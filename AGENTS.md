@@ -1091,4 +1091,35 @@ Before creating, modifying, or locally reimplementing a feature:
    provenance review, and parity evidence where applicable.
 <!-- END CENTRAL FEATURE SYSTEM -->
 
+---
+
+## LEAN WORKFLOW & PROCESS CONTROL
+
+### 1. Risk Tiering & Workflow Gates
+Not every task requires the full multi-agent process. Classify changes into the appropriate risk tier:
+* **Tier 1 (Small Diagnostic / Local fixes)**: 
+  * Main session $\rightarrow$ run deterministic tests $\rightarrow$ 1-day/local smoke.
+  * No planning subagent or final auditor is required unless changes affect core causal/timing logic.
+* **Tier 2 (Normal Research Study)**:
+  * Planning agent $\rightarrow$ main implementation session $\rightarrow$ staged runner $\rightarrow$ independent completion auditor.
+* **Tier 3 (Model Freeze / Production Deployment)**:
+  * Full agent ceremony: `repo-scout` $\rightarrow$ `contract-checker` $\rightarrow$ main implementation $\rightarrow$ staged runner $\rightarrow$ independent completion auditor.
+
+### 2. Output Token Budgets
+Enforce hard word-count limits on subagent outputs to minimize token consumption:
+* **`repo-scout`**: Max 700 words. Output paths, symbols, and line ranges only. No narrative repo background.
+* **`contract-checker`**: Max 1,000 words. Output compliance tables and findings only. No repeated SPEC summaries.
+* **`results-triager`**: Max 500 words. Output failed tests, root cause tracebacks, and exact commands.
+* **`lookahead-auditor`**: Max 1,500 words. Focus strictly on findings sorted by severity. No implementation recap.
+
+### 3. Contextual Diff-First Auditing
+* Auditors must use the contextual diff (`git diff -U20`) as their primary review surface.
+* Open and read full files only when required to establish state flow, causality, base class dependencies, or import behavior.
+* Do not reopen unchanged files merely to repeat discovery. Reopen an unchanged file only when its full context is necessary to resolve a current causal, structural, or audit question.
+
+### 4. Deterministic Process Control
+* Do not use LLMs or agents for process monitoring or status reporting.
+* Use the deterministic wrapper `scripts/run_bounded_study.py` to enforce time limits, log capture, CPU/memory limits, stale log detection (stale progress timeout), and output status JSON cards.
+* The main session reviews only the final compact JSON status card rather than raw output logs.
+
 
