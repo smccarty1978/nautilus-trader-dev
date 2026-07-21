@@ -1,0 +1,74 @@
+{
+  "study": "freeze_reduced_flip_model_artifacts",
+  "decision": "MODEL_FREEZE_COMPLETE_WITH_PROVISIONAL_SHORT",
+  "decision_rationale": "Every joblib artifact passed parity (source of truth intact) and the registry is complete, so the freeze itself succeeded. The label reflects the PROVISIONAL short-side model, which is the materially limiting caveat for downstream use: its source manifest carries status 'candidate' and the NT parity smoke consuming it has published no STUDY_REPORT. MODEL_FREEZE_PARTIAL_ONNX_FAILED also technically applies (2 of 5 ONNX exports failed) but is subordinate - the brief defines ONNX as a secondary artifact that must not block, and joblib remains the source of truth.",
+  "secondary_qualifier": "MODEL_FREEZE_PARTIAL_ONNX_FAILED (2/5 ONNX exports failed; both are GBT, both non-blocking)",
+  "n_models_frozen": 5,
+  "n_final": 4,
+  "n_provisional": 1,
+  "source_of_truth_format": "joblib (sklearn estimator/Pipeline)",
+  "all_joblib_parity_pass": true,
+  "total_parity_checks": 21,
+  "parity_checks_passed": 21,
+  "onnx_pass": [
+    "short_bearish_flip_top25_current_reference",
+    "long_bullish_flip_top25",
+    "long_bullish_flip_top50"
+  ],
+  "onnx_fail": [
+    "short_bearish_flip_top100_ref",
+    "long_bullish_flip_top100"
+  ],
+  "models": [
+    {
+      "model_id": "short_bearish_flip_top25_current_reference",
+      "status": "PROVISIONAL",
+      "model_type": "gbt",
+      "2025_auc": 0.67099,
+      "2026_auc": 0.67247,
+      "joblib_parity_status": "PASS",
+      "onnx_status": "PASS",
+      "threshold_status": "PARTIAL_FROM_SOURCE"
+    },
+    {
+      "model_id": "short_bearish_flip_top100_ref",
+      "status": "FINAL",
+      "model_type": "gbt",
+      "2025_auc": 0.66411,
+      "2026_auc": 0.66879,
+      "joblib_parity_status": "PASS",
+      "onnx_status": "FAIL",
+      "threshold_status": "NOT_SELECTED"
+    },
+    {
+      "model_id": "long_bullish_flip_top25",
+      "status": "FINAL",
+      "model_type": "logreg",
+      "2025_auc": 0.6729,
+      "2026_auc": 0.64619,
+      "joblib_parity_status": "PASS",
+      "onnx_status": "PASS",
+      "threshold_status": "NOT_SELECTED"
+    },
+    {
+      "model_id": "long_bullish_flip_top50",
+      "status": "FINAL",
+      "model_type": "logreg",
+      "2025_auc": 0.67062,
+      "2026_auc": 0.6396,
+      "joblib_parity_status": "PASS",
+      "onnx_status": "PASS",
+      "threshold_status": "NOT_SELECTED"
+    },
+    {
+      "model_id": "long_bullish_flip_top100",
+      "status": "FINAL",
+      "model_type": "gbt",
+      "2025_auc": 0.66816,
+      "2026_auc": 0.6512,
+      "joblib_parity_status": "PASS",
+      "onnx_status": "FAIL",
+      "threshold_status": "NOT_SELECTED"
+    }
+  ]
+}

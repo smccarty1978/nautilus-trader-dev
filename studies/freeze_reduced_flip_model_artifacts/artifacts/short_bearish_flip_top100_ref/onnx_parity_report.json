@@ -1,0 +1,18 @@
+{
+  "onnx_status": "FAIL",
+  "opset": 17,
+  "skl2onnx_version": "1.19.1",
+  "onnx_version": "1.20.0",
+  "onnxruntime_version": "1.23.2",
+  "input_dtype": "float32",
+  "input_shape": "[None, 103]",
+  "onnx_sha256": "91051ee5361765175a35aa51af790a085e9a9414d5420270003523c9ca05516c",
+  "n_rows_compared": 198255,
+  "max_abs_diff": 0.001052599695163428,
+  "mean_abs_diff": 3.3147956296518825e-08,
+  "p99_abs_diff": 8.710960990060412e-08,
+  "n_rows_over_tolerance": 1,
+  "tolerance": 1e-06,
+  "status": "FAIL",
+  "note": "model.onnx deleted - failed parity, not a usable export"
+}

@@ -1,0 +1,24 @@
+{
+  "study": "freeze_reduced_flip_model_artifacts",
+  "created_at": "2026-07-21T12:02:54.570518+00:00",
+  "git_commit": "30a46a49e7adbd80e132c9cdc09416077bb556ad",
+  "python_version": "3.13.7",
+  "sklearn_version": "1.7.2",
+  "numpy_version": "2.3.3",
+  "pandas_version": "2.3.3",
+  "joblib_version": "1.5.2",
+  "n_models_frozen": 5,
+  "source_of_truth_format": "joblib (sklearn estimator/Pipeline)",
+  "onnx_role": "secondary export only; never source of truth",
+  "notes": [
+    "short_bearish_flip_top25_current_reference: frozen copy sha256 equals source sha256 efec43fe7bf7\u2026 (byte-identical copy)",
+    "Short-side TOP50: NO such model exists. The short reduction ladder is 25/40/60/80/100/150/250 (studies/runtime_constrained_f3_feature_reduction/artifacts/models/). The brief's 'TOP50/TOP100 references' requirement is satisfied by TOP100. Recorded, not silently skipped."
+  ],
+  "tolerances": {
+    "logreg_joblib": 1e-12,
+    "gbt_joblib": 1e-09,
+    "onnx_preferred": 1e-06,
+    "onnx_acceptable": 1e-05
+  },
+  "runtime_s": 40.6
+}

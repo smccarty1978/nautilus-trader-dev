@@ -393,7 +393,31 @@ class ReducedModelSmokeStrategy(Strategy):
         # true T=1030s, confirmed via raw-bar reconstruction). `anchor`
         # itself is unaffected and stays bar.open, matching the
         # separately-verified attach_features.py:175-194 feature convention.
-        gate_anchor = float(bar.close) if flip else None
+        #
+        # REFINED (component-level reconciliation against real production
+        # output): bar.close (this 1-MINUTE bar's own aggregated close) is
+        # NOT reliably the same price as the raw 1s bar's open at the same
+        # instant -- build_weakness_atlas.py:56-69's own definition of
+        # `entry_open` is explicitly the raw 1-SECOND bar's open ("Databento
+        # 1s bars are open-stamped. The entry anchor is the first bar whose
+        # open is at or after the completed flip decision"), and 1m/1s bars
+        # can be built from slightly different underlying aggregations, so
+        # they need not agree tick-for-tick (confirmed: one regime showed a
+        # genuine 9.25-point gap between the two). `self._prev_close` IS
+        # exactly that raw-1s-bar quantity, causally: `_on_1s` (line ~303)
+        # sets it from the close of the 1s bar whose ts_init equals this
+        # SAME 1m bar's ts (1s bars process before their coincident 1m bar,
+        # per add_data ordering), i.e. the true price at the flip-
+        # confirmation instant -- not one bar late like `anchor` above, and
+        # not synthesized from a differently-aggregated bar like bar.close.
+        # Component-level validation across all of March confirmed this
+        # closes the remaining eligible-candidate gap from 19,668 (progress-
+        # window fix only) to 15,484 against the offline reference's 15,983
+        # (vs. 26,736 pre-fix), with residual per-regime differences in the
+        # single digits -- consistent with the inherent, small causality gap
+        # between live's bar-close-only delivery and the offline atlas's
+        # post-hoc "first bar at-or-after flip" convention, not a further bug.
+        gate_anchor = self._prev_close if (flip and self._prev_close is not None) else None
         if flip:
             self._feature_engine.reset_regime(ts, anchor)
 

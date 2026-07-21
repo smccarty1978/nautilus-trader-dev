@@ -89,6 +89,31 @@ def test_on_candidate_uses_frozen_atr_not_live_engine_atr():
     assert "on_regime_flip(" in code_text[reads[0] - 80: reads[0] + 20]
 
 
+def test_on_regime_flip_uses_prev_close_gate_anchor_not_bar_open_or_close():
+    """Regression guard for a real bug found during reconciliation:
+    CandidateTracker.on_regime_flip's flip_close/anchor argument must be
+    `gate_anchor` (self._prev_close, the causally-available raw 1s-bar
+    close at the flip instant, matching build_weakness_atlas.py:56-69's
+    `entry_open` definition), never `anchor` (the confirming 1-MINUTE bar's
+    OWN open, 60s stale -- legitimate only for feature_engine.reset_regime)
+    nor a fresh `bar.close`/`bar.open` read (a differently-aggregated bar,
+    confirmed off by up to 9+ points from the true raw-1s-bar anchor on at
+    least one real regime). Using the wrong anchor inflates/deflates the
+    established-gate's MFE/MAE excursion and was the dominant remaining
+    cause of the live candidate population diverging from the offline
+    reference after the progress-window and frozen-ATR fixes."""
+    text = (IMPL / "strategy.py").read_text(encoding="utf-8")
+    code_lines = [ln for ln in text.splitlines() if not ln.strip().startswith("#")]
+    code_text = "\n".join(code_lines)
+    m = re.search(r"on_regime_flip\(([^)]*)\)", code_text)
+    assert m, "on_regime_flip call not found"
+    args = [a.strip() for a in m.group(1).split(",")]
+    assert args[2] == "gate_anchor", (
+        f"on_regime_flip's 3rd arg (flip_close/anchor) must be gate_anchor, got {args[2]!r}")
+    assert re.search(r"gate_anchor\s*=\s*self\._prev_close\b", code_text), (
+        "gate_anchor must be assigned from self._prev_close")
+
+
 def test_add_data_call_order_is_1s_before_1m():
     """Coincident 1s/1m timestamp ordering is determined by data-registration
     call order, not an automatic NT bar-type priority (established by
