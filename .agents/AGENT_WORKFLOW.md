@@ -1,0 +1,33 @@
+# Antigravity Agent Workflow
+
+This workspace supports delegating tasks to specialized subagents to optimize context usage and control API costs. 
+
+When running in **Antigravity**, these subagents run natively using Google Gemini models, which offer massive context windows and high execution speeds.
+
+---
+
+## Agent Roster and Gemini Model Mapping
+
+| Subagent Name | Claude Model (Original) | Gemini Equivalent Model | Antigravity Model Flag | Purpose |
+|---|---|---|---|---|
+| `repo-scout` | Haiku | Gemini Flash / Flash Lite | `flash` / `flash_lite` | Locate code and trace execution paths |
+| `contract-checker` | Sonnet | Gemini Pro / Flash | `pro` / `flash` | Verify specifications and invariant compliance |
+| `results-triager` | Haiku | Gemini Flash / Flash Lite | `flash` / `flash_lite` | Run test commands and triage results |
+| `lookahead-auditor` | Sonnet | Gemini Pro | `pro` | Deep causal audit for look-ahead bias |
+
+---
+
+## Invoking Subagents in Antigravity
+
+Antigravity handles subagent registration and calling natively via its model orchestration loop.
+
+### How to Invoke
+Simply request the flagship model to run the task on a subagent. For example:
+> *"Invoke lookahead-auditor on strategies/short_rth_entry_surface_backfill/"*
+
+The flagship model will use the `invoke_subagent` tool with the corresponding prompt template and target model flag.
+
+### Coordination Rules
+* **Parallel Checks**: Multiple read-only subagents (`repo-scout`, `contract-checker`) can run in parallel safely.
+* **Context Preservation**: Subagents return condensed Markdown summaries rather than raw code dumps to keep the main conversation context clean.
+* **Audit Enforcement**: The `lookahead-auditor` must be run on any modified strategy or data-loading script before declaring a study complete.
