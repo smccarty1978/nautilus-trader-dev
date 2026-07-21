@@ -10,10 +10,11 @@ When running in **Antigravity**, these subagents run natively using Google Gemin
 
 | Subagent Name | Claude Model (Original) | Gemini Equivalent Model | Antigravity Model Flag | Purpose |
 |---|---|---|---|---|
-| `repo-scout` | Haiku | Gemini Flash / Flash Lite | `flash` / `flash_lite` | Locate code and trace execution paths |
-| `contract-checker` | Sonnet | Gemini Pro / Flash | `pro` / `flash` | Verify specifications and invariant compliance |
-| `results-triager` | Haiku | Gemini Flash / Flash Lite | `flash` / `flash_lite` | Run test commands and triage results |
+| `repo-scout` | Haiku | Gemini 3.6 Flash / Flash Lite | `flash` / `flash_lite` | Locate code and trace execution paths |
+| `contract-checker` | Sonnet | Gemini Pro / 3.6 Flash | `pro` / `flash` | Verify specifications and invariant compliance |
+| `results-triager` | Haiku | Gemini 3.6 Flash / Flash Lite | `flash` / `flash_lite` | Run test commands and triage results |
 | `lookahead-auditor` | Sonnet | Gemini Pro | `pro` | Deep causal audit for look-ahead bias |
+
 
 ---
 
