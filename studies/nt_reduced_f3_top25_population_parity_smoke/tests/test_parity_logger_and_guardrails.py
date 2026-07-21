@@ -71,22 +71,34 @@ def test_run_nt_load_end_hardcoded_to_2025():
     assert "2026" not in text
 
 
-def test_on_candidate_uses_frozen_atr_not_live_engine_atr():
-    """Regression guard for a real bug found during reconciliation:
-    strategy.py's _on_candidate must source atr from the candidate dict's
-    frozen atr_val (CandidateTracker's own flip-time value), not by
-    re-reading self._engine.atr (which keeps updating live across
-    checkpoints within the same regime). The only permitted read of
-    self._engine.atr in the whole file is the flip-time freeze itself, in
-    _on_1m's on_regime_flip(...) call."""
+def test_on_candidate_uses_live_engine_atr_not_frozen_atr_val():
+    """Regression guard, SUPERSEDES an earlier (wrong) version of this test.
+    Component-level validation (replaying RegimeEngine from raw 1m bars,
+    sampling .atr at each checkpoint's own observation_time) reproduced the
+    offline reference's per-row atr_at_entry EXACTLY (0.0 diff) -- proving
+    that column is actually a live, per-checkpoint quantity (documented in
+    attach_features.py as "== atr_at_checkpoint", sourced from
+    CODEX_5_X_build_repaired_atlas.py's `out["atr_at_checkpoint"] =
+    out["atr"]`), NOT the frozen established-gate atr_at_entry that
+    entry_surface.py hard-asserts constant per regime (that frozen value is
+    a DIFFERENT quantity, used only internally by CandidateTracker's own
+    MFE/MAE tracking). strategy.py's _on_candidate must therefore read
+    self._engine.atr LIVE for the feature vector / stop sizing / logged
+    atr_at_entry field, not the frozen c["atr_val"]. Exactly two reads of
+    self._engine.atr are expected in the whole file: the flip-time freeze
+    passed to on_regime_flip (CandidateTracker's own internal use), and this
+    live per-checkpoint read in _on_candidate."""
     text = (IMPL / "strategy.py").read_text(encoding="utf-8")
     code_lines = [ln for ln in text.splitlines() if not ln.strip().startswith("#")]
     code_text = "\n".join(code_lines)
     reads = [m.start() for m in re.finditer(r"self\._engine\.atr\b", code_text)]
-    assert len(reads) == 1, (
-        f"expected exactly one self._engine.atr read (the flip-time freeze "
-        f"passed to on_regime_flip), found {len(reads)}")
+    assert len(reads) == 2, (
+        f"expected exactly two self._engine.atr reads (flip-time freeze for "
+        f"on_regime_flip, and the live per-checkpoint read in _on_candidate "
+        f"assigned to `atr`), found {len(reads)}")
     assert "on_regime_flip(" in code_text[reads[0] - 80: reads[0] + 20]
+    assert re.search(r"atr\s*=\s*self\._engine\.atr\b", code_text[reads[1] - 20: reads[1] + 20]), (
+        "second self._engine.atr read must be assigned directly to `atr` in _on_candidate")
 
 
 def test_on_regime_flip_uses_prev_close_gate_anchor_not_bar_open_or_close():
@@ -124,3 +136,39 @@ def test_add_data_call_order_is_1s_before_1m():
     idx_1s = text.index("engine.add_data(bars_1s)")
     idx_1m = text.index("engine.add_data(bars_1m)")
     assert idx_1s < idx_1m, "bars_1s must be added to the engine BEFORE bars_1m"
+
+
+def test_on_1s_uses_ts_event_not_ts_init():
+    """Regression guard for the OHLCVDeltaTracker first-divergence audit's
+    root-cause fix. NT's `ts_init` for a 1-SECOND bar is `ts_event + 1s`
+    (confirmed directly against the live catalog), whereas the offline
+    reference pipeline (attach_features.py / ohlcv_delta.py / the whole
+    candidate-grid timeline) is built entirely from raw 1s parquet's own
+    index, which numerically equals `ts_event` -- matching CLAUDE.md
+    invariant 3's "1s bars need no adjustment". Using `bar.ts_init` in
+    _on_1s fed a value systematically 1s later than offline's convention
+    into `_minute_bucket_key`, corrupting minute-bucket attribution and the
+    entire 5s candidate grid. Reproduced bit-exactly via a targeted
+    pure-Python replay: substituting ts_event+1s for ts_event reproduced the
+    real NT run's own buggy price_change_points_60s/est_delta_sum_1800s/
+    est_bear_vol_sum_300s values to full float precision on the first known-
+    mismatching checkpoint, while ts_event alone reproduces the offline
+    reference exactly (see diagnostics/run_targeted_replay.py
+    --simulate-ts-init-1s). `_on_1m` is UNCHANGED and must keep `bar.ts_init`
+    -- 1-MINUTE bars DO require the ts_init/close shift per the same
+    invariant, independently verified elsewhere this session (regime/ATR
+    component validation)."""
+    text = (IMPL / "strategy.py").read_text(encoding="utf-8")
+    code_lines = [ln for ln in text.splitlines() if not ln.strip().startswith("#")]
+    code_text = "\n".join(code_lines)
+
+    on_1s_start = code_text.index("def _on_1s(")
+    on_1m_start = code_text.index("def _on_1m(")
+    on_1s_body = code_text[on_1s_start:on_1m_start]
+    on_1m_body = code_text[on_1m_start:on_1m_start + 400]
+
+    assert re.search(r"ts\s*=\s*int\(bar\.ts_event\)", on_1s_body), (
+        "_on_1s must read `ts = int(bar.ts_event)`, not bar.ts_init, for 1-second bars")
+    assert "bar.ts_init" not in on_1s_body, "_on_1s must not read bar.ts_init anywhere"
+    assert re.search(r"ts\s*=\s*int\(bar\.ts_init\)", on_1m_body), (
+        "_on_1m must keep reading `ts = int(bar.ts_init)` -- 1-minute bars require the close-time shift")

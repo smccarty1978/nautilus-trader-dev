@@ -1,0 +1,77 @@
+{
+  "tag": "layerA",
+  "phase1_population": {
+    "offline_eligible": 15234,
+    "live_eligible": 15576,
+    "abs_difference": 342,
+    "pct_difference": 2.245,
+    "exact_key_matches": 15131,
+    "pct_of_offline_matched": 99.3239,
+    "offline_only_rows": 103,
+    "live_only_rows": 445,
+    "offline_regimes": 146,
+    "live_regimes": 148,
+    "offline_only_regimes": [],
+    "live_only_regimes": [
+      1741982460000000000,
+      1743192060000000000
+    ],
+    "shared_regimes": 146,
+    "regimes_with_exact_row_counts": 73,
+    "regimes_with_exact_checkpoint_index_sets": 71,
+    "displacement_buckets": {
+      ">30s": 267,
+      "no counterpart": 124,
+      "+/-2-5s": 112,
+      "+/-6-30s": 45
+    }
+  },
+  "phase2_features": {
+    "n_matched_rows": 15131,
+    "features_passing": 4,
+    "features_failing": 21,
+    "worst_feature": {
+      "feature": "rth_vol_cum",
+      "max_abs_diff": 6721.0
+    },
+    "tolerance": 1e-09
+  },
+  "phase3_score": {
+    "probability_live_joblib_vs_offline": {
+      "n": 15131,
+      "max_abs_diff": 0.20728499430525976,
+      "mean_abs_diff": 0.01593508242742702,
+      "p99_abs_diff": 0.11473236045132484,
+      "n_above_tolerance": 15131,
+      "tolerance": 1e-10,
+      "status": "FAIL"
+    },
+    "probability_live_explicit_vs_offline": {
+      "n": 15131,
+      "max_abs_diff": 0.20728499430525996,
+      "mean_abs_diff": 0.01593508242742703,
+      "p99_abs_diff": 0.11473236045132484,
+      "n_above_tolerance": 15131,
+      "tolerance": 1e-10,
+      "status": "FAIL"
+    },
+    "probability_explicit_vs_joblib": {
+      "n": 15131,
+      "max_abs_diff": 4.440892098500626e-16,
+      "mean_abs_diff": 4.18590102911613e-17,
+      "p99_abs_diff": 1.6653345369377348e-16,
+      "n_above_tolerance": 0,
+      "tolerance": 1e-10,
+      "status": "PASS"
+    },
+    "logit_live_vs_offline_implied": {
+      "n": 15131,
+      "max_abs_diff": 4.8959954987310015,
+      "mean_abs_diff": 0.17375176483701382,
+      "p99_abs_diff": 2.0466882895844907,
+      "n_above_tolerance": 15131,
+      "tolerance": 1e-10,
+      "status": "FAIL"
+    }
+  }
+}

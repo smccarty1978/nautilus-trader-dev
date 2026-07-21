@@ -1,0 +1,40 @@
+{
+  "study": "nt_long_top25_march2025_runtime_parity",
+  "phase": "0_offline_reference",
+  "git_commit": "51beb01e0860784d9dc22fbc323e50f2646900cb",
+  "model_id": "long_bullish_flip_top25",
+  "model_artifact_sha256": "ccad9a9b4441a5891ea61bd263ceaedfead42dcd2d5fb2149cdbf2da9e1cc789",
+  "feature_order_sha256": "d601abe692c78c0471088b41cae1fe80bbb918bbe7e7af067ddb45e7b0ce45bf",
+  "coefficients_sha256": "5d128d4f1e59ecceb4e8aa8f8166a6e2cd5979546809fa46078c7b3ff3d71778",
+  "intercept_sha256": "d5046c8ecb969a1586a984bb00643ab0f9ea478243561a83c6cdc903cb2eac39",
+  "prepared_source": "studies/long_rth_mirrored_surface_top100_training/_work/prepared_long_2025.parquet",
+  "prepared_sha256": "ba5fd07ef758cefeb55089c9edea1e6ad0add50bfbb41615dd17e70304f67df8",
+  "score_reference_sha256": "f1a408dc006af173445bd26670d17523d8972f084d49e337793810b1c637905b",
+  "session_timezone": "America/Chicago",
+  "march_window_chicago": [
+    "2025-03-01 00:00:00-06:00",
+    "2025-04-01 00:00:00-05:00"
+  ],
+  "march_window_utc": [
+    "2025-03-01 06:00:00+00:00",
+    "2025-04-01 05:00:00+00:00"
+  ],
+  "rth_rule_chicago": "08:30:00-15:15:00",
+  "n_candidate_rows": 15234,
+  "n_regimes": 146,
+  "rows_per_regime_min": 1,
+  "rows_per_regime_max": 321,
+  "rows_per_regime_median": 88.5,
+  "positive_rate": 0.23815150321648942,
+  "score_min": 0.0006008155684393682,
+  "score_max": 0.7253125046903034,
+  "score_mean": 0.23823882946826214,
+  "n_features": 25,
+  "feature_null_counts": {
+    "rth_elapsed_seconds": 12,
+    "opening_range_30m_low_developing_signed_distance_points": 12,
+    "rth_vol_cum": 12
+  },
+  "target": "bullish_regime_flip_within_300s",
+  "threshold_status": "NOT_SELECTED"
+}

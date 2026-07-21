@@ -1,0 +1,80 @@
+{
+  "n_bars": 117360,
+  "n_1m_bars": 2880,
+  "n_candidates_established": 5988,
+  "per_bar_checked": 117360,
+  "per_bar_divergence_count": 0,
+  "per_bar_first_divergence": null,
+  "candidate_classification_counts": {
+    "no_offline_reference": 25285,
+    "all_agree": 4499,
+    "timestamp_or_offline_contract_mismatch": 156
+  },
+  "first_candidate_level_divergence": {
+    "regime_start_ns": 1743429120000000000,
+    "checkpoint_index": 119,
+    "observation_time_ns": 1743429720000000000,
+    "fill_ts_ns": 1743429720000000000,
+    "obs_ts_matches_last_bar": true,
+    "report": {
+      "price_change_points_60s": {
+        "live": 11.75,
+        "shadow": 11.75,
+        "offline": 11.75,
+        "diff_live_shadow": 0.0,
+        "diff_shadow_offline": 0.0,
+        "diff_live_offline": 0.0,
+        "classification": "all_agree"
+      },
+      "rth_vol_cum": {
+        "live": 102524.0,
+        "shadow": 102524.0,
+        "offline": 99664.0,
+        "diff_live_shadow": 0.0,
+        "diff_shadow_offline": 2860.0,
+        "diff_live_offline": 2860.0,
+        "classification": "timestamp_or_offline_contract_mismatch"
+      },
+      "rth_abs_delta_cum": {
+        "live": 61005.969804076754,
+        "shadow": 61005.969804076674,
+        "offline": 59013.36678781862,
+        "diff_live_shadow": 8.003553375601768e-11,
+        "diff_shadow_offline": 1992.6030162580573,
+        "diff_live_offline": 1992.6030162581374,
+        "classification": "timestamp_or_offline_contract_mismatch"
+      },
+      "est_delta_sum_1800s": {
+        "live": -799.6979246516412,
+        "shadow": -799.6979246516412,
+        "offline": -799.6979246516412,
+        "diff_live_shadow": 0.0,
+        "diff_shadow_offline": 0.0,
+        "diff_live_offline": 0.0,
+        "classification": "all_agree"
+      },
+      "est_bear_vol_sum_300s": {
+        "live": 6189.780938917791,
+        "shadow": 6189.780938917791,
+        "offline": 6189.780938917791,
+        "diff_live_shadow": 0.0,
+        "diff_shadow_offline": 0.0,
+        "diff_live_offline": 0.0,
+        "classification": "all_agree"
+      }
+    },
+    "feature": "rth_vol_cum",
+    "detail": {
+      "live": 102524.0,
+      "shadow": 102524.0,
+      "offline": 99664.0,
+      "diff_live_shadow": 0.0,
+      "diff_shadow_offline": 2860.0,
+      "diff_live_offline": 2860.0,
+      "classification": "timestamp_or_offline_contract_mismatch"
+    }
+  },
+  "duplicate_update_ts_count": 0,
+  "out_of_order_update_count": 0,
+  "n_flips": 202
+}

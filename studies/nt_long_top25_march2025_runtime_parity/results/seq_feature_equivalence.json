@@ -1,0 +1,130 @@
+{
+  "targets": [
+    "seq_8r_mean_retracement",
+    "seq_12r_mean_retracement",
+    "seq_5r_max_overlap"
+  ],
+  "raw_source": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2025.parquet",
+  "warmup_start": "2025-02-20 00:00:00+00:00",
+  "compare_window": [
+    "2025-03-03 00:00:00+00:00",
+    "2025-03-11 00:00:00+00:00"
+  ],
+  "n_raw_1s_bars": 684027,
+  "n_completed_regimes": 1348,
+  "n_reference_rows": 4141,
+  "missing_feature_keys_from_tracker": 0,
+  "tolerance": 1e-09,
+  "verdict": "PASS",
+  "rows": [
+    {
+      "feature": "seq_8r_mean_retracement",
+      "comparison": "live_vs_frozen",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    },
+    {
+      "feature": "seq_8r_mean_retracement",
+      "comparison": "offline_vs_frozen",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    },
+    {
+      "feature": "seq_8r_mean_retracement",
+      "comparison": "live_vs_offline",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    },
+    {
+      "feature": "seq_12r_mean_retracement",
+      "comparison": "live_vs_frozen",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    },
+    {
+      "feature": "seq_12r_mean_retracement",
+      "comparison": "offline_vs_frozen",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    },
+    {
+      "feature": "seq_12r_mean_retracement",
+      "comparison": "live_vs_offline",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    },
+    {
+      "feature": "seq_5r_max_overlap",
+      "comparison": "live_vs_frozen",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    },
+    {
+      "feature": "seq_5r_max_overlap",
+      "comparison": "offline_vs_frozen",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    },
+    {
+      "feature": "seq_5r_max_overlap",
+      "comparison": "live_vs_offline",
+      "n_compared": 4141,
+      "n_a_nan": 0,
+      "n_b_nan": 0,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "p99_abs_diff": 0.0,
+      "n_over_1e_9": 0,
+      "status": "PASS"
+    }
+  ],
+  "runtime_s": 229.2
+}

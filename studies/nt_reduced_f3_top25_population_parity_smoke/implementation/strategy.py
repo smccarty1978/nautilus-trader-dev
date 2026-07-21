@@ -282,7 +282,31 @@ class ReducedModelSmokeStrategy(Strategy):
 
     # ------------------------------------------------------------- 1s bars
     def _on_1s(self, bar: Bar):
-        ts = int(bar.ts_init)
+        # ROOT CAUSE (OHLCVDeltaTracker first-divergence audit, confirmed via
+        # a shadow-calculator targeted replay): NT's `ts_init` for a 1-SECOND
+        # bar equals `ts_event + 1s` (confirmed directly against the live
+        # catalog: a bar with ts_event=19:33:59 has ts_init=19:34:00). The
+        # offline reference (attach_features.py, ohlcv_delta.py,
+        # build_weakness_atlas.py/entry_surface.py's whole checkpoint grid)
+        # is built entirely from raw 1s parquet's own index, which IS
+        # ts_event (open-stamped) -- matching CLAUDE.md invariant 3's "1s
+        # bars need no adjustment" (unlike 1m bars, which DO require the
+        # ts_init/close shift -- _on_1m below correctly keeps `bar.ts_init`).
+        # Using `bar.ts_init` here fed a value systematically 1s later than
+        # offline's convention into `_minute_bucket_key`, silently shifting
+        # every 1s bar's minute-bucket attribution and the entire 5s
+        # candidate grid relative to offline. Reproduced bit-exactly: a
+        # pure-Python replay of this exact code with ts_event+1s substituted
+        # for ts_event reproduced the real NT run's own buggy values on the
+        # first known-mismatching checkpoint (regime_start_ns=
+        # 1743449640000000000, checkpoint_index=203) to the FULL float
+        # precision digit -- price_change_points_60s=57.5,
+        # est_delta_sum_1800s=194.511418, est_bear_vol_sum_300s=5917.879383,
+        # all identical to march_bounded_r5_fix4's logged output -- while the
+        # ts_event-based replay reproduces the offline reference exactly
+        # (16.75 / 126.844751 / 5945.490494). See
+        # diagnostics/run_targeted_replay.py --simulate-ts-init-1s.
+        ts = int(bar.ts_event)
         o, h, l, c, v = float(bar.open), float(bar.high), float(bar.low), float(bar.close), float(bar.volume)
         self._bars_processed_1s += 1
         self._maybe_report_and_checkpoint(ts)
@@ -505,17 +529,45 @@ class ReducedModelSmokeStrategy(Strategy):
         # formula, per the reconciliation-gate fix's exact specification.
         final_candidate_eligible = bool(established_regime_gate and decision_rth and valid_fill)
 
-        # Frozen at this regime's flip time (CandidateTracker's own atr_val,
-        # never reassigned) -- NOT self._engine.atr, which keeps updating
-        # live. Feeding a live-drifting ATR into the feature vector / stop
-        # sizing here was a real bug found during reconciliation: it broke
-        # feature/score/trade parity against the offline reference, which
-        # freezes atr_at_entry per regime (entry_surface.py enforces this
-        # with a hard nunique()==1 assertion upstream).
-        atr = c["atr_val"]
+        # CORRECTED (Phase 1 feature-parity reconciliation): this is
+        # self._engine.atr read LIVE at this checkpoint, NOT the frozen
+        # c["atr_val"]. An earlier version of this fix froze it, reasoning
+        # (wrongly) that entry_surface.py's frozen, hard-asserted
+        # `atr_at_entry` (used ONLY for the established-gate's own internal
+        # MFE/MAE excursion tracking inside CandidateTracker -- unaffected
+        # by this variable either way) also governed the model's feature
+        # vector and stop sizing. It does not: the offline reference's
+        # per-row `atr_at_entry` column (actually sourced from
+        # ohlcv_volume_delta_price_level_features/attach_features.py, which
+        # documents it as "== atr_at_checkpoint", a DIFFERENT, deliberately
+        # non-frozen quantity -- see CODEX_5_X_build_repaired_atlas.py:266
+        # `out["atr_at_checkpoint"] = out["atr"]`) VARIES checkpoint to
+        # checkpoint within a single regime. Component-level validation
+        # (replaying RegimeEngine from raw 1m bars and sampling .atr at each
+        # checkpoint's own observation_time, "last completed 1m bar strictly
+        # before checkpoint") reproduced the offline reference's per-row
+        # atr_at_entry EXACTLY (0.0 diff on every row checked) -- confirming
+        # self._engine.atr, read live here, is correct for the feature
+        # vector, stop sizing, AND the logged atr_at_entry field.
+        # self._engine.atr only updates in _on_1m, and (per add_data's 1s-
+        # before-1m ordering) any 1m bar coincident with this checkpoint's
+        # own timestamp has NOT been processed yet when this fires -- so
+        # this naturally reads "last completed 1m bar strictly before now,"
+        # matching the offline convention without extra bookkeeping.
+        atr = self._engine.atr
         price_now = self._prev_close
         fill_px = price_now  # fill occurs at fill_ts_ns == the bar this checkpoint evaluated on
-        vec, null_mask, any_null = self._feature_engine.ordered_vector(obs_ts, price_now, atr)
+        # Phase-1 feature-parity fix: PriceLevelTracker.calculate()'s
+        # observation_ts argument must be fill_ts_ns (the ACTUAL bar this
+        # checkpoint was evaluated against), not obs_ts (the theoretical
+        # 5s-grid T). attach_features.py:260 passes `bar_ts` (its own
+        # snapped/actual bar) to price_tracker.calculate(), never the
+        # nominal observation_time -- confirmed by direct comparison. T and
+        # fill_ts_ns coincide in the common (no-gap) case but diverge on
+        # ~2.9% of real checkpoints (a quiet-second gap in the 5s grid),
+        # where using T instead of fill_ts_ns evaluates price-level features
+        # up to several seconds too early.
+        vec, null_mask, any_null = self._feature_engine.ordered_vector(fill_ts_ns, price_now, atr)
         score = None if any_null else self._model_runtime.score(vec)
         r5 = None if score is None else self._threshold_policy.r5_trigger(score)
         r2_5 = None if score is None else self._threshold_policy.r2_5_trigger(score)
