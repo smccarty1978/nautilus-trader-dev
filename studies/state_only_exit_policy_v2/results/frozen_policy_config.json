@@ -1,0 +1,60 @@
+{
+  "P3_K_seconds": 30,
+  "P4_Kweak_seconds": 45,
+  "P4_Kterm_seconds": 0,
+  "P5_eth_Kweak_seconds": 45,
+  "P5_eth_Kterm_seconds": 0,
+  "P6_eth_Kweak_seconds": 45,
+  "P6_eth_Kterm_seconds": 0,
+  "P6_rth_Kterm_seconds": 0,
+  "P7_rth_weak_seconds": null,
+  "P7_rth_term_seconds": null,
+  "P7_eth_weak_seconds": null,
+  "P7_eth_term_seconds": null,
+  "P8_adopt_direction_split": true,
+  "P8_diagnostics": {
+    "RTH_long": {
+      "weak": null,
+      "term": null,
+      "val_ev": 25.22151898734177
+    },
+    "RTH_short": {
+      "weak": null,
+      "term": null,
+      "val_ev": 46.15468409586057
+    },
+    "ETH_long": {
+      "weak": null,
+      "term": null,
+      "val_ev": 5.185325264750378
+    },
+    "ETH_short": {
+      "weak": 30,
+      "term": null,
+      "val_ev": -4.059925093632959
+    }
+  },
+  "P9_config": {
+    "RTH_long": {
+      "weak": null,
+      "term": null,
+      "source": "direction_specific"
+    },
+    "RTH_short": {
+      "weak": null,
+      "term": null,
+      "source": "direction_specific"
+    },
+    "ETH_long": {
+      "weak": null,
+      "term": null,
+      "source": "direction_specific"
+    },
+    "ETH_short": {
+      "weak": 30,
+      "term": null,
+      "source": "direction_specific"
+    }
+  },
+  "P9_min_segment_episodes": 50
+}

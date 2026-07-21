@@ -1,0 +1,31 @@
+{
+  "reproduction_ok": true,
+  "model_artifact_path": "studies\\nt_live_scoring_infra_prereqs\\_work\\F3_volume_delta_plus_price_levels__gbt_reconstructed.joblib",
+  "model_artifact_sha256": "dd16ab38518cc00377058a0ff4068b59477eb1261fc541f25976767a08da670b",
+  "reconstruction_script_sha256": "eaa5fdb2b08116e7dd2a9df675b887d9032367e9ca89b6e1fbd4f01b6d1ee35a",
+  "feature_sets_json_sha256": "cac318083674aa036400ca754c12f1b8d0c5668891039d1900f7689093682123",
+  "train_parquet_sha256": "f98e4c45a219b792acbcbc375a15b0e8faa79e480aefd2ea26e1af49b3219263",
+  "dev_parquet_sha256": "75c9c5265d92a384428f65f31956aa21263aa8c5c19a45c856ca45931cff2a53",
+  "sklearn_version": "1.7.2",
+  "numpy_version": "2.3.3",
+  "hyperparameters": {
+    "max_depth": 3,
+    "learning_rate": 0.05,
+    "max_iter": 200,
+    "random_state": 42
+  },
+  "feature_set": "F3_volume_delta_plus_price_levels",
+  "n_features": 695,
+  "target": "bearish_regime_flip_within_300s",
+  "score_method": "predict_proba(...)[:, 1]",
+  "positive_class_index": 1,
+  "model_classes_": [
+    "0",
+    "1"
+  ],
+  "max_abs_diff_vs_stored_reference": 0.0,
+  "mean_abs_diff_vs_stored_reference": 0.0,
+  "n_rows_compared": 198255,
+  "tolerance": 1e-09,
+  "runtime_s": 79.2
+}

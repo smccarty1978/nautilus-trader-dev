@@ -1,0 +1,345 @@
+{
+  "trade_rows": 407261,
+  "completed": 407257,
+  "contracts": [
+    "CLOSE_DETECTED_NEXT_NT_FILL_SENSITIVITY",
+    "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT"
+  ],
+  "years": [
+    2025,
+    2026
+  ],
+  "policies": [
+    "P0",
+    "P1",
+    "P2",
+    "P3",
+    "P4A",
+    "P4B"
+  ],
+  "stops": [
+    0.5,
+    1.0,
+    1.5
+  ],
+  "exit_reasons": {
+    "opposite_regime_flip_exit": 134733,
+    "stop_before_flip": 123944,
+    "d10_exit": 102454,
+    "stop_after_flip": 46126,
+    "data_end_censored": 4
+  },
+  "negative_fill_delays": 0,
+  "overlap_failures": 0,
+  "reset_failures": 0,
+  "gross_component_max_abs_error": 0.0,
+  "net_cost_max_abs_error": 0.0,
+  "censored_with_price": 0,
+  "completed_without_time_or_price": 0,
+  "same_bar_ties": 1815,
+  "primary_lifts": [
+    {
+      "year": 2025,
+      "policy": "P1",
+      "stop_atr_mult": 0.5,
+      "lift": -8.13418101515785
+    },
+    {
+      "year": 2025,
+      "policy": "P1",
+      "stop_atr_mult": 1.0,
+      "lift": -7.12727658334023
+    },
+    {
+      "year": 2025,
+      "policy": "P1",
+      "stop_atr_mult": 1.5,
+      "lift": -3.7614712489720947
+    },
+    {
+      "year": 2025,
+      "policy": "P3",
+      "stop_atr_mult": 0.5,
+      "lift": -6.742046528104904
+    },
+    {
+      "year": 2025,
+      "policy": "P3",
+      "stop_atr_mult": 1.0,
+      "lift": -5.887573626270973
+    },
+    {
+      "year": 2025,
+      "policy": "P3",
+      "stop_atr_mult": 1.5,
+      "lift": -6.296783463957956
+    },
+    {
+      "year": 2026,
+      "policy": "P1",
+      "stop_atr_mult": 0.5,
+      "lift": 16.085598666566742
+    },
+    {
+      "year": 2026,
+      "policy": "P1",
+      "stop_atr_mult": 1.0,
+      "lift": 16.796161410658264
+    },
+    {
+      "year": 2026,
+      "policy": "P1",
+      "stop_atr_mult": 1.5,
+      "lift": 19.239794878247693
+    },
+    {
+      "year": 2026,
+      "policy": "P3",
+      "stop_atr_mult": 0.5,
+      "lift": 20.802794355328288
+    },
+    {
+      "year": 2026,
+      "policy": "P3",
+      "stop_atr_mult": 1.0,
+      "lift": 18.437289424155356
+    },
+    {
+      "year": 2026,
+      "policy": "P3",
+      "stop_atr_mult": 1.5,
+      "lift": 21.318445309549013
+    }
+  ],
+  "manifest": [
+    {
+      "file": "d10_entry_events.parquet",
+      "exists": true,
+      "size": 4608769
+    },
+    {
+      "file": "regime_d10_coverage.parquet",
+      "exists": true,
+      "size": 2900187
+    },
+    {
+      "file": "regime_d10_coverage_summary.parquet",
+      "exists": true,
+      "size": 5522
+    },
+    {
+      "file": "forward_reversal_diagnostics.parquet",
+      "exists": true,
+      "size": 2523797
+    },
+    {
+      "file": "preflip_vs_wait_for_flip.parquet",
+      "exists": true,
+      "size": 7008838
+    },
+    {
+      "file": "policy_results.parquet",
+      "exists": true,
+      "size": 20482
+    },
+    {
+      "file": "trade_results.parquet",
+      "exists": true,
+      "size": 38240708
+    },
+    {
+      "file": "monthly_results.parquet",
+      "exists": true,
+      "size": 17367
+    },
+    {
+      "file": "segment_results.parquet",
+      "exists": true,
+      "size": 30746
+    },
+    {
+      "file": "stop_sensitivity.parquet",
+      "exists": true,
+      "size": 20562
+    },
+    {
+      "file": "pnl_decomposition.parquet",
+      "exists": true,
+      "size": 11438951
+    },
+    {
+      "file": "d10_exit_contribution.parquet",
+      "exists": true,
+      "size": 7075460
+    },
+    {
+      "file": "d10_exit_reason_summary.parquet",
+      "exists": true,
+      "size": 14322
+    },
+    {
+      "file": "matched_placebo_summary.parquet",
+      "exists": true,
+      "size": 11962
+    },
+    {
+      "file": "runner_capture.parquet",
+      "exists": true,
+      "size": 7075460
+    },
+    {
+      "file": "tail_dependence.parquet",
+      "exists": true,
+      "size": 9228
+    },
+    {
+      "file": "final_report.md",
+      "exists": true,
+      "size": 19292
+    }
+  ],
+  "schema_audit": [
+    {
+      "file": "policy_results.parquet",
+      "required_columns": "['ev_per_trade' 'execution_contract' 'policy' 'stop_atr_mult' 'year']",
+      "pass": true
+    },
+    {
+      "file": "segment_results.parquet",
+      "required_columns": "['direction' 'exit_reason' 'session' 'stop_atr_mult' 'year']",
+      "pass": true
+    },
+    {
+      "file": "pnl_decomposition.parquet",
+      "required_columns": "['front_run_advantage_usd' 'post_flip_pnl' 'pre_flip_mae_atr'\n 'pre_flip_pnl']",
+      "pass": true
+    },
+    {
+      "file": "d10_exit_contribution.parquet",
+      "required_columns": "['classification' 'incremental_pnl_from_d10' 'natural_exit_net_pnl']",
+      "pass": true
+    }
+  ],
+  "gap_summary": [
+    {
+      "execution_contract": "CLOSE_DETECTED_NEXT_NT_FILL_SENSITIVITY",
+      "year": 2025,
+      "entry_fill_gap_class": "exact_boundary",
+      "count": 104037,
+      "min_ns": 0,
+      "median_ns": 0.0,
+      "max_ns": 0,
+      "gap_count": 0
+    },
+    {
+      "execution_contract": "CLOSE_DETECTED_NEXT_NT_FILL_SENSITIVITY",
+      "year": 2025,
+      "entry_fill_gap_class": "extended_market_data_gap_gt_60s",
+      "count": 250,
+      "min_ns": 61000000000,
+      "median_ns": 3429000000000.0,
+      "max_ns": 262029000000000,
+      "gap_count": 250
+    },
+    {
+      "execution_contract": "CLOSE_DETECTED_NEXT_NT_FILL_SENSITIVITY",
+      "year": 2025,
+      "entry_fill_gap_class": "short_market_data_gap_le_60s",
+      "count": 41433,
+      "min_ns": 1000000000,
+      "median_ns": 2000000000.0,
+      "max_ns": 60000000000,
+      "gap_count": 41433
+    },
+    {
+      "execution_contract": "CLOSE_DETECTED_NEXT_NT_FILL_SENSITIVITY",
+      "year": 2026,
+      "entry_fill_gap_class": "exact_boundary",
+      "count": 43764,
+      "min_ns": 0,
+      "median_ns": 0.0,
+      "max_ns": 0,
+      "gap_count": 0
+    },
+    {
+      "execution_contract": "CLOSE_DETECTED_NEXT_NT_FILL_SENSITIVITY",
+      "year": 2026,
+      "entry_fill_gap_class": "extended_market_data_gap_gt_60s",
+      "count": 75,
+      "min_ns": 64000000000,
+      "median_ns": 3369000000000.0,
+      "max_ns": 176400000000000,
+      "gap_count": 75
+    },
+    {
+      "execution_contract": "CLOSE_DETECTED_NEXT_NT_FILL_SENSITIVITY",
+      "year": 2026,
+      "entry_fill_gap_class": "short_market_data_gap_le_60s",
+      "count": 13985,
+      "min_ns": 1000000000,
+      "median_ns": 2000000000.0,
+      "max_ns": 59000000000,
+      "gap_count": 13985
+    },
+    {
+      "execution_contract": "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT",
+      "year": 2025,
+      "entry_fill_gap_class": "exact_boundary",
+      "count": 103926,
+      "min_ns": 0,
+      "median_ns": 0.0,
+      "max_ns": 0,
+      "gap_count": 0
+    },
+    {
+      "execution_contract": "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT",
+      "year": 2025,
+      "entry_fill_gap_class": "extended_market_data_gap_gt_60s",
+      "count": 250,
+      "min_ns": 61000000000,
+      "median_ns": 3429000000000.0,
+      "max_ns": 262029000000000,
+      "gap_count": 250
+    },
+    {
+      "execution_contract": "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT",
+      "year": 2025,
+      "entry_fill_gap_class": "short_market_data_gap_le_60s",
+      "count": 41672,
+      "min_ns": 1000000000,
+      "median_ns": 2000000000.0,
+      "max_ns": 60000000000,
+      "gap_count": 41672
+    },
+    {
+      "execution_contract": "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT",
+      "year": 2026,
+      "entry_fill_gap_class": "exact_boundary",
+      "count": 43722,
+      "min_ns": 0,
+      "median_ns": 0.0,
+      "max_ns": 0,
+      "gap_count": 0
+    },
+    {
+      "execution_contract": "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT",
+      "year": 2026,
+      "entry_fill_gap_class": "extended_market_data_gap_gt_60s",
+      "count": 75,
+      "min_ns": 64000000000,
+      "median_ns": 3369000000000.0,
+      "max_ns": 176400000000000,
+      "gap_count": 75
+    },
+    {
+      "execution_contract": "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT",
+      "year": 2026,
+      "entry_fill_gap_class": "short_market_data_gap_le_60s",
+      "count": 14072,
+      "min_ns": 1000000000,
+      "median_ns": 2000000000.0,
+      "max_ns": 59000000000,
+      "gap_count": 14072
+    }
+  ]
+}

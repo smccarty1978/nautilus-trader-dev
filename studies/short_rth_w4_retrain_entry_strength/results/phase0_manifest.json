@@ -1,0 +1,98 @@
+{
+  "decision": "PHASE0_PASS",
+  "join_2021_2024": {
+    "2021": {
+      "rows": 212241,
+      "join_rows": 212241,
+      "join_rate_any_feature_present": 1.0,
+      "fully_missing_features": 0,
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_w4_retrain_entry_strength\\_work\\labeled_featured_2021.parquet"
+    },
+    "2022": {
+      "rows": 192378,
+      "join_rows": 192378,
+      "join_rate_any_feature_present": 1.0,
+      "fully_missing_features": 0,
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_w4_retrain_entry_strength\\_work\\labeled_featured_2022.parquet"
+    },
+    "2023": {
+      "rows": 204742,
+      "join_rows": 204742,
+      "join_rate_any_feature_present": 1.0,
+      "fully_missing_features": 0,
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_w4_retrain_entry_strength\\_work\\labeled_featured_2023.parquet"
+    },
+    "2024": {
+      "rows": 204611,
+      "join_rows": 204611,
+      "join_rate_any_feature_present": 1.0,
+      "fully_missing_features": 0,
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_w4_retrain_entry_strength\\_work\\labeled_featured_2024.parquet"
+    },
+    "combined_rows": 813972,
+    "combined_output": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_w4_retrain_entry_strength\\_work\\train_2021_2024_featured.parquet"
+  },
+  "labels_features_2025_2026": {
+    "2025": {
+      "surface_rows": 198255,
+      "rows_labeled": 198255,
+      "rows_censored": 0,
+      "label_errors": 0,
+      "join_rate_any_feature_present": 1.0,
+      "runtime_s": 34.0,
+      "data_quality_checks": {
+        "negative_hold_time": 0,
+        "exit_before_entry": 0,
+        "alignment_after_exit": 0,
+        "stop_px_wrong_side_for_short": 0,
+        "post_stop_px_wrong_side_for_short": 0,
+        "all_clean": true
+      },
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_w4_retrain_entry_strength\\_work\\labeled_featured_2025.parquet"
+    },
+    "2026": {
+      "surface_rows": 63021,
+      "rows_labeled": 63021,
+      "rows_censored": 0,
+      "label_errors": 0,
+      "join_rate_any_feature_present": 1.0,
+      "runtime_s": 11.0,
+      "data_quality_checks": {
+        "negative_hold_time": 0,
+        "exit_before_entry": 0,
+        "alignment_after_exit": 0,
+        "stop_px_wrong_side_for_short": 0,
+        "post_stop_px_wrong_side_for_short": 0,
+        "all_clean": true
+      },
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_w4_retrain_entry_strength\\_work\\labeled_featured_2026.parquet"
+    }
+  },
+  "control_reconciliation": {
+    "2025": {
+      "crossing_candidates": 650,
+      "expected_control": 650,
+      "gate_result": {
+        "year": 2025,
+        "candidate_trades": 650,
+        "mismatches": 0
+      },
+      "gate_error": null,
+      "missing_from_featured_surface": 0
+    },
+    "2026": {
+      "crossing_candidates": 222,
+      "expected_control": 222,
+      "gate_result": {
+        "year": 2026,
+        "candidate_trades": 222,
+        "mismatches": 0
+      },
+      "gate_error": null,
+      "missing_from_featured_surface": 0
+    }
+  },
+  "feature_columns": 149,
+  "runtime_s": 144.3,
+  "generator_sha256": "674f562a7c318f11ae8d6581bcf02a0e300659228678b1a2052a928175c7827b"
+}

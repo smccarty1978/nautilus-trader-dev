@@ -1,0 +1,216 @@
+{
+  "decision": "SHORT_RTH_BASELINE_STILL_BEST",
+  "selected_model": "gbt",
+  "selected_retention_band": 0.35,
+  "selection_criterion": "highest 2025 Layer-2 per-trade PnL (tie-break: profit factor)",
+  "dev_2025_economics": {
+    "model": "gbt",
+    "split": "2025",
+    "retention_band": 0.35,
+    "layer": "layer2_one_per_regime",
+    "trades": 969,
+    "net_pnl": 4606.09050775478,
+    "per_trade": 4.753447376423921,
+    "gross_profit": 164620.0,
+    "gross_loss": -160013.90949224524,
+    "profit_factor": 1.028785563219915,
+    "win_rate": 0.3942208462332301,
+    "avg_winner": 430.9424083769633,
+    "avg_loser": -275.8860508486987,
+    "max_closed_trade_dd": 21969.61424270376,
+    "pre_alignment_stop_rate": 0.2982456140350877,
+    "timeout_rate": 0.4385964912280701,
+    "post_alignment_stop_rate": 0.0082559339525283,
+    "opposing_flip_rate": 0.2549019607843137,
+    "opposing_flip_pnl": 104895.0
+  },
+  "test_2026_economics": {
+    "model": "gbt",
+    "split": "2026",
+    "retention_band": 0.35,
+    "layer": "layer2_one_per_regime",
+    "trades": 339,
+    "net_pnl": -10970.238290563866,
+    "per_trade": -32.36058492791701,
+    "gross_profit": 51745.0,
+    "gross_loss": -62715.238290563866,
+    "profit_factor": 0.8250785839362035,
+    "win_rate": 0.3746312684365782,
+    "avg_winner": 407.4409448818898,
+    "avg_loser": -297.22861749082404,
+    "max_closed_trade_dd": 12016.095446652544,
+    "pre_alignment_stop_rate": 0.336283185840708,
+    "timeout_rate": 0.4188790560471976,
+    "post_alignment_stop_rate": 0.0147492625368731,
+    "opposing_flip_rate": 0.2300884955752212,
+    "opposing_flip_pnl": 29365.0
+  },
+  "selection_gate": {
+    "dev_2025_improves_over_baseline_a": false,
+    "dev_2025_per_trade": 4.753447376423921,
+    "baseline_a_2025_per_trade": 23.64,
+    "test_2026_positive": false,
+    "test_2026_per_trade": -32.36058492791701,
+    "baseline_a_2026_per_trade": 31.00900900900901,
+    "test_2026_not_materially_worse_than_baseline": false
+  },
+  "failure_attribution": {
+    "2025": {
+      "full_100pct_trades": 1678,
+      "selected_trades": 969,
+      "regimes_removed": 709,
+      "pre_alignment_stops_avoided_by_removal": 187,
+      "net_pnl_saved_from_avoided_stops": 61508.395355416214,
+      "winners_removed_count": 365,
+      "net_pnl_lost_from_removed_winners": 153115.0,
+      "opposing_flip_winners_removed_count": 163,
+      "net_pnl_lost_from_removed_opposing_flip_winners": 107010.0,
+      "losers_removed_count": 344,
+      "net_pnl_saved_from_removed_losers": 81028.29874962299,
+      "timeout_rate_full": 0.4791418355184744,
+      "timeout_rate_selected": 0.43859649122807015,
+      "post_align_stop_rate_full": 0.004767580452920143,
+      "post_align_stop_rate_selected": 0.008255933952528379,
+      "monthly_pnl_full": {
+        "2025-01": 5663.692428908107,
+        "2025-02": 6962.405933423506,
+        "2025-03": 412.36269757813716,
+        "2025-04": -17265.92830086578,
+        "2025-05": 7358.132472262441,
+        "2025-06": -1793.9499526881991,
+        "2025-07": -622.7309740363853,
+        "2025-08": -9891.688585541197,
+        "2025-09": 1766.9352695862472,
+        "2025-10": 1387.1627423026075,
+        "2025-11": 6245.442275767346,
+        "2025-12": -10835.151203669811
+      },
+      "monthly_pnl_selected": {
+        "2025-01": 5570.776888274268,
+        "2025-02": 3735.2844159622327,
+        "2025-03": 5920.780375116665,
+        "2025-04": -15795.547266227222,
+        "2025-05": 5764.678841884233,
+        "2025-06": -3439.719578518343,
+        "2025-07": 2422.3811805409787,
+        "2025-08": -3967.1424564269546,
+        "2025-09": -3927.4566915381,
+        "2025-10": 1745.5717779929546,
+        "2025-11": 10091.382006935673,
+        "2025-12": -3514.8989862416056
+      },
+      "monthly_concentration_selected_top1_share": 0.23970557003039217
+    },
+    "2026": {
+      "full_100pct_trades": 532,
+      "selected_trades": 339,
+      "regimes_removed": 193,
+      "pre_alignment_stops_avoided_by_removal": 57,
+      "net_pnl_saved_from_avoided_stops": 20178.759283706822,
+      "winners_removed_count": 107,
+      "net_pnl_lost_from_removed_winners": 46040.0,
+      "opposing_flip_winners_removed_count": 33,
+      "net_pnl_lost_from_removed_opposing_flip_winners": 25180.0,
+      "losers_removed_count": 86,
+      "net_pnl_saved_from_removed_losers": 24498.759283706822,
+      "timeout_rate_full": 0.5,
+      "timeout_rate_selected": 0.41887905604719766,
+      "post_align_stop_rate_full": 0.0037593984962406013,
+      "post_align_stop_rate_selected": 0.014749262536873156,
+      "monthly_pnl_full": {
+        "2026-01": -5295.882574444258,
+        "2026-02": -1031.472383201908,
+        "2026-03": 7423.763529734788,
+        "2026-04": -11895.454971452491
+      },
+      "monthly_pnl_selected": {
+        "2026-01": -8438.542914904974,
+        "2026-02": 3280.1425970300625,
+        "2026-03": -300.59628035007336,
+        "2026-04": -5511.241692338881
+      },
+      "monthly_concentration_selected_top1_share": 0.4813628596035032
+    }
+  },
+  "layer3_fixed807_overlay_for_selected": [
+    {
+      "model": "gbt",
+      "split": 2025,
+      "retention_band": 0.35,
+      "fixed807_regimes": 604,
+      "kept": 473,
+      "dropped": 131,
+      "added_beyond_fixed807": 496,
+      "moved_entry_within_kept": 443,
+      "kept_trades": 473,
+      "kept_net_pnl": -39724.11284457128,
+      "kept_per_trade": -83.9833252527934,
+      "kept_profit_factor": 0.5990262584980032,
+      "kept_win_rate": 0.2790697674418604
+    },
+    {
+      "model": "gbt",
+      "split": 2026,
+      "retention_band": 0.35,
+      "fixed807_regimes": 203,
+      "kept": 159,
+      "dropped": 44,
+      "added_beyond_fixed807": 180,
+      "moved_entry_within_kept": 152,
+      "kept_trades": 159,
+      "kept_net_pnl": -23454.28147393206,
+      "kept_per_trade": -147.51120423856642,
+      "kept_profit_factor": 0.38081503763283,
+      "kept_win_rate": 0.2515723270440251
+    }
+  ],
+  "baselines": {
+    "A_current_w4_candidate_basis": {
+      "2025": {
+        "trades": 650,
+        "net_pnl": 15366.0,
+        "per_trade": 23.64
+      },
+      "2026": {
+        "trades": 222,
+        "net_pnl": 6884.0,
+        "per_trade": 31.00900900900901
+      },
+      "combined": {
+        "trades": 872,
+        "net_pnl": 22250.0,
+        "per_trade": 25.52,
+        "profit_factor": 1.129,
+        "max_dd": 18686.0
+      }
+    },
+    "B_fixed_807_pocket": {
+      "2025": {
+        "trades": 604,
+        "net_pnl": 20304.0,
+        "per_trade": 33.615894039735096
+      },
+      "2026": {
+        "trades": 203,
+        "net_pnl": 6709.0,
+        "per_trade": 33.04926108374384
+      },
+      "combined": {
+        "trades": 807,
+        "net_pnl": 27013.0,
+        "per_trade": 33.47,
+        "profit_factor": 1.174,
+        "max_dd": 14331.0
+      }
+    },
+    "C_nt_phase1_benchmark": {
+      "combined": {
+        "trades": 807,
+        "net_pnl": 23270.0,
+        "per_trade": 28.84,
+        "profit_factor": 1.149,
+        "max_dd": 15000.0
+      }
+    }
+  }
+}

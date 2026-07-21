@@ -1,0 +1,46 @@
+{
+  "study": "fable5_pre_flip_d10_reversal_entry",
+  "generated_utc": "2026-07-13T10:30:53.776722+00:00",
+  "frozen_threshold": {
+    "frozen_at_utc": "2026-07-12T03:33:38.121901+00:00",
+    "definition": "absolute validation-frozen score threshold",
+    "threshold": 0.6183278577387376,
+    "percentile": 90.0,
+    "val_period": "2025-01-01..2025-02-28",
+    "train_period": "2021-01-01..2024-12-31",
+    "train_rows": 2652620,
+    "val_rows": 635177,
+    "train_base_rate": 0.30516093522630455,
+    "val_base_rate": 0.2757672270878826,
+    "auc_train": 0.8251538078095202,
+    "auc_val": 0.816061741724919,
+    "n_features": 154,
+    "model": "HistGradientBoostingClassifier(max_iter=100, max_depth=5, learning_rate=0.05, random_state=42)",
+    "nan_gate": "aligned_price_minus_center_5m",
+    "atlas_sha256": "d548d1248f930bdaf4794cd98ade74e19d32468a6e64cf19c4cc27077008b08c",
+    "manifest_sha256": "62b5a1d337f78c526e97f9d9a637d26443c9d9833e681527c039609f97c0147e"
+  },
+  "atlas_sha256": "d548d1248f930bdaf4794cd98ade74e19d32468a6e64cf19c4cc27077008b08c",
+  "causal_scores_sha256": "ef83a3b1e72b23078ca164c45084f7440ece222595ef4d9c8ebf330f7e19cb66",
+  "events_sha256": "94098cae678d25e61f53a31a0f8c5e58f0e07ed89afed67120fa7fe515833fa4",
+  "placebo_seed": 42,
+  "cost_model": "$10.0/RT ($5 commission + 1 tick slippage)",
+  "stop_grid": [
+    0.5,
+    1.0,
+    1.5
+  ],
+  "econ_windows": {
+    "2025": [
+      "2025-03-01 00:00:00+00:00",
+      "2025-12-31 00:00:00+00:00"
+    ],
+    "2026": [
+      "2026-01-01 00:00:00+00:00",
+      "2026-04-30 00:00:00+00:00"
+    ]
+  },
+  "fill_convention": "NT bar-execution: market FOK fills at decision boundary vs just-completed 1s close; stop fills at trigger, gap-through repriced to open in analysis (primary)",
+  "verdict": "CLOSE",
+  "best_policy": "NONE"
+}

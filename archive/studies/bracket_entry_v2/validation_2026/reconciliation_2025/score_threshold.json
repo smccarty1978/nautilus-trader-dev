@@ -1,0 +1,16 @@
+{
+  "threshold_top10": 0.4681355191023806,
+  "derived_from": "val_2024_quantile_0.90",
+  "best_iter": 16,
+  "splits": {
+    "train": "2020-2023",
+    "val": "2024"
+  },
+  "parity": {
+    "ref_predictions": "studies/bracket_entry_v2/feature_reduction/predictions_2025_top_15.parquet",
+    "max_abs_score_diff": 0.0,
+    "mean_abs_score_diff": 0.0,
+    "n_exact_matches": 70118,
+    "n_total": 70118
+  }
+}

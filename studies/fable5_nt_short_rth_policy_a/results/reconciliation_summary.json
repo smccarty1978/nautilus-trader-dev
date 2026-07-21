@@ -1,0 +1,176 @@
+{
+  "2025": {
+    "nt": {
+      "trades": 604,
+      "total_net_pnl": 18315.0,
+      "mean_net_pnl": 30.322847682119207,
+      "gross_profit": 130490.0,
+      "gross_loss": -112175.0,
+      "profit_factor": 1.1632716737240918,
+      "win_rate": 0.32450331125827814,
+      "avg_winner": 665.765306122449,
+      "avg_loser": -276.9753086419753,
+      "max_closed_trade_dd": 15000.0,
+      "median_hold_s": 301.0,
+      "mean_hold_s": 572.0960264900663,
+      "median_time_to_align_s": 77.5,
+      "preflip_stop_rate": 0.32781456953642385,
+      "timeout_rate": 0.17880794701986755,
+      "postflip_stop_rate": 0.048013245033112585,
+      "opposing_flip_rate": 0.445364238410596,
+      "exit_reason_counts": {
+        "opposite_flip": 269,
+        "stop_before_flip": 198,
+        "confirmation_timeout": 108,
+        "stop_after_flip": 29
+      },
+      "exit_reason_pnl": {
+        "confirmation_timeout": -605.0,
+        "opposite_flip": 99120.0,
+        "stop_after_flip": -11320.0,
+        "stop_before_flip": -68880.0
+      }
+    },
+    "benchmark": {
+      "trades": 604,
+      "net_pnl": 20304.0,
+      "per_trade": 33.62,
+      "max_dd": 14331.0
+    },
+    "offline_short_rth_trades": 604
+  },
+  "2026": {
+    "nt": {
+      "trades": 203,
+      "total_net_pnl": 4955.0,
+      "mean_net_pnl": 24.408866995073893,
+      "gross_profit": 49395.0,
+      "gross_loss": -44440.0,
+      "profit_factor": 1.1114986498649866,
+      "win_rate": 0.32019704433497537,
+      "avg_winner": 759.9230769230769,
+      "avg_loser": -322.0289855072464,
+      "max_closed_trade_dd": 11730.0,
+      "median_hold_s": 301.0,
+      "mean_hold_s": 546.768472906404,
+      "median_time_to_align_s": 75.0,
+      "preflip_stop_rate": 0.31527093596059114,
+      "timeout_rate": 0.15270935960591134,
+      "postflip_stop_rate": 0.04433497536945813,
+      "opposing_flip_rate": 0.4876847290640394,
+      "exit_reason_counts": {
+        "opposite_flip": 99,
+        "stop_before_flip": 64,
+        "confirmation_timeout": 31,
+        "stop_after_flip": 9
+      },
+      "exit_reason_pnl": {
+        "confirmation_timeout": 635.0,
+        "opposite_flip": 36035.0,
+        "stop_after_flip": -4190.0,
+        "stop_before_flip": -27525.0
+      }
+    },
+    "benchmark": {
+      "trades": 203,
+      "net_pnl": 6709.0,
+      "per_trade": 33.05,
+      "max_dd": 11144.0
+    },
+    "offline_short_rth_trades": 203
+  },
+  "combined": {
+    "nt": {
+      "trades": 807,
+      "total_net_pnl": 23270.0,
+      "mean_net_pnl": 28.835192069392814,
+      "gross_profit": 179885.0,
+      "gross_loss": -156615.0,
+      "profit_factor": 1.1485809149826007,
+      "win_rate": 0.32342007434944237,
+      "avg_winner": 689.2145593869732,
+      "avg_loser": -288.42541436464086,
+      "max_closed_trade_dd": 15000.0,
+      "median_hold_s": 301.0,
+      "mean_hold_s": 565.7249070631971,
+      "median_time_to_align_s": 75.0,
+      "preflip_stop_rate": 0.3246592317224288,
+      "timeout_rate": 0.17224287484510534,
+      "postflip_stop_rate": 0.04708798017348203,
+      "opposing_flip_rate": 0.4560099132589839,
+      "exit_reason_counts": {
+        "opposite_flip": 368,
+        "stop_before_flip": 262,
+        "confirmation_timeout": 139,
+        "stop_after_flip": 38
+      },
+      "exit_reason_pnl": {
+        "confirmation_timeout": 30.0,
+        "opposite_flip": 135155.0,
+        "stop_after_flip": -15510.0,
+        "stop_before_flip": -96405.0
+      }
+    },
+    "benchmark": {
+      "trades": 807,
+      "net_pnl": 27013.0,
+      "per_trade": 33.47,
+      "pf": 1.174,
+      "max_dd": 14331.0
+    }
+  },
+  "parity": {
+    "2025": {
+      "year": 2025,
+      "offline_flips": 27166,
+      "nt_flips": 27166,
+      "matched": 27166,
+      "only_offline": 0,
+      "only_nt": 0,
+      "mismatch_in_roll_window": 0,
+      "blocking_mismatches": 0,
+      "blocking_examples": []
+    },
+    "2026": {
+      "year": 2026,
+      "offline_flips": 8935,
+      "nt_flips": 8935,
+      "matched": 8935,
+      "only_offline": 0,
+      "only_nt": 0,
+      "mismatch_in_roll_window": 0,
+      "blocking_mismatches": 0,
+      "blocking_examples": []
+    },
+    "blocking_total": 0
+  },
+  "ties": {
+    "2025": {
+      "trades": 604,
+      "post_stop_race_flags": 0,
+      "post_stop_race_pnl": 0.0,
+      "pre_stop_race_flags": 0,
+      "pre_stop_race_pnl": 0.0,
+      "pre_align_race_flags": 0,
+      "pre_align_race_pnl": 0.0,
+      "max_mae_atr_opposite_flip": 1.4668125781297265,
+      "max_mae_atr_timeout": 1.235148091396049
+    },
+    "2026": {
+      "trades": 203,
+      "post_stop_race_flags": 0,
+      "post_stop_race_pnl": 0.0,
+      "pre_stop_race_flags": 0,
+      "pre_stop_race_pnl": 0.0,
+      "pre_align_race_flags": 0,
+      "pre_align_race_pnl": 0.0,
+      "max_mae_atr_opposite_flip": 1.4447078359989265,
+      "max_mae_atr_timeout": 1.1840081665588433
+    }
+  },
+  "mismatch_buckets": {
+    "entry_fill_mismatch": 638,
+    "exit_fill_mismatch": 142,
+    "match": 27
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "features": {
+    "seq_Kr_alternation_rate": "percentage of last K regimes that alternated direction",
+    "seq_Kr_efficiency": "net sequence displacement / sum(abs(regime_moves))",
+    "seq_Kr_mean_overlap": "average overlap between adjacent prior regime price ranges",
+    "seq_Kr_mean_retracement": "average retracement fraction of opposing regime pairs",
+    "seq_Kr_center_migration_slope_atr": "OLS slope through completed regime center prices / atr",
+    "seq_Kr_position_pct": "current price position inside the K-regime envelope (0=low, 1=high)"
+  },
+  "K_values": [
+    3,
+    5,
+    8,
+    12
+  ]
+}

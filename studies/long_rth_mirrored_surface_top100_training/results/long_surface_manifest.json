@@ -1,0 +1,106 @@
+{
+  "study": "long_rth_mirrored_surface_top100_training",
+  "population": "NQ RTH prevailing-bearish (direction==-1) established regime checkpoints, 5s cadence",
+  "entry_direction": "+1 (long counter-regime)",
+  "target": "bullish_regime_flip_within_300s",
+  "causal_convention": "strict: latest_source_ts_used < observation_time",
+  "atlas_sources": {
+    "2021-2024": "short_rth_entry_surface_backfill/_work/atlas_5s_backfill_{y}.parquet",
+    "2025-2026": "CODEX_5_X_weakness_atlas_repair/_work/CODEX_5_X_repaired_years/CODEX_5_X_weakness_atlas_repaired_{y}.parquet"
+  },
+  "established_filter_policy_sha256": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b",
+  "feature_sources": {
+    "44_center_slope_alignment": "atlas (regime-direction-relative)",
+    "29_ohlcv_est_delta": "attach OHLCVDeltaTracker (absolute)",
+    "27_price_level_context": "attach PriceLevelTracker(direction=+1)"
+  },
+  "generators": {
+    "surface": "8de3c13dbb965e8126b6d808351144bcba339faa9374e4f64e59e91f89f04328",
+    "attach": "6892718872cb88259b6d414a8173f79819abac831a49cf51b13f1c5bf253e437",
+    "assemble": "86eccb98a2d76048b44b7e7253f4b0394d39c0b23ab605af733c058fe0761386"
+  },
+  "years": {
+    "2021": {
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\atlas_5s_backfill_2021.parquet",
+      "atlas_sha256": "d156e5e6d157daa88f283aacc60807d23dfb265c4f0f52f52c685d1391743c86",
+      "surface_rows": 164940,
+      "surface_regimes": 1626,
+      "mfe_directionality_checks_passed": 1917234,
+      "prepared_rows": 164940,
+      "positive_rate": 0.29417,
+      "censored": 0,
+      "center_join_rate": 1.0,
+      "max_feature_null_rate": 0.06619,
+      "prepared_sha256": "120da2339d2fe3efd137ea3d6e652034f468c3c8e8d82bf30f6cea34ed70c524"
+    },
+    "2022": {
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\atlas_5s_backfill_2022.parquet",
+      "atlas_sha256": "eaa9010ef2176ada027340ec83ca2e5392954a183b71430f759f597b5a371831",
+      "surface_rows": 189071,
+      "surface_regimes": 1672,
+      "mfe_directionality_checks_passed": 1961711,
+      "prepared_rows": 189071,
+      "positive_rate": 0.25209,
+      "censored": 0,
+      "center_join_rate": 1.0,
+      "max_feature_null_rate": 0.08687,
+      "prepared_sha256": "b17d5e611b4d01de8b2e15b95ae1e37710d7cdd95de1e621352b793f1b02390d"
+    },
+    "2023": {
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\atlas_5s_backfill_2023.parquet",
+      "atlas_sha256": "cc0b55ae76cada5cb7c8ca270bc47036d0b41d6c9845ae045ca31a1c6284523a",
+      "surface_rows": 167721,
+      "surface_regimes": 1583,
+      "mfe_directionality_checks_passed": 1929296,
+      "prepared_rows": 167721,
+      "positive_rate": 0.27166,
+      "censored": 0,
+      "center_join_rate": 1.0,
+      "max_feature_null_rate": 0.08017,
+      "prepared_sha256": "5668135cb3a8ab265521ecb7f2f71b6016e5ccd44b429605a9f914d845f6d1f4"
+    },
+    "2024": {
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\atlas_5s_backfill_2024.parquet",
+      "atlas_sha256": "230855ac68201c95c71d8d935a9d4486eca1d39680f5a828ae0b0d5d972d6cfe",
+      "surface_rows": 161220,
+      "surface_regimes": 1520,
+      "mfe_directionality_checks_passed": 1889306,
+      "prepared_rows": 161220,
+      "positive_rate": 0.26575,
+      "censored": 0,
+      "center_join_rate": 1.0,
+      "max_feature_null_rate": 0.08831,
+      "prepared_sha256": "2a89da1ced7c86a1c79707df2988f34b3787b29962a63c62336c04170e5853e0"
+    },
+    "2025": {
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\CODEX_5_X_weakness_atlas_repair\\_work\\CODEX_5_X_repaired_years\\CODEX_5_X_weakness_atlas_repaired_2025.parquet",
+      "atlas_sha256": "c654da5016f7ec4bf26be11a390992dff851d38e81684a2a19f0bbed90ad9ce7",
+      "surface_rows": 163397,
+      "surface_regimes": 1578,
+      "mfe_directionality_checks_passed": 1919630,
+      "prepared_rows": 163397,
+      "positive_rate": 0.26294,
+      "censored": 0,
+      "center_join_rate": 1.0,
+      "max_feature_null_rate": 0.09823,
+      "prepared_sha256": "ba5fd07ef758cefeb55089c9edea1e6ad0add50bfbb41615dd17e70304f67df8"
+    },
+    "2026": {
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\CODEX_5_X_weakness_atlas_repair\\_work\\CODEX_5_X_repaired_years\\CODEX_5_X_weakness_atlas_repaired_2026.parquet",
+      "atlas_sha256": "76192163897e2075dc72e1742ca38d6d3a24aa5977a21bbc537eb2ebc89e2d44",
+      "surface_rows": 52488,
+      "surface_regimes": 488,
+      "mfe_directionality_checks_passed": 636402,
+      "prepared_rows": 52488,
+      "positive_rate": 0.28037,
+      "censored": 0,
+      "center_join_rate": 1.0,
+      "max_feature_null_rate": 0.07665,
+      "prepared_sha256": "5898b0c0ab349f02cc20117967ad6c5016dbabd74208702bed85f7ce4585e1ac"
+    }
+  },
+  "totals": {
+    "surface_rows": 898837,
+    "directionality_checks_passed": 10253579
+  }
+}

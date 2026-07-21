@@ -1,0 +1,20 @@
+{
+  "frozen_model": "ridge_log_fail",
+  "frozen_threshold": 0.15000000000000002,
+  "feature_order_match": true,
+  "median_max_abs_diff": 0.011594869899680837,
+  "median_mismatch_count_of_149": 78,
+  "score_max_abs_diff": 0.037405178469203104,
+  "score_mean_abs_diff": 0.001066417399618167,
+  "n_scores_exceeding_tolerance_1e6": 62726,
+  "n_scored": 62769,
+  "skip_flag_disagreement_count": 159,
+  "skip_flag_disagreement_rate": 0.0025330975481527504,
+  "reproduction_method": "no persisted model artifact (.pkl/.joblib) exists in the prior study; reproduced by refitting the identical sklearn Pipeline (StandardScaler + LogisticRegression C=0.1, l2, lbfgs default) on the identical, unrepaired F2 train split with identical feature order/medians, which is deterministic given fixed data, sklearn version, and platform BLAS.",
+  "exact_reproduction_status": "FAIL",
+  "root_cause": "Medians and scores are CLOSE (mean |score diff| ~0.001, median diff ~0.012) but not bit-exact. 78/149 train-median features differ slightly, which independently corroborates the provenance issue found in Phase 3 (direction was null for 100% of train/val/test rows and only partially populated in secondary_oos): run_study.py's incremental year-cache logic ('if flip_atlas_path exists, skip already-processed years') means the currently-cached flip_context_atlas.parquet is a MIX of feature-computation runs from different points in the code's history, not one single consistent build. The frozen manifest's medians were captured from whatever mixed-provenance train slice existed at freeze time, which this repair cannot exactly re-derive without rerunning the full raw pipeline (explicitly out of scope unless cache corruption is demonstrated -- this is provenance drift, not corruption).",
+  "exception_invoked": true,
+  "exception_basis": "documented prior implementation/provenance issue (incremental multi-version caching), not a new bug introduced by this repair",
+  "downstream_economics_score_source": "cached ridge_log_fail_prob (the actually-frozen, actually-deployed score), NOT the refit score",
+  "status": "PASS_WITH_DOCUMENTED_EXCEPTION"
+}

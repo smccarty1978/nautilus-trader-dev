@@ -1,0 +1,38 @@
+{
+  "model": "F3_volume_delta_plus_price_levels + HistGradientBoostingClassifier",
+  "model_artifact_persisted": false,
+  "model_artifact_persisted_note": "train_and_evaluate.py computes scores in-memory and writes them to scored_{split}.parquet; the fitted model object itself is never pickled/joblib-dumped. Determinism (random_state=42) is the basis for reproducibility, not a saved-artifact hash. Empirically demonstrated earlier this session: an interrupted 8-combo training run was restarted from scratch and reproduced byte-identical diagnostics for every already-completed combo.",
+  "training_years": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "train_rows": 813972,
+  "feature_set": "F3_volume_delta_plus_price_levels",
+  "n_features": 695,
+  "frozen_cutoffs": {
+    "top20": 0.31926453542933286,
+    "top15": 0.3492171767725061,
+    "top10": 0.38901354493248924,
+    "top5": 0.45049368433122905,
+    "top2.5": 0.5064939282727833
+  },
+  "expected_top5": 0.45049368433122905,
+  "expected_top2p5": 0.5064939282727833,
+  "score_column": "score_F3_volume_delta_plus_price_levels__gbt_raw",
+  "score_column_sha256": "5d5f0b85addbccc73192ae194de1f29e42bb94d9bbc0478d195180ade62e3dea",
+  "file_hashes_sha256": {
+    "pure_flip_train_and_evaluate_script": "f96bd6192e089685f62dedc59a13457e0753c456b5c0b7ab340b19fe9f8db73a",
+    "pure_flip_phase0_script": "fcdbad93ba0b7791f3e69a07676f4afa620ea5b322187c3de49952044dc51e78",
+    "entry_policy_trigger_logic": "ef9c9a79a8c85bb02c7d09566a236a106c7a55e731ffdd50d831f97953cd1fb5",
+    "entry_policy_trigger_grid": "1de35671e4670623a854f4b61e6ae0f5f954336c2f6fc015c1f4ab7dd0faa221",
+    "scored_dev_2025_parquet": "4f5445030edb49369f8f5b58ce8a55c83b1cb52b1056c81deec1169c9b07ddc9",
+    "feature_sets_json": "cac318083674aa036400ca754c12f1b8d0c5668891039d1900f7689093682123",
+    "schedule_trig_B_top2p5": "a14d6c21154a2add601d11b580d89daa2774a05eec121a9d3a44e9c884b5ad60",
+    "schedule_trig_C30_top5": "1a2dd95254146470cf9b681aab30677ebeab5398feee2e20ca5b5dd23e979e15",
+    "schedule_trig_B_top5": "a250087005081c453f76709ef396938ac8aa32ada1425939b8e33e405c19c15d"
+  },
+  "git_commit": null,
+  "git_commit_note": "not available -- no .git directory at repo root"
+}

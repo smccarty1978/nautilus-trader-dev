@@ -1,0 +1,37 @@
+{
+  "policy": "a2_3m",
+  "period_key": "2026",
+  "period": {
+    "catalog": "data/catalog/NQ_v0_2026_fixed",
+    "start": "2026-01-01",
+    "end": "2026-04-29"
+  },
+  "elapsed_s": 105.57416987419128,
+  "diag": {
+    "1s_bars": 4255465,
+    "1m_bars": 115056,
+    "buckets_closed_30s": 229811,
+    "buckets_closed_1m": 115056,
+    "buckets_closed_3m": 38364,
+    "buckets_closed_5m": 23018,
+    "rth_flips": 8935,
+    "bar1_checks": 8935,
+    "confirmations_passed_hhll_mom": 3958,
+    "rejected_5m_misaligned": 0,
+    "rejected_low_flip2conf_efficiency": 0,
+    "hhll_armed": 0,
+    "hhll_exits": 0,
+    "hhll_canceled": 0,
+    "rejected_after_no_entry_cutoff": 0,
+    "force_flat_exits": 0,
+    "entries_filled": 3756,
+    "regime_exits": 3755,
+    "snapshots_emitted": 112217,
+    "rejected_by_policy_filter": 202,
+    "pending_entry_canceled": 0,
+    "micro_pre_rows": 8935,
+    "micro_post_rows": 3756,
+    "trade_tape_rows": 0
+  },
+  "skip_set_size": 812
+}

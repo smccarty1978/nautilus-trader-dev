@@ -1,0 +1,37 @@
+{
+  "status": "FROZEN_BEFORE_NEW_CODE_EXECUTION",
+  "candidate_count": 11812,
+  "opportunity_count": 4767,
+  "baseline_trade_count": 4383,
+  "candidate_count_by_year": {"2025": 8682, "2026": 3130},
+  "opportunity_count_by_year": {"2025": 3530, "2026": 1237},
+  "baseline_trade_count_by_year": {"2025": 3246, "2026": 1137},
+  "input_sha256": {
+    "candidates_2025": "b715d76368c719afb772b92bbff9aed31c4f30e0b3254c5d0fe7f93bc7c1fb4f",
+    "candidates_2026": "60d66d8bd667016559b477c6219aee77df37c91f1e1895fd9b00716717af154f",
+    "multi_candidate_opportunities": "d85ee2ee2cd369fadae66c067c6f5926511f8e5c4916a4cb1cde38076fe5d44f",
+    "multi_candidate_policy_results": "9a26f7e0e8d2ba46cc508211233cb37bb3d4eb258c9abbdb1d47a6209629a55c",
+    "multi_candidate_runner": "c06c3702fd9a75612152fb1cc24eac4ac2cd5479a22ced3f168d4d460cbf8b8c",
+    "multi_candidate_completion_audit": "b6c8cf3287396c025f2f2bd23d9c6fb22adea3505e4f7d42d5bba1bf18df5429",
+    "multi_candidate_manifest": "ea30a0bc601bac1b362af32c9ea12ad2851794ffb79cdaa436a5c99361137077",
+    "common_helper": "302fab7b64178ee7626300048e9d1b66ab04b64c4a429a3fcbcd48175523e1c7",
+    "established_fade_helper": "70d4dbad865fa52ed1d054941562f76f1ba4009edc8f693169c1044e2a5bf633",
+    "regime_reproduction_helper": "33823e22055836aa0c4914474ee01724e3e18c432a723079e9bf7a2c011137da",
+    "repaired_atlas_2025": "c654da5016f7ec4bf26be11a390992dff851d38e81684a2a19f0bbed90ad9ce7",
+    "repaired_atlas_2026": "76192163897e2075dc72e1742ca38d6d3a24aa5977a21bbc537eb2ebc89e2d44",
+    "w4_scores_2025": "f97c4e739cb11b19dbaaa3954175bb4f44b8346b7cc10d791dde22a122edeac9",
+    "w4_scores_2026": "c5c1b42da0d5b0e42be36cb1642a04865d46d8601cf5d7abed0ba9ff360300a8",
+    "raw_2025": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "raw_2026": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89"
+  },
+  "prohibited": [
+    "W4 retraining or rescoring",
+    "threshold or filter changes",
+    "R30",
+    "new response thresholds",
+    "direction-specific or session-specific entry rules",
+    "post-flip retained-profit logic",
+    "MFE continuation",
+    "2026-driven selection"
+  ]
+}

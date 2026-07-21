@@ -1,0 +1,36 @@
+{
+  "status": "COMPLETE",
+  "completion_audit": {
+    "path": "../audit/completion_audit.md",
+    "initial_audit_sha256": "c24210bd240a7905265e4b45553827ca7acc2b5f55a4fcf9309c5a45e7aa67fa",
+    "initial_findings": {
+      "critical": 0,
+      "warning": 1,
+      "note": 1
+    },
+    "resolution": "Manifest provenance finalized and candidate wording clarified; narrow auditor re-verification passed.",
+    "final_audit_sha256": "b6c8cf3287396c025f2f2bd23d9c6fb22adea3505e4f7d42d5bba1bf18df5429",
+    "final_findings": {
+      "critical": 0,
+      "warning": 0,
+      "note": 0
+    }
+  },
+  "policies": [
+    "R0",
+    "R10",
+    "R30"
+  ],
+  "opportunity_count": 4767,
+  "runner_sha256": "c06c3702fd9a75612152fb1cc24eac4ac2cd5479a22ced3f168d4d460cbf8b8c",
+  "config_sha256": "d053a5662fbc8b04395c38597988163f7c30acecf82814fde73119d4b4372bb2",
+  "freeze_sha256": "90a6aee2048a48593247999961990a8bf508c67fd1711b294267779b81a960c8",
+  "output_sha256": {
+    "multi_candidate_generation_audit.parquet": "93e1fb76d867fcd80e6b6690d5e9fbcad5891cb29cd5d8a7dcc886ffa4c4873c",
+    "multi_candidate_policy_results.parquet": "9a26f7e0e8d2ba46cc508211233cb37bb3d4eb258c9abbdb1d47a6209629a55c",
+    "multi_candidate_opportunity_results.parquet": "d85ee2ee2cd369fadae66c067c6f5926511f8e5c4916a4cb1cde38076fe5d44f",
+    "multi_candidate_trade_diffs.parquet": "b8df0f71f02e49b31df56d777aa1911771ab72f3b83cc4de50a6cc5e11d0d5dd",
+    "multi_candidate_reentry_accounting.parquet": "115447db16a7d140234369f04fa376c9b8df05af648f5af58b731d0b411e8271",
+    "final_report.md": "8c1a3b7fbac595d156ab41e57c52e29a9ba999bcafd507fb78c4ddab17a77fc3"
+  }
+}

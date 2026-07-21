@@ -1,0 +1,74 @@
+{
+  "method": "regime-stratified, monthly-preserved, per-regime-capped uniform sampling",
+  "cap_per_regime": 25,
+  "target_per_month": 2500,
+  "seed": 42,
+  "n_total_dev_rows": 198255,
+  "n_sampled_rows": 30000,
+  "n_unique_regimes_in_sample": 1673,
+  "per_month_report": {
+    "1": {
+      "n_regimes": 135,
+      "n_rows_available": 15498,
+      "n_rows_sampled": 2500
+    },
+    "2": {
+      "n_regimes": 124,
+      "n_rows_available": 15774,
+      "n_rows_sampled": 2500
+    },
+    "3": {
+      "n_regimes": 146,
+      "n_rows_available": 15983,
+      "n_rows_sampled": 2500
+    },
+    "4": {
+      "n_regimes": 137,
+      "n_rows_available": 16761,
+      "n_rows_sampled": 2500
+    },
+    "5": {
+      "n_regimes": 158,
+      "n_rows_available": 18710,
+      "n_rows_sampled": 2500
+    },
+    "6": {
+      "n_regimes": 125,
+      "n_rows_available": 16105,
+      "n_rows_sampled": 2500
+    },
+    "7": {
+      "n_regimes": 139,
+      "n_rows_available": 16494,
+      "n_rows_sampled": 2500
+    },
+    "8": {
+      "n_regimes": 141,
+      "n_rows_available": 16737,
+      "n_rows_sampled": 2500
+    },
+    "9": {
+      "n_regimes": 149,
+      "n_rows_available": 17082,
+      "n_rows_sampled": 2500
+    },
+    "10": {
+      "n_regimes": 162,
+      "n_rows_available": 18588,
+      "n_rows_sampled": 2500
+    },
+    "11": {
+      "n_regimes": 119,
+      "n_rows_available": 14499,
+      "n_rows_sampled": 2500
+    },
+    "12": {
+      "n_regimes": 143,
+      "n_rows_available": 16024,
+      "n_rows_sampled": 2500
+    }
+  },
+  "positive_rate_full": 0.24907316335023078,
+  "positive_rate_sample": 0.40636666666666665,
+  "row_index_sha256": "3cece6ed7c5be44a9f1eed6117e1160f7c753e21319c576b34ff910599b3d44a"
+}

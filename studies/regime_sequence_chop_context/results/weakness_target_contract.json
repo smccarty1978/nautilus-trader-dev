@@ -1,0 +1,7 @@
+{
+  "targets": {
+    "opp_flip_in_120s": "1 if opposing 1m flip occurs within 120 seconds, else 0",
+    "terminal_deterioration": "1 if current MFE is final and price deteriorates before recovery, else 0",
+    "no_new_fav_before_025_giveback": "1 if price gives back 0.25 ATR before making new favorable extreme, else 0"
+  }
+}

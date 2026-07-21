@@ -1,0 +1,170 @@
+{
+  "gates": {
+    "gate_a_120s": 120.0,
+    "bridge_180s": 180.0,
+    "gate_b_240s": 240.0
+  },
+  "timeout_s": 300.0,
+  "year_reports": {
+    "2021": {
+      "year": 2021,
+      "rows": 212241,
+      "join_rate_gate_cols": 1.0,
+      "distinct_regimes": 1762,
+      "post_flip_mfe_300s_unavailable": 261,
+      "post_flip_mfe_600s_unavailable": 261,
+      "n_position_categorical_cols": 29,
+      "n_position_dummy_cols": 116,
+      "runtime_s": 35.4
+    },
+    "2022": {
+      "year": 2022,
+      "rows": 192378,
+      "join_rate_gate_cols": 1.0,
+      "distinct_regimes": 1711,
+      "post_flip_mfe_300s_unavailable": 0,
+      "post_flip_mfe_600s_unavailable": 0,
+      "n_position_categorical_cols": 29,
+      "n_position_dummy_cols": 116,
+      "runtime_s": 18.5
+    },
+    "2023": {
+      "year": 2023,
+      "rows": 204742,
+      "join_rate_gate_cols": 1.0,
+      "distinct_regimes": 1732,
+      "post_flip_mfe_300s_unavailable": 0,
+      "post_flip_mfe_600s_unavailable": 0,
+      "n_position_categorical_cols": 29,
+      "n_position_dummy_cols": 116,
+      "runtime_s": 9.8
+    },
+    "2024": {
+      "year": 2024,
+      "rows": 204611,
+      "join_rate_gate_cols": 1.0,
+      "distinct_regimes": 1672,
+      "post_flip_mfe_300s_unavailable": 0,
+      "post_flip_mfe_600s_unavailable": 0,
+      "n_position_categorical_cols": 29,
+      "n_position_dummy_cols": 116,
+      "runtime_s": 9.4
+    },
+    "2025": {
+      "year": 2025,
+      "rows": 198255,
+      "join_rate_gate_cols": 1.0,
+      "distinct_regimes": 1678,
+      "post_flip_mfe_300s_unavailable": 0,
+      "post_flip_mfe_600s_unavailable": 0,
+      "n_position_categorical_cols": 29,
+      "n_position_dummy_cols": 116,
+      "runtime_s": 17.6
+    },
+    "2026": {
+      "year": 2026,
+      "rows": 63021,
+      "join_rate_gate_cols": 1.0,
+      "distinct_regimes": 532,
+      "post_flip_mfe_300s_unavailable": 0,
+      "post_flip_mfe_600s_unavailable": 0,
+      "n_position_categorical_cols": 29,
+      "n_position_dummy_cols": 116,
+      "runtime_s": 10.3
+    }
+  },
+  "surface_summary": {
+    "gate_a_120s|2021": {
+      "full_rows": 212241,
+      "full_regimes": 1762,
+      "first_eligible_rows": 1762
+    },
+    "gate_a_120s|2022": {
+      "full_rows": 192378,
+      "full_regimes": 1711,
+      "first_eligible_rows": 1711
+    },
+    "gate_a_120s|2023": {
+      "full_rows": 204742,
+      "full_regimes": 1732,
+      "first_eligible_rows": 1732
+    },
+    "gate_a_120s|2024": {
+      "full_rows": 204611,
+      "full_regimes": 1672,
+      "first_eligible_rows": 1672
+    },
+    "gate_a_120s|2025": {
+      "full_rows": 198255,
+      "full_regimes": 1678,
+      "first_eligible_rows": 1678
+    },
+    "gate_a_120s|2026": {
+      "full_rows": 63021,
+      "full_regimes": 532,
+      "first_eligible_rows": 532
+    },
+    "bridge_180s|2021": {
+      "full_rows": 212094,
+      "full_regimes": 1762,
+      "first_eligible_rows": 1762
+    },
+    "bridge_180s|2022": {
+      "full_rows": 192214,
+      "full_regimes": 1710,
+      "first_eligible_rows": 1710
+    },
+    "bridge_180s|2023": {
+      "full_rows": 204656,
+      "full_regimes": 1732,
+      "first_eligible_rows": 1732
+    },
+    "bridge_180s|2024": {
+      "full_rows": 204494,
+      "full_regimes": 1670,
+      "first_eligible_rows": 1670
+    },
+    "bridge_180s|2025": {
+      "full_rows": 198122,
+      "full_regimes": 1677,
+      "first_eligible_rows": 1677
+    },
+    "bridge_180s|2026": {
+      "full_rows": 62981,
+      "full_regimes": 531,
+      "first_eligible_rows": 531
+    },
+    "gate_b_240s|2021": {
+      "full_rows": 210770,
+      "full_regimes": 1755,
+      "first_eligible_rows": 1755
+    },
+    "gate_b_240s|2022": {
+      "full_rows": 190756,
+      "full_regimes": 1699,
+      "first_eligible_rows": 1699
+    },
+    "gate_b_240s|2023": {
+      "full_rows": 203563,
+      "full_regimes": 1719,
+      "first_eligible_rows": 1719
+    },
+    "gate_b_240s|2024": {
+      "full_rows": 203355,
+      "full_regimes": 1660,
+      "first_eligible_rows": 1660
+    },
+    "gate_b_240s|2025": {
+      "full_rows": 197052,
+      "full_regimes": 1669,
+      "first_eligible_rows": 1669
+    },
+    "gate_b_240s|2026": {
+      "full_rows": 62653,
+      "full_regimes": 528,
+      "first_eligible_rows": 528
+    }
+  },
+  "runtime_s": 521.5,
+  "generator_sha256": "6d785d475570c723fdae7cd8135c9efa5c3521dde2f94ce8b83dfdaff29433c1"
+}

@@ -1,0 +1,84 @@
+{
+  "git_commit": "local_dev",
+  "input_data_identifiers": [
+    "NQ.XCME-1-SECOND-LAST-EXTERNAL"
+  ],
+  "date_ranges": {
+    "train": [
+      "2024-01-01",
+      "2024-12-31"
+    ],
+    "val": [
+      "2025-01-01",
+      "2025-02-28"
+    ],
+    "test": [
+      "2025-03-01",
+      "2025-05-31"
+    ]
+  },
+  "exact_feature_list": [
+    "termination_reason",
+    "episode_end_time",
+    "seconds_since_flip",
+    "current_progress_atr",
+    "max_progress_atr",
+    "max_adverse_atr",
+    "pullback_from_peak_atr",
+    "seconds_since_peak",
+    "progress_efficiency",
+    "aligned_return_5s_atr",
+    "aligned_return_15s_atr",
+    "aligned_return_30s_atr",
+    "aligned_return_60s_atr",
+    "realized_vol_60s_atr",
+    "range_5s_atr",
+    "volume_5s_zscore",
+    "volume_30s_vs_5m",
+    "bollinger_width_percentile_1m",
+    "bollinger_keltner_width_ratio_1m",
+    "kalman_velocity_atr_per_s",
+    "kalman_acceleration_atr_per_s2",
+    "kalman_innovation_zscore",
+    "ema3_ema9_spread_30s_atr",
+    "regime_5s_aligned",
+    "regime_30s_aligned",
+    "regime_5m_aligned",
+    "regime_age_1m_bars",
+    "adx14_1m"
+  ],
+  "exact_label_definitions": {
+    "horizons": [
+      5,
+      15,
+      30,
+      60,
+      120,
+      300
+    ],
+    "targets": [
+      "fixed-horizon",
+      "regime-capped"
+    ]
+  },
+  "model_configurations": {
+    "ridge_log": "LogisticRegression(C=0.1, solver='lbfgs')",
+    "gbm": "HistGradientBoostingClassifier(max_iter=200, max_depth=5, learning_rate=0.05)"
+  },
+  "random_seeds": {
+    "gbm": 42
+  },
+  "frozen_policy_configuration": {
+    "model": "ridge_log",
+    "horizon_s": 300,
+    "threshold": 0.5023544083601342,
+    "exit_rule": "Exit A: fixed predicted horizon",
+    "test_ev_all_usd": -6.459739091318038,
+    "test_ev_all_pts": -0.32298695456590193,
+    "test_ev_trade_usd": -28.99057873485868,
+    "test_ev_trade_pts": -1.449528936742934,
+    "trade_rate": 0.2228220122956965,
+    "win_rate": 0.48250336473755046,
+    "profit_factor": 0.8308100147275405
+  }
+}

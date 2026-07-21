@@ -1,0 +1,28 @@
+======================================================================
+GATE 1: CONDITIONAL FORWARD-INCREMENT PREDICTABILITY
+======================================================================
+
+Criteria: val_AUC >= 0.54 on at least 2 horizons
+
+
+--- ridge_log ---
+   horizon   AUC_train     AUC_val     brier     thr   pass?
+       5s      0.5652      0.5513    0.2317   0.343    PASS
+      15s      0.5537      0.5404    0.2412   0.392    PASS
+      30s      0.5451      0.5345    0.2446   0.413    fail
+      60s      0.5394      0.5338    0.2461   0.427    fail
+     120s      0.5396      0.5375    0.2470   0.433    fail
+     300s      0.5537      0.5507    0.2460   0.420    PASS
+
+--- gbm ---
+   horizon   AUC_train     AUC_val     brier     thr   pass?
+       5s      0.5789      0.5578    0.2312   0.335    PASS
+      15s      0.5687      0.5488    0.2405   0.389    PASS
+      30s      0.5629      0.5455    0.2436   0.418    PASS
+      60s      0.5640      0.5476    0.2448   0.435    PASS
+     120s      0.5732      0.5537    0.2450   0.438    PASS
+     300s      0.5981      0.5634    0.2434   0.443    PASS
+
+Passing horizons: [5, 15, 30, 60, 120, 300]  (need >= 2)
+
+GATE 1 VERDICT: FEASIBLE

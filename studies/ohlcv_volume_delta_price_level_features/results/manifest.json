@@ -1,0 +1,106 @@
+{
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "total_new_features_expected": 461,
+  "families": {
+    "ohlcv_est_delta": 214,
+    "price_level_context": 247
+  },
+  "all_row_counts_unchanged": true,
+  "all_labels_unchanged": true,
+  "all_no_duplicate_rows": true,
+  "all_no_provenance_violations": true,
+  "all_expected_feature_columns_present": true,
+  "per_year": [
+    {
+      "year": 2021,
+      "surface_rows": 212241,
+      "feature_rows_produced": 212241,
+      "row_count_unchanged": true,
+      "labels_unchanged": "True",
+      "duplicate_rows": 0,
+      "provenance_violations": 0,
+      "gap_snapped_checkpoints": 11119,
+      "unmatched_before_data_start": 0,
+      "new_feature_columns_present": 461,
+      "new_feature_columns_missing": 0,
+      "join_rate_any_new_feature_present": 1.0
+    },
+    {
+      "year": 2022,
+      "surface_rows": 192378,
+      "feature_rows_produced": 192378,
+      "row_count_unchanged": true,
+      "labels_unchanged": "True",
+      "duplicate_rows": 0,
+      "provenance_violations": 0,
+      "gap_snapped_checkpoints": 3855,
+      "unmatched_before_data_start": 0,
+      "new_feature_columns_present": 461,
+      "new_feature_columns_missing": 0,
+      "join_rate_any_new_feature_present": 1.0
+    },
+    {
+      "year": 2023,
+      "surface_rows": 204742,
+      "feature_rows_produced": 204742,
+      "row_count_unchanged": true,
+      "labels_unchanged": "True",
+      "duplicate_rows": 0,
+      "provenance_violations": 0,
+      "gap_snapped_checkpoints": 6058,
+      "unmatched_before_data_start": 0,
+      "new_feature_columns_present": 461,
+      "new_feature_columns_missing": 0,
+      "join_rate_any_new_feature_present": 1.0
+    },
+    {
+      "year": 2024,
+      "surface_rows": 204611,
+      "feature_rows_produced": 204611,
+      "row_count_unchanged": true,
+      "labels_unchanged": "True",
+      "duplicate_rows": 0,
+      "provenance_violations": 0,
+      "gap_snapped_checkpoints": 7000,
+      "unmatched_before_data_start": 0,
+      "new_feature_columns_present": 461,
+      "new_feature_columns_missing": 0,
+      "join_rate_any_new_feature_present": 1.0
+    },
+    {
+      "year": 2025,
+      "surface_rows": 198255,
+      "feature_rows_produced": 198255,
+      "row_count_unchanged": true,
+      "labels_unchanged": "True",
+      "duplicate_rows": 0,
+      "provenance_violations": 0,
+      "gap_snapped_checkpoints": 8396,
+      "unmatched_before_data_start": 0,
+      "new_feature_columns_present": 461,
+      "new_feature_columns_missing": 0,
+      "join_rate_any_new_feature_present": 1.0
+    },
+    {
+      "year": 2026,
+      "surface_rows": 63021,
+      "feature_rows_produced": 63021,
+      "row_count_unchanged": true,
+      "labels_unchanged": "True",
+      "duplicate_rows": 0,
+      "provenance_violations": 0,
+      "gap_snapped_checkpoints": 2079,
+      "unmatched_before_data_start": 0,
+      "new_feature_columns_present": 461,
+      "new_feature_columns_missing": 0,
+      "join_rate_any_new_feature_present": 1.0
+    }
+  ]
+}

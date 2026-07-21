@@ -1,0 +1,30 @@
+{
+  "nq_multiplier": 20.0,
+  "nq_tick_size": 0.25,
+  "nq_tick_value": 5.0,
+  "cat_stop_atr": 1.5,
+  "max_episode_s": 1800,
+  "fill_model": "next_1s_bar_open",
+  "stop_model": "gap_or_touch",
+  "cost_scenarios": [
+    {
+      "name": "base",
+      "commission_rt_usd": 5.0,
+      "slippage_ticks_entry": 0.0,
+      "slippage_ticks_stop": 0.0
+    },
+    {
+      "name": "base_plus_1t",
+      "commission_rt_usd": 5.0,
+      "slippage_ticks_entry": 1.0,
+      "slippage_ticks_stop": 1.0
+    },
+    {
+      "name": "base_plus_2t",
+      "commission_rt_usd": 5.0,
+      "slippage_ticks_entry": 2.0,
+      "slippage_ticks_stop": 2.0
+    }
+  ],
+  "note": "Entry fills at next 1s bar open after decision_ts. Stop: gap-through fills at bar.open (direction-adjusted for slippage); touch fills at stop_price (direction-adjusted for slippage). Existing repo uses COMM=4.06 dollars; this study uses $5 RT per spec. Horizon exit at first 1s bar open at-or-after entry_ts + horizon_ns."
+}

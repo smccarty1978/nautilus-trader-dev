@@ -1,0 +1,29 @@
+{
+  "policy_id": "ERWF_STAGE2_V1",
+  "frozen_before_monetization_results": true,
+  "selection_data": "2021-2024 Stage-1 characterization; 2025 Stage-1 divergence sanity check only",
+  "test_data_unseen_at_freeze": "2026",
+  "research_contract": "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT",
+  "label": "1-second OHLC research simulation; not NT-native executable validation",
+  "filter": {
+    "regime_age_s_min": 120,
+    "running_mfe_atr_min": 1.0,
+    "new_progress_windows_min": 2,
+    "retained_mfe_ratio_min": 0.5
+  },
+  "filter_rationale": "120s is the natural rounded discovery median vicinity for time-to-1ATR (137s; 2025 descriptive sanity check 139s); remaining values are the prompt's single candidate structure and were not searched",
+  "weakness_trigger": "first valid W4 crossing from below the frozen absolute threshold while the established filter is true",
+  "w4_threshold": 0.6183278577387376,
+  "entry": "fade prevailing regime at explicit next available 1s bar open after score availability (observation_time + 1s)",
+  "stop_atr": 1.5,
+  "stop_anchor": "entry fill price using causal ATR carried on the W4 checkpoint",
+  "stop_active_entry_bar": true,
+  "stop_fill": "trigger price on touch; entry/open gap through stop fills at bar open",
+  "exit": "hold through first aligning flip; exit at explicit next available 1s open after next flip against countertrade",
+  "same_bar_rule": "scheduled flip exit fills at its decision-boundary open before that bar's intrabar range; stop is evaluated on all earlier bars including entry bar",
+  "overlap_rule": "one position at a time; candidate entry decisions strictly before the current position exit fill are skipped",
+  "cost_rt_usd": 10.0,
+  "validation_window": "2025-03-01 through 2025-12-30 UTC (exclusive end 2025-12-31)",
+  "test_window": "2026-01-01 through available data before 2026-04-30 UTC",
+  "optional_secondary_exit": "not implemented"
+}

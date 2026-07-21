@@ -1,0 +1,156 @@
+{
+  "generator_sha256": "8de3c13dbb965e8126b6d808351144bcba339faa9374e4f64e59e91f89f04328",
+  "policy_sha256": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b",
+  "years": {
+    "2022": {
+      "year": 2022,
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\atlas_5s_backfill_2022.parquet",
+      "atlas_sha256": "eaa9010ef2176ada027340ec83ca2e5392954a183b71430f759f597b5a371831",
+      "raw_sha256": "7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4",
+      "surface_rows": 189071,
+      "surface_regimes": 1672,
+      "attrition": {
+        "checkpoints": {
+          "all": 3954384,
+          "bearish_regime": 1961711,
+          "established": 654901,
+          "rth": 189071,
+          "valid_fill": 189071,
+          "rth_boundary_divergence": 302
+        },
+        "distinct_regimes": {
+          "all": 27111,
+          "bearish_regime": 13557,
+          "established": 5662,
+          "rth": 1672,
+          "valid_fill": 1672,
+          "rth_boundary_divergence": 2
+        },
+        "mfe_directionality_checks_passed": 1961711
+      },
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\long_rth_mirrored_surface_top100_training\\_work\\surface_long_2022.parquet",
+      "output_sha256": "9e6f52cae6bb60db0db675ff3c28c0d48a235c853ee8f5f90781e09c4964a0ca",
+      "runtime_s": 226.3
+    },
+    "2023": {
+      "year": 2023,
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\atlas_5s_backfill_2023.parquet",
+      "atlas_sha256": "cc0b55ae76cada5cb7c8ca270bc47036d0b41d6c9845ae045ca31a1c6284523a",
+      "raw_sha256": "1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153",
+      "surface_rows": 167721,
+      "surface_regimes": 1583,
+      "attrition": {
+        "checkpoints": {
+          "all": 3956507,
+          "bearish_regime": 1929296,
+          "established": 610102,
+          "rth": 167721,
+          "valid_fill": 167721,
+          "rth_boundary_divergence": 675
+        },
+        "distinct_regimes": {
+          "all": 27996,
+          "bearish_regime": 13998,
+          "established": 5597,
+          "rth": 1583,
+          "valid_fill": 1583,
+          "rth_boundary_divergence": 3
+        },
+        "mfe_directionality_checks_passed": 1929296
+      },
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\long_rth_mirrored_surface_top100_training\\_work\\surface_long_2023.parquet",
+      "output_sha256": "7b1055b3333013239f37be5121891e1aaf3c4ab89065e9543eac7162f8894ed7",
+      "runtime_s": 87.0
+    },
+    "2024": {
+      "year": 2024,
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\atlas_5s_backfill_2024.parquet",
+      "atlas_sha256": "230855ac68201c95c71d8d935a9d4486eca1d39680f5a828ae0b0d5d972d6cfe",
+      "raw_sha256": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+      "surface_rows": 161220,
+      "surface_regimes": 1520,
+      "attrition": {
+        "checkpoints": {
+          "all": 3934542,
+          "bearish_regime": 1889306,
+          "established": 582577,
+          "rth": 161220,
+          "valid_fill": 161220,
+          "rth_boundary_divergence": 205
+        },
+        "distinct_regimes": {
+          "all": 27489,
+          "bearish_regime": 13746,
+          "established": 5442,
+          "rth": 1520,
+          "valid_fill": 1520,
+          "rth_boundary_divergence": 1
+        },
+        "mfe_directionality_checks_passed": 1889306
+      },
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\long_rth_mirrored_surface_top100_training\\_work\\surface_long_2024.parquet",
+      "output_sha256": "6c7b5e0c7d27b51450e32f0e9a194ba697f414216d75f4ee8d90bb1bc30e03ea",
+      "runtime_s": 85.3
+    },
+    "2025": {
+      "year": 2025,
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\CODEX_5_X_weakness_atlas_repair\\_work\\CODEX_5_X_repaired_years\\CODEX_5_X_weakness_atlas_repaired_2025.parquet",
+      "atlas_sha256": "c654da5016f7ec4bf26be11a390992dff851d38e81684a2a19f0bbed90ad9ce7",
+      "raw_sha256": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+      "surface_rows": 163397,
+      "surface_regimes": 1578,
+      "attrition": {
+        "checkpoints": {
+          "all": 3934266,
+          "bearish_regime": 1919630,
+          "established": 596357,
+          "rth": 163398,
+          "valid_fill": 163397,
+          "rth_boundary_divergence": 326
+        },
+        "distinct_regimes": {
+          "all": 27137,
+          "bearish_regime": 13571,
+          "established": 5592,
+          "rth": 1578,
+          "valid_fill": 1578,
+          "rth_boundary_divergence": 2
+        },
+        "mfe_directionality_checks_passed": 1919630
+      },
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\long_rth_mirrored_surface_top100_training\\_work\\surface_long_2025.parquet",
+      "output_sha256": "c2de3c4e660e4c9fcc2168d9fafd95e7983d9c6ca289b3650581f702c297edf1",
+      "runtime_s": 82.1
+    },
+    "2026": {
+      "year": 2026,
+      "atlas_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\CODEX_5_X_weakness_atlas_repair\\_work\\CODEX_5_X_repaired_years\\CODEX_5_X_weakness_atlas_repaired_2026.parquet",
+      "atlas_sha256": "76192163897e2075dc72e1742ca38d6d3a24aa5977a21bbc537eb2ebc89e2d44",
+      "raw_sha256": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+      "surface_rows": 52488,
+      "surface_regimes": 488,
+      "attrition": {
+        "checkpoints": {
+          "all": 1289840,
+          "bearish_regime": 636402,
+          "established": 195351,
+          "rth": 52488,
+          "valid_fill": 52488,
+          "rth_boundary_divergence": 0
+        },
+        "distinct_regimes": {
+          "all": 8921,
+          "bearish_regime": 4458,
+          "established": 1795,
+          "rth": 488,
+          "valid_fill": 488,
+          "rth_boundary_divergence": 0
+        },
+        "mfe_directionality_checks_passed": 636402
+      },
+      "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\long_rth_mirrored_surface_top100_training\\_work\\surface_long_2026.parquet",
+      "output_sha256": "dcbf773b20662a192ad889f7cadb270ad8925ee0b3eb6736d1786edf3a94aa7a",
+      "runtime_s": 28.4
+    }
+  }
+}

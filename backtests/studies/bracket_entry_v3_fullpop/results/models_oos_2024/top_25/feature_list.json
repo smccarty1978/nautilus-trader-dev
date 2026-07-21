@@ -1,0 +1,30 @@
+{
+  "features": [
+    "regime_30s_aligned",
+    "price_vs_signal_close_atr",
+    "prior_regime_mfe_atr",
+    "distance_from_session_low_atr",
+    "flip_low_vs_prior_low_atr",
+    "bar1_lower_wick_pct",
+    "price_vs_sma20_atr",
+    "distance_from_session_mid_atr",
+    "price_vs_sma20_30s_atr",
+    "flip_lower_wick_pct",
+    "atr_at_signal",
+    "pre_3_volume_total",
+    "flip_body_pct",
+    "vol_acceleration_5bar",
+    "bar1_range_atr",
+    "vol_1m_20avg",
+    "ema_spread_atr",
+    "pre_10_volume_total",
+    "minutes_since_rth_open",
+    "avg_regime_duration_last_5",
+    "bar1_vol_vs_flip_vol",
+    "time_since_last_1m_bar_close_s",
+    "two_bar_volume_total",
+    "pre_3_body_efficiency",
+    "sma20_slope_atr"
+  ],
+  "n_features": 25
+}

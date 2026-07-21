@@ -1,0 +1,53 @@
+{
+  "n_trades": 215,
+  "impossible_fills_n": 0,
+  "impossible_fills_pnl": 0.0,
+  "exit_before_arm_n": 0,
+  "direction_sign_inconsistent_n": 0,
+  "protect_not_on_tick_grid_n": 0,
+  "exit_after_max_hold_n": 0,
+  "flags": {
+    "exit_outside_bar_ohlc": {
+      "name": "exit_outside_bar_ohlc",
+      "description": "exit_price is outside [bar.low, bar.high] at exit_ts \u2014 phantom fill, not tradable",
+      "count": 0,
+      "pnl_contribution": 0.0
+    },
+    "exit_before_arm": {
+      "name": "exit_before_arm",
+      "description": "exit_ts < arm_ts \u2014 caused by stale arm_ts or bad ordering",
+      "count": 0,
+      "pnl_contribution": 0.0
+    },
+    "stop_invalid_filled_at_stop": {
+      "name": "stop_invalid_filled_at_stop",
+      "description": "stop was invalid at arm (in market) but fill_px == stop_px anyway",
+      "count": 0,
+      "pnl_contribution": 0.0
+    },
+    "exit_reason_overwritten": {
+      "name": "exit_reason_overwritten",
+      "description": "exit_reason inconsistent with fill mechanics",
+      "count": 0,
+      "pnl_contribution": 0.0
+    },
+    "direction_sign_inconsistent": {
+      "name": "direction_sign_inconsistent",
+      "description": "direction not in {-1, +1} or implied PnL has wrong sign vs (exit_price - fill_price)",
+      "count": 0,
+      "pnl_contribution": 0.0
+    },
+    "protect_not_on_tick_grid": {
+      "name": "protect_not_on_tick_grid",
+      "description": "stop_px / protect_px is not a multiple of tick_size",
+      "count": 0,
+      "pnl_contribution": 0.0
+    },
+    "exit_after_max_hold": {
+      "name": "exit_after_max_hold",
+      "description": "exit timestamp implausibly far after entry",
+      "count": 0,
+      "pnl_contribution": 0.0
+    }
+  }
+}

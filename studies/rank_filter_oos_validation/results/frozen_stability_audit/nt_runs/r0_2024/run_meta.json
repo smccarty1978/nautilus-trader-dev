@@ -1,0 +1,38 @@
+{
+  "policy": "r0",
+  "block_key": "2024",
+  "block": {
+    "catalog": "data/catalog/NQ_v0_2020_2026",
+    "start": "2024-01-01",
+    "end": "2024-12-31",
+    "catalog_bug_caveat": true
+  },
+  "elapsed_s": 315.8431451320648,
+  "diag": {
+    "1s_bars": 12144621,
+    "1m_bars": 357715,
+    "buckets_closed_30s": 713417,
+    "buckets_closed_1m": 357713,
+    "buckets_closed_3m": 119273,
+    "buckets_closed_5m": 71564,
+    "rth_flips": 27848,
+    "bar1_checks": 27847,
+    "confirmations_passed_hhll_mom": 11989,
+    "rejected_5m_misaligned": 0,
+    "rejected_low_flip2conf_efficiency": 0,
+    "hhll_armed": 0,
+    "hhll_exits": 0,
+    "hhll_canceled": 0,
+    "rejected_after_no_entry_cutoff": 0,
+    "force_flat_exits": 0,
+    "entries_filled": 11987,
+    "regime_exits": 11987,
+    "snapshots_emitted": 354489,
+    "rejected_by_policy_filter": 0,
+    "pending_entry_canceled": 2,
+    "micro_pre_rows": 27847,
+    "micro_post_rows": 11987,
+    "trade_tape_rows": 0
+  },
+  "skip_set_size": 0
+}

@@ -1,0 +1,1007 @@
+{
+  "matched_events": 120,
+  "n_features_pass": 100,
+  "n_features_fail": 0,
+  "by_feature": {
+    "decision_checkpoint_s": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "atr_14": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "atr_at_signal": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_range_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_body_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_body_pct": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_close_location": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_upper_wick_pct": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_lower_wick_pct": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_volume": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_vol_vs_20avg": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_close_vs_prior_close_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_high_vs_prior_high_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_low_vs_prior_low_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_bar_bullish_volume_pct": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_bar_vol_rank_20": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_range_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_body_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_body_pct": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_close_location": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_upper_wick_pct": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_lower_wick_pct": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_volume": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_vol_vs_flip_vol": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_vol_rank_20": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_hh_amount_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_close_vs_flip_close_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_close_above_flip_close": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_close_above_50pct_range": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar1_bullish_volume_pct": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "two_bar_range_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "two_bar_body_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "two_bar_close_vs_open_pct": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "two_bar_volume_total": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "two_bar_vol_vs_40avg": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "flip_low_to_bar1_high_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "prior_regime_duration_bars": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "consecutive_trend_bars_pre_flip": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "pre_flip_3bar_body_direction": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "pre_flip_3bar_range_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "pre_flip_5bar_range_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "pre_flip_volume_trend": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_flips_last_30min": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_flips_last_60min": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "price_vs_sma20_atr": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "price_vs_sma50_atr": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "sma20_slope_atr": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "sma20_vs_sma50_atr": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "sma50_slope_atr": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "ema3_slope_atr": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "ema_spread_atr": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "ema3_ema9_spread_atr": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "vol_1m_20avg": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "vol_ratio_up_down_10bar": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "vol_ratio_up_down_20bar": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "vol_acceleration_5bar": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "high_vol_bar_count_10": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "cumulative_volume_bias_10": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "hour_of_day": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "minute_of_hour": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "minutes_since_rth_open": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "distance_from_session_high_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "distance_from_session_low_atr": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_30s_aligned_t0": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_5m_aligned_t0": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "signal_direction": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "atr_14_at_T": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_30s_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_30s_aligned_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_30s_duration_bars_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "ema3_slope_30s_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "ema_spread_30s_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "price_vs_sma20_30s_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bar_range_30s_current_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_5m_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_5m_duration_bars_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "ema3_slope_5m_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "ema_spread_5m_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "price_vs_sma20_5m_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_5m_changed_during_delay_by_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "regime_1m_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "micro_same_dir_count_12s_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "micro_opp_dir_count_12s_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "micro_aligned_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "micro_opposing_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "micro_net_return_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "micro_range_compression_T": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "micro_body_pct_avg_T": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "continuation_count_since_signal_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "consecutive_continuation_bars_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "bars_since_last_continuation_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "checkpoint_bars_since_signal_1m_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "is_rth_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "hour_of_day_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "minute_of_hour_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "minutes_since_rth_open_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "distance_from_session_high_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "distance_from_session_low_atr_T": {
+      "status": "PASS",
+      "tolerance": 1e-09,
+      "tolerance_category": "tight",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "vol_total_30s_recent_T": {
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "tolerance_category": "bit_exact",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    "vol_vs_20avg_30s_T": {
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "tolerance_category": "loose",
+      "n_total": 120,
+      "n_pass": 120,
+      "n_fail": 0,
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    }
+  }
+}

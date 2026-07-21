@@ -1,0 +1,65 @@
+{
+  "predeclared_thresholds": {
+    "duration_ratio_min": 1.25,
+    "peak_mfe_ratio_min": 1.25,
+    "progress_windows_delta_min": 1.0,
+    "retained_m60_delta_min": 0.15,
+    "minimum_structural_conditions": 3,
+    "minimum_winner_count_train": 500,
+    "minimum_winner_count_2025": 100,
+    "minimum_paired_w4_count_train": 250,
+    "minimum_paired_w4_count_2025": 50,
+    "weakness_rise_min": 0.05,
+    "minimum_median_peak_to_flip_s": 30.0,
+    "minimum_median_giveback_atr": 0.25
+  },
+  "train": {
+    "period": "train",
+    "winner_count": 28789,
+    "failed_runner_count": 36583,
+    "duration_ratio": 2.3,
+    "peak_mfe_ratio": 2.704269864421758,
+    "progress_windows_delta": 1.0,
+    "retained_m60_delta": 0.45667686034658517,
+    "winner_w4_rise_m60_to_flip": 0.13280380402602654,
+    "winner_w4_rise_paired_n": 20551,
+    "winner_w4_rise_paired_fraction": 0.7138490395637223,
+    "winner_peak_to_flip_s": 347.0,
+    "winner_giveback_atr": 2.40885739704602,
+    "structural_conditions": {
+      "duration": true,
+      "peak_mfe": true,
+      "progress_windows": true,
+      "retention_m60": true
+    },
+    "structural_pass_count": 4,
+    "sample_pass": true,
+    "weakness_window_pass": true,
+    "pass": true
+  },
+  "validation": {
+    "period": "validation",
+    "winner_count": 7147,
+    "failed_runner_count": 9156,
+    "duration_ratio": 2.3,
+    "peak_mfe_ratio": 2.7126021864314644,
+    "progress_windows_delta": 1.0,
+    "retained_m60_delta": 0.44906222809448604,
+    "winner_w4_rise_m60_to_flip": 0.20088705213641367,
+    "winner_w4_rise_paired_n": 5042,
+    "winner_w4_rise_paired_fraction": 0.7054708269203862,
+    "winner_peak_to_flip_s": 316.0,
+    "winner_giveback_atr": 2.416413423384879,
+    "structural_conditions": {
+      "duration": true,
+      "peak_mfe": true,
+      "progress_windows": true,
+      "retention_m60": true
+    },
+    "structural_pass_count": 4,
+    "sample_pass": true,
+    "weakness_window_pass": true,
+    "pass": true
+  },
+  "decision": "ESTABLISHED_REGIME_FILTER_FOUND"
+}

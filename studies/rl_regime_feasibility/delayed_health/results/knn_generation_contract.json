@@ -1,0 +1,70 @@
+{
+  "source_study": "backtests/studies/regime_dna_knn/bar4_knn_path_atlas.py",
+  "k": 100,
+  "distance_metric": "Euclidean on StandardScaler-normalized features",
+  "features_n": 12,
+  "features": [
+    "bar_idx",
+    "mfe_sofar",
+    "mae_sofar",
+    "pnl_now",
+    "pullback",
+    "health_ratio",
+    "progress_eff",
+    "close_loc",
+    "range_exp",
+    "vol_exp",
+    "ema_spread",
+    "kalman_vel"
+  ],
+  "feature_mapping": {
+    "bar_idx": "regime_age_1m_bars",
+    "mfe_sofar": "max_progress_atr",
+    "mae_sofar": "max_adverse_atr",
+    "pnl_now": "current_progress_atr",
+    "pullback": "pullback_from_peak_atr",
+    "health_ratio": null,
+    "progress_eff": "progress_efficiency",
+    "close_loc": "position_in_trailing_1m_range",
+    "range_exp": "range_5s_atr",
+    "vol_exp": "volume_5s_zscore",
+    "ema_spread": "ema3_ema9_spread_30s_atr",
+    "kalman_vel": "kalman_velocity_atr_per_s"
+  },
+  "step_band_matching": "N/A (period-based library approach)",
+  "causality_rule": "neighbor.flip_time < query.flip_time (strict chronological)",
+  "event_dedup": "one observation per episode per step_band (first observation in band)",
+  "walk_forward_scheme": "train obs: query against all prior flip_time episodes; val obs: query against all train-period episodes; test obs: query against train+val-period episodes",
+  "health_definitions": {
+    "hA": "P(y_entry_positive_300s=1 | neighbor) - P(y_entry_positive_300s=0 | neighbor) = 2*P_pos - 1",
+    "hB": "mean(neighbor_pnl_300s_atr) / max(mean(|neighbor_mae_300s_atr|), 0.25)",
+    "hC": "P(neighbor_pnl_60s > 0) - P(neighbor_pnl_60s < 0) = 2*P_pos60 - 1",
+    "composite": "mean(percentile_rank(hA), percentile_rank(hB), percentile_rank(hC)) on training set"
+  },
+  "original_12_features": [
+    "bar_idx",
+    "mfe_sofar",
+    "mae_sofar",
+    "pnl_now",
+    "pullback",
+    "progress_count",
+    "consec_noncont",
+    "dist_flip_open",
+    "health_ratio",
+    "close_loc",
+    "range_exp",
+    "vol_exp"
+  ],
+  "missing_from_snapshots": [
+    "progress_count",
+    "consec_noncont",
+    "dist_flip_open"
+  ],
+  "substitutions": {
+    "bar_idx": "regime_age_1m_bars",
+    "progress_count": "DROPPED (not available; using bar_idx as proxy)",
+    "consec_noncont": "DROPPED (not available)",
+    "dist_flip_open": "APPROXIMATED as current_progress_atr",
+    "health_ratio": "COMPUTED as max_progress_atr / max(max_adverse_atr, 0.1)"
+  }
+}

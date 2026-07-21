@@ -1,0 +1,65 @@
+{
+  "E0_test": {
+    "reproduced": 6.04,
+    "prior": 6.36,
+    "abs_diff": 0.32,
+    "parity": "OK"
+  },
+  "P1a_test": {
+    "reproduced": 5.03,
+    "prior": 5.19,
+    "abs_diff": 0.16,
+    "parity": "OK"
+  },
+  "P1a_test_delta": {
+    "reproduced": -1.01,
+    "prior": -1.17,
+    "abs_diff": 0.16,
+    "parity": "OK"
+  },
+  "P1a_rth_delta": {
+    "reproduced": -11.66,
+    "prior": -11.61,
+    "abs_diff": 0.05,
+    "parity": "OK"
+  },
+  "P1a_eth_delta": {
+    "reproduced": 3.22,
+    "prior": 2.97,
+    "abs_diff": 0.25,
+    "parity": "OK"
+  },
+  "P1b_test": {
+    "reproduced": 5.03,
+    "prior": 5.19,
+    "abs_diff": 0.16,
+    "parity": "OK"
+  },
+  "P3_v2reference_note": "loaded from v2 policy_metrics.parquet, not independently recomputed -- v3's P2/P3 are redefined (see build_policy_candidates.py)",
+  "P3_v2reference_ev": {
+    "reproduced": 5.22,
+    "prior": 5.22,
+    "abs_diff": 0.0,
+    "parity": "OK"
+  },
+  "P3_v2reference_delta": {
+    "reproduced": -1.14,
+    "prior": -1.14,
+    "abs_diff": 0.0,
+    "parity": "OK"
+  },
+  "P3_v2reference_long_delta": {
+    "reproduced": 4.74,
+    "prior": 4.73,
+    "abs_diff": 0.01,
+    "parity": "OK"
+  },
+  "P3_v2reference_short_delta": {
+    "reproduced": -7.09,
+    "prior": -7.06,
+    "abs_diff": 0.03,
+    "parity": "OK"
+  },
+  "P1a_vs_P1b_identical": true,
+  "note_on_P1a_P1b": "P1a and P1b use independent code paths (frozen literal threshold vs fresh validation grid search) but are expected to coincide numerically because the training data, features, hyperparameters and random_state are unchanged from v2 -- this is reported explicitly rather than silently reusing one number for both, per the spec's requirement to keep them distinct."
+}

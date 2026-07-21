@@ -1,0 +1,73 @@
+{
+  "atr_contract": {
+    "checkpoint_context_atr": "atr_at_checkpoint",
+    "legacy_atr_alias": "atr_at_checkpoint",
+    "local_excursion_denominator": "atr_at_entry"
+  },
+  "base_feature_count": 154,
+  "boundary_purge": {
+    "boundary_ns": 1751328000000000000,
+    "calibration_regime_count": 13971,
+    "purged_regime_count": 1,
+    "purged_regime_start_ns": [
+      1751327880000000000
+    ],
+    "selection_regime_count": 13165
+  },
+  "bundle_sha256": "cd1243dc0dc0bd37f1141d9d42a732cf5d7e52fa900536f7b64b9acecb9dc237",
+  "calibration": "direction-specific isotonic on 2025-H2",
+  "calibration_window": "2025-07-01..2025-12-31",
+  "dependency_sha256": {
+    "studies/CODEX_5_X_weakness_atlas_repair/CODEX_5_X_build_regime_history.py": "48f32e322a6c77bec4c5d2a925c962c1c39b8c77ac4b0134383a71bf32bca75b",
+    "studies/CODEX_5_X_weakness_atlas_repair/CODEX_5_X_build_repaired_atlas.py": "93710ef4573c1c1bde6fe945635e4f9e0d424b03a1129b43c97e544113d27633",
+    "studies/CODEX_5_X_weakness_atlas_repair/CODEX_5_X_common.py": "302fab7b64178ee7626300048e9d1b66ab04b64c4a429a3fcbcd48175523e1c7",
+    "studies/CODEX_5_X_weakness_atlas_repair/CODEX_5_X_train_repaired_w4.py": "1ae959f8f8c410708ead631b6dc354eb149ac2559badef2ab3327c5d095f8fed",
+    "studies/regime_sequence_chop_context/build_median_centers.py": "6bcfc94503b92ceffd5b9dfa28064d4b787e7eca09a0f2a4c058ab2213bd40fd",
+    "studies/regime_sequence_chop_context/build_regime_sequence.py": "b35ad953a19eba82be3850c63f3aa76d053a47182b03d71ac95ad05873b926f6",
+    "studies/regime_sequence_chop_context/build_weakness_atlas.py": "1450546a1282d30e030dad5982087bbc12d23c50fbd0405f63b073433d17b58b",
+    "studies/regime_sequence_chop_context/reproduce_regimes.py": "33823e22055836aa0c4914474ee01724e3e18c432a723079e9bf7a2c011137da",
+    "studies/regime_sequence_chop_context/train_weakness_model.py": "396abfbbda4e38b89dd3634b7f76e68e6160cbb5b7d6e90ee1b6f7937f6b6da5"
+  },
+  "gate": {
+    "cross_rate_balance_ratio": 1.036330104063402,
+    "cross_rate_long": 0.8769517261137373,
+    "cross_rate_short": 0.84620886981402,
+    "finite_score_rate_long": 1.0,
+    "finite_score_rate_short": 1.0,
+    "pass": true,
+    "selected_structure": "directional_pair",
+    "selection_auc_long": 0.7724045456570982,
+    "selection_auc_short": 0.7700956826699066
+  },
+  "interaction_features": [
+    "direction",
+    "direction_x_regime_age",
+    "direction_x_current_pnl",
+    "direction_x_current_mfe",
+    "direction_x_current_mae",
+    "direction_x_giveback"
+  ],
+  "no_2026_access": true,
+  "repaired_atlas_sha256": {
+    "2021": "32732ef8f18dac5acdfebaf3974e86cc038407f1220f0f2db40e9617a56a44a4",
+    "2022": "99dfde8430e3920e07d73b85d305448f339fe438f77083306a629326a64b877b",
+    "2023": "d8c1f198098a2b58922ec4e4b12a37e5ce712f0db58b4b5ff463f9bd54dde88a",
+    "2024": "067b32d63f594e2d56f53b3eb5019509f5514d2f743ba576b42cc8a51c21fac1",
+    "2025": "c654da5016f7ec4bf26be11a390992dff851d38e81684a2a19f0bbed90ad9ce7"
+  },
+  "selected_structure": "directional_pair",
+  "selection_rule": "macro directional ROC-AUC; within 0.005 prefer smaller directional gap then simpler pooled",
+  "selection_window": "2025-01-01..2025-06-30",
+  "status": "FROZEN_PRE_2026_GATE_PASSED",
+  "threshold_definition": "direction-specific P90 calibrated score on 2025-H2",
+  "thresholds": {
+    "-1": 0.7183653372722797,
+    "1": 0.6883498713708196
+  },
+  "train_years": [
+    2021,
+    2022,
+    2023,
+    2024
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "study": "fable5_short_rth_postalign_isolation",
+  "engine": "offline 1s-OHLC Policy A (fable5_common.simulate_trade_arrays parity)",
+  "decision": "POSTALIGN_STOP_HELPS",
+  "variants": {
+    "H0": "current Policy A (1.50 ATR post-align stop)",
+    "H1": "no post-align stop; hold to opposing flip"
+  },
+  "population": {
+    "combined": 807,
+    "2025": 604,
+    "2026": 203
+  },
+  "rth": "08:30-15:00 America/Chicago (entry only; frozen schedule)",
+  "cost": {
+    "multiplier": 20.0,
+    "round_trip_usd": 10.0,
+    "quantity": 1
+  },
+  "fill_model": "offline next-open entry; stop at trigger (gap->open); opposing flip next-open",
+  "h0_baseline_reconciliation": {
+    "2025": {
+      "year": 2025,
+      "trades": 604,
+      "mismatches": 0,
+      "h0_net_pnl": 20304.001729998054,
+      "offline_net_pnl": 20304.001729998054
+    },
+    "2026": {
+      "year": 2026,
+      "trades": 203,
+      "mismatches": 0,
+      "h0_net_pnl": 6709.10026674057,
+      "offline_net_pnl": 6709.10026674057
+    }
+  },
+  "attribution_stop_after_flip": {
+    "h0_stop_after_flip_trades": 36,
+    "h0_total_pnl": -15306.535714849379,
+    "h1_total_pnl_at_opposing_flip": -20610.0,
+    "delta_total": -5303.464285150621,
+    "count_improved": 18,
+    "count_worsened": 18,
+    "count_unchanged": 0,
+    "count_loss_got_larger": 18,
+    "count_recovered_to_profit": 2,
+    "count_became_large_winner_ge_500usd": 0,
+    "avg_h0_result": -425.18154763470494,
+    "avg_h1_result": -572.5,
+    "median_h1_result": -405.0,
+    "median_mae_after_h0_stop_atr": 1.8742750504313062,
+    "max_mae_after_h0_stop_atr": 8.289007410337577,
+    "median_time_h0stop_to_opposing_flip_s": 39.0,
+    "non_stop_after_trades_changed_under_h1": 0
+  },
+  "schedule_sha256": {
+    "2025": "1d241bf66949e826f53e11ce09cf2c4fd692affee0529b3979624c0ffcaaa67c",
+    "2026": "0370fd4c7c383a4825fe73010792d0416276cb1eb12712dc4d7d800bf54c961d"
+  },
+  "runner_sha256": "a87085ddce1b6890914fa682260a9c5fe3f23a8ccbcab8989aeab915985bd007"
+}

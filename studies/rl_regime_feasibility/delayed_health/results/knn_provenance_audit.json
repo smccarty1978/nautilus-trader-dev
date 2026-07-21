@@ -1,0 +1,14 @@
+{
+  "total_bar4_obs": 3196237,
+  "scored_obs": 2082010,
+  "pct_scored": 65.14,
+  "k": 100,
+  "median_n_eff": 100.0,
+  "median_unique_eps": 100.0,
+  "hA_mean": -0.1363,
+  "hC_mean": -0.1493,
+  "composite_mean": 0.5498,
+  "approach": "period-based library (train->val, train+val->test, first-half->second-half train)",
+  "causality_check": "val/test: all neighbors have earlier flip_time; train: first-half prior only",
+  "contamination_check": "PASS: no forward-looking labels in features; library does not include query period"
+}

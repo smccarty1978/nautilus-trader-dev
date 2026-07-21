@@ -1,0 +1,56 @@
+[
+  {
+    "artifact": "regime_dna.parquet",
+    "location": "backtests/studies/regime_dna_knn/results/regime_dna.parquet",
+    "shape": "146831 x 68",
+    "key_columns": "regime_start_ts, pre_5/15/30_* (48 pre-flip features), ema9/21_slope, distance_to_vwap",
+    "classification": "CAUSAL_SAFE",
+    "rationale": "All pre_5/15/30 features are computed exclusively from 1m bars COMPLETED before the flip bar. regime_start_ts is the CLOSE of the flip bar. EMA slopes and distances are at flip-bar close. VWAP and session high/low use only bars through flip-bar close. 100% overlap with RL episode flip_time universe.",
+    "use_decision": "INCLUDE \u2014 join on flip_time=regime_start_ts as pre-flip context features"
+  },
+  {
+    "artifact": "early_health_capsule.parquet",
+    "location": "backtests/studies/regime_dna_knn/results/early_health_capsule.parquet",
+    "shape": "146831 x 21",
+    "key_columns": "regime_start_ts, pre5_efficiency, pre5_compression, n_post, post_o/h/l/c/v",
+    "classification": "CAUSAL_UNCERTAIN",
+    "rationale": "pre5_* features are CAUSAL_SAFE (same logic as regime_dna pre_5_*). But n_post and post_o/h/l/c/v record the FIRST bar AFTER the flip \u2014 forward-looking relative to the flip. No causal guarantee on post_* columns.",
+    "use_decision": "EXCLUDE \u2014 pre5 columns are redundant with regime_dna; post_* are forward-looking"
+  },
+  {
+    "artifact": "dna_knn_scores.parquet",
+    "location": "backtests/studies/regime_dna_knn/results/dna_knn_scores.parquet",
+    "shape": "1314501 x 42",
+    "key_columns": "regime_id, bar_ts, score_pt050_sl025..score_failure_risk, score_expected_net",
+    "classification": "NONCAUSAL",
+    "rationale": "KNN scores are trained on regime_dna DNA features via leave-one-out KNN lookup. The training set includes all years, meaning OOS regime IDs have neighbors from future years in the index. Additionally per MEMORY.md: 'Bar-4 KNN path-atlas: calibrated for RISK/TIMING, blind on OPPORTUNITY/DIRECTION. rem-MFE skill +5% & P(+1 before -1) FLAT ~45% (blind). Closes V_A/flip+hC/Model-B line.' Dead signal class.",
+    "use_decision": "EXCLUDE \u2014 non-causal train/test contamination + dead signal per audit"
+  },
+  {
+    "artifact": "obs_depth0p25/0p5/0p75.parquet (hC values)",
+    "location": "studies/pullback_dna/results/obs_depth*.parquet",
+    "shape": "23K-31K x 38 (per file)",
+    "key_columns": "regime_start_ts, entry_ts, hC, hC_velocity, state",
+    "classification": "NONCAUSAL",
+    "rationale": "These files record only regimes where hC >= 0.50 at pullback entry (bar 8+). Using them as RL features creates selection bias: ~57% of RL episodes have no pullback obs record. The hC value is computed at pullback entry_ts, not at the 5s observation time. The underlying components (EMA alignment, ATR, regime state) are already captured in existing features (ema3_ema9_spread, regime_5s/30s/5m aligned, adx14).",
+    "use_decision": "EXCLUDE \u2014 selection bias + already covered by existing features"
+  },
+  {
+    "artifact": "hc_sizing_extremes/trades.parquet",
+    "location": "studies/hc_sizing_extremes/trades.parquet",
+    "shape": "60 x 42",
+    "key_columns": "decision_ts, hC, sizing_factor",
+    "classification": "NONCAUSAL",
+    "rationale": "Only 60 trades covering 2025; too small a subset to use as features. hC at decision time is from the same pullback_dna computation logic. Not joinable to RL episode universe in a representative way.",
+    "use_decision": "EXCLUDE \u2014 too few samples, not representative"
+  },
+  {
+    "artifact": "transition_atlas.parquet / opportunity_curve.parquet",
+    "location": "studies/pullback_dna/results/reports/*.parquet",
+    "shape": "253 x 14 / 9 x 5",
+    "key_columns": "t_s (seconds), survival/probability summary statistics",
+    "classification": "NONCAUSAL",
+    "rationale": "Population-level summary statistics (e.g., P(reach 0.5 ATR | alive at t=30s)). These are derived from the FULL outcome distribution and would inject look-ahead if used as per-observation features. They are not per-episode.",
+    "use_decision": "EXCLUDE \u2014 population summary statistics; forward-looking if used as features"
+  }
+]

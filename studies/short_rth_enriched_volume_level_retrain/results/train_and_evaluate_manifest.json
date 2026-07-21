@@ -1,0 +1,34 @@
+{
+  "runtime_s": 4924.1,
+  "train_rows": 813972,
+  "dev_rows": 198255,
+  "test_rows": 63021,
+  "feature_sets": {
+    "F0_existing_only": 149,
+    "F1_volume_delta_only": 363,
+    "F2_price_levels_only": 481,
+    "F3_volume_delta_plus_price_levels": 695
+  },
+  "classes": [
+    "opposing_flip_winner",
+    "opposing_flip_loser",
+    "pre_alignment_stop",
+    "confirmation_timeout",
+    "post_alignment_stop"
+  ],
+  "score_weights": {
+    "opposing_flip_winner": 1.0,
+    "pre_alignment_stop": -1.0,
+    "confirmation_timeout": -0.25,
+    "post_alignment_stop": -0.5
+  },
+  "bands": [
+    1.0,
+    0.85,
+    0.7,
+    0.5,
+    0.35,
+    0.2
+  ],
+  "generator_sha256": "7b5b0f858cbaf39827f2990853fd50590efdf2c00d210df9772903d72d0b6eec"
+}

@@ -1,0 +1,47 @@
+{
+  "study": "nt_live_scoring_infra_prereqs",
+  "decision": "INFRA_PREREQS_READY_WITH_REDUCED_SCOPE",
+  "completion_audit_critical_findings": 0,
+  "completion_audit_warning_findings": 0,
+  "completion_audit_note_findings": 2,
+  "phase0_model_reconstruction": {
+    "status": "success",
+    "model_artifact_path": "studies/nt_live_scoring_infra_prereqs/_work/F3_volume_delta_plus_price_levels__gbt_reconstructed.joblib",
+    "model_artifact_sha256": "dd16ab38518cc00377058a0ff4068b59477eb1261fc541f25976767a08da670b",
+    "max_abs_diff_vs_stored_reference": 0.0,
+    "n_rows_compared": 198255,
+    "note": "no fitted model object existed anywhere on disk before this study -- a scout-agent claim to the contrary was checked directly and found wrong; this is a genuinely new artifact"
+  },
+  "phase1_feature_inventory": {
+    "n_f3_features": 695,
+    "n_in_registry_with_live_tracker": 546,
+    "pct_live_tracker_exists": 0.7856,
+    "n_not_in_registry_no_live_tracker": 149,
+    "gap_family": "regime_median_center_slope_alignment (F0's 149 'existing' features)",
+    "gap_source": "studies/regime_sequence_chop_context/build_median_centers.py -- pandas-batch rolling-window computation, no live NT equivalent exists anywhere in the repo",
+    "n_timing_unverified_within_registered": 17,
+    "timing_unverified_family": "ohlcv_est_delta regime-relative (A4) features -- regime_starts construction not independently re-traced to the same depth as the feature trackers in this study"
+  },
+  "phase2_registry_schema_extension": {
+    "fields_added": ["window", "window_unit", "reset_policy"],
+    "entries_precisely_backfilled": 384,
+    "total_registry_entries": 502,
+    "snapshot_anchor_binding_mechanism_added": true,
+    "regression_risk": "none -- all FeatureDefinition call sites use keyword arguments, new fields have safe defaults"
+  },
+  "phase3_feature_timing_causal_spec": {
+    "artifact": "studies/nt_live_scoring_infra_prereqs/results/feature_timing_causal_spec.md",
+    "core_rule": "latest_source_ts_used <= observation_ts",
+    "empirically_verified_via_pytest": ["prefix_invariance", "snapshot_immutability", "warmup_unavailability", "regime_reset_no_forward_info"],
+    "known_benign_discrepancy": "build_weakness_atlas.py uses strict '<' for checkpoint-to-bar matching, attach_features.py's re-snap uses '<='; both independently satisfy the core rule, not a look-ahead bug"
+  },
+  "phase4_coincident_bar_ordering": {
+    "original_claim": "1s-before-1m ordering is an NT-native, proven invariant",
+    "corrected_finding": "1s-before-1m ordering at coincident timestamps is a CALLING-CONVENTION requirement (engine.add_data() call order), NOT an NT-native, bar-type-aware guarantee -- reversing the add_data() call order flips the observed arrival order",
+    "reusable_helper_added": "add_bars_causal_order() in studies/nt_live_scoring_infra_prereqs/tests/test_coincident_bar_ordering.py",
+    "significance": "this is the single most important finding of this study -- the follow-on nt_live_ml_scoring_population_parity study's run_nt.py MUST use this helper or replicate its exact add_data call order, or it will silently reintroduce the MFE/MAE blind spot CLAUDE.md invariant 4 exists to prevent"
+  },
+  "recommendation_for_follow_on_study": "Scope nt_live_ml_scoring_population_parity to the 546 F3 features already backed by live NT-callback trackers (ohlcv_est_delta + price_level_context families), explicitly excluding F0's 149 regime-slope-alignment features, which would require a separate from-scratch live-porting effort. Use add_bars_causal_order() (or replicate its call order) for any multi-timeframe NT run. Treat the 17 TIMING_UNVERIFIED regime-relative features as a known, disclosed residual risk, not a blocker -- their causal reasoning is sound (completed-minute-close reset, reused RegimeEngine precedent) even though not independently re-traced to the same depth as the rest of this study.",
+  "git_commit": null,
+  "git_commit_note": "not available -- no .git directory at repo root"
+}

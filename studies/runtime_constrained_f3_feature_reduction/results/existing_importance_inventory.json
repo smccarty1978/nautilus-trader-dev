@@ -1,0 +1,52 @@
+{
+  "sources_reviewed": [
+    {
+      "path": "studies/short_rth_enriched_volume_level_retrain/results/feature_importance.csv",
+      "valid_for_this_study": false,
+      "reason": "Target is 5-class outcome_class (entry_quality_score study), not the binary bearish_regime_flip_within_300s target this study uses. GBT importance rows use scoring=\"roc_auc_ovr\" (multiclass one-vs-rest), not comparable to this study's binary roc_auc. Excluded entirely from Phase 3 ranking."
+    },
+    {
+      "path": "studies/short_rth_pure_flip_prediction_enriched/results/feature_importance.csv",
+      "sha256": "bd82be85c3b9948f81f9d651494617e87285d8f600478ea3ac36492e260e4f5a",
+      "valid_for_this_study": "partial",
+      "checks": {
+        "correct_binary_target": true,
+        "note_target": "bearish_regime_flip_within_300s (train_and_evaluate.py:52), matches this study",
+        "correct_695_feature_f3_model": true,
+        "note_model": "feature_set==F3_volume_delta_plus_price_levels, model==gbt rows present, 695 features confirmed by row count (3376 total rows / (149+363+481+695) features x 2 models = 3376 exact match)",
+        "evaluated_on_2025_not_training": true,
+        "note_split": "permutation_importance called on dev_X (prepared_2025.parquet), never train_X (train_and_evaluate.py:129)",
+        "no_2026_contamination": true,
+        "documented_scoring_metric": true,
+        "note_scoring": "scoring=\"roc_auc\" (binary), train_and_evaluate.py:131",
+        "reproducible_random_seed": true,
+        "note_seed": "random_state=42 (RANDOM_STATE), rng = np.random.default_rng(RANDOM_STATE), train_and_evaluate.py:126,130"
+      },
+      "gaps_vs_this_study_phase3_requirements": [
+        "Sampling is uniform-random (rng.choice, 20000 rows), not regime-stratified/monthly-preserving -- this study's SPEC requires a regime-aware sample to avoid long-regime row-count dominance.",
+        "Only n_repeats=3, no monthly stability computed at all.",
+        "No grouped-by-family or grouped-by-canonical-runtime-source aggregation.",
+        "No threshold-side (top-5%/top-2.5%) importance.",
+        "No correlation/substitutability clustering.",
+        "Not validated on the complete 2025 population for any candidate (this study requires that for selected candidates)."
+      ],
+      "reuse_decision": "Retained as a cross-check reference only (Phase 3 will report rank correlation between this existing evidence and the new regime-stratified ranking as a sanity check). Not reused as the final Phase 3 ranking -- a new regime-stratified, monthly-stable, grouped ranking is computed fresh."
+    }
+  ],
+  "existing_checkpoint_pickles_traced": [
+    {
+      "path": "studies/short_rth_enriched_volume_level_retrain/_work/checkpoints/F3_volume_delta_plus_price_levels__gbt.pkl",
+      "keys_found": [
+        "row",
+        "calib_frames",
+        "importance_rows",
+        "cutoffs",
+        "score_train",
+        "score_dev",
+        "score_test"
+      ],
+      "contains_fitted_model_object": false,
+      "note": "Confirmed by nt_live_scoring_infra_prereqs Phase 0 (finding 6) -- never contains the fitted HistGradientBoostingClassifier itself, and belongs to the WRONG (5-class) target in any case. Not a source of reusable importance evidence beyond the CSV already assessed above."
+    }
+  ]
+}

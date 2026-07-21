@@ -1,0 +1,19 @@
+{
+  "status": "DIAGNOSTIC_OUTPUTS_COMPLETE",
+  "script_sha256": "0fbfc96c1c905e0ef31176783ec0aec0c95092a14e6dab6fc757860c5a84f8b7",
+  "config_sha256": "c5b5a367d499b6315576e83b1f8b4f81beb29159c997438adc8601ca764ae8d5",
+  "trade_count": 4383,
+  "path_row_count": 1320819,
+  "outcome_counts": {
+    "stop_before_aligned_flip": 1476,
+    "opposite_flip_exit_winner": 1360,
+    "opposite_flip_exit_loser": 1172,
+    "stop_after_aligned_flip": 375
+  },
+  "output_sha256": {
+    "path_checkpoints.parquet": "a06d73ccecc15668f42c08f71c52692f29ff2a4a9aefbb74754980472113c993",
+    "outcome_group_summary.parquet": "0b89b4d86049a97d682552b1db3b46fa5317b5477ba2923d54bcc4da6847b7a2",
+    "early_window_summary.parquet": "6370a05311037680b17c311eea48982e108bddace0beef3b941c6c618e33450e",
+    "post_flip_exit_diagnostic.parquet": "fcfe949d070c4f2685372397d9c715001af527210d3fe2332b6ec7911101d84a"
+  }
+}

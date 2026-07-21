@@ -1,0 +1,25 @@
+{
+  "status": "FROZEN_BEFORE_ANY_NEW_CODE_TEST_OR_REPLAY",
+  "candidate_count": 4383,
+  "candidate_count_by_year": {"2025": 3246, "2026": 1137},
+  "policy_ids": ["PR10", "PR30"],
+  "input_sha256": {
+    "2025_raw": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "2026_raw": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+    "2025_trades": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+    "2026_trades": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83",
+    "policy_a_isolation_diffs": "ab3aad543271d6a64d586c853f6aad76702f0a1e4166c11b375a1164cf367367",
+    "policy_a_isolation_completion_audit": "0ac39c2974f95f96d4842f5b3cb435c27e4271d1385b21bcfb419ce9d045da2c",
+    "policy_a_isolation_manifest": "eb6531c8acab975dafc26969e62b27ffc9497510c3615c7ad573c31915f83ee5"
+  },
+  "prohibited": [
+    "W4 retraining",
+    "W4 trigger or threshold changes",
+    "additional confirmation delays",
+    "additional virtual PnL thresholds",
+    "new filters",
+    "2026-driven selection",
+    "MFE continuation",
+    "post-flip retained-profit logic"
+  ]
+}

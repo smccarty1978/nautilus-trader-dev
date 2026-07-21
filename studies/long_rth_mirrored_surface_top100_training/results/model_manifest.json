@@ -1,0 +1,17 @@
+{
+  "target": "bullish_regime_flip_within_300s",
+  "selected_model": "gbt",
+  "n_features": 100,
+  "random_state": 42,
+  "reused_fit_from": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_enriched_volume_level_retrain\\train_and_evaluate.py",
+  "train_rows": 682952,
+  "dev_rows": 163397,
+  "test_rows": 52488,
+  "positive_rate": {
+    "train": 0.2702840023896262,
+    "2025": 0.26293628401990243,
+    "2026": 0.2803688462124676
+  },
+  "generator_sha256": "0a380c0b9fa397caba7fca3cf5d309c16654027e42b3cc4f3f953a27117219dd",
+  "runtime_s": 52.8
+}

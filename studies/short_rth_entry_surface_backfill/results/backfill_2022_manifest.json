@@ -1,0 +1,186 @@
+{
+  "year": 2022,
+  "atlas_audit": {
+    "year": 2022,
+    "rows": 3954384,
+    "distinct_regimes": 27111,
+    "negative_excursion_cells": 0,
+    "running_mfe_monotonicity_violations": 0,
+    "running_mae_monotonicity_violations": 0,
+    "direction_values": [
+      -1,
+      1
+    ],
+    "feature_columns_present": 149,
+    "build_runtime_s": 263.3,
+    "raw_sha256": "7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4",
+    "output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\atlas_5s_backfill_2022.parquet",
+    "output_sha256": "eaa9010ef2176ada027340ec83ca2e5392954a183b71430f759f597b5a371831"
+  },
+  "surface_attrition": {
+    "checkpoints": {
+      "all": 3954384,
+      "bullish_regime": 1992673,
+      "established": 672400,
+      "rth": 192378,
+      "valid_fill": 192378,
+      "rth_boundary_divergence": 0
+    },
+    "distinct_regimes": {
+      "all": 27111,
+      "bullish_regime": 13554,
+      "established": 5804,
+      "rth": 1711,
+      "valid_fill": 1711,
+      "rth_boundary_divergence": 0
+    }
+  },
+  "surface_runtime_s": 48.8,
+  "surface_rows": 192378,
+  "raw_gaps_over_300s": 257,
+  "raw_gap_classes": {
+    "weekend_or_holiday": 51,
+    "SUSPICIOUS_INTRADAY": 7,
+    "daily_maintenance_break": 199
+  },
+  "raw_gaps_top10": [
+    {
+      "gap_start": "2022-04-14 20:59:58+00:00",
+      "gap_end": "2022-04-17 22:00:00+00:00",
+      "gap_s": 262802.0
+    },
+    {
+      "gap_start": "2022-12-23 21:59:59+00:00",
+      "gap_end": "2022-12-26 23:00:00+00:00",
+      "gap_s": 262801.0
+    },
+    {
+      "gap_start": "2022-11-25 18:14:59+00:00",
+      "gap_end": "2022-11-27 23:00:00+00:00",
+      "gap_s": 189901.0
+    },
+    {
+      "gap_start": "2022-11-04 20:59:58+00:00",
+      "gap_end": "2022-11-06 23:00:00+00:00",
+      "gap_s": 180002.0
+    },
+    {
+      "gap_start": "2022-02-25 21:59:57+00:00",
+      "gap_end": "2022-02-27 23:00:00+00:00",
+      "gap_s": 176403.0
+    },
+    {
+      "gap_start": "2022-03-04 21:59:57+00:00",
+      "gap_end": "2022-03-06 23:00:00+00:00",
+      "gap_s": 176403.0
+    },
+    {
+      "gap_start": "2022-04-01 20:59:58+00:00",
+      "gap_end": "2022-04-03 22:00:00+00:00",
+      "gap_s": 176402.0
+    },
+    {
+      "gap_start": "2022-04-22 20:59:58+00:00",
+      "gap_end": "2022-04-24 22:00:00+00:00",
+      "gap_s": 176402.0
+    },
+    {
+      "gap_start": "2022-06-10 20:59:58+00:00",
+      "gap_end": "2022-06-12 22:00:00+00:00",
+      "gap_s": 176402.0
+    },
+    {
+      "gap_start": "2022-08-05 20:59:58+00:00",
+      "gap_end": "2022-08-07 22:00:00+00:00",
+      "gap_s": 176402.0
+    }
+  ],
+  "suspicious_intraday_gaps": [
+    {
+      "gap_start": "2022-06-20 16:59:58+00:00",
+      "gap_end": "2022-06-20 22:00:00+00:00",
+      "gap_s": 18002.0
+    },
+    {
+      "gap_start": "2022-01-17 17:59:59+00:00",
+      "gap_end": "2022-01-17 23:00:00+00:00",
+      "gap_s": 18001.0
+    },
+    {
+      "gap_start": "2022-02-21 17:59:59+00:00",
+      "gap_end": "2022-02-21 23:00:00+00:00",
+      "gap_s": 18001.0
+    },
+    {
+      "gap_start": "2022-05-30 16:59:59+00:00",
+      "gap_end": "2022-05-30 22:00:00+00:00",
+      "gap_s": 18001.0
+    },
+    {
+      "gap_start": "2022-07-04 16:59:59+00:00",
+      "gap_end": "2022-07-04 22:00:00+00:00",
+      "gap_s": 18001.0
+    },
+    {
+      "gap_start": "2022-09-05 16:59:59+00:00",
+      "gap_end": "2022-09-05 22:00:00+00:00",
+      "gap_s": 18001.0
+    },
+    {
+      "gap_start": "2022-11-24 17:59:59+00:00",
+      "gap_end": "2022-11-24 23:00:00+00:00",
+      "gap_s": 18001.0
+    }
+  ],
+  "feature_completeness": {
+    "expected_feature_columns": 149,
+    "present_feature_columns": 149,
+    "missing_feature_columns": [],
+    "overall_nan_rate": 0.00024939952126805766,
+    "surface_row_nan_rate": 1.0151993129298507e-05,
+    "top10_nan_rate_columns": {
+      "activity_duration_median_30m": 0.0005975646270063808,
+      "seq_12r_position_pct": 0.000554827249958527,
+      "seq_12r_dist_to_high_atr": 0.000554827249958527,
+      "seq_12r_dist_to_low_atr": 0.000554827249958527,
+      "seq_12r_range_atr": 0.000554827249958527,
+      "seq_12r_perfect_alternation": 0.000554827249958527,
+      "seq_12r_efficiency": 0.000554827249958527,
+      "seq_12r_disp_atr": 0.000554827249958527,
+      "seq_12r_mean_overlap": 0.000554827249958527,
+      "seq_12r_median_overlap": 0.000554827249958527
+    }
+  },
+  "policy_a_feasibility": {
+    "seq1_candidates": 1711,
+    "labeled": 1711,
+    "label_errors": 0,
+    "error_sample": [],
+    "exit_reason_counts": {
+      "confirmation_timeout_exit": 798,
+      "preflip_policy_stop": 645,
+      "original_opposing_flip_exit": 261,
+      "original_stop_after_aligned_flip": 7
+    },
+    "exit_reason_pnl": {
+      "confirmation_timeout_exit": 75510.0,
+      "original_opposing_flip_exit": 126110.0,
+      "original_stop_after_aligned_flip": -2816.6498976882212,
+      "preflip_policy_stop": -225845.09454196197
+    },
+    "pre_alignment_stop_rate": 0.37697253068381065,
+    "timeout_rate": 0.4663939216832262,
+    "post_alignment_stop_rate": 0.004091174751607247,
+    "opposing_flip_rate": 0.15254237288135594,
+    "avoid_pre_alignment_stop_rate": 0.6230274693161894,
+    "net_pnl_sum": -27041.74443965021,
+    "net_pnl_mean": -15.804643155844659
+  },
+  "policy_sha256": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b",
+  "generator_sha256": {
+    "build_5s_atlas_smoke": "e61097e0e8812bed97226da8c45994845edd7463181d7c7795e4d9eb53a3bc0a",
+    "entry_surface": "474d3d2494b3bcf2481ea342c5a9bdca70ab9d70bacd814127aa8c51c38ee476",
+    "smoke_2021_surface": "0dd79445c2616bc36a17e9e03a42a9eb8248c0b7163d75f2ec9761ec6fb620c0",
+    "run_year_backfill": "f40ac2c66933a6a768c68d972e51d81c4bbfc2521102738befdc9c8baa6d586f"
+  }
+}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nautilus Trader - Backtest Visualizer</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- TradingView Lightweight Charts Local -->
+    <script src="lightweight-charts.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Visual JS Error Banner -->
+    <div id="error-banner" style="display: none; background-color: #f23645; color: white; padding: 12px 20px; font-weight: 500; font-size: 14px; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+        <strong>Javascript Error:</strong> <span id="error-message"></span>
+    </div>
+    <script>
+        function sendErrorToBackend(msg) {
+            fetch("/api/logs", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg })
+            }).catch(e => console.error("Failed to send error to backend:", e));
+        }
+
+        window.onerror = function(message, source, lineno, colno, error) {
+            const banner = document.getElementById("error-banner");
+            const msgSpan = document.getElementById("error-message");
+            const file = source ? source.substring(source.lastIndexOf('/') + 1) : 'unknown';
+            const errMsg = `${message} (${file}:${lineno}:${colno})`;
+            if (banner && msgSpan) {
+                msgSpan.textContent = errMsg;
+                banner.style.display = "block";
+            }
+            sendErrorToBackend(`UNCAUGHT ERROR: ${errMsg}`);
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+            const banner = document.getElementById("error-banner");
+            const msgSpan = document.getElementById("error-message");
+            const errMsg = event.reason.stack || event.reason.message || event.reason;
+            if (banner && msgSpan) {
+                banner.style.display = "block";
+                msgSpan.textContent = `Promise Rejected: ${errMsg}`;
+            }
+            sendErrorToBackend(`UNHANDLED PROMISE REJECTION: ${errMsg}`);
+        });
+    </script>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Nautilus Trader</h2>
+                <div class="selector-container">
+                    <label for="backtest-select">Backtest Run</label>
+                    <select id="backtest-select">
+                        <option value="">-- Select Backtest --</option>
+                    </select>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="trade-search" placeholder="Search Trades (ID, Date, Reason)...">
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="wins">Wins</button>
+                    <button class="filter-btn" data-filter="losses">Losses</button>
+                </div>
+                <div class="trade-stats" id="trade-stats">
+                    Trades: 0 | Win Rate: 0.0%
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <ul class="trades-list" id="trades-list">
+                    <!-- Dynamic List Items -->
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header for Selected Trade Detail -->
+            <header class="detail-header" id="detail-header">
+                <div class="trade-summary-stub">Select a trade from the list to visualize</div>
+                <div class="trade-details-container" style="display: none;">
+                    <div class="detail-group">
+                        <div class="detail-label">Trade ID</div>
+                        <div class="detail-value" id="val-trade-id">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <div class="detail-label">Direction</div>
+                        <div class="detail-value" id="val-direction">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <div class="detail-label">Entry Price</div>
+                        <div class="detail-value" id="val-entry-px">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <div class="detail-label">Exit Price</div>
+                        <div class="detail-value" id="val-exit-px">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <div class="detail-label">PnL</div>
+                        <div class="detail-value" id="val-pnl">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <div class="detail-label">Reason</div>
+                        <div class="detail-value" id="val-reason">-</div>
+                    </div>
+                    <div class="detail-group time-group">
+                        <div class="detail-label">Entry Time (UTC)</div>
+                        <div class="detail-value" id="val-entry-time">-</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Control Bar -->
+            <section class="control-bar">
+                <div class="control-group">
+                    <label>Resolution</label>
+                    <div class="btn-group" id="resolution-buttons">
+                        <button class="btn" data-res="1s">1s</button>
+                        <button class="btn active" data-res="5s">5s</button>
+                        <button class="btn" data-res="15s">15s</button>
+                        <button class="btn" data-res="1m">1m</button>
+                        <button class="btn" data-res="5m">5m</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Padding (mins)</label>
+                    <select id="padding-select">
+                        <option value="5">5m</option>
+                        <option value="15" selected>15m</option>
+                        <option value="30">30m</option>
+                        <option value="60">60m</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <button id="auto-scale-btn" class="btn" title="Auto Scale/Fit (A)">Auto Fit</button>
+                </div>
+                <div class="control-group">
+                    <button id="stop-server-btn" class="btn stop-btn" title="Shutdown Python Visualizer API server">Stop Server</button>
+                </div>
+                <div class="control-group navigation-group">
+                    <button id="prev-trade-btn" class="btn" title="Previous Trade (Left Arrow)">&larr; Prev</button>
+                    <button id="next-trade-btn" class="btn" title="Next Trade (Right Arrow)">Next &rarr;</button>
+                </div>
+            </section>
+
+            <!-- Chart Container -->
+            <div class="chart-wrapper">
+                <div id="chart-container"></div>
+                <div id="chart-legend" class="chart-legend">
+                    <div class="legend-row">
+                        <span class="legend-title">OHLC:</span>
+                        <span id="legend-ohlc">-</span>
+                    </div>
+                    <div class="legend-row">
+                        <span class="legend-indicator short-ema">Short EMA H/L/C:</span>
+                        <span id="legend-short-ema">-</span>
+                    </div>
+                    <div class="legend-row">
+                        <span class="legend-indicator long-ema">Long EMA H/L:</span>
+                        <span id="legend-long-ema">-</span>
+                    </div>
+                    <div class="legend-row">
+                        <span class="legend-indicator regime">Regime:</span>
+                        <span id="legend-regime">-</span>
+                    </div>
+                    <div class="legend-row">
+                        <span class="legend-indicator atr">ATR (14):</span>
+                        <span id="legend-atr">-</span>
+                    </div>
+                </div>
+                <!-- Loading indicator overlay -->
+                <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Loading Trade Data...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Fullscreen Server Offline Screen -->
+    <div id="shutdown-screen" style="display: none; background-color: #131722; color: #d1d4dc; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; flex-direction: column; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif;">
+        <h1 style="color: #ef5350; font-size: 32px; font-weight: 600; margin-bottom: 15px;">Visualizer Server Offline</h1>
+        <p style="font-size: 16px; color: #787b86; text-align: center; max-width: 400px; line-height: 1.6;">
+            The Python FastAPI server process has been shut down cleanly. 
+            <br><br>
+            To start it again, please run the launcher script:
+            <br>
+            <code style="display: inline-block; background-color: #1c2030; color: #2962ff; padding: 6px 12px; border-radius: 6px; font-family: monospace; margin-top: 10px; font-size: 14px;">python run_visualizer.py</code>
+        </p>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "outcomes": {
+    "pnl_base": "net PnL in USD using base execution costs ($5 RT, 0 slippage)",
+    "pnl_plus_1t": "net PnL in USD with 1 tick/side additional slippage ($10 RT)",
+    "pnl_plus_2t": "net PnL in USD with 2 ticks/side additional slippage ($15 RT)",
+    "exit_type": "stop | regime_exit | timeout | censored",
+    "outcome_class": "EARLY_ROTATIONAL_FAILURE | LOW_PROGRESS_REGIME | PRODUCTIVE_ORDINARY_REGIME | LARGE_RUNNER | AMBIGUOUS"
+  }
+}

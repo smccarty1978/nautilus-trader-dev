@@ -1,0 +1,949 @@
+{
+  "study": "fable5_short_rth_threshold_ladder",
+  "decision": "EARLIER_THRESHOLD_ADDS_TOO_MANY_FALSE_STARTS",
+  "w4_score_source": "CODEX_5_X_repaired_w4_scores_{year}.parquet (not retrained)",
+  "thresholds": [
+    0.625,
+    0.65,
+    0.675,
+    0.6883498713708196
+  ],
+  "control": 0.6883498713708196,
+  "rth": "08:30-15:00 America/Chicago (entry only)",
+  "policy_a": {
+    "pre_stop_atr": 1.25,
+    "timeout_s": 300,
+    "post_stop_atr": 1.5,
+    "atr_source": "atr_at_checkpoint"
+  },
+  "cost": {
+    "multiplier": 20.0,
+    "round_trip_usd": 10.0,
+    "quantity": 1
+  },
+  "control_parity": {
+    "candidate_basis": {
+      "2025": {
+        "year": 2025,
+        "candidate_trades": 650,
+        "mismatches": 0
+      },
+      "2026": {
+        "year": 2026,
+        "candidate_trades": 222,
+        "mismatches": 0
+      }
+    },
+    "fixed807_basis": {
+      "2025": {
+        "year": 2025,
+        "fixed807_trades": 604,
+        "mismatches": 0,
+        "net_pnl": 20304.001729998054
+      },
+      "2026": {
+        "year": 2026,
+        "fixed807_trades": 203,
+        "mismatches": 0,
+        "net_pnl": 6709.10026674057
+      }
+    }
+  },
+  "basis_note": "candidate = first-crossing short-RTH per prevailing-long regime (872 control); fixed807 = the globally one-position-executed confirmed pocket (807 control, reproduces +$27,013)",
+  "population_by_threshold_basis": {
+    "candidate": {
+      "0.625": 1063,
+      "0.65": 960,
+      "0.675": 909,
+      "0.6883498713708196": 872
+    },
+    "fixed807": {
+      "0.625": 803,
+      "0.65": 804,
+      "0.675": 806,
+      "0.6883498713708196": 807
+    }
+  },
+  "summary": [
+    {
+      "threshold": 0.625,
+      "basis": "candidate",
+      "split": "combined",
+      "trades": 1063,
+      "net_pnl": 11538.57055919907,
+      "per_trade": 10.85472300959461,
+      "gross_profit": 214245.0,
+      "gross_loss": -202706.42944080092,
+      "profit_factor": 1.0569225682235641,
+      "win_rate": 0.3254938852304798,
+      "avg_winner": 619.2052023121387,
+      "avg_loser": -287.5268502706396,
+      "max_closed_dd": 20029.92102048447,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 90.0,
+      "pre_align_stop_rate": 0.33584195672624645,
+      "timeout_rate": 0.21072436500470368,
+      "post_align_stop_rate": 0.028222013170272814,
+      "opposing_flip_rate": 0.42521166509877706,
+      "opposing_flip_pnl": 163835.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -5180.0,
+        "original_opposing_flip_exit": 163835.0,
+        "original_stop_after_aligned_flip": -12855.070307683709,
+        "preflip_policy_stop": -134261.35913311722
+      },
+      "entry_timing_buckets": {
+        "added": {
+          "count": 195,
+          "pnl": 2133.9922320887854,
+          "per_trade": 10.943549908147617,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 109,
+            "preflip_policy_stop": 56,
+            "confirmation_timeout_exit": 26,
+            "original_stop_after_aligned_flip": 4
+          },
+          "median_entry_time_delta_s": NaN,
+          "median_entry_px_improvement_atr": NaN,
+          "prestop_before_control_entry": 0
+        },
+        "control_missed": {
+          "count": 4,
+          "pnl": 149.31554172064352,
+          "per_trade": 37.32888543016088,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 3,
+            "original_stop_after_aligned_flip": 1
+          },
+          "median_entry_time_delta_s": NaN,
+          "median_entry_px_improvement_atr": NaN,
+          "prestop_before_control_entry": 0
+        },
+        "matched_earlier": {
+          "count": 551,
+          "pnl": -5636.278180878289,
+          "per_trade": -10.229180001593992,
+          "exit_reason_counts": {
+            "preflip_policy_stop": 207,
+            "original_opposing_flip_exit": 192,
+            "confirmation_timeout_exit": 142,
+            "original_stop_after_aligned_flip": 10
+          },
+          "median_entry_time_delta_s": -25.0,
+          "median_entry_px_improvement_atr": 0.14012391669446436,
+          "prestop_before_control_entry": 94
+        },
+        "matched_later": {
+          "count": 5,
+          "pnl": 554.9562824755412,
+          "per_trade": 110.99125649510825,
+          "exit_reason_counts": {
+            "preflip_policy_stop": 3,
+            "original_opposing_flip_exit": 1,
+            "confirmation_timeout_exit": 1
+          },
+          "median_entry_time_delta_s": 75.0,
+          "median_entry_px_improvement_atr": 0.08343866226010674,
+          "prestop_before_control_entry": 0
+        },
+        "matched_same": {
+          "count": 312,
+          "pnl": 14485.900225513033,
+          "per_trade": 46.42916738946485,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 150,
+            "preflip_policy_stop": 91,
+            "confirmation_timeout_exit": 55,
+            "original_stop_after_aligned_flip": 16
+          },
+          "median_entry_time_delta_s": 0.0,
+          "median_entry_px_improvement_atr": 0.0,
+          "prestop_before_control_entry": 0
+        }
+      }
+    },
+    {
+      "threshold": 0.625,
+      "basis": "candidate",
+      "split": "2025",
+      "trades": 801,
+      "net_pnl": 14630.077568475972,
+      "per_trade": 18.2647660030911,
+      "gross_profit": 157970.0,
+      "gross_loss": -143339.92243152403,
+      "profit_factor": 1.1020656166146945,
+      "win_rate": 0.32459425717852686,
+      "avg_winner": 607.5769230769231,
+      "avg_loser": -270.4526838330642,
+      "max_closed_dd": 17534.798710428513,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 95.0,
+      "pre_align_stop_rate": 0.3333333333333333,
+      "timeout_rate": 0.21223470661672908,
+      "post_align_stop_rate": 0.026217228464419477,
+      "opposing_flip_rate": 0.4282147315855181,
+      "opposing_flip_pnl": 123125.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -5025.0,
+        "original_opposing_flip_exit": 123125.0,
+        "original_stop_after_aligned_flip": -8625.073303250247,
+        "preflip_policy_stop": -94844.84912827378
+      }
+    },
+    {
+      "threshold": 0.625,
+      "basis": "candidate",
+      "split": "2026",
+      "trades": 262,
+      "net_pnl": -3091.507009276902,
+      "per_trade": -11.799645073575961,
+      "gross_profit": 56275.0,
+      "gross_loss": -59366.5070092769,
+      "profit_factor": 0.9479250647373644,
+      "win_rate": 0.3282442748091603,
+      "avg_winner": 654.3604651162791,
+      "avg_loser": -339.2371829101537,
+      "max_closed_dd": 20029.92102048447,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 80.0,
+      "pre_align_stop_rate": 0.3435114503816794,
+      "timeout_rate": 0.20610687022900764,
+      "post_align_stop_rate": 0.03435114503816794,
+      "opposing_flip_rate": 0.41603053435114506,
+      "opposing_flip_pnl": 40710.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -155.0,
+        "original_opposing_flip_exit": 40710.0,
+        "original_stop_after_aligned_flip": -4229.997004433462,
+        "preflip_policy_stop": -39416.51000484344
+      }
+    },
+    {
+      "threshold": 0.65,
+      "basis": "candidate",
+      "split": "combined",
+      "trades": 960,
+      "net_pnl": 9787.63988971863,
+      "per_trade": 10.195458218456906,
+      "gross_profit": 196240.0,
+      "gross_loss": -186452.36011028138,
+      "profit_factor": 1.0524940520137664,
+      "win_rate": 0.3177083333333333,
+      "avg_winner": 643.4098360655738,
+      "avg_loser": -288.62594444316005,
+      "max_closed_dd": 23786.266205249776,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 80.0,
+      "pre_align_stop_rate": 0.328125,
+      "timeout_rate": 0.19479166666666667,
+      "post_align_stop_rate": 0.03958333333333333,
+      "opposing_flip_rate": 0.4375,
+      "opposing_flip_pnl": 148140.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -2990.0,
+        "original_opposing_flip_exit": 148140.0,
+        "original_stop_after_aligned_flip": -16785.150119686296,
+        "preflip_policy_stop": -118577.20999059507
+      },
+      "entry_timing_buckets": {
+        "added": {
+          "count": 91,
+          "pnl": -5890.718073509124,
+          "per_trade": -64.7331656429574,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 47,
+            "preflip_policy_stop": 30,
+            "confirmation_timeout_exit": 11,
+            "original_stop_after_aligned_flip": 3
+          },
+          "median_entry_time_delta_s": NaN,
+          "median_entry_px_improvement_atr": NaN,
+          "prestop_before_control_entry": 0
+        },
+        "control_missed": {
+          "count": 3,
+          "pnl": 1595.0,
+          "per_trade": 531.6666666666666,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 3
+          },
+          "median_entry_time_delta_s": NaN,
+          "median_entry_px_improvement_atr": NaN,
+          "prestop_before_control_entry": 0
+        },
+        "matched_earlier": {
+          "count": 278,
+          "pnl": 3498.7796202478057,
+          "per_trade": 12.585538202330236,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 107,
+            "preflip_policy_stop": 92,
+            "confirmation_timeout_exit": 74,
+            "original_stop_after_aligned_flip": 5
+          },
+          "median_entry_time_delta_s": -15.0,
+          "median_entry_px_improvement_atr": 0.09681889141374281,
+          "prestop_before_control_entry": 35
+        },
+        "matched_later": {
+          "count": 3,
+          "pnl": -341.43050300139294,
+          "per_trade": -113.81016766713098,
+          "exit_reason_counts": {
+            "preflip_policy_stop": 2,
+            "confirmation_timeout_exit": 1
+          },
+          "median_entry_time_delta_s": 25.0,
+          "median_entry_px_improvement_atr": 0.025602635598144036,
+          "prestop_before_control_entry": 0
+        },
+        "matched_same": {
+          "count": 588,
+          "pnl": 12521.008845981341,
+          "per_trade": 21.294232731260784,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 266,
+            "preflip_policy_stop": 191,
+            "confirmation_timeout_exit": 101,
+            "original_stop_after_aligned_flip": 30
+          },
+          "median_entry_time_delta_s": 0.0,
+          "median_entry_px_improvement_atr": 0.0,
+          "prestop_before_control_entry": 0
+        }
+      }
+    },
+    {
+      "threshold": 0.65,
+      "basis": "candidate",
+      "split": "2025",
+      "trades": 714,
+      "net_pnl": 5849.572749091676,
+      "per_trade": 8.192678920296466,
+      "gross_profit": 138380.0,
+      "gross_loss": -132530.42725090834,
+      "profit_factor": 1.044137583122834,
+      "win_rate": 0.30952380952380953,
+      "avg_winner": 626.1538461538462,
+      "avg_loser": -273.2586128884708,
+      "max_closed_dd": 23786.266205249776,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 80.0,
+      "pre_align_stop_rate": 0.3319327731092437,
+      "timeout_rate": 0.19607843137254902,
+      "post_align_stop_rate": 0.037815126050420166,
+      "opposing_flip_rate": 0.4341736694677871,
+      "opposing_flip_pnl": 105955.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -4465.0,
+        "original_opposing_flip_exit": 105955.0,
+        "original_stop_after_aligned_flip": -11460.613380354916,
+        "preflip_policy_stop": -84179.81387055341
+      }
+    },
+    {
+      "threshold": 0.65,
+      "basis": "candidate",
+      "split": "2026",
+      "trades": 246,
+      "net_pnl": 3938.067140626954,
+      "per_trade": 16.008403010678673,
+      "gross_profit": 57860.0,
+      "gross_loss": -53921.932859373046,
+      "profit_factor": 1.0730327518284133,
+      "win_rate": 0.34146341463414637,
+      "avg_winner": 688.8095238095239,
+      "avg_loser": -334.9188376358574,
+      "max_closed_dd": 14395.832745270454,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.3170731707317073,
+      "timeout_rate": 0.1910569105691057,
+      "post_align_stop_rate": 0.044715447154471545,
+      "opposing_flip_rate": 0.44715447154471544,
+      "opposing_flip_pnl": 42185.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": 1475.0,
+        "original_opposing_flip_exit": 42185.0,
+        "original_stop_after_aligned_flip": -5324.536739331379,
+        "preflip_policy_stop": -34397.39612004167
+      }
+    },
+    {
+      "threshold": 0.675,
+      "basis": "candidate",
+      "split": "combined",
+      "trades": 909,
+      "net_pnl": 22797.304243718972,
+      "per_trade": 25.079542622353106,
+      "gross_profit": 200105.0,
+      "gross_loss": -177307.69575628103,
+      "profit_factor": 1.1285748153597073,
+      "win_rate": 0.3256325632563256,
+      "avg_winner": 676.0304054054054,
+      "avg_loser": -292.58695669353307,
+      "max_closed_dd": 20645.3804502164,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.3179317931793179,
+      "timeout_rate": 0.18371837183718373,
+      "post_align_stop_rate": 0.04400440044004401,
+      "opposing_flip_rate": 0.45434543454345433,
+      "opposing_flip_pnl": 152200.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -2790.0,
+        "original_opposing_flip_exit": 152200.0,
+        "original_stop_after_aligned_flip": -16950.316266552327,
+        "preflip_policy_stop": -109662.3794897287
+      },
+      "entry_timing_buckets": {
+        "added": {
+          "count": 38,
+          "pnl": 797.1280717374611,
+          "per_trade": 20.977054519406874,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 23,
+            "preflip_policy_stop": 11,
+            "confirmation_timeout_exit": 2,
+            "original_stop_after_aligned_flip": 2
+          },
+          "median_entry_time_delta_s": NaN,
+          "median_entry_px_improvement_atr": NaN,
+          "prestop_before_control_entry": 0
+        },
+        "control_missed": {
+          "count": 1,
+          "pnl": 100.0,
+          "per_trade": 100.0,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 1
+          },
+          "median_entry_time_delta_s": NaN,
+          "median_entry_px_improvement_atr": NaN,
+          "prestop_before_control_entry": 0
+        },
+        "matched_earlier": {
+          "count": 109,
+          "pnl": 2419.173749771362,
+          "per_trade": 22.194254585058367,
+          "exit_reason_counts": {
+            "preflip_policy_stop": 38,
+            "original_opposing_flip_exit": 36,
+            "confirmation_timeout_exit": 32,
+            "original_stop_after_aligned_flip": 3
+          },
+          "median_entry_time_delta_s": -15.0,
+          "median_entry_px_improvement_atr": 0.08730654413630531,
+          "prestop_before_control_entry": 15
+        },
+        "matched_later": {
+          "count": 1,
+          "pnl": 430.0,
+          "per_trade": 430.0,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 1
+          },
+          "median_entry_time_delta_s": 10.0,
+          "median_entry_px_improvement_atr": 0.0,
+          "prestop_before_control_entry": 0
+        },
+        "matched_same": {
+          "count": 761,
+          "pnl": 19151.00242221015,
+          "per_trade": 25.1655747992249,
+          "exit_reason_counts": {
+            "original_opposing_flip_exit": 353,
+            "preflip_policy_stop": 240,
+            "confirmation_timeout_exit": 133,
+            "original_stop_after_aligned_flip": 35
+          },
+          "median_entry_time_delta_s": 0.0,
+          "median_entry_px_improvement_atr": 0.0,
+          "prestop_before_control_entry": 0
+        }
+      }
+    },
+    {
+      "threshold": 0.675,
+      "basis": "candidate",
+      "split": "2025",
+      "trades": 678,
+      "net_pnl": 15759.93714729404,
+      "per_trade": 23.24474505500596,
+      "gross_profit": 142670.0,
+      "gross_loss": -126910.06285270596,
+      "profit_factor": 1.124181934773646,
+      "win_rate": 0.3215339233038348,
+      "avg_winner": 654.4495412844037,
+      "avg_loser": -278.92321506089223,
+      "max_closed_dd": 20645.3804502164,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 80.0,
+      "pre_align_stop_rate": 0.3215339233038348,
+      "timeout_rate": 0.18584070796460178,
+      "post_align_stop_rate": 0.04424778761061947,
+      "opposing_flip_rate": 0.44837758112094395,
+      "opposing_flip_pnl": 109135.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -3140.0,
+        "original_opposing_flip_exit": 109135.0,
+        "original_stop_after_aligned_flip": -12231.240885548832,
+        "preflip_policy_stop": -78003.82196715713
+      }
+    },
+    {
+      "threshold": 0.675,
+      "basis": "candidate",
+      "split": "2026",
+      "trades": 231,
+      "net_pnl": 7037.367096424932,
+      "per_trade": 30.464792625216155,
+      "gross_profit": 57435.0,
+      "gross_loss": -50397.63290357507,
+      "profit_factor": 1.1396368577446763,
+      "win_rate": 0.33766233766233766,
+      "avg_winner": 736.3461538461538,
+      "avg_loser": -333.7591583018216,
+      "max_closed_dd": 12274.936101515414,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 70.0,
+      "pre_align_stop_rate": 0.30735930735930733,
+      "timeout_rate": 0.1774891774891775,
+      "post_align_stop_rate": 0.04329004329004329,
+      "opposing_flip_rate": 0.47186147186147187,
+      "opposing_flip_pnl": 43065.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": 350.0,
+        "original_opposing_flip_exit": 43065.0,
+        "original_stop_after_aligned_flip": -4719.075381003495,
+        "preflip_policy_stop": -31658.557522571573
+      }
+    },
+    {
+      "threshold": 0.6883498713708196,
+      "basis": "candidate",
+      "split": "combined",
+      "trades": 872,
+      "net_pnl": 22250.10229816049,
+      "per_trade": 25.516172360275792,
+      "gross_profit": 194295.0,
+      "gross_loss": -172044.8977018395,
+      "profit_factor": 1.1293273011601936,
+      "win_rate": 0.3291284403669725,
+      "avg_winner": 676.98606271777,
+      "avg_loser": -297.65553235612373,
+      "max_closed_dd": 18685.7689419292,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.32224770642201833,
+      "timeout_rate": 0.17660550458715596,
+      "post_align_stop_rate": 0.04472477064220184,
+      "opposing_flip_rate": 0.45642201834862384,
+      "opposing_flip_pnl": 146800.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -820.0,
+        "original_opposing_flip_exit": 146800.0,
+        "original_stop_after_aligned_flip": -16672.07360861379,
+        "preflip_policy_stop": -107057.82409322572
+      }
+    },
+    {
+      "threshold": 0.6883498713708196,
+      "basis": "candidate",
+      "split": "2025",
+      "trades": 650,
+      "net_pnl": 15365.847319670356,
+      "per_trade": 23.639765107185163,
+      "gross_profit": 138720.0,
+      "gross_loss": -123354.15268032964,
+      "profit_factor": 1.1245669236567228,
+      "win_rate": 0.3261538461538461,
+      "avg_winner": 654.3396226415094,
+      "avg_loser": -284.22615824960747,
+      "max_closed_dd": 18685.7689419292,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.32461538461538464,
+      "timeout_rate": 0.18153846153846154,
+      "post_align_stop_rate": 0.046153846153846156,
+      "opposing_flip_rate": 0.44769230769230767,
+      "opposing_flip_pnl": 105220.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -1760.0,
+        "original_opposing_flip_exit": 105220.0,
+        "original_stop_after_aligned_flip": -12367.853427511509,
+        "preflip_policy_stop": -75726.29925281813
+      }
+    },
+    {
+      "threshold": 0.6883498713708196,
+      "basis": "candidate",
+      "split": "2026",
+      "trades": 222,
+      "net_pnl": 6884.254978490135,
+      "per_trade": 31.010157560766373,
+      "gross_profit": 55575.0,
+      "gross_loss": -48690.745021509865,
+      "profit_factor": 1.1413873411764168,
+      "win_rate": 0.33783783783783783,
+      "avg_winner": 741.0,
+      "avg_loser": -338.13017376048515,
+      "max_closed_dd": 11876.201662272433,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.3153153153153153,
+      "timeout_rate": 0.16216216216216217,
+      "post_align_stop_rate": 0.04054054054054054,
+      "opposing_flip_rate": 0.481981981981982,
+      "opposing_flip_pnl": 41580.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": 940.0,
+        "original_opposing_flip_exit": 41580.0,
+        "original_stop_after_aligned_flip": -4304.220181102282,
+        "preflip_policy_stop": -31331.524840407583
+      }
+    },
+    {
+      "threshold": 0.625,
+      "basis": "fixed807",
+      "split": "combined",
+      "trades": 803,
+      "net_pnl": 19823.956520227875,
+      "per_trade": 24.68736802020906,
+      "gross_profit": 171250.0,
+      "gross_loss": -151426.0434797721,
+      "profit_factor": 1.1309151059135745,
+      "win_rate": 0.31880448318804483,
+      "avg_winner": 668.9453125,
+      "avg_loser": -281.9851833887749,
+      "max_closed_dd": 15684.993036662345,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 95.0,
+      "pre_align_stop_rate": 0.33872976338729766,
+      "timeout_rate": 0.22914072229140722,
+      "post_align_stop_rate": 0.0323785803237858,
+      "opposing_flip_rate": 0.39975093399750933,
+      "opposing_flip_pnl": 133745.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -2155.0,
+        "original_opposing_flip_exit": 133745.0,
+        "original_stop_after_aligned_flip": -11256.49484006899,
+        "preflip_policy_stop": -100509.54863970313
+      }
+    },
+    {
+      "threshold": 0.625,
+      "basis": "fixed807",
+      "split": "2025",
+      "trades": 602,
+      "net_pnl": 18176.712166167345,
+      "per_trade": 30.193874030178314,
+      "gross_profit": 124075.0,
+      "gross_loss": -105898.28783383266,
+      "profit_factor": 1.1716431165977756,
+      "win_rate": 0.3239202657807309,
+      "avg_winner": 636.2820512820513,
+      "avg_loser": -266.07610008500666,
+      "max_closed_dd": 12457.682554337443,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 95.0,
+      "pre_align_stop_rate": 0.33056478405315615,
+      "timeout_rate": 0.23920265780730898,
+      "post_align_stop_rate": 0.03156146179401993,
+      "opposing_flip_rate": 0.39867109634551495,
+      "opposing_flip_pnl": 98255.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -2415.0,
+        "original_opposing_flip_exit": 98255.0,
+        "original_stop_after_aligned_flip": -8032.589513990897,
+        "preflip_policy_stop": -69630.69831984176
+      }
+    },
+    {
+      "threshold": 0.625,
+      "basis": "fixed807",
+      "split": "2026",
+      "trades": 201,
+      "net_pnl": 1647.244354060531,
+      "per_trade": 8.195245542589706,
+      "gross_profit": 47175.0,
+      "gross_loss": -45527.75564593947,
+      "profit_factor": 1.036181101631076,
+      "win_rate": 0.3034825870646766,
+      "avg_winner": 773.360655737705,
+      "avg_loser": -327.53781040244223,
+      "max_closed_dd": 15684.993036662345,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 90.0,
+      "pre_align_stop_rate": 0.36318407960199006,
+      "timeout_rate": 0.19900497512437812,
+      "post_align_stop_rate": 0.03482587064676617,
+      "opposing_flip_rate": 0.40298507462686567,
+      "opposing_flip_pnl": 35490.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": 260.0,
+        "original_opposing_flip_exit": 35490.0,
+        "original_stop_after_aligned_flip": -3223.905326078093,
+        "preflip_policy_stop": -30878.850319861376
+      }
+    },
+    {
+      "threshold": 0.65,
+      "basis": "fixed807",
+      "split": "combined",
+      "trades": 804,
+      "net_pnl": 20831.698372554747,
+      "per_trade": 25.910072602680035,
+      "gross_profit": 173460.0,
+      "gross_loss": -152628.30162744527,
+      "profit_factor": 1.1364864717121954,
+      "win_rate": 0.3208955223880597,
+      "avg_winner": 672.3255813953489,
+      "avg_loser": -284.22402537699304,
+      "max_closed_dd": 14164.61928229408,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 80.0,
+      "pre_align_stop_rate": 0.3246268656716418,
+      "timeout_rate": 0.20149253731343283,
+      "post_align_stop_rate": 0.041044776119402986,
+      "opposing_flip_rate": 0.43283582089552236,
+      "opposing_flip_pnl": 133340.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -1480.0,
+        "original_opposing_flip_exit": 133340.0,
+        "original_stop_after_aligned_flip": -14510.757123704461,
+        "preflip_policy_stop": -96517.54450374079
+      }
+    },
+    {
+      "threshold": 0.65,
+      "basis": "fixed807",
+      "split": "2025",
+      "trades": 602,
+      "net_pnl": 15571.377868831041,
+      "per_trade": 25.866076194071496,
+      "gross_profit": 124085.0,
+      "gross_loss": -108513.62213116896,
+      "profit_factor": 1.1434969874105638,
+      "win_rate": 0.32059800664451826,
+      "avg_winner": 642.9274611398964,
+      "avg_loser": -270.6075364867056,
+      "max_closed_dd": 14164.61928229408,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 85.0,
+      "pre_align_stop_rate": 0.32059800664451826,
+      "timeout_rate": 0.20930232558139536,
+      "post_align_stop_rate": 0.04152823920265781,
+      "opposing_flip_rate": 0.42857142857142855,
+      "opposing_flip_pnl": 96835.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -2485.0,
+        "original_opposing_flip_exit": 96835.0,
+        "original_stop_after_aligned_flip": -10713.594784662855,
+        "preflip_policy_stop": -68065.0273465061
+      }
+    },
+    {
+      "threshold": 0.65,
+      "basis": "fixed807",
+      "split": "2026",
+      "trades": 202,
+      "net_pnl": 5260.320503723706,
+      "per_trade": 26.041190612493594,
+      "gross_profit": 49375.0,
+      "gross_loss": -44114.679496276294,
+      "profit_factor": 1.119241952197969,
+      "win_rate": 0.3217821782178218,
+      "avg_winner": 759.6153846153846,
+      "avg_loser": -324.37264335497275,
+      "max_closed_dd": 12845.51537299376,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.33663366336633666,
+      "timeout_rate": 0.1782178217821782,
+      "post_align_stop_rate": 0.039603960396039604,
+      "opposing_flip_rate": 0.44554455445544555,
+      "opposing_flip_pnl": 36505.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": 1005.0,
+        "original_opposing_flip_exit": 36505.0,
+        "original_stop_after_aligned_flip": -3797.162339041606,
+        "preflip_policy_stop": -28452.517157234688
+      }
+    },
+    {
+      "threshold": 0.675,
+      "basis": "fixed807",
+      "split": "combined",
+      "trades": 806,
+      "net_pnl": 26031.36862828367,
+      "per_trade": 32.29698340978123,
+      "gross_profit": 180720.0,
+      "gross_loss": -154688.63137171633,
+      "profit_factor": 1.1682823643693012,
+      "win_rate": 0.3213399503722084,
+      "avg_winner": 697.7606177606177,
+      "avg_loser": -286.46042846614137,
+      "max_closed_dd": 14163.071303753604,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 80.0,
+      "pre_align_stop_rate": 0.315136476426799,
+      "timeout_rate": 0.18858560794044665,
+      "post_align_stop_rate": 0.04466501240694789,
+      "opposing_flip_rate": 0.45161290322580644,
+      "opposing_flip_pnl": 138065.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -1930.0,
+        "original_opposing_flip_exit": 138065.0,
+        "original_stop_after_aligned_flip": -15306.535714849379,
+        "preflip_policy_stop": -94797.09565686695
+      }
+    },
+    {
+      "threshold": 0.675,
+      "basis": "fixed807",
+      "split": "2025",
+      "trades": 604,
+      "net_pnl": 20177.779288199526,
+      "per_trade": 33.40691935132372,
+      "gross_profit": 130565.0,
+      "gross_loss": -110387.22071180047,
+      "profit_factor": 1.1827908987841969,
+      "win_rate": 0.3228476821192053,
+      "avg_winner": 669.5641025641025,
+      "avg_loser": -273.2356948311893,
+      "max_closed_dd": 14163.071303753604,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 80.0,
+      "pre_align_stop_rate": 0.3129139072847682,
+      "timeout_rate": 0.19536423841059603,
+      "post_align_stop_rate": 0.046357615894039736,
+      "opposing_flip_rate": 0.445364238410596,
+      "opposing_flip_pnl": 100905.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -2195.0,
+        "original_opposing_flip_exit": 100905.0,
+        "original_stop_after_aligned_flip": -11484.22228985677,
+        "preflip_policy_stop": -67047.9984219437
+      }
+    },
+    {
+      "threshold": 0.675,
+      "basis": "fixed807",
+      "split": "2026",
+      "trades": 202,
+      "net_pnl": 5853.589340084145,
+      "per_trade": 28.97816504992151,
+      "gross_profit": 50155.0,
+      "gross_loss": -44301.410659915855,
+      "profit_factor": 1.1321309920584652,
+      "win_rate": 0.31683168316831684,
+      "avg_winner": 783.671875,
+      "avg_loser": -325.74566661702835,
+      "max_closed_dd": 11894.164456863145,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.3217821782178218,
+      "timeout_rate": 0.16831683168316833,
+      "post_align_stop_rate": 0.039603960396039604,
+      "opposing_flip_rate": 0.47029702970297027,
+      "opposing_flip_pnl": 37160.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": 265.0,
+        "original_opposing_flip_exit": 37160.0,
+        "original_stop_after_aligned_flip": -3822.313424992608,
+        "preflip_policy_stop": -27749.097234923247
+      }
+    },
+    {
+      "threshold": 0.6883498713708196,
+      "basis": "fixed807",
+      "split": "combined",
+      "trades": 807,
+      "net_pnl": 27013.101996738624,
+      "per_trade": 33.47348450649148,
+      "gross_profit": 181905.0,
+      "gross_loss": -154891.89800326136,
+      "profit_factor": 1.1743997093777614,
+      "win_rate": 0.32837670384138784,
+      "avg_winner": 686.433962264151,
+      "avg_loser": -289.51756636123616,
+      "max_closed_dd": 14331.162657275781,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.3159851301115242,
+      "timeout_rate": 0.17843866171003717,
+      "post_align_stop_rate": 0.04460966542750929,
+      "opposing_flip_rate": 0.46096654275092935,
+      "opposing_flip_pnl": 137200.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -115.0,
+        "original_opposing_flip_exit": 137200.0,
+        "original_stop_after_aligned_flip": -15306.535714849379,
+        "preflip_policy_stop": -94765.362288412
+      }
+    },
+    {
+      "threshold": 0.6883498713708196,
+      "basis": "fixed807",
+      "split": "2025",
+      "trades": 604,
+      "net_pnl": 20304.001729998054,
+      "per_trade": 33.61589690397029,
+      "gross_profit": 131400.0,
+      "gross_loss": -111095.99827000195,
+      "profit_factor": 1.1827608738944158,
+      "win_rate": 0.33112582781456956,
+      "avg_winner": 657.0,
+      "avg_loser": -277.7399956750049,
+      "max_closed_dd": 14331.162657275781,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 80.0,
+      "pre_align_stop_rate": 0.3162251655629139,
+      "timeout_rate": 0.1870860927152318,
+      "post_align_stop_rate": 0.046357615894039736,
+      "opposing_flip_rate": 0.4503311258278146,
+      "opposing_flip_pnl": 100045.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": -820.0,
+        "original_opposing_flip_exit": 100045.0,
+        "original_stop_after_aligned_flip": -11484.22228985677,
+        "preflip_policy_stop": -67436.77598014518
+      }
+    },
+    {
+      "threshold": 0.6883498713708196,
+      "basis": "fixed807",
+      "split": "2026",
+      "trades": 203,
+      "net_pnl": 6709.10026674057,
+      "per_trade": 33.04975500857424,
+      "gross_profit": 50505.0,
+      "gross_loss": -43795.89973325943,
+      "profit_factor": 1.153190145826495,
+      "win_rate": 0.32019704433497537,
+      "avg_winner": 777.0,
+      "avg_loser": -324.414072098218,
+      "max_closed_dd": 11143.729915408258,
+      "median_hold_s": 301.0,
+      "median_time_to_align_s": 75.0,
+      "pre_align_stop_rate": 0.31527093596059114,
+      "timeout_rate": 0.15270935960591134,
+      "post_align_stop_rate": 0.03940886699507389,
+      "opposing_flip_rate": 0.49261083743842365,
+      "opposing_flip_pnl": 37155.0,
+      "exit_reason_pnl": {
+        "confirmation_timeout_exit": 705.0,
+        "original_opposing_flip_exit": 37155.0,
+        "original_stop_after_aligned_flip": -3822.313424992608,
+        "preflip_policy_stop": -27328.586308266822
+      }
+    }
+  ],
+  "policy_sha256": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b",
+  "runner_sha256": "6b5f8ffc6ea4fdb82e38e65b47f47ad3c628bc4e049c2cb1200645a499d1cf06",
+  "schedule_sha256": {
+    "2025": "1d241bf66949e826f53e11ce09cf2c4fd692affee0529b3979624c0ffcaaa67c",
+    "2026": "0370fd4c7c383a4825fe73010792d0416276cb1eb12712dc4d7d800bf54c961d"
+  }
+}

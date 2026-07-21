@@ -1,0 +1,146 @@
+{
+  "study": "long_rth_pure_flip_top50_top25_training",
+  "feature_source_file": "studies/runtime_constrained_f3_feature_reduction/results/top_100_raw_feature_columns.csv",
+  "feature_source_sha256": "6c6ceba7d3520e91b0feaed00cd6ab320230e8404e840894190b1cc7e70bc619",
+  "feature_source_sha256_matches_expected": true,
+  "ordered_top100_feature_list_sha256": "f2a6db0b6453433ccc1970255808c940133d1530ff4aa907339966c8c4f37992",
+  "ordered_top100_sha256_matches_expected": true,
+  "ranking_provenance": "frozen short-side runtime_constrained_f3_feature_reduction ranking; NOT re-ranked, NOT re-scored on long-side data",
+  "feature_sets": {
+    "TOP100": {
+      "n": 100,
+      "ordered_list_sha256": "f2a6db0b6453433ccc1970255808c940133d1530ff4aa907339966c8c4f37992"
+    },
+    "TOP50": {
+      "n": 50,
+      "ordered_list_sha256": "5a2b1a70ebaff75ef70cccfd5337059b840b882eb6bb996635d9d5c1b4ac9978",
+      "is_exact_prefix_of_top100": true,
+      "feature_names_in_order": [
+        "aligned_price_minus_center_15m",
+        "rolling_5m_low_signed_distance_atr",
+        "aligned_price_minus_center_30m",
+        "aligned_price_minus_center_5m",
+        "rth_elapsed_seconds",
+        "rolling_15m_high_signed_distance_atr",
+        "rolling_60m_high_signed_distance_atr",
+        "rolling_15m_low_signed_distance_atr",
+        "rolling_30m_low_signed_distance_atr",
+        "price_change_points_60s",
+        "seq_8r_mean_retracement",
+        "rolling_30m_high_signed_distance_atr",
+        "range_points_1800s",
+        "opening_range_30m_low_developing_signed_distance_points",
+        "seq_12r_mean_retracement",
+        "est_bear_vol_sum_300s",
+        "full_level_envelope_width_atr",
+        "rth_vol_cum",
+        "est_delta_sum_1800s",
+        "seq_5r_max_overlap",
+        "price_change_atr_60s",
+        "prior_day_close_signed_distance_atr",
+        "up_down_vol_ratio_1800s",
+        "price_change_atr_30s",
+        "pct_levels_behind_trade",
+        "prior_day_low_signed_distance_points",
+        "opening_range_30m_low_final_signed_distance_points",
+        "seq_3r_mean_overlap",
+        "vol_max_1s_1800s",
+        "price_position_in_full_envelope",
+        "rth_abs_delta_cum",
+        "activity_regime_count_120m",
+        "seq_8r_median_overlap",
+        "seq_8r_mean_retracement_mfe",
+        "n_levels_below",
+        "seq_12r_asym_duration",
+        "seq_8r_dist_to_high_atr",
+        "rth_volume_per_second",
+        "overnight_low_developing_signed_distance_points",
+        "est_delta_ratio_900s",
+        "seq_12r_efficiency",
+        "seq_5r_center_migration_slope_atr",
+        "seq_5r_asym_net_move",
+        "volume_per_point_moved_1800s",
+        "up_down_vol_ratio_300s",
+        "downbar_vol_sum_300s",
+        "regime_first_half_vol",
+        "price_cross_count_5m",
+        "seq_8r_mean_overlap",
+        "rolling_5m_close_signed_distance_atr"
+      ]
+    },
+    "TOP25": {
+      "n": 25,
+      "ordered_list_sha256": "d601abe692c78c0471088b41cae1fe80bbb918bbe7e7af067ddb45e7b0ce45bf",
+      "is_exact_prefix_of_top100": true,
+      "feature_names_in_order": [
+        "aligned_price_minus_center_15m",
+        "rolling_5m_low_signed_distance_atr",
+        "aligned_price_minus_center_30m",
+        "aligned_price_minus_center_5m",
+        "rth_elapsed_seconds",
+        "rolling_15m_high_signed_distance_atr",
+        "rolling_60m_high_signed_distance_atr",
+        "rolling_15m_low_signed_distance_atr",
+        "rolling_30m_low_signed_distance_atr",
+        "price_change_points_60s",
+        "seq_8r_mean_retracement",
+        "rolling_30m_high_signed_distance_atr",
+        "range_points_1800s",
+        "opening_range_30m_low_developing_signed_distance_points",
+        "seq_12r_mean_retracement",
+        "est_bear_vol_sum_300s",
+        "full_level_envelope_width_atr",
+        "rth_vol_cum",
+        "est_delta_sum_1800s",
+        "seq_5r_max_overlap",
+        "price_change_atr_60s",
+        "prior_day_close_signed_distance_atr",
+        "up_down_vol_ratio_1800s",
+        "price_change_atr_30s",
+        "pct_levels_behind_trade"
+      ]
+    }
+  },
+  "prefix_check": {
+    "top50_is_exact_prefix": true,
+    "top25_is_exact_prefix": true,
+    "top25_is_prefix_of_top50": true
+  },
+  "family_counts": {
+    "TOP100": {
+      "regime_median_center_slope_alignment": 44,
+      "ohlcv_est_delta": 29,
+      "price_level_context": 27
+    },
+    "TOP50": {
+      "regime_median_center_slope_alignment": 17,
+      "ohlcv_est_delta": 17,
+      "price_level_context": 16
+    },
+    "TOP25": {
+      "price_level_context": 10,
+      "ohlcv_est_delta": 9,
+      "regime_median_center_slope_alignment": 6
+    }
+  },
+  "timing_unverified": {
+    "TOP100": [
+      "regime_first_half_vol",
+      "regime_abs_delta_per_atr_moved",
+      "regime_price_change_atr"
+    ],
+    "TOP50": [
+      "regime_first_half_vol"
+    ],
+    "TOP25": []
+  },
+  "prepared_data_source": "studies/long_rth_mirrored_surface_top100_training/_work",
+  "prepared_data_convention": "latest_source_ts_used < observation_time (strict)",
+  "split_rows": {
+    "train_2021_2024": 682952,
+    "dev_2025": 163397,
+    "test_2026": 52488
+  },
+  "target": "bullish_regime_flip_within_300s",
+  "generator_sha256": "6aec28a9affc3e57b5957225140cc4215da3e4b5455fa0ab2bf0549f3dc117c9"
+}

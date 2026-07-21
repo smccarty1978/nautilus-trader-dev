@@ -1,0 +1,53 @@
+{
+  "bar4_model": {
+    "delay_s": 240,
+    "features": [
+      "seconds_since_flip",
+      "current_progress_atr",
+      "max_progress_atr",
+      "max_adverse_atr",
+      "pullback_from_peak_atr",
+      "seconds_since_peak",
+      "progress_efficiency",
+      "aligned_return_5s_atr",
+      "aligned_return_15s_atr",
+      "aligned_return_30s_atr",
+      "aligned_return_60s_atr",
+      "realized_vol_60s_atr",
+      "range_5s_atr",
+      "volume_5s_zscore",
+      "volume_30s_vs_5m",
+      "bollinger_width_percentile_1m",
+      "bollinger_keltner_width_ratio_1m",
+      "kalman_velocity_atr_per_s",
+      "kalman_acceleration_atr_per_s2",
+      "kalman_innovation_zscore",
+      "ema3_ema9_spread_30s_atr",
+      "regime_5s_aligned",
+      "regime_30s_aligned",
+      "regime_5m_aligned",
+      "regime_age_1m_bars",
+      "adx14_1m",
+      "position_in_trailing_1m_range",
+      "minutes_since_rth_open",
+      "knn_hA",
+      "knn_hB",
+      "knn_hC",
+      "knn_mean_dist",
+      "knn_n_eff",
+      "knn_unique_eps",
+      "knn_neighbor_agreement"
+    ],
+    "val_auc": 0.5381061811170956,
+    "knn_fields_asserted": [
+      "knn_hA",
+      "knn_hB",
+      "knn_hC",
+      "knn_mean_dist",
+      "knn_n_eff"
+    ],
+    "knn_coverage_at_infer": 0.928532460447354
+  },
+  "bar4_threshold": 0.6,
+  "bar4_val_ev": 0.19868949482139084
+}

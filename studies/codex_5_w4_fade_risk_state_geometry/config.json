@@ -1,0 +1,26 @@
+{
+  "study_id": "codex_5_w4_fade_risk_state_geometry_v1",
+  "stage1_descriptive_only": true,
+  "atr_denominator": "atr_at_checkpoint",
+  "preflip_stop_candidates_atr": [0.75, 1.0, 1.25],
+  "preflip_preservation_min_2025": 0.95,
+  "initial_geometry_p95_max_atr_2025": 1.25,
+  "postflip_arm_atr": 1.0,
+  "postflip_floor_atr": 0.25,
+  "postflip_loser_median_giveback_min_2025": 1.0,
+  "postflip_loser_reach_1atr_min_2025": 0.5,
+  "postflip_winner_reach_1atr_min_2025": 0.9,
+  "input_sha256": {
+    "path_checkpoints": "a06d73ccecc15668f42c08f71c52692f29ff2a4a9aefbb74754980472113c993",
+    "post_flip_diagnostic": "fcfe949d070c4f2685372397d9c715001af527210d3fe2332b6ec7911101d84a",
+    "path_manifest": "84acc063a7661253de3edc247e6290f76eb5ee1549df5b09c4deccb1b4854cc9",
+    "2025": {
+      "raw": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+      "trades": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e"
+    },
+    "2026": {
+      "raw": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+      "trades": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83"
+    }
+  }
+}

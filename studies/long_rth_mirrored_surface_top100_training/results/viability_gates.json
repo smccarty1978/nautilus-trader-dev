@@ -1,0 +1,47 @@
+{
+  "selected_model": "gbt",
+  "causal_convention": "strict (latest_source_ts < observation_time), post-audit corrected",
+  "long_corrected": {
+    "2025_auc": 0.6682,
+    "2026_auc": 0.6512,
+    "2025_top_decile_flip_rate": 0.5114,
+    "2026_top_decile_flip_rate": 0.5365,
+    "2025_top_decile_lift": 1.9449,
+    "2026_top_decile_lift": 1.9135,
+    "2026_decile_monotonicity_spearman": 0.9879
+  },
+  "monthly_auc_2026": {
+    "2026-01": 0.63,
+    "2026-02": 0.6838,
+    "2026-03": 0.6418,
+    "2026-04": 0.6407
+  },
+  "short_benchmark_note": "short-side benchmark 0.671/0.670 still carries the same inherited 1s look-ahead; comparison is conservative for the long side",
+  "short_benchmark": {
+    "auc_2025": 0.671,
+    "auc_2026": 0.67,
+    "top_decile_flip": 0.505,
+    "lift": 2.0
+  },
+  "minimum_viable_gate": {
+    "checks": {
+      "auc25>=.60": true,
+      "auc26>=.60": true,
+      "lift25>=1.5": true,
+      "lift26>=1.5": true,
+      "2026_not_inverted": true
+    },
+    "PASS": true
+  },
+  "strong_parity_gate": {
+    "checks": {
+      "auc25_within.03": true,
+      "auc26_within.03": true,
+      "flip25_within10pp": true,
+      "flip26_within10pp": true,
+      "all_months>.58": true
+    },
+    "PASS": true
+  },
+  "decision": "LONG_SURFACE_TOP100_SIGNAL_STRONG_PARITY"
+}

@@ -1,0 +1,41 @@
+{
+  "states": [
+    "PROLIFIC_EXPANDING",
+    "HEALTHY_ESTABLISHED",
+    "ORDINARY",
+    "WEAKENING",
+    "TERMINAL"
+  ],
+  "age_edges_seconds": [
+    0.0,
+    30.0,
+    60.0,
+    90.0,
+    120.0,
+    150.0,
+    180.0,
+    240.0,
+    300.0,
+    420.0,
+    600.0,
+    900.0,
+    1000000000.0
+  ],
+  "thresholds": {
+    "prolific_pctile": 0.75,
+    "healthy_pctile": 0.5,
+    "weak_return": 0.0,
+    "terminal_giveback": 0.5
+  },
+  "causal_inputs": [
+    "mfe_age_pctile (train-frozen)",
+    "aligned_return_30s/180s",
+    "directional_efficiency_180s",
+    "aligned_slope_180s",
+    "structure_intact_5m",
+    "structure_break_against_5m",
+    "giveback_fraction"
+  ],
+  "attribution_rule": "state attached at the DECISION checkpoint (never first).",
+  "n_transitions": 632558
+}

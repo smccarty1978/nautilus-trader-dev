@@ -1,0 +1,25 @@
+{
+  "study_id": "CODEX_5_X_ORIGINAL_W4_TWO_CONTRACT_RUNNER",
+  "research_contract": "TWO_LEG_FIRST_TOUCH_AND_FROZEN_HORIZON_1S_OHLC_RESEARCH_SIMULATION",
+  "population_count": 4383,
+  "pt1_atr": 1.25,
+  "initial_stop_atr": 1.25,
+  "variants": [
+    {"variant_id": "V0", "arm_atr": null, "floor_atr": null},
+    {"variant_id": "V75_25", "arm_atr": 0.75, "floor_atr": 0.25},
+    {"variant_id": "V100_50", "arm_atr": 1.0, "floor_atr": 0.5}
+  ],
+  "arm_activation": "after_arming_bar_for_later_bars",
+  "pt_and_active_floor_same_bar": "pt1_first_floor_deferred",
+  "initial_sl_with_favorable_event_same_bar": "initial_sl_first",
+  "initial_stop_gap_fill": "adverse_open_for_both_contracts",
+  "stop_exit_bar_excursion": "exclude_entire_ambiguous_exit_bar",
+  "floor_and_tail_level_same_bar": "unordered_mark_ambiguous",
+  "horizon_same_timestamp_order": "horizon_open_before_bar_range",
+  "runner_exists_from_entry": true,
+  "runner_horizon_before_pt1": "runner_exits_horizon_contract1_continues_bracket",
+  "multiplier_usd_per_point": 20.0,
+  "cost_per_contract_rt_usd": 10.0,
+  "development_year": 2025,
+  "selection_isolated_year": 2026
+}

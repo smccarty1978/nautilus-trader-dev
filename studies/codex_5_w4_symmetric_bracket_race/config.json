@@ -1,0 +1,19 @@
+{
+  "study_id": "CODEX_5_X_ORIGINAL_W4_SYMMETRIC_BRACKET_RACE",
+  "research_contract": "FROZEN_ENTRY_FIRST_TOUCH_1S_OHLC_RESEARCH_SIMULATION",
+  "primary_bracket_atr": 1.25,
+  "sensitivity_brackets_atr": [1.0, 1.25, 1.5],
+  "tie_policies": ["conservative", "decisive"],
+  "primary_tie_policy": "conservative",
+  "entry_bar_included": true,
+  "race_terminal": "first_pt_or_sl_touch_or_raw_year_end",
+  "unresolved_economics": "excluded_no_invented_exit",
+  "atr_denominator": "atr_at_checkpoint",
+  "multiplier_usd_per_point": 20.0,
+  "round_trip_cost_usd": 10.0,
+  "policy_a_alignment_count": 2332,
+  "policy_a_population_count": 4383,
+  "development_year": 2025,
+  "selection_isolated_year": 2026
+}
+

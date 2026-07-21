@@ -1,0 +1,65 @@
+{
+  "predeclared_thresholds": {
+    "duration_ratio_min": 1.25,
+    "peak_mfe_ratio_min": 1.25,
+    "progress_windows_delta_min": 1.0,
+    "retained_m60_delta_min": 0.15,
+    "minimum_structural_conditions": 3,
+    "minimum_winner_count_train": 500,
+    "minimum_winner_count_2025": 100,
+    "minimum_paired_w4_count_train": 250,
+    "minimum_paired_w4_count_2025": 50,
+    "weakness_rise_min": 0.05,
+    "minimum_median_peak_to_flip_s": 30.0,
+    "minimum_median_giveback_atr": 0.25
+  },
+  "train": {
+    "period": "train",
+    "winner_count": 37112,
+    "failed_runner_count": 28814,
+    "duration_ratio": 1.3636363636363635,
+    "peak_mfe_ratio": 1.7996602451429349,
+    "progress_windows_delta": 0.0,
+    "retained_m60_delta": 0.47124824684431976,
+    "winner_w4_rise_m60_to_flip": 0.1702420505012079,
+    "winner_w4_rise_paired_n": 30001,
+    "winner_w4_rise_paired_fraction": 0.8083908169864195,
+    "winner_peak_to_flip_s": 202.0,
+    "winner_giveback_atr": 1.5449526345742661,
+    "structural_conditions": {
+      "duration": true,
+      "peak_mfe": true,
+      "progress_windows": false,
+      "retention_m60": true
+    },
+    "structural_pass_count": 3,
+    "sample_pass": true,
+    "weakness_window_pass": true,
+    "pass": true
+  },
+  "validation": {
+    "period": "validation",
+    "winner_count": 9109,
+    "failed_runner_count": 7274,
+    "duration_ratio": 1.3636363636363635,
+    "peak_mfe_ratio": 1.7813460378473154,
+    "progress_windows_delta": 0.0,
+    "retained_m60_delta": 0.462101025103384,
+    "winner_w4_rise_m60_to_flip": 0.23373586534030916,
+    "winner_w4_rise_paired_n": 7320,
+    "winner_w4_rise_paired_fraction": 0.8036008343396641,
+    "winner_peak_to_flip_s": 181.0,
+    "winner_giveback_atr": 1.4714922339856304,
+    "structural_conditions": {
+      "duration": true,
+      "peak_mfe": true,
+      "progress_windows": false,
+      "retention_m60": true
+    },
+    "structural_pass_count": 3,
+    "sample_pass": true,
+    "weakness_window_pass": true,
+    "pass": true
+  },
+  "decision": "ESTABLISHED_REGIME_FILTER_FOUND"
+}

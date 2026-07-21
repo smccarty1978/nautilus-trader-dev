@@ -1,0 +1,27 @@
+{
+  "study": "long_rth_mirrored_surface_top100_training",
+  "decision": "LONG_SURFACE_TOP100_SIGNAL_STRONG_PARITY",
+  "selected_model": "gbt",
+  "causal_convention": "strict: latest_source_ts_used < observation_time (post-audit corrected)",
+  "audit": {
+    "completion_gate": "1 CRITICAL + 2 WARNING (remediated)",
+    "re_audit": "0 CRITICAL / 0 WARNING / 3 NOTE",
+    "status": "PASS"
+  },
+  "headline": {
+    "2025_auc": 0.6682,
+    "2026_auc": 0.6512,
+    "2025_top_decile_flip": 0.5114,
+    "2026_top_decile_flip": 0.5365,
+    "2025_lift": 1.9449,
+    "2026_lift": 1.9135
+  },
+  "minimum_viable_gate_PASS": true,
+  "strong_parity_gate_PASS": true,
+  "short_benchmark_note": "short-side benchmark 0.671/0.670 still carries the same inherited 1s look-ahead; comparison is conservative for the long side",
+  "directionality_self_validation_checks_passed": "10,253,579 across 6 years, 0 failures",
+  "scope": "offline surface-build + model training only; NO NautilusTrader, MBP-1, or trade economics; 2026 sealed (never used for fit/select/calibrate)",
+  "train_rows": 682952,
+  "dev_rows": 163397,
+  "test_rows": 52488
+}

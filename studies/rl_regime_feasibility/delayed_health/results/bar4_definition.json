@@ -1,0 +1,26 @@
+{
+  "bar4_delay_seconds": 240,
+  "bar4_step_index": 48,
+  "reference_point": "flip_time (close of the 1m bar that triggered the regime flip)",
+  "bar4_decision_timestamp": "flip_time + 240s",
+  "fill_timestamp": "next 1s bar OPEN at or after decision_timestamp",
+  "bars_counted_from": "flip_time (flip bar = bar 0, bar 1 closes at flip+60s, bar 4 closes at flip+240s)",
+  "survival_requirement": "episode still active (no opposing flip) at bar-4 decision timestamp",
+  "direction_requirement": "same direction as original flip",
+  "bar4_confirmation_requirement": false,
+  "sources_consulted": [
+    "archive/studies/1m_mtf_context/analysis/delayed_entry_bar4.py (delay_s=120 from V_A entry_ts ~ flip+60s -> flip+180s equivalent)",
+    "backtests/studies/regime_dna_knn/bar4_knn_path_atlas.py (bar k>=4 from entry)",
+    "MEMORY.md: 'bar-4 all-flips, GTC market' in ml_entry_knn_hc_mgmt study",
+    "MEMORY.md: 'Post-Bar3 QuickFail-rejection \u2192 Bar4 entry' counting bars from flip"
+  ],
+  "definition_ambiguity": "The archived study (delayed_entry_bar4.py) counts 120s from V_A entry_ts (~flip-30s to flip+90s), corresponding to approximately flip+90s. However, the ML entry knn study and MEMORY.md references consistently use 'bar 4' to mean the 4th 1m bar after the flip close (=flip+240s). We adopt flip+240s as the primary definition and run placebo tests at [60, 120, 180, 240, 300, 360]s to empirically locate the survival knee.",
+  "example": {
+    "flip_confirmed_utc": "10:00:00",
+    "bar_1_closes": "10:01:00",
+    "bar_2_closes": "10:02:00",
+    "bar_3_closes": "10:03:00",
+    "bar_4_closes": "10:04:00  \u2190 entry decision (fill at next 1s open)",
+    "fill_time": "~10:04:00 + 1s"
+  }
+}

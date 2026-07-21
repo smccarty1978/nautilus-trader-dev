@@ -1,0 +1,16 @@
+{
+  "study_id": "CODEX_5_X_W4_FADE_CONFIRMATION_CLOCK_ISOLATION",
+  "research_contract": "EXPLICIT_NEXT_OPEN_1S_OHLC_RESEARCH_SIMULATION",
+  "timeout_seconds": 300,
+  "baseline_stop_atr": 1.5,
+  "policies": [
+    {"policy_id": "POLICY_S_STOP_ONLY_1P25", "preflip_stop_atr": 1.25, "timeout_enabled": false},
+    {"policy_id": "POLICY_T_TIMEOUT_ONLY_300S", "preflip_stop_atr": 1.5, "timeout_enabled": true},
+    {"policy_id": "POLICY_A_COMBINED_1P25_300S", "preflip_stop_atr": 1.25, "timeout_enabled": true}
+  ],
+  "cost_rt_usd": 10.0,
+  "multiplier_usd_per_point": 20.0,
+  "interaction_additive_tolerance_fraction": 0.05,
+  "development_year": 2025,
+  "selection_isolated_year": 2026
+}

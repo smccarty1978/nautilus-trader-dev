@@ -1,0 +1,20 @@
+{
+  "critical_execution_violations_remaining": 0,
+  "original_violation_count": 64,
+  "original_violation_population": "F2 only (F1 had 0 boundary violations)",
+  "repair_method": "exclude affected episodes from eligible population",
+  "assertions": {
+    "decision_ts_le_fill_ts": true,
+    "feature_ts_le_decision_ts": true,
+    "entry_ts_lt_terminal_ts_violations_remaining": 0,
+    "exit_ts_le_terminal_ts_check": "guaranteed_by_replay_construction",
+    "duplicate_episode_ids": 0,
+    "post_exit_position_check": "no_dedicated_flag_in_cache_structurally_guaranteed",
+    "incomplete_bar_use_check": "no_dedicated_flag_in_cache_structurally_guaranteed",
+    "future_regime_outcome_as_feature": "see_f5_score_reproduction_phase4_for_leakage_check"
+  },
+  "rows_audited_pre_repair": 62769,
+  "rows_remaining_post_repair": 62644,
+  "rows_excluded_execution_violation": 64,
+  "rows_excluded_censored_no_price": 61
+}

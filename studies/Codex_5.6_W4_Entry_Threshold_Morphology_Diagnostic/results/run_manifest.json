@@ -1,0 +1,33 @@
+{
+  "config_sha256": "2fb9ef6f7e77ff84d134f767cc9bcf62e6b0adc30e357e3ed8d9af2a8788e2d6",
+  "decision_label": "PRICE_RESPONSE_CONFIRMATION_PROMISING",
+  "input_sha256": {
+    "clock_completion_audit": "50dc2a323a903e618e741e887751d58fb8ffb26fbec211d2f9f02702e7cd546f",
+    "clock_runner": "89956e5a280cfacea774882d51be06f02dc835a4acdda76d0f73deb92b907038",
+    "path_diagnostics": "5bdbc5fab5bb7626abd3040b34748ad72a9c6c6e172e4ed855c461a02dae7fa8",
+    "policy_diffs": "6dcc9f10900a9d37fdbe8aa90ec829b15686c50a752e795dda6760764b669990",
+    "raw_2025": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "raw_2026": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+    "repair_common": "302fab7b64178ee7626300048e9d1b66ab04b64c4a429a3fcbcd48175523e1c7",
+    "repair_runner": "70d4dbad865fa52ed1d054941562f76f1ba4009edc8f693169c1044e2a5bf633",
+    "scores_2025": "f97c4e739cb11b19dbaaa3954175bb4f44b8346b7cc10d791dde22a122edeac9",
+    "scores_2026": "c5c1b42da0d5b0e42be36cb1642a04865d46d8601cf5d7abed0ba9ff360300a8",
+    "trades_2025": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+    "trades_2026": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83"
+  },
+  "output_sha256": {
+    "candidate_gate_retention.parquet": "9d0f5719f6aa2fbaa9b88abbf9def8340214fd09a830fe00652f218a3d98b146",
+    "comparison_tables.parquet": "973fd7c8f183d5be2541c88e465dec70982c8ade48185448c7ecc99eade29df6",
+    "final_report.md": "d9c422dd16124268c1fd4162a7bf81fdf269bdf0011565303b54a36edc440eba",
+    "group_morphology_summary.parquet": "4a8d9e383bd21fe94d704e21020f1ee0a9f130cb701e0db1ca3ad79acb046a68",
+    "group_score_paths.parquet": "2f0bbdee90228292ecfe86b34ca420e38d025d7e0529477b47e99404bda3d8bc",
+    "score_paths.parquet": "08b9f612e5eebe82d0b81ae57fbd0ddca0667fe0ba0a25ebe868a1a4aaa2c60d",
+    "trade_morphology_features.parquet": "6457035b4bdd7714c743fdb8d0c482a78ce6e091196caf7a1db9d71ab9974c1b"
+  },
+  "pre_execution_audit_sha256": "74c064ec3f66066a98f5d4e825929c6dc651b1bd62e78d5e4500e9f35abdd79f",
+  "score_path_rows": 214767,
+  "script_sha256": "523cbdec0079a864a8df7ae57a9c5376c35ba6c58c8727b9e5ee16dfde9fac37",
+  "status": "DIAGNOSTIC_OUTPUTS_COMPLETE_PENDING_COMPLETION_AUDIT",
+  "study_id": "CODEX_5_6_W4_ENTRY_THRESHOLD_MORPHOLOGY_DIAGNOSTIC",
+  "trade_count": 4383
+}

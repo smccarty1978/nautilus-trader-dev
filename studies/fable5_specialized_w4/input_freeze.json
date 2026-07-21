@@ -1,0 +1,35 @@
+{
+  "status": "FROZEN_BEFORE_ANY_EXECUTION",
+  "input_sha256": {
+    "2025_candidates": "b715d76368c719afb772b92bbff9aed31c4f30e0b3254c5d0fe7f93bc7c1fb4f",
+    "2026_candidates": "60d66d8bd667016559b477c6219aee77df37c91f1e1895fd9b00716717af154f",
+    "2025_atlas": "c654da5016f7ec4bf26be11a390992dff851d38e81684a2a19f0bbed90ad9ce7",
+    "2026_atlas": "76192163897e2075dc72e1742ca38d6d3a24aa5977a21bbc537eb2ebc89e2d44",
+    "2025_scores": "f97c4e739cb11b19dbaaa3954175bb4f44b8346b7cc10d791dde22a122edeac9",
+    "2026_scores": "c5c1b42da0d5b0e42be36cb1642a04865d46d8601cf5d7abed0ba9ff360300a8",
+    "2025_raw": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "2026_raw": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+    "2025_frozen_trades": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+    "2026_frozen_trades": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83",
+    "policy_a_isolation_diffs": "ab3aad543271d6a64d586c853f6aad76702f0a1e4166c11b375a1164cf367367",
+    "multi_candidate_policy_results": "9a26f7e0e8d2ba46cc508211233cb37bb3d4eb258c9abbdb1d47a6209629a55c",
+    "streaming_policy_results": "93275cae8da6299613498c50cd494d1b9e58a1648aa8b5a617d53078ff29ebd0",
+    "prior_pr_policy_results": "0cfbb9f3c11da25dca686d8c621300e25365d6e28462c2c39de3b23cfc8def73",
+    "upstream_simulate_trade": "c06c3702fd9a75612152fb1cc24eac4ac2cd5479a22ced3f168d4d460cbf8b8c"
+  },
+  "expected_counts": {
+    "candidates": {
+      "2025": 8682,
+      "2026": 3130
+    },
+    "opportunities": {
+      "2025": 3530,
+      "2026": 1237
+    },
+    "policy_a_trades": {
+      "2025": 3246,
+      "2026": 1137
+    }
+  },
+  "boundary_ns": 1751328000000000000
+}

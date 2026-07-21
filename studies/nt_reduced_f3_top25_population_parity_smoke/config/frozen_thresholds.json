@@ -1,0 +1,14 @@
+{
+  "model_id": "F3_top25_gbt_v1",
+  "model_sha256": "24bf6bece8319cb951bc82f31ea97ac7d3a0a9a200d598d986965143dec7e944",
+  "feature_list_sha256": "8bcfeb74ab3b5453635ad9895fa9d15fd65866044f23fa0415bfc796e5fd6299",
+  "source_population": "full-year 2025 prepared_2025.parquet (198,255 rows)",
+  "source_population_sha256": "75c9c5265d92a384428f65f31956aa21263aa8c5c19a45c856ca45931cff2a53",
+  "threshold_derivation_method": "np.quantile(scores, 0.95) and np.quantile(scores, 0.975) over the complete 2025 population; never tuned on March",
+  "top_5pct_threshold": 0.4962425079016764,
+  "top_2_5pct_threshold": 0.5606134281146,
+  "source_score_column_sha256": "1e7daf60868b56630264f99f8338926fe52fb254d9a7296ec2a795e5f1afe238",
+  "n_rows_scored": 198255,
+  "creation_timestamp": "2026-07-20T21:25:52Z",
+  "script_sha256": "54893a986f8e001b3113b8f86e817bb68a531a60f40541dfaf68639977232d8a"
+}

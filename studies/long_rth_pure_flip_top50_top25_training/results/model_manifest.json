@@ -1,0 +1,27 @@
+{
+  "target": "bullish_regime_flip_within_300s",
+  "random_state": 42,
+  "selection_rule": "max 2025 AUC, tie-break 2025 average precision; 2026 never used",
+  "selected_per_feature_set": {
+    "TOP100": "TOP100_gbt",
+    "TOP50": "TOP50_logreg",
+    "TOP25": "TOP25_logreg"
+  },
+  "feature_set_sizes": {
+    "TOP100": 100,
+    "TOP50": 50,
+    "TOP25": 25
+  },
+  "reused_fit_from": "studies/short_rth_enriched_volume_level_retrain/train_and_evaluate.py",
+  "prepared_data_source": "studies/long_rth_mirrored_surface_top100_training/_work",
+  "train_rows": 682952,
+  "dev_rows": 163397,
+  "test_rows": 52488,
+  "positive_rate": {
+    "train": 0.2702840023896262,
+    "2025": 0.26293628401990243,
+    "2026": 0.2803688462124676
+  },
+  "generator_sha256": "f917737c76d8a577423822bc242c2f189637d0daedaa14c4074944a912fd954a",
+  "runtime_s": 263.2
+}

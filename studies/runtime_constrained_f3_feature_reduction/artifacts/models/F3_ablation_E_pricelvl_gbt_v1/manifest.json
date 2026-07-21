@@ -1,0 +1,36 @@
+{
+  "model_id": "F3_ablation_E_pricelvl_gbt_v1",
+  "model_family": "HistGradientBoostingClassifier",
+  "target": "bearish_regime_flip_within_300s",
+  "score_method": "predict_proba(...)[:, 1]",
+  "positive_class_index": 1,
+  "n_features": 332,
+  "ordered_feature_list_sha256": "149892f97251ac50622b23ed6aa8add39be5f587742f21c9ffe76cf72a3aa784",
+  "model_sha256": "e2ca3d5d60de9fdaaaefe2d2012f90c8bf1ad26e093b9bb539ccc909bbfef091",
+  "training_data_sha256": "f98e4c45a219b792acbcbc375a15b0e8faa79e480aefd2ea26e1af49b3219263",
+  "development_data_sha256": "75c9c5265d92a384428f65f31956aa21263aa8c5c19a45c856ca45931cff2a53",
+  "training_years": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "selection_year": 2025,
+  "training_row_count": 813972,
+  "development_row_count": 198255,
+  "hyperparameters": {
+    "max_depth": 3,
+    "learning_rate": 0.05,
+    "max_iter": 200,
+    "random_state": 42
+  },
+  "random_seed": 42,
+  "sklearn_version": "1.7.2",
+  "numpy_version": "2.3.3",
+  "fit_timestamp": "2026-07-20T17:45:50Z",
+  "fit_runtime_s": 114.3,
+  "source_model_or_parent_ranking": "Phase 2 family ablation E_price_level_context_332",
+  "registry_contract_version": "nt_live_scoring_infra_prereqs Phase 2 schema (window/window_unit/reset_policy/snapshot_anchor)",
+  "feature_inventory_hash": null,
+  "status": "candidate"
+}

@@ -1,0 +1,189 @@
+{
+  "decision": "PURE_FLIP_SIGNAL_INCONCLUSIVE",
+  "selected_feature_set": "F3_volume_delta_plus_price_levels",
+  "selected_model": "gbt",
+  "selection_criterion": "highest 2025 raw AUC (tie-break: 2025 average precision)",
+  "dev_2025_metrics": {
+    "auc": 0.6711675505402167,
+    "average_precision": 0.4121866803487747,
+    "brier": 0.1733095545387678,
+    "logloss": 0.5256512361469449
+  },
+  "dev_2025_decile_lift": {
+    "base_rate": 0.24907316335023078,
+    "top_decile_rate": 0.504943004135983,
+    "bottom_decile_rate": 0.09674165237566831,
+    "top_decile_lift": 2.0272878753539754,
+    "decile_curve_inverted": false
+  },
+  "test_2026_metrics": {
+    "auc": 0.6700191800304137,
+    "average_precision": 0.4267992177630658,
+    "brier": 0.1797320440876439,
+    "logloss": 0.5399033445648089
+  },
+  "test_2026_decile_lift": {
+    "base_rate": 0.2618333571349233,
+    "top_decile_rate": 0.5053951126626468,
+    "bottom_decile_rate": 0.09086584205518554,
+    "top_decile_lift": 1.9302166774809202,
+    "decile_curve_inverted": false
+  },
+  "test_2026_monthly_auc": [
+    {
+      "month": "2026-01",
+      "n": 16332,
+      "auc": 0.6766215590804772
+    },
+    {
+      "month": "2026-02",
+      "n": 15006,
+      "auc": 0.6548932820412031
+    },
+    {
+      "month": "2026-03",
+      "n": 12671,
+      "auc": 0.6534419741496236
+    },
+    {
+      "month": "2026-04",
+      "n": 19012,
+      "auc": 0.6918992773040685
+    }
+  ],
+  "test_2026_monthly_auc_ok": true,
+  "regime_level_2025": {
+    "feature_set": "F3_volume_delta_plus_price_levels",
+    "model": "gbt",
+    "split": 2025,
+    "regime_level_auc": 0.4811945167124412,
+    "n_regimes": 1678,
+    "regime_level_top_decile_flip_rate": 0.8095238095238095,
+    "regime_level_base_rate": 0.7097735399284862,
+    "top20_cutoff_score": 0.3192645354293328,
+    "top20_n_regimes_crossed": 1271,
+    "top20_pct_regimes_crossed": 0.7574493444576877,
+    "top20_missed_flip_rate": 0.4207389749702026,
+    "top20_false_positive_rate": 0.6247049567269867,
+    "top20_median_lead_time_s": 470.0,
+    "top10_cutoff_score": 0.3890135449324892,
+    "top10_n_regimes_crossed": 1029,
+    "top10_pct_regimes_crossed": 0.6132300357568534,
+    "top10_missed_flip_rate": 0.5351609058402861,
+    "top10_false_positive_rate": 0.5238095238095238,
+    "top10_median_lead_time_s": 350.0,
+    "top5_cutoff_score": 0.450493684331229,
+    "top5_n_regimes_crossed": 810,
+    "top5_pct_regimes_crossed": 0.4827175208581645,
+    "top5_missed_flip_rate": 0.6418355184743743,
+    "top5_false_positive_rate": 0.4469135802469136,
+    "top5_median_lead_time_s": 220.0
+  },
+  "regime_level_2026": {
+    "feature_set": "F3_volume_delta_plus_price_levels",
+    "model": "gbt",
+    "split": 2026,
+    "regime_level_auc": 0.5206166899477469,
+    "n_regimes": 532,
+    "regime_level_top_decile_flip_rate": 0.8333333333333334,
+    "regime_level_base_rate": 0.7124060150375939,
+    "top20_cutoff_score": 0.3192645354293328,
+    "top20_n_regimes_crossed": 414,
+    "top20_pct_regimes_crossed": 0.7781954887218046,
+    "top20_missed_flip_rate": 0.3853383458646616,
+    "top20_false_positive_rate": 0.5821256038647343,
+    "top20_median_lead_time_s": 435.0,
+    "top10_cutoff_score": 0.3890135449324892,
+    "top10_n_regimes_crossed": 326,
+    "top10_pct_regimes_crossed": 0.6127819548872181,
+    "top10_missed_flip_rate": 0.5394736842105263,
+    "top10_false_positive_rate": 0.4785276073619632,
+    "top10_median_lead_time_s": 275.0,
+    "top5_cutoff_score": 0.450493684331229,
+    "top5_n_regimes_crossed": 244,
+    "top5_pct_regimes_crossed": 0.4586466165413533,
+    "top5_missed_flip_rate": 0.6522556390977443,
+    "top5_false_positive_rate": 0.4221311475409836,
+    "top5_median_lead_time_s": 160.0
+  },
+  "signal_viability_gate": {
+    "min_2025_row_level_pass": true,
+    "min_2026_row_level_pass": true,
+    "strong_2025_row_level_pass": true,
+    "strong_2026_row_level_pass": true,
+    "regime_2025_pass": false,
+    "regime_2026_pass": false,
+    "regime_2025_auc": 0.4811945167124412,
+    "regime_2026_auc": 0.5206166899477469,
+    "dev_auc": 0.6711675505402167,
+    "test_auc": 0.6700191800304137,
+    "dev_top_decile_lift": 2.0272878753539754,
+    "test_top_decile_lift": 1.9302166774809202
+  },
+  "all_combo_metrics_summary": [
+    {
+      "feature_set": "F3_volume_delta_plus_price_levels",
+      "model": "gbt",
+      "2025_auc_raw": 0.6711675505402167,
+      "2026_auc_raw": 0.6700191800304137,
+      "2025_average_precision_raw": 0.4121866803487747,
+      "2026_average_precision_raw": 0.4267992177630658
+    },
+    {
+      "feature_set": "F1_volume_delta_only",
+      "model": "gbt",
+      "2025_auc_raw": 0.6677931737253106,
+      "2026_auc_raw": 0.6677757667882553,
+      "2025_average_precision_raw": 0.4081620506087576,
+      "2026_average_precision_raw": 0.4231051766002021
+    },
+    {
+      "feature_set": "F2_price_levels_only",
+      "model": "gbt",
+      "2025_auc_raw": 0.6654471722745758,
+      "2026_auc_raw": 0.6697887176956835,
+      "2025_average_precision_raw": 0.404702819987952,
+      "2026_average_precision_raw": 0.4252561747839389
+    },
+    {
+      "feature_set": "F0_existing_only",
+      "model": "gbt",
+      "2025_auc_raw": 0.6634264373104752,
+      "2026_auc_raw": 0.6561504154390081,
+      "2025_average_precision_raw": 0.4060997971649376,
+      "2026_average_precision_raw": 0.4178598982833709
+    },
+    {
+      "feature_set": "F1_volume_delta_only",
+      "model": "logreg",
+      "2025_auc_raw": 0.660601418224098,
+      "2026_auc_raw": 0.6665869907673331,
+      "2025_average_precision_raw": 0.3943867044548798,
+      "2026_average_precision_raw": 0.4196258020411633
+    },
+    {
+      "feature_set": "F2_price_levels_only",
+      "model": "logreg",
+      "2025_auc_raw": 0.6584544462162044,
+      "2026_auc_raw": 0.6487867654702707,
+      "2025_average_precision_raw": 0.3956150724132822,
+      "2026_average_precision_raw": 0.4033749271452541
+    },
+    {
+      "feature_set": "F3_volume_delta_plus_price_levels",
+      "model": "logreg",
+      "2025_auc_raw": 0.6577050825024595,
+      "2026_auc_raw": 0.652625375683998,
+      "2025_average_precision_raw": 0.3941730177656008,
+      "2026_average_precision_raw": 0.4055678719701264
+    },
+    {
+      "feature_set": "F0_existing_only",
+      "model": "logreg",
+      "2025_auc_raw": 0.6555184381035164,
+      "2026_auc_raw": 0.6478150455250035,
+      "2025_average_precision_raw": 0.3899397422148136,
+      "2026_average_precision_raw": 0.3947039390800192
+    }
+  ]
+}

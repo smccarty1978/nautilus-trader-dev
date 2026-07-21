@@ -1,0 +1,13 @@
+{
+  "metric_rows": 137664,
+  "score_rows_valid": 6612283,
+  "availability_counts": {
+    "qual": 72858,
+    "peak": 104126,
+    "m60": 124306,
+    "m30": 124676,
+    "flip": 126171
+  },
+  "selection_rule": "last valid observation_time with observation_time + 1s <= target inside exact regime_start_ns",
+  "score_availability": "score from observation T is actionable at T+1s; Stage 1 is descriptive only"
+}

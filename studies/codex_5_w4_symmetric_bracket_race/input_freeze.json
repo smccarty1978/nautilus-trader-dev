@@ -1,0 +1,25 @@
+{
+  "status": "FROZEN_BEFORE_NEW_CODE_EXECUTION",
+  "population_count": 4383,
+  "population_count_by_year": {"2025": 3246, "2026": 1137},
+  "input_sha256": {
+    "trades_2025": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+    "trades_2026": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83",
+    "raw_2025": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "raw_2026": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+    "scores_2025": "f97c4e739cb11b19dbaaa3954175bb4f44b8346b7cc10d791dde22a122edeac9",
+    "scores_2026": "c5c1b42da0d5b0e42be36cb1642a04865d46d8601cf5d7abed0ba9ff360300a8",
+    "original_policy": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b",
+    "original_policy_completion_audit": "bb882021c50d047b1085a2e591d4d6e03cc658d10d1d548b3e36075d8afc7c34",
+    "frozen_model_manifest": "2b0cc6d0ffd7fdcf28f29a0a73e973fd6b5bc0a797121f23430d220e03dd2180"
+  },
+  "prohibited": [
+    "W4 retraining or rescoring",
+    "specialized side or session models",
+    "threshold changes",
+    "PR10 or PR30 delays",
+    "re-entry, W4Exit, or W4Reverse",
+    "timeouts or regime exits in the primary race",
+    "2026-driven selection"
+  ]
+}

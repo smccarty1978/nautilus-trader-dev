@@ -1,0 +1,126 @@
+{
+  "study_decision": "NO_REDUCED_MODEL_PRESERVES_POPULATION",
+  "selected_model_id": null,
+  "models": [
+    {
+      "model_id": "F3_695_baseline",
+      "n_features": 695,
+      "model_sha256": "dd16ab38518cc00377058a0ff4068b59477eb1261fc541f25976767a08da670b",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_695_baseline",
+      "status": "frozen",
+      "selection_verdict": "not_a_raw_count_candidate"
+    },
+    {
+      "model_id": "F3_live546_gbt_v1",
+      "n_features": 546,
+      "model_sha256": "b8d4d25023143e0ff047645ac68ccf316a3199d61cf6b6256b420a9a2590620d",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_live546_gbt_v1",
+      "status": "candidate",
+      "selection_verdict": "not_a_raw_count_candidate"
+    },
+    {
+      "model_id": "F3_ablation_C_f0only_gbt_v1",
+      "n_features": 149,
+      "model_sha256": "607b551243fea0e26c1f5534d8573c56fc8763d618cecb5aeeb9dbecd1460490",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_ablation_C_f0only_gbt_v1",
+      "status": "candidate",
+      "selection_verdict": "not_a_raw_count_candidate"
+    },
+    {
+      "model_id": "F3_ablation_D_ohlcv_gbt_v1",
+      "n_features": 214,
+      "model_sha256": "1e9bd09305e26d5b013a25b372f7af426e540b428b481a3a168a8ea5a26d4e4f",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_ablation_D_ohlcv_gbt_v1",
+      "status": "candidate",
+      "selection_verdict": "not_a_raw_count_candidate"
+    },
+    {
+      "model_id": "F3_ablation_E_pricelvl_gbt_v1",
+      "n_features": 332,
+      "model_sha256": "e2ca3d5d60de9fdaaaefe2d2012f90c8bf1ad26e093b9bb539ccc909bbfef091",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_ablation_E_pricelvl_gbt_v1",
+      "status": "candidate",
+      "selection_verdict": "not_a_raw_count_candidate"
+    },
+    {
+      "model_id": "F3_ablation_F_f0_ohlcv_gbt_v1",
+      "n_features": 363,
+      "model_sha256": "93766181e017f3a5d4a29fbbdaa43be8bb1321659bde2a96d05c894c16a5c2c8",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_ablation_F_f0_ohlcv_gbt_v1",
+      "status": "candidate",
+      "selection_verdict": "not_a_raw_count_candidate"
+    },
+    {
+      "model_id": "F3_ablation_G_f0_pricelvl_gbt_v1",
+      "n_features": 481,
+      "model_sha256": "5c5ecd4208b50395a063607e3aa9ef3b9629f70090f02d94c6e86421b602d602",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_ablation_G_f0_pricelvl_gbt_v1",
+      "status": "candidate",
+      "selection_verdict": "not_a_raw_count_candidate"
+    },
+    {
+      "model_id": "F3_top25_gbt_v1",
+      "n_features": 25,
+      "model_sha256": "24bf6bece8319cb951bc82f31ea97ac7d3a0a9a200d598d986965143dec7e944",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top25_gbt_v1",
+      "status": "gate_fail",
+      "selection_verdict": "FAIL"
+    },
+    {
+      "model_id": "F3_top40_gbt_v1",
+      "n_features": 40,
+      "model_sha256": "cd32a3bec3dab35eccbe97e2f711f9b1ab6abdaf8df337ad965944dfc0bb2db1",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top40_gbt_v1",
+      "status": "gate_fail",
+      "selection_verdict": "FAIL"
+    },
+    {
+      "model_id": "F3_top60_gbt_v1",
+      "n_features": 60,
+      "model_sha256": "ab29d6ebae5b4ef30d5458849cb4456cfd2ab0fe2aacdab1fc8284f18cda347e",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top60_gbt_v1",
+      "status": "gate_fail",
+      "selection_verdict": "FAIL"
+    },
+    {
+      "model_id": "F3_top80_gbt_v1",
+      "n_features": 80,
+      "model_sha256": "fb2429ca7a40e46ddfa5c3a0a742a413d9bc577056ad851a970ee8e56e2f01b8",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top80_gbt_v1",
+      "status": "gate_fail",
+      "selection_verdict": "FAIL"
+    },
+    {
+      "model_id": "F3_top100_gbt_v1",
+      "n_features": 103,
+      "model_sha256": "84af60387cb8dc28ef213698224f3ab95312d1110f2b663e7a81bd0cf3a6b3e7",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top100_gbt_v1",
+      "status": "gate_fail",
+      "selection_verdict": "FAIL"
+    },
+    {
+      "model_id": "F3_top150_gbt_v1",
+      "n_features": 150,
+      "model_sha256": "47df922e23e1c252f6aa2d44a7fbb642b755f3083f9d03dbf7d87cc18f8fc8a8",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top150_gbt_v1",
+      "status": "gate_fail",
+      "selection_verdict": "FAIL"
+    },
+    {
+      "model_id": "F3_top250_gbt_v1",
+      "n_features": 250,
+      "model_sha256": "a61a67af087eaa8a12ef628737dc87a4885d5a06c39e830147ed863093e812ea",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top250_gbt_v1",
+      "status": "gate_fail",
+      "selection_verdict": "FAIL"
+    },
+    {
+      "model_id": "F3_live546_gbt_v2",
+      "n_features": 546,
+      "model_sha256": "ebc2ea850d134d173b5c6c657cd038e8ec77a49e28e52ad396aed71ac6afc62e",
+      "artifact_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_live546_gbt_v2",
+      "status": "gate_fail",
+      "selection_verdict": "FAIL"
+    }
+  ]
+}

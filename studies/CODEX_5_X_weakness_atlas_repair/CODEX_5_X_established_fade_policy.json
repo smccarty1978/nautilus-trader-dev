@@ -1,0 +1,36 @@
+{
+  "policy_id": "CODEX_5_X_REPAIRED_ERWF_V1",
+  "frozen_before_policy_execution": true,
+  "research_contract": "EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT",
+  "label": "1-second OHLC research simulation; not NT-native executable validation",
+  "chronology": {
+    "model_train": "2021-2024",
+    "model_select_calibrate_and_policy_development": "2025",
+    "final_untouched_test": "2026"
+  },
+  "filter": {
+    "regime_age_s_min": 120.0,
+    "running_mfe_atr_min": 1.0,
+    "new_progress_windows_min": 2,
+    "retained_mfe_ratio_min": 0.5
+  },
+  "filter_status": "unchanged from prior established-regime study; causal and direction-symmetric",
+  "weakness_trigger": "first strict crossing from below the frozen direction-specific W4 threshold while the established filter is true",
+  "direction_thresholds": {
+    "1": 0.6883498713708196,
+    "-1": 0.7183653372722797
+  },
+  "entry": "fade prevailing direction at the first available raw 1-second ts_event open at or after the causal decision boundary",
+  "entry_bar_range_evaluated": true,
+  "stop_atr": 1.5,
+  "stop_denominator": "atr_at_checkpoint",
+  "stop_anchor": "explicit entry fill open",
+  "stop_active_entry_bar": true,
+  "stop_fill": "bar open when the bar gaps through the stop; otherwise stop price when the 1-second OHLC range reaches it",
+  "exit": "hold through the first flip aligning with the countertrade; exit at the next available 1-second open at or after the following flip against the countertrade",
+  "same_bar_rule": "scheduled flip exit fills at its decision-boundary open before that bar range; stop is evaluated on prior bars including the entry bar",
+  "overlap_rule": "one position at a time; after a stop touch, no entry is allowed at that same 1-second bar open",
+  "nq_multiplier_usd_per_point": 20.0,
+  "cost_rt_usd": 10.0,
+  "optional_secondary_exit": "not implemented"
+}

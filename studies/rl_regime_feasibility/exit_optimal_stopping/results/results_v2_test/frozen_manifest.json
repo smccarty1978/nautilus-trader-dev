@@ -1,0 +1,47 @@
+{
+  "freeze_date": "2026-07-05",
+  "train_cutoff": "2024-12-31",
+  "val_period": "2025-01-01 to 2025-02-28",
+  "test_period": "2025-03-01 to 2025-05-31",
+  "label": "DEVELOPMENT TEST \u2014 PREVIOUSLY INSPECTED, NOT PRISTINE OOS",
+  "models": {
+    "m4_minimal": {
+      "path": "studies\\rl_regime_feasibility\\exit_optimal_stopping\\results\\repair\\models\\m4_minimal_repair.pkl",
+      "sha256": "2fd28a1c82a51c24"
+    },
+    "m4_minimal_plus": {
+      "path": "studies\\rl_regime_feasibility\\exit_optimal_stopping\\results\\repair\\models\\m4_minimal_plus_repair.pkl",
+      "sha256": "f62296485007ca56"
+    },
+    "m4_full": {
+      "path": "studies\\rl_regime_feasibility\\exit_optimal_stopping\\results\\repair\\models\\m4_full_repair.pkl",
+      "sha256": "fff54a30e5fb773f"
+    },
+    "m3_hazard": {
+      "path": "studies\\rl_regime_feasibility\\exit_optimal_stopping\\results\\repair\\models\\m3_hazard_repair.pkl",
+      "sha256": "7c04e45d5186894c"
+    }
+  },
+  "thresholds": {
+    "m4_full": 104.007636,
+    "m4_full_original": 104.0076,
+    "m3_hazard": 0.081211,
+    "m4_minimal": 139.137097,
+    "m4_minimal_plus": 93.389638
+  },
+  "feature_hashes": {
+    "FULL": "8f9d604dc0f25223",
+    "MINIMAL": "417e82ba904a96b9",
+    "MINIMAL_PLUS": "4c508e2d4affb47b"
+  },
+  "constants": {
+    "NQ_MULT": 20.0,
+    "COMMISSION": 5.0,
+    "TICK_SIZE": 0.25,
+    "STOP_ATR": 1.5,
+    "MIN_ELIG_S": 30,
+    "HYSTERESIS": 2,
+    "BOOTSTRAP_N": 5000,
+    "BOOTSTRAP_SEED": 42
+  }
+}

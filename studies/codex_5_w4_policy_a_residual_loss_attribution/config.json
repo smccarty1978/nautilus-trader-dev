@@ -1,0 +1,13 @@
+{
+  "study_id": "CODEX_5_X_W4_POLICY_A_RESIDUAL_LOSS_ATTRIBUTION",
+  "policy_id": "POLICY_A_COMBINED_1P25_300S",
+  "timeout_seconds": 300,
+  "align_time_seconds": [60, 120, 300],
+  "regime_age_minutes": [15, 30, 60, 120],
+  "w4_score_edges": [0.70, 0.75, 0.80],
+  "mfe_timeout_atr_edges": [0.25, 0.50, 0.75, 1.00],
+  "pnl_timeout_atr_edges": [-1.00, -0.50, 0.00, 0.50, 1.00],
+  "development_year": 2025,
+  "selection_isolated_year": 2026,
+  "analysis_only": true
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Forensics Review - Regime 202527018</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        h1 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+        .container {
+            position: relative;
+            overflow: hidden;
+            width: 90%;
+            max-width: 1200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            background-color: #1e1e1e;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .img-wrapper {
+            width: 100%;
+            cursor: zoom-in;
+            overflow: hidden;
+            text-align: center;
+        }
+        img {
+            width: 100%;
+            max-width: 100%;
+            transition: transform 0.3s ease;
+        }
+        img.zoomed {
+            transform: scale(2.0);
+            cursor: zoom-out;
+        }
+        .stats-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .stats-table th, .stats-table td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: left;
+        }
+        .stats-table th {
+            background-color: #262626;
+            color: #33ccff;
+        }
+        .back-link {
+            margin-top: 20px;
+            color: #33ccff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover {
+            color: #00b3ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Trade Forensics Review — Regime 202527018</h1>
+    <div class="container">
+        <div class="img-wrapper">
+            <img src="top_202527018.png" id="trade-chart" alt="Trade Chart">
+        </div>
+        <table class="stats-table">
+            <tr>
+                <th>Regime ID</th><td>202527018</td>
+                <th>Direction</th><td>Long</td>
+            </tr>
+            <tr>
+                <th>Entry Time (Central)</th><td>2025-12-23 08:22:00</td>
+                <th>Entry Price</th><td>25723.50</td>
+            </tr>
+            <tr>
+                <th>Exit Time (Central)</th><td>2025-12-23 08:56:00</td>
+                <th>Exit Price</th><td>25700.50</td>
+            </tr>
+            <tr>
+                <th>Gross PnL</th><td style="color: #ff3366;">$-460.00</td>
+                <th>Hold Bars</th><td>23</td>
+            </tr>
+        </table>
+    </div>
+    <a href="../trade_forensics.md" class="back-link">&larr; Back to Forensics Report</a>
+    <script>
+        const img = document.getElementById('trade-chart');
+        img.addEventListener('click', () => {
+            img.classList.toggle('zoomed');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "verdict": "PASS",
+  "per_year_ok": {
+    "2021": true,
+    "2022": true,
+    "2023": true,
+    "2024": true,
+    "2025": true,
+    "2026": true
+  },
+  "timing_unverified_features_disclosed": [
+    "regime_first_half_vol",
+    "regime_abs_delta_per_atr_moved",
+    "regime_price_change_atr"
+  ],
+  "timing_unverified_note": "Inherited disclosed residual from the runtime_constrained_f3_feature_reduction study (regime-relative accumulated A4 family). Non-blocking; flagged for provenance, same treatment as the short-side model."
+}

@@ -1,0 +1,23 @@
+{
+  "horizons_s": [
+    180,
+    300,
+    900
+  ],
+  "features": {
+    "aligned_return": [
+      "ar_180s",
+      "ar_300s",
+      "ar_900s"
+    ],
+    "cross_horizon": [
+      "cross_30s_180s",
+      "cross_30s_300s",
+      "cross_30s_900s",
+      "giveback_vs_5m_trend",
+      "ar_900s_trend_fraction"
+    ]
+  },
+  "description": "Direction-canonicalized aligned returns from 1s bar close prices",
+  "causal_guarantee": "Uses close of bar at T and T-H, both completed before observation"
+}

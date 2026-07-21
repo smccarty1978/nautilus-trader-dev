@@ -1,0 +1,8 @@
+{
+  "stop_convention": "gap-through fills at bar open; intrabar touch fills at next bar open",
+  "entry_convention": "market fill at next 1s bar open after decision timestamp",
+  "cost_base": "$5.0 RT commission",
+  "atr_stop": "1.5 ATR from flip_close",
+  "max_hold_s": 300,
+  "episode_cap_s": 1800
+}

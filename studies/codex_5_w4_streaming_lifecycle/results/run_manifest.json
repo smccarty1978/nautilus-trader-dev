@@ -1,0 +1,31 @@
+{
+  "status": "COMPLETE",
+  "completion_audit": {
+    "path": "../audit/completion_audit.md",
+    "sha256": "0bfc43c0040a801e88bcf92f0af9f389c6edcc1838de0cc60376df92a21ee4c4",
+    "critical": 0,
+    "warning": 0,
+    "note": 0,
+    "tests_passed": 12
+  },
+  "policies": [
+    "BASELINE",
+    "S1",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "opportunity_count": 4767,
+  "runner_sha256": "1529a53d596cc3065de9936eaec1f0ee269c4d2aaa81cc3eb456401e5d5f7d0c",
+  "config_sha256": "06324f36f320ac9e8ca4d88db5f69ded6fe99769fa6ab267ac69ab67f16fae02",
+  "freeze_sha256": "8d6b9bf8334580bf485ce8d58e74366f5ed6fa405fb1acfc82fbbec82673f5ad",
+  "output_sha256": {
+    "streaming_portfolio_policy_results.parquet": "93275cae8da6299613498c50cd494d1b9e58a1648aa8b5a617d53078ff29ebd0",
+    "streaming_portfolio_trade_log.parquet": "0b91ce3462eac0459d83e91b145fed0b6ebc19a30b34af31718b73d409f1522c",
+    "streaming_portfolio_attempt_accounting.parquet": "94b8c0b3acfff9ee5049aec30779979141019db124c12d2ed77e011adb24e27f",
+    "streaming_portfolio_lifecycle_exit_accounting.parquet": "7451d722620a5e30bfffde8c863b32a8f4618bccc5884118ee0f8a420c6535b4",
+    "streaming_portfolio_overlap_audit.parquet": "0fd7294c40b9d9aa921518b11a48c7f9ec1612112e5b4d72f47e7f9fcfc87ce4",
+    "streaming_portfolio_reconciliation.parquet": "68d6a716a1e8896cca40d0550a20cf47eec3d5726378d0244f3413cc6d1e6cb7",
+    "final_report.md": "b034ca8ea4e5a4c6eff99909dd443db7bbdf0507d009e923c58ac64294acfe19"
+  }
+}

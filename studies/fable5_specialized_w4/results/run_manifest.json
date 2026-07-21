@@ -1,0 +1,44 @@
+{
+  "status": "COMPLETE",
+  "selection_manifest_sha256": "9924ccaad65882049e6d761550d32b16eab46f60190a2df129b556622a7d66ca",
+  "bundle_sha256": "496613cad4183d5913c558375298fdb1dc24ef625c3dea51f0f7d9b3f79b4b73",
+  "input_freeze_sha256": "21eac691e54b5ea5ef40d82b72522d566e0ee44bc5942b3add1d23ad10dd8465",
+  "output_sha256": {
+    "specialized_w4_dataset_audit.parquet": "4a252bd4f4312c8f72682fc39667d662b0ec9359e24bcc151fbe8e59b63665dc",
+    "specialized_w4_model_metrics.parquet": "9c5c2e51adc24d6a8a963392b8131a265ccfb3d3fb319c5966ec641ea3061941",
+    "specialized_w4_decile_lift.parquet": "e547526ca76d7f6596841452bce46461caba377fdacb67bbf7691cd0bf1c5f3f",
+    "specialized_w4_policy_results.parquet": "33ba02c36d37db194f58a97987ce0b9e4e322d7b0bd80498a982a7b3b159a7f4",
+    "specialized_w4_trade_diffs.parquet": "2288208da30cc455c75f711223b69ae453096e15d9685f02d379622a31dade5d",
+    "specialized_w4_feature_importance.parquet": "d975a614a1f20dcacc5414c729fa8595a70f27c833f505f484ee5e6d7353733d",
+    "specialized_w4_calibration.parquet": "4454f84e596a834ca858187dd13da3648c2318d0a66c895d2f07e5e63fa3f358"
+  },
+  "decision": "SPECIALIZATION_OVERFITS_2025",
+  "decision_equivalent_deployment": "NO_SPECIALIZED_W4_EDGE",
+  "research_contract": "1S_OHLC_RESEARCH_SIMULATION_NOT_NT_NATIVE",
+  "pre_execution_audit": {
+    "file": "audit/pre_execution_audit.md",
+    "result": "PASS_0C_0W",
+    "sha256": "8c800426514bcfa9ce617a31ebea981ec1903b74da4ad793bb2de72721d44efe"
+  },
+  "completion_audit": {
+    "file": "audit/completion_audit.md",
+    "result": "0_CRITICAL_1_WARNING_cosmetic_retention_band_labels",
+    "sha256": "7dce5e6e4b9a28fdb17bd04f95883f16a8eead12da7d30effd786c6b35cc1755"
+  },
+  "reports": {
+    "final_report": "results/final_report.md",
+    "calibration_report": "results/specialized_w4_calibration_report.md"
+  },
+  "reconciliation": {
+    "2025": {
+      "trades": 3246,
+      "net_pnl_usd": -8114.842750573298,
+      "mismatches": 0
+    },
+    "2026": {
+      "trades": 1137,
+      "net_pnl_usd": 17988.060996803324,
+      "mismatches": 0
+    }
+  }
+}

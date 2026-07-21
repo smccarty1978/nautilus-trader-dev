@@ -1,0 +1,26 @@
+{
+  "study_id": "CODEX_5_X_W4_MULTI_CANDIDATE_REENTRY",
+  "research_contract": "MULTI_CANDIDATE_EXPLICIT_NEXT_OPEN_1S_OHLC_RESEARCH_SIMULATION",
+  "policies": [
+    {"policy_id": "R0", "delay_seconds": 0},
+    {"policy_id": "R10", "delay_seconds": 10},
+    {"policy_id": "R30", "delay_seconds": 30}
+  ],
+  "virtual_directional_pnl_threshold_points": 0.0,
+  "max_regime_age_seconds": 1800,
+  "candidate_crossing": "previous_score_strictly_below_and_current_score_at_or_above",
+  "opportunity_reopen_after_filter_end": false,
+  "crossings_during_confirmation_wait": "not_queued",
+  "acceptance_consumes_opportunity_before_global_overlap": true,
+  "confirmation_mark": "latest_fully_completed_1s_close",
+  "delayed_fill": "first_available_1s_open_strictly_after_confirmation",
+  "timeout_anchor": "actual_accepted_entry",
+  "timeout_seconds": 300,
+  "preflip_stop_atr": 1.25,
+  "postflip_stop_atr": 1.5,
+  "atr_denominator": "atr_at_checkpoint",
+  "multiplier_usd_per_point": 20.0,
+  "cost_rt_usd": 10.0,
+  "development_year": 2025,
+  "selection_isolated_year": 2026
+}

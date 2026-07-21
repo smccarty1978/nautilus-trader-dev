@@ -1,0 +1,13 @@
+- `[x]` Precompute walk-forward KNN $hC$ mapping file (`extract_hc_mapping.py` and run it)
+- `[x]` Implement `hc_sizing_strategy.py` with `HCSizingStrategy` and `HCSizingConfig`
+- `[x]` Implement backtest runner `run_hc_sizing_backtests.py`
+- `[x]` Execute backtests for Baseline, Discrete, Conservative, Continuous sizing for 2022-2026
+- `[x]` Aggregate trade logs and verify parity / correctness
+- `[x]` Generate reports:
+  - `[x]` `hC_bucket_distribution.md`
+  - `[x]` `hC_nt_sizing_validation.md`
+  - `[x]` `hC_continuous_sizing.md`
+  - `[x]` `hC_2026_oos_breakdown.md`
+  - `[x]` `hC_exposure_decomposition.md`
+  - `[x]` `audit_hC_nt_validation.md`
+- `[x]` Deliver final deployability synthesis (YES/NO/INCONCLUSIVE)

@@ -1,0 +1,31 @@
+{
+  "prolific_threshold": 0.75,
+  "mfe_age_bins": [
+    0,
+    60,
+    120,
+    180,
+    240,
+    300,
+    420,
+    600,
+    900,
+    1200,
+    1800,
+    3600,
+    Infinity
+  ],
+  "quantile_keys": [
+    "q25",
+    "q50",
+    "q75",
+    "q90",
+    "q95"
+  ],
+  "train_prolific_fraction": 0.24180900527341176,
+  "weakness_triggers": {
+    "giveback_atr": 0.5,
+    "kalman_velocity": -0.003,
+    "ar_30s": -0.3
+  }
+}

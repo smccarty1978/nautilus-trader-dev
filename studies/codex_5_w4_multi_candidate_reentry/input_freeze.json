@@ -1,0 +1,38 @@
+{
+  "status": "FROZEN_BEFORE_ANY_NEW_CODE_TEST_OR_EXECUTION",
+  "policy_ids": ["R0", "R10", "R30"],
+  "current_policy_a_trade_count": 4383,
+  "current_candidate_count": 4767,
+  "current_policy_a_trade_count_by_year": {"2025": 3246, "2026": 1137},
+  "current_candidate_count_by_year": {"2025": 3530, "2026": 1237},
+  "input_sha256": {
+    "2025_raw": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "2026_raw": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+    "2025_atlas": "c654da5016f7ec4bf26be11a390992dff851d38e81684a2a19f0bbed90ad9ce7",
+    "2026_atlas": "76192163897e2075dc72e1742ca38d6d3a24aa5977a21bbc537eb2ebc89e2d44",
+    "2025_scores": "f97c4e739cb11b19dbaaa3954175bb4f44b8346b7cc10d791dde22a122edeac9",
+    "2026_scores": "c5c1b42da0d5b0e42be36cb1642a04865d46d8601cf5d7abed0ba9ff360300a8",
+    "2025_frozen_candidates": "9c027e19335d40c4ef32c3655e32e016044ac52ca80a48e84de32698f6b9b288",
+    "2026_frozen_candidates": "d40dc7be803873a86fe773faf85210c0386906d15efd8840e48c809983f55055",
+    "2025_frozen_trades": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+    "2026_frozen_trades": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83",
+    "policy_a_isolation_diffs": "ab3aad543271d6a64d586c853f6aad76702f0a1e4166c11b375a1164cf367367",
+    "prior_pr_trade_diffs": "77e64df091d0f7f4e0027497e732fd51627b6285782b2feb67cea6018d547c61",
+    "prior_pr_policy_results": "0cfbb9f3c11da25dca686d8c621300e25365d6e28462c2c39de3b23cfc8def73",
+    "prior_pr_completion_audit": "30cb05d734e3a64d6cf27cd00fa26df947240174f984fbd208218cf6ed49c550",
+    "prior_pr_manifest": "05cbb1c0a716269d6d80632c7570e55e54d00162c6f6111472ccb764a55e1099",
+    "upstream_candidate_runner": "70d4dbad865fa52ed1d054941562f76f1ba4009edc8f693169c1044e2a5bf633",
+    "upstream_policy": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b"
+  },
+  "prohibited": [
+    "W4 retraining or rescoring",
+    "threshold changes",
+    "additional delay values",
+    "additional price-response thresholds",
+    "direction-specific or session-specific rules",
+    "score-shape filters",
+    "MFE continuation",
+    "post-flip retained-profit rules",
+    "2026-driven selection"
+  ]
+}

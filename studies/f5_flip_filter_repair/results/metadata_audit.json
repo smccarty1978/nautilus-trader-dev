@@ -1,0 +1,23 @@
+{
+  "n_episodes": 62644,
+  "missing_direction": 0,
+  "missing_session": 0,
+  "missing_month": 0,
+  "missing_period_role": 0,
+  "direction_source": "rebuilt from canonical 'regime' column (0 nulls in F2; verified 100% match against any pre-existing non-null direction values)",
+  "session_source": "RTH = 08:30-15:00 America/Chicago (project canonical, CLAUDE.md), DST-aware via tz_convert on tz-aware UTC observation_time",
+  "session_distribution": {
+    "ETH": 44664,
+    "RTH": 17980
+  },
+  "period_role_distribution": {
+    "train": 47036,
+    "secondary_2025H2": 6887,
+    "secondary_2026": 3946,
+    "dev_test": 3000,
+    "validation": 1775
+  },
+  "entry_delay_bucket_note": "proxy: tertile of seconds_in_current_ordering within period_role (no direct flip-to-confirmation delay field persisted in the cached atlas); used only as a matching stratum for R3 controls, not as a primary economic metric.",
+  "atr_bucket_note": "tertile of contemporaneous entry-time ATR within period_role.",
+  "runner_tier_note": "top10/top5/top1 percentile of R0 baseline pnl_base, computed within period_role."
+}

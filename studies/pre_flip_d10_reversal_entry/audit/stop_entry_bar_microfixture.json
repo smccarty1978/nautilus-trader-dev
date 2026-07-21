@@ -1,0 +1,57 @@
+{
+  "entry_bar_ts": 1741042801000000000,
+  "entry_bar_open": 20511.25,
+  "entry_bar_low": 20505.25,
+  "trigger": 20511.0,
+  "stop_fill_events": [
+    {
+      "kind": "fill",
+      "order": "O-20250303-230001-MICRO-000-2",
+      "ts_event": 1741042802000000000,
+      "price": 20511.0
+    }
+  ],
+  "same_entry_bar_stop_filled": false,
+  "events": [
+    {
+      "kind": "bar",
+      "ts_event": 1741042800000000000,
+      "open": 20527.0,
+      "low": 20511.25,
+      "high": 20527.0
+    },
+    {
+      "kind": "fill",
+      "order": "O-20250303-230001-MICRO-000-1",
+      "ts_event": 1741042801000000000,
+      "price": 20514.25
+    },
+    {
+      "kind": "fill",
+      "order": "O-20250303-230001-MICRO-000-2",
+      "ts_event": 1741042802000000000,
+      "price": 20511.0
+    },
+    {
+      "kind": "bar",
+      "ts_event": 1741042801000000000,
+      "open": 20511.25,
+      "low": 20505.25,
+      "high": 20511.75
+    },
+    {
+      "kind": "bar",
+      "ts_event": 1741042802000000000,
+      "open": 20508.5,
+      "low": 20507.75,
+      "high": 20512.25
+    },
+    {
+      "kind": "bar",
+      "ts_event": 1741042803000000000,
+      "open": 20513.0,
+      "low": 20513.0,
+      "high": 20515.75
+    }
+  ]
+}

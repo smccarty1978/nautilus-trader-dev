@@ -1,0 +1,12 @@
+{
+  "canonical_source": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\collectors\\collector_v2\\results\\v_a_v0_2025\\trades.parquet",
+  "delay_convention": "legacy ~29s-delayed V_A collector (matches this study's explicit 'canonical 30-second delay' mechanic; NOT the current *_nodelay* collector used in the sibling f5_flip_filter_repair / earlier rank_filter_oos_validation runs)",
+  "f2_episodes_covered": 6898,
+  "full_population_match_rate": 0.2800811829515802,
+  "rth_match_rate": 0.9911962713619886,
+  "rth_price_match_rate": 0.9937304075235109,
+  "match_tolerance_seconds": 5.0,
+  "price_tolerance_points": 5.0,
+  "note": "canonical delayed V_A collector is also ~99% RTH-only as currently deployed; RTH-restricted match rate is the comparable parity metric. Match rate is naturally below 1.0 because delayed_fill_ts is derived here from a 29s-target forward-fill on raw 1s data rather than V_A's own live order-fill event, so a residual few-second jitter is expected.",
+  "verdict": "PASS"
+}

@@ -1,0 +1,47 @@
+collector_diag:
+  checkpoints_snapped: 87468
+  confirmed: 5770
+  events_skipped_warmup: 6
+  events_terminated_data_end: 1
+  events_terminated_max_horizon: 421
+  events_terminated_regime_flip: 5348
+  fills_executed: 83771
+  fills_skipped_past_horizon: 0
+  fills_skipped_slippage_cap: 48
+  fills_skipped_unfillable: 0
+  flips: 8199
+  skipped_no_hhll: 2235
+general:
+  Long Ratio: 0.75
+live_diag:
+  brackets_placed: 1583
+  checkpoints_scored: 40469
+  entries_filled: 1583
+  entries_queued: 2265
+  entries_submitted: 1583
+  missing_features: 15952
+  pt_hits: 774
+  regime_exits: 64
+  scores_above_threshold: 4325
+  skipped_single_position: 2742
+  sl_hits: 745
+pnls:
+  Avg Loser: -210.77639751552795
+  Avg Winner: 206.9922879177378
+  Expectancy: -5.454832596336074
+  Max Loser: -880.0
+  Max Winner: 910.0
+  Min Loser: -5.0
+  Min Winner: 5.0
+  PnL (total): -8635.0
+  PnL% (total): -0.8635
+  Win Rate: 0.4914718888186987
+returns:
+  Average (Return): -1.1370835709855233e-05
+  Average Loss (Return): -0.00042244350621625966
+  Average Win (Return): 0.00041396785292466265
+  Profit Factor: 0.9470691606726287
+  Returns Volatility (252 days): 0.03440178787238505
+  Risk Return Ratio: -0.02310637341306281
+  Sharpe Ratio (252 days): -1.669036120168196
+  Sortino Ratio (252 days): -2.1051647616890032

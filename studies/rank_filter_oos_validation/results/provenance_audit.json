@@ -1,0 +1,21 @@
+{
+  "critical_execution_violations": 0,
+  "critical_provenance_violations": 0,
+  "missing_baseline_pnl_among_filled_trades": 0,
+  "missing_direction": 0,
+  "missing_session": 0,
+  "duplicate_episode_ids": 0,
+  "n_pending_entry_canceled": 12,
+  "n_missing_replay_bar": 0,
+  "canonical_f2_entry_parity": "PASS",
+  "root_cause_decision_after_terminal_time": "F2 confirmation bar selected as 'next row in the 1m-bar array' rather than 'next row within wall-clock tolerance'; session/weekend gaps let confirmations land after their own episode's terminal time. Same defect independently found and repaired in studies/f5_flip_filter_repair and the prior rank_filter_oos_validation run. These are not valid signals and are excluded upstream of the eligible-signal count entirely.",
+  "pending_entry_canceled_treatment": "Opposite-flip-before-activation episodes are valid confirmed signals that never filled. They are RETAINED in the eligible-signal population (unlike the prior run, which dropped them), reported explicitly in pending_entry_cancellations.parquet, and assigned PnL=NaN (never $0) -- their $0 contribution to aggregate EV comes from the eligible-signal denominator excluding them from any PnL-bearing numerator, not from a fabricated per-trade PnL value.",
+  "assertions": {
+    "missing_baseline_pnl_among_filled_trades_eq_0": true,
+    "missing_direction_eq_0": true,
+    "missing_session_eq_0": true,
+    "duplicate_episode_ids_eq_0": true,
+    "critical_execution_violations_eq_0": true,
+    "critical_provenance_violations_eq_0": true
+  }
+}

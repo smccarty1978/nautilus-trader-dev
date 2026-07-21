@@ -1,0 +1,31 @@
+{
+  "status": "FROZEN_BEFORE_ANY_ISOLATION_REPLAY",
+  "policy_ids": [
+    "POLICY_S_STOP_ONLY_1P25",
+    "POLICY_T_TIMEOUT_ONLY_300S",
+    "POLICY_A_COMBINED_1P25_300S"
+  ],
+  "interaction_interpretation": {
+    "additive_tolerance_fraction": 0.05,
+    "formula": "abs(interaction_combined) <= fraction * min(abs(stop_only_combined), abs(timeout_only_combined))"
+  },
+  "prohibited": [
+    "W4 retraining",
+    "entry changes",
+    "additional stop levels",
+    "additional timeout windows",
+    "MFE continuation",
+    "targets",
+    "post-flip protection"
+  ],
+  "input_sha256": {
+    "2025_raw": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "2026_raw": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+    "2025_trades": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+    "2026_trades": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83",
+    "repair_runner": "70d4dbad865fa52ed1d054941562f76f1ba4009edc8f693169c1044e2a5bf633",
+    "repair_common": "302fab7b64178ee7626300048e9d1b66ab04b64c4a429a3fcbcd48175523e1c7",
+    "prior_confirmation_runner": "89956e5a280cfacea774882d51be06f02dc835a4acdda76d0f73deb92b907038",
+    "prior_completion_audit": "50dc2a323a903e618e741e887751d58fb8ffb26fbec211d2f9f02702e7cd546f"
+  }
+}

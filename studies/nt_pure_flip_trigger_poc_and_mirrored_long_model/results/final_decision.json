@@ -1,0 +1,39 @@
+{
+  "study": "nt_pure_flip_trigger_poc_and_mirrored_long_model",
+  "phase2_nt_poc_decision": "NT_POC_PROMISING_LONG_MODEL_NOT_RUN",
+  "phase2_infrastructure_gate_pass": true,
+  "phase2_completion_audit_critical_findings": 0,
+  "phase2_selected_month": "2025-03",
+  "phase2_variant_summary": {
+    "T1_trig_B_top2.5": {
+      "trades": 55, "net_pnl": 1545.0, "profit_factor": 1.106149,
+      "pct_reached_bearish_flip_before_stop": 0.727273,
+      "economic_gate_passes": false,
+      "economic_gate_fail_reason": "not_one_outlier_driven (net_pnl $1545 < largest_winner $5295)"
+    },
+    "T2_trig_C30_top5": {
+      "trades": 75, "net_pnl": 10600.0, "profit_factor": 1.611833,
+      "pct_reached_bearish_flip_before_stop": 0.733333,
+      "economic_gate_passes": true
+    },
+    "T3_trig_B_top5": {
+      "trades": 75, "net_pnl": 10530.0, "profit_factor": 1.605346,
+      "pct_reached_bearish_flip_before_stop": 0.720000,
+      "economic_gate_passes": true
+    }
+  },
+  "phase2_parity_checks": {
+    "regime_transition_parity_exact_match": true,
+    "trigger_condition_parity_exact_match": true,
+    "atr_score_parity_exact_match": true
+  },
+  "phase3_status": "descoped_scope_gap_deferred",
+  "phase3_descope_reason": "SPEC.md assumed 'reuse short_rth_pure_flip_prediction_enriched machinery verbatim, mirrored' for the long-model population. Scouting the actual implementation before writing code found the bearish-flip model's population traces to short_rth_entry_surface_backfill/entry_surface.py:69-71, which drops every direction==-1 (bearish) regime at the first funnel stage for all 6 years -- no bearish-regime checkpoint population exists anywhere in the repo. Correct mirroring requires a new entry_surface build + full 695-feature re-attachment + fresh labeling + fresh GBT retrain across 6 years, i.e. rebuilding three prior studies' pipelines mirrored, not a quick reuse. User decision 2026-07-20: stop after Phase 2; defer Phase 3 to a separately-briefed future study.",
+  "open_residual_items_carried_forward": [
+    "build_schedules.py:24-26 discards upstream entry_ts with no entry-timing parity check against actual NT fill times (up to ~7s drift in 1-2% of rows) -- not a blocker for this run, unresolved for future reuse",
+    "summarize_variants.py max_mtm_dd uses bar close for intratrade mark-outs, not high/low -- understates true intrabar MTM drawdown; does not affect the gate decision (apply_gate.py never reads it)",
+    "apply_gate.py has no coded check for SPEC's 'qualitative path evidence' criterion -- remains a human-judgment step"
+  ],
+  "git_commit": null,
+  "git_commit_note": "not available -- no .git directory at repo root"
+}

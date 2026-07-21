@@ -1,0 +1,30 @@
+======================================================================
+GATE 2: CAUSAL POLICY vs CLAIRVOYANT ORACLE
+======================================================================
+
+Oracle EV/episode = +167.36  (n=6,672 test episodes)
+Gate 2 pass criterion: best_policy_EV >= 50% of oracle_EV
+
+  Policy                                  EV/ep    % Oracle
+  ------------------------------------------------------------
+  ml_ridge_log_h300s                     +23.97       14.3%
+  ml_gbm_h300s                           +11.05        6.6%
+  ml_ridge_log_h5s                        +9.30        5.6%
+  ml_gbm_h120s                            +0.69        0.4%
+  ml_ridge_log_h120s                      +0.26        0.2%
+  fixed_5s                                -1.31       -0.8%
+  fixed_300s                              -1.31       -0.8%
+  hold_to_episode_end                     -2.09       -1.2%
+  ml_ridge_log_h15s                       -2.91       -1.7%
+  fixed_15s                               -2.93       -1.8%
+  fixed_30s                               -3.74       -2.2%
+  fixed_60s                               -5.92       -3.5%
+  fixed_120s                              -6.63       -4.0%
+  ml_ridge_log_h30s                      -11.48       -6.9%
+  ml_gbm_h60s                            -11.85       -7.1%
+  ml_gbm_h30s                            -12.76       -7.6%
+  ml_ridge_log_h60s                      -13.61       -8.1%
+  ml_gbm_h15s                            -21.18      -12.7%
+  ml_gbm_h5s                             -21.75      -13.0%
+
+GATE 2 VERDICT: NOT FEASIBLE

@@ -1,0 +1,29 @@
+{
+  "study_id": "CODEX_5_X_W4_FADE_CONFIRMATION_CLOCK",
+  "research_contract": "EXPLICIT_NEXT_OPEN_1S_OHLC_RESEARCH_SIMULATION",
+  "timeout_seconds": 300,
+  "round_trip_cost_usd": 10.0,
+  "multiplier_usd_per_point": 20.0,
+  "baseline_stop_atr": 1.5,
+  "policies": [
+    {
+      "policy_id": "POLICY_A_TIMEOUT_300S_STOP_1P25",
+      "preflip_stop_atr": 1.25,
+      "mfe_qualification_atr": null
+    },
+    {
+      "policy_id": "POLICY_B_TIMEOUT_300S_MFE_0P75_STOP_1P25",
+      "preflip_stop_atr": 1.25,
+      "mfe_qualification_atr": 0.75,
+      "protected_profit_atr": 0.75
+    },
+    {
+      "policy_id": "POLICY_C_TIMEOUT_300S_STOP_1P00",
+      "preflip_stop_atr": 1.0,
+      "mfe_qualification_atr": null
+    }
+  ],
+  "selection_year": 2025,
+  "final_test_year": 2026,
+  "seed": 42
+}

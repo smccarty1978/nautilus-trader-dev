@@ -1,0 +1,17 @@
+{
+  "frozen_policy": {
+    "model": "ridge_log",
+    "horizon_s": 300,
+    "threshold": 0.5023544083601342,
+    "exit_rule": "Exit A: fixed predicted horizon",
+    "test_ev_all_usd": -6.459739091318038,
+    "test_ev_trade_usd": -28.99057873485868,
+    "trade_rate": 0.2228220122956965,
+    "win_rate": 0.48250336473755046,
+    "profit_factor": 0.8308100147275405,
+    "bootstrap_95_ci": [
+      -12.441501724396462,
+      -0.5844017094017124
+    ]
+  }
+}

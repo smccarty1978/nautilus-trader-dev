@@ -1,0 +1,14 @@
+{
+  "model_id": "F3_top25_gbt_v1",
+  "model_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top25_gbt_v1\\model.joblib",
+  "model_sha256": "24bf6bece8319cb951bc82f31ea97ac7d3a0a9a200d598d986965143dec7e944",
+  "feature_list_path": "studies\\runtime_constrained_f3_feature_reduction\\results\\candidate_feature_sets.json",
+  "feature_list_sha256": "8bcfeb74ab3b5453635ad9895fa9d15fd65866044f23fa0415bfc796e5fd6299",
+  "feature_count": 25,
+  "score_method": "predict_proba(...)[:, 1]",
+  "positive_class_index": 1,
+  "sklearn_version": "1.7.2",
+  "numpy_version": "2.3.3",
+  "threshold_file": "config/frozen_thresholds.json",
+  "threshold_file_sha256": null
+}

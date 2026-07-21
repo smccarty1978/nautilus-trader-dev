@@ -1,0 +1,31 @@
+{
+  "status": "STAGE1_COMPLETE",
+  "script_sha256": "63be45f7349630d0574081f5528d129ef89b49498dd7e2225cdbacbd0909071c",
+  "config_sha256": "be00ce697f9821bec66bb21cd084a4a4baaa1ecbbc23566186a802413bbc8f7f",
+  "trade_count": 4383,
+  "stage2_gate_2025": {
+    "selection_source": "2025_only",
+    "initial_geometry_pass": false,
+    "postflip_geometry_pass": true,
+    "stage2_pass": true,
+    "reached_flip_pre_mae_p95_2025": 1.316890996992945,
+    "reached_flip_preservation_by_candidate_2025": {
+      "0.75": 0.7438055165965405,
+      "1.0": 0.8499298737727911,
+      "1.25": 0.9308087891538102
+    },
+    "selected_preflip_stop_atr": null,
+    "planned_loser_median_giveback_2025": 1.9357060240771657,
+    "planned_loser_reach_1atr_rate_2025": 0.7104651162790697,
+    "planned_winner_reach_1atr_rate_2025": 0.996003996003996,
+    "selected_postflip_rule": {
+      "arm_atr": 1.0,
+      "floor_atr": 0.25
+    }
+  },
+  "output_sha256": {
+    "pre_flip_mae_geometry.parquet": "bf54c16d3916704ff8c283d7f76b2d5771e7f32f9aa505ae0a57663a5f4c6f2d",
+    "pre_stop_mfe_geometry.parquet": "143191ec94b3f153dccdc2c50be8ffd948da1aee00b844369b827fb95c091f5f",
+    "post_flip_giveback_geometry.parquet": "bfa305e0eaec6e5daea7603a2a07ea1375d1ac1c925abeea9e9990b398b730fa"
+  }
+}

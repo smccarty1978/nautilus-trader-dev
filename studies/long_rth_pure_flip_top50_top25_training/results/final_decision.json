@@ -1,0 +1,43 @@
+{
+  "study": "long_rth_pure_flip_top50_top25_training",
+  "decision": "LONG_TOP25_SIGNAL_STRONG_PRESERVATION",
+  "preferred_feature_set": "TOP25",
+  "selected_model": "TOP25_logreg",
+  "n_features": 25,
+  "ordered_feature_list_sha256": "d601abe692c78c0471088b41cae1fe80bbb918bbe7e7af067ddb45e7b0ce45bf",
+  "headline": {
+    "2025_auc": 0.6729,
+    "2026_auc": 0.64619,
+    "2025_average_precision": 0.42493,
+    "2026_average_precision": 0.43423,
+    "2025_top_decile_flip_rate": 0.50887,
+    "2026_top_decile_flip_rate": 0.54506,
+    "2025_top_decile_lift": 1.93535,
+    "2026_top_decile_lift": 1.94407,
+    "2025_decile_monotonicity_spearman": 1.0,
+    "2026_decile_monotonicity_spearman": 1.0
+  },
+  "top100_reference": {
+    "2025_auc": 0.66816,
+    "2026_auc": 0.6512
+  },
+  "top100_reproducibility": {
+    "top100_refit_2025_auc": 0.6682,
+    "top100_refit_2026_auc": 0.6512,
+    "prior_published_2025_auc": 0.6682,
+    "prior_published_2026_auc": 0.6512,
+    "reproduces_prior": true
+  },
+  "gates": {
+    "TOP50": {
+      "minimum_viable_pass": true,
+      "strong_preservation_pass": true
+    },
+    "TOP25": {
+      "minimum_viable_pass": true,
+      "strong_preservation_pass": true
+    }
+  },
+  "scope": "offline reduced-feature training only; no NautilusTrader, no MBP-1, no surface rebuild, no trade economics, no entry/stop/exit/threshold tuning",
+  "selection_discipline": "2025 AUC only (tie-break 2025 AP); 2026 sealed - never used for fit, selection, hyperparameters, thresholds, or calibration"
+}

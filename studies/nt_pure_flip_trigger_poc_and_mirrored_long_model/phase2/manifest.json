@@ -1,0 +1,37 @@
+{
+  "phase2_nt_poc_decision": "NT_POC_PROMISING_LONG_MODEL_NOT_RUN",
+  "infrastructure_gate_pass": true,
+  "economic_gate_checks": {
+    "T1": {
+      "trades": 55,
+      "net_positive": true,
+      "pf_ok": true,
+      "n_trades_ok": true,
+      "pct_flip_ok": true,
+      "opposing_flip_bucket_positive": true,
+      "not_outlier_driven": false,
+      "passes": false
+    },
+    "T2": {
+      "trades": 75,
+      "net_positive": true,
+      "pf_ok": true,
+      "n_trades_ok": true,
+      "pct_flip_ok": true,
+      "opposing_flip_bucket_positive": true,
+      "not_outlier_driven": true,
+      "passes": true
+    },
+    "T3": {
+      "trades": 75,
+      "net_positive": true,
+      "pf_ok": true,
+      "n_trades_ok": true,
+      "pct_flip_ok": true,
+      "opposing_flip_bucket_positive": true,
+      "not_outlier_driven": true,
+      "passes": true
+    }
+  },
+  "any_variant_passes_econ_gate": true
+}

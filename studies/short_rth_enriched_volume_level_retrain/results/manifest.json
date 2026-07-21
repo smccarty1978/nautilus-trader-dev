@@ -1,0 +1,334 @@
+{
+  "decision": "ENRICHED_RETRAIN_OVERFITS_2025",
+  "selected_feature_set": "F3_volume_delta_plus_price_levels",
+  "selected_model": "logreg",
+  "selected_retention_band": 0.2,
+  "selection_criterion": "highest 2025 Layer-2 per-trade PnL across all 48 (feature_set,model,band) combos (tie-break: profit factor)",
+  "dev_2025_economics": {
+    "feature_set": "F3_volume_delta_plus_price_levels",
+    "model": "logreg",
+    "split": "2025",
+    "retention_band": 0.2,
+    "layer": "layer2_one_per_regime",
+    "trades": 1243,
+    "net_pnl": 45110.25219778087,
+    "per_trade": 36.29143378743432,
+    "gross_profit": 232045.0,
+    "gross_loss": -186934.74780221912,
+    "profit_factor": 1.2413155003451175,
+    "win_rate": 0.3998390989541432,
+    "avg_winner": 466.8913480885312,
+    "avg_loser": -253.29911626316957,
+    "max_closed_trade_dd": 8185.00763613607,
+    "pre_alignment_stop_rate": 0.2839903459372486,
+    "timeout_rate": 0.3660498793242156,
+    "post_alignment_stop_rate": 0.0104585679806918,
+    "opposing_flip_rate": 0.3395012067578439,
+    "opposing_flip_pnl": 168340.0
+  },
+  "test_2026_economics": {
+    "feature_set": "F3_volume_delta_plus_price_levels",
+    "model": "logreg",
+    "split": "2026",
+    "retention_band": 0.2,
+    "layer": "layer2_one_per_regime",
+    "trades": 378,
+    "net_pnl": -1177.363173696067,
+    "per_trade": -3.114717390730336,
+    "gross_profit": 67270.0,
+    "gross_loss": -68447.36317369607,
+    "profit_factor": 0.9827989988349396,
+    "win_rate": 0.365079365079365,
+    "avg_winner": 487.463768115942,
+    "avg_loser": -287.59396291468937,
+    "max_closed_trade_dd": 16248.332408142887,
+    "pre_alignment_stop_rate": 0.328042328042328,
+    "timeout_rate": 0.3386243386243386,
+    "post_alignment_stop_rate": 0.0132275132275132,
+    "opposing_flip_rate": 0.3201058201058201,
+    "opposing_flip_pnl": 47175.0
+  },
+  "selection_gate": {
+    "criteria_2025": {
+      "per_trade_beats_baseline_a": true,
+      "profit_factor_beats_baseline_a": true,
+      "max_dd_better_than_baseline_a": true
+    },
+    "dev_2025_improves_over_baseline_a": true,
+    "dev_2025_per_trade": 36.29143378743432,
+    "baseline_a_2025_per_trade": 23.64,
+    "test_2026_positive": false,
+    "test_2026_per_trade": -3.114717390730336,
+    "baseline_a_2026_per_trade": 31.00900900900901,
+    "test_2026_not_materially_worse_than_baseline": false,
+    "monthly_shape_ok": true,
+    "clips_winners": true
+  },
+  "failure_attribution": {
+    "2025": {
+      "full_100pct_trades": 1678,
+      "selected_trades": 1243,
+      "regimes_removed": 435,
+      "pre_alignment_stops_avoided_by_removal": 105,
+      "net_pnl_saved_from_avoided_stops": 34445.8427813583,
+      "winners_removed_count": 248,
+      "net_pnl_lost_from_removed_winners": 119720.0,
+      "opposing_flip_winners_removed_count": 124,
+      "net_pnl_lost_from_removed_opposing_flip_winners": 89470.0,
+      "net_stop_savings_minus_winner_clipping": -55024.1572186417,
+      "losers_removed_count": 187,
+      "net_pnl_saved_from_removed_losers": 44902.96272535437,
+      "timeout_rate_full": 0.4791418355184744,
+      "timeout_rate_selected": 0.3660498793242156,
+      "post_align_stop_rate_full": 0.004767580452920143,
+      "post_align_stop_rate_selected": 0.010458567980691875,
+      "monthly_pnl_full": {
+        "2025-01": 5663.692428908107,
+        "2025-02": 6962.405933423506,
+        "2025-03": 412.36269757813716,
+        "2025-04": -17265.92830086578,
+        "2025-05": 7358.132472262441,
+        "2025-06": -1793.9499526881991,
+        "2025-07": -622.7309740363853,
+        "2025-08": -9891.688585541197,
+        "2025-09": 1766.9352695862472,
+        "2025-10": 1387.1627423026075,
+        "2025-11": 6245.442275767346,
+        "2025-12": -10835.151203669811
+      },
+      "monthly_pnl_selected": {
+        "2025-01": 3745.3844458077947,
+        "2025-02": 4748.489033423175,
+        "2025-03": 6928.96989129702,
+        "2025-04": -496.749031033105,
+        "2025-05": 8027.030677970179,
+        "2025-06": 128.99472595010593,
+        "2025-07": -1534.1692951940786,
+        "2025-08": 1127.9324564349372,
+        "2025-09": 4163.185934851499,
+        "2025-10": 5156.406602062416,
+        "2025-11": 6567.038653648415,
+        "2025-12": 6547.738102562507
+      },
+      "monthly_concentration_selected_top1_share": 0.1632436381219908
+    },
+    "2026": {
+      "full_100pct_trades": 532,
+      "selected_trades": 378,
+      "regimes_removed": 154,
+      "pre_alignment_stops_avoided_by_removal": 42,
+      "net_pnl_saved_from_avoided_stops": 14363.357708053227,
+      "winners_removed_count": 94,
+      "net_pnl_lost_from_removed_winners": 45400.0,
+      "opposing_flip_winners_removed_count": 33,
+      "net_pnl_lost_from_removed_opposing_flip_winners": 26615.0,
+      "net_stop_savings_minus_winner_clipping": -12251.642291946773,
+      "losers_removed_count": 60,
+      "net_pnl_saved_from_removed_losers": 16733.357708053227,
+      "timeout_rate_full": 0.5,
+      "timeout_rate_selected": 0.3386243386243386,
+      "post_align_stop_rate_full": 0.0037593984962406013,
+      "post_align_stop_rate_selected": 0.013227513227513227,
+      "monthly_pnl_full": {
+        "2026-01": -5295.882574444258,
+        "2026-02": -1031.472383201908,
+        "2026-03": 7423.763529734788,
+        "2026-04": -11895.454971452491
+      },
+      "monthly_pnl_selected": {
+        "2026-01": -2552.930360384198,
+        "2026-02": 15787.362207421102,
+        "2026-03": -923.9641842234414,
+        "2026-04": -13487.830836509529
+      },
+      "monthly_concentration_selected_top1_share": 0.48202613542551576
+    }
+  },
+  "layer3_fixed807_overlay_for_selected": [
+    {
+      "feature_set": "F3_volume_delta_plus_price_levels",
+      "model": "logreg",
+      "split": 2025,
+      "retention_band": 0.2,
+      "fixed807_regimes": 604,
+      "kept": 554,
+      "dropped": 50,
+      "added_beyond_fixed807": 689,
+      "moved_entry_within_kept": 527,
+      "kept_trades": 554,
+      "kept_net_pnl": -33276.64524841988,
+      "kept_per_trade": -60.06614665779762,
+      "kept_profit_factor": 0.6868423675294572,
+      "kept_win_rate": 0.3086642599277978
+    },
+    {
+      "feature_set": "F3_volume_delta_plus_price_levels",
+      "model": "logreg",
+      "split": 2026,
+      "retention_band": 0.2,
+      "fixed807_regimes": 203,
+      "kept": 178,
+      "dropped": 25,
+      "added_beyond_fixed807": 200,
+      "moved_entry_within_kept": 171,
+      "kept_trades": 178,
+      "kept_net_pnl": -10184.96683626021,
+      "kept_per_trade": -57.21891481045061,
+      "kept_profit_factor": 0.7390475149776962,
+      "kept_win_rate": 0.2696629213483146
+    }
+  ],
+  "feature_set_comparison": [
+    {
+      "feature_set": "F0_existing_only",
+      "model": "logreg",
+      "best_band_2025": 1.0,
+      "2025_trades": "1678",
+      "2025_per_trade": -6.324979259221085,
+      "2025_pf": 0.9602814882591104,
+      "2026_trades": "532",
+      "2026_per_trade": -20.298959397300507,
+      "2026_pf": 0.8875322469414213
+    },
+    {
+      "feature_set": "F0_existing_only",
+      "model": "gbt",
+      "best_band_2025": 0.5,
+      "2025_trades": "1442",
+      "2025_per_trade": -3.87404487953869,
+      "2025_pf": 0.9766408502997728,
+      "2026_trades": "467",
+      "2026_per_trade": -43.863199195229775,
+      "2026_pf": 0.7625556462950028
+    },
+    {
+      "feature_set": "F1_volume_delta_only",
+      "model": "logreg",
+      "best_band_2025": 0.2,
+      "2025_trades": "1297",
+      "2025_per_trade": 29.00351694795212,
+      "2025_pf": 1.192651294160339,
+      "2026_trades": "406",
+      "2026_per_trade": -32.37687400220713,
+      "2026_pf": 0.8384637899471252
+    },
+    {
+      "feature_set": "F1_volume_delta_only",
+      "model": "gbt",
+      "best_band_2025": 0.85,
+      "2025_trades": "1623",
+      "2025_per_trade": 6.072971130198792,
+      "2025_pf": 1.0392837464550595,
+      "2026_trades": "512",
+      "2026_per_trade": -9.314384966229454,
+      "2026_pf": 0.9473007388139444
+    },
+    {
+      "feature_set": "F2_price_levels_only",
+      "model": "logreg",
+      "best_band_2025": 0.2,
+      "2025_trades": "1198",
+      "2025_per_trade": 13.11820832499968,
+      "2025_pf": 1.083888465063927,
+      "2026_trades": "369",
+      "2026_per_trade": -6.563415650177491,
+      "2026_pf": 0.9643008176137268
+    },
+    {
+      "feature_set": "F2_price_levels_only",
+      "model": "gbt",
+      "best_band_2025": 0.85,
+      "2025_trades": "1614",
+      "2025_per_trade": 4.46182045398009,
+      "2025_pf": 1.0285742192007792,
+      "2026_trades": "512",
+      "2026_per_trade": -8.306564275612658,
+      "2026_pf": 0.9529268744272824
+    },
+    {
+      "feature_set": "F3_volume_delta_plus_price_levels",
+      "model": "logreg",
+      "best_band_2025": 0.2,
+      "2025_trades": "1243",
+      "2025_per_trade": 36.29143378743432,
+      "2025_pf": 1.2413155003451175,
+      "2026_trades": "378",
+      "2026_per_trade": -3.114717390730336,
+      "2026_pf": 0.9827989988349396
+    },
+    {
+      "feature_set": "F3_volume_delta_plus_price_levels",
+      "model": "gbt",
+      "best_band_2025": 0.2,
+      "2025_trades": "1075",
+      "2025_per_trade": 21.518057283677017,
+      "2025_pf": 1.1306827941391009,
+      "2026_trades": "363",
+      "2026_per_trade": -27.304473648839902,
+      "2026_pf": 0.856513857820595
+    }
+  ],
+  "baselines": {
+    "A_current_w4_candidate_basis": {
+      "2025": {
+        "trades": 650,
+        "net_pnl": 15366.0,
+        "per_trade": 23.64
+      },
+      "2026": {
+        "trades": 222,
+        "net_pnl": 6884.0,
+        "per_trade": 31.00900900900901
+      },
+      "combined": {
+        "trades": 872,
+        "net_pnl": 22250.0,
+        "per_trade": 25.52,
+        "profit_factor": 1.129,
+        "max_dd": 18686.0
+      }
+    },
+    "B_fixed_807_pocket": {
+      "2025": {
+        "trades": 604,
+        "net_pnl": 20304.0,
+        "per_trade": 33.615894039735096
+      },
+      "2026": {
+        "trades": 203,
+        "net_pnl": 6709.0,
+        "per_trade": 33.04926108374384
+      },
+      "combined": {
+        "trades": 807,
+        "net_pnl": 27013.0,
+        "per_trade": 33.47,
+        "profit_factor": 1.174,
+        "max_dd": 14331.0
+      }
+    },
+    "C_nt_phase1_benchmark": {
+      "combined": {
+        "trades": 807,
+        "net_pnl": 23270.0,
+        "per_trade": 28.84,
+        "profit_factor": 1.149,
+        "max_dd": 15000.0
+      }
+    },
+    "D_prior_149_feature_retrain": {
+      "decision": "SHORT_RTH_BASELINE_STILL_BEST",
+      "selected_model": "GBT",
+      "retention": 0.35,
+      "2025": {
+        "per_trade": 4.75,
+        "profit_factor": 1.029
+      },
+      "2026": {
+        "per_trade": -32.36,
+        "profit_factor": 0.825
+      }
+    }
+  },
+  "note_on_2025_gate_scope": "Baseline A publishes only per_trade/profit_factor/max_dd as reusable constants (no split-year pre_alignment_stop_rate or opposing_flip_pnl constant exists upstream for Baseline A itself) -- the 'at least two of five' 2025 check is therefore evaluated on these three criteria only. Pre-alignment-stop-rate and opposing-flip-PnL are reported as within-model before/after attribution instead (see failure_attribution), which is what the SPEC's separate stop-savings-vs-winner-clipping comparison actually asks for."
+}

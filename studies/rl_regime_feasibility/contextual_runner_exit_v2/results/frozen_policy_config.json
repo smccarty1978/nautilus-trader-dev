@@ -1,0 +1,15 @@
+{
+  "P1_thr_m0": 125.23300123309254,
+  "P2_thr_terminal": 0.22667452147476133,
+  "P3_persist_K": 6,
+  "P5_decay_s": 15,
+  "P6_seg_thr": {
+    "RTH": 0.20691993346858076,
+    "ETH": 0.11616700007904207
+  },
+  "stop_buffer_atr": 0.25,
+  "scores": {
+    "P1": "M0 fitted-Q reg",
+    "P2/P4/P6": "M3 terminal-prob clf"
+  }
+}

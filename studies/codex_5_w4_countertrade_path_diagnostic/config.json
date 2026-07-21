@@ -1,0 +1,33 @@
+{
+  "study_id": "codex_5_w4_countertrade_path_diagnostic_v1",
+  "exploratory_only": true,
+  "no_policy_backtest": true,
+  "price_atr_denominator": "atr_at_checkpoint",
+  "grid_seconds": 5,
+  "entry_offsets_seconds": [30, 60, 90, 120, 180, 300],
+  "post_flip_offsets_seconds": [60, 120],
+  "w4_slope_windows_seconds": [15, 30, 60],
+  "w4_max_staleness_seconds": 5,
+  "post_flip_warning": "first aligned-regime W4 observation at or above its frozen direction threshold",
+  "planned_exit_winner_definition": "stored net_pnl_usd > 0",
+  "input_sha256": {
+    "2025": {
+      "trades": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+      "scores": "f97c4e739cb11b19dbaaa3954175bb4f44b8346b7cc10d791dde22a122edeac9",
+      "raw": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+      "atlas": "c654da5016f7ec4bf26be11a390992dff851d38e81684a2a19f0bbed90ad9ce7"
+    },
+    "2026": {
+      "trades": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83",
+      "scores": "c5c1b42da0d5b0e42be36cb1642a04865d46d8601cf5d7abed0ba9ff360300a8",
+      "raw": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+      "atlas": "76192163897e2075dc72e1742ca38d6d3a24aa5977a21bbc537eb2ebc89e2d44"
+    },
+    "policy": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b",
+    "code_dependencies": {
+      "repair_runner": "70d4dbad865fa52ed1d054941562f76f1ba4009edc8f693169c1044e2a5bf633",
+      "repair_common": "302fab7b64178ee7626300048e9d1b66ab04b64c4a429a3fcbcd48175523e1c7",
+      "reproduce_regimes": "33823e22055836aa0c4914474ee01724e3e18c432a723079e9bf7a2c011137da"
+    }
+  }
+}

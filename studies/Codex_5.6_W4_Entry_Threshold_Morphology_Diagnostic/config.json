@@ -1,0 +1,19 @@
+{
+  "study_id": "CODEX_5_6_W4_ENTRY_THRESHOLD_MORPHOLOGY_DIAGNOSTIC",
+  "study_type": "retrospective_descriptive_fixed_entry_diagnostic",
+  "years": [2025, 2026],
+  "score_offsets_seconds": [-120, -115, -110, -105, -100, -95, -90, -85, -80, -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120],
+  "reported_path_offsets_seconds": [-60, -30, -15, -10, -5, 0, 5, 10, 15, 30, 60],
+  "price_offsets_seconds": [5, 10, 15, 30, 60, 120],
+  "near_threshold_bands": [0.05, 0.10],
+  "persistence_horizon_seconds": 60,
+  "chop_lookback_seconds": 120,
+  "near_threshold_lookback_seconds": 60,
+  "gate_4_lookback_seconds": 30,
+  "gate_4_band": 0.10,
+  "price_response_gate_definition": "directional completed-bar close PnL at checkpoint is >= 0 points",
+  "policy_a_id": "POLICY_A_TIMEOUT_300S_STOP_1P25",
+  "multiplier_usd_per_point": 20.0,
+  "round_trip_cost_usd": 10.0,
+  "seed": 42
+}

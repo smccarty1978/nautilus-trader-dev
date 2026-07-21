@@ -1,0 +1,177 @@
+{
+  "source_study": "studies\\regime_sequence_chop_context\\results",
+  "required_count": 21,
+  "found_count": 21,
+  "missing": [],
+  "artifacts": {
+    "flip_validation_policy_grid.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_validation_policy_grid.parquet",
+      "exists": true,
+      "size_bytes": 3857,
+      "rows": 17,
+      "n_cols": 5
+    },
+    "flip_policy_episode_results.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_policy_episode_results.parquet",
+      "exists": true,
+      "size_bytes": 76123,
+      "rows": 3006,
+      "n_cols": 7
+    },
+    "flip_policy_metrics.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_policy_metrics.parquet",
+      "exists": true,
+      "size_bytes": 12023,
+      "rows": 24,
+      "n_cols": 15
+    },
+    "flip_runner_retention.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_runner_retention.parquet",
+      "exists": true,
+      "size_bytes": 3413,
+      "rows": 24,
+      "n_cols": 4
+    },
+    "flip_segment_results.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_segment_results.parquet",
+      "exists": true,
+      "size_bytes": 2814,
+      "rows": 8,
+      "n_cols": 4
+    },
+    "flip_validation_metrics_F1.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_validation_metrics_F1.parquet",
+      "exists": true,
+      "size_bytes": 2982,
+      "rows": 1,
+      "n_cols": 4
+    },
+    "flip_validation_metrics_F2.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_validation_metrics_F2.parquet",
+      "exists": true,
+      "size_bytes": 2982,
+      "rows": 1,
+      "n_cols": 4
+    },
+    "baseline_population_metrics.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\baseline_population_metrics.parquet",
+      "exists": true,
+      "size_bytes": 5763170,
+      "rows": 209372,
+      "n_cols": 10
+    },
+    "baseline_reproduction_audit.json": {
+      "path": "studies\\regime_sequence_chop_context\\results\\baseline_reproduction_audit.json",
+      "exists": true,
+      "size_bytes": 312,
+      "top_level_keys": [
+        "F1_total_count",
+        "F2_total_count",
+        "F1_train_count",
+        "F2_train_count",
+        "F1_val_count",
+        "F2_val_count",
+        "F1_test_count",
+        "F2_test_count",
+        "F1_baseline_net_pnl",
+        "F2_baseline_net_pnl"
+      ]
+    },
+    "control_results.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\control_results.parquet",
+      "exists": true,
+      "size_bytes": 3307,
+      "rows": 14,
+      "n_cols": 3
+    },
+    "data_coverage.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\data_coverage.parquet",
+      "exists": true,
+      "size_bytes": 3459,
+      "rows": 11,
+      "n_cols": 4
+    },
+    "execution_audit.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\execution_audit.parquet",
+      "exists": true,
+      "size_bytes": 2358,
+      "rows": 1,
+      "n_cols": 3
+    },
+    "flip_feature_deciles.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_feature_deciles.parquet",
+      "exists": true,
+      "size_bytes": 4040,
+      "rows": 30,
+      "n_cols": 5
+    },
+    "flip_frozen_policy.json": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_frozen_policy.json",
+      "exists": true,
+      "size_bytes": 120,
+      "top_level_keys": [
+        "model",
+        "threshold",
+        "val_best_ev_per_eligible"
+      ]
+    },
+    "flip_model_manifest_F1.json": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_model_manifest_F1.json",
+      "exists": true,
+      "size_bytes": 7930,
+      "top_level_keys": [
+        "features",
+        "medians",
+        "population"
+      ]
+    },
+    "flip_model_manifest_F2.json": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_model_manifest_F2.json",
+      "exists": true,
+      "size_bytes": 7982,
+      "top_level_keys": [
+        "features",
+        "medians",
+        "population"
+      ]
+    },
+    "flip_monthly_results.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_monthly_results.parquet",
+      "exists": true,
+      "size_bytes": 2819,
+      "rows": 6,
+      "n_cols": 4
+    },
+    "flip_context_atlas.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\flip_context_atlas.parquet",
+      "exists": true,
+      "size_bytes": 204275021,
+      "rows": 209372,
+      "n_cols": 207
+    },
+    "median_center_features.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\median_center_features.parquet",
+      "exists": true,
+      "size_bytes": 153112891,
+      "rows": 146603,
+      "n_cols": 207
+    },
+    "regime_sequence_features.parquet": {
+      "path": "studies\\regime_sequence_chop_context\\results\\regime_sequence_features.parquet",
+      "exists": true,
+      "size_bytes": 153112891,
+      "rows": 146603,
+      "n_cols": 207
+    },
+    "provenance_audit.json": {
+      "path": "studies\\regime_sequence_chop_context\\results\\provenance_audit.json",
+      "exists": true,
+      "size_bytes": 113,
+      "top_level_keys": [
+        "timestamp_audit_passed",
+        "number_of_rows_audited",
+        "c_c_lock_overlap_checked"
+      ]
+    }
+  }
+}

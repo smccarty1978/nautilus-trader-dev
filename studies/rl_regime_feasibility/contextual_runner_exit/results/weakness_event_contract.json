@@ -1,0 +1,16 @@
+{
+  "triggers": {
+    "giveback_threshold_atr": 0.5,
+    "velocity_threshold_atr_per_s": -0.003,
+    "aligned_return_30s_threshold": -0.3
+  },
+  "cooldown_s": 60,
+  "min_elig_s": 30,
+  "classes": [
+    "NORMAL_PULLBACK",
+    "DEEP_BUT_RECOVERED",
+    "FAILED_CONTINUATION",
+    "TERMINAL_DETERIORATION",
+    "AMBIGUOUS"
+  ]
+}

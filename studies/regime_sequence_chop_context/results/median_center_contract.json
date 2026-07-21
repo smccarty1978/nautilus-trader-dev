@@ -1,0 +1,13 @@
+{
+  "features": {
+    "median_center_5m": "rolling 5m median of 1s closes",
+    "median_center_15m": "rolling 15m median of 1s closes",
+    "median_center_30m": "rolling 30m median of 1s closes",
+    "aligned_price_minus_center_5m": "direction*(close - median_5m) / atr_1m",
+    "slope_5m_5m_aligned_atr": "direction-aligned rolling OLS slope of 5m center / atr_1m",
+    "center_spread_5m_30m": "direction*(center_5m - center_30m) / atr_1m",
+    "ordering_state": "state of center ordering (0=fav, 5=adv, 6=compressed)",
+    "crosses_per_minute": "total price crossings of 5m/15m/30m centers per minute over trailing 30m"
+  },
+  "observation_cadence": "every second (for intermediate) and sampled at flips & checkpoints"
+}

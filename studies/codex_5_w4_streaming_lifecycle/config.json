@@ -1,0 +1,29 @@
+{
+  "study_id": "CODEX_5_X_W4_STREAMING_LIFECYCLE",
+  "research_contract": "ONE_POSITION_STREAMING_EXPLICIT_NEXT_OPEN_1S_OHLC_RESEARCH_SIMULATION",
+  "policies": [
+    {"policy_id": "BASELINE", "entry_delay_seconds": 0, "lifecycle_exit": "frozen_policy_a"},
+    {"policy_id": "S1", "entry_delay_seconds": 0, "lifecycle_exit": "original_opposing_flip"},
+    {"policy_id": "S2", "entry_delay_seconds": 0, "lifecycle_exit": "w4_exit_only"},
+    {"policy_id": "S3", "entry_delay_seconds": 0, "lifecycle_exit": "w4_reverse"},
+    {"policy_id": "S4", "entry_delay_seconds": 10, "lifecycle_exit": "original_opposing_flip"}
+  ],
+  "candidate_crossing": "frozen_strict_below_to_at_or_above_recross_stream",
+  "virtual_directional_pnl_threshold_points": 0.0,
+  "crossings_while_position_open": "consumed_not_queued",
+  "crossings_during_confirmation_wait": "consumed_not_queued",
+  "resume_scan_boundary": "strictly_after_exit_timestamp",
+  "maximum_net_positions": 1,
+  "w4_exit_signal": "first_opposite_entry_direction_candidate_in_aligned_regime",
+  "w4_exit_fill": "candidate_first_available_1s_open_after_signal",
+  "same_timestamp_order": "open_signal_or_scheduled_exit_before_ohlc_stop_range",
+  "timeout_seconds": 300,
+  "preflip_stop_atr": 1.25,
+  "postflip_stop_atr": 1.5,
+  "atr_denominator": "atr_at_checkpoint",
+  "multiplier_usd_per_point": 20.0,
+  "cost_rt_usd": 10.0,
+  "development_year": 2025,
+  "selection_isolated_year": 2026
+}
+

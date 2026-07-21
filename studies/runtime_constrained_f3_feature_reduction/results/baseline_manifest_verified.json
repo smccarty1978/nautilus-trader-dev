@@ -1,0 +1,33 @@
+{
+  "frozen_prereqs_manifest_path": "studies/nt_live_scoring_infra_prereqs/results/phase0_manifest.json",
+  "checks": {
+    "model_artifact_sha256_matches": true,
+    "model_artifact_sha256": "dd16ab38518cc00377058a0ff4068b59477eb1261fc541f25976767a08da670b",
+    "reproduction_ok": true,
+    "max_abs_diff_vs_stored_reference": 0.0,
+    "n_rows_compared": 198255,
+    "n_features": 695,
+    "feature_set_name": "F3_volume_delta_plus_price_levels",
+    "target": "bearish_regime_flip_within_300s",
+    "score_method": "predict_proba(...)[:, 1]",
+    "positive_class_index": 1,
+    "model_classes_": [
+      "0",
+      "1"
+    ],
+    "hyperparameters": {
+      "max_depth": 3,
+      "learning_rate": 0.05,
+      "max_iter": 200,
+      "random_state": 42
+    },
+    "sklearn_version_frozen": "1.7.2",
+    "numpy_version_frozen": "2.3.3",
+    "sklearn_version_current": "1.7.2",
+    "numpy_version_current": "2.3.3",
+    "sklearn_version_matches": true,
+    "numpy_version_matches": true
+  },
+  "verdict": "BASELINE_VERIFIED_MATCHES_FROZEN_MANIFEST",
+  "promoted_artifact_path": "studies/runtime_constrained_f3_feature_reduction/artifacts/models/F3_695_baseline/model.joblib"
+}

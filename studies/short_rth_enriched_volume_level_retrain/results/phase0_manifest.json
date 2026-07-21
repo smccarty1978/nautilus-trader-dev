@@ -1,0 +1,86 @@
+{
+  "decision": "PHASE0_PASS",
+  "identity_vs_prior_retrain": {
+    "2021": {
+      "rows_prior_retrain": 212241,
+      "rows_feature_foundation": 212241,
+      "row_count_match": true,
+      "key_match": true,
+      "label_columns_identical": true
+    },
+    "2022": {
+      "rows_prior_retrain": 192378,
+      "rows_feature_foundation": 192378,
+      "row_count_match": true,
+      "key_match": true,
+      "label_columns_identical": true
+    },
+    "2023": {
+      "rows_prior_retrain": 204742,
+      "rows_feature_foundation": 204742,
+      "row_count_match": true,
+      "key_match": true,
+      "label_columns_identical": true
+    },
+    "2024": {
+      "rows_prior_retrain": 204611,
+      "rows_feature_foundation": 204611,
+      "row_count_match": true,
+      "key_match": true,
+      "label_columns_identical": true
+    },
+    "2025": {
+      "rows_prior_retrain": 198255,
+      "rows_feature_foundation": 198255,
+      "row_count_match": true,
+      "key_match": true,
+      "label_columns_identical": true
+    },
+    "2026": {
+      "rows_prior_retrain": 63021,
+      "rows_feature_foundation": 63021,
+      "row_count_match": true,
+      "key_match": true,
+      "label_columns_identical": true
+    }
+  },
+  "control_reconciliation_reused_from": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_w4_retrain_entry_strength\\results\\phase0_manifest.json",
+  "control_reconciliation": {
+    "2025": {
+      "crossing_candidates": 650,
+      "expected_control": 650,
+      "gate_result": {
+        "year": 2025,
+        "candidate_trades": 650,
+        "mismatches": 0
+      },
+      "gate_error": null,
+      "missing_from_featured_surface": 0
+    },
+    "2026": {
+      "crossing_candidates": 222,
+      "expected_control": 222,
+      "gate_result": {
+        "year": 2026,
+        "candidate_trades": 222,
+        "mismatches": 0
+      },
+      "gate_error": null,
+      "missing_from_featured_surface": 0
+    }
+  },
+  "control_reconciliation_reused_valid": true,
+  "feature_set_sizes": {
+    "F0_existing_only": 149,
+    "F1_volume_delta_only": 363,
+    "F2_price_levels_only": 481,
+    "F3_volume_delta_plus_price_levels": 695
+  },
+  "n_ohlcv_delta_features": 214,
+  "n_price_level_features_numeric": 216,
+  "n_price_level_dummy_features": 116,
+  "n_position_categorical_cols_source": 29,
+  "train_2021_2024_rows": 813972,
+  "runtime_s": 175.8,
+  "generator_sha256": "4c2b9192cd5578221267c88d8b47cf28f3de8d8b2bfaf9743d1fab81009e1bfc"
+}

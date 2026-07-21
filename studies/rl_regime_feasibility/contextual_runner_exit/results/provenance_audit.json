@@ -1,0 +1,25 @@
+{
+  "study": "contextual_runner_exit",
+  "date": "2026-07-05",
+  "train_period": "2024-01-01 to 2024-12-31",
+  "val_period": "2025-01-01 to 2025-02-28",
+  "test_period": "2025-03-01 to 2025-05-31",
+  "test_label": "DEVELOPMENT TEST - NOT PRISTINE OOS",
+  "entry_population": "Same as repaired exit study (frozen atlas)",
+  "replay_mechanics": "Identical to test_v2.py (sim_v2 stack)",
+  "thresholds_selected_on": "val",
+  "runner_config_selected_on": "val",
+  "no_test_tuning": true,
+  "baseline_parity": true,
+  "model_files": {
+    "M0": "667696b19df13e0e",
+    "M1": "c80a4dc73636cf44",
+    "M2": "322ae76d0fd5ae9b",
+    "M3": "11b0b3b219530814"
+  },
+  "execution_assertions": {
+    "post_stop_positioned_rows": 0,
+    "ghost_rows_removed_val": 41660,
+    "ghost_rows_removed_test": 61921
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "top100_reproducibility": {
+    "top100_refit_2025_auc": 0.6682,
+    "top100_refit_2026_auc": 0.6512,
+    "prior_published_2025_auc": 0.6682,
+    "prior_published_2026_auc": 0.6512,
+    "reproduces_prior": true
+  },
+  "feature_sets": {
+    "TOP50": {
+      "selected_model": "TOP50_logreg",
+      "metrics": {
+        "2025_auc": 0.67062,
+        "2026_auc": 0.6396,
+        "2025_average_precision": 0.41762,
+        "2026_average_precision": 0.42479,
+        "2025_top_decile_flip_rate": 0.50294,
+        "2026_top_decile_flip_rate": 0.53382,
+        "2025_top_decile_lift": 1.91277,
+        "2026_top_decile_lift": 1.90398,
+        "2025_decile_monotonicity_spearman": 1.0,
+        "2026_decile_monotonicity_spearman": 0.98788
+      },
+      "delta_vs_top100": {
+        "2025_auc": 0.00245,
+        "2026_auc": -0.01161,
+        "2025_top_decile_flip_pp": -0.845,
+        "2026_top_decile_flip_pp": -0.267
+      },
+      "monthly_auc_2026": {
+        "2026-01": 0.6206685668691296,
+        "2026-02": 0.6676505701032267,
+        "2026-03": 0.6409455190987795,
+        "2026-04": 0.6240835589145408
+      },
+      "minimum_viable": {
+        "2025_auc>=0.63": true,
+        "2026_auc>=0.62": true,
+        "2025_lift>=1.70": true,
+        "2026_lift>=1.70": true,
+        "2026_decile_not_inverted": true,
+        "all_2026_months>0.58": true
+      },
+      "minimum_viable_pass": true,
+      "strong_preservation": {
+        "2025_auc_within_0.015": true,
+        "2026_auc_within_0.020": true,
+        "2025_flip_within_5pp": true,
+        "2026_flip_within_5pp": true,
+        "all_2026_months>0.60": true
+      },
+      "strong_preservation_pass": true
+    },
+    "TOP25": {
+      "selected_model": "TOP25_logreg",
+      "metrics": {
+        "2025_auc": 0.6729,
+        "2026_auc": 0.64619,
+        "2025_average_precision": 0.42493,
+        "2026_average_precision": 0.43423,
+        "2025_top_decile_flip_rate": 0.50887,
+        "2026_top_decile_flip_rate": 0.54506,
+        "2025_top_decile_lift": 1.93535,
+        "2026_top_decile_lift": 1.94407,
+        "2025_decile_monotonicity_spearman": 1.0,
+        "2026_decile_monotonicity_spearman": 1.0
+      },
+      "delta_vs_top100": {
+        "2025_auc": 0.00474,
+        "2026_auc": -0.00501,
+        "2025_top_decile_flip_pp": -0.251,
+        "2026_top_decile_flip_pp": 0.857
+      },
+      "monthly_auc_2026": {
+        "2026-01": 0.6294115900328214,
+        "2026-02": 0.6706795921945843,
+        "2026-03": 0.6433678280417928,
+        "2026-04": 0.6409111525341049
+      },
+      "minimum_viable": {
+        "2025_auc>=0.63": true,
+        "2026_auc>=0.62": true,
+        "2025_lift>=1.70": true,
+        "2026_lift>=1.70": true,
+        "2026_decile_not_inverted": true,
+        "all_2026_months>0.58": true
+      },
+      "minimum_viable_pass": true,
+      "strong_preservation": {
+        "2025_auc_within_0.015": true,
+        "2026_auc_within_0.020": true,
+        "2025_flip_within_5pp": true,
+        "2026_flip_within_5pp": true,
+        "all_2026_months>0.60": true
+      },
+      "strong_preservation_pass": true
+    }
+  },
+  "preferred_feature_set": "TOP25",
+  "decision": "LONG_TOP25_SIGNAL_STRONG_PRESERVATION"
+}

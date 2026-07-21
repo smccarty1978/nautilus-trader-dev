@@ -1,0 +1,20 @@
+{
+  "study_id": "CODEX_5_X_W4_PRICE_RESPONSE_DELAYED_ENTRY_REPLAY",
+  "research_contract": "EXPLICIT_DELAYED_NEXT_OPEN_1S_OHLC_RESEARCH_SIMULATION",
+  "policies": [
+    {"policy_id": "PR10", "delay_seconds": 10},
+    {"policy_id": "PR30", "delay_seconds": 30}
+  ],
+  "virtual_directional_pnl_threshold_points": 0.0,
+  "confirmation_mark": "latest_fully_completed_1s_close",
+  "delayed_fill_rule": "first_available_1s_open_strictly_after_gate_decision",
+  "timeout_anchor": "actual_delayed_entry_fill",
+  "timeout_seconds": 300,
+  "preflip_stop_atr": 1.25,
+  "postflip_stop_atr": 1.5,
+  "atr_denominator": "atr_at_checkpoint",
+  "cost_rt_usd": 10.0,
+  "multiplier_usd_per_point": 20.0,
+  "development_year": 2025,
+  "selection_isolated_year": 2026
+}

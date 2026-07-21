@@ -1,0 +1,23 @@
+{
+  "critical_execution_violations": 0,
+  "critical_provenance_violations": 0,
+  "retained_trade_parity_pct": 100.0,
+  "retained_trade_parity_pass": true,
+  "missing_pnl_for_filled_trades": 0,
+  "duplicate_episode_ids": 0,
+  "duplicate_trade_fills": 0,
+  "unresolved_episodes_per_policy": 68,
+  "unresolved_identical_across_all_policies": true,
+  "insufficient_data_folds": 0,
+  "total_folds": 48,
+  "n_policies": 12,
+  "n_eligible_episodes": 15629,
+  "assertions": {
+    "critical_execution_violations == 0": true,
+    "critical_provenance_violations == 0": true,
+    "retained_trade_parity == 100%": true,
+    "missing_pnl == 0 for filled trades": true,
+    "duplicate_episode_ids == 0": true
+  },
+  "all_assertions_pass": true
+}

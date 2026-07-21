@@ -1,0 +1,84 @@
+{
+  "decision": "BACKFILL_RECONCILIATION_PASS",
+  "reports": {
+    "2025": {
+      "year": 2025,
+      "expected_control": 650,
+      "crossing_candidates": 650,
+      "gate_result": {
+        "year": 2025,
+        "candidate_trades": 650,
+        "mismatches": 0
+      },
+      "gate_error": null,
+      "missing_from_surface": 0,
+      "missing_keys_sample": [],
+      "mismatched_identity": 0,
+      "mismatched_keys_sample": [],
+      "runtime_s": 152.8,
+      "attrition": {
+        "checkpoints": {
+          "all": 3934266,
+          "bullish_regime": 2014636,
+          "established": 698801,
+          "rth": 198255,
+          "valid_fill": 198255,
+          "rth_boundary_divergence": 0
+        },
+        "distinct_regimes": {
+          "all": 27137,
+          "bullish_regime": 13566,
+          "established": 5822,
+          "rth": 1678,
+          "valid_fill": 1678,
+          "rth_boundary_divergence": 0
+        }
+      }
+    },
+    "2026": {
+      "year": 2026,
+      "expected_control": 222,
+      "crossing_candidates": 222,
+      "gate_result": {
+        "year": 2026,
+        "candidate_trades": 222,
+        "mismatches": 0
+      },
+      "gate_error": null,
+      "missing_from_surface": 0,
+      "missing_keys_sample": [],
+      "mismatched_identity": 0,
+      "mismatched_keys_sample": [],
+      "runtime_s": 28.7,
+      "attrition": {
+        "checkpoints": {
+          "all": 1289840,
+          "bullish_regime": 653438,
+          "established": 223785,
+          "rth": 63021,
+          "valid_fill": 63021,
+          "rth_boundary_divergence": 0
+        },
+        "distinct_regimes": {
+          "all": 8921,
+          "bullish_regime": 4463,
+          "established": 1870,
+          "rth": 532,
+          "valid_fill": 532,
+          "rth_boundary_divergence": 0
+        }
+      }
+    }
+  },
+  "policy_sha256": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b",
+  "atlas_sha256": {
+    "2025": "c654da5016f7ec4bf26be11a390992dff851d38e81684a2a19f0bbed90ad9ce7",
+    "2026": "76192163897e2075dc72e1742ca38d6d3a24aa5977a21bbc537eb2ebc89e2d44"
+  },
+  "raw_sha256": {
+    "2025": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "2026": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89"
+  },
+  "generator_sha256": "474d3d2494b3bcf2481ea342c5a9bdca70ab9d70bacd814127aa8c51c38ee476",
+  "runner_sha256": "30fdf70938b83e01af2a812f8de4ce6d6f462423203d34093744ddeaa9a1b218"
+}

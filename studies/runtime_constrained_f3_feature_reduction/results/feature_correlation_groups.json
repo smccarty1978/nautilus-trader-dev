@@ -1,0 +1,1428 @@
+{
+  "method": "1 - |spearman correlation| distance, average linkage, cutoff=0.15",
+  "n_clusters_total": 363,
+  "n_multi_member_clusters": 125,
+  "clusters": {
+    "279": [
+      "aligned_price_minus_center_5m"
+    ],
+    "253": [
+      "aligned_price_minus_center_15m"
+    ],
+    "67": [
+      "aligned_price_minus_center_30m"
+    ],
+    "245": [
+      "slope_5m_1m_aligned_atr"
+    ],
+    "64": [
+      "slope_5m_3m_aligned_atr"
+    ],
+    "63": [
+      "slope_5m_5m_aligned_atr",
+      "center_spread_5m_15m"
+    ],
+    "82": [
+      "slope_15m_3m_aligned_atr",
+      "slope_15m_5m_aligned_atr"
+    ],
+    "83": [
+      "slope_15m_10m_aligned_atr",
+      "center_spread_15m_30m"
+    ],
+    "76": [
+      "slope_30m_5m_aligned_atr",
+      "slope_30m_10m_aligned_atr",
+      "slope_30m_15m_aligned_atr",
+      "cross_family_slope_vs_reg_count"
+    ],
+    "289": [
+      "center_slope_change_5m"
+    ],
+    "61": [
+      "center_slope_change_15m",
+      "center_slope_acceleration_15m"
+    ],
+    "89": [
+      "center_slope_change_30m"
+    ],
+    "290": [
+      "center_slope_acceleration_5m"
+    ],
+    "90": [
+      "center_slope_acceleration_30m"
+    ],
+    "84": [
+      "center_spread_5m_30m"
+    ],
+    "247": [
+      "spread_change_5m_15m"
+    ],
+    "62": [
+      "spread_change_15m_30m"
+    ],
+    "246": [
+      "spread_change_5m_30m"
+    ],
+    "86": [
+      "ordering_state"
+    ],
+    "78": [
+      "seconds_in_current_ordering"
+    ],
+    "79": [
+      "ordering_changes_15m"
+    ],
+    "28": [
+      "ordering_changes_30m"
+    ],
+    "29": [
+      "ordering_changes_60m"
+    ],
+    "60": [
+      "price_cross_count_5m"
+    ],
+    "57": [
+      "price_cross_count_15m"
+    ],
+    "59": [
+      "price_cross_count_30m"
+    ],
+    "58": [
+      "crosses_per_minute"
+    ],
+    "75": [
+      "fraction_of_time_on_favorable_side",
+      "fraction_of_time_on_adverse_side"
+    ],
+    "87": [
+      "activity_regime_count_5m"
+    ],
+    "77": [
+      "activity_regime_count_15m",
+      "regime_elapsed_seconds"
+    ],
+    "34": [
+      "activity_regime_count_30m",
+      "activity_flip_count_30m"
+    ],
+    "38": [
+      "activity_regime_count_60m"
+    ],
+    "39": [
+      "activity_regime_count_120m"
+    ],
+    "35": [
+      "activity_duration_median_30m"
+    ],
+    "30": [
+      "duration_median_last_3"
+    ],
+    "32": [
+      "duration_median_last_5"
+    ],
+    "40": [
+      "duration_median_last_10"
+    ],
+    "31": [
+      "duration_ratio_3_vs_10"
+    ],
+    "33": [
+      "duration_ratio_5_vs_10"
+    ],
+    "85": [
+      "cross_family_spread_vs_reg_count"
+    ],
+    "303": [
+      "seq_3r_alternation_rate"
+    ],
+    "304": [
+      "seq_3r_perfect_alternation"
+    ],
+    "117": [
+      "seq_3r_efficiency"
+    ],
+    "139": [
+      "seq_3r_disp_atr"
+    ],
+    "10": [
+      "seq_3r_mean_overlap",
+      "seq_3r_median_overlap"
+    ],
+    "44": [
+      "seq_3r_max_overlap"
+    ],
+    "12": [
+      "seq_3r_overlap_above_50"
+    ],
+    "11": [
+      "seq_3r_overlap_above_75"
+    ],
+    "9": [
+      "seq_3r_mean_retracement"
+    ],
+    "26": [
+      "seq_3r_mean_retracement_mfe"
+    ],
+    "54": [
+      "seq_3r_reclaim_rate"
+    ],
+    "36": [
+      "seq_3r_range_atr"
+    ],
+    "120": [
+      "seq_3r_position_pct",
+      "seq_3r_dist_to_high_atr",
+      "seq_5r_position_pct",
+      "seq_5r_dist_to_high_atr"
+    ],
+    "114": [
+      "seq_3r_dist_to_low_atr"
+    ],
+    "140": [
+      "seq_3r_center_migration_slope_atr"
+    ],
+    "45": [
+      "seq_3r_center_migration_r2"
+    ],
+    "126": [
+      "seq_3r_center_dir_consistency"
+    ],
+    "46": [
+      "seq_3r_center_reversal_count"
+    ],
+    "137": [
+      "seq_3r_asym_duration",
+      "seq_3r_asym_volume"
+    ],
+    "138": [
+      "seq_3r_asym_mfe"
+    ],
+    "143": [
+      "seq_3r_asym_net_move"
+    ],
+    "147": [
+      "seq_3r_asym_efficiency"
+    ],
+    "305": [
+      "seq_5r_alternation_rate"
+    ],
+    "306": [
+      "seq_5r_perfect_alternation"
+    ],
+    "118": [
+      "seq_5r_efficiency"
+    ],
+    "134": [
+      "seq_5r_disp_atr",
+      "seq_5r_center_migration_slope_atr"
+    ],
+    "13": [
+      "seq_5r_mean_overlap",
+      "seq_5r_median_overlap"
+    ],
+    "43": [
+      "seq_5r_max_overlap"
+    ],
+    "15": [
+      "seq_5r_overlap_above_50"
+    ],
+    "14": [
+      "seq_5r_overlap_above_75"
+    ],
+    "8": [
+      "seq_5r_mean_retracement"
+    ],
+    "27": [
+      "seq_5r_mean_retracement_mfe"
+    ],
+    "55": [
+      "seq_5r_reclaim_rate"
+    ],
+    "37": [
+      "seq_5r_range_atr"
+    ],
+    "116": [
+      "seq_5r_dist_to_low_atr"
+    ],
+    "56": [
+      "seq_5r_center_migration_r2"
+    ],
+    "127": [
+      "seq_5r_center_dir_consistency"
+    ],
+    "49": [
+      "seq_5r_center_reversal_count"
+    ],
+    "135": [
+      "seq_5r_asym_duration",
+      "seq_5r_asym_volume"
+    ],
+    "136": [
+      "seq_5r_asym_mfe"
+    ],
+    "144": [
+      "seq_5r_asym_net_move"
+    ],
+    "148": [
+      "seq_5r_asym_efficiency"
+    ],
+    "307": [
+      "seq_8r_alternation_rate"
+    ],
+    "308": [
+      "seq_8r_perfect_alternation"
+    ],
+    "91": [
+      "seq_8r_efficiency"
+    ],
+    "128": [
+      "seq_8r_disp_atr",
+      "seq_8r_center_migration_slope_atr"
+    ],
+    "16": [
+      "seq_8r_mean_overlap"
+    ],
+    "19": [
+      "seq_8r_median_overlap"
+    ],
+    "41": [
+      "seq_8r_max_overlap"
+    ],
+    "17": [
+      "seq_8r_overlap_above_50"
+    ],
+    "20": [
+      "seq_8r_overlap_above_75"
+    ],
+    "6": [
+      "seq_8r_mean_retracement"
+    ],
+    "24": [
+      "seq_8r_mean_retracement_mfe"
+    ],
+    "52": [
+      "seq_8r_reclaim_rate"
+    ],
+    "50": [
+      "seq_8r_range_atr"
+    ],
+    "121": [
+      "seq_8r_position_pct",
+      "seq_8r_dist_to_high_atr",
+      "seq_12r_position_pct",
+      "seq_12r_dist_to_high_atr"
+    ],
+    "113": [
+      "seq_8r_dist_to_low_atr",
+      "seq_12r_dist_to_low_atr"
+    ],
+    "93": [
+      "seq_8r_center_migration_r2"
+    ],
+    "124": [
+      "seq_8r_center_dir_consistency"
+    ],
+    "47": [
+      "seq_8r_center_reversal_count"
+    ],
+    "130": [
+      "seq_8r_asym_duration"
+    ],
+    "129": [
+      "seq_8r_asym_mfe",
+      "seq_8r_asym_volume"
+    ],
+    "141": [
+      "seq_8r_asym_net_move"
+    ],
+    "145": [
+      "seq_8r_asym_efficiency"
+    ],
+    "309": [
+      "seq_12r_alternation_rate"
+    ],
+    "310": [
+      "seq_12r_perfect_alternation"
+    ],
+    "92": [
+      "seq_12r_efficiency"
+    ],
+    "131": [
+      "seq_12r_disp_atr",
+      "seq_12r_asym_mfe",
+      "seq_12r_asym_volume"
+    ],
+    "23": [
+      "seq_12r_mean_overlap"
+    ],
+    "21": [
+      "seq_12r_median_overlap"
+    ],
+    "42": [
+      "seq_12r_max_overlap"
+    ],
+    "18": [
+      "seq_12r_overlap_above_50"
+    ],
+    "22": [
+      "seq_12r_overlap_above_75"
+    ],
+    "7": [
+      "seq_12r_mean_retracement"
+    ],
+    "25": [
+      "seq_12r_mean_retracement_mfe"
+    ],
+    "53": [
+      "seq_12r_reclaim_rate"
+    ],
+    "51": [
+      "seq_12r_range_atr"
+    ],
+    "132": [
+      "seq_12r_center_migration_slope_atr"
+    ],
+    "94": [
+      "seq_12r_center_migration_r2"
+    ],
+    "125": [
+      "seq_12r_center_dir_consistency"
+    ],
+    "48": [
+      "seq_12r_center_reversal_count"
+    ],
+    "133": [
+      "seq_12r_asym_duration"
+    ],
+    "142": [
+      "seq_12r_asym_net_move"
+    ],
+    "146": [
+      "seq_12r_asym_efficiency"
+    ],
+    "191": [
+      "bar_volume"
+    ],
+    "192": [
+      "bar_est_bull_volume"
+    ],
+    "151": [
+      "bar_est_bear_volume"
+    ],
+    "150": [
+      "bar_est_delta",
+      "bar_est_delta_ratio"
+    ],
+    "219": [
+      "bar_zero_range"
+    ],
+    "311": [
+      "window_available_5s"
+    ],
+    "205": [
+      "vol_sum_5s",
+      "vol_mean_1s_5s",
+      "vol_max_1s_5s",
+      "est_abs_delta_sum_5s"
+    ],
+    "189": [
+      "est_bull_vol_sum_5s",
+      "est_delta_pos_sum_5s"
+    ],
+    "197": [
+      "est_bear_vol_sum_5s",
+      "est_delta_neg_sum_5s"
+    ],
+    "236": [
+      "est_delta_sum_5s",
+      "est_delta_ratio_5s"
+    ],
+    "190": [
+      "upbar_vol_sum_5s"
+    ],
+    "198": [
+      "downbar_vol_sum_5s"
+    ],
+    "237": [
+      "up_down_vol_ratio_5s"
+    ],
+    "235": [
+      "price_change_points_5s",
+      "price_change_atr_5s"
+    ],
+    "214": [
+      "range_points_5s"
+    ],
+    "182": [
+      "range_atr_5s"
+    ],
+    "188": [
+      "volume_per_point_moved_5s",
+      "abs_delta_per_point_moved_5s"
+    ],
+    "187": [
+      "volume_per_atr_moved_5s",
+      "abs_delta_per_atr_moved_5s"
+    ],
+    "312": [
+      "window_available_15s"
+    ],
+    "209": [
+      "vol_sum_15s",
+      "vol_mean_1s_15s",
+      "est_bear_vol_sum_15s",
+      "est_abs_delta_sum_15s",
+      "vol_sum_30s",
+      "vol_mean_1s_30s",
+      "est_bull_vol_sum_30s",
+      "est_abs_delta_sum_30s",
+      "est_delta_pos_sum_30s",
+      "upbar_vol_sum_30s"
+    ],
+    "210": [
+      "vol_max_1s_15s"
+    ],
+    "208": [
+      "est_bull_vol_sum_15s",
+      "est_delta_pos_sum_15s",
+      "upbar_vol_sum_15s"
+    ],
+    "240": [
+      "est_delta_sum_15s",
+      "est_delta_ratio_15s"
+    ],
+    "207": [
+      "est_delta_neg_sum_15s",
+      "downbar_vol_sum_15s"
+    ],
+    "243": [
+      "up_down_vol_ratio_15s"
+    ],
+    "242": [
+      "price_change_points_15s",
+      "price_change_atr_15s"
+    ],
+    "212": [
+      "range_points_15s",
+      "range_points_30s"
+    ],
+    "180": [
+      "range_atr_15s"
+    ],
+    "184": [
+      "volume_per_point_moved_15s",
+      "abs_delta_per_point_moved_15s"
+    ],
+    "183": [
+      "volume_per_atr_moved_15s",
+      "abs_delta_per_atr_moved_15s"
+    ],
+    "313": [
+      "window_available_30s"
+    ],
+    "211": [
+      "vol_max_1s_30s"
+    ],
+    "206": [
+      "est_bear_vol_sum_30s",
+      "est_delta_neg_sum_30s",
+      "downbar_vol_sum_30s"
+    ],
+    "238": [
+      "est_delta_sum_30s",
+      "est_delta_ratio_30s"
+    ],
+    "264": [
+      "up_down_vol_ratio_30s"
+    ],
+    "263": [
+      "price_change_points_30s",
+      "price_change_atr_30s"
+    ],
+    "181": [
+      "range_atr_30s"
+    ],
+    "186": [
+      "volume_per_point_moved_30s",
+      "abs_delta_per_point_moved_30s"
+    ],
+    "185": [
+      "volume_per_atr_moved_30s",
+      "abs_delta_per_atr_moved_30s"
+    ],
+    "314": [
+      "window_available_60s"
+    ],
+    "202": [
+      "vol_sum_60s",
+      "vol_mean_1s_60s",
+      "est_bull_vol_sum_60s",
+      "est_bear_vol_sum_60s",
+      "est_abs_delta_sum_60s",
+      "est_delta_pos_sum_60s",
+      "est_delta_neg_sum_60s",
+      "upbar_vol_sum_60s",
+      "downbar_vol_sum_60s",
+      "vol_sum_120s",
+      "vol_mean_1s_120s",
+      "est_bull_vol_sum_120s",
+      "est_bear_vol_sum_120s",
+      "est_abs_delta_sum_120s",
+      "est_delta_pos_sum_120s",
+      "est_delta_neg_sum_120s",
+      "upbar_vol_sum_120s",
+      "downbar_vol_sum_120s",
+      "vol_sum_300s",
+      "vol_mean_1s_300s",
+      "est_bull_vol_sum_300s",
+      "est_bear_vol_sum_300s",
+      "est_abs_delta_sum_300s",
+      "est_delta_pos_sum_300s",
+      "est_delta_neg_sum_300s",
+      "upbar_vol_sum_300s",
+      "downbar_vol_sum_300s"
+    ],
+    "199": [
+      "vol_max_1s_60s"
+    ],
+    "260": [
+      "est_delta_sum_60s",
+      "est_delta_ratio_60s"
+    ],
+    "255": [
+      "up_down_vol_ratio_60s"
+    ],
+    "277": [
+      "price_change_points_60s",
+      "price_change_atr_60s"
+    ],
+    "213": [
+      "range_points_60s",
+      "range_points_120s",
+      "range_points_300s"
+    ],
+    "176": [
+      "range_atr_60s"
+    ],
+    "173": [
+      "volume_per_point_moved_60s",
+      "abs_delta_per_point_moved_60s"
+    ],
+    "172": [
+      "volume_per_atr_moved_60s",
+      "abs_delta_per_atr_moved_60s"
+    ],
+    "315": [
+      "window_available_120s"
+    ],
+    "200": [
+      "vol_max_1s_120s"
+    ],
+    "258": [
+      "est_delta_sum_120s",
+      "est_delta_ratio_120s"
+    ],
+    "256": [
+      "up_down_vol_ratio_120s"
+    ],
+    "278": [
+      "price_change_points_120s",
+      "price_change_atr_120s"
+    ],
+    "177": [
+      "range_atr_120s"
+    ],
+    "175": [
+      "volume_per_point_moved_120s",
+      "abs_delta_per_point_moved_120s"
+    ],
+    "174": [
+      "volume_per_atr_moved_120s",
+      "abs_delta_per_atr_moved_120s"
+    ],
+    "316": [
+      "window_available_300s"
+    ],
+    "201": [
+      "vol_max_1s_300s"
+    ],
+    "155": [
+      "est_delta_sum_300s",
+      "est_delta_ratio_300s"
+    ],
+    "257": [
+      "up_down_vol_ratio_300s"
+    ],
+    "251": [
+      "price_change_points_300s",
+      "rolling_5m_open_signed_distance_points",
+      "rolling_5m_open_signed_distance_ticks"
+    ],
+    "252": [
+      "price_change_atr_300s",
+      "rolling_5m_open_signed_distance_atr",
+      "rolling_5m_low_signed_distance_atr"
+    ],
+    "254": [
+      "range_atr_300s"
+    ],
+    "249": [
+      "volume_per_point_moved_300s",
+      "abs_delta_per_point_moved_300s"
+    ],
+    "248": [
+      "volume_per_atr_moved_300s",
+      "abs_delta_per_atr_moved_300s"
+    ],
+    "317": [
+      "window_available_900s"
+    ],
+    "203": [
+      "vol_sum_900s",
+      "vol_mean_1s_900s",
+      "est_bull_vol_sum_900s",
+      "est_bear_vol_sum_900s",
+      "est_abs_delta_sum_900s",
+      "est_delta_pos_sum_900s",
+      "est_delta_neg_sum_900s",
+      "upbar_vol_sum_900s",
+      "downbar_vol_sum_900s",
+      "vol_sum_1800s",
+      "vol_mean_1s_1800s",
+      "est_bull_vol_sum_1800s",
+      "est_bear_vol_sum_1800s",
+      "est_abs_delta_sum_1800s",
+      "est_delta_pos_sum_1800s",
+      "est_delta_neg_sum_1800s",
+      "upbar_vol_sum_1800s",
+      "downbar_vol_sum_1800s",
+      "regime_volume_per_second"
+    ],
+    "193": [
+      "vol_max_1s_900s"
+    ],
+    "162": [
+      "est_delta_sum_900s",
+      "est_delta_ratio_900s"
+    ],
+    "159": [
+      "up_down_vol_ratio_900s"
+    ],
+    "217": [
+      "price_change_points_900s",
+      "rolling_15m_open_signed_distance_points",
+      "rolling_15m_open_signed_distance_ticks"
+    ],
+    "65": [
+      "price_change_atr_900s",
+      "rolling_15m_open_signed_distance_atr"
+    ],
+    "216": [
+      "range_points_900s",
+      "rolling_15m_low_signed_distance_points",
+      "rolling_15m_low_signed_distance_ticks"
+    ],
+    "66": [
+      "range_atr_900s",
+      "rolling_15m_low_signed_distance_atr"
+    ],
+    "69": [
+      "volume_per_point_moved_900s",
+      "abs_delta_per_point_moved_900s"
+    ],
+    "68": [
+      "volume_per_atr_moved_900s",
+      "abs_delta_per_atr_moved_900s"
+    ],
+    "318": [
+      "window_available_1800s"
+    ],
+    "194": [
+      "vol_max_1s_1800s"
+    ],
+    "161": [
+      "est_delta_sum_1800s",
+      "est_delta_ratio_1800s"
+    ],
+    "160": [
+      "up_down_vol_ratio_1800s"
+    ],
+    "73": [
+      "price_change_points_1800s",
+      "rolling_30m_open_signed_distance_points",
+      "rolling_30m_open_signed_distance_ticks"
+    ],
+    "74": [
+      "price_change_atr_1800s",
+      "rolling_30m_open_signed_distance_atr"
+    ],
+    "215": [
+      "range_points_1800s",
+      "rolling_30m_low_signed_distance_points",
+      "rolling_30m_low_signed_distance_ticks",
+      "rolling_60m_low_signed_distance_points",
+      "rolling_60m_low_signed_distance_ticks"
+    ],
+    "81": [
+      "range_atr_1800s",
+      "rolling_30m_low_signed_distance_atr"
+    ],
+    "72": [
+      "volume_per_point_moved_1800s",
+      "abs_delta_per_point_moved_1800s"
+    ],
+    "71": [
+      "volume_per_atr_moved_1800s",
+      "abs_delta_per_atr_moved_1800s"
+    ],
+    "262": [
+      "est_delta_sum_15s_minus_60s_scaled"
+    ],
+    "259": [
+      "est_delta_sum_30s_minus_120s_scaled"
+    ],
+    "156": [
+      "est_delta_sum_60s_minus_300s_scaled"
+    ],
+    "241": [
+      "est_delta_ratio_15s_minus_60s"
+    ],
+    "239": [
+      "est_delta_ratio_30s_minus_120s"
+    ],
+    "261": [
+      "est_delta_ratio_60s_minus_300s"
+    ],
+    "178": [
+      "vol_sum_30s_vs_300s_ratio"
+    ],
+    "179": [
+      "vol_sum_60s_vs_900s_ratio"
+    ],
+    "319": [
+      "regime_available"
+    ],
+    "196": [
+      "regime_vol_sum",
+      "regime_est_abs_delta_sum",
+      "regime_first_half_vol",
+      "regime_second_half_vol"
+    ],
+    "163": [
+      "regime_est_delta_sum"
+    ],
+    "164": [
+      "regime_est_delta_ratio"
+    ],
+    "80": [
+      "regime_price_change_atr",
+      "regime_range_atr"
+    ],
+    "195": [
+      "regime_volume_per_atr_moved",
+      "regime_abs_delta_per_atr_moved"
+    ],
+    "165": [
+      "regime_first_half_est_delta_ratio"
+    ],
+    "157": [
+      "regime_second_half_est_delta_ratio"
+    ],
+    "158": [
+      "regime_late_minus_early_delta_ratio"
+    ],
+    "88": [
+      "regime_late_vs_early_vol_ratio"
+    ],
+    "3": [
+      "rth_available",
+      "overnight_high_final_available",
+      "overnight_low_final_available",
+      "rth_open_available",
+      "opening_range_30m_high_developing_available",
+      "opening_range_30m_low_developing_available",
+      "opening_range_30m_high_developing_position__UNAVAILABLE",
+      "opening_range_30m_low_developing_position__UNAVAILABLE",
+      "overnight_high_final_position__UNAVAILABLE",
+      "overnight_low_final_position__UNAVAILABLE",
+      "rth_open_position__UNAVAILABLE"
+    ],
+    "169": [
+      "rth_elapsed_seconds",
+      "rth_open_elapsed_seconds"
+    ],
+    "170": [
+      "rth_vol_cum",
+      "rth_abs_delta_cum"
+    ],
+    "154": [
+      "rth_est_delta_cum",
+      "rth_est_delta_ratio_cum"
+    ],
+    "204": [
+      "rth_volume_per_second"
+    ],
+    "152": [
+      "prior_day_open_price",
+      "prior_day_high_price",
+      "prior_day_low_price",
+      "prior_day_close_price",
+      "overnight_high_developing_price",
+      "overnight_low_developing_price",
+      "overnight_high_final_price",
+      "overnight_low_final_price",
+      "rth_open_price",
+      "opening_range_30m_high_developing_price",
+      "opening_range_30m_low_developing_price",
+      "opening_range_30m_high_final_price",
+      "opening_range_30m_low_final_price",
+      "rolling_5m_open_price",
+      "rolling_5m_high_price",
+      "rolling_5m_low_price",
+      "rolling_5m_close_price",
+      "rolling_15m_open_price",
+      "rolling_15m_high_price",
+      "rolling_15m_low_price",
+      "rolling_15m_close_price",
+      "rolling_30m_open_price",
+      "rolling_30m_high_price",
+      "rolling_30m_low_price",
+      "rolling_30m_close_price",
+      "rolling_60m_open_price",
+      "rolling_60m_high_price",
+      "rolling_60m_low_price",
+      "rolling_60m_close_price",
+      "nearest_level_above_price",
+      "nearest_level_below_price",
+      "lowest_available_level",
+      "highest_available_level",
+      "nearest_cluster_above_price",
+      "nearest_cluster_below_price"
+    ],
+    "5": [
+      "prior_day_open_available",
+      "prior_day_high_available",
+      "prior_day_low_available",
+      "prior_day_close_available",
+      "prior_day_close_position__UNAVAILABLE",
+      "prior_day_high_position__UNAVAILABLE",
+      "prior_day_low_position__UNAVAILABLE",
+      "prior_day_open_position__UNAVAILABLE"
+    ],
+    "112": [
+      "prior_day_open_signed_distance_points",
+      "prior_day_open_signed_distance_ticks",
+      "prior_day_open_signed_distance_atr"
+    ],
+    "110": [
+      "prior_day_high_signed_distance_points",
+      "prior_day_high_signed_distance_ticks",
+      "prior_day_high_signed_distance_atr",
+      "n_prior_day_levels_above",
+      "n_prior_day_levels_below",
+      "price_position_in_full_envelope"
+    ],
+    "109": [
+      "prior_day_low_signed_distance_points",
+      "prior_day_low_signed_distance_ticks",
+      "prior_day_low_signed_distance_atr"
+    ],
+    "101": [
+      "prior_day_close_signed_distance_points",
+      "prior_day_close_signed_distance_ticks",
+      "prior_day_close_signed_distance_atr"
+    ],
+    "320": [
+      "overnight_high_developing_available"
+    ],
+    "103": [
+      "overnight_high_developing_signed_distance_points",
+      "overnight_high_developing_signed_distance_ticks",
+      "overnight_high_developing_signed_distance_atr",
+      "overnight_high_final_signed_distance_points",
+      "overnight_high_final_signed_distance_ticks",
+      "overnight_high_final_signed_distance_atr"
+    ],
+    "321": [
+      "overnight_low_developing_available"
+    ],
+    "96": [
+      "overnight_low_developing_signed_distance_points",
+      "overnight_low_developing_signed_distance_ticks",
+      "overnight_low_developing_signed_distance_atr",
+      "overnight_low_final_signed_distance_points",
+      "overnight_low_final_signed_distance_ticks",
+      "overnight_low_final_signed_distance_atr"
+    ],
+    "97": [
+      "rth_open_signed_distance_points",
+      "rth_open_signed_distance_ticks",
+      "rth_open_signed_distance_atr",
+      "opening_range_30m_high_developing_signed_distance_points",
+      "opening_range_30m_high_developing_signed_distance_ticks",
+      "opening_range_30m_high_developing_signed_distance_atr",
+      "opening_range_30m_low_developing_signed_distance_points",
+      "opening_range_30m_low_developing_signed_distance_ticks",
+      "opening_range_30m_low_developing_signed_distance_atr",
+      "opening_range_30m_high_final_signed_distance_points",
+      "opening_range_30m_high_final_signed_distance_ticks",
+      "opening_range_30m_high_final_signed_distance_atr",
+      "opening_range_30m_low_final_signed_distance_points",
+      "opening_range_30m_low_final_signed_distance_ticks",
+      "opening_range_30m_low_final_signed_distance_atr",
+      "n_session_levels_above",
+      "n_session_levels_below"
+    ],
+    "168": [
+      "opening_range_30m_high_final_available",
+      "opening_range_30m_low_final_available",
+      "opening_range_30m_elapsed_seconds",
+      "opening_range_30m_is_developing",
+      "opening_range_30m_is_final",
+      "n_levels_available",
+      "opening_range_30m_high_final_position__UNAVAILABLE",
+      "opening_range_30m_low_final_position__UNAVAILABLE"
+    ],
+    "322": [
+      "rolling_5m_open_available"
+    ],
+    "323": [
+      "rolling_5m_high_available"
+    ],
+    "276": [
+      "rolling_5m_high_signed_distance_points",
+      "rolling_5m_high_signed_distance_ticks",
+      "rolling_5m_high_signed_distance_atr",
+      "rolling_15m_high_signed_distance_points",
+      "rolling_15m_high_signed_distance_ticks",
+      "rolling_15m_high_signed_distance_atr"
+    ],
+    "324": [
+      "rolling_5m_low_available"
+    ],
+    "250": [
+      "rolling_5m_low_signed_distance_points",
+      "rolling_5m_low_signed_distance_ticks"
+    ],
+    "325": [
+      "rolling_5m_close_available"
+    ],
+    "270": [
+      "rolling_5m_close_signed_distance_points",
+      "rolling_5m_close_signed_distance_ticks",
+      "rolling_5m_close_signed_distance_atr",
+      "rolling_15m_close_signed_distance_points",
+      "rolling_15m_close_signed_distance_ticks",
+      "rolling_15m_close_signed_distance_atr",
+      "rolling_30m_close_signed_distance_points",
+      "rolling_30m_close_signed_distance_ticks",
+      "rolling_30m_close_signed_distance_atr",
+      "rolling_60m_close_signed_distance_points",
+      "rolling_60m_close_signed_distance_ticks",
+      "rolling_60m_close_signed_distance_atr",
+      "rolling_15m_close_position__ABOVE",
+      "rolling_30m_close_position__ABOVE",
+      "rolling_5m_close_position__ABOVE",
+      "rolling_60m_close_position__ABOVE"
+    ],
+    "326": [
+      "rolling_15m_open_available"
+    ],
+    "327": [
+      "rolling_15m_high_available"
+    ],
+    "328": [
+      "rolling_15m_low_available"
+    ],
+    "329": [
+      "rolling_15m_close_available"
+    ],
+    "330": [
+      "rolling_30m_open_available"
+    ],
+    "331": [
+      "rolling_30m_high_available"
+    ],
+    "275": [
+      "rolling_30m_high_signed_distance_points",
+      "rolling_30m_high_signed_distance_ticks",
+      "rolling_30m_high_signed_distance_atr"
+    ],
+    "332": [
+      "rolling_30m_low_available"
+    ],
+    "333": [
+      "rolling_30m_close_available"
+    ],
+    "334": [
+      "rolling_60m_open_available"
+    ],
+    "123": [
+      "rolling_60m_open_signed_distance_points",
+      "rolling_60m_open_signed_distance_ticks",
+      "rolling_60m_open_signed_distance_atr"
+    ],
+    "335": [
+      "rolling_60m_high_available"
+    ],
+    "119": [
+      "rolling_60m_high_signed_distance_points",
+      "rolling_60m_high_signed_distance_ticks",
+      "rolling_60m_high_signed_distance_atr"
+    ],
+    "336": [
+      "rolling_60m_low_available"
+    ],
+    "115": [
+      "rolling_60m_low_signed_distance_atr"
+    ],
+    "337": [
+      "rolling_60m_close_available"
+    ],
+    "99": [
+      "n_levels_above",
+      "n_levels_below",
+      "pct_levels_above",
+      "pct_levels_below",
+      "level_balance",
+      "n_level_clusters_above",
+      "n_level_clusters_below",
+      "levels_ahead_of_trade",
+      "levels_behind_trade",
+      "pct_levels_ahead_of_trade",
+      "pct_levels_behind_trade"
+    ],
+    "284": [
+      "n_levels_touched",
+      "pct_levels_touched",
+      "n_level_clusters_touched"
+    ],
+    "268": [
+      "n_rolling_levels_above",
+      "n_rolling_levels_below"
+    ],
+    "230": [
+      "nearest_level_above_distance_points",
+      "nearest_level_above_distance_ticks",
+      "nearest_level_above_distance_atr",
+      "nearest_level_behind_distance_atr",
+      "nearest_cluster_behind_distance_atr"
+    ],
+    "223": [
+      "nearest_level_below_distance_points",
+      "nearest_level_below_distance_ticks",
+      "nearest_level_below_distance_atr",
+      "nearest_level_ahead_distance_atr",
+      "nearest_cluster_ahead_distance_atr"
+    ],
+    "222": [
+      "nearest_space_balance_atr",
+      "nearest_upside_downside_ratio",
+      "directional_space_balance_atr"
+    ],
+    "234": [
+      "nearest_space_total_atr"
+    ],
+    "227": [
+      "level_density_025a"
+    ],
+    "232": [
+      "levels_above_within_025a"
+    ],
+    "225": [
+      "levels_below_within_025a"
+    ],
+    "229": [
+      "level_density_050a"
+    ],
+    "233": [
+      "levels_above_within_050a"
+    ],
+    "226": [
+      "levels_below_within_050a"
+    ],
+    "220": [
+      "level_density_100a"
+    ],
+    "265": [
+      "levels_above_within_100a"
+    ],
+    "267": [
+      "levels_below_within_100a",
+      "levels_below_within_200a"
+    ],
+    "221": [
+      "level_density_200a"
+    ],
+    "266": [
+      "levels_above_within_200a"
+    ],
+    "228": [
+      "inverse_distance_density"
+    ],
+    "153": [
+      "full_level_envelope_width_points"
+    ],
+    "218": [
+      "full_level_envelope_width_atr"
+    ],
+    "149": [
+      "distance_above_full_envelope_atr"
+    ],
+    "338": [
+      "distance_below_full_envelope_atr"
+    ],
+    "171": [
+      "n_level_clusters_available"
+    ],
+    "231": [
+      "nearest_cluster_above_distance_atr"
+    ],
+    "280": [
+      "nearest_cluster_above_strength"
+    ],
+    "224": [
+      "nearest_cluster_below_distance_atr"
+    ],
+    "271": [
+      "nearest_cluster_below_strength"
+    ],
+    "166": [
+      "max_cluster_strength",
+      "max_nearby_cluster_strength_100a"
+    ],
+    "167": [
+      "max_nearby_cluster_strength_050a"
+    ],
+    "98": [
+      "opening_range_30m_high_developing_position__ABOVE",
+      "opening_range_30m_high_developing_position__BELOW",
+      "opening_range_30m_high_final_position__ABOVE",
+      "opening_range_30m_high_final_position__BELOW"
+    ],
+    "281": [
+      "opening_range_30m_high_developing_position__TOUCH"
+    ],
+    "282": [
+      "opening_range_30m_high_final_position__TOUCH"
+    ],
+    "105": [
+      "opening_range_30m_low_developing_position__ABOVE",
+      "opening_range_30m_low_developing_position__BELOW",
+      "opening_range_30m_low_final_position__BELOW"
+    ],
+    "1": [
+      "opening_range_30m_low_developing_position__TOUCH",
+      "opening_range_30m_low_final_position__TOUCH"
+    ],
+    "106": [
+      "opening_range_30m_low_final_position__ABOVE"
+    ],
+    "102": [
+      "overnight_high_developing_position__ABOVE",
+      "overnight_high_developing_position__BELOW",
+      "overnight_high_final_position__ABOVE",
+      "overnight_high_final_position__BELOW"
+    ],
+    "4": [
+      "overnight_high_developing_position__TOUCH",
+      "overnight_high_final_position__TOUCH"
+    ],
+    "339": [
+      "overnight_high_developing_position__UNAVAILABLE"
+    ],
+    "104": [
+      "overnight_low_developing_position__ABOVE",
+      "overnight_low_developing_position__BELOW",
+      "overnight_low_final_position__ABOVE",
+      "overnight_low_final_position__BELOW"
+    ],
+    "2": [
+      "overnight_low_developing_position__TOUCH",
+      "overnight_low_final_position__TOUCH"
+    ],
+    "340": [
+      "overnight_low_developing_position__UNAVAILABLE"
+    ],
+    "100": [
+      "prior_day_close_position__ABOVE",
+      "prior_day_close_position__BELOW"
+    ],
+    "301": [
+      "prior_day_close_position__TOUCH"
+    ],
+    "108": [
+      "prior_day_high_position__ABOVE",
+      "prior_day_high_position__BELOW"
+    ],
+    "302": [
+      "prior_day_high_position__TOUCH"
+    ],
+    "107": [
+      "prior_day_low_position__ABOVE",
+      "prior_day_low_position__BELOW"
+    ],
+    "300": [
+      "prior_day_low_position__TOUCH"
+    ],
+    "111": [
+      "prior_day_open_position__ABOVE",
+      "prior_day_open_position__BELOW"
+    ],
+    "297": [
+      "prior_day_open_position__TOUCH"
+    ],
+    "269": [
+      "rolling_15m_close_position__BELOW",
+      "rolling_30m_close_position__BELOW",
+      "rolling_5m_close_position__BELOW",
+      "rolling_60m_close_position__BELOW"
+    ],
+    "283": [
+      "rolling_15m_close_position__TOUCH",
+      "rolling_30m_close_position__TOUCH",
+      "rolling_5m_close_position__TOUCH",
+      "rolling_60m_close_position__TOUCH"
+    ],
+    "341": [
+      "rolling_15m_close_position__UNAVAILABLE"
+    ],
+    "274": [
+      "rolling_15m_high_position__ABOVE",
+      "rolling_15m_high_position__BELOW",
+      "rolling_5m_high_position__ABOVE",
+      "rolling_5m_high_position__BELOW"
+    ],
+    "285": [
+      "rolling_15m_high_position__TOUCH",
+      "rolling_5m_high_position__TOUCH"
+    ],
+    "342": [
+      "rolling_15m_high_position__UNAVAILABLE"
+    ],
+    "293": [
+      "rolling_15m_low_position__ABOVE",
+      "rolling_15m_low_position__BELOW"
+    ],
+    "343": [
+      "rolling_15m_low_position__TOUCH"
+    ],
+    "344": [
+      "rolling_15m_low_position__UNAVAILABLE"
+    ],
+    "294": [
+      "rolling_15m_open_position__ABOVE",
+      "rolling_15m_open_position__BELOW"
+    ],
+    "295": [
+      "rolling_15m_open_position__TOUCH"
+    ],
+    "345": [
+      "rolling_15m_open_position__UNAVAILABLE"
+    ],
+    "346": [
+      "rolling_30m_close_position__UNAVAILABLE"
+    ],
+    "273": [
+      "rolling_30m_high_position__ABOVE",
+      "rolling_30m_high_position__BELOW"
+    ],
+    "286": [
+      "rolling_30m_high_position__TOUCH"
+    ],
+    "347": [
+      "rolling_30m_high_position__UNAVAILABLE"
+    ],
+    "348": [
+      "rolling_30m_low_position__ABOVE"
+    ],
+    "349": [
+      "rolling_30m_low_position__BELOW"
+    ],
+    "350": [
+      "rolling_30m_low_position__TOUCH"
+    ],
+    "351": [
+      "rolling_30m_low_position__UNAVAILABLE"
+    ],
+    "70": [
+      "rolling_30m_open_position__ABOVE",
+      "rolling_30m_open_position__BELOW"
+    ],
+    "296": [
+      "rolling_30m_open_position__TOUCH"
+    ],
+    "352": [
+      "rolling_30m_open_position__UNAVAILABLE"
+    ],
+    "353": [
+      "rolling_5m_close_position__UNAVAILABLE"
+    ],
+    "354": [
+      "rolling_5m_high_position__UNAVAILABLE"
+    ],
+    "291": [
+      "rolling_5m_low_position__ABOVE",
+      "rolling_5m_low_position__BELOW"
+    ],
+    "292": [
+      "rolling_5m_low_position__TOUCH"
+    ],
+    "355": [
+      "rolling_5m_low_position__UNAVAILABLE"
+    ],
+    "244": [
+      "rolling_5m_open_position__ABOVE",
+      "rolling_5m_open_position__BELOW"
+    ],
+    "288": [
+      "rolling_5m_open_position__TOUCH"
+    ],
+    "356": [
+      "rolling_5m_open_position__UNAVAILABLE"
+    ],
+    "357": [
+      "rolling_60m_close_position__UNAVAILABLE"
+    ],
+    "272": [
+      "rolling_60m_high_position__ABOVE",
+      "rolling_60m_high_position__BELOW"
+    ],
+    "287": [
+      "rolling_60m_high_position__TOUCH"
+    ],
+    "358": [
+      "rolling_60m_high_position__UNAVAILABLE"
+    ],
+    "359": [
+      "rolling_60m_low_position__ABOVE"
+    ],
+    "360": [
+      "rolling_60m_low_position__BELOW"
+    ],
+    "361": [
+      "rolling_60m_low_position__TOUCH"
+    ],
+    "362": [
+      "rolling_60m_low_position__UNAVAILABLE"
+    ],
+    "122": [
+      "rolling_60m_open_position__ABOVE",
+      "rolling_60m_open_position__BELOW"
+    ],
+    "298": [
+      "rolling_60m_open_position__TOUCH"
+    ],
+    "363": [
+      "rolling_60m_open_position__UNAVAILABLE"
+    ],
+    "95": [
+      "rth_open_position__ABOVE",
+      "rth_open_position__BELOW"
+    ],
+    "299": [
+      "rth_open_position__TOUCH"
+    ]
+  }
+}

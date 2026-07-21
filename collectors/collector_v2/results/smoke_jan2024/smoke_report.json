@@ -1,0 +1,65 @@
+{
+  "mode1_diag": {
+    "1s_bars": 316486,
+    "1m_bars": 9419,
+    "buckets_closed_30s": 18822,
+    "buckets_closed_1m": 9419,
+    "buckets_closed_3m": 3140,
+    "buckets_closed_5m": 1884,
+    "rth_flips": 183,
+    "bar1_checks": 183,
+    "confirmations_passed_hhll_mom": 75,
+    "rejected_5m_misaligned": 0,
+    "entries_filled": 0,
+    "regime_exits": 0,
+    "snapshots_emitted": 366
+  },
+  "mode2_diag": {
+    "1s_bars": 316486,
+    "1m_bars": 9419,
+    "buckets_closed_30s": 18822,
+    "buckets_closed_1m": 9419,
+    "buckets_closed_3m": 3140,
+    "buckets_closed_5m": 1884,
+    "rth_flips": 183,
+    "bar1_checks": 183,
+    "confirmations_passed_hhll_mom": 75,
+    "rejected_5m_misaligned": 0,
+    "entries_filled": 75,
+    "regime_exits": 75,
+    "snapshots_emitted": 366
+  },
+  "mode1_runtime_s": 5.373750448226929,
+  "mode2_runtime_s": 5.520662546157837,
+  "n_m1_snapshots": 366,
+  "n_m2_snapshots": 366,
+  "n_m2_trades": 75,
+  "provenance_mode1": {
+    "label": "Mode 1",
+    "n_rows": 366,
+    "violations": {
+      "30s": 0,
+      "1m": 0,
+      "3m": 0,
+      "5m": 0
+    }
+  },
+  "provenance_mode2": {
+    "label": "Mode 2",
+    "n_rows": 366,
+    "violations": {
+      "30s": 0,
+      "1m": 0,
+      "3m": 0,
+      "5m": 0
+    }
+  },
+  "parity": {
+    "ok": true,
+    "n_matched": 366,
+    "n_only_mode1": 0,
+    "n_only_mode2": 0,
+    "n_compared_cols": 48,
+    "mismatches": {}
+  }
+}

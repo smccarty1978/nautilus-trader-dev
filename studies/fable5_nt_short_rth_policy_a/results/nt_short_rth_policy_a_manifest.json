@@ -1,0 +1,80 @@
+{
+  "study": "fable5_nt_short_rth_policy_a",
+  "phase": "Phase 1 \u2014 schedule-driven parity",
+  "decision": "NT_SHORT_RTH_CONFIRMED",
+  "decision_note": "magnitude mildly fill-sensitive; gap 100% fill-model",
+  "research_contract": "NT_EVENT_DRIVEN_1S_OHLC_SCHEDULE_PARITY_NOT_TICK_OR_LIVE",
+  "nt_version": "1.230.0",
+  "instrument": {
+    "id": "NQ.XCME",
+    "multiplier": 20.0,
+    "price_increment": 0.25,
+    "venue": "XCME"
+  },
+  "rth_definition": "08:30-15:00 America/Chicago (entry only; matches frozen session col; task 15:15 not used)",
+  "cost": {
+    "round_trip_usd": 10.0,
+    "multiplier_usd_per_point": 20.0,
+    "quantity": 1
+  },
+  "fill_model": "FOK market at completed-bar close; GTC stop-market at trigger (gap-through at trigger); no slippage model",
+  "code": {
+    "common.py": "e83b5aa615fc4c0dfb10eb3e086a05fe97e5decc103b0a5e8363147b1023739d",
+    "build_schedule.py": "b38584bd81d62bf40270418865cab05e66a04d51e6187f60ed86c10d98856c64",
+    "strategy.py": "64e57abd61d32fbc7c82ed212cc87cd5a0817ebd676e3d23d4064d3403f2b8ba",
+    "run_nt.py": "d7d469544576d150adf74035273e01367322b0777904bfdfb0d9f69d23b9b24b",
+    "reconcile.py": "176b1b2983ca17ad93e65348f6cab5a3db2c1f240ffd1f0e7057326f11d68321",
+    "tests/test_policy_a_fixture.py": "9221e35a1eafbbd1a214c05a1dc22e77097c2b05c9b6c395ece00a00fd1264a3"
+  },
+  "inputs": {
+    "catalog": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+    "schedule_2025": "1d241bf66949e826f53e11ce09cf2c4fd692affee0529b3979624c0ffcaaa67c",
+    "schedule_2026": "0370fd4c7c383a4825fe73010792d0416276cb1eb12712dc4d7d800bf54c961d",
+    "frozen_trades_2025": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+    "frozen_trades_2026": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83",
+    "raw_2025": "see CODEX_5_X"
+  },
+  "population": {
+    "combined": 807,
+    "2025": 604,
+    "2026": 203,
+    "skips": 0
+  },
+  "results": {
+    "combined_net_usd": 23270.0,
+    "combined_pf": 1.149,
+    "combined_per_trade": 28.84,
+    "2025_net_usd": 18315.0,
+    "2026_net_usd": 4955.0
+  },
+  "benchmark": {
+    "combined_net_usd": 27013.0,
+    "combined_pf": 1.174,
+    "combined_per_trade": 33.47,
+    "2025_net_usd": 20304.0,
+    "2026_net_usd": 6709.0
+  },
+  "parity": {
+    "flip_mismatches_blocking": 0,
+    "flip_matched_2025": 27166,
+    "flip_matched_2026": 8935,
+    "alignment_ts_exact_matches": 406,
+    "alignment_ts_nonzero_deltas": 0,
+    "exit_reason_agreement_pct": 97.9,
+    "tie_race_flags": 0
+  },
+  "pre_execution_audit": {
+    "status": "PASS",
+    "critical": 0,
+    "warning": 0,
+    "passes": 4
+  },
+  "deliverables": [
+    "nt_short_rth_policy_a_summary.md",
+    "nt_short_rth_policy_a_results.parquet",
+    "nt_short_rth_policy_a_trade_reconciliation.parquet",
+    "nt_short_rth_policy_a_monthly.csv",
+    "reconciliation_summary.json",
+    "nt_short_rth_policy_a_manifest.json"
+  ]
+}

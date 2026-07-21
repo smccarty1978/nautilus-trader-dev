@@ -1,0 +1,36 @@
+study_seed: 20260711
+model_seed: 42
+model_train_period: ["2021-01-01", "2024-12-31"]
+threshold_validation_period: ["2025-01-01", "2025-02-28"]
+evaluation_periods:
+  2025: ["2025-03-01", "2025-12-31"]
+  2026: ["2026-01-01", "2026-04-29"]
+primary_execution_contract: EXPLICIT_NEXT_OPEN_OHLC_RESEARCH_CONTRACT
+sensitivity_execution_contract: CLOSE_DETECTED_NEXT_NT_FILL_SENSITIVITY
+executable_validation_claimed: false
+threshold_type: absolute_validation_frozen_score
+threshold_quantile: 0.90
+stop_atr_grid: [0.50, 1.00, 1.50]
+position_size: 1
+nq_multiplier: 20.0
+commission_round_trip: 5.0
+slippage_ticks_round_trip: 1.0
+tick_size: 0.25
+tick_value: 5.0
+session_timezone: America/Chicago
+rth: ["08:30", "15:00"]
+primary_entry: explicit_next_1s_bar_open
+primary_stop_active_from: entry_bar_open
+primary_intrabar_ordering_claimed: false
+same_bar_tie_rule: stop_wins_over_d10_or_flip
+gap_stop_rule: worse_bar_open_if_open_through_stop_else_stop_level
+position_release_after_ohlc_stop: stop_touch_bar_ts_init
+sensitivity_entry: prior_completed_bar_close_timestamped_at_next_bar_event
+sensitivity_stop: close_detected_then_fixture_observed_next_nt_fill
+monthly_attribution: exit_month_central_time
+drawdown_convention: cumulative_net_pnl_from_initial_zero
+maximum_allowed_next_executable_gap_seconds: null
+fill_gap_classes: [exact_boundary, short_market_data_gap_le_60s, extended_market_data_gap_gt_60s]
+extended_gap_policy: fill_at_first_available_1s_open_and_report_separately
+score_cadence_seconds: 5
+placebo_seed: 20260711

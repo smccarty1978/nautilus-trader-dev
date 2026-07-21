@@ -1,0 +1,91 @@
+# Data files (large, regeneratable)
+data/raw/
+data/catalog/
+
+# Backtest results (generated)
+backtests/results/
+
+# Model artifacts (large)
+models/*/artifacts/
+
+# Logs (generated)
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets
+*.pem
+*.key
+credentials.json
+secrets.yaml
+
+# Agent directories
+.claude/
+.codex/
+
+# Python/testing caches
+.pytest_cache/
+.mypy_cache/
+
+# Parquet data files
+*.parquet
+*.npy
+*.pkl
+*.joblib
+*.csv
+
+# Log files
+*.log
+*.lock
+
+# Temporary/Working/Cache directories
+**/_work/
+**/cache/
+
+# Windows junk / special files
+nul
+

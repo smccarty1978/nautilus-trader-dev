@@ -1,0 +1,117 @@
+Year 2022: bar load range 2021-12-27 00:00:00+00:00 .. 2022-12-31 23:59:59+00:00
+  Loaded 13,472,895 1s bars  (29s)
+
+Running backtest...
+[1m2021-12-30T18:24:01.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20211230-182401-VWAP-000-1, venue_order_id=XCME-1-001, account_id=XCME-001, ts_event=1640888641000000000)[0m
+[1m2022-01-17T16:22:01.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20220117-162201-VWAP-000-2, venue_order_id=XCME-1-002, account_id=XCME-001, ts_event=1642436521000000000)[0m
+[1m2022-06-20T15:05:01.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20220620-150501-VWAP-000-3, venue_order_id=XCME-1-003, account_id=XCME-001, ts_event=1655737501000000000)[0m
+[1m2022-07-04T16:04:01.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20220704-160401-VWAP-000-19, venue_order_id=XCME-1-019, account_id=XCME-001, ts_event=1656950641000000000)[0m
+[1m2022-07-04T16:29:01.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20220704-162901-VWAP-000-20, venue_order_id=XCME-1-020, account_id=XCME-001, ts_event=1656952141000000000)[0m
+[1m2022-11-24T14:43:01.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20221124-144301-VWAP-000-26, venue_order_id=XCME-1-026, account_id=XCME-001, ts_event=1669300981000000000)[0m
+[1m2022-11-24T14:58:01.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20221124-145801-VWAP-000-27, venue_order_id=XCME-1-027, account_id=XCME-001, ts_event=1669301881000000000)[0m
+[1m2022-11-24T15:08:05.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20221124-150805-VWAP-000-28, venue_order_id=XCME-1-028, account_id=XCME-001, ts_event=1669302485000000000)[0m
+[1m2022-11-24T15:21:02.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20221124-152102-VWAP-000-29, venue_order_id=XCME-1-029, account_id=XCME-001, ts_event=1669303262000000000)[0m
+[1m2022-11-24T16:37:01.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: Entry cancelled: OrderCanceled(instrument_id=NQ.XCME, client_order_id=O-20221124-163701-VWAP-000-35, venue_order_id=XCME-1-035, account_id=XCME-001, ts_event=1669307821000000000)[0m
+[1m2022-12-30T22:00:00.000000000Z[0m [1;33m[WARN] COMPRESS-VWAP.CompressionLaunchpadLongStrategy: The `Strategy.on_stop` handler was called when not overridden. It's expected that any actions required when stopping the strategy occur here, such as unsubscribing from data[0m
+  Done in 1538s
+
+Total trade records: 7
+In-year trade records: 7
+
+--- Exit Reason Breakdown ---
+exit_reason
+T2             4
+SL_after_T1    2
+SL             1
+
+--- T1 Fill Rate ---
+  T1 filled: 6 / 7 (85.7%)
+
+Wrote 7 trade records → backtests\compression_vwap_launchpad\results\live_2022\trades.parquet
+
+--- Signal Gate Diagnostics ---
+  1m_closes: 359605
+  gate_not_warm: 13
+  gate_not_long_flip: 345799
+  gate_not_rth: 10050
+  gate_window_short: 0
+  gate_excursion_high: 3688
+  gate_no_vwap: 0
+  gate_outside_band1: 29
+  gate_toward_vwap: 9
+  signals_fired: 17
+
+--- Account Report ---
+                                total locked        free currency account_id account_type base_currency margins  reported info
+2021-12-27 00:00:01+00:00  1000000.00   0.00  1000000.00      USD   XCME-001       MARGIN           USD      []      True   {}
+2021-12-30 18:24:01+00:00  1000000.00   0.00  1000000.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-01-17 16:22:01+00:00  1000000.00   0.00  1000000.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-20 15:05:01+00:00  1000000.00   0.00  1000000.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:11:01+00:00  1000000.00   0.00  1000000.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:11:01+00:00  1000000.00   0.00  1000000.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:11:01+00:00  1000000.00   0.00  1000000.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:11:01+00:00  1000000.00   0.00  1000000.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:11:50+00:00  1000130.00   0.00  1000130.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:11:50+00:00  1000130.00   0.00  1000130.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:11:50+00:00  1000130.00   0.00  1000130.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:15:33+00:00  1000390.00   0.00  1000390.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 18:15:33+00:00  1000390.00   0.00  1000390.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:15:01+00:00  1000390.00   0.00  1000390.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:15:01+00:00  1000390.00   0.00  1000390.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:15:01+00:00  1000390.00   0.00  1000390.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:15:01+00:00  1000390.00   0.00  1000390.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:18:42+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:18:42+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:18:42+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:19:31+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:19:31+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:38:01+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:38:01+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:38:01+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:38:01+00:00  1000510.00   0.00  1000510.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:39:59+00:00  1000630.00   0.00  1000630.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:39:59+00:00  1000630.00   0.00  1000630.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:39:59+00:00  1000630.00   0.00  1000630.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:43:15+00:00  1000870.00   0.00  1000870.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-06-24 19:43:15+00:00  1000870.00   0.00  1000870.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-07-04 16:04:01+00:00  1000870.00   0.00  1000870.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-07-04 16:29:01+00:00  1000870.00   0.00  1000870.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:07:01+00:00  1000870.00   0.00  1000870.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:07:01+00:00  1000870.00   0.00  1000870.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:07:01+00:00  1000870.00   0.00  1000870.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:07:01+00:00  1000870.00   0.00  1000870.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:10:02+00:00  1000990.00   0.00  1000990.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:10:02+00:00  1000990.00   0.00  1000990.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:10:02+00:00  1000990.00   0.00  1000990.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:12:46+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-09-21 16:12:46+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 14:43:01+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 14:58:01+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:08:05+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:21:02+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:36:02+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:36:02+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:36:02+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:36:02+00:00  1001230.00   0.00  1001230.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:36:49+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:36:49+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:36:49+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:40:49+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 15:40:49+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-11-24 16:37:01+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-12 17:35:01+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-12 17:35:01+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-12 17:35:01+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-12 17:35:01+00:00  1001280.00   0.00  1001280.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-12 17:36:39+00:00  1001020.00   0.00  1001020.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-12 17:36:39+00:00  1001020.00   0.00  1001020.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-12 17:36:39+00:00  1001020.00   0.00  1001020.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:02:01+00:00  1001020.00   0.00  1001020.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:02:01+00:00  1001020.00   0.00  1001020.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:02:01+00:00  1001020.00   0.00  1001020.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:02:01+00:00  1001020.00   0.00  1001020.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:04:26+00:00  1001170.00   0.00  1001170.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:04:26+00:00  1001170.00   0.00  1001170.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:04:26+00:00  1001170.00   0.00  1001170.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:05:55+00:00  1001470.00   0.00  1001470.00      USD   XCME-001       MARGIN           USD      []     False   {}
+2022-12-14 18:05:55+00:00  1001470.00   0.00  1001470.00      USD   XCME-001       MARGIN           USD      []     False   {}

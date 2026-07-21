@@ -1,0 +1,26 @@
+{
+  "n_episodes_primary_window": 6898,
+  "n_filled": 6886,
+  "n_pending_entry_canceled": 12,
+  "n_missing_replay_bar": 0,
+  "missing_direction": 0,
+  "missing_session": 0,
+  "missing_baseline_pnl_among_filled_trades": 0,
+  "duplicate_episode_ids": 0,
+  "direction_source": "rebuilt from canonical 'regime' column (0 nulls in F2)",
+  "session_source": "CORRECTED (Phase 1 fix): RTH = 08:30 <= Chicago local time < 15:00, Mon-Fri; ETH = all other times (matches project CLAUDE.md convention; supersedes the prior run's incorrect 09:30-16:00 override)",
+  "baseline_pnl_source": "canonical E0 opposite-regime exit (exit price derived from the cached E0_regime_exit_pnl formula, unaffected by entry delay) paired with a re-derived ENTRY price under the canonical exact-30s decision delay (next 1s-open at/after confirmation_ts+30s). See delayed_entry_audit.parquet for the full expected-vs-actual fill audit and pending_entry_cancellations.parquet for episodes where the opposite flip occurred before activation (kept as explicit non-trade records, PnL=NaN, never dropped or zero-filled).",
+  "session_distribution": {
+    "ETH": 4967,
+    "RTH": 1931
+  },
+  "monthly_counts": {
+    "2025-06": 928,
+    "2025-07": 963,
+    "2025-08": 953,
+    "2025-09": 1089,
+    "2025-10": 1021,
+    "2025-11": 974,
+    "2025-12": 970
+  }
+}

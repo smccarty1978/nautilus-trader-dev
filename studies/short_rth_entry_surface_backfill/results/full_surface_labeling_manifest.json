@@ -1,0 +1,376 @@
+{
+  "decision": "FULL_SURFACE_LABELING_PASS",
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "total_surface_rows": 813972,
+  "total_labeled": 813972,
+  "total_censored": 0,
+  "total_label_errors": 0,
+  "acceptance_gate": {
+    "seq1_parity_exact": true,
+    "all_rows_labeled_or_coded": true,
+    "label_errors_zero_or_explained": true,
+    "data_quality_all_clean": true
+  },
+  "per_year_summary": {
+    "2021": {
+      "year": 2021,
+      "surface_rows": 212241,
+      "rows_labeled": 212241,
+      "rows_censored": 0,
+      "label_errors": 0,
+      "runtime_s": 34.4,
+      "exit_reason_counts": {
+        "confirmation_timeout_exit": 92419,
+        "preflip_policy_stop": 67324,
+        "original_opposing_flip_exit": 49623,
+        "original_stop_after_aligned_flip": 2875
+      },
+      "exit_reason_pct": {
+        "confirmation_timeout_exit": 43.5443670167404,
+        "preflip_policy_stop": 31.720544098454116,
+        "original_opposing_flip_exit": 23.380496699506693,
+        "original_stop_after_aligned_flip": 1.3545921852987877
+      },
+      "exit_reason_net_pnl": {
+        "confirmation_timeout_exit": 1502605.0,
+        "original_opposing_flip_exit": 10710870.0,
+        "original_stop_after_aligned_flip": -684313.5516079731,
+        "preflip_policy_stop": -13894736.772079915
+      },
+      "pre_alignment_stop_rate": 0.3172054409845412,
+      "timeout_rate": 0.43544367016740404,
+      "post_alignment_stop_rate": 0.013545921852987877,
+      "opposing_flip_rate": 0.23380496699506692,
+      "alignment_rate": 0.2473508888480548,
+      "median_time_to_alignment_s": 165.0,
+      "median_hold_time_s": 301.0,
+      "gross_pnl_sum": -243165.32368788891,
+      "net_pnl_sum": -2365575.3236878887,
+      "net_pnl_mean": -11.14570381635918,
+      "net_pnl_std": 296.2963091171667,
+      "mae_atr_median": 0.8905962550268329,
+      "mfe_atr_median": 0.8176448246291661,
+      "mae_atr_p90": 1.3732224948857936,
+      "mfe_atr_p90": 3.2741384496645685,
+      "label_column_nan_rate": {
+        "exit_ts": 0.0,
+        "exit_px": 0.0,
+        "net_pnl": 0.0,
+        "mae_atr": 0.0,
+        "mfe_atr": 0.0
+      },
+      "data_quality_checks": {
+        "negative_hold_time": 0,
+        "exit_before_entry": 0,
+        "alignment_after_exit": 0,
+        "stop_px_wrong_side_for_short": 0,
+        "post_stop_px_wrong_side_for_short": 0,
+        "all_clean": true
+      },
+      "label_error_reason_counts": {},
+      "censor_reason_counts": {}
+    },
+    "2022": {
+      "year": 2022,
+      "surface_rows": 192378,
+      "rows_labeled": 192378,
+      "rows_censored": 0,
+      "label_errors": 0,
+      "runtime_s": 32.9,
+      "exit_reason_counts": {
+        "confirmation_timeout_exit": 78214,
+        "preflip_policy_stop": 65804,
+        "original_opposing_flip_exit": 45984,
+        "original_stop_after_aligned_flip": 2376
+      },
+      "exit_reason_pct": {
+        "confirmation_timeout_exit": 40.65641601430517,
+        "preflip_policy_stop": 34.20557444198401,
+        "original_opposing_flip_exit": 23.902941084739417,
+        "original_stop_after_aligned_flip": 1.2350684589714
+      },
+      "exit_reason_net_pnl": {
+        "confirmation_timeout_exit": 4781165.0,
+        "original_opposing_flip_exit": 17628245.0,
+        "original_stop_after_aligned_flip": -1005306.7497575544,
+        "preflip_policy_stop": -22842169.462207586
+      },
+      "pre_alignment_stop_rate": 0.3420557444198401,
+      "timeout_rate": 0.4065641601430517,
+      "post_alignment_stop_rate": 0.012350684589714,
+      "opposing_flip_rate": 0.23902941084739418,
+      "alignment_rate": 0.2513800954371082,
+      "median_time_to_alignment_s": 165.0,
+      "median_hold_time_s": 301.0,
+      "gross_pnl_sum": 485713.78803486354,
+      "net_pnl_sum": -1438066.211965136,
+      "net_pnl_mean": -7.475211364943684,
+      "net_pnl_std": 500.0437726235861,
+      "mae_atr_median": 0.9336423434569177,
+      "mfe_atr_median": 0.8684195121739198,
+      "mae_atr_p90": 1.370784365280494,
+      "mfe_atr_p90": 3.307486104475027,
+      "label_column_nan_rate": {
+        "exit_ts": 0.0,
+        "exit_px": 0.0,
+        "net_pnl": 0.0,
+        "mae_atr": 0.0,
+        "mfe_atr": 0.0
+      },
+      "data_quality_checks": {
+        "negative_hold_time": 0,
+        "exit_before_entry": 0,
+        "alignment_after_exit": 0,
+        "stop_px_wrong_side_for_short": 0,
+        "post_stop_px_wrong_side_for_short": 0,
+        "all_clean": true
+      },
+      "label_error_reason_counts": {},
+      "censor_reason_counts": {}
+    },
+    "2023": {
+      "year": 2023,
+      "surface_rows": 204742,
+      "rows_labeled": 204742,
+      "rows_censored": 0,
+      "label_errors": 0,
+      "runtime_s": 33.6,
+      "exit_reason_counts": {
+        "confirmation_timeout_exit": 85752,
+        "preflip_policy_stop": 70070,
+        "original_opposing_flip_exit": 46691,
+        "original_stop_after_aligned_flip": 2229
+      },
+      "exit_reason_pct": {
+        "confirmation_timeout_exit": 41.88295513377812,
+        "preflip_policy_stop": 34.22355940647254,
+        "original_opposing_flip_exit": 22.80479823387483,
+        "original_stop_after_aligned_flip": 1.0886872258745153
+      },
+      "exit_reason_net_pnl": {
+        "confirmation_timeout_exit": 2238890.0,
+        "original_opposing_flip_exit": 11742345.0,
+        "original_stop_after_aligned_flip": -594840.7050583346,
+        "preflip_policy_stop": -16178357.321145708
+      },
+      "pre_alignment_stop_rate": 0.34223559406472537,
+      "timeout_rate": 0.4188295513377812,
+      "post_alignment_stop_rate": 0.010886872258745153,
+      "opposing_flip_rate": 0.2280479823387483,
+      "alignment_rate": 0.23893485459749342,
+      "median_time_to_alignment_s": 165.0,
+      "median_hold_time_s": 301.0,
+      "gross_pnl_sum": -744543.0262040428,
+      "net_pnl_sum": -2791963.026204043,
+      "net_pnl_mean": -13.636493861562567,
+      "net_pnl_std": 323.1598199100235,
+      "mae_atr_median": 0.9336302223033213,
+      "mfe_atr_median": 0.8460492462562652,
+      "mae_atr_p90": 1.3780586258546166,
+      "mfe_atr_p90": 3.2351618898695413,
+      "label_column_nan_rate": {
+        "exit_ts": 0.0,
+        "exit_px": 0.0,
+        "net_pnl": 0.0,
+        "mae_atr": 0.0,
+        "mfe_atr": 0.0
+      },
+      "data_quality_checks": {
+        "negative_hold_time": 0,
+        "exit_before_entry": 0,
+        "alignment_after_exit": 0,
+        "stop_px_wrong_side_for_short": 0,
+        "post_stop_px_wrong_side_for_short": 0,
+        "all_clean": true
+      },
+      "label_error_reason_counts": {},
+      "censor_reason_counts": {}
+    },
+    "2024": {
+      "year": 2024,
+      "surface_rows": 204611,
+      "rows_labeled": 204611,
+      "rows_censored": 0,
+      "label_errors": 0,
+      "runtime_s": 32.9,
+      "exit_reason_counts": {
+        "confirmation_timeout_exit": 91819,
+        "preflip_policy_stop": 68973,
+        "original_opposing_flip_exit": 42338,
+        "original_stop_after_aligned_flip": 1481
+      },
+      "exit_reason_pct": {
+        "confirmation_timeout_exit": 44.874908973613344,
+        "preflip_policy_stop": 33.70933136537136,
+        "original_opposing_flip_exit": 20.691947158266174,
+        "original_stop_after_aligned_flip": 0.723812502749119
+      },
+      "exit_reason_net_pnl": {
+        "confirmation_timeout_exit": 2373105.0,
+        "original_opposing_flip_exit": 12740970.0,
+        "original_stop_after_aligned_flip": -440892.6809429751,
+        "preflip_policy_stop": -19029397.264078096
+      },
+      "pre_alignment_stop_rate": 0.33709331365371364,
+      "timeout_rate": 0.4487490897361334,
+      "post_alignment_stop_rate": 0.0072381250274911905,
+      "opposing_flip_rate": 0.20691947158266175,
+      "alignment_rate": 0.21415759661015293,
+      "median_time_to_alignment_s": 170.0,
+      "median_hold_time_s": 301.0,
+      "gross_pnl_sum": -2310104.945021073,
+      "net_pnl_sum": -4356214.945021072,
+      "net_pnl_mean": -21.29022850687926,
+      "net_pnl_std": 358.12001297855085,
+      "mae_atr_median": 0.9180637121218264,
+      "mfe_atr_median": 0.83049454312768,
+      "mae_atr_p90": 1.3613697962051203,
+      "mfe_atr_p90": 3.2862403924282075,
+      "label_column_nan_rate": {
+        "exit_ts": 0.0,
+        "exit_px": 0.0,
+        "net_pnl": 0.0,
+        "mae_atr": 0.0,
+        "mfe_atr": 0.0
+      },
+      "data_quality_checks": {
+        "negative_hold_time": 0,
+        "exit_before_entry": 0,
+        "alignment_after_exit": 0,
+        "stop_px_wrong_side_for_short": 0,
+        "post_stop_px_wrong_side_for_short": 0,
+        "all_clean": true
+      },
+      "label_error_reason_counts": {},
+      "censor_reason_counts": {}
+    }
+  },
+  "seq1_parity": {
+    "2021": {
+      "year": 2021,
+      "seq1_rows": 1762,
+      "checked": 1762,
+      "matches": 1762,
+      "mismatches": 0,
+      "examples": [],
+      "note": "The original seq-1 feasibility check (smoke_2021_surface.py / run_year_backfill.py) persisted only aggregate stats, not per-row exit_reason/net_pnl -- so this gate checks that every seq-1 key is present and labelable in the full run, and separately re-verifies the AGGREGATE seq-1-subset exit-reason distribution and net PnL against the original manifest (see 'seq1_aggregate_reconciliation')."
+    },
+    "2022": {
+      "year": 2022,
+      "seq1_rows": 1711,
+      "checked": 1711,
+      "matches": 1711,
+      "mismatches": 0,
+      "examples": [],
+      "note": "The original seq-1 feasibility check (smoke_2021_surface.py / run_year_backfill.py) persisted only aggregate stats, not per-row exit_reason/net_pnl -- so this gate checks that every seq-1 key is present and labelable in the full run, and separately re-verifies the AGGREGATE seq-1-subset exit-reason distribution and net PnL against the original manifest (see 'seq1_aggregate_reconciliation')."
+    },
+    "2023": {
+      "year": 2023,
+      "seq1_rows": 1732,
+      "checked": 1732,
+      "matches": 1732,
+      "mismatches": 0,
+      "examples": [],
+      "note": "The original seq-1 feasibility check (smoke_2021_surface.py / run_year_backfill.py) persisted only aggregate stats, not per-row exit_reason/net_pnl -- so this gate checks that every seq-1 key is present and labelable in the full run, and separately re-verifies the AGGREGATE seq-1-subset exit-reason distribution and net PnL against the original manifest (see 'seq1_aggregate_reconciliation')."
+    },
+    "2024": {
+      "year": 2024,
+      "seq1_rows": 1672,
+      "checked": 1672,
+      "matches": 1672,
+      "mismatches": 0,
+      "examples": [],
+      "note": "The original seq-1 feasibility check (smoke_2021_surface.py / run_year_backfill.py) persisted only aggregate stats, not per-row exit_reason/net_pnl -- so this gate checks that every seq-1 key is present and labelable in the full run, and separately re-verifies the AGGREGATE seq-1-subset exit-reason distribution and net PnL against the original manifest (see 'seq1_aggregate_reconciliation')."
+    }
+  },
+  "seq1_aggregate_reconciliation": {
+    "2021": {
+      "year": 2021,
+      "seq1_subset_size": 1762,
+      "seq1_subset_labeled": 1762,
+      "new_exit_reason_counts": {
+        "confirmation_timeout_exit": 872,
+        "preflip_policy_stop": 606,
+        "original_opposing_flip_exit": 279,
+        "original_stop_after_aligned_flip": 5
+      },
+      "orig_exit_reason_counts": {
+        "confirmation_timeout_exit": 872,
+        "preflip_policy_stop": 606,
+        "original_opposing_flip_exit": 279,
+        "original_stop_after_aligned_flip": 5
+      },
+      "new_net_pnl_sum": -6618.837564832902,
+      "orig_net_pnl_sum": -6618.837564832902,
+      "exact_match": true
+    },
+    "2022": {
+      "year": 2022,
+      "seq1_subset_size": 1711,
+      "seq1_subset_labeled": 1711,
+      "new_exit_reason_counts": {
+        "confirmation_timeout_exit": 798,
+        "preflip_policy_stop": 645,
+        "original_opposing_flip_exit": 261,
+        "original_stop_after_aligned_flip": 7
+      },
+      "orig_exit_reason_counts": {
+        "confirmation_timeout_exit": 798,
+        "preflip_policy_stop": 645,
+        "original_opposing_flip_exit": 261,
+        "original_stop_after_aligned_flip": 7
+      },
+      "new_net_pnl_sum": -27041.74443965021,
+      "orig_net_pnl_sum": -27041.74443965021,
+      "exact_match": true
+    },
+    "2023": {
+      "year": 2023,
+      "seq1_subset_size": 1732,
+      "seq1_subset_labeled": 1732,
+      "new_exit_reason_counts": {
+        "confirmation_timeout_exit": 822,
+        "preflip_policy_stop": 610,
+        "original_opposing_flip_exit": 292,
+        "original_stop_after_aligned_flip": 8
+      },
+      "orig_exit_reason_counts": {
+        "confirmation_timeout_exit": 822,
+        "preflip_policy_stop": 610,
+        "original_opposing_flip_exit": 292,
+        "original_stop_after_aligned_flip": 8
+      },
+      "new_net_pnl_sum": -4764.067450264265,
+      "orig_net_pnl_sum": -4764.067450264265,
+      "exact_match": true
+    },
+    "2024": {
+      "year": 2024,
+      "seq1_subset_size": 1672,
+      "seq1_subset_labeled": 1672,
+      "new_exit_reason_counts": {
+        "confirmation_timeout_exit": 848,
+        "preflip_policy_stop": 566,
+        "original_opposing_flip_exit": 251,
+        "original_stop_after_aligned_flip": 7
+      },
+      "orig_exit_reason_counts": {
+        "confirmation_timeout_exit": 848,
+        "preflip_policy_stop": 566,
+        "original_opposing_flip_exit": 251,
+        "original_stop_after_aligned_flip": 7
+      },
+      "new_net_pnl_sum": -10086.320966768035,
+      "orig_net_pnl_sum": -10086.320966768035,
+      "exact_match": true
+    }
+  },
+  "combined_output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\results\\training_surface_2021_2024_labeled.parquet",
+  "combined_output_sha256": "6d0a801774fda2b84bc04325e44511a374538e6f570f5c0dd70419eb588bc756",
+  "generator_sha256": "7db671e13c49cf515c2b2855e7adf950ae3a48ada8d8ac8843d1f79c5d88e7e4"
+}

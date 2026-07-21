@@ -1,0 +1,38 @@
+{
+  "status": "FROZEN_AFTER_STAGE1_BEFORE_POLICY_SIMULATION",
+  "selection_source": "2025_only",
+  "preflip_policy_test": null,
+  "preflip_branch_reason": "closed: no candidate preserved 95% of reached-flip 2025 trades",
+  "postflip_policy_test": {
+    "policy_id": "POSTFLIP_ARM_1P0_FLOOR_0P25",
+    "arm_postflip_entry_anchored_mfe_atr": 1.0,
+    "retained_profit_floor_atr": 0.25,
+    "activation": "next 1-second bar after arm-reaching bar",
+    "same_bar_rule": "original 1.5 ATR stop is loss-first on the arm-reaching bar",
+    "active_floor_fill": "gap through floor fills at bar open; otherwise floor price",
+    "scheduled_exit_priority": "original opposing-flip boundary open exits before that bar range"
+  },
+  "unchanged": {
+    "entry_set": "original repaired CODEX 5.X executed trades",
+    "entry_price": "stored explicit next 1-second open",
+    "original_stop_atr": 1.5,
+    "cost_rt_usd": 10.0,
+    "multiplier_usd_per_point": 20.0,
+    "fallback_exit": "original opposing regime flip"
+  },
+  "stage1_sha256": {
+    "manifest": "0ace2f04291d882e8b0ea5847b61ad04b4c344213f261a4c1f8557051ad9e9e5",
+    "pre_flip_mae": "bf54c16d3916704ff8c283d7f76b2d5771e7f32f9aa505ae0a57663a5f4c6f2d",
+    "pre_stop_mfe": "143191ec94b3f153dccdc2c50be8ffd948da1aee00b844369b827fb95c091f5f",
+    "post_flip_giveback": "bfa305e0eaec6e5daea7603a2a07ea1375d1ac1c925abeea9e9990b398b730fa",
+    "completion_audit": "94275609227fe9513b1518faf2893f710d20130dccb4579f62382ce16ccb6c86"
+  },
+  "stage2_input_sha256": {
+    "2025_raw": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+    "2025_trades": "149e2b039935a9dbf61cb2a0ff416ef0550f95e94c61a278b1a56998c718ef2e",
+    "2026_raw": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+    "2026_trades": "1bfe5696c24b990ee4ad693abfe707315fa92b7195837f193af32e6c0c062c83",
+    "repair_runner": "70d4dbad865fa52ed1d054941562f76f1ba4009edc8f693169c1044e2a5bf633",
+    "repair_common": "302fab7b64178ee7626300048e9d1b66ab04b64c4a429a3fcbcd48175523e1c7"
+  }
+}

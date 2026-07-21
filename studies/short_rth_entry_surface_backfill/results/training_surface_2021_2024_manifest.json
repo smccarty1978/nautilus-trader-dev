@@ -1,0 +1,245 @@
+{
+  "decision": "BACKFILL_TRAINING_SURFACE_READY",
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "combined_row_count": 813972,
+  "surface_rows_by_year": {
+    "2021": 212241,
+    "2022": 192378,
+    "2023": 204742,
+    "2024": 204611
+  },
+  "candidates_by_year": {
+    "2021": 1762,
+    "2022": 1711,
+    "2023": 1732,
+    "2024": 1672
+  },
+  "labels_by_year": {
+    "2021": 1762,
+    "2022": 1711,
+    "2023": 1732,
+    "2024": 1672
+  },
+  "label_errors_by_year": {
+    "2021": 0,
+    "2022": 0,
+    "2023": 0,
+    "2024": 0
+  },
+  "exit_reason_counts_by_year": {
+    "2021": {
+      "confirmation_timeout_exit": 872,
+      "preflip_policy_stop": 606,
+      "original_opposing_flip_exit": 279,
+      "original_stop_after_aligned_flip": 5
+    },
+    "2022": {
+      "confirmation_timeout_exit": 798,
+      "preflip_policy_stop": 645,
+      "original_opposing_flip_exit": 261,
+      "original_stop_after_aligned_flip": 7
+    },
+    "2023": {
+      "confirmation_timeout_exit": 822,
+      "preflip_policy_stop": 610,
+      "original_opposing_flip_exit": 292,
+      "original_stop_after_aligned_flip": 8
+    },
+    "2024": {
+      "confirmation_timeout_exit": 848,
+      "preflip_policy_stop": 566,
+      "original_opposing_flip_exit": 251,
+      "original_stop_after_aligned_flip": 7
+    }
+  },
+  "exit_reason_pnl_by_year": {
+    "2021": {
+      "confirmation_timeout_exit": 25385.0,
+      "original_opposing_flip_exit": 92730.0,
+      "original_stop_after_aligned_flip": -1015.3373589719558,
+      "preflip_policy_stop": -123718.50020586094
+    },
+    "2022": {
+      "confirmation_timeout_exit": 75510.0,
+      "original_opposing_flip_exit": 126110.0,
+      "original_stop_after_aligned_flip": -2816.6498976882212,
+      "preflip_policy_stop": -225845.09454196197
+    },
+    "2023": {
+      "confirmation_timeout_exit": 34310.0,
+      "original_opposing_flip_exit": 101975.0,
+      "original_stop_after_aligned_flip": -1609.603350173602,
+      "preflip_policy_stop": -139439.46410009067
+    },
+    "2024": {
+      "confirmation_timeout_exit": 33740.0,
+      "original_opposing_flip_exit": 114630.0,
+      "original_stop_after_aligned_flip": -1390.4069806843472,
+      "preflip_policy_stop": -157065.9139860837
+    }
+  },
+  "feature_completeness_by_year": {
+    "2021": {
+      "expected_feature_columns": 149,
+      "present_feature_columns": 149,
+      "missing_feature_columns": [],
+      "overall_nan_rate": 0.00017101714303633967,
+      "surface_row_nan_rate": 1.0782980687175643e-05,
+      "top10_nan_rate_columns": {
+        "activity_duration_median_30m": 0.0005590597489106798,
+        "seq_12r_position_pct": 0.00041860009215770284,
+        "seq_12r_dist_to_high_atr": 0.00041860009215770284,
+        "seq_12r_dist_to_low_atr": 0.00041860009215770284,
+        "seq_12r_range_atr": 0.00041860009215770284,
+        "seq_12r_perfect_alternation": 0.00041860009215770284,
+        "seq_12r_efficiency": 0.00041860009215770284,
+        "seq_12r_disp_atr": 0.00041860009215770284,
+        "seq_12r_mean_overlap": 0.00041860009215770284,
+        "seq_12r_median_overlap": 0.00041860009215770284
+      }
+    },
+    "2022": {
+      "expected_feature_columns": 149,
+      "present_feature_columns": 149,
+      "missing_feature_columns": [],
+      "overall_nan_rate": 0.00024939952126805766,
+      "surface_row_nan_rate": 1.0151993129298507e-05,
+      "top10_nan_rate_columns": {
+        "activity_duration_median_30m": 0.0005975646270063808,
+        "seq_12r_position_pct": 0.000554827249958527,
+        "seq_12r_dist_to_high_atr": 0.000554827249958527,
+        "seq_12r_dist_to_low_atr": 0.000554827249958527,
+        "seq_12r_range_atr": 0.000554827249958527,
+        "seq_12r_perfect_alternation": 0.000554827249958527,
+        "seq_12r_efficiency": 0.000554827249958527,
+        "seq_12r_disp_atr": 0.000554827249958527,
+        "seq_12r_mean_overlap": 0.000554827249958527,
+        "seq_12r_median_overlap": 0.000554827249958527
+      }
+    },
+    "2023": {
+      "expected_feature_columns": 149,
+      "present_feature_columns": 149,
+      "missing_feature_columns": [],
+      "overall_nan_rate": 0.00017651492853053727,
+      "surface_row_nan_rate": 1.1735181661595516e-05,
+      "top10_nan_rate_columns": {
+        "activity_duration_median_30m": 0.0005714636673206947,
+        "seq_12r_position_pct": 0.00044913354127769774,
+        "seq_12r_dist_to_high_atr": 0.00044913354127769774,
+        "seq_12r_dist_to_low_atr": 0.00044913354127769774,
+        "seq_12r_range_atr": 0.00044913354127769774,
+        "seq_12r_perfect_alternation": 0.00044913354127769774,
+        "seq_12r_efficiency": 0.00044913354127769774,
+        "seq_12r_disp_atr": 0.00044913354127769774,
+        "seq_12r_mean_overlap": 0.00044913354127769774,
+        "seq_12r_median_overlap": 0.00044913354127769774
+      }
+    },
+    "2024": {
+      "expected_feature_columns": 149,
+      "present_feature_columns": 149,
+      "missing_feature_columns": [],
+      "overall_nan_rate": 0.00021661015309188281,
+      "surface_row_nan_rate": 1.3448337833005036e-05,
+      "top10_nan_rate_columns": {
+        "activity_duration_median_30m": 0.0006475976111069598,
+        "seq_12r_position_pct": 0.00046358635897138727,
+        "seq_12r_dist_to_high_atr": 0.00046358635897138727,
+        "seq_12r_dist_to_low_atr": 0.00046358635897138727,
+        "seq_12r_range_atr": 0.00046358635897138727,
+        "seq_12r_perfect_alternation": 0.00046358635897138727,
+        "seq_12r_efficiency": 0.00046358635897138727,
+        "seq_12r_disp_atr": 0.00046358635897138727,
+        "seq_12r_mean_overlap": 0.00046358635897138727,
+        "seq_12r_median_overlap": 0.00046358635897138727
+      }
+    }
+  },
+  "feature_schema_hash": "846ead21e7bc8d78f225571e43a371e200a17ee0904a3560e058ecaccff0db93",
+  "feature_schema_stable_across_years": true,
+  "schema_by_year": {
+    "2021": {
+      "present_feature_columns": 149,
+      "matches_expected": true
+    },
+    "2022": {
+      "present_feature_columns": 149,
+      "matches_expected": true
+    },
+    "2023": {
+      "present_feature_columns": 149,
+      "matches_expected": true
+    },
+    "2024": {
+      "present_feature_columns": 149,
+      "matches_expected": true
+    }
+  },
+  "rth_boundary_divergence_by_year": {
+    "2021": {
+      "checkpoints": 121,
+      "regimes": 1
+    },
+    "2022": {
+      "checkpoints": 0,
+      "regimes": 0
+    },
+    "2023": {
+      "checkpoints": 0,
+      "regimes": 0
+    },
+    "2024": {
+      "checkpoints": 62,
+      "regimes": 2
+    }
+  },
+  "raw_gaps_over_300s_by_year": {
+    "2021": 379,
+    "2022": 257,
+    "2023": 257,
+    "2024": 258
+  },
+  "causal_violations_by_year": {
+    "2021": 0,
+    "2022": 0,
+    "2023": 0,
+    "2024": 0
+  },
+  "acceptance_gate": {
+    "atlas_rebuilds_complete": true,
+    "zero_causal_critical_violations": true,
+    "all_expected_feature_columns_present": true,
+    "policy_a_labels_zero_errors": true,
+    "fill_time_rth_convention_preserved": true,
+    "schema_stable_across_years": true,
+    "no_unexplained_intraday_gaps_reviewed": true
+  },
+  "input_atlas_sha256": {
+    "2021": "d156e5e6d157daa88f283aacc60807d23dfb265c4f0f52f52c685d1391743c86",
+    "2022": "eaa9010ef2176ada027340ec83ca2e5392954a183b71430f759f597b5a371831",
+    "2023": "cc0b55ae76cada5cb7c8ca270bc47036d0b41d6c9845ae045ca31a1c6284523a",
+    "2024": "230855ac68201c95c71d8d935a9d4486eca1d39680f5a828ae0b0d5d972d6cfe"
+  },
+  "input_surface_sha256": {
+    "2021": "b3f0beedfb60d390017ce2d7d44acc010f66ec324ea31aaf93069e0065fdeea9",
+    "2022": "6b3637c50a69941e6209b8f98d18517e131eb609ac9d5e83810b685ec9789e1b",
+    "2023": "5b9096400e7dac90db09fd0c78be8e6242ee559e18419c815003416292458ff3",
+    "2024": "0e714fd6881f7a73ca6668d6b335820dea2d5b886102bb52f841ee3366c7c9dd"
+  },
+  "policy_sha256": "1a22e4adaf7ebf141cb9b9011c4b5d05f7da8b0de7130ee4f7f7bcea7bc77c5b",
+  "generator_sha256": {
+    "entry_surface": "474d3d2494b3bcf2481ea342c5a9bdca70ab9d70bacd814127aa8c51c38ee476",
+    "build_5s_atlas_smoke": "e61097e0e8812bed97226da8c45994845edd7463181d7c7795e4d9eb53a3bc0a",
+    "run_year_backfill": "f40ac2c66933a6a768c68d972e51d81c4bbfc2521102738befdc9c8baa6d586f",
+    "smoke_2021_surface": "0dd79445c2616bc36a17e9e03a42a9eb8248c0b7163d75f2ec9761ec6fb620c0",
+    "assemble_training_surface": "21658a8cf51dd5594d6aeeefe0bfae9982069b2c7f7ec53deb6d836e7dc8f735"
+  },
+  "combined_surface_output_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\short_rth_entry_surface_backfill\\_work\\training_surface_2021_2024.parquet",
+  "combined_surface_output_sha256": "4382fa0b06db44717c8f4f026a837edce6c9e88707c4c2dd2e8b14be7e7efc17"
+}

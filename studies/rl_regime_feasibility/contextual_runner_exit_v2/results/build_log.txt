@@ -1,0 +1,14 @@
+======================================================================
+Phase 2 — build full MTF context
+======================================================================
+  checkpoints (train+val+test): 3,694,220
+  [load_1s_full] 17,477,465 bars in 9.2s [2023-12-30 00:00:00 .. 2025-06-05 00:00:00]
+  building families A-E (returns/slope/efficiency/extremes/vol/volume) ...
+    102 context columns
+  building family F (structural) ...
+    20 structural columns
+  building family G (pullback history) ...
+    6 pullback columns
+  wrote feature_provenance_audit.json
+  wrote full_mtf_feature_contract.json
+  wrote full_context_features.parquet (3,694,220 x 133)

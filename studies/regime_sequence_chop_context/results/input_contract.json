@@ -1,0 +1,88 @@
+{
+  "nq_multiplier": 20.0,
+  "nq_tick_size": 0.25,
+  "cat_stop_atr": 1.5,
+  "data_sources": [
+    {
+      "filename": "NQ_v0_1s_2016.parquet",
+      "row_count": 6352832,
+      "start_time": "2016-01-03 23:00:00+00:00",
+      "end_time": "2016-12-30 21:59:58+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2017.parquet",
+      "row_count": 6001165,
+      "start_time": "2017-01-02 23:00:00+00:00",
+      "end_time": "2017-12-29 21:59:59+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2018.parquet",
+      "row_count": 9838254,
+      "start_time": "2018-01-01 23:00:00+00:00",
+      "end_time": "2018-12-30 23:59:56+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2019.parquet",
+      "row_count": 10491068,
+      "start_time": "2019-01-01 23:00:00+00:00",
+      "end_time": "2019-12-30 23:59:37+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2020.parquet",
+      "row_count": 12791391,
+      "start_time": "2020-01-01 23:00:00+00:00",
+      "end_time": "2020-12-30 23:59:55+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2021.parquet",
+      "row_count": 11908368,
+      "start_time": "2021-01-03 23:00:00+00:00",
+      "end_time": "2021-12-30 23:59:57+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2022.parquet",
+      "row_count": 13312875,
+      "start_time": "2022-01-02 23:00:00+00:00",
+      "end_time": "2022-12-30 21:59:59+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2023.parquet",
+      "row_count": 12217236,
+      "start_time": "2023-01-02 23:00:00+00:00",
+      "end_time": "2023-12-29 21:59:58+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2024.parquet",
+      "row_count": 12021665,
+      "start_time": "2024-01-01 23:00:00+00:00",
+      "end_time": "2024-12-30 23:59:59+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2025.parquet",
+      "row_count": 12083801,
+      "start_time": "2025-01-01 23:00:00+00:00",
+      "end_time": "2025-12-30 23:59:52+00:00"
+    },
+    {
+      "filename": "NQ_v0_1s_2026_ytd.parquet",
+      "row_count": 4255466,
+      "start_time": "2026-01-01 23:00:00+00:00",
+      "end_time": "2026-04-29 23:59:59+00:00"
+    }
+  ],
+  "commission_rt": 5.0,
+  "slippage_scenarios": {
+    "base": {
+      "entry_ticks": 0.0,
+      "stop_ticks": 0.0
+    },
+    "base_plus_1t": {
+      "entry_ticks": 1.0,
+      "stop_ticks": 1.0
+    },
+    "base_plus_2t": {
+      "entry_ticks": 2.0,
+      "stop_ticks": 2.0
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "threshold_status": "PARTIAL_FROM_SOURCE",
+  "threshold_source": "studies/nt_reduced_f3_top25_population_parity_smoke/config/frozen_thresholds.json",
+  "threshold_source_sha256": "f5a4a62deccc504c838b257b93bfd89f7475be39db70271bb4c383ad54ad8e01",
+  "threshold_selection_year": 2025,
+  "threshold_selection_rule": "np.quantile(scores, 0.95) and np.quantile(scores, 0.975) over the complete 2025 population; never tuned on March",
+  "top20_cutoff": null,
+  "top15_cutoff": null,
+  "top10_cutoff": null,
+  "top5_cutoff": 0.4962425079016764,
+  "top2p5_cutoff": 0.5606134281146,
+  "not_provided_note": "top20/top15/top10 were NEVER selected upstream. Left null - not invented, not recomputed.",
+  "selected_trigger_variants_using_this_model": [
+    "nt_reduced_f3_top25_population_parity_smoke (march_bounded_r5)"
+  ]
+}

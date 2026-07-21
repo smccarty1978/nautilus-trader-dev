@@ -1,0 +1,17 @@
+{
+  "label": "nq_24_to_25",
+  "train_tags": [
+    "NQ_2024"
+  ],
+  "test_tags": [
+    "NQ_2025"
+  ],
+  "train_n": 298794,
+  "test_n": 293260,
+  "lgbm_exit_now_better_than_hold_auc": 0.5317575932870092,
+  "logreg_exit_now_better_than_hold_auc": 0.5349357228748086,
+  "lgbm_future_giveback_risk_auc": 0.7908641578450463,
+  "logreg_future_giveback_risk_auc": 0.7256998347895786,
+  "lgbm_remaining_ev_atr_corr": 0.006531241079934773,
+  "lgbm_remaining_ev_atr_rmse": 3.1113545807776632
+}

@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "authorized_action": "sealed CODEX 5.X repaired 2026 atlas build and frozen W4 evaluation only",
+  "authorization_utc": "2026-07-13T23:57:29.844601+00:00",
+  "manifest_sha256": "2b0cc6d0ffd7fdcf28f29a0a73e973fd6b5bc0a797121f23430d220e03dd2180",
+  "bundle_sha256": "cd1243dc0dc0bd37f1141d9d42a732cf5d7e52fa900536f7b64b9acecb9dc237",
+  "audit_report": "CODEX_5_X_pre_2026_freeze_audit.md",
+  "audit_report_sha256": "fdedc7a172e7fd9bca2387577128651f4fcc717827b31327a48157fff0ea0590",
+  "findings": {
+    "critical": 0,
+    "warning": 0
+  },
+  "frozen_contract": {
+    "selected_structure": "directional_pair",
+    "train_years": [2021, 2022, 2023, 2024],
+    "selection_window": "2025-H1 exact regime-purged",
+    "calibration_window": "2025-H2 exact regime-purged",
+    "threshold_long": 0.6883498713708196,
+    "threshold_short": 0.7183653372722797,
+    "base_feature_count": 154,
+    "seed": 42
+  },
+  "restrictions": [
+    "2026 may not alter model structure, features, calibrators, thresholds, filters, stops, exits, or any parameter",
+    "access must occur through require_frozen_pre_2026_contract and the immutable first-open ledger",
+    "policy execution is not authorized by this artifact"
+  ]
+}
