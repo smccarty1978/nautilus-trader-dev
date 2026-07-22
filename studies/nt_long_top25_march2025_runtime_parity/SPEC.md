@@ -2,11 +2,14 @@
 
 ## Status
 
-**IN PROGRESS.** Phase 0 (offline reference) is complete and **all three**
-blocking feasibility unknowns are resolved with evidence — including exact
-offline-vs-live equivalence for every one of the 25 features. Phases 1–5 (live
-NT run and reconciliation) are **not yet executed** — no parity claim is made
-and no adjudication label is assigned.
+**LAYER A CLOSED — `LONG_MARCH_2025_RUNTIME_PARITY_PARTIAL`.** Phases 0–3 are
+executed over full March 2025 in a real `BacktestEngine`
+(`results/reconciliation_layerA_v2.json`): Phase 2 **25/25 features exact
+(0.0)** and Phase 3 **score exact (2.22e-16)** on 15,131 matched rows. Phase 1
+population parity is **99.32%, not exact**, and Phases 4–5 (Layer B) have not
+run — hence PARTIAL, not PASS. Production-threshold status remains
+**NOT_SELECTED**. See `STUDY_REPORT.md`; the conventions that had to be
+reproduced to get here are findings 4 and 5 below.
 
 ## Objective
 
@@ -143,6 +146,62 @@ Incidental: `MedianCenterTracker.completed_regimes` is `deque(maxlen=300)`, so a
 live-vs-offline regime *count* gap (300 vs 1,348) is expected and harmless —
 300 is far more than `seq_12r` needs.
 
+### 4. The offline replay's minute bar is NOT the minute (root cause, measured)
+
+`attach_features_long.py` imports `attach_features.minute_bucket_key` verbatim
+— deliberately, "so the CRIT-1 minute-bucketing fix cannot silently drift":
+
+```python
+def minute_bucket_key(bar_ts: int) -> int:
+    return (bar_ts - 1) // (60 * NS)      # written for CLOSE-labelled bars
+```
+
+That rule is correct for bars covering `(ts-1s, ts]`. But the same file's own
+header states the raw 1s bars are **OPEN-labelled** (`ts` covers `[ts, ts+1s)`)
+— that is the entire justification for its change 3. Applied to open-labelled
+bars the bucket becomes `(m-60s, m]`: the synthesized "minute closing at `m`"
+holds the bars at `m-59s … m`, **shifted +1 second** from the true minute
+`[m-60s, m)`, and its rollover fires at the bar `ts == m+1s`, not `ts == m`.
+
+Consequences the live engine must reproduce:
+
+| | offline | naive live |
+|---|---|---|
+| minute closing at `m` contains | bars `(m-60s, m]` | bars `[m-60s, m)` |
+| rollover fires at bar | `m + 1s` | `m` |
+| price levels / RTH accumulators driven by | re-aggregated 1s bars | catalog 1m bar |
+
+**Measured proof** (2025-03-03, first two RTH checkpoints). The offline
+reference's `rth_vol_cum` is 1180 at 08:30:05 and 5253 at 08:31:05. Summing raw
+1s volume over `(08:29:00, 08:30:00]` gives **1180** and over
+`(08:29:00, 08:31:00]` gives **5253** — exact. The true-minute reading gives 706
+and 5226, which is precisely what the live run produced.
+
+This is **not** a look-ahead. The newest bar folded in (`ts == m`) covers
+`[m, m+1s)`; a snapshot that can see it is taken at a snap bar `S >= m` for an
+observation `O > S`, so `m + 1s <= O`. It is a labelling quirk, and it is
+causally implementable live.
+
+It also explains the 12 offline-null rows in `rth_elapsed_seconds`,
+`rth_vol_cum` and `opening_range_30m_low_developing_*`: at an observation of
+exactly 08:30:00 the offline rollover (due at 08:30:01) has not run, so RTH has
+not opened yet.
+
+The earlier hypothesis — that the gap was the *values* passed to `update_1m`
+(1s-aggregated OHLC vs the catalog 1m bar's) — was **tested and refuted**: over
+2025-02-25 → 2025-03-04 the two agree on 7,259 of 7,260 minutes, and catalog 1s
+is byte-identical to the raw 1s file. The gap was never the values; it was the
+bucket boundary and the rollover position.
+
+### 5. Two RTH rules, deliberately
+
+The offline attach imports `is_rth` from
+`CODEX_5_X_run_established_fade.py:146`, which ends RTH at **15:00** Chicago.
+The study's decision/fill rule is **15:15**. Both are live now:
+`common.is_rth_feature_minute` (features) vs `common.is_rth_minute_of_day`
+(population). Collapsing them leaves `rth_vol_cum` populated for 15 minutes
+after the offline reference has gone null.
+
 ## Causality contract
 
 1s bars before coincident 1m bars via `add_bars_causal_order()`. At every
@@ -172,18 +231,100 @@ March candidates require prior state (`seq_12r` needs 12 completed regimes;
 **2025-02-01** with candidate emission gated to the March Chicago window; the
 exact loaded range goes in `run_manifest.json`.
 
-## Remaining phases (not executed)
+## Live engine ownership (the contract that had to change)
 
-1. Candidate-population parity (live ledger + reconciliation, displacement buckets).
-2. Feature parity (per-feature summary; `seq_*` highest risk).
-3. Logistic score parity — joblib vs explicit `intercept + Σ(coef·x)`, tol 1e-10.
-4. Provisional trigger parity (`PROVISIONAL_PARITY_HARNESS_ONLY`).
-5. Order/fill/trade parity — fixed 1.25×ATR stop frozen at entry, never trailed;
-   exit on stop or opposing flip only.
+| concern | owner | driven by |
+|---|---|---|
+| regime series (`close_ts <= t`) | `RegimeEngine`, `strategy._on_1m` | the **1m** feed |
+| median-center / `seq_*` | `MedianCenterTracker` | 1s bars + the immediate regime int |
+| minute buckets, price levels, RTH + regime accumulators | `LongFeatureEngine` | the **1s** stream, `minute_bucket_key` |
+| running 1m ATR for center features | `strategy._center_atr_at_snap` | pinned to the snap bar |
 
-Then: focused tests, `lookahead-auditor` to **0 CRITICAL / 0 WARNING**.
+`LongFeatureEngine` exposes **no 1m update path at all** — that is enforced by a
+test. The 1m feed reaching the price/RTH trackers is the defect this study
+found, and removing the entry point is what stops it recurring.
+
+## Phase results
+
+| phase | status | evidence |
+|---|---|---|
+| 0 offline reference | COMPLETE | 15,234 rows / 146 regimes, `offline_reference_manifest.json` |
+| 1 candidate population | **PARTIAL — 99.32%** | 15,131 matched; 103 offline-only / 445 live-only |
+| 2 feature parity | **PASS — 25/25 exact (0.0)** | `feature_parity_summary.csv`, 15,131 rows, null masks agree |
+| 3 score parity | **PASS — 2.22e-16** | all four comparisons, tol 1e-10 |
+| 4 trigger parity | **NOT RUN** | gated behind Phase 3 + the H4/E4 warning below |
+| 5 order/fill/trade parity | **NOT RUN** | ditto |
+
+Run of record: `results/run_manifest_layerA_v2.json` /
+`reconciliation_layerA_v2.json` (2,023,875 1s + 56,751 1m bars, 831 s).
+Tests: **16/16**, including 5 convention tests that were mutation-checked —
+reverting `minute_bucket_key` to `ts // 60s` fails three of them.
+
+### Phase 1 — what the gap actually is
+
+Live and offline agree **exactly on where every candidate stream starts** and
+diverge on where it **ends**; live always runs longer:
+
+| regime | offline cp_idx | live cp_idx | live-only |
+|---|---|---|---|
+| 1741722660 | 57..106 | 57..**250** | 107..250 |
+| 1742240100 | 186..298 | 186..**358** | 299..358 |
+| 1742413740 | 72..130 | 72..**199** | 131..199 |
+
+Five regimes supply 382 of the 445 live-only rows; the 124 `no counterpart`
+rows are exactly the 2 live-only regimes. So this is **not** an
+established-gate reproduction problem — the gate is exact. It is a
+stream-*termination* difference, and that is the whole remaining question.
+
+### Waterfall caveat
+
+`population_waterfall_live_layerA_v2.csv` was **regenerated from the ledger**
+after the run: the run's own counters were not emit-window gated (audit
+WARNING 1, now fixed in `strategy.py`). Corrected March-only stages: raw
+161,549 → established 54,851 → decision_rth 15,576 → eligible 15,576.
+
+Two of the six stages are **non-informative by construction** and must not be
+read as evidence: `valid_fill` is hardcoded `True`
+(`candidate_tracker_long.py:136`) and `fill_rth` is assigned `= decision_rth`
+(:199). Only raw → established → decision_rth/eligible actually filter.
+
+## Audit gate
+
+`lookahead-auditor`, post-rewire: **0 CRITICAL / 2 WARNING / 3 NOTE**
+(`audit/audit.md`). The `S >= m` non-look-ahead argument for the shifted minute
+bucket was re-derived independently against the code across the no-gap case,
+stream gaps, the first bucket after warmup, a missing first-second-of-minute,
+and session edges — and **survived**, including one constructed counter-example
+(observation coinciding with the rollover trigger bar) that resolved correctly.
+The auditor found the live guarantee is `S >= m + 1s`, strictly stronger than
+claimed.
+
+The original bar was 0 CRITICAL / 0 WARNING. That bar is **met for Layer A** and
+**not yet met for Layer B**:
+
+- WARNING 1 (waterfall scope) — **FIXED**, artifact regenerated.
+- WARNING 2 (H4/E4: `_enter`/`_check_stop` book the snap price and the exact
+  stop level, not NT-realized fills) — **OPEN, and blocking Phase 4**. Inert
+  today: every run is `trigger_threshold=-1.0`, 0 triggers, 0 trades, so it
+  cannot have touched any Layer A number. It must be closed before Layer B runs.
+- NOTE 2 — a checkpoint due exactly at a regime-flip instant is dropped, not
+  mis-evaluated. Undercount, not causality; a candidate contributor to Phase 1.
 
 ## Adjudication
 
-`LONG_MARCH_2025_RUNTIME_PARITY_PASS` | `..._PARTIAL` | `..._FAIL` — **none
-assigned yet.** Production-threshold status remains **NOT_SELECTED**.
+**`LONG_MARCH_2025_RUNTIME_PARITY_PARTIAL`.**
+
+PASS was not claimed: Phase 1 is 99.32%, not exact, and Phases 4–5 never ran.
+What *is* established is narrow and strong — on the 15,131 rows both pipelines
+agree exist, the live NT event loop reproduces the frozen offline pipeline
+exactly (features `0.0`, probability `2.22e-16`).
+
+Production-threshold status remains **NOT_SELECTED**. No economics, no PnL, no
+2026 data. One month.
+
+### Next step (exactly one)
+
+Attribute the **stream-termination** difference behind Phase 1 — why offline
+candidate streams end earlier than live ones in the five regimes that dominate
+the gap. Do not open Layer B until that is closed or explicitly accepted, and
+not before WARNING 2 is fixed.

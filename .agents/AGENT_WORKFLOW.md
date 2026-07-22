@@ -35,24 +35,17 @@ The flagship model will use the `invoke_subagent` tool with the corresponding pr
 
 ---
 
-## Lean Workflow Coordination & Token Minimization
+## Lean Workflow, Token Budgets, and Standing Authorization
 
-### 1. Risk Tiering & Gates
-Before starting any task, the main session classifies the work into a risk tier:
-* **Tier 1 (Small Diagnostic)**: Main session $\rightarrow$ run deterministic tests $\rightarrow$ local smoke check. No planning or audit agents.
-* **Tier 2 (Normal Research)**: Planning agent $\rightarrow$ main session implementation $\rightarrow$ staged runner $\rightarrow$ independent completion auditor.
-* **Tier 3 (Model Freeze / Deploy)**: `repo-scout` $\rightarrow$ `contract-checker` $\rightarrow$ main session implementation $\rightarrow$ staged runner $\rightarrow$ independent completion auditor.
+These rules are harness-independent and are maintained in one place. See:
 
-### 2. Output Word Limits
-All subagents must strictly obey role-specific output limits to minimize token generation costs:
-* `repo-scout`: Max 700 words. Paths and symbols only.
-* `contract-checker`: Max 1,000 words. Compliance table and findings only.
-* `results-triager`: Max 500 words. Root cause test failures only.
-* `lookahead-auditor`: Max 1,500 words. Findings sorted by severity only.
+* `AGENTS.md` § Subagent Routing & Lean Workflow — risk tiers, per-agent output
+  word caps, diff-first auditing, deterministic run bounding via
+  `scripts/run_bounded_study.py`.
+* `AGENTS.md` § Standing Authorization for Named Mandatory Agent Gates — which
+  gates may be invoked without asking, and the limits on that authorization.
 
-### 3. Contextual Diff Audits
-Audits are executed "diff-first" using a contextual patch (`git diff -U20`). Full source files are only read if structural context or dependencies are unresolved in the diff. Unchanged files are not reopened unless necessary.
-
-### 4. Deterministic Run Bounding
-Process monitoring, execution stats, timeouts, and stalled run detection are handled by the deterministic wrapper `scripts/run_bounded_study.py`. Do not invoke results-triager or runtime controller agents for simple runs.
+Antigravity-specific note: the Gemini model mapping above determines which model
+backs each agent, but the output caps and gate scoping are identical to the
+Claude and Codex harnesses.
 

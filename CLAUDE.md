@@ -7,6 +7,13 @@
 4. **MFE/MAE Blind Spot.** 1s bars process before their parent 1m bar in NT. To avoid missing the first minute of price action, you MUST buffer recent 1s bars and replay them retroactively from fill time when a signal triggers.
 5. **Mandatory Audit Gate.** You must invoke the `lookahead-auditor` and clear all CRITICAL findings before finalizing any strategy, feature engineering, or causal matching logic.
 
+## LEAN WORKFLOW (token discipline)
+- **Risk tiers.** Tier 1 (small fix / diagnostic): main session + deterministic tests, no agents. Tier 2 (research study): plan → implement → staged runner → completion audit. Tier 3 (model freeze / deploy): add `repo-scout` then `contract-checker` before implementing.
+- **Diff-first.** Review `git diff -U20` as the primary surface. Open full files only to resolve causality, state flow, base classes, or imports — never to repeat discovery already done.
+- **No agents for process monitoring.** Use `scripts/run_bounded_study.py` and read its JSON status card, not raw logs.
+- **Subagent output caps.** `repo-scout` 700w (paths/symbols only) · `contract-checker` 1,000w (compliance table) · `results-triager` 500w (failures + root cause) · `lookahead-auditor` 1,500w (findings by severity).
+- **Standing authorization.** The named mandatory gates above may be invoked without asking, scoped strictly to the gate. No discretionary, general-purpose, nested, or fan-out agent use. Full text: `AGENTS.md` § Standing Authorization.
+
 ## DOCUMENTATION INDEX
 Do not guess implementation details. Use your `Read` tool to read the relevant spec before writing code:
 

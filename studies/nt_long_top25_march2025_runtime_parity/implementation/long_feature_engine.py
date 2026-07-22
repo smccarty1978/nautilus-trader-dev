@@ -19,11 +19,24 @@ auto-orient bearish -- matching the offline atlas, which built them per-regime.
 Offline/live equivalence for all six of these was verified before this engine
 was written (studies/.../results/seq_feature_equivalence.json: max_abs_diff 0.0
 on seq_*; 7.105e-15 on the median centers). Do not "fix" them here.
+
+MINUTE BARS ARE SYNTHESIZED FROM THE 1s STREAM, NEVER TAKEN FROM THE 1m FEED.
+The offline attach never sees a 1m bar: it buckets raw 1s bars with
+`common.minute_bucket_key` (`(ts-1)//60s`) and finalizes the bucket when a bar
+with a new key arrives. Because the raw bars are OPEN-labelled, that bucket is
+shifted +1 second from the true minute and its rollover fires one second late.
+Driving `PriceLevelTracker` / the RTH accumulators from the catalog 1m bar
+instead -- which is what an earlier version of this engine did -- reproduces
+neither the values nor the timing. See `common.minute_bucket_key` for the
+measured proof and why it is not a look-ahead.
 """
 from __future__ import annotations
 
+from collections import deque
 from types import SimpleNamespace
-from typing import Dict, List, Optional
+from typing import Callable, Deque, Dict, List, Optional
+
+import common as C
 
 from features.trackers.median_center import MedianCenterTracker
 from features.trackers.ohlcv_delta import OHLCVDeltaTracker
@@ -31,47 +44,103 @@ from features.trackers.price_levels import PriceLevelTracker
 
 ENTRY_DIRECTION = +1        # long counter-regime entry
 PREVAILING_DIRECTION = -1   # bearish regime being observed
+NS = 1_000_000_000
 
 
 class LongFeatureEngine:
-    def __init__(self, ordered_features: List[str]):
+    def __init__(self, ordered_features: List[str],
+                 is_rth_ts: Callable[[int], bool]):
         self.ordered_features = list(ordered_features)
         self.ohlcv = OHLCVDeltaTracker()
         self.price = PriceLevelTracker()
         self.center = MedianCenterTracker()
+        self._is_rth_ts = is_rth_ts
         self._last_1m_close_ts: Optional[int] = None
 
+        # --- synthesized-minute state (mirrors attach_features_long.py:127-166)
+        self._minute_key: Optional[int] = None
+        self._m_open: Optional[float] = None
+        self._m_high: Optional[float] = None
+        self._m_low: Optional[float] = None
+        self._prev_close: Optional[float] = None
+        self._minute_buffer: List[tuple] = []
+        self._was_rth = False
+        # Regime flips are detected on the 1m close but APPLIED at the bucket
+        # rollover, exactly as offline advances `reg_idx` there.
+        self._pending_regime_starts: Deque[int] = deque()
+
     # ---------------- update path ----------------
+    def declare_regime_start(self, regime_start_ns: int) -> None:
+        """Called from the 1m handler the instant a flip is confirmed. The
+        OHLCV tracker's regime reset is deferred to the next bucket rollover
+        (offline: `while m_close_ts >= regime_starts[reg_idx+1]`), and its
+        anchor is the just-closed bucket's OPEN, not the 1m bar's close."""
+        self._pending_regime_starts.append(int(regime_start_ns))
+
     def update_1s(self, ts_event: int, open_px: float, high: float, low: float,
                   close: float, volume: float, current_regime: int, atr: float) -> dict:
-        """Unconditional rolling-window updates. Returns the OHLCV per-bar
-        estimate dict so the caller can buffer it for `accumulate_regime_rth`
-        once regime/RTH context resolves at the parent minute's close."""
+        """One completed 1s bar. Folds it into the rolling-window trackers, then
+        runs the minute-bucket rollover if this bar opens a new bucket.
+
+        ORDER IS THE OFFLINE ORDER (attach_features_long.py:135-166):
+        `ohlcv.update` -> rollover(regime, RTH, buffer flush, price.update_1m)
+        -> `prev_close = close`. The caller MUST already have emitted every
+        checkpoint due at this instant before calling this, so a snapshot sees
+        state as of the previous bar -- the offline snap bar.
+        """
         est = self.ohlcv.update(ts_event, open_px, high, low, close, volume)
         # MedianCenterTracker needs a bar-like object and the CURRENT regime.
         self.center.update_1s(
             SimpleNamespace(open=open_px, high=high, low=low, close=close,
                             volume=volume, ts_init=int(ts_event)),
             int(current_regime), float(atr) if atr and atr > 0 else 1.0)
+
+        bar = (int(ts_event), float(high), float(low), float(volume),
+               est.get("bar_est_delta", 0.0) if est else 0.0)
+        mkey = C.minute_bucket_key(int(ts_event))
+        if self._minute_key is None:
+            self._minute_key = mkey
+            self._m_open, self._m_high, self._m_low = open_px, high, low
+            self._minute_buffer = [bar]
+        elif mkey != self._minute_key:
+            self._finalize_minute()
+            self._minute_key = mkey
+            self._m_open, self._m_high, self._m_low = open_px, high, low
+            self._minute_buffer = [bar]
+        else:
+            self._m_high = max(self._m_high, high)
+            self._m_low = min(self._m_low, low)
+            self._minute_buffer.append(bar)
+
+        self._prev_close = close
         return est
 
-    def accumulate_regime_rth(self, ts_event: int, high: float, low: float,
-                              volume: float, est_delta: float) -> None:
-        self.ohlcv.accumulate_regime_rth(ts_event, high, low, volume, est_delta)
+    def _finalize_minute(self) -> None:
+        """Close the current bucket. `m_close_ts` is derived from the bucket
+        key, never from a bar timestamp, so a missing first second of the next
+        minute delays the rollover without corrupting the label."""
+        m_close_ts = int((self._minute_key + 1) * 60 * NS)
 
-    def reset_regime(self, ts_event: int, anchor_price: float) -> None:
-        self.ohlcv.reset_regime(ts_event, anchor_price)
+        while (self._pending_regime_starts
+               and self._pending_regime_starts[0] <= m_close_ts):
+            rs = self._pending_regime_starts.popleft()
+            self.ohlcv.reset_regime(rs, float(self._m_open))
 
-    def reset_rth(self, ts_event: int) -> None:
-        self.ohlcv.reset_rth(ts_event)
+        now_rth = bool(self._is_rth_ts(m_close_ts))
+        if now_rth and not self._was_rth:
+            self.ohlcv.reset_rth(m_close_ts)
+        elif not now_rth and self._was_rth:
+            self.ohlcv.end_rth()
+        self._was_rth = now_rth
 
-    def end_rth(self) -> None:
-        self.ohlcv.end_rth()
+        for b_ts, b_high, b_low, b_vol, b_delta in self._minute_buffer:
+            self.ohlcv.accumulate_regime_rth(b_ts, b_high, b_low, b_vol, b_delta)
 
-    def update_1m(self, ts_event: int, open_px: float, high: float, low: float,
-                  close: float, is_rth: bool) -> None:
-        self.price.update_1m(ts_event, open_px, high, low, close, is_rth)
-        self._last_1m_close_ts = ts_event
+        # `prev_close` is the LAST 1s close of the bucket -- offline passes it
+        # because it assigns `prev_close = closes[i]` after the rollover.
+        self.price.update_1m(m_close_ts, self._m_open, self._m_high, self._m_low,
+                             self._prev_close, now_rth)
+        self._last_1m_close_ts = m_close_ts
 
     # ---------------- snapshot path ----------------
     def snapshot(self, snap_bar_ts: int, observation_ts: int, reference_price: float,

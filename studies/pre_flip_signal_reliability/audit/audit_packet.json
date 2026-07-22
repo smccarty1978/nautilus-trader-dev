@@ -1,0 +1,37 @@
+{
+    "study_name": "pre_flip_signal_reliability",
+    "spec_content": "# Pre-Flip Signal Reliability Study (Short-RTH & Long-RTH Models)\n\n## Objective\n\nThis study determines whether the frozen RTH models genuinely identify **imminent regime exhaustion**.\n\nThe central question is:\n> **When the model produces a qualifying signal, how close is the current regime to ending, and how much additional movement remains before the predicted flip occurs?**\n\nThis study intentionally evaluates the models as **forecasting systems**, not entry/trading systems. Thresholds, stops, exits, or position management are NOT optimized in this study.\n\n---\n\n## Models Evaluated\n\n- **Short-RTH model**: `short_bearish_flip_top25_current_reference` (predicting bearish regime flips, 25 GBT features).\n- **Long-RTH model**: `long_bullish_flip_top25` (predicting bullish regime flips, 25 LogReg features).\n\nAll statistics are computed and reported separately by direction before presenting pooled summaries.\n\n---\n\n## Data & Partition\n\n- **Research Partition**: 2024\u20132025.\n- **Final OOS Partition**: 2026 (untouched, excluded from this study).\n- **Filter**: RTH candidates only (08:30:00 to 15:00:00 America/Chicago).\n\n---\n\n## Signal Definition\n\nA \"signal\" is the **first 5s checkpoint within a regime** whose score exceeds the tested threshold.\n- Later checkpoints within that same regime are ignored.\n- For every tested threshold, there is at most **one signal per regime**.\n\n---\n\n## Thresholds (Percentile-Based)\n\n- Top 50%\n- Top 40%\n- Top 30%\n- Top 25%\n- Top 20%\n- Top 15%\n- Top 10%\n- Top 7.5%\n- Top 5%\n- Top 2.5%\n- Top 1%\n\n---\n\n## Primary Classification Buckets (Mutually Exclusive)\n\n- **Bucket A**: Flip $\\le$ 300s AND Entry at signal price would be profitable if exited at the regime flip.\n- **Bucket B**: Flip $\\le$ 300s BUT Entry at signal price would lose money if exited at the regime flip.\n- **Bucket C**: No regime flip within 300 seconds.\n\n---\n\n## Core Measurements & Output Files\n\n- `signal_population.csv`: Per-signal level details (timestamps, prices, remaining MFE/MAE, path MAE, post-flip MFE, bucket).\n- `signal_bucket_summary.csv`: Proportions and metrics for Buckets A, B, and C per threshold and direction.\n- `remaining_regime_mfe.csv`: Remaining prevailing-regime MFE breakdown (0-0.10 ATR, 0.10-0.25 ATR, 0.25-0.50 ATR, 0.50-1.00 ATR, >1.00 ATR).\n- `time_to_flip.csv`: Time-to-flip breakdown (0-30s, 30-60s, 60-120s, 120-300s, >300s, Never flips).\n- `threshold_summary.csv`: Complete reliability metrics for each threshold.\n- `direction_comparison.csv`: Head-to-head comparison of Short-RTH vs Long-RTH reliability.\n- `study_report.md`: Executive summary answering the 7 core forecasting questions.\n",
+    "code_files": [
+        {
+            "file": "implementation\\audit_candidates_and_trace.py",
+            "sha256": "46c904e29e2934b84b2dd171c12ef3555ab5e90d22652d9197ec83ef6178303b"
+        },
+        {
+            "file": "implementation\\audit_model_identity.py",
+            "sha256": "c35be678a169f5e396cb65fc20eefde7da6ae83309ab8f4dcdfd4ce16121a19e"
+        },
+        {
+            "file": "implementation\\collect_and_evaluate.py",
+            "sha256": "0e96d6e1809ef130a179c5b4592244311d637bfb728edcf09775f3ca7648db87"
+        },
+        {
+            "file": "implementation\\export_summaries.py",
+            "sha256": "a1a8020b2b072c61f010f7ddf2ac5291bfdb16cb7888e8f58123731a8ef0d5b3"
+        },
+        {
+            "file": "implementation\\generate_report.py",
+            "sha256": "d4b96b0b15b3d50975b6be1390a8f52b26ad5d79cdbfe42bdceaaeb1e06c6f98"
+        },
+        {
+            "file": "implementation\\trace_20_signals.py",
+            "sha256": "be5ffeb3094987652d49d2185097a1dfabb4a6f355e3ab0f90668f24953a982f"
+        },
+        {
+            "file": "results\\status.json",
+            "sha256": "19808d3f16dfe151746e343a2cb3a126c20ec5a7ea0d5597ff0fc694d68626c4"
+        }
+    ],
+    "changed_files": [],
+    "git_diff_content": "",
+    "test_results": {}
+}

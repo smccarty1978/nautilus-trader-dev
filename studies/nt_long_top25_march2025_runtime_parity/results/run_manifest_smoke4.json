@@ -1,0 +1,59 @@
+{
+  "tag": "smoke4",
+  "git_commit": "f01cf8dda82e66baebc72b06c0cd925bdcadc50e",
+  "model_id": "long_bullish_flip_top25",
+  "model_sha256": "ccad9a9b4441a5891ea61bd263ceaedfead42dcd2d5fb2149cdbf2da9e1cc789",
+  "feature_order_sha256": "d601abe692c78c0471088b41cae1fe80bbb918bbe7e7af067ddb45e7b0ce45bf",
+  "coefficients_sha256": "5d128d4f1e59ecceb4e8aa8f8166a6e2cd5979546809fa46078c7b3ff3d71778",
+  "intercept_sha256": "d5046c8ecb969a1586a984bb00643ab0f9ea478243561a83c6cdc903cb2eac39",
+  "data_range_loaded_utc": [
+    "2025-02-25 00:00:00+00:00",
+    "2025-03-04 06:00:00+00:00"
+  ],
+  "emit_window_chicago": [
+    "2025-03-01 00:00:00-06:00",
+    "2025-03-04 00:00:00-06:00"
+  ],
+  "emit_window_utc": [
+    "2025-03-01 06:00:00+00:00",
+    "2025-03-04 06:00:00+00:00"
+  ],
+  "session_timezone": "America/Chicago",
+  "rth_rule_chicago": "08:30:00-15:15:00",
+  "bar_counts": {
+    "1s": 275447,
+    "1m": 7261
+  },
+  "bars_processed": {
+    "1s": 275447,
+    "1m": 7261
+  },
+  "nt_version": "1.230.0",
+  "python_version": "3.13.7",
+  "pandas_version": "2.3.3",
+  "random_seeds": {
+    "model": 42
+  },
+  "tolerances": {
+    "feature": 1e-09,
+    "logit": 1e-10,
+    "probability": 1e-10
+  },
+  "threshold": -1.0,
+  "threshold_label": "NONE_LAYER_A_THRESHOLD_FREE",
+  "stop_atr_mult": 1.25,
+  "management_contract": "fixed 1.25xATR stop frozen at regime flip, never reset/trailed; exit = stop OR opposing regime flip; no timeout, no PT, no trailing",
+  "waterfall_live": {
+    "raw": 39404,
+    "established": 12640,
+    "decision_rth": 4148,
+    "fill_rth": 4148,
+    "valid_fill": 39404,
+    "eligible": 4148
+  },
+  "n_candidate_rows_in_window": 9845,
+  "n_eligible_in_window": 1085,
+  "n_triggers": 0,
+  "n_trades": 0,
+  "runtime_s": 119.4
+}

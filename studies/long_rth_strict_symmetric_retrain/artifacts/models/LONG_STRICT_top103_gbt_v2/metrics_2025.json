@@ -1,0 +1,74 @@
+{
+  "roc_auc": 0.6552893708728997,
+  "average_precision": 0.4100258258281727,
+  "log_loss": 0.5457548179037153,
+  "brier_score": 0.18186632764696103,
+  "score_mean": 0.2716805530795468,
+  "score_standard_deviation": 0.1282373602599365,
+  "feature_count": 103,
+  "canonical_runtime_calculation_count": 85,
+  "training_rows": 682952,
+  "training_regimes": 6401,
+  "development_rows": 163397,
+  "development_regimes": 1578,
+  "positive_prevalence": 0.26293628401990243,
+  "fit_runtime": 9.436810400002287,
+  "score_runtime": 0.38744690000021365,
+  "monthly_metrics": {
+    "2025-01": {
+      "roc_auc": 0.6667875539695723,
+      "average_precision": 0.41315445897399244
+    },
+    "2025-02": {
+      "roc_auc": 0.6755703426738632,
+      "average_precision": 0.3737062952023436
+    },
+    "2025-03": {
+      "roc_auc": 0.6523993833931087,
+      "average_precision": 0.34593844749513547
+    },
+    "2025-04": {
+      "roc_auc": 0.6632926896438511,
+      "average_precision": 0.467168221748881
+    },
+    "2025-05": {
+      "roc_auc": 0.6135232800428062,
+      "average_precision": 0.3670197865309847
+    },
+    "2025-06": {
+      "roc_auc": 0.6854642295576663,
+      "average_precision": 0.49477086978279317
+    },
+    "2025-07": {
+      "roc_auc": 0.6686285337586015,
+      "average_precision": 0.44613193641807536
+    },
+    "2025-08": {
+      "roc_auc": 0.6642037164809061,
+      "average_precision": 0.46274276004987147
+    },
+    "2025-09": {
+      "roc_auc": 0.6532162839559668,
+      "average_precision": 0.382718723425616
+    },
+    "2025-10": {
+      "roc_auc": 0.6605699944648485,
+      "average_precision": 0.40841290401512687
+    },
+    "2025-11": {
+      "roc_auc": 0.6183998062624589,
+      "average_precision": 0.37096747796751095
+    },
+    "2025-12": {
+      "roc_auc": 0.6454686817019298,
+      "average_precision": 0.4229208397844797
+    }
+  },
+  "top_5pct_threshold": 0.5153172404083236,
+  "top_5pct_selected_rows": 8170,
+  "top_5pct_selected_regimes": 598,
+  "top_2_5pct_threshold": 0.5825024560133262,
+  "top_2_5pct_selected_rows": 4085,
+  "top_2_5pct_selected_regimes": 423,
+  "artifact_size": 372616
+}
