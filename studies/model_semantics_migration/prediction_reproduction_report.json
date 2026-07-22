@@ -1,0 +1,94 @@
+{
+  "required_max_abs_prediction_diff": 0.0,
+  "overall_status": "PASS",
+  "models": [
+    {
+      "canonical_name": "BULLISH_FADE_TO_BEARISH_FLIP_TOP25_GBT_V1",
+      "legacy_names_checked": [
+        "short_bearish_flip_top25_current_reference",
+        "F3_top25_gbt_v1",
+        "legacy_short_model"
+      ],
+      "runtime_alias_checked": "bullish_fade_top25_gbt_v1",
+      "rows": 198255,
+      "artifact_hash": "efec43fe7bf73298b6cdd8d71c90ecbe4642d7ebf8729efe5f27d88a71a67215",
+      "max_abs_prediction_diff": 0.0,
+      "bit_exact": true,
+      "status": "PASS"
+    },
+    {
+      "canonical_name": "BULLISH_FADE_TO_BEARISH_FLIP_TOP100_GBT_V1",
+      "legacy_names_checked": [
+        "short_bearish_flip_top100_ref",
+        "F3_top100_gbt_v1"
+      ],
+      "runtime_alias_checked": "bullish_fade_top100_gbt_v1",
+      "rows": 198255,
+      "artifact_hash": "0208b30929f5b051a9d57228f59434de3ef30517bf09662046632d85dac958ab",
+      "max_abs_prediction_diff": 0.0,
+      "bit_exact": true,
+      "status": "PASS"
+    },
+    {
+      "canonical_name": "BEARISH_FADE_TO_BULLISH_FLIP_TOP25_LOGREG_V1",
+      "legacy_names_checked": [
+        "long_bullish_flip_top25"
+      ],
+      "runtime_alias_checked": "bearish_fade_top25_logreg_v1",
+      "rows": 163397,
+      "artifact_hash": "ccad9a9b4441a5891ea61bd263ceaedfead42dcd2d5fb2149cdbf2da9e1cc789",
+      "max_abs_prediction_diff": 0.0,
+      "bit_exact": true,
+      "status": "PASS"
+    },
+    {
+      "canonical_name": "BEARISH_FADE_TO_BULLISH_FLIP_TOP50_LOGREG_V1",
+      "legacy_names_checked": [
+        "long_bullish_flip_top50"
+      ],
+      "runtime_alias_checked": "bearish_fade_top50_logreg_v1",
+      "rows": 163397,
+      "artifact_hash": "232846091c23c76c5cabd9ae618959e75608207becc60586604d6341a18357b3",
+      "max_abs_prediction_diff": 0.0,
+      "bit_exact": true,
+      "status": "PASS"
+    },
+    {
+      "canonical_name": "BEARISH_FADE_TO_BULLISH_FLIP_TOP100_GBT_V1",
+      "legacy_names_checked": [
+        "long_bullish_flip_top100"
+      ],
+      "runtime_alias_checked": "bearish_fade_top100_gbt_v1",
+      "rows": 163397,
+      "artifact_hash": "6ef3e2ca1503cf61be280d2267b9f3c8a398205e8617afb051e1b71d882aa03a",
+      "max_abs_prediction_diff": 0.0,
+      "bit_exact": true,
+      "status": "PASS"
+    },
+    {
+      "canonical_name": "BEARISH_FADE_TO_BULLISH_FLIP_TOP25_GBT_V2",
+      "legacy_names_checked": [
+        "LONG_STRICT_top25_gbt_v2"
+      ],
+      "runtime_alias_checked": "bearish_fade_top25_gbt_v2",
+      "rows": 2048,
+      "artifact_hash": "1d696d85f2e31026db8415fb15913267d447bd7fde9be0fcefed490c7bf4af26",
+      "max_abs_prediction_diff": 0.0,
+      "bit_exact": true,
+      "status": "PASS"
+    },
+    {
+      "canonical_name": "BEARISH_FADE_TO_BULLISH_FLIP_TOP103_GBT_V2",
+      "legacy_names_checked": [
+        "LONG_STRICT_top103_gbt_v2",
+        "legacy_long_model"
+      ],
+      "runtime_alias_checked": "bearish_fade_top103_gbt_v2",
+      "rows": 2048,
+      "artifact_hash": "34e3f50771d3ed32fd4ef7c8ded7e958e624be89bfb86db4d0cf28f20f517967",
+      "max_abs_prediction_diff": 0.0,
+      "bit_exact": true,
+      "status": "PASS"
+    }
+  ]
+}

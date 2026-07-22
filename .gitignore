@@ -63,9 +63,12 @@ desktop.ini
 credentials.json
 secrets.yaml
 
-# Agent directories
-.claude/
-.codex/
+# Agent definitions are repository workflow configuration and are versioned.
+# Keep local migration backups out of Git.
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/scratch/
+.codex/agents/backups/
 
 # Python/testing caches
 .pytest_cache/
@@ -88,4 +91,3 @@ secrets.yaml
 
 # Windows junk / special files
 nul
-

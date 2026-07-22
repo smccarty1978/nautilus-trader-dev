@@ -1,0 +1,37 @@
+{
+  "model_id": "LONG_STRICT_top103_gbt_v2",
+  "model_class": "HistGradientBoostingClassifier",
+  "hyperparameters": {
+    "max_depth": 3,
+    "learning_rate": 0.05,
+    "max_iter": 200,
+    "random_state": 42
+  },
+  "target": "bullish_regime_flip_within_300s",
+  "population_direction": -1,
+  "trade_direction": 1,
+  "strict_timing_contract": "open-labelled source bar ts_event < observation_time",
+  "training_years": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "development_year": 2025,
+  "feature_count": 103,
+  "ordered_feature_list_hash": "59a796630f4e5f8a488bae67cb028245c5a5f7477fadf0067f580886b1b01db6",
+  "feature_mapping_hash": "071f22da8728ef54b6b980db0a0de5d7bdb159cdc2a16848933955d6dfcbad19",
+  "population_builder_hash": "8de3c13dbb965e8126b6d808351144bcba339faa9374e4f64e59e91f89f04328",
+  "feature_attachment_hash": "6892718872cb88259b6d414a8173f79819abac831a49cf51b13f1c5bf253e437",
+  "training_data_hash": "0f692128349532ade97e91d1289b8b51c7d908f0c41dc7585cd87675afdea2c1",
+  "development_data_hash": "0896c991902754f7f8c1a8bd6662ce2103753d5d1d02ffaadde6f7dbd5f4c770",
+  "model_hash": "34e3f50771d3ed32fd4ef7c8ded7e958e624be89bfb86db4d0cf28f20f517967",
+  "validation_score_hash": "788e3a12a61bfcd6e9e9637e3bee84abc9438c9347964f6894cc276da430e725",
+  "sklearn_version": "1.7.2",
+  "numpy_version": "2.3.3",
+  "python_version": "3.13.7",
+  "random_seed": 42,
+  "fit_timestamp": "2026-07-22T04:45:54.669640+00:00",
+  "fit_runtime": 9.436810400002287,
+  "artifact_status": "CANDIDATE"
+}

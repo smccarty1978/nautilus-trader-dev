@@ -1,5 +1,7 @@
 # Pre-Flip Signal Reliability Study — Programmatically Validated Final Report
 
+> **Semantic correction (2026-07-22):** Legacy “Short-RTH” means the **Bullish Fade** model: bullish-regime candidates forecasting confirmed bearish flips, with expected trade direction short. Legacy “Long-RTH” means the **Bearish Fade** model: bearish-regime candidates forecasting confirmed bullish flips, with expected trade direction long. The Bullish Fade model is `REQUIRES_TARGET_AND_DIRECTION_SEMANTICS_REAUDIT` and must not be treated as production-ready.
+
 **Date:** 2026-07-21  
 **Partition:** 2024–2025 (Research Partition, 2026 Untouched OOS)  
 **Session Window:** Canonical Chicago RTH (08:30:00 to 15:15:00 America/Chicago)  

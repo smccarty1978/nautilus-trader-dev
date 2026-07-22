@@ -1,5 +1,12 @@
 {
-  "model_id": "F3_top25_gbt_v1",
+  "model_id": "bullish_fade_top25_gbt_v1",
+  "canonical_name": "BULLISH_FADE_TO_BEARISH_FLIP_TOP25_GBT_V1",
+  "legacy_model_id": "F3_top25_gbt_v1",
+  "legacy_name_deprecated": true,
+  "prevailing_regime": "bullish",
+  "target_flip_direction": "bearish",
+  "trade_direction": "short",
+  "production_status": "REQUIRES_TARGET_AND_DIRECTION_SEMANTICS_REAUDIT",
   "model_path": "studies\\runtime_constrained_f3_feature_reduction\\artifacts\\models\\F3_top25_gbt_v1\\model.joblib",
   "model_sha256": "24bf6bece8319cb951bc82f31ea97ac7d3a0a9a200d598d986965143dec7e944",
   "feature_list_path": "studies\\runtime_constrained_f3_feature_reduction\\results\\candidate_feature_sets.json",
@@ -10,5 +17,5 @@
   "sklearn_version": "1.7.2",
   "numpy_version": "2.3.3",
   "threshold_file": "config/frozen_thresholds.json",
-  "threshold_file_sha256": null
+  "threshold_file_sha256": "f5a4a62deccc504c838b257b93bfd89f7475be39db70271bb4c383ad54ad8e01"
 }

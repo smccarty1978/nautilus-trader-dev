@@ -1,0 +1,54 @@
+{
+  "production_model": "LONG_STRICT_top103_gbt_v2",
+  "challenger_model": "LONG_STRICT_top25_gbt_v2",
+  "semantic_production_model": "bearish_fade_top103_gbt_v2",
+  "semantic_challenger_model": "bearish_fade_top25_gbt_v2",
+  "models": {
+    "LONG_STRICT_top25_gbt_v2": {
+      "canonical_name": "BEARISH_FADE_TO_BULLISH_FLIP_TOP25_GBT_V2",
+      "runtime_alias": "bearish_fade_top25_gbt_v2",
+      "legacy_name_deprecated": true,
+      "prevailing_regime": "bearish",
+      "target_flip_direction": "bullish",
+      "trade_direction": "long",
+      "model_id": "LONG_STRICT_top25_gbt_v2",
+      "deployment_status": "FROZEN_CHALLENGER",
+      "source_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\long_rth_strict_symmetric_retrain\\artifacts\\models\\LONG_STRICT_top25_gbt_v2",
+      "source_model_hash": "1d696d85f2e31026db8415fb15913267d447bd7fde9be0fcefed490c7bf4af26",
+      "files": {
+        "feature_list.json": "3d94c17c1068c4f1a25d2d635eeb844bdf8ebbce12aa88e0c3dfcfaf98b4a7dc",
+        "feature_mapping.json": "c8984d771df35011ab3489ba762f5ef0a1f276eada6e8e7b893679e1649c6fd5",
+        "manifest.json": "76cd0c03ba2fc5cd0380cef66217a7e2223d38a0fd640a0aa4aeedadf6f0667c",
+        "metrics_2025.json": "2b673e00eb5387c7722698aae0d991f643b02021a354da18c4be495dd99835dc",
+        "model.joblib": "1d696d85f2e31026db8415fb15913267d447bd7fde9be0fcefed490c7bf4af26",
+        "README.md": "bb04f9640c01e1212c7d48cf196856a520a17992560b4362d1d88417a8b7f214",
+        "validation_fixture.parquet": "62370778df05af35163857f7743f623de414174dff4298af484931489d50e674",
+        "validation_fixture_scores.npy": "9610820da46115de2a47d5ba29f5c8e7f3233ff0ad783fb4c02e3551669dfc17"
+      },
+      "immutable": true
+    },
+    "LONG_STRICT_top103_gbt_v2": {
+      "canonical_name": "BEARISH_FADE_TO_BULLISH_FLIP_TOP103_GBT_V2",
+      "runtime_alias": "bearish_fade_top103_gbt_v2",
+      "legacy_name_deprecated": true,
+      "prevailing_regime": "bearish",
+      "target_flip_direction": "bullish",
+      "trade_direction": "long",
+      "model_id": "LONG_STRICT_top103_gbt_v2",
+      "deployment_status": "PRODUCTION",
+      "source_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\long_rth_strict_symmetric_retrain\\artifacts\\models\\LONG_STRICT_top103_gbt_v2",
+      "source_model_hash": "34e3f50771d3ed32fd4ef7c8ded7e958e624be89bfb86db4d0cf28f20f517967",
+      "files": {
+        "feature_list.json": "60fedc56e3ce70801bcf8dbf774f34a82a01eb0658e3c9f772c1e0f643c0a13b",
+        "feature_mapping.json": "071f22da8728ef54b6b980db0a0de5d7bdb159cdc2a16848933955d6dfcbad19",
+        "manifest.json": "ca7c71305d9bc45a40ad96c45345f47950f40162ef61258648f45e8b1102b0ef",
+        "metrics_2025.json": "fa47776bd7af26d00e92775c41338c64c615c7c36a6afe7f7bd9611a791d94e3",
+        "model.joblib": "34e3f50771d3ed32fd4ef7c8ded7e958e624be89bfb86db4d0cf28f20f517967",
+        "README.md": "16b7856bab98b261506ed046e0c87856057588bcb5f6b4a80aedf099243c19cc",
+        "validation_fixture.parquet": "62370778df05af35163857f7743f623de414174dff4298af484931489d50e674",
+        "validation_fixture_scores.npy": "788e3a12a61bfcd6e9e9637e3bee84abc9438c9347964f6894cc276da430e725"
+      },
+      "immutable": true
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "models": {
+    "Top25": {
+      "id": "LONG_STRICT_top25_gbt_v2",
+      "model_hash": "1d696d85f2e31026db8415fb15913267d447bd7fde9be0fcefed490c7bf4af26"
+    },
+    "Top103": {
+      "id": "LONG_STRICT_top103_gbt_v2",
+      "model_hash": "34e3f50771d3ed32fd4ef7c8ded7e958e624be89bfb86db4d0cf28f20f517967"
+    }
+  },
+  "years": [
+    2024,
+    2025
+  ],
+  "rth_trading_days": {
+    "2024": 258,
+    "2025": 256
+  },
+  "calendar_sources": {
+    "2024": {
+      "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2024.parquet",
+      "sha256": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+      "rule": "08:30:00 <= CT < 15:00:00"
+    },
+    "2025": {
+      "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2025.parquet",
+      "sha256": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+      "rule": "08:30:00 <= CT < 15:00:00"
+    }
+  },
+  "2024_status": "IN_SAMPLE_TRAINING_DIAGNOSTIC",
+  "2025_status": "FROZEN_DEVELOPMENT",
+  "retrained": false,
+  "2026_scored": false,
+  "deployment_recommendation": "Deploy Top103",
+  "override_criteria": {
+    "modest_global_gain": true,
+    "little_top5_precision_gain": true,
+    "high_top5_overlap": false,
+    "similar_calibration": true,
+    "yearly_advantage_not_independently_established": true,
+    "substantially_greater_complexity": true,
+    "substantially_larger_runtime_surface": true,
+    "substantially_greater_maintenance_burden": true
+  }
+}

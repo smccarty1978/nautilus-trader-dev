@@ -1,0 +1,60 @@
+{
+  "quantitative": {
+    "feature_count": {
+      "Top25": 25,
+      "Top103": 103
+    },
+    "runtime_calculations": {
+      "Top25": 25,
+      "Top103": 85
+    },
+    "feature_dependencies": {
+      "Top25": 2,
+      "Top103": 2
+    },
+    "feature_families": {
+      "Top25": 2,
+      "Top103": 2
+    },
+    "feature_contracts": {
+      "Top25": 25,
+      "Top103": 103
+    },
+    "additional_features": 78,
+    "auc_gain_per_additional_feature": 6.441645046706412e-05,
+    "ap_gain_per_additional_feature": 0.00012414411016439738,
+    "brier_reduction_per_additional_feature": 1.4685577944448745e-05
+  },
+  "risk_assessment": {
+    "runtime_parity_risk": {
+      "Top25": "Low",
+      "Top103": "High",
+      "reason": "85 vs 25 canonical calculations and 103 vs 25 ordered outputs"
+    },
+    "maintenance_burden": {
+      "Top25": "Low",
+      "Top103": "High",
+      "reason": "78 additional feature contracts and larger categorical parity surface"
+    },
+    "future_retraining_cost": {
+      "Top25": "Low",
+      "Top103": "Medium",
+      "reason": "same estimator, but wider materialization/scoring matrix"
+    },
+    "debug_difficulty": {
+      "Top25": "Low",
+      "Top103": "High",
+      "reason": "more failure points and interacting feature groups"
+    },
+    "audit_complexity": {
+      "Top25": "Low",
+      "Top103": "High",
+      "reason": "4.1x columns and 3.4x canonical calculations"
+    },
+    "feature_drift_exposure": {
+      "Top25": "Low",
+      "Top103": "High",
+      "reason": "103 monitored inputs versus 25"
+    }
+  }
+}

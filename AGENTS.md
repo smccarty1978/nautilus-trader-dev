@@ -58,17 +58,17 @@ not restate them.
 
 ### Audit gate (mandatory)
 
-Before declaring any of the following "done", invoke the lookahead-auditor subagent:
+Before declaring any of the following "done", invoke the causal audit subagent (`lookahead-auditor` in Claude; `lookahead_auditor` in Codex):
 - A new strategy file or material edit to an existing one
 - A new study/research script that produces results you'll act on
 - Any change to data loading, feature engineering, or label construction
 
 Workflow:
-1. Invoke lookahead-auditor on the changed scope
-2. Read the resulting audit.md
+1. Invoke the harness-specific lookahead auditor on the changed scope
+2. In Codex, persist the read-only auditor's complete Markdown response to the required `audit.md`; in Claude, read the auditor-written `audit.md`
 3. Address every CRITICAL finding by editing the code (do not dismiss without explicit approval from the user)
 4. Address WARNING findings unless they are out of scope or the user has waived them
-5. Re-invoke lookahead-auditor on the same scope
+5. Re-invoke the harness-specific lookahead auditor on the same scope
 6. Repeat 3–5 until zero CRITICAL and either zero WARNING or user-acknowledged WARNING
 7. Only then report back to the user
 
@@ -80,10 +80,10 @@ Named mandatory gates in this repository constitute standing user authorization 
 
 This authorization applies only to:
 
-- `repo-scout` where the selected risk tier requires it
-- `contract-checker` where the selected risk tier requires it
-- `results-triager` for exact approved test commands
-- `lookahead-auditor` at mandatory causal or look-ahead audit gates
+- `repo-scout` / Codex `repo_scout` where the selected risk tier requires it
+- `contract-checker` / Codex `contract_checker` where the selected risk tier requires it
+- `results-triager` / Codex `results_triager` for exact approved test commands
+- `lookahead-auditor` / Codex `lookahead_auditor` at mandatory causal or look-ahead audit gates
 
 The invocation must remain limited to the scope of the named gate.
 
@@ -108,7 +108,7 @@ If a mandatory gate and a session-level restriction appear to conflict, the orch
 
 Passing criteria remain governed by the applicable frozen contract or SPEC. Standing authorization to invoke an auditor does not relax the audit acceptance standard. Do not mark the work finalized unless the audit satisfies the acceptance gate defined by the applicable frozen SPEC. At minimum, any CRITICAL finding blocks finalization. Any WARNING must either be remediated or explicitly adjudicated according to the SPEC; do not silently treat an unresolved WARNING as cleared.
 
-**Pre-execution trigger for complex causal/matching logic.** The completion gate above catches bugs only after the full pipeline has already run once — expensive when a multi-phase study (smoothing, matched-donor placebos, permutation/shuffle controls, stop-timing mechanics) has to be entirely rerun after the fact. For any of the following, invoke lookahead-auditor on that component's code BEFORE its first execution, not only before declaring the study done:
+**Pre-execution trigger for complex causal/matching logic.** The completion gate above catches bugs only after the full pipeline has already run once — expensive when a multi-phase study (smoothing, matched-donor placebos, permutation/shuffle controls, stop-timing mechanics) has to be entirely rerun after the fact. For any of the following, invoke the harness-specific lookahead auditor (`lookahead_auditor` in Codex) on that component's code BEFORE its first execution, not only before declaring the study done:
 - state-smoothing / hysteresis state machines
 - matched-donor or nearest-neighbor selection logic (placebos, controls)
 - any shuffle/permutation/circular-shift control
@@ -240,17 +240,17 @@ For significant results, create a tagged release with:
 <!-- BEGIN SUBAGENT ROUTING -->
 ## Subagent Routing & Lean Workflow
 
-Keep architecture, causal interpretation, integration, and final approval in the main session. Agent names are hyphenated in both harnesses (`.claude/agents/*.md`, `.codex/agents/*.toml`).
+Keep architecture, causal interpretation, integration, and final approval in the main session. Claude agent names are hyphenated. Codex `name` / `agent_type` values use underscores; filenames may remain hyphenated for easy cross-harness comparison. Use the exact harness-specific identifier below when invoking an agent.
 
 ### Roster
 
-| Agent | Role | Output cap | Available in |
-|---|---|---|---|
-| `repo-scout` | Locate files, trace execution paths | 700w — paths, symbols, line ranges only | Claude, Codex |
-| `contract-checker` | Compare code/tests against explicit specs | 1,000w — compliance table + findings only | Claude, Codex |
-| `results-triager` | Run exact approved pytest commands | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
-| `lookahead-auditor` | Independent causal / look-ahead audit | 1,500w — findings sorted by severity | Claude, Codex |
-| `implementation-worker` | Implement one frozen, bounded task packet | — | **Codex only** |
+| Agent | Codex `agent_type` | Role | Output cap | Available in |
+|---|---|---|---|---|
+| `repo-scout` | `repo_scout` | Locate files, trace execution paths | 700w — paths, symbols, line ranges only | Claude, Codex |
+| `contract-checker` | `contract_checker` | Compare code/tests against explicit specs | 1,000w — compliance table + findings only | Claude, Codex |
+| `results-triager` | `results_triager` | Run exact approved pytest commands | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
+| `lookahead-auditor` | `lookahead_auditor` | Independent causal / look-ahead audit | 1,500w — complete Markdown report, parent persists | Claude, Codex |
+| `implementation-worker` | `implementation_worker` | Implement one frozen, bounded task packet | — | **Codex only** |
 
 ### Risk tiers
 
@@ -262,7 +262,7 @@ Not every task needs the full ceremony.
 
 ### Coordination rules
 
-* Spawn `repo-scout` and `contract-checker` in parallel only when their assignments are independent; wait for both before freezing the task packet.
+* Spawn `repo-scout` and `contract-checker` (Codex: `repo_scout`, `contract_checker`) in parallel only when their assignments are independent; wait for both before freezing the task packet.
 * Never run multiple writing agents in the same worktree concurrently.
 * Do not duplicate searches or tests a subagent already completed.
 * Subagent prompts must be self-contained — child agents do not inherit the parent conversation.
@@ -285,4 +285,3 @@ Not every task needs the full ceremony.
 See `CLAUDE.md` § Central Feature System (canonical). In short: check
 `features/FEATURE_REGISTRY_CONTRACT.md` and `features/registry.py` before
 creating, modifying, or locally reimplementing any feature.
-
