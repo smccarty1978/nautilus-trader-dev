@@ -1,0 +1,18 @@
+years: [2024, 2025]
+rth_start: "08:30:00"
+rth_end_exclusive: "15:15:00"
+score_top_percentiles: [1.0, 2.5, 5.0, 10.0, 25.0]
+fixed_horizons_seconds: [300, 600]
+post_flip_horizons_seconds: [60, 300, 600]
+nq_dollars_per_point: 20.0
+sealed_year: 2026
+random_seed: 42
+max_estimated_peak_memory_mb: 10000
+bounded_timeout_seconds: 3600
+bullish_prepared_inputs:
+  2024:
+    rows: 204611
+    sha256: "219cfff6a95edec6b0ad10a9d99faa15f437ec94d368f482ba3dbb938e9a0035"
+  2025:
+    rows: 198255
+    sha256: "75c9c5265d92a384428f65f31956aa21263aa8c5c19a45c856ca45931cff2a53"
