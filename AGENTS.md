@@ -63,16 +63,94 @@ Before declaring any of the following "done", invoke the causal audit subagent (
 - A new study/research script that produces results you'll act on
 - Any change to data loading, feature engineering, or label construction
 
+**The gate is split.** Two agents with disjoint scope, defined in
+`docs/CAUSAL_CHECKLIST.md` § SCOPE SPLIT:
+
+| Agent | Owns | Must not report |
+|---|---|---|
+| `lookahead-auditor` | A, B, C1–C3, F, G, H — causality and timestamps | deliverables, manifests, seal design, test quality |
+| `contract-checker` | C4, D, E + the SPEC's Deliverables Manifest | novel causal theories |
+
+Splitting them is deliberate. Across ~100 historical audits, ~60% of blocking
+findings were completeness issues raised by the causal auditor, which has no
+natural stopping point for them —
+`studies/codex_5.6_short_rth_enriched_volume_level_retrain/` ran **18 passes**
+and produced a 1,240-line append-only `audit.md`.
+
 Workflow:
-1. Invoke the harness-specific lookahead auditor on the changed scope
-2. In Codex, persist the read-only auditor's complete Markdown response to the required `audit.md`; in Claude, read the auditor-written `audit.md`
-3. Address every CRITICAL finding by editing the code (do not dismiss without explicit approval from the user)
-4. Address WARNING findings unless they are out of scope or the user has waived them
-5. Re-invoke the harness-specific lookahead auditor on the same scope
-6. Repeat 3–5 until zero CRITICAL and either zero WARNING or user-acknowledged WARNING
-7. Only then report back to the user
+
+1. **Run the free lint first.** `python scripts/causal_lint.py --study studies/<name> --json studies/<name>/audit/lint.json`.
+   It catches the known-recurring defect classes (H4 trigger-price fills, session
+   gates on `ts_event`, `center=True`, `.shift(-N)`, `bfill`, `merge_asof`
+   without `direction=`, non-`*.v.0` symbols) deterministically and for free.
+   Fix everything it reports before spending an agent turn.
+2. Invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
+   on the Deliverables Manifest. They are independent and may run in parallel.
+3. Each writes a **new** `audit/pass_<NN>.md` plus a machine-readable
+   `audit/status.json` (`contract_status.json` for the contract-checker).
+   **Never append to a previous pass's report** — append-only files make the
+   verdict unparseable, and a gate that greps for "critical" and "0" will pass
+   on a failing report that merely contains an earlier clean summary.
+4. Address every CRITICAL finding by editing the code (do not dismiss without
+   explicit user approval). Address WARNINGs unless out of scope or waived.
+5. Re-invoke on the same scope, **passing the previous pass's findings**. The
+   auditor must adjudicate every prior finding (`FIXED` / `NOT FIXED` /
+   `WITHDRAWN`) *before* raising anything new, and may raise **at most 3 new
+   CRITICAL findings per pass.**
+6. Repeat 4–5 until `status.json` shows `critical: 0` and either zero WARNING or
+   user-acknowledged WARNING.
+7. Only then report back to the user.
+
+Gates read `audit/status.json`. Do not parse prose for a verdict.
 
 Do not skip the audit because the change "looks small". Look-ahead bugs are most often introduced by small edits to previously-clean code.
+
+### Commit protocol (mandatory)
+
+Every phase gate ends with a commit. A study that runs for days without commits
+cannot be bisected when a defect is found late, and audit reports lose their
+anchor to the code they audited.
+
+**Commit at these points, and only these:**
+
+| Trigger | Message prefix | Must include |
+|---|---|---|
+| SPEC frozen (before implementation) | `spec(<study>):` | `SPEC.md`, `config/*.yaml` |
+| Phase gate passed (`status.json` clean) | `phase(<study>): <phase> <verdict>` | code + `audit/pass_NN.md` + `audit/status.json` |
+| Study accepted | `study(<study>): ACCEPTED` | `BUILD_REPORT.md` / `STUDY_REPORT.md` + manifests |
+| Tooling / governance change | `chore:` or `docs:` | — |
+
+Rules:
+
+1. **Never commit on `main`.** Branch first: `study/<study_name>` or
+   `chore/<topic>`. Open a PR when the study is accepted.
+2. **The audit artifact commits with the code it audited.** A `pass_NN.md`
+   committed separately from its code is unanchored — the scope hash it records
+   must correspond to the tree in that same commit.
+3. **Never commit generated data.** `canonical_*/`, `_work/`, `results/*.parquet`,
+   `artifacts/**/model.joblib` stay untracked. Commit the *manifests* and hashes
+   that identify them, not the bytes.
+4. Run `python scripts/causal_lint.py` and `python scripts/sync_agents.py --check`
+   before committing. Both must exit 0.
+5. Do not use `--no-verify` or skip hooks.
+
+### Agent definition parity (all three harnesses)
+
+`.claude/agents/*.md` is the **canonical** source. `.agents/agents_staging/*.md`
+(Antigravity) and `.codex/agents/*.toml` (Codex) are **generated** — do not edit
+them by hand.
+
+```bash
+python scripts/sync_agents.py           # regenerate from canonical
+python scripts/sync_agents.py --check   # verify in sync
+```
+
+This exists because the harnesses silently drifted: the Codex auditor was
+missing 14 checklist rules including `C4` and `D4`, the #2 and #4 most frequent
+finding categories in the repository. An audit that passed under Codex would
+fail under Claude, causing rework on every harness switch. Agent definitions
+must **reference** `docs/CAUSAL_CHECKLIST.md`, never restate rules inline;
+`sync_agents.py` warns when a definition inlines rule text.
 
 ### Standing Authorization for Named Mandatory Agent Gates
 

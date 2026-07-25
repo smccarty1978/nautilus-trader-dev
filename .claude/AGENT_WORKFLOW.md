@@ -65,6 +65,68 @@ Not every task requires the full agent ceremony. Launch sessions according to ri
 
 ---
 
+## The Split Audit Gate
+
+Rules live in `docs/CAUSAL_CHECKLIST.md` — the single source of truth shared by
+Claude, Codex, and Antigravity. Agent definitions reference it; they never
+restate it.
+
+### Order of operations (cheapest first)
+
+| # | Step | Cost | Catches |
+|---|---|---|---|
+| 0 | `python scripts/causal_lint.py --study studies/<name>` | free | H4 trigger-price fills, `ts_event` session gates, `center=True`, `.shift(-N)`, `bfill`, bare `merge_asof`, random CV, non-`*.v.0` symbols |
+| 1 | `contract-checker` on the Deliverables Manifest | 1,000w | missing artifacts, unreachable terminal labels, seal integrity, C4/D/E |
+| 2 | `lookahead-auditor` on the causal contract | 1,500w | state flow, callback ordering, cross-file convention conflicts, train/serve divergence |
+
+Steps 1 and 2 have **disjoint scope** and may run in parallel. Never let one
+report the other's category.
+
+### Why the split exists
+
+Across ~100 historical audit reports, ~60% of blocking findings were
+completeness issues (`D1` 22, `C4` 22, `C3` 12, `D4` 9) rather than look-ahead.
+The causal checklist has no natural stopping point for completeness, so the
+auditor invented new findings each pass —
+`studies/codex_5.6_short_rth_enriched_volume_level_retrain/` ran **18 passes**.
+
+### Re-audit protocol
+
+Pass 2+ must:
+
+1. Adjudicate **every** prior finding (`FIXED` / `NOT FIXED` / `WITHDRAWN`) with
+   one line of evidence, *before* raising anything new.
+2. Raise **at most 3 new CRITICAL findings per pass.**
+3. Never re-raise an addressed finding under new framing — mark the original
+   `NOT FIXED` instead.
+
+### Artifacts
+
+* `audit/pass_<NN>.md` — a **new** file per pass. Never append.
+* `audit/status.json` / `audit/contract_status.json` — machine-readable verdict.
+
+Gates read the JSON. Prose is for humans. A gate that greps a 1,240-line
+append-only report for "critical" and "0" passes on a failing audit that merely
+contains an earlier clean summary — this actually happened.
+
+---
+
+## Agent Definition Parity
+
+`.claude/agents/*.md` is **canonical**. The other harnesses are generated:
+
+```bash
+python scripts/sync_agents.py           # regenerate Codex + Antigravity
+python scripts/sync_agents.py --check   # verify in sync
+```
+
+Do not hand-edit `.agents/agents_staging/*.md` or `.codex/agents/*.toml`. The
+harnesses previously drifted far enough that the Codex auditor was missing 14
+checklist rules, including `C4` and `D4` — the #2 and #4 most frequent finding
+categories in the repository.
+
+---
+
 ## Required Delegation Packet
 
 Every subagent prompt must include:
