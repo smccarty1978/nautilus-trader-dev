@@ -1,0 +1,19 @@
+{
+  "agent": "main-session-contract-fallback",
+  "authorization": "explicit user authorization on 2026-07-26",
+  "critical": 0,
+  "date": "2026-07-26",
+  "gate": "canonical_research_parquet_consolidation_completion",
+  "notes": 0,
+  "pass": 6,
+  "report": "studies/full_trade_path_builder/audit/contract_pass_06.md",
+  "scope": [
+    "studies/full_trade_path_builder/CONSOLIDATION_SPEC.md",
+    "studies/full_trade_path_builder/config/consolidation.yaml",
+    "studies/full_trade_path_builder/implementation/consolidate_research_parquets.py",
+    "studies/full_trade_path_builder/implementation/canonical_research_loader.py",
+    "tests/test_research_parquet_consolidation.py"
+  ],
+  "status": "PASS",
+  "warnings": 0
+}
