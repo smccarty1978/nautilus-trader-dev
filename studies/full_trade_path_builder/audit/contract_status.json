@@ -3,16 +3,15 @@
   "authorization": "explicit user authorization on 2026-07-26",
   "critical": 0,
   "date": "2026-07-26",
-  "gate": "canonical_research_parquet_consolidation_completion",
+  "gate": "canonical_research_store_acceptance_completion",
   "notes": 0,
-  "pass": 6,
-  "report": "studies/full_trade_path_builder/audit/contract_pass_06.md",
+  "pass": 9,
+  "report": "studies/full_trade_path_builder/audit/contract_pass_09.md",
   "scope": [
-    "studies/full_trade_path_builder/CONSOLIDATION_SPEC.md",
-    "studies/full_trade_path_builder/config/consolidation.yaml",
-    "studies/full_trade_path_builder/implementation/consolidate_research_parquets.py",
-    "studies/full_trade_path_builder/implementation/canonical_research_loader.py",
-    "tests/test_research_parquet_consolidation.py"
+    "studies/full_trade_path_builder/RESEARCH_STORE_ACCEPTANCE_SPEC.md",
+    "studies/full_trade_path_builder/config/research_store_acceptance.yaml",
+    "studies/full_trade_path_builder/analysis/validate_canonical_research_store.py",
+    "tests/test_research_store_acceptance.py"
   ],
   "status": "PASS",
   "warnings": 0
