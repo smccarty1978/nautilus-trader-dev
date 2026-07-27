@@ -1,4 +1,4 @@
-"""Analyze the canonical first-signal Top-2.5% paths under a 1.25 ATR stop."""
+"""Analyze canonical first-signal Top-2.5% paths under a configured ATR stop."""
 from __future__ import annotations
 
 import argparse
@@ -87,6 +87,7 @@ def _write_report(summary: dict, path: Path) -> None:
     primary = summary["primary_results"]
     by_outcome = {row["outcome_class"]: row for row in primary}
     total = summary["total_entries"]
+    stop_atr = summary["conventions"]["stop_atr"]
     count = lambda outcome: by_outcome.get(outcome, {}).get("trade_count", 0)
     reached = summary["confirmation_funnel"]["reached_confirmation"]
     cols = [
@@ -107,7 +108,7 @@ def _write_report(summary: dict, path: Path) -> None:
         ("mean_realized_return_atr", "Mean return ATR"),
         ("median_MFE_atr", "Median MFE ATR"),
     ]
-    text = f"""# Top 2.5% First-Signal Entries With 1.25 ATR Stop
+    text = f"""# Top 2.5% First-Signal Entries With {stop_atr:.2f} ATR Stop
 
 ## Executive summary
 
@@ -131,7 +132,7 @@ for bearish-fade longs. Entry is `checkpoint_reference_price`; risk
 normalization is frozen `atr_at_entry`.
 
 A stop touch is detected from the completed one-second bar high/low through
-`adverse_intrabar_extreme_atr <= -1.25`. The exit fills at the following path
+`adverse_intrabar_extreme_atr <= -{stop_atr:.2f}`. The exit fills at the following path
 bar's open, with that bar's open timestamp. The trigger price is not credited.
 Same-bar competing stop and regime events are ambiguous. A final-bar stop touch
 without a following open is censored. The stop remains active after
@@ -163,8 +164,9 @@ later stopped, while {count("REGIME-FLIP EXIT FOR PROFIT"):,} exited profitably,
 
 ## Interpretation
 
-The fixed stop prevented 31.79% of the first-signal population from reaching
-confirmation. Another 14.75% stopped after confirmation. Profitable opposing
+The fixed stop prevented {100*count("STOPPED BEFORE CONFIRMATION")/total:.2f}% of the
+first-signal population from reaching confirmation. Another
+{100*count("STOPPED AFTER CONFIRMATION")/total:.2f}% stopped after confirmation. Profitable opposing
 flip exits were more frequent than losing opposing flip exits, but losing exits
 still commonly experienced favorable movement first; their pooled median MFE
 was {by_outcome["REGIME-FLIP EXIT FOR LOSS"]["median_MFE_atr"]:.3f} ATR.
