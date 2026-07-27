@@ -1,0 +1,31 @@
+version: canonical_research_consolidation_v1
+compression: zstd
+compression_level: 6
+row_group_size: 131072
+create_annual_convenience_files: false
+outputs:
+  observations: canonical_observations_all.parquet
+  trade_summaries: canonical_trade_summaries_all.parquet
+  trade_paths: canonical_trade_paths_all.parquet
+sort_columns:
+  observations:
+    - instrument_id
+    - checkpoint_decision_ns
+  trade_summaries:
+    - instrument_id
+    - checkpoint_decision_ns
+    - model_id
+    - trade_direction
+    - trade_id
+  trade_paths:
+    - trade_id
+    - timestamp_close_ns
+duplicate_keys:
+  observations:
+    - instrument_id
+    - checkpoint_decision_ns
+  trade_summaries:
+    - trade_id
+  trade_paths:
+    - trade_id
+    - timestamp_close_ns
