@@ -69,6 +69,9 @@ def _reconcile_regimes(regimes: pl.DataFrame) -> dict:
         "duplicate_regime_ids": regimes.height - regimes["regime_id"].n_unique(),
         "duplicate_starts": regimes.height
         - regimes["regime_start_decision_ns"].n_unique(),
+        "duplicate_sequence_numbers": regimes.height
+        - regimes["regime_sequence_number"].n_unique(),
+        "sequence_is_dense": sequence == list(range(1, len(sequence) + 1)),
         "sequence_is_monotonic": sequence == sorted(sequence),
         "consecutive_same_direction": sum(
             1 for a, b in zip(directions, directions[1:]) if a == b
@@ -98,17 +101,50 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
         "partition_list": [name for name, _, _ in partitions],
         "datasets": {},
     }
+    # regime_id -> globally monotonic sequence number, filled when the regime
+    # dataset is written and applied to every dataset that carries the column.
+    sequence_map: pl.DataFrame | None = None
 
     for key, target in TARGETS.items():
         sources = [directory / OUTPUTS[key] for _, directory, _ in partitions]
         expected = sum(manifest["rows"][key] for _, _, manifest in partitions)
 
-        frames = [pl.read_parquet(path) for path in sources]
-        frames = [f for f in frames if f.height]
-        if not frames:
-            combined = pl.read_parquet(sources[0])
-        else:
-            combined = pl.concat(frames, how="vertical_relaxed")
+        # Each partition is collected by its own subprocess, so its regime
+        # counter starts at 1. Concatenated, the column collides ~60 ways and
+        # is useless for the successor-regime lookup that DECISION-2 depends on
+        # (confirmation = regime R+1, opposing exit = regime R+2). Renumber
+        # globally by start time, then propagate by exact regime_id so no
+        # dataset can disagree with another.
+        #
+        # The remap is applied per partition, before concatenation. Joining once
+        # on the concatenated path table means a string join over 61.5M rows,
+        # which exhausts memory and is killed without a traceback.
+        frames = []
+        for path in sources:
+            frame = pl.read_parquet(path)
+            if not frame.height:
+                continue
+            if key != "regimes" and "regime_sequence_number" in frame.columns:
+                if sequence_map is None:
+                    raise RuntimeError("regimes must be consolidated before dependants")
+                frame = frame.drop("regime_sequence_number").join(
+                    sequence_map, on="regime_id", how="left"
+                )
+            frames.append(frame)
+
+        combined = (
+            pl.read_parquet(sources[0])
+            if not frames
+            else pl.concat(frames, how="vertical_relaxed")
+        )
+        frames.clear()
+
+        if key == "regimes":
+            combined = combined.sort("regime_start_decision_ns").with_columns(
+                regime_sequence_number=pl.int_range(1, pl.len() + 1, dtype=pl.Int64)
+            )
+            sequence_map = combined.select("regime_id", "regime_sequence_number")
+
         sort_keys = [k for k in SORT_KEYS[key] if k in combined.columns]
         if sort_keys:
             combined = combined.sort(sort_keys)
@@ -135,7 +171,7 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
             )
         if key == "regimes":
             report["regime_reconciliation"] = _reconcile_regimes(combined)
-        del combined, frames
+        del combined
 
     scores = pl.scan_parquet(out_dir / TARGETS["scores"])
     paths = pl.scan_parquet(out_dir / TARGETS["paths"])
@@ -152,9 +188,15 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
         ),
     }
 
-    report["all_reconciled"] = all(
-        d["reconciled"] for d in report["datasets"].values()
-    ) and not any(report["global_integrity"].values())
+    rec = report["regime_reconciliation"]
+    report["all_reconciled"] = (
+        all(d["reconciled"] for d in report["datasets"].values())
+        and not any(report["global_integrity"].values())
+        and rec["duplicate_regime_ids"] == 0
+        and rec["duplicate_sequence_numbers"] == 0
+        and rec["sequence_is_dense"]
+        and rec["consecutive_same_direction"] == 0
+    )
 
     (out_dir / "canonical_collection_manifest.json").write_text(
         json.dumps(report, indent=2, default=str)

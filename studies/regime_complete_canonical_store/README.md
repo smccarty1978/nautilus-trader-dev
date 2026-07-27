@@ -12,11 +12,14 @@ The collection layer records observable state. The analysis layer creates trades
 | Phase | State |
 |---|---|
 | 0 — discovery, contract freeze, threshold contracts | **complete** |
-| 1 — micro fixture | not started |
-| 2 — bounded pilot (2025-03) | not started |
-| 3 — full 2021–2025 build | not started |
-| 4 — backward parity vs 5,836 accepted trades | not started |
-| 5 — independent audit | not started |
+| 1 — micro fixture | **complete** |
+| 2 — bounded pilot (2025-03) | **complete** |
+| 3 — full 2021–2025 build | **complete** — 60/60 partitions, 0 failed |
+| 4 — backward parity vs 5,836 accepted trades | **PASS** — 0 unexplained |
+| 5 — independent audit | **PASS** — 125 regimes, 0 mismatches |
+
+**Verdict: REGIME-COMPLETE STORE ACCEPTED.** See
+`REGIME_COMPLETE_CANONICAL_STORE_REPORT.md`.
 
 ## Documents
 
@@ -67,16 +70,21 @@ now materialized.
 > thresholds are descriptive and must not be represented as threshold-out-of-sample
 > for 2025. Inherits `full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json`.
 
-## Planned outputs
+## Built outputs
 
 ```text
 data/canonical/regime_complete_v1/
-  canonical_regimes_all.parquet                 ~137,881 rows      ~30 MB
-  canonical_regime_scores_all.parquet          ~12,156,904 rows   ~4.0 GB
-  canonical_regime_paths_all.parquet           ~61,543,945 rows   ~2.5 GB
-  canonical_model_threshold_contracts.parquet          12 rows     built
+  canonical_regimes_all.parquet                    137,673 rows    0.01 GB
+  canonical_regime_scores_all.parquet           12,156,904 rows    3.78 GB
+  canonical_regime_paths_all.parquet            61,543,945 rows    1.35 GB
+  canonical_missing_dispatch_all.parquet        19,396,376 rows    0.09 GB
+  canonical_model_threshold_contracts.parquet           12 rows
   canonical_collection_manifest.json
 ```
+
+Scores and paths land **exactly** on the counts measured independently from the
+catalog before this code existed (12,156,904 5s dispatch slots; 61,543,945 1s
+bars), and `scores + missing` equals the full 5s grid.
 
 Development writes to `regime_complete_v1/`. The accepted `full_trade_path_builder/`
 artifacts are never overwritten — they are the backward-parity reference.

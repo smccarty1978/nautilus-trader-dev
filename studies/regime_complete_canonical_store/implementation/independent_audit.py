@@ -28,7 +28,21 @@ CATALOG_1S = (
     / "2020-01-01T23-00-01-000000000Z_2026-04-30T00-00-00-000000000Z.parquet"
 )
 NS = 1_000_000_000
-PRICE_SCALE = 1e-9  # NT stores fixed-point prices; scaled only for comparison.
+# The catalog stores prices as NautilusTrader fixed-point integers packed into
+# 8-byte little-endian binary columns, not as floats.
+PRICE_SCALE = 1e-9
+
+
+def _decode_prices(column: pl.Series) -> list[float]:
+    """Decode a raw fixed-point binary price column to floats."""
+    import numpy as np
+
+    if column.dtype == pl.Binary:
+        raw = np.frombuffer(b"".join(column.to_list()), dtype="<u8")
+        return (raw * PRICE_SCALE).tolist()
+    if column.dtype.is_integer():
+        return (column.to_numpy() * PRICE_SCALE).tolist()
+    return column.to_list()
 
 
 def independent_regimes(highs, lows, closes, ts_inits) -> list[dict]:
@@ -130,12 +144,11 @@ def audit(store: Path, per_year: int, seed: int) -> dict:
         .sort("ts_init")
         .collect()
     )
-    scale = PRICE_SCALE if minutes["high"].dtype in (pl.Int64, pl.Int32) else 1.0
     flips = independent_regimes(
-        [h * scale for h in minutes["high"].to_list()],
-        [l * scale for l in minutes["low"].to_list()],
-        [c * scale for c in minutes["close"].to_list()],
-        minutes["ts_init"].to_list(),
+        _decode_prices(minutes["high"]),
+        _decode_prices(minutes["low"]),
+        _decode_prices(minutes["close"]),
+        [int(t) for t in minutes["ts_init"].to_list()],
     )
     flip_starts = {f["confirm_flip_ns"]: f for f in flips}
 

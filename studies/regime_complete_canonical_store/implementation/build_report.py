@@ -66,6 +66,44 @@ def determine_verdict(parity, audit, consolidation) -> tuple[str, list[str]]:
     return ("CONDITIONAL" if reconciled and parity_ok else "REJECTED"), limitations
 
 
+def _known_limitations(counts: dict | None) -> list[str]:
+    """Limitations that hold even when every gate passes.
+
+    Stated unconditionally so a clean run cannot read as an unqualified one.
+    """
+    items = [
+        "**Threshold provenance.** Both frozen calibration populations are "
+        "calendar-2025 and overlap the 2021–2025 evaluation window. Every "
+        "threshold row carries `overlaps_evaluation_window = true`. Results "
+        "using these thresholds are descriptive and must not be represented as "
+        "threshold-out-of-sample for 2025.",
+        "**ETH scores are almost entirely absent by contract.** Three of the 25 "
+        "frozen features are RTH accumulators that return null once the session "
+        "ends, so the frozen adapters decline to score outside RTH. ETH "
+        "checkpoints, regimes, and paths are retained in full, but ETH carries "
+        "no usable model probability and is never in-domain.",
+        "**Model coverage is unchanged.** This store adds no model, retrains "
+        "nothing, and changes no feature. Out-of-domain and exploratory score "
+        "semantics are inherited from the accepted artifacts.",
+        "**Feature snapshots are inline, not a separate long table** "
+        "(DECISION-5). Provenance is preserved via the per-model feature "
+        "vector hashes; the tradeoff is documented rather than silent.",
+        "**58 path rows of 61,543,945 carry a null `regime_sequence_number`.** "
+        "They belong to a single regime that began during warmup before "
+        "2021-01, so its regime row falls outside the build window while its "
+        "path rows fall inside. This affects the first regime of the corpus only.",
+        "**2026 is absent by design**, reserved for runtime out-of-sample "
+        "validation. No calibration or collection touched it.",
+    ]
+    if counts and counts.get("unexplained") == 0:
+        items.append(
+            "**Regime count differs from the accepted flip file by 208, fully "
+            "explained** (199 outside the window, 9 cold-start warmup "
+            "artifacts). No unexplained difference remains."
+        )
+    return items
+
+
 def build() -> str:
     consolidation = json.loads(
         (STORE / "canonical_collection_manifest.json").read_text()
@@ -276,8 +314,43 @@ def build() -> str:
     else:
         sections.append("The independent audit was not run.\n")
 
+    # 9b. Regime-count reconciliation --------------------------------------
+    counts = _load("regime_count_reconciliation.json")
+    if counts:
+        sections.append("### Regime-count reconciliation\n")
+        sections.append(
+            _table(
+                [
+                    [
+                        "Accepted flips, deduplicated",
+                        _fmt(counts["accepted_flips_deduplicated"]),
+                    ],
+                    [
+                        "— outside the 2021–2025 window (2020 warmup)",
+                        _fmt(counts["accepted_flips_outside_window"]),
+                    ],
+                    [
+                        "— cold-start warmup artifacts",
+                        _fmt(counts["explained_as_cold_start_warmup_artifacts"]),
+                    ],
+                    ["Store regimes", _fmt(counts["store_regimes"])],
+                    ["In store, not in accepted", _fmt(counts["in_store_not_in_accepted"])],
+                    ["**Unexplained**", f"**{_fmt(counts['unexplained'])}**"],
+                ],
+                ["Component", "Count"],
+            )
+            + "\n"
+        )
+        sections.append(counts["conclusion"] + "\n")
+
+    # 10. Limitations ------------------------------------------------------
+    sections.append("## 10. Limitations\n")
+    for item in _known_limitations(counts):
+        sections.append(f"- {item}")
+    sections.append("")
+
     # 11. Verdict ----------------------------------------------------------
-    sections.append("## 10. Verdict\n")
+    sections.append("## 11. Verdict\n")
     sections.append(f"```text\n{VERDICTS[verdict_key]}\n```\n")
     sections.append(
         _table(
