@@ -1,0 +1,87 @@
+{
+  "rows": {
+    "scores": 10913,
+    "regimes": 114,
+    "paths": 55292,
+    "missing": 6367
+  },
+  "failures": {},
+  "rth_equivalence": {
+    "accepted_rows": 4646,
+    "pilot_rth_rows": 4646,
+    "compared_columns": 160,
+    "missing_vs_accepted": 0,
+    "extra_vs_accepted": 0,
+    "mismatched_columns": {}
+  },
+  "score_coverage": {
+    "by_session": [
+      {
+        "session": "ETH",
+        "len": 6267
+      },
+      {
+        "session": "RTH",
+        "len": 4646
+      }
+    ],
+    "bullish_scored": 4274,
+    "bearish_scored": 4286,
+    "bullish_in_domain": 515,
+    "bearish_in_domain": 1555,
+    "both_in_domain": 0,
+    "neither_in_domain": 8843
+  },
+  "regime_coverage": {
+    "by_direction": [
+      {
+        "regime_direction": -1,
+        "len": 57
+      },
+      {
+        "regime_direction": 1,
+        "len": 57
+      }
+    ],
+    "by_start_session": [
+      {
+        "session_at_start": "ETH",
+        "len": 87
+      },
+      {
+        "session_at_start": "RTH",
+        "len": 27
+      }
+    ],
+    "established": 46,
+    "never_established": 68,
+    "complete_paths": 113,
+    "censored_paths": 1
+  },
+  "partition_boundary": {
+    "regimes_straddling_partition_start": 1
+  },
+  "linkage": {
+    "scores_without_local_regime_row": 286,
+    "paths_without_local_regime_row": 1441,
+    "scores_with_null_regime_id": 0
+  },
+  "policy_freedom": {
+    "regimes_with_multiple_checkpoints": 115,
+    "regimes_with_no_score_row_retained": 0,
+    "min_bullish_probability": 0.06360899163340407,
+    "min_bearish_probability": 0.07211212704876019
+  },
+  "dispatch_grid": {
+    "expected_5s_slots": 17280,
+    "scored": 10913,
+    "missing": 6367,
+    "accounted": 17280
+  },
+  "verdict": "PASS",
+  "partition": "2025-03",
+  "window": {
+    "start": "2025-03-03T00:00:00+00:00",
+    "end": "2025-03-04T00:00:00+00:00"
+  }
+}
