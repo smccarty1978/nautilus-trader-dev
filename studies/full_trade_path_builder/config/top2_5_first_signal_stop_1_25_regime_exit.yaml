@@ -1,0 +1,22 @@
+study_id: top2_5_first_signal_stop_1_25_regime_exit
+population: canonical_selected_first_signal_top_2_5_percent
+expected_population: 5836
+stop_atr: 1.25
+flat_tolerance_points: 0.125
+validation_sample_size: 100
+validation_seed: 20260726
+inputs:
+  summaries: studies/full_trade_path_builder/consolidated/canonical_trade_summaries_all.parquet
+  paths: studies/full_trade_path_builder/consolidated/canonical_trade_paths_all.parquet
+outputs:
+  results: studies/full_trade_path_builder/results/top2_5_stop_1_25_regime_exit_results.parquet
+  summary: studies/full_trade_path_builder/results/top2_5_stop_1_25_regime_exit_summary.json
+  report: studies/full_trade_path_builder/TOP2_5_STOP_1_25_REGIME_EXIT_REPORT.md
+thresholds:
+  bullish_fade_short: 0.5697449423968936
+  bearish_fade_long: 0.5641320087327389
+stop_fill:
+  detection: completed_1s_bar_high_low
+  execution: next_path_bar_open
+  same_bar_competition: ambiguous
+  final_bar_touch: censored
