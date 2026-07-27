@@ -1,0 +1,36 @@
+{
+  "study_id": "top2_5_first_signal_stop_0_75_regime_exit",
+  "accepted_date": "2026-07-26",
+  "verdict": "RESULTS VALID WITH LIMITATIONS",
+  "population_rows": 5836,
+  "artifacts": [
+    {
+      "path": "studies/full_trade_path_builder/results/top2_5_stop_0_75_regime_exit_results.parquet",
+      "bytes": 845003,
+      "sha256": "741252b139d45c39a05ab1d0b8c085c16cb7fae10647f7fcaed55b8806440461",
+      "committed": false
+    },
+    {
+      "path": "studies/full_trade_path_builder/results/top2_5_stop_0_75_regime_exit_summary.json",
+      "bytes": 69898,
+      "sha256": "fa6ced54e2b2c39c256e95c8ed7a0dbfd05adaf76a3273a308aeacd4f1462987",
+      "committed": false
+    },
+    {
+      "path": "studies/full_trade_path_builder/TOP2_5_STOP_0_75_REGIME_EXIT_REPORT.md",
+      "bytes": 5251,
+      "sha256": "41e4efb1c5c19f528b176547aabfd050c93bbdab645b6a7fca761fda265da58d",
+      "committed": true
+    }
+  ],
+  "validation": {
+    "causal_audit_pass": 15,
+    "causal_critical": 0,
+    "causal_warnings": 0,
+    "contract_pass": 14,
+    "contract_critical": 0,
+    "contract_warnings": 0,
+    "independent_replay_size": 100,
+    "independent_replay_mismatches": 0
+  }
+}
