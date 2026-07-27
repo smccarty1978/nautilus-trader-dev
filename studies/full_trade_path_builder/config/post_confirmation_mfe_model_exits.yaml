@@ -1,0 +1,35 @@
+study_id: post_confirmation_mfe_model_exits
+population_rows: 5836
+initial_stops_atr: [0.75, 1.00, 1.25]
+flat_tolerance_points: 0.125
+validation_seed: 20260727
+validation_trades_per_stop: 100
+thresholds:
+  bullish:
+    top_10: 0.43167249785595935
+    top_5: 0.5067081427626979
+    top_2_5: 0.5697449423968936
+  bearish:
+    top_10: null
+    top_5: 0.5084619230529974
+    top_2_5: 0.5641320087327389
+price_policies:
+  activations_all: [0.75, 1.00, 1.50, 2.00]
+  fixed_floors: [0.00, 0.25, 0.50]
+  givebacks: [0.50, 0.75, 1.00]
+  activations_fractional: [1.00, 1.50, 2.00]
+  retentions: [0.25, 0.50, 0.75]
+model_persistence_observations: [1, 2, 3]
+inputs:
+  observations: studies/full_trade_path_builder/consolidated/canonical_observations_all.parquet
+  summaries: studies/full_trade_path_builder/consolidated/canonical_trade_summaries_all.parquet
+  paths: studies/full_trade_path_builder/consolidated/canonical_trade_paths_all.parquet
+  baseline_0_75: studies/full_trade_path_builder/results/top2_5_stop_0_75_regime_exit_results.parquet
+  baseline_1_00: studies/full_trade_path_builder/results/top2_5_stop_1_00_regime_exit_results.parquet
+  baseline_1_25: studies/full_trade_path_builder/results/top2_5_stop_1_25_regime_exit_results.parquet
+outputs:
+  trade_policy: studies/full_trade_path_builder/results/post_confirmation_mfe_model_exit_trade_policy_results.parquet
+  warnings: studies/full_trade_path_builder/results/post_confirmation_model_warning_events.parquet
+  cross_stop: studies/full_trade_path_builder/results/post_confirmation_policy_cross_stop_comparison.parquet
+  summary: studies/full_trade_path_builder/results/post_confirmation_mfe_model_exit_summary.json
+  report: studies/full_trade_path_builder/POST_CONFIRMATION_MFE_AND_MODEL_EXIT_REPORT.md
