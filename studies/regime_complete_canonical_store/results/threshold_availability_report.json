@@ -1,0 +1,72 @@
+{
+  "created_at": "2026-07-27T14:40:55.802296+00:00",
+  "models": {
+    "BULLISH_STRICT_top25_gbt_v2": {
+      "calibration_population_id": "BULLISH_2025_RTH_ESTABLISHED_INDOMAIN_COMPLETE",
+      "derived": {
+        "top_0_5": 0.6886333180788179,
+        "top_1": 0.6412279079940403,
+        "top_20": 0.34374423771129053
+      },
+      "deterministic_sort": "checkpoint_decision_ns",
+      "key_column": "checkpoint_decision_ns",
+      "model_artifact_hash": "ac833f5f4c983b791f3632660d762dfd6fd47ecc20e78822797628c11e7817f8",
+      "population_description": "all feature-complete in-domain established bullish RTH checkpoints",
+      "population_key_sha256": "a41d09cfbf2cbd49b2a5465ede7f84d290fee7b17ea106eacb3ceb631405f8a0",
+      "reproduced": {
+        "top_10": {
+          "exact": true,
+          "frozen": 0.43167249785595935,
+          "value": 0.43167249785595935
+        },
+        "top_2_5": {
+          "exact": true,
+          "frozen": 0.5697449423968936,
+          "value": 0.5697449423968936
+        },
+        "top_5": {
+          "exact": true,
+          "frozen": 0.5067081427626979,
+          "value": 0.5067081427626979
+        }
+      },
+      "row_filter": "feature_complete == true",
+      "sample_count": 171334,
+      "score_sha256_little_endian_float64": "70ac7a94176689a7f57cadba2492e7eef548421b12befa3a2b3d8cb164224b37",
+      "source_glob": "studies/full_trade_path_builder/_work/phase_a_monthly/year=2025/month=*/checkpoints.parquet"
+    },
+    "LONG_STRICT_top25_gbt_v2": {
+      "calibration_population_id": "BEARISH_2025_DEVELOPMENT_POPULATION",
+      "derived": {
+        "top_0_5": 0.6706161496105166,
+        "top_1": 0.6306416772425602,
+        "top_10": 0.44559149246408103,
+        "top_20": 0.3745119841718754
+      },
+      "deterministic_sort": "observation_time",
+      "key_column": "observation_time",
+      "model_artifact_hash": "1d696d85f2e31026db8415fb15913267d447bd7fde9be0fcefed490c7bf4af26",
+      "population_description": "frozen 2025 development population of the LONG_STRICT symmetric retrain",
+      "population_key_sha256": "abf6637068ce11f8d36bdf2be55ae60f08c73df79d96abc656f9c2d8c9629b94",
+      "reproduced": {
+        "top_2_5": {
+          "exact": true,
+          "frozen": 0.5641320087327389,
+          "value": 0.5641320087327389
+        },
+        "top_5": {
+          "exact": true,
+          "frozen": 0.5084619230529974,
+          "value": 0.5084619230529974
+        }
+      },
+      "row_filter": "none",
+      "sample_count": 163397,
+      "score_sha256_little_endian_float64": "a421eeb339717ee75b0d8dd5af06a3da88ae0482bd490fbcc74d9cbb4f0d0f80",
+      "source_glob": "studies/long_rth_strict_symmetric_retrain/_work/monthly/2025/2025-*.parquet"
+    }
+  },
+  "output": "data/canonical/regime_complete_v1/canonical_model_threshold_contracts.parquet",
+  "output_sha256": "db243c161a044d3338f1029211d24ab6ed6b9278b77295796ce39caddad3c714",
+  "row_count": 12
+}
