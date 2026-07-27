@@ -449,9 +449,22 @@ correctness argument.
 | 4 | Backward parity §10.1 | 5,836 exact |
 | 5 | `lookahead-auditor` + `contract-checker` + data-integrity audit | 0 CRITICAL |
 
-Estimates: ~7 GB total on disk; peak memory < 10 GB (existing Phase B budget);
-runtime ~12–20 h sharded monthly, versus the ~6 h RTH-only Phase B budget — driven
-by 2.15× the checkpoints plus 61.5M path rows.
+### 11.1 Measured cost (2025-03 pilot, superseding the Phase 0 estimates)
+
+| Dataset | Pilot rows | Pilot bytes | ×60 months |
+|---|---:|---:|---:|
+| regimes | 2,174 | 0.20 MB | ~130K rows, ~12 MB |
+| scores | 212,078 | 68.9 MB | ~12.7M rows, ~4.1 GB |
+| paths | 1,072,575 | 23.1 MB | ~64M rows, ~1.4 GB |
+| missing dispatch | 323,602 | 1.4 MB | ~19.4M rows, ~86 MB |
+| **total** | | **93.6 MB** | **~5.6 GB** |
+
+Runtime 318 s/month → **~5.3 h** for the full 60-partition build, well under the
+Phase 0 estimate of 12–20 h. Peak memory ~5.6 GB, within the 10 GB Phase B budget.
+
+Extrapolated row counts track the independently measured totals closely (~130K vs
+137,881 regimes; ~12.7M vs 12,156,904 checkpoints; ~64M vs 61,543,945 1s bars),
+which is itself a coverage check — March is a slightly denser month than average.
 
 ---
 

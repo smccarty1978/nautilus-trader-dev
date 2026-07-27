@@ -28,6 +28,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from studies.fable5_pre_flip_d10_reversal_entry.run_nt import create_instrument  # noqa: E402
+from studies.full_trade_path_builder.implementation.phase_a_strategy import (  # noqa: E402
+    is_rth_decision,
+)
 from studies.full_trade_path_builder.implementation.run_phase_a_collect import (  # noqa: E402
     BAR_1M,
     BAR_1S,
@@ -136,11 +139,10 @@ def collect(
     paths = build_paths(strategy.paths, all_regimes, partition).filter(
         (pl.col("path_init_ns") >= start_ns) & (pl.col("path_init_ns") < end_ns)
     )
-    scores = build_scores(
-        [r for r in strategy.rows if in_window(r["checkpoint_decision_ns"])], partition
-    )
+    scored_rows = [r for r in strategy.rows if in_window(r["checkpoint_decision_ns"])]
+    scores = build_scores(scored_rows, partition)
     missing = build_missing(
-        [m for m in strategy.missing if in_window(m["checkpoint_decision_ns"])]
+        start_ns, end_ns, {r["checkpoint_decision_ns"] for r in scored_rows}
     )
 
     for key, frame in (
@@ -179,16 +181,32 @@ def collect(
     return manifest
 
 
-def build_missing(rows: list[dict]) -> pl.DataFrame:
-    """Gaps in the 5s dispatch grid, retained separately and never imputed."""
+def build_missing(start_ns: int, end_ns: int, scored: set[int]) -> pl.DataFrame:
+    """Every 5s slot in the window with no score row.
+
+    Reconciled against the complete window grid rather than detected as the
+    stream advances, so `scores + missing` equals the expected slot count by
+    construction -- including slots that run to the end of the window, which an
+    incremental detector cannot see.
+
+    Gaps are retained separately and never imputed into the score table.
+    """
     schema = {
         "checkpoint_decision_ns": pl.Int64,
         "session": pl.String,
         "suppression_reason": pl.String,
     }
-    if not rows:
+    gaps = [t for t in range(start_ns, end_ns, 5 * NS) if t not in scored]
+    if not gaps:
         return pl.DataFrame(schema=schema)
-    return pl.DataFrame(rows, schema=schema)
+    return pl.DataFrame(
+        {
+            "checkpoint_decision_ns": gaps,
+            "session": ["RTH" if is_rth_decision(t) else "ETH" for t in gaps],
+            "suppression_reason": ["missing_dispatch_bar"] * len(gaps),
+        },
+        schema=schema,
+    )
 
 
 def main() -> None:

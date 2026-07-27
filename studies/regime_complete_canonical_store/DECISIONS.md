@@ -35,6 +35,22 @@ in-domain row carries `session != "RTH"`.
 **Consequence.** Score table grows from 5,665,103 to ~12,156,904 rows (+6,491,801).
 ETH probabilities may never qualify an entry.
 
+**Phase 2 empirical outcome — the frozen contract enforces the boundary itself.**
+Scoring ETH yields almost nothing: in the 2025-03 pilot, 117,024 ETH checkpoints
+produced essentially no computable scores, because `rth_elapsed_seconds`,
+`rth_vol_cum`, and `rth_abs_delta_cum` return `None` once
+`OHLCVDeltaTracker.end_rth()` clears `_rth_active`. The frozen adapters decline
+to score, so the vector is incomplete and the probability is null.
+
+This is the honest result and it is better than either option considered: the
+ETH rows are retained in full (regime state, price, ATR, path linkage, null
+masks), and their absence of a score is *mechanically derived from the frozen
+feature contract* rather than imposed by a collector-side session gate. Nothing
+was discarded, and nothing was fabricated.
+
+**Defect this exposed.** Widening the session broke an implicit assumption in the
+inherited in-domain predicate. See DECISION-7.
+
 ---
 
 ## DECISION-2 — Confirmation columns hold the established-gate onset
@@ -176,3 +192,65 @@ parity proof against `RegimeEngine` first.
 5,836 trades exactly puts backward parity — the central acceptance gate — at risk for
 no benefit. `regime_engine_version` (SHA-256 of the engine source) is baked into
 `regime_id`, so a silent engine swap changes every ID and is immediately detectable.
+
+---
+
+## DECISION-7 — In-domain requires RTH explicitly
+
+**Date:** 2026-07-27 · **Authority:** implementer (defect correction) · **Spec:** §5.2.3
+
+**Context.** The inherited predicate is:
+
+```python
+bullish_in_domain = (direction == 1 and established_regime_gate)
+bearish_in_domain = (direction == -1 and established_regime_gate)
+```
+
+It never tested session, because the Phase B collector only ever dispatched
+inside RTH — the session conjunct was implicit in the emission gate. Widening to
+the full session (DECISION-1) made that assumption false. The 2025-03-03 smoke
+produced **2,682 ETH rows marked in-domain**: 1,578 bullish and 1,104 bearish.
+
+Both frozen model contracts specify `session: [08:30:00,15:00:00) America/Chicago`
+as part of the model domain, so a mature ETH regime is out of domain by
+definition, however established it is.
+
+**Decision.** Re-derive in-domain in the augmentation as the inherited predicate
+**and** RTH. ETH rows additionally carry
+`bullish_out_of_domain_reason` / `bearish_out_of_domain_reason` =
+`OUT_OF_FROZEN_SESSION_CONTRACT`.
+
+**Why in the augmentation rather than the parent.** RTH rows already satisfy the
+session conjunct, so the correction is a no-op for them — which is what keeps the
+RTH byte-identity gate meaningful. Editing the parent would change the accepted
+collector.
+
+**Consequence.** Out-of-domain suppresses *eligibility*, never *retention*: the
+ETH rows, their regimes, and their paths are all still stored. Guarded by
+`test_no_eth_row_can_ever_be_in_domain` and
+`test_established_eth_regimes_are_retained_despite_being_out_of_domain`, plus a
+store-wide check in `validate_pilot.py`.
+
+---
+
+## DECISION-8 — Dispatch gaps reconciled against the window grid, not detected incrementally
+
+**Date:** 2026-07-27 · **Authority:** implementer (defect correction) · **Spec:** §5.2.4
+
+**Context.** The inherited collector detected a dispatch gap by comparing each
+observed 5s boundary against the previous one. That only emits a gap once a
+*later* boundary arrives, so a gap running to the end of the collection window is
+never emitted at all. The 2025-03 pilot came up **2 slots short** of the expected
+535,680 — the final two, 23:59:50 and 23:59:55 — and this would recur at every one
+of the 60 partition boundaries.
+
+**Decision.** Remove the incremental detector. The runner, which knows the window
+bounds, computes `missing = full 5s window grid − scored keys`.
+
+**Why.** `scores + missing == expected slots` then holds *by construction* rather
+than as a property that happens to be true when the stream cooperates. Full count
+reconciliation with no silently dropped slots is an acceptance criterion, so it
+should not depend on where the data happens to stop.
+
+**Consequence.** Gaps are still a separate artifact and are never imputed into the
+score table. `validate_pilot.py` asserts the identity exactly.

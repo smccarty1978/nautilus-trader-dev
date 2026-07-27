@@ -125,14 +125,13 @@ class RegimeCompleteCollector(PhaseBCollector):
         self._minute_buffer.append((te, h, l, v, float(estimate["bar_est_delta"])))
 
         if ti % (5 * NS) == 0:
-            if self._last_grid_ns is not None and ti > self._last_grid_ns + 5 * NS:
-                for missing_t in range(self._last_grid_ns + 5 * NS, ti, 5 * NS):
-                    self.missing.append({
-                        "checkpoint_decision_ns": missing_t,
-                        "session": "RTH" if is_rth_decision(missing_t) else "ETH",
-                        "suppression_reason": "missing_dispatch_bar",
-                    })
             self._last_grid_ns = ti
+            # Gaps in the dispatch grid are reconciled against the full window
+            # grid by the runner rather than detected incrementally here. An
+            # incremental detector only emits a gap once a *later* boundary
+            # arrives, so it silently drops a gap that runs to the end of the
+            # window -- which happens at every partition boundary.
+            #
             # DECISION-1: no session gate. The frozen adapters decide whether a
             # score exists; the collector does not decide it for them.
             if self._regime.atr is not None:
