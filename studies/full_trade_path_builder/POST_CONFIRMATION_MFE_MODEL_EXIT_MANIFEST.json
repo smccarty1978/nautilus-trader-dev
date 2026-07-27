@@ -1,0 +1,57 @@
+{
+  "study_id": "post_confirmation_mfe_model_exits",
+  "accepted_date": "2026-07-27",
+  "verdict": "BROAD EVIDENCE IS MIXED",
+  "population_rows": 5836,
+  "trade_policy_rows": 1067988,
+  "artifacts": [
+    {
+      "path": "studies/full_trade_path_builder/results/post_confirmation_mfe_model_exit_trade_policy_results.parquet",
+      "bytes": 20095959,
+      "sha256": "9f25f8c56546fdfddb4fc0c5de03caa7e3c493d3396a2b830908e9006afb9574",
+      "committed": false
+    },
+    {
+      "path": "studies/full_trade_path_builder/results/post_confirmation_model_warning_events.parquet",
+      "bytes": 2439968,
+      "sha256": "e83b99787a2d585c62c83b861b169df426f3ad208264ba24e8ee32fbda1ba684",
+      "committed": false
+    },
+    {
+      "path": "studies/full_trade_path_builder/results/post_confirmation_policy_cross_stop_comparison.parquet",
+      "bytes": 12146,
+      "sha256": "489557f8963da2bd43c3054a6c545f2348c72f6714e3266a402763e7642d0318",
+      "committed": false
+    },
+    {
+      "path": "studies/full_trade_path_builder/results/post_confirmation_mfe_model_exit_summary.json",
+      "bytes": 3331312,
+      "sha256": "fccb32589c80c04764bc147f0ae43cabde3bb0c92ffae681d65d60c9782a3ee1",
+      "committed": false
+    },
+    {
+      "path": "studies/full_trade_path_builder/POST_CONFIRMATION_MFE_AND_MODEL_EXIT_REPORT.md",
+      "bytes": 5060,
+      "sha256": "d538e1324f62da25b2df565101c0cc298074cb7f05be0bedb967bab4fd47a524",
+      "committed": true
+    }
+  ],
+  "validation": {
+    "causal_audit_pass": 23,
+    "causal_critical": 0,
+    "causal_warnings": 0,
+    "contract_pass": 24,
+    "contract_critical": 0,
+    "contract_warnings": 0,
+    "independent_trade_stop_cases": 300,
+    "independent_mismatches": 0,
+    "verified_distinct_next_open_fills": 35016,
+    "verified_landmarks": 151299
+  },
+  "documented_blockers": [
+    "bearish Top-10 threshold unavailable; unsupported rather than estimated",
+    "percentile columns unavailable; frozen probability thresholds used",
+    "opposing model in-domain on 39.94% of trades",
+    "scores recomputed at causal five-second checkpoints and carried on one-second paths"
+  ]
+}
