@@ -24,6 +24,9 @@ from studies.full_trade_path_builder.implementation.run_phase_a_collect import (
 from studies.regime_complete_canonical_store.implementation.run_collect import (  # noqa: E402
     OUTPUTS,
 )
+from studies.regime_complete_canonical_store.implementation.writer import (  # noqa: E402
+    _session_expr,
+)
 
 TARGETS = {
     "regimes": "canonical_regimes_all.parquet",
@@ -132,6 +135,12 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
                 frame = frame.with_columns(
                     source_file_id=pl.lit(manifest["sha256"][key])
                 )
+            # The partition files carry a `session` computed by the pre-fix
+            # expression, which overflowed Int8 and labelled every path row ETH.
+            # Session is a pure function of the timestamp, so it is recomputed
+            # here rather than by recollecting 60 partitions.
+            if key == "paths":
+                frame = frame.with_columns(session=_session_expr("path_init_ns"))
             if key != "regimes" and "regime_sequence_number" in frame.columns:
                 if sequence_map is None:
                     raise RuntimeError("regimes must be consolidated before dependants")
@@ -182,6 +191,7 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
         del combined
 
     report["path_coverage"] = _check_path_coverage(out_dir)
+    report["session_distribution"] = _check_session_distribution(out_dir)
 
     scores = pl.scan_parquet(out_dir / TARGETS["scores"])
     paths = pl.scan_parquet(out_dir / TARGETS["paths"])
@@ -207,6 +217,7 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
         and rec["sequence_is_dense"]
         and rec["consecutive_same_direction"] == 0
         and report["path_coverage"].get("status") in ("COMPLETE", "SKIPPED")
+        and report["session_distribution"].get("status") == "PLAUSIBLE"
     )
 
     (out_dir / "canonical_collection_manifest.json").write_text(
@@ -269,6 +280,31 @@ def _check_path_coverage(out_dir: Path) -> dict:
         "path_rows_without_regime_id": unattributed,
         "status": "COMPLETE" if expected == actual else "INCOMPLETE",
     }
+
+
+def _check_session_distribution(out_dir: Path) -> dict:
+    """Both sessions must be represented in every dataset that labels one.
+
+    The first build wrote `session = "ETH"` on all 61,543,945 path rows because
+    `dt.hour()` is Int8 and `hour * 60` overflowed. The column was present,
+    correctly typed, and fully non-null -- so schema and provenance checks all
+    passed. Only the value distribution reveals it.
+    """
+    out: dict = {}
+    for key, column in (("paths", "session"), ("scores", "session")):
+        counts = (
+            pl.scan_parquet(out_dir / TARGETS[key])
+            .group_by(column)
+            .len()
+            .collect()
+            .sort(column)
+        )
+        out[key] = {row[column]: row["len"] for row in counts.iter_rows(named=True)}
+    both = all(
+        set(v) == {"RTH", "ETH"} and min(v.values()) > 0 for v in out.values()
+    )
+    out["status"] = "PLAUSIBLE" if both else "DEGENERATE"
+    return out
 
 
 def _write_partition_manifest(partitions) -> None:

@@ -40,8 +40,14 @@ PATH_SCHEMA = {
 
 
 def _chicago_minute(column: str) -> pl.Expr:
+    """Minutes since local midnight.
+
+    `dt.hour()` returns Int8, so `hour * 60` overflows silently: 8 * 60 = 480
+    wraps to -32, and the RTH window test is then never true. Every path row in
+    the first build was consequently labelled ETH. Cast before multiplying.
+    """
     local = pl.from_epoch(pl.col(column), time_unit="ns").dt.convert_time_zone(CT)
-    return local.dt.hour() * 60 + local.dt.minute()
+    return local.dt.hour().cast(pl.Int32) * 60 + local.dt.minute().cast(pl.Int32)
 
 
 def _session_expr(column: str) -> pl.Expr:
