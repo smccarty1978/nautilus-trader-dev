@@ -426,6 +426,12 @@ def run(store: Path, out_path: Path, parity: bool) -> dict:
         report["first_signal"].append(describe(population, f"first_{label}"))
         if label == "top_2_5" and parity:
             report["backward_parity"] = backward_parity(population)
+            # Also emitted standalone under the name the study request asked for.
+            parity_path = out_path.parent / "backward_parity_report.json"
+            parity_path.parent.mkdir(parents=True, exist_ok=True)
+            parity_path.write_text(
+                json.dumps(report["backward_parity"], indent=2, default=str)
+            )
 
     for label in ("top_5", "top_2_5", "top_1"):
         report["all_crossings"].append(

@@ -17,7 +17,7 @@ Frozen in `REGIME_COMPLETE_CANONICAL_STORE_SPEC.md`; decisions and the options r
 
 | Dataset | File | Rows | Columns | Size |
 |---|---|---|---|---|
-| regimes | canonical_regimes_all.parquet | 137,673 | 32 | 0.01 GB |
+| regimes | canonical_regimes_all.parquet | 137,673 | 33 | 0.01 GB |
 | scores | canonical_regime_scores_all.parquet | 12,156,904 | 182 | 3.78 GB |
 | paths | canonical_regime_paths_all.parquet | 61,543,945 | 34 | 1.35 GB |
 | missing | canonical_missing_dispatch_all.parquet | 19,396,376 | 3 | 0.09 GB |

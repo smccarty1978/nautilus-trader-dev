@@ -164,7 +164,12 @@ entry_year  session_at_start  session_at_established  session_at_end
 path_start_ns  path_end_ns  path_row_count  path_is_complete  path_censor_reason
 duration_seconds  duration_bars_1m
 source_partition  source_file_id  collector_version  regime_engine_version
+contract_version                                            # DECISION-9
 ```
+
+`source_file_id` is attached at consolidation from the partition manifest's
+dataset hash: a collector subprocess cannot know the hash of the file it is
+still writing.
 
 Nulls where an event does not occur. Censored regimes never receive invented
 terminal values. `regime_end_reason ∈ {opposing_flip, sealed_boundary_censored,
@@ -266,7 +271,15 @@ is_regime_start_row  is_established_row  is_opposing_flip_row  is_terminal_row
 last_score_decision_ns  last_bullish_probability  last_bearish_probability
 score_age_seconds  is_carried_forward
 source_partition  collector_version
+regime_sequence_number  regime_established_decision_ns  contract_version  # DECISION-9
 ```
+
+`regime_sequence_number` is required here, not incidental: DECISION-4 serves
+hold-through by reading successor regimes, so the path table must carry the key
+it joins on. `regime_established_decision_ns` is the anchor `established_state`
+and `seconds_from_established` derive from, retained so a query can recompute
+them against its own anchor without joining back to the regime table. Neither is
+entry-dependent.
 
 `is_opposing_confirmation_row` is **omitted**: it is identically
 `is_opposing_flip_row` under §2.2 and would be a duplicate column.

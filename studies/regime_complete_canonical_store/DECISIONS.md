@@ -254,3 +254,88 @@ should not depend on where the data happens to stop.
 
 **Consequence.** Gaps are still a separate artifact and are never imputed into the
 score table. `validate_pilot.py` asserts the identity exactly.
+
+---
+
+## DECISION-9 — Schema and artifact-name deviations from the frozen SPEC
+
+**Date:** 2026-07-27 · **Authority:** implementer (contract-checker Pass 1 finding)
+· **Spec:** §5.1, §5.3, §11
+
+**Context.** `contract-checker` Pass 1 returned BLOCKED on four discrepancies
+between the frozen SPEC and the built artifacts. All four were verified directly
+against the Parquet schemas rather than taken on report:
+
+```text
+REGIMES  missing vs SPEC: source_file_id
+REGIMES  extra   vs SPEC: contract_version
+PATHS    missing vs SPEC: (none)
+PATHS    extra   vs SPEC: contract_version, regime_established_decision_ns,
+                          regime_sequence_number
+```
+
+**Decision.**
+
+1. **`source_file_id` is added**, not waived. It is attached during
+   consolidation from the partition manifest's dataset hash, because a collector
+   subprocess cannot know the hash of the file it is still writing. This required
+   re-consolidation only — no recollection.
+
+2. **The four additive columns are adopted into the contract**, and the SPEC
+   field lists in §5.1 and §5.3 are amended to include them:
+   - `contract_version` — pins the store contract on every row, the same role
+     `collector_version` plays for code.
+   - `regime_sequence_number` on paths — **required** by DECISION-4. Successor
+     regime lookup is the storage-saving mechanism, so the path table must carry
+     the key it joins on.
+   - `regime_established_decision_ns` on paths — the anchor that
+     `established_state` and `seconds_from_established` are derived from;
+     retaining it lets a query recompute those against its own anchor without
+     joining back to the regime table.
+
+   None is entry-dependent, so none violates the §5.3 prohibition.
+
+3. **`backward_parity_report.json` and `partition_manifest.parquet` are now
+   emitted under the names the study request used.** Their contents already
+   existed inside `population_coverage_summary.json` and
+   `canonical_collection_manifest.json`; equivalent content under a different
+   filename is not compliance with a named deliverable, so both are written
+   directly rather than argued as satisfied.
+
+**Why amend rather than waive.** A frozen SPEC whose schema does not match the
+artifact is the repeat-offender `C4`/`D1` category the split audit gate exists to
+catch. Leaving a documented column absent, or extra columns unlisted, means the
+next reader cannot tell a deviation from a defect.
+
+---
+
+## DECISION-10 — Three SPEC negative tests were asserted from architecture, now exercised
+
+**Date:** 2026-07-27 · **Authority:** implementer (contract-checker Pass 1 finding)
+· **Spec:** §10.2
+
+**Context.** Three negative properties the SPEC lists as required tests had no
+implementation. Their correctness rested on absence of mechanism — "the collector
+has no exit concept, so an exit cannot truncate a path" — which is a design claim,
+not evidence, and would not survive a refactor that introduced one:
+
+```text
+a selected-trade exit cannot terminate a regime path
+a Top-2.5% filter cannot remove low-score regimes
+a future bar cannot alter a prior score row
+```
+
+**Decision.** Implemented in `tests/test_negative_collection.py`, each driving
+the behavior rather than inspecting structure: a long candidate whose stop is
+breached mid-regime (path must continue 400s to the regime boundary); a regime
+whose every checkpoint scores below the lowest frozen threshold (regime, 12 score
+rows, and 120 path rows all retained); and a byte-comparison of every score row
+before and after 300 further seconds and two later checkpoints.
+
+Two further immutability tests were added while writing these: establishment must
+not backfill an offset onto earlier checkpoints, and a path row's carried-forward
+score must never reference a future checkpoint.
+
+**Why.** A required test that was never written is `NOT VERIFIED`, not `PASS`.
+The distinction matters most for exactly these properties, since each is the kind
+of thing a later optimization silently breaks.

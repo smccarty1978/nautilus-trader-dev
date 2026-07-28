@@ -120,10 +120,18 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
         # on the concatenated path table means a string join over 61.5M rows,
         # which exhausts memory and is killed without a traceback.
         frames = []
-        for path in sources:
+        for (_, _, manifest), path in zip(partitions, sources):
             frame = pl.read_parquet(path)
             if not frame.height:
                 continue
+            # SPEC 5.1 requires source_file_id on the regime row. It identifies
+            # the exact partition artifact the row was read from, which is only
+            # known here, so it is attached at consolidation rather than by the
+            # collector (which cannot know its own file's hash while writing it).
+            if key == "regimes":
+                frame = frame.with_columns(
+                    source_file_id=pl.lit(manifest["sha256"][key])
+                )
             if key != "regimes" and "regime_sequence_number" in frame.columns:
                 if sequence_map is None:
                     raise RuntimeError("regimes must be consolidated before dependants")
@@ -173,6 +181,8 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
             report["regime_reconciliation"] = _reconcile_regimes(combined)
         del combined
 
+    report["path_coverage"] = _check_path_coverage(out_dir)
+
     scores = pl.scan_parquet(out_dir / TARGETS["scores"])
     paths = pl.scan_parquet(out_dir / TARGETS["paths"])
     report["global_integrity"] = {
@@ -196,12 +206,97 @@ def consolidate(work_root: Path, out_dir: Path) -> dict:
         and rec["duplicate_sequence_numbers"] == 0
         and rec["sequence_is_dense"]
         and rec["consecutive_same_direction"] == 0
+        and report["path_coverage"].get("status") in ("COMPLETE", "SKIPPED")
     )
 
     (out_dir / "canonical_collection_manifest.json").write_text(
         json.dumps(report, indent=2, default=str)
     )
+    _write_partition_manifest(partitions)
     return report
+
+
+def _check_path_coverage(out_dir: Path) -> dict:
+    """Every 1s bar in scope must own a path row.
+
+    `lookahead-auditor` pass_01 raised a concrete mechanism by which path rows
+    could vanish silently: a partition's collector only opens a regime record on
+    a *detected flip*, so a regime older than the 4-day warmup that spans a
+    partition boundary would never be reopened, and its 1s bars would hit the
+    early return in `_append_path_row` with no `regime_id` and no entry in
+    `missing_dispatch` (which tracks only the score grid).
+
+    Count reconciliation against the manifests cannot see this: every partition
+    would agree with its own manifest while both were short. Comparing against
+    the source catalog can, so that is what this does. It also removes the
+    reliance on a data-dependent margin -- the longest observed regime is 3.08
+    days against a 4-day warmup, which is only 23% of headroom.
+    """
+    catalog = (
+        ROOT
+        / "data/catalog/NQ_v0_2020_2026/data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL"
+        / "2020-01-01T23-00-01-000000000Z_2026-04-30T00-00-00-000000000Z.parquet"
+    )
+    if not catalog.exists():
+        return {"status": "SKIPPED", "reason": f"catalog absent: {catalog}"}
+
+    expected = (
+        pl.scan_parquet(catalog)
+        .select(
+            pl.from_epoch("ts_event", time_unit="ns")
+            .dt.convert_time_zone("America/Chicago")
+            .dt.year()
+            .alias("year")
+        )
+        .filter(pl.col("year").is_between(2021, 2025))
+        .select(pl.len())
+        .collect()
+        .item()
+    )
+    actual = (
+        pl.scan_parquet(out_dir / TARGETS["paths"]).select(pl.len()).collect().item()
+    )
+    unattributed = (
+        pl.scan_parquet(out_dir / TARGETS["paths"])
+        .select(pl.col("regime_id").is_null().sum())
+        .collect()
+        .item()
+    )
+    return {
+        "catalog_1s_bars_2021_2025": expected,
+        "path_rows": actual,
+        "dropped_bars": expected - actual,
+        "path_rows_without_regime_id": unattributed,
+        "status": "COMPLETE" if expected == actual else "INCOMPLETE",
+    }
+
+
+def _write_partition_manifest(partitions) -> None:
+    """Emit the partition manifest as Parquet under the name the study request
+    asked for, alongside the JSON collection manifest."""
+    rows = []
+    for name, directory, manifest in partitions:
+        row = {
+            "partition": name,
+            "start": manifest["start"],
+            "end": manifest["end"],
+            "runtime_seconds": manifest["runtime_seconds"],
+            "warmup_flips_skipped": manifest["warmup_flips_skipped"],
+            "collector_version": manifest["collector_version"],
+            "regime_engine_version": manifest["regime_engine_version"],
+            "directory": str(directory).replace("\\", "/"),
+        }
+        for key in OUTPUTS:
+            row[f"rows_{key}"] = manifest["rows"][key]
+            row[f"sha256_{key}"] = manifest["sha256"][key]
+        rows.append(row)
+    destination = (
+        ROOT / "studies/regime_complete_canonical_store/results/partition_manifest.parquet"
+    )
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame(rows).sort("partition").write_parquet(
+        destination, compression="zstd", statistics=True
+    )
 
 
 def main() -> None:
