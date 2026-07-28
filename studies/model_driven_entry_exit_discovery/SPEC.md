@@ -214,6 +214,58 @@ partition boundaries create no duplicate or missing flips
 
 ---
 
+## 8a. Deliverables Manifest
+
+Frozen before implementation. The completion gate checks this list literally;
+anything not listed here cannot be demanded later.
+
+| # | Path | Type | Required contents |
+|---|---|---|---|
+| 1 | `results/validation_report.json` | json | all eight SPEC 8 gates, each with `passed`, plus `all_passed` |
+| 2 | `results/stage1_entries.json` | json | one row per entry family x threshold: family, threshold, resolved, net_atr, gross_atr, win_rate, mfe_mean, max_drawdown_atr |
+| 3 | `results/stage1_exits.json` | json | one row per exit setting, same metric set |
+| 4 | `results/stage3_composite.json` | json | `screen` (all composites, discovery) and `carried` (top 6 x 3 periods) |
+| 5 | `results/partition_manifest.json` | json | cost assumption, split years, family and threshold inventory, code hashes |
+| 6 | `REPORT.md` | report | the ten sections the study request enumerates, ending in one verdict |
+| 7 | `audit/status.json` | json | lookahead-auditor machine-readable verdict |
+| 8 | `audit/contract_status.json` | json | contract-checker machine-readable verdict |
+
+Every finalist row reported in item 6 must carry: entry rule, exit rule, stop
+rule, reentry rule, trade count, gross and net ATR expectancy, win rate, average
+win, average loss, median, MFE, MAE, capture ratio, max drawdown, year
+breakdown, direction breakdown, threshold breakdown, censored count, ambiguous
+count, share of PnL from the best calendar month, and share of PnL from the
+largest 1% of trades.
+
+### Terminal decision labels
+
+Every label is reachable through the real workflow.
+
+| Label | Condition |
+|---|---|
+| `DISCOVERY_TARGET_MET` | at least one policy reaches net >= +0.25 ATR and passes every SPEC 7 robustness criterion |
+| `DISCOVERY_LOWER_EV_CANDIDATE` | no policy reaches +0.25, but at least one in the +0.15 to +0.25 band passes every SPEC 7 criterion |
+| `DISCOVERY_NEGATIVE` | no policy reaches +0.15 net, and the search executed every family SPEC 5 names with all SPEC 8 gates passing |
+| `DISCOVERY_INCONCLUSIVE` | a SPEC 8 gate fails, or a SPEC 5 family was not executed, so absence of a candidate cannot be distinguished from absence of a search |
+
+`DISCOVERY_NEGATIVE` and `DISCOVERY_INCONCLUSIVE` are deliberately separated:
+the first is a result, the second is an admission. A study that has not run
+every promised family may only emit the second.
+
+## 8b. Domain and completeness contract
+
+| Dimension | Domain | Completeness rule |
+|---|---|---|
+| Instrument | NQ only | any other symbol is out of scope, not missing data |
+| Years | 2021-2025 | 2026 forbidden; a missing year is a defect, not a gap |
+| Session | RTH entries only | ETH checkpoints exist but are never in-domain, by frozen model contract |
+| Entry families | the 11 in `candidates.FAMILIES` | every family SPEC 5 names must appear here or the verdict is INCONCLUSIVE |
+| Thresholds | the 6 frozen contracts | no interpolation, no new percentile |
+| Censoring | counted, never imputed | a censored trade is excluded from expectancy and reported separately |
+| Ambiguity | counted, both bounds reported | same-second stop/regime collisions resolved adversely for the conservative bound |
+
+---
+
 ## 9. Reporting
 
 Per finalist: exact entry / exit / stop / reentry rule · trade count · gross and

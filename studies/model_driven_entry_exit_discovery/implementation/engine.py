@@ -74,13 +74,28 @@ class RegimeIndex:
     start_ns: np.ndarray      # sorted
     direction: np.ndarray
 
-    def next_start_after(self, ts_ns: int, direction: int | None = None) -> int | None:
-        """First regime start strictly after `ts_ns`, optionally of a direction.
+    def next_start_after(
+        self, ts_ns: int, direction: int | None = None, inclusive: bool = True
+    ) -> int | None:
+        """First regime start at or after `ts_ns`, optionally of a direction.
 
         This is how the direction flip and the opposing exit are resolved. No
         caller may substitute a hard-coded sequence offset.
+
+        `inclusive=True` is the causally correct default. A 1s checkpoint with
+        `ts_init == T` is dispatched *before* the 1m bar with `ts_init == T`
+        (the project's 1s-before-1m convention), so a regime flip stamped T is
+        knowable only after a decision made at T -- it is genuinely in the
+        trade's future.
+
+        Searching strictly after skipped exactly those boundary flips, and then
+        matched a much later regime of the same direction instead: for an entry
+        at 09:53:00 whose confirming flip was also stamped 09:53:00, the confirm
+        resolved 28 minutes late and the *opposing* regime in between was
+        mislabelled as the exit. 69 of 3,415 top_1 trades were affected.
         """
-        i = int(np.searchsorted(self.start_ns, ts_ns, side="right"))
+        side = "left" if inclusive else "right"
+        i = int(np.searchsorted(self.start_ns, ts_ns, side=side))
         if direction is None:
             return int(self.start_ns[i]) if i < self.start_ns.size else None
         while i < self.start_ns.size:
@@ -252,15 +267,24 @@ def simulate(
         _first_true(run_mfe >= policy.target_atr) if policy.target_atr else -1
     )
 
+    current = favorable / atr
+
     be_hit = (
         _first_true(run_mfe >= policy.breakeven_at_atr)
         if policy.breakeven_at_atr
         else -1
     )
     if be_hit >= 0:
-        # After the breakeven arm bar, any return to entry closes the trade.
-        after = np.arange(run_mae.size) > be_hit
-        be_stop = _first_true(after & (run_mae >= 0.0))
+        # Once armed, the stop sits at the entry price: the trade closes when
+        # favorable excursion returns to zero or below.
+        #
+        # This previously tested `run_mae >= 0.0`, which is a tautology --
+        # `run_mae` is a running maximum floored at zero, so it is non-negative
+        # at every index. Every armed trade was force-closed one bar after
+        # arming regardless of price, which made the breakeven family untestable
+        # and understated it. Found by lookahead-auditor pass 1.
+        after = np.arange(current.size) > be_hit
+        be_stop = _first_true(after & (current <= 0.0))
         if be_stop >= 0 and (stop_hit < 0 or be_stop < stop_hit):
             stop_hit = be_stop
 
@@ -271,7 +295,6 @@ def simulate(
             if policy.mfe_floor_atr
             else run_mfe > 0
         )
-        current = favorable / atr
         if policy.giveback_frac:
             give = armed & (current <= run_mfe * (1.0 - policy.giveback_frac))
             give_hit = _first_true(give)

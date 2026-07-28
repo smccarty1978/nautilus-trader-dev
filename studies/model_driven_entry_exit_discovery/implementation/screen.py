@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import polars as pl
@@ -30,6 +32,7 @@ SELECTION_YEAR = (2024,)
 HOLDOUT_YEAR = (2025,)
 
 BASELINE_EXIT = ExitPolicy(stop_atr=1.00, name="baseline_stop1.0_opposing")
+CT = ZoneInfo("America/Chicago")
 
 
 def run_policy(market, regimes, entries: pl.DataFrame, policy: ExitPolicy) -> dict:
@@ -46,6 +49,12 @@ def run_policy(market, regimes, entries: pl.DataFrame, policy: ExitPolicy) -> di
             )
         )
     return summarize(trades, entries)
+
+
+def _month_key(entry_ns: int) -> int:
+    """Calendar month in America/Chicago, as year*12 + month."""
+    local = datetime.fromtimestamp(entry_ns / 1e9, tz=timezone.utc).astimezone(CT)
+    return local.year * 12 + local.month
 
 
 def summarize(trades, entries: pl.DataFrame) -> dict:
@@ -70,6 +79,12 @@ def summarize(trades, entries: pl.DataFrame) -> dict:
     top1pct = max(1, int(0.01 * w.size))
     largest = np.sort(w)[-top1pct:].sum()
 
+    # SPEC 9 requires concentration by calendar month, not only by trade. A
+    # policy whose expectancy comes from one month is not an edge.
+    months = np.array([_month_key(t.entry_ns) for t in trades])[resolved]
+    month_totals = {int(m): float(w[months == m].sum()) for m in set(months.tolist())}
+    best_month = max(month_totals.values()) if month_totals else 0.0
+
     return {
         "trades": int(len(trades)),
         "resolved": n,
@@ -87,6 +102,8 @@ def summarize(trades, entries: pl.DataFrame) -> dict:
         "max_drawdown_atr": drawdown,
         "total_atr": float(w.sum()),
         "pnl_share_largest_1pct": float(largest / w.sum()) if w.sum() != 0 else float("nan"),
+        "pnl_share_best_month": float(best_month / w.sum()) if w.sum() != 0 else float("nan"),
+        "months_covered": len(month_totals),
         "by_year": {
             int(y): float(w[years == y].mean()) for y in sorted(set(years.tolist()))
         },

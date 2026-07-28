@@ -121,3 +121,125 @@ def test_short_side_is_contained_too(market: MarketData):
                  ExitPolicy(stop_atr=None))
     assert t.exit_ns < _ns(2022, 11, 9, 15, 0)
     assert abs(t.gross_atr) < 1.0
+
+
+# ------------------------------------------------------- breakeven mechanics
+
+def _v_shaped_market() -> MarketData:
+    """Price rises 20 points, then falls back through entry and beyond.
+
+    A correct breakeven exit closes on the way back down at entry. A tautological
+    one closes one bar after arming, near the high.
+    """
+    close_ns = _ns(2022, 11, 9, 15, 0)
+    ts, o, h, l, c, dc = [], [], [], [], [], []
+    for sec in range(600):
+        t = _ns(2022, 11, 9, 8, 30) + sec * NS
+        price = 10_000.0 + (sec * 0.1 if sec < 200 else 20.0 - (sec - 200) * 0.1)
+        ts.append(t); o.append(price); h.append(price + 0.25)
+        l.append(price - 0.25); c.append(price); dc.append(close_ns)
+    return MarketData(
+        ts=np.array(ts, dtype=np.int64), open_=np.array(o), high=np.array(h),
+        low=np.array(l), close=np.array(c), day_close_ns=np.array(dc, dtype=np.int64),
+    )
+
+
+def test_breakeven_does_not_close_one_bar_after_arming():
+    """Regression: `run_mae >= 0` is a tautology (running max floored at zero),
+    so every armed trade closed one bar after arming regardless of price."""
+    market = _v_shaped_market()
+    entry = _ns(2022, 11, 9, 8, 30)
+    t = simulate(market, _no_flips(), entry, 1, 10_000.0, 10.0,
+                 ExitPolicy(stop_atr=None, breakeven_at_atr=0.5))
+    held = t.bars
+    assert held > 60, (
+        f"closed after only {held} bars — breakeven armed at 0.5 ATR (5 pts, "
+        f"~50 bars) and should hold until price returns to entry (~bar 400)"
+    )
+
+
+def test_breakeven_closes_when_price_returns_to_entry():
+    market = _v_shaped_market()
+    entry = _ns(2022, 11, 9, 8, 30)
+    t = simulate(market, _no_flips(), entry, 1, 10_000.0, 10.0,
+                 ExitPolicy(stop_atr=None, breakeven_at_atr=0.5))
+    assert t.exit_price is not None
+    assert abs(t.exit_price - 10_000.0) < 2.0, (
+        f"breakeven exit filled at {t.exit_price}, not near entry 10000"
+    )
+    assert t.mfe_atr > 1.0, "fixture must actually reach the arming level"
+
+
+def test_unarmed_breakeven_never_triggers():
+    """A trade that never reaches the arming MFE must be unaffected."""
+    market = _v_shaped_market()
+    entry = _ns(2022, 11, 9, 8, 30)
+    a = simulate(market, _no_flips(), entry, 1, 10_000.0, 10.0,
+                 ExitPolicy(stop_atr=None))
+    b = simulate(market, _no_flips(), entry, 1, 10_000.0, 10.0,
+                 ExitPolicy(stop_atr=None, breakeven_at_atr=100.0))
+    assert (a.exit_ns, a.exit_price) == (b.exit_ns, b.exit_price)
+
+
+# --------------------------------------------- lifecycle boundary resolution
+
+def test_a_flip_stamped_at_the_entry_second_is_the_next_flip():
+    """A 1s checkpoint at ts_init T is dispatched before the 1m bar at T, so a
+    regime flip stamped T is in the trade's future.
+
+    Searching strictly after skipped it and matched a far later regime of the
+    same direction, mislabelling the opposing regime in between as the exit.
+    """
+    entry = _ns(2021, 3, 30, 9, 53)
+    regimes = RegimeIndex(
+        start_ns=np.array([
+            _ns(2021, 3, 30, 9, 27),   # +1  entry's own regime
+            _ns(2021, 3, 30, 9, 53),   # -1  confirm, same second as entry
+            _ns(2021, 3, 30, 10, 0),   # +1  opposing exit
+            _ns(2021, 3, 30, 10, 21),  # -1
+        ], dtype=np.int64),
+        direction=np.array([1, -1, 1, -1], dtype=np.int64),
+    )
+    # SHORT fade: confirm is the -1 flip, exit is the following +1 flip.
+    assert regimes.next_start_after(entry, -1) == _ns(2021, 3, 30, 9, 53)
+    assert regimes.next_start_after(entry, 1) == _ns(2021, 3, 30, 10, 0)
+
+
+def test_confirm_precedes_the_opposing_exit_at_a_boundary_entry():
+    """The ordering that was inverted: confirm must not resolve after the exit."""
+    entry = _ns(2021, 3, 30, 9, 53)
+    regimes = RegimeIndex(
+        start_ns=np.array([
+            _ns(2021, 3, 30, 9, 27), _ns(2021, 3, 30, 9, 53),
+            _ns(2021, 3, 30, 10, 0), _ns(2021, 3, 30, 10, 21),
+        ], dtype=np.int64),
+        direction=np.array([1, -1, 1, -1], dtype=np.int64),
+    )
+    confirm = regimes.next_start_after(entry, -1)
+    opposing = regimes.next_start_after(entry, 1)
+    assert confirm < opposing, "confirm flip must precede the opposing exit"
+
+
+def test_strict_mode_still_available_and_differs_at_the_boundary():
+    entry = _ns(2021, 3, 30, 9, 53)
+    regimes = RegimeIndex(
+        start_ns=np.array([_ns(2021, 3, 30, 9, 53), _ns(2021, 3, 30, 10, 21)],
+                          dtype=np.int64),
+        direction=np.array([-1, -1], dtype=np.int64),
+    )
+    assert regimes.next_start_after(entry, -1, inclusive=True) == entry
+    assert regimes.next_start_after(entry, -1, inclusive=False) == _ns(2021, 3, 30, 10, 21)
+
+
+def test_non_boundary_entries_are_unaffected():
+    """Away from a boundary the two modes must agree, so the fix cannot shift
+    the 98% of trades that never sat on a flip second."""
+    regimes = RegimeIndex(
+        start_ns=np.array([_ns(2021, 3, 30, 9, 27), _ns(2021, 3, 30, 10, 0)],
+                          dtype=np.int64),
+        direction=np.array([1, -1], dtype=np.int64),
+    )
+    entry = _ns(2021, 3, 30, 9, 40)
+    for d in (1, -1):
+        assert (regimes.next_start_after(entry, d, inclusive=True)
+                == regimes.next_start_after(entry, d, inclusive=False))

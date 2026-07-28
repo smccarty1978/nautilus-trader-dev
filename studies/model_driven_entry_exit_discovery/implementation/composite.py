@@ -16,7 +16,14 @@ from pathlib import Path
 import numpy as np
 import polars as pl
 
-from .candidates import THRESHOLDS, load_scored, reexpansion, age_conditioned, first_qualifying
+from .candidates import (
+    THRESHOLDS,
+    age_conditioned,
+    first_qualifying,
+    load_scored,
+    path_development,
+    reexpansion,
+)
 from .engine import ExitPolicy, load_market, load_regimes, simulate
 from .screen import attach_meta, summarize
 
@@ -33,6 +40,14 @@ ENTRIES = {
     for t in ("top_20", "top_10", "top_5", "top_2_5", "top_1")
     for p in (0.03, 0.05, 0.08)
 }
+# path_development was the strongest entry family in the corrected Stage 1
+# screen and carries a far larger sample than reexpansion, so its neighbourhood
+# is refined here too.
+ENTRIES.update({
+    f"path_dev_{lo}_{hi}_{t}": (lambda s, t=t, lo=lo, hi=hi: path_development(s, t, lo, hi))
+    for t in ("top_20", "top_10", "top_5")
+    for lo, hi in ((0.5, 2.0), (0.5, 3.0), (1.0, 2.5))
+})
 ENTRIES["age_300_1800_top_5"] = lambda s: age_conditioned(s, "top_5", 300.0, 1800.0)
 ENTRIES["first_qualifying_top_10"] = lambda s: first_qualifying(s, "top_10")
 

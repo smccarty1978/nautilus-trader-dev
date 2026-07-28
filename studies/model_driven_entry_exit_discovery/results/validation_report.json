@@ -1,0 +1,69 @@
+{
+  "checks": {
+    "backward_parity": {
+      "total": 5836,
+      "expected_total": 5836,
+      "short": 3329,
+      "long": 2507,
+      "by_year": {
+        "2021": 1147,
+        "2022": 1206,
+        "2023": 1187,
+        "2024": 1149,
+        "2025": 1147
+      },
+      "expected_by_year": {
+        "2021": 1147,
+        "2022": 1206,
+        "2023": 1187,
+        "2024": 1149,
+        "2025": 1147
+      },
+      "missing_vs_accepted": 0,
+      "extra_vs_accepted": 0,
+      "passed": true
+    },
+    "no_duplicate_candidates": {
+      "families_checked": 60,
+      "violations": {},
+      "passed": true
+    },
+    "score_cadence": {
+      "checkpoints": 2205823,
+      "unique_checkpoints": 2205823,
+      "off_5s_grid": 0,
+      "passed": true
+    },
+    "no_lookahead_columns": {
+      "forbidden_present": [],
+      "passed": true
+    },
+    "session_containment": {
+      "trades_checked": 3000,
+      "cross_session": 0,
+      "passed": true
+    },
+    "deterministic_ordering": {
+      "trades_checked": 500,
+      "mismatches": 0,
+      "passed": true
+    },
+    "regime_boundaries": {
+      "regimes": 137673,
+      "duplicate_starts": 0,
+      "consecutive_same_direction": 0,
+      "sequence_dense": true,
+      "passed": true
+    },
+    "reentry_state": {
+      "candidates_checked": 1000,
+      "sequences_with_reentry": 314,
+      "overlapping_legs": 0,
+      "out_of_order_legs": 0,
+      "bad_reentry_index": 0,
+      "passed": true
+    }
+  },
+  "all_passed": true,
+  "failed": []
+}

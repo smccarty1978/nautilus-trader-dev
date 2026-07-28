@@ -30,6 +30,7 @@ BASE_COLUMNS = [
     "checkpoint_decision_ns", "regime_id", "regime_start_ns", "entry_year",
     "checkpoint_reference_price", "atr_at_checkpoint",
     "confirmed_regime_direction", "seconds_from_regime_start",
+    "current_progress_atr", "running_mfe_atr",
     "bullish_probability", "bearish_probability",
     "bullish_in_domain", "bearish_in_domain",
 ]
@@ -217,6 +218,71 @@ def age_conditioned(
     )
 
 
+def score_rank(
+    scored: pl.DataFrame, label: str, top_k: int = 1, min_obs: int = 3
+) -> pl.DataFrame:
+    """Within-regime score rank, computed causally.
+
+    The rank is expanding, not whole-regime: a checkpoint qualifies when it is
+    among the `top_k` highest scores *seen so far in this regime*. A whole-regime
+    rank would require knowing scores that had not yet occurred.
+    """
+    return (
+        scored.with_columns(
+            rank_so_far=pl.col("probability")
+            .rank(method="ordinal", descending=True)
+            .cum_max()
+            .over("regime_id"),
+            seen=pl.col("obs_index") + 1,
+        )
+        .filter(
+            _qualifies(label)
+            & (pl.col("seen") >= min_obs)
+            & (pl.col("probability") >= pl.col("running_max_probability"))
+        )
+        .group_by("regime_id")
+        .first()
+        .sort("checkpoint_decision_ns")
+        .with_columns(
+            family=pl.lit(f"score_rank_{top_k}"), threshold_label=pl.lit(label)
+        )
+    )
+
+
+def path_development(
+    scored: pl.DataFrame, label: str, min_progress_atr: float = 0.5,
+    max_progress_atr: float = 2.0,
+) -> pl.DataFrame:
+    """Condition on how far the regime has already travelled at the decision.
+
+    `current_progress_atr` is the regime's favourable excursion at the
+    checkpoint, a value carried on the score row and therefore available at the
+    decision timestamp. Entering only inside a progress band tests whether the
+    fade works better before the move is exhausted.
+    """
+    if "current_progress_atr" not in scored.columns:
+        return scored.head(0).with_columns(
+            family=pl.lit("path_development"), threshold_label=pl.lit(label)
+        )
+    return (
+        scored.filter(
+            _qualifies(label)
+            & pl.col("current_progress_atr").is_not_null()
+            & (pl.col("current_progress_atr") >= min_progress_atr)
+            & (pl.col("current_progress_atr") <= max_progress_atr)
+        )
+        .group_by("regime_id")
+        .first()
+        .sort("checkpoint_decision_ns")
+        .with_columns(
+            family=pl.lit(
+                f"path_dev_{min_progress_atr}_{max_progress_atr}"
+            ),
+            threshold_label=pl.lit(label),
+        )
+    )
+
+
 def all_crossings(scored: pl.DataFrame, label: str) -> pl.DataFrame:
     """Every crossing, retained for the reentry simulator (not one per regime)."""
     return true_crossing(scored, label)
@@ -231,4 +297,7 @@ FAMILIES = {
     "reexpansion": lambda s, l: reexpansion(s, l, 0.05),
     "spread": lambda s, l: spread(s, l, 0.20),
     "age_300_1800": lambda s, l: age_conditioned(s, l, 300.0, 1800.0),
+    "score_rank": lambda s, l: score_rank(s, l, 1, 3),
+    "path_dev_0.5_2.0": lambda s, l: path_development(s, l, 0.5, 2.0),
+    "path_dev_2.0_5.0": lambda s, l: path_development(s, l, 2.0, 5.0),
 }
