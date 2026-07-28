@@ -168,3 +168,5 @@ REGIME-COMPLETE STORE ACCEPTED
 | Backward-parity status | PASS |
 | Causal-audit status | PASS |
 | Population-completeness status | RECONCILED |
+| lookahead-auditor gate | PASS (0 CRITICAL, pass 1) |
+| contract-checker gate | CLEAR (0 CRITICAL, pass 2) |

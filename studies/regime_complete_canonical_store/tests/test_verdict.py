@@ -17,10 +17,14 @@ PASS = {"verdict": "PASS"}
 FAIL = {"verdict": "FAIL"}
 RECONCILED = {"all_reconciled": True}
 NOT_RECONCILED = {"all_reconciled": False}
+GATE_CLEAN = {"critical": 0, "verdict": "PASS", "pass": 1}
+GATE_CRITICAL = {"critical": 3, "verdict": "BLOCKED", "pass": 1}
 
 
 def test_all_checks_passing_accepts():
-    verdict, limitations = determine_verdict(PASS, PASS, RECONCILED)
+    verdict, limitations = determine_verdict(
+        PASS, PASS, RECONCILED, GATE_CLEAN, GATE_CLEAN
+    )
     assert verdict == "ACCEPTED"
     assert limitations == []
 
@@ -47,9 +51,11 @@ def test_failed_backward_parity_rejects():
 
 
 def test_failed_independent_audit_downgrades_to_conditional():
-    """Parity and reconciliation hold, but an independent recomputation
-    disagrees somewhere -- reportable, not acceptable as-is."""
-    verdict, limitations = determine_verdict(PASS, FAIL, RECONCILED)
+    """Parity, reconciliation, and both gates hold, but an independent
+    recomputation disagrees somewhere -- reportable, not acceptable as-is."""
+    verdict, limitations = determine_verdict(
+        PASS, FAIL, RECONCILED, GATE_CLEAN, GATE_CLEAN
+    )
     assert verdict == "CONDITIONAL"
     assert any("independent audit" in item for item in limitations)
 
@@ -72,13 +78,69 @@ def test_every_non_accepted_verdict_states_a_reason():
                     )
 
 
-def test_acceptance_requires_all_three_simultaneously():
-    """No two passing checks may carry a third that is failing or absent."""
+def test_acceptance_requires_all_five_simultaneously():
+    """No four passing checks may carry a fifth that is failing or absent.
+
+    Exhaustive over parity, the independent audit, reconciliation, and both
+    mandatory agent gates -- 108 combinations, exactly one of which accepts.
+    """
+    accepted_count = 0
     for parity in (PASS, FAIL, None):
         for audit in (PASS, FAIL, None):
             for consolidation in (RECONCILED, NOT_RECONCILED, None):
-                accepted = determine_verdict(parity, audit, consolidation)[0] == "ACCEPTED"
-                expected = (
-                    parity == PASS and audit == PASS and consolidation == RECONCILED
-                )
-                assert accepted == expected
+                for lookahead in (GATE_CLEAN, GATE_CRITICAL, None):
+                    for contract in (GATE_CLEAN, GATE_CRITICAL, None):
+                        verdict = determine_verdict(
+                            parity, audit, consolidation, lookahead, contract
+                        )[0]
+                        expected = (
+                            parity == PASS
+                            and audit == PASS
+                            and consolidation == RECONCILED
+                            and lookahead == GATE_CLEAN
+                            and contract == GATE_CLEAN
+                        )
+                        assert (verdict == "ACCEPTED") == expected
+                        accepted_count += verdict == "ACCEPTED"
+    assert accepted_count == 1, "exactly one combination may accept"
+
+
+# --------------------------------------------------- mandatory agent gates
+
+
+def test_acceptance_requires_both_agent_gates():
+    """An earlier revision computed ACCEPTED without reading the gates, so a
+    BLOCKED contract-checker could sit beside an ACCEPTED report."""
+    verdict, _ = determine_verdict(PASS, PASS, RECONCILED, GATE_CLEAN, GATE_CLEAN)
+    assert verdict == "ACCEPTED"
+
+
+@pytest.mark.parametrize(
+    "lookahead,contract",
+    [(None, GATE_CLEAN), (GATE_CLEAN, None), (None, None)],
+)
+def test_an_unrun_agent_gate_is_never_an_acceptance(lookahead, contract):
+    verdict, limitations = determine_verdict(
+        PASS, PASS, RECONCILED, lookahead, contract
+    )
+    assert verdict == "REJECTED"
+    assert any("has not been run" in item for item in limitations)
+
+
+@pytest.mark.parametrize(
+    "lookahead,contract",
+    [(GATE_CRITICAL, GATE_CLEAN), (GATE_CLEAN, GATE_CRITICAL)],
+)
+def test_critical_agent_findings_block_acceptance(lookahead, contract):
+    verdict, limitations = determine_verdict(
+        PASS, PASS, RECONCILED, lookahead, contract
+    )
+    assert verdict != "ACCEPTED"
+    assert any("CRITICAL" in item for item in limitations)
+
+
+def test_legacy_three_argument_call_can_no_longer_accept():
+    """Calling without the gates must not yield ACCEPTED by omission."""
+    verdict, limitations = determine_verdict(PASS, PASS, RECONCILED)
+    assert verdict == "REJECTED"
+    assert len(limitations) == 2

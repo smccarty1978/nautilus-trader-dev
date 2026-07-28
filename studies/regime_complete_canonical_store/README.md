@@ -17,9 +17,16 @@ The collection layer records observable state. The analysis layer creates trades
 | 3 — full 2021–2025 build | **complete** — 60/60 partitions, 0 failed |
 | 4 — backward parity vs 5,836 accepted trades | **PASS** — 0 unexplained |
 | 5 — independent audit | **PASS** — 125 regimes, 0 mismatches |
+| 5 — `lookahead-auditor` gate | **PASS** — 0 CRITICAL (pass 1) |
+| 5 — `contract-checker` gate | **CLEAR** — 0 CRITICAL (pass 2; pass 1 BLOCKED, 6 findings fixed) |
 
 **Verdict: REGIME-COMPLETE STORE ACCEPTED.** See
 `REGIME_COMPLETE_CANONICAL_STORE_REPORT.md`.
+
+The verdict is computed, not asserted: `determine_verdict` requires backward
+parity, the independent audit, row-count reconciliation, **and both agent
+gates** to pass simultaneously. An unrun gate is REJECTED, not a pass —
+exhaustively tested over all 108 combinations, exactly one of which accepts.
 
 ## Documents
 

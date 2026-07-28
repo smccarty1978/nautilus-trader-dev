@@ -30,6 +30,13 @@ def _load(name: str) -> dict | None:
     return json.loads(path.read_text())
 
 
+def _load_audit(name: str) -> dict | None:
+    path = STUDY / "audit" / name
+    if not path.exists():
+        return None
+    return json.loads(path.read_text())
+
+
 def _table(rows: list[list], header: list[str]) -> str:
     out = ["| " + " | ".join(header) + " |"]
     out.append("|" + "|".join(["---"] * len(header)) + "|")
@@ -42,8 +49,17 @@ def _fmt(value) -> str:
     return f"{value:,}" if isinstance(value, int) else str(value)
 
 
-def determine_verdict(parity, audit, consolidation) -> tuple[str, list[str]]:
-    """A missing artifact is never treated as a pass."""
+def determine_verdict(
+    parity, audit, consolidation, lookahead=None, contract=None
+) -> tuple[str, list[str]]:
+    """A missing artifact is never treated as a pass.
+
+    The two mandatory agent gates are inputs here, not commentary alongside the
+    verdict. An earlier revision computed ACCEPTED from parity, the independent
+    audit, and reconciliation alone -- so a BLOCKED contract-checker could sit
+    beside an ACCEPTED report without contradicting it. Passing `None` for either
+    gate means it has not been run, which is not a pass.
+    """
     limitations: list[str] = []
     if parity is None or audit is None or consolidation is None:
         limitations.append(
@@ -54,16 +70,29 @@ def determine_verdict(parity, audit, consolidation) -> tuple[str, list[str]]:
     parity_ok = parity.get("verdict") == "PASS"
     audit_ok = audit.get("verdict") == "PASS"
     reconciled = consolidation.get("all_reconciled") is True
+    lookahead_ok = lookahead is not None and lookahead.get("critical", 1) == 0
+    contract_ok = contract is not None and contract.get("critical", 1) == 0
 
-    if parity_ok and audit_ok and reconciled:
+    if parity_ok and audit_ok and reconciled and lookahead_ok and contract_ok:
         return "ACCEPTED", limitations
+
     if not parity_ok:
         limitations.append("Backward parity did not reproduce the accepted population.")
     if not audit_ok:
         limitations.append("The independent audit reported unexplained mismatches.")
     if not reconciled:
         limitations.append("Consolidation row counts did not reconcile.")
-    return ("CONDITIONAL" if reconciled and parity_ok else "REJECTED"), limitations
+    if lookahead is None:
+        limitations.append("The lookahead-auditor gate has not been run.")
+    elif not lookahead_ok:
+        limitations.append("The lookahead-auditor reported CRITICAL findings.")
+    if contract is None:
+        limitations.append("The contract-checker gate has not been run.")
+    elif not contract_ok:
+        limitations.append("The contract-checker reported CRITICAL findings.")
+
+    blocking = not parity_ok or not reconciled or lookahead is None or contract is None
+    return ("REJECTED" if blocking else "CONDITIONAL"), limitations
 
 
 def _known_limitations(counts: dict | None) -> list[str]:
@@ -113,8 +142,12 @@ def build() -> str:
     audit = _load("independent_audit_sample.json")
     thresholds = _load("threshold_availability_report.json")
     pilot = _load("pilot_validation.json")
+    lookahead = _load_audit("status.json")
+    contract = _load_audit("contract_checker_status.json")
 
-    verdict_key, limitations = determine_verdict(parity, audit, consolidation)
+    verdict_key, limitations = determine_verdict(
+        parity, audit, consolidation, lookahead, contract
+    )
 
     sections: list[str] = []
     sections.append("# Regime-Complete Canonical Store — Report\n")
@@ -362,6 +395,20 @@ def build() -> str:
                     "RECONCILED"
                     if (consolidation or {}).get("all_reconciled")
                     else "NOT RECONCILED",
+                ],
+                [
+                    "lookahead-auditor gate",
+                    f"{lookahead['verdict']} "
+                    f"({lookahead['critical']} CRITICAL, pass {lookahead['pass']})"
+                    if lookahead
+                    else "NOT RUN",
+                ],
+                [
+                    "contract-checker gate",
+                    f"{contract['verdict']} "
+                    f"({contract['critical']} CRITICAL, pass {contract['pass']})"
+                    if contract
+                    else "NOT RUN",
                 ],
             ],
             ["Criterion", "Status"],
