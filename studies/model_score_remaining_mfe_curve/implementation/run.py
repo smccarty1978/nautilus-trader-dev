@@ -70,8 +70,8 @@ def _remaining_mfe(market: MarketData, regimes: RegimeIndex, entry_ns: int, dire
     return float(max(0.0, float(np.max(favorable))) / atr)
 
 
-def _first_per_regime(frame: pl.DataFrame) -> pl.DataFrame:
-    return frame.sort("checkpoint_decision_ns").group_by("regime_id", maintain_order=True).first()
+def _first_per_regime(frame: pl.DataFrame, timestamp: str = "checkpoint_decision_ns") -> pl.DataFrame:
+    return frame.sort(timestamp).group_by("regime_id", maintain_order=True).first()
 
 
 def select_candidates(scored: pl.DataFrame) -> list[dict]:
@@ -83,7 +83,12 @@ def select_candidates(scored: pl.DataFrame) -> list[dict]:
         if side.is_empty():
             continue
         top10 = dict((name, value) for name, value, _ in levels(direction))["top_10"]
-        arms = _first_per_regime(side.filter(pl.col("probability") >= top10).select("regime_id", pl.col("checkpoint_decision_ns").alias("arm_ns")))
+        arms = _first_per_regime(
+            side.filter(pl.col("probability") >= top10).select(
+                "regime_id", pl.col("checkpoint_decision_ns").alias("arm_ns")
+            ),
+            timestamp="arm_ns",
+        )
         for label, value, kind in levels(direction):
             independent = _first_per_regime(side.filter(pl.col("probability") >= value))
             for row in independent.iter_rows(named=True):
@@ -157,11 +162,10 @@ def run() -> dict:
             "mae_to_confirm_atr": path.get("mae_to_confirm_atr"),
             "remaining_mfe_atr": _remaining_mfe(market, regimes, entry, direction, float(candidate["checkpoint_reference_price"]), float(candidate["atr_at_checkpoint"])),
         })
-    summary = summarize(measured)
-    frame = pl.DataFrame(summary)
-    frame.write_parquet(out / "score_level_curve.parquet")
-    frame.filter(pl.col("entry_year") != 0).write_parquet(out / "year_direction_breakdown.parquet")
-    pooled = frame.group_by(["view", "model_id", "direction", "level", "probability_level", "level_kind"]).agg([pl.col(c).mean().alias(c) for c in frame.columns if c not in {"view", "model_id", "direction", "entry_year", "level", "probability_level", "level_kind", "n"}] + [pl.col("n").sum().alias("n")])
+    by_year = pl.DataFrame(summarize(measured))
+    pooled = pl.DataFrame(summarize([{**row, "entry_year": 0} for row in measured]))
+    pooled.write_parquet(out / "score_level_curve.parquet")
+    by_year.write_parquet(out / "year_direction_breakdown.parquet")
     pooled.write_json(out / "score_level_curve.json")
     validation = {"true_in_domain_score_dispatches_only": True, "years": [2021, 2022, 2023, 2024, 2025], "sealed_2026_accessed": False, "candidate_rows": len(candidates), "all_candidate_atr_positive": all(float(r["atr_at_checkpoint"]) > 0 for r in candidates), "passed": True}
     (out / "validation_report.json").write_text(json.dumps(validation, indent=2) + "\n", encoding="utf-8")
