@@ -1,0 +1,127 @@
+{
+  "hold_seconds_after_confirmation": [
+    {
+      "terminal_label_full": "FINAL_FLIP_EXIT_WINNER",
+      "n": 2350,
+      "median_hold_s": 960.0,
+      "p25": 600.0,
+      "p75": 1440.0,
+      "p90": 2040.0,
+      "median_mfe_atr": 3.6678
+    },
+    {
+      "terminal_label_full": "FINAL_FLIP_EXIT_LOSER",
+      "n": 1359,
+      "median_hold_s": 300.0,
+      "p25": 180.0,
+      "p75": 480.0,
+      "p90": 720.0,
+      "median_mfe_atr": 1.483
+    },
+    {
+      "terminal_label_full": "CONFIRMED_THEN_STOPPED",
+      "n": 822,
+      "median_hold_s": 217.5,
+      "p25": 115.0,
+      "p75": 349.0,
+      "p90": 567.0,
+      "median_mfe_atr": 1.048
+    },
+    {
+      "terminal_label_full": "SESSION_EXIT",
+      "n": 174,
+      "median_hold_s": 419.0,
+      "p25": -1.0,
+      "p75": 779.0,
+      "p90": 1379.0,
+      "median_mfe_atr": 3.5645
+    }
+  ],
+  "established_gate_vs_trade": [
+    {
+      "terminal_label_full": "FINAL_FLIP_EXIT_WINNER",
+      "n": 2350,
+      "pct_gate_never_opens_before_exit": 30.6,
+      "median_gate_delay_s": 410.0,
+      "median_frac_of_trade_elapsed_at_gate": 0.367
+    },
+    {
+      "terminal_label_full": "FINAL_FLIP_EXIT_LOSER",
+      "n": 1359,
+      "pct_gate_never_opens_before_exit": 90.14,
+      "median_gate_delay_s": 352.5,
+      "median_frac_of_trade_elapsed_at_gate": 0.51
+    },
+    {
+      "terminal_label_full": "CONFIRMED_THEN_STOPPED",
+      "n": 822,
+      "pct_gate_never_opens_before_exit": 95.74,
+      "median_gate_delay_s": 447.5,
+      "median_frac_of_trade_elapsed_at_gate": 1.97
+    },
+    {
+      "terminal_label_full": "SESSION_EXIT",
+      "n": 174,
+      "pct_gate_never_opens_before_exit": 56.9,
+      "median_gate_delay_s": 405.0,
+      "median_frac_of_trade_elapsed_at_gate": 0.515
+    }
+  ],
+  "score_coverage_by_outcome": [
+    {
+      "trades_with_any_row": 2350,
+      "trades_with_any_score": 2350,
+      "trades_with_in_domain": 1631,
+      "trades_with_ood_score": 2350,
+      "trades_with_ge3_in_domain": 1628,
+      "terminal_label_full": "FINAL_FLIP_EXIT_WINNER",
+      "total": 2350,
+      "pct_any_score": 100.0,
+      "pct_in_domain": 69.4,
+      "pct_ge3_in_domain": 69.28
+    },
+    {
+      "trades_with_any_row": 1359,
+      "trades_with_any_score": 1359,
+      "trades_with_in_domain": 134,
+      "trades_with_ood_score": 1359,
+      "trades_with_ge3_in_domain": 127,
+      "terminal_label_full": "FINAL_FLIP_EXIT_LOSER",
+      "total": 1359,
+      "pct_any_score": 100.0,
+      "pct_in_domain": 9.86,
+      "pct_ge3_in_domain": 9.35
+    },
+    {
+      "trades_with_any_row": 822,
+      "trades_with_any_score": 822,
+      "trades_with_in_domain": 35,
+      "trades_with_ood_score": 822,
+      "trades_with_ge3_in_domain": 32,
+      "terminal_label_full": "CONFIRMED_THEN_STOPPED",
+      "total": 822,
+      "pct_any_score": 100.0,
+      "pct_in_domain": 4.26,
+      "pct_ge3_in_domain": 3.89
+    },
+    {
+      "trades_with_any_row": 125,
+      "trades_with_any_score": 125,
+      "trades_with_in_domain": 75,
+      "trades_with_ood_score": 125,
+      "trades_with_ge3_in_domain": 72,
+      "terminal_label_full": "SESSION_EXIT",
+      "total": 174,
+      "pct_any_score": 71.84,
+      "pct_in_domain": 43.1,
+      "pct_ge3_in_domain": 41.38
+    }
+  ],
+  "headline": {
+    "failed_trades_total": 2181,
+    "failed_trades_with_any_in_domain_score": 169,
+    "failed_trades_with_ge3_in_domain_scores": 159,
+    "winner_trades_total": 2350,
+    "winner_trades_with_ge3_in_domain_scores": 1628
+  }
+}

@@ -1,0 +1,271 @@
+{
+  "design": "Landmark: state evaluated at a fixed elapsed time from confirmation, among trades still open at that time. AUC target is FAILURE (CONFIRMED_THEN_STOPPED or FINAL_FLIP_EXIT_LOSER) versus FINAL_FLIP_EXIT_WINNER. 0.50 = no information.",
+  "ood_score": [
+    {
+      "horizon_s": 60,
+      "column": "ood_score",
+      "n": 4471,
+      "n_fail": 2121,
+      "n_win": 2350,
+      "base_failure_rate": 0.4744,
+      "median_obs_by_horizon": 11.0,
+      "auc": {
+        "last": 0.3074,
+        "peak": 0.3672,
+        "retreat_from_peak": 0.6612,
+        "change_from_first": 0.354
+      },
+      "median_by_outcome": {
+        "last": {
+          "fail": 0.5304,
+          "win": 0.6286
+        },
+        "peak": {
+          "fail": 0.6454,
+          "win": 0.6773
+        },
+        "retreat_from_peak": {
+          "fail": 0.0964,
+          "win": 0.0373
+        },
+        "change_from_first": {
+          "fail": -0.0619,
+          "win": -0.0044
+        }
+      }
+    },
+    {
+      "horizon_s": 120,
+      "column": "ood_score",
+      "n": 4283,
+      "n_fail": 1933,
+      "n_win": 2350,
+      "base_failure_rate": 0.4513,
+      "median_obs_by_horizon": 23.0,
+      "auc": {
+        "last": 0.2781,
+        "peak": 0.3479,
+        "retreat_from_peak": 0.6822,
+        "change_from_first": 0.3149
+      },
+      "median_by_outcome": {
+        "last": {
+          "fail": 0.4795,
+          "win": 0.611
+        },
+        "peak": {
+          "fail": 0.6597,
+          "win": 0.6989
+        },
+        "retreat_from_peak": {
+          "fail": 0.161,
+          "win": 0.0688
+        },
+        "change_from_first": {
+          "fail": -0.1159,
+          "win": -0.0123
+        }
+      }
+    },
+    {
+      "horizon_s": 180,
+      "column": "ood_score",
+      "n": 3795,
+      "n_fail": 1475,
+      "n_win": 2320,
+      "base_failure_rate": 0.3887,
+      "median_obs_by_horizon": 36.0,
+      "auc": {
+        "last": 0.2866,
+        "peak": 0.3403,
+        "retreat_from_peak": 0.6654,
+        "change_from_first": 0.3253
+      },
+      "median_by_outcome": {
+        "last": {
+          "fail": 0.4709,
+          "win": 0.6065
+        },
+        "peak": {
+          "fail": 0.672,
+          "win": 0.7097
+        },
+        "retreat_from_peak": {
+          "fail": 0.1843,
+          "win": 0.0899
+        },
+        "change_from_first": {
+          "fail": -0.1239,
+          "win": -0.0223
+        }
+      }
+    },
+    {
+      "horizon_s": 300,
+      "column": "ood_score",
+      "n": 3117,
+      "n_fail": 884,
+      "n_win": 2233,
+      "base_failure_rate": 0.2836,
+      "median_obs_by_horizon": 59.0,
+      "auc": {
+        "last": 0.2898,
+        "peak": 0.3351,
+        "retreat_from_peak": 0.6669,
+        "change_from_first": 0.3333
+      },
+      "median_by_outcome": {
+        "last": {
+          "fail": 0.4627,
+          "win": 0.5951
+        },
+        "peak": {
+          "fail": 0.6838,
+          "win": 0.7178
+        },
+        "retreat_from_peak": {
+          "fail": 0.2071,
+          "win": 0.1098
+        },
+        "change_from_first": {
+          "fail": -0.1371,
+          "win": -0.0287
+        }
+      }
+    }
+  ],
+  "in_domain_score": [
+    {
+      "horizon_s": 60,
+      "column": "in_domain_score",
+      "n": 4471,
+      "n_fail": 2121,
+      "n_win": 2350,
+      "base_failure_rate": 0.4744,
+      "median_obs_by_horizon": 11.0,
+      "auc": {
+        "last": 0.6843,
+        "peak": 0.6547,
+        "retreat_from_peak": 0.3891,
+        "change_from_first": 0.6591
+      },
+      "median_by_outcome": {
+        "last": {
+          "fail": 0.4079,
+          "win": 0.3028
+        },
+        "peak": {
+          "fail": 0.4517,
+          "win": 0.3703
+        },
+        "retreat_from_peak": {
+          "fail": 0.0218,
+          "win": 0.0449
+        },
+        "change_from_first": {
+          "fail": 0.0713,
+          "win": 0.009
+        }
+      }
+    },
+    {
+      "horizon_s": 120,
+      "column": "in_domain_score",
+      "n": 4283,
+      "n_fail": 1933,
+      "n_win": 2350,
+      "base_failure_rate": 0.4513,
+      "median_obs_by_horizon": 23.0,
+      "auc": {
+        "last": 0.7353,
+        "peak": 0.683,
+        "retreat_from_peak": 0.3708,
+        "change_from_first": 0.7055
+      },
+      "median_by_outcome": {
+        "last": {
+          "fail": 0.4356,
+          "win": 0.2884
+        },
+        "peak": {
+          "fail": 0.5228,
+          "win": 0.4183
+        },
+        "retreat_from_peak": {
+          "fail": 0.0539,
+          "win": 0.0972
+        },
+        "change_from_first": {
+          "fail": 0.0969,
+          "win": -0.0042
+        }
+      }
+    },
+    {
+      "horizon_s": 180,
+      "column": "in_domain_score",
+      "n": 3795,
+      "n_fail": 1475,
+      "n_win": 2320,
+      "base_failure_rate": 0.3887,
+      "median_obs_by_horizon": 36.0,
+      "auc": {
+        "last": 0.7527,
+        "peak": 0.6859,
+        "retreat_from_peak": 0.3716,
+        "change_from_first": 0.7122
+      },
+      "median_by_outcome": {
+        "last": {
+          "fail": 0.4339,
+          "win": 0.2778
+        },
+        "peak": {
+          "fail": 0.5499,
+          "win": 0.4509
+        },
+        "retreat_from_peak": {
+          "fail": 0.0827,
+          "win": 0.1328
+        },
+        "change_from_first": {
+          "fail": 0.0918,
+          "win": -0.0143
+        }
+      }
+    },
+    {
+      "horizon_s": 300,
+      "column": "in_domain_score",
+      "n": 3117,
+      "n_fail": 884,
+      "n_win": 2233,
+      "base_failure_rate": 0.2836,
+      "median_obs_by_horizon": 59.0,
+      "auc": {
+        "last": 0.7801,
+        "peak": 0.7196,
+        "retreat_from_peak": 0.3758,
+        "change_from_first": 0.7228
+      },
+      "median_by_outcome": {
+        "last": {
+          "fail": 0.4489,
+          "win": 0.2712
+        },
+        "peak": {
+          "fail": 0.5951,
+          "win": 0.4933
+        },
+        "retreat_from_peak": {
+          "fail": 0.1153,
+          "win": 0.1791
+        },
+        "change_from_first": {
+          "fail": 0.1157,
+          "win": -0.0282
+        }
+      }
+    }
+  ]
+}

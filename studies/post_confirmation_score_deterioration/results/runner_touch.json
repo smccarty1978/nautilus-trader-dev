@@ -1,0 +1,488 @@
+{
+  "ESCALATION_0_03_from_min": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 188,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.1304,
+        "median_remaining_mfe_after_touch_atr": 0.8375
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 323,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.1894,
+        "median_remaining_mfe_after_touch_atr": 1.1624
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 293,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.2358,
+        "median_remaining_mfe_after_touch_atr": 1.5894
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 1546,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.2354,
+        "median_remaining_mfe_after_touch_atr": 3.414
+      }
+    },
+    "touch_rate_ge_2atr": 1.0,
+    "touch_rate_ge_2_5atr": 1.0,
+    "touch_rate_ge_3atr": 1.0,
+    "sensitivity": 0.9991,
+    "econ_winners": {
+      "n": 2350,
+      "median_fire_elapsed_s": 20.0,
+      "median_open_pnl_atr": -0.0092,
+      "p25_open_pnl_atr": -0.2289,
+      "p75_open_pnl_atr": 0.2638,
+      "median_mfe_at_fire_atr": 0.2186,
+      "median_giveback_at_fire_atr": 0.2753,
+      "median_remaining_mfe_atr": 2.4817,
+      "median_seconds_to_terminal": 925.0
+    }
+  },
+  "ESCALATION_0_03_from_confirm": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 187,
+        "touch_rate": 0.9947,
+        "median_mfe_at_touch_atr": 0.1747,
+        "median_remaining_mfe_after_touch_atr": 0.8637
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 323,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.2375,
+        "median_remaining_mfe_after_touch_atr": 1.2122
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 293,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.2806,
+        "median_remaining_mfe_after_touch_atr": 1.6248
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 1544,
+        "touch_rate": 0.9987,
+        "median_mfe_at_touch_atr": 0.2842,
+        "median_remaining_mfe_after_touch_atr": 3.3644
+      }
+    },
+    "touch_rate_ge_2atr": 0.9991,
+    "touch_rate_ge_2_5atr": 0.9989,
+    "touch_rate_ge_3atr": 0.9987,
+    "sensitivity": 0.9977,
+    "econ_winners": {
+      "n": 2347,
+      "median_fire_elapsed_s": 30.0,
+      "median_open_pnl_atr": -0.0813,
+      "p25_open_pnl_atr": -0.2699,
+      "p75_open_pnl_atr": 0.2012,
+      "median_mfe_at_fire_atr": 0.2613,
+      "median_giveback_at_fire_atr": 0.4181,
+      "median_remaining_mfe_atr": 2.3558,
+      "median_seconds_to_terminal": 875.0
+    }
+  },
+  "ESCALATION_0_05_from_min": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 188,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.1889,
+        "median_remaining_mfe_after_touch_atr": 0.8166
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 323,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.2411,
+        "median_remaining_mfe_after_touch_atr": 1.1879
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 293,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.3092,
+        "median_remaining_mfe_after_touch_atr": 1.5791
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 1546,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.3511,
+        "median_remaining_mfe_after_touch_atr": 3.3826
+      }
+    },
+    "touch_rate_ge_2atr": 1.0,
+    "touch_rate_ge_2_5atr": 1.0,
+    "touch_rate_ge_3atr": 1.0,
+    "sensitivity": 0.9986,
+    "econ_winners": {
+      "n": 2350,
+      "median_fire_elapsed_s": 30.0,
+      "median_open_pnl_atr": -0.0132,
+      "p25_open_pnl_atr": -0.259,
+      "p75_open_pnl_atr": 0.3294,
+      "median_mfe_at_fire_atr": 0.2993,
+      "median_giveback_at_fire_atr": 0.3503,
+      "median_remaining_mfe_atr": 2.4377,
+      "median_seconds_to_terminal": 905.0
+    }
+  },
+  "ESCALATION_0_05_from_confirm": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 187,
+        "touch_rate": 0.9947,
+        "median_mfe_at_touch_atr": 0.2326,
+        "median_remaining_mfe_after_touch_atr": 0.875
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 322,
+        "touch_rate": 0.9969,
+        "median_mfe_at_touch_atr": 0.2832,
+        "median_remaining_mfe_after_touch_atr": 1.2813
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 292,
+        "touch_rate": 0.9966,
+        "median_mfe_at_touch_atr": 0.3866,
+        "median_remaining_mfe_after_touch_atr": 1.6492
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 1543,
+        "touch_rate": 0.9981,
+        "median_mfe_at_touch_atr": 0.4434,
+        "median_remaining_mfe_after_touch_atr": 3.2336
+      }
+    },
+    "touch_rate_ge_2atr": 0.9977,
+    "touch_rate_ge_2_5atr": 0.9978,
+    "touch_rate_ge_3atr": 0.9981,
+    "sensitivity": 0.995,
+    "econ_winners": {
+      "n": 2344,
+      "median_fire_elapsed_s": 50.0,
+      "median_open_pnl_atr": -0.0954,
+      "p25_open_pnl_atr": -0.3146,
+      "p75_open_pnl_atr": 0.3078,
+      "median_mfe_at_fire_atr": 0.3791,
+      "median_giveback_at_fire_atr": 0.5277,
+      "median_remaining_mfe_atr": 2.234,
+      "median_seconds_to_terminal": 825.0
+    }
+  },
+  "ESCALATION_0_10_from_min": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 188,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.3003,
+        "median_remaining_mfe_after_touch_atr": 0.8224
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 323,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.4019,
+        "median_remaining_mfe_after_touch_atr": 1.1613
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 293,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.4252,
+        "median_remaining_mfe_after_touch_atr": 1.5758
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 1546,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.602,
+        "median_remaining_mfe_after_touch_atr": 3.3231
+      }
+    },
+    "touch_rate_ge_2atr": 1.0,
+    "touch_rate_ge_2_5atr": 1.0,
+    "touch_rate_ge_3atr": 1.0,
+    "sensitivity": 0.995,
+    "econ_winners": {
+      "n": 2350,
+      "median_fire_elapsed_s": 65.0,
+      "median_open_pnl_atr": 0.0,
+      "p25_open_pnl_atr": -0.3212,
+      "p75_open_pnl_atr": 0.5021,
+      "median_mfe_at_fire_atr": 0.5129,
+      "median_giveback_at_fire_atr": 0.5309,
+      "median_remaining_mfe_atr": 2.3038,
+      "median_seconds_to_terminal": 855.0
+    }
+  },
+  "ESCALATION_0_10_from_confirm": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 186,
+        "touch_rate": 0.9894,
+        "median_mfe_at_touch_atr": 0.358,
+        "median_remaining_mfe_after_touch_atr": 0.7946
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 320,
+        "touch_rate": 0.9907,
+        "median_mfe_at_touch_atr": 0.5567,
+        "median_remaining_mfe_after_touch_atr": 1.1312
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 291,
+        "touch_rate": 0.9932,
+        "median_mfe_at_touch_atr": 0.5764,
+        "median_remaining_mfe_after_touch_atr": 1.5683
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 1529,
+        "touch_rate": 0.989,
+        "median_mfe_at_touch_atr": 0.8945,
+        "median_remaining_mfe_after_touch_atr": 2.9936
+      }
+    },
+    "touch_rate_ge_2atr": 0.9898,
+    "touch_rate_ge_2_5atr": 0.9897,
+    "touch_rate_ge_3atr": 0.989,
+    "sensitivity": 0.984,
+    "econ_winners": {
+      "n": 2326,
+      "median_fire_elapsed_s": 120.0,
+      "median_open_pnl_atr": -0.0722,
+      "p25_open_pnl_atr": -0.3944,
+      "p75_open_pnl_atr": 0.5779,
+      "median_mfe_at_fire_atr": 0.6928,
+      "median_giveback_at_fire_atr": 0.8061,
+      "median_remaining_mfe_atr": 2.0118,
+      "median_seconds_to_terminal": 720.0
+    }
+  },
+  "STREAMC_RETREAT_0_03": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 188,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.1304,
+        "median_remaining_mfe_after_touch_atr": 0.8119
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 323,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.1804,
+        "median_remaining_mfe_after_touch_atr": 1.1533
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 293,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.2475,
+        "median_remaining_mfe_after_touch_atr": 1.5888
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 1546,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.2397,
+        "median_remaining_mfe_after_touch_atr": 3.4173
+      }
+    },
+    "touch_rate_ge_2atr": 1.0,
+    "touch_rate_ge_2_5atr": 1.0,
+    "touch_rate_ge_3atr": 1.0,
+    "sensitivity": 0.9991,
+    "econ_winners": {
+      "n": 2350,
+      "median_fire_elapsed_s": 25.0,
+      "median_open_pnl_atr": -0.0197,
+      "p25_open_pnl_atr": -0.2466,
+      "p75_open_pnl_atr": 0.2536,
+      "median_mfe_at_fire_atr": 0.2203,
+      "median_giveback_at_fire_atr": 0.285,
+      "median_remaining_mfe_atr": 2.4835,
+      "median_seconds_to_terminal": 920.0
+    }
+  },
+  "STREAMC_RETREAT_0_05": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 188,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.1758,
+        "median_remaining_mfe_after_touch_atr": 0.8406
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 323,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.2697,
+        "median_remaining_mfe_after_touch_atr": 1.1464
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 293,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.3056,
+        "median_remaining_mfe_after_touch_atr": 1.5907
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 1546,
+        "touch_rate": 1.0,
+        "median_mfe_at_touch_atr": 0.3445,
+        "median_remaining_mfe_after_touch_atr": 3.393
+      }
+    },
+    "touch_rate_ge_2atr": 1.0,
+    "touch_rate_ge_2_5atr": 1.0,
+    "touch_rate_ge_3atr": 1.0,
+    "sensitivity": 0.9986,
+    "econ_winners": {
+      "n": 2350,
+      "median_fire_elapsed_s": 35.0,
+      "median_open_pnl_atr": -0.0,
+      "p25_open_pnl_atr": -0.2782,
+      "p75_open_pnl_atr": 0.3314,
+      "median_mfe_at_fire_atr": 0.3047,
+      "median_giveback_at_fire_atr": 0.3504,
+      "median_remaining_mfe_atr": 2.4393,
+      "median_seconds_to_terminal": 905.0
+    }
+  },
+  "DIVERGENCE_price_high_score_high": {
+    "runner_touch_by_mfe_bucket": {
+      "0-1": {
+        "n_runners": 0,
+        "n_touched": 0,
+        "touch_rate": null,
+        "median_mfe_at_touch_atr": null,
+        "median_remaining_mfe_after_touch_atr": null
+      },
+      "1-2": {
+        "n_runners": 188,
+        "n_touched": 4,
+        "touch_rate": 0.0213,
+        "median_mfe_at_touch_atr": 0.2923,
+        "median_remaining_mfe_after_touch_atr": 0.5858
+      },
+      "2-2.5": {
+        "n_runners": 323,
+        "n_touched": 10,
+        "touch_rate": 0.031,
+        "median_mfe_at_touch_atr": 0.2051,
+        "median_remaining_mfe_after_touch_atr": 0.7847
+      },
+      "2.5-3": {
+        "n_runners": 293,
+        "n_touched": 18,
+        "touch_rate": 0.0614,
+        "median_mfe_at_touch_atr": 0.3671,
+        "median_remaining_mfe_after_touch_atr": 1.298
+      },
+      "3-inf": {
+        "n_runners": 1546,
+        "n_touched": 72,
+        "touch_rate": 0.0466,
+        "median_mfe_at_touch_atr": 0.2938,
+        "median_remaining_mfe_after_touch_atr": 3.4483
+      }
+    },
+    "touch_rate_ge_2atr": 0.0463,
+    "touch_rate_ge_2_5atr": 0.0489,
+    "touch_rate_ge_3atr": 0.0466,
+    "sensitivity": 0.0243,
+    "econ_winners": {
+      "n": 104,
+      "median_fire_elapsed_s": 20.0,
+      "median_open_pnl_atr": 0.2395,
+      "p25_open_pnl_atr": 0.1241,
+      "p75_open_pnl_atr": 0.4768,
+      "median_mfe_at_fire_atr": 0.2395,
+      "median_giveback_at_fire_atr": 0.0,
+      "median_remaining_mfe_atr": 2.2738,
+      "median_seconds_to_terminal": 885.0
+    }
+  }
+}

@@ -1,0 +1,790 @@
+{
+  "base_failure_rate": 0.4814,
+  "universe_n": 4531,
+  "polarity_note": "On stream B the deterioration direction is ESCALATION (score rising = the new regime is likely ending). Stream C events keep the brief's retreat framing, where that sign is correct.",
+  "not_applicable": {
+    "events": [
+      "loss of Top-1",
+      "loss of Top-2.5",
+      "loss of Top-5",
+      "loss of Top-10"
+    ],
+    "reason": "The frozen percentile contracts were calibrated in-domain. Stream B reads each model outside its contractual domain, so the thresholds do not transfer. Constructing new cutoffs would be a second incompatible threshold definition, which Phase 0 rule 4 forbids."
+  },
+  "events": [
+    {
+      "event": "ESCALATION_0_03_from_min",
+      "n_fired": 4529,
+      "fire_rate": 0.9996,
+      "failures_caught": 2179,
+      "sensitivity": 0.9991,
+      "winner_touch_rate": 1.0,
+      "precision_p_failure_given_event": 0.4811,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 4529,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": -0.0924,
+        "p25_open_pnl_atr": -0.292,
+        "p75_open_pnl_atr": 0.1681,
+        "median_mfe_at_fire_atr": 0.1477,
+        "median_giveback_at_fire_atr": 0.2848,
+        "median_remaining_mfe_atr": 1.0647,
+        "median_seconds_to_terminal": 510.0
+      },
+      "econ_failures": {
+        "n": 2179,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": -0.1673,
+        "p25_open_pnl_atr": -0.3503,
+        "p75_open_pnl_atr": 0.0563,
+        "median_mfe_at_fire_atr": 0.0794,
+        "median_giveback_at_fire_atr": 0.2974,
+        "median_remaining_mfe_atr": 0.3515,
+        "median_seconds_to_terminal": 245.0
+      },
+      "econ_winners": {
+        "n": 2350,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": -0.0092,
+        "p25_open_pnl_atr": -0.2289,
+        "p75_open_pnl_atr": 0.2638,
+        "median_mfe_at_fire_atr": 0.2186,
+        "median_giveback_at_fire_atr": 0.2753,
+        "median_remaining_mfe_atr": 2.4817,
+        "median_seconds_to_terminal": 925.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 188,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.1304,
+          "median_remaining_mfe_after_touch_atr": 0.8375
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 323,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.1894,
+          "median_remaining_mfe_after_touch_atr": 1.1624
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 293,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.2358,
+          "median_remaining_mfe_after_touch_atr": 1.5894
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 1546,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.2354,
+          "median_remaining_mfe_after_touch_atr": 3.414
+        }
+      },
+      "touch_rate_ge_2atr": 1.0,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 1.0,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 1.0,
+      "n_runners_ge_3atr": 1546
+    },
+    {
+      "event": "ESCALATION_0_03_from_confirm",
+      "n_fired": 4523,
+      "fire_rate": 0.9982,
+      "failures_caught": 2176,
+      "sensitivity": 0.9977,
+      "winner_touch_rate": 0.9987,
+      "precision_p_failure_given_event": 0.4811,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 4523,
+        "median_fire_elapsed_s": 25.0,
+        "median_open_pnl_atr": -0.1576,
+        "p25_open_pnl_atr": -0.3423,
+        "p75_open_pnl_atr": 0.0669,
+        "median_mfe_at_fire_atr": 0.1746,
+        "median_giveback_at_fire_atr": 0.413,
+        "median_remaining_mfe_atr": 1.0303,
+        "median_seconds_to_terminal": 465.0
+      },
+      "econ_failures": {
+        "n": 2176,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": -0.2276,
+        "p25_open_pnl_atr": -0.4031,
+        "p75_open_pnl_atr": -0.0466,
+        "median_mfe_at_fire_atr": 0.097,
+        "median_giveback_at_fire_atr": 0.4081,
+        "median_remaining_mfe_atr": 0.3551,
+        "median_seconds_to_terminal": 230.0
+      },
+      "econ_winners": {
+        "n": 2347,
+        "median_fire_elapsed_s": 30.0,
+        "median_open_pnl_atr": -0.0813,
+        "p25_open_pnl_atr": -0.2699,
+        "p75_open_pnl_atr": 0.2012,
+        "median_mfe_at_fire_atr": 0.2613,
+        "median_giveback_at_fire_atr": 0.4181,
+        "median_remaining_mfe_atr": 2.3558,
+        "median_seconds_to_terminal": 875.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 187,
+          "touch_rate": 0.9947,
+          "median_mfe_at_touch_atr": 0.1747,
+          "median_remaining_mfe_after_touch_atr": 0.8637
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 323,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.2375,
+          "median_remaining_mfe_after_touch_atr": 1.2122
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 293,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.2806,
+          "median_remaining_mfe_after_touch_atr": 1.6248
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 1544,
+          "touch_rate": 0.9987,
+          "median_mfe_at_touch_atr": 0.2842,
+          "median_remaining_mfe_after_touch_atr": 3.3644
+        }
+      },
+      "touch_rate_ge_2atr": 0.9991,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 0.9989,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 0.9987,
+      "n_runners_ge_3atr": 1546
+    },
+    {
+      "event": "ESCALATION_0_05_from_min",
+      "n_fired": 4528,
+      "fire_rate": 0.9993,
+      "failures_caught": 2178,
+      "sensitivity": 0.9986,
+      "winner_touch_rate": 1.0,
+      "precision_p_failure_given_event": 0.481,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 4528,
+        "median_fire_elapsed_s": 30.0,
+        "median_open_pnl_atr": -0.118,
+        "p25_open_pnl_atr": -0.3339,
+        "p75_open_pnl_atr": 0.1833,
+        "median_mfe_at_fire_atr": 0.1966,
+        "median_giveback_at_fire_atr": 0.3575,
+        "median_remaining_mfe_atr": 1.046,
+        "median_seconds_to_terminal": 490.0
+      },
+      "econ_failures": {
+        "n": 2178,
+        "median_fire_elapsed_s": 25.0,
+        "median_open_pnl_atr": -0.2009,
+        "p25_open_pnl_atr": -0.3934,
+        "p75_open_pnl_atr": 0.0321,
+        "median_mfe_at_fire_atr": 0.1138,
+        "median_giveback_at_fire_atr": 0.3673,
+        "median_remaining_mfe_atr": 0.3416,
+        "median_seconds_to_terminal": 233.0
+      },
+      "econ_winners": {
+        "n": 2350,
+        "median_fire_elapsed_s": 30.0,
+        "median_open_pnl_atr": -0.0132,
+        "p25_open_pnl_atr": -0.259,
+        "p75_open_pnl_atr": 0.3294,
+        "median_mfe_at_fire_atr": 0.2993,
+        "median_giveback_at_fire_atr": 0.3503,
+        "median_remaining_mfe_atr": 2.4377,
+        "median_seconds_to_terminal": 905.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 188,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.1889,
+          "median_remaining_mfe_after_touch_atr": 0.8166
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 323,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.2411,
+          "median_remaining_mfe_after_touch_atr": 1.1879
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 293,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.3092,
+          "median_remaining_mfe_after_touch_atr": 1.5791
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 1546,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.3511,
+          "median_remaining_mfe_after_touch_atr": 3.3826
+        }
+      },
+      "touch_rate_ge_2atr": 1.0,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 1.0,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 1.0,
+      "n_runners_ge_3atr": 1546
+    },
+    {
+      "event": "ESCALATION_0_05_from_confirm",
+      "n_fired": 4514,
+      "fire_rate": 0.9962,
+      "failures_caught": 2170,
+      "sensitivity": 0.995,
+      "winner_touch_rate": 0.9974,
+      "precision_p_failure_given_event": 0.4807,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 4514,
+        "median_fire_elapsed_s": 35.0,
+        "median_open_pnl_atr": -0.1929,
+        "p25_open_pnl_atr": -0.3946,
+        "p75_open_pnl_atr": 0.0665,
+        "median_mfe_at_fire_atr": 0.2299,
+        "median_giveback_at_fire_atr": 0.5059,
+        "median_remaining_mfe_atr": 0.9834,
+        "median_seconds_to_terminal": 435.0
+      },
+      "econ_failures": {
+        "n": 2170,
+        "median_fire_elapsed_s": 30.0,
+        "median_open_pnl_atr": -0.2807,
+        "p25_open_pnl_atr": -0.4558,
+        "p75_open_pnl_atr": -0.0913,
+        "median_mfe_at_fire_atr": 0.1296,
+        "median_giveback_at_fire_atr": 0.4819,
+        "median_remaining_mfe_atr": 0.3531,
+        "median_seconds_to_terminal": 220.0
+      },
+      "econ_winners": {
+        "n": 2344,
+        "median_fire_elapsed_s": 50.0,
+        "median_open_pnl_atr": -0.0954,
+        "p25_open_pnl_atr": -0.3146,
+        "p75_open_pnl_atr": 0.3078,
+        "median_mfe_at_fire_atr": 0.3791,
+        "median_giveback_at_fire_atr": 0.5277,
+        "median_remaining_mfe_atr": 2.234,
+        "median_seconds_to_terminal": 825.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 187,
+          "touch_rate": 0.9947,
+          "median_mfe_at_touch_atr": 0.2326,
+          "median_remaining_mfe_after_touch_atr": 0.875
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 322,
+          "touch_rate": 0.9969,
+          "median_mfe_at_touch_atr": 0.2832,
+          "median_remaining_mfe_after_touch_atr": 1.2813
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 292,
+          "touch_rate": 0.9966,
+          "median_mfe_at_touch_atr": 0.3866,
+          "median_remaining_mfe_after_touch_atr": 1.6492
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 1543,
+          "touch_rate": 0.9981,
+          "median_mfe_at_touch_atr": 0.4434,
+          "median_remaining_mfe_after_touch_atr": 3.2336
+        }
+      },
+      "touch_rate_ge_2atr": 0.9977,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 0.9978,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 0.9981,
+      "n_runners_ge_3atr": 1546
+    },
+    {
+      "event": "ESCALATION_0_10_from_min",
+      "n_fired": 4520,
+      "fire_rate": 0.9976,
+      "failures_caught": 2170,
+      "sensitivity": 0.995,
+      "winner_touch_rate": 1.0,
+      "precision_p_failure_given_event": 0.4801,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 4520,
+        "median_fire_elapsed_s": 55.0,
+        "median_open_pnl_atr": -0.1775,
+        "p25_open_pnl_atr": -0.4441,
+        "p75_open_pnl_atr": 0.204,
+        "median_mfe_at_fire_atr": 0.3113,
+        "median_giveback_at_fire_atr": 0.5397,
+        "median_remaining_mfe_atr": 1.0046,
+        "median_seconds_to_terminal": 450.0
+      },
+      "econ_failures": {
+        "n": 2170,
+        "median_fire_elapsed_s": 45.0,
+        "median_open_pnl_atr": -0.3109,
+        "p25_open_pnl_atr": -0.5451,
+        "p75_open_pnl_atr": -0.0425,
+        "median_mfe_at_fire_atr": 0.1771,
+        "median_giveback_at_fire_atr": 0.549,
+        "median_remaining_mfe_atr": 0.3467,
+        "median_seconds_to_terminal": 215.0
+      },
+      "econ_winners": {
+        "n": 2350,
+        "median_fire_elapsed_s": 65.0,
+        "median_open_pnl_atr": 0.0,
+        "p25_open_pnl_atr": -0.3212,
+        "p75_open_pnl_atr": 0.5021,
+        "median_mfe_at_fire_atr": 0.5129,
+        "median_giveback_at_fire_atr": 0.5309,
+        "median_remaining_mfe_atr": 2.3038,
+        "median_seconds_to_terminal": 855.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 188,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.3003,
+          "median_remaining_mfe_after_touch_atr": 0.8224
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 323,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.4019,
+          "median_remaining_mfe_after_touch_atr": 1.1613
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 293,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.4252,
+          "median_remaining_mfe_after_touch_atr": 1.5758
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 1546,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.602,
+          "median_remaining_mfe_after_touch_atr": 3.3231
+        }
+      },
+      "touch_rate_ge_2atr": 1.0,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 1.0,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 1.0,
+      "n_runners_ge_3atr": 1546
+    },
+    {
+      "event": "ESCALATION_0_10_from_confirm",
+      "n_fired": 4472,
+      "fire_rate": 0.987,
+      "failures_caught": 2146,
+      "sensitivity": 0.984,
+      "winner_touch_rate": 0.9898,
+      "precision_p_failure_given_event": 0.4799,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 4472,
+        "median_fire_elapsed_s": 70.0,
+        "median_open_pnl_atr": -0.2836,
+        "p25_open_pnl_atr": -0.5467,
+        "p75_open_pnl_atr": 0.0832,
+        "median_mfe_at_fire_atr": 0.3621,
+        "median_giveback_at_fire_atr": 0.7563,
+        "median_remaining_mfe_atr": 0.8265,
+        "median_seconds_to_terminal": 355.0
+      },
+      "econ_failures": {
+        "n": 2146,
+        "median_fire_elapsed_s": 55.0,
+        "median_open_pnl_atr": -0.4339,
+        "p25_open_pnl_atr": -0.6533,
+        "p75_open_pnl_atr": -0.2029,
+        "median_mfe_at_fire_atr": 0.1935,
+        "median_giveback_at_fire_atr": 0.7101,
+        "median_remaining_mfe_atr": 0.3467,
+        "median_seconds_to_terminal": 181.0
+      },
+      "econ_winners": {
+        "n": 2326,
+        "median_fire_elapsed_s": 120.0,
+        "median_open_pnl_atr": -0.0722,
+        "p25_open_pnl_atr": -0.3944,
+        "p75_open_pnl_atr": 0.5779,
+        "median_mfe_at_fire_atr": 0.6928,
+        "median_giveback_at_fire_atr": 0.8061,
+        "median_remaining_mfe_atr": 2.0118,
+        "median_seconds_to_terminal": 720.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 186,
+          "touch_rate": 0.9894,
+          "median_mfe_at_touch_atr": 0.358,
+          "median_remaining_mfe_after_touch_atr": 0.7946
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 320,
+          "touch_rate": 0.9907,
+          "median_mfe_at_touch_atr": 0.5567,
+          "median_remaining_mfe_after_touch_atr": 1.1312
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 291,
+          "touch_rate": 0.9932,
+          "median_mfe_at_touch_atr": 0.5764,
+          "median_remaining_mfe_after_touch_atr": 1.5683
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 1529,
+          "touch_rate": 0.989,
+          "median_mfe_at_touch_atr": 0.8945,
+          "median_remaining_mfe_after_touch_atr": 2.9936
+        }
+      },
+      "touch_rate_ge_2atr": 0.9898,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 0.9897,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 0.989,
+      "n_runners_ge_3atr": 1546
+    },
+    {
+      "event": "STREAMC_RETREAT_0_03",
+      "n_fired": 4529,
+      "fire_rate": 0.9996,
+      "failures_caught": 2179,
+      "sensitivity": 0.9991,
+      "winner_touch_rate": 1.0,
+      "precision_p_failure_given_event": 0.4811,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 4529,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": -0.1046,
+        "p25_open_pnl_atr": -0.3038,
+        "p75_open_pnl_atr": 0.1481,
+        "median_mfe_at_fire_atr": 0.15,
+        "median_giveback_at_fire_atr": 0.3002,
+        "median_remaining_mfe_atr": 1.0514,
+        "median_seconds_to_terminal": 505.0
+      },
+      "econ_failures": {
+        "n": 2179,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": -0.1757,
+        "p25_open_pnl_atr": -0.3568,
+        "p75_open_pnl_atr": 0.0569,
+        "median_mfe_at_fire_atr": 0.0817,
+        "median_giveback_at_fire_atr": 0.3177,
+        "median_remaining_mfe_atr": 0.3648,
+        "median_seconds_to_terminal": 241.0
+      },
+      "econ_winners": {
+        "n": 2350,
+        "median_fire_elapsed_s": 25.0,
+        "median_open_pnl_atr": -0.0197,
+        "p25_open_pnl_atr": -0.2466,
+        "p75_open_pnl_atr": 0.2536,
+        "median_mfe_at_fire_atr": 0.2203,
+        "median_giveback_at_fire_atr": 0.285,
+        "median_remaining_mfe_atr": 2.4835,
+        "median_seconds_to_terminal": 920.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 188,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.1304,
+          "median_remaining_mfe_after_touch_atr": 0.8119
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 323,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.1804,
+          "median_remaining_mfe_after_touch_atr": 1.1533
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 293,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.2475,
+          "median_remaining_mfe_after_touch_atr": 1.5888
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 1546,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.2397,
+          "median_remaining_mfe_after_touch_atr": 3.4173
+        }
+      },
+      "touch_rate_ge_2atr": 1.0,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 1.0,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 1.0,
+      "n_runners_ge_3atr": 1546
+    },
+    {
+      "event": "STREAMC_RETREAT_0_05",
+      "n_fired": 4528,
+      "fire_rate": 0.9993,
+      "failures_caught": 2178,
+      "sensitivity": 0.9986,
+      "winner_touch_rate": 1.0,
+      "precision_p_failure_given_event": 0.481,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 4528,
+        "median_fire_elapsed_s": 30.0,
+        "median_open_pnl_atr": -0.1211,
+        "p25_open_pnl_atr": -0.3485,
+        "p75_open_pnl_atr": 0.1574,
+        "median_mfe_at_fire_atr": 0.1997,
+        "median_giveback_at_fire_atr": 0.3641,
+        "median_remaining_mfe_atr": 1.046,
+        "median_seconds_to_terminal": 490.0
+      },
+      "econ_failures": {
+        "n": 2178,
+        "median_fire_elapsed_s": 25.0,
+        "median_open_pnl_atr": -0.2167,
+        "p25_open_pnl_atr": -0.3997,
+        "p75_open_pnl_atr": 0.0365,
+        "median_mfe_at_fire_atr": 0.1103,
+        "median_giveback_at_fire_atr": 0.3774,
+        "median_remaining_mfe_atr": 0.3531,
+        "median_seconds_to_terminal": 235.0
+      },
+      "econ_winners": {
+        "n": 2350,
+        "median_fire_elapsed_s": 35.0,
+        "median_open_pnl_atr": -0.0,
+        "p25_open_pnl_atr": -0.2782,
+        "p75_open_pnl_atr": 0.3314,
+        "median_mfe_at_fire_atr": 0.3047,
+        "median_giveback_at_fire_atr": 0.3504,
+        "median_remaining_mfe_atr": 2.4393,
+        "median_seconds_to_terminal": 905.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 188,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.1758,
+          "median_remaining_mfe_after_touch_atr": 0.8406
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 323,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.2697,
+          "median_remaining_mfe_after_touch_atr": 1.1464
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 293,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.3056,
+          "median_remaining_mfe_after_touch_atr": 1.5907
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 1546,
+          "touch_rate": 1.0,
+          "median_mfe_at_touch_atr": 0.3445,
+          "median_remaining_mfe_after_touch_atr": 3.393
+        }
+      },
+      "touch_rate_ge_2atr": 1.0,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 1.0,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 1.0,
+      "n_runners_ge_3atr": 1546
+    },
+    {
+      "event": "DIVERGENCE_price_high_score_high",
+      "n_fired": 157,
+      "fire_rate": 0.0347,
+      "failures_caught": 53,
+      "sensitivity": 0.0243,
+      "winner_touch_rate": 0.0443,
+      "precision_p_failure_given_event": 0.3376,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 157,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": 0.2254,
+        "p25_open_pnl_atr": 0.1083,
+        "p75_open_pnl_atr": 0.4308,
+        "median_mfe_at_fire_atr": 0.2254,
+        "median_giveback_at_fire_atr": 0.0,
+        "median_remaining_mfe_atr": 1.298,
+        "median_seconds_to_terminal": 585.0
+      },
+      "econ_failures": {
+        "n": 53,
+        "median_fire_elapsed_s": 15.0,
+        "median_open_pnl_atr": 0.1623,
+        "p25_open_pnl_atr": 0.0606,
+        "p75_open_pnl_atr": 0.3268,
+        "median_mfe_at_fire_atr": 0.1623,
+        "median_giveback_at_fire_atr": 0.0,
+        "median_remaining_mfe_atr": 0.4548,
+        "median_seconds_to_terminal": 285.0
+      },
+      "econ_winners": {
+        "n": 104,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": 0.2395,
+        "p25_open_pnl_atr": 0.1241,
+        "p75_open_pnl_atr": 0.4768,
+        "median_mfe_at_fire_atr": 0.2395,
+        "median_giveback_at_fire_atr": 0.0,
+        "median_remaining_mfe_atr": 2.2738,
+        "median_seconds_to_terminal": 885.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 4,
+          "touch_rate": 0.0213,
+          "median_mfe_at_touch_atr": 0.2923,
+          "median_remaining_mfe_after_touch_atr": 0.5858
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 10,
+          "touch_rate": 0.031,
+          "median_mfe_at_touch_atr": 0.2051,
+          "median_remaining_mfe_after_touch_atr": 0.7847
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 18,
+          "touch_rate": 0.0614,
+          "median_mfe_at_touch_atr": 0.3671,
+          "median_remaining_mfe_after_touch_atr": 1.298
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 72,
+          "touch_rate": 0.0466,
+          "median_mfe_at_touch_atr": 0.2938,
+          "median_remaining_mfe_after_touch_atr": 3.4483
+        }
+      },
+      "touch_rate_ge_2atr": 0.0463,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 0.0489,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 0.0466,
+      "n_runners_ge_3atr": 1546
+    }
+  ]
+}

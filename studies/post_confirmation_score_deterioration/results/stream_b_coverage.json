@@ -1,0 +1,59 @@
+{
+  "question": "Is the domain-model raw score (stream B) available on the trades this study needs to protect, or is its availability determined by the outcome the way the in-domain-flagged stream (A) is?",
+  "answer": "Available. Coverage is complete on all three primary outcome groups, with a healthy observation count even on the shortest-lived failures. Stream A's 7.7% coverage on failures was an artifact of the established-regime contract gate, not of score availability.",
+  "in_domain_flag_is_a_contract_gate_not_an_availability_gate": true,
+  "probability_present_rate_by_in_domain_flag": {
+    "note": "Over all 5,665,103 RTH score rows. The model emits a probability at essentially the same rate whether or not it is in-domain; the ~8% of nulls are feature-incompleteness, not gating.",
+    "bullish_in_domain=false": 0.9146,
+    "bullish_in_domain=true": 0.9223,
+    "bearish_in_domain=false": 0.9195,
+    "bearish_in_domain=true": 0.9161
+  },
+  "stream_b_coverage_by_label": [
+    {
+      "terminal_label_full": "FINAL_FLIP_EXIT_WINNER",
+      "total": 2350,
+      "trades_with_ge1_obs": 2350,
+      "trades_with_ge3_obs": 2350,
+      "pct_ge1": 100.0,
+      "pct_ge3": 100.0,
+      "median_obs_per_trade": 179.0
+    },
+    {
+      "terminal_label_full": "FINAL_FLIP_EXIT_LOSER",
+      "total": 1359,
+      "trades_with_ge1_obs": 1359,
+      "trades_with_ge3_obs": 1359,
+      "pct_ge1": 100.0,
+      "pct_ge3": 100.0,
+      "median_obs_per_trade": 59.0
+    },
+    {
+      "terminal_label_full": "CONFIRMED_THEN_STOPPED",
+      "total": 822,
+      "trades_with_ge1_obs": 822,
+      "trades_with_ge3_obs": 819,
+      "pct_ge1": 100.0,
+      "pct_ge3": 99.64,
+      "median_obs_per_trade": 41.0
+    },
+    {
+      "terminal_label_full": "SESSION_EXIT",
+      "total": 174,
+      "trades_with_ge1_obs": 125,
+      "trades_with_ge3_obs": 125,
+      "pct_ge1": 71.84,
+      "pct_ge3": 71.84,
+      "median_obs_per_trade": 119.0
+    }
+  ],
+  "failed_trades_total": 2181,
+  "failed_trades_with_ge1_obs": 2181,
+  "failed_trades_with_ge3_obs": 2178,
+  "failed_coverage_pct": 100.0,
+  "contrast_with_stream_a": {
+    "stream_a_failed_coverage_pct": 7.75,
+    "stream_a_verdict": "UNUSABLE - availability determined by outcome (established gate opens a median 352-448s after confirmation; failed trades die at a median 217-300s)"
+  },
+  "caveat": "Stream B reads each model outside its contractual domain. The number is causally available at runtime, but the frozen percentile thresholds (Top-10/5/2.5/1) were calibrated in-domain and DO NOT apply to it. Threshold-loss events from the brief are therefore NOT APPLICABLE on this stream and must not be synthesised from new cutoffs."
+}

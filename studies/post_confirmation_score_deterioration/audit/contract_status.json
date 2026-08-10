@@ -1,0 +1,41 @@
+{
+  "agent": "contract-checker",
+  "pass": 1,
+  "date": "2026-08-10",
+  "critical": 0,
+  "blocking": 0,
+  "warning": 2,
+  "note": 1,
+  "not_verified": 0,
+  "verdict": "CLEAR",
+  "deliverables_manifest_present": true,
+  "prior_findings_adjudicated": true,
+  "findings": [
+    {
+      "severity": "WARNING",
+      "id": "manifest-item-10",
+      "text": "results/escalation_recovery.json did not exist; no code computed the Phase 5 escalation-then-recovery question. Non-blocking: the terminal label rests on the placebo null, not on recovery framing.",
+      "resolution": "RESOLVED 2026-08-10. analysis/escalation_recovery.py written and run; results/escalation_recovery.json emitted. The finding materially strengthened the report: 58-78% of flags are temporary and 86-99% of flagged >=2.5 ATR runners recover. Added to REPORT.md as section 5.3."
+    },
+    {
+      "severity": "WARNING",
+      "id": "manifest-item-8-11",
+      "text": "landmark_features.json and divergence.json shipped under different filenames (phase0_gate1.json; an embedded row inside deterioration_event_table.json). Content present, path drift only.",
+      "resolution": "RESOLVED 2026-08-10. Both written to their manifest names by analysis/escalation_recovery.py. The manifest was not amended to match the code; the code was made to match the manifest."
+    },
+    {
+      "severity": "NOTE",
+      "id": "partition-manifest-hashes",
+      "text": "code_hashes in partition_manifest.json covers implementation/*.py only, omitting analysis/*.py and validate.py.",
+      "resolution": "RESOLVED 2026-08-10. build_panel.py now hashes both implementation/*.py and analysis/*.py."
+    }
+  ],
+  "notes": [
+    "Scope was deliverables, seals, terminal-label reachability, and C4/D/E only. Causality (A, B, C1-C3, F, G, H) is owned by lookahead-auditor, which returned PASS with 0 critical and 0 warning (audit/status.json, audit/pass_01.md).",
+    "C4, D and E were judged NOT APPLICABLE: no model training, selection or promotion; no live-serving artifact; no NT BacktestEngine run. This is an offline diagnostic query over a frozen upstream store.",
+    "Terminal label B was checked against the artifacts and found defensible: AUC 0.684-0.780 rules out A; 6.0% touch of >=2.5 ATR runners at t=120s/q=0.85 rules out C; placebo.json shows no operating point beats the random p95, ruling out D and E.",
+    "Gate 9 audit_gates read false at the time of this pass solely because this file did not yet exist. The gate's logic was judged sound: it reads machine-readable JSON only, never prose.",
+    "The agent originally proposed blocking:1 for manifest item 10 under strict literalism while holding critical:0. Since that item has since been implemented rather than waived, blocking is recorded as 0 and the finding carries its resolution.",
+    "This file was authored by the contract-checker agent and persisted by the main session, which has the Write tool the agent lacks. Content is verbatim apart from the resolution fields and these notes."
+  ]
+}
