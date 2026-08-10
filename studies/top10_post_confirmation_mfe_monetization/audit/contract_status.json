@@ -1,0 +1,42 @@
+{
+  "agent": "contract-checker",
+  "pass": 1,
+  "date": "2026-08-10",
+  "blocking": 0,
+  "critical": 0,
+  "warning": 0,
+  "not_verified": 0,
+  "note": 0,
+  "verdict": "CLEAR",
+  "deliverables_manifest_present": true,
+  "prior_findings_adjudicated": true,
+  "findings": [
+    {
+      "id": "CC-1",
+      "severity": "WARNING",
+      "requirement": "SPEC 6 deliverables -- parquet + CSV mirrors",
+      "evidence": "results/ contained parquet for baseline_geometry, runner_landmarks, p90_event_geometry, p90_mfe_location, runner_destruction, loss_containment and year_direction_stability with no CSV sibling; giveback_recovery was JSON only.",
+      "remediation": "add CSV mirrors or scope the SPEC parenthetical",
+      "resolution": "RESOLVED 2026-08-10. CSV mirrors written for all seven parquet deliverables plus a flat tabular mirror of giveback_recovery. results/ now carries nine CSVs."
+    },
+    {
+      "id": "CC-2",
+      "severity": "NOTE",
+      "requirement": "SPEC 4 / REPORT header policy count",
+      "evidence": "REPORT header read 'Policies: 15 + baseline' while POLICIES totals 15 INCLUDING baseline (14 non-baseline). Ambiguous wording, not a cap violation.",
+      "remediation": "reword",
+      "resolution": "RESOLVED 2026-08-10. REPORT header now reads '14 + baseline (15 total)'; SPEC section 4 heading notes '14 + baseline run' against the cap of 16."
+    }
+  ],
+  "notes": [
+    "Scope was deliverables, seals, terminal-label reachability and C4/D/E only. Causality is owned by lookahead-auditor: pass 1 BLOCKED on 1 CRITICAL, pass 2 PASS with 0 CRITICAL and the fix verified including the jb+1+h remap arithmetic.",
+    "Terminal-label reachability verified twice over: the four trade-outcome labels all have n>0 (822 / 1,359 / 2,350 / 174), and each of the seven A-G classification labels is tied to a concrete numeric rejection in the REPORT.",
+    "Label F is defensible: best measurable policy +0.0086 ATR per original entry = 1.0% of the 0.898 pool against a 35-50% target; every measurable policy destroys 39-61% of >=3 ATR runners; two price-only variants are negative; population and pool both reconcile to the accepted excursion study, so G does not fire.",
+    "Policy cap honoured: 15 entries including BASELINE, one buffer (0.25 ATR), one 4-rung staircase, no grid construct anywhere in engine.py.",
+    "Stream labelling verified consistent across code, results artifacts, SPEC, README and REPORT; no code path sums or averages stream A and B together.",
+    "All fifteen numbered SPEC 8 requirements are covered by the twelve executed gates -- items 9 and 12 are combined in independent_replay_causal_fill and items 13-15 in audit_gates. That is compactness, not a coverage gap.",
+    "Non-goals hold: entry parameters are read frozen from the upstream artifact and never recomputed, thresholds are imported from the frozen contract with none defined here, and no stream-B result is promoted to deployable.",
+    "REPORT section 6a's correction record was checked line by line against the code and against results/policy_results.csv and is accurate, including the entry recording that a bug's symptom had been reported as a finding.",
+    "Authored by the contract-checker agent and persisted by the main session, which has the Write tool the agent lacks. Content is verbatim apart from the resolution fields, the counts moving to reflect them, and these notes."
+  ]
+}

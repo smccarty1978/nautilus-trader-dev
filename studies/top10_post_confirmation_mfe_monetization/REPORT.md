@@ -2,7 +2,7 @@
 
 **Study:** `top10_post_confirmation_mfe_monetization` · 2026-08-10
 **Population:** 8,950 original Top-10 entries → 4,656 confirmed trades
-**Policies:** 15 + baseline · **Target:** recover 35–50% of the giveback pool
+**Policies:** 14 + baseline (15 total) · **Target:** recover 35–50% of the giveback pool
 
 ---
 
@@ -214,10 +214,21 @@ ATR/entry it is economically indistinguishable from doing nothing.
 | 2 | Per-original-entry level omitted the 4,245 pre-confirmation stops | own review | Reported a baseline of +0.4298 instead of −0.0765 — an inflated study conditioned on survivors. Deltas were unaffected. |
 | 3 | Giveback pool included `CONFIRMED_THEN_STOPPED` peak-to-stop giveback | own reconciliation against the accepted study | Pool read 1.114/entry instead of the accepted 0.899. Recovery is now reported against the accepted flip-exit-only definition, which this study reproduces at 0.898. |
 
-A known WARNING is carried, not fixed: when a stop triggers on the final bar of an
+Two further WARNINGs were raised against the **validator** in pass 2 and both were
+fixed: `score_causally_available` checked only the bullish model when roughly half
+the population trades the bearish one, and the crossing check re-ran build.py's own
+polars expression rather than deriving it independently — a shared bug would have
+passed trivially. It now uses a per-regime numpy scan.
+
+One WARNING is carried, not fixed: when a stop triggers on the final bar of an
 already-truncated window there is no legal next bar to fill against, so the fill
 falls back to that bar's close. It is session-containment-forced, not future
 information, and cannot move the headline.
+
+**All twelve validation gates pass (`all_passed = true`)**, including a 240-trade
+independent replay of the causal fill from raw 1s with zero mismatches, and
+reconciliation of both the population and the giveback pool to the accepted
+excursion study.
 
 ## 7. Limitations
 

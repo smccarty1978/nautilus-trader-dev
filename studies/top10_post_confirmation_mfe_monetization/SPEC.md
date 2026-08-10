@@ -98,7 +98,7 @@ Top-10 entry**, so nothing is inflated by conditioning on survivors.
 
 ---
 
-## 4. Policies — cap 16 including baseline
+## 4. Policies — cap 16 including baseline (14 + baseline run)
 
 | # | Policy | Stream |
 |---|---|---|
