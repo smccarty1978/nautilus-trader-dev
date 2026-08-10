@@ -1,0 +1,462 @@
+{
+  "path_mode": "unconstrained",
+  "note": "Separability map, NOT a stop backtest. Losers: touched at any point post-confirmation. Runners: touched BEFORE first reaching their MFE threshold (0 if already held at the flip). Method A is measured from the confirmation close; Method B from the running favorable extreme.",
+  "populations": {
+    "top_2_5": {
+      "confirmed": 3774,
+      "group_sizes": {
+        "eventual_losers": 2250,
+        "flip_exit_winners": 1425,
+        "runners_ge_2atr": 1784,
+        "runners_ge_2_5atr": 1415,
+        "runners_ge_3atr": 1130
+      },
+      "levels": [
+        {
+          "deterioration_atr": 0.25,
+          "all_confirmed": {
+            "n": 3774,
+            "pct_touched_A_whole_path": 91.68,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "eventual_losers": {
+            "n": 2250,
+            "pct_touched_A_whole_path": 99.64,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 1425,
+            "pct_touched_A_whole_path": 80.21,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 1784,
+            "n_with_pre_landmark_measure": 1784,
+            "pct_touched_before_developing": 67.99,
+            "pct_touched_A_whole_path": 83.3
+          },
+          "runners_ge_2_5atr": {
+            "n": 1415,
+            "n_with_pre_landmark_measure": 1415,
+            "pct_touched_before_developing": 71.24,
+            "pct_touched_A_whole_path": 80.0
+          },
+          "runners_ge_3atr": {
+            "n": 1130,
+            "n_with_pre_landmark_measure": 1130,
+            "pct_touched_before_developing": 73.72,
+            "pct_touched_A_whole_path": 78.5
+          }
+        },
+        {
+          "deterioration_atr": 0.375,
+          "all_confirmed": {
+            "n": 3774,
+            "pct_touched_A_whole_path": 86.7,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "eventual_losers": {
+            "n": 2250,
+            "pct_touched_A_whole_path": 99.24,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 1425,
+            "pct_touched_A_whole_path": 68.21,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 1784,
+            "n_with_pre_landmark_measure": 1784,
+            "pct_touched_before_developing": 56.17,
+            "pct_touched_A_whole_path": 73.43
+          },
+          "runners_ge_2_5atr": {
+            "n": 1415,
+            "n_with_pre_landmark_measure": 1415,
+            "pct_touched_before_developing": 59.08,
+            "pct_touched_A_whole_path": 68.98
+          },
+          "runners_ge_3atr": {
+            "n": 1130,
+            "n_with_pre_landmark_measure": 1130,
+            "pct_touched_before_developing": 61.77,
+            "pct_touched_A_whole_path": 66.99
+          }
+        },
+        {
+          "deterioration_atr": 0.5,
+          "all_confirmed": {
+            "n": 3774,
+            "pct_touched_A_whole_path": 82.17,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "eventual_losers": {
+            "n": 2250,
+            "pct_touched_A_whole_path": 98.49,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 1425,
+            "pct_touched_A_whole_path": 58.25,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 1784,
+            "n_with_pre_landmark_measure": 1784,
+            "pct_touched_before_developing": 47.09,
+            "pct_touched_A_whole_path": 65.02
+          },
+          "runners_ge_2_5atr": {
+            "n": 1415,
+            "n_with_pre_landmark_measure": 1415,
+            "pct_touched_before_developing": 49.96,
+            "pct_touched_A_whole_path": 59.51
+          },
+          "runners_ge_3atr": {
+            "n": 1130,
+            "n_with_pre_landmark_measure": 1130,
+            "pct_touched_before_developing": 51.5,
+            "pct_touched_A_whole_path": 56.9
+          }
+        },
+        {
+          "deterioration_atr": 0.625,
+          "all_confirmed": {
+            "n": 3774,
+            "pct_touched_A_whole_path": 76.66,
+            "pct_touched_B_whole_path": 99.95
+          },
+          "eventual_losers": {
+            "n": 2250,
+            "pct_touched_A_whole_path": 96.49,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 1425,
+            "pct_touched_A_whole_path": 47.58,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 1784,
+            "n_with_pre_landmark_measure": 1784,
+            "pct_touched_before_developing": 38.23,
+            "pct_touched_A_whole_path": 55.94
+          },
+          "runners_ge_2_5atr": {
+            "n": 1415,
+            "n_with_pre_landmark_measure": 1415,
+            "pct_touched_before_developing": 40.0,
+            "pct_touched_A_whole_path": 49.68
+          },
+          "runners_ge_3atr": {
+            "n": 1130,
+            "n_with_pre_landmark_measure": 1130,
+            "pct_touched_before_developing": 41.5,
+            "pct_touched_A_whole_path": 46.99
+          }
+        },
+        {
+          "deterioration_atr": 0.75,
+          "all_confirmed": {
+            "n": 3774,
+            "pct_touched_A_whole_path": 71.09,
+            "pct_touched_B_whole_path": 99.92
+          },
+          "eventual_losers": {
+            "n": 2250,
+            "pct_touched_A_whole_path": 94.27,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 1425,
+            "pct_touched_A_whole_path": 36.91,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 1784,
+            "n_with_pre_landmark_measure": 1784,
+            "pct_touched_before_developing": 30.33,
+            "pct_touched_A_whole_path": 47.25
+          },
+          "runners_ge_2_5atr": {
+            "n": 1415,
+            "n_with_pre_landmark_measure": 1415,
+            "pct_touched_before_developing": 31.45,
+            "pct_touched_A_whole_path": 40.85
+          },
+          "runners_ge_3atr": {
+            "n": 1130,
+            "n_with_pre_landmark_measure": 1130,
+            "pct_touched_before_developing": 33.1,
+            "pct_touched_A_whole_path": 38.41
+          }
+        },
+        {
+          "deterioration_atr": 1.0,
+          "all_confirmed": {
+            "n": 3774,
+            "pct_touched_A_whole_path": 59.8,
+            "pct_touched_B_whole_path": 99.76
+          },
+          "eventual_losers": {
+            "n": 2250,
+            "pct_touched_A_whole_path": 85.16,
+            "pct_touched_B_whole_path": 99.96
+          },
+          "flip_exit_winners": {
+            "n": 1425,
+            "pct_touched_A_whole_path": 22.32,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 1784,
+            "n_with_pre_landmark_measure": 1784,
+            "pct_touched_before_developing": 18.72,
+            "pct_touched_A_whole_path": 33.35
+          },
+          "runners_ge_2_5atr": {
+            "n": 1415,
+            "n_with_pre_landmark_measure": 1415,
+            "pct_touched_before_developing": 20.0,
+            "pct_touched_A_whole_path": 28.2
+          },
+          "runners_ge_3atr": {
+            "n": 1130,
+            "n_with_pre_landmark_measure": 1130,
+            "pct_touched_before_developing": 21.59,
+            "pct_touched_A_whole_path": 26.28
+          }
+        }
+      ]
+    },
+    "armed": {
+      "confirmed": 4656,
+      "group_sizes": {
+        "eventual_losers": 2181,
+        "flip_exit_winners": 2350,
+        "runners_ge_2atr": 2692,
+        "runners_ge_2_5atr": 2134,
+        "runners_ge_3atr": 1742
+      },
+      "levels": [
+        {
+          "deterioration_atr": 0.25,
+          "all_confirmed": {
+            "n": 4656,
+            "pct_touched_A_whole_path": 91.0,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "eventual_losers": {
+            "n": 2181,
+            "pct_touched_A_whole_path": 100.0,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 2350,
+            "pct_touched_A_whole_path": 83.36,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 2692,
+            "n_with_pre_landmark_measure": 2692,
+            "pct_touched_before_developing": 59.81,
+            "pct_touched_A_whole_path": 84.62
+          },
+          "runners_ge_2_5atr": {
+            "n": 2134,
+            "n_with_pre_landmark_measure": 2134,
+            "pct_touched_before_developing": 66.54,
+            "pct_touched_A_whole_path": 81.35
+          },
+          "runners_ge_3atr": {
+            "n": 1742,
+            "n_with_pre_landmark_measure": 1742,
+            "pct_touched_before_developing": 71.01,
+            "pct_touched_A_whole_path": 78.47
+          }
+        },
+        {
+          "deterioration_atr": 0.375,
+          "all_confirmed": {
+            "n": 4656,
+            "pct_touched_A_whole_path": 85.22,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "eventual_losers": {
+            "n": 2181,
+            "pct_touched_A_whole_path": 99.86,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 2350,
+            "pct_touched_A_whole_path": 72.43,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 2692,
+            "n_with_pre_landmark_measure": 2692,
+            "pct_touched_before_developing": 48.74,
+            "pct_touched_A_whole_path": 75.22
+          },
+          "runners_ge_2_5atr": {
+            "n": 2134,
+            "n_with_pre_landmark_measure": 2134,
+            "pct_touched_before_developing": 54.26,
+            "pct_touched_A_whole_path": 70.29
+          },
+          "runners_ge_3atr": {
+            "n": 1742,
+            "n_with_pre_landmark_measure": 1742,
+            "pct_touched_before_developing": 57.75,
+            "pct_touched_A_whole_path": 66.25
+          }
+        },
+        {
+          "deterioration_atr": 0.5,
+          "all_confirmed": {
+            "n": 4656,
+            "pct_touched_A_whole_path": 80.43,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "eventual_losers": {
+            "n": 2181,
+            "pct_touched_A_whole_path": 99.63,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 2350,
+            "pct_touched_A_whole_path": 63.62,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 2692,
+            "n_with_pre_landmark_measure": 2692,
+            "pct_touched_before_developing": 40.12,
+            "pct_touched_A_whole_path": 67.46
+          },
+          "runners_ge_2_5atr": {
+            "n": 2134,
+            "n_with_pre_landmark_measure": 2134,
+            "pct_touched_before_developing": 44.66,
+            "pct_touched_A_whole_path": 61.53
+          },
+          "runners_ge_3atr": {
+            "n": 1742,
+            "n_with_pre_landmark_measure": 1742,
+            "pct_touched_before_developing": 47.76,
+            "pct_touched_A_whole_path": 57.0
+          }
+        },
+        {
+          "deterioration_atr": 0.625,
+          "all_confirmed": {
+            "n": 4656,
+            "pct_touched_A_whole_path": 75.21,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "eventual_losers": {
+            "n": 2181,
+            "pct_touched_A_whole_path": 98.9,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 2350,
+            "pct_touched_A_whole_path": 54.34,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 2692,
+            "n_with_pre_landmark_measure": 2692,
+            "pct_touched_before_developing": 32.47,
+            "pct_touched_A_whole_path": 59.36
+          },
+          "runners_ge_2_5atr": {
+            "n": 2134,
+            "n_with_pre_landmark_measure": 2134,
+            "pct_touched_before_developing": 36.32,
+            "pct_touched_A_whole_path": 52.86
+          },
+          "runners_ge_3atr": {
+            "n": 1742,
+            "n_with_pre_landmark_measure": 1742,
+            "pct_touched_before_developing": 38.75,
+            "pct_touched_A_whole_path": 47.42
+          }
+        },
+        {
+          "deterioration_atr": 0.75,
+          "all_confirmed": {
+            "n": 4656,
+            "pct_touched_A_whole_path": 69.78,
+            "pct_touched_B_whole_path": 99.96
+          },
+          "eventual_losers": {
+            "n": 2181,
+            "pct_touched_A_whole_path": 97.66,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "flip_exit_winners": {
+            "n": 2350,
+            "pct_touched_A_whole_path": 45.06,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 2692,
+            "n_with_pre_landmark_measure": 2692,
+            "pct_touched_before_developing": 25.93,
+            "pct_touched_A_whole_path": 51.52
+          },
+          "runners_ge_2_5atr": {
+            "n": 2134,
+            "n_with_pre_landmark_measure": 2134,
+            "pct_touched_before_developing": 29.24,
+            "pct_touched_A_whole_path": 44.8
+          },
+          "runners_ge_3atr": {
+            "n": 1742,
+            "n_with_pre_landmark_measure": 1742,
+            "pct_touched_before_developing": 31.17,
+            "pct_touched_A_whole_path": 39.78
+          }
+        },
+        {
+          "deterioration_atr": 1.0,
+          "all_confirmed": {
+            "n": 4656,
+            "pct_touched_A_whole_path": 58.2,
+            "pct_touched_B_whole_path": 99.83
+          },
+          "eventual_losers": {
+            "n": 2181,
+            "pct_touched_A_whole_path": 91.47,
+            "pct_touched_B_whole_path": 99.95
+          },
+          "flip_exit_winners": {
+            "n": 2350,
+            "pct_touched_A_whole_path": 28.81,
+            "pct_touched_B_whole_path": 100.0
+          },
+          "runners_ge_2atr": {
+            "n": 2692,
+            "n_with_pre_landmark_measure": 2692,
+            "pct_touched_before_developing": 16.08,
+            "pct_touched_A_whole_path": 37.0
+          },
+          "runners_ge_2_5atr": {
+            "n": 2134,
+            "n_with_pre_landmark_measure": 2134,
+            "pct_touched_before_developing": 18.51,
+            "pct_touched_A_whole_path": 31.44
+          },
+          "runners_ge_3atr": {
+            "n": 1742,
+            "n_with_pre_landmark_measure": 1742,
+            "pct_touched_before_developing": 19.69,
+            "pct_touched_A_whole_path": 26.92
+          }
+        }
+      ]
+    }
+  }
+}

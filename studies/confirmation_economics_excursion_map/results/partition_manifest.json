@@ -1,0 +1,72 @@
+{
+  "study": "confirmation_economics_excursion_map",
+  "substrate": "data/canonical/regime_complete_v1",
+  "populations": {
+    "top_10": 8988,
+    "top_5": 7396,
+    "top_2_5": 5823,
+    "top_1": 3415,
+    "armed": 8950
+  },
+  "required_base_counts": {
+    "top_10": 8988,
+    "top_5": 7396,
+    "top_2_5": 5823,
+    "top_1": 3415
+  },
+  "full_depth_populations": [
+    "top_2_5",
+    "armed"
+  ],
+  "path_modes": {
+    "constrained": "1.0 ATR entry stop live; canonical terminal labels",
+    "unconstrained": "stop removed after confirmation; excursion geometry"
+  },
+  "atr_anchor": "atr_at_checkpoint at ENTRY, frozen for the whole trade",
+  "landmarks_entry_relative_atr": [
+    0.5,
+    0.75,
+    1.0,
+    1.25,
+    1.5,
+    2.0,
+    2.5,
+    3.0
+  ],
+  "transition_landmarks_atr": [
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0
+  ],
+  "floors_entry_relative_atr": [
+    -0.25,
+    0.0,
+    0.25,
+    0.5,
+    0.75
+  ],
+  "deterioration_levels_atr": [
+    0.25,
+    0.375,
+    0.5,
+    0.625,
+    0.75,
+    1.0
+  ],
+  "stop_atr": 1.0,
+  "cost_points_round_turn": 0.5,
+  "min_regime_age_s": 600.0,
+  "rth_bars": 28383730,
+  "in_domain_checkpoints": 2205823,
+  "panel_rows": 49345,
+  "threshold_overlap_disclosure": "both calibration populations are calendar-2025 and overlap the evaluation window; 2025 is not threshold-OOS. Canonical waiver: studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json",
+  "code_hashes": {
+    "analysis/__init__.py": "e3b0c44298fc1c14",
+    "analysis/overlay.py": "edda52479ac7c7db",
+    "analysis/phases.py": "24f0bbce1db452aa",
+    "implementation/__init__.py": "e3b0c44298fc1c14",
+    "implementation/panel.py": "7f4cc1dd896a7bc7"
+  }
+}
