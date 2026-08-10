@@ -1,0 +1,33 @@
+{
+  "final_classification": "F. NO ROBUST POST-CONFIRMATION MFE MONETIZATION FOUND",
+  "finalists": [],
+  "advance_count": 0,
+  "target": "recover 35-50% of the ~0.89 ATR/original-entry giveback pool",
+  "best_achieved_recovery_pct": 0.6,
+  "best_measurable_policy": {
+    "policy": "P90B_EXIT",
+    "domain": "B: EXPLORATORY_OUT_OF_DOMAIN",
+    "coverage_pct": 97.87,
+    "delta_per_original_entry": 0.0051,
+    "giveback_recovered_pct": 0.57,
+    "median_capture": 0.2821,
+    "win_rate": 0.8464,
+    "preserved_ge_2_00_pct": 54.21,
+    "preserved_ge_2_50_pct": 46.4,
+    "preserved_ge_3_00_pct": 38.97,
+    "confirmed_losers_improved_pct": 96.59,
+    "confirmed_losers_atr_avoided": 2157.24
+  },
+  "closest_to_interesting": {
+    "policy": "P90ARM_PRICE_BUF",
+    "delta_per_original_entry": 0.0023,
+    "preserved_ge_3_00_pct": 61.85,
+    "confirmed_losers_improved_pct": 91.6
+  },
+  "excluded_from_interpretation": {
+    "policy": "P90A_EXIT",
+    "reason": "NOT INTERPRETABLE - SURVIVORSHIP: contract-valid P90 fires on 0.4%/1.0% of losers vs 47.9% of winners"
+  },
+  "why_none_advance": "Every measurable policy converts loss containment into runner destruction at par. P90B_EXIT saves 2,157 ATR on confirmed losers and surrenders 4,875 ATR by cutting 61.0% of >=3 ATR runners short; net +0.0051 ATR per original entry = 0.6% of the pool against a 35-50% target.",
+  "mechanism": "P90 is a genuine exhaustion marker (median 94.4% of final MFE already realised, 52% of events after >=90%) but the median trade has already given back 0.953 ATR when it fires, with 0.095 ATR left to protect."
+}
