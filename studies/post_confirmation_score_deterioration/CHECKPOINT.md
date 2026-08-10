@@ -1,6 +1,15 @@
 # CHECKPOINT — post_confirmation_score_deterioration
 
-**Last updated:** 2026-08-10 ~00:40 CDT · **Phase 0 complete, Gate 1 provisionally PASS**
+**STUDY COMPLETE — committed `9f2033f` on `study/post_confirmation_score_deterioration`.**
+Terminal label **B**. All 9 validation gates pass; all three audit gates clean.
+Phase 8 deliberately not run, per the brief's stop rule. Nothing is outstanding.
+
+The remaining-work list at the foot of this file is **done**. History below is
+kept as the decision trail, including two of my own errors that the process
+caught (the stream A/B conflation, and the runner-damage estimate the ledger
+overturned).
+
+**Last updated:** 2026-08-10 ~02:15 CDT
 
 Read this first on resume. It records what is established, what was decided and
 why, and what is next. Everything below is reproduced from artifacts under
