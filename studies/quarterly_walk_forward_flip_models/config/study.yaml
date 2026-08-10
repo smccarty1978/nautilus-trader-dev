@@ -1,0 +1,33 @@
+study: quarterly_walk_forward_flip_models
+instrument: NQ.v.0
+timezone: America/Chicago
+evaluation_years: [2021, 2022, 2023, 2024, 2025]
+sealed_oos_year: 2026
+training_window: expanding
+target_horizon_seconds: 300
+threshold_quantiles:
+  top_10: 0.90
+  top_5: 0.95
+  top_2_5: 0.975
+  top_1: 0.99
+model:
+  class: HistGradientBoostingClassifier
+  max_depth: 3
+  learning_rate: 0.05
+  max_iter: 200
+  random_state: 42
+entry_path:
+  min_regime_age_seconds: 600
+  stop_atr: 1.0
+  cost_points: 0.50
+  rth_forced_flat: '15:00 America/Chicago'
+advancement_gate:
+  median_auc_delta_min: 0.005
+  worst_auc_delta_min: -0.02
+  median_survival_delta_pp_min: 1.0
+  top_2_5_nonnegative_quarters_min: 0.60
+  median_return_at_confirm_atr_min: -0.05
+  max_single_year_improvement_share: 0.50
+  max_monotonicity_violation_quarters: 0.10
+  net_expectancy_delta_atr_min: -0.03
+  required_audit_blockers: 0
