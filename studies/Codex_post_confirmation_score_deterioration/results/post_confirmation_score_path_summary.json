@@ -1,0 +1,70 @@
+{
+  "by_terminal_label": [
+    {
+      "median_first_delay_s": 340.0,
+      "median_obs": 0.0,
+      "pct_with_any_obs": 4.26,
+      "pct_with_ge3_obs": 3.89,
+      "terminal_label_full": "CONFIRMED_THEN_STOPPED",
+      "trades": 822,
+      "trades_with_any_obs": 35,
+      "trades_with_ge3_obs": 32
+    },
+    {
+      "median_first_delay_s": 352.5,
+      "median_obs": 0.0,
+      "pct_with_any_obs": 9.86,
+      "pct_with_ge3_obs": 9.35,
+      "terminal_label_full": "FINAL_FLIP_EXIT_LOSER",
+      "trades": 1359,
+      "trades_with_any_obs": 134,
+      "trades_with_ge3_obs": 127
+    },
+    {
+      "median_first_delay_s": 410.0,
+      "median_obs": 54.0,
+      "pct_with_any_obs": 69.4,
+      "pct_with_ge3_obs": 69.28,
+      "terminal_label_full": "FINAL_FLIP_EXIT_WINNER",
+      "trades": 2350,
+      "trades_with_any_obs": 1631,
+      "trades_with_ge3_obs": 1628
+    },
+    {
+      "median_first_delay_s": 375.0,
+      "median_obs": 0.0,
+      "pct_with_any_obs": 43.1,
+      "pct_with_ge3_obs": 41.38,
+      "terminal_label_full": "SESSION_EXIT",
+      "trades": 174,
+      "trades_with_any_obs": 75,
+      "trades_with_ge3_obs": 72
+    }
+  ],
+  "dispatch_gap_seconds": {
+    "median": 5.0,
+    "n": 1871,
+    "p25": 5.0,
+    "p75": 5.0,
+    "p90": 5.0
+  },
+  "first_valid_score_delay_seconds": {
+    "median": 400.0,
+    "n": 1875,
+    "p25": 290.0,
+    "p75": 560.0,
+    "p90": 780.0
+  },
+  "observations_per_trade": {
+    "median": 0.0,
+    "n": 4705,
+    "p25": 0.0,
+    "p75": 60.0,
+    "p90": 188.0
+  },
+  "out_of_domain_scores_used": false,
+  "polarity": "higher score is an opposing-model warning (danger to the still-open fade trade)",
+  "score_definition": "non-null in-domain score of the newly confirmed regime at a true canonical dispatch",
+  "trades_with_any_observation": 1875,
+  "trades_with_zero_observations": 2830
+}

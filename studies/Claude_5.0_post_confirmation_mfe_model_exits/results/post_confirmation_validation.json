@@ -1,0 +1,15 @@
+{
+  "seed": 20260727,
+  "sample_per_stop": 100,
+  "stops": [
+    0.75,
+    1.0,
+    1.25
+  ],
+  "unique_trades_sampled": 292,
+  "trade_stop_cases": 300,
+  "policy_checks_performed": 3000,
+  "unexplained_mismatches": 0,
+  "mismatch_detail": [],
+  "independent_implementation": "bar-by-bar replay recomputing favorable/adverse excursion from raw path high/low; does not import the engine module"
+}

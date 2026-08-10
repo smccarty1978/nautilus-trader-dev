@@ -1,0 +1,73 @@
+phase: A
+instrument: NQ
+session: RTH
+timezone: America/Chicago
+rth_interval: "[08:30:00,15:00:00)"
+training_years: [2021, 2022, 2023, 2024]
+development_year: 2025
+sealed_year: 2026
+scoring_cadence_seconds: 5
+population_regime_direction: 1
+trade_direction: -1
+target: bearish_regime_flip_within_300s
+target_horizon_seconds: 300
+positive_flip_interval: "(T,T+300s]"
+model_id: BULLISH_STRICT_top25_gbt_v2
+feature_set_source: studies/runtime_constrained_f3_feature_reduction/results/candidate_feature_sets.json
+feature_set_key: F3_top25_gbt_v1
+feature_count: 25
+adapter_direction: -1
+model:
+  class: HistGradientBoostingClassifier
+  max_depth: 3
+  learning_rate: 0.05
+  max_iter: 200
+  random_state: 42
+calibration:
+  method: NONE_IDENTITY
+  probability_definition: predict_proba_positive_class
+threshold_reference:
+  source_year: 2025
+  population: in_domain_established_bullish_rth_five_second_checkpoints
+  quantiles:
+    top_10: 0.90
+    top_5: 0.95
+    top_2_5: 0.975
+  numpy_method: linear
+  finite_scores_only: true
+  membership_operator: ">="
+  score_serialization: little_endian_float64
+collector:
+  environment: NautilusTrader_BacktestEngine
+  bar_1s: NQ.XCME-1-SECOND-LAST-EXTERNAL
+  bar_1m: NQ.XCME-1-MINUTE-LAST-EXTERNAL
+  register_1s_before_1m: true
+  checkpoint_grid: regime_start_plus_5s_through_less_than_1800s_at_1s_ts_init
+  feature_source_invariant:
+    max_source_ts_event_1s: "< T"
+    max_source_ts_init_1s: "<= T"
+    max_source_ts_init_1m: "< T"
+  equal_timestamp_order: completed_1s_update_then_checkpoint_snapshot_then_session_reset_then_equal_ts_init_1m_update_and_flip
+  gap_policy: omit_missing_exact_ts_init_dispatch_callback_no_timer_no_catch_up
+  rth_basis: checkpoint_decision_ns
+population:
+  regime_direction: 1
+  age_min_seconds: 120
+  running_mfe_min_atr: 1.0
+  progress_windows_min: 2
+  progress_gap_seconds: 120
+  retained_mfe_ratio_min: 0.5
+  excursion_direction: prevailing_regime
+  atr_anchor: confirmed_regime_start
+  feature_atr_anchor: checkpoint_latest_admissible_minute_ts_init_lt_T
+  require_all_features_finite: true
+labeling:
+  observation_end_required_for_negative: T_plus_300s
+  month_partition_carry_forward: true
+  year_boundary_carry_forward: true
+  dataset_end_unresolved_action: right_censor
+bounded_execution:
+  benchmark_month: 2025-03
+  benchmark_timeout_seconds: 3600
+  full_timeout_seconds: 21600
+  max_peak_memory_mb: 10000

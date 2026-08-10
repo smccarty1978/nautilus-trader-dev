@@ -1,0 +1,240 @@
+{
+  "summaries_rows": 5836,
+  "summaries_unique_trade_id": 5836,
+  "summaries_unique_regime_key": 5836,
+  "model_mapping": [
+    {
+      "model_id": "BULLISH_STRICT_top25_gbt_v2",
+      "entry_model_id": "BULLISH_STRICT_top25_gbt_v2",
+      "trade_direction_name": "SHORT",
+      "trade_direction": -1,
+      "opposite_exit_model_id": "LONG_STRICT_top25_gbt_v2",
+      "len": 3329
+    },
+    {
+      "model_id": "LONG_STRICT_top25_gbt_v2",
+      "entry_model_id": "LONG_STRICT_top25_gbt_v2",
+      "trade_direction_name": "LONG",
+      "trade_direction": 1,
+      "opposite_exit_model_id": "BULLISH_STRICT_top25_gbt_v2",
+      "len": 2507
+    }
+  ],
+  "frozen_entry_thresholds": [
+    {
+      "model_id": "BULLISH_STRICT_top25_gbt_v2",
+      "thresholds": [
+        0.5697449423968936
+      ]
+    },
+    {
+      "model_id": "LONG_STRICT_top25_gbt_v2",
+      "thresholds": [
+        0.5641320087327389
+      ]
+    }
+  ],
+  "threshold_membership_operator": [
+    ">="
+  ],
+  "summaries_all_null_dtype_columns": [
+    "bearish_percentile_at_entry",
+    "bullish_percentile_at_entry",
+    "entry_decile",
+    "entry_percentile",
+    "opposite_percentile_at_confirm",
+    "max_opposite_percentile_after_confirm"
+  ],
+  "opposite_top_10_unavailable_reason": [
+    {
+      "opposite_top_10_unavailable_reason": null,
+      "count": 2507
+    },
+    {
+      "opposite_top_10_unavailable_reason": "BEARISH_TOP_10_NOT_FROZEN",
+      "count": 3329
+    }
+  ],
+  "summaries_nonnull__opposite_first_top_10_ns": 2384,
+  "summaries_nonnull__opposite_first_top_5_ns": 5560,
+  "summaries_nonnull__opposite_first_top_2_5_ns": 5304,
+  "summaries_nonnull__opposite_probability_at_confirm": 5836,
+  "summaries_nonnull__max_opposite_probability_after_confirm": 5725,
+  "summaries_nonnull__max_opposite_score_ns": 5725,
+  "entry_year_counts": [
+    {
+      "entry_year": 2021,
+      "count": 1147
+    },
+    {
+      "entry_year": 2022,
+      "count": 1206
+    },
+    {
+      "entry_year": 2023,
+      "count": 1187
+    },
+    {
+      "entry_year": 2024,
+      "count": 1149
+    },
+    {
+      "entry_year": 2025,
+      "count": 1147
+    }
+  ],
+  "path_is_complete_counts": [
+    {
+      "path_is_complete": true,
+      "count": 5617
+    },
+    {
+      "path_is_complete": false,
+      "count": 219
+    }
+  ],
+  "censor_reason_counts": [
+    {
+      "censor_reason": "fallback_boundary_bar_missing",
+      "count": 219
+    },
+    {
+      "censor_reason": null,
+      "count": 5617
+    }
+  ],
+  "observations_all_null_dtype_columns": [
+    "bullish_percentile",
+    "bullish_decile",
+    "bullish_is_top_10",
+    "bullish_is_top_5",
+    "bullish_is_top_2_5",
+    "bearish_percentile",
+    "bearish_decile",
+    "bearish_is_top_10",
+    "bearish_is_top_5",
+    "bearish_is_top_2_5"
+  ],
+  "observations_model_ids": [
+    {
+      "bullish_model_id": "BULLISH_STRICT_top25_gbt_v2",
+      "bearish_model_id": "LONG_STRICT_top25_gbt_v2",
+      "model_id": "BULLISH_STRICT_top25_gbt_v2+LONG_STRICT_top25_gbt_v2",
+      "trade_direction": "DUAL_MODEL_CHECKPOINT"
+    }
+  ],
+  "paths_all_null_dtype_columns": [
+    "bullish_percentile",
+    "bearish_percentile"
+  ],
+  "path_score_coverage": {
+    "path_rows": 6589582,
+    "path_trades": 5836,
+    "bullish_prob_nonnull": 6589582,
+    "bearish_prob_nonnull": 6589582,
+    "bullish_in_domain_rows": 1932113,
+    "bearish_in_domain_rows": 1688525,
+    "bullish_carried_rows": 5325844,
+    "bearish_carried_rows": 5325679,
+    "bullish_age_median_s": 2.0,
+    "bearish_age_median_s": 2.0,
+    "bullish_age_p90_s": 4.0,
+    "bearish_age_p90_s": 4.0,
+    "bullish_age_max_s": 237669.0,
+    "bearish_age_max_s": 192119.0
+  },
+  "score_source_uniqueness": {
+    "median_bars_per_trade": 901.0,
+    "median_unique_bullish_sources": 172.0,
+    "median_unique_bearish_sources": 172.0,
+    "mean_bull_sources_per_bar": 0.19612128045577845,
+    "mean_bear_sources_per_bar": 0.19616086393407553
+  },
+  "bullish_source_gap_seconds": [
+    {
+      "gap_s": 5.0,
+      "count": 1220760
+    },
+    {
+      "gap_s": 10.0,
+      "count": 36122
+    },
+    {
+      "gap_s": 15.000000000000002,
+      "count": 4593
+    },
+    {
+      "gap_s": 20.0,
+      "count": 1149
+    },
+    {
+      "gap_s": 25.0,
+      "count": 455
+    },
+    {
+      "gap_s": 30.000000000000004,
+      "count": 216
+    },
+    {
+      "gap_s": 35.0,
+      "count": 149
+    },
+    {
+      "gap_s": 40.0,
+      "count": 72
+    },
+    {
+      "gap_s": 45.0,
+      "count": 52
+    },
+    {
+      "gap_s": 50.0,
+      "count": 45
+    },
+    {
+      "gap_s": 55.0,
+      "count": 35
+    },
+    {
+      "gap_s": 64870.00000000001,
+      "count": 21
+    },
+    {
+      "gap_s": 60.00000000000001,
+      "count": 16
+    },
+    {
+      "gap_s": 65.0,
+      "count": 13
+    },
+    {
+      "gap_s": 75.0,
+      "count": 9
+    }
+  ],
+  "future_score_rows": {
+    "bull_future": 0,
+    "bear_future": 0
+  },
+  "post_confirmation_opposing_coverage": {
+    "trades_with_post_confirmation_bars": 5836,
+    "trades_with_any_opposing_probability": 5836,
+    "trades_with_any_opposing_in_domain_bar": 2331,
+    "median_post_conf_bars": 539.0,
+    "median_opp_domain_bars": 0.0,
+    "by_direction": [
+      {
+        "trade_direction_name": "LONG",
+        "trades": 2507,
+        "with_domain": 1020,
+        "median_domain_bars": 0.0
+      },
+      {
+        "trade_direction_name": "SHORT",
+        "trades": 3329,
+        "with_domain": 1311,
+        "median_domain_bars": 0.0
+      }
+    ]
+  }
+}

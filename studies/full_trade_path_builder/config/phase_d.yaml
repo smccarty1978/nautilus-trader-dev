@@ -1,0 +1,21 @@
+phase: D
+instrument_id: NQ.XCME
+source_bar: NQ.XCME-1-SECOND-LAST-EXTERNAL
+path_anchor: checkpoint_reference_price
+atr_anchor: atr_at_entry
+fallback_endpoint: next_confirmed_flip_opposite_trade_direction
+path_start: first_bar_with_ts_event_gte_checkpoint_decision
+path_end_inclusive: bar_ts_init_equals_fallback_flip
+same_bar_ordering: explicitly_ambiguous
+summary_mae_sign: positive_distance
+path_mae_sign: signed_nonpositive
+sealed_boundary_utc: "2026-01-01T00:00:00Z"
+threshold_reference_overlap_waiver: true
+bullish_thresholds:
+  top_10: 0.43167249785595935
+  top_5: 0.5067081427626979
+  top_2_5: 0.5697449423968936
+bearish_thresholds:
+  top_10: null
+  top_5: 0.5084619230529974
+  top_2_5: 0.5641320087327389

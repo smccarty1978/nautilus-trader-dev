@@ -1,0 +1,28 @@
+{
+  "all_terminal_labels": {
+    "CONFIRMED_THEN_STOPPED": 822,
+    "FINAL_FLIP_EXIT_LOSER": 1359,
+    "FINAL_FLIP_EXIT_WINNER": 2350,
+    "SESSION_EXIT": 174,
+    "STOPPED_BEFORE_CONFIRM": 4245
+  },
+  "confirmed_continuation_total": 4705,
+  "new_regime_joined": 4705,
+  "new_regime_unmatched": 0,
+  "post_confirmation_trades": 4705,
+  "quoted_counts_match": {
+    "CONFIRMED_THEN_STOPPED": true,
+    "FINAL_FLIP_EXIT_LOSER": true,
+    "FINAL_FLIP_EXIT_WINNER": true,
+    "SESSION_EXIT": true
+  },
+  "quoted_post_confirmation_labels": {
+    "CONFIRMED_THEN_STOPPED": 822,
+    "FINAL_FLIP_EXIT_LOSER": 1359,
+    "FINAL_FLIP_EXIT_WINNER": 2350,
+    "SESSION_EXIT": 174
+  },
+  "source": "studies\\armed_fade_score_path_progression\\results\\armed_regime_score_paths.parquet",
+  "stopped_before_confirmation": 4245,
+  "valid_armed_regimes": 8950
+}
