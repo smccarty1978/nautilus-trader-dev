@@ -1,0 +1,320 @@
+{
+  "study": "top10_fast_confirm_runner_path",
+  "fast_confirm_n": 2383,
+  "cohort_test": {
+    "fast_n": 2383,
+    "slow_n": 2273,
+    "fast_mean_net_atr": 0.6702013279592482,
+    "slow_mean_net_atr": 0.9895879729179939,
+    "fast_p_ge3": 0.3457826269408309,
+    "slow_p_ge3": 0.4038715354157501,
+    "years_both_better": 0,
+    "passed": false,
+    "by_year": [
+      {
+        "year": 2021,
+        "fast_net": 0.6373374851929682,
+        "slow_net": 0.6817317197314215,
+        "fast_p_ge3": 0.3314814814814815,
+        "slow_p_ge3": 0.3605150214592275,
+        "net_better": false,
+        "p_ge3_better": false
+      },
+      {
+        "year": 2022,
+        "fast_net": 0.4912075489849332,
+        "slow_net": 1.0430718385733053,
+        "fast_p_ge3": 0.2984189723320158,
+        "slow_p_ge3": 0.4038876889848812,
+        "net_better": false,
+        "p_ge3_better": false
+      },
+      {
+        "year": 2023,
+        "fast_net": 0.7368363978896292,
+        "slow_net": 0.9346153474723262,
+        "fast_p_ge3": 0.35135135135135137,
+        "slow_p_ge3": 0.3870246085011186,
+        "net_better": false,
+        "p_ge3_better": false
+      },
+      {
+        "year": 2024,
+        "fast_net": 0.7525881001882258,
+        "slow_net": 1.1187877430611026,
+        "fast_p_ge3": 0.38817480719794345,
+        "slow_p_ge3": 0.43897216274089934,
+        "net_better": false,
+        "p_ge3_better": false
+      },
+      {
+        "year": 2025,
+        "fast_net": 0.7648852770410668,
+        "slow_net": 1.1824587987410533,
+        "fast_p_ge3": 0.37259100642398285,
+        "slow_p_ge3": 0.43023255813953487,
+        "net_better": false,
+        "p_ge3_better": false
+      }
+    ]
+  },
+  "separation_gate": {
+    "criterion": "|AUC-0.5| >= 0.1 AND quintile-monotonic AND same sign in >= 4 of 5 years, on the UNDETERMINED population (run_mfe < 2.0 at the landmark)",
+    "n_variables_passing": 25,
+    "open": true,
+    "n_passing_constant": 27,
+    "best": [
+      {
+        "landmark_s": 120,
+        "variable": "ret_from_entry",
+        "auc": 0.7559552025440714,
+        "auc_abs_lift": 0.25595520254407145,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 120,
+        "variable": "retrace_frac",
+        "auc": 0.261606334841629,
+        "auc_abs_lift": 0.23839366515837102,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 120,
+        "variable": "ret_since_confirm",
+        "auc": 0.7278522826099127,
+        "auc_abs_lift": 0.22785228260991275,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 60,
+        "variable": "ret_from_entry",
+        "auc": 0.7242374052814794,
+        "auc_abs_lift": 0.2242374052814794,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 120,
+        "variable": "dd_from_run_max",
+        "auc": 0.2904518936834915,
+        "auc_abs_lift": 0.2095481063165085,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      }
+    ]
+  },
+  "phase12_ran": true,
+  "phase12": {
+    "policies": [
+      "P1_PROG120_LE0",
+      "P2_PROG60_LE0",
+      "P3_STALL60_DD050",
+      "P4_MFE15_DD050_STALL45"
+    ],
+    "n_fast": 2383,
+    "placebo_repetitions": 20,
+    "seed": 20260810,
+    "results": [
+      {
+        "policy": "P2_PROG60_LE0",
+        "coverage_pct": 13.26059588753672,
+        "delta_atr_per_fast_trade": 0.010875101934393982,
+        "delta_atr_per_original_entry": 0.00289557183348166,
+        "placebo_delta_atr_per_fast_trade": 0.08637327633139023,
+        "beats_placebo": false,
+        "edge_over_placebo_per_fast_trade": -0.07549817439699626,
+        "giveback_recovered_pct": 0.3224170790869407,
+        "confirmed_losers_improved_pct": 19.682539682539684,
+        "preserved_ge_2_0_pct": 95.28455284552845,
+        "preserved_ge_2_5_pct": 94.97435897435898,
+        "preserved_ge_3_0_pct": 95.23809523809523,
+        "preserved_ge_4_0_pct": 95.24714828897338
+      },
+      {
+        "policy": "P3_STALL60_DD050",
+        "coverage_pct": 87.11707931179185,
+        "delta_atr_per_fast_trade": 0.0030859924018153823,
+        "delta_atr_per_original_entry": 0.0008216670272096152,
+        "placebo_delta_atr_per_fast_trade": 0.5177256854817718,
+        "beats_placebo": false,
+        "edge_over_placebo_per_fast_trade": -0.5146396930799564,
+        "giveback_recovered_pct": 0.09149124875152295,
+        "confirmed_losers_improved_pct": 75.0,
+        "preserved_ge_2_0_pct": 54.95934959349593,
+        "preserved_ge_2_5_pct": 41.74358974358975,
+        "preserved_ge_3_0_pct": 29.699248120300748,
+        "preserved_ge_4_0_pct": 17.30038022813688
+      },
+      {
+        "policy": "P1_PROG120_LE0",
+        "coverage_pct": 12.211498111624003,
+        "delta_atr_per_fast_trade": 0.0016336835955921194,
+        "delta_atr_per_original_entry": 0.00043497966573139893,
+        "placebo_delta_atr_per_fast_trade": 0.08344871846443594,
+        "beats_placebo": false,
+        "edge_over_placebo_per_fast_trade": -0.08181503486884383,
+        "giveback_recovered_pct": 0.04843425801621363,
+        "confirmed_losers_improved_pct": 18.015873015873016,
+        "preserved_ge_2_0_pct": 95.36585365853658,
+        "preserved_ge_2_5_pct": 95.48717948717949,
+        "preserved_ge_3_0_pct": 95.36340852130326,
+        "preserved_ge_4_0_pct": 95.05703422053232
+      },
+      {
+        "policy": "P4_MFE15_DD050_STALL45",
+        "coverage_pct": 63.99496433067562,
+        "delta_atr_per_fast_trade": -0.019965920504618134,
+        "delta_atr_per_original_entry": -0.005316065761173744,
+        "placebo_delta_atr_per_fast_trade": 0.2945502853253379,
+        "beats_placebo": false,
+        "edge_over_placebo_per_fast_trade": -0.31451620582995604,
+        "giveback_recovered_pct": -0.5919350282154169,
+        "confirmed_losers_improved_pct": 32.93650793650794,
+        "preserved_ge_2_0_pct": 67.80487804878048,
+        "preserved_ge_2_5_pct": 46.97435897435898,
+        "preserved_ge_3_0_pct": 30.576441102756892,
+        "preserved_ge_4_0_pct": 15.019011406844108
+      }
+    ]
+  },
+  "report_answers": {
+    "q1_n_fast_confirm": {
+      "measurable": 2383,
+      "pct_of_confirmed": 50.64824654622742,
+      "pct_of_original_entries": 26.625698324022345
+    },
+    "q2_fast_vs_slow_economics": {
+      "fast_mean_net_atr": 0.6702013279592482,
+      "slow_mean_net_atr": 0.9895879729179939,
+      "fast_p_ge3": 0.3457826269408309,
+      "slow_p_ge3": 0.4038715354157501,
+      "years_fast_better": 0,
+      "verdict": "fast confirmation is WORSE, monotonically in confirm time"
+    },
+    "q3_at_confirming_flip_median": {
+      "return_atr": 0.7386469189505706,
+      "mfe_atr": 0.926868254205439,
+      "mae_atr": 0.18110753903807658,
+      "capture": 0.8301886792452831
+    },
+    "q4_additional_mfe_after_confirm": {
+      "fast_mean": 1.9628515070185446,
+      "fast_median": 1.1409359685544558,
+      "slow_median": 1.1665609361806464,
+      "median_frac_maxmfe_already_at_confirm": 0.4444444444444444
+    },
+    "q5_runner_rates": {
+      "p_ge_2_0": 0.5325220310532942,
+      "p_ge_2_5": 0.42173730591691144,
+      "p_ge_3_0": 0.3457826269408309,
+      "p_ge_4_0": 0.22786403692824173
+    },
+    "q6_ge3_new_extremes_speed": "84% have made a new favorable extreme within 60s (median 4 extremes, 31s since last) vs 65% / 1 / 53s for <2 ATR outcomes",
+    "q7_retracement_normal_for_runners": {
+      "pct_reaching_0_25": 99.45446915652539,
+      "pct_reaching_0_50": 97.524129248846,
+      "verdict": "0.25-0.50 ATR retracement is normal runner behaviour"
+    },
+    "q8_giveback_deterioration_threshold": {
+      "p_new_extreme_by_level": {
+        "0.25": 0.8518987341772152,
+        "0.5": 0.7444061962134251,
+        "0.75": 0.635341726618705,
+        "1.0": 0.5338528981977594
+      },
+      "verdict": "no level materially deteriorates; P(>=3 ATR) RISES with giveback depth (conditioning artefact)"
+    },
+    "q9_stall_informative": {
+      "median_additional_mfe_by_stall": {
+        "15": 0.913021842950385,
+        "30": 0.7858410143664677,
+        "45": 0.6557380372383221,
+        "60": 0.5381292502841243,
+        "90": 0.33919964010265136,
+        "120": 0.2084937567571708
+      },
+      "verdict": "yes - 4.4x decay from 15s to 120s stall"
+    },
+    "q10_best_separators_undetermined": [
+      {
+        "landmark_s": 120,
+        "variable": "ret_from_entry",
+        "auc": 0.7559552025440714,
+        "auc_abs_lift": 0.25595520254407145,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 120,
+        "variable": "retrace_frac",
+        "auc": 0.261606334841629,
+        "auc_abs_lift": 0.23839366515837102,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 120,
+        "variable": "ret_since_confirm",
+        "auc": 0.7278522826099127,
+        "auc_abs_lift": 0.22785228260991275,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 60,
+        "variable": "ret_from_entry",
+        "auc": 0.7242374052814794,
+        "auc_abs_lift": 0.2242374052814794,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 120,
+        "variable": "dd_from_run_max",
+        "auc": 0.2904518936834915,
+        "auc_abs_lift": 0.2095481063165085,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      },
+      {
+        "landmark_s": 60,
+        "variable": "retrace_frac",
+        "auc": 0.300961715769018,
+        "auc_abs_lift": 0.19903828423098202,
+        "bucket_table_monotonic": true,
+        "years_consistent": 5
+      }
+    ],
+    "q11_model_score_adds": {
+      "score_auc_at_120s": 0.24665118265325686,
+      "score_abs_lift_at_120s": 0.25334881734674314,
+      "best_price_abs_lift_undetermined": 0.25595520254407145,
+      "domain": "EXPLORATORY_OUT_OF_DOMAIN",
+      "verdict": "comparable to price path, not additive"
+    },
+    "q12_separation_justifies_exit_rule": {
+      "separation_exists": true,
+      "n_variables_passing_gate": 25,
+      "exit_rule_justified": false,
+      "reason": "actionable window is 12-13% of trades: at +120s, 20.8% of fast trades are at or below break-even but 40.5% of those are ALREADY STOPPED OUT by the 1.00 ATR initial stop"
+    },
+    "q13_policies_warranting_validation": {
+      "count": 0,
+      "detail": "4 policies tested; qualifying under the SPEC \u00a76 label-D standard: none. beats_placebo count = 0"
+    },
+    "q14_giveback_recovery_vs_tail": "For rules of this family, yes. The pool lives in the >=3 ATR runners (34.6% of trades, +2.876 ATR mean), whose defining behaviour is surviving deep retracement (median 0.367 ATR drawdown at +60s, 78% make a new extreme after a 0.50 ATR giveback). Giveback rules must fire inside that distribution - P3/P4 cut 70% of them. The one axis that separates, forward progress, is already ~40% consumed by the existing 1 ATR stop."
+  },
+  "final_classification": {
+    "code": "C",
+    "label": "CONFIRMATION SPEED IS NOT ECONOMICALLY INFORMATIVE, BUT POST-CONFIRM PATH IS",
+    "routed_by": "SPEC section 6 decision table, executed in analysis/close_out.py::classify()",
+    "cohort_test_passed": false,
+    "separation_gate_open": true,
+    "policy_standard_met": false,
+    "policy_note": "4 policies tested; qualifying under the SPEC \u00a76 label-D standard: none. beats_placebo count = 0",
+    "label_E_precondition_score_only_separation": false
+  }
+}
