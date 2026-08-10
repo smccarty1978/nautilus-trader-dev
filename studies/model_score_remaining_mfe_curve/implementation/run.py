@@ -167,7 +167,32 @@ def run() -> dict:
     pooled.write_parquet(out / "score_level_curve.parquet")
     by_year.write_parquet(out / "year_direction_breakdown.parquet")
     pooled.write_json(out / "score_level_curve.json")
-    validation = {"true_in_domain_score_dispatches_only": True, "years": [2021, 2022, 2023, 2024, 2025], "sealed_2026_accessed": False, "candidate_rows": len(candidates), "all_candidate_atr_positive": all(float(r["atr_at_checkpoint"]) > 0 for r in candidates), "passed": True}
+    # These are the accepted full-population counts from the prior frozen
+    # score-path study.  They apply to this study's independent first-qualifying
+    # view; the armed-later view intentionally has a different population.
+    expected_first_qualifying = {"top_10": 8988, "top_5": 7396, "top_2_5": 5823}
+    observed_first_qualifying = {
+        level: sum(
+            1 for row in measured
+            if row["view"] == "INDEPENDENT_FIXED_LEVEL" and row["level"] == level
+        )
+        for level in expected_first_qualifying
+    }
+    counts_match = observed_first_qualifying == expected_first_qualifying
+    validation = {
+        "true_in_domain_score_dispatches_only": True,
+        "years": [2021, 2022, 2023, 2024, 2025],
+        "sealed_2026_accessed": False,
+        "candidate_rows": len(candidates),
+        "all_candidate_atr_positive": all(float(r["atr_at_checkpoint"]) > 0 for r in candidates),
+        "known_first_qualifying_count_parity": {
+            "population": "INDEPENDENT_FIXED_LEVEL; true in-domain dispatches; age >600s; 2021-2025",
+            "expected": expected_first_qualifying,
+            "observed": observed_first_qualifying,
+            "passed": counts_match,
+        },
+        "passed": counts_match,
+    }
     (out / "validation_report.json").write_text(json.dumps(validation, indent=2) + "\n", encoding="utf-8")
     return validation
 
