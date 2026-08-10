@@ -1,0 +1,53 @@
+{
+  "agent": "contract-checker",
+  "pass": 1,
+  "date": "2026-08-09",
+  "blocking": 0,
+  "warning": 2,
+  "note": 1,
+  "not_verified": 1,
+  "pending": 1,
+  "critical": 0,
+  "verdict": "CLEAR",
+  "deliverables_manifest_present": true,
+  "prior_findings_adjudicated": true,
+  "findings": [
+    {
+      "id": "CC-1",
+      "severity": "WARNING",
+      "requirement": "SPEC 2.4 / threshold overlap disclosure",
+      "finding": "SPEC.md and README.md cited `THRESHOLD_OVERLAP_WAIVER.json` as the source of the 2025-overlap disclosure without a path. No such file exists under studies/armed_fade_score_path_progression/; the only file of that name in the repo belongs to studies/full_trade_path_builder/. The disclosure itself was present in prose (SPEC, README, partition_manifest.json) but its cited authority was unresolvable from this study.",
+      "remediation": "Correct the citation to the canonical path.",
+      "resolution": "RESOLVED 2026-08-09. Verified that canonical_model_threshold_contracts.parquet carries `waiver_artifact = studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json` for all six percentiles, so that file IS the canonical waiver and no local copy should exist. SPEC 2.4 and README now cite the full path and state explicitly that this study inherits the waiver rather than forking it."
+    },
+    {
+      "id": "CC-2",
+      "severity": "NOTE",
+      "requirement": "SPEC 3 / gate 1 lifecycle_parity",
+      "finding": "SPEC 3 stated 'Expected population: 8,953 armed regimes ... the 35-regime delta'. Observed armed_population is 8,950 with a 38-regime delta (22 predecessor-already-qualified + 16 no-predecessor). validate.py gate_1 does not hardcode 8,953/35; it checks that all exclusions are explained (excluded_unexplained = 0), which they are. The gate passes on sound logic, but the frozen SPEC prose numbers were off by 3.",
+      "remediation": "Amend SPEC prose or note the delta in REPORT.md.",
+      "resolution": "RESOLVED 2026-08-09. SPEC 3 now carries a dated amendment recording the original pre-implementation estimate alongside the reconciled figures, and naming the two corrections that moved it (no-predecessor rejection, and the unscored-dispatch filter of SPEC 2.1a). The estimate is preserved rather than overwritten."
+    },
+    {
+      "id": "CC-3",
+      "severity": "PENDING",
+      "requirement": "Deliverables Manifest #3, REPORT.md",
+      "finding": "REPORT.md did not exist at the time of this pass. Expected and in progress per the task scope, not a violation.",
+      "remediation": "Write REPORT.md per SPEC 10/10a; re-run this gate afterward.",
+      "resolution": "WRITTEN 2026-08-09, after this pass. Requires contract-checker pass 2 to verify its section structure and its assigned terminal label against the SPEC 9a criteria."
+    },
+    {
+      "id": "CC-4",
+      "severity": "NOT_VERIFIED",
+      "requirement": "SPEC 9a terminal decision labels, reachability",
+      "finding": "All four labels have executable, mutually exclusive criteria, and every input they depend on (threshold_progression_funnel.json by-direction/by-year p_confirm, remaining_opportunity.json medians, validation_report.json all_passed) exists and is well-formed. No label had been assigned at the time of this pass because REPORT.md was unwritten.",
+      "remediation": "Re-verify the assigned label against the SPEC 9a criteria once REPORT.md exists.",
+      "resolution": "OPEN. REPORT.md now assigns ARMED SCORE PROGRESSION SUPPORTS REFINEMENT. Deferred to contract-checker pass 2."
+    }
+  ],
+  "notes": [
+    "Scope was deliverables, seals, terminal-label reachability, and C4/D/E only. Causality categories A, B, C1-C3, F, G, H are owned by lookahead-auditor, which cleared them across two passes (audit/status.json, verdict PASS, 0 CRITICAL).",
+    "Gate 8 `audit_gates` read `passed: false` at the time of this pass solely because this file did not yet exist. The gate's logic was judged and found sound: it reads machine-readable JSON only, never prose.",
+    "This file was authored by the contract-checker agent and persisted by the main session, which has the Write tool the agent lacks. Content is verbatim apart from the `resolution` fields and this note, which record post-pass remediation."
+  ]
+}

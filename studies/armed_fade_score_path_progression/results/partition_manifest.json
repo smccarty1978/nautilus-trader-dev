@@ -1,0 +1,59 @@
+{
+  "study": "armed_fade_score_path_progression",
+  "substrate": "data/canonical/regime_complete_v1",
+  "cost_points_round_turn": 0.5,
+  "stop_atr": 1.0,
+  "min_regime_age_s": 600.0,
+  "arm_level": "top_10",
+  "levels": [
+    "top_10",
+    "top_5",
+    "top_2_5",
+    "top_1"
+  ],
+  "retreat_definitions": [
+    0.03,
+    0.05
+  ],
+  "thresholds": {
+    "top_10": [
+      0.43167249785595935,
+      0.44559149246408103
+    ],
+    "top_5": [
+      0.5067081427626979,
+      0.5084619230529974
+    ],
+    "top_2_5": [
+      0.5697449423968936,
+      0.5641320087327389
+    ],
+    "top_1": [
+      0.6412279079940403,
+      0.6306416772425602
+    ]
+  },
+  "walks": {
+    "walk_a": "arm-anchored: one lifecycle per armed regime, reference price and ATR frozen at the Top-10 arm; deeper levels subset the population and never move the origin",
+    "walk_b": "per-level independent: one hypothetical entry per level reached, own reference price, own frozen ATR, own 1.0 ATR stop"
+  },
+  "session_rule": "RTH only, forced flat 15:00 CT, level reach must fall inside the arm's own session",
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "armed_regimes": 8950,
+  "rth_bars": 28383730,
+  "in_domain_dispatches": 2028394,
+  "code_hashes": {
+    "__init__.py": "0c7eb47b0c5a596e",
+    "arming.py": "c6c5cda80776d452",
+    "build_paths.py": "94a2beb777034e7e",
+    "validate.py": "0c8811bf553df829",
+    "walks.py": "a472576cd57c2d8c"
+  },
+  "threshold_overlap_disclosure": "both calibration populations are calendar-2025 and overlap the evaluation window; 2025 is not threshold-OOS"
+}

@@ -1,0 +1,964 @@
+{
+  "breakdowns": {
+    "pooled": {
+      "retreat_0_03": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 493,
+            "pct_of_armed": 5.51,
+            "p_confirm": 0.9899,
+            "p_stop_before_confirm": 0.0041,
+            "median_mae_to_confirm_atr": 0.0853,
+            "median_return_at_confirm_atr": 0.7731,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 1966,
+            "pct_of_armed": 21.97,
+            "p_confirm": 0.6984,
+            "p_stop_before_confirm": 0.2986,
+            "median_mae_to_confirm_atr": 0.5558,
+            "median_return_at_confirm_atr": 0.873,
+            "median_seconds_to_confirm": 220.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 1158,
+            "pct_of_armed": 12.94,
+            "p_confirm": 0.3506,
+            "p_stop_before_confirm": 0.6451,
+            "median_mae_to_confirm_atr": 0.2388,
+            "median_return_at_confirm_atr": 0.781,
+            "median_seconds_to_confirm": 110.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 1787,
+            "pct_of_armed": 19.97,
+            "p_confirm": 0.6027,
+            "p_stop_before_confirm": 0.3884,
+            "median_mae_to_confirm_atr": 0.3693,
+            "median_return_at_confirm_atr": 0.8116,
+            "median_seconds_to_confirm": 110.0
+          },
+          "TOP10_ONLY": {
+            "n": 3546,
+            "pct_of_armed": 39.62,
+            "p_confirm": 0.37,
+            "p_stop_before_confirm": 0.6246,
+            "median_mae_to_confirm_atr": 0.2519,
+            "median_return_at_confirm_atr": 0.9135,
+            "median_seconds_to_confirm": 105.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 5404,
+            "p_confirm": 0.6188
+          },
+          "reached_top5=False": {
+            "n": 3546,
+            "p_confirm": 0.37
+          }
+        }
+      },
+      "retreat_0_05": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 708,
+            "pct_of_armed": 7.91,
+            "p_confirm": 0.9887,
+            "p_stop_before_confirm": 0.0056,
+            "median_mae_to_confirm_atr": 0.1038,
+            "median_return_at_confirm_atr": 0.7685,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 1557,
+            "pct_of_armed": 17.4,
+            "p_confirm": 0.6956,
+            "p_stop_before_confirm": 0.3012,
+            "median_mae_to_confirm_atr": 0.5956,
+            "median_return_at_confirm_atr": 0.873,
+            "median_seconds_to_confirm": 235.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 1317,
+            "pct_of_armed": 14.72,
+            "p_confirm": 0.3311,
+            "p_stop_before_confirm": 0.6644,
+            "median_mae_to_confirm_atr": 0.2983,
+            "median_return_at_confirm_atr": 0.8229,
+            "median_seconds_to_confirm": 120.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 1822,
+            "pct_of_armed": 20.36,
+            "p_confirm": 0.6175,
+            "p_stop_before_confirm": 0.3743,
+            "median_mae_to_confirm_atr": 0.4208,
+            "median_return_at_confirm_atr": 0.8281,
+            "median_seconds_to_confirm": 120.0
+          },
+          "TOP10_ONLY": {
+            "n": 3546,
+            "pct_of_armed": 39.62,
+            "p_confirm": 0.37,
+            "p_stop_before_confirm": 0.6246,
+            "median_mae_to_confirm_atr": 0.2519,
+            "median_return_at_confirm_atr": 0.9135,
+            "median_seconds_to_confirm": 105.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 5404,
+            "p_confirm": 0.6188
+          },
+          "reached_top5=False": {
+            "n": 3546,
+            "p_confirm": 0.37
+          }
+        }
+      }
+    },
+    "direction:SHORT": {
+      "retreat_0_03": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 275,
+            "pct_of_armed": 5.61,
+            "p_confirm": 0.9964,
+            "p_stop_before_confirm": 0.0036,
+            "median_mae_to_confirm_atr": 0.0787,
+            "median_return_at_confirm_atr": 0.774,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 1090,
+            "pct_of_armed": 22.24,
+            "p_confirm": 0.7183,
+            "p_stop_before_confirm": 0.2789,
+            "median_mae_to_confirm_atr": 0.5557,
+            "median_return_at_confirm_atr": 0.8545,
+            "median_seconds_to_confirm": 220.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 685,
+            "pct_of_armed": 13.97,
+            "p_confirm": 0.3547,
+            "p_stop_before_confirm": 0.6453,
+            "median_mae_to_confirm_atr": 0.2542,
+            "median_return_at_confirm_atr": 0.8025,
+            "median_seconds_to_confirm": 115.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 1024,
+            "pct_of_armed": 20.89,
+            "p_confirm": 0.6143,
+            "p_stop_before_confirm": 0.3789,
+            "median_mae_to_confirm_atr": 0.3542,
+            "median_return_at_confirm_atr": 0.8304,
+            "median_seconds_to_confirm": 115.0
+          },
+          "TOP10_ONLY": {
+            "n": 1828,
+            "pct_of_armed": 37.29,
+            "p_confirm": 0.3507,
+            "p_stop_before_confirm": 0.6466,
+            "median_mae_to_confirm_atr": 0.2474,
+            "median_return_at_confirm_atr": 0.9309,
+            "median_seconds_to_confirm": 105.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 3074,
+            "p_confirm": 0.6275
+          },
+          "reached_top5=False": {
+            "n": 1828,
+            "p_confirm": 0.3507
+          }
+        }
+      },
+      "retreat_0_05": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 378,
+            "pct_of_armed": 7.71,
+            "p_confirm": 0.9947,
+            "p_stop_before_confirm": 0.0053,
+            "median_mae_to_confirm_atr": 0.098,
+            "median_return_at_confirm_atr": 0.7876,
+            "median_seconds_to_confirm": 55.0
+          },
+          "OSCILLATING": {
+            "n": 883,
+            "pct_of_armed": 18.01,
+            "p_confirm": 0.7214,
+            "p_stop_before_confirm": 0.2752,
+            "median_mae_to_confirm_atr": 0.5798,
+            "median_return_at_confirm_atr": 0.8545,
+            "median_seconds_to_confirm": 230.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 765,
+            "pct_of_armed": 15.61,
+            "p_confirm": 0.3386,
+            "p_stop_before_confirm": 0.6614,
+            "median_mae_to_confirm_atr": 0.2993,
+            "median_return_at_confirm_atr": 0.8465,
+            "median_seconds_to_confirm": 130.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 1048,
+            "pct_of_armed": 21.38,
+            "p_confirm": 0.6269,
+            "p_stop_before_confirm": 0.3664,
+            "median_mae_to_confirm_atr": 0.4086,
+            "median_return_at_confirm_atr": 0.8179,
+            "median_seconds_to_confirm": 120.0
+          },
+          "TOP10_ONLY": {
+            "n": 1828,
+            "pct_of_armed": 37.29,
+            "p_confirm": 0.3507,
+            "p_stop_before_confirm": 0.6466,
+            "median_mae_to_confirm_atr": 0.2474,
+            "median_return_at_confirm_atr": 0.9309,
+            "median_seconds_to_confirm": 105.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 3074,
+            "p_confirm": 0.6275
+          },
+          "reached_top5=False": {
+            "n": 1828,
+            "p_confirm": 0.3507
+          }
+        }
+      }
+    },
+    "direction:LONG": {
+      "retreat_0_03": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 218,
+            "pct_of_armed": 5.39,
+            "p_confirm": 0.9817,
+            "p_stop_before_confirm": 0.0046,
+            "median_mae_to_confirm_atr": 0.091,
+            "median_return_at_confirm_atr": 0.7702,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 876,
+            "pct_of_armed": 21.64,
+            "p_confirm": 0.6735,
+            "p_stop_before_confirm": 0.3231,
+            "median_mae_to_confirm_atr": 0.5576,
+            "median_return_at_confirm_atr": 0.8964,
+            "median_seconds_to_confirm": 215.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 473,
+            "pct_of_armed": 11.68,
+            "p_confirm": 0.3446,
+            "p_stop_before_confirm": 0.6448,
+            "median_mae_to_confirm_atr": 0.2238,
+            "median_return_at_confirm_atr": 0.7214,
+            "median_seconds_to_confirm": 100.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 763,
+            "pct_of_armed": 18.85,
+            "p_confirm": 0.5872,
+            "p_stop_before_confirm": 0.401,
+            "median_mae_to_confirm_atr": 0.3819,
+            "median_return_at_confirm_atr": 0.7799,
+            "median_seconds_to_confirm": 110.0
+          },
+          "TOP10_ONLY": {
+            "n": 1718,
+            "pct_of_armed": 42.44,
+            "p_confirm": 0.3906,
+            "p_stop_before_confirm": 0.6013,
+            "median_mae_to_confirm_atr": 0.2558,
+            "median_return_at_confirm_atr": 0.8973,
+            "median_seconds_to_confirm": 110.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 2330,
+            "p_confirm": 0.6073
+          },
+          "reached_top5=False": {
+            "n": 1718,
+            "p_confirm": 0.3906
+          }
+        }
+      },
+      "retreat_0_05": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 330,
+            "pct_of_armed": 8.15,
+            "p_confirm": 0.9818,
+            "p_stop_before_confirm": 0.0061,
+            "median_mae_to_confirm_atr": 0.1068,
+            "median_return_at_confirm_atr": 0.7559,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 674,
+            "pct_of_armed": 16.65,
+            "p_confirm": 0.6617,
+            "p_stop_before_confirm": 0.3353,
+            "median_mae_to_confirm_atr": 0.6255,
+            "median_return_at_confirm_atr": 0.9038,
+            "median_seconds_to_confirm": 245.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 552,
+            "pct_of_armed": 13.64,
+            "p_confirm": 0.3207,
+            "p_stop_before_confirm": 0.6685,
+            "median_mae_to_confirm_atr": 0.2885,
+            "median_return_at_confirm_atr": 0.759,
+            "median_seconds_to_confirm": 115.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 774,
+            "pct_of_armed": 19.12,
+            "p_confirm": 0.6047,
+            "p_stop_before_confirm": 0.385,
+            "median_mae_to_confirm_atr": 0.4321,
+            "median_return_at_confirm_atr": 0.8487,
+            "median_seconds_to_confirm": 120.0
+          },
+          "TOP10_ONLY": {
+            "n": 1718,
+            "pct_of_armed": 42.44,
+            "p_confirm": 0.3906,
+            "p_stop_before_confirm": 0.6013,
+            "median_mae_to_confirm_atr": 0.2558,
+            "median_return_at_confirm_atr": 0.8973,
+            "median_seconds_to_confirm": 110.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 2330,
+            "p_confirm": 0.6073
+          },
+          "reached_top5=False": {
+            "n": 1718,
+            "p_confirm": 0.3906
+          }
+        }
+      }
+    },
+    "year:2021": {
+      "retreat_0_03": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 112,
+            "pct_of_armed": 6.13,
+            "p_confirm": 0.9732,
+            "p_stop_before_confirm": 0.0089,
+            "median_mae_to_confirm_atr": 0.0831,
+            "median_return_at_confirm_atr": 0.7447,
+            "median_seconds_to_confirm": 45.0
+          },
+          "OSCILLATING": {
+            "n": 394,
+            "pct_of_armed": 21.55,
+            "p_confirm": 0.7563,
+            "p_stop_before_confirm": 0.236,
+            "median_mae_to_confirm_atr": 0.5433,
+            "median_return_at_confirm_atr": 0.8077,
+            "median_seconds_to_confirm": 206.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 235,
+            "pct_of_armed": 12.86,
+            "p_confirm": 0.3702,
+            "p_stop_before_confirm": 0.6213,
+            "median_mae_to_confirm_atr": 0.3664,
+            "median_return_at_confirm_atr": 0.7806,
+            "median_seconds_to_confirm": 115.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 374,
+            "pct_of_armed": 20.46,
+            "p_confirm": 0.6123,
+            "p_stop_before_confirm": 0.3824,
+            "median_mae_to_confirm_atr": 0.3612,
+            "median_return_at_confirm_atr": 0.7734,
+            "median_seconds_to_confirm": 100.0
+          },
+          "TOP10_ONLY": {
+            "n": 713,
+            "pct_of_armed": 39.0,
+            "p_confirm": 0.3969,
+            "p_stop_before_confirm": 0.5975,
+            "median_mae_to_confirm_atr": 0.266,
+            "median_return_at_confirm_atr": 0.87,
+            "median_seconds_to_confirm": 100.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1115,
+            "p_confirm": 0.6484
+          },
+          "reached_top5=False": {
+            "n": 713,
+            "p_confirm": 0.3969
+          }
+        }
+      },
+      "retreat_0_05": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 154,
+            "pct_of_armed": 8.42,
+            "p_confirm": 0.9805,
+            "p_stop_before_confirm": 0.0065,
+            "median_mae_to_confirm_atr": 0.1066,
+            "median_return_at_confirm_atr": 0.7392,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 314,
+            "pct_of_armed": 17.18,
+            "p_confirm": 0.7643,
+            "p_stop_before_confirm": 0.2261,
+            "median_mae_to_confirm_atr": 0.5688,
+            "median_return_at_confirm_atr": 0.8066,
+            "median_seconds_to_confirm": 225.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 267,
+            "pct_of_armed": 14.61,
+            "p_confirm": 0.3408,
+            "p_stop_before_confirm": 0.6517,
+            "median_mae_to_confirm_atr": 0.3876,
+            "median_return_at_confirm_atr": 0.7661,
+            "median_seconds_to_confirm": 130.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 380,
+            "pct_of_armed": 20.79,
+            "p_confirm": 0.6342,
+            "p_stop_before_confirm": 0.3605,
+            "median_mae_to_confirm_atr": 0.415,
+            "median_return_at_confirm_atr": 0.7909,
+            "median_seconds_to_confirm": 110.0
+          },
+          "TOP10_ONLY": {
+            "n": 713,
+            "pct_of_armed": 39.0,
+            "p_confirm": 0.3969,
+            "p_stop_before_confirm": 0.5975,
+            "median_mae_to_confirm_atr": 0.266,
+            "median_return_at_confirm_atr": 0.87,
+            "median_seconds_to_confirm": 100.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1115,
+            "p_confirm": 0.6484
+          },
+          "reached_top5=False": {
+            "n": 713,
+            "p_confirm": 0.3969
+          }
+        }
+      }
+    },
+    "year:2022": {
+      "retreat_0_03": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 90,
+            "pct_of_armed": 4.93,
+            "p_confirm": 1.0,
+            "p_stop_before_confirm": 0.0,
+            "median_mae_to_confirm_atr": 0.0893,
+            "median_return_at_confirm_atr": 0.7441,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 428,
+            "pct_of_armed": 23.45,
+            "p_confirm": 0.6963,
+            "p_stop_before_confirm": 0.2991,
+            "median_mae_to_confirm_atr": 0.535,
+            "median_return_at_confirm_atr": 0.8579,
+            "median_seconds_to_confirm": 220.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 252,
+            "pct_of_armed": 13.81,
+            "p_confirm": 0.3571,
+            "p_stop_before_confirm": 0.6389,
+            "median_mae_to_confirm_atr": 0.2114,
+            "median_return_at_confirm_atr": 0.7296,
+            "median_seconds_to_confirm": 102.5
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 363,
+            "pct_of_armed": 19.89,
+            "p_confirm": 0.6364,
+            "p_stop_before_confirm": 0.3526,
+            "median_mae_to_confirm_atr": 0.3216,
+            "median_return_at_confirm_atr": 0.7655,
+            "median_seconds_to_confirm": 105.0
+          },
+          "TOP10_ONLY": {
+            "n": 692,
+            "pct_of_armed": 37.92,
+            "p_confirm": 0.3757,
+            "p_stop_before_confirm": 0.6214,
+            "median_mae_to_confirm_atr": 0.2208,
+            "median_return_at_confirm_atr": 0.9514,
+            "median_seconds_to_confirm": 110.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1133,
+            "p_confirm": 0.6258
+          },
+          "reached_top5=False": {
+            "n": 692,
+            "p_confirm": 0.3757
+          }
+        }
+      },
+      "retreat_0_05": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 138,
+            "pct_of_armed": 7.56,
+            "p_confirm": 1.0,
+            "p_stop_before_confirm": 0.0,
+            "median_mae_to_confirm_atr": 0.0948,
+            "median_return_at_confirm_atr": 0.741,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 346,
+            "pct_of_armed": 18.96,
+            "p_confirm": 0.7081,
+            "p_stop_before_confirm": 0.289,
+            "median_mae_to_confirm_atr": 0.5774,
+            "median_return_at_confirm_atr": 0.8548,
+            "median_seconds_to_confirm": 235.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 280,
+            "pct_of_armed": 15.34,
+            "p_confirm": 0.3429,
+            "p_stop_before_confirm": 0.65,
+            "median_mae_to_confirm_atr": 0.228,
+            "median_return_at_confirm_atr": 0.7885,
+            "median_seconds_to_confirm": 107.5
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 369,
+            "pct_of_armed": 20.22,
+            "p_confirm": 0.6233,
+            "p_stop_before_confirm": 0.3659,
+            "median_mae_to_confirm_atr": 0.3973,
+            "median_return_at_confirm_atr": 0.7884,
+            "median_seconds_to_confirm": 115.0
+          },
+          "TOP10_ONLY": {
+            "n": 692,
+            "pct_of_armed": 37.92,
+            "p_confirm": 0.3757,
+            "p_stop_before_confirm": 0.6214,
+            "median_mae_to_confirm_atr": 0.2208,
+            "median_return_at_confirm_atr": 0.9514,
+            "median_seconds_to_confirm": 110.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1133,
+            "p_confirm": 0.6258
+          },
+          "reached_top5=False": {
+            "n": 692,
+            "p_confirm": 0.3757
+          }
+        }
+      }
+    },
+    "year:2023": {
+      "retreat_0_03": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 114,
+            "pct_of_armed": 6.47,
+            "p_confirm": 0.9912,
+            "p_stop_before_confirm": 0.0,
+            "median_mae_to_confirm_atr": 0.0875,
+            "median_return_at_confirm_atr": 0.7725,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 384,
+            "pct_of_armed": 21.78,
+            "p_confirm": 0.7057,
+            "p_stop_before_confirm": 0.2943,
+            "median_mae_to_confirm_atr": 0.5568,
+            "median_return_at_confirm_atr": 0.8619,
+            "median_seconds_to_confirm": 225.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 217,
+            "pct_of_armed": 12.31,
+            "p_confirm": 0.3502,
+            "p_stop_before_confirm": 0.6452,
+            "median_mae_to_confirm_atr": 0.2453,
+            "median_return_at_confirm_atr": 0.691,
+            "median_seconds_to_confirm": 115.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 358,
+            "pct_of_armed": 20.31,
+            "p_confirm": 0.6285,
+            "p_stop_before_confirm": 0.3547,
+            "median_mae_to_confirm_atr": 0.3777,
+            "median_return_at_confirm_atr": 0.835,
+            "median_seconds_to_confirm": 115.0
+          },
+          "TOP10_ONLY": {
+            "n": 690,
+            "pct_of_armed": 39.14,
+            "p_confirm": 0.3522,
+            "p_stop_before_confirm": 0.6391,
+            "median_mae_to_confirm_atr": 0.2289,
+            "median_return_at_confirm_atr": 0.8552,
+            "median_seconds_to_confirm": 105.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1073,
+            "p_confirm": 0.6384
+          },
+          "reached_top5=False": {
+            "n": 690,
+            "p_confirm": 0.3522
+          }
+        }
+      },
+      "retreat_0_05": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 163,
+            "pct_of_armed": 9.25,
+            "p_confirm": 0.9816,
+            "p_stop_before_confirm": 0.0123,
+            "median_mae_to_confirm_atr": 0.1072,
+            "median_return_at_confirm_atr": 0.7596,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 291,
+            "pct_of_armed": 16.51,
+            "p_confirm": 0.6838,
+            "p_stop_before_confirm": 0.3162,
+            "median_mae_to_confirm_atr": 0.6116,
+            "median_return_at_confirm_atr": 0.873,
+            "median_seconds_to_confirm": 240.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 246,
+            "pct_of_armed": 13.95,
+            "p_confirm": 0.3252,
+            "p_stop_before_confirm": 0.6667,
+            "median_mae_to_confirm_atr": 0.3482,
+            "median_return_at_confirm_atr": 0.7291,
+            "median_seconds_to_confirm": 140.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 373,
+            "pct_of_armed": 21.16,
+            "p_confirm": 0.6595,
+            "p_stop_before_confirm": 0.3271,
+            "median_mae_to_confirm_atr": 0.4106,
+            "median_return_at_confirm_atr": 0.8538,
+            "median_seconds_to_confirm": 128.0
+          },
+          "TOP10_ONLY": {
+            "n": 690,
+            "pct_of_armed": 39.14,
+            "p_confirm": 0.3522,
+            "p_stop_before_confirm": 0.6391,
+            "median_mae_to_confirm_atr": 0.2289,
+            "median_return_at_confirm_atr": 0.8552,
+            "median_seconds_to_confirm": 105.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1073,
+            "p_confirm": 0.6384
+          },
+          "reached_top5=False": {
+            "n": 690,
+            "p_confirm": 0.3522
+          }
+        }
+      }
+    },
+    "year:2024": {
+      "retreat_0_03": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 90,
+            "pct_of_armed": 5.08,
+            "p_confirm": 1.0,
+            "p_stop_before_confirm": 0.0,
+            "median_mae_to_confirm_atr": 0.0768,
+            "median_return_at_confirm_atr": 0.8724,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 388,
+            "pct_of_armed": 21.91,
+            "p_confirm": 0.6778,
+            "p_stop_before_confirm": 0.3222,
+            "median_mae_to_confirm_atr": 0.5686,
+            "median_return_at_confirm_atr": 0.8996,
+            "median_seconds_to_confirm": 235.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 214,
+            "pct_of_armed": 12.08,
+            "p_confirm": 0.3178,
+            "p_stop_before_confirm": 0.6776,
+            "median_mae_to_confirm_atr": 0.206,
+            "median_return_at_confirm_atr": 0.9194,
+            "median_seconds_to_confirm": 110.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 332,
+            "pct_of_armed": 18.75,
+            "p_confirm": 0.5602,
+            "p_stop_before_confirm": 0.4337,
+            "median_mae_to_confirm_atr": 0.3945,
+            "median_return_at_confirm_atr": 0.8902,
+            "median_seconds_to_confirm": 115.0
+          },
+          "TOP10_ONLY": {
+            "n": 747,
+            "pct_of_armed": 42.18,
+            "p_confirm": 0.3333,
+            "p_stop_before_confirm": 0.6573,
+            "median_mae_to_confirm_atr": 0.2858,
+            "median_return_at_confirm_atr": 0.9384,
+            "median_seconds_to_confirm": 125.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1024,
+            "p_confirm": 0.5928
+          },
+          "reached_top5=False": {
+            "n": 747,
+            "p_confirm": 0.3333
+          }
+        }
+      },
+      "retreat_0_05": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 126,
+            "pct_of_armed": 7.11,
+            "p_confirm": 0.9921,
+            "p_stop_before_confirm": 0.0,
+            "median_mae_to_confirm_atr": 0.0941,
+            "median_return_at_confirm_atr": 0.8176,
+            "median_seconds_to_confirm": 55.0
+          },
+          "OSCILLATING": {
+            "n": 308,
+            "pct_of_armed": 17.39,
+            "p_confirm": 0.6721,
+            "p_stop_before_confirm": 0.3279,
+            "median_mae_to_confirm_atr": 0.6123,
+            "median_return_at_confirm_atr": 0.8911,
+            "median_seconds_to_confirm": 235.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 245,
+            "pct_of_armed": 13.83,
+            "p_confirm": 0.3102,
+            "p_stop_before_confirm": 0.6898,
+            "median_mae_to_confirm_atr": 0.2433,
+            "median_return_at_confirm_atr": 1.0,
+            "median_seconds_to_confirm": 140.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 345,
+            "pct_of_armed": 19.48,
+            "p_confirm": 0.5768,
+            "p_stop_before_confirm": 0.4174,
+            "median_mae_to_confirm_atr": 0.4648,
+            "median_return_at_confirm_atr": 0.9095,
+            "median_seconds_to_confirm": 145.0
+          },
+          "TOP10_ONLY": {
+            "n": 747,
+            "pct_of_armed": 42.18,
+            "p_confirm": 0.3333,
+            "p_stop_before_confirm": 0.6573,
+            "median_mae_to_confirm_atr": 0.2858,
+            "median_return_at_confirm_atr": 0.9384,
+            "median_seconds_to_confirm": 125.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1024,
+            "p_confirm": 0.5928
+          },
+          "reached_top5=False": {
+            "n": 747,
+            "p_confirm": 0.3333
+          }
+        }
+      }
+    },
+    "year:2025": {
+      "retreat_0_03": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 87,
+            "pct_of_armed": 4.93,
+            "p_confirm": 0.9885,
+            "p_stop_before_confirm": 0.0115,
+            "median_mae_to_confirm_atr": 0.0891,
+            "median_return_at_confirm_atr": 0.7691,
+            "median_seconds_to_confirm": 47.5
+          },
+          "OSCILLATING": {
+            "n": 372,
+            "pct_of_armed": 21.1,
+            "p_confirm": 0.6532,
+            "p_stop_before_confirm": 0.3441,
+            "median_mae_to_confirm_atr": 0.5672,
+            "median_return_at_confirm_atr": 0.9792,
+            "median_seconds_to_confirm": 215.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 240,
+            "pct_of_armed": 13.61,
+            "p_confirm": 0.3542,
+            "p_stop_before_confirm": 0.6458,
+            "median_mae_to_confirm_atr": 0.2389,
+            "median_return_at_confirm_atr": 0.8454,
+            "median_seconds_to_confirm": 115.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 360,
+            "pct_of_armed": 20.42,
+            "p_confirm": 0.5722,
+            "p_stop_before_confirm": 0.4222,
+            "median_mae_to_confirm_atr": 0.3837,
+            "median_return_at_confirm_atr": 0.888,
+            "median_seconds_to_confirm": 112.5
+          },
+          "TOP10_ONLY": {
+            "n": 704,
+            "pct_of_armed": 39.93,
+            "p_confirm": 0.3935,
+            "p_stop_before_confirm": 0.6065,
+            "median_mae_to_confirm_atr": 0.2598,
+            "median_return_at_confirm_atr": 0.9188,
+            "median_seconds_to_confirm": 105.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1059,
+            "p_confirm": 0.5855
+          },
+          "reached_top5=False": {
+            "n": 704,
+            "p_confirm": 0.3935
+          }
+        }
+      },
+      "retreat_0_05": {
+        "classes": {
+          "MONOTONIC_PROGRESS": {
+            "n": 127,
+            "pct_of_armed": 7.2,
+            "p_confirm": 0.9921,
+            "p_stop_before_confirm": 0.0079,
+            "median_mae_to_confirm_atr": 0.114,
+            "median_return_at_confirm_atr": 0.8153,
+            "median_seconds_to_confirm": 50.0
+          },
+          "OSCILLATING": {
+            "n": 298,
+            "pct_of_armed": 16.9,
+            "p_confirm": 0.6443,
+            "p_stop_before_confirm": 0.3523,
+            "median_mae_to_confirm_atr": 0.6202,
+            "median_return_at_confirm_atr": 0.9655,
+            "median_seconds_to_confirm": 225.0
+          },
+          "RETREAT_NO_RECOVERY": {
+            "n": 279,
+            "pct_of_armed": 15.83,
+            "p_confirm": 0.3333,
+            "p_stop_before_confirm": 0.6667,
+            "median_mae_to_confirm_atr": 0.2904,
+            "median_return_at_confirm_atr": 0.8484,
+            "median_seconds_to_confirm": 120.0
+          },
+          "RETREAT_REEXPANSION": {
+            "n": 355,
+            "pct_of_armed": 20.14,
+            "p_confirm": 0.5887,
+            "p_stop_before_confirm": 0.4056,
+            "median_mae_to_confirm_atr": 0.4474,
+            "median_return_at_confirm_atr": 0.8854,
+            "median_seconds_to_confirm": 130.0
+          },
+          "TOP10_ONLY": {
+            "n": 704,
+            "pct_of_armed": 39.93,
+            "p_confirm": 0.3935,
+            "p_stop_before_confirm": 0.6065,
+            "median_mae_to_confirm_atr": 0.2598,
+            "median_return_at_confirm_atr": 0.9188,
+            "median_seconds_to_confirm": 105.0
+          }
+        },
+        "depth_cross_tab": {
+          "reached_top5=True": {
+            "n": 1059,
+            "p_confirm": 0.5855
+          },
+          "reached_top5=False": {
+            "n": 704,
+            "p_confirm": 0.3935
+          }
+        }
+      }
+    }
+  }
+}
