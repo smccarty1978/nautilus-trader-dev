@@ -1,0 +1,129 @@
+{
+  "empirical_facts": {
+    "rth_score_rows": 5665103,
+    "score_is_new_all_true": {
+      "bullish": true,
+      "bearish": true
+    },
+    "available_ns_minus_decision_ns": {
+      "bullish": {
+        "min": 0,
+        "max": 0
+      },
+      "bearish": {
+        "min": 0,
+        "max": 0
+      }
+    },
+    "probability_present_by_in_domain": {
+      "bullish": {
+        "False": {
+          "rows": 4446640,
+          "probability_present": 4066691,
+          "pct": 91.46
+        },
+        "True": {
+          "rows": 1218463,
+          "probability_present": 1123834,
+          "pct": 92.23
+        }
+      },
+      "bearish": {
+        "False": {
+          "rows": 4677743,
+          "probability_present": 4301268,
+          "pct": 91.95
+        },
+        "True": {
+          "rows": 987360,
+          "probability_present": 904560,
+          "pct": 91.61
+        }
+      }
+    },
+    "feature_complete_determines_probability": {
+      "bullish": {
+        "mismatches": 0
+      },
+      "bearish": {
+        "mismatches": 0
+      }
+    }
+  },
+  "columns": {
+    "in_domain_score": {
+      "canonical_source_table": "canonical_regime_scores_all.parquet",
+      "carried_forward": false,
+      "as_of_join": false,
+      "reconstructed": false,
+      "true_model_dispatch_at_timestamp": true,
+      "causally_available_at_decision_ns": true,
+      "availability_evidence": "score_available_ns - checkpoint_decision_ns == 0 for all 5,665,103 RTH rows (min == max == 0)",
+      "dispatch_evidence": "*_score_is_new is true for 100% of RTH rows",
+      "defined_at": "implementation/phase0_gate1.py:115-117",
+      "expression": "when(direction == 1).then(bullish_probability).otherwise(bearish_probability)",
+      "source_columns": [
+        "bullish_probability",
+        "bearish_probability"
+      ],
+      "gated_by_in_domain_flag": false,
+      "model": "the model whose DOMAIN is the new regime (bullish model when regime_direction == +1)",
+      "regime_direction": "matches the new regime's direction",
+      "feature_contract_valid": "yes where *_feature_complete is true, which is exactly where the probability is non-null",
+      "NAME_IS_A_MISNOMER": "This column is NOT gated on the *_in_domain flag. It is the raw probability of the domain-matching model. The name caused a real misreading during the study and is the direct source of the apparent conflict with Codex. Renamed score_b in the panel."
+    },
+    "ood_score": {
+      "canonical_source_table": "canonical_regime_scores_all.parquet",
+      "carried_forward": false,
+      "as_of_join": false,
+      "reconstructed": false,
+      "true_model_dispatch_at_timestamp": true,
+      "causally_available_at_decision_ns": true,
+      "availability_evidence": "score_available_ns - checkpoint_decision_ns == 0 for all 5,665,103 RTH rows (min == max == 0)",
+      "dispatch_evidence": "*_score_is_new is true for 100% of RTH rows",
+      "defined_at": "implementation/phase0_gate1.py:112-114",
+      "expression": "when(direction == 1).then(bearish_probability).otherwise(bullish_probability)",
+      "source_columns": [
+        "bearish_probability",
+        "bullish_probability"
+      ],
+      "gated_by_in_domain_flag": false,
+      "model": "the OTHER model, out of its own domain by construction",
+      "regime_direction": "opposite of the new regime's direction",
+      "feature_contract_valid": "same rule"
+    },
+    "score_b": {
+      "canonical_source_table": "canonical_regime_scores_all.parquet",
+      "carried_forward": false,
+      "as_of_join": false,
+      "reconstructed": false,
+      "true_model_dispatch_at_timestamp": true,
+      "causally_available_at_decision_ns": true,
+      "availability_evidence": "score_available_ns - checkpoint_decision_ns == 0 for all 5,665,103 RTH rows (min == max == 0)",
+      "dispatch_evidence": "*_score_is_new is true for 100% of RTH rows",
+      "defined_at": "implementation/build_panel.py:120-123",
+      "expression": "identical to in_domain_score",
+      "gated_by_in_domain_flag": false,
+      "note": "The panel's name for in_domain_score. SPEC 1.2 documents it as 'stream B, domain-model raw, ungated'."
+    },
+    "score_c": {
+      "canonical_source_table": "canonical_regime_scores_all.parquet",
+      "carried_forward": false,
+      "as_of_join": false,
+      "reconstructed": false,
+      "true_model_dispatch_at_timestamp": true,
+      "causally_available_at_decision_ns": true,
+      "availability_evidence": "score_available_ns - checkpoint_decision_ns == 0 for all 5,665,103 RTH rows (min == max == 0)",
+      "dispatch_evidence": "*_score_is_new is true for 100% of RTH rows",
+      "defined_at": "implementation/build_panel.py:124-126",
+      "expression": "identical to ood_score",
+      "gated_by_in_domain_flag": false
+    },
+    "stream_a_in_domain": {
+      "defined_at": "implementation/build_panel.py:129-131",
+      "expression": "when(direction == 1).then(bullish_in_domain).otherwise(bearish_in_domain)",
+      "gated_by_in_domain_flag": true,
+      "role": "carried ONLY so the report can quantify how outcome-dependent stream A is. Never used as a predictor."
+    }
+  }
+}

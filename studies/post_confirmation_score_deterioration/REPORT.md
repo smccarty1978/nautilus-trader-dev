@@ -15,10 +15,38 @@ the trade.** Both halves of that sentence are strongly supported.
 Answering the brief's seven questions directly:
 
 **1. Does post-confirmation score deterioration predict regime failure?**
-Yes, and strongly — but only after fixing the sign. Landmark AUC for failure on
-the domain-model score is **0.684 / 0.735 / 0.753 / 0.780** at 60 / 120 / 180 /
+Yes, and strongly — but only after fixing the sign, and only as **exploratory
+out-of-domain evidence** (see the box below). Landmark AUC for failure on the
+domain-model raw score is **0.684 / 0.735 / 0.753 / 0.780** at 60 / 120 / 180 /
 300s, monotone in horizon, on 100% coverage of failed trades. Precision at a
 0.85-quantile cutoff reaches 0.75 against a 0.45 base rate.
+
+> ### ⚠ These AUCs are exploratory out-of-domain evidence, not deployable evidence
+>
+> Reconciliation against an independent Codex replication
+> ([`reconciliation/`](reconciliation/SCORE_STREAM_RECONCILIATION_REPORT.md),
+> verdict **B**) quantified something this report originally stated only
+> qualitatively. The share of evaluated trades holding a **contract-valid
+> in-domain** score is:
+>
+> | landmark | contract-valid | of alive |
+> |---|---:|---:|
+> | 60s | **0** | 4,594 (**0.0%**) |
+> | 120s | **0** | 4,403 (**0.0%**) |
+> | 180s | 61 | 3,908 (1.6%) |
+> | 300s | 525 | 3,209 (16.4%) |
+>
+> At the two earliest landmarks **not one evaluation was contract-valid.** The
+> scores are genuine, causally available dispatches — `*_score_is_new` true for
+> 100% of rows, `*_score_available_ns − checkpoint_decision_ns == 0` for all
+> 5,665,103 RTH rows, nothing carried forward or as-of joined — but they are read
+> outside the frozen model's domain contract. A live system honouring that
+> contract would have no score to read at 60s or 120s in *any* of these trades.
+>
+> Codex's strict in-domain counts (32 / 127 / 1,628 / 72; failures 159/2,181)
+> **reproduce exactly** through an independent code path. The two studies never
+> disagreed about a number — only about which stream to count. This does not
+> change the terminal label, which rests on the placebo null.
 
 **2. Which deterioration behaviour is most informative?**
 The score **level at a fixed elapsed time**. Nothing else. Path-threshold events

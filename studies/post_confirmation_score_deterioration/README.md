@@ -50,6 +50,20 @@ Stream B is read outside its contractual domain, so **the frozen Top-10/5/2.5/1
 thresholds do not transfer to it.** Threshold-loss events are reported NOT
 APPLICABLE rather than reconstructed from invented cutoffs.
 
+**How far outside the domain?** Almost entirely, at the early landmarks. Share of
+evaluated trades holding a contract-valid in-domain score: **0.0% at 60s, 0.0% at
+120s**, 1.6% at 180s, 16.4% at 300s. The scores are real causally-available
+dispatches (nothing carried forward; `available_ns == decision_ns` for all 5.67M
+RTH rows), but **the AUCs are exploratory out-of-domain evidence, not deployable
+evidence.** See [`reconciliation/`](reconciliation/SCORE_STREAM_RECONCILIATION_REPORT.md)
+— verdict **B**, which also reproduces the Codex replication's strict in-domain
+counts exactly.
+
+The column that produced these was originally named `in_domain_score`, which was
+a **misnomer** — it is not gated on the `*_in_domain` flag. Renamed
+`domain_model_raw_score`. If you are comparing against another implementation,
+check which side of that flag it sits on before concluding the results conflict.
+
 ### 3. Landmark evaluation is mandatory
 
 Every diagnostic is evaluated at a **fixed elapsed time from confirmation, among

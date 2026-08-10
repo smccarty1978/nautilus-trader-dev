@@ -1,0 +1,208 @@
+{
+  "landmarks": [
+    {
+      "landmark_s": 60,
+      "n_alive": 4594,
+      "n_with_true_dispatch_at_or_before": 4594,
+      "n_with_raw_domain_score": 4594,
+      "n_with_contract_valid_in_domain_score": 0,
+      "n_study_used_score_despite_in_domain_false": 4594,
+      "n_carried_or_as_of_prior_score": 0,
+      "carried_note": "zero by construction: every score row is a true dispatch (*_score_is_new true for 100% of rows) and the study never forward-fills; the landmark takes the most recent REAL dispatch at or before it",
+      "score_age_at_landmark_s": {
+        "median": 5.0,
+        "p90": 5.0,
+        "max": 55.0
+      },
+      "by_outcome": {
+        "CONFIRMED_THEN_STOPPED": {
+          "n_alive": 762,
+          "with_raw_domain_score": 762,
+          "with_contract_valid_in_domain": 0,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.0
+        },
+        "FINAL_FLIP_EXIT_LOSER": {
+          "n_alive": 1359,
+          "with_raw_domain_score": 1359,
+          "with_contract_valid_in_domain": 0,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.0
+        },
+        "FINAL_FLIP_EXIT_WINNER": {
+          "n_alive": 2350,
+          "with_raw_domain_score": 2350,
+          "with_contract_valid_in_domain": 0,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.0
+        },
+        "SESSION_EXIT": {
+          "n_alive": 123,
+          "with_raw_domain_score": 123,
+          "with_contract_valid_in_domain": 0,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.0
+        }
+      },
+      "failures_vs_winners": {
+        "failures_raw_pct": 100.0,
+        "failures_strict_pct": 0.0,
+        "winners_raw_pct": 100.0,
+        "winners_strict_pct": 0.0
+      }
+    },
+    {
+      "landmark_s": 120,
+      "n_alive": 4403,
+      "n_with_true_dispatch_at_or_before": 4403,
+      "n_with_raw_domain_score": 4403,
+      "n_with_contract_valid_in_domain_score": 0,
+      "n_study_used_score_despite_in_domain_false": 4403,
+      "n_carried_or_as_of_prior_score": 0,
+      "carried_note": "zero by construction: every score row is a true dispatch (*_score_is_new true for 100% of rows) and the study never forward-fills; the landmark takes the most recent REAL dispatch at or before it",
+      "score_age_at_landmark_s": {
+        "median": 4.999999999999986,
+        "p90": 4.999999999999986,
+        "max": 55.0
+      },
+      "by_outcome": {
+        "CONFIRMED_THEN_STOPPED": {
+          "n_alive": 608,
+          "with_raw_domain_score": 608,
+          "with_contract_valid_in_domain": 0,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.0
+        },
+        "FINAL_FLIP_EXIT_LOSER": {
+          "n_alive": 1325,
+          "with_raw_domain_score": 1325,
+          "with_contract_valid_in_domain": 0,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.0
+        },
+        "FINAL_FLIP_EXIT_WINNER": {
+          "n_alive": 2350,
+          "with_raw_domain_score": 2350,
+          "with_contract_valid_in_domain": 0,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.0
+        },
+        "SESSION_EXIT": {
+          "n_alive": 120,
+          "with_raw_domain_score": 120,
+          "with_contract_valid_in_domain": 0,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.0
+        }
+      },
+      "failures_vs_winners": {
+        "failures_raw_pct": 100.0,
+        "failures_strict_pct": 0.0,
+        "winners_raw_pct": 100.0,
+        "winners_strict_pct": 0.0
+      }
+    },
+    {
+      "landmark_s": 180,
+      "n_alive": 3908,
+      "n_with_true_dispatch_at_or_before": 3908,
+      "n_with_raw_domain_score": 3908,
+      "n_with_contract_valid_in_domain_score": 61,
+      "n_study_used_score_despite_in_domain_false": 3847,
+      "n_carried_or_as_of_prior_score": 0,
+      "carried_note": "zero by construction: every score row is a true dispatch (*_score_is_new true for 100% of rows) and the study never forward-fills; the landmark takes the most recent REAL dispatch at or before it",
+      "score_age_at_landmark_s": {
+        "median": 0.0,
+        "p90": 0.0,
+        "max": 85.0
+      },
+      "by_outcome": {
+        "CONFIRMED_THEN_STOPPED": {
+          "n_alive": 476,
+          "with_raw_domain_score": 476,
+          "with_contract_valid_in_domain": 3,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.63
+        },
+        "FINAL_FLIP_EXIT_LOSER": {
+          "n_alive": 999,
+          "with_raw_domain_score": 999,
+          "with_contract_valid_in_domain": 7,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 0.7
+        },
+        "FINAL_FLIP_EXIT_WINNER": {
+          "n_alive": 2320,
+          "with_raw_domain_score": 2320,
+          "with_contract_valid_in_domain": 49,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 2.11
+        },
+        "SESSION_EXIT": {
+          "n_alive": 113,
+          "with_raw_domain_score": 113,
+          "with_contract_valid_in_domain": 2,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 1.77
+        }
+      },
+      "failures_vs_winners": {
+        "failures_raw_pct": 100.0,
+        "failures_strict_pct": 0.68,
+        "winners_raw_pct": 100.0,
+        "winners_strict_pct": 2.11
+      }
+    },
+    {
+      "landmark_s": 300,
+      "n_alive": 3209,
+      "n_with_true_dispatch_at_or_before": 3209,
+      "n_with_raw_domain_score": 3209,
+      "n_with_contract_valid_in_domain_score": 525,
+      "n_study_used_score_despite_in_domain_false": 2684,
+      "n_carried_or_as_of_prior_score": 0,
+      "carried_note": "zero by construction: every score row is a true dispatch (*_score_is_new true for 100% of rows) and the study never forward-fills; the landmark takes the most recent REAL dispatch at or before it",
+      "score_age_at_landmark_s": {
+        "median": 0.0,
+        "p90": 0.0,
+        "max": 80.0
+      },
+      "by_outcome": {
+        "CONFIRMED_THEN_STOPPED": {
+          "n_alive": 266,
+          "with_raw_domain_score": 266,
+          "with_contract_valid_in_domain": 15,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 5.64
+        },
+        "FINAL_FLIP_EXIT_LOSER": {
+          "n_alive": 618,
+          "with_raw_domain_score": 618,
+          "with_contract_valid_in_domain": 52,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 8.41
+        },
+        "FINAL_FLIP_EXIT_WINNER": {
+          "n_alive": 2233,
+          "with_raw_domain_score": 2233,
+          "with_contract_valid_in_domain": 438,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 19.61
+        },
+        "SESSION_EXIT": {
+          "n_alive": 92,
+          "with_raw_domain_score": 92,
+          "with_contract_valid_in_domain": 20,
+          "raw_coverage_pct": 100.0,
+          "strict_coverage_pct": 21.74
+        }
+      },
+      "failures_vs_winners": {
+        "failures_raw_pct": 100.0,
+        "failures_strict_pct": 7.58,
+        "winners_raw_pct": 100.0,
+        "winners_strict_pct": 19.61
+      }
+    }
+  ]
+}

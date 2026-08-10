@@ -6,9 +6,29 @@ a median 352-448s after confirmation while failed trades die at a median
 217-300s. Availability is determined by the outcome, which is an unfixable
 selection bias, not a small-sample problem.
 
-The only stream with complete coverage is the OUT-OF-DOMAIN (exploratory) score
-of the model that is not in-domain for the new regime. This module tests whether
-it carries management information.
+The only stream with complete coverage is the **raw, ungated** probability of the
+model whose domain is the new regime. This module tests whether it carries
+management information.
+
+**That stream is read OUTSIDE the frozen model's domain contract, and almost
+totally so at the early landmarks.** Quantified by the reconciliation against the
+Codex replication (`reconciliation/landmark_availability_reconciliation.json`),
+the share of evaluated trades holding a contract-valid in-domain score is:
+
+    60s    0 of 4,594   (0.0%)
+    120s   0 of 4,403   (0.0%)
+    180s  61 of 3,908   (1.6%)
+    300s 525 of 3,209  (16.4%)
+
+The scores are genuine causally-available dispatches -- `*_score_is_new` is true
+for 100% of rows, `*_score_available_ns - checkpoint_decision_ns == 0` for all
+5,665,103 RTH rows, and nothing is carried forward or as-of joined. But the AUC
+this module reports is **exploratory out-of-domain evidence, not deployable
+evidence**, and must be cited as such.
+
+The column was originally named `in_domain_score`, which was a misnomer -- it is
+not gated on the `*_in_domain` flag -- and that name is the direct cause of an
+apparent conflict with the Codex replication. Renamed `domain_model_raw_score`.
 
 **Landmark design.** Everything is evaluated at a FIXED elapsed time from
 confirmation, among trades still open at that time. This is deliberate:
@@ -112,7 +132,7 @@ def build_panel() -> pl.DataFrame:
             ood_score=pl.when(pl.col("direction") == 1)
             .then(pl.col("bearish_probability"))
             .otherwise(pl.col("bullish_probability")),
-            in_domain_score=pl.when(pl.col("direction") == 1)
+            domain_model_raw_score=pl.when(pl.col("direction") == 1)
             .then(pl.col("bullish_probability"))
             .otherwise(pl.col("bearish_probability")),
         )
@@ -186,14 +206,14 @@ def main() -> None:
             "FINAL_FLIP_EXIT_WINNER. 0.50 = no information."
         ),
         "ood_score": [],
-        "in_domain_score": [],
+        "domain_model_raw_score": [],
     }
     for h in HORIZONS_S:
         report["ood_score"].append(landmark(post, h, "ood_score"))
-        report["in_domain_score"].append(landmark(post, h, "in_domain_score"))
+        report["domain_model_raw_score"].append(landmark(post, h, "domain_model_raw_score"))
 
     (OUT / "phase0_gate1.json").write_text(json.dumps(report, indent=2, default=str))
-    for stream in ("ood_score", "in_domain_score"):
+    for stream in ("ood_score", "domain_model_raw_score"):
         print(f"\n=== {stream}")
         for r in report[stream]:
             if not r.get("n"):
