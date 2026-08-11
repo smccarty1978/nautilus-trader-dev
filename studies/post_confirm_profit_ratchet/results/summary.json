@@ -1,0 +1,274 @@
+{
+  "study": "post_confirm_profit_ratchet",
+  "label": "D",
+  "label_text": "GEOMETRY SEPARATES BUT ECONOMICS DO NOT",
+  "gate_open": false,
+  "n_cells_evaluated": 126,
+  "n_cells_passing_all_7": 0,
+  "n_cells_passing_conditions_1_and_2": 2,
+  "cells_passing_1_and_2": [
+    "rung_4_0__D_1_25__LADDER_STATIC",
+    "rung_4_0__D_1_25__STATIC"
+  ],
+  "all_validation_gates_passed": true,
+  "population_reconciliation_passed": true,
+  "Q1_retracement_required_by_successful_continuation": {
+    "1.0": {
+      "n": 2447,
+      "median": 0.5258823438170447,
+      "p75": 0.8926963926047775,
+      "p90": 1.3877246945023345,
+      "p95": 1.6403265317299816
+    },
+    "1.5": {
+      "n": 2391,
+      "median": 0.5946981650800762,
+      "p75": 1.040224663650316,
+      "p90": 1.559942876731524,
+      "p95": 1.9046189684903996
+    },
+    "2.0": {
+      "n": 2023,
+      "median": 0.563087624244794,
+      "p75": 0.9644461769413246,
+      "p90": 1.518048508514265,
+      "p95": 1.8858236995284607
+    },
+    "2.5": {
+      "n": 1685,
+      "median": 0.5911612936946717,
+      "p75": 1.0254703002436494,
+      "p90": 1.6989792915686606,
+      "p95": 2.0408425166625133
+    },
+    "3.0": {
+      "n": 1344,
+      "median": 0.5586593788027683,
+      "p75": 1.0181724558182337,
+      "p90": 1.5918360137790777,
+      "p95": 1.9711048009486791
+    },
+    "4.0": {
+      "n": 871,
+      "median": 0.5461236480612679,
+      "p75": 0.9856193583978734,
+      "p90": 1.436748219723365,
+      "p95": 1.9195866617522443
+    }
+  },
+  "Q2_stop_distance_for_85_90_95pct_preservation": {
+    "STATIC_rung_1.0": {
+      "D_for_85pct": 1.0,
+      "D_for_90pct": 1.25,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 92.52
+    },
+    "HWM_rung_1.0": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 86.88
+    },
+    "LADDER_STATIC_rung_1.0": {
+      "D_for_85pct": 1.0,
+      "D_for_90pct": 1.25,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 92.52
+    },
+    "STATIC_rung_1.5": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 88.46
+    },
+    "HWM_rung_1.5": {
+      "D_for_85pct": null,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 82.27
+    },
+    "LADDER_STATIC_rung_1.5": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 88.46
+    },
+    "STATIC_rung_2.0": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 89.67
+    },
+    "HWM_rung_2.0": {
+      "D_for_85pct": null,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 83.89
+    },
+    "LADDER_STATIC_rung_2.0": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 89.67
+    },
+    "STATIC_rung_2.5": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 86.47
+    },
+    "HWM_rung_2.5": {
+      "D_for_85pct": null,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 81.6
+    },
+    "LADDER_STATIC_rung_2.5": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 86.47
+    },
+    "STATIC_rung_3.0": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 87.95
+    },
+    "HWM_rung_3.0": {
+      "D_for_85pct": null,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 81.85
+    },
+    "LADDER_STATIC_rung_3.0": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 87.95
+    },
+    "STATIC_rung_4.0": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": 1.25,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 90.82
+    },
+    "HWM_rung_4.0": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": null,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 85.53
+    },
+    "LADDER_STATIC_rung_4.0": {
+      "D_for_85pct": 1.25,
+      "D_for_90pct": 1.25,
+      "D_for_95pct": null,
+      "max_survival_on_grid": 90.82
+    }
+  },
+  "Q3_are_failures_distinguishable_auc": {
+    "1.0": {
+      "auc_raw_DURATION_CONFOUNDED": 0.9727122732604533,
+      "auc_matched_h30s": 0.6701905840221677,
+      "auc_matched_h60s": 0.7141693172055558,
+      "auc_matched_h120s": 0.7502952875269937
+    },
+    "1.5": {
+      "auc_raw_DURATION_CONFOUNDED": 0.9616008731441604,
+      "auc_matched_h30s": 0.626688168720791,
+      "auc_matched_h60s": 0.6721100020974551,
+      "auc_matched_h120s": 0.7256371804677952
+    },
+    "2.0": {
+      "auc_raw_DURATION_CONFOUNDED": 0.9681458921329442,
+      "auc_matched_h30s": 0.6356443905835579,
+      "auc_matched_h60s": 0.6734754622911784,
+      "auc_matched_h120s": 0.7075894241314489
+    },
+    "2.5": {
+      "auc_raw_DURATION_CONFOUNDED": 0.962444740507479,
+      "auc_matched_h30s": 0.654087688487858,
+      "auc_matched_h60s": 0.6718464240295525,
+      "auc_matched_h120s": 0.7037591594501302
+    },
+    "3.0": {
+      "auc_raw_DURATION_CONFOUNDED": 0.9603692201518288,
+      "auc_matched_h30s": 0.6209605762594893,
+      "auc_matched_h60s": 0.6363375603864734,
+      "auc_matched_h120s": 0.6639277087646653
+    },
+    "4.0": {
+      "auc_raw_DURATION_CONFOUNDED": 0.9597124021382818,
+      "auc_matched_h30s": 0.5624159051592023,
+      "auc_matched_h60s": 0.5959915009013408,
+      "auc_matched_h120s": 0.639822121553735
+    }
+  },
+  "Q4_profit_floor_without_tail_sacrifice": {
+    "answer": "NO",
+    "evidence": "no cell clears >=90% preservation together with >=80% >=3 ATR runner survival and positive economics"
+  },
+  "Q5_static_vs_high_water": {
+    "static_preserves_more_at_same_D": true,
+    "hwm_better_economics_at_high_rungs": true
+  },
+  "Q6_where_protection_becomes_justified": {
+    "best_cell": "rung 4.0 / D 1.25 / HWM",
+    "delta_per_original_entry": 0.015535619402164424,
+    "ci_lo": -0.0018835603496304306,
+    "ci_hi": 0.03143977069700899,
+    "ci_spans_zero": true,
+    "absolute_net_per_original_entry": -0.06099402316113144,
+    "years_positive_of_5": 4,
+    "both_sides_positive": true,
+    "runner_tiers": [
+      {
+        "tier_atr": 2.0,
+        "n_tier": 1134,
+        "runner_survival_pct": 100.0,
+        "runner_pnl_retained": 1.0321831570022706
+      },
+      {
+        "tier_atr": 2.5,
+        "n_tier": 1134,
+        "runner_survival_pct": 100.0,
+        "runner_pnl_retained": 1.0321831570022706
+      },
+      {
+        "tier_atr": 3.0,
+        "n_tier": 1134,
+        "runner_survival_pct": 100.0,
+        "runner_pnl_retained": 1.0321831570022706
+      },
+      {
+        "tier_atr": 4.0,
+        "n_tier": 1134,
+        "runner_survival_pct": 100.0,
+        "runner_pnl_retained": 1.0321831570022706
+      },
+      {
+        "tier_atr": 5.0,
+        "n_tier": 760,
+        "runner_survival_pct": 71.84210526315789,
+        "runner_pnl_retained": 0.9324217581658634
+      }
+    ]
+  },
+  "Q7_pct_of_giveback_pool_recoverable": {
+    "best_pct": 1.7298652278397997,
+    "pool_per_entry": 0.8980826455229006,
+    "target_band_pct": "35-50 (the program's stated bar)"
+  },
+  "Q8_can_the_payoff_function_replace_prediction": {
+    "answer": "NO",
+    "reason": "the retracement a successful continuation requires (median 0.53-0.60, p90 1.39-1.70 ATR) overlaps the retracement a failed one shows in its first comparable window; no frozen stop distance separates them"
+  },
+  "bootstrap_draws": 1000,
+  "denominator": 8950,
+  "disclosures": [
+    "2025 is NOT threshold-OOS (inherited waiver)",
+    "runner_survival at a tier <= the arming rung is TAUTOLOGICAL (a >=T runner necessarily reaches the T rung and is alive at that touch by construction); only tiers STRICTLY ABOVE the arming rung are informative",
+    "auc_raw is DURATION-CONFOUNDED and is never quoted alone",
+    "2026 sealed and never read"
+  ]
+}

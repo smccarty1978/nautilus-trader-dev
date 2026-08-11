@@ -1,0 +1,48 @@
+{
+  "agent": "contract-checker",
+  "pass": 1,
+  "date": "2026-08-11",
+  "blocking": 0,
+  "critical": 0,
+  "warning": 0,
+  "not_verified": 0,
+  "note": 1,
+  "verdict": "CLEAR",
+  "deliverables_manifest_present": true,
+  "prior_findings_adjudicated": true,
+  "referral_from_lookahead_pass_01_resolved": "implementation/validate.py now exists",
+  "extra_artifacts_not_in_manifest": [
+    "results/trade_panel.parquet",
+    "results/path_examples_index.csv",
+    "results/path_examples_index.parquet",
+    "results/gate_verdict.json"
+  ],
+  "note_findings": [
+    "four intermediate/derived artifacts are not manifest rows; documented in README under Layout"
+  ],
+  "remediated_after_report": [
+    "WARNING (master_tradeoff.csv had no explicit empty-cell flag, relying on n_achieving==0) FIXED: an explicit `empty_cell` boolean column is now selected into master_tradeoff, so SPEC section 7 completeness is checkable without inference"
+  ],
+  "verified": {
+    "manifest_rows_present": "22/22",
+    "csv_mirrors": "present for #1, #3, #5-#9, #11-#17; #2/#4/#10 parquet-only by design",
+    "terminal_labels_reachable": "6/6 (A, B, C, D, E, H) via distinct non-dead branches in analysis/close_out.py",
+    "verdict_mechanically_produced": true,
+    "seal_2026": "absent from every produced table; partition_manifest.years = [2021..2025]",
+    "disclosures_present": [
+      "2025 is NOT threshold-OOS",
+      "tautological runner survival at tiers <= arming rung",
+      "auc_raw is DURATION_CONFOUNDED"
+    ],
+    "domain_completeness": {
+      "partitions": 10,
+      "master_cells": 126,
+      "rung_achievement_stratum_rows": 24,
+      "transitions_equals_2x_events": true
+    },
+    "report_figures_verified": ">= 10, byte-for-byte to reported precision",
+    "C4_promotion_gate": "all 7 frozen conditions implemented per cell; 882 gate rows",
+    "D_train_serve_skew": "NOT_APPLICABLE - descriptive offline study, no live-scored model",
+    "E_backtest_configuration": "NOT_APPLICABLE - no BacktestEngine; fill convention inherited unchanged and re-verified by gate h4_fill_never_at_trigger"
+  }
+}
