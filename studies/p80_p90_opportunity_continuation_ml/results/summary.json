@@ -1,0 +1,266 @@
+{
+  "model_a": {
+    "gates": {
+      "P80": {
+        "gates": {
+          "A-1 MONOTONIC": {
+            "spearman": -0.7500000000000002,
+            "inversions": 4,
+            "threshold": "spearman>=0.80 and inversions<=1",
+            "passed": false
+          },
+          "A-2 TAIL": {
+            "baseline_win_pct": 29.764243614931235,
+            "top10_win_pct": 26.47058823529412,
+            "top5_win_pct": 25.49019607843137,
+            "top10_lift_pp": -3.2936553796371157,
+            "top5_lift_pp": -4.2740475364998645,
+            "threshold": ">=+5.0pp both",
+            "passed": false
+          },
+          "A-3 BOTH FOLDS": {
+            "fold_top10_lift_pp": {
+              "FOLD_1": -0.3700312809948869,
+              "FOLD_2": -3.74603174603174
+            },
+            "threshold": "both >0",
+            "passed": false
+          },
+          "A-4 DIRECTION": {
+            "side_top10_lift_pp": {
+              "LONG": 9.770140794386215,
+              "SHORT": -8.620455317703026
+            },
+            "threshold": "neither below its own baseline",
+            "passed": false
+          },
+          "A-5 ECONOMICS": {
+            "baseline_net_atr": -0.0841645036071215,
+            "top10_net_atr": -0.14416027345439997,
+            "ci95": [
+              -0.28348279987062014,
+              -0.007981927943358471
+            ],
+            "threshold": ">0, >baseline, CI_lo>0",
+            "passed": false
+          },
+          "A-6 SAMPLE": {
+            "top5_n": 51,
+            "threshold": ">=30",
+            "passed": true
+          },
+          "A-7 FAMILIES": {
+            "auc": {
+              "ABL_MARKET": 0.5225368690715225,
+              "ABL_STATE": 0.5313715986983314,
+              "ABL_ALL": 0.54001246278474
+            },
+            "best_single": 0.5313715986983314,
+            "combined_minus_best": 0.008640864086408628,
+            "clause_combined_beats_best_by_0_02": false,
+            "clause_single_family_already_sufficient": false,
+            "threshold": ">=0.02 OR one family already passes A1-A6",
+            "passed": false
+          }
+        },
+        "n_passed": 1,
+        "all_passed": false
+      },
+      "P90": {
+        "gates": {
+          "A-1 MONOTONIC": {
+            "spearman": -0.7500000000000002,
+            "inversions": 4,
+            "threshold": "spearman>=0.80 and inversions<=1",
+            "passed": false
+          },
+          "A-2 TAIL": {
+            "baseline_win_pct": 29.705215419501137,
+            "top10_win_pct": 32.95454545454545,
+            "top5_win_pct": 29.545454545454547,
+            "top10_lift_pp": 3.2493300350443164,
+            "top5_lift_pp": -0.15976087404659012,
+            "threshold": ">=+5.0pp both",
+            "passed": false
+          },
+          "A-3 BOTH FOLDS": {
+            "fold_top10_lift_pp": {
+              "FOLD_1": 6.825043306112349,
+              "FOLD_2": -0.4833771953381003
+            },
+            "threshold": "both >0",
+            "passed": false
+          },
+          "A-4 DIRECTION": {
+            "side_top10_lift_pp": {
+              "LONG": 0.75,
+              "SHORT": 7.41701244813278
+            },
+            "threshold": "neither below its own baseline",
+            "passed": true
+          },
+          "A-5 ECONOMICS": {
+            "baseline_net_atr": -0.09124505030819795,
+            "top10_net_atr": -0.042703762820948184,
+            "ci95": [
+              -0.18067710040798005,
+              0.11101622773833492
+            ],
+            "threshold": ">0, >baseline, CI_lo>0",
+            "passed": false
+          },
+          "A-6 SAMPLE": {
+            "top5_n": 44,
+            "threshold": ">=30",
+            "passed": true
+          },
+          "A-7 FAMILIES": {
+            "auc": {
+              "ABL_MARKET": 0.5264035951736026,
+              "ABL_STATE": 0.5143191332184192,
+              "ABL_ALL": 0.5393006648608717
+            },
+            "best_single": 0.5264035951736026,
+            "combined_minus_best": 0.012897069687269114,
+            "clause_combined_beats_best_by_0_02": false,
+            "clause_single_family_already_sufficient": false,
+            "threshold": ">=0.02 OR one family already passes A1-A6",
+            "passed": false
+          }
+        },
+        "n_passed": 2,
+        "all_passed": false
+      }
+    },
+    "baselines_300s": [
+      {
+        "prime": "P80",
+        "slice": "POOLED",
+        "value": "ALL",
+        "horizon_s": 300,
+        "n": 2063,
+        "win_pct": 30.29568589432865,
+        "loss_pct": 66.7959282598158,
+        "timeout_pct": 2.90838584585555,
+        "win_ci_lo": 28.3508320891055,
+        "win_ci_hi": 32.313785097350284,
+        "p_win_given_resolved": 31.203195207189218,
+        "win_pct_optimistic": 30.29568589432865,
+        "n_ambiguous": 0,
+        "mfe_mean": 1.0665312925816857,
+        "mfe_median": 0.8678187764882925,
+        "mae_mean": 1.1347377953693916,
+        "mae_median": 0.9276041363692356,
+        "mfe_over_mae": 0.939892279021602,
+        "median_secs_to_win": 83.0,
+        "median_secs_to_loss": 42.0,
+        "confirm_rate_pct": 34.7067377605429,
+        "win_pct_ref_next_open": 30.97430925836161
+      },
+      {
+        "prime": "P90",
+        "slice": "POOLED",
+        "value": "ALL",
+        "horizon_s": 300,
+        "n": 1771,
+        "win_pct": 30.660643704121966,
+        "loss_pct": 66.62902315076228,
+        "timeout_pct": 2.710333145115754,
+        "win_ci_lo": 28.55698691452143,
+        "win_ci_hi": 32.848016525517444,
+        "p_win_given_resolved": 31.514799767846778,
+        "win_pct_optimistic": 30.660643704121966,
+        "n_ambiguous": 0,
+        "mfe_mean": 1.1015512452619163,
+        "mfe_median": 0.8309586260145646,
+        "mae_mean": 1.1026601940203937,
+        "mae_median": 0.9067824244406344,
+        "mfe_over_mae": 0.9989942969153225,
+        "median_secs_to_win": 76.0,
+        "median_secs_to_loss": 42.0,
+        "confirm_rate_pct": 42.2360248447205,
+        "win_pct_ref_next_open": 31.16883116883117
+      }
+    ]
+  },
+  "model_b": {
+    "gates": {
+      "B-1 SEPARATION": {
+        "top_minus_bottom_decile_pp": 17.021276595744677,
+        "threshold": ">=15pp",
+        "passed": true
+      },
+      "B-2 MONOTONIC": {
+        "spearman": -0.7857142857142859,
+        "inversions": 4,
+        "threshold": "spearman>=0.80 and inversions<=1",
+        "passed": false
+      },
+      "B-3 BOTH FOLDS": {
+        "fold_separation_pp": {
+          "FOLD_1": 20.833333333333336,
+          "FOLD_2": 5.797101449275366
+        },
+        "threshold": "both >=15pp",
+        "passed": false
+      },
+      "B-4 ECONOMICS": {
+        "bottom_decile_continue_minus_exit_atr": -0.7197865666220643,
+        "ci95_trade_clustered": [
+          -1.3032425442743978,
+          -0.17990555687969254
+        ],
+        "threshold": "<0 with CI excluding 0",
+        "passed": true
+      },
+      "B-5 NOT-COMPOSITION": {
+        "stratified_top10_lift_pp": {
+          "RUNG_2.0": -12.387096774193552,
+          "RUNG_4.0": 7.756463719766465,
+          "RUNG_2.5": -2.284263959390863,
+          "SINCECONF_T3": -0.34249833507753635,
+          "RUNG_1.5": -11.706349206349202,
+          "RUNG_3.0": -3.41614906832298,
+          "SINCECONF_T2": -4.779328725662914,
+          "SINCECONF_T1": -1.9190871369294626,
+          "RUNG_1.0": 8.421052631578945
+        },
+        "threshold": "positive in every stratum",
+        "passed": false
+      },
+      "B-6 BOTH SIDES": {
+        "side_top10_lift_pp": {
+          "LONG": -2.736318407960205,
+          "SHORT": 0.44976823167653635
+        },
+        "threshold": "same sign",
+        "passed": false
+      },
+      "B-7 SAMPLE": {
+        "min_bucket_unique_trades": 7,
+        "threshold": ">=20",
+        "passed": false
+      }
+    },
+    "auc": {
+      "ABL_MARKET": 0.4883332896981318,
+      "ABL_STATE": 0.5337061793487345,
+      "ABL_ALL": 0.5321786116352929
+    },
+    "n_passed": 2,
+    "all_passed": false,
+    "baseline_success_pct": 48.43971631205674
+  },
+  "terminal_labels": {
+    "model_a": "A3 NO USEFUL SIGNAL",
+    "model_b": "B2 WEAK BUT PLAUSIBLE \u2014 FEATURE/DEFINITION WORK WARRANTED",
+    "program": "P4 NEITHER WARRANTS EXPANSION",
+    "model_a_best_prime": "P90",
+    "model_a_gates_passed": {
+      "P80": 1,
+      "P90": 2
+    },
+    "model_b_gates_passed": 2
+  },
+  "validation_all_passed": true
+}

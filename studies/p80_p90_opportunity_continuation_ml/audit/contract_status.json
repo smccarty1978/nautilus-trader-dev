@@ -1,0 +1,26 @@
+{
+  "study": "p80_p90_opportunity_continuation_ml",
+  "agent": "contract-checker",
+  "pass": 1,
+  "date": "2026-08-11",
+  "critical": 0,
+  "warning": 3,
+  "info": 2,
+  "all_deliverables_present": true,
+  "seal_intact": true,
+  "labels_reachable": true,
+  "report_answers_all_questions": true,
+  "verdict": "PASS",
+  "blocking": 0,
+  "not_verified": 1,
+  "deliverables_manifest_present": true,
+  "prior_findings_adjudicated": false,
+  "findings": [
+    {"id": "W1", "severity": "warning", "area": "REPORT format", "desc": "SPEC 15 requires REPORT.md to 'end with exactly three labels'; the three labels appear at the TOP of REPORT.md, not the end.", "evidence": "REPORT.md:1-5 vs SPEC.md:634", "remediation": "FIXED -- the three labels now also close the REPORT."},
+    {"id": "W2", "severity": "warning", "area": "REPORT number accuracy", "desc": "Headline paragraph states pooled OOS AUC '0.539 (P80) and 0.539 (P90)'; actual P80 ABL_ALL AUC is 0.5400.", "evidence": "results/summary.json A-7 auc.ABL_ALL=0.54001246278474 vs REPORT.md:15", "remediation": "FIXED -- headline now reads 0.540 (P80) and 0.539 (P90)."},
+    {"id": "W3", "severity": "warning", "area": "C4/A-7 gate implementation", "desc": "SPEC 10 A-7 allows pass via '>=0.02 OR one family alone already satisfies A-1..A-6'; gates.py implemented only the first clause.", "evidence": "analysis/gates.py:104-107. Did not change this run's verdicts.", "remediation": "FIXED -- the OR-alternative is now implemented and reported as a separate sub-condition."},
+    {"id": "I1", "severity": "info", "area": "Provenance transcription", "desc": "SPEC 2.1 prose gave P80 SHORT as '0.3437437...'; the true frozen value is 0.34374423771129053. Implementation never hardcodes it (reads the parquet contract), so V12 was unaffected.", "evidence": "SPEC.md:75 vs results/provenance.json", "remediation": "FIXED -- SPEC prose now carries the exact frozen values."},
+    {"id": "I2", "severity": "info", "area": "Label completeness assertion", "desc": "SPEC 12 calls for a hard assertion n_candidates*3*2 == n_label_rows; completeness was guaranteed structurally rather than by a literal assertion.", "evidence": "implementation/labels_a.py; results/population_reconciliation.json", "remediation": "FIXED -- assert_label_completeness() now runs in Stage 1 and its result is recorded in validation_report.json."},
+    {"id": "NV1", "severity": "not_verified", "area": "Domain completeness", "desc": "16 Model-A and 48 Model-B partitions were not enumerated as a single inspectable cross-product with zero-cell flags.", "evidence": "population_reconciliation.json carries per-prime quarter/side breakdowns only", "remediation": "FIXED -- results/partition_completeness.csv now enumerates all 64 partitions with is_empty flags."}
+  ]
+}
