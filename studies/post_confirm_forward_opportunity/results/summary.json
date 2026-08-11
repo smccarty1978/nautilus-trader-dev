@@ -1,0 +1,363 @@
+{
+  "study": "post_confirm_forward_opportunity",
+  "date": "2026-08-11",
+  "predecessor": "top10_fast_confirm_runner_path (verdict C)",
+  "population": {
+    "original_top10_entries": 8950,
+    "confirmed": 4705,
+    "measurable_confirmed": 4656,
+    "non_measurable": 49,
+    "dense_observations": 140929,
+    "sparse_observations": 3041,
+    "reconciliation_passed": true,
+    "giveback_pool_per_entry": 0.8980826455229006,
+    "baseline_net_per_entry": -0.07652964256329595
+  },
+  "q1_forward_opportunity_from_a_generic_state": {
+    "forward_mfe_median": 1.1526014568736311,
+    "forward_mfe_mean": 1.9438498883853617,
+    "forward_mae_median": 0.9397429560118089,
+    "forward_mae_mean": 1.0388294917631986,
+    "median_ratio_mfe_over_mae": 1.226507152301706,
+    "cv_stop_live_mean": -0.013202856699925528,
+    "cv_stop_live_median": -0.5729932853009378
+  },
+  "q2_q3_forward_excursion_decay_with_stall": {
+    "stall_buckets": [
+      "0-15",
+      "16-30",
+      "31-45",
+      "46-60",
+      "61-90",
+      "91-120",
+      ">120"
+    ],
+    "fwd_mfe_median": [
+      1.4546022482405725,
+      1.3607422809343548,
+      1.2942846843031008,
+      1.2412231033828949,
+      1.1456920139261046,
+      1.0191292510111154,
+      0.892491083055523
+    ],
+    "fwd_mae_median": [
+      1.1722537390150656,
+      1.090687244983556,
+      1.0466617366906292,
+      0.9875115965284013,
+      0.9321034196208218,
+      0.8776401417183353,
+      0.7889146118410599
+    ],
+    "mfe_over_mae_ratio": [
+      1.2408595509899911,
+      1.2476008014147724,
+      1.236583548372958,
+      1.2569200278218675,
+      1.2291468841431463,
+      1.161215403178526,
+      1.1312898375310234
+    ],
+    "ratio_range": [
+      1.1312898375310234,
+      1.2569200278218675
+    ],
+    "p_another_extreme": [
+      0.8766649866801065,
+      0.7689402038343668,
+      0.7149767108563239,
+      0.6676106565974408,
+      0.6129177377892031,
+      0.5527123848515865,
+      0.47507027371862603
+    ],
+    "consistency_fwd_mfe": {
+      "YEAR": {
+        "monotone_decreasing": 5,
+        "slices": 5
+      },
+      "SIDE": {
+        "monotone_decreasing": 2,
+        "slices": 2
+      }
+    },
+    "consistency_p_another_extreme": {
+      "YEAR": {
+        "monotone_decreasing": 5,
+        "slices": 5
+      },
+      "SIDE": {
+        "monotone_decreasing": 2,
+        "slices": 2
+      }
+    },
+    "finding": "forward MFE and forward MAE decay together; the ratio is nearly constant, so the state predicts the SCALE of what remains, not its SIGN"
+  },
+  "q4_when_does_up050_before_dn050_fall_below_50pct": {
+    "by_stall_all_observations": [
+      0.49240406076751386,
+      0.49533176537666596,
+      0.49346112504478684,
+      0.4939165093350115,
+      0.5025064267352185,
+      0.4815368868593024,
+      0.46374673551165246
+    ],
+    "by_stall_resolved_only": [
+      0.49259912846184317,
+      0.4960388266362144,
+      0.4969330687353419,
+      0.5018115942028986,
+      0.5170270448984989,
+      0.5135180520570949,
+      0.5138502319416832
+    ],
+    "unresolved_share_by_stall": [
+      0.00039599683202534377,
+      0.0014254151521630675,
+      0.006986743102830526,
+      0.015733165512901194,
+      0.028084832904884317,
+      0.062278560743248564,
+      0.09750603058152749
+    ],
+    "answer": "never on a like-for-like basis; the apparent decay is the unresolved share rising as observations sit closer to the trade's own terminal"
+  },
+  "q5_up100_before_dn050": {
+    "pooled": 0.32060824954409667,
+    "range_across_progress_x_stall_cells": [
+      0.2808813843482426,
+      0.35294117647058826
+    ],
+    "range_across_mfe_x_stall_cells": [
+      0.2959650957343237,
+      0.3566988950276243
+    ]
+  },
+  "q6_does_recent_progress_help": {
+    "progress60_buckets": [
+      {
+        "progress_bucket": "STRONG_NEG",
+        "p_up050_b_dn050": 0.44700094419321174,
+        "fwd_mfe_median": 0.7679884358539606,
+        "fwd_mae_median": 0.7239056819811173,
+        "p_another_extreme": 0.4058291507230532,
+        "mean_cv_stop_live": -0.010894417242540642
+      },
+      {
+        "progress_bucket": "NEG",
+        "p_up050_b_dn050": 0.49232127096204764,
+        "fwd_mfe_median": 1.1037831921689092,
+        "fwd_mae_median": 0.902712164821811,
+        "p_another_extreme": 0.588702559576346,
+        "mean_cv_stop_live": -0.014111729131261703
+      },
+      {
+        "progress_bucket": "FLAT",
+        "p_up050_b_dn050": 0.5091394975948691,
+        "fwd_mfe_median": 1.2171588054212448,
+        "fwd_mae_median": 0.9331806952418225,
+        "p_another_extreme": 0.6475681453768038,
+        "mean_cv_stop_live": 0.004619000245101763
+      },
+      {
+        "progress_bucket": "POS",
+        "p_up050_b_dn050": 0.4986427952642218,
+        "fwd_mfe_median": 1.2301400559343378,
+        "fwd_mae_median": 0.9921383222172921,
+        "p_another_extreme": 0.6908460872076234,
+        "mean_cv_stop_live": -0.031667731933979676
+      },
+      {
+        "progress_bucket": "STRONG_POS",
+        "p_up050_b_dn050": 0.49869918699186994,
+        "fwd_mfe_median": 1.452197079582376,
+        "fwd_mae_median": 1.1298900026717749,
+        "p_another_extreme": 0.8052729384436702,
+        "mean_cv_stop_live": -0.006435639470199253
+      }
+    ]
+  },
+  "q7_does_accumulated_mfe_change_the_meaning_of_a_stall": {
+    "p_up050_b_dn050_range": [
+      0.4539718025457037,
+      0.5224447513812155
+    ],
+    "cv_range": [
+      -0.10266298809601403,
+      0.13151554264789822
+    ]
+  },
+  "q8_does_drawdown_become_informative": {
+    "p_up050_b_dn050_range": [
+      0.45018577923426645,
+      0.5166666666666667
+    ],
+    "cv_range": [
+      -0.09032928967845653,
+      0.017697688838892483
+    ]
+  },
+  "q9_q10_where_is_continuation_value_negative": {
+    "n_trade_level_buckets": 79,
+    "n_with_ci_spanning_zero": 79,
+    "mean_cv_range": [
+      -0.08886969583770606,
+      0.045576791516996076
+    ],
+    "pct_cv_negative_range": [
+      0.6196886832141355,
+      0.7087198515769945
+    ],
+    "answer": "nowhere; every trade-level bucket's trade-clustered 95% CI spans zero, and the share of observations where continuing is worse is a near-constant ~2/3 of the population in every state -- a property of the return distribution, not a signal"
+  },
+  "q11_q12_why_random_beats_opposing_flip": {
+    "mean_opposing_flip_return": 0.8837432772120417,
+    "mean_random_lifetime_uniform": 1.5018446908212981,
+    "mean_random_length_blind": 0.894992926990853,
+    "d_random_minus_flip": 0.6181014136092563,
+    "d_blind_minus_flip": 0.011249649778811125,
+    "d_blind_minus_flip_on_R3_runners": -0.8477001809694241,
+    "median_secs_peak_to_terminal": 238.0,
+    "mean_giveback_after_peak": 2.141027404713478,
+    "answer": "because a lifetime-uniform draw needs to know how long the trade lives. Removing that knowledge removes the entire edge (+0.618 -> +0.011), and on >=3 ATR runners the causally implementable version is sharply negative"
+  },
+  "q13_armed_protection_evidence": {
+    "min_forward_geometry_found": 0.4421455187291626,
+    "min_geometry_region": "progress3_x_stall4:NEGATIVE x >90",
+    "cv_of_that_region": -0.0004635475271551001,
+    "answer": "no; the most unfavorable forward geometry anywhere is 0.4421, and that region's continuation value is indistinguishable from zero, so a protective trigger armed there would fire on a coin flip"
+  },
+  "q14_staged_realization": {
+    "p_next_050_by_rung": [
+      0.8069711538461538,
+      0.800774270399047,
+      0.7919762258543833,
+      0.8149015932521088,
+      0.8008036739380023,
+      0.8042328042328042
+    ],
+    "p_next_100_by_rung": [
+      0.646875,
+      0.6351995235259082,
+      0.6471025260029718,
+      0.6541705716963448,
+      0.6498277841561424,
+      0.6701940035273368
+    ],
+    "median_mae_before_next_rung": [
+      0.30378068364933575,
+      0.35898005453770354,
+      0.3509241493058859,
+      0.3582278782852968,
+      0.3363708261904401,
+      0.32567627761157913
+    ],
+    "control": [
+      {
+        "rung_atr": 1.0,
+        "d_rung_per_achieving_trade": -0.05530370379807455,
+        "d_placebo_uniform": 0.29483482935381655,
+        "d_placebo_blind": -0.011704468005155963,
+        "edge_over_uniform": -0.3501385331518911,
+        "edge_over_blind": -0.043599235792918585,
+        "d_rung_per_original_entry": -0.025371732714513307,
+        "pct_of_giveback_pool": -2.8253599904803233
+      },
+      {
+        "rung_atr": 1.5,
+        "d_rung_per_achieving_trade": -0.020785819746954457,
+        "d_placebo_uniform": 0.24770306397085953,
+        "d_placebo_blind": -0.07201225973684718,
+        "edge_over_uniform": -0.268488883717814,
+        "edge_over_blind": 0.05122643998989272,
+        "d_rung_per_original_entry": -0.007650110642063461,
+        "pct_of_giveback_pool": -0.8519054167108532
+      },
+      {
+        "rung_atr": 2.0,
+        "d_rung_per_achieving_trade": -0.006234224412641555,
+        "d_placebo_uniform": 0.17988820220121202,
+        "d_placebo_blind": -0.16443155042156377,
+        "edge_over_uniform": -0.18612242661385356,
+        "edge_over_blind": 0.15819732600892222,
+        "d_rung_per_original_entry": -0.0018298667633530016,
+        "pct_of_giveback_pool": -0.20377135449365275
+      },
+      {
+        "rung_atr": 2.5,
+        "d_rung_per_achieving_trade": -0.004822438446991551,
+        "d_placebo_uniform": 0.10403058566439125,
+        "d_placebo_blind": -0.2991681012356142,
+        "edge_over_uniform": -0.1088530241113828,
+        "edge_over_blind": 0.2943456627886227,
+        "d_rung_per_original_entry": -0.0011218231113560232,
+        "pct_of_giveback_pool": -0.12492462264543688
+      },
+      {
+        "rung_atr": 3.0,
+        "d_rung_per_achieving_trade": 0.011541848767414006,
+        "d_placebo_uniform": 0.025155748343980728,
+        "d_placebo_blind": -0.4469882251540233,
+        "edge_over_uniform": -0.013613899576566722,
+        "edge_over_blind": 0.4585300739214373,
+        "d_rung_per_original_entry": 0.002187148101623928,
+        "pct_of_giveback_pool": 0.24355769505834388
+      },
+      {
+        "rung_atr": 4.0,
+        "d_rung_per_achieving_trade": 0.0403999421510136,
+        "d_placebo_uniform": -0.16831391238279383,
+        "d_placebo_blind": -0.803565784441575,
+        "edge_over_uniform": 0.20871385453380742,
+        "edge_over_blind": 0.8439657265925886,
+        "d_rung_per_original_entry": 0.004992439778661568,
+        "pct_of_giveback_pool": 0.5559509775792393
+      }
+    ],
+    "answer": "the ladder is real and memoryless (P(next +0.5 rung) = 0.79-0.81 at every rung), but harvesting on it is worth at most +0.0050 ATR per original entry (0.56% of the giveback pool), is negative at rungs <=2.5, and loses to the lifetime-uniform control at rungs 1.0-3.0"
+  },
+  "q15_model_score_additivity": {
+    "domain": "EXPLORATORY_OUT_OF_DOMAIN",
+    "apparent_gap_negative_x_gt90": 0.1214,
+    "p_favorable_of_resolved_high": 0.5316,
+    "p_favorable_of_resolved_low": 0.5071,
+    "unresolved_share_high": 0.2999,
+    "unresolved_share_low": 0.0268,
+    "median_secs_to_terminal_high": 105.0,
+    "median_secs_to_terminal_low": 375.0,
+    "within_trade_demeaned_high": 0.4744,
+    "within_trade_demeaned_low": 0.3881,
+    "answer": "no. The apparent gap is composition: the high-score half sits 270 s closer to its own terminal, so its races fail to resolve. On resolved races the high half is slightly MORE favorable, and a within-trade demeaned split inverts the sign entirely. The score reads remaining regime lifetime."
+  },
+  "q16_justify_another_policy_study": {
+    "answer": "no",
+    "gate_regions_evaluated": 220,
+    "gate_regions_passing": 0,
+    "max_conditions_passed": 6,
+    "failure_histogram": {
+      "c2": 1,
+      "c1": 219
+    }
+  },
+  "decision_gate": {
+    "open": false,
+    "regions_evaluated": 220,
+    "most_negative_cv": -0.1026629880960141,
+    "cv_bar": -0.1,
+    "min_geometry": 0.4421455187291626,
+    "geometry_bar": 0.45,
+    "anti_correlation_note": "the two substantive conditions never co-occur: the region with the most negative continuation value has the MOST favorable forward geometry in the study"
+  },
+  "architectures_ran": false,
+  "architectures_note": "SPEC 8 routes a closed gate to a descriptive label with no policy manufactured. The harvest family was adjudicated with a placebo CONTROL (not an architecture) so label C could be ruled out on evidence rather than on routing.",
+  "validation": {
+    "all_passed": true,
+    "n_gates": 15,
+    "replay_trades": 300,
+    "replay_observation_states": 8671,
+    "replay_mismatches": 0
+  },
+  "final_classification": "E. PRICE STATE HAS FORWARD INFORMATION BUT NOT ENOUGH FOR ECONOMIC ACTION"
+}
