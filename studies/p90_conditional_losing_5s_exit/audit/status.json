@@ -1,0 +1,112 @@
+{
+  "study": "p90_conditional_losing_5s_exit",
+  "date": "2026-08-12",
+  "critical": 0,
+  "warning": 0,
+  "verdict": "PASS",
+  "both_gates_run": true,
+  "note": "Roll-up. Gates read this file, never prose. `critical`/`warning` are the sums across both agents at their FINAL pass; either agent still BLOCKED means this roll-up is not PASS.",
+  "causal_lint": {
+    "tool": "scripts/causal_lint.py",
+    "files_scanned": 9,
+    "critical": 0,
+    "warning": 0,
+    "verdict": "PASS",
+    "report": "audit/lint_pass3.json"
+  },
+  "tests": {
+    "path": "studies/p90_conditional_losing_5s_exit/tests/test_conditional_rule.py",
+    "passed": 23,
+    "failed": 0,
+    "note": "Added in response to lookahead-auditor pass 2's referral. FULL-lifecycle parity is deliberately NOT retested here -- gate V2 checks it on all 8,950 arms, which is stronger than any fixture."
+  },
+  "lookahead_auditor": {
+    "agent": "lookahead-auditor",
+    "scope": "causality only (A, B, C1-C3, F, G, H)",
+    "pass": 3,
+    "date": "2026-08-12",
+    "scope_hash": "8d5de7b47f43386e99cf79926c49d350f940aabbc6366ba56417656c901402f5",
+    "critical": 0,
+    "warning": 0,
+    "note": 0,
+    "verdict": "PASS",
+    "report": "audit/pass_03.md",
+    "prior_findings_adjudicated": true,
+    "referred_to_contract_checker": 0,
+    "passes": [
+      {
+        "pass": 1,
+        "critical": 0,
+        "warning": 0,
+        "note": 2,
+        "verdict": "PASS",
+        "report": "audit/pass_01.md",
+        "disposition": "N1 (placebo anchored on arm_ns while the pool is measured from entry_ns) REMEDIATED -- re-anchored on entry_ns; placebo delta moved -0.0022 to -0.0046, conclusion unchanged. N2 (exact-timestamp mark match drops non-matching flips) ACCEPTED as the causally safe choice. Two items referred to contract-checker: V10 coverage and V13 naming."
+      },
+      {
+        "pass": 2,
+        "critical": 0,
+        "warning": 0,
+        "note": 0,
+        "verdict": "PASS",
+        "report": "audit/pass_02.md",
+        "disposition": "Both prior NOTES adjudicated. Referred the absence of executable tests to contract-checker."
+      },
+      {
+        "pass": 3,
+        "critical": 0,
+        "warning": 0,
+        "note": 0,
+        "verdict": "PASS",
+        "report": "audit/pass_03.md",
+        "reason_run": "Post-pass-2 edits (a docstring, two manifest-name alias columns, and a new test file) invalidated the pass-2 scope hash. Run rather than self-certified as non-causal. All four confirmed non-causal by direct inspection, including element-wise identity of both alias column pairs."
+      }
+    ]
+  },
+  "contract_checker": {
+    "agent": "contract-checker",
+    "scope": "deliverables, seals, terminal-label reachability, C4/D/E",
+    "pass": 2,
+    "date": "2026-08-12",
+    "critical": 0,
+    "warning": 0,
+    "verdict": "CLEAR",
+    "report": "audit/contract_pass_02.md",
+    "prior_findings_adjudicated": true,
+    "new_criticals_raised": 0,
+    "transcribed_by_main_session": true,
+    "transcription_note": "The contract-checker agent is read-only (Read/Grep/Glob) and cannot write files; its findings were transcribed into audit/contract_pass_NN.md and this file by the main session.",
+    "passes": [
+      {
+        "pass": 1,
+        "critical": 2,
+        "warning": 1,
+        "verdict": "BLOCKED",
+        "report": "audit/contract_pass_01.md",
+        "disposition": "C1 (pct_losing_before_075 missing) and C2 (p_unreached missing and never tracked) fixed; W1 (stale V1-V12 reference) fixed. All re-verified against the files at pass 2."
+      },
+      {
+        "pass": 2,
+        "critical": 0,
+        "warning": 0,
+        "verdict": "CLEAR",
+        "report": "audit/contract_pass_02.md",
+        "disposition": "All pass-1 findings CONFIRMED FIXED. Three new non-blocking items (manifest column-name literalism x2, a stale module docstring) plus one transcription error in REPORT.md (32,981 vs 32,997) -- all fixed in-session."
+      }
+    ]
+  },
+  "validation_gates": {
+    "total": 28,
+    "passed": 28,
+    "failed": 0,
+    "report": "results/validation_report.json"
+  },
+  "full_lifecycle_parity": {
+    "gate": "V2",
+    "arms_compared": 8950,
+    "mismatches": 0,
+    "note": "Baseline reproduces armed_fade_score_path_progression/implementation/walks.py::continuation_label exactly -- label plus gross/net/MFE/MAE -- on every arm."
+  },
+  "study_verdict": "G4_NO_USEFUL_EDGE",
+  "study_verdict_source": "computed by implementation/validate.py::determine_verdict from the gate table; see SPEC.md section 8.2 for the amendment that moved it from G2 to G4"
+}

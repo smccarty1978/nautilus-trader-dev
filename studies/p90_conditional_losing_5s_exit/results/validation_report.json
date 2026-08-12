@@ -1,0 +1,280 @@
+{
+  "gates": [
+    {
+      "gate": "V1_armed_population",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V2_full_lifecycle_parity_exact",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": "baseline reproduces walks.py::continuation_label on every arm"
+    },
+    {
+      "gate": "V3_predecessor_entry_population",
+      "expected": 8379,
+      "observed": 8379,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V4_walk_a_mae_references",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V5_BASELINE_1.00_outcome_set",
+      "expected": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "observed": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "pass": true,
+      "note": "a label outside the frozen set means confirmation leaked in"
+    },
+    {
+      "gate": "V8_BASELINE_1.00_entry_after_decision",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V12_BASELINE_1.00_positive_hold",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V5_COND_1.00_outcome_set",
+      "expected": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "LOSING_5S_FLIP_EXIT",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "observed": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "LOSING_5S_FLIP_EXIT",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "pass": true,
+      "note": "a label outside the frozen set means confirmation leaked in"
+    },
+    {
+      "gate": "V8_COND_1.00_entry_after_decision",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V12_COND_1.00_positive_hold",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V5_BASELINE_0.75_outcome_set",
+      "expected": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "observed": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "pass": true,
+      "note": "a label outside the frozen set means confirmation leaked in"
+    },
+    {
+      "gate": "V8_BASELINE_0.75_entry_after_decision",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V12_BASELINE_0.75_positive_hold",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V5_COND_0.75_outcome_set",
+      "expected": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "LOSING_5S_FLIP_EXIT",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "observed": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "LOSING_5S_FLIP_EXIT",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "pass": true,
+      "note": "a label outside the frozen set means confirmation leaked in"
+    },
+    {
+      "gate": "V8_COND_0.75_entry_after_decision",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V12_COND_0.75_positive_hold",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V5_PLACEBO_COND_1.00_outcome_set",
+      "expected": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "LOSING_5S_FLIP_EXIT",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "observed": [
+        "CONFIRMED_THEN_STOPPED",
+        "FINAL_FLIP_EXIT_LOSER",
+        "FINAL_FLIP_EXIT_WINNER",
+        "LOSING_5S_FLIP_EXIT",
+        "SESSION_EXIT",
+        "STOPPED_BEFORE_CONFIRM"
+      ],
+      "pass": true,
+      "note": "a label outside the frozen set means confirmation leaked in"
+    },
+    {
+      "gate": "V8_PLACEBO_COND_1.00_entry_after_decision",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V12_PLACEBO_COND_1.00_positive_hold",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V6_1.00_differs_only_by_the_rule",
+      "expected": {
+        "same_entries": true,
+        "untouched_drift": 0
+      },
+      "observed": {
+        "same_entries": true,
+        "untouched_drift": 0
+      },
+      "pass": true,
+      "note": "trades the rule did not fire on must be identical"
+    },
+    {
+      "gate": "V6_0.75_differs_only_by_the_rule",
+      "expected": {
+        "same_entries": true,
+        "untouched_drift": 0
+      },
+      "observed": {
+        "same_entries": true,
+        "untouched_drift": 0
+      },
+      "pass": true,
+      "note": "trades the rule did not fire on must be identical"
+    },
+    {
+      "gate": "V7_stops_share_entries",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V9_COND_1.00_exit_after_flip",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "exit fills strictly after the flip bucket's close_ts"
+    },
+    {
+      "gate": "V9_COND_0.75_exit_after_flip",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "exit fills strictly after the flip bucket's close_ts"
+    },
+    {
+      "gate": "V10_COND_1.00_fires_on_first_losing_flip",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "SPEC 9.5; a miss means the repeated-flip walk is broken"
+    },
+    {
+      "gate": "V10_COND_0.75_fires_on_first_losing_flip",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "SPEC 9.5; a miss means the repeated-flip walk is broken"
+    },
+    {
+      "gate": "V11_2026_sealed",
+      "expected": "max <= 2025",
+      "observed": 2025,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V13_placebo_pooled_draws",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": "both k and tau drawn from POOLED distributions"
+    }
+  ],
+  "n_gates": 28,
+  "n_failed": 0
+}
