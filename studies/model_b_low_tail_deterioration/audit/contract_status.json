@@ -1,0 +1,29 @@
+{
+  "agent": "contract-checker",
+  "pass": 2,
+  "date": "2026-08-11",
+  "critical": 0,
+  "warning": 0,
+  "note": 1,
+  "verdict": "CLEAR",
+  "report": "audit/contract_pass_02.md",
+  "deliverables_manifest_present": true,
+  "prior_findings_adjudicated": true,
+  "adjudication": [
+    {"id": "C1", "status": "FIXED", "evidence": "audit/status.json pass:2 critical:0 verdict:PASS; audit/pass_02.md re-executed the fix against the real 1,410-row population before adjudicating"},
+    {"id": "W1", "status": "FIXED", "evidence": "implementation/common.py::metrics nulls CI and sets ci_suppressed_underpowered on n<20 cells; verified in low_tail_curve.csv bottom_2_5 and low_tail_by_rung.csv RUNG_3.0/4.0 bottom_10; analysis/gates.py::decide is null-safe"},
+    {"id": "N1", "status": "RESOLVED", "evidence": "SPEC.md section 10 now states D1 > D3 > D4 > D2 explicitly, matching analysis/gates.py::decide"},
+    {"id": "N2", "status": "FIXED", "evidence": "results/summary.json report_answers Q1..Q17 present; REPORT.md and README.md written and traced"}
+  ],
+  "scope_hash_note": "No scope_hash computed for this pass; reviewed the same file set as lookahead-auditor pass 2 (scope_hash 97d90ce588832449c40220ce22a1bf8f20e75db8b00182023425e081950e48d1) plus results/, REPORT.md and README.md, which are outside that hash by design -- contract-checker owns deliverables, lookahead-auditor owns implementation/analysis code.",
+  "findings": [
+    {
+      "id": "N3",
+      "severity": "NOTE",
+      "file": "studies/model_b_low_tail_deterioration/REPORT.md",
+      "line": 22,
+      "summary": "Headline claimed 'No low-tail cut in this study has a mark-based CI that excludes zero.' Accurate as scoped, but low_tail_curve.csv band_50_60 (a middle-distribution disjoint band, not a low-tail cut) does exclude zero (ci95_hi_mark=-0.176). Non-blocking wording ambiguity.",
+      "resolution": "APPLIED -- REPORT.md headline reworded to 'No bottom-percentile cut', with the band_50_60 exception stated inline and again in the band table discussion."
+    }
+  ]
+}

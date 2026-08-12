@@ -1,0 +1,134 @@
+{
+  "checks": [
+    {
+      "quantity": "n_observations",
+      "accepted": 2991,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "n_unique_trades",
+      "accepted": 781,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "n_oos_observations",
+      "accepted": 1410,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "n_oos_trades",
+      "accepted": 380,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "baseline_success_pct",
+      "accepted": 48.4397163,
+      "reproduced": true,
+      "delta": 1.2056737830334896e-08,
+      "tolerance": 5e-06,
+      "reproduced_exactly": false
+    },
+    {
+      "quantity": "bottom_decile_continue_minus_exit_hwm_atr",
+      "accepted": -0.7197866,
+      "reproduced": true,
+      "delta": 3.337793574864634e-08,
+      "tolerance": 5e-07,
+      "reproduced_exactly": false
+    },
+    {
+      "quantity": "ci95_lo",
+      "accepted": -1.3032425,
+      "reproduced": true,
+      "delta": -4.427439748155848e-08,
+      "tolerance": 5e-07,
+      "reproduced_exactly": false
+    },
+    {
+      "quantity": "ci95_hi",
+      "accepted": -0.1799056,
+      "reproduced": true,
+      "delta": 4.312030749131779e-08,
+      "tolerance": 5e-07,
+      "reproduced_exactly": false
+    },
+    {
+      "quantity": "per_rung_1.0",
+      "accepted": 781,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "per_rung_1.5",
+      "accepted": 658,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "per_rung_2.0",
+      "accepted": 522,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "per_rung_2.5",
+      "accepted": 426,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "per_rung_3.0",
+      "accepted": 356,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    },
+    {
+      "quantity": "per_rung_4.0",
+      "accepted": 248,
+      "reproduced": true,
+      "delta": 0.0,
+      "tolerance": 0,
+      "reproduced_exactly": true
+    }
+  ],
+  "stop_triggered": false,
+  "failed_quantities": [],
+  "bottom_decile_n_obs": 141,
+  "bottom_decile_n_trades": 78,
+  "exit_basis_amendment": {
+    "rationale": "SPEC 3. current_mfe_atr is the running HWM and is not a transactable fill; return_from_entry_atr is the mark.",
+    "drawdown_from_hwm_atr_mean": 0.13004092149990765,
+    "drawdown_from_hwm_atr_median": 0.07513133079048506,
+    "pooled_cme_hwm": -0.28464680232840295,
+    "pooled_cme_mark": -0.15460588082849527,
+    "bottom_decile_cme_hwm": -0.7197865666220643,
+    "bottom_decile_cme_mark": -0.2763692423132807,
+    "bottom_decile_cme_mark_ci95": [
+      -0.8447858737500747,
+      0.24743546387292462
+    ],
+    "share_of_headline_that_is_unexecutable_pct": 61.60400108461695
+  }
+}
