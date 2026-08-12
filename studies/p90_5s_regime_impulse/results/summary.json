@@ -1,0 +1,232 @@
+{
+  "study": "p90_5s_regime_impulse",
+  "verdict": "F4_NO_USEFUL_5S_EDGE",
+  "facts": {
+    "best_variant": "S075",
+    "exp_per_arm_net": -0.06883123530670243,
+    "benchmark_a_per_arm_net": -0.05163933293600455,
+    "beats_benchmark_a": false,
+    "positive_after_cost": false,
+    "separates_from_placebo_exit": false,
+    "years_positive": 0,
+    "no_side_inversion": true,
+    "failure_cost_cheaper": true,
+    "failure_cost_materially_cheaper": true,
+    "pct_confirmers_cut_before_confirm": 0.5475319926873857,
+    "confirmer_preservation_ok": false,
+    "entry_coverage": 0.9362011173184358
+  },
+  "report_answers": {
+    "q1_pct_arms_5s_aligned": 0.9362011173184358,
+    "q2_confirming_mae": {
+      "censored_note": "bounded below 1.00 ATR BY CONSTRUCTION",
+      "see": "results/confirming_trade_mae.csv"
+    },
+    "q3_confirmers_killed_by_075_surviving_100": {
+      "n": 54,
+      "pct": 0.012340036563071298
+    },
+    "q4_expectancy": {
+      "per_entered_trade": {
+        "S1": -0.07459059729275624,
+        "S075": -0.0735218469978502
+      },
+      "per_original_arm": {
+        "S1": -0.06983180052692788,
+        "S075": -0.06883123530670243,
+        "A_LIFECYCLE": -0.05163933293600455
+      }
+    },
+    "q5_capture": {
+      "vs_confirm_return": 0.7593103448275862,
+      "vs_confirm_mfe": 0.6041666666666666
+    },
+    "q6_5s_exit_before_confirmation": {
+      "pct_5s_exit_first": 0.7560568086883876,
+      "pct_confirm_first": 0.23308270676691728
+    },
+    "q7_holding_through_confirmation": {
+      "median_incremental_atr": -0.19946224923342992,
+      "ci": [
+        -0.05882314841959382,
+        0.006522284903929948
+      ],
+      "ci_excludes_zero": false
+    },
+    "q8_failed_p90_signals": {
+      "accepted_net_atr_per_failure_arm": -1.0523727212403355,
+      "s1_net_atr_per_failure_arm": -0.36268979753437874,
+      "placebo_net_atr_per_failure_arm": -0.37725253081229265
+    },
+    "q9_failures_become_smaller_losses": {
+      "s1_mean_loss": -0.38905570587375027,
+      "pct_out_before_100_adverse": 0.9825131151636273
+    },
+    "q10_075_vs_100": {
+      "d_exp_per_arm": 0.001000565220225444,
+      "d_max_dd": -8.713579817602522,
+      "n_confirm_trades_destroyed": 54,
+      "pct_s1_trades_reaching_stop": 0.008592910848549946
+    },
+    "q11_year_stability": {
+      "2021": -0.08943648319555167,
+      "2022": -0.04736619042917122,
+      "2023": -0.06945869360774987,
+      "2024": -0.07530292721150453,
+      "2025": -0.06763713271654062
+    },
+    "q12_side_consistency": {
+      "LONG": -0.07219761516717864,
+      "SHORT": -0.06787814535276734
+    },
+    "q13_nonentry_future_alignment": {
+      "<=15": 0.3169877408056042,
+      "16-30": 0.18213660245183888,
+      "31-60": 0.25569176882662,
+      "61-120": 0.1628721541155867,
+      ">120": 0.08231173380035026,
+      "never": 0.0
+    },
+    "q14_verdict": "F4_NO_USEFUL_5S_EDGE",
+    "q15_next_study": "ABANDON THE BRANCH. Fresh-5s-flip entry is ruled out by the Phase 11 age diagnostic (fresh entries perform the same as stale ones); 5s-as-early-failure-exit is ruled out by PLACEBO_EXIT (the failure saving does not separate from a length-blind random hold)."
+  },
+  "placebo": {
+    "s1_minus_placebo_exit_per_arm": -0.0044724185824002215,
+    "s1_minus_placebo_ci_low": -0.015904943115577053,
+    "s1_minus_placebo_ci_high": 0.007770516319236825,
+    "s1_minus_placebo_ci_excludes_zero": false,
+    "entry_placebo_draws": 1000,
+    "aligned_subset_bench_exp_per_arm": -0.05025328258490391,
+    "entry_placebo_band_exp": [
+      -0.05338815371964465,
+      -0.04813111750718817,
+      -0.04308669546084609
+    ],
+    "aligned_subset_bench_confirm_rate": 0.5222580260174245,
+    "entry_placebo_band_confirm": [
+      0.517484186657119,
+      0.5202888172812985,
+      0.5228577395870628
+    ],
+    "aligned_beats_entry_placebo_band": false,
+    "placebo_exit_hold_pool_median_s": 50.0,
+    "placebo_exit_p_unresolved": 0.002506265664160401
+  },
+  "benchmark_a_next_open": {
+    "n": 8950,
+    "n_resolved": 8928,
+    "n_censored_no_fill_bar": 22,
+    "mean_gross_atr": 0.005664633180460757,
+    "mean_net_atr": -0.05176658039619632,
+    "median_net_atr": 0.18411197324858364,
+    "win_rate": 0.5155689964157706,
+    "net_atr_per_arm": -0.05163933293600455,
+    "outcomes": {
+      "CENSORED": 22,
+      "SCORE_EXIT": 4650,
+      "SESSION_CLOSE": 41,
+      "STOP": 4237
+    }
+  },
+  "S1": {
+    "policy": "S1",
+    "n_arms": 8950,
+    "n_entries": 8379,
+    "entry_coverage": 0.9362011173184358,
+    "n_stop": 72,
+    "n_5s_exit": 8288,
+    "n_session": 19,
+    "win_rate": 0.30958348251581336,
+    "mean_atr": -0.07459059729275624,
+    "median_atr": -0.2530389819230554,
+    "mean_winner": 0.6588623070027373,
+    "median_winner": 0.4414178770102306,
+    "mean_loser": -0.410713256920835,
+    "median_loser": -0.39767362498958564,
+    "profit_factor": 0.7322312457852596,
+    "gross_atr_total": -143.90583217771572,
+    "net_atr_total": -624.9946147160045,
+    "exp_per_entry_gross": -0.017174583145687518,
+    "exp_per_entry_net": -0.07459059729275624,
+    "exp_per_arm_gross": -0.01607886393047103,
+    "exp_per_arm_net": -0.06983180052692788,
+    "exp_per_arm_net_ci_low": -0.0831105173878942,
+    "exp_per_arm_net_ci_high": -0.05704993449879757,
+    "atr_per_100_arms": -6.983180052692788,
+    "max_dd_atr": 630.3812571777622,
+    "median_hold_s": 50.0,
+    "pct_ambiguous": 0.0014321518080916578
+  },
+  "S075": {
+    "policy": "S075",
+    "n_arms": 8950,
+    "n_entries": 8379,
+    "entry_coverage": 0.9362011173184358,
+    "n_stop": 439,
+    "n_5s_exit": 7922,
+    "n_session": 18,
+    "win_rate": 0.3091060985797828,
+    "mean_atr": -0.0735218469978502,
+    "median_atr": -0.2539013900626558,
+    "mean_winner": 0.659031869042055,
+    "median_winner": 0.4414178770102306,
+    "mean_loser": -0.40846353029961474,
+    "median_loser": -0.39876340337912225,
+    "profit_factor": 0.7348008765129488,
+    "gross_atr_total": -134.95077345669796,
+    "net_atr_total": -616.0395559949868,
+    "exp_per_entry_gross": -0.016105832850781474,
+    "exp_per_entry_net": -0.0735218469978502,
+    "exp_per_arm_gross": -0.015078298710245581,
+    "exp_per_arm_net": -0.06883123530670243,
+    "exp_per_arm_net_ci_low": -0.08180522611982617,
+    "exp_per_arm_net_ci_high": -0.056089988162389415,
+    "atr_per_100_arms": -6.883123530670243,
+    "max_dd_atr": 621.6676773601597,
+    "median_hold_s": 50.0,
+    "pct_ambiguous": 0.015037593984962405
+  },
+  "PLACEBO_EXIT": {
+    "policy": "PLACEBO_EXIT",
+    "n_arms": 8950,
+    "n_entries": 8379,
+    "entry_coverage": 0.9362011173184358,
+    "n_stop": 923,
+    "n_5s_exit": 7435,
+    "n_session": 21,
+    "win_rate": 0.42379758921112304,
+    "mean_atr": -0.06981339878309138,
+    "median_atr": -0.07749048322310972,
+    "mean_winner": 0.4755082321236502,
+    "median_winner": 0.33996499034828526,
+    "mean_loser": -0.49092986410593925,
+    "median_loser": -0.39314652903730213,
+    "profit_factor": 0.7427018051624857,
+    "gross_atr_total": -103.87768586523374,
+    "net_atr_total": -584.9664684035226,
+    "exp_per_entry_gross": -0.012397384636022645,
+    "exp_per_entry_net": -0.06981339878309138,
+    "exp_per_arm_gross": -0.01160644534807081,
+    "exp_per_arm_net": -0.06535938194452767,
+    "exp_per_arm_net_ci_low": -0.07828689189690635,
+    "exp_per_arm_net_ci_high": -0.05320099634924801,
+    "atr_per_100_arms": -6.5359381944527675,
+    "max_dd_atr": 595.8853424301175,
+    "median_hold_s": 49.0,
+    "pct_ambiguous": 0.0021482277121374865
+  },
+  "alignment_all": {
+    "group": "ALL",
+    "n_arms": 8950,
+    "n_aligned": 8379,
+    "pct_aligned": 0.9362011173184358,
+    "n_opposite": 571,
+    "pct_opposite": 0.06379888268156425,
+    "n_uninit": 0,
+    "pct_uninit": 0.0
+  },
+  "cost_points_round_turn": 0.5,
+  "gates_passed": 26,
+  "gates_total": 26,
+  "runtime_s": 25.5
+}

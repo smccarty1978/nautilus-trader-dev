@@ -1,0 +1,141 @@
+{
+  "study": "p90_5s_regime_impulse",
+  "phase": 0,
+  "armed_population_source": "studies\\armed_fade_score_path_progression\\results\\armed_regime_score_paths.parquet",
+  "p90_equals_top10": {
+    "note": "p80_p90_opportunity_continuation_ml/SPEC.md:76 maps P90 -> top_10",
+    "bullish_threshold": 0.43167249785595935,
+    "bearish_threshold": 0.44559149246408103
+  },
+  "checks": {
+    "arms": {
+      "expected": 8950,
+      "observed": 8950,
+      "match": true
+    },
+    "arms_long": {
+      "expected": 4048,
+      "observed": 4048,
+      "match": true
+    },
+    "arms_short": {
+      "expected": 4902,
+      "observed": 4902,
+      "match": true
+    },
+    "confirm_rate_censored": {
+      "expected": 0.5202,
+      "observed": 0.5202234636871509,
+      "match": true
+    },
+    "stop_before_confirm_rate": {
+      "expected": 0.4743,
+      "observed": 0.47430167597765366,
+      "match": true
+    },
+    "session_unresolved_rate": {
+      "expected": 0.0055,
+      "observed": 0.005474860335195531,
+      "match": true
+    },
+    "median_return_at_confirm": {
+      "expected": 0.8541,
+      "observed": 0.8540966950974154,
+      "match": true
+    },
+    "median_mfe_to_confirm": {
+      "expected": 1.0347,
+      "observed": 1.034709024392483,
+      "match": true
+    },
+    "median_mae_to_confirm": {
+      "expected": 0.3302,
+      "observed": 0.3301695014363496,
+      "match": true
+    },
+    "arms_by_year": {
+      "expected": {
+        "2021": 1828,
+        "2022": 1825,
+        "2023": 1763,
+        "2024": 1771,
+        "2025": 1763
+      },
+      "observed": {
+        "2023": 1763,
+        "2024": 1771,
+        "2021": 1828,
+        "2022": 1825,
+        "2025": 1763
+      },
+      "match": true
+    },
+    "confirmation_timing_censored": {
+      "expected": {
+        "<=60": 1174,
+        "61-120": 1206,
+        "121-300": 1525,
+        ">300": 751
+      },
+      "observed": {
+        "<=60": 1174,
+        "61-120": 1206,
+        "121-300": 1525,
+        ">300": 751
+      },
+      "match": true
+    },
+    "mean_return_at_confirm": {
+      "expected": null,
+      "observed": 0.9215315833101805,
+      "match": true
+    },
+    "mean_mfe_to_confirm": {
+      "expected": null,
+      "observed": 1.110965708779031,
+      "match": true
+    },
+    "mean_mae_to_confirm": {
+      "expected": null,
+      "observed": 0.3856759677724851,
+      "match": true
+    }
+  },
+  "all_targets_reproduced": true,
+  "failed_targets": [],
+  "benchmark_a": {
+    "reference_fill": {
+      "n": 8950,
+      "n_resolved": 8928,
+      "n_censored_no_fill_bar": 22,
+      "mean_gross_atr": 0.002065114936720895,
+      "mean_net_atr": -0.05536609863993618,
+      "median_net_atr": 0.1803005270501693,
+      "win_rate": 0.5157930107526881,
+      "net_atr_per_arm": -0.05523000320193857,
+      "outcomes": {
+        "CENSORED": 22,
+        "SCORE_EXIT": 4644,
+        "SESSION_CLOSE": 40,
+        "STOP": 4244
+      }
+    },
+    "next_open_fill": {
+      "n": 8950,
+      "n_resolved": 8928,
+      "n_censored_no_fill_bar": 22,
+      "mean_gross_atr": 0.005664633180460757,
+      "mean_net_atr": -0.05176658039619632,
+      "median_net_atr": 0.18411197324858364,
+      "win_rate": 0.5155689964157706,
+      "net_atr_per_arm": -0.05163933293600455,
+      "outcomes": {
+        "CENSORED": 22,
+        "SCORE_EXIT": 4650,
+        "SESSION_CLOSE": 41,
+        "STOP": 4237
+      }
+    },
+    "note": "reference_fill is the accepted lineage parity anchor (checkpoint_reference_price); next_open_fill is the convention S1/S075 enter on and is the only one B and C may be compared against (SPEC 4.3)"
+  }
+}
