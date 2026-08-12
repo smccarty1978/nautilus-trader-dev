@@ -1,0 +1,155 @@
+{
+  "study": "post_confirm_retracement_recovery",
+  "terminal_label": "R4_NO_USEFUL_FAILED_RECOVERY_STATE",
+  "checks": {
+    "recovery_condition_adds_value": false,
+    "ordered_deterioration": true,
+    "beats_decisive_controls": false,
+    "sign_stable_across_sides": false,
+    "runners_preserved": false,
+    "more_significant_than_chance": false,
+    "year_consistent": false
+  },
+  "evidence": {
+    "n_rules": 96,
+    "rules_ci_excludes_zero": 1,
+    "expected_by_chance_at_95pct": 4.8,
+    "best_rule_cme_atr": -0.09804653390698378,
+    "median_rule_cme_atr": -0.014450006485597126,
+    "retracement_only_gap_atr": -0.00234,
+    "material_threshold_atr": 0.05,
+    "cells_with_ge3_horizons": 125,
+    "cells_monotonically_worsening": 5,
+    "monotone_cells": [
+      {
+        "state": "NO_R25",
+        "recovery_level": "R25",
+        "rung_atr": 2.0,
+        "retracement_d": 1.0,
+        "cme_by_horizon": [
+          -0.0199,
+          -0.0481,
+          -0.1173,
+          -0.1178,
+          -0.1419
+        ]
+      },
+      {
+        "state": "NO_R75",
+        "recovery_level": "R75",
+        "rung_atr": 3.0,
+        "retracement_d": 1.0,
+        "cme_by_horizon": [
+          -0.0579,
+          -0.0768,
+          -0.1056,
+          -0.1063
+        ]
+      },
+      {
+        "state": "NO_R75",
+        "recovery_level": "R75",
+        "rung_atr": 4.0,
+        "retracement_d": 0.75,
+        "cme_by_horizon": [
+          -0.0667,
+          -0.1295,
+          -0.1594,
+          -0.2012
+        ]
+      },
+      {
+        "state": "NO_R75",
+        "recovery_level": "R75",
+        "rung_atr": 4.0,
+        "retracement_d": 1.25,
+        "cme_by_horizon": [
+          -0.1314,
+          -0.172,
+          -0.1785,
+          -0.1834
+        ]
+      },
+      {
+        "state": "NO_HWM_RECLAIM",
+        "recovery_level": "R100",
+        "rung_atr": 4.0,
+        "retracement_d": 0.75,
+        "cme_by_horizon": [
+          -0.0974,
+          -0.1012,
+          -0.1474,
+          -0.1982,
+          -0.2393
+        ]
+      }
+    ],
+    "pct_decisive_control_beats_rule": 0.3271,
+    "per_control": [
+      {
+        "control_id": "RETRACEMENT_ONLY",
+        "pct_beats": 0.4583333333333333,
+        "mean_gap": -0.002335574865361284
+      },
+      {
+        "control_id": "CURRENT_RETURN_ONLY",
+        "pct_beats": 0.375,
+        "mean_gap": -0.007805826043986352
+      },
+      {
+        "control_id": "TIME_SINCE_CONFIRM_ONLY",
+        "pct_beats": 0.3020833333333333,
+        "mean_gap": -0.005433466150642945
+      },
+      {
+        "control_id": "DRAWDOWN_FROM_HWM_ONLY",
+        "pct_beats": 0.2916666666666667,
+        "mean_gap": -0.018735421675955977
+      },
+      {
+        "control_id": "TIME_SINCE_RUNG_ONLY",
+        "pct_beats": 0.20833333333333334,
+        "mean_gap": -0.01367375426977075
+      }
+    ],
+    "pct_side_sign_inverted": 0.8333,
+    "median_loser_winner_ratio": 1.3783,
+    "median_pct_runners_ge3_intercepted": 13.28,
+    "cells_consistent_across_all_5_years": 0
+  },
+  "population": {
+    "original_top10_entries": 8950,
+    "confirmed": 4705,
+    "measurable_confirmed": 4656,
+    "arm_rows": 60880,
+    "lineage_status": "REPRODUCED",
+    "lineage_checks_failed": 0
+  },
+  "gates": {
+    "passed": 14,
+    "of": 14,
+    "all_passed": true
+  },
+  "headline": {
+    "pct_retracing_min": 93.08,
+    "pct_retracing_max": 99.38,
+    "p_reclaim_hwm_min": 0.4242,
+    "p_reclaim_hwm_max": 0.814,
+    "median_secs_to_hwm_reclaim": 107.0
+  },
+  "answers": {
+    "Q1": "Near-universally. 93.1-99.4% of trades reaching a rung retrace by D; at D=1.00 ATR it is 98.8-99.4%. Retracement is not a state, it is what always happens.",
+    "Q2": "Usually. P(reclaim the full HWM) before terminal is 0.752-0.792 and P(new HWM) 0.743-0.782; R25 is 0.925-0.937.",
+    "Q3": "Fast. Median 5-6s to R25 and 55-57s to full HWM reclaim; p90 267-280s.",
+    "Q4": "Little. Median additional adverse excursion before recovery is well under 0.5 ATR, p90 ~1.10 and p95 ~1.44 ATR. Arms that never recover fall a median ~1.60 ATR further.",
+    "Q5": "No. Only 5 of 125 cells with >=3 horizons worsen monotonically -- roughly the chance rate for 4-point sequences -- and they do not form a neighbourhood.",
+    "Q6": "Nowhere reliably. Best of 96 rules is -0.098 ATR (CI -0.201 to -0.006); median -0.015. Only 1 of 96 CIs excludes zero, fewer than the ~4.8 expected by chance at 95%.",
+    "Q7": "No. The rule beats RETRACEMENT_ONLY by 0.002 ATR on average -- far under one tick. The recovery condition is decoration on the retracement.",
+    "Q8": "No. Simple drawdown, trade age, rung age and current return controls match the rule to within 0.008-0.019 ATR; each beats it outright in 21-38% of cells.",
+    "Q9": "Too many. The states intercept a median 13.3% of >=3 ATR runners and 21.2% of >=4 ATR runners, at a median loser:winner ratio of only 1.38 -- close to destroying winners and losers in equal measure.",
+    "Q10": "No. 40 of 48 side-split cells (83.3%) invert sign between LONG and SHORT; LONG frequently favours continuing where SHORT favours exiting.",
+    "Q11": "No knee. The few coherent-looking cells are isolated and no cell is consistent across all five years (best is 4 of 5).",
+    "Q12": "R4. Retracement is universal, recovery is the norm, the recovery condition adds nothing over the retracement, controls match it, sign inverts by side, and runner destruction is near-symmetric.",
+    "Q13": "Abandonment of this axis. Do not train an ML recovery/failure model and do not build a price-only exit architecture on this state. Local post-confirmation retracement geometry does not carry terminal deterioration."
+  }
+}
