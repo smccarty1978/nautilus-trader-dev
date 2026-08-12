@@ -1,0 +1,86 @@
+{
+  "gates": [
+    {
+      "gate": "V1_armed_population",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V2_lineage_reproduced",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V3_parity_test_passed",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": "tests/test_regime_5m_parity.py must pass before any classification runs (SPEC 9.4)"
+    },
+    {
+      "gate": "V4_build_reconciles",
+      "expected": true,
+      "observed": {
+        "buckets_reconcile": true,
+        "rows_reconcile": true
+      },
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V5_p90_lookup_causal",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "regime_age_s_at_p90 < 0 would mean a flip after the decision was used"
+    },
+    {
+      "gate": "V6_classification_schema_no_outcome_leak",
+      "expected": [],
+      "observed": [],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V7_no_label_only_leak",
+      "expected": {},
+      "observed": {},
+      "pass": true,
+      "note": "label_only_ columns may exist only in phase6_labels/phase6_timing.csv"
+    },
+    {
+      "gate": "V8_2026_sealed",
+      "expected": "max <= 2025",
+      "observed": 2025,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V9_transition_matrix_reconciles",
+      "expected": 4656,
+      "observed": 4656,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V10_phase6_covers_population",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V11_lookahead_single_call_site",
+      "expected": 1,
+      "observed": 1,
+      "pass": true,
+      "note": "sites=['classify.py:110']"
+    }
+  ],
+  "n_gates": 11,
+  "n_failed": 0
+}

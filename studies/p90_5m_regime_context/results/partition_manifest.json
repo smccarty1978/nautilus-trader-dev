@@ -1,0 +1,81 @@
+{
+  "study": "p90_5m_regime_context",
+  "predecessors": [
+    "studies/p90_5s_regime_impulse",
+    "studies/p90_conditional_losing_5s_exit"
+  ],
+  "inputs": {
+    "data/canonical/regime_complete_v1/canonical_regime_paths_all.parquet": {
+      "exists": true,
+      "size_bytes": 1346003856,
+      "rows": 61543945
+    },
+    "studies/armed_fade_score_path_progression/results/armed_regime_score_paths.parquet": {
+      "exists": true,
+      "size_bytes": 4230195,
+      "rows": 8950
+    },
+    "studies/p90_5m_regime_context/_work/regime_5m_flips.parquet": {
+      "exists": true,
+      "size_bytes": 193250,
+      "rows": 25757
+    },
+    "studies/p90_5m_regime_context/_work/regime_5m_buckets.parquet": {
+      "exists": true,
+      "size_bytes": 7397599,
+      "rows": 352949
+    },
+    "studies/p90_conditional_losing_5s_exit/results/adverse_5s_flip_events.parquet": {
+      "exists": true,
+      "size_bytes": 2579055,
+      "rows": 90437
+    },
+    "studies/p90_conditional_losing_5s_exit/results/baseline_100.parquet": {
+      "exists": true,
+      "size_bytes": 848627,
+      "rows": 8379
+    },
+    "studies/p90_conditional_losing_5s_exit/results/baseline_075.parquet": {
+      "exists": true,
+      "size_bytes": 847971,
+      "rows": 8379
+    }
+  },
+  "code_sha256": "a745dd60652dc052c7f5cfdc151cd1b50deda3bcf7a6aab59ffc9e56ca1d90c5",
+  "seed": 20260812,
+  "arms": 8950,
+  "confirming": 4656,
+  "age_bucket_edges_min": [
+    5,
+    15,
+    30,
+    60
+  ],
+  "time_of_day_edges_min": [
+    510,
+    600,
+    690,
+    780,
+    900
+  ],
+  "arm_score_quartile_edges": [
+    0.4486670145085186,
+    0.461786049438737,
+    0.4836931208211524
+  ],
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "sealed_years": [
+    2026
+  ],
+  "generated_not_committed": [
+    "results/*.parquet",
+    "results/*.csv",
+    "_work/*"
+  ]
+}

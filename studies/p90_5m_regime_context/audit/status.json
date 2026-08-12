@@ -1,0 +1,90 @@
+{
+  "study": "p90_5m_regime_context",
+  "date": "2026-08-12",
+  "critical": 0,
+  "warning": 0,
+  "verdict": "PASS",
+  "both_gates_run": true,
+  "causal_lint": {
+    "tool": "scripts/causal_lint.py",
+    "critical": 0,
+    "warning": 0,
+    "verdict": "PASS",
+    "files_scanned": 10
+  },
+  "lookahead_auditor": {
+    "scope": "causality only (A, B, C1-C3, F, G, H)",
+    "pass": 2,
+    "scope_hash": "fde67e4060cb53037316120e40886d67408d2928390bbed2a54f6c162fa04ca6",
+    "critical": 0,
+    "warning": 0,
+    "note": 1,
+    "verdict": "PASS",
+    "report": "audit/pass_02.md",
+    "prior_findings_adjudicated": true,
+    "referred_to_contract_checker": 0,
+    "passes": [
+      {
+        "pass": 1,
+        "scope": "SPEC.md pre-execution (sections 2-5)",
+        "critical": 1,
+        "warning": 2,
+        "note": 2,
+        "verdict": "BLOCKED",
+        "report": "audit/pass_01.md",
+        "resolution": "all findings fixed in SPEC.md / implementation before pass 2 (see pass_01.md Pass 2 adjudication section)"
+      },
+      {
+        "pass": 2,
+        "scope": "completion -- implementation code and results",
+        "critical": 0,
+        "warning": 0,
+        "note": 1,
+        "verdict": "PASS",
+        "report": "audit/pass_02.md",
+        "resolution": "all 3 pass-1 findings (C2 critical, C1 + F1/A1 warning) confirmed fixed against live code and a real run (checkpoint_s==0 cross-check re-run: 79.5% -> 99.9% agreement; V11 single-call-site gate passes; V9 transition-matrix reconciliation passes)"
+      }
+    ]
+  },
+  "contract_checker": {
+    "scope": "deliverables, seals, terminal-label reachability, C4/D/E",
+    "pass": 2,
+    "critical": 0,
+    "warning": 0,
+    "note": 2,
+    "verdict": "CLEAR",
+    "report": "audit/contract_pass_02.md",
+    "prior_findings_adjudicated": true,
+    "new_criticals_raised": 0,
+    "passes": [
+      {
+        "pass": 1,
+        "scope": "SPEC.md pre-execution (sections 7-9)",
+        "critical": 1,
+        "warning": 4,
+        "note": 3,
+        "verdict": "BLOCKED",
+        "report": "audit/contract_pass_01.md",
+        "resolution": "all findings fixed in SPEC.md before implementation (see contract_pass_01.md Pass 2 adjudication section)"
+      },
+      {
+        "pass": 2,
+        "scope": "completion -- 23-item Deliverables Manifest vs. actual results/",
+        "critical": 0,
+        "warning": 0,
+        "note": 2,
+        "verdict": "CLEAR",
+        "report": "audit/contract_pass_02.md",
+        "resolution": "all 8 pass-1 findings confirmed fixed against live SPEC.md and produced results; 2 new non-blocking notes (status.json per-agent format -- resolved by this file; SPEC section 7 M2 pair naming -- fixed, see SPEC.md amendment)"
+      }
+    ]
+  },
+  "validation_gates": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "report": "results/validation_report.json"
+  },
+  "study_verdict": "M2_POST_CONFIRM_CONTEXT",
+  "study_verdict_source": "computed by implementation/validate.py::determine_verdict from the frozen SPEC.md section 7 thresholds against results/primary_table.csv, pre_confirm_outcome.csv, transition_matrix.csv, against_with_deep_dive.csv, five_m_x_5s_failure.csv, and matched_stratified_control.csv; secondary_signals: [\"M2_POST_CONFIRM_CONTEXT\", \"M3_TRANSITION_PATH_MATTERS\"]"
+}
