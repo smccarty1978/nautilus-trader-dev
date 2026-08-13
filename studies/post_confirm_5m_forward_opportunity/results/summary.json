@@ -1,0 +1,1183 @@
+{
+  "study": "post_confirm_5m_forward_opportunity",
+  "verdict": "C3_EXPLAINED_BY_CONFIRMATION_QUALITY",
+  "facts": {
+    "phase12_n_metrics": 8,
+    "phase12_n_ci_excludes_zero": 0,
+    "phase12_majority_survives": false,
+    "timing_gap_50pct_s": 0.0,
+    "remaining_mfe_gap_300s": 0.18817246106142904,
+    "giveback_onset_gap_s": 0.0,
+    "years_stable": false,
+    "no_side_inversion": false
+  },
+  "primary_table": [
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "n_confirmed",
+      "value": 629.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "confirm_return_median",
+      "value": 1.0180797570289837
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "confirm_mfe_median",
+      "value": 1.2118300342291661
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "confirm_mae_median",
+      "value": 0.3300122525333081
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "terminal_return",
+      "value": 0.3520757278176586
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "terminal_giveback",
+      "value": 2.0333943294726664
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_60s",
+      "value": 0.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_60s",
+      "value": 0.4124984250949889
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_60s",
+      "value": 0.80669892983777
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "p_new_extreme_next_60s",
+      "value": 0.7090620031796503
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_60s",
+      "value": -0.605248230567161
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_120s",
+      "value": 0.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_120s",
+      "value": 0.6032855693045391
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_120s",
+      "value": 0.5908305202538477
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_120s",
+      "value": -0.5318631676473901
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_180s",
+      "value": -0.007039178626806919
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_180s",
+      "value": 0.7386792394818933
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_180s",
+      "value": 0.5559474572098946
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_180s",
+      "value": -0.4636335380988781
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_300s",
+      "value": 0.2770032676722367
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_300s",
+      "value": 1.0489525626848812
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_300s",
+      "value": 0.5573567432036581
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_300s",
+      "value": -0.4705534080395629
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_600s",
+      "value": 1.1799059927928057
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_600s",
+      "value": 2.0197104454403956
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_600s",
+      "value": 0.29882394956815617
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_600s",
+      "value": -0.6048491750458675
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "n_confirmed",
+      "value": 4027.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "confirm_return_median",
+      "value": 0.8237149034972642
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "confirm_mfe_median",
+      "value": 1.0107874414400357
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "confirm_mae_median",
+      "value": 0.3306064519883736
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "terminal_return",
+      "value": 0.036658631802223424
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "terminal_giveback",
+      "value": 1.9983278673120943
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_60s",
+      "value": -0.030590275107669485
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_60s",
+      "value": 0.39130984527414037
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_60s",
+      "value": 0.7094699930981503
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "p_new_extreme_next_60s",
+      "value": 0.6819085487077535
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_60s",
+      "value": -0.6569416580736036
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_120s",
+      "value": -0.03620297027094033
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_120s",
+      "value": 0.5666791191899637
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_120s",
+      "value": 0.5217922306609766
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_120s",
+      "value": -0.6070934764315673
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_180s",
+      "value": 0.03339935909627334
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_180s",
+      "value": 0.7363610067524717
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_180s",
+      "value": 0.403778862722048
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_180s",
+      "value": -0.5587451497003457
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_300s",
+      "value": 0.28211999770646323
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_300s",
+      "value": 1.0759523755130218
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_300s",
+      "value": 0.3691842821422291
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_300s",
+      "value": -0.5320999176100644
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_600s",
+      "value": 1.1276621391899566
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_600s",
+      "value": 1.9315468676065382
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_600s",
+      "value": 0.3233677941913875
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_600s",
+      "value": -0.5370378554009372
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "n_confirmed",
+      "value": 623.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "confirm_return_median",
+      "value": 1.0106867411374003
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "confirm_mfe_median",
+      "value": 1.193309991292729
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "confirm_mae_median",
+      "value": 0.32667427605168164
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "terminal_return",
+      "value": 0.3493430275723673
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "terminal_giveback",
+      "value": 2.0333943294726664
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_60s",
+      "value": 0.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_60s",
+      "value": 0.4140821274881924
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_60s",
+      "value": 0.80669892983777
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "p_new_extreme_next_60s",
+      "value": 0.7110754414125201
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_60s",
+      "value": -0.6186594365074822
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_120s",
+      "value": 0.02211514779034074
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_120s",
+      "value": 0.6066167959594646
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_120s",
+      "value": 0.5908305202538477
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_120s",
+      "value": -0.5293579905376737
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_180s",
+      "value": 0.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_180s",
+      "value": 0.7415039057383397
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_180s",
+      "value": 0.558881637645531
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_180s",
+      "value": -0.4507994340819914
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_300s",
+      "value": 0.27938796937209
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_300s",
+      "value": 1.0664155578524896
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_300s",
+      "value": 0.5604065320874039
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_300s",
+      "value": -0.46379574102667187
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "delta_mark_median_600s",
+      "value": 1.1799059927928057
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "incr_mfe_median_600s",
+      "value": 2.0197104454403956
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_600s",
+      "value": 0.29882394956815617
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "continuation_value_median_600s",
+      "value": -0.6054958238754766
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "n_confirmed",
+      "value": 4018.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "confirm_return_median",
+      "value": 0.8227438128065003
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "confirm_mfe_median",
+      "value": 1.0101488117452702
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "confirm_mae_median",
+      "value": 0.32969551686829834
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "terminal_return",
+      "value": 0.03691906195817814
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "terminal_giveback",
+      "value": 1.9982323608146602
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_60s",
+      "value": -0.029873845815927558
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_60s",
+      "value": 0.39114601142762373
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_60s",
+      "value": 0.7089439305616176
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "p_new_extreme_next_60s",
+      "value": 0.6821917808219178
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_60s",
+      "value": -0.6582301062887514
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_120s",
+      "value": -0.035478860247859845
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_120s",
+      "value": 0.5669456822585788
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_120s",
+      "value": 0.5201555782195398
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_120s",
+      "value": -0.6070830205734317
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_180s",
+      "value": 0.033304083502485426
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_180s",
+      "value": 0.7367458642173463
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_180s",
+      "value": 0.403778862722048
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_180s",
+      "value": -0.5587451497003457
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_300s",
+      "value": 0.28187950099595777
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_300s",
+      "value": 1.0757987184696933
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_300s",
+      "value": 0.3648776992677405
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_300s",
+      "value": -0.5324671661630948
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "delta_mark_median_600s",
+      "value": 1.1276621391899566
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "incr_mfe_median_600s",
+      "value": 1.9297209916081428
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_600s",
+      "value": 0.3233677941913875
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "continuation_value_median_600s",
+      "value": -0.5376905249800015
+    }
+  ],
+  "opportunity_capture_summary": [
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "time_to_25pct_s",
+      "value": 45.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "time_to_25pct_coverage_pct",
+      "value": 0.8648648648648649
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "time_to_50pct_s",
+      "value": 90.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "time_to_50pct_coverage_pct",
+      "value": 0.7996820349761526
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "time_to_75pct_s",
+      "value": 135.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "time_to_75pct_coverage_pct",
+      "value": 0.7106518282988871
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "time_to_90pct_s",
+      "value": 135.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "time_to_90pct_coverage_pct",
+      "value": 0.6534181240063593
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_30s",
+      "value": 0.9858499971981457
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_60s",
+      "value": 0.80669892983777
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_120s",
+      "value": 0.5908305202538477
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_180s",
+      "value": 0.5559474572098946
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_300s",
+      "value": 0.5573567432036581
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_600s",
+      "value": 0.29882394956815617
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "time_to_25pct_s",
+      "value": 30.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "time_to_25pct_coverage_pct",
+      "value": 0.8420660541345915
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "time_to_50pct_s",
+      "value": 90.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "time_to_50pct_coverage_pct",
+      "value": 0.771542090886516
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "time_to_75pct_s",
+      "value": 120.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "time_to_75pct_coverage_pct",
+      "value": 0.6848770797119443
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "time_to_90pct_s",
+      "value": 135.0
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "time_to_90pct_coverage_pct",
+      "value": 0.6347156692326794
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_30s",
+      "value": 0.8378730580424376
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_60s",
+      "value": 0.7094699930981503
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_120s",
+      "value": 0.5217922306609766
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_180s",
+      "value": 0.403778862722048
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_300s",
+      "value": 0.3691842821422291
+    },
+    {
+      "population_definition": "TRANSITION",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_600s",
+      "value": 0.3233677941913875
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "time_to_25pct_s",
+      "value": 45.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "time_to_25pct_coverage_pct",
+      "value": 0.8651685393258427
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "time_to_50pct_s",
+      "value": 90.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "time_to_50pct_coverage_pct",
+      "value": 0.7993579454253612
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "time_to_75pct_s",
+      "value": 135.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "time_to_75pct_coverage_pct",
+      "value": 0.7110754414125201
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "time_to_90pct_s",
+      "value": 135.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "time_to_90pct_coverage_pct",
+      "value": 0.6532905296950241
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_30s",
+      "value": 0.9889527036836543
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_60s",
+      "value": 0.80669892983777
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_120s",
+      "value": 0.5908305202538477
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_180s",
+      "value": 0.558881637645531
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_300s",
+      "value": 0.5604065320874039
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "WITH_5M",
+      "metric": "remaining_mfe_median_600s",
+      "value": 0.29882394956815617
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "time_to_25pct_s",
+      "value": 30.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "time_to_25pct_coverage_pct",
+      "value": 0.8427078148332504
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "time_to_50pct_s",
+      "value": 90.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "time_to_50pct_coverage_pct",
+      "value": 0.7720258835241414
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "time_to_75pct_s",
+      "value": 120.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "time_to_75pct_coverage_pct",
+      "value": 0.6856645097063215
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "time_to_90pct_s",
+      "value": 135.0
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "time_to_90pct_coverage_pct",
+      "value": 0.6353907416625186
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_30s",
+      "value": 0.837847461248701
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_60s",
+      "value": 0.7089439305616176
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_120s",
+      "value": 0.5201555782195398
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_180s",
+      "value": 0.403778862722048
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_300s",
+      "value": 0.3648776992677405
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "group": "AGAINST_5M",
+      "metric": "remaining_mfe_median_600s",
+      "value": 0.3233677941913875
+    }
+  ],
+  "phase12_matched_control": [
+    {
+      "population_definition": "TRANSITION",
+      "outcome_metric": "incremental_mfe_300s",
+      "n_cells": 2614,
+      "n_cells_both_present": 189,
+      "raw_delta": 0.017290849942909414,
+      "stratified_delta": -0.0026535888474925246,
+      "delta_ci_low": -0.1905526768090658,
+      "delta_ci_high": 0.1867275925834031,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "TRANSITION",
+      "outcome_metric": "remaining_mfe_300s",
+      "n_cells": 2614,
+      "n_cells_both_present": 189,
+      "raw_delta": 0.19536922695648906,
+      "stratified_delta": 0.24330392355870492,
+      "delta_ci_low": -0.17185096609640407,
+      "delta_ci_high": 0.6430209112228928,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "TRANSITION",
+      "outcome_metric": "continuation_value_300s",
+      "n_cells": 2614,
+      "n_cells_both_present": 189,
+      "raw_delta": 0.060514198132238975,
+      "stratified_delta": 0.17934039136144853,
+      "delta_ci_low": -0.19566451670738658,
+      "delta_ci_high": 0.6013912968139145,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "TRANSITION",
+      "outcome_metric": "incremental_mfe_600s",
+      "n_cells": 1837,
+      "n_cells_both_present": 94,
+      "raw_delta": -0.030836287120590278,
+      "stratified_delta": -0.10925197145955944,
+      "delta_ci_low": -0.5319985851225594,
+      "delta_ci_high": 0.286247026635008,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "TRANSITION",
+      "outcome_metric": "remaining_mfe_600s",
+      "n_cells": 1837,
+      "n_cells_both_present": 94,
+      "raw_delta": -0.03816726989638308,
+      "stratified_delta": 0.07936197169981675,
+      "delta_ci_low": -0.4276206104976753,
+      "delta_ci_high": 0.5595229952519503,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "TRANSITION",
+      "outcome_metric": "continuation_value_600s",
+      "n_cells": 1837,
+      "n_cells_both_present": 94,
+      "raw_delta": -0.055590128493634844,
+      "stratified_delta": 0.05496009922363036,
+      "delta_ci_low": -0.4556895158037663,
+      "delta_ci_high": 0.6035342535328658,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "TRANSITION",
+      "outcome_metric": "new_extreme_probability_300s",
+      "n_cells": 2614,
+      "n_cells_both_present": 189,
+      "raw_delta": 0.03386312234718214,
+      "stratified_delta": 0.03816378758797185,
+      "delta_ci_low": -0.006902106891898181,
+      "delta_ci_high": 0.08166359483301826,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "TRANSITION",
+      "outcome_metric": "terminal_return",
+      "n_cells": 3110,
+      "n_cells_both_present": 271,
+      "raw_delta": 0.16824259517896178,
+      "stratified_delta": 0.16045090054611874,
+      "delta_ci_low": -0.17646343937618217,
+      "delta_ci_high": 0.5054256647497568,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "outcome_metric": "incremental_mfe_300s",
+      "n_cells": 2607,
+      "n_cells_both_present": 188,
+      "raw_delta": 0.02307306343254112,
+      "stratified_delta": 0.002517346464394017,
+      "delta_ci_low": -0.1848253045365633,
+      "delta_ci_high": 0.19656992298262668,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "outcome_metric": "remaining_mfe_300s",
+      "n_cells": 2607,
+      "n_cells_both_present": 188,
+      "raw_delta": 0.19823518741263269,
+      "stratified_delta": 0.24396447097168864,
+      "delta_ci_low": -0.1669024850799262,
+      "delta_ci_high": 0.6695548460722832,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "outcome_metric": "continuation_value_300s",
+      "n_cells": 2607,
+      "n_cells_both_present": 188,
+      "raw_delta": 0.06378309808342222,
+      "stratified_delta": 0.18256374252959182,
+      "delta_ci_low": -0.1905726871906779,
+      "delta_ci_high": 0.5980784927765914,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "outcome_metric": "incremental_mfe_600s",
+      "n_cells": 1832,
+      "n_cells_both_present": 94,
+      "raw_delta": -0.030836287120590278,
+      "stratified_delta": -0.1092519714595594,
+      "delta_ci_low": -0.5140220986715747,
+      "delta_ci_high": 0.26415376785024397,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "outcome_metric": "remaining_mfe_600s",
+      "n_cells": 1832,
+      "n_cells_both_present": 94,
+      "raw_delta": -0.038167269896383305,
+      "stratified_delta": 0.07936197169981676,
+      "delta_ci_low": -0.41523072683746515,
+      "delta_ci_high": 0.5647668996170262,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "outcome_metric": "continuation_value_600s",
+      "n_cells": 1832,
+      "n_cells_both_present": 94,
+      "raw_delta": -0.055590128493634955,
+      "stratified_delta": 0.05496009922363033,
+      "delta_ci_low": -0.47403493507086086,
+      "delta_ci_high": 0.560627333664005,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "outcome_metric": "new_extreme_probability_300s",
+      "n_cells": 2607,
+      "n_cells_both_present": 188,
+      "raw_delta": 0.03387263016522468,
+      "stratified_delta": 0.038310854206807965,
+      "delta_ci_low": -0.006111314418296655,
+      "delta_ci_high": 0.08245131373696009,
+      "ci_excludes_zero": false
+    },
+    {
+      "population_definition": "STABLE_STATE",
+      "outcome_metric": "terminal_return",
+      "n_cells": 3099,
+      "n_cells_both_present": 269,
+      "raw_delta": 0.16955987535153005,
+      "stratified_delta": 0.15921869187386703,
+      "delta_ci_low": -0.16548528483528005,
+      "delta_ci_high": 0.496203033988059,
+      "ci_excludes_zero": false
+    }
+  ],
+  "gates_passed": 9,
+  "gates_total": 9,
+  "runtime_s": 21.3
+}

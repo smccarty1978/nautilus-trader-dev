@@ -1,0 +1,82 @@
+{
+  "study": "post_confirm_5m_forward_opportunity",
+  "phase": 0,
+  "checks": {
+    "armed_population": {
+      "expected": 8950,
+      "observed": 8950,
+      "match": true
+    },
+    "confirmed": {
+      "expected": 4705,
+      "observed": 4705,
+      "match": true
+    },
+    "stopped_before_confirm": {
+      "expected": 4245,
+      "observed": 4245,
+      "match": true
+    },
+    "measurable_confirmed_by_panel_membership": {
+      "expected": 4656,
+      "observed": 4656,
+      "match": true
+    },
+    "measurable_confirmed_by_walk_a": {
+      "expected": 4656,
+      "observed": 4656,
+      "match": true,
+      "note": "cross-check: FULL-lifecycle panel membership vs Walk-A confirm flag must agree"
+    },
+    "panel_trade_count": {
+      "expected": 4656,
+      "observed": 4656,
+      "match": true
+    },
+    "panel_classification_100pct_overlap": {
+      "expected": true,
+      "observed": true,
+      "match": true
+    },
+    "transition_matrix": {
+      "expected": {
+        "WITH_WITH": 623,
+        "WITH_AGAINST": 9,
+        "AGAINST_WITH": 6,
+        "AGAINST_AGAINST": 4018
+      },
+      "observed": {
+        "WITH_WITH": 623,
+        "AGAINST_AGAINST": 4018,
+        "AGAINST_WITH": 6,
+        "WITH_AGAINST": 9
+      },
+      "match": true
+    },
+    "group_transition": {
+      "expected": {
+        "WITH_5M": 629,
+        "AGAINST_5M": 4027
+      },
+      "observed": {
+        "AGAINST_5M": 4027,
+        "WITH_5M": 629
+      },
+      "match": true
+    },
+    "group_stable": {
+      "expected": {
+        "WITH_5M": 623,
+        "AGAINST_5M": 4018
+      },
+      "observed": {
+        "WITH_5M": 623,
+        "AGAINST_5M": 4018
+      },
+      "match": true
+    }
+  },
+  "all_reproduced": true,
+  "failed": [],
+  "non_measurable_confirmed": 49
+}

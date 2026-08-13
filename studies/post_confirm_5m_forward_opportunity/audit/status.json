@@ -1,0 +1,87 @@
+{
+  "study": "post_confirm_5m_forward_opportunity",
+  "date": "2026-08-13",
+  "critical": 0,
+  "warning": 0,
+  "verdict": "PASS",
+  "both_gates_run": true,
+  "causal_lint": {
+    "tool": "scripts/causal_lint.py",
+    "critical": 0,
+    "warning": 0,
+    "verdict": "PASS",
+    "files_scanned": 9
+  },
+  "lookahead_auditor": {
+    "scope": "causality only (A, B, C1-C3, F, G, H)",
+    "pass": 2,
+    "scope_hash": "ceadcc56ea9cf1999c0f30bb7a2943464bf8a1bbfebaf018da2809faeaec6bef",
+    "critical": 0,
+    "warning": 0,
+    "note": 1,
+    "verdict": "PASS",
+    "report": "audit/pass_02.md",
+    "prior_findings_adjudicated": true,
+    "referred_to_contract_checker": 0,
+    "passes": [
+      {
+        "pass": 1,
+        "scope": "SPEC.md pre-execution",
+        "critical": 0,
+        "warning": 3,
+        "note": 2,
+        "verdict": "PASS",
+        "report": "audit/pass_01.md",
+        "resolution": "all 3 warnings + 2 notes fixed in SPEC.md/analysis.py before implementation completed (see pass_01.md Pass 2 adjudication section)"
+      },
+      {
+        "pass": 2,
+        "scope": "completion -- implementation code and results",
+        "critical": 0,
+        "warning": 1,
+        "note": 1,
+        "verdict": "PASS",
+        "report": "audit/pass_02.md",
+        "resolution": "the 1 new WARNING (mfe_bucket mischaracterization in Phase 11 -- verified directly against the panel: runner_bucket is the correct constant-per-trade, eventual_max_mfe_atr-derived column; mfe_bucket is a contemporaneous per-offset value, 60.6% of trades cross multiple buckets) fixed by switching Phase 11 to runner_bucket, not just relabeling; full pipeline re-run, 9/9 gates still pass, verdict unchanged. The 1 NOTE (stop condition 5's wrong test-file citation) fixed by citing the actual enforcing gate (V_MATCH_confirmation_time_only). See pass_02.md Pass 3 adjudication section."
+      }
+    ]
+  },
+  "contract_checker": {
+    "scope": "deliverables, seals, terminal-label reachability, C4/D/E",
+    "pass": 2,
+    "critical": 0,
+    "warning": 0,
+    "verdict": "CLEAR",
+    "report": "audit/contract_pass_02.md",
+    "prior_findings_adjudicated": true,
+    "new_criticals_raised": 0,
+    "passes": [
+      {
+        "pass": 1,
+        "scope": "SPEC.md pre-execution",
+        "critical": 0,
+        "warning": 6,
+        "verdict": "BLOCKED",
+        "report": "audit/contract_pass_01.md",
+        "resolution": "all 6 warnings fixed in SPEC.md before implementation (see contract_pass_01.md Pass 2 adjudication section)"
+      },
+      {
+        "pass": 2,
+        "scope": "completion -- Deliverables Manifest vs. actual results/",
+        "critical": 0,
+        "warning": 1,
+        "verdict": "BLOCKED",
+        "report": "audit/contract_pass_02.md",
+        "resolution": "1 residual self-contradiction found (SS3.1 item 9 vs SS9's audit-plan text disagreed on whether Phase 8 needed fresh causal proof -- the earlier 'FIXED' claim for this exact finding in pass 1 had not actually landed in SS9's text); corrected SS9 to match SS3.1 item 9. No new findings. Re-adjudicated CLEAR in this session before commit."
+      }
+    ]
+  },
+  "validation_gates": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "report": "results/validation_report.json"
+  },
+  "study_verdict": "C3_EXPLAINED_BY_CONFIRMATION_QUALITY",
+  "study_verdict_source": "computed by implementation/validate.py::determine_verdict from the frozen SPEC.md section 6 thresholds against results/primary_table.csv, matched_confirmation_control.csv, opportunity_capture_time_to_threshold.csv, giveback_timing.csv, mfe_quality_buckets.csv, and year_side_stability.csv; 0 of 8 Phase 12 outcome metrics have a stratified-delta CI excluding zero"
+}
