@@ -1,0 +1,65 @@
+{
+  "study": "p90_regime_age_progress_diagnostic",
+  "years": "2021-2025 (2026 SEALED)",
+  "n_gates": 34,
+  "n_gates_failed": 0,
+  "verdict": {
+    "verdicts_fired": [
+      "D3_YOUNGER_TRADES_BETTER",
+      "D4_AGE_PROGRESS_INTERACTION",
+      "D5_NOTHING_CHANGES"
+    ],
+    "primary_verdict": "D3_YOUNGER_TRADES_BETTER",
+    "unclassified": false,
+    "age_contrast_substitution": "SPEC 7's young/old contrast uses 300-600s vs >900s. The brief's 120-240s and 240-300s buckets carry n=5 and n=14 and are barred from every inferential test by the thin-cell rule (SPEC 6.1).",
+    "facts": {
+      "usable_contrast": true,
+      "young_bucket": "300-600s",
+      "old_bucket": ">900s",
+      "young_n": 562.0,
+      "old_n": 6408.0,
+      "p_flip_le_300s": {
+        "young": 0.4181494661921708,
+        "old": 0.4794007490636704,
+        "rel_diff": 0.12776634786476873
+      },
+      "p_confirm_before_1atr": {
+        "young": 0.48398576512455516,
+        "old": 0.5188826466916354,
+        "rel_diff": 0.0672538998742407
+      },
+      "median_eventual_mfe": {
+        "young": 2.9005363374481083,
+        "old": 2.3053842592440046
+      },
+      "p_mfe_ge_3": {
+        "young": 0.47794117647058826,
+        "old": 0.3699248120300752
+      },
+      "monotone_velocity_metric": "median_eventual_mfe",
+      "velocity_series": [
+        2.448334514240937,
+        2.3540512435723517,
+        2.311300097590002,
+        2.2429958788442637
+      ],
+      "ab_deltas": {
+        "p_flip_le_300s": 0.004984232422662271,
+        "p_confirm_before_1atr": 0.0019951472218119326,
+        "median_eventual_mfe": 0.019066140038584756
+      }
+    }
+  },
+  "population_fact": {
+    "headline": "The >600s gate is barely a restriction. The MODEL is what excludes young regimes: the P90 qualify rate among ELIGIBLE checkpoints rises ~180x with regime age.",
+    "n_a_arms_excluded_by_600s_gate": 593,
+    "n_a_arms_strictly_below_600s": 581,
+    "n_a": 9189,
+    "n_b": 8950
+  },
+  "discrepancies_recorded": [
+    "D_AGE_FLOOR",
+    "D_TRAINING_AGE_CEILING",
+    "D_PROGRESS_BUCKET_0_5"
+  ]
+}

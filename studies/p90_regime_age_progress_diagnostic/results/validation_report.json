@@ -1,0 +1,222 @@
+{
+  "n_gates": 34,
+  "n_failed": 0,
+  "gates": [
+    {
+      "gate": "V_LINEAGE_scored_observations",
+      "expected": 2028394,
+      "observed": 2028394,
+      "pass": true
+    },
+    {
+      "gate": "V_LINEAGE_eligible_regimes",
+      "expected": 15076,
+      "observed": 15076,
+      "pass": true
+    },
+    {
+      "gate": "V_PARITY_population_b_8950",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true
+    },
+    {
+      "gate": "V_LINEAGE_population_a",
+      "expected": 9189,
+      "observed": 9189,
+      "pass": true
+    },
+    {
+      "gate": "V_AB_n_in_both",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true
+    },
+    {
+      "gate": "V_AB_n_same_timestamp",
+      "expected": 8596,
+      "observed": 8596,
+      "pass": true
+    },
+    {
+      "gate": "V_AB_n_different_timestamp",
+      "expected": 354,
+      "observed": 354,
+      "pass": true
+    },
+    {
+      "gate": "V_AB_n_only_a",
+      "expected": 239,
+      "observed": 239,
+      "pass": true
+    },
+    {
+      "gate": "V_AB_n_only_b",
+      "expected": 0,
+      "observed": 0,
+      "pass": true
+    },
+    {
+      "gate": "V_AB_b_subset_of_a_at_regime_level",
+      "expected": 0,
+      "observed": 0,
+      "pass": true
+    },
+    {
+      "gate": "V_TILE_regime_end_is_next_start",
+      "expected": 0,
+      "observed": 0,
+      "pass": true
+    },
+    {
+      "gate": "V_CONTRACT_eligibility_matches_artifact",
+      "expected": true,
+      "observed": true,
+      "pass": true
+    },
+    {
+      "gate": "V_SEALED_no_2026",
+      "expected": true,
+      "observed": true,
+      "pass": true
+    },
+    {
+      "gate": "V_FROZEN_velocity_is_at_arm_only",
+      "expected": true,
+      "observed": true,
+      "pass": true
+    },
+    {
+      "gate": "V_FROZEN_age_above_eligibility_floor",
+      "expected": true,
+      "observed": true,
+      "pass": true
+    },
+    {
+      "gate": "V_FROZEN_running_mfe_above_eligibility_floor",
+      "expected": true,
+      "observed": true,
+      "pass": true
+    },
+    {
+      "gate": "V_ATR_positive_frozen_at_checkpoint",
+      "expected": true,
+      "observed": true,
+      "pass": true
+    },
+    {
+      "gate": "V_LABEL_buckets_from_at_arm_columns_only",
+      "expected": true,
+      "observed": true,
+      "pass": true
+    },
+    {
+      "gate": "V_COMPLETE_events_A",
+      "expected": 9189,
+      "observed": 9189,
+      "pass": true
+    },
+    {
+      "gate": "V_COMPLETE_events_B",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true
+    },
+    {
+      "gate": "V_COMPLETE_40_cell_grid",
+      "expected": 40,
+      "observed": 40,
+      "pass": true
+    },
+    {
+      "gate": "V_DENOM_median_return_at_confirm_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_mean_return_at_confirm_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_mae_to_confirm_p50_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_mae_to_confirm_p75_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_mae_to_confirm_p90_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_median_secs_to_confirm_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_median_eventual_mfe_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_p_mfe_ge_1_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_p_mfe_ge_2_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_p_mfe_ge_3_is_confirmers_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "n_cells_checked": 22
+    },
+    {
+      "gate": "V_DENOM_all_columns_present",
+      "expected": [],
+      "observed": [],
+      "pass": true
+    },
+    {
+      "gate": "V_DENOM_coverage_is_complete",
+      "expected": [],
+      "observed": [],
+      "pass": true,
+      "n_confirmer_columns_checked": 10
+    },
+    {
+      "gate": "V_DENOM_leak_surface_is_disclosed",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "n_nonconfirmers_with_a_return_at_confirm_value": 8255
+    }
+  ]
+}
