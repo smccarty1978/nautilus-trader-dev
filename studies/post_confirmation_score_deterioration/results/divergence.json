@@ -1,0 +1,94 @@
+{
+  "note": "Manifest item 11. Phase 3 price/score divergence, extracted from deterioration_event_table.json.",
+  "definition": "Price sets a new favorable extreme for the trade while stream B simultaneously sets a new high -- the regime is still paying, but the model's conviction that it is about to end is at its worst so far. Simplest interpretable form; no parameter search.",
+  "base_failure_rate": 0.4814,
+  "verdict": "NULL. Fires on 157 trades at precision 0.338, BELOW the 0.481 base rate -- it weakly predicts winners, not failures.",
+  "events": [
+    {
+      "event": "DIVERGENCE_price_high_score_high",
+      "n_fired": 157,
+      "fire_rate": 0.0347,
+      "failures_caught": 53,
+      "sensitivity": 0.0243,
+      "winner_touch_rate": 0.0443,
+      "precision_p_failure_given_event": 0.3376,
+      "base_failure_rate": 0.4814,
+      "econ_all": {
+        "n": 157,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": 0.2254,
+        "p25_open_pnl_atr": 0.1083,
+        "p75_open_pnl_atr": 0.4308,
+        "median_mfe_at_fire_atr": 0.2254,
+        "median_giveback_at_fire_atr": 0.0,
+        "median_remaining_mfe_atr": 1.298,
+        "median_seconds_to_terminal": 585.0
+      },
+      "econ_failures": {
+        "n": 53,
+        "median_fire_elapsed_s": 15.0,
+        "median_open_pnl_atr": 0.1623,
+        "p25_open_pnl_atr": 0.0606,
+        "p75_open_pnl_atr": 0.3268,
+        "median_mfe_at_fire_atr": 0.1623,
+        "median_giveback_at_fire_atr": 0.0,
+        "median_remaining_mfe_atr": 0.4548,
+        "median_seconds_to_terminal": 285.0
+      },
+      "econ_winners": {
+        "n": 104,
+        "median_fire_elapsed_s": 20.0,
+        "median_open_pnl_atr": 0.2395,
+        "p25_open_pnl_atr": 0.1241,
+        "p75_open_pnl_atr": 0.4768,
+        "median_mfe_at_fire_atr": 0.2395,
+        "median_giveback_at_fire_atr": 0.0,
+        "median_remaining_mfe_atr": 2.2738,
+        "median_seconds_to_terminal": 885.0
+      },
+      "runner_touch_by_mfe_bucket": {
+        "0-1": {
+          "n_runners": 0,
+          "n_touched": 0,
+          "touch_rate": null,
+          "median_mfe_at_touch_atr": null,
+          "median_remaining_mfe_after_touch_atr": null
+        },
+        "1-2": {
+          "n_runners": 188,
+          "n_touched": 4,
+          "touch_rate": 0.0213,
+          "median_mfe_at_touch_atr": 0.2923,
+          "median_remaining_mfe_after_touch_atr": 0.5858
+        },
+        "2-2.5": {
+          "n_runners": 323,
+          "n_touched": 10,
+          "touch_rate": 0.031,
+          "median_mfe_at_touch_atr": 0.2051,
+          "median_remaining_mfe_after_touch_atr": 0.7847
+        },
+        "2.5-3": {
+          "n_runners": 293,
+          "n_touched": 18,
+          "touch_rate": 0.0614,
+          "median_mfe_at_touch_atr": 0.3671,
+          "median_remaining_mfe_after_touch_atr": 1.298
+        },
+        "3-inf": {
+          "n_runners": 1546,
+          "n_touched": 72,
+          "touch_rate": 0.0466,
+          "median_mfe_at_touch_atr": 0.2938,
+          "median_remaining_mfe_after_touch_atr": 3.4483
+        }
+      },
+      "touch_rate_ge_2atr": 0.0463,
+      "n_runners_ge_2atr": 2162,
+      "touch_rate_ge_2_5atr": 0.0489,
+      "n_runners_ge_2_5atr": 1839,
+      "touch_rate_ge_3atr": 0.0466,
+      "n_runners_ge_3atr": 1546
+    }
+  ]
+}

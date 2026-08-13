@@ -1,0 +1,163 @@
+{
+  "study": "post_confirm_retracement_recovery",
+  "n_gates": 14,
+  "n_passed": 14,
+  "all_passed": true,
+  "gates": [
+    {
+      "gate_id": "V1",
+      "description": "2026 sealed; every timestamp resolves to 2021-2025 in CT",
+      "passed": true,
+      "detail": {
+        "unexpected_years": [],
+        "permitted": [
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ]
+      }
+    },
+    {
+      "gate_id": "V2",
+      "description": "Accepted predecessor lineage reproduced",
+      "passed": true,
+      "detail": {
+        "n_checks": 23,
+        "n_failed": 0,
+        "failed": []
+      }
+    },
+    {
+      "gate_id": "V3",
+      "description": "No estimator library; HWM never used as an exit price",
+      "passed": true,
+      "detail": {
+        "forbidden_imports": [],
+        "unsuffixed_hwm_refs": []
+      }
+    },
+    {
+      "gate_id": "V4",
+      "description": "Arm is the first causal breach of hwm_prev - D after the rung",
+      "passed": true,
+      "detail": {
+        "arms_checked": 552,
+        "violations": [],
+        "n_violations": 0
+      }
+    },
+    {
+      "gate_id": "V5",
+      "description": "Recovery targets frozen at the arm; later HWM never moves them",
+      "passed": true,
+      "detail": {
+        "targets_checked": 2755,
+        "violations": [],
+        "n_violations": 0
+      }
+    },
+    {
+      "gate_id": "V10",
+      "description": "Vectorised fill == accepted realise(i, fill_next=True), bar for bar",
+      "passed": true,
+      "detail": {
+        "bars_checked": 1000,
+        "violations": []
+      }
+    },
+    {
+      "gate_id": "V13",
+      "description": "Same-bar ambiguity resolved AGAINST the study hypothesis",
+      "passed": true,
+      "detail": {
+        "recovery_bars_that_also_fell_further": 111,
+        "resolution": "counted as RECOVERED (optimistic about recovery, conservative for a failed-recovery finding)"
+      }
+    },
+    {
+      "gate_id": "V6",
+      "description": "Constant-population accounting; survivor variants suffixed",
+      "passed": true,
+      "detail": {
+        "rows_checked": 120,
+        "violations": 0,
+        "alive_columns": [
+          "n_alive_15",
+          "p_recover_15_alive_only",
+          "n_alive_30",
+          "p_recover_30_alive_only",
+          "n_alive_60",
+          "p_recover_60_alive_only",
+          "n_alive_120",
+          "p_recover_120_alive_only",
+          "n_alive_180",
+          "p_recover_180_alive_only",
+          "n_alive_300",
+          "p_recover_300_alive_only"
+        ]
+      }
+    },
+    {
+      "gate_id": "V7",
+      "description": "No conditional recovery time without its resolution rate",
+      "passed": true,
+      "detail": {
+        "rows": 120,
+        "unpaired": 0
+      }
+    },
+    {
+      "gate_id": "V8",
+      "description": "Every emitted row is labelled STOP_LIVE or UNCONSTRAINED",
+      "passed": true,
+      "detail": {
+        "tables_missing_path": [],
+        "state_panel_unexpected_path_labels": []
+      }
+    },
+    {
+      "gate_id": "V9",
+      "description": "Strata partition every rung cell exactly, all cells x all years",
+      "passed": true,
+      "detail": {
+        "pooled_violations": 0,
+        "per_year_violations": [],
+        "cells": 24
+      }
+    },
+    {
+      "gate_id": "V11",
+      "description": "First-trigger-per-trade is the genuine earliest causal trigger",
+      "passed": true,
+      "detail": {
+        "triggers_checked": 286933,
+        "violations": []
+      }
+    },
+    {
+      "gate_id": "V12",
+      "description": "Placebo is length-blind: grid offsets, not realised lifetime",
+      "passed": true,
+      "detail": {
+        "grid": [
+          15,
+          600,
+          40
+        ],
+        "n_draws": 20,
+        "max_fired": 20,
+        "share_of_arms_where_all_draws_fire": 0.45139332414534944
+      }
+    },
+    {
+      "gate_id": "V14",
+      "description": "Every threshold in every result is a member of a frozen grid",
+      "passed": true,
+      "detail": {
+        "violations": []
+      }
+    }
+  ]
+}

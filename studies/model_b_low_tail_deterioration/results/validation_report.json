@@ -1,0 +1,122 @@
+{
+  "V1 SEAL": {
+    "passed": true,
+    "detail": "all inputs are frozen predecessor artifacts; 2024 assertion runs in common.assert_2024_seal"
+  },
+  "V2 LINEAGE": {
+    "passed": true,
+    "failed_quantities": [],
+    "n_checks": 14
+  },
+  "V3 NO REFIT": {
+    "passed": true,
+    "violations": [],
+    "scanned_files": 11
+  },
+  "V4 POPULATION": {
+    "passed": true,
+    "n_obs": 1410,
+    "n_unique_trades": 380
+  },
+  "V5 DISJOINT BANDS": {
+    "passed": true,
+    "sum_n": 1410,
+    "n_population": 1410,
+    "pairwise_overlap": 0,
+    "n_covered": 1410,
+    "n_bands": 10
+  },
+  "V6 FIRST TRIGGER": {
+    "passed": true,
+    "max_rows_per_cut_trade": 1,
+    "clause_uniqueness": true,
+    "clause_minimality_n_non_earliest": 0
+  },
+  "V7 TIMING REDERIVATION": {
+    "passed": true,
+    "reason": null,
+    "n_frozen": 2991,
+    "n_rederived": 2991,
+    "n_quantities_checked": 53838,
+    "total_mismatches": 0,
+    "checks": [
+      {
+        "quantity": "fwd_mfe_180",
+        "mismatches": 0
+      },
+      {
+        "quantity": "fwd_mae_180",
+        "mismatches": 0
+      },
+      {
+        "quantity": "fwd_mfe_240",
+        "mismatches": 0
+      },
+      {
+        "quantity": "fwd_mae_240",
+        "mismatches": 0
+      },
+      {
+        "quantity": "fwd_mfe_300",
+        "mismatches": 0
+      },
+      {
+        "quantity": "fwd_mae_300",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a050_180",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a050_240",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a050_300",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a075_180",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a075_240",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a075_300",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a100_180",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a100_240",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a100_300",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a125_180",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a125_240",
+        "mismatches": 0
+      },
+      {
+        "quantity": "lab_f050_a125_300",
+        "mismatches": 0
+      }
+    ]
+  },
+  "V8 PLACEBO MATCH": {
+    "passed": true,
+    "max_deficit": 0
+  },
+  "all_passed": true
+}

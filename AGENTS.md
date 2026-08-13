@@ -34,185 +34,165 @@ This repository follows strict methodology to ensure all backtests, studies, and
 - Strategies: Config-driven, indicator-agnostic
 - Backtests: Strategy-agnostic runners
 - Analysis: Works on any backtest output
+---
+
+## DOCUMENTATION INDEX
+
+Implementation detail lives in `docs/`. Do not guess — read the relevant spec
+before writing code. These files are canonical; this document intentionally does
+not restate them.
+
+| Topic | Spec |
+|---|---|
+| Wrangling, catalog build, validation, timestamp convention | `docs/DATA_CATALOG.md` |
+| Runner setup, StrategyConfig, parameter sweeps, logging | `docs/BACKTEST_EXECUTION.md` |
+| NT built-in reports, tearsheets, key metrics | `docs/ANALYSIS_REPORTING.md` |
+| Feature collection, MFE/MAE replay, ML requirements, pitfalls | `docs/STUDY_METHODOLOGY.md` |
+| Indicator and Strategy `SPEC.md` templates | `docs/TEMPLATES.md` |
+| Profiling, Cython/Rust thresholds, ONNX inference | `docs/PERFORMANCE.md` |
+| Feature registry contract | `features/FEATURE_REGISTRY_CONTRACT.md` |
 
 ---
 
-## DATA HANDLING
-
-### Timestamp Convention (CRITICAL)
-
-Databento timestamps bars at OPEN time. NT must process at CLOSE time.
-
-```python
-# When loading data, ALWAYS apply ts_init_delta:
-# 1m bars: ts_init_delta = 60_000_000_000 (nanoseconds)
-# 5m bars: ts_init_delta = 300_000_000_000 (nanoseconds)
-# 1s bars: No adjustment needed
-
-from nautilus_trader.persistence.wranglers import BarDataWrangler
-
-wrangler = BarDataWrangler(instrument=instrument, bar_type=bar_type)
-bars = wrangler.process(
-    data=df,
-    ts_init_delta=60_000_000_000  # For 1m bars
-)
-```
+## AGENT GOVERNANCE
 
 ### Audit gate (mandatory)
 
-Before declaring any of the following "done", invoke the lookahead-auditor subagent:
+Before declaring any of the following "done", invoke the causal audit subagent (`lookahead-auditor` in Claude; `lookahead_auditor` in Codex):
 - A new strategy file or material edit to an existing one
 - A new study/research script that produces results you'll act on
 - Any change to data loading, feature engineering, or label construction
 
+**The gate is split.** Two agents with disjoint scope, defined in
+`docs/CAUSAL_CHECKLIST.md` § SCOPE SPLIT:
+
+| Agent | Owns | Must not report |
+|---|---|---|
+| `lookahead-auditor` | A, B, C1–C3, F, G, H — causality and timestamps | deliverables, manifests, seal design, test quality |
+| `contract-checker` | C4, D, E + the SPEC's Deliverables Manifest | novel causal theories |
+
+Splitting them is deliberate. Across ~100 historical audits, ~60% of blocking
+findings were completeness issues raised by the causal auditor, which has no
+natural stopping point for them —
+`studies/codex_5.6_short_rth_enriched_volume_level_retrain/` ran **18 passes**
+and produced a 1,240-line append-only `audit.md`.
+
 Workflow:
-1. Invoke lookahead-auditor on the changed scope
-2. Read the resulting audit.md
-3. Address every CRITICAL finding by editing the code (do not dismiss without explicit approval from the user)
-4. Address WARNING findings unless they are out of scope or the user has waived them
-5. Re-invoke lookahead-auditor on the same scope
-6. Repeat 3–5 until zero CRITICAL and either zero WARNING or user-acknowledged WARNING
-7. Only then report back to the user
+
+1. **Run the free lint first.** `python scripts/causal_lint.py --study studies/<name> --json studies/<name>/audit/lint.json`.
+   It catches the known-recurring defect classes (H4 trigger-price fills, session
+   gates on `ts_event`, `center=True`, `.shift(-N)`, `bfill`, `merge_asof`
+   without `direction=`, non-`*.v.0` symbols) deterministically and for free.
+   Fix everything it reports before spending an agent turn.
+2. Invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
+   on the Deliverables Manifest. They are independent and may run in parallel.
+3. Each writes a **new** `audit/pass_<NN>.md` plus a machine-readable
+   `audit/status.json` (`contract_status.json` for the contract-checker).
+   **Never append to a previous pass's report** — append-only files make the
+   verdict unparseable, and a gate that greps for "critical" and "0" will pass
+   on a failing report that merely contains an earlier clean summary.
+4. Address every CRITICAL finding by editing the code (do not dismiss without
+   explicit user approval). Address WARNINGs unless out of scope or waived.
+5. Re-invoke on the same scope, **passing the previous pass's findings**. The
+   auditor must adjudicate every prior finding (`FIXED` / `NOT FIXED` /
+   `WITHDRAWN`) *before* raising anything new, and may raise **at most 3 new
+   CRITICAL findings per pass.**
+6. Repeat 4–5 until `status.json` shows `critical: 0` and either zero WARNING or
+   user-acknowledged WARNING.
+7. Only then report back to the user.
+
+Gates read `audit/status.json`. Do not parse prose for a verdict.
 
 Do not skip the audit because the change "looks small". Look-ahead bugs are most often introduced by small edits to previously-clean code.
 
-**Pre-execution trigger for complex causal/matching logic.** The completion gate above catches bugs only after the full pipeline has already run once — expensive when a multi-phase study (smoothing, matched-donor placebos, permutation/shuffle controls, stop-timing mechanics) has to be entirely rerun after the fact. For any of the following, invoke lookahead-auditor on that component's code BEFORE its first execution, not only before declaring the study done:
+### Commit protocol (mandatory)
+
+Every phase gate ends with a commit. A study that runs for days without commits
+cannot be bisected when a defect is found late, and audit reports lose their
+anchor to the code they audited.
+
+**Commit at these points, and only these:**
+
+| Trigger | Message prefix | Must include |
+|---|---|---|
+| SPEC frozen (before implementation) | `spec(<study>):` | `SPEC.md`, `config/*.yaml` |
+| Phase gate passed (`status.json` clean) | `phase(<study>): <phase> <verdict>` | code + `audit/pass_NN.md` + `audit/status.json` |
+| Study accepted | `study(<study>): ACCEPTED` | `BUILD_REPORT.md` / `STUDY_REPORT.md` + manifests |
+| Tooling / governance change | `chore:` or `docs:` | — |
+
+Rules:
+
+1. **Never commit on `main`.** Branch first: `study/<study_name>` or
+   `chore/<topic>`. Open a PR when the study is accepted.
+2. **The audit artifact commits with the code it audited.** A `pass_NN.md`
+   committed separately from its code is unanchored — the scope hash it records
+   must correspond to the tree in that same commit.
+3. **Never commit generated data.** `canonical_*/`, `_work/`, `results/*.parquet`,
+   `artifacts/**/model.joblib` stay untracked. Commit the *manifests* and hashes
+   that identify them, not the bytes.
+4. Run `python scripts/causal_lint.py` and `python scripts/sync_agents.py --check`
+   before committing. Both must exit 0.
+5. Do not use `--no-verify` or skip hooks.
+
+### Agent definition parity (all three harnesses)
+
+`.claude/agents/*.md` is the **canonical** source. `.agents/agents_staging/*.md`
+(Antigravity) and `.codex/agents/*.toml` (Codex) are **generated** — do not edit
+them by hand.
+
+```bash
+python scripts/sync_agents.py           # regenerate from canonical
+python scripts/sync_agents.py --check   # verify in sync
+```
+
+This exists because the harnesses silently drifted: the Codex auditor was
+missing 14 checklist rules including `C4` and `D4`, the #2 and #4 most frequent
+finding categories in the repository. An audit that passed under Codex would
+fail under Claude, causing rework on every harness switch. Agent definitions
+must **reference** `docs/CAUSAL_CHECKLIST.md`, never restate rules inline;
+`sync_agents.py` warns when a definition inlines rule text.
+
+### Standing Authorization for Named Mandatory Agent Gates
+
+Named mandatory gates in this repository constitute standing user authorization for the main orchestrator to invoke the specifically named agent when that gate condition is reached.
+
+This authorization applies only to:
+
+- `repo-scout` / Codex `repo_scout` where the selected risk tier requires it
+- `contract-checker` / Codex `contract_checker` where the selected risk tier requires it
+- `results-triager` / Codex `results_triager` for exact approved test commands
+- `lookahead-auditor` / Codex `lookahead_auditor` at mandatory causal or look-ahead audit gates
+
+The invocation must remain limited to the scope of the named gate.
+
+This standing authorization does not permit:
+
+- discretionary agent use
+- unnamed or general-purpose agents
+- broad parallel fan-out
+- nested delegation
+- workers spawning subagents
+- expanding the audit into implementation work
+- code modifications by an audit-only agent
+
+Session-level instructions prohibiting discretionary agent spawning remain in force. They do not prevent execution of a specifically named mandatory repository gate covered by this standing authorization.
+
+If a mandatory gate and a session-level restriction appear to conflict, the orchestrator should:
+
+1. invoke only the specifically named mandatory gate;
+2. keep the scope limited to the gate’s defined responsibilities;
+3. avoid all additional agent delegation; and
+4. record the invocation and resulting verdict in the study artifacts.
+
+Passing criteria remain governed by the applicable frozen contract or SPEC. Standing authorization to invoke an auditor does not relax the audit acceptance standard. Do not mark the work finalized unless the audit satisfies the acceptance gate defined by the applicable frozen SPEC. At minimum, any CRITICAL finding blocks finalization. Any WARNING must either be remediated or explicitly adjudicated according to the SPEC; do not silently treat an unresolved WARNING as cleared.
+
+**Pre-execution trigger for complex causal/matching logic.** The completion gate above catches bugs only after the full pipeline has already run once — expensive when a multi-phase study (smoothing, matched-donor placebos, permutation/shuffle controls, stop-timing mechanics) has to be entirely rerun after the fact. For any of the following, invoke the harness-specific lookahead auditor (`lookahead_auditor` in Codex) on that component's code BEFORE its first execution, not only before declaring the study done:
 - state-smoothing / hysteresis state machines
 - matched-donor or nearest-neighbor selection logic (placebos, controls)
 - any shuffle/permutation/circular-shift control
 - stop/exit fill-timing mechanics (new or reused from another study)
 
 If the component reuses another study's execution stack "verbatim," audit it anyway — a bug inherited from upstream is still a bug in your results. (See `studies/rl_regime_feasibility/contextual_runner_exit_v3/`: a completion-gate-only audit found 4 CRITICAL issues — a phantom stop-fill price inherited from a reused sim stack, a matched-placebo geometry mismatch, and two matched-donor/shuffle controls that leaked outcome-correlated or future information — only after the entire pipeline had already been run once and was partway through a second run.)
-
-### Data Directory Structure
-
-```
-data/
-  raw/
-    {instrument}_{timeframe}_{year}.parquet
-  catalog/
-    # NT catalog files (generated)
-```
-
-### Data Validation Checklist
-- [ ] Timestamps verified (first bar at expected time)
-- [ ] No gaps in data (or gaps documented)
-- [ ] OHLCV values valid (H >= L, O/C within H/L)
-- [ ] ts_init_delta applied for aggregated bars
-
----
-
-## DATA CATALOG
-
-The catalog is your single source of truth. Process data once, use forever.
-
-### Why Catalog Matters
-- **Bit-perfect consistency** - Every backtest uses identical data
-- **Process once, use forever** - Wrangling done once during catalog build
-- **No "it worked before" bugs** - Eliminates per-script data handling differences
-- **Timestamp corrections baked in** - ts_init_delta applied at catalog time
-
-### Catalog Workflow
-
-**1. Download raw data (once)**
-```python
-# scripts/download_data.py
-import databento as db
-
-client = db.Historical()
-data = client.timeseries.get_range(
-    dataset="GLBX.MDP3",
-    symbols=["NQ.c.0"],
-    start="2025-01-01",
-    end="2025-12-31",
-)
-data.to_parquet("data/raw/NQ_1s_2025.parquet")
-```
-
-**2. Build catalog (once)**
-```python
-# scripts/build_catalog.py
-from nautilus_trader.persistence.catalog import ParquetDataCatalog
-from nautilus_trader.persistence.wranglers import BarDataWrangler
-
-catalog = ParquetDataCatalog("./data/catalog")
-
-# Load raw data
-df = pd.read_parquet("data/raw/NQ_1s_2025.parquet")
-
-# Wrangle with timestamp correction
-wrangler = BarDataWrangler(instrument=instrument, bar_type=bar_type)
-bars = wrangler.process(
-    data=df,
-    ts_init_delta=60_000_000_000,  # 1m bars: shift to CLOSE time
-)
-
-# Write to catalog
-catalog.write_data(bars)
-```
-
-**3. Use in backtests (always)**
-```python
-# backtests/run_backtest.py
-from nautilus_trader.persistence.catalog import ParquetDataCatalog
-
-catalog = ParquetDataCatalog("./data/catalog")
-
-# Data is always identical, always correct
-bars_1m = catalog.bars(bar_types=["NQ.XCME-1-MINUTE-LAST-EXTERNAL"])
-bars_1s = catalog.bars(bar_types=["NQ.XCME-1-SECOND-LAST-EXTERNAL"])
-```
-
-### Catalog Best Practices
-
-1. **Build once, validate thoroughly**
-   - Check first/last timestamps
-   - Verify bar count matches expected
-   - Spot check OHLCV values
-
-2. **Version your catalog builds**
-   - Document when catalog was built
-   - Note any data corrections applied
-   - Tag significant catalog versions
-
-3. **Never modify raw data**
-   - Keep raw Databento files untouched
-   - All transformations happen in wrangler
-   - Can rebuild catalog if needed
-
-4. **Separate catalogs for different data**
-   ```
-   data/
-     catalog/
-       NQ_2025/          # NQ futures 2025
-       ES_2025/          # ES futures 2025
-       NQ_2024/          # NQ futures 2024
-   ```
-
-### Catalog Validation Script
-
-```python
-# scripts/validate_catalog.py
-from nautilus_trader.persistence.catalog import ParquetDataCatalog
-
-catalog = ParquetDataCatalog("./data/catalog")
-
-# Check available instruments
-print(catalog.instruments())
-
-# Check bar types
-print(catalog.bar_types())
-
-# Verify data range
-bars = catalog.bars(bar_types=["NQ.XCME-1-MINUTE-LAST-EXTERNAL"])
-print(f"First bar: {bars[0].ts_event}")
-print(f"Last bar: {bars[-1].ts_event}")
-print(f"Total bars: {len(bars)}")
-
-# Spot check
-for bar in bars[:5]:
-    print(f"{bar.ts_event}: O={bar.open} H={bar.high} L={bar.low} C={bar.close}")
-```
 
 ---
 
@@ -276,627 +256,6 @@ for bar in bars[:5]:
     ├── build_catalog.py         # Build NT catalog
     └── validate_data.py         # Data validation
 ```
-
----
-
-## STRATEGY CONFIGURATION
-
-All strategies use NT StrategyConfig pattern for reproducibility and portability.
-
-### Config Definition
-
-```python
-from nautilus_trader.config import StrategyConfig
-from decimal import Decimal
-
-class MyStrategyConfig(StrategyConfig):
-    """Configuration for MyStrategy."""
-    
-    # Instrument
-    instrument_id: str
-    
-    # Bar types
-    bar_type_1m: str
-    bar_type_1s: str
-    
-    # Strategy parameters
-    param_1: int = 10
-    param_2: float = 1.0
-    
-    # Risk parameters
-    position_size: Decimal = Decimal("1")
-    pt_atr_mult: float = 1.0
-    sl_atr_mult: float = 1.0
-```
-
-### Saving Config
-
-```python
-import yaml
-
-config_dict = config.dict()
-with open('backtests/configs/my_strategy_v1.yaml', 'w') as f:
-    yaml.dump(config_dict, f, default_flow_style=False)
-```
-
-### Loading Config
-
-```python
-with open('backtests/configs/my_strategy_v1.yaml', 'r') as f:
-    config_dict = yaml.safe_load(f)
-config = MyStrategyConfig(**config_dict)
-```
-
----
-
-## BACKTEST EXECUTION
-
-### Standard Backtest Runner
-
-```python
-from nautilus_trader.backtest.engine import BacktestEngine
-from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
-
-def run_backtest(
-    strategy_class,
-    strategy_config,
-    data_catalog,
-    venue_config,
-    start_time,
-    end_time,
-    output_dir: str,
-) -> dict:
-    """Run backtest and save all results."""
-    
-    engine_config = BacktestEngineConfig(
-        trader_id="BACKTESTER-001",
-        logging=LoggingConfig(
-            log_level="INFO",
-            log_level_file="DEBUG",
-            log_directory="logs",
-        ),
-    )
-    
-    engine = BacktestEngine(config=engine_config)
-    
-    # Add venue, data, strategy
-    # ...
-    
-    engine.run(start=start_time, end=end_time)
-    
-    # Generate reports
-    results = generate_results(engine, output_dir)
-    
-    engine.dispose()
-    
-    return results
-```
-
-### Multiple Backtests (Parameter Sweep)
-
-```python
-log_guard = None
-
-for params in param_grid:
-    config = MyStrategyConfig(**params)
-    engine = BacktestEngine(config=engine_config)
-    
-    # Retain LogGuard from first engine
-    if log_guard is None:
-        log_guard = engine.get_log_guard()
-    
-    # Setup and run
-    engine.run()
-    
-    # Save results
-    save_results(engine, f"results/{params['name']}")
-    
-    engine.dispose()
-
-# LogGuard keeps logging alive across all runs
-```
-
----
-
-## ANALYSIS AND REPORTING
-
-### Use NT Built-in Reports (NOT pandas)
-
-```python
-# After backtest
-engine.run()
-
-# Generate reports using NT
-orders_report = engine.trader.generate_orders_report()
-fills_report = engine.trader.generate_fills_report()
-positions_report = engine.trader.generate_positions_report()
-
-# Performance statistics
-stats_pnls = engine.portfolio.analyzer.get_performance_stats_pnls()
-stats_returns = engine.portfolio.analyzer.get_performance_stats_returns()
-stats_general = engine.portfolio.analyzer.get_performance_stats_general()
-
-# Summary
-results = {
-    "total_positions": len(engine.cache.positions_closed()),
-    "pnl_total": stats_pnls.get("PnL (total)"),
-    "sharpe_ratio": stats_returns.get("Sharpe Ratio (252 days)"),
-    "profit_factor": stats_general.get("Profit Factor"),
-    "win_rate": stats_general.get("Win Rate"),
-}
-```
-
-### Save Results
-
-```python
-import yaml
-from pathlib import Path
-
-def save_results(engine, output_dir: str, config: dict):
-    """Save all backtest results."""
-    output_path = Path(output_dir)
-    output_path.mkdir(parents=True, exist_ok=True)
-    
-    # Save config used
-    with open(output_path / "config.yaml", "w") as f:
-        yaml.dump(config, f)
-    
-    # Save trade data
-    positions_report = engine.trader.generate_positions_report()
-    positions_report.to_parquet(output_path / "positions.parquet")
-    
-    fills_report = engine.trader.generate_fills_report()
-    fills_report.to_parquet(output_path / "fills.parquet")
-    
-    # Save metrics
-    metrics = {
-        "pnls": engine.portfolio.analyzer.get_performance_stats_pnls(),
-        "returns": engine.portfolio.analyzer.get_performance_stats_returns(),
-        "general": engine.portfolio.analyzer.get_performance_stats_general(),
-    }
-    with open(output_path / "metrics.yaml", "w") as f:
-        yaml.dump(metrics, f)
-```
-
----
-
-## VISUALIZATION
-
-### Standard Tearsheet (Every Backtest)
-
-```python
-from nautilus_trader.analysis.tearsheet import create_tearsheet
-from nautilus_trader.analysis import TearsheetConfig
-
-# After backtest
-engine.run()
-
-# Generate standard tearsheet
-config = TearsheetConfig(
-    charts=[
-        "run_info",        # Metadata, balances
-        "stats_table",     # Win rate, Sharpe, profit factor
-        "equity",          # Cumulative returns
-        "drawdown",        # Drawdown from peak
-        "monthly_returns", # Monthly consistency
-    ],
-    theme="nautilus_dark",
-    title=f"{strategy_name} - {start_date} to {end_date}",
-)
-
-create_tearsheet(
-    engine=engine,
-    output_path=f"results/{timestamp}_{strategy_name}/tearsheet.html",
-    config=config,
-)
-```
-
-### Extended Analysis (When Needed)
-
-```python
-extended_config = TearsheetConfig(
-    charts=[
-        "run_info",
-        "stats_table", 
-        "equity",
-        "drawdown",
-        "monthly_returns",
-        "distribution",     # Return distribution
-        "rolling_sharpe",   # Edge consistency over time
-        "yearly_returns",   # Annual breakdown
-    ],
-    theme="nautilus_dark",
-)
-```
-
-### Trade Review (Visual Inspection)
-
-```python
-from nautilus_trader.analysis.tearsheet import create_bars_with_fills
-from nautilus_trader.model.data import BarType
-
-# View trades on price chart
-bar_type = BarType.from_str("NQ.XCME-1-MINUTE-LAST-EXTERNAL")
-fig = create_bars_with_fills(
-    engine=engine,
-    bar_type=bar_type,
-    title="Trade Entries/Exits",
-)
-fig.write_html("results/trade_review.html")
-```
-
-### Key Metrics to Monitor
-
-| Metric | Target | Why |
-|--------|--------|-----|
-| Win Rate | >50% for 1:1 R/R | Basic profitability |
-| Profit Factor | >1.2 | Wins exceed losses |
-| Sharpe Ratio | >1.0 (>2.0 excellent) | Risk-adjusted returns |
-| Max Drawdown | Under prop firm limit | Risk management |
-| Monthly Consistency | No catastrophic months | Stability |
-
----
-
-## LOGGING
-
-### Standard Config
-
-```python
-from nautilus_trader.config import LoggingConfig
-
-# Default for backtests
-logging_config = LoggingConfig(
-    log_level="INFO",           # Console
-    log_level_file="DEBUG",     # File (full detail)
-    log_directory="logs",
-    log_file_format="json",     # Parseable
-)
-```
-
-### Debug Config (Verbose)
-
-```python
-logging_config = LoggingConfig(
-    log_level="DEBUG",
-    log_level_file="DEBUG",
-    log_directory="logs",
-    log_component_levels={
-        "MyStrategy": "DEBUG",   # Your strategy verbose
-        "Portfolio": "INFO",     # Less noise
-        "RiskEngine": "INFO",
-    },
-)
-```
-
-### Strategy Logging
-
-Use `self.log` inside strategies:
-
-```python
-class MyStrategy(Strategy):
-    def on_bar(self, bar):
-        self.log.debug(f"Bar: {bar.close}, EMA: {self.ema.value}")
-        
-        if self._signal_triggered():
-            self.log.info(f"SIGNAL: {self.signal_type} at {bar.close}")
-        
-    def on_order_filled(self, event):
-        self.log.info(f"FILLED: {event.order_side} at {event.last_px}")
-```
-
-Log levels:
-- `self.log.debug()` - Detailed state (indicators, conditions)
-- `self.log.info()` - Key events (signals, entries, exits)
-- `self.log.warning()` - Unexpected conditions
-- `self.log.error()` - Failures
-
----
-
-## STUDY METHODOLOGY
-
-### Valid Study Pattern (features collected in NT)
-
-```python
-# studies/my_study/collect.py
-
-class FeatureCollectorStrategy(Strategy):
-    """Collects features for offline analysis."""
-    
-    def __init__(self, config):
-        super().__init__(config)
-        self.feature_log = []
-    
-    def on_bar(self, bar):
-        # Compute features AT DECISION TIME (no look-ahead)
-        features = {
-            'timestamp': bar.ts_event,
-            'close': float(bar.close),
-            'ema_value': self.ema.value,
-            'atr_value': self.atr.value,
-            # ... other features
-        }
-        
-        # Check if signal triggered
-        if self._signal_triggered():
-            self.feature_log.append({
-                **features,
-                'signal_type': self.signal_type,
-            })
-    
-    def on_stop(self):
-        # Save collected features
-        import pandas as pd
-        df = pd.DataFrame(self.feature_log)
-        df.to_parquet('studies/my_study/results/features.parquet')
-```
-
-### Invalid Study Pattern (DO NOT USE)
-
-```python
-# WRONG - pandas signal detection has look-ahead bias
-df['regime'] = np.where(df['close'] > df['ema'], 1, -1)
-df['signal'] = df['regime'].diff()  # SEES FUTURE DATA
-```
-
-### MFE/MAE Collection (Valid Pattern)
-
-**CRITICAL: Replay buffered 1s bars from fill time.**
-
-NT processes bars in `ts_init` order. For 1s bars, `ts_init = ts_event + 1s`. For 1m bars
-with `ts_init_delta`, `ts_init = ts_event + 60s`. This means ALL 1s bars within a minute
-process BEFORE their parent 1m bar. If a signal triggers on a 1m bar close, MFE/MAE tracking
-that starts on the next `_on_1s()` call misses the entire first minute of price action.
-
-**Fix:** Buffer recent 1s bars in a deque. When a signal triggers on a 1m bar, retroactively
-replay the buffered 1s bars from fill time forward to seed MFE/MAE before live tracking begins.
-
-```python
-from collections import deque
-
-class MFEMAECollector(Strategy):
-    """Collects MFE/MAE for signals detected in NT."""
-
-    def __init__(self, config):
-        super().__init__(config)
-        self.open_signals = []
-        self.completed_signals = []
-        # Buffer recent 1s bars for retroactive MFE/MAE seeding
-        self._recent_1s_bars = deque(maxlen=120)  # 2 min buffer
-
-    def on_bar(self, bar):
-        if self._is_1s_bar(bar):
-            # Buffer 1s bar BEFORE tracking (for retroactive replay)
-            self._recent_1s_bars.append(bar)
-            # Update tracking for open signals
-            for signal in self.open_signals:
-                self._update_mfe_mae(signal, bar)
-            return
-
-        # 1m bar processing
-        if self._signal_triggered():
-            signal = {
-                'entry_time': bar.ts_event,
-                'entry_price': self.entry_price,
-                'atr_at_entry': self.atr.value,
-                'mfe': 0.0,
-                'mae': 0.0,
-            }
-            # Replay buffered 1s bars from fill time
-            # These bars already processed but MFE/MAE wasn't tracked
-            for hist_bar in self._recent_1s_bars:
-                if hist_bar.ts_event >= signal['entry_time']:
-                    self._update_mfe_mae(signal, hist_bar)
-            self.open_signals.append(signal)
-
-    def _update_mfe_mae(self, signal, bar):
-        entry = signal['entry_price']
-        atr = signal['atr_at_entry']
-
-        if self.direction == 1:  # Long
-            mfe_pts = (float(bar.high) - entry) / atr
-            mae_pts = (entry - float(bar.low)) / atr
-        else:  # Short
-            mfe_pts = (entry - float(bar.low)) / atr
-            mae_pts = (float(bar.high) - entry) / atr
-
-        signal['mfe'] = max(signal['mfe'], mfe_pts)
-        signal['mae'] = max(signal['mae'], mae_pts)
-```
-
----
-
-## ML MODEL REQUIREMENTS
-
-### Training Data
-- Features MUST come from NT feature collection (not pandas)
-- Labels MUST come from NT backtest outcomes
-- Train/test split by TIME (not random)
-
-### Feature Requirements
-- All features computable at decision time
-- No future information leakage
-- Document feature computation exactly
-
-### Model Validation
-- Backtest on out-of-sample period using NT
-- Compare NT backtest results to model predictions
-- Report realistic metrics (after slippage, commission)
-
-### Model Integration
-
-```python
-class MLStrategy(Strategy):
-    """Strategy with ML model for signal filtering."""
-    
-    def __init__(self, config):
-        super().__init__(config)
-        self.model = self._load_model(config.model_path)
-    
-    def on_bar(self, bar):
-        if self._base_signal_triggered():
-            # Compute features (same as training)
-            features = self._compute_features()
-            
-            # Get model prediction
-            prob = self.model.predict_proba([features])[0][1]
-            
-            # Only trade if model confident
-            if prob >= self.config.min_probability:
-                self._submit_entry()
-            else:
-                self.log.debug(f"ML filtered: prob={prob:.3f}")
-```
-
----
-
-## INDICATOR SPECIFICATION TEMPLATE
-
-Every custom indicator needs a SPEC.md:
-
-```markdown
-# {Indicator Name}
-
-## Purpose
-{What this indicator measures}
-
-## Inputs
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| period | int | 14 | Lookback period |
-| source | str | "close" | Price field to use |
-
-## Calculation
-```
-{Exact formula or pseudocode}
-```
-
-## Output
-| Field | Type | Description |
-|-------|------|-------------|
-| value | float | Current indicator value |
-
-## Usage Example
-```python
-from indicators.my_indicator import MyIndicator
-
-indicator = MyIndicator(period=14)
-indicator.update_raw(close_price)
-current_value = indicator.value
-```
-
-## Validation
-{How to verify calculation matches expected}
-```
-
----
-
-## STRATEGY SPECIFICATION TEMPLATE
-
-Every strategy needs a SPEC.md:
-
-```markdown
-# {Strategy Name}
-
-## Hypothesis
-{What market behavior this exploits}
-
-## Required Indicators
-| Indicator | Purpose |
-|-----------|---------|
-| EMA(3) | Entry level |
-| ATR(14) | Position sizing |
-
-## Signal Logic
-
-### Entry Conditions
-1. {Condition 1}
-2. {Condition 2}
-3. {Condition 3}
-
-### Exit Conditions
-- PT: {profit target logic}
-- SL: {stop loss logic}
-
-### Invalidation
-- {When to cancel pending orders}
-
-## Parameters
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| pt_atr_mult | float | 1.0 | Profit target in ATR |
-| sl_atr_mult | float | 1.0 | Stop loss in ATR |
-
-## State Machine
-```
-FLAT -> WATCHING -> PENDING -> IN_POSITION -> FLAT
-```
-
-## Configuration Example
-```yaml
-instrument_id: "NQ.XCME"
-bar_type_1m: "NQ.XCME-1-MINUTE-LAST-EXTERNAL"
-pt_atr_mult: 1.0
-sl_atr_mult: 1.0
-```
-```
-
----
-
-## VALIDATION CHECKLIST
-
-### Before ANY Backtest
-- [ ] ts_init_delta applied to bar data
-- [ ] Indicator warmup period accounted for
-- [ ] Config saved to YAML before run
-- [ ] Results directory created
-
-### Before Trusting Results
-- [ ] Trade count reasonable for period
-- [ ] Win rate plausible (not 80%+ without explanation)
-- [ ] Sample trades manually verified
-- [ ] No look-ahead in signal logic
-- [ ] PT/SL calculated from fill price
-
-### Before ML Training
-- [ ] Features collected via NT (not pandas)
-- [ ] Labels from NT backtest outcomes
-- [ ] Train/test split by time
-- [ ] Feature leakage audit completed
-
----
-
-## COMMON PITFALLS
-
-### 1. Pandas "quick check"
-**NEVER** validate signals in pandas. It will give wrong results due to look-ahead bias.
-
-### 2. Timestamp at bar open
-Databento timestamps at OPEN. Without ts_init_delta, you have look-ahead bias.
-
-### 3. Vectorized calculations
-```python
-# WRONG - sees future
-df['regime'] = np.where(df['close'] > df['ema'], 1, -1)
-
-# RIGHT - compute bar by bar in NT
-def on_bar(self, bar):
-    if bar.close > self.ema.value:
-        self.regime = 1
-```
-
-### 4. MFE/MAE from wrong baseline
-- Calculate from FILL price, not signal price
-- Use ATR at entry, not current ATR
-
-### 5. Not saving config with results
-Always save exact config used. Results without config are useless.
-
-### 6. Indicator warmup
-First N bars have incomplete indicator values. Account for warmup period.
-
-### 7. Collector MFE/MAE blind spot (1s bar processing order)
-NT processes 1s bars BEFORE their parent 1m bar (ts_init ordering: 1s ts_init = ts_event + 1s, 1m ts_init = ts_event + 60s). If a collector detects a signal on a 1m bar close and starts MFE/MAE tracking on the next `_on_1s()` call, the entire first minute of price action after the signal is invisible. **Always buffer recent 1s bars and replay them retroactively from fill time when a signal triggers.** See MFE/MAE Collection pattern above.
-
 ---
 
 ## TIMEZONE CONVENTION
@@ -942,83 +301,6 @@ For significant results, create a tagged release with:
 - Config used
 - Summary metrics
 - Link to full results (external storage if large)
-
----
-
-## PERFORMANCE CONSIDERATIONS
-
-### Start with Pure Python
-- NT core (Rust/Cython) handles the heavy lifting (indicators, matching engine, order management)
-- Strategy logic is typically <15% of backtest time
-- Optimize only after profiling shows need
-- Faster iteration during strategy development
-
-### Structure for Future Optimization
-
-Keep computation in pure functions that could be Cythonized later:
-
-```python
-def compute_regime(
-    close: float, 
-    ema3_h: float, 
-    ema9_h: float, 
-    ema3_l: float, 
-    ema9_l: float,
-    current_regime: int,
-) -> int:
-    """Pure function - easy to port to Cython if needed."""
-    if close > ema3_h and close > ema9_h:
-        return 1
-    if close < ema3_l and close < ema9_l:
-        return -1
-    return current_regime  # Sticky
-
-def compute_signal(close: float, ema: float, atr: float) -> bool:
-    """Pure function - portable to Cython."""
-    return close > ema + (0.5 * atr)
-```
-
-### When to Optimize
-
-Consider Cython/Rust when:
-1. Backtests exceed 30 min for full year
-2. Live trading latency is critical
-3. ML inference needed per bar
-4. Strategy logic is stable and validated
-
-### ML Inference Optimization
-
-```python
-# SLOW - sklearn predict on every bar
-prediction = model.predict([features])  # Python overhead
-
-# FAST - ONNX runtime
-import onnxruntime as ort
-session = ort.InferenceSession("model.onnx")
-prediction = session.run(None, {"input": features})  # Optimized C++
-```
-
-Best practices for ML in strategies:
-- Use ONNX runtime for model inference
-- Pre-compute features where possible
-- Consider inference only on signal bars, not every bar
-- Batch predictions if possible
-
-### Profiling Backtests
-
-```python
-import cProfile
-import pstats
-
-# Profile the backtest
-cProfile.run('engine.run()', 'backtest_profile.stats')
-
-# Analyze results
-stats = pstats.Stats('backtest_profile.stats')
-stats.sort_stats('cumulative')
-stats.print_stats(20)  # Top 20 time consumers
-```
-
 ---
 
 ## LESSONS LEARNED
@@ -1033,93 +315,51 @@ stats.print_stats(20)  # Top 20 time consumers
 
 ---
 
-## QUICK REFERENCE
+<!-- BEGIN SUBAGENT ROUTING -->
+## Subagent Routing & Lean Workflow
 
-### Backtest Command
-```python
-engine.run(start=start_time, end=end_time)
-```
+Keep architecture, causal interpretation, integration, and final approval in the main session. Claude agent names are hyphenated. Codex `name` / `agent_type` values use underscores; filenames may remain hyphenated for easy cross-harness comparison. Use the exact harness-specific identifier below when invoking an agent.
 
-### Get Results
-```python
-stats = engine.portfolio.analyzer.get_performance_stats_general()
-```
+### Roster
 
-### Generate Tearsheet
-```python
-from nautilus_trader.analysis.tearsheet import create_tearsheet
-create_tearsheet(engine=engine, output_path="tearsheet.html")
-```
+| Agent | Codex `agent_type` | Role | Output cap | Available in |
+|---|---|---|---|---|
+| `repo-scout` | `repo_scout` | Locate files, trace execution paths | 700w — paths, symbols, line ranges only | Claude, Codex |
+| `contract-checker` | `contract_checker` | Compare code/tests against explicit specs | 1,000w — compliance table + findings only | Claude, Codex |
+| `results-triager` | `results_triager` | Run exact approved pytest commands | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
+| `lookahead-auditor` | `lookahead_auditor` | Independent causal / look-ahead audit | 1,500w — complete Markdown report, parent persists | Claude, Codex |
+| `implementation-worker` | `implementation_worker` | Implement one frozen, bounded task packet | — | **Codex only** |
 
-### Save Trades
-```python
-positions = engine.trader.generate_positions_report()
-positions.to_parquet("trades.parquet")
-```
+### Risk tiers
 
-<!-- BEGIN CODEX SUBAGENT ROUTING -->
-## Codex Subagent Routing
+Not every task needs the full ceremony.
 
-For nontrivial code or research changes, keep architecture, causal interpretation, integration, and final approval in the main Sol session.
+* **Tier 1 — small diagnostic / local fix:** main session → deterministic tests → local smoke. No planning agent or auditor unless the change touches core causal or timing logic.
+* **Tier 2 — normal research study:** planning → main-session implementation → staged runner → independent completion audit.
+* **Tier 3 — model freeze / deployment:** `repo-scout` → `contract-checker` → main-session implementation → staged runner → independent completion audit.
 
-Use project subagents as follows:
+### Coordination rules
 
-- `repo_scout`: locate files and trace execution paths.
-- `contract_checker`: compare code and tests against explicit specifications.
-- `implementation_worker`: implement only a frozen, bounded task packet.
-- `results_triager`: run exact pytest commands and summarize results.
-- `lookahead_auditor`: perform an independent final causal audit.
+* Spawn `repo-scout` and `contract-checker` (Codex: `repo_scout`, `contract_checker`) in parallel only when their assignments are independent; wait for both before freezing the task packet.
+* Never run multiple writing agents in the same worktree concurrently.
+* Do not duplicate searches or tests a subagent already completed.
+* Subagent prompts must be self-contained — child agents do not inherit the parent conversation.
 
-Spawn `repo_scout` and `contract_checker` in parallel only when their assignments are independent. Wait for both before freezing the task packet.
+### Diff-first auditing
 
-Never run multiple writing agents in the same worktree concurrently. Do not duplicate searches or tests already completed by a subagent. Subagent prompts must be self-contained because child agents do not inherit the full parent conversation.
-<!-- END CODEX SUBAGENT ROUTING -->
+* Auditors use the contextual diff (`git diff -U20`) as the primary review surface.
+* Open full files only to resolve state flow, causality, base-class dependencies, or import behavior.
+* Do not reopen unchanged files to repeat discovery — only when full context is needed to resolve a live causal, structural, or audit question.
 
-<!-- BEGIN CENTRAL FEATURE SYSTEM -->
+### Deterministic process control
+
+* Never use an LLM or agent for process monitoring or status reporting.
+* Use `scripts/run_bounded_study.py` to enforce time limits, log capture, CPU/memory limits, and stale-progress detection, and to emit a status JSON card.
+* The main session reviews the compact JSON status card, not raw output logs.
+<!-- END SUBAGENT ROUTING -->
+
 ## Central Feature System
 
-Before creating, modifying, or locally reimplementing a feature:
-
-1. Read `features/FEATURE_REGISTRY_CONTRACT.md`.
-2. Inspect `features/registry.py` for the canonical name, implementation,
-   lifecycle, aliases, and verification status.
-3. Reuse a verified registered feature when available.
-4. Do not add a study-local duplicate without a documented exemption.
-5. A central implementation defines how a feature is calculated; the
-   study contract must still define when it is updated and snapped.
-6. New or changed features require registry metadata, focused tests,
-   provenance review, and parity evidence where applicable.
-<!-- END CENTRAL FEATURE SYSTEM -->
-
----
-
-## LEAN WORKFLOW & PROCESS CONTROL
-
-### 1. Risk Tiering & Workflow Gates
-Not every task requires the full multi-agent process. Classify changes into the appropriate risk tier:
-* **Tier 1 (Small Diagnostic / Local fixes)**: 
-  * Main session $\rightarrow$ run deterministic tests $\rightarrow$ 1-day/local smoke.
-  * No planning subagent or final auditor is required unless changes affect core causal/timing logic.
-* **Tier 2 (Normal Research Study)**:
-  * Planning agent $\rightarrow$ main implementation session $\rightarrow$ staged runner $\rightarrow$ independent completion auditor.
-* **Tier 3 (Model Freeze / Production Deployment)**:
-  * Full agent ceremony: `repo-scout` $\rightarrow$ `contract-checker` $\rightarrow$ main implementation $\rightarrow$ staged runner $\rightarrow$ independent completion auditor.
-
-### 2. Output Token Budgets
-Enforce hard word-count limits on subagent outputs to minimize token consumption:
-* **`repo-scout`**: Max 700 words. Output paths, symbols, and line ranges only. No narrative repo background.
-* **`contract-checker`**: Max 1,000 words. Output compliance tables and findings only. No repeated SPEC summaries.
-* **`results-triager`**: Max 500 words. Output failed tests, root cause tracebacks, and exact commands.
-* **`lookahead-auditor`**: Max 1,500 words. Focus strictly on findings sorted by severity. No implementation recap.
-
-### 3. Contextual Diff-First Auditing
-* Auditors must use the contextual diff (`git diff -U20`) as their primary review surface.
-* Open and read full files only when required to establish state flow, causality, base class dependencies, or import behavior.
-* Do not reopen unchanged files merely to repeat discovery. Reopen an unchanged file only when its full context is necessary to resolve a current causal, structural, or audit question.
-
-### 4. Deterministic Process Control
-* Do not use LLMs or agents for process monitoring or status reporting.
-* Use the deterministic wrapper `scripts/run_bounded_study.py` to enforce time limits, log capture, CPU/memory limits, stale log detection (stale progress timeout), and output status JSON cards.
-* The main session reviews only the final compact JSON status card rather than raw output logs.
-
-
+See `CLAUDE.md` § Central Feature System (canonical). In short: check
+`features/FEATURE_REGISTRY_CONTRACT.md` and `features/registry.py` before
+creating, modifying, or locally reimplementing any feature.

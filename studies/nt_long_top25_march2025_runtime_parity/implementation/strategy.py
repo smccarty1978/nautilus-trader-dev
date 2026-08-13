@@ -85,16 +85,21 @@ class LongParityStrategy(Strategy):
             self.feature_order, C.EXPECTED_MODEL_SHA256, C.sha256_file)
 
         self._engine = RegimeEngine()
-        self._features = LongFeatureEngine(self.feature_order)
+        # TWO session rules, deliberately: the candidate tracker decides/fills on
+        # 08:30-15:15, the FEATURE path uses the offline attach's 08:30-15:00.
+        self._features = LongFeatureEngine(
+            self.feature_order,
+            is_rth_ts=lambda ts: C.is_rth_feature_minute(minute_of_day_chicago(ts)))
         self._tracker = CandidateTrackerLong(self._on_candidate, C.is_rth_minute_of_day)
 
         self._regime_dir = 0
         self._atr_frozen: Optional[float] = None   # frozen at the active regime's flip
         self._regime_flip_ts: Optional[int] = None
-        self._was_rth = False
-        self._pending_1s: list[tuple] = []         # buffered 1s bars for the open minute
         self._last_1s_close: Optional[float] = None
         self._last_1s_ts: Optional[int] = None
+        # Running 1m ATR AS OF THE SNAP BAR (see _on_1s). Not the same object as
+        # `_atr_frozen`, and not the engine's live value at the observation.
+        self._center_atr_at_snap: Optional[float] = None
 
         # ledgers
         self.candidates: list[dict] = []
@@ -152,46 +157,45 @@ class LongParityStrategy(Strategy):
         # a real, measured look-ahead.
         self._tracker.on_1s_bar(ts_ns=ts, high=h, low=l, close=c, minute_of_day=mod)
 
-        # Only NOW fold this bar into the rolling-window trackers.
-        est = self._features.update_1s(ts, o, h, l, c, v, self._regime_dir, atr)
-        # Buffer for regime/RTH accumulation, resolved at the parent 1m close
-        # (identical deferral to the offline replay's minute_buffer).
-        self._pending_1s.append((ts, h, l, v, est.get("bar_est_delta", 0.0) if est else 0.0))
+        # Only NOW fold this bar into the trackers. update_1s also runs the
+        # minute-bucket rollover (price levels, RTH/regime accumulators) at the
+        # offline position in the loop -- see LongFeatureEngine.update_1s.
+        self._features.update_1s(ts, o, h, l, c, v, self._regime_dir, atr)
 
         self._last_1s_close, self._last_1s_ts = c, ts
+        # The offline atlas merged the running 1m ATR onto the 1s frame with
+        # `close_ts <= t`, and the center features were read at the SNAP bar.
+        # `self._engine.atr` read at the observation instant is one 1m bar
+        # newer whenever the observation lands on a minute boundary -- which was
+        # 100% of the aligned_price_minus_center_* mismatches (0% elsewhere).
+        # Recording it here pins it to the bar, not to the observation.
+        self._center_atr_at_snap = atr if atr else None
 
     # ------------------------------------------------------------------
     def _on_1m(self, bar: Bar):
+        """REGIME DETECTION ONLY.
+
+        The 1m bar drives the regime series (and nothing else) because that is
+        the one thing the offline pipeline also took from 1m data. Price
+        levels, RTH accumulators and the regime reset are driven from the 1s
+        stream's own minute buckets inside LongFeatureEngine -- feeding them the
+        catalog 1m bar here put them one bucket ahead of the offline replay and
+        broke 9 of the 25 features. See common.minute_bucket_key.
+        """
         self.bars_1m += 1
         close_ts = int(bar.ts_init)
-        o, h, l, c = float(bar.open), float(bar.high), float(bar.low), float(bar.close)
-        mod = minute_of_day_chicago(close_ts)
-        is_rth = C.is_rth_minute_of_day(mod)
+        h, l, c = float(bar.high), float(bar.low), float(bar.close)
 
         prev_dir = self._regime_dir
         new_dir = self._engine.update(h, l, c)
         atr = self._engine.atr
-
-        # RTH session transitions for the OHLCV tracker.
-        if is_rth and not self._was_rth:
-            self._features.reset_rth(close_ts)
-        elif self._was_rth and not is_rth:
-            self._features.end_rth()
-        self._was_rth = is_rth
-
-        # Flush buffered 1s bars into regime/RTH accumulators.
-        for (ts_b, h_b, l_b, v_b, d_b) in self._pending_1s:
-            self._features.accumulate_regime_rth(ts_b, h_b, l_b, v_b, d_b)
-        self._pending_1s.clear()
-
-        self._features.update_1m(close_ts, o, h, l, c, is_rth)
 
         if new_dir != 0 and new_dir != prev_dir:
             # Regime flip confirmed at this 1m close.
             self._regime_dir = new_dir
             self._regime_flip_ts = close_ts
             self._atr_frozen = float(atr) if atr and atr > 0 else None
-            self._features.reset_regime(close_ts, c)
+            self._features.declare_regime_start(close_ts)
             # Opposing-flip exit for any open long: a bullish flip ends it.
             if self._open is not None and new_dir == +1:
                 self._close_trade(close_ts, c, "opposing_regime_flip")
@@ -205,9 +209,20 @@ class LongParityStrategy(Strategy):
         """Called for EVERY 5s grid point of an active bearish regime, eligible
         or not. Waterfall stages are counted separately -- never collapsed."""
         T = cand["observation_time_ns"]
+        in_window = self._cfg.emit_start_ns <= T < self._cfg.emit_end_ns
+        eligible = cand["final_candidate_eligible"]
+
+        # EVERY waterfall stage is gated to the emit window, including `raw`.
+        # Bars are loaded from the Feb warmup start, so ungated counters mix
+        # warmup candidates into a total that is then printed next to the
+        # March-only offline waterfall -- an earlier version did exactly that
+        # and reported eligible=28,894 against offline's 15,234, which reads as
+        # catastrophic population failure when the real gap is 2.25%.
+        if not in_window:
+            return
+
         self.waterfall["raw"] += 1
-        est_ok = cand["established_regime_gate"]
-        if est_ok:
+        if cand["established_regime_gate"]:
             self.waterfall["established"] += 1
         if cand.get("decision_rth"):
             self.waterfall["decision_rth"] += 1
@@ -215,13 +230,8 @@ class LongParityStrategy(Strategy):
             self.waterfall["fill_rth"] += 1
         if cand.get("valid_fill"):
             self.waterfall["valid_fill"] += 1
-
-        in_window = self._cfg.emit_start_ns <= T < self._cfg.emit_end_ns
-        eligible = cand["final_candidate_eligible"]
         if eligible:
             self.waterfall["eligible"] += 1
-        if not in_window:
-            return
 
         row = {
             "regime_id": cand["regime_start_ns"],
@@ -260,7 +270,7 @@ class LongParityStrategy(Strategy):
             snap_ts, ref_px = self._last_1s_ts, self._last_1s_close
             vec, null_mask, _ = self._features.ordered_vector(
                 snap_ts, T, ref_px, cand["atr_val"], self._regime_dir,
-                center_atr=(self._engine.atr or cand["atr_val"]))
+                center_atr=(self._center_atr_at_snap or cand["atr_val"]))
             out = self._model.score_both(vec)
             row["score"] = out["probability_joblib"]
             row["score_explicit"] = out["probability"]

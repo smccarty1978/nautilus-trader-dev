@@ -1,0 +1,62 @@
+{
+  "study": "top10_post_confirmation_mfe_monetization",
+  "original_top10_entries": 8950,
+  "confirmed_trades": 4656,
+  "stop_atr": 1.0,
+  "cost_points_round_turn": 0.5,
+  "landmarks_from_entry_atr": [
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0
+  ],
+  "runner_tiers_atr": [
+    2.0,
+    2.5,
+    3.0,
+    4.0
+  ],
+  "price_policies": {
+    "PRICE_A_mfe1_0_gb0_75": [
+      1.0,
+      0.75
+    ],
+    "PRICE_B_mfe1_5_gb0_75": [
+      1.5,
+      0.75
+    ],
+    "PRICE_C_mfe2_0_gb0_75": [
+      2.0,
+      0.75
+    ],
+    "PRICE_D_mfe2_0_gb1_00": [
+      2.0,
+      1.0
+    ]
+  },
+  "p90_price_buffer_atr": 0.25,
+  "stairstep_rungs_mfe_giveback": [
+    [
+      1.0,
+      1.0
+    ],
+    [
+      1.5,
+      0.75
+    ],
+    [
+      2.0,
+      0.6
+    ],
+    [
+      2.5,
+      0.5
+    ]
+  ],
+  "stream_A": "contract-valid (in-domain) \u2014 NOT INTERPRETABLE, SURVIVORSHIP: fires on 0.4%/1.0% of losers vs 47.9% of winners",
+  "stream_B": "raw causal \u2014 EXPLORATORY_OUT_OF_DOMAIN, 97-99.6% coverage",
+  "threshold_overlap_disclosure": "2025 is NOT threshold-OOS; waiver studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json"
+}

@@ -1,0 +1,48 @@
+{
+  "study": "top10_fast_confirm_runner_path",
+  "inputs": {
+    "armed_paths": "studies\\armed_fade_score_path_progression\\results\\armed_regime_score_paths.parquet",
+    "store": "data\\canonical\\regime_complete_v1"
+  },
+  "original_top10_entries": 8950,
+  "confirmed_rows": 4705,
+  "trade_panel_rows": 4656,
+  "non_measurable_confirmed": 49,
+  "non_measurable_by_label": [
+    {
+      "terminal_label": "SESSION_EXIT",
+      "count": 49
+    }
+  ],
+  "fast_confirm_trades": 2383,
+  "landmark_state_rows": 23830,
+  "fast_cutoff_seconds": 120,
+  "clock_reference": "arm_top10_ns (SPEC D2)",
+  "stop_atr": 1.0,
+  "cost_points_round_turn": 0.5,
+  "landmarks_s": [
+    5,
+    10,
+    15,
+    20,
+    30,
+    45,
+    60,
+    90,
+    120,
+    180
+  ],
+  "stop_live_for_economics": true,
+  "unconstrained_for_geometry": true,
+  "landmark_population": "constant, terminal carry-forward (SPEC D3)",
+  "model_score_stream": "raw causal \u2014 EXPLORATORY_OUT_OF_DOMAIN",
+  "threshold_overlap_disclosure": "2025 is NOT threshold-OOS; waiver studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json",
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "note_2026": "untouched"
+}

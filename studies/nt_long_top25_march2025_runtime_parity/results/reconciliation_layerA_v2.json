@@ -1,0 +1,77 @@
+{
+  "tag": "layerA_v2",
+  "phase1_population": {
+    "offline_eligible": 15234,
+    "live_eligible": 15576,
+    "abs_difference": 342,
+    "pct_difference": 2.245,
+    "exact_key_matches": 15131,
+    "pct_of_offline_matched": 99.3239,
+    "offline_only_rows": 103,
+    "live_only_rows": 445,
+    "offline_regimes": 146,
+    "live_regimes": 148,
+    "offline_only_regimes": [],
+    "live_only_regimes": [
+      1741982460000000000,
+      1743192060000000000
+    ],
+    "shared_regimes": 146,
+    "regimes_with_exact_row_counts": 73,
+    "regimes_with_exact_checkpoint_index_sets": 71,
+    "displacement_buckets": {
+      ">30s": 267,
+      "no counterpart": 124,
+      "+/-2-5s": 112,
+      "+/-6-30s": 45
+    }
+  },
+  "phase2_features": {
+    "n_matched_rows": 15131,
+    "features_passing": 25,
+    "features_failing": 0,
+    "worst_feature": {
+      "feature": "aligned_price_minus_center_15m",
+      "max_abs_diff": 0.0
+    },
+    "tolerance": 1e-09
+  },
+  "phase3_score": {
+    "probability_live_joblib_vs_offline": {
+      "n": 15131,
+      "max_abs_diff": 2.220446049250313e-16,
+      "mean_abs_diff": 1.3217378202175048e-17,
+      "p99_abs_diff": 1.1102230246251565e-16,
+      "n_above_tolerance": 0,
+      "tolerance": 1e-10,
+      "status": "PASS"
+    },
+    "probability_live_explicit_vs_offline": {
+      "n": 15131,
+      "max_abs_diff": 3.3306690738754696e-16,
+      "mean_abs_diff": 4.2390105155227084e-17,
+      "p99_abs_diff": 1.6653345369377348e-16,
+      "n_above_tolerance": 0,
+      "tolerance": 1e-10,
+      "status": "PASS"
+    },
+    "probability_explicit_vs_joblib": {
+      "n": 15131,
+      "max_abs_diff": 3.3306690738754696e-16,
+      "mean_abs_diff": 4.3034607492193453e-17,
+      "p99_abs_diff": 1.6653345369377348e-16,
+      "n_above_tolerance": 0,
+      "tolerance": 1e-10,
+      "status": "PASS"
+    },
+    "logit_live_vs_offline_implied": {
+      "n": 15131,
+      "max_abs_diff": 3.552713678800501e-15,
+      "mean_abs_diff": 3.2270587632511575e-16,
+      "p99_abs_diff": 1.3322676295501878e-15,
+      "n_above_tolerance": 0,
+      "tolerance": 1e-10,
+      "status": "PASS"
+    }
+  }
+}

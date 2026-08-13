@@ -1,0 +1,199 @@
+{
+  "question": "When the landmark flag fires, how often does the score recover (fall back below the same cutoff) before the trade ends -- i.e. how often would acting on the flag eject a trade that was not really in trouble?",
+  "definition": "Flagged at horizon t if score_b >= the q-quantile of the alive cross-section at t. Recovered if score_b subsequently falls back below that same cutoff strictly after t and before the terminal.",
+  "note": "Only defined against the landmark flag. The path-threshold events fire on ~100% of trades and have nothing to recover from.",
+  "horizons": [
+    {
+      "horizon_s": 60,
+      "n_alive": 4594,
+      "operating_points": [
+        {
+          "quantile": 0.7,
+          "score_cutoff": 0.4478,
+          "n_flagged": 1378,
+          "n_recovered": 1052,
+          "recovery_rate": 0.7634,
+          "failure_rate_if_recovered": 0.5409,
+          "failure_rate_if_not_recovered": 0.9755,
+          "median_remaining_mfe_if_recovered": 1.3134,
+          "median_remaining_mfe_if_not_recovered": 0.039,
+          "ge_2_5atr_runners_flagged": 394,
+          "ge_2_5atr_runners_that_recovered": 392,
+          "ge_2_5atr_recovery_rate": 0.9949
+        },
+        {
+          "quantile": 0.85,
+          "score_cutoff": 0.5354,
+          "n_flagged": 689,
+          "n_recovered": 536,
+          "recovery_rate": 0.7779,
+          "failure_rate_if_recovered": 0.6213,
+          "failure_rate_if_not_recovered": 0.9935,
+          "median_remaining_mfe_if_recovered": 1.1418,
+          "median_remaining_mfe_if_not_recovered": 0.0,
+          "ge_2_5atr_runners_flagged": 166,
+          "ge_2_5atr_runners_that_recovered": 164,
+          "ge_2_5atr_recovery_rate": 0.988
+        },
+        {
+          "quantile": 0.95,
+          "score_cutoff": 0.6252,
+          "n_flagged": 230,
+          "n_recovered": 171,
+          "recovery_rate": 0.7435,
+          "failure_rate_if_recovered": 0.6608,
+          "failure_rate_if_not_recovered": 1.0,
+          "median_remaining_mfe_if_recovered": 0.9725,
+          "median_remaining_mfe_if_not_recovered": 0.0,
+          "ge_2_5atr_runners_flagged": 49,
+          "ge_2_5atr_runners_that_recovered": 48,
+          "ge_2_5atr_recovery_rate": 0.9796
+        }
+      ]
+    },
+    {
+      "horizon_s": 120,
+      "n_alive": 4403,
+      "operating_points": [
+        {
+          "quantile": 0.7,
+          "score_cutoff": 0.4512,
+          "n_flagged": 1321,
+          "n_recovered": 888,
+          "recovery_rate": 0.6722,
+          "failure_rate_if_recovered": 0.5214,
+          "failure_rate_if_not_recovered": 0.9584,
+          "median_remaining_mfe_if_recovered": 1.3214,
+          "median_remaining_mfe_if_not_recovered": 0.0,
+          "ge_2_5atr_runners_flagged": 357,
+          "ge_2_5atr_runners_that_recovered": 341,
+          "ge_2_5atr_recovery_rate": 0.9552
+        },
+        {
+          "quantile": 0.85,
+          "score_cutoff": 0.5426,
+          "n_flagged": 661,
+          "n_recovered": 437,
+          "recovery_rate": 0.6611,
+          "failure_rate_if_recovered": 0.6201,
+          "failure_rate_if_not_recovered": 0.9598,
+          "median_remaining_mfe_if_recovered": 1.0379,
+          "median_remaining_mfe_if_not_recovered": -0.0369,
+          "ge_2_5atr_runners_flagged": 142,
+          "ge_2_5atr_runners_that_recovered": 132,
+          "ge_2_5atr_recovery_rate": 0.9296
+        },
+        {
+          "quantile": 0.95,
+          "score_cutoff": 0.6426,
+          "n_flagged": 221,
+          "n_recovered": 129,
+          "recovery_rate": 0.5837,
+          "failure_rate_if_recovered": 0.7132,
+          "failure_rate_if_not_recovered": 0.9674,
+          "median_remaining_mfe_if_recovered": 0.6512,
+          "median_remaining_mfe_if_not_recovered": -0.0565,
+          "ge_2_5atr_runners_flagged": 36,
+          "ge_2_5atr_runners_that_recovered": 30,
+          "ge_2_5atr_recovery_rate": 0.8333
+        }
+      ]
+    },
+    {
+      "horizon_s": 180,
+      "n_alive": 3908,
+      "operating_points": [
+        {
+          "quantile": 0.7,
+          "score_cutoff": 0.4326,
+          "n_flagged": 1173,
+          "n_recovered": 831,
+          "recovery_rate": 0.7084,
+          "failure_rate_if_recovered": 0.5138,
+          "failure_rate_if_not_recovered": 0.9211,
+          "median_remaining_mfe_if_recovered": 1.3127,
+          "median_remaining_mfe_if_not_recovered": 0.0185,
+          "ge_2_5atr_runners_flagged": 353,
+          "ge_2_5atr_runners_that_recovered": 327,
+          "ge_2_5atr_recovery_rate": 0.9263
+        },
+        {
+          "quantile": 0.85,
+          "score_cutoff": 0.5287,
+          "n_flagged": 587,
+          "n_recovered": 440,
+          "recovery_rate": 0.7496,
+          "failure_rate_if_recovered": 0.6023,
+          "failure_rate_if_not_recovered": 0.9592,
+          "median_remaining_mfe_if_recovered": 1.133,
+          "median_remaining_mfe_if_not_recovered": 0.0,
+          "ge_2_5atr_runners_flagged": 164,
+          "ge_2_5atr_runners_that_recovered": 156,
+          "ge_2_5atr_recovery_rate": 0.9512
+        },
+        {
+          "quantile": 0.95,
+          "score_cutoff": 0.6082,
+          "n_flagged": 196,
+          "n_recovered": 153,
+          "recovery_rate": 0.7806,
+          "failure_rate_if_recovered": 0.6078,
+          "failure_rate_if_not_recovered": 0.9535,
+          "median_remaining_mfe_if_recovered": 0.9664,
+          "median_remaining_mfe_if_not_recovered": -0.0242,
+          "ge_2_5atr_runners_flagged": 56,
+          "ge_2_5atr_runners_that_recovered": 56,
+          "ge_2_5atr_recovery_rate": 1.0
+        }
+      ]
+    },
+    {
+      "horizon_s": 300,
+      "n_alive": 3209,
+      "operating_points": [
+        {
+          "quantile": 0.7,
+          "score_cutoff": 0.422,
+          "n_flagged": 963,
+          "n_recovered": 655,
+          "recovery_rate": 0.6802,
+          "failure_rate_if_recovered": 0.4122,
+          "failure_rate_if_not_recovered": 0.7532,
+          "median_remaining_mfe_if_recovered": 1.4028,
+          "median_remaining_mfe_if_not_recovered": 0.0373,
+          "ge_2_5atr_runners_flagged": 378,
+          "ge_2_5atr_runners_that_recovered": 317,
+          "ge_2_5atr_recovery_rate": 0.8386
+        },
+        {
+          "quantile": 0.85,
+          "score_cutoff": 0.518,
+          "n_flagged": 482,
+          "n_recovered": 346,
+          "recovery_rate": 0.7178,
+          "failure_rate_if_recovered": 0.5116,
+          "failure_rate_if_not_recovered": 0.8015,
+          "median_remaining_mfe_if_recovered": 1.1058,
+          "median_remaining_mfe_if_not_recovered": 0.0,
+          "ge_2_5atr_runners_flagged": 169,
+          "ge_2_5atr_runners_that_recovered": 145,
+          "ge_2_5atr_recovery_rate": 0.858
+        },
+        {
+          "quantile": 0.95,
+          "score_cutoff": 0.6009,
+          "n_flagged": 161,
+          "n_recovered": 126,
+          "recovery_rate": 0.7826,
+          "failure_rate_if_recovered": 0.627,
+          "failure_rate_if_not_recovered": 0.8286,
+          "median_remaining_mfe_if_recovered": 0.7093,
+          "median_remaining_mfe_if_not_recovered": 0.0,
+          "ge_2_5atr_runners_flagged": 55,
+          "ge_2_5atr_runners_that_recovered": 50,
+          "ge_2_5atr_recovery_rate": 0.9091
+        }
+      ]
+    }
+  ]
+}

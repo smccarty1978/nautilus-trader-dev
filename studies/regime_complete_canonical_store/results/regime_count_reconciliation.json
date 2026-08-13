@@ -1,0 +1,69 @@
+{
+  "accepted_flips_deduplicated": 137881,
+  "accepted_flips_inside_window": 137682,
+  "accepted_flips_outside_window": 199,
+  "store_regimes": 137673,
+  "in_accepted_not_in_store": 9,
+  "in_store_not_in_accepted": 0,
+  "explained_as_cold_start_warmup_artifacts": 9,
+  "unexplained": 0,
+  "independent_flips_derived": 172942,
+  "classified": [
+    {
+      "timestamp_utc": "2021-02-26T00:07:00+00:00",
+      "days_before_partition_boundary": 3.0,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    },
+    {
+      "timestamp_utc": "2021-05-30T22:13:00+00:00",
+      "days_before_partition_boundary": 1.07,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    },
+    {
+      "timestamp_utc": "2021-09-28T00:03:00+00:00",
+      "days_before_partition_boundary": 3.0,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    },
+    {
+      "timestamp_utc": "2021-09-28T00:06:00+00:00",
+      "days_before_partition_boundary": 3.0,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    },
+    {
+      "timestamp_utc": "2022-11-28T00:08:00+00:00",
+      "days_before_partition_boundary": 2.99,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    },
+    {
+      "timestamp_utc": "2023-10-29T22:09:00+00:00",
+      "days_before_partition_boundary": 2.08,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    },
+    {
+      "timestamp_utc": "2024-04-28T22:17:00+00:00",
+      "days_before_partition_boundary": 2.07,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    },
+    {
+      "timestamp_utc": "2025-04-28T00:09:00+00:00",
+      "days_before_partition_boundary": 2.99,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    },
+    {
+      "timestamp_utc": "2025-10-29T00:22:00+00:00",
+      "days_before_partition_boundary": 2.98,
+      "inside_next_partition_warmup": true,
+      "present_in_independent_derivation": false
+    }
+  ],
+  "conclusion": "Every difference is explained. Flips outside the window come from the 2021-01 partition's 2020 warmup. The remainder are cold-start convergence artifacts recorded during a later partition's warmup; none appear in an independently derived continuous regime stream, so the store is correct to exclude them.",
+  "verdict": "RECONCILED"
+}

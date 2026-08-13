@@ -1,0 +1,18 @@
+phase: C
+study_years: [2021, 2022, 2023, 2024, 2025]
+instrument_id: NQ.XCME
+cadence_seconds: 5
+selection_environment: NautilusTrader_event_loop
+one_entry_per: [instrument_id, entry_model_id, regime_start_ns]
+membership_operator: ">="
+threshold_overlap_waiver: studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json
+bullish:
+  model_id: BULLISH_STRICT_top25_gbt_v2
+  approved_regime: 1
+  trade_direction: -1
+  top_2_5_threshold: 0.5697449423968936
+bearish:
+  model_id: LONG_STRICT_top25_gbt_v2
+  approved_regime: -1
+  trade_direction: 1
+  top_2_5_threshold: 0.5641320087327389

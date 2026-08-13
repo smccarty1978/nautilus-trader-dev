@@ -1,0 +1,26 @@
+{
+  "models": {
+    "LONG_STRICT_top25_gbt_v2": [
+      "F3_top25_gbt_v1",
+      25
+    ],
+    "LONG_STRICT_top103_gbt_v2": [
+      "F3_top100_gbt_v1",
+      103
+    ]
+  },
+  "hyperparameters": {
+    "max_depth": 3,
+    "learning_rate": 0.05,
+    "max_iter": 200,
+    "random_state": 42
+  },
+  "target": "bullish_regime_flip_within_300s",
+  "train_years": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "development_year": 2025
+}

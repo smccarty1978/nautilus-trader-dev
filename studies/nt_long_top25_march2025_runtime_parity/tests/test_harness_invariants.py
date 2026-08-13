@@ -125,6 +125,90 @@ def test_missing_value_uses_frozen_median_impute():
     assert np.allclose(out["imputed"], rt.fill)
 
 
+def _offline_attach_module():
+    """The REAL upstream module the frozen features were produced by."""
+    sys.path.insert(0, str(ROOT / "studies" / "ohlcv_volume_delta_price_level_features"))
+    import attach_features
+    return attach_features
+
+
+def test_minute_bucket_key_is_the_offline_function_not_a_retyped_copy():
+    """The live bucket rule must BE the offline one, value for value. A drift
+    here silently rebuilds every price-level and RTH feature (see
+    common.minute_bucket_key)."""
+    offline = _offline_attach_module().minute_bucket_key
+    for ts in (0, 1, NS, 59 * NS, 60 * NS, 61 * NS, 119 * NS, 120 * NS,
+               1_741_012_200 * NS, 1_741_012_201 * NS):
+        assert C.minute_bucket_key(ts) == offline(ts), f"bucket drift at ts={ts}"
+
+
+def test_open_labelled_bar_at_the_minute_close_belongs_to_the_closing_bucket():
+    """The offline bucket spans (m-60s, m] on OPEN-labelled bars, so the bar at
+    ts == m is the LAST member of the bucket closing at m -- not the first
+    member of the next one. This +1s shift is the whole defect class."""
+    m = 120 * NS
+    assert C.minute_bucket_key(m) == C.minute_bucket_key(m - 59 * NS)
+    assert C.minute_bucket_key(m + NS) == C.minute_bucket_key(m) + 1
+    assert C.minute_bucket_key(m - 60 * NS) == C.minute_bucket_key(m) - 1
+
+
+def test_feature_path_rth_window_is_the_offline_one_and_differs_from_decisions():
+    """Two session rules coexist on purpose: 08:30-15:00 for features (the
+    offline attach's `is_rth`), 08:30-15:15 for decisions/fills."""
+    offline_is_rth = _offline_attach_module().is_rth
+    # 2025-03-03 (CST): 08:30 CT = 14:30Z, 15:00 CT = 21:00Z, 15:14 CT = 21:14Z
+    base = pd.Timestamp("2025-03-03 00:00:00", tz="UTC").value
+    for hh, mm in ((14, 29), (14, 30), (20, 59), (21, 0), (21, 14), (21, 15)):
+        ts = base + (hh * 60 + mm) * 60 * NS
+        mod = (pd.Timestamp(ts, tz="UTC").tz_convert(C.SESSION_TZ).hour * 60
+               + pd.Timestamp(ts, tz="UTC").tz_convert(C.SESSION_TZ).minute)
+        assert C.is_rth_feature_minute(mod) == offline_is_rth(ts), \
+            f"feature-path RTH diverges from the offline attach at {hh}:{mm}Z"
+    assert C.is_rth_minute_of_day(15 * 60 + 5)
+    assert not C.is_rth_feature_minute(15 * 60 + 5), \
+        "the feature path must close RTH at 15:00, the decision path at 15:15"
+
+
+def test_engine_finalizes_the_minute_one_bar_late_and_with_shifted_membership():
+    """Behavioural mirror of attach_features_long.py:139-166.
+
+    Feeds 1s bars priced by their own second, so the synthesized minute's OHLC
+    reads back its exact membership. The bucket closing at 120s must contain
+    the bars at 61s..120s -- NOT 60s..119s -- and must not exist at all until
+    the bar at 121s arrives.
+    """
+    from long_feature_engine import LongFeatureEngine
+
+    eng = LongFeatureEngine(["rth_vol_cum"], is_rth_ts=lambda ts: True)
+    for sec in range(60, 121):                       # 60s .. 120s inclusive
+        px = float(sec)
+        eng.update_1s(sec * NS, px, px, px, px, 1.0, -1, 10.0)
+
+    assert eng._last_1m_close_ts == 60 * NS, \
+        "the bar at ts == 120s must NOT have closed the 120s bucket"
+    assert eng.ohlcv.calculate(atr=1.0)["rth_vol_cum"] == pytest.approx(1.0), \
+        "only the single bar at 60s belongs to the bucket closing at 60s"
+
+    eng.update_1s(121 * NS, 121.0, 121.0, 121.0, 121.0, 1.0, -1, 10.0)
+    assert eng._last_1m_close_ts == 120 * NS, "the bar at 121s must close the 120s bucket"
+
+    ts_1m, o, h, l, c = eng.price.bars_1m[-1]
+    assert ts_1m == 120 * NS
+    assert (o, h, l, c) == (61.0, 120.0, 61.0, 120.0), \
+        "synthesized minute must span (60s, 120s], not [60s, 120s)"
+    assert eng.ohlcv.calculate(atr=1.0)["rth_vol_cum"] == pytest.approx(61.0)
+
+
+def test_minute_finalization_is_not_driven_by_the_1m_feed():
+    """A 1m bar must not be able to advance the price tracker: the strategy
+    routes only regime detection through `_on_1m`."""
+    from long_feature_engine import LongFeatureEngine
+
+    eng = LongFeatureEngine(["rth_vol_cum"], is_rth_ts=lambda ts: True)
+    assert not hasattr(eng, "update_1m"), \
+        "LongFeatureEngine must expose no 1m update path -- minutes come from 1s bars"
+
+
 def test_regime_engine_matches_offline_reproduction():
     """The live RegimeEngine must reproduce the offline 1m regime series that
     the frozen population was built from."""

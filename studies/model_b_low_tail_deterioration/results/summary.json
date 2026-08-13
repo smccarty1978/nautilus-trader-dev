@@ -1,0 +1,525 @@
+{
+  "study": "model_b_low_tail_deterioration",
+  "report_answers": {
+    "Q1_lineage_reproduced_exactly": {
+      "answer": "YES",
+      "n_checks": 14,
+      "n_failed": 0,
+      "caveat": "reproduced against an unexecutable high-water-mark fill; 61.6% of the effect disappears at the mark",
+      "bottom_decile_hwm": -0.7197865666220643,
+      "bottom_decile_mark": -0.2763692423132807,
+      "bottom_decile_mark_ci95": [
+        -0.8447858737500747,
+        0.24743546387292462
+      ]
+    },
+    "Q2_monotonic_deterioration_curve": {
+      "answer": "NO",
+      "disjoint_band_spearman": -0.05454545454545455,
+      "inversions": 4,
+      "direction": "IMPROVEMENT",
+      "worst_band": "band_50_60",
+      "worst_band_value": -0.5163383521815439
+    },
+    "Q3_where_economically_meaningful": {
+      "answer": "NOWHERE RELIABLY",
+      "population": -0.15460588082849527,
+      "bottom_20": -0.030793992054877813,
+      "bottom_10": -0.27636924231328064,
+      "bottom_5": -0.2131480495789908,
+      "materiality_bar_atr": 0.15
+    },
+    "Q4_both_folds": {
+      "answer": "DIRECTIONALLY YES, HOLLOW",
+      "fold_1_all": 0.15662559016019537,
+      "fold_2_all": -0.47936915490365073,
+      "fold_1_bottom_10": -0.17806339501416146,
+      "fold_2_bottom_10": -0.374866887311976,
+      "fold_1_bottom_25": 0.2065468043944055,
+      "fold_1_bottom_5": 0.0825921320887893
+    },
+    "Q5_long_and_short": {
+      "answer": "THEY INVERT",
+      "long": {
+        "ALL": 0.10547948900983727,
+        "bottom_25": 0.519276449311936,
+        "bottom_20": 0.6373331990830112,
+        "bottom_10": 0.3120808477909825,
+        "bottom_5": 0.13914721002550542
+      },
+      "short": {
+        "ALL": -0.3489447631240523,
+        "bottom_25": -0.4609560224838966,
+        "bottom_20": -0.4470911326374812,
+        "bottom_10": -0.2881494653486344,
+        "bottom_5": 0.23277714202618696
+      }
+    },
+    "Q6_survives_rung_composition": {
+      "answer": "NO",
+      "n_rungs": 6,
+      "n_negative": 4,
+      "n_powered": 4,
+      "powered_sign_flip": true,
+      "values": {
+        "RUNG_1.0": -0.4529640390104877,
+        "RUNG_1.5": -0.5786338011294188,
+        "RUNG_2.0": 0.34780110679289167,
+        "RUNG_2.5": -0.12609682338062336,
+        "RUNG_3.0": -0.16458580060006908,
+        "RUNG_4.0": 0.30621105529156734
+      },
+      "threshold": "negative in a majority of rungs, no positive in a powered rung",
+      "passed": false
+    },
+    "Q7_survives_time_composition": {
+      "answer": "NO",
+      "values": {
+        "SINCECONF_T1": 0.21575740152014342,
+        "SINCECONF_T2": -0.006660362259303266,
+        "SINCECONF_T3": 0.02952198769847093
+      },
+      "threshold": "negative in all three frozen strata",
+      "passed": false,
+      "low_tail_is_young_not_old": {
+        "pct_age_zero_bottom_10": 68.08510638297872,
+        "pct_age_zero_population": 26.95035460992908,
+        "median_age_bottom_10": 0.0,
+        "median_age_population": 75.0
+      }
+    },
+    "Q8_beats_drawdown_alone": {
+      "answer": "NARROWLY, INSIDE THE NOISE",
+      "per_cut": {
+        "bottom_25": {
+          "ml": -0.2791920098604118,
+          "c4": -0.21124468663066356
+        },
+        "bottom_20": {
+          "ml": -0.3141703327529703,
+          "c4": -0.2783861174795633
+        },
+        "bottom_10": {
+          "ml": -0.4238959237434241,
+          "c4": -0.36535140829411056
+        },
+        "bottom_5": {
+          "ml": -0.22411216488062044,
+          "c4": -0.16354900976213968
+        }
+      },
+      "trigger_overlap_with_drawdown_rule": {
+        "bottom_25": {
+          "n_triggers": 190,
+          "n_shared_with_C4_DESC": 130,
+          "pct_shared": 68.42105263157895
+        },
+        "bottom_20": {
+          "n_triggers": 152,
+          "n_shared_with_C4_DESC": 101,
+          "pct_shared": 66.44736842105263
+        },
+        "bottom_10": {
+          "n_triggers": 78,
+          "n_shared_with_C4_DESC": 50,
+          "pct_shared": 64.1025641025641
+        },
+        "bottom_5": {
+          "n_triggers": 36,
+          "n_shared_with_C4_DESC": 27,
+          "pct_shared": 75.0
+        }
+      },
+      "spearman_score_vs_drawdown": -0.4825687741846954
+    },
+    "Q9_beats_matched_placebo": {
+      "answer": "NO",
+      "per_cut": {
+        "bottom_25": {
+          "ml": -0.2791920098604118,
+          "best_control": {
+            "C1": -0.17656983008787858,
+            "C2": -0.12904517721503433,
+            "C3": -0.12375006235622561,
+            "C4": -0.21124468663066356
+          },
+          "ml_beats_all": true
+        },
+        "bottom_20": {
+          "ml": -0.3141703327529703,
+          "best_control": {
+            "C1": -0.1658574250171627,
+            "C2": -0.20039678839673175,
+            "C3": -0.18561019335355317,
+            "C4": -0.2783861174795633
+          },
+          "ml_beats_all": true
+        },
+        "bottom_10": {
+          "ml": -0.4238959237434241,
+          "best_control": {
+            "C1": -0.1404272904146944,
+            "C2": -0.4523900401072262,
+            "C3": -0.3615907026910654,
+            "C4": -0.36535140829411056
+          },
+          "ml_beats_all": false
+        },
+        "bottom_5": {
+          "ml": -0.22411216488062044,
+          "best_control": {
+            "C1": -0.06869280631198064,
+            "C2": -0.2348928869475349,
+            "C3": -0.3244296877745306,
+            "C4": -0.16354900976213968
+          },
+          "ml_beats_all": false
+        }
+      },
+      "threshold": "ML strictly more negative than every control family",
+      "passed": false
+    },
+    "Q10_adverse_barrier_widening": {
+      "answer": "DISCRIMINATION GETS WORSE, NOT BETTER",
+      "auc_by_target": {
+        "lab_f050_a050_180": {
+          "base_rate": 35.53191489361702,
+          "auc": 0.560130563954599,
+          "auc_resolved_only": 0.5623987451106756
+        },
+        "lab_f050_a050_240": {
+          "base_rate": 35.95744680851064,
+          "auc": 0.5601042765622372,
+          "auc_resolved_only": 0.5611870060760097
+        },
+        "lab_f050_a050_300": {
+          "base_rate": 36.09929078014184,
+          "auc": 0.5601710825561644,
+          "auc_resolved_only": 0.5609891517895277
+        },
+        "lab_f050_a075_180": {
+          "base_rate": 46.52482269503546,
+          "auc": 0.5262209274115287,
+          "auc_resolved_only": 0.5329546466085099
+        },
+        "lab_f050_a075_240": {
+          "base_rate": 47.73049645390071,
+          "auc": 0.5311350178729478,
+          "auc_resolved_only": 0.5328224199648791
+        },
+        "lab_f050_a075_300": {
+          "base_rate": 48.43971631205674,
+          "auc": 0.532178611635293,
+          "auc_resolved_only": 0.531675983537327
+        },
+        "lab_f050_a100_180": {
+          "base_rate": 51.91489361702127,
+          "auc": 0.5299125924851299,
+          "auc_resolved_only": 0.5441776887729757
+        },
+        "lab_f050_a100_240": {
+          "base_rate": 54.25531914893617,
+          "auc": 0.5381172417287329,
+          "auc_resolved_only": 0.5455398738596431
+        },
+        "lab_f050_a100_300": {
+          "base_rate": 55.673758865248224,
+          "auc": 0.5414247133757962,
+          "auc_resolved_only": 0.5449028198096819
+        },
+        "lab_f050_a125_180": {
+          "base_rate": 54.184397163120565,
+          "auc": 0.5186943818585577,
+          "auc_resolved_only": 0.5561349434217193
+        },
+        "lab_f050_a125_240": {
+          "base_rate": 57.234042553191486,
+          "auc": 0.527818363777971,
+          "auc_resolved_only": 0.5504823762730734
+        },
+        "lab_f050_a125_300": {
+          "base_rate": 59.50354609929078,
+          "auc": 0.5395224904971935,
+          "auc_resolved_only": 0.5450394941516333
+        }
+      },
+      "note": "frozen predictions scored against alternative labels; no refit, so this is not what a model trained on those targets could do"
+    },
+    "Q11_is_050_075_too_tight": {
+      "answer": "NO -- the model is BEST at the tightest barrier",
+      "auc_a050_300": 0.560130563954599,
+      "auc_a125_300": 0.5186943818585577
+    },
+    "Q12_what_does_the_model_identify": {
+      "answer": "DRAWDOWN-FROM-HWM, PLUS NEAR-TERM VOLATILITY",
+      "spearman_score_vs_feature": {
+        "drawdown_from_hwm_atr": -0.4825687741846954,
+        "rung_overshoot_atr": -0.23105774570422102,
+        "rung_atr": 0.015027380066824138,
+        "seconds_since_confirm": 0.14857226639258497,
+        "current_mfe_atr": -0.08962929551594137,
+        "realized_vol_60s_atr": -0.15358106708382183
+      }
+    },
+    "Q13_trades_receiving_an_actionable_signal": {
+      "answer": {
+        "bottom_25": 190,
+        "bottom_20": 152,
+        "bottom_10": 78,
+        "bottom_5": 36
+      },
+      "pct_of_population": {
+        "bottom_25": 50.0,
+        "bottom_20": 40.0,
+        "bottom_10": 20.526315789473685,
+        "bottom_5": 9.473684210526315
+      }
+    },
+    "Q14_major_runners_intercepted": {
+      "pct_R3": {
+        "bottom_25": 63.35403726708075,
+        "bottom_20": 49.68944099378882,
+        "bottom_10": 25.46583850931677,
+        "bottom_5": 10.559006211180124
+      },
+      "pct_R4": {
+        "bottom_25": 63.30275229357798,
+        "bottom_20": 52.293577981651374,
+        "bottom_10": 26.605504587155963,
+        "bottom_5": 9.174311926605505
+      }
+    },
+    "Q15_bad_outcomes_identified": {
+      "pct_eventual_losers": {
+        "bottom_25": 38.0,
+        "bottom_20": 32.0,
+        "bottom_10": 19.333333333333332,
+        "bottom_5": 8.0
+      },
+      "pct_eventual_winners": {
+        "bottom_25": 57.82608695652174,
+        "bottom_20": 45.21739130434783,
+        "bottom_10": 21.304347826086957,
+        "bottom_5": 10.434782608695652
+      },
+      "answer": "FEWER LOSERS THAN WINNERS AT THE TWO WIDEST CUTS"
+    },
+    "Q16_classification": "D3 COMPOSITION / PLACEBO EFFECT",
+    "Q17_train_dedicated_multiyear_model": {
+      "answer": "NO",
+      "reason": "the low tail is drawdown-from-HWM, which is a single existing feature, is matched by a one-line threshold rule, and is most of what the HWM-anchored adverse barrier already measures"
+    }
+  },
+  "population": {
+    "oos_observations": 1410,
+    "oos_trades": 380,
+    "full_observations": 2991,
+    "full_trades": 781
+  },
+  "lineage": {
+    "stop_triggered": false,
+    "n_checks": 14,
+    "exit_basis_amendment": {
+      "rationale": "SPEC 3. current_mfe_atr is the running HWM and is not a transactable fill; return_from_entry_atr is the mark.",
+      "drawdown_from_hwm_atr_mean": 0.13004092149990765,
+      "drawdown_from_hwm_atr_median": 0.07513133079048506,
+      "pooled_cme_hwm": -0.28464680232840295,
+      "pooled_cme_mark": -0.15460588082849527,
+      "bottom_decile_cme_hwm": -0.7197865666220643,
+      "bottom_decile_cme_mark": -0.2763692423132807,
+      "bottom_decile_cme_mark_ci95": [
+        -0.8447858737500747,
+        0.24743546387292462
+      ],
+      "share_of_headline_that_is_unexecutable_pct": 61.60400108461695
+    }
+  },
+  "monotonicity": {
+    "DISJOINT_BAND__cme_mark": {
+      "spearman": -0.05454545454545455,
+      "inversions": 4,
+      "role": "gate",
+      "direction": "IMPROVEMENT"
+    },
+    "DISJOINT_BAND__cme_hwm": {
+      "spearman": 0.10303030303030303,
+      "inversions": 4,
+      "role": "gate",
+      "direction": "DETERIORATION"
+    },
+    "NESTED_CONSTRUCTION_CORRELATED__cme_mark": {
+      "spearman": -0.17575757575757575,
+      "inversions": 4,
+      "role": "diagnostic",
+      "direction": "IMPROVEMENT"
+    },
+    "NESTED_CONSTRUCTION_CORRELATED__cme_hwm": {
+      "spearman": -0.9151515151515152,
+      "inversions": 6,
+      "role": "diagnostic",
+      "direction": "IMPROVEMENT"
+    }
+  },
+  "mechanism": {
+    "spearman_score_vs_feature": {
+      "drawdown_from_hwm_atr": -0.4825687741846954,
+      "rung_overshoot_atr": -0.23105774570422102,
+      "rung_atr": 0.015027380066824138,
+      "seconds_since_confirm": 0.14857226639258497,
+      "current_mfe_atr": -0.08962929551594137,
+      "realized_vol_60s_atr": -0.15358106708382183
+    },
+    "ml_trigger_overlap_with_drawdown_rule": {
+      "bottom_25": {
+        "n_triggers": 190,
+        "n_shared_with_C4_DESC": 130,
+        "pct_shared": 68.42105263157895
+      },
+      "bottom_20": {
+        "n_triggers": 152,
+        "n_shared_with_C4_DESC": 101,
+        "pct_shared": 66.44736842105263
+      },
+      "bottom_10": {
+        "n_triggers": 78,
+        "n_shared_with_C4_DESC": 50,
+        "pct_shared": 64.1025641025641
+      },
+      "bottom_5": {
+        "n_triggers": 36,
+        "n_shared_with_C4_DESC": 27,
+        "pct_shared": 75.0
+      }
+    },
+    "age_composition": {
+      "pct_age_zero_bottom_10": 68.08510638297872,
+      "pct_age_zero_population": 26.95035460992908,
+      "median_age_bottom_10": 0.0,
+      "median_age_population": 75.0
+    }
+  },
+  "validation_all_passed": true,
+  "decision": {
+    "conditions": {
+      "monotonic": {
+        "spearman": -0.05454545454545455,
+        "inversions": 4,
+        "direction": "IMPROVEMENT",
+        "threshold": "spearman>=0.7 and inversions<=2",
+        "passed": false
+      },
+      "tail_material": {
+        "population_cme_mark": -0.15460588082849527,
+        "delta_vs_population": {
+          "bottom_20": 0.12381188877361746,
+          "bottom_10": -0.12176336148478537
+        },
+        "threshold": "both bottom_20 and bottom_10 at least 0.15 ATR worse",
+        "passed": false
+      },
+      "both_folds": {
+        "values": {
+          "FOLD_1": -0.17806339501416146,
+          "FOLD_2": -0.374866887311976
+        },
+        "threshold": "same sign, both negative",
+        "passed": true
+      },
+      "both_sides": {
+        "values": {
+          "LONG": 0.3120808477909825,
+          "SHORT": -0.2881494653486344
+        },
+        "threshold": "same sign, both negative",
+        "passed": false
+      },
+      "rung_control": {
+        "n_rungs": 6,
+        "n_negative": 4,
+        "n_powered": 4,
+        "powered_sign_flip": true,
+        "values": {
+          "RUNG_1.0": -0.4529640390104877,
+          "RUNG_1.5": -0.5786338011294188,
+          "RUNG_2.0": 0.34780110679289167,
+          "RUNG_2.5": -0.12609682338062336,
+          "RUNG_3.0": -0.16458580060006908,
+          "RUNG_4.0": 0.30621105529156734
+        },
+        "threshold": "negative in a majority of rungs, no positive in a powered rung",
+        "passed": false
+      },
+      "time_control": {
+        "values": {
+          "SINCECONF_T1": 0.21575740152014342,
+          "SINCECONF_T2": -0.006660362259303266,
+          "SINCECONF_T3": 0.02952198769847093
+        },
+        "threshold": "negative in all three frozen strata",
+        "passed": false
+      },
+      "beats_placebo": {
+        "per_cut": {
+          "bottom_25": {
+            "ml": -0.2791920098604118,
+            "best_control": {
+              "C1": -0.17656983008787858,
+              "C2": -0.12904517721503433,
+              "C3": -0.12375006235622561,
+              "C4": -0.21124468663066356
+            },
+            "ml_beats_all": true
+          },
+          "bottom_20": {
+            "ml": -0.3141703327529703,
+            "best_control": {
+              "C1": -0.1658574250171627,
+              "C2": -0.20039678839673175,
+              "C3": -0.18561019335355317,
+              "C4": -0.2783861174795633
+            },
+            "ml_beats_all": true
+          },
+          "bottom_10": {
+            "ml": -0.4238959237434241,
+            "best_control": {
+              "C1": -0.1404272904146944,
+              "C2": -0.4523900401072262,
+              "C3": -0.3615907026910654,
+              "C4": -0.36535140829411056
+            },
+            "ml_beats_all": false
+          },
+          "bottom_5": {
+            "ml": -0.22411216488062044,
+            "best_control": {
+              "C1": -0.06869280631198064,
+              "C2": -0.2348928869475349,
+              "C3": -0.3244296877745306,
+              "C4": -0.16354900976213968
+            },
+            "ml_beats_all": false
+          }
+        },
+        "threshold": "ML strictly more negative than every control family",
+        "passed": false
+      },
+      "sample": {
+        "bottom_10_unique_trades": 78,
+        "threshold": ">=20",
+        "passed": true
+      }
+    },
+    "n_passed": 2,
+    "n_conditions": 8,
+    "bottom_10_ci95_mark": [
+      -0.8447858737500745,
+      0.24743546387292462
+    ],
+    "bottom_10_ci_excludes_zero": false,
+    "control_killed": true,
+    "incoherent": true,
+    "terminal_label": "D3 COMPOSITION / PLACEBO EFFECT"
+  },
+  "terminal_label": "D3 COMPOSITION / PLACEBO EFFECT"
+}

@@ -1,0 +1,189 @@
+{
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "sealed_years_never_read": [
+    2020,
+    2026
+  ],
+  "rows": [
+    {
+      "quantity": "original_top10_entries",
+      "observed": 8950.0,
+      "accepted": 8950.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "confirmed",
+      "observed": 4705.0,
+      "accepted": 4705.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "stopped_before_confirm",
+      "observed": 4245.0,
+      "accepted": 4245.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "stopped_before_confirm_by_label",
+      "observed": 4245.0,
+      "accepted": 4245.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "measurable_confirmed",
+      "observed": 4656.0,
+      "accepted": 4656.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "non_measurable",
+      "observed": 49.0,
+      "accepted": 49.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "giveback_pool_per_entry",
+      "observed": 0.8980826455229006,
+      "accepted": 0.89808,
+      "delta": 2.6455229006350223e-06,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "baseline_net_per_entry",
+      "observed": -0.07652964256329595,
+      "accepted": -0.07653,
+      "delta": 3.574367040543036e-07,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rung_events_post_confirm",
+      "observed": 15220.0,
+      "accepted": 15220.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "trades_reaching_1atr",
+      "observed": 4160.0,
+      "accepted": 4160.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rung_1.0_events",
+      "observed": 4160.0,
+      "accepted": 4160.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rung_1.5_events",
+      "observed": 3358.0,
+      "accepted": 3358.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rung_2.0_events",
+      "observed": 2692.0,
+      "accepted": 2692.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rung_2.5_events",
+      "observed": 2134.0,
+      "accepted": 2134.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rung_3.0_events",
+      "observed": 1742.0,
+      "accepted": 1742.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rung_4.0_events",
+      "observed": 1134.0,
+      "accepted": 1134.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rebuilt_rung_1.0_membership",
+      "observed": 4160.0,
+      "accepted": 4160.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rebuilt_rung_1.5_membership",
+      "observed": 3358.0,
+      "accepted": 3358.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rebuilt_rung_2.0_membership",
+      "observed": 2692.0,
+      "accepted": 2692.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rebuilt_rung_2.5_membership",
+      "observed": 2134.0,
+      "accepted": 2134.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rebuilt_rung_3.0_membership",
+      "observed": 1742.0,
+      "accepted": 1742.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rebuilt_rung_4.0_membership",
+      "observed": 1134.0,
+      "accepted": 1134.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    },
+    {
+      "quantity": "rung_ts_mismatches",
+      "observed": 0.0,
+      "accepted": 0.0,
+      "delta": 0.0,
+      "status": "EXACT"
+    }
+  ],
+  "n_checks": 23,
+  "n_failed": 0,
+  "lineage_status": "REPRODUCED",
+  "failed": [],
+  "build_diagnostics": {
+    "trades_in": 4656,
+    "no_window": 0,
+    "walked": 4656,
+    "seed": 20260811,
+    "arm_rows": 60880,
+    "state_rows": 356988,
+    "seconds": 22.4
+  }
+}

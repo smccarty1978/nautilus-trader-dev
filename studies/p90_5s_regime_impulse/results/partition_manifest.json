@@ -1,0 +1,88 @@
+{
+  "study": "p90_5s_regime_impulse",
+  "inputs": {
+    "data/canonical/regime_complete_v1/canonical_regime_paths_all.parquet": {
+      "exists": true,
+      "size_bytes": 1346003856,
+      "rows": 61543945
+    },
+    "data/canonical/regime_complete_v1/canonical_regimes_all.parquet": {
+      "exists": true,
+      "size_bytes": 11334672,
+      "rows": 137673
+    },
+    "data/canonical/regime_complete_v1/canonical_regime_scores_all.parquet": {
+      "exists": true,
+      "size_bytes": 3783769482,
+      "rows": 12156904
+    },
+    "data/canonical/regime_complete_v1/canonical_model_threshold_contracts.parquet": {
+      "exists": true,
+      "size_bytes": 19654,
+      "rows": 12
+    },
+    "studies/armed_fade_score_path_progression/results/armed_regime_score_paths.parquet": {
+      "exists": true,
+      "size_bytes": 4230195,
+      "rows": 8950
+    },
+    "studies/p90_5s_regime_impulse/_work/regime_5s_flips.parquet": {
+      "exists": true,
+      "size_bytes": 13291960,
+      "rows": 2054398
+    }
+  },
+  "code_sha256": "429b9df13e687e8351f5a4909a4b1c4c2f795fdf2e6514bbbb10499af94a0979",
+  "seed": 20260812,
+  "arms": 8950,
+  "market_rth_1s_bars": 28383730,
+  "regime_5s_build": {
+    "buckets_built": 18774838,
+    "buckets_expected_closed": 18774838,
+    "distinct_5s_slots_touched": 18774839,
+    "buckets_reconcile": true,
+    "source_1s_rows": 61543945,
+    "absorbed_1s_rows": 61543944,
+    "final_partial_bucket_1s_rows": 1,
+    "rows_reconcile": true,
+    "regime_changes": 2054398,
+    "alpha3": 0.5,
+    "alpha9": 0.2,
+    "bucket_ns": 5000000000,
+    "bucketing_clock": "path_event_ns (bar OPEN)",
+    "availability_clock": "close_ts = (bucket_id + 1) * 5e9",
+    "sessions_included": "RTH+ETH (continuous engine); entries/exits gated to RTH downstream",
+    "final_partial_bucket_discarded": true,
+    "regime_value_counts_over_closed_buckets": {
+      "-1": 9269684,
+      "0": 6,
+      "1": 9505148
+    },
+    "flips_sha256": "42e42bf9b42ba83b7d525879b35bfdc0cb8858a8cc98f6a4bc507436b1b9af93"
+  },
+  "stop_grid_atr": [
+    1.0,
+    0.75
+  ],
+  "cost_points_round_turn": 0.5,
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "sealed_years": [
+    2026
+  ],
+  "entry_fill_convention": "open of first 1s bar with path_init_ns > arm_ns",
+  "exit_fill_convention": "open of first 1s bar after the 5s bucket close_ts",
+  "generated_not_committed": [
+    "_work/regime_5s_flips.parquet"
+  ],
+  "supporting_artifacts_beyond_the_manifest": [
+    "results/benchmark_a_reference.parquet",
+    "results/benchmark_a_next_open.parquet",
+    "results/trades_placebo_exit.parquet"
+  ]
+}

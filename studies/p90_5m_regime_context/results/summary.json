@@ -1,0 +1,145 @@
+{
+  "study": "p90_5m_regime_context",
+  "verdict": "M2_POST_CONFIRM_CONTEXT",
+  "secondary_signals": [
+    "M2_POST_CONFIRM_CONTEXT",
+    "M3_TRANSITION_PATH_MATTERS"
+  ],
+  "facts": {
+    "confirm_rate_delta": -0.025399208440888055,
+    "return_at_confirm_delta": 0.1868564610466663,
+    "years_positive_both_metrics": 1,
+    "no_side_inversion": false,
+    "phase11_confirms_direction": false,
+    "transition_mfe3_delta": 0.0561238471820627,
+    "transition_giveback_delta": 0.0457263301517421,
+    "against_with_vs_others_mfe3_delta": 0.2541466024612092,
+    "5s_failure_ppv_delta": 0.01497326755155537
+  },
+  "primary_table": [
+    {
+      "metric": "P90 arms",
+      "WITH_5M": 1268.0,
+      "AGAINST_5M": 7682.0
+    },
+    {
+      "metric": "% population",
+      "WITH_5M": 0.1416759776536313,
+      "AGAINST_5M": 0.8583240223463687
+    },
+    {
+      "metric": "P(confirm<1ATR)",
+      "WITH_5M": 0.49842271293375395,
+      "AGAINST_5M": 0.523821921374642
+    },
+    {
+      "metric": "median sec to confirm",
+      "WITH_5M": 155.0,
+      "AGAINST_5M": 115.0
+    },
+    {
+      "metric": "MAE->confirm p50",
+      "WITH_5M": 0.33016652596498,
+      "AGAINST_5M": 0.3303244619586407
+    },
+    {
+      "metric": "MAE->confirm p75",
+      "WITH_5M": 0.5989208682390235,
+      "AGAINST_5M": 0.5955664772604217
+    },
+    {
+      "metric": "MAE->confirm p90",
+      "WITH_5M": 0.8092039465983073,
+      "AGAINST_5M": 0.8204384972861393
+    },
+    {
+      "metric": "median return @ confirm",
+      "WITH_5M": 1.0106443140482142,
+      "AGAINST_5M": 0.8237878530015479
+    },
+    {
+      "metric": "median eventual MaxMFE",
+      "WITH_5M": 1.0800006074396313,
+      "AGAINST_5M": 0.9779824439584042
+    },
+    {
+      "metric": "P(MFE>=3ATR)",
+      "WITH_5M": 0.20504731861198738,
+      "AGAINST_5M": 0.18732101015360583
+    },
+    {
+      "metric": "P(MFE>=4ATR)",
+      "WITH_5M": 0.14511041009463724,
+      "AGAINST_5M": 0.12028117677688102
+    },
+    {
+      "metric": "baseline net ATR / P90 arm",
+      "WITH_5M": 0.017287678241302097,
+      "AGAINST_5M": -0.0903913061763191
+    },
+    {
+      "metric": "MaxDD",
+      "WITH_5M": 90.28606417815845,
+      "AGAINST_5M": 777.7899433822392
+    }
+  ],
+  "phase6_bucket_summary": [
+    {
+      "timing_bucket": "121-300s",
+      "n": 42,
+      "label_only_p90_relative_to_5m_flip": "BEFORE_FUTURE_FLIP",
+      "confirm_rate": 1.0,
+      "mfe_mean": 5.794851499464,
+      "mae_mean": 0.303388404071488,
+      "terminal_return_mean": 2.9530656102373194
+    },
+    {
+      "timing_bucket": "301-600s",
+      "n": 270,
+      "label_only_p90_relative_to_5m_flip": "BEFORE_FUTURE_FLIP",
+      "confirm_rate": 1.0,
+      "mfe_mean": 6.146816916444924,
+      "mae_mean": 0.35480526306513294,
+      "terminal_return_mean": 3.546361181717231
+    },
+    {
+      "timing_bucket": "61-120s",
+      "n": 3,
+      "label_only_p90_relative_to_5m_flip": "BEFORE_FUTURE_FLIP",
+      "confirm_rate": 1.0,
+      "mfe_mean": 5.872726434890942,
+      "mae_mean": 0.34048285542967993,
+      "terminal_return_mean": 3.291274279334081
+    },
+    {
+      "timing_bucket": ">600s",
+      "n": 673,
+      "label_only_p90_relative_to_5m_flip": "BEFORE_FUTURE_FLIP",
+      "confirm_rate": 1.0,
+      "mfe_mean": 6.039662749716,
+      "mae_mean": 0.4732571252805029,
+      "terminal_return_mean": 3.6292260655200272
+    },
+    {
+      "timing_bucket": "N/A_ALREADY_WITH",
+      "n": 1268,
+      "label_only_p90_relative_to_5m_flip": "AFTER_EXISTING_FLIP",
+      "confirm_rate": 0.49842271293375395,
+      "mfe_mean": 1.8863704217633317,
+      "mae_mean": 0.8210596028719634,
+      "terminal_return_mean": 0.0172876782413021
+    },
+    {
+      "timing_bucket": "NO_FLIP_BEFORE_TERMINAL",
+      "n": 6694,
+      "label_only_p90_relative_to_5m_flip": "NO_FLIP_BEFORE_TERMINAL",
+      "confirm_rate": 0.4535404840155363,
+      "mfe_mean": 1.1201106556161435,
+      "mae_mean": 0.8886374468961123,
+      "terminal_return_mean": -0.6316515168319516
+    }
+  ],
+  "gates_passed": 11,
+  "gates_total": 11,
+  "runtime_s": 4.3
+}

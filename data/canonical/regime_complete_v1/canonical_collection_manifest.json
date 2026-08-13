@@ -1,0 +1,181 @@
+{
+  "partitions": 60,
+  "partition_list": [
+    "2021-01",
+    "2021-02",
+    "2021-03",
+    "2021-04",
+    "2021-05",
+    "2021-06",
+    "2021-07",
+    "2021-08",
+    "2021-09",
+    "2021-10",
+    "2021-11",
+    "2021-12",
+    "2022-01",
+    "2022-02",
+    "2022-03",
+    "2022-04",
+    "2022-05",
+    "2022-06",
+    "2022-07",
+    "2022-08",
+    "2022-09",
+    "2022-10",
+    "2022-11",
+    "2022-12",
+    "2023-01",
+    "2023-02",
+    "2023-03",
+    "2023-04",
+    "2023-05",
+    "2023-06",
+    "2023-07",
+    "2023-08",
+    "2023-09",
+    "2023-10",
+    "2023-11",
+    "2023-12",
+    "2024-01",
+    "2024-02",
+    "2024-03",
+    "2024-04",
+    "2024-05",
+    "2024-06",
+    "2024-07",
+    "2024-08",
+    "2024-09",
+    "2024-10",
+    "2024-11",
+    "2024-12",
+    "2025-01",
+    "2025-02",
+    "2025-03",
+    "2025-04",
+    "2025-05",
+    "2025-06",
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12"
+  ],
+  "datasets": {
+    "regimes": {
+      "target": "canonical_regimes_all.parquet",
+      "rows": 137673,
+      "expected_rows": 137673,
+      "reconciled": true,
+      "columns": 33,
+      "bytes": 11334672,
+      "sha256": "7ee3f2b120daedc0f2d78c718d79c4eb44ed257c1fc03757ee3150c0ccd844ec"
+    },
+    "scores": {
+      "target": "canonical_regime_scores_all.parquet",
+      "rows": 12156904,
+      "expected_rows": 12156904,
+      "reconciled": true,
+      "columns": 182,
+      "bytes": 3783769482,
+      "sha256": "d8c7baee28ea845a056162c58d99ca3a3de8c840cc829f08c681396130f7ab5b"
+    },
+    "paths": {
+      "target": "canonical_regime_paths_all.parquet",
+      "rows": 61543945,
+      "expected_rows": 61543945,
+      "reconciled": true,
+      "columns": 34,
+      "bytes": 1346003856,
+      "sha256": "0c525979a28045047013dff79b40d87acffd8616a69c74d5c26ef8165cb3e04f"
+    },
+    "missing": {
+      "target": "canonical_missing_dispatch_all.parquet",
+      "rows": 19396376,
+      "expected_rows": 19396376,
+      "reconciled": true,
+      "columns": 3,
+      "bytes": 87176811,
+      "sha256": "1ca7eff3a5b955e420f7af4f5733b22614cc1c5098d715619b8dd2deef9e8193"
+    }
+  },
+  "regime_reconciliation": {
+    "regimes": 137673,
+    "duplicate_regime_ids": 0,
+    "duplicate_starts": 0,
+    "duplicate_sequence_numbers": 0,
+    "sequence_is_dense": true,
+    "sequence_is_monotonic": true,
+    "consecutive_same_direction": 0,
+    "established": 56234,
+    "never_established": 81439,
+    "complete_paths": 137619,
+    "censored_paths": 54,
+    "by_year": [
+      {
+        "entry_year": 2021,
+        "len": 27825
+      },
+      {
+        "entry_year": 2022,
+        "len": 27138
+      },
+      {
+        "entry_year": 2023,
+        "len": 28029
+      },
+      {
+        "entry_year": 2024,
+        "len": 27515
+      },
+      {
+        "entry_year": 2025,
+        "len": 27166
+      }
+    ],
+    "by_direction": [
+      {
+        "regime_direction": -1,
+        "len": 68836
+      },
+      {
+        "regime_direction": 1,
+        "len": 68837
+      }
+    ],
+    "by_start_session": [
+      {
+        "session_at_start": "ETH",
+        "len": 100952
+      },
+      {
+        "session_at_start": "RTH",
+        "len": 36721
+      }
+    ]
+  },
+  "path_coverage": {
+    "catalog_1s_bars_2021_2025": 61543945,
+    "path_rows": 61543945,
+    "dropped_bars": 0,
+    "path_rows_without_regime_id": 0,
+    "status": "COMPLETE"
+  },
+  "session_distribution": {
+    "paths": {
+      "ETH": 33160215,
+      "RTH": 28383730
+    },
+    "scores": {
+      "ETH": 6491801,
+      "RTH": 5665103
+    },
+    "status": "PLAUSIBLE"
+  },
+  "global_integrity": {
+    "duplicate_score_observation_ids": 0,
+    "duplicate_path_keys": 0
+  },
+  "all_reconciled": true
+}

@@ -1,0 +1,206 @@
+{
+  "all_passed": true,
+  "gates": {
+    "lifecycle_parity": {
+      "gate": "lifecycle_parity",
+      "passed": true,
+      "accepted_first_qualifying": {
+        "top_1": 3415,
+        "top_2_5": 5823,
+        "top_5": 7396,
+        "top_10": 8988
+      },
+      "observed_first_qualifying": {
+        "top_10": 8988,
+        "top_5": 7396,
+        "top_2_5": 5823,
+        "top_1": 3415
+      },
+      "counts_match": true,
+      "armed_population": 8950,
+      "arm_is_subset_of_first_qualifying": true,
+      "excluded_by_arm_rule": 38,
+      "excluded_predecessor_already_qualified": 22,
+      "excluded_no_predecessor_dispatch": 16,
+      "excluded_unexplained": 0,
+      "explanation": "the arm rule requires an observed crossing from below; excluded regimes either had a predecessor that already qualified, or had no predecessor dispatch at all",
+      "method": "reconciled by as-of join, independent of the positional shift used in arm_population"
+    },
+    "true_dispatch_cadence": {
+      "gate": "true_dispatch_cadence",
+      "passed": true,
+      "in_domain_dispatches_raw": 2205823,
+      "in_domain_dispatches_unscored": 177429,
+      "score_observations": 2028394,
+      "nulls_remaining_in_stream": 0,
+      "duplicate_regime_timestamp_pairs": 0,
+      "carry_forward_column_on_paths": true,
+      "carry_forward_column_on_scores": false,
+      "modal_gap_s": 5.0,
+      "gap_gt_5s_pct": 5.003
+    },
+    "arm_definition": {
+      "gate": "arm_definition",
+      "passed": true,
+      "armed_regimes": 8950,
+      "one_arm_per_regime": true,
+      "all_regime_age_gt_600s": true,
+      "all_at_or_above_top10": true,
+      "all_crossings_from_below": true,
+      "arms_without_a_predecessor_dispatch": 0,
+      "arms_whose_predecessor_already_qualified": 0,
+      "min_regime_age_s": 605.0,
+      "method": "predecessor recovered by as-of join, independent of the positional shift used in arm_population"
+    },
+    "event_ordering": {
+      "gate": "event_ordering",
+      "passed": true,
+      "violations": {
+        "confirm_before_arm": 0,
+        "non_monotonic_level_sequence": 0,
+        "top5_before_arm": 0,
+        "top2_5_before_arm": 0,
+        "top1_before_arm": 0,
+        "censored_mae_above_1atr": 0,
+        "confirmed_and_stopped": 0,
+        "walk_a_walk_b_top10_disagreements": 0
+      },
+      "multi_level_same_dispatch_pairs": 2757,
+      "ambiguous_same_bar": 0
+    },
+    "session_containment": {
+      "gate": "session_containment",
+      "passed": true,
+      "trades_checked": 8950,
+      "terminal_after_session_close": 0,
+      "confirm_after_session_close": 0,
+      "level_reach_after_session_close": 0
+    },
+    "mae_independent_recompute": {
+      "gate": "mae_independent_recompute",
+      "passed": true,
+      "sample_per_level": 100,
+      "by_level": {
+        "top10": {
+          "n": 100,
+          "mismatches": 0
+        },
+        "top5": {
+          "n": 100,
+          "mismatches": 0
+        },
+        "top2_5": {
+          "n": 100,
+          "mismatches": 0
+        },
+        "top1": {
+          "n": 100,
+          "mismatches": 0
+        }
+      },
+      "method": "re-derived from canonical_regime_paths_all.parquet via a separate code path, not by re-reading walks.py arrays"
+    },
+    "assertions": {
+      "gate": "assertions",
+      "passed": true,
+      "violations": {
+        "confirm_before_entry_top10": 0,
+        "censored_mae_above_1atr_top10": 0,
+        "negative_elapsed_to_top10": 0,
+        "confirm_before_entry_top5": 0,
+        "censored_mae_above_1atr_top5": 0,
+        "negative_elapsed_to_top5": 0,
+        "confirm_before_entry_top2_5": 0,
+        "censored_mae_above_1atr_top2_5": 0,
+        "negative_elapsed_to_top2_5": 0,
+        "confirm_before_entry_top1": 0,
+        "censored_mae_above_1atr_top1": 0,
+        "negative_elapsed_to_top1": 0,
+        "shape_class_null": 0,
+        "deeper_reached_without_shallower": 0
+      }
+    },
+    "audit_gates": {
+      "gate": "audit_gates",
+      "causal_lint": {
+        "tool": "causal_lint",
+        "version": 1,
+        "roots": [
+          "studies\\armed_fade_score_path_progression"
+        ],
+        "files_scanned": 11,
+        "critical": 0,
+        "warning": 0,
+        "clean": true,
+        "findings": []
+      },
+      "lookahead_auditor": {
+        "agent": "lookahead-auditor",
+        "pass": 2,
+        "date": "2026-08-09",
+        "scope_hash": "e1c77b8f91a93af4f4f8e46a5657ac69547d80232a2bb6672211d9aa4a2cc5ec",
+        "critical": 0,
+        "warning": 0,
+        "note": 0,
+        "verdict": "PASS",
+        "report": "audit/pass_02.md",
+        "prior_findings_adjudicated": true,
+        "referred_to_contract_checker": 0
+      },
+      "contract_checker": {
+        "agent": "contract-checker",
+        "pass": 1,
+        "date": "2026-08-09",
+        "blocking": 0,
+        "warning": 2,
+        "note": 1,
+        "not_verified": 1,
+        "pending": 1,
+        "critical": 0,
+        "verdict": "CLEAR",
+        "deliverables_manifest_present": true,
+        "prior_findings_adjudicated": true,
+        "findings": [
+          {
+            "id": "CC-1",
+            "severity": "WARNING",
+            "requirement": "SPEC 2.4 / threshold overlap disclosure",
+            "finding": "SPEC.md and README.md cited `THRESHOLD_OVERLAP_WAIVER.json` as the source of the 2025-overlap disclosure without a path. No such file exists under studies/armed_fade_score_path_progression/; the only file of that name in the repo belongs to studies/full_trade_path_builder/. The disclosure itself was present in prose (SPEC, README, partition_manifest.json) but its cited authority was unresolvable from this study.",
+            "remediation": "Correct the citation to the canonical path.",
+            "resolution": "RESOLVED 2026-08-09. Verified that canonical_model_threshold_contracts.parquet carries `waiver_artifact = studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json` for all six percentiles, so that file IS the canonical waiver and no local copy should exist. SPEC 2.4 and README now cite the full path and state explicitly that this study inherits the waiver rather than forking it."
+          },
+          {
+            "id": "CC-2",
+            "severity": "NOTE",
+            "requirement": "SPEC 3 / gate 1 lifecycle_parity",
+            "finding": "SPEC 3 stated 'Expected population: 8,953 armed regimes ... the 35-regime delta'. Observed armed_population is 8,950 with a 38-regime delta (22 predecessor-already-qualified + 16 no-predecessor). validate.py gate_1 does not hardcode 8,953/35; it checks that all exclusions are explained (excluded_unexplained = 0), which they are. The gate passes on sound logic, but the frozen SPEC prose numbers were off by 3.",
+            "remediation": "Amend SPEC prose or note the delta in REPORT.md.",
+            "resolution": "RESOLVED 2026-08-09. SPEC 3 now carries a dated amendment recording the original pre-implementation estimate alongside the reconciled figures, and naming the two corrections that moved it (no-predecessor rejection, and the unscored-dispatch filter of SPEC 2.1a). The estimate is preserved rather than overwritten."
+          },
+          {
+            "id": "CC-3",
+            "severity": "PENDING",
+            "requirement": "Deliverables Manifest #3, REPORT.md",
+            "finding": "REPORT.md did not exist at the time of this pass. Expected and in progress per the task scope, not a violation.",
+            "remediation": "Write REPORT.md per SPEC 10/10a; re-run this gate afterward.",
+            "resolution": "WRITTEN 2026-08-09, after this pass. Requires contract-checker pass 2 to verify its section structure and its assigned terminal label against the SPEC 9a criteria."
+          },
+          {
+            "id": "CC-4",
+            "severity": "NOT_VERIFIED",
+            "requirement": "SPEC 9a terminal decision labels, reachability",
+            "finding": "All four labels have executable, mutually exclusive criteria, and every input they depend on (threshold_progression_funnel.json by-direction/by-year p_confirm, remaining_opportunity.json medians, validation_report.json all_passed) exists and is well-formed. No label had been assigned at the time of this pass because REPORT.md was unwritten.",
+            "remediation": "Re-verify the assigned label against the SPEC 9a criteria once REPORT.md exists.",
+            "resolution": "OPEN. REPORT.md now assigns ARMED SCORE PROGRESSION SUPPORTS REFINEMENT. Deferred to contract-checker pass 2."
+          }
+        ],
+        "notes": [
+          "Scope was deliverables, seals, terminal-label reachability, and C4/D/E only. Causality categories A, B, C1-C3, F, G, H are owned by lookahead-auditor, which cleared them across two passes (audit/status.json, verdict PASS, 0 CRITICAL).",
+          "Gate 8 `audit_gates` read `passed: false` at the time of this pass solely because this file did not yet exist. The gate's logic was judged and found sound: it reads machine-readable JSON only, never prose.",
+          "This file was authored by the contract-checker agent and persisted by the main session, which has the Write tool the agent lacks. Content is verbatim apart from the `resolution` fields and this note, which record post-pass remediation."
+        ]
+      },
+      "passed": true
+    }
+  }
+}

@@ -13,6 +13,11 @@ except ImportError:
     psutil = None
 
 
+def progress_signature(path: Path) -> tuple[int, int]:
+    """Return a heartbeat signature that changes on rewrites, growth, or truncation."""
+    stat_info = path.stat()
+    return stat_info.st_mtime_ns, stat_info.st_size
+
 
 def monitor_process(
     cmd_args: list,
@@ -40,10 +45,10 @@ def monitor_process(
     status = "running"
     exit_code = None
     last_progress_time = time.time()
-    last_progress_size = 0
+    last_progress_signature = None
 
     if progress_file_path and progress_file_path.exists():
-        last_progress_size = progress_file_path.stat().st_size
+        last_progress_signature = progress_signature(progress_file_path)
 
     try:
         while proc.poll() is None:
@@ -55,20 +60,19 @@ def monitor_process(
                 print(f"[RUNNER] Terminated process due to absolute timeout (> {timeout_sec}s)")
                 break
 
-            # Check stale progress (log file updates)
+            # Treat every rewrite as progress, even when the file's size is unchanged.
             if progress_file_path and progress_file_path.exists():
-                stat_info = progress_file_path.stat()
-                curr_size = stat_info.st_size
-                curr_mtime = stat_info.st_mtime
-                
-                # If file size increased or mod time changed, reset stale check
-                if curr_size > last_progress_size:
+                current_signature = progress_signature(progress_file_path)
+                if current_signature != last_progress_signature:
                     last_progress_time = time.time()
-                    last_progress_size = curr_size
+                    last_progress_signature = current_signature
                 elif time.time() - last_progress_time > stale_timeout_sec:
                     status = "stale_stall"
                     proc.terminate()
-                    print(f"[RUNNER] Terminated process due to stale progress (> {stale_timeout_sec}s without log updates)")
+                    print(
+                        "[RUNNER] Terminated process due to stale progress "
+                        f"(> {stale_timeout_sec}s without progress-file modification)"
+                    )
                     break
 
             # Memory tracking

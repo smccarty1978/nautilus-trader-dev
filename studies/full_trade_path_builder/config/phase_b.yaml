@@ -1,0 +1,58 @@
+phase: B
+instrument: NQ
+timezone: America/Chicago
+session: "[08:30:00,15:00:00)"
+study_years: [2021, 2022, 2023, 2024, 2025]
+sealed_boundary_utc: "2026-01-01T00:00:00Z"
+cadence_seconds: 5
+warmup_days: 4
+checkpoint_alignment: utc_epoch
+dispatch: exact_1s_ts_init_equals_T
+bullish:
+  model_id: BULLISH_STRICT_top25_gbt_v2
+  artifact: studies/full_trade_path_builder/artifacts/BULLISH_STRICT_top25_gbt_v2
+  model_sha256: ac833f5f4c983b791f3632660d762dfd6fd47ecc20e78822797628c11e7817f8
+  direction: -1
+  approved_regime: 1
+  top_10: 0.43167249785595935
+  top_5: 0.5067081427626979
+  top_2_5: 0.5697449423968936
+  rank_application_2021_2025: unavailable_reference_overlaps_study
+bearish:
+  model_id: LONG_STRICT_top25_gbt_v2
+  semantic_alias: bearish_fade_top25_gbt_v2
+  artifact: studies/freeze_long_strict_models_v2/artifacts/LONG_STRICT_top25_gbt_v2
+  model_sha256: 1d696d85f2e31026db8415fb15913267d447bd7fde9be0fcefed490c7bf4af26
+  direction: 1
+  approved_regime: -1
+  normalization_atr: frozen_at_confirmed_regime_start
+  synthetic_minute_rth_classification: close_label
+  top_10: null
+  top_5: 0.5084619230529974
+  top_2_5: 0.5641320087327389
+  percentile: unavailable_no_frozen_reference
+  decile: unavailable_no_frozen_reference
+  rank_application_2021_2025: unavailable_reference_overlaps_study
+population:
+  require_atr_initialized: true
+  include_all_regime_states: true
+  future_conditioned_filtering: forbidden
+  missing_dispatch: omit_and_diagnose
+labels:
+  horizons_seconds: [300, 600]
+  interval: "(T,T+horizon]"
+  same_time_flip: excluded
+  unresolved: right_censor
+  censor_fields:
+    horizon_300: label_300_is_right_censored
+    horizon_600: label_600_is_right_censored
+    shared: label_is_right_censored_equals_horizon_600
+ranks:
+  phase_b_2021_2025: null
+  unavailable_reason: NO_PRE_STUDY_FROZEN_RANK_REFERENCE
+  retrospective_phase_b_ranking: forbidden
+bounded_execution:
+  benchmark_month: 2025-03
+  benchmark_timeout_seconds: 3600
+  full_timeout_seconds: 21600
+  max_peak_memory_mb: 10000

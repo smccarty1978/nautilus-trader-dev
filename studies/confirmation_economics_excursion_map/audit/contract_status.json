@@ -1,0 +1,40 @@
+{
+  "agent": "contract-checker",
+  "pass": 1,
+  "date": "2026-08-10",
+  "blocking": 0,
+  "not_verified": 1,
+  "verdict": "CLEAR",
+  "critical": 0,
+  "warning": 1,
+  "note": 0,
+  "deliverables_manifest_present": true,
+  "prior_findings_adjudicated": true,
+  "findings": [
+    {
+      "id": "CC-1",
+      "severity": "WARNING",
+      "requirement": "SPEC 10 non-goals",
+      "summary": "REPORT.md terminal-classification section named a specific ATR band (0.625-1.00) and specific median/p90 room figures (0.6/1.6 ATR) as 'structural regions worth testing' -- explicitly disclaimed as non-recommended and framed as diagnostic ranges, not a tuned parameter, but close to the non-goal boundary.",
+      "blocks": false,
+      "resolution": "RESOLVED 2026-08-10. Wording tightened to 'Candidate regions -- described, NOT evaluated as rules', each item reframed as a description of where the curves lie rather than a proposed setting, with the ladder finding restated as a negative implication. No figure changed; every number still reads directly off a phase table."
+    },
+    {
+      "id": "CC-2",
+      "severity": "NOT_VERIFIED",
+      "requirement": "SPEC 9 gate 11 (audit_gates)",
+      "summary": "validation_report.json showed all_passed:false and contract_checker.present:false solely because this agent's contract_status.json did not exist when validate.py last ran. The gate logic (implementation/validate.py g11_audit) is correct and refuses to self-report clear.",
+      "blocks": false,
+      "resolution": "RESOLVED 2026-08-10. validate.py re-run after this file landed; all eleven gates pass and all_passed is true."
+    }
+  ],
+  "notes": [
+    "Scope was deliverables, seals, terminal-label reachability, and C4/D/E only. Causality is owned by lookahead-auditor, which blocked pass 1 on 2 CRITICALs and returned PASS with 0 findings at pass 2.",
+    "C4 judged NOT APPLICABLE: this is a diagnostic study with no model selection, promotion pipeline, or walk-forward. Most of D is likewise not applicable (no training or serving); the artifact-hash-binding analogue is satisfied by partition_manifest.json code_hashes over panel.py, phases.py and overlay.py.",
+    "E verified: stop, landmark and floor triggers all use the intrabar extreme and fill at the FOLLOWING bar's open; the trigger price is never credited.",
+    "All four base population counts (8,988 / 7,396 / 5,823 / 3,415) and the armed count (8,950) reproduce exactly. Landmarks, floors and deterioration levels in partition_manifest.json match SPEC 4 with no added or tuned value.",
+    "Phase-depth split honoured in code and report: FULL = (top_2_5, armed) receive all phases; top_10 / top_5 / top_1 appear in the Phase 1/2/4/8 annex and are not silently dropped.",
+    "Terminal label E is defensible and correctly subsumes B and D: SPEC 7 makes E fire exactly when Gates A and B both pass materially, which they do (Gate A 94.3% vs 31.4% at 0.75 ATR; Gate B capture 0.138 with +0.89 ATR/entry recoverable). C is excluded because an unconditional level does separate; F is excluded because all validation gates pass.",
+    "Authored by the contract-checker agent and persisted by the main session, which has the Write tool the agent lacks. Content is verbatim apart from the resolution fields and these notes."
+  ]
+}

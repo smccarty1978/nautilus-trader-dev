@@ -1,0 +1,499 @@
+{
+  "primary_key": [
+    "direction",
+    "regime_start_ns",
+    "observation_time"
+  ],
+  "rows": 727482,
+  "columns": [
+    {
+      "name": "regime_start_ns",
+      "dtype": "int64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "observation_time",
+      "dtype": "int64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "confirm_flip_ns",
+      "dtype": "int64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "checkpoint_price",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "atr_at_checkpoint",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "seconds_to_flip",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "flip_le_300",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "flip_le_600",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "direction",
+      "dtype": "object",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "year",
+      "dtype": "int64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "artifact_name",
+      "dtype": "object",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "artifact_causal_status",
+      "dtype": "object",
+      "nullable": false,
+      "description": "Frozen-artifact causal provenance; Bullish is provisional with known 1s look-ahead, Bearish is strict causal."
+    },
+    {
+      "name": "known_feature_lookahead_seconds",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "trade_direction",
+      "dtype": "int64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "model_score",
+      "dtype": "float64",
+      "nullable": false,
+      "description": "Frozen artifact positive-class probability."
+    },
+    {
+      "name": "checkpoint_sequence",
+      "dtype": "int64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "regime_age_seconds",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "score_percentile",
+      "dtype": "float64",
+      "nullable": false,
+      "description": "Within-direction combined-2024-2025 empirical percentile (0-100)."
+    },
+    {
+      "name": "is_top_1",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_first_top_1",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_top_2_5",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_first_top_2_5",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_top_5",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_first_top_5",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_top_10",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_first_top_10",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_top_25",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "is_first_top_25",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "top_bucket",
+      "dtype": "object",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "selected_first_signal",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "flip_open_price",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "flip_close_price",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "atr_at_confirmed_flip",
+      "dtype": "float64",
+      "nullable": false,
+      "description": "Wilder ATR(14) from the completed canonical 1m bar whose close timestamp is the confirmed flip."
+    },
+    {
+      "name": "atr_confirm_source_observation_time",
+      "dtype": "int64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "atr_confirm_source_gap_seconds",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "checkpoint_to_flip_close_atr",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "next_opposing_confirm_flip_ns",
+      "dtype": "int64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "to_flip_path_available",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "to_flip_first_bar_lag_s",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "to_flip_terminal_bar_lag_s",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "to_flip_interior_gap_count",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "mfe_to_flip_atr",
+      "dtype": "float64",
+      "nullable": true,
+      "description": "Maximum favorable excursion in hypothetical trade direction, checkpoint to confirmed flip, normalized by checkpoint ATR."
+    },
+    {
+      "name": "mae_to_flip_atr",
+      "dtype": "float64",
+      "nullable": true,
+      "description": "Maximum adverse excursion against hypothetical trade direction, checkpoint to confirmed flip, normalized by checkpoint ATR."
+    },
+    {
+      "name": "mfe_timestamp",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "mae_timestamp",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "fixed_300_path_available",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "fixed_300_first_bar_lag_s",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "fixed_300_terminal_bar_lag_s",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "fixed_300_interior_gap_count",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "mfe_300s_atr",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "mae_300s_atr",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "fixed_600_path_available",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "fixed_600_first_bar_lag_s",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "fixed_600_terminal_bar_lag_s",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "fixed_600_interior_gap_count",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "mfe_600s_atr",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "mae_600s_atr",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_60_path_available",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_60_first_bar_lag_s",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_60_terminal_bar_lag_s",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_60_interior_gap_count",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_flip_mfe_60s_atr",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_flip_mae_60s_atr",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_300_path_available",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_300_first_bar_lag_s",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_300_terminal_bar_lag_s",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_300_interior_gap_count",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_flip_mfe_300s_atr",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_flip_mae_300s_atr",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_600_path_available",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_600_first_bar_lag_s",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_600_terminal_bar_lag_s",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_600_interior_gap_count",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_flip_mfe_600s_atr",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_flip_mae_600s_atr",
+      "dtype": "float64",
+      "nullable": true,
+      "description": ""
+    },
+    {
+      "name": "post_next_flip_path_available",
+      "dtype": "bool",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_next_flip_first_bar_lag_s",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_next_flip_terminal_bar_lag_s",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_next_flip_interior_gap_count",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_flip_mfe_until_next_flip_atr",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    },
+    {
+      "name": "post_flip_mae_until_next_flip_atr",
+      "dtype": "float64",
+      "nullable": false,
+      "description": ""
+    }
+  ],
+  "atr_denominator": "atr_at_checkpoint",
+  "nq_dollars_per_point": 20.0,
+  "event_source": "confirm_flip_ns only"
+}

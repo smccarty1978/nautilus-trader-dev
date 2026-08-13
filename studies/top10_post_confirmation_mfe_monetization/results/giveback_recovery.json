@@ -1,0 +1,89 @@
+{
+  "original_top10_entries": 8950,
+  "confirmed_trades": 4656,
+  "giveback_pool_accepted_flip_exit_only_atr": 8037.84,
+  "giveback_pool_accepted_per_original_entry": 0.8981,
+  "giveback_pool_all_confirmed_atr": 9968.62,
+  "giveback_pool_all_confirmed_per_original_entry": 1.1138,
+  "recovery_denominator": "accepted flip-exit-only pool",
+  "baseline_net_atr_per_original_entry": -0.0765,
+  "stopped_before_confirmation_n": 4245,
+  "stopped_before_confirmation_net_atr": -4531.36,
+  "policies": {
+    "BASELINE": {
+      "delta_per_original_entry": 0.0,
+      "giveback_recovered_pct": 0.0,
+      "domain": "-"
+    },
+    "P90A_EXIT": {
+      "delta_per_original_entry": 0.0159,
+      "giveback_recovered_pct": 1.78,
+      "domain": "A: NOT INTERPRETABLE - SURVIVORSHIP"
+    },
+    "P90B_EXIT": {
+      "delta_per_original_entry": 0.0051,
+      "giveback_recovered_pct": 0.57,
+      "domain": "B: EXPLORATORY_OUT_OF_DOMAIN"
+    },
+    "PRICE_A_mfe1_0_gb0_75": {
+      "delta_per_original_entry": 0.0021,
+      "giveback_recovered_pct": 0.24,
+      "domain": "price only"
+    },
+    "PRICE_B_mfe1_5_gb0_75": {
+      "delta_per_original_entry": -0.0127,
+      "giveback_recovered_pct": -1.41,
+      "domain": "price only"
+    },
+    "PRICE_C_mfe2_0_gb0_75": {
+      "delta_per_original_entry": -0.0053,
+      "giveback_recovered_pct": -0.59,
+      "domain": "price only"
+    },
+    "PRICE_D_mfe2_0_gb1_00": {
+      "delta_per_original_entry": 0.0027,
+      "giveback_recovered_pct": 0.3,
+      "domain": "price only"
+    },
+    "P90ARM_GB050": {
+      "delta_per_original_entry": 0.0046,
+      "giveback_recovered_pct": 0.51,
+      "domain": "B: EXPLORATORY_OUT_OF_DOMAIN"
+    },
+    "P90ARM_GB075": {
+      "delta_per_original_entry": 0.0034,
+      "giveback_recovered_pct": 0.37,
+      "domain": "B: EXPLORATORY_OUT_OF_DOMAIN"
+    },
+    "P90ARM_PRICE": {
+      "delta_per_original_entry": 0.0086,
+      "giveback_recovered_pct": 0.96,
+      "domain": "B: EXPLORATORY_OUT_OF_DOMAIN"
+    },
+    "P90ARM_PRICE_BUF": {
+      "delta_per_original_entry": 0.0019,
+      "giveback_recovered_pct": 0.21,
+      "domain": "B: EXPLORATORY_OUT_OF_DOMAIN"
+    },
+    "P80ARM_075": {
+      "delta_per_original_entry": 0.0035,
+      "giveback_recovered_pct": 0.39,
+      "domain": "B: EXPLORATORY_OUT_OF_DOMAIN"
+    },
+    "P80ARM_100": {
+      "delta_per_original_entry": 0.0043,
+      "giveback_recovered_pct": 0.48,
+      "domain": "B: EXPLORATORY_OUT_OF_DOMAIN"
+    },
+    "P80ARM_P90EXIT": {
+      "delta_per_original_entry": 0.0033,
+      "giveback_recovered_pct": 0.37,
+      "domain": "B: EXPLORATORY_OUT_OF_DOMAIN"
+    },
+    "STAIRSTEP": {
+      "delta_per_original_entry": 0.0008,
+      "giveback_recovered_pct": 0.09,
+      "domain": "price only"
+    }
+  }
+}

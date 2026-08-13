@@ -1,0 +1,148 @@
+{
+  "all_passed": true,
+  "gates": {
+    "population_reconciliation": {
+      "gate": "population_reconciliation",
+      "passed": true,
+      "derived": {
+        "CONFIRMED_THEN_STOPPED": 822,
+        "FINAL_FLIP_EXIT_LOSER": 1359,
+        "FINAL_FLIP_EXIT_WINNER": 2350,
+        "SESSION_EXIT": 174
+      },
+      "brief": {
+        "CONFIRMED_THEN_STOPPED": 822,
+        "FINAL_FLIP_EXIT_LOSER": 1359,
+        "FINAL_FLIP_EXIT_WINNER": 2350,
+        "SESSION_EXIT": 174
+      },
+      "confirmed_continuation": 4705,
+      "walk_a_confirmed": 4656,
+      "walk_a_session_close_unresolved": 49,
+      "delta_explained": true
+    },
+    "event_ordering": {
+      "gate": "event_ordering",
+      "passed": true,
+      "violations": {
+        "obs_before_confirmation": 0,
+        "obs_after_terminal": 0,
+        "confirmation_after_terminal": 0,
+        "negative_elapsed": 0
+      }
+    },
+    "no_duplicate_observations": {
+      "gate": "no_duplicate_observations",
+      "passed": true,
+      "duplicate_rows": 0,
+      "rows": 658331
+    },
+    "monotonic_events": {
+      "gate": "monotonic_events",
+      "passed": true,
+      "non_increasing_steps": 0
+    },
+    "independent_recompute": {
+      "gate": "independent_recompute",
+      "passed": true,
+      "trades_sampled": 200,
+      "mismatched_trades": {
+        "score_peak": 0,
+        "escalation_from_min": 0,
+        "mfe": 0,
+        "mae": 0,
+        "open_pnl": 0
+      },
+      "method": "re-derived from raw price and score columns, not by re-reading the panel's computed columns"
+    },
+    "session_containment": {
+      "gate": "session_containment",
+      "passed": true,
+      "observations_past_session_close": 0
+    },
+    "same_dispatch_ordering": {
+      "gate": "same_dispatch_ordering",
+      "passed": true,
+      "timestamps_with_multiple_rows": 0,
+      "policy": "One score dispatch per (trade, timestamp); no tie-break is required. First-firing of an event is the earliest such dispatch satisfying the condition on rows at or before it."
+    },
+    "no_terminal_leakage": {
+      "gate": "no_terminal_leakage",
+      "passed": true,
+      "static_findings": [],
+      "forward_columns_present_in_panel": [
+        "terminal_label",
+        "is_failure",
+        "terminal_ns",
+        "hold_s",
+        "full_mfe_atr"
+      ],
+      "note": "Forward columns are present as TARGETS and as alive-filters (hold_s > horizon), never inside a flag condition. Every flag in events.py and landmark_tradeoff.py reads only score_b, open_pnl, and running expanding aggregates."
+    },
+    "audit_gates": {
+      "gate": "audit_gates",
+      "causal_lint": {
+        "tool": "causal_lint",
+        "version": 1,
+        "roots": [
+          "studies\\post_confirmation_score_deterioration"
+        ],
+        "files_scanned": 15,
+        "critical": 0,
+        "warning": 0,
+        "clean": true,
+        "findings": []
+      },
+      "lookahead_auditor": {
+        "agent": "lookahead-auditor",
+        "pass": 2,
+        "date": "2026-08-10",
+        "scope_hash": "60d4c0aca7597d54e0cfc62e845bfd73b73a95e033c981298c7bde72c63b55de",
+        "critical": 0,
+        "warning": 1,
+        "note": 2,
+        "verdict": "PASS",
+        "report": "audit/pass_02.md",
+        "prior_findings_adjudicated": true,
+        "referred_to_contract_checker": 0
+      },
+      "contract_checker": {
+        "agent": "contract-checker",
+        "pass": 2,
+        "date": "2026-08-10",
+        "scope": "reconciliation/ deliverable, plus adjudication of pass 1 findings",
+        "critical": 0,
+        "blocking": 0,
+        "warning": 0,
+        "note": 0,
+        "not_verified": 0,
+        "verdict": "CLEAR",
+        "deliverables_manifest_present": true,
+        "prior_findings_adjudicated": true,
+        "findings": [
+          {
+            "severity": "WARNING",
+            "id": "reconcile-sample-table-score-is-new-flag",
+            "text": "sample_trade_timestamp_reconciliation.parquet's score_is_new field read bullish_score_is_new unconditionally instead of branching on trade direction for SHORT trades. Diagnostic-only column, not consumed by coverage_recompute() or landmark_availability(); could not produce a wrong value since both models are 100% is_new across all 5,665,103 RTH rows.",
+            "resolution": "RESOLVED before this pass ran. Raised by lookahead-auditor pass 2; fixed at reconcile.py:417-421, which now branches on tr['direction'], and reconcile.py was re-run so the parquet was regenerated from the corrected code. The contract-checker cited the correct line range but read it as still unconditional. Verified after the fact: the branch is present and all 242 sampled rows carry score_is_new = true."
+          }
+        ],
+        "pass_1_adjudication": {
+          "manifest-item-10": "RESOLVED \u00e2\u20ac\u201d analysis/escalation_recovery.py written; results/escalation_recovery.json emitted; finding added to REPORT.md as section 5.3",
+          "manifest-item-8-11": "RESOLVED \u00e2\u20ac\u201d landmark_features.json and divergence.json now written under their manifest names",
+          "partition-manifest-hashes": "RESOLVED \u00e2\u20ac\u201d build_panel.py hash glob extended to analysis/*.py"
+        },
+        "notes": [
+          "C4/D/E judged NOT APPLICABLE to the reconciliation itself: no training, selection or promotion; no live-serving artifact; no BacktestEngine run. It is a provenance/availability recompute over the frozen canonical store.",
+          "Phase 3/4 independence verified: reconcile.py never opens results/post_confirm_paths.parquet, and canonical_coverage_recompute.json reproduces all four Codex label counts plus the failure total exactly.",
+          "Phase 2 stratification verified against reconcile.py's sampling logic rather than the report's prose: 76 trades / 242 trade x landmark rows spanning all four terminal labels, both directions, zero-strict-observation trades, both-systems-valid trades, short-lived failures (hold <= 120s) and long-lived winners (hold >= 1200s).",
+          "The phase0_gate1.py re-run does NOT cross the 'do not rerun' constraint: lookahead-auditor pass 2 verified it as a pure identifier rename (in_domain_score -> domain_model_raw_score) plus a docstring correction, with AUCs bit-identical before and after (0.6843 / 0.7353 / 0.7527 / 0.7801).",
+          "REPORT.md and README.md were both updated with the 0% / 0% / 1.6% / 16.4% contract-validity figures and explicit 'exploratory out-of-domain, not deployable' labelling of the AUC.",
+          "Terminal classification B is the sole label given and is defensible against A/C/D/E on evidence unaffected by this reconciliation.",
+          "Authored by the contract-checker agent and persisted by the main session, which has the Write tool the agent lacks. Content is verbatim apart from the resolution field, the warning count moving 1 -> 0 to reflect that the item was already fixed, and these notes."
+        ]
+      },
+      "passed": true
+    }
+  }
+}

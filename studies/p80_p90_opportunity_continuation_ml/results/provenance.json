@@ -1,0 +1,144 @@
+{
+  "study": "p80_p90_opportunity_continuation_ml",
+  "year_accessed": 2024,
+  "years_sealed": [
+    2021,
+    2022,
+    2023,
+    2025,
+    2026
+  ],
+  "thresholds": {
+    "contracts": [
+      {
+        "prime": "P80",
+        "percentile_label": "top_20",
+        "model_id": "BULLISH_STRICT_top25_gbt_v2",
+        "fade_side": "SHORT",
+        "probability_threshold": 0.34374423771129053,
+        "upper_tail_fraction": 0.2,
+        "availability_status": "RECONSTRUCTED_FROM_FROZEN_CALIBRATION_DISTRIBUTION",
+        "is_frozen": true,
+        "calibration_population_id": "BULLISH_2025_RTH_ESTABLISHED_INDOMAIN_COMPLETE",
+        "calibration_start_date": "2025-01-01",
+        "calibration_end_date_exclusive": "2026-01-01",
+        "overlaps_evaluation_window": true,
+        "waiver_artifact": "studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json",
+        "threshold_contract_id": "BULLISH_STRICT_top25_gbt_v2::top_20::2025_calibration"
+      },
+      {
+        "prime": "P80",
+        "percentile_label": "top_20",
+        "model_id": "LONG_STRICT_top25_gbt_v2",
+        "fade_side": "LONG",
+        "probability_threshold": 0.3745119841718754,
+        "upper_tail_fraction": 0.2,
+        "availability_status": "RECONSTRUCTED_FROM_FROZEN_CALIBRATION_DISTRIBUTION",
+        "is_frozen": true,
+        "calibration_population_id": "BEARISH_2025_DEVELOPMENT_POPULATION",
+        "calibration_start_date": "2025-01-01",
+        "calibration_end_date_exclusive": "2026-01-01",
+        "overlaps_evaluation_window": true,
+        "waiver_artifact": "studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json",
+        "threshold_contract_id": "LONG_STRICT_top25_gbt_v2::top_20::2025_calibration"
+      },
+      {
+        "prime": "P90",
+        "percentile_label": "top_10",
+        "model_id": "BULLISH_STRICT_top25_gbt_v2",
+        "fade_side": "SHORT",
+        "probability_threshold": 0.43167249785595935,
+        "upper_tail_fraction": 0.1,
+        "availability_status": "AVAILABLE_AND_FROZEN",
+        "is_frozen": true,
+        "calibration_population_id": "BULLISH_2025_RTH_ESTABLISHED_INDOMAIN_COMPLETE",
+        "calibration_start_date": "2025-01-01",
+        "calibration_end_date_exclusive": "2026-01-01",
+        "overlaps_evaluation_window": true,
+        "waiver_artifact": "studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json",
+        "threshold_contract_id": "BULLISH_STRICT_top25_gbt_v2::top_10::2025_calibration"
+      },
+      {
+        "prime": "P90",
+        "percentile_label": "top_10",
+        "model_id": "LONG_STRICT_top25_gbt_v2",
+        "fade_side": "LONG",
+        "probability_threshold": 0.44559149246408103,
+        "upper_tail_fraction": 0.1,
+        "availability_status": "RECONSTRUCTED_FROM_FROZEN_CALIBRATION_DISTRIBUTION",
+        "is_frozen": true,
+        "calibration_population_id": "BEARISH_2025_DEVELOPMENT_POPULATION",
+        "calibration_start_date": "2025-01-01",
+        "calibration_end_date_exclusive": "2026-01-01",
+        "overlaps_evaluation_window": true,
+        "waiver_artifact": "studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json",
+        "threshold_contract_id": "LONG_STRICT_top25_gbt_v2::top_10::2025_calibration"
+      }
+    ],
+    "P80_SHORT": 0.34374423771129053,
+    "P80_LONG": 0.3745119841718754,
+    "P90_SHORT": 0.43167249785595935,
+    "P90_LONG": 0.44559149246408103
+  },
+  "scoring_models": {
+    "BULLISH_STRICT_top25_gbt_v2": {
+      "fade_side": "SHORT",
+      "train_years": [
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "dev_year": 2025,
+      "IN_SAMPLE_FOR_2024": true,
+      "causal_status": "CORRECTED v2 -- replaces the provisional one-second-look-ahead bullish artifact"
+    },
+    "LONG_STRICT_top25_gbt_v2": {
+      "fade_side": "LONG",
+      "train_years": [
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "dev_year": 2025,
+      "IN_SAMPLE_FOR_2024": true,
+      "causal_status": "CORRECTED (strict latest_source_ts_used < observation_time)"
+    }
+  },
+  "feature_family_decision": {
+    "frozen": "F25 canonical inline + STATE + REGIME + PATH",
+    "rejected": "F100 via per-year training surfaces",
+    "reason": "Top-100 vectors are not in the canonical store; joining the per-year surfaces covers only 75.1% SHORT / 81.4% LONG of 2024 in-domain checkpoints (different established-regime filter) and the SHORT surface carries a disclosed UNFIXED 1s look-ahead the LONG surface corrected, which would make the mandatory LONG/SHORT comparison non-comparable.",
+    "n_market_features": 50
+  },
+  "inputs": {
+    "scores": "data/canonical/regime_complete_v1/canonical_regime_scores_all.parquet",
+    "paths": "data/canonical/regime_complete_v1/canonical_regime_paths_all.parquet",
+    "regimes": "data/canonical/regime_complete_v1/canonical_regimes_all.parquet",
+    "thresholds": "data/canonical/regime_complete_v1/canonical_model_threshold_contracts.parquet",
+    "arm_table": "studies\\armed_fade_score_path_progression\\results\\armed_regime_score_paths.parquet",
+    "rung_events": "studies\\post_confirm_profit_ratchet\\results\\rung_events.parquet"
+  },
+  "frozen_constants": {
+    "risk_atr": 0.5,
+    "reward_atr": 1.0,
+    "horizons_s": [
+      180,
+      240,
+      300
+    ],
+    "b_favourable": [
+      0.5,
+      1.0
+    ],
+    "b_adverse": [
+      0.5,
+      0.75,
+      1.0,
+      1.25
+    ],
+    "cost_points": 0.5,
+    "seed": 20260811
+  }
+}

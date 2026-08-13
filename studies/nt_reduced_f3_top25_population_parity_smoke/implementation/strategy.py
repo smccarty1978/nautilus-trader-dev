@@ -120,6 +120,11 @@ class ReducedModelSmokeStrategy(Strategy):
         self._current_minute: Optional[int] = None
         self._minute_o = self._minute_h = self._minute_l = None
         self._minute_buf: list[tuple[int, float, float, float, float]] = []
+        # See _on_1s's "delayed boundary bar" branch: the bucket _on_1m just
+        # flushed, so the one late-arriving 1s bar structurally owned by that
+        # same bucket (see that branch's comment for why it arrives late) can
+        # be recognized instead of silently dropped.
+        self._last_flushed_minute: Optional[int] = None
         self._prev_close: Optional[float] = None
         self._last_1m_close_ts: Optional[int] = None
 
@@ -329,20 +334,54 @@ class ReducedModelSmokeStrategy(Strategy):
         b_est = self._feature_engine.update_1s(ts, o, h, l, c, v)
 
         mk = _minute_bucket_key(ts)
-        if self._current_minute is None:
-            self._current_minute = mk
-            self._minute_o, self._minute_h, self._minute_l = o, h, l
-            self._minute_buf = [(ts, h, l, v, b_est["bar_est_delta"])]
-        elif mk == self._current_minute:
+        if self._current_minute is not None and mk == self._current_minute:
             self._minute_h = max(self._minute_h, h)
             self._minute_l = min(self._minute_l, l)
             self._minute_buf.append((ts, h, l, v, b_est["bar_est_delta"]))
+        elif self._current_minute is None and mk == self._last_flushed_minute:
+            # ROOT CAUSE (RTH-cumulative flush-boundary audit): offline's
+            # minute_bucket_key((bar_ts-1)//60s) puts bar_ts values
+            # {60k+1,...,60(k+1)} in bucket k -- so bucket k's OWN LAST bar
+            # is the 1s bar whose ts_event is an exact multiple of 60s.
+            # attach_features.py flushes bucket k when it sees the FIRST bar
+            # of bucket k+1, so that boundary bar IS included in bucket k's
+            # flush. Live cannot match that: NT dispatches the 1-MINUTE bar
+            # closing minute k (ts_init=60(k+1)s) strictly BEFORE the 1s bar
+            # with ts_event=60(k+1)s arrives (that 1s bar's own ts_init is
+            # one second LATER, 60(k+1)s+1s -- confirmed via
+            # nt_live_scoring_infra_prereqs's coincident-ts_init tie-break:
+            # 1s always precedes 1m at equal ts_init, and this bar isn't
+            # even coincident, it's strictly after). So _on_1m's flush of
+            # bucket k structurally happens one bar early, before this bar
+            # exists. The bug (found via a synthetic-sequence reproduction
+            # against this exact code, see diagnostics/
+            # test_minute_flush_boundary.py): _on_1m used to reset
+            # _current_minute straight to None, so this bar's own mk (which
+            # -- by the same formula -- ALSO equals k, the bucket that was
+            # just flushed) fell into the "start a fresh buffer" branch
+            # below, silently masquerading as bucket k restarting. The VERY
+            # NEXT bar (mk=k+1) then mismatched that phantom buffer and
+            # discarded it entirely via the warning branch -- losing this
+            # bar's volume/delta from accumulate_regime_rth forever, every
+            # single minute (confirmed: reproduction showed 177.0 vs the
+            # correct 180.0 over 3 minutes, with a warning firing on schedule
+            # every 60s). Fix: recognize this bar for what it structurally
+            # is -- bucket k's own last bar, arriving one bar late -- and
+            # accumulate it immediately using the CURRENT (already
+            # reset/rolled-over) regime/RTH context, exactly matching
+            # attach_features.py's own order (reset regime/RTH for m_close_ts
+            # FIRST, then accumulate the whole buffer including this bar).
+            # It must NOT restart _current_minute/_minute_buf -- the true
+            # first bar of bucket k+1 does that, in the branch below.
+            self._feature_engine.accumulate_regime_rth(ts, h, l, v, b_est["bar_est_delta"])
         else:
-            # A new minute's first 1s bar arrived without an intervening 1m
-            # close event -- should not happen under add_bars_causal_order()
-            # (1s always precedes its coincident 1m), but guard rather than
-            # silently misattribute.
-            self.log.warning(f"1s bar minute bucket advanced without 1m close: {ts}")
+            if self._current_minute is not None:
+                # A new minute's first 1s bar arrived without an intervening
+                # 1m close event, and it is NOT the expected delayed
+                # boundary bar either -- a genuine gap, not the bucket-off-
+                # by-one-bar case above. Guard rather than silently
+                # misattribute.
+                self.log.warning(f"1s bar minute bucket advanced without 1m close: {ts}")
             self._current_minute = mk
             self._minute_o, self._minute_h, self._minute_l = o, h, l
             self._minute_buf = [(ts, h, l, v, b_est["bar_est_delta"])]
@@ -466,6 +505,13 @@ class ReducedModelSmokeStrategy(Strategy):
                                        self._prev_close if self._prev_close is not None else float(bar.open),
                                        now_rth)
         self._last_1m_close_ts = ts
+        # Record which bucket this flush covered (by the 1m bar's OWN
+        # ts_init, not self._current_minute -- they agree in the normal
+        # case, but expected_minute is authoritative even when
+        # buffer_matches_this_minute was False) so _on_1s's delayed-
+        # boundary-bar branch above can recognize that one late bar instead
+        # of discarding it.
+        self._last_flushed_minute = expected_minute
         self._current_minute = None
         self._minute_buf = []
 

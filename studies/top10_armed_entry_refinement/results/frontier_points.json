@@ -1,0 +1,160 @@
+[
+  {
+    "rule": "A_IMMEDIATE_TOP10",
+    "family": "BASELINE",
+    "n": 8950,
+    "p_confirm_given_entered": 0.5202,
+    "median_return_at_confirm_atr": 0.8541,
+    "confirmed_per_100_arms": 52.02,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  },
+  {
+    "rule": "B_FIRST_TOP5",
+    "family": "BASELINE",
+    "n": 7371,
+    "p_confirm_given_entered": 0.5892,
+    "median_return_at_confirm_atr": 0.655,
+    "confirmed_per_100_arms": 48.53,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  },
+  {
+    "rule": "C_FIRST_TOP2_5",
+    "family": "BASELINE",
+    "n": 5803,
+    "p_confirm_given_entered": 0.6478,
+    "median_return_at_confirm_atr": 0.4753,
+    "confirmed_per_100_arms": 42.0,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  },
+  {
+    "rule": "D_FIRST_TOP1",
+    "family": "BASELINE",
+    "n": 3401,
+    "p_confirm_given_entered": 0.7313,
+    "median_return_at_confirm_atr": 0.2951,
+    "confirmed_per_100_arms": 27.79,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  },
+  {
+    "rule": "A1_INTERP_L1",
+    "family": "CANDIDATE",
+    "n": 8426,
+    "p_confirm_given_entered": 0.5398,
+    "median_return_at_confirm_atr": 0.7917,
+    "confirmed_per_100_arms": 50.82,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [
+      "B1_PERSIST_TOP10_x2"
+    ],
+    "non_dominated_throughput": false
+  },
+  {
+    "rule": "A2_INTERP_L2",
+    "family": "CANDIDATE",
+    "n": 8148,
+    "p_confirm_given_entered": 0.5511,
+    "median_return_at_confirm_atr": 0.7519,
+    "confirmed_per_100_arms": 50.17,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  },
+  {
+    "rule": "B1_PERSIST_TOP10_x2",
+    "family": "CANDIDATE",
+    "n": 8330,
+    "p_confirm_given_entered": 0.5491,
+    "median_return_at_confirm_atr": 0.7907,
+    "confirmed_per_100_arms": 51.11,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  },
+  {
+    "rule": "B2_PERSIST_TOP10_x3",
+    "family": "CANDIDATE",
+    "n": 7773,
+    "p_confirm_given_entered": 0.5657,
+    "median_return_at_confirm_atr": 0.7384,
+    "confirmed_per_100_arms": 49.13,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  },
+  {
+    "rule": "C1_PROGRESS_0_03",
+    "family": "CANDIDATE",
+    "n": 7381,
+    "p_confirm_given_entered": 0.5812,
+    "median_return_at_confirm_atr": 0.6745,
+    "confirmed_per_100_arms": 47.93,
+    "dominated_by_conditional": [
+      "F1_PERSIST_x2_AT_INTERP_L2"
+    ],
+    "non_dominated_conditional": false,
+    "dominated_by_throughput": [
+      "B_FIRST_TOP5",
+      "F1_PERSIST_x2_AT_INTERP_L2"
+    ],
+    "non_dominated_throughput": false
+  },
+  {
+    "rule": "C2_PROGRESS_0_06",
+    "family": "CANDIDATE",
+    "n": 6657,
+    "p_confirm_given_entered": 0.6136,
+    "median_return_at_confirm_atr": 0.5847,
+    "confirmed_per_100_arms": 45.64,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  },
+  {
+    "rule": "D1_REEXPANSION_0_05",
+    "family": "CANDIDATE",
+    "n": 6539,
+    "p_confirm_given_entered": 0.5758,
+    "median_return_at_confirm_atr": 0.6863,
+    "confirmed_per_100_arms": 42.07,
+    "dominated_by_conditional": [
+      "F1_PERSIST_x2_AT_INTERP_L2"
+    ],
+    "non_dominated_conditional": false,
+    "dominated_by_throughput": [
+      "B_FIRST_TOP5",
+      "C1_PROGRESS_0_03",
+      "C2_PROGRESS_0_06",
+      "F1_PERSIST_x2_AT_INTERP_L2"
+    ],
+    "non_dominated_throughput": false
+  },
+  {
+    "rule": "F1_PERSIST_x2_AT_INTERP_L2",
+    "family": "CANDIDATE",
+    "n": 7499,
+    "p_confirm_given_entered": 0.5814,
+    "median_return_at_confirm_atr": 0.6882,
+    "confirmed_per_100_arms": 48.72,
+    "dominated_by_conditional": [],
+    "non_dominated_conditional": true,
+    "dominated_by_throughput": [],
+    "non_dominated_throughput": true
+  }
+]

@@ -1,0 +1,11 @@
+version: research_store_acceptance_v1
+random_seed: 20260726
+sample_completed_trades: 100
+absolute_tolerance: 1.0e-12
+relative_tolerance: 1.0e-12
+load_test:
+  year: 2025
+  model_id: BULLISH_STRICT_top25_gbt_v2
+  direction: LONG
+  bounded_start: "2025-01-01T00:00:00Z"
+  bounded_end: "2025-02-01T00:00:00Z"

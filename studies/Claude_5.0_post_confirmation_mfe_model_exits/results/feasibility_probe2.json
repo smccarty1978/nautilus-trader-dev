@@ -1,0 +1,106 @@
+{
+  "null__confirm_flip_ns": 0,
+  "null__fallback_exit_flip_ns": 0,
+  "null__atr_at_entry": 0,
+  "null__checkpoint_reference_price": 0,
+  "null__fallback_exit_mark_return_points": 219,
+  "null__seconds_entry_to_confirm": 0,
+  "null__full_trade_mfe_atr": 0,
+  "atr_min": 0.7024566818315728,
+  "confirm_lt_fallback": 5836,
+  "n_confirm_boundary_counts": [
+    {
+      "n_confirm": 0,
+      "count": 128
+    },
+    {
+      "n_confirm": 1,
+      "count": 5708
+    }
+  ],
+  "n_fallback_boundary_counts": [
+    {
+      "n_fallback": 0,
+      "count": 219
+    },
+    {
+      "n_fallback": 1,
+      "count": 5617
+    }
+  ],
+  "running_mfe_min_overall": 0.0,
+  "seq_min_unique": [
+    1
+  ],
+  "seq_contiguous": 5836,
+  "total_trades_in_paths": 5836,
+  "bars_stats": {
+    "sum": 6589582,
+    "max": 6983,
+    "median": 901.0,
+    "p99": 4132.0
+  },
+  "eligible_post_conf_trades": 2331,
+  "eligible_obs_stats": {
+    "median": 89.0,
+    "p25": 33.0,
+    "p75": 183.0,
+    "max": 1074
+  },
+  "secs_conf_to_first_eligible": {
+    "median": 405.0,
+    "p25": 290.0,
+    "p75": 560.0
+  },
+  "eligible_by_direction": [
+    {
+      "trade_direction_name": "SHORT",
+      "trades_with_eligible": 1311,
+      "median_obs": 85.0,
+      "median_max_opp_prob": 0.4785467276727635
+    },
+    {
+      "trade_direction_name": "LONG",
+      "trades_with_eligible": 1020,
+      "median_obs": 96.0,
+      "median_max_opp_prob": 0.538979998750651
+    }
+  ],
+  "eligible_by_year": [
+    {
+      "entry_year": 2021,
+      "trades_with_eligible": 437
+    },
+    {
+      "entry_year": 2022,
+      "trades_with_eligible": 518
+    },
+    {
+      "entry_year": 2023,
+      "trades_with_eligible": 468
+    },
+    {
+      "entry_year": 2024,
+      "trades_with_eligible": 457
+    },
+    {
+      "entry_year": 2025,
+      "trades_with_eligible": 451
+    }
+  ],
+  "ever_above_top_10": {
+    "scope": "LONG only (bearish top_10 not frozen)",
+    "trades": 1020,
+    "ever_above": 678
+  },
+  "ever_above_top_5": {
+    "scope": "both",
+    "trades": 2331,
+    "ever_above": 1143
+  },
+  "ever_above_top_2_5": {
+    "scope": "both",
+    "trades": 2331,
+    "ever_above": 871
+  }
+}

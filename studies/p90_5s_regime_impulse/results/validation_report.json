@@ -1,0 +1,218 @@
+{
+  "gates": [
+    {
+      "gate": "V1_armed_population",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true,
+      "note": "the frozen Top-10 arm population, consumed not rebuilt"
+    },
+    {
+      "gate": "V2_lineage_targets_reproduced",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": "SPEC 2.2; a miss is an ABORT, not a caveat"
+    },
+    {
+      "gate": "V3_5s_grid_reconciles",
+      "expected": {
+        "buckets": true,
+        "rows": true
+      },
+      "observed": {
+        "buckets": true,
+        "rows": true
+      },
+      "pass": true,
+      "note": "every 1s path row absorbed; bucket count == distinct 5s slots"
+    },
+    {
+      "gate": "V4_arms_on_5s_clock_grid",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "SPEC 3.3; if false the availability argument collapses"
+    },
+    {
+      "gate": "V5_S1_entry_after_decision",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "entry fill must be the open of a bar strictly after the arm"
+    },
+    {
+      "gate": "V6_S1_exit_after_signal",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "5s exit fills strictly after the flip bucket's close_ts"
+    },
+    {
+      "gate": "V7_S1_outcome_set",
+      "expected": [
+        "FIVE_S_EXIT",
+        "SESSION_CLOSE",
+        "STOP"
+      ],
+      "observed": [
+        "FIVE_S_EXIT",
+        "SESSION_CLOSE",
+        "STOP"
+      ],
+      "pass": true,
+      "note": "SPEC 8.5; any other label means confirmation leaked in"
+    },
+    {
+      "gate": "V8_S1_denominator",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true,
+      "note": "non-entered arms are retained, not filtered away"
+    },
+    {
+      "gate": "V11_S1_no_open_trades",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V12_S1_positive_hold",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V5_S075_entry_after_decision",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "entry fill must be the open of a bar strictly after the arm"
+    },
+    {
+      "gate": "V6_S075_exit_after_signal",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "5s exit fills strictly after the flip bucket's close_ts"
+    },
+    {
+      "gate": "V7_S075_outcome_set",
+      "expected": [
+        "FIVE_S_EXIT",
+        "SESSION_CLOSE",
+        "STOP"
+      ],
+      "observed": [
+        "FIVE_S_EXIT",
+        "SESSION_CLOSE",
+        "STOP"
+      ],
+      "pass": true,
+      "note": "SPEC 8.5; any other label means confirmation leaked in"
+    },
+    {
+      "gate": "V8_S075_denominator",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true,
+      "note": "non-entered arms are retained, not filtered away"
+    },
+    {
+      "gate": "V11_S075_no_open_trades",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V12_S075_positive_hold",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V5_PLACEBO_EXIT_entry_after_decision",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "entry fill must be the open of a bar strictly after the arm"
+    },
+    {
+      "gate": "V6_PLACEBO_EXIT_exit_after_signal",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "5s exit fills strictly after the flip bucket's close_ts"
+    },
+    {
+      "gate": "V7_PLACEBO_EXIT_outcome_set",
+      "expected": [
+        "FIVE_S_EXIT",
+        "SESSION_CLOSE",
+        "STOP"
+      ],
+      "observed": [
+        "FIVE_S_EXIT",
+        "SESSION_CLOSE",
+        "STOP"
+      ],
+      "pass": true,
+      "note": "SPEC 8.5; any other label means confirmation leaked in"
+    },
+    {
+      "gate": "V8_PLACEBO_EXIT_denominator",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true,
+      "note": "non-entered arms are retained, not filtered away"
+    },
+    {
+      "gate": "V11_PLACEBO_EXIT_no_open_trades",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V12_PLACEBO_EXIT_positive_hold",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V9_entry_set_is_alignment_only",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "entered set == ALIGNED set minus no-fill-bar censoring"
+    },
+    {
+      "gate": "V10_2026_sealed",
+      "expected": "max <= 2025",
+      "observed": 2025,
+      "pass": true,
+      "note": "the sealed year is never read"
+    },
+    {
+      "gate": "V13_alignment_partitions_arms",
+      "expected": 8950,
+      "observed": 8950,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V14_stop_variants_share_entries",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": "a stop distance may not change who is eligible to enter"
+    }
+  ],
+  "n_gates": 26,
+  "n_failed": 0
+}

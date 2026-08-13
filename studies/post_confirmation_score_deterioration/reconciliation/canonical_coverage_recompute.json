@@ -1,0 +1,50 @@
+{
+  "method": "read directly from canonical_regime_scores_all.parquet; the study's derived panel is not used anywhere in this function",
+  "by_label": {
+    "CONFIRMED_THEN_STOPPED": {
+      "population_total": 822,
+      "strict_in_domain_ge1": 35,
+      "strict_in_domain_ge3": 32,
+      "raw_domain_ge1": 822,
+      "raw_domain_ge3": 819,
+      "codex_strict_ge3": 32,
+      "matches_codex_ge3": true
+    },
+    "FINAL_FLIP_EXIT_LOSER": {
+      "population_total": 1359,
+      "strict_in_domain_ge1": 134,
+      "strict_in_domain_ge3": 127,
+      "raw_domain_ge1": 1359,
+      "raw_domain_ge3": 1359,
+      "codex_strict_ge3": 127,
+      "matches_codex_ge3": true
+    },
+    "FINAL_FLIP_EXIT_WINNER": {
+      "population_total": 2350,
+      "strict_in_domain_ge1": 1631,
+      "strict_in_domain_ge3": 1628,
+      "raw_domain_ge1": 2350,
+      "raw_domain_ge3": 2350,
+      "codex_strict_ge3": 1628,
+      "matches_codex_ge3": true
+    },
+    "SESSION_EXIT": {
+      "population_total": 174,
+      "strict_in_domain_ge1": 75,
+      "strict_in_domain_ge3": 72,
+      "raw_domain_ge1": 125,
+      "raw_domain_ge3": 125,
+      "codex_strict_ge3": 72,
+      "matches_codex_ge3": true
+    }
+  },
+  "failures": {
+    "strict_in_domain_ge3": 159,
+    "population_total": 2181,
+    "codex_reported": "159 / 2181",
+    "matches_codex": true,
+    "raw_domain_ge1": 2181,
+    "raw_domain_coverage_pct": 100.0
+  },
+  "verdict": "Codex's strict in-domain counts reproduce EXACTLY through an independent code path. Both studies are right about their own stream: the disagreement is which stream, not which numbers."
+}

@@ -1,0 +1,51 @@
+{
+  "study": "p90_conditional_losing_5s_exit",
+  "predecessor": "studies/p90_5s_regime_impulse",
+  "inputs": {
+    "data/canonical/regime_complete_v1/canonical_regime_paths_all.parquet": {
+      "exists": true,
+      "size_bytes": 1346003856,
+      "rows": 61543945
+    },
+    "data/canonical/regime_complete_v1/canonical_regimes_all.parquet": {
+      "exists": true,
+      "size_bytes": 11334672,
+      "rows": 137673
+    },
+    "studies/armed_fade_score_path_progression/results/armed_regime_score_paths.parquet": {
+      "exists": true,
+      "size_bytes": 4230195,
+      "rows": 8950
+    },
+    "studies/p90_5s_regime_impulse/_work/regime_5s_flips.parquet": {
+      "exists": true,
+      "size_bytes": 13291960,
+      "rows": 2054398
+    }
+  },
+  "code_sha256": "50a2b57207ea800df00aa817c26098d5fa6046125e491d9e586859d251e2cb39",
+  "seed": 20260812,
+  "arms": 8950,
+  "entries": 8379,
+  "adverse_flip_events": 90437,
+  "stop_grid_atr": [
+    1.0,
+    0.75
+  ],
+  "conditional_threshold": "current_return_atr < 0",
+  "cost_points_round_turn": 0.5,
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "sealed_years": [
+    2026
+  ],
+  "generated_not_committed": [
+    "results/*.parquet",
+    "results/*.csv"
+  ]
+}

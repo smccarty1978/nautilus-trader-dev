@@ -1,0 +1,202 @@
+[
+  {
+    "source_short_feature": "rolling_5m_low_signed_distance_atr",
+    "long_model_feature": "rolling_5m_low_signed_distance_atr",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "rth_elapsed_seconds",
+    "long_model_feature": "rth_elapsed_seconds",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "rolling_15m_high_signed_distance_atr",
+    "long_model_feature": "rolling_15m_high_signed_distance_atr",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "rolling_60m_high_signed_distance_atr",
+    "long_model_feature": "rolling_60m_high_signed_distance_atr",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "rolling_15m_low_signed_distance_atr",
+    "long_model_feature": "rolling_15m_low_signed_distance_atr",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "rolling_30m_low_signed_distance_atr",
+    "long_model_feature": "rolling_30m_low_signed_distance_atr",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "price_change_points_60s",
+    "long_model_feature": "price_change_points_60s",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "rolling_30m_high_signed_distance_atr",
+    "long_model_feature": "rolling_30m_high_signed_distance_atr",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "range_points_1800s",
+    "long_model_feature": "range_points_1800s",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "opening_range_30m_low_developing_signed_distance_points",
+    "long_model_feature": "opening_range_30m_low_developing_signed_distance_points",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "est_bear_vol_sum_300s",
+    "long_model_feature": "est_bear_vol_sum_300s",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "full_level_envelope_width_atr",
+    "long_model_feature": "full_level_envelope_width_atr",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "rth_vol_cum",
+    "long_model_feature": "rth_vol_cum",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "est_delta_sum_1800s",
+    "long_model_feature": "est_delta_sum_1800s",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "price_change_atr_60s",
+    "long_model_feature": "price_change_atr_60s",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "prior_day_close_signed_distance_atr",
+    "long_model_feature": "prior_day_close_signed_distance_atr",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "up_down_vol_ratio_1800s",
+    "long_model_feature": "up_down_vol_ratio_1800s",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "price_change_atr_30s",
+    "long_model_feature": "price_change_atr_30s",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "pct_levels_behind_trade",
+    "long_model_feature": "pct_levels_behind_trade",
+    "mapping_type": "DIRECTION_NORMALIZED_IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate/_direction_normalized; independently reviewed in long_rth_mirrored_surface_top100_training/results/directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1)",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "prior_day_low_signed_distance_points",
+    "long_model_feature": "prior_day_low_signed_distance_points",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "opening_range_30m_low_final_signed_distance_points",
+    "long_model_feature": "opening_range_30m_low_final_signed_distance_points",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "vol_max_1s_1800s",
+    "long_model_feature": "vol_max_1s_1800s",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "price_position_in_full_envelope",
+    "long_model_feature": "price_position_in_full_envelope",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "rth_abs_delta_cum",
+    "long_model_feature": "rth_abs_delta_cum",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/ohlcv_delta.py:164-295 OHLCVDeltaTracker.calculate; absolute market-state semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "OHLCVDeltaTracker.calculate(atr); no direction argument",
+    "status": "RESOLVED"
+  },
+  {
+    "source_short_feature": "n_levels_below",
+    "long_model_feature": "n_levels_below",
+    "mapping_type": "IDENTITY",
+    "formula_source": "features/trackers/price_levels.py:178-428 PriceLevelTracker.calculate; absolute signed-distance/position semantics reviewed against registry.py and prior directionality_audit.csv",
+    "runtime_tracker": "PriceLevelTracker.calculate(direction=+1); output is absolute and direction-invariant",
+    "status": "RESOLVED"
+  }
+]

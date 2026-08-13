@@ -1,0 +1,211 @@
+{
+  "all_passed": true,
+  "gates": {
+    "population_parity": {
+      "gate": "population_parity",
+      "passed": true,
+      "observed": {
+        "top_10": 8988,
+        "top_5": 7396,
+        "top_2_5": 5823,
+        "top_1": 3415
+      },
+      "required": {
+        "top_10": 8988,
+        "top_5": 7396,
+        "top_2_5": 5823,
+        "top_1": 3415
+      },
+      "armed_observed": 8950,
+      "armed_required": 8950
+    },
+    "confirmation_parity": {
+      "gate": "confirmation_parity",
+      "passed": true,
+      "by_level": {
+        "top_10": {
+          "confirmed_adverse": 4678,
+          "ambiguous_ties": 0,
+          "accepted_survived_to_confirm": 4678,
+          "brackets_accepted": true
+        },
+        "top_5": {
+          "confirmed_adverse": 4362,
+          "ambiguous_ties": 0,
+          "accepted_survived_to_confirm": 4362,
+          "brackets_accepted": true
+        },
+        "top_2_5": {
+          "confirmed_adverse": 3774,
+          "ambiguous_ties": 0,
+          "accepted_survived_to_confirm": 3774,
+          "brackets_accepted": true
+        },
+        "top_1": {
+          "confirmed_adverse": 2496,
+          "ambiguous_ties": 0,
+          "accepted_survived_to_confirm": 2496,
+          "brackets_accepted": true
+        }
+      },
+      "note": "This study resolves a same-bar stop/confirm tie adversely; the accepted lifecycle resolved it optimistically. The two must bracket, and the gap must equal the ambiguous count."
+    },
+    "independent_recompute": {
+      "gate": "independent_recompute",
+      "passed": true,
+      "paths_checked": 248,
+      "mismatches": {
+        "mfe": 0,
+        "mae": 0,
+        "confirm_close": 0,
+        "return": 0,
+        "landmark_first_touch": 0,
+        "landmark_not_first": 0
+      },
+      "method": "re-derived from canonical_regime_paths_all.parquet through a separate code path, not by re-reading the panel"
+    },
+    "entry_to_confirm_parity": {
+      "gate": "entry_to_confirm_parity",
+      "passed": true,
+      "mfe_mismatches": 0,
+      "mae_mismatches": 0
+    },
+    "confirm_close_parity": {
+      "gate": "confirm_close_parity",
+      "passed": true,
+      "close_mismatches": 0,
+      "return_mismatches": 0
+    },
+    "landmark_first_touch": {
+      "gate": "landmark_first_touch",
+      "passed": true,
+      "timestamp_mismatches": 0,
+      "not_actually_first": 0
+    },
+    "session_containment": {
+      "gate": "session_containment",
+      "passed": true,
+      "events_past_session_close": {
+        "confirm_ns": 0,
+        "lmp0_50_ns": 0,
+        "lmp0_75_ns": 0,
+        "lmp1_00_ns": 0,
+        "lmp1_25_ns": 0,
+        "lmp1_50_ns": 0,
+        "lmp2_00_ns": 0,
+        "lmp2_50_ns": 0,
+        "lmp3_00_ns": 0,
+        "floorm0_25_ns": 0,
+        "floorp0_00_ns": 0,
+        "floorp0_25_ns": 0,
+        "floorp0_50_ns": 0,
+        "floorp0_75_ns": 0
+      }
+    },
+    "no_overnight_stitching": {
+      "gate": "no_overnight_stitching",
+      "passed": true,
+      "entries_whose_session_close_is_another_day": 0,
+      "note": "Only RTH bars are loaded, so index i+1 after 14:59:59 is the next session's 08:30; every window is clamped to the entry's own session index range."
+    },
+    "direction_normalization": {
+      "gate": "direction_normalization",
+      "passed": true,
+      "by_side": {
+        "LONG": {
+          "n": 8829,
+          "median_return_at_confirm_atr": 0.6814,
+          "median_mfe_to_confirm_atr": 0.8452,
+          "negative_mfe_rows": 0,
+          "negative_mae_rows": 0
+        },
+        "SHORT": {
+          "n": 11137,
+          "median_return_at_confirm_atr": 0.685,
+          "median_mfe_to_confirm_atr": 0.877,
+          "negative_mfe_rows": 0,
+          "negative_mae_rows": 0
+        }
+      },
+      "unit_tests": "tests/test_panel.py::test_long_and_short_mirror_exactly asserts exact mirroring on synthetic bars"
+    },
+    "same_bar_accounting": {
+      "gate": "same_bar_accounting",
+      "passed": true,
+      "ambiguous_stop_confirm": 0,
+      "ambiguous_stop_landmark": 2,
+      "ambiguous_floor_landmark": 123,
+      "trades_with_any_ambiguity": 109,
+      "resolution": "adverse (conservative). Ambiguous landmarks are not credited; the optimistic bound is recoverable as reached_after_confirm OR ambiguous_with_stop."
+    },
+    "audit_gates": {
+      "gate": "audit_gates",
+      "causal_lint": {
+        "tool": "causal_lint",
+        "version": 1,
+        "roots": [
+          "studies\\confirmation_economics_excursion_map"
+        ],
+        "files_scanned": 9,
+        "critical": 0,
+        "warning": 0,
+        "clean": true,
+        "findings": []
+      },
+      "lookahead_auditor": {
+        "agent": "lookahead-auditor",
+        "pass": 2,
+        "date": "2026-08-10",
+        "scope_hash": "b56ef37b6a0bd927cec8717231a1176edcbfd079e3fdd8d91579e1c1c038594f",
+        "critical": 0,
+        "warning": 0,
+        "note": 0,
+        "verdict": "PASS",
+        "report": "audit/pass_02.md",
+        "prior_findings_adjudicated": true,
+        "referred_to_contract_checker": 1
+      },
+      "contract_checker": {
+        "agent": "contract-checker",
+        "pass": 1,
+        "date": "2026-08-10",
+        "blocking": 0,
+        "not_verified": 1,
+        "verdict": "CLEAR",
+        "critical": 0,
+        "warning": 1,
+        "note": 0,
+        "deliverables_manifest_present": true,
+        "prior_findings_adjudicated": true,
+        "findings": [
+          {
+            "id": "CC-1",
+            "severity": "WARNING",
+            "requirement": "SPEC 10 non-goals",
+            "summary": "REPORT.md terminal-classification section named a specific ATR band (0.625-1.00) and specific median/p90 room figures (0.6/1.6 ATR) as 'structural regions worth testing' -- explicitly disclaimed as non-recommended and framed as diagnostic ranges, not a tuned parameter, but close to the non-goal boundary.",
+            "blocks": false,
+            "resolution": "RESOLVED 2026-08-10. Wording tightened to 'Candidate regions -- described, NOT evaluated as rules', each item reframed as a description of where the curves lie rather than a proposed setting, with the ladder finding restated as a negative implication. No figure changed; every number still reads directly off a phase table."
+          },
+          {
+            "id": "CC-2",
+            "severity": "NOT_VERIFIED",
+            "requirement": "SPEC 9 gate 11 (audit_gates)",
+            "summary": "validation_report.json showed all_passed:false and contract_checker.present:false solely because this agent's contract_status.json did not exist when validate.py last ran. The gate logic (implementation/validate.py g11_audit) is correct and refuses to self-report clear.",
+            "blocks": false,
+            "resolution": "RESOLVED 2026-08-10. validate.py re-run after this file landed; all eleven gates pass and all_passed is true."
+          }
+        ],
+        "notes": [
+          "Scope was deliverables, seals, terminal-label reachability, and C4/D/E only. Causality is owned by lookahead-auditor, which blocked pass 1 on 2 CRITICALs and returned PASS with 0 findings at pass 2.",
+          "C4 judged NOT APPLICABLE: this is a diagnostic study with no model selection, promotion pipeline, or walk-forward. Most of D is likewise not applicable (no training or serving); the artifact-hash-binding analogue is satisfied by partition_manifest.json code_hashes over panel.py, phases.py and overlay.py.",
+          "E verified: stop, landmark and floor triggers all use the intrabar extreme and fill at the FOLLOWING bar's open; the trigger price is never credited.",
+          "All four base population counts (8,988 / 7,396 / 5,823 / 3,415) and the armed count (8,950) reproduce exactly. Landmarks, floors and deterioration levels in partition_manifest.json match SPEC 4 with no added or tuned value.",
+          "Phase-depth split honoured in code and report: FULL = (top_2_5, armed) receive all phases; top_10 / top_5 / top_1 appear in the Phase 1/2/4/8 annex and are not silently dropped.",
+          "Terminal label E is defensible and correctly subsumes B and D: SPEC 7 makes E fire exactly when Gates A and B both pass materially, which they do (Gate A 94.3% vs 31.4% at 0.75 ATR; Gate B capture 0.138 with +0.89 ATR/entry recoverable). C is excluded because an unconditional level does separate; F is excluded because all validation gates pass.",
+          "Authored by the contract-checker agent and persisted by the main session, which has the Write tool the agent lacks. Content is verbatim apart from the resolution fields and these notes."
+        ]
+      },
+      "passed": true
+    }
+  }
+}

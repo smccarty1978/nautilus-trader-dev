@@ -1,0 +1,119 @@
+{
+  "study": "p90_conditional_losing_5s_exit",
+  "phase": 0,
+  "predecessor": "studies/p90_5s_regime_impulse",
+  "baseline_lifecycle": "FULL (hold through confirmation -> opposing flip)",
+  "baseline_lifecycle_source": "armed_fade_score_path_progression/implementation/walks.py::continuation_label",
+  "checks": {
+    "armed_population": {
+      "expected": 8950,
+      "observed": 8950,
+      "match": true
+    },
+    "aligned_entries": {
+      "expected": 8379,
+      "observed": 8379,
+      "match": true
+    },
+    "entry_coverage": {
+      "expected": 0.936201,
+      "observed": 0.936201,
+      "match": true
+    },
+    "arms_by_year": {
+      "expected": {
+        "2021": 1828,
+        "2022": 1825,
+        "2023": 1763,
+        "2024": 1771,
+        "2025": 1763
+      },
+      "observed": {
+        "2022": 1825,
+        "2021": 1828,
+        "2024": 1771,
+        "2023": 1763,
+        "2025": 1763
+      },
+      "match": true
+    },
+    "arms_by_side": {
+      "expected": {
+        "LONG": 4048,
+        "SHORT": 4902
+      },
+      "observed": {
+        "LONG": 4048,
+        "SHORT": 4902
+      },
+      "match": true
+    },
+    "full_lifecycle_labels": {
+      "expected": {
+        "STOPPED_BEFORE_CONFIRM": 4245,
+        "FINAL_FLIP_EXIT_WINNER": 2350,
+        "FINAL_FLIP_EXIT_LOSER": 1359,
+        "CONFIRMED_THEN_STOPPED": 822,
+        "SESSION_EXIT": 174
+      },
+      "observed": {
+        "FINAL_FLIP_EXIT_LOSER": 1359,
+        "STOPPED_BEFORE_CONFIRM": 4245,
+        "CONFIRMED_THEN_STOPPED": 822,
+        "FINAL_FLIP_EXIT_WINNER": 2350,
+        "SESSION_EXIT": 174
+      },
+      "match": true
+    },
+    "full_lifecycle_parity_exact": {
+      "expected": true,
+      "observed": true,
+      "match": true,
+      "detail": {
+        "arms_compared": 8950,
+        "mismatches": {
+          "label": 0,
+          "gross": 0,
+          "net": 0,
+          "mfe": 0,
+          "mae": 0
+        },
+        "exact": true,
+        "examples": []
+      }
+    },
+    "walk_a_confirming_mae": {
+      "expected": {
+        "p50": 0.33,
+        "p75": 0.596,
+        "p80": 0.66,
+        "p90": 0.818,
+        "p95": 0.907
+      },
+      "observed": {
+        "p50": 0.3301724769077192,
+        "p75": 0.5956022192065624,
+        "p80": 0.660387077444664,
+        "p90": 0.8183761903211149,
+        "p95": 0.9067824244406344
+      },
+      "match": true,
+      "tolerance": 0.002,
+      "note": "predecessor references; a miss STOPS the study and is explained -- it is not permission to repair a discrepancy"
+    }
+  },
+  "all_reproduced": true,
+  "failed": [],
+  "accepted_full_lifecycle_economics": {
+    "mean_gross_atr": -0.017720101187663366,
+    "mean_net_atr": -0.07513578078620248,
+    "median_net_atr": -0.9629322878836896,
+    "win_rate": 0.27128491620111733,
+    "mean_mfe_atr": 1.773773627237042
+  },
+  "walk_a_reference": {
+    "confirm_rate_censored": 0.5202234636871509,
+    "n_confirming": 4656,
+    "median_return_at_confirm": 0.8540966950974154
+  }
+}

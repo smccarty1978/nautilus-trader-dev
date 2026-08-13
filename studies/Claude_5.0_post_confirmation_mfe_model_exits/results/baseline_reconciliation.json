@@ -1,0 +1,86 @@
+{
+  "per_stop": {
+    "0.75": {
+      "population": 5836,
+      "expected": {
+        "STOPPED BEFORE CONFIRMATION": 2528,
+        "STOPPED AFTER CONFIRMATION": 1511,
+        "REGIME-FLIP EXIT FOR PROFIT": 1215,
+        "REGIME-FLIP EXIT FOR LOSS": 504,
+        "REGIME-FLIP EXIT FLAT": 15,
+        "CENSORED / UNRESOLVED": 54,
+        "AMBIGUOUS EVENT ORDER": 9
+      },
+      "engine": {
+        "STOPPED AFTER CONFIRMATION": 1511,
+        "REGIME-FLIP EXIT FLAT": 15,
+        "REGIME-FLIP EXIT FOR LOSS": 504,
+        "AMBIGUOUS EVENT ORDER": 9,
+        "REGIME-FLIP EXIT FOR PROFIT": 1215,
+        "CENSORED / UNRESOLVED": 54,
+        "STOPPED BEFORE CONFIRMATION": 2528
+      },
+      "counts_exact": true,
+      "joined_rows": 5836,
+      "classification_mismatches_vs_stored": 0,
+      "realized_return_mismatches_vs_stored": 0,
+      "exact": true,
+      "mismatch_examples": []
+    },
+    "1.0": {
+      "population": 5836,
+      "expected": {
+        "STOPPED BEFORE CONFIRMATION": 2149,
+        "STOPPED AFTER CONFIRMATION": 1209,
+        "REGIME-FLIP EXIT FOR PROFIT": 1464,
+        "REGIME-FLIP EXIT FOR LOSS": 905,
+        "REGIME-FLIP EXIT FLAT": 17,
+        "CENSORED / UNRESOLVED": 78,
+        "AMBIGUOUS EVENT ORDER": 14
+      },
+      "engine": {
+        "STOPPED BEFORE CONFIRMATION": 2149,
+        "REGIME-FLIP EXIT FOR LOSS": 905,
+        "STOPPED AFTER CONFIRMATION": 1209,
+        "CENSORED / UNRESOLVED": 78,
+        "AMBIGUOUS EVENT ORDER": 14,
+        "REGIME-FLIP EXIT FOR PROFIT": 1464,
+        "REGIME-FLIP EXIT FLAT": 17
+      },
+      "counts_exact": true,
+      "joined_rows": 5836,
+      "classification_mismatches_vs_stored": 0,
+      "realized_return_mismatches_vs_stored": 0,
+      "exact": true,
+      "mismatch_examples": []
+    },
+    "1.25": {
+      "population": 5836,
+      "expected": {
+        "STOPPED BEFORE CONFIRMATION": 1855,
+        "STOPPED AFTER CONFIRMATION": 861,
+        "REGIME-FLIP EXIT FOR PROFIT": 1631,
+        "REGIME-FLIP EXIT FOR LOSS": 1357,
+        "REGIME-FLIP EXIT FLAT": 20,
+        "CENSORED / UNRESOLVED": 98,
+        "AMBIGUOUS EVENT ORDER": 14
+      },
+      "engine": {
+        "AMBIGUOUS EVENT ORDER": 14,
+        "REGIME-FLIP EXIT FLAT": 20,
+        "STOPPED AFTER CONFIRMATION": 861,
+        "STOPPED BEFORE CONFIRMATION": 1855,
+        "CENSORED / UNRESOLVED": 98,
+        "REGIME-FLIP EXIT FOR LOSS": 1357,
+        "REGIME-FLIP EXIT FOR PROFIT": 1631
+      },
+      "counts_exact": true,
+      "joined_rows": 5836,
+      "classification_mismatches_vs_stored": 0,
+      "realized_return_mismatches_vs_stored": 0,
+      "exact": true,
+      "mismatch_examples": []
+    }
+  },
+  "all_exact": true
+}

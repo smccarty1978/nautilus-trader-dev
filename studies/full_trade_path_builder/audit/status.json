@@ -1,0 +1,32 @@
+{
+  "agent": "lookahead-auditor",
+  "critical": 0,
+  "date": "2026-07-27",
+  "gate": "post_confirmation_mfe_model_exits_completion",
+  "notes": 0,
+  "pass": 23,
+  "report": "studies/full_trade_path_builder/audit/pass_23.md",
+  "scope": [
+    "studies/full_trade_path_builder/POST_CONFIRMATION_MFE_MODEL_EXIT_SPEC.md",
+    "studies/full_trade_path_builder/config/post_confirmation_mfe_model_exits.yaml",
+    "studies/full_trade_path_builder/analysis/analyze_post_confirmation_mfe_and_model_exits.py",
+    "studies/full_trade_path_builder/tests/test_post_confirmation_mfe_model_exits.py",
+    "studies/full_trade_path_builder/implementation/canonical_research_loader.py",
+    "studies/full_trade_path_builder/TOP2_5_FIRST_SIGNAL_STOP_1_25_REGIME_EXIT_SPEC.md",
+    "studies/full_trade_path_builder/POST_CONFIRMATION_MFE_AND_MODEL_EXIT_REPORT.md",
+    "studies/full_trade_path_builder/results/post_confirmation_mfe_model_exit_summary.json",
+    "studies/full_trade_path_builder/results/post_confirmation_mfe_model_exit_trade_policy_results.parquet",
+    "studies/full_trade_path_builder/results/post_confirmation_model_warning_events.parquet",
+    "studies/full_trade_path_builder/results/post_confirmation_policy_cross_stop_comparison.parquet",
+    "studies/full_trade_path_builder/results/post_confirmation_mfe_model_exit_run_status.json",
+    "studies/full_trade_path_builder/consolidated/canonical_observations_all.parquet",
+    "studies/full_trade_path_builder/consolidated/canonical_trade_summaries_all.parquet",
+    "studies/full_trade_path_builder/consolidated/canonical_trade_paths_all.parquet",
+    "studies/full_trade_path_builder/results/top2_5_stop_0_75_regime_exit_results.parquet",
+    "studies/full_trade_path_builder/results/top2_5_stop_1_00_regime_exit_results.parquet",
+    "studies/full_trade_path_builder/results/top2_5_stop_1_25_regime_exit_results.parquet"
+  ],
+  "scope_hash": "d870bbfd2a30880b9776eae438b4ed9ece51433c43684aa211c3add0a5f1fa39",
+  "status": "PASS",
+  "warnings": 0
+}

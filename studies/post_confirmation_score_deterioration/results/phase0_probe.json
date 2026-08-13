@@ -1,0 +1,157 @@
+{
+  "armed_regimes": 8950,
+  "reconciliation": {
+    "observed_terminal_labels": {
+      "FINAL_FLIP_EXIT_LOSER": 1359,
+      "SESSION_EXIT": 174,
+      "STOPPED_BEFORE_CONFIRM": 4245,
+      "FINAL_FLIP_EXIT_WINNER": 2350,
+      "CONFIRMED_THEN_STOPPED": 822
+    },
+    "quoted_in_brief": {
+      "CONFIRMED_THEN_STOPPED": 822,
+      "FINAL_FLIP_EXIT_LOSER": 1359,
+      "FINAL_FLIP_EXIT_WINNER": 2350,
+      "SESSION_EXIT": 174
+    },
+    "matches_brief": {
+      "CONFIRMED_THEN_STOPPED": true,
+      "FINAL_FLIP_EXIT_LOSER": true,
+      "FINAL_FLIP_EXIT_WINNER": true,
+      "SESSION_EXIT": true
+    },
+    "confirmed_via_continuation_walk": 4705,
+    "confirmed_via_walk_a": 4656,
+    "delta": 49
+  },
+  "new_regime_join": {
+    "confirmed_trades": 4705,
+    "matched_new_regime": 4705,
+    "unmatched": 0,
+    "established_reached_pct": 42.4
+  },
+  "established_gate_delay_s": {
+    "n": 1995,
+    "median": 410.0,
+    "p25": 290.0,
+    "p75": 570.0,
+    "p95": 955.0000000000001
+  },
+  "post_confirm_observations": {
+    "trades_with_at_least_one_obs": 1875,
+    "trades_with_zero_obs": 2830,
+    "obs_per_trade": {
+      "median": 94.0,
+      "p25": 36.0,
+      "p75": 189.0,
+      "p90": 303.0
+    },
+    "first_obs_delay_s": {
+      "median": 400.0,
+      "p25": 290.0,
+      "p75": 560.0,
+      "p90": 780.0
+    },
+    "obs_median_by_label": {
+      "CONFIRMED_THEN_STOPPED": 13.0,
+      "SESSION_EXIT": 67.0,
+      "FINAL_FLIP_EXIT_WINNER": 111.0,
+      "FINAL_FLIP_EXIT_LOSER": 16.5
+    },
+    "trades_with_ge_3_obs": 1859,
+    "trades_with_ge_5_obs": 1836,
+    "trades_with_ge_10_obs": 1768
+  },
+  "polarity": {
+    "host_regime_direction_equals_trade_direction_rate": 1.0,
+    "interpretation": "host_regime_direction is the fade direction the in-domain model implies for the NEW regime. If it never equals our trade direction, the live post-confirmation score is predicting the END of our own regime: HIGH score = danger, and 'deterioration' for our position is the score RISING, not falling."
+  },
+  "score_by_outcome_and_elapsed": [
+    {
+      "bucket": "60-180s",
+      "terminal_label_full": "CONFIRMED_THEN_STOPPED",
+      "n": 5,
+      "mean_score": 0.1901,
+      "med_score": 0.1762
+    },
+    {
+      "bucket": "60-180s",
+      "terminal_label_full": "FINAL_FLIP_EXIT_LOSER",
+      "n": 27,
+      "mean_score": 0.163,
+      "med_score": 0.1559
+    },
+    {
+      "bucket": "60-180s",
+      "terminal_label_full": "FINAL_FLIP_EXIT_WINNER",
+      "n": 222,
+      "mean_score": 0.1902,
+      "med_score": 0.1824
+    },
+    {
+      "bucket": "60-180s",
+      "terminal_label_full": "SESSION_EXIT",
+      "n": 17,
+      "mean_score": 0.1402,
+      "med_score": 0.1261
+    },
+    {
+      "bucket": ">180s",
+      "terminal_label_full": "CONFIRMED_THEN_STOPPED",
+      "n": 836,
+      "mean_score": 0.2468,
+      "med_score": 0.2343
+    },
+    {
+      "bucket": ">180s",
+      "terminal_label_full": "FINAL_FLIP_EXIT_LOSER",
+      "n": 3125,
+      "mean_score": 0.2654,
+      "med_score": 0.2589
+    },
+    {
+      "bucket": ">180s",
+      "terminal_label_full": "FINAL_FLIP_EXIT_WINNER",
+      "n": 235392,
+      "mean_score": 0.2822,
+      "med_score": 0.2587
+    },
+    {
+      "bucket": ">180s",
+      "terminal_label_full": "SESSION_EXIT",
+      "n": 8450,
+      "mean_score": 0.2551,
+      "med_score": 0.2348
+    }
+  ],
+  "per_trade_score_by_outcome": [
+    {
+      "label": "FINAL_FLIP_EXIT_WINNER",
+      "n": 1631,
+      "med_first": 0.1823,
+      "med_max": 0.5397,
+      "med_last": 0.5022
+    },
+    {
+      "label": "FINAL_FLIP_EXIT_LOSER",
+      "n": 134,
+      "med_first": 0.2007,
+      "med_max": 0.331,
+      "med_last": 0.315
+    },
+    {
+      "label": "SESSION_EXIT",
+      "n": 75,
+      "med_first": 0.1848,
+      "med_max": 0.3829,
+      "med_last": 0.186
+    },
+    {
+      "label": "CONFIRMED_THEN_STOPPED",
+      "n": 35,
+      "med_first": 0.1795,
+      "med_max": 0.331,
+      "med_last": 0.2828
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "agent": "contract-checker",
+  "pass": 2,
+  "date": "2026-08-10",
+  "blocking": 0,
+  "critical": 0,
+  "warning": 1,
+  "not_verified": 0,
+  "note": "Pass-1 blocking finding (stale results/summary.json, Manifest #13) verified FIXED: phases.py now preserves phase12/report_answers/final_classification from prior summary.json instead of clobbering; close_out.py populates the 14-answer block and final_classification by reading back from parquet artifacts and executes (not asserts) the SPEC section 6 decision table, correctly returning C. One new non-blocking WARNING: classify() has no explicit branch for label E, verified not to affect current routing. Only remaining step: overwrite this file into the study and re-run validate.py to close gate 15/all_passed.",
+  "verdict": "CLEAR",
+  "deliverables_manifest_present": true,
+  "prior_findings_adjudicated": true,
+  "report": "audit/contract_pass_02.md",
+  "warning_remediated_after_pass": "label E branch added to close_out.py::classify() via score_only_separation(); precondition evaluates false in this run (25 price variables clear the gate) so the routing to C is unchanged"
+}

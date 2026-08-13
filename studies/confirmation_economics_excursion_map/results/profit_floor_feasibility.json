@@ -1,0 +1,376 @@
+{
+  "path_mode": "unconstrained",
+  "note": "Feasibility map, NOT a policy. A floor is evaluated only where it sits BELOW the open profit at confirmation and could therefore actually be placed. Floors trigger on the bar's intrabar extreme, matching the 1 ATR stop.",
+  "populations": {
+    "top_2_5": {
+      "confirmed": 3774,
+      "floors": [
+        {
+          "floor_entry_relative_atr": -0.25,
+          "n_placeable_of_confirmed": 3746,
+          "pct_placeable": 99.26,
+          "n_ambiguous_with_landmark": 1,
+          "confirmed_failures": {
+            "n_placeable": 2227,
+            "n_touched": 2162,
+            "pct_touched": 97.08
+          },
+          "flip_exit_losers": {
+            "n_placeable": 944,
+            "n_touched": 879,
+            "pct_touched": 93.11
+          },
+          "flip_exit_winners": {
+            "n_placeable": 1420,
+            "n_touched": 413,
+            "pct_touched": 29.08
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 1775,
+            "n_touched": 755,
+            "pct_touched": 42.54
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 1409,
+            "n_touched": 517,
+            "pct_touched": 36.69
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 1126,
+            "n_touched": 393,
+            "pct_touched": 34.9
+          }
+        },
+        {
+          "floor_entry_relative_atr": 0.0,
+          "n_placeable_of_confirmed": 3403,
+          "pct_placeable": 90.17,
+          "n_ambiguous_with_landmark": 2,
+          "confirmed_failures": {
+            "n_placeable": 1953,
+            "n_touched": 1953,
+            "pct_touched": 100.0
+          },
+          "flip_exit_losers": {
+            "n_placeable": 885,
+            "n_touched": 885,
+            "pct_touched": 100.0
+          },
+          "flip_exit_winners": {
+            "n_placeable": 1351,
+            "n_touched": 658,
+            "pct_touched": 48.7
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 1672,
+            "n_touched": 955,
+            "pct_touched": 57.12
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 1326,
+            "n_touched": 680,
+            "pct_touched": 51.28
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 1063,
+            "n_touched": 514,
+            "pct_touched": 48.35
+          }
+        },
+        {
+          "floor_entry_relative_atr": 0.25,
+          "n_placeable_of_confirmed": 2673,
+          "pct_placeable": 70.83,
+          "n_ambiguous_with_landmark": 8,
+          "confirmed_failures": {
+            "n_placeable": 1413,
+            "n_touched": 1413,
+            "pct_touched": 100.0
+          },
+          "flip_exit_losers": {
+            "n_placeable": 718,
+            "n_touched": 718,
+            "pct_touched": 100.0
+          },
+          "flip_exit_winners": {
+            "n_placeable": 1168,
+            "n_touched": 756,
+            "pct_touched": 64.73
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 1420,
+            "n_touched": 969,
+            "pct_touched": 68.24
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 1121,
+            "n_touched": 698,
+            "pct_touched": 62.27
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 899,
+            "n_touched": 528,
+            "pct_touched": 58.73
+          }
+        },
+        {
+          "floor_entry_relative_atr": 0.5,
+          "n_placeable_of_confirmed": 1797,
+          "pct_placeable": 47.62,
+          "n_ambiguous_with_landmark": 11,
+          "confirmed_failures": {
+            "n_placeable": 855,
+            "n_touched": 855,
+            "pct_touched": 100.0
+          },
+          "flip_exit_losers": {
+            "n_placeable": 485,
+            "n_touched": 485,
+            "pct_touched": 100.0
+          },
+          "flip_exit_winners": {
+            "n_placeable": 866,
+            "n_touched": 656,
+            "pct_touched": 75.75
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 1051,
+            "n_touched": 805,
+            "pct_touched": 76.59
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 840,
+            "n_touched": 599,
+            "pct_touched": 71.31
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 665,
+            "n_touched": 444,
+            "pct_touched": 66.77
+          }
+        },
+        {
+          "floor_entry_relative_atr": 0.75,
+          "n_placeable_of_confirmed": 1033,
+          "pct_placeable": 27.37,
+          "n_ambiguous_with_landmark": 2,
+          "confirmed_failures": {
+            "n_placeable": 439,
+            "n_touched": 439,
+            "pct_touched": 100.0
+          },
+          "flip_exit_losers": {
+            "n_placeable": 277,
+            "n_touched": 277,
+            "pct_touched": 100.0
+          },
+          "flip_exit_winners": {
+            "n_placeable": 539,
+            "n_touched": 442,
+            "pct_touched": 82.0
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 672,
+            "n_touched": 554,
+            "pct_touched": 82.44
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 547,
+            "n_touched": 430,
+            "pct_touched": 78.61
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 445,
+            "n_touched": 336,
+            "pct_touched": 75.51
+          }
+        }
+      ]
+    },
+    "armed": {
+      "confirmed": 4656,
+      "floors": [
+        {
+          "floor_entry_relative_atr": -0.25,
+          "n_placeable_of_confirmed": 4650,
+          "pct_placeable": 99.87,
+          "n_ambiguous_with_landmark": 1,
+          "confirmed_failures": {
+            "n_placeable": 2177,
+            "n_touched": 2009,
+            "pct_touched": 92.28
+          },
+          "flip_exit_losers": {
+            "n_placeable": 1358,
+            "n_touched": 1190,
+            "pct_touched": 87.63
+          },
+          "flip_exit_winners": {
+            "n_placeable": 2348,
+            "n_touched": 340,
+            "pct_touched": 14.48
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 2688,
+            "n_touched": 673,
+            "pct_touched": 25.04
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 2131,
+            "n_touched": 429,
+            "pct_touched": 20.13
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 1741,
+            "n_touched": 296,
+            "pct_touched": 17.0
+          }
+        },
+        {
+          "floor_entry_relative_atr": 0.0,
+          "n_placeable_of_confirmed": 4610,
+          "pct_placeable": 99.01,
+          "n_ambiguous_with_landmark": 2,
+          "confirmed_failures": {
+            "n_placeable": 2146,
+            "n_touched": 2146,
+            "pct_touched": 100.0
+          },
+          "flip_exit_losers": {
+            "n_placeable": 1352,
+            "n_touched": 1352,
+            "pct_touched": 100.0
+          },
+          "flip_exit_winners": {
+            "n_placeable": 2340,
+            "n_touched": 715,
+            "pct_touched": 30.56
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 2680,
+            "n_touched": 1051,
+            "pct_touched": 39.22
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 2123,
+            "n_touched": 690,
+            "pct_touched": 32.5
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 1734,
+            "n_touched": 482,
+            "pct_touched": 27.8
+          }
+        },
+        {
+          "floor_entry_relative_atr": 0.25,
+          "n_placeable_of_confirmed": 4427,
+          "pct_placeable": 95.08,
+          "n_ambiguous_with_landmark": 3,
+          "confirmed_failures": {
+            "n_placeable": 2013,
+            "n_touched": 2013,
+            "pct_touched": 100.0
+          },
+          "flip_exit_losers": {
+            "n_placeable": 1315,
+            "n_touched": 1315,
+            "pct_touched": 100.0
+          },
+          "flip_exit_winners": {
+            "n_placeable": 2293,
+            "n_touched": 1133,
+            "pct_touched": 49.41
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 2625,
+            "n_touched": 1410,
+            "pct_touched": 53.71
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 2077,
+            "n_touched": 957,
+            "pct_touched": 46.08
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 1697,
+            "n_touched": 690,
+            "pct_touched": 40.66
+          }
+        },
+        {
+          "floor_entry_relative_atr": 0.5,
+          "n_placeable_of_confirmed": 3830,
+          "pct_placeable": 82.26,
+          "n_ambiguous_with_landmark": 4,
+          "confirmed_failures": {
+            "n_placeable": 1640,
+            "n_touched": 1640,
+            "pct_touched": 100.0
+          },
+          "flip_exit_losers": {
+            "n_placeable": 1129,
+            "n_touched": 1129,
+            "pct_touched": 100.0
+          },
+          "flip_exit_winners": {
+            "n_placeable": 2074,
+            "n_touched": 1312,
+            "pct_touched": 63.26
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 2387,
+            "n_touched": 1569,
+            "pct_touched": 65.73
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 1894,
+            "n_touched": 1108,
+            "pct_touched": 58.5
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 1543,
+            "n_touched": 813,
+            "pct_touched": 52.69
+          }
+        },
+        {
+          "floor_entry_relative_atr": 0.75,
+          "n_placeable_of_confirmed": 2789,
+          "pct_placeable": 59.9,
+          "n_ambiguous_with_landmark": 5,
+          "confirmed_failures": {
+            "n_placeable": 1056,
+            "n_touched": 1056,
+            "pct_touched": 100.0
+          },
+          "flip_exit_losers": {
+            "n_placeable": 762,
+            "n_touched": 762,
+            "pct_touched": 100.0
+          },
+          "flip_exit_winners": {
+            "n_placeable": 1635,
+            "n_touched": 1217,
+            "pct_touched": 74.43
+          },
+          "runners_ge_2atr": {
+            "n_placeable": 1885,
+            "n_touched": 1418,
+            "pct_touched": 75.23
+          },
+          "runners_ge_2_5atr": {
+            "n_placeable": 1505,
+            "n_touched": 1040,
+            "pct_touched": 69.1
+          },
+          "runners_ge_3atr": {
+            "n_placeable": 1221,
+            "n_touched": 781,
+            "pct_touched": 63.96
+          }
+        }
+      ]
+    }
+  }
+}

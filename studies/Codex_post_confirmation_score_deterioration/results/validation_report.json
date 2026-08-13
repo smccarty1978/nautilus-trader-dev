@@ -1,0 +1,24 @@
+{
+  "all_passed": false,
+  "checks": {
+    "duplicate_regime_timestamp_score_observations": 0,
+    "monotonic_path_endpoints": true,
+    "new_regime_join_complete": true,
+    "new_regime_score_polarity_matches_trade_direction": true,
+    "population_reconciliation": true,
+    "reserved_2026_excluded": true,
+    "same_dispatch_ordering_policy": "confirmation and terminal are inclusive; each score is usable only at its canonical dispatch timestamp",
+    "score_timestamps_within_confirmation_terminal_window": true,
+    "session_containment": "RTH score stream selected; predecessor ledger supplies canonical RTH terminal"
+  },
+  "gate_1_observability": {
+    "coverage": 0.072902,
+    "decision": "stop_no_policy_simulation",
+    "failed_trades": 2181,
+    "failed_with_ge3_valid_dispatches": 159,
+    "minimum_required": 0.5,
+    "passed": false
+  },
+  "terminal_classification": "A. POST-CONFIRMATION SCORE HAS NO USEFUL MANAGEMENT INFORMATION",
+  "validation_passed": true
+}

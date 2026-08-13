@@ -1,0 +1,13 @@
+study: Codex_post_confirmation_score_deterioration
+substrate: data/canonical/regime_complete_v1
+predecessor: studies/armed_fade_score_path_progression
+years: [2021, 2022, 2023, 2024, 2025]
+session: RTH
+score_stream: true dispatches with a non-null, in-domain score for the newly confirmed regime
+post_confirmation_start: confirmation dispatch inclusive
+post_confirmation_end: canonical full-exit timestamp inclusive
+minimum_observations_for_path_features: 3
+failure_labels: [CONFIRMED_THEN_STOPPED, FINAL_FLIP_EXIT_LOSER]
+winner_label: FINAL_FLIP_EXIT_WINNER
+threshold_overlap_disclosure: 2025 overlaps frozen percentile calibration and is not threshold-OOS
+reserved_runtime_oos: 2026 excluded

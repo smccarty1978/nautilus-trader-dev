@@ -1,0 +1,678 @@
+{
+  "walk": "A (arm-anchored)",
+  "note": "all metrics measured from the Top-10 arm; deeper levels subset the population. Confirmation is the conservative (censored) bound, in which a same-bar stop/confirm tie resolves adversely.",
+  "breakdowns": {
+    "pooled": {
+      "armed_n": 8950,
+      "stages": [
+        {
+          "stage": "armed_top10",
+          "n": 8950,
+          "pct_of_armed": 100.0,
+          "p_confirm": 0.5202,
+          "p_confirm_uncensored": 0.9749,
+          "p_stop_before_confirm": 0.4743,
+          "p_session_close_unresolved": 0.0055,
+          "median_seconds_to_confirm": 115.5,
+          "median_return_at_confirm_atr": 0.8541,
+          "median_net_return_at_confirm_atr": 0.7941,
+          "median_mae_to_confirm_atr": 0.3302,
+          "median_mfe_to_confirm_atr": 1.0347,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top5",
+          "n": 5404,
+          "pct_of_armed": 60.38,
+          "p_confirm": 0.6188,
+          "p_confirm_uncensored": 0.9787,
+          "p_stop_before_confirm": 0.3756,
+          "p_session_close_unresolved": 0.0056,
+          "median_seconds_to_confirm": 130.0,
+          "median_return_at_confirm_atr": 0.827,
+          "median_net_return_at_confirm_atr": 0.7723,
+          "median_mae_to_confirm_atr": 0.3714,
+          "median_mfe_to_confirm_atr": 1.0123,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top2_5",
+          "n": 3290,
+          "pct_of_armed": 36.76,
+          "p_confirm": 0.7033,
+          "p_confirm_uncensored": 0.9836,
+          "p_stop_before_confirm": 0.2921,
+          "p_session_close_unresolved": 0.0046,
+          "median_seconds_to_confirm": 135.0,
+          "median_return_at_confirm_atr": 0.8412,
+          "median_net_return_at_confirm_atr": 0.7808,
+          "median_mae_to_confirm_atr": 0.3781,
+          "median_mfe_to_confirm_atr": 1.0254,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top1",
+          "n": 1482,
+          "pct_of_armed": 16.56,
+          "p_confirm": 0.8003,
+          "p_confirm_uncensored": 0.9879,
+          "p_stop_before_confirm": 0.1943,
+          "p_session_close_unresolved": 0.0054,
+          "median_seconds_to_confirm": 155.0,
+          "median_return_at_confirm_atr": 0.9162,
+          "median_net_return_at_confirm_atr": 0.8694,
+          "median_mae_to_confirm_atr": 0.3998,
+          "median_mfe_to_confirm_atr": 1.0983,
+          "ambiguous": 0
+        }
+      ],
+      "incremental_lift": {
+        "reached_top5_minus_armed_top10": 0.0986,
+        "reached_top2_5_minus_reached_top5": 0.0845,
+        "reached_top1_minus_reached_top2_5": 0.097
+      },
+      "terminal_labels": {
+        "CONFIRMED": 4656,
+        "STOPPED_BEFORE_CONFIRM": 4245,
+        "SESSION_CLOSE_UNRESOLVED": 49,
+        "CENSORED": 0
+      },
+      "terminal_labels_full": {
+        "STOPPED_BEFORE_CONFIRM": 4245,
+        "CONFIRMED_THEN_STOPPED": 822,
+        "FINAL_FLIP_EXIT_WINNER": 2350,
+        "FINAL_FLIP_EXIT_LOSER": 1359,
+        "SESSION_EXIT": 174,
+        "CENSORED": 0
+      }
+    },
+    "direction:SHORT": {
+      "armed_n": 4902,
+      "stages": [
+        {
+          "stage": "armed_top10",
+          "n": 4902,
+          "pct_of_armed": 100.0,
+          "p_confirm": 0.5243,
+          "p_confirm_uncensored": 0.9816,
+          "p_stop_before_confirm": 0.4727,
+          "p_session_close_unresolved": 0.0031,
+          "median_seconds_to_confirm": 120.0,
+          "median_return_at_confirm_atr": 0.8597,
+          "median_net_return_at_confirm_atr": 0.7972,
+          "median_mae_to_confirm_atr": 0.3345,
+          "median_mfe_to_confirm_atr": 1.0512,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top5",
+          "n": 3074,
+          "pct_of_armed": 62.71,
+          "p_confirm": 0.6275,
+          "p_confirm_uncensored": 0.9841,
+          "p_stop_before_confirm": 0.3692,
+          "p_session_close_unresolved": 0.0033,
+          "median_seconds_to_confirm": 135.0,
+          "median_return_at_confirm_atr": 0.8288,
+          "median_net_return_at_confirm_atr": 0.7723,
+          "median_mae_to_confirm_atr": 0.3662,
+          "median_mfe_to_confirm_atr": 1.0256,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top2_5",
+          "n": 1961,
+          "pct_of_armed": 40.0,
+          "p_confirm": 0.7114,
+          "p_confirm_uncensored": 0.9883,
+          "p_stop_before_confirm": 0.2856,
+          "p_session_close_unresolved": 0.0031,
+          "median_seconds_to_confirm": 135.0,
+          "median_return_at_confirm_atr": 0.8457,
+          "median_net_return_at_confirm_atr": 0.7808,
+          "median_mae_to_confirm_atr": 0.3642,
+          "median_mfe_to_confirm_atr": 1.0445,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top1",
+          "n": 857,
+          "pct_of_armed": 17.48,
+          "p_confirm": 0.8098,
+          "p_confirm_uncensored": 0.993,
+          "p_stop_before_confirm": 0.1879,
+          "p_session_close_unresolved": 0.0023,
+          "median_seconds_to_confirm": 150.0,
+          "median_return_at_confirm_atr": 0.9348,
+          "median_net_return_at_confirm_atr": 0.8825,
+          "median_mae_to_confirm_atr": 0.387,
+          "median_mfe_to_confirm_atr": 1.1365,
+          "ambiguous": 0
+        }
+      ],
+      "incremental_lift": {
+        "reached_top5_minus_armed_top10": 0.1032,
+        "reached_top2_5_minus_reached_top5": 0.0839,
+        "reached_top1_minus_reached_top2_5": 0.0984
+      },
+      "terminal_labels": {
+        "CONFIRMED": 2570,
+        "STOPPED_BEFORE_CONFIRM": 2317,
+        "SESSION_CLOSE_UNRESOLVED": 15,
+        "CENSORED": 0
+      },
+      "terminal_labels_full": {
+        "STOPPED_BEFORE_CONFIRM": 2317,
+        "CONFIRMED_THEN_STOPPED": 414,
+        "FINAL_FLIP_EXIT_WINNER": 1299,
+        "FINAL_FLIP_EXIT_LOSER": 801,
+        "SESSION_EXIT": 71,
+        "CENSORED": 0
+      }
+    },
+    "direction:LONG": {
+      "armed_n": 4048,
+      "stages": [
+        {
+          "stage": "armed_top10",
+          "n": 4048,
+          "pct_of_armed": 100.0,
+          "p_confirm": 0.5153,
+          "p_confirm_uncensored": 0.9667,
+          "p_stop_before_confirm": 0.4763,
+          "p_session_close_unresolved": 0.0084,
+          "median_seconds_to_confirm": 115.0,
+          "median_return_at_confirm_atr": 0.8472,
+          "median_net_return_at_confirm_atr": 0.7906,
+          "median_mae_to_confirm_atr": 0.3279,
+          "median_mfe_to_confirm_atr": 1.0148,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top5",
+          "n": 2330,
+          "pct_of_armed": 57.56,
+          "p_confirm": 0.6073,
+          "p_confirm_uncensored": 0.9717,
+          "p_stop_before_confirm": 0.3841,
+          "p_session_close_unresolved": 0.0086,
+          "median_seconds_to_confirm": 125.0,
+          "median_return_at_confirm_atr": 0.8193,
+          "median_net_return_at_confirm_atr": 0.7729,
+          "median_mae_to_confirm_atr": 0.3776,
+          "median_mfe_to_confirm_atr": 0.9968,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top2_5",
+          "n": 1329,
+          "pct_of_armed": 32.83,
+          "p_confirm": 0.6915,
+          "p_confirm_uncensored": 0.9767,
+          "p_stop_before_confirm": 0.3017,
+          "p_session_close_unresolved": 0.0068,
+          "median_seconds_to_confirm": 135.0,
+          "median_return_at_confirm_atr": 0.8285,
+          "median_net_return_at_confirm_atr": 0.7833,
+          "median_mae_to_confirm_atr": 0.4018,
+          "median_mfe_to_confirm_atr": 1.0032,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top1",
+          "n": 625,
+          "pct_of_armed": 15.44,
+          "p_confirm": 0.7872,
+          "p_confirm_uncensored": 0.9808,
+          "p_stop_before_confirm": 0.2032,
+          "p_session_close_unresolved": 0.0096,
+          "median_seconds_to_confirm": 160.0,
+          "median_return_at_confirm_atr": 0.8927,
+          "median_net_return_at_confirm_atr": 0.8374,
+          "median_mae_to_confirm_atr": 0.4204,
+          "median_mfe_to_confirm_atr": 1.0386,
+          "ambiguous": 0
+        }
+      ],
+      "incremental_lift": {
+        "reached_top5_minus_armed_top10": 0.092,
+        "reached_top2_5_minus_reached_top5": 0.0842,
+        "reached_top1_minus_reached_top2_5": 0.0957
+      },
+      "terminal_labels": {
+        "CONFIRMED": 2086,
+        "STOPPED_BEFORE_CONFIRM": 1928,
+        "SESSION_CLOSE_UNRESOLVED": 34,
+        "CENSORED": 0
+      },
+      "terminal_labels_full": {
+        "STOPPED_BEFORE_CONFIRM": 1928,
+        "CONFIRMED_THEN_STOPPED": 408,
+        "FINAL_FLIP_EXIT_WINNER": 1051,
+        "FINAL_FLIP_EXIT_LOSER": 558,
+        "SESSION_EXIT": 103,
+        "CENSORED": 0
+      }
+    },
+    "year:2021": {
+      "armed_n": 1828,
+      "stages": [
+        {
+          "stage": "armed_top10",
+          "n": 1828,
+          "pct_of_armed": 100.0,
+          "p_confirm": 0.5503,
+          "p_confirm_uncensored": 0.9759,
+          "p_stop_before_confirm": 0.4426,
+          "p_session_close_unresolved": 0.0071,
+          "median_seconds_to_confirm": 115.0,
+          "median_return_at_confirm_atr": 0.8028,
+          "median_net_return_at_confirm_atr": 0.7298,
+          "median_mae_to_confirm_atr": 0.3371,
+          "median_mfe_to_confirm_atr": 0.9838,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top5",
+          "n": 1115,
+          "pct_of_armed": 61.0,
+          "p_confirm": 0.6484,
+          "p_confirm_uncensored": 0.9785,
+          "p_stop_before_confirm": 0.3435,
+          "p_session_close_unresolved": 0.0081,
+          "median_seconds_to_confirm": 120.0,
+          "median_return_at_confirm_atr": 0.7861,
+          "median_net_return_at_confirm_atr": 0.7139,
+          "median_mae_to_confirm_atr": 0.3722,
+          "median_mfe_to_confirm_atr": 0.9638,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top2_5",
+          "n": 662,
+          "pct_of_armed": 36.21,
+          "p_confirm": 0.7387,
+          "p_confirm_uncensored": 0.9864,
+          "p_stop_before_confirm": 0.2553,
+          "p_session_close_unresolved": 0.006,
+          "median_seconds_to_confirm": 115.0,
+          "median_return_at_confirm_atr": 0.791,
+          "median_net_return_at_confirm_atr": 0.7228,
+          "median_mae_to_confirm_atr": 0.3576,
+          "median_mfe_to_confirm_atr": 0.9738,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top1",
+          "n": 304,
+          "pct_of_armed": 16.63,
+          "p_confirm": 0.8257,
+          "p_confirm_uncensored": 0.9836,
+          "p_stop_before_confirm": 0.1645,
+          "p_session_close_unresolved": 0.0099,
+          "median_seconds_to_confirm": 135.0,
+          "median_return_at_confirm_atr": 0.873,
+          "median_net_return_at_confirm_atr": 0.7958,
+          "median_mae_to_confirm_atr": 0.3683,
+          "median_mfe_to_confirm_atr": 1.0475,
+          "ambiguous": 0
+        }
+      ],
+      "incremental_lift": {
+        "reached_top5_minus_armed_top10": 0.0981,
+        "reached_top2_5_minus_reached_top5": 0.0903,
+        "reached_top1_minus_reached_top2_5": 0.087
+      },
+      "terminal_labels": {
+        "CONFIRMED": 1006,
+        "STOPPED_BEFORE_CONFIRM": 809,
+        "SESSION_CLOSE_UNRESOLVED": 13,
+        "CENSORED": 0
+      },
+      "terminal_labels_full": {
+        "STOPPED_BEFORE_CONFIRM": 809,
+        "CONFIRMED_THEN_STOPPED": 212,
+        "FINAL_FLIP_EXIT_WINNER": 455,
+        "FINAL_FLIP_EXIT_LOSER": 307,
+        "SESSION_EXIT": 45,
+        "CENSORED": 0
+      }
+    },
+    "year:2022": {
+      "armed_n": 1825,
+      "stages": [
+        {
+          "stage": "armed_top10",
+          "n": 1825,
+          "pct_of_armed": 100.0,
+          "p_confirm": 0.531,
+          "p_confirm_uncensored": 0.9764,
+          "p_stop_before_confirm": 0.4641,
+          "p_session_close_unresolved": 0.0049,
+          "median_seconds_to_confirm": 115.0,
+          "median_return_at_confirm_atr": 0.849,
+          "median_net_return_at_confirm_atr": 0.804,
+          "median_mae_to_confirm_atr": 0.3172,
+          "median_mfe_to_confirm_atr": 1.0235,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top5",
+          "n": 1133,
+          "pct_of_armed": 62.08,
+          "p_confirm": 0.6258,
+          "p_confirm_uncensored": 0.9762,
+          "p_stop_before_confirm": 0.368,
+          "p_session_close_unresolved": 0.0062,
+          "median_seconds_to_confirm": 125.0,
+          "median_return_at_confirm_atr": 0.7986,
+          "median_net_return_at_confirm_atr": 0.7563,
+          "median_mae_to_confirm_atr": 0.3534,
+          "median_mfe_to_confirm_atr": 0.9896,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top2_5",
+          "n": 707,
+          "pct_of_armed": 38.74,
+          "p_confirm": 0.7129,
+          "p_confirm_uncensored": 0.9859,
+          "p_stop_before_confirm": 0.2815,
+          "p_session_close_unresolved": 0.0057,
+          "median_seconds_to_confirm": 130.0,
+          "median_return_at_confirm_atr": 0.8027,
+          "median_net_return_at_confirm_atr": 0.7637,
+          "median_mae_to_confirm_atr": 0.36,
+          "median_mfe_to_confirm_atr": 0.9955,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top1",
+          "n": 329,
+          "pct_of_armed": 18.03,
+          "p_confirm": 0.8024,
+          "p_confirm_uncensored": 0.9848,
+          "p_stop_before_confirm": 0.1915,
+          "p_session_close_unresolved": 0.0061,
+          "median_seconds_to_confirm": 165.0,
+          "median_return_at_confirm_atr": 0.9057,
+          "median_net_return_at_confirm_atr": 0.8607,
+          "median_mae_to_confirm_atr": 0.365,
+          "median_mfe_to_confirm_atr": 1.0733,
+          "ambiguous": 0
+        }
+      ],
+      "incremental_lift": {
+        "reached_top5_minus_armed_top10": 0.0948,
+        "reached_top2_5_minus_reached_top5": 0.0871,
+        "reached_top1_minus_reached_top2_5": 0.0895
+      },
+      "terminal_labels": {
+        "CONFIRMED": 969,
+        "STOPPED_BEFORE_CONFIRM": 847,
+        "SESSION_CLOSE_UNRESOLVED": 9,
+        "CENSORED": 0
+      },
+      "terminal_labels_full": {
+        "STOPPED_BEFORE_CONFIRM": 847,
+        "CONFIRMED_THEN_STOPPED": 181,
+        "FINAL_FLIP_EXIT_WINNER": 481,
+        "FINAL_FLIP_EXIT_LOSER": 288,
+        "SESSION_EXIT": 28,
+        "CENSORED": 0
+      }
+    },
+    "year:2023": {
+      "armed_n": 1763,
+      "stages": [
+        {
+          "stage": "armed_top10",
+          "n": 1763,
+          "pct_of_armed": 100.0,
+          "p_confirm": 0.5264,
+          "p_confirm_uncensored": 0.9773,
+          "p_stop_before_confirm": 0.4657,
+          "p_session_close_unresolved": 0.0079,
+          "median_seconds_to_confirm": 115.0,
+          "median_return_at_confirm_atr": 0.8281,
+          "median_net_return_at_confirm_atr": 0.7616,
+          "median_mae_to_confirm_atr": 0.3282,
+          "median_mfe_to_confirm_atr": 1.0065,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top5",
+          "n": 1073,
+          "pct_of_armed": 60.86,
+          "p_confirm": 0.6384,
+          "p_confirm_uncensored": 0.9851,
+          "p_stop_before_confirm": 0.3541,
+          "p_session_close_unresolved": 0.0075,
+          "median_seconds_to_confirm": 125.0,
+          "median_return_at_confirm_atr": 0.8141,
+          "median_net_return_at_confirm_atr": 0.7513,
+          "median_mae_to_confirm_atr": 0.3714,
+          "median_mfe_to_confirm_atr": 0.9952,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top2_5",
+          "n": 672,
+          "pct_of_armed": 38.12,
+          "p_confirm": 0.7247,
+          "p_confirm_uncensored": 0.9881,
+          "p_stop_before_confirm": 0.2708,
+          "p_session_close_unresolved": 0.0045,
+          "median_seconds_to_confirm": 140.0,
+          "median_return_at_confirm_atr": 0.8419,
+          "median_net_return_at_confirm_atr": 0.7833,
+          "median_mae_to_confirm_atr": 0.3862,
+          "median_mfe_to_confirm_atr": 1.0231,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top1",
+          "n": 290,
+          "pct_of_armed": 16.45,
+          "p_confirm": 0.8034,
+          "p_confirm_uncensored": 0.9897,
+          "p_stop_before_confirm": 0.1897,
+          "p_session_close_unresolved": 0.0069,
+          "median_seconds_to_confirm": 150.0,
+          "median_return_at_confirm_atr": 0.8757,
+          "median_net_return_at_confirm_atr": 0.8205,
+          "median_mae_to_confirm_atr": 0.4086,
+          "median_mfe_to_confirm_atr": 1.0704,
+          "ambiguous": 0
+        }
+      ],
+      "incremental_lift": {
+        "reached_top5_minus_armed_top10": 0.112,
+        "reached_top2_5_minus_reached_top5": 0.0863,
+        "reached_top1_minus_reached_top2_5": 0.0787
+      },
+      "terminal_labels": {
+        "CONFIRMED": 928,
+        "STOPPED_BEFORE_CONFIRM": 821,
+        "SESSION_CLOSE_UNRESOLVED": 14,
+        "CENSORED": 0
+      },
+      "terminal_labels_full": {
+        "STOPPED_BEFORE_CONFIRM": 821,
+        "CONFIRMED_THEN_STOPPED": 157,
+        "FINAL_FLIP_EXIT_WINNER": 461,
+        "FINAL_FLIP_EXIT_LOSER": 283,
+        "SESSION_EXIT": 41,
+        "CENSORED": 0
+      }
+    },
+    "year:2024": {
+      "armed_n": 1771,
+      "stages": [
+        {
+          "stage": "armed_top10",
+          "n": 1771,
+          "pct_of_armed": 100.0,
+          "p_confirm": 0.4833,
+          "p_confirm_uncensored": 0.9684,
+          "p_stop_before_confirm": 0.511,
+          "p_session_close_unresolved": 0.0056,
+          "median_seconds_to_confirm": 140.0,
+          "median_return_at_confirm_atr": 0.908,
+          "median_net_return_at_confirm_atr": 0.8574,
+          "median_mae_to_confirm_atr": 0.349,
+          "median_mfe_to_confirm_atr": 1.092,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top5",
+          "n": 1024,
+          "pct_of_armed": 57.82,
+          "p_confirm": 0.5928,
+          "p_confirm_uncensored": 0.9814,
+          "p_stop_before_confirm": 0.4043,
+          "p_session_close_unresolved": 0.0029,
+          "median_seconds_to_confirm": 150.0,
+          "median_return_at_confirm_atr": 0.8947,
+          "median_net_return_at_confirm_atr": 0.8482,
+          "median_mae_to_confirm_atr": 0.3716,
+          "median_mfe_to_confirm_atr": 1.0854,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top2_5",
+          "n": 602,
+          "pct_of_armed": 33.99,
+          "p_confirm": 0.6761,
+          "p_confirm_uncensored": 0.9801,
+          "p_stop_before_confirm": 0.3206,
+          "p_session_close_unresolved": 0.0033,
+          "median_seconds_to_confirm": 155.0,
+          "median_return_at_confirm_atr": 0.8966,
+          "median_net_return_at_confirm_atr": 0.8467,
+          "median_mae_to_confirm_atr": 0.3908,
+          "median_mfe_to_confirm_atr": 1.0861,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top1",
+          "n": 268,
+          "pct_of_armed": 15.13,
+          "p_confirm": 0.7612,
+          "p_confirm_uncensored": 0.9925,
+          "p_stop_before_confirm": 0.2351,
+          "p_session_close_unresolved": 0.0037,
+          "median_seconds_to_confirm": 175.0,
+          "median_return_at_confirm_atr": 0.9158,
+          "median_net_return_at_confirm_atr": 0.8707,
+          "median_mae_to_confirm_atr": 0.452,
+          "median_mfe_to_confirm_atr": 1.1011,
+          "ambiguous": 0
+        }
+      ],
+      "incremental_lift": {
+        "reached_top5_minus_armed_top10": 0.1095,
+        "reached_top2_5_minus_reached_top5": 0.0833,
+        "reached_top1_minus_reached_top2_5": 0.0851
+      },
+      "terminal_labels": {
+        "CONFIRMED": 856,
+        "STOPPED_BEFORE_CONFIRM": 905,
+        "SESSION_CLOSE_UNRESOLVED": 10,
+        "CENSORED": 0
+      },
+      "terminal_labels_full": {
+        "STOPPED_BEFORE_CONFIRM": 905,
+        "CONFIRMED_THEN_STOPPED": 139,
+        "FINAL_FLIP_EXIT_WINNER": 460,
+        "FINAL_FLIP_EXIT_LOSER": 233,
+        "SESSION_EXIT": 34,
+        "CENSORED": 0
+      }
+    },
+    "year:2025": {
+      "armed_n": 1763,
+      "stages": [
+        {
+          "stage": "armed_top10",
+          "n": 1763,
+          "pct_of_armed": 100.0,
+          "p_confirm": 0.5088,
+          "p_confirm_uncensored": 0.9762,
+          "p_stop_before_confirm": 0.4895,
+          "p_session_close_unresolved": 0.0017,
+          "median_seconds_to_confirm": 115.0,
+          "median_return_at_confirm_atr": 0.8991,
+          "median_net_return_at_confirm_atr": 0.8527,
+          "median_mae_to_confirm_atr": 0.3418,
+          "median_mfe_to_confirm_atr": 1.0863,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top5",
+          "n": 1059,
+          "pct_of_armed": 60.07,
+          "p_confirm": 0.5855,
+          "p_confirm_uncensored": 0.9726,
+          "p_stop_before_confirm": 0.4117,
+          "p_session_close_unresolved": 0.0028,
+          "median_seconds_to_confirm": 135.0,
+          "median_return_at_confirm_atr": 0.8851,
+          "median_net_return_at_confirm_atr": 0.8374,
+          "median_mae_to_confirm_atr": 0.385,
+          "median_mfe_to_confirm_atr": 1.0798,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top2_5",
+          "n": 647,
+          "pct_of_armed": 36.7,
+          "p_confirm": 0.66,
+          "p_confirm_uncensored": 0.9768,
+          "p_stop_before_confirm": 0.3369,
+          "p_session_close_unresolved": 0.0031,
+          "median_seconds_to_confirm": 135.0,
+          "median_return_at_confirm_atr": 0.8941,
+          "median_net_return_at_confirm_atr": 0.8424,
+          "median_mae_to_confirm_atr": 0.4008,
+          "median_mfe_to_confirm_atr": 1.0863,
+          "ambiguous": 0
+        },
+        {
+          "stage": "reached_top1",
+          "n": 291,
+          "pct_of_armed": 16.51,
+          "p_confirm": 0.8041,
+          "p_confirm_uncensored": 0.9897,
+          "p_stop_before_confirm": 0.1959,
+          "p_session_close_unresolved": 0.0,
+          "median_seconds_to_confirm": 150.0,
+          "median_return_at_confirm_atr": 1.0206,
+          "median_net_return_at_confirm_atr": 0.993,
+          "median_mae_to_confirm_atr": 0.4113,
+          "median_mfe_to_confirm_atr": 1.2172,
+          "ambiguous": 0
+        }
+      ],
+      "incremental_lift": {
+        "reached_top5_minus_armed_top10": 0.0767,
+        "reached_top2_5_minus_reached_top5": 0.0745,
+        "reached_top1_minus_reached_top2_5": 0.1441
+      },
+      "terminal_labels": {
+        "CONFIRMED": 897,
+        "STOPPED_BEFORE_CONFIRM": 863,
+        "SESSION_CLOSE_UNRESOLVED": 3,
+        "CENSORED": 0
+      },
+      "terminal_labels_full": {
+        "STOPPED_BEFORE_CONFIRM": 863,
+        "CONFIRMED_THEN_STOPPED": 133,
+        "FINAL_FLIP_EXIT_WINNER": 493,
+        "FINAL_FLIP_EXIT_LOSER": 248,
+        "SESSION_EXIT": 26,
+        "CENSORED": 0
+      }
+    }
+  }
+}

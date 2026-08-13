@@ -1,0 +1,90 @@
+{
+  "study": "p90_5s_regime_impulse",
+  "date": "2026-08-12",
+  "critical": 0,
+  "warning": 0,
+  "verdict": "PASS",
+  "both_gates_run": true,
+  "note": "Roll-up. Gates read this file, never prose. `critical` and `warning` are the sums across both agents; either agent still BLOCKED means this roll-up is not PASS.",
+  "causal_lint": {
+    "tool": "scripts/causal_lint.py",
+    "files_scanned": 10,
+    "critical": 0,
+    "warning": 0,
+    "verdict": "PASS",
+    "report": "audit/lint.json"
+  },
+  "lookahead_auditor": {
+    "agent": "lookahead-auditor",
+    "scope": "causality only (A, B, C1-C3, F, G, H)",
+    "pass": 2,
+    "date": "2026-08-12",
+    "scope_hash": "c6faf020a87fcf7be32f262ac9baf03ad7c85f18fa6a7a032a9cee74c4a1e704",
+    "critical": 0,
+    "warning": 0,
+    "note": 0,
+    "verdict": "PASS",
+    "report": "audit/pass_02.md",
+    "prior_findings_adjudicated": true,
+    "referred_to_contract_checker": 0,
+    "passes": [
+      {
+        "pass": 1,
+        "critical": 0,
+        "warning": 0,
+        "note": 1,
+        "verdict": "PASS",
+        "report": "audit/pass_01.md",
+        "scope_hash": "df23824655645abe54fcbe21e70369a424c05906053b1b18e1596500de0a3bc4",
+        "disposition": "NOTE remediated: the 5s build now discards the final partial bucket and computes the flag rather than hardcoding it. Pass 2 re-run because the fix touched an audited file, invalidating the pass-1 scope hash."
+      },
+      {
+        "pass": 2,
+        "critical": 0,
+        "warning": 0,
+        "note": 0,
+        "verdict": "PASS",
+        "report": "audit/pass_02.md"
+      }
+    ]
+  },
+  "contract_checker": {
+    "agent": "contract-checker",
+    "scope": "deliverables, seals, terminal-label reachability, C4/D/E",
+    "pass": 2,
+    "date": "2026-08-12",
+    "critical": 0,
+    "warning": 0,
+    "verdict": "CLEAR",
+    "report": "audit/contract_pass_02.md",
+    "prior_findings_adjudicated": true,
+    "new_criticals_raised": 0,
+    "transcribed_by_main_session": true,
+    "transcription_note": "The contract-checker agent is read-only (Read/Grep/Glob) and cannot write files; its findings were transcribed verbatim in substance into audit/contract_pass_NN.md and this file by the main session.",
+    "passes": [
+      {
+        "pass": 1,
+        "critical": 2,
+        "warning": 3,
+        "verdict": "BLOCKED",
+        "report": "audit/contract_pass_01.md",
+        "disposition": "All 5 findings remediated and independently re-verified against the files in pass 2."
+      },
+      {
+        "pass": 2,
+        "critical": 0,
+        "warning": 0,
+        "verdict": "CLEAR",
+        "report": "audit/contract_pass_02.md"
+      }
+    ]
+  },
+  "validation_gates": {
+    "total": 26,
+    "passed": 26,
+    "failed": 0,
+    "report": "results/validation_report.json"
+  },
+  "study_verdict": "F4_NO_USEFUL_5S_EDGE",
+  "study_verdict_source": "computed by implementation/validate.py::determine_verdict from the gate table"
+}

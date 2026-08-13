@@ -1,0 +1,198 @@
+{
+  "all_passed": true,
+  "gates": {
+    "entry_population": {
+      "gate": "entry_population",
+      "passed": true,
+      "observed": 8950,
+      "accepted": 8950
+    },
+    "confirmed_population": {
+      "gate": "confirmed_population",
+      "passed": true,
+      "observed": 4705,
+      "accepted": 4705
+    },
+    "non_measurable_confirmed_reconciled": {
+      "gate": "non_measurable_confirmed_reconciled",
+      "passed": true,
+      "n": 49,
+      "accepted": 49,
+      "by_terminal_label": {
+        "SESSION_EXIT": 49
+      },
+      "cause": "no measurable post-entry window: the entry's own RTH session has no bar strictly after entry_ns, or the clamped window collapses to <=0 bars",
+      "note": "identical to the predecessor study's SESSION_CLOSE_UNRESOLVED set; panel height 4,656 matches exactly"
+    },
+    "baseline_and_pool_reconciliation": {
+      "gate": "baseline_and_pool_reconciliation",
+      "passed": true,
+      "giveback_pool_per_entry": 0.8980826455229006,
+      "baseline_net_per_entry": -0.07652964256329595,
+      "accepted_pool": 0.899,
+      "accepted_baseline": -0.0742
+    },
+    "fast_classification_exact_from_causal_timestamps": {
+      "gate": "fast_classification_exact_from_causal_timestamps",
+      "passed": true,
+      "method": "integer nanoseconds: confirm_ns - entry_ns <= 120 * NS",
+      "panel_fast_count": 2383,
+      "integer_ns_recount": 2383,
+      "n_exactly_on_120s_boundary_measurable": 52,
+      "n_exactly_on_120s_boundary_confirmed": 52,
+      "sensitivity_polars_float_seconds": 2340,
+      "sensitivity_stored_field": 2380,
+      "sensitivity_note": "over the 4,705 confirmed trades, polars Int64/1e9 classifies 2340 vs 2392 exact -- it renders a 120.000s gap as 120.00000000000001 and silently drops all 52 boundary trades. The stored walk_a_seconds_to_confirm field would classify 2380. Neither is used (SPEC D2)."
+    },
+    "confirm_precedes_stop": {
+      "gate": "confirm_precedes_stop",
+      "passed": true,
+      "violations": 0,
+      "note": "membership in CONFIRMED already requires it; verified independently against the walked bar indices"
+    },
+    "landmarks_after_confirmation": {
+      "gate": "landmarks_after_confirmation",
+      "passed": true,
+      "violations": 0,
+      "checked": 23830
+    },
+    "session_containment_no_overnight": {
+      "gate": "session_containment_no_overnight",
+      "passed": true,
+      "violations": 0,
+      "note": "windows are clamped to the entry's own session index range; only RTH bars are loaded"
+    },
+    "independent_replay_landmark_state": {
+      "gate": "independent_replay_landmark_state",
+      "passed": true,
+      "checked": 2400,
+      "fields_checked": [
+        "ret_from_entry",
+        "run_mfe_entry",
+        "dd_from_run_max",
+        "mfe_since_confirm",
+        "n_new_extremes",
+        "secs_since_last_extreme"
+      ],
+      "mismatches_by_field": {
+        "ret_from_entry": 0,
+        "run_mfe_entry": 0,
+        "dd_from_run_max": 0,
+        "mfe_since_confirm": 0,
+        "n_new_extremes": 0,
+        "secs_since_last_extreme": 0
+      },
+      "landmark_bar_after_target": 0,
+      "method": "six state variables recomputed from the raw 1s parquet on an array HARD-TRUNCATED at the landmark bar, independent of the engine's array construction"
+    },
+    "no_future_extreme_in_causal_state": {
+      "gate": "no_future_extreme_in_causal_state",
+      "passed": true,
+      "evidence": "derived from independent_replay_landmark_state: 2400 (trade, landmark) pairs recomputed on hard-truncated arrays with 0 mismatches across 6 variables including the cummax-derived run_mfe / new-extreme fields",
+      "note": "prog_* lookbacks are additionally bounded below by j_W and null when the lookback would predate confirmation"
+    },
+    "future_maxmfe_label_only": {
+      "gate": "future_maxmfe_label_only",
+      "passed": true,
+      "labels": [
+        "eventual_max_mfe_atr",
+        "runner_bucket",
+        "reached_2_0",
+        "reached_2_5",
+        "reached_3_0",
+        "reached_4_0"
+      ],
+      "note": "these appear only as outcome labels in Phases 4/6/7/8/11 and never as an input to a state variable or a trigger"
+    },
+    "same_bar_ambiguity_flagged": {
+      "gate": "same_bar_ambiguity_flagged",
+      "passed": true,
+      "ambiguous_stop_confirm": 0,
+      "resolution": "adverse; a stop coincident with the confirming flip counts as unconfirmed and is excluded upstream"
+    },
+    "trigger_events_non_degenerate": {
+      "gate": "trigger_events_non_degenerate",
+      "passed": true,
+      "raw_giveback_pct_reaching": [
+        100.0,
+        100.0,
+        99.95803608896348,
+        99.91607217792698
+      ],
+      "armed_giveback_pct_reaching": [
+        99.45446915652539,
+        97.524129248846,
+        93.32773814519513,
+        86.15190935795216
+      ],
+      "raw_stall_pct_reaching": [
+        100.0,
+        100.0,
+        100.0,
+        99.16072177926982,
+        97.14645404951742,
+        92.82417121275704
+      ],
+      "armed_stall_pct_reaching": [
+        90.13848090642048,
+        90.13848090642048,
+        90.09651699538396,
+        89.2992026856903,
+        87.99832144355854,
+        83.4242551405791
+      ],
+      "note": "RAW definitions fire on ~100% of trades and are reported only to document the degeneracy; ARMED definitions are primary and are the ones used in Phase 12"
+    },
+    "mechanical_containment_controlled": {
+      "gate": "mechanical_containment_controlled",
+      "passed": true,
+      "n_gate_open_constant": 27,
+      "n_gate_open_undetermined": 25,
+      "note": "eventual MaxMFE >= run_mfe by construction, so trades with run_mfe >= 2.0 at the landmark are guaranteed positives; the gate is judged on the undetermined population only"
+    },
+    "audit_gates": {
+      "gate": "audit_gates",
+      "causal_lint": {
+        "tool": "causal_lint",
+        "version": 1,
+        "roots": [
+          "studies\\top10_fast_confirm_runner_path"
+        ],
+        "files_scanned": 11,
+        "critical": 0,
+        "warning": 0,
+        "clean": true,
+        "findings": []
+      },
+      "lookahead_auditor": {
+        "agent": "lookahead-auditor",
+        "pass": 1,
+        "date": "2026-08-10",
+        "scope_hash": "e451d8f3bd5bf04c0ab8d165de5b2ac2b1b2208deb5986d50244145d6770ec0",
+        "critical": 0,
+        "warning": 0,
+        "note": 3,
+        "verdict": "PASS",
+        "report": "audit/pass_01.md",
+        "prior_findings_adjudicated": null,
+        "referred_to_contract_checker": 2
+      },
+      "contract_checker": {
+        "agent": "contract-checker",
+        "pass": 2,
+        "date": "2026-08-10",
+        "blocking": 0,
+        "critical": 0,
+        "warning": 1,
+        "not_verified": 0,
+        "note": "Pass-1 blocking finding (stale results/summary.json, Manifest #13) verified FIXED: phases.py now preserves phase12/report_answers/final_classification from prior summary.json instead of clobbering; close_out.py populates the 14-answer block and final_classification by reading back from parquet artifacts and executes (not asserts) the SPEC section 6 decision table, correctly returning C. One new non-blocking WARNING: classify() has no explicit branch for label E, verified not to affect current routing. Only remaining step: overwrite this file into the study and re-run validate.py to close gate 15/all_passed.",
+        "verdict": "CLEAR",
+        "deliverables_manifest_present": true,
+        "prior_findings_adjudicated": true,
+        "report": "audit/contract_pass_02.md",
+        "warning_remediated_after_pass": "label E branch added to close_out.py::classify() via score_only_separation(); precondition evaluates false in this run (25 price variables clear the gate) so the routing to C is unchanged"
+      },
+      "passed": true
+    }
+  }
+}

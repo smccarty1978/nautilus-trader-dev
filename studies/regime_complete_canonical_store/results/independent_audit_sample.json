@@ -1,0 +1,70 @@
+{
+  "seed": 20260727,
+  "regimes_per_year": 25,
+  "regimes_sampled": 125,
+  "independent_flips_derived": 172942,
+  "store_regimes": 137673,
+  "unexplained_mismatches": 0,
+  "mismatches": [],
+  "coverage": {
+    "by_direction": [
+      {
+        "regime_direction": -1,
+        "len": 65
+      },
+      {
+        "regime_direction": 1,
+        "len": 60
+      }
+    ],
+    "by_session": [
+      {
+        "session_at_start": "RTH",
+        "len": 65
+      },
+      {
+        "session_at_start": "ETH",
+        "len": 60
+      }
+    ],
+    "by_established": [
+      {
+        "established_reached": false,
+        "len": 60
+      },
+      {
+        "established_reached": true,
+        "len": 65
+      }
+    ],
+    "by_complete": [
+      {
+        "path_is_complete": true,
+        "len": 125
+      }
+    ],
+    "by_year": [
+      {
+        "entry_year": 2021,
+        "len": 25
+      },
+      {
+        "entry_year": 2022,
+        "len": 25
+      },
+      {
+        "entry_year": 2023,
+        "len": 25
+      },
+      {
+        "entry_year": 2024,
+        "len": 25
+      },
+      {
+        "entry_year": 2025,
+        "len": 25
+      }
+    ]
+  },
+  "verdict": "PASS"
+}

@@ -1,0 +1,248 @@
+{
+  "STATUS": "EXPLORATORY OUT-OF-DOMAIN \u2014 NOT DEPLOYABLE",
+  "provenance": "Raw domain-model score, read ungated. Causally available and a true dispatch (reconciliation verdict B), but contract-valid in-domain share is 0.0%/0.0%/1.6%/16.4% at 60/120/180/300s post-confirmation. Frozen percentile thresholds do not transfer, so all splits here are distribution-free medians of the alive cross-section.",
+  "populations": {
+    "top_2_5": {
+      "confirmed": 3774,
+      "states": {
+        "B_p0_25": {
+          "price_state": "method B, deterioration >= 0.25 ATR",
+          "n_price_only": 1020,
+          "score_median_split": 0.2945,
+          "in_domain_share_at_event": 0.0,
+          "PRICE_ONLY": {
+            "n": 1020,
+            "p_failure": 0.5863,
+            "p_flip_winner": 0.3931,
+            "p_runner_ge_2_5atr": 0.3657,
+            "median_eventual_mfe_atr": 1.8465
+          },
+          "PRICE_PLUS_HIGH_MODEL_DANGER": {
+            "n": 510,
+            "p_failure": 0.6392,
+            "p_flip_winner": 0.3431,
+            "p_runner_ge_2_5atr": 0.3235,
+            "median_eventual_mfe_atr": 1.6381
+          },
+          "PRICE_PLUS_LOW_MODEL_DANGER": {
+            "n": 510,
+            "p_failure": 0.5333,
+            "p_flip_winner": 0.4431,
+            "p_runner_ge_2_5atr": 0.4078,
+            "median_eventual_mfe_atr": 2.0599
+          },
+          "failure_precision_lift_vs_price_only": 0.0529,
+          "runner_protection_cost": -0.0422
+        },
+        "B_p0_50": {
+          "price_state": "method B, deterioration >= 0.5 ATR",
+          "n_price_only": 2952,
+          "score_median_split": 0.314,
+          "in_domain_share_at_event": 0.0003,
+          "PRICE_ONLY": {
+            "n": 2952,
+            "p_failure": 0.5935,
+            "p_flip_winner": 0.3828,
+            "p_runner_ge_2_5atr": 0.3736,
+            "median_eventual_mfe_atr": 1.8778
+          },
+          "PRICE_PLUS_HIGH_MODEL_DANGER": {
+            "n": 1476,
+            "p_failure": 0.6816,
+            "p_flip_winner": 0.2988,
+            "p_runner_ge_2_5atr": 0.2886,
+            "median_eventual_mfe_atr": 1.4306
+          },
+          "PRICE_PLUS_LOW_MODEL_DANGER": {
+            "n": 1476,
+            "p_failure": 0.5054,
+            "p_flip_winner": 0.4668,
+            "p_runner_ge_2_5atr": 0.4587,
+            "median_eventual_mfe_atr": 2.2641
+          },
+          "failure_precision_lift_vs_price_only": 0.0881,
+          "runner_protection_cost": -0.085
+        },
+        "B_p0_75": {
+          "price_state": "method B, deterioration >= 0.75 ATR",
+          "n_price_only": 3567,
+          "score_median_split": 0.3464,
+          "in_domain_share_at_event": 0.005,
+          "PRICE_ONLY": {
+            "n": 3567,
+            "p_failure": 0.5935,
+            "p_flip_winner": 0.383,
+            "p_runner_ge_2_5atr": 0.3748,
+            "median_eventual_mfe_atr": 1.8836
+          },
+          "PRICE_PLUS_HIGH_MODEL_DANGER": {
+            "n": 1784,
+            "p_failure": 0.7035,
+            "p_flip_winner": 0.2803,
+            "p_runner_ge_2_5atr": 0.2691,
+            "median_eventual_mfe_atr": 1.3394
+          },
+          "PRICE_PLUS_LOW_MODEL_DANGER": {
+            "n": 1783,
+            "p_failure": 0.4835,
+            "p_flip_winner": 0.4857,
+            "p_runner_ge_2_5atr": 0.4807,
+            "median_eventual_mfe_atr": 2.3936
+          },
+          "failure_precision_lift_vs_price_only": 0.11,
+          "runner_protection_cost": -0.1057
+        },
+        "A_p0_50": {
+          "price_state": "method A, deterioration >= 0.5 ATR",
+          "n_price_only": 2995,
+          "score_median_split": 0.4441,
+          "in_domain_share_at_event": 0.001,
+          "PRICE_ONLY": {
+            "n": 2995,
+            "p_failure": 0.7129,
+            "p_flip_winner": 0.2705,
+            "p_runner_ge_2_5atr": 0.2721,
+            "median_eventual_mfe_atr": 1.561
+          },
+          "PRICE_PLUS_HIGH_MODEL_DANGER": {
+            "n": 1498,
+            "p_failure": 0.7483,
+            "p_flip_winner": 0.239,
+            "p_runner_ge_2_5atr": 0.2397,
+            "median_eventual_mfe_atr": 1.5521
+          },
+          "PRICE_PLUS_LOW_MODEL_DANGER": {
+            "n": 1497,
+            "p_failure": 0.6774,
+            "p_flip_winner": 0.3019,
+            "p_runner_ge_2_5atr": 0.3046,
+            "median_eventual_mfe_atr": 1.5701
+          },
+          "failure_precision_lift_vs_price_only": 0.0354,
+          "runner_protection_cost": -0.0324
+        }
+      }
+    },
+    "armed": {
+      "confirmed": 4656,
+      "states": {
+        "B_p0_25": {
+          "price_state": "method B, deterioration >= 0.25 ATR",
+          "n_price_only": 1311,
+          "score_median_split": 0.2897,
+          "in_domain_share_at_event": 0.0,
+          "PRICE_ONLY": {
+            "n": 1311,
+            "p_failure": 0.4485,
+            "p_flip_winner": 0.5301,
+            "p_runner_ge_2_5atr": 0.4432,
+            "median_eventual_mfe_atr": 2.313
+          },
+          "PRICE_PLUS_HIGH_MODEL_DANGER": {
+            "n": 656,
+            "p_failure": 0.5198,
+            "p_flip_winner": 0.4573,
+            "p_runner_ge_2_5atr": 0.3796,
+            "median_eventual_mfe_atr": 2.0292
+          },
+          "PRICE_PLUS_LOW_MODEL_DANGER": {
+            "n": 655,
+            "p_failure": 0.3771,
+            "p_flip_winner": 0.6031,
+            "p_runner_ge_2_5atr": 0.5069,
+            "median_eventual_mfe_atr": 2.5634
+          },
+          "failure_precision_lift_vs_price_only": 0.0713,
+          "runner_protection_cost": -0.0636
+        },
+        "B_p0_50": {
+          "price_state": "method B, deterioration >= 0.5 ATR",
+          "n_price_only": 3679,
+          "score_median_split": 0.312,
+          "in_domain_share_at_event": 0.0,
+          "PRICE_ONLY": {
+            "n": 3679,
+            "p_failure": 0.4607,
+            "p_flip_winner": 0.5162,
+            "p_runner_ge_2_5atr": 0.4569,
+            "median_eventual_mfe_atr": 2.3254
+          },
+          "PRICE_PLUS_HIGH_MODEL_DANGER": {
+            "n": 1840,
+            "p_failure": 0.5636,
+            "p_flip_winner": 0.4147,
+            "p_runner_ge_2_5atr": 0.3592,
+            "median_eventual_mfe_atr": 1.8272
+          },
+          "PRICE_PLUS_LOW_MODEL_DANGER": {
+            "n": 1839,
+            "p_failure": 0.3578,
+            "p_flip_winner": 0.6177,
+            "p_runner_ge_2_5atr": 0.5546,
+            "median_eventual_mfe_atr": 2.7291
+          },
+          "failure_precision_lift_vs_price_only": 0.1029,
+          "runner_protection_cost": -0.0977
+        },
+        "B_p0_75": {
+          "price_state": "method B, deterioration >= 0.75 ATR",
+          "n_price_only": 4418,
+          "score_median_split": 0.3433,
+          "in_domain_share_at_event": 0.0061,
+          "PRICE_ONLY": {
+            "n": 4418,
+            "p_failure": 0.4672,
+            "p_flip_winner": 0.5091,
+            "p_runner_ge_2_5atr": 0.4556,
+            "median_eventual_mfe_atr": 2.3173
+          },
+          "PRICE_PLUS_HIGH_MODEL_DANGER": {
+            "n": 2209,
+            "p_failure": 0.5962,
+            "p_flip_winner": 0.3857,
+            "p_runner_ge_2_5atr": 0.325,
+            "median_eventual_mfe_atr": 1.7137
+          },
+          "PRICE_PLUS_LOW_MODEL_DANGER": {
+            "n": 2209,
+            "p_failure": 0.3382,
+            "p_flip_winner": 0.6324,
+            "p_runner_ge_2_5atr": 0.5862,
+            "median_eventual_mfe_atr": 2.8824
+          },
+          "failure_precision_lift_vs_price_only": 0.129,
+          "runner_protection_cost": -0.1306
+        },
+        "A_p0_50": {
+          "price_state": "method A, deterioration >= 0.5 ATR",
+          "n_price_only": 3616,
+          "score_median_split": 0.4431,
+          "in_domain_share_at_event": 0.0006,
+          "PRICE_ONLY": {
+            "n": 3616,
+            "p_failure": 0.5766,
+            "p_flip_winner": 0.4043,
+            "p_runner_ge_2_5atr": 0.3496,
+            "median_eventual_mfe_atr": 1.9446
+          },
+          "PRICE_PLUS_HIGH_MODEL_DANGER": {
+            "n": 1808,
+            "p_failure": 0.5846,
+            "p_flip_winner": 0.4015,
+            "p_runner_ge_2_5atr": 0.3368,
+            "median_eventual_mfe_atr": 1.9346
+          },
+          "PRICE_PLUS_LOW_MODEL_DANGER": {
+            "n": 1808,
+            "p_failure": 0.5686,
+            "p_flip_winner": 0.4071,
+            "p_runner_ge_2_5atr": 0.3623,
+            "median_eventual_mfe_atr": 1.9671
+          },
+          "failure_precision_lift_vs_price_only": 0.008,
+          "runner_protection_cost": -0.0128
+        }
+      }
+    }
+  }
+}

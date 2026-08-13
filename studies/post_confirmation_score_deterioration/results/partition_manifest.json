@@ -1,0 +1,35 @@
+{
+  "study": "post_confirmation_score_deterioration",
+  "substrate": "data/canonical/regime_complete_v1",
+  "predecessor": "studies/armed_fade_score_path_progression",
+  "confirmed_trades": 4705,
+  "population_reconciliation": {
+    "SESSION_EXIT": 174,
+    "FINAL_FLIP_EXIT_WINNER": 2350,
+    "FINAL_FLIP_EXIT_LOSER": 1359,
+    "CONFIRMED_THEN_STOPPED": 822
+  },
+  "panel_rows": 658331,
+  "panel_trades": 4656,
+  "obs_per_trade_by_label": {
+    "FINAL_FLIP_EXIT_LOSER": 59.0,
+    "FINAL_FLIP_EXIT_WINNER": 179.0,
+    "CONFIRMED_THEN_STOPPED": 41.0,
+    "SESSION_EXIT": 119.0
+  },
+  "primary_stream": "B (domain-model raw, ungated) -- rising = danger",
+  "secondary_stream": "C (other model, exploratory)",
+  "excluded_stream": "A (in-domain-flagged) -- availability determined by outcome",
+  "polarity_warning": "The domain model predicts the NEW regime's own flip. Deterioration for our aligned position is the score RISING, not falling. Every brief event phrased as a retreat is sign-flipped on stream B.",
+  "excursion_anchor": "confirmation price; ATR at confirmation (arm-anchored emitted alongside)",
+  "cost_points_round_turn": 0.5,
+  "no_synthesized_observations": true,
+  "threshold_overlap_disclosure": "Both calibration populations are calendar-2025 and overlap the evaluation window; 2025 is not threshold-OOS. Canonical waiver: studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json",
+  "code_hashes": {
+    "__init__.py": "e3b0c44298fc1c14",
+    "build_panel.py": "d02d61032283c7a7",
+    "phase0_gate1.py": "04fe041aa0e4636d",
+    "phase0_probe.py": "ffc002037617292d",
+    "phase0_probe2.py": "669e6eda6924b307"
+  }
+}

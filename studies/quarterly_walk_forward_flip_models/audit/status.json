@@ -1,0 +1,26 @@
+{
+  "auditor": "lookahead-auditor v1",
+  "audit_type": "pre_execution_causal",
+  "pass": 3,
+  "timestamp": "2026-08-10T12:40:00-05:00",
+  "scope_hash": "bc2ccec1217a5d454e500b5bb733f3ba12c9881cd2d77a43013e623da7507fa8",
+  "scope": [
+    "studies/quarterly_walk_forward_flip_models/SPEC.md",
+    "studies/quarterly_walk_forward_flip_models/config/study.yaml",
+    "studies/quarterly_walk_forward_flip_models/implementation/contracts.py",
+    "studies/quarterly_walk_forward_flip_models/implementation/train_pre_2026.py",
+    "studies/quarterly_walk_forward_flip_models/tests/test_contracts.py"
+  ],
+  "critical": 0,
+  "warning": 0,
+  "note": 0,
+  "blockers": 0,
+  "verdict": "PASS",
+  "pre_2026_training_may_proceed": true,
+  "prior_findings": [
+    {"id": "C1", "summary": "unsealed regime scan", "status": "FIXED"},
+    {"id": "C2", "summary": "unsorted searchsorted target", "status": "FIXED"},
+    {"id": "C1/C2", "summary": "confirmed-flip semantic proof", "status": "FIXED"},
+    {"id": "C2", "summary": "confirmed-regime sequence continuity", "status": "FIXED"}
+  ]
+}

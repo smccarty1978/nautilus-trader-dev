@@ -1,0 +1,141 @@
+{
+  "V1_2024_seal": {
+    "passed": true,
+    "note": "all loaders filter entry_year==2024 at scan; every produced frame re-asserted on America/Chicago year"
+  },
+  "V2_p90_reproduces_accepted_arm_population": {
+    "accepted_n": 1771,
+    "reproduced_n": 1771,
+    "exact_matches": 1771,
+    "missing": 0,
+    "extra": 0,
+    "accepted_by_side": {
+      "LONG": 796,
+      "SHORT": 975
+    },
+    "reproduced_by_side": {
+      "SHORT": 975,
+      "LONG": 796
+    },
+    "passed": true
+  },
+  "V3_model_b_reproduces_accepted_rung_population": {
+    "observations": 2991,
+    "accepted": 2991,
+    "trades": 781,
+    "accepted_trades": 781,
+    "passed": true
+  },
+  "V4_no_label_in_features": {
+    "model_a_intersection": [],
+    "model_b_intersection": [],
+    "excluded_as_decision_time_identity": {
+      "model_b": [
+        "entry_atr"
+      ]
+    },
+    "entry_atr_identical_in_both_frames": true,
+    "passed": true
+  },
+  "V5_fold_causality": {
+    "checks": [
+      {
+        "model": "A",
+        "fold": "FOLD_1",
+        "max_train_ns": 1719602140000000000,
+        "min_eval_ns": 1719842945000000000,
+        "causal": true
+      },
+      {
+        "model": "B",
+        "fold": "FOLD_1",
+        "max_train_ns": 1719593285000000000,
+        "min_eval_ns": 1719843015000000000,
+        "causal": true
+      },
+      {
+        "model": "A",
+        "fold": "FOLD_2",
+        "max_train_ns": 1727725400000000000,
+        "min_eval_ns": 1727792480000000000,
+        "causal": true
+      },
+      {
+        "model": "B",
+        "fold": "FOLD_2",
+        "max_train_ns": 1727719495000000000,
+        "min_eval_ns": 1727792495000000000,
+        "causal": true
+      }
+    ],
+    "passed": true
+  },
+  "V6_trade_containment": {
+    "checks": [
+      {
+        "fold": "FOLD_1",
+        "trades_on_both_sides": 0
+      },
+      {
+        "fold": "FOLD_2",
+        "trades_on_both_sides": 0
+      }
+    ],
+    "passed": true
+  },
+  "V7_feature_availability_truncated_replay": {
+    "observations_checked": 300,
+    "quantities_checked": 13800,
+    "mismatches": 0,
+    "examples": [],
+    "passed": true
+  },
+  "V8_forward_labels_strictly_after_truncated_replay": {
+    "observations_checked": 300,
+    "quantities_checked": 3300,
+    "mismatches": 0,
+    "examples": [],
+    "passed": true
+  },
+  "V9_session_containment": {
+    "windows_checked": 3834,
+    "windows_leaving_session": 0,
+    "passed": true
+  },
+  "V10_same_bar_collisions": {
+    "ambiguous_180": 0,
+    "ambiguous_240": 0,
+    "ambiguous_300": 0,
+    "optimistic_bound_reported": true
+  },
+  "V11_dependence": {
+    "n_unique_trades_on_every_pooled_model_b_table": true,
+    "bootstrap_is_trade_clustered": true,
+    "passed": true
+  },
+  "V12_provenance": {
+    "thresholds_byte_match_frozen_contract": true,
+    "train_year_contamination_recorded": true,
+    "passed": true
+  },
+  "V14_cross_prime_causality": {
+    "passed": true,
+    "note": "p80_to_p90_seconds is exposed only when BOTH crossings precede the decision second. A first implementation exposed it at P80 candidates, where it is the time until a FUTURE P90 crossing; it carried +0.267 permutation AUC and was the entire apparent P80 signal. Found by the P80/P90 asymmetry, fixed at the source, and all Model-A results were recomputed."
+  },
+  "all_passed": true,
+  "per_gate": {
+    "V2": true,
+    "V3": true,
+    "V4": true,
+    "V5": true,
+    "V6": true,
+    "V7": true,
+    "V8": true,
+    "V9": true,
+    "V1": true,
+    "V10": true,
+    "V11": true,
+    "V12": true,
+    "V14": true
+  }
+}

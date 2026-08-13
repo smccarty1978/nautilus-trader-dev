@@ -1,0 +1,143 @@
+{
+  "model_a_p90_vs_accepted_arm_table": {
+    "accepted_n": 1771,
+    "reproduced_n": 1771,
+    "exact_matches": 1771,
+    "missing": 0,
+    "extra": 0,
+    "accepted_by_side": {
+      "LONG": 796,
+      "SHORT": 975
+    },
+    "reproduced_by_side": {
+      "LONG": 796,
+      "SHORT": 975
+    },
+    "passed": true
+  },
+  "model_a_cross_prime_causality_check": {
+    "checked": 3834,
+    "non_null_cross_prime": 1906,
+    "future_references": 0
+  },
+  "model_a_label_completeness": {
+    "n_candidates": 3834,
+    "n_label_rows": 3834,
+    "n_label_cells": 23004,
+    "expected_cells": 23004,
+    "invalid_or_null": 0,
+    "passed": true
+  },
+  "partition_completeness": {
+    "n_enumerated": 64,
+    "n_empty_retained_with_flag": 0,
+    "model_a_expected": 16,
+    "model_b_expected": 48,
+    "passed": true
+  },
+  "model_a_population": {
+    "P80": {
+      "n": 2063,
+      "n_regimes": 2063,
+      "by_side": {
+        "SHORT": 1110,
+        "LONG": 953
+      },
+      "by_quarter": {
+        "1": 534,
+        "2": 511,
+        "3": 514,
+        "4": 504
+      },
+      "by_month": {
+        "1": 181,
+        "2": 178,
+        "3": 175,
+        "4": 171,
+        "5": 187,
+        "6": 153,
+        "7": 189,
+        "8": 174,
+        "9": 151,
+        "10": 176,
+        "11": 166,
+        "12": 162
+      },
+      "by_overlap_class": {
+        "P80_ONLY": 299,
+        "P80_THEN_P90": 1764
+      }
+    },
+    "P90": {
+      "n": 1771,
+      "n_regimes": 1771,
+      "by_side": {
+        "SHORT": 975,
+        "LONG": 796
+      },
+      "by_quarter": {
+        "1": 453,
+        "2": 436,
+        "3": 449,
+        "4": 433
+      },
+      "by_month": {
+        "1": 156,
+        "2": 150,
+        "3": 147,
+        "4": 148,
+        "5": 160,
+        "6": 128,
+        "7": 163,
+        "8": 151,
+        "9": 135,
+        "10": 151,
+        "11": 138,
+        "12": 144
+      },
+      "by_overlap_class": {
+        "P80_THEN_P90": 1764,
+        "P90_ONLY": 7
+      }
+    },
+    "overlap": {
+      "regimes_with_both": 1764,
+      "p80_only": 299,
+      "p90_without_measurable_p80": 7,
+      "p80_to_p90_seconds_median": 60.00000000000001,
+      "p80_to_p90_seconds_p25": 10.0,
+      "p80_to_p90_seconds_p75": 220.0,
+      "n_p90_before_p80": 33
+    }
+  },
+  "model_a_candidates_dropped_no_window": 0,
+  "model_b": {
+    "accepted_observations": 2991,
+    "loaded_observations": 2991,
+    "built_observations": 2991,
+    "accepted_trades": 781,
+    "loaded_trades": 781,
+    "per_rung_accepted": {
+      "1.0": 781,
+      "1.5": 658,
+      "2.0": 522,
+      "2.5": 426,
+      "3.0": 356,
+      "4.0": 248
+    },
+    "per_rung_loaded": {
+      "1.0": 781,
+      "1.5": 658,
+      "2.0": 522,
+      "2.5": 426,
+      "3.0": 356,
+      "4.0": 248
+    },
+    "dropped": {
+      "no_window": 0,
+      "rung_not_found": 0,
+      "hwm_mismatch": 0
+    },
+    "passed": true
+  }
+}

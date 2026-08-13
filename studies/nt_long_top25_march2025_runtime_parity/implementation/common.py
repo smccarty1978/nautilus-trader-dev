@@ -117,4 +117,57 @@ def verify_frozen_model_inputs() -> dict:
 
 
 def is_rth_minute_of_day(minute_of_day: int) -> bool:
+    """DECISION/FILL session rule (08:30-15:15). Governs the candidate
+    population only -- NOT the feature path (see `is_rth_feature_minute`)."""
     return RTH_START_MIN <= minute_of_day < RTH_END_MIN
+
+
+# ---------------------------------------------------------------------------
+# OFFLINE FEATURE-ATTACH CONVENTIONS -- reproduced verbatim, deliberately.
+#
+# The frozen model was TRAINED on features produced by
+# `long_rth_mirrored_surface_top100_training/implementation/attach_features_long.py`.
+# That replay carries two conventions that differ from the obvious live reading
+# of the data. A live engine that "does the sensible thing" instead does NOT
+# reproduce the model's inputs. Both are measured, not assumed -- see SPEC.md.
+# ---------------------------------------------------------------------------
+
+NS = 1_000_000_000
+
+
+def minute_bucket_key(bar_ts_ns: int) -> int:
+    """The offline minute bucket: `(ts - 1) // 60s`.
+
+    `attach_features.minute_bucket_key` was written for CLOSE-labelled bars
+    (`ts` covers `(ts-1s, ts]`) and is imported verbatim by the long attach --
+    but the raw 1s bars it replays are OPEN-labelled (`ts` covers
+    `[ts, ts+1s)`). The synthesized "minute closing at m" therefore holds the
+    1s bars with `ts in (m-60s, m]`, i.e. it is shifted **+1 second** from the
+    true minute `[m-60s, m)`, and its rollover fires at the bar `ts == m+1s`,
+    not `ts == m`.
+
+    This is NOT a look-ahead: the newest bar it folds in (`ts == m`) covers
+    `[m, m+1s)` and the snapshot that can see it is taken at a snap bar
+    `S >= m`, for an observation `O > S >= m`, so `m + 1s <= O`. It is a
+    labelling quirk that the live engine must mirror to reproduce the frozen
+    features. Measured proof: it reproduces the offline reference's
+    `rth_vol_cum` exactly (1180 at 08:30:05 and 5253 at 08:31:05 on
+    2025-03-03), where the true-minute reading gives 706 / 5226.
+
+    Consequence: the live 1m bar stream must NOT drive the price/RTH trackers.
+    Minute bars are re-aggregated from the 1s stream under this rule.
+    """
+    return (bar_ts_ns - 1) // (60 * NS)
+
+
+# The offline attach imports `is_rth` from
+# `CODEX_5_X_weakness_atlas_repair/CODEX_5_X_run_established_fade.py:146`,
+# which ends RTH at 15:00 -- NOT the 15:15 used for decisions/fills above.
+# The feature path must use 15:00 or `rth_vol_cum`/`rth_elapsed_seconds` stay
+# live-populated for 15 minutes after the offline reference has gone null.
+RTH_FEATURE_END_MIN = 15 * 60
+
+
+def is_rth_feature_minute(minute_of_day: int) -> bool:
+    """FEATURE-PATH session rule (08:30-15:00). See `RTH_FEATURE_END_MIN`."""
+    return RTH_START_MIN <= minute_of_day < RTH_FEATURE_END_MIN

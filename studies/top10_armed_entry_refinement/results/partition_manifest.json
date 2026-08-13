@@ -1,0 +1,57 @@
+{
+  "study": "top10_armed_entry_refinement",
+  "armed_regimes": 8950,
+  "armed_required": 8950,
+  "post_arm_dispatches": 839973,
+  "levels": {
+    "top_10": [
+      0.43167249785595935,
+      0.44559149246408103
+    ],
+    "INTERP_L1": [
+      0.4566843794915389,
+      0.4665483026603865
+    ],
+    "INTERP_L2": [
+      0.4691903203093286,
+      0.4770267077585392
+    ],
+    "top_5": [
+      0.5067081427626979,
+      0.5084619230529974
+    ],
+    "top_2_5": [
+      0.5697449423968936,
+      0.5641320087327389
+    ],
+    "top_1": [
+      0.6412279079940403,
+      0.6306416772425602
+    ]
+  },
+  "interpolated_levels": [
+    "INTERP_L1",
+    "INTERP_L2"
+  ],
+  "interpolated_disclaimer": "INTERPOLATED RESEARCH LEVEL -- NOT A PERCENTILE. Arithmetic between two frozen contract values (1/3 and 1/2 of the way from Top-10 to Top-5 in probability space). The frozen calibration distribution is not recoverable, so a true Top-7.5 percentile cannot be derived; deriving one from the evaluation population is forbidden.",
+  "stop_atr": 1.0,
+  "min_regime_age_s": 600.0,
+  "arm_level": "top_10",
+  "slope_windows_s": [
+    10,
+    20,
+    30,
+    60
+  ],
+  "landmark_times_s": [
+    5,
+    10,
+    15,
+    20,
+    30,
+    45,
+    60
+  ],
+  "arm_expiry": "no adverse invalidation; structurally bounded by the armed regime's end (post-arm rows carry the old regime_id)",
+  "threshold_overlap_disclosure": "2025 is NOT threshold-OOS; waiver studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json"
+}

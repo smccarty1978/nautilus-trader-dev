@@ -1,0 +1,17 @@
+evaluation_year: 2025
+calibration_bins: 10
+lift_percentiles: [1.0, 2.5, 5.0, 10.0]
+manual_trace_per_class: 50
+shap_sample_rows: 5000
+random_seed: 42
+sealed_year: 2026
+classification:
+  published_bullish_auc: 0.67099
+  reproduction_auc_tolerance: 0.00001
+  minimum_event_disagreement: 0.05
+  maximum_legacy_recall_of_training_positives: 0.50
+  minimum_original_top_2_5pct_positive_rate: 0.40
+  maximum_legacy_top_2_5pct_positive_rate: 0.15
+  minimum_original_target_predictive_auc: 0.60
+  economically_weak_median_exit_pnl_atr: 0.0
+  market_asymmetry_minimum_auc_gap: 0.05

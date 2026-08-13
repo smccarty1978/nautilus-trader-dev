@@ -1,0 +1,36 @@
+{
+  "agent": "contract-checker",
+  "pass": 2,
+  "date": "2026-07-27",
+  "verdict": "CLEAR",
+  "critical": 0,
+  "new_findings": 0,
+  "prior_findings_adjudicated": true,
+  "prior_findings": {
+    "source_file_id_missing_from_regimes": "RESOLVED",
+    "undocumented_extra_columns_in_paths": "RESOLVED",
+    "negative_test_exit_cannot_terminate_path": "RESOLVED",
+    "negative_test_future_bar_cannot_alter_prior_score": "RESOLVED",
+    "negative_test_threshold_cannot_remove_low_score_regimes": "RESOLVED",
+    "named_deliverables_absent": "RESOLVED"
+  },
+  "vacuous_pass_assessment": {
+    "question": "would each new negative test genuinely fail if its property were violated",
+    "result": "no vacuous-pass defect found; each verified against the real code path",
+    "residual_note": "not blocking; the guard comment in feed_priced_seconds documents why toy prices were dangerous, reducing but not eliminating the risk of reintroduction in a sibling test"
+  },
+  "pass_1_verdict": "BLOCKED",
+  "pass_1_findings": 6,
+  "transcription_note": "contract-checker is read-only and cannot write files; this status is transcribed by the implementer from the agent's returned pass-2 report. The agent's own prose verdict is the authority.",
+  "spec_12_non_goals": {
+    "status": "VERIFIED_BY_IMPLEMENTER",
+    "reason": "agent marked NOT VERIFIED this pass; checked directly instead of relying on pass 1",
+    "max_regime_start_utc": "2025-12-30T23:52:00+00:00",
+    "max_score_decision_utc": "2025-12-30T23:59:35+00:00",
+    "max_path_init_utc": "2025-12-30T23:59:53+00:00",
+    "sealed_boundary_utc": "2026-01-01T00:00:00+00:00",
+    "all_below_sealed_boundary": true,
+    "threshold_calibration_end_exclusive": "2026-01-01",
+    "accepted_artifacts_modified": 0
+  }
+}

@@ -1,0 +1,265 @@
+{
+  "all_passed": true,
+  "n_gates": 15,
+  "gates": {
+    "population_reproduced_exactly": {
+      "gate": "population_reproduced_exactly",
+      "passed": true,
+      "entries": 8950,
+      "confirmed": 4705,
+      "measurable": 4656,
+      "non_measurable": 49,
+      "stopped_before_confirm": 4245
+    },
+    "pool_and_baseline_reconciled": {
+      "gate": "pool_and_baseline_reconciled",
+      "passed": true,
+      "giveback_pool_per_entry": 0.8980826455229006,
+      "baseline_net_per_entry": -0.07652964256329595,
+      "accepted": [
+        0.898,
+        -0.0765
+      ],
+      "tolerance": 0.005
+    },
+    "no_2026_access": {
+      "gate": "no_2026_access",
+      "passed": true,
+      "years_present": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "note": "the arm table is filtered upstream; 2026 is never loaded"
+    },
+    "session_containment_no_overnight": {
+      "gate": "session_containment_no_overnight",
+      "passed": true,
+      "trade_violations": 0,
+      "observation_violations": 0
+    },
+    "observations_strictly_after_confirmation": {
+      "gate": "observations_strictly_after_confirmation",
+      "passed": true,
+      "violations": 0,
+      "checked": 140929
+    },
+    "observations_at_or_before_unconstrained_terminal": {
+      "gate": "observations_at_or_before_unconstrained_terminal",
+      "passed": true,
+      "violations": 0
+    },
+    "domain_completeness_partitions_and_offsets": {
+      "gate": "domain_completeness_partitions_and_offsets",
+      "passed": true,
+      "expected_partitions": 10,
+      "present_partitions": 10,
+      "missing_partitions": [],
+      "min_partition_rows": 376,
+      "dense_offsets_expected": 40,
+      "dense_offsets_present": 40,
+      "missing_offsets": [],
+      "min_alive_at_any_offset": 2300
+    },
+    "independent_replay_state_and_labels": {
+      "gate": "independent_replay_state_and_labels",
+      "passed": true,
+      "checked": 8671,
+      "n_trades_sampled": 300,
+      "mismatches_by_field": {
+        "return_from_entry_atr": 0,
+        "running_mfe_from_entry_atr": 0,
+        "running_mae_from_entry_atr": 0,
+        "drawdown_from_running_max_atr": 0,
+        "running_mfe_since_confirm_atr": 0,
+        "n_new_favorable_extremes_since_confirm": 0,
+        "seconds_since_last_favorable_extreme": 0,
+        "forward_mfe_atr": 0,
+        "forward_mae_atr": 0,
+        "another_favorable_extreme": 0,
+        "race_0_5_before_0_5": 0
+      },
+      "total_mismatches": 0,
+      "boundary_violations": 0,
+      "state_fields": [
+        "return_from_entry_atr",
+        "running_mfe_from_entry_atr",
+        "running_mae_from_entry_atr",
+        "drawdown_from_running_max_atr",
+        "running_mfe_since_confirm_atr",
+        "n_new_favorable_extremes_since_confirm",
+        "seconds_since_last_favorable_extreme"
+      ],
+      "label_fields": [
+        "forward_mfe_atr",
+        "forward_mae_atr",
+        "another_favorable_extreme",
+        "race_0_5_before_0_5"
+      ],
+      "method": "state recomputed on an array HARD-TRUNCATED at the observation bar; labels recomputed on an array that BEGINS at observation bar + 1; entry price recovered from the accepted population, not from the panel"
+    },
+    "forward_labels_strictly_after_observation": {
+      "gate": "forward_labels_strictly_after_observation",
+      "passed": true,
+      "evidence": "derived from the replay: 8,671 observation states matched a recomputation whose label slice starts at j+1, so no forward label can contain the observation bar or anything before it",
+      "structural": "suffix arrays in engine.forward_at are sliced [j+1 : unc_i+1]; there is no array spanning j"
+    },
+    "natural_exit_reconciles_from_every_observation": {
+      "gate": "natural_exit_reconciles_from_every_observation",
+      "passed": true,
+      "violations": 0,
+      "checked": 140929,
+      "note": "exit_now + continuation == natural return, on the mark basis and both fill bases"
+    },
+    "barrier_collisions_adverse_with_optimistic_bound": {
+      "gate": "barrier_collisions_adverse_with_optimistic_bound",
+      "passed": true,
+      "ambiguous_by_pair": {
+        "+0.25/-0.25": 96,
+        "+0.50/-0.25": 62,
+        "+0.50/-0.50": 51,
+        "+0.75/-0.25": 46,
+        "+0.75/-0.50": 37,
+        "+1.00/-0.50": 33,
+        "+1.00/-0.75": 32,
+        "+1.50/-0.50": 20,
+        "+1.50/-0.75": 14,
+        "+1.50/-1.00": 9
+      },
+      "total_ambiguous": 400,
+      "resolution": "same-bar collisions resolved ADVERSE for economic reporting; every race table carries the optimistic bound as *_optimistic and the unresolved share"
+    },
+    "placebo_cannot_choose_exit_with_future_information": {
+      "gate": "placebo_cannot_choose_exit_with_future_information",
+      "passed": true,
+      "lifetime_uniform": "index-uniform over [confirm, stop-live terminal); outcome-blind, but its SUPPORT depends on the realised lifetime -- a benchmark, never a rule",
+      "length_blind": "offset drawn from the frozen dense grid; support does not depend on the realised lifetime, so it is causally implementable",
+      "mean_d_random_minus_flip": 0.6181014136092563,
+      "mean_d_blind_minus_flip": 0.011249649778811125,
+      "finding": "the gap between the two IS the measure of how much of a random exit's apparent edge is knowledge of the trade's length"
+    },
+    "repeated_observations_not_treated_as_independent": {
+      "gate": "repeated_observations_not_treated_as_independent",
+      "passed": true,
+      "tables_missing_unique_trade_counts": [],
+      "n_observations": 140929,
+      "n_unique_trades": 4656,
+      "stability_unit": "TRADE_FIRST -- one observation per trade per bucket (SPEC D8); the decision gate's year and direction conditions read only that unit",
+      "no_pooled_p_values": true,
+      "gate_regions_evaluated": 220
+    },
+    "causal_lint_clean": {
+      "gate": "causal_lint_clean",
+      "passed": true,
+      "critical": 0,
+      "warning": 0,
+      "files_scanned": 14
+    },
+    "auditors_clean": {
+      "gate": "auditors_clean",
+      "lookahead_auditor": {
+        "agent": "lookahead-auditor",
+        "pass": 1,
+        "date": "2026-08-11",
+        "scope_hash": "0c88030ec8edec43000024fbb1a1b7c92c29d785d294401ffab45c482ee78fb1",
+        "critical": 0,
+        "warning": 0,
+        "note": 2,
+        "verdict": "PASS",
+        "report": "audit/pass_01.md",
+        "prior_findings_adjudicated": true,
+        "referred_to_contract_checker": 1
+      },
+      "contract_checker": {
+        "study": "post_confirm_forward_opportunity",
+        "auditor": "contract-checker",
+        "pass": 1,
+        "date": "2026-08-11",
+        "scope": "deliverables, seals, terminal-label reachability, C4/D/E",
+        "verdict": "PASS",
+        "critical": 0,
+        "warning": 0,
+        "note": 1,
+        "note_on_authorship": "contract-checker is read-only (Read/Grep/Glob) and cannot write this file; the audit was performed by the agent and the record transcribed verbatim by the main session, with the REMEDIATED blocks added after the fixes were applied and the pipeline re-run.",
+        "findings": [
+          {
+            "id": "W1",
+            "severity": "WARNING",
+            "status": "REMEDIATED",
+            "category": "deliverables_manifest_item13",
+            "summary": "extended_horizon.parquet (#13) had no CSV mirror; the manifest requires CSV mirrors for #1, #3-#13, #15. Only extended_horizon_summary.csv existed.",
+            "location": "analysis/phases.py",
+            "remediation": "analysis/phases.py now writes results/extended_horizon.csv alongside the parquet; the mirror is produced by the pipeline, not by hand."
+          },
+          {
+            "id": "W2",
+            "severity": "WARNING",
+            "status": "REMEDIATED",
+            "category": "deliverables_manifest_item15",
+            "summary": "decision_gate.parquet was wide (one row per region, c1_*..c8_* columns) rather than the manifest's literal long form 'condition, value, threshold, passed'. Substance (8 conditions x 220 regions) was present; shape differed.",
+            "location": "analysis/gate.py",
+            "remediation": "analysis/gate.py additionally emits results/decision_gate_conditions.parquet/.csv in the exact long form (region, axis, n_obs, n_unique_trades, condition, metric, value, threshold, operator, passed). The wide table is retained because the REPORT cites per-region context that the long form drops."
+          },
+          {
+            "id": "N1",
+            "severity": "NOTE",
+            "status": "REMEDIATED",
+            "category": "domain_completeness_sec7",
+            "summary": "buckets.py::slices() skips a zero-row YEAR/SIDE slice, so an empty partition would have been dropped silently rather than surfaced. Moot in this run (all 10 partitions non-empty) but not structurally enforced.",
+            "location": "analysis/buckets.py",
+            "remediation": "validate.py gains gate 'domain_completeness_partitions_and_offsets', which asserts the 10-cell year x side grid against an explicit expected set and asserts all 40 dense offsets are present with alive > 0. Completeness is now asserted, not inferred."
+          },
+          {
+            "id": "N2",
+            "severity": "NOTE",
+            "status": "EXPECTED_SEQUENCING",
+            "category": "gate_14_stale",
+            "summary": "validation_report.json gate 'auditors_clean' read present:false for both auditors because it was written before the audits ran.",
+            "location": "results/validation_report.json",
+            "remediation": "validate.py re-run after both audit status files landed; the gate is now satisfied from the real files."
+          }
+        ],
+        "deliverables_checked": 21,
+        "deliverables_missing": [],
+        "csv_mirrors_missing": [],
+        "conditional_deliverable_21": {
+          "gate_open": false,
+          "architecture_results_present": false,
+          "runner_destruction_present": false,
+          "summary_records_architectures_ran_false": true,
+          "verdict": "correctly absent"
+        },
+        "labels_reachable": {
+          "A": true,
+          "B": true,
+          "C": "DISCLOSED DEFECT \u00e2\u20ac\u201d unreachable when the SPEC 8 gate closes, because 6 routes a closed gate only to D/E/F/G. Self-reported in REPORT.md section 11 item 4 and adjudicated with a placebo CONTROL rather than by amending the frozen SPEC after seeing results.",
+          "D": "reachable; its frozen condition was literally satisfied but was NOT routed to, because Phase 11 shows the quantity it rests on is non-causal. Reasoning stated in REPORT.md section 13.",
+          "E": true,
+          "F": true,
+          "G": true,
+          "H": true,
+          "emitted_this_run": "E"
+        },
+        "seals_intact": true,
+        "seal_evidence": [
+          "implementation/build.py asserts 2026 not in the population's years before any walk",
+          "validate.py gate no_2026_access confirms over both the trade panel and the observation panel",
+          "2025-not-threshold-OOS waiver disclosed in partition_manifest.json and REPORT.md section 14"
+        ],
+        "c4_d_e": {
+          "C4_selection_seal": "PASS \u00e2\u20ac\u201d no threshold search or grid; the 8 gate thresholds were frozen in SPEC 8 before the tables were read, and gate.py scores 220 fixed regions against them",
+          "D_train_serve_determinism": "PASS \u00e2\u20ac\u201d single deterministic pipeline, seeded placebos (20260811), inherited engine reused unchanged; replay gate 0 mismatches over 8,671 observation states",
+          "E_backtest_config_fill_warmup": "PASS \u00e2\u20ac\u201d next-bar-open fill convention inherited and verified at every call site by lookahead-auditor pass 1"
+        },
+        "report_completeness": {
+          "questions_answered": 16,
+          "single_terminal_label": true,
+          "label": "E"
+        }
+      },
+      "passed": true
+    }
+  }
+}

@@ -1,0 +1,3 @@
+# Training Target Contract
+
+Bullish candidates are established bullish (`+1`) RTH regimes sampled every five seconds. The observation timestamp is `observation_time`; the event timestamp is the already-confirmed next opposing regime transition `confirm_flip_ns`. A positive is exactly `0 < confirm_flip_ns-observation_time <= 300s`; a negative is a later confirmed flip. Confirmation comes from the upstream regime tracker, not a trade exit. All 100 deterministic manual traces pass; see `results/manual_target_trace_100.csv`. The frozen lineage carries a separate disclosed one-second feature look-ahead from open-labelled OHLCV attachment.
