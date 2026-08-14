@@ -1,0 +1,28 @@
+study_id: Codex_clean_maturity_flip_rolling_5m_productivity
+instrument_id: NQ.XCME
+session: RTH
+train_years: [2021, 2022, 2023]
+oos_year: 2024
+unused_years: [2025]
+sealed_years: [2026]
+candidate_universe:
+  source: features.registry.FEATURE_REGISTRY
+  allowed_status: verified
+  selection_years: [2021, 2022, 2023]
+  feature_count: 25
+  selection_method: frozen_train_only_temporal_rank
+eligibility:
+  regime_age_seconds_gt: 120
+  running_mfe_atr_gte: 1.0
+  new_progress_windows_gte: 2
+  retained_mfe_ratio_gte: 0.5
+  cadence_seconds: 5
+rolling_productivity:
+  window_seconds: 300
+  source_timeframe: 1s_completed
+  atr_normalizer: current_1m_regime_start
+models: [BASELINE, BASELINE_PLUS_STRUCTURAL, BASELINE_PLUS_STRUCTURAL_PLUS_ROLLING_5M]
+model_class: HistGradientBoostingClassifier
+model_params: {max_depth: 3, learning_rate: 0.05, max_iter: 200, random_state: 42}
+primary_maturity_buckets: [300-600s, 600-900s, 900-1800s]
+extrapolation_bucket: ">=1800s"
