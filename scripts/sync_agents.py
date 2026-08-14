@@ -44,14 +44,16 @@ BANNER = (
 CODEX_META: dict[str, dict[str, str]] = {
     "lookahead-auditor": {
         "name": "lookahead_auditor",
-        "model": "gemini-3.5-pro",
+        # GPT-5.6 Sol is Codex's frontier model for complex professional work;
+        # it replaces the unavailable Gemini 3.5 Pro target for causal audits.
+        "model": "gpt-5.6-sol",
         "model_reasoning_effort": "high",
         "sandbox_mode": "read-only",
         "approval_policy": "never",
     },
     "contract-checker": {
         "name": "contract_checker",
-        "model": "gemini-3.5-pro",
+        "model": "gpt-5.6-sol",
         "model_reasoning_effort": "medium",
         "sandbox_mode": "read-only",
         "approval_policy": "never",

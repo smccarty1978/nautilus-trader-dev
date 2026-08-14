@@ -4,7 +4,7 @@
 
 name = "contract_checker"
 description = "Read-only compliance reviewer. Owns deliverable completeness, seal integrity, terminal-label reachability, and train/serve contract compliance against an explicit frozen SPEC."
-model = "gemini-3.5-pro"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 approval_policy = "never"
