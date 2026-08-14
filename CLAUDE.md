@@ -5,7 +5,7 @@
 2. **No Look-Ahead Bias.** Indicators compute on COMPLETED bars only.
 3. **Timestamp Convention.** Databento timestamps at OPEN. You MUST apply `ts_init_delta` when wrangling (e.g., `60_000_000_000` for 1m bars). 1s bars need no adjustment.
 4. **MFE/MAE Blind Spot.** 1s bars process before their parent 1m bar in NT. To avoid missing the first minute of price action, you MUST buffer recent 1s bars and replay them retroactively from fill time when a signal triggers.
-5. **Mandatory Audit Gate.** Run `scripts/causal_lint.py` FIRST (free, deterministic), then invoke `lookahead-auditor` (causality) and `contract-checker` (deliverables) and clear all CRITICAL findings before finalizing any strategy, feature engineering, or causal matching logic. Gates read `audit/status.json`, never prose.
+5. **Mandatory Pre-Execution Audit Gate.** After a study/model pipeline is implemented and unit-tested, but before its first collection, label-build, training, backtest, or staged-runner execution, run `scripts/causal_lint.py`, then invoke `lookahead-auditor` (causality) and `contract-checker` (deliverables). Clear all CRITICAL findings before execution. Before acceptance, re-run `contract-checker` on materialized outputs and re-run causality only when the audited surface changes; gates read `audit/status.json`, never prose.
 
 ## LEAN WORKFLOW (token discipline)
 - **Cheapest thing first.** `python scripts/causal_lint.py --study studies/<name>` before any agent turn. It catches the repeat offenders (H4 trigger-price fills, `ts_event` session gates, `center=True`, `.shift(-N)`, `bfill`, bare `merge_asof`, non-`*.v.0` symbols) for zero tokens.
@@ -14,7 +14,7 @@
 - **Freeze deliverables up front.** Every study SPEC needs the Deliverables Manifest and Domain/Completeness sections from `docs/TEMPLATES.md`. An auditor cannot verify a deliverable set that was never written down — it invents one finding at a time instead.
 - **Agent defs are generated.** Edit `.claude/agents/*.md` only; run `python scripts/sync_agents.py` to propagate to Codex and Antigravity.
 - **Commit at every phase gate.** Branch (`study/<name>` or `chore/<topic>`) — never commit on `main`. Commit code together with the `audit/pass_NN.md` + `status.json` that audited it, so the scope hash matches the tree. Never commit generated data (`canonical_*/`, `_work/`, `*.parquet`, `model.joblib`) — commit the manifests instead. Full protocol: `AGENTS.md` § Commit protocol.
-- **Risk tiers.** Tier 1 (small fix / diagnostic): main session + deterministic tests, no agents. Tier 2 (research study): plan → implement → staged runner → completion audit. Tier 3 (model freeze / deploy): add `repo-scout` then `contract-checker` before implementing.
+- **Risk tiers.** Tier 1 (small fix / diagnostic): main session + deterministic tests, no agents. Tier 2 (research study): plan → implement/tests → split pre-execution audit → staged runner. Tier 3 (model freeze / deploy): add `repo-scout`, then implement/tests → split pre-execution audit → staged runner.
 - **Diff-first.** Review `git diff -U20` as the primary surface. Open full files only to resolve causality, state flow, base classes, or imports — never to repeat discovery already done.
 - **No agents for process monitoring.** Use `scripts/run_bounded_study.py` and read its JSON status card, not raw logs.
 - **Subagent output caps.** `repo-scout` 700w (paths/symbols only) · `contract-checker` 1,000w (compliance table) · `results-triager` 500w (failures + root cause) · `lookahead-auditor` 1,500w (findings by severity).

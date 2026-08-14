@@ -15,7 +15,7 @@ These agents share access to the project filesystem, but each subagent begins wi
 | `repo-scout` | `claude-haiku-4-5` | Read, Grep, Glob | Max 700 words | Locate code and trace execution paths |
 | `contract-checker` | `claude-sonnet-5` | Read, Grep, Glob | Max 1,000 words | Check explicit contracts and invariants |
 | `results-triager` | `claude-haiku-4-5` | Read, Grep, Glob, Bash | Max 500 words | Run bounded pytest commands and summarize failures |
-| `lookahead-auditor` | `claude-sonnet-5` | Read, Grep, Glob, Bash, Write | Max 1,500 words | Independent final causal audit |
+| `lookahead-auditor` | `claude-sonnet-5` | Read, Grep, Glob, Bash, Write | Max 1,500 words | Independent pre-execution causal audit |
 
 > **Note on Model Configuration:**
 > Do NOT set `CLAUDE_CODE_SUBAGENT_MODEL` to a fixed model in your environment (leave it unset or set to `inherit`). This allows each agent file's frontmatter `model:` field to control the exact routing (`claude-haiku-4-5` or `claude-sonnet-5`).
@@ -35,7 +35,7 @@ Not every task requires the full agent ceremony. Launch sessions according to ri
   ```
 
 ### Tier 2: Normal Research Study
-* **Workflow**: Planning (`repo-scout` only when needed) $\rightarrow$ Main implementation $\rightarrow$ Staged runner (`scripts/run_bounded_study.py`) $\rightarrow$ Independent auditor (`lookahead-auditor`).
+* **Workflow**: Planning (`repo-scout` only when needed) $\rightarrow$ Main implementation + tests $\rightarrow$ split pre-execution audit $\rightarrow$ Staged runner (`scripts/run_bounded_study.py`) $\rightarrow$ completion contract check. Re-audit causality only after an audited-surface change.
 * **Contract Checker**: Optional; invoke only when causal contracts or timeframe rules changed.
 * **Launch Command**:
   ```bash
@@ -43,7 +43,7 @@ Not every task requires the full agent ceremony. Launch sessions according to ri
   ```
 
 ### Tier 3: Model Freeze / Population Parity / Live Feature Implementation
-* **Workflow**: Planning (`repo-scout` + `contract-checker`) $\rightarrow$ Freeze SPEC/Task Packet $\rightarrow$ Implementation $\rightarrow$ Staged runner $\rightarrow$ Independent auditor (`lookahead-auditor`).
+* **Workflow**: Planning (`repo-scout`) $\rightarrow$ Freeze SPEC/Task Packet $\rightarrow$ Implementation + tests $\rightarrow$ split pre-execution audit $\rightarrow$ Staged runner $\rightarrow$ completion contract check. Re-audit causality only after an audited-surface change.
 * **Planning Launch**:
   ```bash
   claude --model opusplan --permission-mode plan --allow-dangerously-skip-permissions

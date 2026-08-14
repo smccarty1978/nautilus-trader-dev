@@ -56,9 +56,15 @@ not restate them.
 
 ## AGENT GOVERNANCE
 
-### Audit gate (mandatory)
+### Audit gates (mandatory: pre-execution and completion)
 
-Before declaring any of the following "done", invoke the causal audit subagent (`lookahead-auditor` in Claude; `lookahead_auditor` in Codex):
+For any of the following, the split audit is required **before the first study
+collector, label builder, model-training script, backtest, or staged runner is
+executed**. Unit tests and deterministic lint may run first so the audit has a
+testable code surface. After execution, `contract-checker` verifies the
+materialized deliverables; a completion causal re-audit is required only if the
+audited code/configuration surface changed.
+
 - A new strategy file or material edit to an existing one
 - A new study/research script that produces results you'll act on
 - Any change to data loading, feature engineering, or label construction
@@ -77,29 +83,36 @@ natural stopping point for them —
 `studies/codex_5.6_short_rth_enriched_volume_level_retrain/` ran **18 passes**
 and produced a 1,240-line append-only `audit.md`.
 
-Workflow:
+Pre-execution workflow:
 
-1. **Run the free lint first.** `python scripts/causal_lint.py --study studies/<name> --json studies/<name>/audit/lint.json`.
+1. Freeze the SPEC/config and implement the smallest testable code surface. Do
+   not run collection, label construction, model fitting, backtesting, or a
+   staged runner yet.
+2. **Run the free lint first.** `python scripts/causal_lint.py --study studies/<name> --json studies/<name>/audit/lint.json`.
    It catches the known-recurring defect classes (H4 trigger-price fills, session
    gates on `ts_event`, `center=True`, `.shift(-N)`, `bfill`, `merge_asof`
    without `direction=`, non-`*.v.0` symbols) deterministically and for free.
    Fix everything it reports before spending an agent turn.
-2. Invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
+3. Invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
    on the Deliverables Manifest. They are independent and may run in parallel.
-3. Each writes a **new** `audit/pass_<NN>.md` plus a machine-readable
+4. Each writes a **new** `audit/pass_<NN>.md` plus a machine-readable
    `audit/status.json` (`contract_status.json` for the contract-checker).
    **Never append to a previous pass's report** — append-only files make the
    verdict unparseable, and a gate that greps for "critical" and "0" will pass
    on a failing report that merely contains an earlier clean summary.
-4. Address every CRITICAL finding by editing the code (do not dismiss without
+5. Address every CRITICAL finding by editing the code (do not dismiss without
    explicit user approval). Address WARNINGs unless out of scope or waived.
-5. Re-invoke on the same scope, **passing the previous pass's findings**. The
+6. Re-invoke on the same scope, **passing the previous pass's findings**. The
    auditor must adjudicate every prior finding (`FIXED` / `NOT FIXED` /
    `WITHDRAWN`) *before* raising anything new, and may raise **at most 3 new
    CRITICAL findings per pass.**
-6. Repeat 4–5 until `status.json` shows `critical: 0` and either zero WARNING or
+7. Repeat 5–6 until `status.json` shows `critical: 0` and either zero WARNING or
    user-acknowledged WARNING.
-7. Only then report back to the user.
+8. Only after both statuses are clean may the study/model execution begin. If
+   code or configuration changes afterward, re-run lint and the affected audit
+   before executing the changed pipeline. Before acceptance, run
+   `contract-checker` against the materialized deliverables and re-run the causal
+   audit if the audited code/configuration surface changed.
 
 Gates read `audit/status.json`. Do not parse prose for a verdict.
 
@@ -186,7 +199,11 @@ If a mandatory gate and a session-level restriction appear to conflict, the orch
 
 Passing criteria remain governed by the applicable frozen contract or SPEC. Standing authorization to invoke an auditor does not relax the audit acceptance standard. Do not mark the work finalized unless the audit satisfies the acceptance gate defined by the applicable frozen SPEC. At minimum, any CRITICAL finding blocks finalization. Any WARNING must either be remediated or explicitly adjudicated according to the SPEC; do not silently treat an unresolved WARNING as cleared.
 
-**Pre-execution trigger for complex causal/matching logic.** The completion gate above catches bugs only after the full pipeline has already run once — expensive when a multi-phase study (smoothing, matched-donor placebos, permutation/shuffle controls, stop-timing mechanics) has to be entirely rerun after the fact. For any of the following, invoke the harness-specific lookahead auditor (`lookahead_auditor` in Codex) on that component's code BEFORE its first execution, not only before declaring the study done:
+**Immediate component audit for high-risk logic.** The universal pre-execution
+gate above applies to every study and model-training pipeline. For the following
+components, invoke the harness-specific lookahead auditor immediately after that
+component is implemented, before any dependent code is added or any execution
+occurs:
 - state-smoothing / hysteresis state machines
 - matched-donor or nearest-neighbor selection logic (placebos, controls)
 - any shuffle/permutation/circular-shift control
@@ -335,8 +352,8 @@ Keep architecture, causal interpretation, integration, and final approval in the
 Not every task needs the full ceremony.
 
 * **Tier 1 — small diagnostic / local fix:** main session → deterministic tests → local smoke. No planning agent or auditor unless the change touches core causal or timing logic.
-* **Tier 2 — normal research study:** planning → main-session implementation → staged runner → independent completion audit.
-* **Tier 3 — model freeze / deployment:** `repo-scout` → `contract-checker` → main-session implementation → staged runner → independent completion audit.
+* **Tier 2 — normal research study:** planning → freeze SPEC → main-session implementation + tests → split pre-execution audit → staged runner → completion contract check; causal re-audit only if the audited surface changes.
+* **Tier 3 — model freeze / deployment:** `repo-scout` → freeze SPEC → main-session implementation + tests → split pre-execution audit → staged runner → completion contract check; causal re-audit only if the audited surface changes.
 
 ### Coordination rules
 
