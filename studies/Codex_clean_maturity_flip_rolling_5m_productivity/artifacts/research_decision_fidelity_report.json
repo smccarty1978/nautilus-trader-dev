@@ -1,0 +1,49 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\Codex_clean_maturity_flip_rolling_5m_productivity",
+  "decision_contract": {
+    "research_question": "Do clean, direction-specific train-only baseline features plus structural geometry and rolling 5m productivity add incremental information for imminent prevailing-1m flips across maturity buckets?",
+    "baseline": {
+      "short": "clean_verified_registry_train_only_top25_for_bullish_to_short",
+      "long": "clean_verified_registry_train_only_top25_for_bearish_to_long"
+    },
+    "baseline_feature_selection": {
+      "mode": "train_only"
+    },
+    "model_arms": {
+      "A": "direction-specific clean train-only Top-25 baseline",
+      "B": "A plus completed-5m structural regime geometry",
+      "C": "B plus rolling 5m productivity"
+    },
+    "variable_being_tested": [
+      "completed_5m_structural_regime_geometry",
+      "rolling_5m_productivity",
+      "regime_maturity_interaction"
+    ],
+    "prohibited_changes": [
+      "use_2024_to_change_model_design"
+    ],
+    "allowed_changes": [
+      "train_only_direction_specific_feature_selection",
+      "evaluate_model_arms_a_b_c",
+      "stratify_by_maturity_buckets"
+    ],
+    "chronology": {
+      "train": [
+        2021,
+        2022,
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": "Model C versus Model B versus Model A on 2024 OOS in the 300-600s, 600-900s, and 900-1800s maturity buckets.",
+    "terminal_question": "Does either structural or rolling information add clean OOS discrimination without using 2024 outcomes for selection or design?"
+  },
+  "findings": []
+}

@@ -1,12 +1,18 @@
 {
   "tool": "causal_lint",
-  "version": 1,
+  "version": 2,
   "roots": [
-    "studies\\Codex_clean_maturity_flip_rolling_5m_productivity"
+    "<execution_manifest>"
   ],
-  "files_scanned": 0,
+  "files_expected": 38,
+  "files_scanned": 38,
+  "coverage_pct": 100.0,
+  "invocation_valid": true,
+  "invocation_errors": [],
+  "blocking_clean": true,
   "critical": 0,
   "warning": 0,
   "clean": true,
-  "findings": []
+  "findings": [],
+  "suppressions": []
 }

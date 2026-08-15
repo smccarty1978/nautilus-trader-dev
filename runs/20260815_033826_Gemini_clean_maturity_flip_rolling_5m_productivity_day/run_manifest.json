@@ -1,0 +1,45 @@
+{
+  "run_id": "20260815_033826_Gemini_clean_maturity_flip_rolling_5m_productivity_day",
+  "study_id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "f3e3d302a25ec8fe0e936aef00f1f01b3a1f75805fd0bfebdbdd4a26b2c67761",
+  "stage": "day",
+  "dates": {
+    "start": "2023-03-03",
+    "end": "2023-03-03",
+    "warmup_start": "2023-02-26T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME",
+    "instrument_id": "NQ.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-15T03:38:26.803269+00:00",
+  "status": "COMPLETED",
+  "telemetry": {
+    "wall_time_seconds": 199.74809389997972,
+    "total_bars_processed": 0,
+    "throughput_bars_per_sec": 0.0,
+    "baseline_process_rss_mb": 184.94,
+    "peak_process_rss_mb": 602.42,
+    "rss_delta_mb": 417.48,
+    "python_tracemalloc_peak_mb": 454.33,
+    "bars_loaded": {
+      "1s": 252660,
+      "1m": 6899
+    },
+    "callbacks": {}
+  },
+  "outputs": {
+    "candidates_count": 2032,
+    "candidates_sha256": "2ddef5c354549852f5ca47e99bcb18089eb9e7d9c0020425ec8bd59a314f1d41",
+    "observations_count": 2032,
+    "observations_sha256": "89aa4ff4fdf809166c86f8ded49490300e46e19aa4c679de0ec9b09e0dc1584e"
+  },
+  "end_time_utc": "2026-08-15T03:41:47.027023+00:00"
+}

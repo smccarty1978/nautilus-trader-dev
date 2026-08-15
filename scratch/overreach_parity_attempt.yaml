@@ -1,0 +1,26 @@
+study:
+  id: overreach_parity_attempt
+  type: flip_prediction
+  risk_tier: 2
+  description: "Parity study attempting to masquerade as canonical flip_prediction."
+
+operation:
+  kind: runtime_population_parity
+  reconciliation_target: candidate_population
+
+instrument:
+  symbol: NQ
+  venue: XCME
+
+population:
+  type: regime_state
+  prevailing_regime: bullish
+  session: RTH
+
+target:
+  type: flip
+  direction: bearish
+  horizon_seconds: 300
+
+execution:
+  runtime: nautilustrader

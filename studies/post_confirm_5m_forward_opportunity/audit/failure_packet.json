@@ -1,0 +1,30 @@
+{
+  "status": "BLOCKED",
+  "failed_gate": "ARTIFACT_SCHEMA",
+  "failure_ids": [
+    "STATUS_SCHEMA",
+    "STATUS_SCHEMA",
+    "STATUS_SCHEMA"
+  ],
+  "failure_details": [
+    {
+      "severity": "CRITICAL",
+      "code": "STATUS_SCHEMA",
+      "artifact": "studies\\post_confirm_5m_forward_opportunity\\audit\\run_status.json",
+      "message": "Missing required field 'verdict'"
+    },
+    {
+      "severity": "CRITICAL",
+      "code": "STATUS_SCHEMA",
+      "artifact": "studies\\post_confirm_5m_forward_opportunity\\audit\\run_status.json",
+      "message": "Missing or non-integer field 'critical'"
+    },
+    {
+      "severity": "CRITICAL",
+      "code": "STATUS_SCHEMA",
+      "artifact": "studies\\post_confirm_5m_forward_opportunity\\audit\\run_status.json",
+      "message": "Missing or non-integer field 'warning'"
+    }
+  ],
+  "recommended_smallest_investigation_scope": "Inspect findings in ARTIFACT_SCHEMA and fix locally before requesting audit."
+}

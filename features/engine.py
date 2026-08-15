@@ -10,6 +10,7 @@ from features.trackers.pullback import PullbackTracker
 from features.trackers.ohlcv_delta import OHLCVDeltaTracker
 from features.trackers.price_levels import PriceLevelTracker
 from features.trackers.median_center import MedianCenterTracker
+from features.trackers.rolling_5m_productivity import Rolling5mProductivityTracker
 from features.registry import FEATURE_REGISTRY, resolve_feature_name
 
 CT = pytz.timezone('America/Chicago')
@@ -46,12 +47,15 @@ class FeatureEngine:
     Ensures clear call ordering and explicit stream updates.
     """
 
-    def __init__(self, buffer_size_1s: int = 60, buffer_size_1m: int = 30):
+    def __init__(self, buffer_size_1s: int = 60, buffer_size_1m: int = 30,
+                 rolling_productivity_window_seconds: int = 300):
         self._velocity_tracker = ArrivalVelocityTracker(maxlen=buffer_size_1s)
         self._volume_tracker = ArrivalVolumeTracker(maxlen=buffer_size_1s)
         self._ohlcv_delta_tracker = OHLCVDeltaTracker()
         self._price_level_tracker = PriceLevelTracker()
         self._median_center_tracker = MedianCenterTracker()
+        self._rolling_productivity_tracker = Rolling5mProductivityTracker(
+            window_seconds=rolling_productivity_window_seconds)
         self.last_atr = 1.0
 
         # 1s price streams
@@ -95,6 +99,12 @@ class FeatureEngine:
         self._volume_tracker.update(volume_val, open_px, close_px)
         b_est = self._ohlcv_delta_tracker.update(
             int(bar.ts_init), open_px, high_px, low_px, close_px, volume_val)
+        # Production NT bars always carry a positive availability timestamp.
+        # Some legacy unit fixtures deliberately use zero as an unspecified
+        # ts_init; do not invent a completed-bar timestamp for those fixtures.
+        if int(bar.ts_init) > 0:
+            self._rolling_productivity_tracker.on_completed_1s(
+                int(bar.ts_init), high_px, low_px, close_px)
         self._median_center_tracker.update_1s(bar, self.last_regime, self.last_atr)
         # Regime/RTH context for this bar is not yet knowable (see the
         # buffer's docstring in __init__) -- buffer for retroactive replay
@@ -112,6 +122,29 @@ class FeatureEngine:
 
     def update_1m(self, bar, regime) -> None:
         """Explicitly update 1m data stream after regime calculations close."""
+        had_active_regime = self.last_regime_id != 0
+        buffered_minute = self._minute_1s_buffer
+        self._minute_1s_buffer = []
+        # Session attribution uses the completed parent-minute close boundary.
+        # It must be transitioned before flushing its completed 1s members.
+        is_rth_now = _is_rth(int(bar.ts_init))
+        if is_rth_now and not self._was_rth:
+            self._ohlcv_delta_tracker.reset_rth(int(bar.ts_init))
+        elif not is_rth_now and self._was_rth:
+            self._ohlcv_delta_tracker.end_rth()
+        self._was_rth = is_rth_now
+
+        # A real flip has an active prior regime, so its already-completed
+        # minute is flushed before the reset below. A first regime has no
+        # declared start before this close; discard its pre-start buffer.
+        if had_active_regime:
+            for buf_ts, buf_high, buf_low, buf_vol, buf_delta in buffered_minute:
+                self._ohlcv_delta_tracker.accumulate_regime(
+                    buf_ts, buf_high, buf_low, buf_vol, buf_delta)
+        # Valid completed RTH minutes are session data even before the first
+        # 1m regime exists; never couple them to regime initialization.
+        for _buf_ts, _buf_high, _buf_low, buf_vol, buf_delta in buffered_minute:
+            self._ohlcv_delta_tracker.accumulate_rth(buf_vol, buf_delta)
         if regime.regime_id != self.last_regime_id:
             self.bars_in_regime = 0
             self.bars_since_breach_1m = []
@@ -144,13 +177,6 @@ class FeatureEngine:
         self.ema_spread_history.append(spread)
 
         self.last_atr = regime.atr.value if regime.atr.value > 0 else 1.0
-
-        is_rth_now = _is_rth(int(bar.ts_init))
-        if is_rth_now and not self._was_rth:
-            self._ohlcv_delta_tracker.reset_rth(int(bar.ts_init))
-        elif not is_rth_now and self._was_rth:
-            self._ohlcv_delta_tracker.end_rth()
-        self._was_rth = is_rth_now
 
         # Retroactively attribute this minute's buffered 1s bars to whichever
         # regime/RTH state is active AFTER the reset decisions above -- their
@@ -234,6 +260,19 @@ class FeatureEngine:
         # 8. Median Center, Activity & Sequence Features
         raw_features.update(self._median_center_tracker.calculate(
             self.last_regime, atr, touch_bar))
+
+        # Study collectors supply the fixed current-regime-start ATR and the
+        # already-causal structural lifetime speed at their decision boundary.
+        # The engine owns the completed-1s routing; the study owns when this
+        # block is requested and how its companion structural state is formed.
+        rolling_context = snap_context.get("rolling_productivity")
+        if rolling_context is not None:
+            raw_features.update(self._rolling_productivity_tracker.snapshot(
+                checkpoint_ns=int(rolling_context["checkpoint_ns"]),
+                direction=direction,
+                current_regime_start_atr=float(rolling_context["current_regime_start_atr"]),
+                regime_expansion_atr_per_min=rolling_context.get("regime_expansion_atr_per_min"),
+            ))
 
         # Filter, map aliases, and deduplicate
         output = {}

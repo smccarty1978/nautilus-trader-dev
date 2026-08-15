@@ -1,0 +1,377 @@
+<title>NT Research Flow — Red Team Round 3</title>
+<style>
+  :root{
+    --ground:#EEF1F5; --surface:#FFFFFF; --surface-2:#F7F9FB;
+    --ink:#131A24; --ink-2:#3F4A59; --ink-3:#6B7787;
+    --rule:#D3DAE3; --rule-soft:#E4E9EF;
+    --accent:#2F5D8C; --accent-soft:#E2EAF3;
+    --crit:#A81F26; --crit-bg:#FBE9EA;
+    --warn:#8A5A0B; --warn-bg:#FBF1DF;
+    --note:#3B5A78; --note-bg:#E8EEF4;
+    --ok:#256B4A;  --ok-bg:#E3F1E9;
+    --term-bg:#141B25; --term-ink:#C8D3E0; --term-dim:#7E8DA0;
+    --term-go:#79C08E; --term-no:#E58388;
+    --shadow:0 1px 2px rgba(19,26,36,.06), 0 6px 18px -10px rgba(19,26,36,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+      --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+      --rule:#2A3543; --rule-soft:#212B37;
+      --accent:#7FAAD8; --accent-soft:#1B2735;
+      --crit:#FF8087; --crit-bg:#2B171A;
+      --warn:#E5AE5C; --warn-bg:#2A2117;
+      --note:#8FB0CE; --note-bg:#1A222C;
+      --ok:#6FC095;  --ok-bg:#152420;
+      --term-bg:#0A0F16; --term-dim:#6F7E90;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+    --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+    --rule:#2A3543; --rule-soft:#212B37;
+    --accent:#7FAAD8; --accent-soft:#1B2735;
+    --crit:#FF8087; --crit-bg:#2B171A;
+    --warn:#E5AE5C; --warn-bg:#2A2117;
+    --note:#8FB0CE; --note-bg:#1A222C;
+    --ok:#6FC095;  --ok-bg:#152420;
+    --term-bg:#0A0F16; --term-dim:#6F7E90;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px 96px;}
+  header.mast{border-bottom:1px solid var(--rule);background:var(--surface);}
+  .mast-inner{max-width:1080px;margin:0 auto;padding:38px 28px 30px;display:flex;flex-direction:column;gap:20px;}
+  .eyebrow{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-3);}
+  h1{margin:0;font-size:clamp(30px,4.4vw,46px);line-height:1.06;letter-spacing:-.022em;font-weight:700;text-wrap:balance;}
+  .dek{margin:0;max-width:64ch;color:var(--ink-2);font-size:17px;}
+  .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:18px 20px;border-radius:3px;
+    background:var(--crit-bg);border:1px solid var(--crit);border-left-width:5px;}
+  .verdict-stamp{font-family:ui-monospace,Consolas,monospace;font-size:clamp(20px,3vw,28px);
+    font-weight:700;letter-spacing:.04em;color:var(--crit);}
+  .verdict-why{color:var(--ink-2);font-size:14.5px;max-width:58ch;margin:0;}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
+    background:var(--rule);border:1px solid var(--rule);}
+  .fact{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:3px;}
+  .fact dt{font-family:ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);}
+  .fact dd{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .fact dd.c-crit{color:var(--crit);} .fact dd.c-warn{color:var(--warn);} .fact dd.c-ok{color:var(--ok);}
+  section{margin-top:56px;}
+  h2{margin:0 0 6px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-family:ui-monospace,Consolas,monospace;color:var(--accent);font-weight:700;}
+  h2 + .sub{margin:0 0 22px;font-size:24px;font-weight:660;letter-spacing:-.018em;text-wrap:balance;}
+  h3{font-size:17px;font-weight:650;margin:32px 0 10px;letter-spacing:-.01em;}
+  p{margin:0 0 14px;max-width:72ch;}
+  code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.875em;
+    background:var(--surface-2);border:1px solid var(--rule-soft);padding:1px 5px;border-radius:2px;
+    color:var(--ink);overflow-wrap:anywhere;}
+  .tscroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;}
+  thead th{background:var(--surface-2);font-family:ui-monospace,Consolas,monospace;font-size:10.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--rule);white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.vd{white-space:nowrap;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;}
+  .v-fail{color:var(--crit);} .v-weak{color:var(--warn);} .v-pass{color:var(--ok);}
+  td.fid-cell{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:var(--ink-3);white-space:nowrap;}
+  .find{background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--rule);
+    margin-bottom:16px;box-shadow:var(--shadow);}
+  .find.crit{border-left-color:var(--crit);}
+  .find.warn{border-left-color:var(--warn);}
+  .find.ok{border-left-color:var(--ok);}
+  .find-head{padding:15px 20px 13px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--rule-soft);}
+  .find-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+  .pill{font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;padding:3px 8px;border-radius:2px;}
+  .pill.crit{background:var(--crit-bg);color:var(--crit);}
+  .pill.warn{background:var(--warn-bg);color:var(--warn);}
+  .pill.ok{background:var(--ok-bg);color:var(--ok);}
+  .fid{font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;}
+  .find-title{font-size:17.5px;font-weight:650;letter-spacing:-.012em;margin:0;text-wrap:balance;}
+  .loc{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--ink-2);overflow-wrap:anywhere;}
+  .find-body{padding:4px 20px 16px;display:grid;gap:0;}
+  .row{display:grid;grid-template-columns:132px 1fr;gap:16px;padding:11px 0;border-bottom:1px solid var(--rule-soft);}
+  .row:last-child{border-bottom:none;}
+  .row dt{font-family:ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-3);padding-top:3px;}
+  .row dd{margin:0;font-size:14.5px;color:var(--ink-2);}
+  .row dd strong{color:var(--ink);font-weight:640;}
+  @media (max-width:640px){ .row{grid-template-columns:1fr;gap:4px;} }
+  .term{background:var(--term-bg);color:var(--term-ink);
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12.5px;line-height:1.68;
+    padding:16px 18px;overflow-x:auto;border-radius:3px;border:1px solid rgba(127,170,216,.18);
+    margin:0 0 18px;white-space:pre;}
+  .term .c{color:var(--term-dim);} .term .g{color:var(--term-go);} .term .r{color:var(--term-no);font-weight:600;}
+  .term-cap{font-family:ui-monospace,Consolas,monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 7px;}
+  ul,ol{max-width:72ch;padding-left:22px;margin:0 0 16px;}
+  li{margin-bottom:7px;}
+  .callout{background:var(--accent-soft);border-left:4px solid var(--accent);padding:14px 18px;margin:0 0 18px;}
+  .callout.good{background:var(--ok-bg);border-left-color:var(--ok);}
+  .callout p:last-child{margin-bottom:0;}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  @page{ margin:14mm 12mm; }
+  @media print{
+    :root, :root[data-theme="dark"]{
+      --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F6F9;
+      --ink:#0E141C; --ink-2:#2E3844; --ink-3:#5C6775;
+      --rule:#B9C2CD; --rule-soft:#D8DEE6;
+      --accent:#23507D; --accent-soft:#EAF0F7;
+      --crit:#8E161D; --crit-bg:#FBE9EA;
+      --warn:#6F470A; --warn-bg:#FAF0DC;
+      --note:#2F4A64; --note-bg:#EAF0F5;
+      --ok:#1C5739;  --ok-bg:#E4F1E9;
+      --term-bg:#F4F6F9; --term-ink:#161D26; --term-dim:#5C6775;
+      --term-go:#1C5739; --term-no:#8E161D; --shadow:none;
+    }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body{ background:#fff; font-size:10.5pt; line-height:1.5; }
+    .wrap{ max-width:none; padding:0 0 8mm; }
+    .mast-inner{ max-width:none; padding:0 0 8mm; }
+    header.mast{ border-bottom:2px solid var(--ink); }
+    h1{ font-size:24pt; } .dek{ font-size:11pt; }
+    .tscroll{ overflow:visible; }
+    table{ min-width:0; width:100%; font-size:8.6pt; table-layout:fixed; }
+    th,td{ padding:5px 7px; overflow-wrap:anywhere; }
+    .term{ white-space:pre-wrap; overflow-wrap:anywhere; overflow:visible; font-size:8.2pt;
+      line-height:1.5; padding:9px 11px; border:1px solid var(--rule); }
+    code{ overflow-wrap:anywhere; }
+    .find,.fact,tr,.callout,.row{ break-inside:avoid; page-break-inside:avoid; }
+    h2,h3,.sub{ break-after:avoid; page-break-after:avoid; }
+    section{ margin-top:9mm; }
+    footer{ break-before:avoid; }
+  }
+</style>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="eyebrow">Red Team Round 3 · NautilusTrader ML Research Flow · 2026-08-15</div>
+    <h1>The code surface is now genuinely defended. Every remaining bypass is an unsigned JSON file that a gate trusts.</h1>
+    <p class="dek">Third independent red-team pass. All four round-2 bypasses are closed and verified closed. What remains is a single, sharply-defined failure class — and it has one fix.</p>
+
+    <div class="verdict">
+      <div class="verdict-stamp">FLOW_BLOCKED</div>
+      <p class="verdict-why">Eleven items fixed, including every round-2 bypass. But a fully forged smoke acceptance — declaring <em>4,321 look-ahead violations</em> and pointing at a nonexistent run — still authorizes a full production run.</p>
+    </div>
+
+    <dl class="facts">
+      <div class="fact"><dt>Fixed this round</dt><dd class="c-ok">11</dd></div>
+      <div class="fact"><dt>R2 bypasses closed</dt><dd class="c-ok">4 / 4</dd></div>
+      <div class="fact"><dt>Still open</dt><dd class="c-crit">3</dd></div>
+      <div class="fact"><dt>New findings</dt><dd class="c-warn">3</dd></div>
+      <div class="fact"><dt>Sealed files</dt><dd>37 → 53</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>Executive verdict</h2>
+  <p class="sub">A real step change, and one failure class left</p>
+
+  <p>This round is materially different from the last one. Where round 2's governance fixes were written to the text of my findings, <strong>round 3 fixed the underlying properties</strong>. The resolver now performs an actual AST transitive closure over three dependency graphs — runtime, contract authority, and governance — and raises <code>UnresolvedDependencyError</code> on any repo-local import it cannot resolve. The sealed set went from 37 hand-listed files to <strong>53 computed ones</strong>. I re-ran every round-2 bypass and all four are now blocked.</p>
+
+  <p>Several fixes went beyond what I asked for. <code>timestamp_engine.py</code> no longer asserts the timestamp contract — it opens catalog parquet, measures <code>ts_init − ts_event</code>, and raises <code>CatalogTimestampSemanticError</code> on violation. The warmup guard now builds a proper year <em>range</em> and checks it against both prohibited years and the DEV lock, blocking my round-2 leak with a precise error. The two <code>except ImportError: pass</code> fail-opens on the OOS lock now re-raise. And the smoke acceptance a real validator produced is genuinely good evidence: <span class="mono">2,002 candidates, 0 duplicates, 0 future-source violations, exact feature SHA</span> — independently corroborating that F3 is fixed.</p>
+
+  <div class="callout good">
+    <p><strong>The causal surface is now in good shape.</strong> F3 (the look-ahead violation) remains fixed and survived this round's edits; the lint covers 46/46 Python files at 100%; the closure covers 53 files; every code-tampering bypass I have attempted across three rounds is now blocked. If the remaining items were closed, I would sign this off.</p>
+  </div>
+
+  <p><strong>What remains is one failure class, stated precisely:</strong> three JSON files — <code>smoke_acceptance.json</code>, <code>status.json</code>, <code>contract_status.json</code> — carry authorization decisions, are consumed by gates that trust their contents, and are <em>not covered by the seal and not bound to any producer</em>. Anyone who can write to the study directory can author all three by hand. The fix is one pattern applied three times: seal them, and bind each to the artifact it summarizes.</p>
+
+  <p>Note the asymmetry that makes this so easy to miss: the round-3 work correctly identified that <em>code</em> must be inside the closure, and built real machinery to guarantee it. But the closure is a <em>Python import graph</em>, so authorization data that no module imports is structurally invisible to it — no matter how good the AST walk is.</p>
+</section>
+
+<section>
+  <h2>Round-2 findings, re-tested</h2>
+  <p class="sub">Every bypass re-attempted against the new closure</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:52px">ID</th><th>Finding</th><th>Evidence</th><th style="width:96px">Status</th></tr></thead>
+    <tbody>
+      <tr><td class="fid-cell">N1</td><td>Smoke gate read the wrong seal key</td><td>Now <code>seal_data["composite_seal_hash"]</code> with an explicit key-presence check, plus study-name match and a <code>deterministic_validation_verified</code> requirement</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">N2</td><td><code>generate_oos_unlock.py</code> unsealed</td><td>In the governance closure. Tampered → <code>PREEXEC_AUDIT_STALE</code></td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">N3</td><td><code>study_spec.py</code> unsealed</td><td>In the contract-authority closure. Tampered → <code>PREEXEC_AUDIT_STALE</code></td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">N4</td><td>Closure test was a filename checklist</td><td>Real <code>compute_ast_closure()</code>; <code>UnresolvedDependencyError</code> on unresolvable repo-local imports; 25 tests pass</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">N5</td><td>Strategy path built from a dotted class name</td><td><code>resolve_dynamic_strategy_file()</code> splits correctly and raises <code>UnresolvedStrategyError</code></td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">N6</td><td>Warmup entered locked DEV years</td><td>Verified blocked: <code>UNAUTHORIZED_WARMUP_DOMAIN: Warmup window [2024-12-27 to 2025-01-01] enters locked DEV year 2024</code></td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F2</td><td>Audit provenance self-issued</td><td>Verdict now <em>parsed</em> from the report rather than passed in — a real improvement. But the parser is optional and the parse itself fails open (R3-2, R3-3)</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F6</td><td>Warmup crosses unauthorized years</td><td>Prohibited and DEV now checked; <strong>authorized-set membership still is not</strong>. Real study full-stage still warms from unauthorized 2020 (R3-4)</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F7</td><td>SPEC fidelity hardcoded to one study</td><td>Per-study <code>study_clauses.yaml</code> introduced and sealed — good. But SPEC.md is still never opened, and an absent clause file falls back to three trivial non-empty checks (R3-6)</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F11</td><td>OOS unlock fail-opens</td><td>Both <code>except ImportError: pass</code> now raise <code>OOS_AUTHORIZATION_DEPENDENCY_MISSING</code>. The hand-typed <code>2024_not_read…</code> boolean remains</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F12</td><td>Timestamp engine asserted, didn't measure</td><td><code>measure_catalog_bar_semantics()</code> reads catalog parquet and raises <code>CatalogTimestampSemanticError</code> on delta violation</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F13</td><td>Auditor has Bash+Write; hook unwired</td><td>Unchanged: <code>tools: [Read, Grep, Glob, Bash, Write]</code>; <code>settings.local.json</code> still has no <code>hooks</code> key</td><td class="vd v-fail">OPEN</td></tr>
+      <tr><td class="fid-cell">F14</td><td>Study-specific literals in framework</td><td><code>feature_universe_count = 60</code> removed; tracker list now derived. <code>meta_cols</code> in <code>output_manager.py:118</code> still hardcoded</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F17</td><td>Stale runs indistinguishable</td><td>No lineage marker on <code>runs/</code>; the acceptance now records <code>run_dir</code> + parquet SHA, which is most of the fix — but nothing verifies them (R3-1)</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F3 / F4</td><td>Causal fixes from round 2</td><td>Both intact after this round's edits. Skip-on-gap present at <code>collector:393–397</code>; <code>obs_ts = T</code> at <code>:500</code>; lint 46/46 at 100%</td><td class="vd v-pass">HOLDS</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>Bypass attempts</h2>
+  <p class="sub">Executed against the live repository, then reverted</p>
+
+  <p class="term-cap">Closed — the three round-2 code bypasses</p>
+  <div class="term"><span class="c">$ # append a comment to each of the three previously-unsealed modules</span>
+re-tampered the 3 round-2 bypass targets
+
+<span class="c">$ python scripts/preexec_audit_seal.py --study studies/&lt;s&gt; --verify-only</span>
+<span class="g">PreexecAuditStaleError: PREEXEC_AUDIT_STALE: File 'research/schemas/study_spec.py' was
+  modified after audit seal! (Sealed hash: fc4d27682990..., Current hash: 6b1894eb97b0...)</span></div>
+
+  <p class="term-cap">Closed — the round-2 warmup leak</p>
+  <div class="term">N6 DEV-adjacent warmup -&gt; <span class="g">BLOCKED: UnauthorizedExecutionDomainError</span>
+    UNAUTHORIZED_WARMUP_DOMAIN: Warmup window [2024-12-27 to 2025-01-01] enters
+    locked DEV year 2024 without authorized OOS unlock token.</div>
+
+  <p class="term-cap">Still open — forged smoke acceptance authorizes a full run</p>
+  <div class="term"><span class="c">$ # write smoke_acceptance.json by hand. No smoke was run. All fields are</span>
+<span class="c">$ # derivable from public repo state; the file is not in the seal.</span>
+RESULT: stage=FULL <span class="r">ACCEPTED</span> a fully forged smoke acceptance.
+        run_dir points nowhere, parquet sha is zeros,
+        future_source_violations_count = <span class="r">4321</span>  (self-declared FAILING smoke)
+        -&gt; reached engine build anyway.</div>
+
+  <p class="term-cap">Still open — hand-written audit status bypasses the new parser entirely</p>
+  <div class="term"><span class="c">$ # write status.json and contract_status.json by hand, declare CLEAR,</span>
+<span class="c">$ # use legacy provenance version 1. The parser is never invoked.</span>
+RESULT: seal <span class="r">GENERATED</span> from hand-written status.json (no parser, no auditor).
+        seal_status = LOCKED | composite = 24d608f344472ddc...
+        provenance version accepted: <span class="r">1</span></div>
+
+  <p class="term-cap">Still open — the report parser reads a blocking audit as CLEAR</p>
+  <div class="term">A. prose CRITICAL findings, no numeric summary, no verdict token
+    -&gt; <span class="g">RAISED AuditArtifactParseError (fail-closed)</span>
+B. prose CRITICAL findings + the word CLEAR in benign prose
+    -&gt; verdict=<span class="r">CLEAR</span>  critical=<span class="r">0</span>  warning=0   <span class="r">&lt;== FAIL-OPEN</span>
+C. low count stated first, true tally later
+    -&gt; verdict=<span class="r">CLEAR</span>  critical=<span class="r">0</span>  warning=7
+D. one-word report ("CLEAR\n")
+    -&gt; verdict=<span class="r">CLEAR</span>  critical=0  warning=0
+E. honest blocked report
+    -&gt; verdict=<span class="g">BLOCKED</span> critical=2</div>
+</section>
+
+<section>
+  <h2>Findings</h2>
+  <p class="sub">Three criticals, three warnings</p>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">R3-1</span></div>
+      <p class="find-title">The smoke acceptance is unsealed, and none of its substantive claims are re-verified</p>
+      <div class="loc">backtests/nt_runtime/modes/collect.py:41–75 &nbsp;·&nbsp; scripts/resolve_execution_manifest.py:182–210</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>resolve_study_files()</code> seals five mandatory study files plus <code>study_clauses.yaml</code> and tests — <code>artifacts/smoke_acceptance.json</code> is not among them. The gate then checks four fields: <code>status</code>, <code>study_name</code>, <code>sealed_composite_sha256</code>, and <code>deterministic_validation_verified</code>. Every one is derivable from public repo state, and the file's own substantive fields — <code>run_dir</code>, <code>candidates_parquet_sha256</code>, <code>future_source_violations_count</code>, <code>duplicate_candidates_count</code> — are recorded but never read by the gate.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Demonstrated end-to-end. A hand-written acceptance declaring <strong>4,321 future-source violations</strong>, a zeroed parquet hash and <code>run_dir: /nonexistent/never/ran</code> passed the gate and reached engine construction. The validator that produces the honest version (<code>scripts/validate_smoke.py</code>) is sealed and appears sound — but nothing forces its output to be the file the gate reads.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>The closure is an import graph. <code>smoke_acceptance.json</code> is data no module imports, so no amount of AST work reaches it. Its correct home is <code>resolve_study_files()</code>, which is hand-listed.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Two parts, both small. (1) Have the gate <em>enforce</em> the fields the validator already writes: <code>future_source_violations_count == 0</code>, <code>duplicate_candidates_count == 0</code>, <code>exact_timestamp_equality_verified is True</code>, and re-hash the parquet at <code>run_dir</code> against <code>candidates_parquet_sha256</code>. (2) Because the acceptance is written <em>after</em> sealing, it cannot go in the seal — instead have <code>validate_smoke.py</code> record <code>validator_file_sha256</code> (it already does) and have the gate verify that value against the sealed validator's actual hash, so an acceptance can only claim to come from the sealed validator.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_full_stage_rejects_forged_smoke_acceptance</code> — an acceptance with non-zero violation counts, and one whose <code>candidates_parquet_sha256</code> does not match the file at <code>run_dir</code>, must both raise.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">R3-2</span></div>
+      <p class="find-title">The new audit parser is optional — a hand-written status.json still produces a valid seal</p>
+      <div class="loc">scripts/preexec_audit_seal.py:84–87 &nbsp;·&nbsp; scripts/run_preexec_audits.py:127–150</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>Moving the verdict from a function parameter to a parsed value closes the <em>legitimate</em> path's abuse, but nothing closes the illegitimate one. The seal validates <code>status.json</code>'s <em>shape</em> — provenance version, report existence, report SHA, verdict, counts, composite match — all of which a hand-authored file satisfies. <code>derived_by_parser</code> is a free-text string the seal never checks. Worse, the version gate was widened to <code>not in (1, 2)</code>, so <strong>legacy version-1 records — the ones with orchestrator-declared verdicts — remain acceptable</strong>.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Demonstrated: wrote both status files by hand with <code>"auditor": "definitely_a_real_independent_auditor"</code> and <code>audit_provenance_version: 1</code>, and <code>generate_preexec_audit_seal()</code> returned <code>seal_status: LOCKED</code>.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Require <code>audit_provenance_version == 2</code> (drop 1 — the legacy records it admits are exactly the untrustworthy ones). Then make the seal re-derive rather than trust: call <code>parse_causal_audit_report()</code> on the sealed report itself and require the parsed verdict and counts to equal what <code>status.json</code> claims. That makes the JSON a cache of the parse instead of an independent assertion, and costs about six lines.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_seal_rejects_handwritten_status</code> — a status whose verdict disagrees with a re-parse of its own report must raise.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">R3-3</span></div>
+      <p class="find-title">The report parser records a blocking audit as CLEAR when findings are prose rather than counts</p>
+      <div class="loc">scripts/run_preexec_audits.py:46–70, :82–101</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>Three compounding weaknesses. The verdict falls back to <code>re.search(r"\b(CLEAR|BLOCKED)\b", text)</code> — the first occurrence anywhere, including incidental prose. The critical count requires <code>Critical</code> followed by a <strong>digit</strong>; a report whose findings are headed <code>### CRITICAL: …</code> matches nothing, and the count silently defaults to <code>0</code> whenever the verdict token read CLEAR. And <code>re.search</code> takes the first match, so an early "Critical: 0" beats a later true tally.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Measured. A report containing two genuine <code>### CRITICAL:</code> findings and one benign sentence — "the execution surface is CLEAR of scratch dependencies" — parses as <strong>verdict=CLEAR, critical=0</strong>. A report with "Critical: 0" early and <code>| CRITICAL | 4 |</code> later also parses as CLEAR. A file containing only the word <code>CLEAR</code> issues a CLEAR status. Note that all three of my own audit reports would parse as CLEAR under this rule.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>The parser was tested against well-formed reports. Its failure mode requires a report that is <em>realistic</em> rather than schematic.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Stop parsing prose. Require a machine-readable block the auditor must emit — a fenced <code>audit-summary</code> JSON with <code>verdict</code>, <code>critical</code>, <code>warning</code>, <code>note</code> — and raise <code>AuditArtifactParseError</code> when it is absent rather than inferring from free text. As a defence in depth, also count <code>^#{1,6}\s*CRITICAL</code> headings and raise on any mismatch with the declared count.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_parser_blocks_on_prose_critical_findings</code> — the four cases above, each asserted to raise or return BLOCKED.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">R3-4</span></div>
+      <p class="find-title">Warmup still is not checked against the authorized set</p>
+      <div class="loc">backtests/nt_runtime/data_plan.py:142–167</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The active-window guard applies three tests: prohibited, authorized-set membership, and the DEV lock. The warmup guard now applies two of them — prohibited and DEV — but still omits authorized-set membership.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Verified: the real study at <code>--stage full</code> resolves warmup to <strong>2020-12-27</strong>. 2020 is neither prohibited nor DEV, but it is not in <code>{2021, 2022, 2023, 2024}</code> either, so five days of unauthorized data enter the replay. The consequence here is small; the gap is that "not explicitly forbidden" is being treated as "authorized" for warmup only.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Fold <code>warmup_years</code> into <code>run_years</code> before the three checks so all of them apply uniformly, or add the authorized-set test to the warmup block. If pre-partition warmup is intentional, make it an explicit <code>chronology.warmup</code> allowance rather than an unchecked default.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_warmup_year_must_be_authorized</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">R3-5</span></div>
+      <p class="find-title">coverage_pct is a hardcoded literal, so the coverage metric cannot fail</p>
+      <div class="loc">scripts/resolve_execution_manifest.py:320–328</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>files_count = len(file_hashes)</code>, then <code>files_expected = files_count</code>, <code>files_resolved = files_count</code>, <code>"coverage_pct": 100.0</code>, <code>"unresolved_dependencies": []</code> — all written unconditionally after the point where a failure would already have raised. The reported figure is "everything I found divided by everything I found."</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Not exploitable on its own — the genuine control is the <code>UnresolvedDependencyError</code> raise at line 280, which does work. The risk is that <code>Coverage: 100.0%</code> on the summary card and in <code>execution_manifest.json</code> reads as an independently measured guarantee when it is a constant. That is the same pattern that made round 2's closure test misleading, in a lower-stakes place.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Either compute it honestly — <code>resolved / (resolved + len(all_unresolved))</code> before the raise — or delete the three fields and let the exception be the whole contract. Deleting is cleaner.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_coverage_pct_reflects_unresolved</code>, or removal of the assertion alongside the fields.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">R3-6</span></div>
+      <p class="find-title">SPEC fidelity is opt-in, and still never opens SPEC.md</p>
+      <div class="loc">scripts/check_spec_fidelity.py:83–108</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>Per-study <code>study_clauses.yaml</code> is the right design and removes the hardcoded years from framework code — a genuine improvement, and the file is sealed. But when it is absent, <code>load_study_clauses()</code> falls back to three checks that assert <code>chronology.train</code>, <code>chronology.prohibited</code> and <code>instrument.symbol</code> are non-empty. A study that ships no clause file therefore passes SPEC fidelity at 100% coverage for having non-empty fields. Despite the module docstring's "from study_clauses.yaml (or SPEC.md)", <code>SPEC.md</code> is still never read.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Make <code>study_clauses.yaml</code> mandatory — raise when absent rather than degrading — and have <code>create_study.py</code> scaffold it. Since the resolver already seals it when present, requiring it also closes the gap where dropping the file weakens the gate without changing the composite.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_spec_fidelity_requires_clause_file</code>.</dd></div>
+    </dl>
+  </article>
+</section>
+
+<section>
+  <h2>Recommended order</h2>
+  <p class="sub">Three criticals, all small, all the same shape</p>
+  <ol>
+    <li><strong>R3-1</strong> — the only finding that authorizes a full production run on bad evidence. Enforce the fields the validator already writes, and bind the acceptance to the sealed validator's hash.</li>
+    <li><strong>R3-3</strong> — require a structured <code>audit-summary</code> block and stop inferring verdicts from prose. Without this, an auditor that finds real defects can be recorded as CLEAR.</li>
+    <li><strong>R3-2</strong> — require provenance version 2, and have the seal re-parse the report rather than trust the JSON.</li>
+    <li><strong>R3-4, R3-5, R3-6</strong> — each a few lines.</li>
+    <li><strong>F13</strong> — still unaddressed across three rounds: <code>lookahead-auditor</code> holds <code>Bash</code> and <code>Write</code>, and the <code>results-triager</code> guard hook sits on disk unregistered. Given that R3-2 shows audit status is hand-writable, an auditor with shell access can issue its own PASS.</li>
+  </ol>
+
+  <p>A closing observation on where the boundary now sits. Round 3 correctly concluded that the seal must cover a computed closure rather than a list, and built the machinery to do it. But a Python import graph can only ever reach code. The three files that still carry authorization — an acceptance, a causal status, a contract status — are read as data, produced after the seal, and referenced by no import. <strong>They need a second mechanism: not "is this file in the closure?" but "was this file produced by the sealed tool that claims to have produced it?"</strong> Each of the three already records enough to answer that (<code>validator_file_sha256</code>, <code>audit_report_sha256</code>, <code>derived_by_parser</code>); the gates simply do not check.</p>
+</section>
+
+<footer>
+  Red team round 3, 2026-08-15 · study <span class="mono">Gemini_clean_maturity_flip_rolling_5m_productivity</span> · seal composite <span class="mono">24d608f344472ddc…</span> · 53 sealed files · lint 46/46 · 25/25 tests pass.
+  All bypasses executed against the live working tree and reverted; <span class="mono">PREEXEC_AUDIT_SEAL_VALID</span>, <span class="mono">PREFLIGHT CLEAR</span> and clean file state reconfirmed after restore.
+  The genuine <span class="mono">smoke_acceptance.json</span> was backed up before testing and restored intact (2,002 candidates, 0 violations).
+</footer>
+
+</div>

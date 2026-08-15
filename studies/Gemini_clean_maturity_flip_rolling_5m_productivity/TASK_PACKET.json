@@ -1,0 +1,149 @@
+{
+  "task_packet_version": "1.0",
+  "study_id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "6f8a5440267f6bf282b378f07e764054505687ed3c20e427f80355897b7c17c6",
+  "risk_tier": 2,
+  "runtime": "nautilustrader",
+  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+  "contracts": {
+    "population_contract": {
+      "instrument": {
+        "symbol": "NQ",
+        "venue": "XCME"
+      },
+      "population_type": "regime_state",
+      "prevailing_regime": "both",
+      "session": "RTH",
+      "qualification": {
+        "age_gate_seconds": 120,
+        "running_mfe_atr_gte": 1.0,
+        "new_progress_windows_gte": 2,
+        "retained_mfe_ratio_gte": 0.5,
+        "cadence_seconds": 5,
+        "established": true
+      },
+      "causal_checkpoint": {
+        "checkpoint_frequency": "1m_bar_close",
+        "observation_timing": "interval_close"
+      }
+    },
+    "target_contract": {
+      "target_type": "flip",
+      "event": "confirmed_flip",
+      "direction": "both",
+      "horizon_seconds": 300,
+      "confirmation": {
+        "mode": "bar_close",
+        "confirmation_bars": 1
+      },
+      "censoring_policy": {
+        "session_end_censoring": true,
+        "max_horizon_seconds": 300
+      }
+    },
+    "feature_contract": {
+      "source_key": "F3_top25_gbt_v1",
+      "feature_count": 25,
+      "feature_list": [
+        "rolling_5m_low_signed_distance_atr",
+        "rth_elapsed_seconds",
+        "rolling_15m_high_signed_distance_atr",
+        "rolling_60m_high_signed_distance_atr",
+        "rolling_15m_low_signed_distance_atr",
+        "rolling_30m_low_signed_distance_atr",
+        "price_change_points_60s",
+        "rolling_30m_high_signed_distance_atr",
+        "range_points_1800s",
+        "opening_range_30m_low_developing_signed_distance_points",
+        "est_bear_vol_sum_300s",
+        "full_level_envelope_width_atr",
+        "rth_vol_cum",
+        "est_delta_sum_1800s",
+        "price_change_atr_60s",
+        "prior_day_close_signed_distance_atr",
+        "up_down_vol_ratio_1800s",
+        "price_change_atr_30s",
+        "pct_levels_behind_trade",
+        "prior_day_low_signed_distance_points",
+        "opening_range_30m_low_final_signed_distance_points",
+        "vol_max_1s_1800s",
+        "price_position_in_full_envelope",
+        "rth_abs_delta_cum",
+        "n_levels_below"
+      ],
+      "feature_list_sha256": "8bcfeb74ab3b5453635ad9895fa9d15fd65866044f23fa0415bfc796e5fd6299",
+      "bound_trackers": [
+        "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "features.trackers.price_levels.PriceLevelTracker"
+      ],
+      "families": [
+        "ohlcv_est_delta",
+        "price_level_context"
+      ],
+      "source_timeframes": [
+        "1m",
+        "1s"
+      ],
+      "directional_mapping": "direction_normalized",
+      "timing_contract": "verified"
+    },
+    "execution_contract": {
+      "runtime": "nautilustrader",
+      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "bounded_execution": true,
+      "progress_seconds": 60,
+      "checkpoint": null,
+      "chronology": {
+        "train": [
+          2021,
+          2022,
+          2023
+        ],
+        "dev": [
+          2024
+        ],
+        "diagnostic": [],
+        "prohibited": [
+          2025,
+          2026
+        ]
+      }
+    },
+    "timestamp_contract": {
+      "source": "databento_glbx_mdp3",
+      "raw_timestamp_semantic": "OPEN_STAMPED",
+      "raw_index_field": "ts_event",
+      "timezone": "UTC",
+      "offline_research_aggregation": {
+        "pandas_rule": "resample(rule, label='right', closed='left')",
+        "semantic": "CLOSE_STAMPED"
+      },
+      "nautilus_catalog": {
+        "ts_event_semantic": "OPEN_STAMPED",
+        "ts_init_semantic": "CLOSE_STAMPED",
+        "causal_dispatch_field": "ts_init",
+        "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
+        "timeframe_deltas_ns": {
+          "1s": 1000000000,
+          "1m": 60000000000,
+          "3m": 180000000000,
+          "5m": 300000000000
+        }
+      },
+      "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "lineage": {
+      "has_parent": true,
+      "parent_study": "Codex_clean_maturity_flip_rolling_5m_productivity",
+      "parent_dir_exists": true,
+      "parent_compiled_contract_exists": false,
+      "frozen_dimensions": []
+    },
+    "baseline": {
+      "has_baseline": false
+    }
+  },
+  "preflight_required": true,
+  "preflight_status": "PENDING_EXECUTION"
+}

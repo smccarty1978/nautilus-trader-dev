@@ -1,0 +1,74 @@
+study:
+  id: reconstructed_nt_reduced_f3_top25_smoke
+  type: flip_prediction
+  risk_tier: 2
+  description: "Reconstructed NT Event-Driven Reduced-Model Population-Parity Smoke Study using Study Factory."
+
+instrument:
+  symbol: NQ
+  venue: XCME
+
+population:
+  type: regime_state
+  prevailing_regime: bullish
+  session: RTH
+  qualification:
+    age_gate_seconds: 300
+    established: true
+
+target:
+  type: flip
+  event: confirmed_flip
+  direction: bearish
+  horizon_seconds: 300
+  confirmation:
+    mode: bar_close
+    confirmation_bars: 1
+
+features:
+  source_key: F3_top25_gbt_v1
+  feature_list_sha256: 8bcfeb74ab3b5453635ad9895fa9d15fd65866044f23fa0415bfc796e5fd6299
+  feature_list:
+    - rolling_5m_low_signed_distance_atr
+    - rth_elapsed_seconds
+    - rolling_15m_high_signed_distance_atr
+    - rolling_60m_high_signed_distance_atr
+    - rolling_15m_low_signed_distance_atr
+    - rolling_30m_low_signed_distance_atr
+    - price_change_points_60s
+    - rolling_30m_high_signed_distance_atr
+    - range_points_1800s
+    - opening_range_30m_low_developing_signed_distance_points
+    - est_bear_vol_sum_300s
+    - full_level_envelope_width_atr
+    - rth_vol_cum
+    - est_delta_sum_1800s
+    - price_change_atr_60s
+    - prior_day_close_signed_distance_atr
+    - up_down_vol_ratio_1800s
+    - price_change_atr_30s
+    - pct_levels_behind_trade
+    - prior_day_low_signed_distance_points
+    - opening_range_30m_low_final_signed_distance_points
+    - vol_max_1s_1800s
+    - price_position_in_full_envelope
+    - rth_abs_delta_cum
+    - n_levels_below
+  directional_mapping: direction_normalized
+  timing_contract: verified
+
+model:
+  mode: scoring
+  family: HistGradientBoostingClassifier
+  artifact_path: studies/runtime_constrained_f3_feature_reduction/artifacts/models/F3_top25_gbt_v1/model.joblib
+  artifact_sha256: 24bf6bece8319cb951bc82f31ea97ac7d3a0a9a200d598d986965143dec7e944
+
+chronology:
+  dev: [2025]
+  prohibited: [2026]
+
+execution:
+  runtime: nautilustrader
+  strategy_class: strategies.flip_prediction_collector.FlipPredictionCollector
+  progress_seconds: 60
+  bounded: true

@@ -1,0 +1,26 @@
+{
+  "run_id": "20260815_213044_Gemini_clean_maturity_flip_rolling_5m_productivity_full",
+  "study_id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "2ce0817ac7df4c9ad5e16fd83f77fc5b865e9229eaa8265c9c6d134bac18b0a5",
+  "composite_seal_hash": "f01abb545ab4c76fe633b21588cdd606382d5cd2362494401e834211d04f4e30",
+  "execution_manifest_sha256": "f01abb545ab4c76fe633b21588cdd606382d5cd2362494401e834211d04f4e30",
+  "stage": "full",
+  "dates": {
+    "start": "2021-01-01",
+    "end": "2023-12-31",
+    "warmup_start": "2020-12-27T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME",
+    "instrument_id": "NQ.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-15T21:30:44.884915+00:00",
+  "status": "RUNNING"
+}

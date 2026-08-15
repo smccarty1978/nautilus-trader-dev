@@ -588,6 +588,57 @@ for _K in (3, 5, 8, 12):
             reset_policy='none'
         )
 
+# Structural-regime geometry is provisional until the owning study's parity,
+# prefix-invariance, and causal audits clear. Its study-specific snapshot binding is
+# declared by the collector; the registry records update ownership and formulas.
+_STRUCTURAL_IMPL = 'features.trackers.structural_regime_geometry.StructuralRegimeGeometryTracker'
+_STRUCTURAL_TESTS = ('studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py',)
+for _col in (
+    'structural_max_expansion_atr', 'structural_current_expansion_atr',
+    'structural_giveback_atr', 'structural_retention_ratio',
+    'structural_expansion_atr_per_min', 'regime_expansion_atr_per_min',
+    'prior_1m_regime_duration_min', 'prior_1m_regime_range_atr',
+    'prior_1m_regime_net_directional_move_atr', 'prior_1m_regime_mfe_atr',
+    'prior_1m_regime_range_atr_per_min', 'prior_1m_regime_net_move_atr_per_min',
+    'prior_1m_regime_efficiency', 'current_5m_regime_age_min',
+    'current_5m_regime_range_atr', 'current_5m_directional_displacement_atr',
+    'current_5m_regime_range_atr_per_min', 'prior_5m_regime_duration_min',
+    'prior_5m_regime_range_atr', 'prior_5m_regime_net_directional_move_atr',
+    'prior_5m_regime_mfe_atr', 'prior_5m_regime_range_atr_per_min',
+    'prior_5m_regime_net_move_atr_per_min', 'prior_5m_regime_efficiency',
+    'distance_to_completed_5m_high_atr', 'distance_to_completed_5m_low_atr',
+    'current_1m_move_outside_completed_5m_range',
+):
+    FEATURE_REGISTRY[_col] = FeatureDefinition(
+        name=_col, status='provisional', family='structural_regime_geometry',
+        implementation=_STRUCTURAL_IMPL, tests=_STRUCTURAL_TESTS,
+        source_timeframe='1s+1m+5m',
+        update_anchor='completed_1s_completed_5m_then_1m_flip',
+        normalizer='study_contract', window_unit='since_regime_flip',
+        reset_policy='event_start', null_policy='allow',
+    )
+
+# Study-owned rolling productivity.  It is provisional until this study's
+# pre-execution and completion audits, deterministic boundary tests, and NT
+# collection validation have all cleared.  The tracker has no hidden label or
+# outcome input: every value comes from completed 1s bars at the checkpoint.
+_ROLLING_PRODUCTIVITY_IMPL = 'features.trackers.rolling_5m_productivity.Rolling5mProductivityTracker'
+_ROLLING_PRODUCTIVITY_TESTS = ('studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py',)
+for _col in (
+    'rolling_5m_max_progress_atr', 'rolling_5m_current_progress_atr',
+    'rolling_5m_giveback_atr', 'rolling_5m_retention_ratio',
+    'rolling_5m_max_speed_atr_per_min', 'rolling_5m_current_speed_atr_per_min',
+    'rolling_5m_max_speed_vs_lifetime',
+    'rolling_5m_current_speed_vs_lifetime',
+):
+    FEATURE_REGISTRY[_col] = FeatureDefinition(
+        name=_col, status='provisional', family='rolling_5m_productivity',
+        implementation=_ROLLING_PRODUCTIVITY_IMPL, tests=_ROLLING_PRODUCTIVITY_TESTS,
+        source_timeframe='1s', update_anchor='completed_1s_at_or_before_checkpoint',
+        snapshot_anchor='at_5s_decision_ts', normalizer='current_1m_regime_start_atr',
+        window=300, window_unit='seconds', reset_policy='none', null_policy='allow',
+    )
+
 # Reverse mapping for alias lookup
 _ALIAS_TO_CANONICAL: Dict[str, str] = {}
 for canonical_name, definition in FEATURE_REGISTRY.items():

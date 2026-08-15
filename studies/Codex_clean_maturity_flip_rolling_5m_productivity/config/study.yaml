@@ -21,6 +21,8 @@ rolling_productivity:
   window_seconds: 300
   source_timeframe: 1s_completed
   atr_normalizer: current_1m_regime_start
+structural_coverage:
+  minimum_complete_fraction_per_primary_directional_cell: 0.90
 models: [BASELINE, BASELINE_PLUS_STRUCTURAL, BASELINE_PLUS_STRUCTURAL_PLUS_ROLLING_5M]
 model_class: HistGradientBoostingClassifier
 model_params: {max_depth: 3, learning_rate: 0.05, max_iter: 200, random_state: 42}

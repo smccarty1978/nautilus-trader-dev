@@ -29,16 +29,15 @@ stopping point for them; one study ran 18 audit passes as a result. If you spot
 a completeness problem, write one line under `## Referred to contract-checker`
 and move on. Do not block on it. Do not itemize it. Do not re-raise it later.
 
-## Step 1 — read the deterministic lint first
+## Step 1 — verify deterministic preflight passed first
+
+Read `<study_dir>/audit/preflight.json`. Preflight must be `CLEAR`.
 
 ```bash
-python scripts/causal_lint.py --study <study_dir> --json <study_dir>/audit/lint.json
+python scripts/research_preflight.py --study <study_dir>
 ```
 
-Everything the lint already caught is **out of your scope** — it is reported
-and tracked without your tokens. Your job is what grep cannot see: state flow,
-callback ordering, cross-file convention conflicts, train/serve divergence.
-Do not re-report a lint finding.
+Everything deterministic checks (AST lint, schema checks, model binding, invariant canaries) already proved is **out of your scope** — it is proven without your tokens. Your job is what deterministic gates cannot fully resolve: complex state flow, callback ordering, cross-file convention conflicts, train/serve divergence. Do not re-report a preflight finding.
 
 ## Step 2 — diff-first review
 

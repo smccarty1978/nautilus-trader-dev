@@ -1,0 +1,42 @@
+research_question: "Do structural geometry and rolling 5m productivity add incremental information to the existing frozen base models across regime maturity stages?"
+
+baseline:
+  short: "BULLISH_FADE_TO_BEARISH_FLIP_TOP25_GBT_V1"
+  long: "BEARISH_FADE_TO_BULLISH_FLIP_TOP25_GBT_V2"
+
+baseline_feature_selection:
+  mode: "none"
+
+model_arms:
+  A: "frozen_top25"
+  B: "frozen_top25_plus_structural"
+  C: "frozen_top25_plus_structural_plus_rolling_productivity"
+
+variable_being_tested:
+  - "structural_regime_geometry"
+  - "rolling_5m_productivity"
+  - "regime_maturity_interaction"
+
+prohibited_changes:
+  - "rerank_baseline_features"
+  - "replace_frozen_top25"
+  - "expand_to_full_feature_registry"
+  - "use_2024_to_change_model_design"
+
+allowed_changes:
+  - "evaluate_model_arms_a_b_c"
+  - "stratify_by_maturity_buckets"
+
+chronology:
+  train:
+    - 2021
+    - 2022
+    - 2023
+  dev:
+    - 2024
+  prohibited:
+    - 2025
+    - 2026
+
+primary_comparison: "Model C vs Model B vs Model A on 2024 OOS across maturity buckets (300-600s, 600-900s, 900-1800s)"
+terminal_question: "Does Model C improve PR-AUC and Top-Decile Precision over Model A and Model B in mature regimes without degrading early regimes?"

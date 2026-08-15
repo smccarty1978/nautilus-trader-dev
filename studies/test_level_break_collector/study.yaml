@@ -1,0 +1,64 @@
+study:
+  id: test_level_break_collector
+  type: bespoke
+  description: "Level break 1m bar-close collector test fixture for genericity proof"
+  risk_tier: 1
+
+instrument:
+  symbol: NQ
+  venue: XCME
+
+chronology:
+  train: [2023]
+  dev: [2024]
+  diagnostic: []
+  prohibited: [2025, 2026]
+  warmup:
+    days_before_partition: 1
+    allowed: true
+    candidate_emission: false
+    target_generation: false
+    permitted_partition_relationship: pre_train_only
+
+population:
+  type: regime_state
+  prevailing_regime: neutral
+  session: RTH
+
+target:
+  type: return
+  horizon_seconds: 300
+
+features:
+  feature_list:
+    - arrival_vel_5s
+    - arrival_vel_10s
+    - arrival_vel_20s
+    - arrival_vel_30s
+    - arrival_accel_5s
+    - arrival_accel_10s
+    - arrival_jerk
+  feature_list_sha256: 490150eda8485f43e63ad0572c8104f21eec135b3a1a6568ba47158c944779e9
+  metadata_columns:
+    - observation_ts
+    - event_index
+    - bar_close_1m
+    - bar_volume_1m
+    - triggering_1s_ts_init
+
+execution:
+  runtime: nautilustrader
+  strategy_class: strategies.level_break_test_collector.LevelBreakTestCollector
+  observation_policy:
+    type: parent_bar_close
+    cadence_seconds: 60
+    source_timeframe: 1m
+    required_source_relation: "<="
+
+bespoke:
+  reason: "Genericity test fixture for 1m bar-close level break test collector with 7 features."
+  unsupported_contract_element: "none"
+  canonical_type_considered: "flip_prediction"
+  reusable_extension_considered: "none"
+  custom_scope:
+    - strategies/level_break_test_collector.py

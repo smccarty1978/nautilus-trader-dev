@@ -1,0 +1,54 @@
+{
+  "run_id": "20260814_231347_reconstructed_long_rth_strict_retrain_day",
+  "study_id": "reconstructed_long_rth_strict_retrain",
+  "status": "SUCCESS",
+  "stage": "day",
+  "wall_time_seconds": 24.663,
+  "total_bars_processed": 59132,
+  "candidates_count": 1085,
+  "observations_count": 1085,
+  "throughput_bars_per_sec": 2397.6,
+  "memory": {
+    "baseline_process_rss_mb": 185.18,
+    "peak_process_rss_mb": 260.46,
+    "rss_delta_mb": 75.27,
+    "python_tracemalloc_peak_mb": 16.31
+  },
+  "bars_breakdown": {
+    "loaded": {
+      "1s": 57693,
+      "1m": 1439
+    },
+    "callbacks": {
+      "1s": 57693,
+      "1m": 1439
+    },
+    "ts_event_ranges": {
+      "1s": {
+        "first": null,
+        "last": null
+      },
+      "1m": {
+        "first": null,
+        "last": null
+      }
+    },
+    "ts_init_ranges": {
+      "1s": {
+        "first": null,
+        "last": null
+      },
+      "1m": {
+        "first": null,
+        "last": null
+      }
+    }
+  },
+  "output_artifacts": {
+    "candidates_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260814_231347_reconstructed_long_rth_strict_retrain_day\\collection\\candidates.parquet",
+    "observations_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260814_231347_reconstructed_long_rth_strict_retrain_day\\collection\\observations.parquet",
+    "collection_manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260814_231347_reconstructed_long_rth_strict_retrain_day\\collection\\collection_manifest.json"
+  },
+  "end_time_utc": "2026-08-14T23:14:11.890795+00:00",
+  "lineage_status": "SUPERSEDED"
+}

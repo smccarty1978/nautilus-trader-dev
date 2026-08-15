@@ -1,0 +1,48 @@
+{
+  "run_id": "20260814_231347_reconstructed_long_rth_strict_retrain_day",
+  "study_id": "reconstructed_long_rth_strict_retrain",
+  "study_type": "flip_prediction",
+  "spec_sha256": "bd51e8c29eb7d0fa300c6bb638034541851e1c4db0c0552603714aa2bf4ecaa2",
+  "stage": "day",
+  "dates": {
+    "start": "2025-03-03",
+    "end": "2025-03-03",
+    "warmup_start": "2025-03-02T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME",
+    "instrument_id": "NQ.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-14T23:13:47.179906+00:00",
+  "status": "COMPLETED",
+  "telemetry": {
+    "wall_time_seconds": 24.66312340000877,
+    "total_bars_processed": 59132,
+    "throughput_bars_per_sec": 2397.5876469879304,
+    "baseline_process_rss_mb": 185.18,
+    "peak_process_rss_mb": 260.46,
+    "rss_delta_mb": 75.27,
+    "python_tracemalloc_peak_mb": 16.31,
+    "bars_loaded": {
+      "1s": 57693,
+      "1m": 1439
+    },
+    "callbacks": {
+      "1s": 57693,
+      "1m": 1439
+    }
+  },
+  "outputs": {
+    "candidates_count": 1085,
+    "candidates_sha256": "3958f9809ff7ac535b51fb3299c5f7fa9ac3bc7a21612387cb4433ef4a2c1199",
+    "observations_count": 1085,
+    "observations_sha256": "3b7f8d2f7336d4bd855bf0ebab506566d806dfe61788bf19a0677ec3224f2369"
+  },
+  "end_time_utc": "2026-08-14T23:14:11.907086+00:00"
+}

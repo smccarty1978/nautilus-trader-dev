@@ -12,8 +12,7 @@ defined there, not restated here.
 
 ## Your scope — and what is NOT yours
 
-You own:
-
+- **The Research Decision Contract (`research_decision.yaml`)** — if present, does SPEC.md and study.yaml adhere strictly to its baseline, feature selection mode, model arms, chronology, and prohibited changes?
 - **The SPEC's Deliverables Manifest (section 6)** — does every listed artifact
   exist, with the listed columns and contents?
 - **Terminal decision labels** — is every declared label reachable through the

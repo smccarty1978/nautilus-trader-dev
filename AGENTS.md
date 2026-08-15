@@ -34,6 +34,17 @@ This repository follows strict methodology to ensure all backtests, studies, and
 - Strategies: Config-driven, indicator-agnostic
 - Backtests: Strategy-agnostic runners
 - Analysis: Works on any backtest output
+
+### 5. Factory-first study creation
+- Every new study MUST be configured via `study.yaml`, scaffolded via `python scripts/create_study.py --config <study.yaml>`, and validated via `python scripts/compile_study.py`.
+- Coding agents MUST NOT create study-specific implementations for behavior already representable by a canonical study type (e.g. `flip_prediction`).
+- A coding agent proposing bespoke code must provide `BESPOKE_JUSTIFICATION` before implementation.
+
+### 6. Research Decision Contract Authority & Fidelity
+- Precedence: `research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code`.
+- BEFORE drafting or modifying `SPEC.md`: Create or verify `research_decision.yaml`.
+- `SPEC.md` must be derived from `research_decision.yaml`. No study may compile or pass preflight unless decision-contract fidelity passes (`python scripts/check_research_decision_fidelity.py --study studies/<name>`).
+- Behavioral Rule: Never improve, broaden, clean up, or make a study more statistically pure by changing a fixed baseline or adding feature discovery unless the Research Decision Contract explicitly permits it. If a design concern exists, surface it as a caveat; do not silently alter the experiment.
 ---
 
 ## DOCUMENTATION INDEX
@@ -88,12 +99,13 @@ Pre-execution workflow:
 1. Freeze the SPEC/config and implement the smallest testable code surface. Do
    not run collection, label construction, model fitting, backtesting, or a
    staged runner yet.
-2. **Run the free lint first.** `python scripts/causal_lint.py --study studies/<name> --json studies/<name>/audit/lint.json`.
-   It catches the known-recurring defect classes (H4 trigger-price fills, session
-   gates on `ts_event`, `center=True`, `.shift(-N)`, `bfill`, `merge_asof`
-   without `direction=`, non-`*.v.0` symbols) deterministically and for free.
-   Fix everything it reports before spending an agent turn.
-3. Invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
+2. **Run deterministic preflight first.** `python scripts/research_preflight.py --study studies/<name>`.
+   It orchestrates AST causal linting (`causal_lint.py`), artifact schema checks (`check_artifact_schema.py`),
+   model/feature binding (`check_model_binding.py`), and fast causal canaries (`select_required_tests.py` -> pytest)
+   deterministically and for free.
+   - If preflight is `BLOCKED`, inspect `audit/failure_packet.json` and resolve all issues locally.
+   - Coding agents may NOT bypass a `BLOCKED` preflight or request an audit while preflight is failing.
+3. Once preflight is `CLEAR`, invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
    on the Deliverables Manifest. They are independent and may run in parallel.
 4. Each writes a **new** `audit/pass_<NN>.md` plus a machine-readable
    `audit/status.json` (`contract_status.json` for the contract-checker).
@@ -275,7 +287,7 @@ If the component reuses another study's execution stack "verbatim," audit it any
 ```
 ---
 
-## TIMEZONE CONVENTION
+## TIMEZONE & TIMESTAMP CONVENTION
 
 All timestamps in Central Time (America/Chicago) for display/analysis.
 Internal NT uses UTC. Convert for human-readable output.
@@ -288,7 +300,12 @@ def to_ct(utc_timestamp):
     return utc_timestamp.astimezone(CT)
 ```
 
-RTH (Regular Trading Hours): 8:30 CT - 15:00 CT
+RTH (Regular Trading Hours): 08:30 CT - 15:15 CT
+
+### Canonical Bar-Availability & Timestamp Contract
+- **Raw Databento OHLCV:** OPEN-stamped (`ts_event`). Complete OHLCV becomes usable only at interval close.
+- **Offline Research:** Normalize derived bars to CLOSE-stamped indices (`label='right', closed='left'`).
+- **NautilusTrader Catalog:** Preserve open-stamped `ts_event` and set `ts_init = ts_event + bar_duration_ns` (1s: +1s, 1m: +60s, 3m: +180s, 5m: +300s) so the NT event loop dispatches completed bars at interval close.
 
 ---
 
@@ -323,7 +340,7 @@ For significant results, create a tagged release with:
 ## LESSONS LEARNED
 
 1. **Pandas validation is invalid** - Breakdown strategy showed 63% WR in pandas, 11% in NT due to look-ahead
-2. **Timestamp handling is critical** - Databento OPEN timestamps caused massive look-ahead bias
+2. **Timestamp handling is critical** - Databento OPEN timestamps require ts_init = ts_event + bar_duration_ns in NT catalog to prevent look-ahead bias
 3. **MFE/MAE from pandas may be inflated** - Only trust NT backtest results
 4. **CTB checked at touch time, not breach time** - Order of operations matters
 5. **Regime change bar can be breach bar** - Don't return early on regime change
@@ -344,7 +361,7 @@ Keep architecture, causal interpretation, integration, and final approval in the
 | `repo-scout` | `repo_scout` | Locate files, trace execution paths | 700w — paths, symbols, line ranges only | Claude, Codex |
 | `contract-checker` | `contract_checker` | Compare code/tests against explicit specs | 1,000w — compliance table + findings only | Claude, Codex |
 | `results-triager` | `results_triager` | Run exact approved pytest commands | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
-| `lookahead-auditor` | `lookahead_auditor` | Independent causal / look-ahead audit | 1,500w — complete Markdown report, parent persists | Claude, Codex |
+| `lookahead-auditor` | `lookahead_auditor` | Internal causal / look-ahead review (self-attested) | 1,500w — complete Markdown report, parent persists | Claude, Codex |
 | `implementation-worker` | `implementation_worker` | Implement one frozen, bounded task packet | — | **Codex only** |
 
 ### Risk tiers

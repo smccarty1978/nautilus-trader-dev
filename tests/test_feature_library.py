@@ -224,30 +224,26 @@ def test_ohlcv_delta_regime_transition_buffers_and_replays_correctly():
 
     regime1 = MockRegime(regime_id=1, regime=1, has_breached=False, atr=2.0, short_ema=100, long_ema=99)
 
-    # Minute 1: first-ever regime confirmation (regime_id 0 -> 1) at the 1m
-    # bar that closes this same minute -- these 60 buffered bars must land
-    # in regime 1's accumulator, not be dropped.
+    # Minute 1 precedes the first declared regime start at its close, so its
+    # buffered bars must be discarded rather than backfilled into that regime.
     feed_minute(0, vol=10.0)
     m1 = MockBar(100.0, 101.0, 99.0, 100.5, 600.0, ts0 + 60 * NS, ts_init=ts0 + 60 * NS)
     engine.update_1m(m1, regime1)
-    assert engine._ohlcv_delta_tracker._regime_vol_sum == pytest.approx(600.0)
+    assert engine._ohlcv_delta_tracker._regime_vol_sum == pytest.approx(0.0)
 
-    # Minute 2: same regime continues -- must accumulate, not reset.
+    # Minute 2 occurs after that start, so it accumulates normally.
     feed_minute(60, vol=10.0)
     m2 = MockBar(100.0, 101.0, 99.0, 100.5, 600.0, ts0 + 120 * NS, ts_init=ts0 + 120 * NS)
     engine.update_1m(m2, regime1)
-    assert engine._ohlcv_delta_tracker._regime_vol_sum == pytest.approx(1200.0)
+    assert engine._ohlcv_delta_tracker._regime_vol_sum == pytest.approx(600.0)
 
     # Minute 3: a NEW regime is confirmed by the 1m bar that closes THIS
-    # minute. The 60 1s bars just fed (buffered, not yet attributed to any
-    # regime) must land in the NEW regime's accumulator only -- not the old
-    # regime (which would silently misattribute a full minute) and not lost.
+    # minute. The 60 1s bars just fed completed before the parent 1m close,
+    # so they belong to the OLD regime. The new regime starts at that close
+    # and must begin with an empty completed-1s accumulator.
     feed_minute(120, vol=25.0)
     regime2 = MockRegime(regime_id=2, regime=-1, has_breached=False, atr=2.0, short_ema=99, long_ema=100)
     m3 = MockBar(105.0, 106.0, 104.0, 105.5, 1500.0, ts0 + 180 * NS, ts_init=ts0 + 180 * NS)
     engine.update_1m(m3, regime2)
-    # Reset to the new regime must have happened BEFORE the replay, so the
-    # old regime's 1200 must NOT still be present, and the new minute's own
-    # 60*25=1500 must be fully counted (not partially/zero).
-    assert engine._ohlcv_delta_tracker._regime_vol_sum == pytest.approx(1500.0)
+    assert engine._ohlcv_delta_tracker._regime_vol_sum == pytest.approx(0.0)
     assert engine._ohlcv_delta_tracker._regime_anchor_price == pytest.approx(105.0)  # new regime bar's OPEN

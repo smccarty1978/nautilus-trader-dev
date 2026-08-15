@@ -46,8 +46,10 @@ denominators emit unavailable values, never clamps. Forming 5m bars remain exclu
 
 ## Evaluation
 
-Report A/B/C separately by SHORT, LONG, pooled direction-labelled diagnostic, and
-300-600s, 600-900s, 900-1800s; >=1800s is descriptive only. Freeze directional
+Report the exact 18 directional model cells (A/B/C × SHORT/LONG × the three
+primary maturity buckets) and the separate nine pooled direction-labelled
+diagnostic rows (A/B/C × bucket). Pooled rows never enter terminal
+classification. >=1800s is descriptive only. Freeze directional
 P90/P95/P97.5 thresholds and deciles from TRAIN only. OOS reports AUC, PR AUC/Brier
 where available, within-regime timing, first-crossing confirmation/MAE/return/MFE,
 and decile economics. Pooled rows never determine terminal classification.
@@ -56,13 +58,36 @@ and decile economics. Pooled rows never determine terminal classification.
 
 R1 broad clean improvement; R2 young-regime improvement; R3 timing only; R4 economic
 tail only; R5 rolling block adds nothing; R6 no clean incremental information; ABORT
-for any selection, causal, coverage, audit, or seal failure.
+for any selection, causal, coverage, audit, or seal failure. Directional evidence
+alone determines the terminal label; pooled rows are descriptive only.
 
 ## Deliverables and gates
 
-Required: candidate-universe manifest, frozen source manifests, collection/feature
-manifests, model/score/crossing/decile artifacts, validation, summary, report, seal,
-promotion gate, causal and contract audits. The report must state that the baseline
-universe was rebuilt independently because the predecessor's F3 universe was
-post-2024 selected. Run lint and split causal/contract pre-execution audits before
-candidate collection, feature freezing, or fitting; completion requires both clear.
+Run lint and split causal/contract pre-execution audits before candidate
+collection, feature freezing, or fitting; completion requires both clear.
+
+## Deliverables Manifest
+
+All paths below are relative to this study directory. Generated row data remains
+untracked; manifests, reports, audit artifacts, and the frozen contract are
+versioned.
+
+| Path | Required contents / exact checks |
+|---|---|
+| `artifacts/phase0_source_manifest.json` | Authenticated `study.yaml` and `SPEC.md` hashes; registry and engine hashes; ordered verified numeric candidate inventory with definitions, implementation hashes, and test paths; explicit proof that F3 scored tables, 2024+ labels, 2025, and 2026 were not read. Must be created before collection, selection, or fit. |
+| `artifacts/collection_manifest.json` | NT event-loop collector/config/data hashes; partitions restricted to 2021–2024; row counts and SHA-256 for each feature and runtime-regime partition; warmup/readiness, RTH, exact-5s, completed-1s, and completed-5m provenance checks. |
+| `artifacts/frozen_feature_manifest.json` | One ordered 25-feature baseline list per SHORT/LONG direction; Train-only row/positive counts, temporal folds, candidate inventory hash, ranking method, feature-list hash, imputer fit hash, and explicit `2024_not_read_before_freeze: true`. |
+| `artifacts/model_manifest.json` | A/B/C model feature blocks, fixed HistGradientBoosting parameters, direction, TRAIN dates, model hashes, and hashes of the frozen feature and preprocessing artifacts. No fit may run without a matching authenticated phase-zero manifest. |
+| `artifacts/score_manifest.json` | 2024-only score partitions; score/model/source hashes; the exact 18 directional cells (A/B/C × SHORT/LONG × 300-600s/600-900s/900-1800s) and nine descriptive pooled rows. Each directional row contains N, positives, ROC AUC, PR AUC, Brier, and timing metrics. |
+| `artifacts/crossing_manifest.json` | TRAIN-derived P90/P95/P97.5 thresholds and deciles for every model/direction/bucket; 2024 first-crossing rows with one arm per regime and Walk-A confirmation/MAE/return/eventual-MFE diagnostics. |
+| `artifacts/decile_manifest.json` | 2024 OOS directional model/bucket/decile rows with flip rate, confirmation rate, return at confirmation, MAE, eventual opposite MFE, and P(MFE >=3 ATR). |
+| `artifacts/validation.json` | Fail-closed checks for source authenticity, 2021–2023 selection/training, 2024-only scoring, no 2025/2026 access, availability timestamps, exact target interval, directional 18-cell completeness, pooled 9-row completeness, nonempty primary-cell denominators, and every required artifact/hash. |
+| `artifacts/result_seal.json` | SHA-256 bindings for phase-zero, collection, frozen features, preprocessing, models, scores, crossings, deciles, validation, summary, and report. Missing or changed inputs invalidate the seal. |
+| `artifacts/promotion_gate.json` | `PASS` only if both audit status files have zero critical/blocking findings, validation passes, result seal verifies, all primary directional cells are complete, and the terminal label is not ABORT. It records the directional-only evidence used for the label and never permits pooled rows to decide it. |
+| `STUDY_REPORT.md` | The final R1–R6/ABORT label, direction-by-bucket A/B/C results, timing/crossing/decile/economic diagnostics, family attribution, limitations, all manifest locations/hashes, and an explicit statement that the old F3-selected study remains exploratory only. |
+| `audit/pass_*.md`, `audit/status.json`, `audit/contract_pass_*.md`, `audit/contract_status.json` | Immutable causal and contract audit verdicts. Any nonzero critical/blocking result stops execution or promotion. |
+
+The only canonical terminal labels are R1, R2, R3, R4, R5, R6, and ABORT as
+defined above. The promotion gate must prove every label is reachable and must
+fail closed when material evidence is absent. Pooled direction-labelled rows are
+descriptive diagnostics only and cannot influence classification or promotion.

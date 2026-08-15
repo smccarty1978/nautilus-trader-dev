@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "source": "accepted canonical Top25 surface",
+  "study_years": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "sealed_after_ns": 1735689600000000000,
+  "target": "prevailing_1m_regime_flip_in_(T,T+300s]",
+  "train_years": [
+    2021,
+    2022,
+    2023
+  ],
+  "oos_year": 2024,
+  "accepted_eligibility": {
+    "session": "RTH",
+    "minimum_age_seconds": 300,
+    "in_domain": "direction-specific accepted canonical gate",
+    "right_censoring": "excluded"
+  },
+  "top25_sources": {
+    "prevailing_bullish_short": {
+      "name": "F3_top25_gbt_v1",
+      "sha256": "caab31085099e09a00f518ae528145635c8d15d0d248cde7456c56c22dc191f0"
+    },
+    "prevailing_bearish_long": {
+      "name": "F3_top25_gbt_v1",
+      "sha256": "caab31085099e09a00f518ae528145635c8d15d0d248cde7456c56c22dc191f0"
+    }
+  },
+  "observed_reconciliation": {
+    "joined_2021_2024_rth_rows": 4551256,
+    "minimum_checkpoint_year": 2021,
+    "maximum_checkpoint_year": 2024,
+    "bullish_in_domain_rows": 982334,
+    "bearish_in_domain_rows": 796590
+  }
+}

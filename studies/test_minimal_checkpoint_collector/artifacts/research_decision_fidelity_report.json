@@ -1,0 +1,38 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\test_minimal_checkpoint_collector",
+  "decision_contract": {
+    "research_question": "Can a minimal 15-second checkpoint collector track basic 1m bar dynamics without complex feature tracker pipelines?",
+    "baseline": {
+      "short": "minimal_baseline",
+      "long": "Minimal 15-second checkpoint collector baseline"
+    },
+    "baseline_feature_selection": {
+      "mode": "none"
+    },
+    "model_arms": {
+      "model_single": "3-feature minimal model"
+    },
+    "variable_being_tested": [
+      "15s checkpoint cadence",
+      "3 basic bar features"
+    ],
+    "prohibited_changes": [],
+    "allowed_changes": [],
+    "chronology": {
+      "train": [
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": "minimal_vs_baseline",
+    "terminal_question": "Does the minimal collector compile and execute cleanly in NautilusTrader?"
+  },
+  "findings": []
+}

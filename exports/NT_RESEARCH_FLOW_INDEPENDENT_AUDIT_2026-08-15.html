@@ -1,0 +1,746 @@
+<title>NT Research Flow — Independent Audit</title>
+<style>
+  :root{
+    --ground:#EEF1F5;
+    --surface:#FFFFFF;
+    --surface-2:#F7F9FB;
+    --ink:#131A24;
+    --ink-2:#3F4A59;
+    --ink-3:#6B7787;
+    --rule:#D3DAE3;
+    --rule-soft:#E4E9EF;
+    --accent:#2F5D8C;
+    --accent-soft:#E2EAF3;
+    --crit:#A81F26;
+    --crit-bg:#FBE9EA;
+    --warn:#8A5A0B;
+    --warn-bg:#FBF1DF;
+    --note:#3B5A78;
+    --note-bg:#E8EEF4;
+    --ok:#256B4A;
+    --ok-bg:#E3F1E9;
+    --term-bg:#141B25;
+    --term-ink:#C8D3E0;
+    --term-dim:#7E8DA0;
+    --term-go:#79C08E;
+    --term-no:#E58388;
+    --shadow:0 1px 2px rgba(19,26,36,.06), 0 6px 18px -10px rgba(19,26,36,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D131B;
+      --surface:#151D27;
+      --surface-2:#111822;
+      --ink:#E4EAF1;
+      --ink-2:#B0BCCA;
+      --ink-3:#7E8B9B;
+      --rule:#2A3543;
+      --rule-soft:#212B37;
+      --accent:#7FAAD8;
+      --accent-soft:#1B2735;
+      --crit:#FF8087;
+      --crit-bg:#2B171A;
+      --warn:#E5AE5C;
+      --warn-bg:#2A2117;
+      --note:#8FB0CE;
+      --note-bg:#1A222C;
+      --ok:#6FC095;
+      --ok-bg:#152420;
+      --term-bg:#0A0F16;
+      --term-ink:#C8D3E0;
+      --term-dim:#6F7E90;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D131B;
+    --surface:#151D27;
+    --surface-2:#111822;
+    --ink:#E4EAF1;
+    --ink-2:#B0BCCA;
+    --ink-3:#7E8B9B;
+    --rule:#2A3543;
+    --rule-soft:#212B37;
+    --accent:#7FAAD8;
+    --accent-soft:#1B2735;
+    --crit:#FF8087;
+    --crit-bg:#2B171A;
+    --warn:#E5AE5C;
+    --warn-bg:#2A2117;
+    --note:#8FB0CE;
+    --note-bg:#1A222C;
+    --ok:#6FC095;
+    --ok-bg:#152420;
+    --term-bg:#0A0F16;
+    --term-ink:#C8D3E0;
+    --term-dim:#6F7E90;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--ground);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px 96px;}
+
+  /* ---------- masthead ---------- */
+  header.mast{
+    border-bottom:1px solid var(--rule);
+    background:var(--surface);
+  }
+  .mast-inner{max-width:1080px;margin:0 auto;padding:38px 28px 30px;display:flex;flex-direction:column;gap:20px;}
+  .eyebrow{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-3);
+  }
+  h1{
+    margin:0;
+    font-size:clamp(30px,4.4vw,46px);
+    line-height:1.06;
+    letter-spacing:-.022em;
+    font-weight:700;
+    text-wrap:balance;
+  }
+  .dek{margin:0;max-width:64ch;color:var(--ink-2);font-size:17px;}
+
+  .verdict{
+    display:flex;flex-wrap:wrap;align-items:center;gap:16px;
+    padding:18px 20px;border-radius:3px;
+    background:var(--crit-bg);
+    border:1px solid var(--crit);
+    border-left-width:5px;
+  }
+  .verdict-stamp{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:clamp(20px,3vw,28px);font-weight:700;letter-spacing:.04em;
+    color:var(--crit);
+  }
+  .verdict-why{color:var(--ink-2);font-size:14.5px;max-width:58ch;margin:0;}
+
+  .facts{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px;background:var(--rule);border:1px solid var(--rule);
+  }
+  .fact{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:3px;}
+  .fact dt{font-family:ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);}
+  .fact dd{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .fact dd.c-crit{color:var(--crit);} .fact dd.c-warn{color:var(--warn);} .fact dd.c-ok{color:var(--ok);}
+
+  /* ---------- sections ---------- */
+  section{margin-top:56px;}
+  h2{
+    margin:0 0 6px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-family:ui-monospace,Consolas,monospace;color:var(--accent);font-weight:700;
+  }
+  h2 + .sub{margin:0 0 22px;font-size:24px;font-weight:660;letter-spacing:-.018em;text-wrap:balance;}
+  h3{font-size:17px;font-weight:650;margin:32px 0 10px;letter-spacing:-.01em;}
+  p{margin:0 0 14px;max-width:72ch;}
+  a{color:var(--accent);}
+  code{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:.875em;background:var(--surface-2);border:1px solid var(--rule-soft);
+    padding:1px 5px;border-radius:2px;color:var(--ink);
+    overflow-wrap:anywhere;
+  }
+
+  /* ---------- tables ---------- */
+  .tscroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;}
+  thead th{
+    background:var(--surface-2);font-family:ui-monospace,Consolas,monospace;
+    font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+    border-bottom:1px solid var(--rule);white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  td.vd{white-space:nowrap;font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:700;letter-spacing:.05em;}
+  .v-fail{color:var(--crit);} .v-weak{color:var(--warn);} .v-pass{color:var(--ok);}
+
+  /* ---------- findings ---------- */
+  .find{
+    background:var(--surface);border:1px solid var(--rule);
+    border-left:5px solid var(--rule);
+    margin-bottom:16px;box-shadow:var(--shadow);
+  }
+  .find.crit{border-left-color:var(--crit);}
+  .find.warn{border-left-color:var(--warn);}
+  .find.note{border-left-color:var(--note);}
+  .find-head{padding:15px 20px 13px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--rule-soft);}
+  .find-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+  .pill{
+    font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:2px;
+  }
+  .pill.crit{background:var(--crit-bg);color:var(--crit);}
+  .pill.warn{background:var(--warn-bg);color:var(--warn);}
+  .pill.note{background:var(--note-bg);color:var(--note);}
+  .fid{font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;}
+  .find-title{font-size:17.5px;font-weight:650;letter-spacing:-.012em;margin:0;text-wrap:balance;}
+  .loc{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--ink-2);overflow-wrap:anywhere;}
+  .find-body{padding:4px 20px 16px;display:grid;gap:0;}
+  .row{display:grid;grid-template-columns:132px 1fr;gap:16px;padding:11px 0;border-bottom:1px solid var(--rule-soft);}
+  .row:last-child{border-bottom:none;}
+  .row dt{
+    font-family:ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-3);padding-top:3px;
+  }
+  .row dd{margin:0;font-size:14.5px;color:var(--ink-2);}
+  .row dd strong{color:var(--ink);font-weight:640;}
+  @media (max-width:640px){
+    .row{grid-template-columns:1fr;gap:4px;}
+  }
+
+  /* ---------- terminal ---------- */
+  .term{
+    background:var(--term-bg);color:var(--term-ink);
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:12.5px;line-height:1.68;
+    padding:16px 18px;overflow-x:auto;border-radius:3px;
+    border:1px solid rgba(127,170,216,.18);
+    margin:0 0 18px;white-space:pre;
+  }
+  .term .c{color:var(--term-dim);}
+  .term .g{color:var(--term-go);}
+  .term .r{color:var(--term-no);font-weight:600;}
+  .term-cap{
+    font-family:ui-monospace,Consolas,monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 7px;
+  }
+
+  ul,ol{max-width:72ch;padding-left:22px;margin:0 0 16px;}
+  li{margin-bottom:7px;}
+  .callout{
+    background:var(--accent-soft);border-left:4px solid var(--accent);
+    padding:14px 18px;margin:0 0 18px;
+  }
+  .callout p:last-child{margin-bottom:0;}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+  /* ---------- print / PDF ---------- */
+  @page{ margin:14mm 12mm; }
+  @media print{
+    /* Pin the light palette: a PDF has no viewer theme to follow. */
+    :root, :root[data-theme="dark"]{
+      --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F6F9;
+      --ink:#0E141C; --ink-2:#2E3844; --ink-3:#5C6775;
+      --rule:#B9C2CD; --rule-soft:#D8DEE6;
+      --accent:#23507D; --accent-soft:#EAF0F7;
+      --crit:#8E161D; --crit-bg:#FBE9EA;
+      --warn:#6F470A; --warn-bg:#FAF0DC;
+      --note:#2F4A64; --note-bg:#EAF0F5;
+      --ok:#1C5739;  --ok-bg:#E4F1E9;
+      --term-bg:#F4F6F9; --term-ink:#161D26; --term-dim:#5C6775;
+      --term-go:#1C5739; --term-no:#8E161D;
+      --shadow:none;
+    }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body{ background:#fff; font-size:10.5pt; line-height:1.5; }
+    .wrap{ max-width:none; padding:0 0 8mm; }
+    header.mast{ border-bottom:2px solid var(--ink); }
+    .mast-inner{ max-width:none; padding:0 0 8mm; }
+    h1{ font-size:24pt; }
+    .dek{ font-size:11pt; }
+
+    /* Nothing scrolls in print — wrap it instead of clipping it. */
+    .tscroll{ overflow:visible; }
+    table{ min-width:0; width:100%; font-size:8.6pt; table-layout:fixed; }
+    th,td{ padding:5px 7px; overflow-wrap:anywhere; }
+    .term{
+      white-space:pre-wrap; overflow-wrap:anywhere; overflow:visible;
+      font-size:8.2pt; line-height:1.5; padding:9px 11px;
+      border:1px solid var(--rule);
+    }
+    code{ overflow-wrap:anywhere; }
+
+    /* Keep a finding, a table row, and a heading with what follows it. */
+    .find, .fact, tr, .callout{ break-inside:avoid; page-break-inside:avoid; }
+    .row{ break-inside:avoid; page-break-inside:avoid; }
+    h2, h3, .sub{ break-after:avoid; page-break-after:avoid; }
+    section{ break-before:auto; margin-top:9mm; }
+    .verdict{ break-inside:avoid; }
+    footer{ break-before:avoid; }
+
+    a{ text-decoration:none; }
+    a[href^="http"]::after{ content:" (" attr(href) ")"; font-size:7.5pt; color:var(--ink-3); word-break:break-all; }
+  }
+</style>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="eyebrow">Independent Framework Audit &middot; NautilusTrader ML Research Flow &middot; 2026-08-15</div>
+    <h1>The gate stack is enforcing a smaller perimeter than it reports.</h1>
+    <p class="dek">Response to <span class="mono">NT_RESEARCH_FLOW_INDEPENDENT_AUDIT_BRIEF.md</span>. Every material claim was verified against the working tree; controls were red-teamed by tampering with real files and re-running the real gates. Repository restored to its original state afterward.</p>
+
+    <div class="verdict">
+      <div class="verdict-stamp">FLOW_BLOCKED</div>
+      <p class="verdict-why">Three independent bypasses were executed successfully, and a measurable look-ahead violation exists inside the currently sealed fixture that six audit passes, the causal lint, and the cryptographic seal all certified as CLEAR.</p>
+    </div>
+
+    <dl class="facts">
+      <div class="fact"><dt>Critical</dt><dd class="c-crit">5</dd></div>
+      <div class="fact"><dt>Warning</dt><dd class="c-warn">9</dd></div>
+      <div class="fact"><dt>Note</dt><dd>4</dd></div>
+      <div class="fact"><dt>Bypasses landed</dt><dd class="c-crit">3 / 10</dd></div>
+      <div class="fact"><dt>Controls holding</dt><dd class="c-ok">7</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>A. Executive verdict</h2>
+  <p class="sub">What the framework actually guarantees today</p>
+
+  <p>The architecture is sound and several controls are genuinely load-bearing — the compiled-study staleness hash, the prohibited-year guard, the OOS dev-year lock, the ordered feature-list + SHA enforcement, and the seal-before-catalog call ordering all fail closed exactly as designed, and I could not break them. That part of the brief's <em>"what good looks like"</em> list is real.</p>
+
+  <p>The failures cluster in one place: <strong>the perimeter of what is sealed, linted, and independently audited is much narrower than the documents assert</strong>, and nothing in the system measures its own coverage. The seal covers 36 files and omits the single most causally load-bearing module in the repository. The causal lint scanned exactly one file — a test file. The "independent audit" is a Python function that writes whatever verdict its caller passes as an argument. Each of these is invisible from the inside, because every gate reports on what it checked, never on what it skipped.</p>
+
+  <p>Consequence: the four green stamps on the current study (<span class="mono">preflight CLEAR</span>, <span class="mono">status.json CLEAR</span>, <span class="mono">contract_status.json CLEAR</span>, <span class="mono">PREEXEC_AUDIT_SEAL_VALID</span>) do not, individually or together, establish that the audited code is causal — and F3 below shows a concrete case where they were wrong.</p>
+
+  <div class="callout">
+    <p><strong>Do not read this as "add more gates."</strong> The count of controls is already high; the problem is that several of them have <em>zero or near-zero effective scope</em>, and one is a no-op that returns its own input. Section F recommends deleting two checks outright.</p>
+  </div>
+</section>
+
+<section>
+  <h2>B. Architecture map</h2>
+  <p class="sub">The path as it exists in code, not as documented</p>
+
+  <p class="term-cap">Execution path — verified by reading each hand-off</p>
+  <div class="term"><span class="c">$ python backtests/run_nt_study.py --study &lt;s&gt; --mode collect --stage day</span>
+
+backtests/run_nt_study.py:88            → run_collect_mode(...)
+backtests/nt_runtime/modes/collect.py:32  load_compiled_study()     <span class="c"># study.yaml→spec hash integrity</span>
+                              :36  verify_preexec_audit_seal() <span class="g">← seal check IS before catalog access</span>
+                              :39  resolve_run_plan()        <span class="c"># bounded stage, auto_expand=False</span>
+                              :40  resolve_data_plan()       <span class="c"># chronology + OOS lock</span>
+                              :57  build_engine()            <span class="c"># ← first catalog read happens here</span>
+    engine_builder.py         :70    CausalDataLoader(...).load_bars(warmup_start_dt → end_dt)
+                              :87    add_bars_causal_order(engine, bars_1s, bars_1m)
+                                       └→ utils/causal_registration.py:59  add_data(1s) then add_data(1m)
+                              :76  engine.add_strategy(FlipPredictionCollector)
+                              :79  engine.run()
+    flip_prediction_collector.py:221  on_bar → _handle_1s_bar / _handle_1m_bar
+                              :386      while T = regime_start + (k+1)*5s ≤ ts_init:  _evaluate_checkpoint(T, price_at_T=c)
+                              :604      cand_record["observation_ts"] = T
+                              :97  output_mgr.persist_collection()  <span class="c"># ordered feature list + SHA, fails closed</span></div>
+
+  <p class="term-cap">Authority path — where enforcement actually lives</p>
+  <div class="term">research_decision.yaml  →  <span class="r">check_research_decision_fidelity.py</span>  <span class="c">2 of 4 prohibited_changes enforced; SPEC check = 2-string grep</span>
+SPEC.md                 →  <span class="r">check_spec_fidelity.py</span>            <span class="c">never opens SPEC.md; clause map hardcoded to one study</span>
+study.yaml              →  compiled_study_loader.py:90       <span class="g">spec hash integrity — HOLDS</span>
+compiled_study.json     →  run_plan / data_plan              <span class="g">chronology guards — HOLD</span>
+audit/*.md + status.json → <span class="r">run_preexec_audits.py</span>            <span class="c">verdict/critical/warning are CALLER ARGUMENTS</span>
+                        →  preexec_audit_seal.py             <span class="c">binds 36 files; omits 8 execution-affecting modules</span></div>
+</section>
+
+<section>
+  <h2>C. Control matrix</h2>
+  <p class="sub">Intended control vs. what the code does</p>
+
+  <div class="tscroll">
+  <table>
+    <thead><tr><th>Risk</th><th>Intended control</th><th>Actual implementation</th><th>Test / canary</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Intent drift</td><td>Decision contract gates SPEC/YAML</td><td>Enforces 2 of 4 declared <code>prohibited_changes</code>; <code>baseline.short/long</code> never bound to any artifact</td><td>none</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td>SPEC drift</td><td>Mandatory clause coverage 100%</td><td><code>check_spec_fidelity.py</code> never reads <code>SPEC.md</code>; validators are substring tests against a study-specific hardcoded map</td><td>none</td><td class="vd v-fail">FAIL</td></tr>
+      <tr><td>Stale compiled artifact</td><td>Recompile-or-fail</td><td>spec SHA-256 recomputed and compared at load</td><td><code>test_load_compiled_study_detects_stale_yaml</code></td><td class="vd v-pass">PASS</td></tr>
+      <tr><td>Lineage drift</td><td>Frozen dims immutable vs parent</td><td>Implemented, but current study declares no parent — untested in practice</td><td>none</td><td class="vd v-weak">UNEXERCISED</td></tr>
+      <tr><td>Look-ahead</td><td>AST lint + independent causal audit</td><td>Lint scanned <strong>1 file</strong> (<code>files_scanned: 1</code>); collector/trackers/runtime never linted. Real violation present (F3)</td><td>lint clean on empty scope</td><td class="vd v-fail">FAIL</td></tr>
+      <tr><td>Fake audit provenance</td><td>Authenticated independent verdicts</td><td><code>record_*_audit_verdict()</code> writes caller-supplied verdict; <code>auditor</code> is a default string; no agent invoked</td><td>none</td><td class="vd v-fail">FAIL</td></tr>
+      <tr><td>Code change after audit</td><td>Composite hash equality</td><td>Holds for the 36 sealed files; 8 execution-affecting modules omitted entirely</td><td>tests tamper only seal metadata, never a source file</td><td class="vd v-fail">PARTIAL&nbsp;FAIL</td></tr>
+      <tr><td>Seal self-protection</td><td>Seal logic itself covered</td><td><code>preexec_audit_seal.py</code> and <code>modes/collect.py</code> are not sealed — the verifier and its caller are both editable</td><td>none</td><td class="vd v-fail">FAIL</td></tr>
+      <tr><td>Seal before data</td><td>Verify before catalog load</td><td><code>collect.py:36</code> precedes <code>build_engine()</code> at <code>:57</code></td><td>manual trace</td><td class="vd v-pass">PASS</td></tr>
+      <tr><td>OOS access</td><td>Locked until unlock token</td><td>Dev-year request blocked; token required. <strong>But</strong> warmup window bypasses the guard, and the unlock rests on a hand-typed boolean</td><td><code>test_resolve_data_plan_*</code></td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td>Prohibited years</td><td>Hard block</td><td>2026 request rejected with <code>UNAUTHORIZED_EXECUTION_DOMAIN</code></td><td><code>test_resolve_data_plan_rejects_prohibited_years</code></td><td class="vd v-pass">PASS</td></tr>
+      <tr><td>Timestamp semantics</td><td>Docs match catalog</td><td>Measured: 1s/1m/5m <code>ts_init−ts_event</code> = 1s/60s/300s, exactly as <code>CLAUDE.md</code> states</td><td>this audit</td><td class="vd v-pass">PASS</td></tr>
+      <tr><td>Coincident TF ordering</td><td>Shared helper enforces 1s-first</td><td>Helper is correct and used — but is <strong>not sealed</strong>, so inverting it is undetectable (bypass #1)</td><td>helper has no test in the seal chain</td><td class="vd v-fail">FAIL</td></tr>
+      <tr><td>Feature order/hash drift</td><td>Ordered list + SHA, not count</td><td><code>output_manager.py:126</code> compares ordered list <em>and</em> SHA, raises before write</td><td><code>test_output_manager_persists_artifacts</code></td><td class="vd v-pass">PASS</td></tr>
+      <tr><td>Scratch dependency</td><td>No hidden prod dependency</td><td>Zero imports of <code>scratch/</code> from <code>scripts/ backtests/ strategies/ features/ research/ utils/</code></td><td>repo-wide grep</td><td class="vd v-pass">PASS</td></tr>
+      <tr><td>Unauthorized full-run expansion</td><td>Smoke required; no auto-expand</td><td><code>auto_expand=False</code> holds. <strong>No smoke gate exists</strong> — zero references to smoke evidence in the runtime</td><td>none</td><td class="vd v-fail">FAIL</td></tr>
+      <tr><td>Harness parity</td><td><code>sync_agents.py --check</code></td><td><code>AGENT PARITY: OK (8 generated files match canonical source)</code></td><td>the check itself</td><td class="vd v-pass">PASS</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>E. Red-team bypass attempts</h2>
+  <p class="sub">Executed against the live repository, then reverted</p>
+
+  <p>I modified three real execution-affecting files — inverting the multi-timeframe registration order (the exact defect a prior audit proved reverses callback order), deleting the seal check from collect mode, and appending to the data loader — then re-ran the real gates.</p>
+
+  <div class="term"><span class="c">$ python - &lt;&lt;PY   # invert add_data order, delete verify_preexec_audit_seal(), touch data loader</span>
+3 execution-affecting files tampered
+
+<span class="c">$ python scripts/preexec_audit_seal.py --study studies/&lt;s&gt; --verify-only</span>
+<span class="r">PREEXEC_AUDIT_SEAL_VALID</span>
+
+<span class="c">$ python scripts/preexec_audit_seal.py --study studies/&lt;s&gt;        # regenerate on tampered tree</span>
+<span class="r">PREEXEC_AUDIT_SEAL_GENERATED: composite=216133a2d509d59c...</span>
+
+<span class="c">$ python scripts/research_preflight.py --study studies/&lt;s&gt; --skip-tests</span>
+<span class="r">RESEARCH PREFLIGHT VERDICT: CLEAR (3.83s)</span>
+Checks Run: CAUSAL_LINT, ARTIFACT_SCHEMA, RESEARCH_DECISION_FIDELITY, SPEC_FIDELITY, DOMAIN_GUARD
+Ready for independent causal auditor gate.</div>
+
+  <div class="tscroll">
+  <table>
+    <thead><tr><th>Attempt</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Reversed 1s/1m data registration</td><td class="v-fail"><strong>BYPASSED</strong> — seal valid, preflight CLEAR, seal regenerable</td></tr>
+      <tr><td>Delete seal verification from <code>collect.py</code></td><td class="v-fail"><strong>BYPASSED</strong> — the file that enforces the seal is not sealed</td></tr>
+      <tr><td>Tamper <code>utils/runner/data.py</code> (bar loader)</td><td class="v-fail"><strong>BYPASSED</strong> — not in the composite</td></tr>
+      <tr><td>Manufacture a CLEAR audit without an auditor</td><td class="v-fail"><strong>TRIVIAL</strong> — <code>record_causal_audit_verdict(dir, n, "CLEAR", 0, 0)</code>; verdict is a parameter</td></tr>
+      <tr><td>Stale audit + changed code (within sealed set)</td><td class="v-pass">BLOCKED — <code>PREEXEC_AUDIT_STALE</code>, composite mismatch</td></tr>
+      <tr><td>Forge seal file hashes</td><td class="v-pass">BLOCKED — <code>test_audit_seal_valid_and_tamper_detection</code></td></tr>
+      <tr><td>Modified <code>study.yaml</code> + stale compiled artifact</td><td class="v-pass">BLOCKED — <code>STALE_COMPILED_STUDY</code></td></tr>
+      <tr><td>Request OOS year 2024 before unlock</td><td class="v-pass">BLOCKED — <code>OOS_LOCKED_UNTIL_FREEZE</code></td></tr>
+      <tr><td>Request prohibited year 2026</td><td class="v-pass">BLOCKED — <code>UNAUTHORIZED_EXECUTION_DOMAIN</code></td></tr>
+      <tr><td>Wrong feature, same count</td><td class="v-pass">BLOCKED — ordered list + SHA compared, raises before parquet write</td></tr>
+      <tr><td>Full run with no smoke</td><td class="v-fail"><strong>BYPASSED</strong> — nothing consults smoke evidence</td></tr>
+      <tr><td>Reach unauthorized data via warmup</td><td class="v-fail"><strong>BYPASSED</strong> — <code>--stage full</code> loads from 2020-12-27, year 2020 unauthorized</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>D. Findings</h2>
+  <p class="sub">Critical</p>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">F1</span></div>
+      <p class="find-title">The seal omits the causal-ordering helper, the seal verifier, and its caller</p>
+      <div class="loc">scripts/preexec_audit_seal.py:33–51 (<code>CRITICAL_REPO_PATHS</code>), :232–257 (<code>verify_preexec_audit_seal</code>)</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The composite hash is built from a hardcoded 17-path list. Missing: <strong><code>utils/causal_registration.py</code></strong> (the only thing enforcing 1s-before-1m), <strong><code>backtests/nt_runtime/modes/collect.py</code></strong> (the file that calls <code>verify_preexec_audit_seal</code>), <strong><code>scripts/preexec_audit_seal.py</code></strong> itself, <code>utils/runner/data.py</code>, <code>compiled_study_loader.py</code>, <code>strategy_binding.py</code>, <code>run_nt_study.py</code>, and <code>features/engine.py</code>. Verification iterates only <code>file_hashes</code>, so an unlisted file is invisible by construction.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Demonstrated above: three tampered files, <code>PREEXEC_AUDIT_SEAL_VALID</code>, and the seal regenerates cleanly. An inverted registration order silently reintroduces the MFE/MAE blind spot that <code>CLAUDE.md</code> invariant #4 exists to prevent.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>No control measures the seal's own coverage, and the guard tests never modify a source file (see F5).</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Derive the repo set from the compiled contract instead of a literal list: seal every module transitively imported by <code>modes/collect.py</code> plus every <code>bound_trackers</code> entry in <code>feature_contract</code>, and always include the seal module itself. Make an unresolvable import a hard error, not a silent omission.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_seal_covers_full_import_closure</code> — walk <code>modes/collect.py</code>'s import graph, assert every repo-local module appears in <code>compute_execution_files_manifest()</code>'s output.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">F2</span></div>
+      <p class="find-title">Audit provenance is self-issued — no independent auditor is ever invoked</p>
+      <div class="loc">scripts/run_preexec_audits.py:22–75, :78–130</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The module contains two functions and nothing else — no <code>main()</code>, no CLI, no subprocess, no agent call. <code>verdict</code>, <code>critical</code>, and <code>warning</code> are <strong>caller parameters</strong>; <code>auditor="lookahead_auditor"</code> is a default string literal. It hashes a Markdown file the caller wrote. The brief states this script "must never substitute 'write CLEAR JSON' for a real auditor invocation" — writing CLEAR JSON is the entirety of what it does.</dd></div>
+      <div class="row"><dt>Failure</dt><dd><code>record_causal_audit_verdict(study_dir, 7, "CLEAR", 0, 0)</code> after writing any <code>pass_07.md</code> produces provenance the seal accepts as authentic. The report SHA, composite SHA, and timestamps are all real — they authenticate a document, not an independent review.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>The seal validates provenance <em>structure</em> (version, hash binding, verdict counts) and every field is genuinely well-formed. Nothing distinguishes an auditor-authored report from an implementer-authored one.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Independence cannot be proven cryptographically by the party being audited; stop implying it is. Either (a) record the actual subagent transcript hash and invoking session id and have the seal require them, or (b) rename the artifacts to <code>self_attested_*</code> and drop "independent" from the docs. Option (b) is honest and costs nothing; (a) is the real fix.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_audit_status_requires_external_transcript</code> — assert <code>record_*_audit_verdict</code> raises when no auditor transcript artifact with a distinct session identity is supplied.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">F3</span></div>
+      <p class="find-title">30 of 2,032 rows in the sealed fixture are priced one second after their own observation timestamp</p>
+      <div class="loc">strategies/flip_prediction_collector.py:386–394, :482, :604, :609</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The checkpoint loop fires for every <code>T = regime_start + (k+1)·5s</code> with <code>T ≤ ts_init</code> of the current 1s bar, and prices it with <strong>that bar's close</strong> (<code>price_at_T=c</code>) while stamping <code>observation_ts = T</code> (:604). The base-25 windows use a third anchor, <code>obs_ts = ot.ts[-1]</code> (:482) — the latest 1s bar, not T. The 1s stream is <strong>not gapless</strong>: seconds with no trade produce no bar, so whenever T lands in a gap the loop catches up on the next bar and back-stamps future data onto T.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Measured directly against the catalog and the sealed fixture run:
+        <div class="term" style="margin-top:10px">2023-03-03 RTH: 22,955 1s bars / 23,400 seconds → <span class="r">445 seconds missing</span>
+  gap sizes(s): {1: 22531, 2: 402, 3: 20, 4: 1}
+
+fixture candidates.parquet (2,032 rows, 72 cols):
+  evaluated with a 1s bar exactly at T   : 2002
+  evaluated LATE (trigger ts_init &gt; T)   : <span class="r">30   (1.48% of population)</span>
+  lateness histogram                     : {1.0s: 30}
+  e.g. observation_ts 2023-03-03 16:55:30Z  close 12217.75  ← sourced from 16:55:31Z</div>
+        Affected columns include <code>close</code>, <code>price_change_atr_30s/60s</code>, every <code>*_signed_distance_atr</code>, and <code>pct_levels_behind_trade</code>. This violates the framework's own canonical form, <code>latest_source_ts_init &lt;= observation_ts</code>.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>Three reasons compounding. The lint never opened the file (F4). The bias is <em>conditional on a data gap</em>, so it is invisible in any code reading that assumes a dense 1s stream. And the compiled contract asserts the cadence is <code>1m_bar_close</code> (F9), so an auditor checking the contract would not look for a 5s-grid/1s-arrival mismatch at all.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Smallest correct change: in <code>_evaluate_checkpoint</code>, skip any checkpoint where the triggering bar's <code>ts_init != T</code>, or emit it with <code>observation_ts = ts_init</code> and an explicit <code>checkpoint_late_seconds</code> column. Do not interpolate. Given the 0.5 progress floor and MFE gates already applied, dropping ~1.5% of rows is the cheaper and more defensible option.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_no_candidate_sourced_after_observation_ts</code> — replay the fixture day, assert for every emitted row that the triggering bar's <code>ts_init</code> equals <code>observation_ts</code>. It fails today at 30 rows.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">F4</span></div>
+      <p class="find-title">The causal lint scanned exactly one file — and it was a test file</p>
+      <div class="loc">scripts/research_preflight.py:67–74 &nbsp;·&nbsp; studies/&lt;s&gt;/audit/lint.json</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>Preflight builds the lint command with <code>--study &lt;dir&gt;</code> and appends <code>--path</code> only from an optional CLI argument that the documented invocation never passes. The study directory's only Python file is <code>tests/test_study_contracts.py</code>. The recorded result is unambiguous: <code>{"files_scanned": 1, "critical": 0, "clean": true}</code>.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>The collector, all four feature trackers, the runtime modules, and the data loader — every file that can actually contain look-ahead — were never parsed. "CAUSAL_LINT" appears in the CLEAR banner regardless. This is the "a validation check that always passes is worse than no check" pattern.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>The preflight card prints <em>which checks ran</em>, never <em>what they covered</em>. <code>files_scanned: 1</code> is written to <code>lint.json</code> and read by nothing.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Lint the same file set the seal covers — i.e. drive both from one resolved execution-file list — and make preflight fail when <code>files_scanned</code> is smaller than that list. Surface the count on the summary card.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_preflight_lints_every_sealed_execution_file</code> — assert <code>set(lint.json.files)</code> ⊇ the repo paths in <code>compute_execution_files_manifest()</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">F5</span></div>
+      <p class="find-title">No smoke gate exists, and the seal-guard tests never touch a source file</p>
+      <div class="loc">backtests/nt_runtime/ (no smoke reference) &nbsp;·&nbsp; scripts/tests/test_audit_seal_guard.py:12, :39</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>Two gaps with one root cause — the tests assert the intended behaviour was never written. (a) <code>--stage full</code> reaches <code>engine.run()</code> with no check for a prior successful smoke; there is no smoke artifact, no reference to one, and no code path that could consult one. (b) Both seal-guard tests corrupt <em>seal metadata</em> — a hash inside <code>preexec_audit_seal.json</code>, and <code>audited_execution_composite_sha256</code> inside <code>status.json</code>. Neither modifies a repository source file, which is precisely the test class the brief names as critical.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>The absent test is exactly what would have caught F1. Had any test edited <code>utils/causal_registration.py</code> and asserted the seal fails, the omission would have surfaced immediately.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>Both tests pass, and the suite reports 2/2 on a file named <code>test_audit_seal_guard.py</code>.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>(a) Have <code>run_collect_mode</code> require, for <code>stage=full</code>, a <code>runs/&lt;id&gt;/status.json</code> with <code>status: SUCCESS</code> whose <code>composite_seal_hash</code> matches the current seal. (b) Add the source-file tamper test.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_seal_rejects_modified_source_file</code> (append a comment to a sealed <em>and</em> an unsealed module; both must fail) and <code>test_full_stage_requires_current_sealed_smoke</code>.</dd></div>
+    </dl>
+  </article>
+
+  <p class="sub" style="margin-top:44px">Warning</p>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F6</span></div>
+      <p class="find-title">Warmup loads data from years the chronology guard just rejected</p>
+      <div class="loc">backtests/nt_runtime/data_plan.py:96–136 (guard), :138 (warmup) &nbsp;·&nbsp; engine_builder.py:71–80</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>warmup_start_dt = start_dt − 5 days</code> is computed <em>after</em> all three domain checks, which only ever inspect <code>start_dt..end_dt</code>. The loader then reads from <code>warmup_start_dt</code>.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Confirmed live: <code>--stage full</code> resolves 2021-01-01..2023-12-31, then loads from <strong>2020-12-27</strong> — year 2020, not in the authorized set. Benign here, but the same mechanism would read five days of locked 2024 DEV data for any study whose TRAIN begins 2025-01-01, with the OOS lock never consulted.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd><code>test_resolve_data_plan_*</code> assert on the active window only; no test asserts on <code>warmup_start_dt</code>.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Compute <code>warmup_start_dt</code> before validation and include its year in <code>run_years</code>. If warmup must legitimately precede the partition, require an explicit <code>chronology.warmup</code> allowance rather than defaulting open.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_warmup_window_respects_authorized_domain</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F7</span></div>
+      <p class="find-title">The SPEC fidelity gate never opens SPEC.md, and its clause map is hardcoded to one study</p>
+      <div class="loc">scripts/check_spec_fidelity.py:24–106, :109–117</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>check_spec_fidelity()</code> loads <code>study.yaml</code> and nothing else — <code>SPEC.md</code> is never read. What it validates is a literal map: train == <code>[2021,2022,2023]</code>, dev == <code>[2024]</code>, prohibited ⊇ <code>{2025,2026}</code>, buckets == <code>[300,600],[600,900],[900,1800]</code>. The arm validator is <code>any("A" in arm ...)</code> — satisfied by any three arms whose names contain the letters A, B and C, including "BASELINE" alone.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Two ways. Any SPEC prose contradicting the YAML passes at 100% coverage. And any <em>different</em> study fails this framework-level gate for having different (correct) years — so the gate is study-specific code sitting in the shared framework, which will push the next study toward editing the gate rather than the study.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Move the clause map into the study directory (<code>study_clauses.yaml</code>), have the script load it, and have the validators compare SPEC.md-extracted values against StudySpec fields rather than against literals.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_spec_fidelity_fails_when_spec_contradicts_yaml</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F8</span></div>
+      <p class="find-title">Half the declared prohibited_changes are silently unenforced, and the frozen baseline is never bound</p>
+      <div class="loc">scripts/check_research_decision_fidelity.py:118–131, :148–157</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The loop over <code>decision.prohibited_changes</code> recognises exactly two string values. The contract declares four: <code>replace_frozen_top25</code> and <code>use_2024_to_change_model_design</code> match no branch and are dropped without comment. Separately, <code>baseline.short/long</code> name two frozen model IDs that are compared to nothing — <code>baseline_engine.validate_baseline()</code> operates on an unrelated <code>BaselineSpec</code> with a <code>.study</code> field. The SPEC.md check is a grep for two literals, <code>"fresh Top-25"</code> and <code>"selected from 2021"</code>.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Swapping the 25 baseline features for 25 different registry features satisfies every check: registry-bound, count 60, mode <code>none</code>, hash recomputed. <code>replace_frozen_top25</code> is the one prohibition that would have caught it, and it is inert. Rewording the SPEC ("newly ranked Top-25") defeats the grep.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Raise <code>UNKNOWN_PROHIBITION</code> for any <code>prohibited_changes</code> entry with no handler — an unenforceable prohibition must block, not pass. Then pin the baseline: store the frozen models' ordered feature-list SHA-256 in the decision contract and compare it to the first 25 entries of <code>features.feature_list</code>.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_unknown_prohibition_blocks</code> and <code>test_baseline_feature_substitution_blocks</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F9</span></div>
+      <p class="find-title">The compiled contract states a checkpoint cadence that contradicts the study and the code</p>
+      <div class="loc">research/engines/population_engine.py:22–25 &nbsp;·&nbsp; studies/&lt;s&gt;/compiled_study.json</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>compile_population_contract</code> hardcodes <code>causal_checkpoint: {checkpoint_frequency: "1m_bar_close"}</code> irrespective of the spec. The same compiled artifact carries <code>qualification.cadence_seconds: 5</code>, and the collector evaluates on a 5-second grid (<code>CANDIDATE_STEP_NS</code>, verified: all offsets divisible by 5s).</dd></div>
+      <div class="row"><dt>Failure</dt><dd>The artifact the brief designates as the machine-readable execution contract is internally contradictory and wrong about the observation cadence. Any auditor honouring the stated precedence would verify against <code>1m_bar_close</code> and pass code doing something else — plausibly why F3's 5s-grid/1s-arrival mismatch was never examined.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Derive <code>checkpoint_frequency</code> from <code>pop_spec.qualification["cadence_seconds"]</code>; raise if absent.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_population_contract_cadence_matches_spec</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F10</span></div>
+      <p class="find-title">The multi-stream domain guard scans a directory that contains no runtime code</p>
+      <div class="loc">scripts/check_authorized_domain.py:87–98, :27–48</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>scan_study_domain_guards</code> walks <code>study_dir.rglob("*.py")</code>. The study directory contains one test file; <code>implementation/</code> is empty. The actual dual-stream load lives in <code>engine_builder.py:71–80</code>, outside the scan root. <code>DomainGuardVisitor</code> is defined and never instantiated.</dd></div>
+      <div class="row"><dt>Failure</dt><dd><code>DOMAIN_GUARD_CLEAR</code> on a scan of effectively zero relevant files, contributing a green check to the preflight card. Ironically, the asymmetry it looks for does not exist here (both streams use identical bounds) — but it would not have detected it if it did.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Point the scan at the resolved execution-file set (same list as F1/F4), or delete the script — see Section F.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_domain_guard_scans_runtime_modules</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F11</span></div>
+      <p class="find-title">The OOS unlock turns on a hand-typed boolean and a self-computed hash</p>
+      <div class="loc">scripts/generate_oos_unlock.py:55–61, :83–103</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The gating condition is <code>feat_data.get("2024_not_read_in_current_valid_lineage_before_freeze", False)</code> — a literal field in a JSON file the operator writes. Nothing measures it against run history. <code>verify_oos_unlock_token</code> recomputes the SHA of the token's own contents with no secret, so the hash detects corruption, not authorship.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>A hand-authored <code>oos_unlock.json</code> with a correctly computed SHA unlocks 2024. The brief anticipates this exact question about measurable vs. typed claims.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Compute the claim: scan <code>runs/*/run_manifest.json</code> for any run whose date window intersects the OOS year and whose <code>composite_seal_hash</code> is in the current valid lineage. Emit <code>false</code> automatically if one exists.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_oos_unlock_blocks_when_prior_run_touched_oos_year</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F12</span></div>
+      <p class="find-title">The timestamp engine asserts the contract instead of measuring it</p>
+      <div class="loc">research/engines/timestamp_engine.py:10–36</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The function takes <code>instrument_symbol</code> and <code>catalog_path</code>, reads neither, and returns a constant dict. The <code>availability_invariant</code> is emitted as a prose string, never evaluated against a bar.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>A catalog rebuilt with a wrong <code>ts_init</code> delta would still compile a contract claiming the correct one. <strong>Note:</strong> I measured the live catalog and it currently matches — 1s/1m/5m deltas are 1s/60s/300s exactly, consistent with <code>CLAUDE.md</code>. So this is latent, not active.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Sample N bars per registered timeframe from the resolved catalog and assert <code>ts_init − ts_event == duration_ns</code>; fail compilation otherwise. Roughly ten lines, and it converts the framework's central causal premise from documentation into evidence.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_timestamp_contract_measured_from_catalog</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F13</span></div>
+      <p class="find-title">The lookahead-auditor has Write and Bash; the results-triager guard hook is not wired up</p>
+      <div class="loc">.claude/agents/lookahead-auditor.md:3 &nbsp;·&nbsp; .claude/settings.local.json &nbsp;·&nbsp; .claude/hooks/validate-results-triager-command.py</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>lookahead-auditor</code> declares <code>tools: [Read, Grep, Glob, Bash, Write]</code>. Bash alone makes "must not edit production code" unenforceable, and it is sufficient to call <code>record_causal_audit_verdict</code> and regenerate the seal — the auditor can issue its own PASS. Separately, the guard script exists on disk but <code>settings.local.json</code> contains only <code>permissions</code>; <code>hooks</code> is empty, so it never executes. <code>results-triager</code> has unguarded <code>Bash</code>.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Two of the brief's stated agent constraints are documentation only. (<code>contract-checker</code> and <code>repo-scout</code> are correctly read-only, and <code>sync_agents.py --check</code> reports parity across all three harnesses.)</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Restrict <code>lookahead-auditor</code> to <code>[Read, Grep, Glob, Write]</code> with Write confined to <code>audit/</code>, and register the existing hook under <code>hooks.PreToolUse</code> for the triager.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_agent_tool_grants_match_policy</code> — parse the agent frontmatter and assert the declared tool sets.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F14</span></div>
+      <p class="find-title">Study-specific constants are embedded in framework code</p>
+      <div class="loc">run_preexec_audits.py:84 · output_manager.py:118–122 · preexec_audit_seal.py:35–41 · check_spec_fidelity.py:31–71</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The exact pattern the brief warns against ("the framework must not hardcode 60"). <code>feature_universe_count: int = 60</code> is a default parameter. <code>meta_cols</code> is a literal set of this study's 12 metadata columns — the boundary between metadata and features for <em>every</em> study. <code>CRITICAL_REPO_PATHS</code> names <code>rolling_5m_productivity.py</code> and <code>structural_regime_geometry.py</code> directly. The SPEC clause map is per-study (F7).</dd></div>
+      <div class="row"><dt>Failure</dt><dd>The next study either fails these gates for being different, or the gates get edited — and editing them is what makes prior seals meaningless.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Source all four from the compiled contract: <code>feature_count</code>, a declared <code>metadata_columns</code> list, <code>bound_trackers</code>, and a study-local clause file.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_framework_has_no_study_specific_literals</code> — compile two studies with different feature counts and assert both pass unmodified.</dd></div>
+    </dl>
+  </article>
+
+  <p class="sub" style="margin-top:44px">Note</p>
+
+  <article class="find note">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill note">Note</span><span class="fid">F15</span></div>
+      <p class="find-title">verify_feature_surface.py is orphaned, computes the retired 537-feature universe, and was cited as audit evidence</p>
+      <div class="loc">scripts/verify_feature_surface.py:22–45 &nbsp;·&nbsp; studies/&lt;s&gt;/audit/contract_pass_02.md:24</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Detail</dt><dd>The function takes no study argument and is called by nothing. Its only reference outside its own file is <code>contract_pass_02.md</code>, which cites it as evidence for "502 baseline + 27 structural + 8 rolling = 537 total" — the universe the remediation removed. That stale pass file is inside the current seal.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Delete the script, or reduce it to a per-study contract check driven by <code>feature_contract.feature_list</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find note">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill note">Note</span><span class="fid">F16</span></div>
+      <p class="find-title"><code>Optional</code> is used but never imported in two modules</p>
+      <div class="loc">backtests/nt_runtime/engine_builder.py:46 &nbsp;·&nbsp; scripts/check_spec_fidelity.py:24</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Detail</dt><dd>Both annotate parameters as <code>Optional[...]</code> without importing it. Masked at runtime by <code>from __future__ import annotations</code>, so annotations stay unevaluated strings. Any call to <code>typing.get_type_hints()</code>, a Pydantic <code>validate_call</code>, or a future removal of the future-import raises <code>NameError</code>. One-line fix each.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find note">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill note">Note</span><span class="fid">F17</span></div>
+      <p class="find-title">Nine runs of the same study are retained with 37, 524, 549 and 72 columns; only the last generation matches the contract</p>
+      <div class="loc">runs/*_Gemini_clean_maturity_flip_rolling_5m_productivity_day/</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Detail</dt><dd>Three runs predate the feature-contract enforcement and carry the retired 537-column surface; the final five are the correct 72 (60 features + 12 metadata, 2,032 candidates, matching the brief). <code>runs/</code> has no lineage marker, so nothing distinguishes a pre-remediation artifact from a valid one at the filesystem level. Tag each <code>run_manifest.json</code> with the <code>composite_seal_hash</code> in force and have the collection validator reject runs sealed under a superseded composite.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find note">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill note">Note</span><span class="fid">F18</span></div>
+      <p class="find-title">Three brief concerns checked out clean — no action needed</p>
+      <div class="loc">verification results</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Timestamp doc drift</dt><dd>The brief's §14 worry about stale "1s bars need no adjustment" text is <strong>resolved</strong>. Current <code>CLAUDE.md</code> invariant #3 states <code>ts_init = ts_event + bar_duration_ns</code> with 1s: +1s, and the catalog measures exactly that for 1s, 1m and 5m.</dd></div>
+      <div class="row"><dt>Scratch dependency</dt><dd><strong>None.</strong> No import of <code>scratch/</code> from <code>scripts/</code>, <code>backtests/nt_runtime/</code>, <code>strategies/</code>, <code>features/</code>, <code>research/</code> or <code>utils/</code>. All scratch utilities are correctly disposable. <code>build_phase0_manifest.py</code> is a clean canonical script with zero scratch references.</dd></div>
+      <div class="row"><dt>Harness parity</dt><dd><code>sync_agents.py --check</code> → <code>AGENT PARITY: OK (8 generated files match canonical source)</code>. No drift between <code>.claude</code>, <code>.agents</code> and <code>.codex</code>.</dd></div>
+    </dl>
+  </article>
+</section>
+
+<section>
+  <h2>Answers</h2>
+  <p class="sub">The twelve hard questions, directly</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:52%">Question</th><th>Answer</th></tr></thead>
+    <tbody>
+      <tr><td>1. Can an LLM change a frozen baseline or add feature discovery without failure?</td><td class="v-fail"><strong>Yes.</strong> Feature-discovery <em>mode</em> is caught; baseline <em>substitution</em> is not — <code>replace_frozen_top25</code> is inert (F8)</td></tr>
+      <tr><td>2. Can a study run with a stale/forged audit?</td><td class="v-fail"><strong>Yes</strong>, for the 8 unsealed execution modules (F1)</td></tr>
+      <tr><td>3. Can audit status be manufactured without an independent auditor?</td><td class="v-fail"><strong>Yes</strong> — it is a function parameter (F2)</td></tr>
+      <tr><td>4. Does a code change after audit always invalidate the seal?</td><td class="v-fail"><strong>No</strong> — only within the 36 sealed files (F1)</td></tr>
+      <tr><td>5. Does seal verification occur before catalog access?</td><td class="v-pass"><strong>Yes</strong> — <code>collect.py:36</code> before <code>:57</code></td></tr>
+      <tr><td>6. Can DEV/OOS be read before unlock through any path?</td><td class="v-weak"><strong>Yes, via warmup</strong> — the direct request is blocked (F6)</td></tr>
+      <tr><td>7. Do timestamp docs match actual catalog semantics?</td><td class="v-pass"><strong>Yes</strong> — measured for 1s/1m/5m (F18)</td></tr>
+      <tr><td>8. Is 1s-before-1m ordering structurally enforced everywhere?</td><td class="v-weak"><strong>Correct in code, unprotected</strong> — the helper is unsealed and untested (F1)</td></tr>
+      <tr><td>9. Is exact ordered feature identity enforced?</td><td class="v-pass"><strong>Yes</strong> — ordered list <em>and</em> SHA, raises before write</td></tr>
+      <tr><td>10. Can an alternate/legacy runner bypass the gates?</td><td class="v-weak">Legacy <code>backtests/studies/*</code> runners exist and are ungated, but are not wired into this flow</td></tr>
+      <tr><td>11. Can a full run happen without a current sealed smoke?</td><td class="v-fail"><strong>Yes</strong> — no smoke gate exists (F5)</td></tr>
+      <tr><td>12. Are downstream fitting/OOS governed by the same discipline?</td><td class="v-weak"><strong>Partially</strong> — the unlock chain is structured but rests on a typed assertion (F11); no <code>TRAIN_COLLECTION_COMPLETE</code> validator exists yet</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>F. Complexity</h2>
+  <p class="sub">What to remove, and what to leave alone</p>
+
+  <h3>Safe to delete — another control covers the same failure class</h3>
+  <ul>
+    <li><strong><code>scripts/check_authorized_domain.py</code></strong> — its scan root contains no runtime code (F10), and the failure class it targets (asymmetric stream bounds) is structurally impossible in <code>engine_builder.py</code>, which passes the same <code>warmup_start_dt</code>/<code>end_dt</code> to both loads. Fixing F6 covers the real domain risk. Delete rather than repair.</li>
+    <li><strong><code>scripts/verify_feature_surface.py</code></strong> — orphaned, computes a retired universe, and its intended job is already done properly by <code>output_manager.py:126</code> (ordered list + SHA, fails closed) and <code>feature_binding_engine</code>'s registry check (F15).</li>
+  </ul>
+
+  <h3>Load-bearing — do not touch</h3>
+  <ul>
+    <li><code>compiled_study_loader.py:90</code> spec-hash integrity — the only thing stopping a silently stale compiled contract.</li>
+    <li><code>data_plan.py:104–136</code> prohibited-year and OOS-dev locks — both verified to fail closed.</li>
+    <li><code>output_manager.py:113–131</code> ordered feature identity — the one control that already does exactly what the brief asks of it.</li>
+    <li><code>run_plan.py</code> <code>auto_expand=False</code> and bounded stages — no silent expansion path found.</li>
+    <li><code>collect.py:36</code> seal-before-data ordering.</li>
+  </ul>
+
+  <h3>Suggested order of work</h3>
+  <ol>
+    <li><strong>F3</strong> first — it is a live data defect in the sealed fixture, and it invalidates the current collection contract regardless of governance.</li>
+    <li><strong>F1 + F4</strong> together — both are solved by one change: resolve the execution-file set once, from the compiled contract, and drive the seal, the lint, and the domain scan from that single list.</li>
+    <li><strong>F5</strong> — add the source-file tamper test before anything else, so F1's fix is provably correct.</li>
+    <li><strong>F2</strong> — decide between real transcript binding and honest renaming. Do not leave it claiming independence it does not have.</li>
+    <li><strong>F6, F8, F9</strong> — small, self-contained, each with an obvious regression test.</li>
+  </ol>
+
+  <p>One structural recommendation above all: <strong>every gate should report its coverage, not just its verdict.</strong> <code>files_scanned: 1</code> was written to disk, was correct, and was read by no one. A preflight card that printed "CAUSAL_LINT: 1 file" instead of "CAUSAL_LINT ✓" would have surfaced F3 and F4 months ago without any new machinery.</p>
+</section>
+
+<footer>
+  Independent audit of the NautilusTrader ML research framework, 2026-08-15 · branch <span class="mono">study/Codex_clean_maturity_flip_rolling_5m_productivity</span> · traced study <span class="mono">Gemini_clean_maturity_flip_rolling_5m_productivity</span>.
+  All bypasses were executed against the live working tree and reverted; <span class="mono">PREEXEC_AUDIT_SEAL_VALID</span> and clean file state were reconfirmed after restore. No study design was modified.
+</footer>
+
+</div>

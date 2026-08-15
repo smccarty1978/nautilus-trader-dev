@@ -3,18 +3,28 @@
 ## CORE INVARIANTS (NEVER VIOLATE)
 1. **NT is the ONLY execution environment.** NO pandas for signal detection, validation, or backtesting. Pandas is strictly for loading raw data and post-analysis of NT outputs.
 2. **No Look-Ahead Bias.** Indicators compute on COMPLETED bars only.
-3. **Timestamp Convention.** Databento timestamps at OPEN. You MUST apply `ts_init_delta` when wrangling (e.g., `60_000_000_000` for 1m bars). 1s bars need no adjustment.
+3. **Timestamp Convention.** Raw Databento OHLCV bars are OPEN-stamped. Offline research normalizes derived bars to CLOSE-stamped indices (`label='right', closed='left'`). NautilusTrader catalogs preserve open-stamped `ts_event` and set `ts_init = ts_event + bar_duration_ns` (1s: +1s, 1m: +60s, 3m: +180s, 5m: +300s) so the NT event loop dispatches completed bars at interval close.
 4. **MFE/MAE Blind Spot.** 1s bars process before their parent 1m bar in NT. To avoid missing the first minute of price action, you MUST buffer recent 1s bars and replay them retroactively from fill time when a signal triggers.
-5. **Mandatory Pre-Execution Audit Gate.** After a study/model pipeline is implemented and unit-tested, but before its first collection, label-build, training, backtest, or staged-runner execution, run `scripts/causal_lint.py`, then invoke `lookahead-auditor` (causality) and `contract-checker` (deliverables). Clear all CRITICAL findings before execution. Before acceptance, re-run `contract-checker` on materialized outputs and re-run causality only when the audited surface changes; gates read `audit/status.json`, never prose.
+5. **Mandatory Preflight & Pre-Execution Audit Gate.** After a study/model pipeline is implemented and unit-tested, but before its first collection, label-build, training, backtest, or staged-runner execution:
+   - Run `python scripts/research_preflight.py --study studies/<name>`. Preflight must be `CLEAR` (0 CRITICAL, exit code 0). Coding agents may NOT bypass a `BLOCKED` preflight.
+   - If preflight is `BLOCKED`, inspect `audit/failure_packet.json` and fix locally before requesting an audit.
+   - Only after preflight is `CLEAR`, invoke `lookahead-auditor` (causality) and `contract-checker` (deliverables). Clear all CRITICAL findings before execution. Before acceptance, re-run `contract-checker` on materialized outputs and re-run causality only when the audited surface changes; gates read `audit/status.json`, never prose.
+6. **Factory-First Study Creation.** Every new study MUST be configured via `study.yaml`, scaffolded via `python scripts/create_study.py --config <study.yaml>`, and validated via `python scripts/compile_study.py`. Coding agents MUST NOT create study-specific implementations for behavior already representable by a canonical study type (e.g. `flip_prediction`). A coding agent proposing bespoke code must provide `BESPOKE_JUSTIFICATION` before implementation.
+7. **Research Decision Contract Authority & Fidelity.**
+   - Hierarchy: `research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code`.
+   - BEFORE drafting or modifying `SPEC.md`: Create or verify `research_decision.yaml`. `SPEC.md` must be derived from `research_decision.yaml`. No study may compile or pass preflight unless decision-contract fidelity passes (`python scripts/check_research_decision_fidelity.py --study studies/<name>`).
+   - Behavioral Rule: Never improve, broaden, clean up, or make a study more statistically pure by changing a fixed baseline or adding feature discovery unless the Research Decision Contract explicitly permits it. If a design concern exists, surface it as a caveat; do not silently alter the experiment.
 
 ## LEAN WORKFLOW (token discipline)
-- **Cheapest thing first.** `python scripts/causal_lint.py --study studies/<name>` before any agent turn. It catches the repeat offenders (H4 trigger-price fills, `ts_event` session gates, `center=True`, `.shift(-N)`, `bfill`, bare `merge_asof`, non-`*.v.0` symbols) for zero tokens.
+- **Deterministic Preflight First.** `python scripts/research_preflight.py --study studies/<name>` before any agent turn. It orchestrates AST causal linting, schema validation, model binding, and fast causal canaries for zero LLM tokens.
+- **Worker Subagent Boundary.** Worker and coding agents cannot spawn additional subagents. Only the main orchestrator may invoke named mandatory repository gates.
 - **Split audit gate.** `lookahead-auditor` = causality only (A, B, C1–C3, F, G, H). `contract-checker` = deliverables, seals, C4/D/E. Scope defined in `docs/CAUSAL_CHECKLIST.md`. Neither may report the other's category — that boundary is what stops multi-pass loops.
 - **Bounded re-audits.** Pass 2+ must adjudicate all prior findings before raising new ones, max 3 new CRITICALs per pass. New file per pass (`audit/pass_NN.md`), never append.
 - **Freeze deliverables up front.** Every study SPEC needs the Deliverables Manifest and Domain/Completeness sections from `docs/TEMPLATES.md`. An auditor cannot verify a deliverable set that was never written down — it invents one finding at a time instead.
 - **Agent defs are generated.** Edit `.claude/agents/*.md` only; run `python scripts/sync_agents.py` to propagate to Codex and Antigravity.
 - **Commit at every phase gate.** Branch (`study/<name>` or `chore/<topic>`) — never commit on `main`. Commit code together with the `audit/pass_NN.md` + `status.json` that audited it, so the scope hash matches the tree. Never commit generated data (`canonical_*/`, `_work/`, `*.parquet`, `model.joblib`) — commit the manifests instead. Full protocol: `AGENTS.md` § Commit protocol.
-- **Risk tiers.** Tier 1 (small fix / diagnostic): main session + deterministic tests, no agents. Tier 2 (research study): plan → implement/tests → split pre-execution audit → staged runner. Tier 3 (model freeze / deploy): add `repo-scout`, then implement/tests → split pre-execution audit → staged runner.
+- **Risk tiers.** Tier 1 (small fix / diagnostic): main session + deterministic tests, no agents. Tier 2 (research study): plan → implement/tests → deterministic preflight CLEAR → split pre-execution audit → staged runner. Tier 3 (model freeze / deploy): add `repo-scout`, then implement/tests → deterministic preflight CLEAR → split pre-execution audit → staged runner.
+- **Parity Failure First-Divergence Rule.** For any parity failure, no broad repository investigation is allowed until first-divergence localization (`python scripts/find_first_parity_divergence.py --reference ledger_a.jsonl --runtime ledger_b.jsonl`) has pinpointed the exact earliest failing timestamp, stage, and field difference.
 - **Diff-first.** Review `git diff -U20` as the primary surface. Open full files only to resolve causality, state flow, base classes, or imports — never to repeat discovery already done.
 - **No agents for process monitoring.** Use `scripts/run_bounded_study.py` and read its JSON status card, not raw logs.
 - **Subagent output caps.** `repo-scout` 700w (paths/symbols only) · `contract-checker` 1,000w (compliance table) · `results-triager` 500w (failures + root cause) · `lookahead-auditor` 1,500w (findings by severity).
@@ -45,4 +55,3 @@ Before creating, modifying, or locally reimplementing a feature:
 6. New or changed features require registry metadata, focused tests,
    provenance review, and parity evidence where applicable.
 <!-- END CENTRAL FEATURE SYSTEM -->
-

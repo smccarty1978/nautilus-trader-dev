@@ -1,0 +1,23 @@
+{
+  "source": "databento_glbx_mdp3",
+  "raw_timestamp_semantic": "OPEN_STAMPED",
+  "raw_index_field": "ts_event",
+  "timezone": "UTC",
+  "offline_research_aggregation": {
+    "pandas_rule": "resample(rule, label='right', closed='left')",
+    "semantic": "CLOSE_STAMPED"
+  },
+  "nautilus_catalog": {
+    "ts_event_semantic": "OPEN_STAMPED",
+    "ts_init_semantic": "CLOSE_STAMPED",
+    "causal_dispatch_field": "ts_init",
+    "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
+    "timeframe_deltas_ns": {
+      "1s": 1000000000,
+      "1m": 60000000000,
+      "3m": 180000000000,
+      "5m": 300000000000
+    }
+  },
+  "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+}

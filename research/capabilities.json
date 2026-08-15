@@ -1,0 +1,79 @@
+{
+  "version": "1.1.0",
+  "framework": "NautilusTrader Research Study Factory",
+  "supported_study_types": {
+    "flip_prediction": {
+      "description": "Construct, train, evaluate, or reconstruct a predictive causal regime flip model",
+      "allowed_operations": [
+        "train_evaluate",
+        "artifact_reconstruction"
+      ],
+      "unsupported_operations_requiring_bespoke": [
+        "runtime_population_parity",
+        "candidate_population_parity",
+        "score_parity",
+        "trigger_parity",
+        "order_fill_parity",
+        "execution_economics",
+        "stop_target_policies"
+      ],
+      "supported_populations": {
+        "type": "regime_state",
+        "prevailing_regimes": ["bearish", "bullish"],
+        "sessions": ["RTH", "ETH", "ALL"],
+        "qualification_parameters": [
+          "age_gate_seconds",
+          "established",
+          "touch_count_min",
+          "compression_vwap"
+        ]
+      },
+      "supported_targets": {
+        "type": "flip",
+        "events": ["regime_flip", "confirmed_flip"],
+        "directions": ["bullish", "bearish"],
+        "horizons_seconds": [30, 60, 120, 180, 300, 600, 900, 1800],
+        "confirmation_modes": ["bar_close", "tick_instant"]
+      },
+      "feature_system": {
+        "registry_source": "features.registry",
+        "supported_trackers": [
+          "OHLCVDeltaTracker",
+          "PriceLevelTracker",
+          "MedianCenterTracker"
+        ],
+        "standard_manifests": ["F3_top25_gbt_v1", "F3_top103_v1"]
+      },
+      "model_modes": ["training", "evaluation", "scoring"],
+      "model_families": [
+        "HistGradientBoostingClassifier",
+        "LogisticRegression",
+        "RandomForestClassifier"
+      ],
+      "execution_compatibility": {
+        "runtime": "nautilustrader",
+        "standard_strategy_classes": [
+          "strategies.flip_prediction_collector.FlipPredictionCollector",
+          "strategies.score_fanning_strategy.ScoreFanningStrategy"
+        ]
+      },
+      "standard_deliverables": [
+        "candidates.parquet",
+        "scores.parquet",
+        "triggers.parquet",
+        "metrics.json"
+      ]
+    },
+    "bespoke": {
+      "description": "First-class escape hatch for non-standard studies with full governance integration",
+      "requirements": [
+        "Strict machine-readable justification (bespoke.reason)",
+        "Declaration of unsupported contract elements (bespoke.unsupported_contract_element)",
+        "Full inheritance of timestamp contracts, chronology guards, preflight, and NT runtime"
+      ],
+      "execution_compatibility": {
+        "runtime": "nautilustrader"
+      }
+    }
+  }
+}

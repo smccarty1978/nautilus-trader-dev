@@ -1,0 +1,266 @@
+{
+  "study_id": "test_minimal_checkpoint_collector",
+  "study_type": "bespoke",
+  "spec_sha256": "9bb8959d55740e64cae7fada0cb9e2c5774299080058138a9724c69f53f66462",
+  "spec": {
+    "study": {
+      "id": "test_minimal_checkpoint_collector",
+      "type": "bespoke",
+      "risk_tier": 1,
+      "description": "Minimal 15-second checkpoint collector test fixture for genericity proof"
+    },
+    "operation": {
+      "kind": "train_evaluate",
+      "target_metric": null,
+      "reconciliation_target": null
+    },
+    "instrument": {
+      "symbol": "NQ",
+      "venue": "XCME"
+    },
+    "population": {
+      "type": "regime_state",
+      "prevailing_regime": "neutral",
+      "session": "RTH",
+      "qualification": null
+    },
+    "target": {
+      "type": "return",
+      "event": null,
+      "direction": null,
+      "horizon_seconds": 60,
+      "confirmation": null
+    },
+    "features": {
+      "source_manifest": null,
+      "source": null,
+      "source_key": null,
+      "selection": null,
+      "forbidden_lineage": null,
+      "feature_list": [
+        "arrival_vel_5s",
+        "arrival_vel_10s",
+        "arrival_vel_20s"
+      ],
+      "feature_list_sha256": "74d47a28dc033f0c4c9e36ab0894592c6564c6673dcd9720cd2a8d2c5d3c8300",
+      "directional_mapping": null,
+      "timing_contract": "verified",
+      "metadata_columns": [
+        "observation_ts",
+        "checkpoint_index",
+        "close",
+        "triggering_1s_ts_init"
+      ]
+    },
+    "model": {
+      "mode": "scoring",
+      "family": null,
+      "arms": null,
+      "artifact_path": null,
+      "artifact_sha256": null,
+      "params": null
+    },
+    "chronology": {
+      "train": [
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "diagnostic": [],
+      "prohibited": [
+        2025,
+        2026
+      ],
+      "warmup": {
+        "days_before_partition": 1,
+        "allowed": true,
+        "candidate_emission": false,
+        "target_generation": false,
+        "permitted_partition_relationship": "pre_train_only"
+      }
+    },
+    "stratification": {
+      "column": null,
+      "buckets": null,
+      "extrapolation_bucket": null
+    },
+    "baseline": {
+      "study": null,
+      "manifest_sha256": null,
+      "results_sha256": null
+    },
+    "lineage": {
+      "parent_study": null,
+      "parent_manifest_sha256": null,
+      "clean_lineage_start": null,
+      "invalidated_prior_runs": null,
+      "intended_changes": null,
+      "frozen": null
+    },
+    "execution": {
+      "runtime": "nautilustrader",
+      "strategy_class": "strategies.minimal_checkpoint_collector.MinimalCheckpointCollector",
+      "data_requirements": null,
+      "checkpoint": null,
+      "progress_seconds": 60,
+      "bounded": true,
+      "observation_policy": null
+    },
+    "acceptance": {
+      "criteria": null
+    },
+    "bespoke": {
+      "reason": "Genericity test fixture for minimal 15-second checkpoint collector with 3 features.",
+      "unsupported_contract_element": "none",
+      "canonical_type_considered": "flip_prediction",
+      "reusable_extension_considered": "none",
+      "custom_scope": [
+        "strategies/minimal_checkpoint_collector.py"
+      ]
+    }
+  },
+  "contracts": {
+    "population_contract": {
+      "instrument": {
+        "symbol": "NQ",
+        "venue": "XCME"
+      },
+      "population_type": "regime_state",
+      "prevailing_regime": "neutral",
+      "session": "RTH",
+      "qualification": {},
+      "causal_checkpoint": {
+        "checkpoint_frequency": "1m_bar_close",
+        "observation_timing": "interval_close"
+      }
+    },
+    "target_contract": {
+      "target_type": "return",
+      "event": "regime_flip",
+      "direction": null,
+      "horizon_seconds": 60,
+      "confirmation": {
+        "mode": "bar_close",
+        "confirmation_bars": 1
+      },
+      "censoring_policy": {
+        "session_end_censoring": true,
+        "max_horizon_seconds": 60
+      }
+    },
+    "feature_contract": {
+      "source_key": null,
+      "feature_count": 3,
+      "feature_list": [
+        "arrival_vel_5s",
+        "arrival_vel_10s",
+        "arrival_vel_20s"
+      ],
+      "feature_list_sha256": "74d47a28dc033f0c4c9e36ab0894592c6564c6673dcd9720cd2a8d2c5d3c8300",
+      "bound_trackers": [
+        "features.trackers.velocity.ArrivalVelocityTracker"
+      ],
+      "families": [
+        "arrival_velocity"
+      ],
+      "source_timeframes": [
+        "1s"
+      ],
+      "directional_mapping": "direction_normalized",
+      "timing_contract": "verified"
+    },
+    "execution_contract": {
+      "runtime": "nautilustrader",
+      "strategy_class": "strategies.minimal_checkpoint_collector.MinimalCheckpointCollector",
+      "bounded_execution": true,
+      "progress_seconds": 60,
+      "checkpoint": null,
+      "custom_scope": [
+        "strategies/minimal_checkpoint_collector.py"
+      ],
+      "chronology": {
+        "train": [
+          2023
+        ],
+        "dev": [
+          2024
+        ],
+        "diagnostic": [],
+        "prohibited": [
+          2025,
+          2026
+        ]
+      }
+    },
+    "timestamp_contract": {
+      "source": "databento_glbx_mdp3",
+      "raw_timestamp_semantic": "OPEN_STAMPED",
+      "raw_index_field": "ts_event",
+      "timezone": "UTC",
+      "offline_research_aggregation": {
+        "pandas_rule": "resample(rule, label='right', closed='left')",
+        "semantic": "CLOSE_STAMPED"
+      },
+      "nautilus_catalog": {
+        "ts_event_semantic": "OPEN_STAMPED",
+        "ts_init_semantic": "CLOSE_STAMPED",
+        "causal_dispatch_field": "ts_init",
+        "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
+        "timeframe_deltas_ns": {
+          "1-SECOND": 1000000000,
+          "1-MINUTE": 60000000000,
+          "3-MINUTE": 180000000000,
+          "5-MINUTE": 300000000000
+        },
+        "empirical_measurement": {
+          "status": "MEASURED",
+          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+          "measurements": {
+            "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 60000000000,
+              "observed_deltas_ns": [
+                60000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 1000000000,
+              "observed_deltas_ns": [
+                1000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-5-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 300000000000,
+              "observed_deltas_ns": [
+                300000000000
+              ],
+              "pass": true
+            }
+          }
+        }
+      },
+      "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "lineage": {
+      "has_parent": false
+    },
+    "baseline": {
+      "has_baseline": false
+    },
+    "bespoke_justification": {
+      "reason": "Genericity test fixture for minimal 15-second checkpoint collector with 3 features.",
+      "unsupported_contract_element": "none",
+      "canonical_type_considered": "flip_prediction",
+      "reusable_extension_considered": "none",
+      "custom_scope": [
+        "strategies/minimal_checkpoint_collector.py"
+      ]
+    }
+  },
+  "strategy_class": "strategies.minimal_checkpoint_collector.MinimalCheckpointCollector"
+}

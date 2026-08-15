@@ -95,24 +95,24 @@ class PriceLevelTracker:
         self._opening_range_low = None
         self._opening_range_final = None
 
-    def update_1m(self, ts_event: int, open_px: float, high: float, low: float,
+    def update_1m(self, ts_avail: int, open_px: float, high: float, low: float,
                   close: float, is_rth: bool) -> None:
         """Feed one COMPLETED 1-minute bar, in chronological order.
-        `ts_event` must be the bar's CLOSE timestamp (causally available time)."""
-        day_key = trading_day_key(ts_event)
+        `ts_avail` must be the bar's CLOSE timestamp (causally available time)."""
+        day_key = trading_day_key(ts_avail)
         if day_key != self.current_trading_day:
             self._on_new_trading_day(day_key)
 
-        self._today_bars.append((ts_event, open_px, high, low, close))
-        self.bars_1m.append((ts_event, open_px, high, low, close))
+        self._today_bars.append((ts_avail, open_px, high, low, close))
+        self.bars_1m.append((ts_avail, open_px, high, low, close))
 
         if is_rth:
             if self._rth_open is None:
                 self._rth_open = open_px
-                self._rth_open_ts = ts_event
+                self._rth_open_ts = ts_avail
                 if self._overnight_high is not None and self._overnight_final is None:
                     self._overnight_final = {"high": self._overnight_high, "low": self._overnight_low}
-            elapsed = (ts_event - self._rth_open_ts) / NS
+            elapsed = (ts_avail - self._rth_open_ts) / NS
             if elapsed < OPENING_RANGE_SECONDS:
                 self._opening_range_high = high if self._opening_range_high is None else max(self._opening_range_high, high)
                 self._opening_range_low = low if self._opening_range_low is None else min(self._opening_range_low, low)

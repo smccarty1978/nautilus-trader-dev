@@ -1,0 +1,17 @@
+required_clauses:
+  chronology_train:
+    target: chronology.train
+    contains: [2023]
+    description: "Train partition covers 2023"
+  chronology_dev:
+    target: chronology.dev
+    contains: [2024]
+    description: "Dev partition covers 2024"
+  features_count_3:
+    target: features.feature_list
+    length_expected: 3
+    description: "Exactly 3 features configured"
+  strategy_class_minimal:
+    target: execution.strategy_class
+    expected: "strategies.minimal_checkpoint_collector.MinimalCheckpointCollector"
+    description: "Strategy class is MinimalCheckpointCollector"

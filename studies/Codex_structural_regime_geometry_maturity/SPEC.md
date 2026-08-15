@@ -36,8 +36,16 @@ improvement are distinct outcomes; either may be absent.
 | Primary maturity buckets | `[300,600)`, `[600,900)`, `[900,1800)` seconds from current 1m-regime start |
 | Separate extrapolation bucket | `[1800,∞)`; never mixed with the primary buckets |
 
-The accepted eligibility is verified before collection against
-`BULLISH_STRICT_top25_gbt_v2` and `LONG_STRICT_top25_gbt_v2`: strict age `>120s`,
+**Amendment 2026-08-14 (user-authorized after causal audit C3):** the prior named
+baseline artifacts resolved to a Top-25 selected with 2025 labels and are therefore
+inadmissible for 2024 OOS. Baseline A is replaced by study-owned,
+direction-specific `BULLISH_STRICT_top25_train_2023_v1` and
+`LONG_STRICT_top25_train_2023_v1`, selected and frozen using 2021-2023 only; their
+manifests must assert the 2024 boundary, empty future-year reads, source hashes,
+and exact strict eligibility facts.
+
+The accepted eligibility is verified before fitting against the replacement sources:
+strict age `>120s`,
 `running_mfe_atr >= 1`, `new_progress_windows >= 2`,
 `retained_mfe_ratio >= .5`, ATR anchored at confirmed 1m-regime start, and 5s cadence.
 Any discrepancy aborts rather than being repaired here.

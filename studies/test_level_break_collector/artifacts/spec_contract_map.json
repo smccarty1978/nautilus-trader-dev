@@ -1,0 +1,31 @@
+{
+  "study_id": "test_level_break_collector",
+  "spec_clause_coverage_pct": 100.0,
+  "total_mandatory_clauses": 4,
+  "satisfied_clauses_count": 4,
+  "unmapped_required_clauses_count": 0,
+  "unmapped_clauses": [],
+  "clauses": {
+    "chronology_train": {
+      "description": "Train partition covers 2023",
+      "satisfied": true,
+      "status": "PASS"
+    },
+    "chronology_dev": {
+      "description": "Dev partition covers 2024",
+      "satisfied": true,
+      "status": "PASS"
+    },
+    "features_count_7": {
+      "description": "Exactly 7 features configured",
+      "satisfied": true,
+      "status": "PASS"
+    },
+    "strategy_class_level_break": {
+      "description": "Strategy class is LevelBreakTestCollector",
+      "satisfied": true,
+      "status": "PASS"
+    }
+  },
+  "verdict": "PASS"
+}

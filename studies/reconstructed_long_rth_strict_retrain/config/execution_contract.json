@@ -1,0 +1,22 @@
+{
+  "runtime": "nautilustrader",
+  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+  "bounded_execution": true,
+  "progress_seconds": 60,
+  "checkpoint": null,
+  "chronology": {
+    "train": [
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "dev": [
+      2025
+    ],
+    "diagnostic": [],
+    "prohibited": [
+      2026
+    ]
+  }
+}

@@ -35,15 +35,15 @@ Not every task requires the full agent ceremony. Launch sessions according to ri
   ```
 
 ### Tier 2: Normal Research Study
-* **Workflow**: Planning (`repo-scout` only when needed) $\rightarrow$ Main implementation + tests $\rightarrow$ split pre-execution audit $\rightarrow$ Staged runner (`scripts/run_bounded_study.py`) $\rightarrow$ completion contract check. Re-audit causality only after an audited-surface change.
+* **Workflow**: `research_decision.yaml` (create/verify) $\rightarrow$ `SPEC.md` $\rightarrow$ `study.yaml` $\rightarrow$ `python scripts/create_study.py --config study.yaml` $\rightarrow$ `python scripts/compile_study.py` $\rightarrow$ deterministic preflight (`scripts/research_preflight.py` CLEAR) $\rightarrow$ split pre-execution audit $\rightarrow$ Staged runner (`scripts/run_bounded_study.py`) $\rightarrow$ completion contract check. Re-audit causality only after an audited-surface change.
 * **Contract Checker**: Optional; invoke only when causal contracts or timeframe rules changed.
 * **Launch Command**:
   ```bash
   claude --model claude-sonnet-5 --dangerously-skip-permissions
   ```
 
-### Tier 3: Model Freeze / Population Parity / Live Feature Implementation
-* **Workflow**: Planning (`repo-scout`) $\rightarrow$ Freeze SPEC/Task Packet $\rightarrow$ Implementation + tests $\rightarrow$ split pre-execution audit $\rightarrow$ Staged runner $\rightarrow$ completion contract check. Re-audit causality only after an audited-surface change.
+### Tier 3: Model Freeze / Deployment / Cross-Timeframe Strategy
+* **Workflow**: `research_decision.yaml` (create/verify) $\rightarrow$ `SPEC.md` $\rightarrow$ `study.yaml` $\rightarrow$ `python scripts/create_study.py` $\rightarrow$ deterministic preflight $\rightarrow$ split pre-execution audit $\rightarrow$ Staged runner $\rightarrow$ completion contract check. Re-audit causality only after an audited-surface change.
 * **Planning Launch**:
   ```bash
   claude --model opusplan --permission-mode plan --allow-dangerously-skip-permissions
@@ -57,11 +57,15 @@ Not every task requires the full agent ceremony. Launch sessions according to ri
 
 ## Token-Minimization & Execution Rules
 
-1. **Deterministic Runner over Agent Monitoring**: Use `scripts/run_bounded_study.py` to monitor execution runtime, memory, stale log updates, and timeouts. Do not spawn subagents to watch background process logs.
-2. **Contextual Diff-First Auditing**: Auditors must review the contextual diff (`git diff -U20`) inside `audit_packet.json` first. Full files are read only when structural dependencies or state flow are unresolved in the diff.
-3. **No Unchanged File Re-discovery**: Do not reopen unchanged files to repeat discovery. Read an unchanged file only when its full context is required to resolve a current causal/audit question.
-4. **Structured & Compact Outputs**: Subagents must use concise tables, file:line citations, and paths instead of narrative explanations or repeated SPEC summaries.
-5. **No Automatic Stage Expansion**: Always run bounded stages (synthetic $\rightarrow$ 1-day $\rightarrow$ 1-week $\rightarrow$ 1-month) and verify metrics before expanding.
+1. **Deterministic Preflight First**: Run `python scripts/research_preflight.py --study studies/<name>` before calling any subagent. If preflight is `BLOCKED`, read `audit/failure_packet.json` and fix locally.
+2. **Worker Subagent Boundary**: Worker and coding agents cannot spawn additional subagents. Only the main orchestrator may invoke named mandatory repository gates.
+3. **Deterministic Runner over Agent Monitoring**: Use `scripts/run_bounded_study.py` to monitor execution runtime, memory, stale log updates, and timeouts. Do not spawn subagents to watch background process logs.
+4. **Contextual Diff-First Auditing**: Auditors must review the contextual diff (`git diff -U20`) inside `audit_packet.json` first. Full files are read only when structural dependencies or state flow are unresolved in the diff.
+5. **No Unchanged File Re-discovery**: Do not reopen unchanged files to repeat discovery. Read an unchanged file only when its full context is required to resolve a current causal/audit question.
+6. **Structured & Compact Outputs**: Subagents must use concise tables, file:line citations, and paths instead of narrative explanations or repeated SPEC summaries.
+7. **No Automatic Stage Expansion**: Always run bounded stages (synthetic $\rightarrow$ 1-day $\rightarrow$ 1-week $\rightarrow$ 1-month) and verify metrics before expanding.
+8. **Parity Failure First-Divergence Rule**: For any parity failure, no broad repository exploration is permitted until `scripts/find_first_parity_divergence.py` is executed to pinpoint the exact timestamp, stage, and field difference.
+9. **Research Decision Contract Authority**: Never improve, broaden, clean up, or make a study more statistically pure by changing a fixed baseline or adding feature discovery unless `research_decision.yaml` explicitly permits it. If a design concern exists, surface it as a caveat; do not silently alter the experiment.
 
 ---
 
@@ -75,12 +79,12 @@ restate it.
 
 | # | Step | Cost | Catches |
 |---|---|---|---|
-| 0 | `python scripts/causal_lint.py --study studies/<name>` | free | H4 trigger-price fills, `ts_event` session gates, `center=True`, `.shift(-N)`, `bfill`, bare `merge_asof`, random CV, non-`*.v.0` symbols |
+| 0 | `python scripts/research_preflight.py --study studies/<name>` | free | AST causal linting, schema validation, model binding, and fast causal canaries |
 | 1 | `contract-checker` on the Deliverables Manifest | 1,000w | missing artifacts, unreachable terminal labels, seal integrity, C4/D/E |
 | 2 | `lookahead-auditor` on the causal contract | 1,500w | state flow, callback ordering, cross-file convention conflicts, train/serve divergence |
 
-Steps 1 and 2 have **disjoint scope** and may run in parallel. Never let one
-report the other's category.
+Preflight must be `CLEAR` before Steps 1 and 2 may run. If preflight is `BLOCKED`, the agent must inspect `audit/failure_packet.json` and fix locally.
+Steps 1 and 2 have **disjoint scope** and may run in parallel. Never let one report the other's category.
 
 ### Why the split exists
 
@@ -138,39 +142,3 @@ Every subagent prompt must include:
 * Required output format & word cap
 * Explicit prohibitions
 * Known facts vs. unresolved questions
-
----
-
-## Standing Authorization for Named Mandatory Agent Gates
-
-Named mandatory gates in this repository constitute standing user authorization for the main orchestrator to invoke the specifically named agent when that gate condition is reached.
-
-This authorization applies only to:
-
-- `repo-scout` where the selected risk tier requires it
-- `contract-checker` where the selected risk tier requires it
-- `results-triager` for exact approved test commands
-- `lookahead-auditor` at mandatory causal or look-ahead audit gates
-
-The invocation must remain limited to the scope of the named gate.
-
-This standing authorization does not permit:
-
-- discretionary agent use
-- unnamed or general-purpose agents
-- broad parallel fan-out
-- nested delegation
-- workers spawning subagents
-- expanding the audit into implementation work
-- code modifications by an audit-only agent
-
-Session-level instructions prohibiting discretionary agent spawning remain in force. They do not prevent execution of a specifically named mandatory repository gate covered by this standing authorization.
-
-If a mandatory gate and a session-level restriction appear to conflict, the orchestrator should:
-
-1. invoke only the specifically named mandatory gate;
-2. keep the scope limited to the gate’s defined responsibilities;
-3. avoid all additional agent delegation; and
-4. record the invocation and resulting verdict in the study artifacts.
-
-Passing criteria remain governed by the applicable frozen contract or SPEC. Standing authorization to invoke an auditor does not relax the audit acceptance standard. Do not mark the work finalized unless the audit satisfies the acceptance gate defined by the applicable frozen SPEC. At minimum, any CRITICAL finding blocks finalization. Any WARNING must either be remediated or explicitly adjudicated according to the SPEC; do not silently treat an unresolved WARNING as cleared.

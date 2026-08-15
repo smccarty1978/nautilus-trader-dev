@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "audit_date": "2026-08-14",
+  "guardrail_verdict": "CURRENT_TIMESTAMP_GUARDRAIL_PARTIALLY_CORRECT",
+  "canonical_contract": {
+    "source_format": "databento_parquet",
+    "raw_schema": "ohlcv-1s",
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "raw_index_field": "ts_event",
+    "timezone": "UTC",
+    "higher_timeframes_origin": "DERIVED_FROM_1S",
+    "offline_research_aggregation": {
+      "pandas_resample": "resample(rule, label='right', closed='left')",
+      "resulting_timestamp_semantic": "CLOSE_STAMPED"
+    },
+    "nautilus_catalog_contract": {
+      "ts_event_semantic": "OPEN_STAMPED",
+      "ts_init_semantic": "CLOSE_STAMPED",
+      "causal_dispatch_field": "ts_init",
+      "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
+      "rules_by_timeframe": {
+        "1s": {
+          "bar_duration_ns": 1000000000,
+          "ts_init_delta_ns": 1000000000,
+          "ts_event_semantic": "interval_open",
+          "ts_init_semantic": "interval_close",
+          "provenance": "empirically_verified_on_disk"
+        },
+        "1m": {
+          "bar_duration_ns": 60000000000,
+          "ts_init_delta_ns": 60000000000,
+          "ts_event_semantic": "interval_open",
+          "ts_init_semantic": "interval_close",
+          "provenance": "empirically_verified_on_disk"
+        },
+        "3m": {
+          "bar_duration_ns": 180000000000,
+          "ts_init_delta_ns": 180000000000,
+          "ts_event_semantic": "interval_open",
+          "ts_init_semantic": "interval_close",
+          "provenance": "contract_defined_by_rule"
+        },
+        "5m": {
+          "bar_duration_ns": 300000000000,
+          "ts_init_delta_ns": 300000000000,
+          "ts_event_semantic": "interval_open",
+          "ts_init_semantic": "interval_close",
+          "provenance": "empirically_verified_on_disk"
+        }
+      }
+    }
+  },
+  "evidence_paths": [
+    "data/raw/NQ_v0_1s_2024.parquet",
+    "data/raw/ES_v0_1s_2024.parquet",
+    "data/raw/NQ_v0_mbp1_2026_01.parquet",
+    "data/catalog/NQ_v0_2020_2026/data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2020-01-01T23-00-01-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+    "data/catalog/NQ_v0_2020_2026/data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2020-01-01T23-01-00-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+    "data/catalog/NQ_v0_2020_2026/data/bar/NQ.XCME-5-MINUTE-LAST-EXTERNAL/2020-01-01T23-05-00-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+    "scripts/build_es_v0_2020_2026_catalog.py",
+    "archive/scripts/build_v0_multi_year_catalog.py"
+  ],
+  "confidence": "HIGH"
+}
