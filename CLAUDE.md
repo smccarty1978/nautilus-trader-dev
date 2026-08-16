@@ -30,6 +30,29 @@
 - **Subagent output caps.** `repo-scout` 700w (paths/symbols only) · `contract-checker` 1,000w (compliance table) · `results-triager` 500w (failures + root cause) · `lookahead-auditor` 1,500w (findings by severity).
 - **Standing authorization.** The named mandatory gates above may be invoked without asking, scoped strictly to the gate. No discretionary, general-purpose, nested, or fan-out agent use. Full text: `AGENTS.md` § Standing Authorization.
 
+## BACKTEST / COLLECT — IMPORT, DON'T REGENERATE
+Engine setup, instrument construction, catalog loading and the `sys.path`/`os.chdir` preamble
+are already implemented. Import them; never re-type them into a new script.
+
+| Concern | Canonical import |
+| --- | --- |
+| Engine + venue + instrument | `backtests/nt_runtime/engine_builder.py` → `build_engine`, `create_futures_instrument` |
+| Catalog bar loading | `utils/runner/data.py` → `CausalDataLoader.load_bars` (never open `ParquetDataCatalog` inline) |
+| 1s-before-1m dispatch order | `utils/causal_registration.py` → `add_bars_causal_order` |
+| Study / stage / output / telemetry | `backtests/nt_runtime/{compiled_study_loader,data_plan,run_plan,output_manager,telemetry}.py` |
+| Collect entrypoint | `backtests/run_nt_study.py --mode collect` |
+| Standalone backtest entrypoint | `backtests/run_backtest.py` (non-collector strategies) |
+
+- A standard backtest is `python backtests/run_backtest.py --strategy <id> --param k=v`, **not** a new `run_*.py`.
+  Legacy `backtests/run_*.py` scripts are frozen references, not templates to copy.
+- `resolve_catalog_plan(...)` is the generic catalog/instrument/warmup resolver.
+  `resolve_data_plan(...)` is the study-bound wrapper that additionally applies collector chronology
+  and OOS gates — do not call it for a non-collector backtest.
+- `--strategy` must NEVER override a sealed study's declared `strategy_class`. If a study is sealed,
+  the strategy it seals is the only strategy permitted to run under that study identity.
+- Shared helpers go in `backtests/nt_runtime/`, `utils/runner/`, or `features/`. NEVER `sys.path.insert`
+  into a sibling study directory.
+
 ## DOCUMENTATION INDEX
 Do not guess implementation details. Use your `Read` tool to read the relevant spec before writing code:
 

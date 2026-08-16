@@ -67,6 +67,43 @@ def _extract_v2_summary(text: str, report_path: Path) -> Dict[str, Any]:
     return data
 
 
+# A finding heading is `<marker> SEVERITY: <title>`:
+#   - a markdown heading (#..####) or list bullet (-/*) marker,
+#   - the severity token, optionally wrapped in [] or markdown emphasis,
+#   - a MANDATORY colon,
+#   - a non-empty title.
+#
+# The colon and title requirements are what stop the two false-positive classes
+# that previously rejected valid reports:
+#   `## Critical findings`  -> section label, no colon        -> not a finding
+#   `- Critical: 0`         -> count bullet, numeric title    -> not a finding
+_FINDING_HEADING = (
+    r"^(?:#{1,4}|[-*])\s+"                 # heading or bullet marker
+    r"[\[\*_`]{0,3}\s*"                    # optional [ / ** / __ / ` decoration
+    r"(?:%s)"                              # severity token
+    r"\s*[\]\*_`]{0,3}"                    # closing decoration
+    r"\s*:\s*"                             # MANDATORY colon
+    r"(?P<title>\S.*)$"                    # non-empty title
+)
+
+_COUNT_ONLY_TITLE = re.compile(r"^(?:\d+|none|n/?a|zero)\b\.?$", re.IGNORECASE)
+
+
+def _count_severity_headings(text: str, severities: str) -> int:
+    pattern = re.compile(_FINDING_HEADING % severities, re.MULTILINE | re.IGNORECASE)
+    count = 0
+    for match in pattern.finditer(text):
+        # Strip markdown emphasis from BOTH ends: a count bullet is often written
+        # `- **Critical:** 0`, where the colon sits inside the emphasis and the
+        # captured title begins with the closing `**`.
+        title = match.group("title").strip().strip("*_`").strip()
+        # `- Critical: 0` / `- Warning: none` are summary counts, not findings.
+        if _COUNT_ONLY_TITLE.match(title):
+            continue
+        count += 1
+    return count
+
+
 def _count_independent_headings(text: str) -> Tuple[int, int]:
     """Independently counts finding headings in report markdown body.
 
@@ -75,11 +112,8 @@ def _count_independent_headings(text: str) -> Tuple[int, int]:
     # Exclude the summary block from heading regex scan to avoid self-matches
     clean_text = re.sub(r"<!-- AUDIT_SUMMARY_V2_START -->.*?<!-- AUDIT_SUMMARY_V2_END -->", "", text, flags=re.DOTALL)
 
-    crit_pattern = re.compile(r"^(?:#{1,4}\s*|[-*]\s*)\[?(?:CRITICAL|BLOCKING)\]?[\s:]+", re.MULTILINE | re.IGNORECASE)
-    warn_pattern = re.compile(r"^(?:#{1,4}\s*|[-*]\s*)\[?(?:WARNING)\]?[\s:]+", re.MULTILINE | re.IGNORECASE)
-
-    crit_matches = len(crit_pattern.findall(clean_text))
-    warn_matches = len(warn_pattern.findall(clean_text))
+    crit_matches = _count_severity_headings(clean_text, r"CRITICAL|BLOCKING")
+    warn_matches = _count_severity_headings(clean_text, r"WARNING")
 
     return crit_matches, warn_matches
 
@@ -261,14 +295,200 @@ def issue_contract_audit_status_from_report(
     return status_data
 
 
+class AuditIngestionError(RuntimeError):
+    """Raised when an externally authored audit report cannot be safely ingested."""
+    pass
+
+
+REPORT_FILENAMES = {
+    "causal": "pass_{n:02d}.md",
+    "contract": "contract_pass_{n:02d}.md",
+}
+
+
+def ingest_external_audit_report(
+    study_dir: Path,
+    pass_num: int,
+    audit_type: str,
+    source_path: Path,
+    author: str,
+    repo_root: Optional[Path] = None,
+    allow_overwrite: bool = False,
+) -> Dict[str, Any]:
+    """Validates an independently authored audit report and files it as official evidence.
+
+    This exists so that an auditor which cannot write into the repository (a
+    read-only agent, a different toolchain, or a human red team) can still supply
+    evidence without the orchestrator hand-authoring an audit verdict. Ingestion
+    is deliberately narrow and fails closed:
+
+    1. Only a Markdown **report** may be ingested. A status JSON can never be
+       supplied directly -- status is always re-derived by the parser here.
+    2. The report must parse under the strict V2 rules, including the
+       summary-vs-heading consistency check. A report that claims CLEAR while
+       listing findings is rejected.
+    3. The report must name the study it audited, and it must match ``study_dir``.
+    4. The report must declare the execution composite it reviewed, and that must
+       equal the composite of the code as it stands now. This is what makes a
+       stale audit unusable after a code change.
+    5. The destination must not already exist unless ``allow_overwrite``.
+
+    The recorded status carries ``ingested_from``/``ingested_by``/``source_sha256``
+    so a reviewer can always see that this evidence arrived from outside.
+    """
+    if repo_root is None:
+        repo_root = REPO_ROOT
+    study_dir = study_dir.resolve()
+    source_path = Path(source_path)
+
+    if audit_type not in REPORT_FILENAMES:
+        raise AuditIngestionError(
+            f"INGEST_BAD_TYPE: audit type must be one of {sorted(REPORT_FILENAMES)}, got '{audit_type}'"
+        )
+    if not source_path.is_file():
+        raise AuditIngestionError(f"INGEST_SOURCE_MISSING: {source_path}")
+    if source_path.suffix.lower() != ".md":
+        raise AuditIngestionError(
+            f"INGEST_NOT_A_REPORT: only a Markdown audit report may be ingested, got "
+            f"'{source_path.name}'. Status JSON is always re-derived, never supplied."
+        )
+
+    # Independence is a structural precondition, checked before validity: a file
+    # that is already the destination artifact is not external evidence at all.
+    dest = study_dir / "audit" / REPORT_FILENAMES[audit_type].format(n=pass_num)
+    if source_path.resolve() == dest.resolve():
+        raise AuditIngestionError(
+            "INGEST_SELF_ASSERTED: the source report is already the destination artifact; "
+            "there is nothing independent to ingest."
+        )
+    try:
+        source_path.resolve().relative_to((study_dir / "audit").resolve())
+        raise AuditIngestionError(
+            f"INGEST_SELF_ASSERTED: {source_path} already lives inside the study's audit "
+            f"directory. Ingestion is for evidence authored outside it."
+        )
+    except ValueError:
+        pass  # outside audit/ -- this is what we want
+
+    text = source_path.read_text(encoding="utf-8", errors="replace")
+    if not text.strip():
+        raise AuditIngestionError(f"INGEST_EMPTY_REPORT: {source_path}")
+
+    # (2) strict parse of the SOURCE, before anything is written. This must include
+    # the summary-vs-heading consistency check, otherwise a self-contradictory report
+    # would be filed into audit/ and only rejected afterwards, leaving the bad
+    # artifact behind.
+    summary = _extract_v2_summary(text, source_path)
+    if audit_type == "causal":
+        parse_causal_audit_report(source_path)
+    else:
+        parse_contract_audit_report(source_path)
+
+    # (3) study binding
+    declared_study = summary.get("study")
+    if not declared_study:
+        raise AuditIngestionError(
+            "INGEST_STUDY_UNDECLARED: the AUDIT_SUMMARY_V2 block must carry a 'study' field "
+            "naming the audited study, so a report cannot be filed against the wrong study."
+        )
+    if declared_study != study_dir.name:
+        raise AuditIngestionError(
+            f"INGEST_STUDY_MISMATCH: report declares study '{declared_study}' but is being "
+            f"filed under '{study_dir.name}'."
+        )
+
+    # (4) freshness binding
+    declared_composite = summary.get("audited_execution_composite_sha256")
+    if not declared_composite:
+        raise AuditIngestionError(
+            "INGEST_COMPOSITE_UNDECLARED: the AUDIT_SUMMARY_V2 block must carry "
+            "'audited_execution_composite_sha256' identifying the code that was reviewed."
+        )
+    current_composite, _file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+    if declared_composite != current_composite:
+        raise AuditIngestionError(
+            f"INGEST_STALE_AUDIT: report reviewed execution composite {declared_composite[:12]}… "
+            f"but current code is {current_composite[:12]}…. Re-audit against the current tree."
+        )
+
+    # (5) destination
+    if dest.exists() and not allow_overwrite:
+        raise AuditIngestionError(
+            f"INGEST_DESTINATION_EXISTS: {dest} already exists. Use a new pass number rather "
+            f"than overwriting existing audit evidence."
+        )
+
+    source_sha = _hash_file(source_path)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(text, encoding="utf-8")
+
+    issue = (
+        issue_causal_audit_status_from_report
+        if audit_type == "causal"
+        else issue_contract_audit_status_from_report
+    )
+    status = issue(study_dir, pass_num, repo_root=repo_root)
+    status.update(
+        {
+            "ingested_from": str(source_path),
+            "ingested_by": author,
+            "source_sha256": source_sha,
+            "ingestion_validated": [
+                "markdown_report_only",
+                "strict_v2_parse",
+                "summary_heading_consistency",
+                "study_binding",
+                "execution_composite_freshness",
+                "destination_not_overwritten",
+            ],
+        }
+    )
+    status_name = "status.json" if audit_type == "causal" else "contract_status.json"
+    with open(study_dir / "audit" / status_name, "w", encoding="utf-8") as f:
+        json.dump(status, f, indent=2)
+    return status
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Parse auditor artifacts and issue authenticated audit status.")
     parser.add_argument("--study", "-s", type=str, required=True, help="Path to study directory")
     parser.add_argument("--pass-num", "-p", type=int, required=True, help="Pass number to parse")
+    parser.add_argument("--ingest", type=str, default=None,
+                        help="Path to an independently authored audit report (.md) to validate and file.")
+    parser.add_argument("--author", type=str, default=None,
+                        help="Identity of the independent auditor supplying --ingest (required with --ingest).")
+    parser.add_argument("--allow-overwrite", action="store_true",
+                        help="Permit --ingest to replace an existing pass artifact.")
     parser.add_argument("--type", choices=["causal", "contract", "both"], default="both", help="Audit type")
     args = parser.parse_args()
 
     study_dir = Path(args.study).resolve()
+
+    if args.ingest:
+        if args.type == "both":
+            print("[ERROR] --ingest requires an explicit --type (causal|contract).", file=sys.stderr)
+            return 2
+        if not args.author:
+            print("[ERROR] --ingest requires --author identifying the independent auditor.",
+                  file=sys.stderr)
+            return 2
+        try:
+            status = ingest_external_audit_report(
+                study_dir,
+                args.pass_num,
+                args.type,
+                Path(args.ingest),
+                author=args.author,
+                allow_overwrite=args.allow_overwrite,
+            )
+        except (AuditIngestionError, AuditArtifactParseError) as err:
+            print(f"[ERROR] {err}", file=sys.stderr)
+            return 2
+        print(
+            f"INGESTED {args.type.upper()} AUDIT (Pass {args.pass_num:02d}) from "
+            f"{args.ingest} by {args.author}: Verdict={status['verdict']}"
+        )
+        return 0
 
     if args.type in ("causal", "both"):
         c_status = issue_causal_audit_status_from_report(study_dir, args.pass_num)

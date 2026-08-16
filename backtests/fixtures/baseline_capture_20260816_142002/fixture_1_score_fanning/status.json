@@ -1,0 +1,219 @@
+{
+  "fixture_id": "fixture_1_score_fanning",
+  "description": "ScoreFanningStrategy multi-policy virtual evaluator, single day 2023-03-03. Places zero NT orders; its real output is per-policy virtual trade tables.",
+  "status": "FAILED_UNMODIFIED",
+  "baseline_valid": false,
+  "command": [
+    "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "backtests/run_staged_backtest.py",
+    "--start-date",
+    "2023-03-03",
+    "--end-date",
+    "2023-03-03"
+  ],
+  "command_display": "python.exe backtests/run_staged_backtest.py --start-date 2023-03-03 --end-date 2023-03-03",
+  "returncode": 1,
+  "started_utc": "2026-08-16T14:20:03.559221+00:00",
+  "finished_utc": "2026-08-16T14:20:08.358569+00:00",
+  "entrypoint": "backtests/run_staged_backtest.py",
+  "source_closure": {
+    "file_count": 7,
+    "stable_across_run": true,
+    "drifted_files": [],
+    "hashes_before": {
+      "backtests/run_staged_backtest.py": "2ac163029d7b3c88c1c853685c289c5a53a4640680da5b6f1b6ede0ee8a88df7",
+      "strategies/score_fanning_strategy.py": "cf5173894a9d4c1a9f3d76099b81d5da5e89406960ba09200f4a55e716ca0b74",
+      "utils/runner/checkpoint.py": "9e24e74446f72c1114b44f5ad359f92fd89fdabf2c8b858d4a4ac437220c6404",
+      "utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+      "utils/runner/fanning.py": "8b23d34fd1579126a8ad2ff579d8483f9cb7531c936363c190abc5bc60488355",
+      "utils/runner/progress.py": "9bc8b06102803bc10fd180d10416dbe13af7d3c6e3470dbb5c423fc1d4f0a0c2",
+      "utils/runner/registry.py": "eb52847d1b362015df4b96b9b456385df11cb6200f94f54fa517af1f811df9df"
+    },
+    "hashes_after": {
+      "backtests/run_staged_backtest.py": "2ac163029d7b3c88c1c853685c289c5a53a4640680da5b6f1b6ede0ee8a88df7",
+      "strategies/score_fanning_strategy.py": "cf5173894a9d4c1a9f3d76099b81d5da5e89406960ba09200f4a55e716ca0b74",
+      "utils/runner/checkpoint.py": "9e24e74446f72c1114b44f5ad359f92fd89fdabf2c8b858d4a4ac437220c6404",
+      "utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+      "utils/runner/fanning.py": "8b23d34fd1579126a8ad2ff579d8483f9cb7531c936363c190abc5bc60488355",
+      "utils/runner/progress.py": "9bc8b06102803bc10fd180d10416dbe13af7d3c6e3470dbb5c423fc1d4f0a0c2",
+      "utils/runner/registry.py": "eb52847d1b362015df4b96b9b456385df11cb6200f94f54fa517af1f811df9df"
+    }
+  },
+  "external_inputs": [],
+  "catalog_bounds": {
+    "status": "ok",
+    "catalog_path": "data/catalog/NQ_v0_2020_2026",
+    "window_start": "2023-02-26 00:00:00+00:00",
+    "window_end": "2023-03-03 23:59:59+00:00",
+    "bar_types": {
+      "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+        "row_count": 252660,
+        "first_ts_event": 1677452400000000000,
+        "last_ts_event": 1677880799000000000,
+        "first_ts_init": 1677452401000000000,
+        "last_ts_init": 1677880800000000000
+      },
+      "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+        "row_count": 6899,
+        "first_ts_event": 1677452400000000000,
+        "last_ts_event": 1677880740000000000,
+        "first_ts_init": 1677452460000000000,
+        "last_ts_init": 1677880800000000000
+      }
+    }
+  },
+  "resolved_config": {
+    "status": "unavailable_config_class_unimportable",
+    "config_class": "strategies.score_fanning_strategy.ScoreFanningConfig",
+    "entrypoint_kwargs": {
+      "instrument_id": "NQ.XCME",
+      "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+      "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+      "checkpoint_dir": "backtests/results/checkpoints",
+      "policies": [
+        {
+          "name": "R5",
+          "threshold": 0.62,
+          "sl_atr_mult": 1.5,
+          "pt_atr_mult": 2.0
+        },
+        {
+          "name": "R2.5",
+          "threshold": 0.5,
+          "sl_atr_mult": 1.5,
+          "pt_atr_mult": 2.0
+        }
+      ]
+    },
+    "kwargs_provenance": "backtests/run_staged_backtest.py:68-77 (strat_cfg_dict literal)",
+    "error": "TypeError: Using a non-empty mutable collection ([{'name': 'R5', 'threshold': 0.62, 'sl_atr_mult': 1.5, 'pt_atr_mult': 2.0}, {'name': 'R2.5', 'threshold': 0.5, 'sl_atr_mult': 1.5, 'pt_atr_mult': 2.0}]) as a default value is unsafe. Instead configure a `default_factory` for this field."
+  },
+  "fill_evidence": {
+    "fill_artifact_present": false,
+    "statement": "No fills exist: ScoreFanningStrategy submits no NT orders, so the positions report is empty by construction and that emptiness is part of the baseline.",
+    "rationale": "The legacy entrypoint does not call generate_order_fills_report() and does not persist fills. Producing one would require instrumenting the run, which Phase 1 forbids. Absence of a fill artifact is therefore stated explicitly rather than left as a silent gap."
+  },
+  "warmup_evidence": {
+    "bars_loaded_by_timeframe": {},
+    "bar_callbacks_dispatched": "unavailable_uninstrumented",
+    "rationale": "Phase 1 executes the legacy entrypoint verbatim; observing per-bar callbacks would require instrumenting it, which would invalidate the authoritative run.",
+    "derived_observations": [
+      {
+        "observation": "daily_checkpoint_files_present",
+        "value": [
+          "checkpoint_2023-03-02.pkl"
+        ],
+        "interpretation": "ScoreFanningStrategy.save_daily_checkpoint fires on a ts_event day rollover. A checkpoint for the day before --start-date indicates at least one pre-start bar was dispatched by ts_event labelling (bars are OPEN-stamped, ts_init=close), and is NOT by itself proof that the full 5-day lead-in was replayed."
+      }
+    ]
+  },
+  "targets": [
+    {
+      "target_path": "backtests/results/checkpoints/results_R2.5.parquet",
+      "expectation": "produced",
+      "status": "expected_absent_unverified_due_to_preexisting_target",
+      "preexisting_before_run": true,
+      "pre_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+      "pre_size_bytes": 7344,
+      "quarantined_to_prove_absence": false,
+      "preserved_to": "preserved_preexisting/fixture_1_score_fanning/results_R2.5.parquet",
+      "post_run_exists": true,
+      "post_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+      "evidence_copy": "fixture_1_score_fanning/results_R2.5.parquet",
+      "normalized_identity": {
+        "row_count": 20,
+        "columns": [
+          "trade_id",
+          "entry_time",
+          "entry_px",
+          "direction",
+          "qty",
+          "atr",
+          "exit_time",
+          "exit_px",
+          "exit_reason",
+          "pnl",
+          "is_open"
+        ],
+        "columns_hashed": [
+          "trade_id",
+          "entry_time",
+          "entry_px",
+          "direction",
+          "qty",
+          "atr",
+          "exit_time",
+          "exit_px",
+          "exit_reason",
+          "pnl",
+          "is_open"
+        ],
+        "columns_excluded_volatile": [],
+        "normalized_sha256": "5fc80964515084819e8d34698154eca20f447b65b29adcf9c0e1fb3caa3cd07d",
+        "file_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+        "file_size_bytes": 7344
+      },
+      "absence_cause": null,
+      "attribution_note": "Pre-existing file was not modified by the run and was not quarantined; neither production nor a fresh absence can be verified for this target.",
+      "restored_to_original_state": true,
+      "restore_verified_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857"
+    },
+    {
+      "target_path": "backtests/results/checkpoints/results_R5.parquet",
+      "expectation": "conditional",
+      "status": "expected_absent_verified",
+      "preexisting_before_run": false,
+      "pre_sha256": null,
+      "pre_size_bytes": null,
+      "quarantined_to_prove_absence": false,
+      "preserved_to": null,
+      "post_run_exists": false,
+      "post_sha256": null,
+      "evidence_copy": null,
+      "normalized_identity": null,
+      "absence_cause": "ScoreFanningStrategy.on_bar emits a constant dummy_score=0.55 which is below the R5 threshold of 0.62, so the R5 evaluator opens no trades and run_staged_backtest.py:148 `if trades_list:` is False.",
+      "attribution_note": null,
+      "restored_to_original_state": true,
+      "restore_verified_sha256": null
+    },
+    {
+      "target_path": "backtests/results/checkpoints/resume_manifest.json",
+      "expectation": "conditional",
+      "status": "expected_absent_verified",
+      "preexisting_before_run": true,
+      "pre_sha256": "28e23fef483a888ede2153d26bc386bc62d359e025cf5800e487329f4bf623cc",
+      "pre_size_bytes": 1375,
+      "quarantined_to_prove_absence": true,
+      "preserved_to": "preserved_preexisting/fixture_1_score_fanning/resume_manifest.json",
+      "post_run_exists": false,
+      "post_sha256": null,
+      "evidence_copy": null,
+      "normalized_identity": null,
+      "absence_cause": "Written by save_daily_checkpoint only on a day rollover.",
+      "attribution_note": null,
+      "restored_to_original_state": true,
+      "restore_verified_sha256": "28e23fef483a888ede2153d26bc386bc62d359e025cf5800e487329f4bf623cc"
+    }
+  ],
+  "preexisting_stale_unmanaged": [
+    {
+      "path": "backtests/results/checkpoints/checkpoint_2023-03-02.pkl",
+      "status": "preexisting_stale_unmanaged",
+      "sha256": "f6e85ea76eb4ad4c1272c826671ff28b864216a7ff803652dea279b1d70311f8",
+      "size_bytes": 321,
+      "note": "Not produced by this run configuration. Preserved in place; never attributed."
+    }
+  ],
+  "undeclared_side_effects": {
+    "created": [
+      "backtests/results/checkpoints/resume_manifest.json"
+    ],
+    "modified": [],
+    "note": "Undeclared side effects (NT logs, daily checkpoints) are recorded for provenance and intentionally left in place; they are not attributed as fixture outputs."
+  },
+  "notes": [
+    "Legacy defaults: --checkpoint-dir=backtests/results/checkpoints, --resume absent.",
+    "checkpoint_dir is BOTH an input location and the output location for results_*.parquet.",
+    "NT positions report is expected empty; that emptiness is part of the baseline."
+  ]
+}

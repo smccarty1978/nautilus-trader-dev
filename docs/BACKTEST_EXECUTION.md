@@ -28,90 +28,80 @@ class MyStrategyConfig(StrategyConfig):
     sl_atr_mult: float = 1.0
 ```
 
-### Saving Config
+### Saving / Loading Config
 
-```python
-import yaml
-
-config_dict = config.dict()
-with open('backtests/configs/my_strategy_v1.yaml', 'w') as f:
-    yaml.dump(config_dict, f, default_flow_style=False)
-```
-
-### Loading Config
-
-```python
-with open('backtests/configs/my_strategy_v1.yaml', 'r') as f:
-    config_dict = yaml.safe_load(f)
-config = MyStrategyConfig(**config_dict)
-```
+Standalone backtest configs live in `backtests/configs/<name>.yaml` and are loaded by the
+canonical CLI (below) — you do not hand-roll the YAML round-trip. See
+`backtests/configs/score_fanning_2023_03_03.yaml` for a worked example.
 
 ## BACKTEST EXECUTION
 
-### Standard Backtest Runner
+> **Do not copy an engine-setup snippet out of this document.**
+> Engine construction, venue/account setup, instrument creation and catalog loading are
+> implemented once in `backtests/nt_runtime/`. Historically this section carried a
+> `run_backtest(...)` code block that existed only as Markdown; agents copied it into new
+> `run_*.py` scripts, which is the origin of the 101 near-identical engine bootstraps
+> documented in `REPO_ANALYSIS.md`. The importable implementation is now the only supported path.
+
+### Standard Backtest Runner (canonical, importable)
+
+```bash
+python backtests/run_backtest.py \
+  --strategy score_fanning_strategy \
+  --symbol NQ \
+  --start-date 2023-03-03 --end-date 2023-03-03 \
+  --warmup-days 5 \
+  --order-handling virtual \
+  --param policies_preset=r5_r25
+```
+
+Add `--dry-run` to print the fully resolved execution plan (data window, instrument, venue,
+execution mode, parameters, output identity) without replaying any data.
+
+To drive it from Python instead of the CLI:
 
 ```python
-from nautilus_trader.backtest.engine import BacktestEngine
-from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
+from backtests.nt_runtime.modes.backtest import run_backtest_mode
 
-def run_backtest(
-    strategy_class,
-    strategy_config,
-    data_catalog,
-    venue_config,
-    start_time,
-    end_time,
-    output_dir: str,
-) -> dict:
-    """Run backtest and save all results."""
-    
-    engine_config = BacktestEngineConfig(
-        trader_id="BACKTESTER-001",
-        logging=LoggingConfig(
-            log_level="INFO",
-            log_level_file="DEBUG",
-            log_directory="logs",
-        ),
-    )
-    
-    engine = BacktestEngine(config=engine_config)
-    
-    # Add venue, data, strategy
-    # ...
-    
-    engine.run(start=start_time, end=end_time)
-    
-    # Generate reports
-    results = generate_results(engine, output_dir)
-    
-    engine.dispose()
-    
-    return results
+status = run_backtest_mode(
+    strategy="score_fanning_strategy",
+    symbol="NQ",
+    start_date="2023-03-03",
+    end_date="2023-03-03",
+    warmup_days=5,
+    order_handling="virtual",
+)
 ```
+
+The building blocks, if you need them individually:
+
+| Concern | Import |
+| --- | --- |
+| Catalog / instrument / warmup resolution | `backtests.nt_runtime.data_plan.resolve_catalog_plan` |
+| Study-bound resolution + chronology/OOS gates | `backtests.nt_runtime.data_plan.resolve_data_plan` |
+| Engine + venue + instrument | `backtests.nt_runtime.engine_builder.build_engine` |
+| Execution semantics (fill model, OMS, run window) | `backtests.nt_runtime.engine_builder.ExecutionMode` |
+| Catalog bars | `utils.runner.data.CausalDataLoader` |
+| 1s-before-1m ordering | `utils.causal_registration.add_bars_causal_order` |
+| Run artifacts / manifest | `backtests.nt_runtime.output_manager.OutputManager` |
 
 ### Multiple Backtests (Parameter Sweep)
 
-```python
-log_guard = None
+The harness executes **one parameter set per run** so that every run keeps an independent
+manifest and output identity. Orchestrate a sweep as a batch of bounded runs:
 
-for params in param_grid:
-    config = MyStrategyConfig(**params)
-    engine = BacktestEngine(config=engine_config)
-    
-    # Retain LogGuard from first engine
-    if log_guard is None:
-        log_guard = engine.get_log_guard()
-    
-    # Setup and run
-    engine.run()
-    
-    # Save results
-    save_results(engine, f"results/{params['name']}")
-    
-    engine.dispose()
-
-# LogGuard keeps logging alive across all runs
+```bash
+for theta in 0.58 0.62 0.66; do
+  python backtests/run_backtest.py --strategy w4_exit_strategy --symbol NQ \
+    --start-date 2023-01-01 --end-date 2023-12-31 \
+    --order-handling simulated_orders \
+    --param year=2023 --param policy=B1 --param theta=$theta --param N=10 \
+    --run-tag "theta_$theta"
+done
 ```
+
+Each run writes its own `runs/<timestamp>_<id>_<stage>/` directory; compare them from their
+`run_manifest.json` + `summary.json` rather than from stdout.
 
 ## LOGGING
 

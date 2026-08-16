@@ -1,0 +1,16 @@
+{
+  "status": "unavailable_config_class_unimportable",
+  "config_class": "strategies.w4_exit_strategy.W4ExitConfig",
+  "entrypoint_kwargs": {
+    "instrument_id": "NQ.XCME",
+    "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+    "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+    "year": 2023,
+    "entry_qty": 1,
+    "policy": "B1",
+    "theta": 0.62,
+    "N": 10
+  },
+  "kwargs_provenance": "backtests/run_w4_backtest.py:112-122 (entry_qty derived at :112, remaining inherited BaselineFlipParityConfig fields left at class defaults)",
+  "error": "ModuleNotFoundError: No module named 'strategies'"
+}

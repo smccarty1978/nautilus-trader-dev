@@ -16,7 +16,9 @@
 | **Study Factory** | Scaffolder | `scripts/create_study.py` | FROZEN |
 | **Study Factory** | Compiler & Validator | `scripts/compile_study.py` | FROZEN |
 | **Study Factory** | Specification Schema | `scripts/study_spec.py` | FROZEN |
-| **Execution Runtime** | Shared Core & Causal Loader | `backtests/nt_runtime/causal_loader.py` | FROZEN |
+| **Execution Runtime** | Causal Bar Loader | `utils/runner/data.py` (`CausalDataLoader`) | FROZEN |
+| **Execution Runtime** | Causal Stream Registration | `utils/causal_registration.py` (`add_bars_causal_order`) | FROZEN |
+| **Execution Runtime** | Data / Catalog Plan Resolver | `backtests/nt_runtime/data_plan.py` | FROZEN |
 | **Execution Runtime** | Engine Builder | `backtests/nt_runtime/engine_builder.py` | FROZEN |
 | **Execution Runtime** | Output Manager | `backtests/nt_runtime/output_manager.py` | FROZEN |
 | **Execution Runtime** | Telemetry & Profiler | `backtests/nt_runtime/telemetry.py` | FROZEN |

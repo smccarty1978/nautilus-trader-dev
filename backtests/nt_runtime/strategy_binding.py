@@ -39,14 +39,37 @@ STRATEGY_REGISTRY: Dict[str, Dict[str, Any]] = {
         "class_name": "ScoreFanningStrategy",
         "config_class_name": "ScoreFanningConfig",
         "supported_modes": ["collect", "backtest"],
+        "order_handling": "virtual",
+    },
+    "w4_exit_strategy": {
+        "module_path": "strategies.w4_exit_strategy",
+        "class_name": "W4ExitStrategy",
+        "config_class_name": "W4ExitConfig",
+        "supported_modes": ["backtest"],
+        "order_handling": "simulated_orders",
     },
 }
+
+
+def _registry_entry_for_class_path(module_path: str, class_name: str) -> Optional[str]:
+    """Returns the registry key whose (module, class) matches, else None."""
+    for key, entry in STRATEGY_REGISTRY.items():
+        if entry["module_path"] == module_path and entry["class_name"] == class_name:
+            return key
+    return None
+
+
+def registered_order_handling(binding_id: str) -> Optional[str]:
+    """Declared output contract for a registered strategy, if it declares one."""
+    entry = STRATEGY_REGISTRY.get(binding_id)
+    return entry.get("order_handling") if entry else None
 
 
 def resolve_strategy_binding(
     binding_or_class: str,
     study_type: str = "flip_prediction",
     mode: str = "collect",
+    allow_unregistered: Optional[bool] = None,
 ) -> StrategyBinding:
     """Resolves Strategy and StrategyConfig classes for NT execution generically.
 
@@ -58,14 +81,42 @@ def resolve_strategy_binding(
         Study type ('flip_prediction', 'bespoke', or custom).
     mode : str
         Requested execution mode ('collect', 'parity', 'backtest').
+    allow_unregistered : bool, optional
+        Whether an arbitrary dotted class path may be imported. Defaults to
+        ``False`` for ``mode='backtest'`` and ``True`` otherwise.
+
+        Rationale: in collect mode the strategy identity comes from a *compiled and
+        sealed* study contract, which is itself the authorization, and study-local
+        collectors legitimately live under ``studies.<name>.implementation``. The
+        standalone backtest harness has no such contract, so an arbitrary import
+        string there would execute code that nothing has authorized. Backtest mode
+        is therefore registry-only.
 
     Returns
     -------
     StrategyBinding
         Resolved classes and metadata.
     """
+    if allow_unregistered is None:
+        allow_unregistered = mode != "backtest"
+
     # 1. Dotted Python class path (e.g. 'strategies.flip_prediction_collector.FlipPredictionCollector')
     if "." in binding_or_class:
+        mod_name_probe, _, cls_name_probe = binding_or_class.rpartition(".")
+        matched_key = _registry_entry_for_class_path(mod_name_probe, cls_name_probe)
+        if matched_key is not None:
+            # Fully-qualified path of a registered strategy: resolve through the registry
+            # so mode support and config binding are enforced identically.
+            return resolve_strategy_binding(
+                matched_key, study_type=study_type, mode=mode, allow_unregistered=allow_unregistered
+            )
+        if not allow_unregistered:
+            raise UnregisteredStrategyBindingError(
+                f"UNREGISTERED_STRATEGY_IMPORT_BLOCKED: '{binding_or_class}' is not a registered "
+                f"strategy and arbitrary import paths are not permitted in mode '{mode}'. "
+                f"Register it in STRATEGY_REGISTRY (backtests/nt_runtime/strategy_binding.py) or "
+                f"use one of: {sorted(k for k, v in STRATEGY_REGISTRY.items() if mode in v.get('supported_modes', []))}."
+            )
         mod_name, cls_name = binding_or_class.rsplit(".", 1)
         try:
             mod = importlib.import_module(mod_name)

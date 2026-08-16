@@ -6,19 +6,19 @@
   ],
   "failure_details": [
     {
-      "message": ""
-    },
-    {
-      "message": "scripts\\preexec_audit_seal.py:242: PreexecAuditStaleError"
-    },
-    {
       "message": "=========================== short test summary info ==========================="
+    },
+    {
+      "message": "SKIPPED [1] scripts\\tests\\test_nt_runner_backtest.py:627: set RUN_GOLDEN_EQUIVALENCE=1 (replays market data)"
+    },
+    {
+      "message": "SKIPPED [1] scripts\\tests\\test_nt_runner_backtest.py:667: set RUN_GOLDEN_EQUIVALENCE=1 (replays a full year)"
     },
     {
       "message": "FAILED scripts/tests/test_audit_seal_guard.py::test_audit_seal_valid_and_tamper_detection"
     },
     {
-      "message": "1 failed, 131 passed, 1 deselected in 68.98s (0:01:08)"
+      "message": "1 failed, 264 passed, 2 skipped, 1 deselected in 30.70s"
     }
   ],
   "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit."

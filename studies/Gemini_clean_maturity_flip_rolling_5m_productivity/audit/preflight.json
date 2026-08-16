@@ -1,7 +1,7 @@
 {
-  "status": "CLEAR",
-  "elapsed_seconds": 87.35,
-  "code_hash": "73ee757806267fb47e4b9c82bd976a3f2751663f509200b8358536351f222651",
+  "status": "BLOCKED",
+  "elapsed_seconds": 36.16,
+  "code_hash": "433afbd42d1a4905a3b4d3fb3a46769a9ab33aedd89a3b383f4ed263221654f6",
   "spec_hash": "5ffac2991517a314a7f25d24b9c22bbb7b24ecf50e63f68706332bfc0d8487e2",
   "checks_run": [
     "EXECUTION_MANIFEST",
@@ -11,7 +11,9 @@
     "SPEC_FIDELITY",
     "CAUSAL_INVARIANTS"
   ],
-  "failed_gate": null,
-  "failure_ids": [],
-  "required_next_action": "READY_FOR_AUDIT"
+  "failed_gate": "CAUSAL_INVARIANTS",
+  "failure_ids": [
+    "INVARIANT_TEST_FAILURE"
+  ],
+  "required_next_action": "FIX_BEFORE_AUDIT"
 }

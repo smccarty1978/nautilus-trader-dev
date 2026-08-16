@@ -1,0 +1,755 @@
+{
+  "schema_version": "1.0.0",
+  "status": "VALID",
+  "status_semantics": {
+    "VALID": "every selected fixture produced a usable baseline",
+    "PARTIALLY_VALID": "at least one fixture produced a usable baseline and at least one failed unmodified; use per-fixture 'baseline_valid'",
+    "INVALIDATED": "no usable baseline, or a capture-wide integrity problem"
+  },
+  "capture_timestamp_utc": "20260816_152758",
+  "generated_utc": "2026-08-16T15:33:36.053038+00:00",
+  "git_commit": "97b97dbab60ddf65ba29e631cba105c585d1206b",
+  "repo_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader",
+  "evidence_directory": "backtests/fixtures/baseline_capture_20260816_152758",
+  "capture_script": {
+    "path": "scripts/capture_baseline_fixtures.py",
+    "sha256_before": "5916e60ac7fb9454f879485b4f539ebefcf4c20588544e94dd6b13620e1f10a0",
+    "sha256_after": "5916e60ac7fb9454f879485b4f539ebefcf4c20588544e94dd6b13620e1f10a0",
+    "stable": true
+  },
+  "worktree_gates": {
+    "passed": true,
+    "blocking_reason": null,
+    "worktree_clean": false,
+    "modified_tracked": [
+      ".agents/agents_staging/contract-checker.md",
+      ".claude/agents/contract-checker.md",
+      ".codex/agents/contract-checker.toml",
+      "CLAUDE.md",
+      "backtests/nt_runtime/data_plan.py",
+      "backtests/nt_runtime/engine_builder.py",
+      "backtests/nt_runtime/strategy_binding.py",
+      "docs/BACKTEST_EXECUTION.md",
+      "docs/INFRASTRUCTURE_FREEZE.md",
+      "scripts/run_preexec_audits.py",
+      "strategies/score_fanning_strategy.py",
+      "studies/Gemini_clean_maturity_flip_rolling_5m_productivity/audit/execution_manifest.json",
+      "studies/Gemini_clean_maturity_flip_rolling_5m_productivity/audit/failure_packet.json",
+      "studies/Gemini_clean_maturity_flip_rolling_5m_productivity/audit/preflight.json",
+      "studies/Gemini_clean_maturity_flip_rolling_5m_productivity/audit/status.json"
+    ],
+    "staged": [],
+    "untracked_py": [
+      "backtests/nt_runtime/modes/backtest.py",
+      "backtests/run_backtest.py",
+      "scripts/capture_baseline_fixtures.py",
+      "scripts/tests/test_audit_report_ingestion.py",
+      "scripts/tests/test_capture_baseline_fixtures.py",
+      "scripts/tests/test_nt_runner_backtest.py"
+    ],
+    "disallowed_untracked_py": [],
+    "untracked_py_outside_closure": [
+      "backtests/nt_runtime/modes/backtest.py",
+      "backtests/run_backtest.py",
+      "scripts/tests/test_audit_report_ingestion.py",
+      "scripts/tests/test_nt_runner_backtest.py"
+    ],
+    "protected_path_count": 11,
+    "gate_3_rule": "An untracked .py BLOCKS only if it is inside a selected fixture's resolved repo-local import closure. Because the closure is resolved by module name against the filesystem, a file that shadows an imported module is inside the closure and is therefore caught. Untracked .py outside every closure cannot affect the run and is recorded, not blocked."
+  },
+  "python": {
+    "executable": "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "comparison_rules": {
+    "exact_match_required": [
+      "row counts",
+      "event timestamps",
+      "order sides",
+      "quantities",
+      "tick-quantised prices",
+      "exit reason strings"
+    ],
+    "float_relative_tolerance": 1e-09,
+    "volatile_columns_excluded": [
+      "account_id",
+      "run_id",
+      "trader_id",
+      "ts_captured"
+    ]
+  },
+  "module_trace": {
+    "collected": false,
+    "policy": "DIAGNOSTIC_ONLY - supplemental evidence, never a replacement for the authoritative Phase 1 CLI run."
+  },
+  "fixtures": [
+    {
+      "fixture_id": "fixture_1_score_fanning",
+      "description": "ScoreFanningStrategy multi-policy virtual evaluator, single day 2023-03-03. Places zero NT orders; its real output is per-policy virtual trade tables.",
+      "status": "SUCCESS",
+      "baseline_valid": true,
+      "command": [
+        "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "backtests/run_staged_backtest.py",
+        "--start-date",
+        "2023-03-03",
+        "--end-date",
+        "2023-03-03"
+      ],
+      "command_display": "python.exe backtests/run_staged_backtest.py --start-date 2023-03-03 --end-date 2023-03-03",
+      "returncode": 0,
+      "started_utc": "2026-08-16T15:28:00.349002+00:00",
+      "finished_utc": "2026-08-16T15:28:05.752222+00:00",
+      "entrypoint": "backtests/run_staged_backtest.py",
+      "source_closure": {
+        "file_count": 8,
+        "stable_across_run": true,
+        "drifted_files": [],
+        "discovery": {
+          "backtests/run_staged_backtest.py": "entrypoint",
+          "strategies/score_fanning_strategy.py": "static_import",
+          "utils/__init__.py": "package_init",
+          "utils/runner/checkpoint.py": "static_import",
+          "utils/runner/data.py": "static_import",
+          "utils/runner/fanning.py": "static_import",
+          "utils/runner/progress.py": "static_import",
+          "utils/runner/registry.py": "static_import"
+        },
+        "discovery_counts": {
+          "entrypoint": 1,
+          "package_init": 1,
+          "static_import": 6
+        },
+        "resolver": "AST transitive walk over repo-local imports, including ancestor package __init__.py files and dotted module paths appearing as string literals (dynamic strategy/config resolution). Not a curated filename list.",
+        "hashes_before": {
+          "backtests/run_staged_backtest.py": "2ac163029d7b3c88c1c853685c289c5a53a4640680da5b6f1b6ede0ee8a88df7",
+          "strategies/score_fanning_strategy.py": "412bfda3b12b17d983e66ffe254a7d72820df9e7b6065bd4508ce4240b948370",
+          "utils/__init__.py": "f5bfd4d288959f97f3474f0cdb69a118186a5c4ae18a52f25108e9f2860d12fe",
+          "utils/runner/checkpoint.py": "9e24e74446f72c1114b44f5ad359f92fd89fdabf2c8b858d4a4ac437220c6404",
+          "utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+          "utils/runner/fanning.py": "8b23d34fd1579126a8ad2ff579d8483f9cb7531c936363c190abc5bc60488355",
+          "utils/runner/progress.py": "9bc8b06102803bc10fd180d10416dbe13af7d3c6e3470dbb5c423fc1d4f0a0c2",
+          "utils/runner/registry.py": "eb52847d1b362015df4b96b9b456385df11cb6200f94f54fa517af1f811df9df"
+        },
+        "hashes_after": {
+          "backtests/run_staged_backtest.py": "2ac163029d7b3c88c1c853685c289c5a53a4640680da5b6f1b6ede0ee8a88df7",
+          "strategies/score_fanning_strategy.py": "412bfda3b12b17d983e66ffe254a7d72820df9e7b6065bd4508ce4240b948370",
+          "utils/__init__.py": "f5bfd4d288959f97f3474f0cdb69a118186a5c4ae18a52f25108e9f2860d12fe",
+          "utils/runner/checkpoint.py": "9e24e74446f72c1114b44f5ad359f92fd89fdabf2c8b858d4a4ac437220c6404",
+          "utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+          "utils/runner/fanning.py": "8b23d34fd1579126a8ad2ff579d8483f9cb7531c936363c190abc5bc60488355",
+          "utils/runner/progress.py": "9bc8b06102803bc10fd180d10416dbe13af7d3c6e3470dbb5c423fc1d4f0a0c2",
+          "utils/runner/registry.py": "eb52847d1b362015df4b96b9b456385df11cb6200f94f54fa517af1f811df9df"
+        }
+      },
+      "external_inputs": [],
+      "catalog_bounds": {
+        "status": "ok",
+        "catalog_path": "data/catalog/NQ_v0_2020_2026",
+        "window_start": "2023-02-26 00:00:00+00:00",
+        "window_end": "2023-03-03 23:59:59+00:00",
+        "bar_types": {
+          "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+            "row_count": 252660,
+            "first_ts_event": 1677452400000000000,
+            "last_ts_event": 1677880799000000000,
+            "first_ts_init": 1677452401000000000,
+            "last_ts_init": 1677880800000000000
+          },
+          "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+            "row_count": 6899,
+            "first_ts_event": 1677452400000000000,
+            "last_ts_event": 1677880740000000000,
+            "first_ts_init": 1677452460000000000,
+            "last_ts_init": 1677880800000000000
+          }
+        }
+      },
+      "resolved_config": {
+        "status": "observed_from_config_class",
+        "config_class": "strategies.score_fanning_strategy.ScoreFanningConfig",
+        "entrypoint_kwargs": {
+          "instrument_id": "NQ.XCME",
+          "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+          "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+          "checkpoint_dir": "backtests/results/checkpoints",
+          "policies": [
+            {
+              "name": "R5",
+              "threshold": 0.62,
+              "sl_atr_mult": 1.5,
+              "pt_atr_mult": 2.0
+            },
+            {
+              "name": "R2.5",
+              "threshold": 0.5,
+              "sl_atr_mult": 1.5,
+              "pt_atr_mult": 2.0
+            }
+          ]
+        },
+        "kwargs_provenance": "backtests/run_staged_backtest.py:68-77 (strat_cfg_dict literal)",
+        "resolved_fields": {
+          "instrument_id": "NQ.XCME",
+          "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+          "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+          "checkpoint_dir": "backtests/results/checkpoints",
+          "policies": [
+            {
+              "name": "R5",
+              "threshold": 0.62,
+              "sl_atr_mult": 1.5,
+              "pt_atr_mult": 2.0
+            },
+            {
+              "name": "R2.5",
+              "threshold": 0.5,
+              "sl_atr_mult": 1.5,
+              "pt_atr_mult": 2.0
+            }
+          ],
+          "strategy_id": null,
+          "order_id_tag": null,
+          "use_uuid_client_order_ids": false,
+          "use_hyphens_in_client_order_ids": true,
+          "oms_type": null,
+          "external_order_claims": null,
+          "manage_contingent_orders": false,
+          "manage_gtd_expiry": false,
+          "manage_stop": false,
+          "market_exit_interval_ms": 100,
+          "market_exit_max_attempts": 100,
+          "market_exit_time_in_force": 1,
+          "market_exit_reduce_only": true,
+          "log_events": true,
+          "log_commands": true,
+          "log_rejected_due_post_only_as_warning": true
+        },
+        "resolved_field_count": 21
+      },
+      "fill_evidence": {
+        "fill_artifact_present": false,
+        "statement": "No fills exist: ScoreFanningStrategy submits no NT orders, so the positions report is empty by construction and that emptiness is part of the baseline.",
+        "rationale": "The legacy entrypoint does not call generate_order_fills_report() and does not persist fills. Producing one would require instrumenting the run, which Phase 1 forbids. Absence of a fill artifact is therefore stated explicitly rather than left as a silent gap."
+      },
+      "warmup_evidence": {
+        "bars_loaded_by_timeframe": {
+          "1s": 252660,
+          "1m": 6899
+        },
+        "bar_callbacks_dispatched": "unavailable_uninstrumented",
+        "rationale": "Phase 1 executes the legacy entrypoint verbatim; observing per-bar callbacks would require instrumenting it, which would invalidate the authoritative run.",
+        "derived_observations": [
+          {
+            "observation": "daily_checkpoint_files_present",
+            "value": [
+              "checkpoint_2023-03-02.pkl"
+            ],
+            "interpretation": "ScoreFanningStrategy.save_daily_checkpoint fires on a ts_event day rollover. A checkpoint for the day before --start-date indicates at least one pre-start bar was dispatched by ts_event labelling (bars are OPEN-stamped, ts_init=close), and is NOT by itself proof that the full 5-day lead-in was replayed."
+          }
+        ]
+      },
+      "targets": [
+        {
+          "target_path": "backtests/results/checkpoints/results_R2.5.parquet",
+          "expectation": "produced",
+          "status": "produced_by_current_run",
+          "preexisting_before_run": true,
+          "pre_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+          "pre_size_bytes": 7344,
+          "quarantined_to_prove_absence": false,
+          "preserved_to": "preserved_preexisting/fixture_1_score_fanning/results_R2.5.parquet",
+          "post_run_exists": true,
+          "post_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+          "evidence_copy": "fixture_1_score_fanning/results_R2.5.parquet",
+          "normalized_identity": {
+            "row_count": 20,
+            "columns": [
+              "trade_id",
+              "entry_time",
+              "entry_px",
+              "direction",
+              "qty",
+              "atr",
+              "exit_time",
+              "exit_px",
+              "exit_reason",
+              "pnl",
+              "is_open"
+            ],
+            "columns_hashed": [
+              "trade_id",
+              "entry_time",
+              "entry_px",
+              "direction",
+              "qty",
+              "atr",
+              "exit_time",
+              "exit_px",
+              "exit_reason",
+              "pnl",
+              "is_open"
+            ],
+            "columns_excluded_volatile": [],
+            "normalized_sha256": "5fc80964515084819e8d34698154eca20f447b65b29adcf9c0e1fb3caa3cd07d",
+            "file_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+            "file_size_bytes": 7344
+          },
+          "absence_cause": null,
+          "attribution_note": "Content is byte-identical to the pre-existing file; production is evidenced by the modification timestamp only, consistent with a deterministic re-run.",
+          "restored_to_original_state": true,
+          "restore_verified_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857"
+        },
+        {
+          "target_path": "backtests/results/checkpoints/results_R5.parquet",
+          "expectation": "conditional",
+          "status": "expected_absent_verified",
+          "preexisting_before_run": false,
+          "pre_sha256": null,
+          "pre_size_bytes": null,
+          "quarantined_to_prove_absence": false,
+          "preserved_to": null,
+          "post_run_exists": false,
+          "post_sha256": null,
+          "evidence_copy": null,
+          "normalized_identity": null,
+          "absence_cause": "ScoreFanningStrategy.on_bar emits a constant dummy_score=0.55 which is below the R5 threshold of 0.62, so the R5 evaluator opens no trades and run_staged_backtest.py:148 `if trades_list:` is False.",
+          "attribution_note": null,
+          "restored_to_original_state": true,
+          "restore_verified_sha256": null
+        },
+        {
+          "target_path": "backtests/results/checkpoints/resume_manifest.json",
+          "expectation": "conditional",
+          "status": "produced_by_current_run",
+          "preexisting_before_run": true,
+          "pre_sha256": "28e23fef483a888ede2153d26bc386bc62d359e025cf5800e487329f4bf623cc",
+          "pre_size_bytes": 1375,
+          "quarantined_to_prove_absence": true,
+          "preserved_to": "preserved_preexisting/fixture_1_score_fanning/resume_manifest.json",
+          "post_run_exists": true,
+          "post_sha256": "28e23fef483a888ede2153d26bc386bc62d359e025cf5800e487329f4bf623cc",
+          "evidence_copy": "fixture_1_score_fanning/resume_manifest.json",
+          "normalized_identity": null,
+          "absence_cause": null,
+          "attribution_note": null,
+          "restored_to_original_state": true,
+          "restore_verified_sha256": "28e23fef483a888ede2153d26bc386bc62d359e025cf5800e487329f4bf623cc"
+        }
+      ],
+      "preexisting_stale_unmanaged": [
+        {
+          "path": "backtests/results/checkpoints/checkpoint_2023-03-02.pkl",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "f6e85ea76eb4ad4c1272c826671ff28b864216a7ff803652dea279b1d70311f8",
+          "size_bytes": 321,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        }
+      ],
+      "undeclared_side_effects": {
+        "created": [
+          "backtests/results/checkpoints/logs/STAGED-BACKTESTER_2026-08-16_4e1adfe0-87e7-43a0-8947-52f16fdc4bcd.log",
+          "backtests/results/checkpoints/resume_manifest.json"
+        ],
+        "modified": [
+          "backtests/results/checkpoints/checkpoint_2023-03-02.pkl",
+          "backtests/results/checkpoints/results_R2.5.parquet"
+        ],
+        "note": "Undeclared side effects (NT logs, daily checkpoints) are recorded for provenance and intentionally left in place; they are not attributed as fixture outputs."
+      },
+      "notes": [
+        "Legacy defaults: --checkpoint-dir=backtests/results/checkpoints, --resume absent.",
+        "checkpoint_dir is BOTH an input location and the output location for results_*.parquet.",
+        "NT positions report is expected empty; that emptiness is part of the baseline."
+      ]
+    },
+    {
+      "fixture_id": "fixture_2_w4_b1",
+      "description": "W4ExitStrategy policy B1, full-year 2023 simulated-orders run. Inherits BaselineFlipParityStrategy which submits real NT orders.",
+      "status": "SUCCESS",
+      "baseline_valid": true,
+      "command": [
+        "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "backtests/run_w4_backtest.py",
+        "--year",
+        "2023",
+        "--policy",
+        "B1",
+        "--theta",
+        "0.62",
+        "--N",
+        "10"
+      ],
+      "command_display": "python.exe backtests/run_w4_backtest.py --year 2023 --policy B1 --theta 0.62 --N 10",
+      "returncode": 0,
+      "started_utc": "2026-08-16T15:28:11.752030+00:00",
+      "finished_utc": "2026-08-16T15:33:35.473726+00:00",
+      "entrypoint": "backtests/run_w4_backtest.py",
+      "source_closure": {
+        "file_count": 3,
+        "stable_across_run": true,
+        "drifted_files": [],
+        "discovery": {
+          "backtests/baseline_flip_parity/strategy.py": "static_import",
+          "backtests/run_w4_backtest.py": "entrypoint",
+          "strategies/w4_exit_strategy.py": "static_import"
+        },
+        "discovery_counts": {
+          "entrypoint": 1,
+          "static_import": 2
+        },
+        "resolver": "AST transitive walk over repo-local imports, including ancestor package __init__.py files and dotted module paths appearing as string literals (dynamic strategy/config resolution). Not a curated filename list.",
+        "hashes_before": {
+          "backtests/baseline_flip_parity/strategy.py": "916f6d66e25a7cab017528dee905ac67d0c8223a205f1fd316c4346a82ab0608",
+          "backtests/run_w4_backtest.py": "9d76df8bed2b71701022212dfe99fed000b2c6fa6cab427f8646912424a9b9b4",
+          "strategies/w4_exit_strategy.py": "1fa44a0a4f01a2781c6be21ee3621e6570079471db019ae90187cf3581dec7a0"
+        },
+        "hashes_after": {
+          "backtests/baseline_flip_parity/strategy.py": "916f6d66e25a7cab017528dee905ac67d0c8223a205f1fd316c4346a82ab0608",
+          "backtests/run_w4_backtest.py": "9d76df8bed2b71701022212dfe99fed000b2c6fa6cab427f8646912424a9b9b4",
+          "strategies/w4_exit_strategy.py": "1fa44a0a4f01a2781c6be21ee3621e6570079471db019ae90187cf3581dec7a0"
+        }
+      },
+      "external_inputs": [
+        {
+          "path": "studies/regime_sequence_signal_audit/results/weakness_checkpoint_predictions.parquet",
+          "exists": true,
+          "sha256": "d66a761bd5dbc2c2b7f05d9d74e57a685cc4f12de6eb59f3dcbcd3b3248efdb8",
+          "size_bytes": 221937449,
+          "total_row_count": 7910451,
+          "row_count_year_2023": 664162
+        }
+      ],
+      "catalog_bounds": {
+        "status": "ok",
+        "catalog_path": "data/catalog/NQ_v0_2020_2026",
+        "window_start": "2022-12-27 00:00:00+00:00",
+        "window_end": "2023-12-31 23:59:59+00:00",
+        "bar_types": {
+          "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+            "row_count": 12395770,
+            "first_ts_event": 1672099200000000000,
+            "last_ts_event": 1703887198000000000,
+            "first_ts_init": 1672099201000000000,
+            "last_ts_init": 1703887199000000000
+          },
+          "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+            "row_count": 358816,
+            "first_ts_event": 1672099140000000000,
+            "last_ts_event": 1703887140000000000,
+            "first_ts_init": 1672099200000000000,
+            "last_ts_init": 1703887200000000000
+          }
+        }
+      },
+      "resolved_config": {
+        "status": "observed_from_config_class",
+        "config_class": "strategies.w4_exit_strategy.W4ExitConfig",
+        "entrypoint_kwargs": {
+          "instrument_id": "NQ.XCME",
+          "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+          "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+          "year": 2023,
+          "entry_qty": 1,
+          "policy": "B1",
+          "theta": 0.62,
+          "N": 10
+        },
+        "kwargs_provenance": "backtests/run_w4_backtest.py:112-122 (entry_qty derived at :112, remaining inherited BaselineFlipParityConfig fields left at class defaults)",
+        "resolved_fields": {
+          "instrument_id": "NQ.XCME",
+          "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+          "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+          "year": 2023,
+          "entry_qty": 1,
+          "use_stall_protection": false,
+          "gate_atr": 0.5,
+          "stall_thresh": 3,
+          "ma_period": 9,
+          "ma_type": "SMA",
+          "trade_side": "both",
+          "entry_type": "flip",
+          "entry_prob": 0.04,
+          "sl_atr": 1.0,
+          "tp_atr": 1.0,
+          "use_trailing_stop": false,
+          "trail_distance_atr": 0.25,
+          "be_trigger_atr": 0.25,
+          "be_level_atr": 0.25,
+          "policy": "B1",
+          "theta": 0.62,
+          "N": 10,
+          "strategy_id": null,
+          "order_id_tag": null,
+          "use_uuid_client_order_ids": false,
+          "use_hyphens_in_client_order_ids": true,
+          "oms_type": null,
+          "external_order_claims": null,
+          "manage_contingent_orders": false,
+          "manage_gtd_expiry": false,
+          "manage_stop": false,
+          "market_exit_interval_ms": 100,
+          "market_exit_max_attempts": 100,
+          "market_exit_time_in_force": 1,
+          "market_exit_reduce_only": true,
+          "log_events": true,
+          "log_commands": true,
+          "log_rejected_due_post_only_as_warning": true
+        },
+        "resolved_field_count": 38
+      },
+      "fill_evidence": {
+        "fill_artifact_present": false,
+        "statement": "Fills are not persisted by the legacy entrypoint; it saves only the positions report (filtered to closed) and strategy.all_trades. Per-fill evidence is therefore absent from this baseline and equivalence is asserted at position and strategy-trade level.",
+        "rationale": "The legacy entrypoint does not call generate_order_fills_report() and does not persist fills. Producing one would require instrumenting the run, which Phase 1 forbids. Absence of a fill artifact is therefore stated explicitly rather than left as a silent gap."
+      },
+      "warmup_evidence": {
+        "bars_loaded_by_timeframe": {
+          "1s": 12395770,
+          "1m": 358816
+        },
+        "bar_callbacks_dispatched": "unavailable_uninstrumented",
+        "rationale": "Phase 1 executes the legacy entrypoint verbatim; observing per-bar callbacks would require instrumenting it, which would invalidate the authoritative run.",
+        "derived_observations": []
+      },
+      "targets": [
+        {
+          "target_path": "backtests/results/w4_exit_backtests/NQ_2023_B1/trades.parquet",
+          "expectation": "produced",
+          "status": "produced_by_current_run",
+          "preexisting_before_run": true,
+          "pre_sha256": "050d5a5890bff0868f5d79f89ca8f39ab75ee5a7a7540b3080914a9faa18b5c9",
+          "pre_size_bytes": 1381093,
+          "quarantined_to_prove_absence": false,
+          "preserved_to": "preserved_preexisting/fixture_2_w4_b1/trades.parquet",
+          "post_run_exists": true,
+          "post_sha256": "050d5a5890bff0868f5d79f89ca8f39ab75ee5a7a7540b3080914a9faa18b5c9",
+          "evidence_copy": "fixture_2_w4_b1/trades.parquet",
+          "normalized_identity": {
+            "row_count": 18372,
+            "columns": [
+              "trader_id",
+              "strategy_id",
+              "instrument_id",
+              "account_id",
+              "opening_order_id",
+              "closing_order_id",
+              "entry",
+              "side",
+              "quantity",
+              "peak_qty",
+              "ts_init",
+              "ts_opened",
+              "ts_last",
+              "ts_closed",
+              "duration_ns",
+              "avg_px_open",
+              "avg_px_close",
+              "commissions",
+              "realized_return",
+              "realized_pnl",
+              "is_snapshot"
+            ],
+            "columns_hashed": [
+              "strategy_id",
+              "instrument_id",
+              "opening_order_id",
+              "closing_order_id",
+              "entry",
+              "side",
+              "quantity",
+              "peak_qty",
+              "ts_init",
+              "ts_opened",
+              "ts_last",
+              "ts_closed",
+              "duration_ns",
+              "avg_px_open",
+              "avg_px_close",
+              "commissions",
+              "realized_return",
+              "realized_pnl",
+              "is_snapshot"
+            ],
+            "columns_excluded_volatile": [
+              "account_id",
+              "trader_id"
+            ],
+            "normalized_sha256": "4db473610703d8f39fd6a25f2465ead29e56e363434e7f0f612a7003baf07a01",
+            "file_sha256": "050d5a5890bff0868f5d79f89ca8f39ab75ee5a7a7540b3080914a9faa18b5c9",
+            "file_size_bytes": 1381093
+          },
+          "absence_cause": null,
+          "attribution_note": "Content is byte-identical to the pre-existing file; production is evidenced by the modification timestamp only, consistent with a deterministic re-run.",
+          "restored_to_original_state": true,
+          "restore_verified_sha256": "050d5a5890bff0868f5d79f89ca8f39ab75ee5a7a7540b3080914a9faa18b5c9"
+        },
+        {
+          "target_path": "backtests/results/w4_exit_backtests/NQ_2023_B1/strategy_trades.parquet",
+          "expectation": "conditional",
+          "status": "produced_by_current_run",
+          "preexisting_before_run": true,
+          "pre_sha256": "7e06844732d35aab86140356bcdee9e713ab2f220b7dc213ec9242fce96bfc28",
+          "pre_size_bytes": 601206,
+          "quarantined_to_prove_absence": true,
+          "preserved_to": "preserved_preexisting/fixture_2_w4_b1/strategy_trades.parquet",
+          "post_run_exists": true,
+          "post_sha256": "7e06844732d35aab86140356bcdee9e713ab2f220b7dc213ec9242fce96bfc28",
+          "evidence_copy": "fixture_2_w4_b1/strategy_trades.parquet",
+          "normalized_identity": {
+            "row_count": 18372,
+            "columns": [
+              "entry_ts",
+              "entry_px",
+              "entry_atr",
+              "signal_direction",
+              "exit_ts",
+              "exit_px",
+              "exit_reason",
+              "exit_pnl_pts",
+              "exit_pnl_atr"
+            ],
+            "columns_hashed": [
+              "entry_ts",
+              "entry_px",
+              "entry_atr",
+              "signal_direction",
+              "exit_ts",
+              "exit_px",
+              "exit_reason",
+              "exit_pnl_pts",
+              "exit_pnl_atr"
+            ],
+            "columns_excluded_volatile": [],
+            "normalized_sha256": "3b4840afb506815c9fac9800b5da9ee3c7e233671836ec7adf6c3256d97a6bdc",
+            "file_sha256": "7e06844732d35aab86140356bcdee9e713ab2f220b7dc213ec9242fce96bfc28",
+            "file_size_bytes": 601206
+          },
+          "absence_cause": null,
+          "attribution_note": null,
+          "restored_to_original_state": true,
+          "restore_verified_sha256": "7e06844732d35aab86140356bcdee9e713ab2f220b7dc213ec9242fce96bfc28"
+        },
+        {
+          "target_path": "backtests/results/w4_parity_2023_B1.parquet",
+          "expectation": "conditional",
+          "status": "expected_absent_verified",
+          "preexisting_before_run": false,
+          "pre_sha256": null,
+          "pre_size_bytes": null,
+          "quarantined_to_prove_absence": false,
+          "preserved_to": null,
+          "post_run_exists": false,
+          "post_sha256": null,
+          "evidence_copy": null,
+          "normalized_identity": null,
+          "absence_cause": "w4_exit_strategy.py:264 `if self.parity_logs:` is False. parity_logs gains rows only where _pred_dict.get((direction, flip_ts, ts)) matches; this is a property of the executed run, NOT of --year 2023.",
+          "attribution_note": null,
+          "restored_to_original_state": true,
+          "restore_verified_sha256": null
+        }
+      ],
+      "preexisting_stale_unmanaged": [
+        {
+          "path": "backtests/results/w4_parity_2025_B0.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "e342e89c25de29430141b5f1287376bb58b3ce97c3b793dd96b3145e5a3a25fb",
+          "size_bytes": 942792,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2025_B1.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "4fb6a38ce841d64d4ac2ad0883255ea67002f5800b3612d562ab0c3b052342f6",
+          "size_bytes": 901427,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2025_B2.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "9c446e138af013e977b862d45ccf292d39a17bc7ce5840131e1da1a481c89195",
+          "size_bytes": 938362,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2025_B3.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "053c9e7042da6fb34ab235be93ff8780d9253cd3839eab8e3ec5661549e06751",
+          "size_bytes": 936429,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2025_B4.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "f2b0d8ead1e70a2fbe66ecf7b548504bb0256f31a3e76e66a8f74052451238a0",
+          "size_bytes": 482770,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2025_B5.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "2f0aea06b453a86ad4872ad7181d52b4ebc6ebc0b86fe5a20e02630db9941da3",
+          "size_bytes": 928267,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2026_B0.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "697fb64bd86e2c6c57ae49609dbba87e930ae536c0581544188e4dca8ab5e2a1",
+          "size_bytes": 348519,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2026_B1.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "a37ad8f00969b59786fae5a8bbc6e5521da7fcf901d7f11cb540d2ec6bbb9c54",
+          "size_bytes": 339561,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2026_B2.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "0a5c18a3cc569dae4596fdd0606f2545ec7f7216608794ab89ed3fef29d9c2cc",
+          "size_bytes": 350337,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2026_B3.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "35205af9e32bbb098c16bfa566ff696e979bb5b52917e4eabfc5d8b90b3d7ddb",
+          "size_bytes": 348527,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2026_B4.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "25b2cc2e7c22a39b3b1d1135642040ab2a9e9dc2a41683b5338d367d6fbf06f3",
+          "size_bytes": 176348,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        },
+        {
+          "path": "backtests/results/w4_parity_2026_B5.parquet",
+          "status": "preexisting_stale_unmanaged",
+          "sha256": "0a696babe08f4f818fa61e632066a68272554a4d5769930528dcdae2eecae567",
+          "size_bytes": 350141,
+          "note": "Not produced by this run configuration. Preserved in place; never attributed."
+        }
+      ],
+      "undeclared_side_effects": {
+        "created": [
+          "backtests/results/w4_exit_backtests/NQ_2023_B1/logs/W4-BACKTESTER_2026-08-16_847337ae-4fd8-4d3f-a645-1e029bfdb35b.log",
+          "backtests/results/w4_exit_backtests/NQ_2023_B1/strategy_trades.parquet"
+        ],
+        "modified": [
+          "backtests/results/w4_exit_backtests/NQ_2023_B1/trades.parquet"
+        ],
+        "note": "Undeclared side effects (NT logs, daily checkpoints) are recorded for provenance and intentionally left in place; they are not attributed as fixture outputs."
+      },
+      "notes": [
+        "entry_qty is derived in the runner: 2 for policy B4, else 1.",
+        "engine.run(start=2023-01-01) with NO end -> run window mode 'from_start_all_loaded'.",
+        "w4_parity_{year}_{policy}.parquet is an unmanaged side-effect write outside runs/."
+      ]
+    }
+  ]
+}

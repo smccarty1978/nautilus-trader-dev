@@ -68,18 +68,41 @@ class DataPlan:
     ts_init_delta_1m_ns: int
 
 
-def resolve_data_plan(
-    compiled_data: CompiledStudyData,
+def resolve_catalog_plan(
+    symbol: str,
     start_date: str,
     end_date: str,
     warmup_days: int = 5,
     repo_root: Optional[Path] = None,
 ) -> DataPlan:
-    """Resolves data plan and validates date domain against study chronology."""
+    """Resolves the **generic** half of a data plan: catalog, instrument, bar types, warmup.
+
+    This function is deliberately free of study governance. It performs no
+    chronology, prohibited-year, authorized-domain, or OOS/DEV partition checks,
+    because those rules belong to the study contract that declares them and must
+    not leak into an unrelated backtest. Use :func:`resolve_data_plan` when a
+    compiled study contract governs the run.
+
+    Parameters
+    ----------
+    symbol : str
+        Product symbol (e.g. ``"NQ"``). Case-insensitive.
+    start_date, end_date : str
+        Inclusive ``YYYY-MM-DD`` run window bounds.
+    warmup_days : int
+        Calendar days of lead-in data loaded before ``start_date``.
+    repo_root : Path, optional
+        Repository root used to resolve the catalog path.
+
+    Returns
+    -------
+    DataPlan
+        The same frozen structure consumed by ``build_engine``.
+    """
     if repo_root is None:
         repo_root = Path(__file__).resolve().parents[2]
 
-    symbol = compiled_data.spec.instrument.symbol.upper()
+    symbol = symbol.upper()
     if symbol not in PRODUCT_CATALOGS:
         raise ValueError(f"Unsupported product '{symbol}'. Supported: {list(PRODUCT_CATALOGS.keys())}")
 
@@ -93,6 +116,57 @@ def resolve_data_plan(
     end_dt = pd.Timestamp(f"{end_date} 23:59:59.999999999", tz="UTC")
     if start_dt > end_dt:
         raise ValueError(f"start_date ({start_date}) cannot be after end_date ({end_date})")
+
+    warmup_start_dt = start_dt - pd.Timedelta(days=warmup_days)
+
+    return DataPlan(
+        symbol=symbol,
+        venue=prod["venue"],
+        instrument_id=prod["instrument_id"],
+        multiplier=prod["multiplier"],
+        price_increment=prod["price_increment"],
+        catalog_path=catalog_path,
+        bar_type_1s=prod["bar_type_1s"],
+        bar_type_1m=prod["bar_type_1m"],
+        start_dt=start_dt,
+        end_dt=end_dt,
+        warmup_days=warmup_days,
+        warmup_start_dt=warmup_start_dt,
+        raw_timestamp_semantic=prod["raw_timestamp_semantic"],
+        ts_init_delta_1s_ns=prod["ts_init_delta_1s_ns"],
+        ts_init_delta_1m_ns=prod["ts_init_delta_1m_ns"],
+    )
+
+
+def resolve_data_plan(
+    compiled_data: CompiledStudyData,
+    start_date: str,
+    end_date: str,
+    warmup_days: int = 5,
+    repo_root: Optional[Path] = None,
+) -> DataPlan:
+    """Resolves data plan and validates date domain against study chronology.
+
+    Study-bound wrapper: delegates generic catalog/instrument/warmup resolution to
+    :func:`resolve_catalog_plan`, then applies this study's governance gates
+    (prohibited years, authorized domain, DEV/OOS partition locks, warmup domain).
+    Behaviour is unchanged from the pre-split implementation.
+    """
+    if repo_root is None:
+        repo_root = Path(__file__).resolve().parents[2]
+
+    symbol = compiled_data.spec.instrument.symbol.upper()
+
+    # Generic half (raises identically for unsupported product / inverted dates).
+    plan = resolve_catalog_plan(
+        symbol=symbol,
+        start_date=start_date,
+        end_date=end_date,
+        warmup_days=warmup_days,
+        repo_root=repo_root,
+    )
+    start_dt = plan.start_dt
+    end_dt = plan.end_dt
 
     # Chronology validation
     chrono = compiled_data.spec.chronology
@@ -139,7 +213,7 @@ def resolve_data_plan(
             )
 
     # 4. Warmup Domain Authorization & Validation
-    warmup_start_dt = start_dt - pd.Timedelta(days=warmup_days)
+    warmup_start_dt = plan.warmup_start_dt
     warmup_years = set(range(warmup_start_dt.year, start_dt.year + 1))
 
     # Warmup prohibited check
@@ -166,20 +240,4 @@ def resolve_data_plan(
                 f"OOS_AUTHORIZATION_DEPENDENCY_MISSING: Cannot verify warmup DEV access: {err}"
             )
 
-    return DataPlan(
-        symbol=symbol,
-        venue=prod["venue"],
-        instrument_id=prod["instrument_id"],
-        multiplier=prod["multiplier"],
-        price_increment=prod["price_increment"],
-        catalog_path=catalog_path,
-        bar_type_1s=prod["bar_type_1s"],
-        bar_type_1m=prod["bar_type_1m"],
-        start_dt=start_dt,
-        end_dt=end_dt,
-        warmup_days=warmup_days,
-        warmup_start_dt=warmup_start_dt,
-        raw_timestamp_semantic=prod["raw_timestamp_semantic"],
-        ts_init_delta_1s_ns=prod["ts_init_delta_1s_ns"],
-        ts_init_delta_1m_ns=prod["ts_init_delta_1m_ns"],
-    )
+    return plan
