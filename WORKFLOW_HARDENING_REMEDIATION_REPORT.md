@@ -210,15 +210,116 @@ Placement in the existing free-form `data_requirements` dict is deliberate — s
 
 ## 13. One-day ES smoke
 
-_Filled in below after execution._
+Fresh study `studies/es_wick_imbalance_acceptance_v2`. The failed study was **not** mutated
+or reused; it remains the forensic fixture.
+
+Run `20260817_173816_es_wick_imbalance_acceptance_v2_day`, ES, **2024-09-03 only**.
+`scripts/validate_smoke.py` -> `ACCEPTED`.
+
+| Property | Result |
+| --- | --- |
+| Candidates (target day) | 1893 |
+| Observations | 1893 |
+| Session window observed (CT) | 08:31:15 -> **15:15:00** |
+| Both regime directions | yes (-1: 1589, +1: 304) |
+| `latest_1m_wick_imbalance` | 0 nulls / 1893, 89 distinct, range -0.8696 .. 0.8750 |
+| Feature surface validation | passed |
+| Dispositions | 1507 LABELED_NEGATIVE, 328 LABELED_POSITIVE, 58 CENSORED |
+| Censor reasons | 58 SESSION_END, 0 DATA_END |
+| Reconciliation | 0 undisposed, 0 orphaned, 0 duplicates |
+| Future-source violations | 0 |
+| Exact timestamp equality | True |
+| Seal binding | run manifest, seal and manifest all `a580bc38…` |
+| Run terminal state | SUCCESS (reconciler agrees) |
+
+Two numbers are worth reading rather than skimming:
+
+- The last candidate lands at **15:15:00**, not 14:59:55. Under the old candidate gate the
+  15:00–15:15 band was discarded, so this smoke is not comparable to the historical run and
+  is not meant to be.
+- **58 censored** is the arithmetic of the contract, not a coincidence: candidates in the
+  final 300s of the session on a 5s grid number ~60, and every one has a horizon crossing
+  the close. `target_flip_within_horizon` is null for exactly those 58 rows and for no
+  others.
+
+Re-running the historical 100 %-NULL collection through the new validator returns
+`FEATURE_NEVER_EMITTED` — the run that was filed `SUCCESS` can no longer be.
+
+No economic interpretation was produced. September 4 and 5 were **not** run.
 
 ## 14. Fresh audit / seal state
 
-_Filled in below after execution._
+| | Causal | Contract |
+| --- | --- | --- |
+| Pass | **03** | **02** |
+| Artifact | `audit/pass_03.md` | `audit/contract_pass_02.md` |
+| Verdict | CLEAR (0/0/0) | CLEAR (0/0/0) |
+| Declared reviewer | `causal-audit-scottm-pass01` | `contract-audit-mccarty-2026-08-17-p01` |
+| Provenance strength | DECLARED_IDENTITY_ONLY | DECLARED_IDENTITY_ONLY |
+| `independence_proven` | false | false |
+
+Seal `preexec_seal_es_wick_imbalance_acceptance_v2_a580bc38bcda6b03`, `LOCKED`, 72 files,
+`PREEXEC_AUDIT_SEAL_VALID`.
+
+**The gates earned their pass numbers; they were not decoration.** Causal pass 01 came back
+**BLOCKED** on a real defect in this remediation's own censoring code (§6). Contract pass 01
+came back CLEAR **with a warning** on a real gap in the fidelity gate (a check that only
+validated one of its three modes) — and because the seal requires zero warnings, that was
+fixed and re-audited rather than sealed around. Each fix moved the composite, which forced a
+new pass number, which is exactly the B1 machinery working:
+
+```
+causal   pass 01  BLOCKED   composite de04e181   (artifact lost, see Deferred #4)
+causal   pass 02  CLEAR     composite 3cacbb80
+causal   pass 03  CLEAR     composite a580bc38   <- sealed
+contract pass 01  CLEAR/1W  composite 3cacbb80
+contract pass 02  CLEAR     composite a580bc38   <- sealed
+```
+
+Verified live against the sealed study: re-issuing pass 03 under a different composite is
+refused `AUDIT_PASS_IMMUTABLE`; a new composite under pass 01 is refused
+`AUDIT_PASS_NUMBER_STALE`; a byte-identical re-issue is idempotent. No pass artifact was
+overwritten, in this study or the historical one — the four historical ES hashes were
+re-checked after all work and are byte-identical.
 
 ## 15. Files changed
 
-_Filled in below._
+44 files, +5870 / -136, across three commits on `chore/workflow-hardening-remediation`
+(`9fe8461`, `3a22100`, `e9e22d7`), excluding the new study's generated artifacts.
+
+**New shared infrastructure**
+`research/engines/deliverables_engine.py` · `scripts/check_feature_surface.py` ·
+`scripts/check_feature_promotion.py` · `scripts/reconcile_runs.py` ·
+`features/feature_lifecycle_baseline.json`
+
+**Modified shared infrastructure**
+`scripts/resolve_execution_manifest.py` · `scripts/build_phase0_manifest.py` ·
+`scripts/run_preexec_audits.py` · `scripts/preexec_audit_seal.py` ·
+`scripts/research_preflight.py` · `scripts/validate_smoke.py` · `scripts/create_study.py` ·
+`scripts/check_research_decision_fidelity.py` · `strategies/flip_prediction_collector.py` ·
+`utils/session_boundaries.py` · `features/trackers/wick.py` · `features/registry.py` ·
+`backtests/nt_runtime/{data_plan,run_plan,output_manager,modes/collect}.py` ·
+`research/engines/{timestamp,population,feature_binding}_engine.py` ·
+`research/study_types/flip_prediction.py` · `research/schemas/study_spec.py`
+
+**Tests** — 11 new files, 152 new tests
+`test_execution_closure` (11) · `test_phase0_source_lineage` (9) ·
+`test_audit_pass_immutability` (16) · `test_feature_surface_validation` (12) ·
+`test_wick_availability` (11) · `test_feature_promotion` (17) · `test_target_censoring` (15) ·
+`test_deliverables_and_generated_contracts` (17) ·
+`test_instrument_evidence_and_session` (27) · `test_run_lifecycle_and_dates` (21) ·
+`test_decision_selection_mode_gate` (9)
+
+**Docs / contracts**
+`docs/forensics/ES_WORKFLOW_ACCEPTANCE_FAILURE_20260817.md` ·
+`features/FEATURE_REGISTRY_CONTRACT.md` · `.claude/agents/contract-checker.md` (+ synced)
+
+**Corrected test** — `tests/test_feature_library.py` asserted `0.0` for an unavailable wick
+value. It was encoding the C2 defect and now asserts `None`.
+
+**No parallel infrastructure was created.** No new `run_*.py`, no bespoke ES
+collector/runner, no sibling-study imports. Every fix landed in the layer that owned the
+defect.
 
 ## 16. Deferred items
 
