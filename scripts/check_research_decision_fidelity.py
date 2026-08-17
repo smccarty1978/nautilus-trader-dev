@@ -102,13 +102,46 @@ def check_research_decision_fidelity(study_dir: Path) -> Dict[str, Any]:
         study_selection = study_features.get("selection", {})
         study_sel_mode = study_selection.get("mode", "none") if isinstance(study_selection, dict) else "none"
 
+        # The study's selection regime may be NARROWER than the decision contract
+        # authorizes, never broader. Ranked by how much freedom each mode grants:
+        #
+        #   none / pre_frozen  -> 0  no new selection is performed
+        #   train_only         -> 1  features are selected, on train data only
+        #
+        # Ranking rather than equality matters because a study that names an explicit
+        # feature_list performs no selection at all (mode defaults to "none") while its
+        # decision contract may legitimately declare "train_only" for the baseline. That
+        # is narrower, not a violation.
+        #
+        # Previously only `mode == "none"` was compared, so a decision declaring
+        # 'train_only' or 'pre_frozen' cross-checked nothing at all -- the gate silently
+        # passed for two of its three modes (contract audit pass 01, WARNING).
+        _SELECTION_FREEDOM = {None: 0, "none": 0, "pre_frozen": 0, "train_only": 1}
+        decision_mode = decision.baseline_feature_selection.mode
+        decision_rank = _SELECTION_FREEDOM.get(decision_mode)
+        study_rank = _SELECTION_FREEDOM.get(study_sel_mode)
+
+        if decision_rank is None or study_rank is None:
+            findings.append({
+                "severity": "CRITICAL",
+                "code": "UNKNOWN_SELECTION_MODE",
+                "message": (
+                    f"Unrecognized feature selection mode (decision: {decision_mode!r}, "
+                    f"study: {study_sel_mode!r}); known: {sorted(k for k in _SELECTION_FREEDOM if k)}"
+                ),
+            })
+        elif study_rank > decision_rank:
+            findings.append({
+                "severity": "CRITICAL",
+                "code": "UNAUTHORIZED_FEATURE_DISCOVERY",
+                "message": (
+                    f"study.yaml selection.mode '{study_sel_mode}' grants more feature-selection "
+                    f"freedom than research_decision.yaml authorizes "
+                    f"(baseline_feature_selection.mode: '{decision_mode}')"
+                ),
+            })
+
         if decision.baseline_feature_selection.mode == "none":
-            if study_sel_mode not in ("none", None):
-                findings.append({
-                    "severity": "CRITICAL",
-                    "code": "UNAUTHORIZED_FEATURE_DISCOVERY",
-                    "message": f"research_decision.yaml specifies baseline_feature_selection.mode: 'none', but study.yaml has selection.mode: '{study_sel_mode}'",
-                })
             if study_features.get("source") == "verified_registry_numeric_universe":
                 findings.append({
                     "severity": "CRITICAL",
