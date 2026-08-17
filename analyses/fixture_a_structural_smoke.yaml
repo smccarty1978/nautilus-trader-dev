@@ -1,0 +1,58 @@
+# Structural smoke of the hardened maturity/flip collection (A0 Fixture A).
+#
+# This is an INFRASTRUCTURE fixture, not a research analysis. It exists so the
+# harness has one real, end-to-end-exercisable spec. It declares no model arms and
+# derives no threshold, so running it produces descriptive tables only and cannot
+# constitute a research conclusion.
+#
+# Real TRAIN/DEV/OOS analysis is blocked until the prerequisites in
+# ANALYSIS_HARNESS_IMPLEMENTATION_REPORT.md are met.
+analysis_id: fixture_a_structural_smoke
+schema_version: 1
+
+collection:
+  # Exact, immutable run identity. There is no 'latest'.
+  run_id: 20260815_213139_Gemini_clean_maturity_flip_rolling_5m_productivity_day
+  study_id: Gemini_clean_maturity_flip_rolling_5m_productivity
+  # Leave collection_identity_sha256 unset here so this file stays valid if the
+  # fixture is re-captured; a real analysis MUST pin it.
+  allow_unsealed_collection: false
+  allow_stale_compiled_study: false
+  # A real analysis should also pin the join key it expects. Without a pin the key
+  # of record falls back to the collection manifest's own declaration, which is the
+  # producer's assertion rather than the analyst's. Left unset here for the same
+  # re-capture reason as above. For this fixture it would be:
+  # expected_join_key:
+  #   - observation_ts
+  #   - regime_start_ns
+  #   - regime_direction
+  #   - checkpoint_index
+
+target:
+  column: target_flip_within_horizon
+  horizon_seconds: 300
+
+# TRAIN only. Requesting dev as well would fail PARTITION_MIXING; requesting dev
+# alone would fail OOS_LOCKED without a verified unlock token.
+partitions:
+  - train
+
+features:
+  feature_list_sha256: 2a744cfa3acfa437ae0ff8219c56451e176a170ae83450c52b8ca42842b0cba5
+  set: declared
+
+missing_values: report_only
+seed: 20260816
+
+slices:
+  - direction
+  - year
+  - partition
+  - maturity
+  - session
+  - regime
+
+notes: >
+  Descriptive only. No model arms are declared, so no fit is performed and no
+  threshold is frozen. The 2002-row single-day sample is far too small for any
+  economic claim; see the report's prerequisites section.
