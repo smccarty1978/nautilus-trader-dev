@@ -1,0 +1,79 @@
+{
+  "run_id": "20260817_173816_es_wick_imbalance_acceptance_v2_day",
+  "study_id": "es_wick_imbalance_acceptance_v2",
+  "candidates_count": 1893,
+  "observations_count": 1893,
+  "candidates_sha256": "d84cfdce13874f165f265af83a3449d201ebf280f90ec1e764a9f7823000c96f",
+  "observations_sha256": "752d7fc423384254a6ad7581d99eff5475aa67b924a51432cda7265c590214f4",
+  "columns": {
+    "candidates": [
+      "observation_ts",
+      "regime_start_ns",
+      "regime_direction",
+      "checkpoint_index",
+      "regime_age_seconds",
+      "close",
+      "atr",
+      "running_mfe_atr",
+      "running_mae_atr",
+      "current_pnl_atr",
+      "new_progress_windows",
+      "retained_mfe_ratio",
+      "triggering_1s_ts_init",
+      "latest_1m_wick_imbalance"
+    ],
+    "observations": [
+      "observation_ts",
+      "regime_start_ns",
+      "regime_direction",
+      "checkpoint_index",
+      "flip_ts",
+      "time_to_flip_seconds",
+      "target_flip_within_horizon",
+      "disposition",
+      "censored",
+      "censor_reason",
+      "horizon_end_ts",
+      "session_close_ts",
+      "resolved_at_ts"
+    ]
+  },
+  "feature_surface_validation": {
+    "passed": true,
+    "rows": 1893,
+    "declared_features": [
+      "latest_1m_wick_imbalance"
+    ],
+    "emitted_features": [
+      "latest_1m_wick_imbalance"
+    ],
+    "per_feature": {
+      "latest_1m_wick_imbalance": {
+        "registered": true,
+        "status": "provisional",
+        "null_policy": "allow",
+        "declared_dtype": "float64",
+        "rows": 1893,
+        "null_count": 0,
+        "null_fraction": 0.0,
+        "produced_dtype": "float64",
+        "distinct_non_null": 89
+      }
+    },
+    "findings": []
+  },
+  "candidate_disposition_reconciliation": {
+    "candidates": 1893,
+    "observations": 1893,
+    "passed": true,
+    "findings": [],
+    "undisposed_candidates": 0,
+    "orphaned_observations": 0,
+    "duplicate_observations": 0,
+    "disposition_counts": {
+      "LABELED_NEGATIVE": 1507,
+      "LABELED_POSITIVE": 328,
+      "CENSORED": 58
+    }
+  }
+}
