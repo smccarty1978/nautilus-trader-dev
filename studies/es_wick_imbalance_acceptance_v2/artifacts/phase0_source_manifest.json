@@ -1,21 +1,17 @@
 {
   "study_id": "es_wick_imbalance_acceptance_v2",
-  "git_commit_hash": "b367c58182effd57fd21314707bd3ab97f25e4cc",
+  "git_commit_hash": "9fe8461627f70a9750bdc5f1060869c4655ba6c0",
   "source_state_binding": {
-    "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "b367c58182effd57fd21314707bd3ab97f25e4cc",
-    "git_commit_is_sufficient_provenance": false,
+    "provenance_strength": "COMMITTED",
+    "git_commit_hash": "9fe8461627f70a9750bdc5f1060869c4655ba6c0",
+    "git_commit_is_sufficient_provenance": true,
     "working_tree_dirty": true,
     "source_state_sha256": "cd42af022a3b23cc178cc99629bd84b59e2fe8fd3d78935007294c1fab375c96",
-    "dependencies_diverging_from_commit": [
-      "features/registry.py",
-      "studies/es_wick_imbalance_acceptance_v2/SPEC.md",
-      "studies/es_wick_imbalance_acceptance_v2/study.yaml"
-    ],
+    "dependencies_diverging_from_commit": [],
     "source_files": {
       "features/registry.py": {
         "sha256": "4b27ac3b37a6c5f6cd9b99183e2000bdedc1526b4bd80f3dedcd0b5dd149749a",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       },
       "features/trackers/ohlcv_delta.py": {
         "sha256": "33096e1d58bdb24ffcfa89e4b403e82fe996b836fa820e44bb3e83c067497b63",
@@ -39,11 +35,11 @@
       },
       "studies/es_wick_imbalance_acceptance_v2/SPEC.md": {
         "sha256": "3d9f64b42fc53c441cca4e3c18831f6c6c8cbab50093b91d75f6c7874c290a15",
-        "state": "UNTRACKED_OR_NEW"
+        "state": "COMMITTED"
       },
       "studies/es_wick_imbalance_acceptance_v2/study.yaml": {
         "sha256": "a82c5286f34eba01a4e5367fbfabba75121e7f3d6c2147801ec95d262d8b903f",
-        "state": "UNTRACKED_OR_NEW"
+        "state": "COMMITTED"
       }
     }
   },
@@ -4102,5 +4098,5 @@
       2026
     ]
   },
-  "manifest_sha256": "77d76bc983072ba21c0b801339f5f6e968ba6d9b61ac98b6661bb44b0a642107"
+  "manifest_sha256": "6f01227390e1f035306e89527912a94ccaae22e68a0bf6508f677e974a03e296"
 }

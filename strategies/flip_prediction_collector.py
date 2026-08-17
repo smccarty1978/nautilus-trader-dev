@@ -388,20 +388,33 @@ class FlipPredictionCollector(Strategy):
             "resolved_at_ts": censored_at_ts if flip_ts is None else flip_ts,
         })
 
-    def _sweep_elapsed_horizons(self, now_ts: int) -> None:
+    def _sweep_elapsed_horizons(self, now_ts: int, final: bool = False) -> None:
         """Resolves pending candidates whose horizon has fully elapsed with no flip.
 
         Called on every completed 1s bar. Resolving at horizon expiry rather than at the
         next flip matters for two reasons: the label stops depending on an event outside
         the horizon, and the recorded ``flip_ts`` stops carrying a timestamp the candidate
         was never entitled to see.
+
+        Boundary handling (causal audit pass 01). The horizon is **inclusive** of its
+        endpoint, so a flip at exactly ``horizon_end`` is a positive. Candidates sit on a
+        5s grid from a minute-aligned regime start and the horizon is 300s, so every 12th
+        candidate's ``horizon_end`` falls exactly on a minute boundary -- which is when
+        flips happen. Because a 1s bar closing at T is dispatched before the 1m bar
+        closing at the same T, sweeping with ``>=`` here would resolve such a candidate
+        NEGATIVE moments before the coincident flip was visible, systematically
+        mislabelling roughly one candidate in twelve.
+
+        So a candidate whose horizon ends exactly at ``now_ts`` is held for one more tick,
+        giving the same-timestamp 1m flip its chance. ``final=True`` (run end) resolves
+        those, because by then no further bar can arrive to change the answer.
         """
         if not self.pending_candidates:
             return
         still_pending: List[Dict[str, Any]] = []
         for cand in self.pending_candidates:
             horizon_end = cand["horizon_end_ts"]
-            if horizon_end > now_ts:
+            if horizon_end > now_ts or (horizon_end == now_ts and not final):
                 still_pending.append(cand)
                 continue
             # Horizon fully elapsed without an opposing flip.
@@ -436,6 +449,12 @@ class FlipPredictionCollector(Strategy):
         ``candidates.parquet``; their absence from ``observations.parquet`` is exactly the
         future-conditioned selection the censoring policy exists to prevent.
         """
+        # Any candidate whose horizon completed within the observed data has a known
+        # outcome and must be labeled, not censored -- including the boundary case the
+        # sweep deferred by one tick.
+        if self.last_ts_seen is not None:
+            self._sweep_elapsed_horizons(self.last_ts_seen, final=True)
+
         for cand in self.pending_candidates:
             reason = (
                 CENSOR_SESSION_END if self._is_censored_by_session(cand) else CENSOR_DATA_END

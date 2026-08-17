@@ -106,11 +106,69 @@ def test_2_no_event_during_the_full_horizon_is_a_negative():
     c = _Collector()
     T = ct_ns(DAY, "10:00:00")
     c.add_candidate(T)
-    c._sweep_elapsed_horizons(T + HORIZON * NS)
+    # One tick past the inclusive endpoint: at exactly horizon_end a coincident flip is
+    # still entitled to resolve this candidate (see test_2c).
+    c._sweep_elapsed_horizons(T + (HORIZON + 1) * NS)
     assert dispositions(c) == [DISPOSITION_NEGATIVE]
     obs = c.observations_log[0]
     assert obs["target_flip_within_horizon"] == 0
     assert obs["flip_ts"] is None, "a negative must not carry a flip it never saw"
+
+
+def test_2c_flip_landing_exactly_on_the_horizon_boundary_is_positive():
+    """Same-tick race between horizon expiry and an opposing flip (causal audit pass 01).
+
+    Candidates sit on a 5s grid from a minute-aligned regime start and the horizon is
+    300s, so every 12th candidate has a horizon_end that falls exactly on a minute
+    boundary -- which is precisely when flips occur. The 1s-before-1m dispatch convention
+    means the 1s bar closing at T is handled before the 1m bar closing at the same T, so
+    an eager sweep resolves the candidate NEGATIVE moments before the flip is seen.
+
+    The horizon is inclusive of its endpoint, so a flip at exactly horizon_end is a
+    POSITIVE. Roughly 1 candidate in 12 was exposed to this.
+    """
+    c = _Collector()
+    T = ct_ns(DAY, "10:00:00")
+    c.add_candidate(T)
+    horizon_end = T + HORIZON * NS
+
+    # 1s bar closing at the horizon boundary arrives first.
+    c._sweep_elapsed_horizons(horizon_end)
+    assert c.observations_log == [], (
+        "candidate was resolved by the 1s sweep before the coincident 1m flip was seen"
+    )
+
+    # The 1m bar closing at the same instant carries the flip.
+    c._on_regime_flip(-1, horizon_end, 1.0, 1.0, 1.0)
+    assert dispositions(c) == [DISPOSITION_POSITIVE]
+    assert c.observations_log[0]["time_to_flip_seconds"] == pytest.approx(float(HORIZON))
+
+
+def test_2d_boundary_candidate_still_resolves_negative_when_no_flip_arrives():
+    """Deferring by one tick must not leave the candidate unresolved."""
+    c = _Collector()
+    T = ct_ns(DAY, "10:00:00")
+    c.add_candidate(T)
+    horizon_end = T + HORIZON * NS
+
+    c._sweep_elapsed_horizons(horizon_end)          # deferred
+    c._sweep_elapsed_horizons(horizon_end + NS)     # next 1s bar, no flip came
+    assert dispositions(c) == [DISPOSITION_NEGATIVE]
+
+
+def test_2e_boundary_candidate_at_run_end_is_labeled_not_censored():
+    """A horizon that fully elapsed by the last observed bar is a label, not a censor."""
+    c = _Collector()
+    T = ct_ns(DAY, "10:00:00")
+    c.add_candidate(T)
+    horizon_end = T + HORIZON * NS
+
+    c._sweep_elapsed_horizons(horizon_end)   # deferred
+    c.last_ts_seen = horizon_end
+    c.on_stop()
+    assert dispositions(c) == [DISPOSITION_NEGATIVE], (
+        "the horizon completed within observed data, so the outcome is known"
+    )
 
 
 def test_2b_negative_is_not_emitted_before_the_horizon_elapses():
@@ -131,7 +189,7 @@ def test_3_session_ends_before_the_full_horizon_is_censored():
     c = _Collector()
     T = ct_ns(DAY, "15:12:00")
     c.add_candidate(T)
-    c._sweep_elapsed_horizons(T + HORIZON * NS)
+    c._sweep_elapsed_horizons(T + (HORIZON + 1) * NS)
     assert dispositions(c) == [DISPOSITION_CENSORED]
     obs = c.observations_log[0]
     assert obs["censor_reason"] == CENSOR_SESSION_END
@@ -143,7 +201,7 @@ def test_3b_candidate_whose_horizon_just_fits_is_labeled_not_censored():
     c = _Collector()
     T = ct_ns(DAY, "15:10:00")           # horizon ends exactly at 15:15:00
     c.add_candidate(T)
-    c._sweep_elapsed_horizons(T + HORIZON * NS)
+    c._sweep_elapsed_horizons(T + (HORIZON + 1) * NS)
     assert dispositions(c) == [DISPOSITION_NEGATIVE]
 
 
@@ -188,7 +246,13 @@ def test_6_candidate_emitted_near_session_end_is_censored_even_if_a_flip_lands()
 
 
 def test_7_pending_candidates_at_strategy_stop_all_reach_a_disposition():
-    """E.7 -- nothing may still be pending once the strategy has stopped."""
+    """E.7 -- nothing may still be pending once the strategy has stopped.
+
+    Disposition depends on whether the horizon completed within observed data. The 10:00
+    and 12:00 candidates ran their full 300s inside the session, so their outcome is
+    known and they are LABELED. Only 15:14:30, whose horizon reaches past the 15:15
+    close, is genuinely unanswerable.
+    """
     c = _Collector()
     for hhmmss in ("10:00:00", "12:00:00", "15:14:30"):
         c.add_candidate(ct_ns(DAY, hhmmss))
@@ -196,7 +260,13 @@ def test_7_pending_candidates_at_strategy_stop_all_reach_a_disposition():
     c.on_stop()
     assert len(c.observations_log) == 3
     assert c.pending_candidates == []
-    assert all(o["disposition"] == DISPOSITION_CENSORED for o in c.observations_log)
+
+    by_ts = {o["observation_ts"]: o for o in c.observations_log}
+    assert by_ts[ct_ns(DAY, "10:00:00")]["disposition"] == DISPOSITION_NEGATIVE
+    assert by_ts[ct_ns(DAY, "12:00:00")]["disposition"] == DISPOSITION_NEGATIVE
+    late = by_ts[ct_ns(DAY, "15:14:30")]
+    assert late["disposition"] == DISPOSITION_CENSORED
+    assert late["censor_reason"] == CENSOR_SESSION_END
 
 
 # ---------------------------------------------------------------------------
@@ -242,7 +312,7 @@ def test_disabling_censoring_labels_the_late_candidates_instead_of_dropping_them
     c = _Collector(session_end_censoring=False)
     T = ct_ns(DAY, "15:14:00")
     c.add_candidate(T)
-    c._sweep_elapsed_horizons(T + HORIZON * NS)
+    c._sweep_elapsed_horizons(T + (HORIZON + 1) * NS)
     assert dispositions(c) == [DISPOSITION_NEGATIVE]
 
 

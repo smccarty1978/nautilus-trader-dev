@@ -62,6 +62,21 @@ def test_clean_tree_yields_committed_provenance(git_repo: Path):
     assert b["dependencies_diverging_from_commit"] == []
 
 
+def test_unrelated_untracked_file_does_not_downgrade_provenance(git_repo: Path):
+    """Strength is decided by the dependencies, not by global tree cleanliness.
+
+    A repository nearly always holds some untracked file (a run directory, a scratch
+    note). If that forced WORKING_TREE forever the field would carry no information --
+    the failure mode of a check that fires on everything.
+    """
+    mod = _load_module(git_repo)
+    (git_repo / "untracked_scratch.txt").write_bytes(b"noise\n")
+    b = mod.build_source_state_binding([git_repo / "features" / "registry.py"])
+    assert b["working_tree_dirty"] is True, "global dirtiness is still reported"
+    assert b["provenance_strength"] == "COMMITTED"
+    assert b["dependencies_diverging_from_commit"] == []
+
+
 def test_dirty_tree_downgrades_provenance(git_repo: Path):
     """A2.2 -- a modified dependency must not be signed off by the old commit."""
     mod = _load_module(git_repo)

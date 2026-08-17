@@ -146,8 +146,15 @@ def build_source_state_binding(dependency_paths: list[Path]) -> dict:
         json.dumps({k: v["sha256"] for k, v in files.items()}, sort_keys=True).encode("utf-8")
     ).hexdigest()
 
+    # Strength is decided by the DEPENDENCIES, not by global tree cleanliness.
+    # A repository almost always has some untracked file (a run directory, a scratch
+    # file), and letting that force WORKING_TREE forever would make the field carry no
+    # information -- the same failure mode as a check that fires on every file. What the
+    # manifest actually claims is "this content came from this commit", and only the
+    # dependencies it enumerated can falsify that. Global dirtiness is retained
+    # alongside as context.
     tree_dirty = _git_tree_is_dirty()
-    strength = "COMMITTED" if (not divergent and not tree_dirty) else "WORKING_TREE"
+    strength = "COMMITTED" if not divergent else "WORKING_TREE"
 
     return {
         "provenance_strength": strength,
