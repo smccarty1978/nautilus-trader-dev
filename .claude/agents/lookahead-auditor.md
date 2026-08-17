@@ -77,37 +77,32 @@ validation would fail. Speculative hardening is a `NOTE`.
 previous pass's file. Append-only audit files grew to 1,240 lines and made the
 verdict unparseable by any automated gate.
 
-**2. `<study_dir>/audit/status.json`** — overwrite each pass:
+It MUST contain the V2 audit summary block parsed by `scripts/run_preexec_audits.py`:
 
-```json
-{
-  "agent": "lookahead-auditor",
-  "pass": 3,
-  "date": "<ISO-8601>",
-  "scope_hash": "<sha256 of ordered file list>",
-  "critical": 0,
-  "warning": 1,
-  "note": 2,
-  "verdict": "PASS",
-  "report": "audit/pass_03.md",
-  "prior_findings_adjudicated": true,
-  "referred_to_contract_checker": 2
-}
+```
+<!-- AUDIT_SUMMARY_V2_START -->
+{"verdict": "CLEAR", "audit_type": "causal", "auditor": "lookahead-auditor", "critical": 0, "warning": 0, "note": 0, "study": "<study_dir_name>", "audited_execution_composite_sha256": "<composite>"}
+<!-- AUDIT_SUMMARY_V2_END -->
 ```
 
-`verdict` is exactly one of `PASS`, `BLOCKED`, `INCOMPLETE`. Gates read this
-file, not the prose.
+**2. `<study_dir>/audit/status.json`** — issued via `run_preexec_audits.py` or written as a convenience copy.
+
+`verdict` is strictly `CLEAR` or `BLOCKED` (or `INCOMPLETE`). Gates read this block, not prose.
 
 ## Report template
 
 ```markdown
+<!-- AUDIT_SUMMARY_V2_START -->
+{"verdict": "CLEAR", "audit_type": "causal", "auditor": "lookahead-auditor", "critical": 0, "warning": 0, "note": 0, "study": "<study_dir_name>", "audited_execution_composite_sha256": "<composite>"}
+<!-- AUDIT_SUMMARY_V2_END -->
+
 # Look-Ahead & Timestamp Audit — Pass <NN>
 
 **Date:** <ISO-8601>
 **Scope:** <files inspected>
 **Scope hash:** <sha256>
 **Lint:** <N critical / N warning from causal_lint.py>
-**Verdict:** <PASS | BLOCKED | INCOMPLETE>
+**Verdict:** <CLEAR | BLOCKED | INCOMPLETE>
 
 ## Summary
 - Critical: N

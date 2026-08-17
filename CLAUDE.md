@@ -56,12 +56,24 @@ are already implemented. Import them; never re-type them into a new script.
 ## DOCUMENTATION INDEX
 Do not guess implementation details. Use your `Read` tool to read the relevant spec before writing code:
 
+- **Workflow Manual:** `docs/RESEARCH_WORKFLOW.md` (End-to-end execution, audit, feature & analysis flow)
 - **Catalog & Data:** `docs/DATA_CATALOG.md` (Wrangling, building, validation)
 - **Backtest & Config:** `docs/BACKTEST_EXECUTION.md` (Runner setup, parameter sweeps, yaml configs)
 - **Reporting & Tearsheets:** `docs/ANALYSIS_REPORTING.md` (NT built-in reports, TearsheetConfigs)
 - **Studies & ML Data:** `docs/STUDY_METHODOLOGY.md` (Feature collection, MFE/MAE replay pattern)
 - **Templates:** `docs/TEMPLATES.md` (Indicator and Strategy SPEC.md templates)
 - **Optimization:** `docs/PERFORMANCE.md` (Profiling, ONNX ML inference)
+
+## CANONICAL RESEARCH WORKFLOW
+- Read `docs/RESEARCH_WORKFLOW.md` before starting any new study, collector, backtest, feature, or analysis task.
+- Use canonical collector (`backtests/run_nt_study.py`), backtest (`backtests/run_backtest.py`), and analysis harnesses. Do not regenerate engine, instrument, catalog, loading, validation, or reporting infrastructure.
+- A new feature must be implemented/registered through `features/registry.py` and declared in the study feature list; never bypass missing-feature errors with a one-off runner.
+- No new sibling-study imports. Promote genuinely shared helpers to shared code (`backtests/nt_runtime/`, `utils/runner/`, `features/`).
+- No new `run_*.py` for ordinary backtest variations.
+- Shared framework code changes require a demonstrated missing capability or defect (`AGENTS.md` § Escalation Rule).
+- Do not search `archive/`, `scratch/`, `runs/`, or historical result directories unless explicitly needed.
+- Prefer bounded sessions and compact handoffs; do not reread unchanged files.
+- Detailed evidence goes to artifacts; chat responses stay concise.
 
 <!-- BEGIN CENTRAL FEATURE SYSTEM -->
 ## Central Feature System

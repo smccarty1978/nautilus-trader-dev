@@ -10,6 +10,11 @@ Run only the exact pytest commands requested by the parent.
 - Keep response under 500 words.
 - Summarize failed tests, root cause, and the next exact command.
 - Do not paste repetitive warnings, deprecation logs, or complete standard output.
+- Consume compact result artifacts (`audit/preflight.json`, `validation_report.json`) first before opening raw log or parquet files.
+- Distinguish strictly between deterministic results, interpretation, and hypotheses.
+- Never alter or silently change the underlying research question.
+- Output only decision-relevant anomalies/findings.
+- Stop once assigned question is answered.
 
 Every Bash invocation must pass the agent-scoped `PreToolUse` validation hook.
 

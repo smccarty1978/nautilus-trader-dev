@@ -89,14 +89,11 @@ exactly one machine-parsed summary block, which is what
 
 ```
 <!-- AUDIT_SUMMARY_V2_START -->
-{"verdict": "CLEAR"|"BLOCKED", "blocking": <int>, "warning": <int>, "note": <int>,
- "study": "<study_dir_name>", "audited_execution_composite_sha256": "<composite>"}
+{"verdict": "CLEAR", "audit_type": "contract", "auditor": "contract-checker", "blocking": 0, "warning": 0, "note": 0, "study": "<study_dir_name>", "audited_execution_composite_sha256": "<composite>"}
 <!-- AUDIT_SUMMARY_V2_END -->
 ```
 
-`study` and `audited_execution_composite_sha256` bind the report to a specific
-study and a specific state of the code, so a stale or misfiled audit is rejected
-mechanically rather than by reviewer attention.
+`audit_type`, `auditor`, `study`, and `audited_execution_composite_sha256` bind the report to a specific audit type, auditor identity, study, and specific execution composite hash.
 
 Formatting rule enforced by the parser: a line is counted as a finding only when
 it is a heading or bullet of the form `SEVERITY: <title>` — e.g.

@@ -55,6 +55,7 @@ not restate them.
 
 | Topic | Spec |
 |---|---|
+| End-to-end research workflow, stage gates, CLI reference, escalation rules | `docs/RESEARCH_WORKFLOW.md` |
 | Wrangling, catalog build, validation, timestamp convention | `docs/DATA_CATALOG.md` |
 | Runner setup, StrategyConfig, parameter sweeps, logging | `docs/BACKTEST_EXECUTION.md` |
 | NT built-in reports, tearsheets, key metrics | `docs/ANALYSIS_REPORTING.md` |
@@ -62,6 +63,7 @@ not restate them.
 | Indicator and Strategy `SPEC.md` templates | `docs/TEMPLATES.md` |
 | Profiling, Cython/Rust thresholds, ONNX inference | `docs/PERFORMANCE.md` |
 | Feature registry contract | `features/FEATURE_REGISTRY_CONTRACT.md` |
+
 
 ---
 
@@ -230,60 +232,55 @@ If the component reuses another study's execution stack "verbatim," audit it any
 ```
 {repo_root}/
 │
-├── AGENTS.md                    # This file - framework rules
+├── AGENTS.md                    # Framework rules & governance
+├── CLAUDE.md                    # Core invariants & quick reference
 │
-├── data/
-│   ├── raw/                     # Raw parquet from Databento
-│   └── catalog/                 # NT catalog (generated)
+├── docs/                        # Operational specs & workflow manuals
+│   ├── RESEARCH_WORKFLOW.md     # Primary end-to-end research workflow manual
+│   ├── CAUSAL_CHECKLIST.md      # Disjoint ruleset for causal & contract auditors
+│   └── DATA_CATALOG.md          # Catalog wrangling & timestamp conventions
 │
-├── indicators/
-│   ├── __init__.py
-│   ├── {indicator_name}/
-│   │   ├── indicator.py         # NT Indicator class
-│   │   ├── config.py            # IndicatorConfig if needed
-│   │   └── SPEC.md              # Indicator specification
-│   └── registry.py              # Indicator registry
+├── backtests/                   # Standalone & generic study backtest execution
+│   ├── nt_runtime/              # Canonical NT engine builder & modes
+│   ├── run_backtest.py          # Supported standalone CLI entrypoint
+│   ├── run_nt_study.py          # Supported declarative study collection CLI
+│   └── configs/                 # Config YAMLs for standalone runs
 │
-├── strategies/
-│   ├── __init__.py
-│   ├── {strategy_name}/
-│   │   ├── strategy.py          # NT Strategy class
-│   │   ├── config.py            # StrategyConfig dataclass
-│   │   └── SPEC.md              # Strategy specification
-│   └── registry.py              # Strategy registry
+├── features/                    # Central feature registry & stateful trackers
+│   ├── registry.py              # Canonical feature definitions & metadata
+│   ├── FEATURE_REGISTRY_CONTRACT.md
+│   └── trackers/                # Real-time stateful feature tracker implementations
 │
-├── backtests/
-│   ├── engine.py                # Reusable backtest runner
-│   ├── configs/
-│   │   └── {strategy}_{version}.yaml
-│   └── results/
-│       └── {timestamp}_{strategy}_{config}/
-│           ├── config.yaml      # Exact config used
-│           ├── trades.parquet   # All trades
-│           ├── metrics.yaml     # Summary metrics
-│           ├── equity.parquet   # Equity curve
-│           └── tearsheet.html   # Interactive report
+├── indicators/                  # Reusable indicator definitions & registry
+│   └── registry.py
 │
-├── studies/
-│   ├── {study_name}/
-│   │   ├── SPEC.md              # Study design document
-│   │   ├── collect.py           # Data collection (IN NT)
-│   │   ├── analyze.py           # Analysis (on NT output)
-│   │   └── results/
+├── strategies/                  # Reusable NT strategy implementations & registry
+│   └── registry.py
 │
-├── models/
-│   ├── {model_name}/
-│   │   ├── SPEC.md              # Model specification
-│   │   ├── train.py             # Training script
-│   │   ├── config.yaml          # Hyperparameters
-│   │   └── artifacts/           # Saved models
+├── research/                    # Analysis schemas, contract compilers & engines
+│   ├── schemas/study_spec.py    # Authoritative StudySpec pydantic model
+│   └── engines/                 # Feature binding, target & lineage engines
 │
-├── logs/                        # Log files (generated)
+├── studies/                     # Declarative research studies
+│   └── {study_name}/
+│       ├── research_decision.yaml # Authoritative decision contract
+│       ├── study.yaml           # Machine-readable spec
+│       ├── SPEC.md              # Rendered specification
+│       ├── compiled_study.json  # Compiled sha256-bound contract
+│       ├── audit/               # Audit pass reports & status.json
+│       ├── artifacts/           # Sealed execution manifests & frozen weights
+│       └── results/             # Study reports & analysis artifacts
 │
-└── scripts/
-    ├── download_data.py         # Databento download
-    ├── build_catalog.py         # Build NT catalog
-    └── validate_data.py         # Data validation
+├── models/                      # Trained models & frozen artifacts
+│   └── artifacts/               # Joblib / ONNX weights
+│
+└── scripts/                     # Preflight, audit, sync, and orchestration scripts
+    ├── create_study.py          # Scaffold new study from study.yaml
+    ├── compile_study.py         # Compile & validate study contracts
+    ├── research_preflight.py    # Deterministic AST lint, schema & test preflight
+    ├── run_preexec_audits.py    # Deterministic audit provenance & status parser
+    ├── preexec_audit_seal.py    # Cryptographic pre-execution seal manager
+    └── sync_agents.py           # Cross-harness agent definition generator
 ```
 ---
 
