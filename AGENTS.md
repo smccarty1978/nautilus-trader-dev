@@ -257,9 +257,10 @@ If the component reuses another study's execution stack "verbatim," audit it any
 ├── strategies/                  # Reusable NT strategy implementations & registry
 │   └── registry.py
 │
-├── research/                    # Analysis schemas, contract compilers & engines
+├── research/                    # Analysis schemas, contract compilers, engines & harness
+│   ├── analysis/                # Canonical validated analysis package (on analysis-harness branch if unmerged)
 │   ├── schemas/study_spec.py    # Authoritative StudySpec pydantic model
-│   └── engines/                 # Feature binding, target & lineage engines
+│   └── engines/                 # Low-level feature binding, target & lineage engines
 │
 ├── studies/                     # Declarative research studies
 │   └── {study_name}/
@@ -353,13 +354,20 @@ Keep architecture, causal interpretation, integration, and final approval in the
 
 ### Roster
 
-| Agent | Codex `agent_type` | Role | Output cap | Available in |
-|---|---|---|---|---|
-| `repo-scout` | `repo_scout` | Locate files, trace execution paths | 700w — paths, symbols, line ranges only | Claude, Codex |
-| `contract-checker` | `contract_checker` | Compare code/tests against explicit specs | 1,000w — compliance table + findings only | Claude, Codex |
-| `results-triager` | `results_triager` | Run exact approved pytest commands | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
-| `lookahead-auditor` | `lookahead_auditor` | Internal causal / look-ahead review (self-attested) | 1,500w — complete Markdown report, parent persists | Claude, Codex |
-| `implementation-worker` | `implementation_worker` | Implement one frozen, bounded task packet | — | **Codex only** |
+| Agent | Codex `agent_type` | Role | Model tier | Output cap | Available in |
+|---|---|---|---|---|---|
+| `repo-scout` | `repo_scout` | Locate files, trace execution paths | Haiku / low | 700w — paths, symbols, line ranges only | Claude, Codex |
+| `contract-checker` | `contract_checker` | Compare code/tests against explicit specs | Sonnet / medium | 1,000w — compliance table + findings only | Claude, Codex |
+| `results-triager` | `results_triager` | Run exact approved pytest commands | Haiku / low | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
+| `lookahead-auditor` | `lookahead_auditor` | Internal causal / look-ahead review (self-attested) | Sonnet / high | 1,500w — complete Markdown report, parent persists | Claude, Codex |
+| `Explore` | — | Broad fan-out location sweep; prefer `repo-scout` | Haiku / low | 700w — paths and symbols only | **Claude only** |
+| `implementation-worker` | `implementation_worker` | Implement one frozen, bounded task packet | Sonnet-class / medium | — | **Codex only** |
+
+Tier rationale and the no-escalate-for-length rule: `CLAUDE.md` § LEAN WORKFLOW
+(*Model tiering*). Exact model ids live in the `.claude/agents/*.md` frontmatter
+(canonical) and in `CODEX_META` in `scripts/sync_agents.py` (per-harness). The
+`Explore` definition exists only to pin the model — the built-in agent inherits
+the orchestrator's model, which is Opus.
 
 ### Risk tiers
 

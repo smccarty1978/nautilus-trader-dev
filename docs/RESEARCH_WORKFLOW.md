@@ -152,17 +152,24 @@ Feature collection extracts dataset matrices directly from the NautilusTrader ev
 3. **Split Pre-Execution Audit**:
    - **Causal Audit**: Invoke `lookahead-auditor`. Report filed via:
      ```bash
-     python scripts/run_preexec_audits.py --study studies/<id> --pass-num 1 --type causal --ingest audit/pass_01.md --author lookahead-auditor
+     python scripts/run_preexec_audits.py --study studies/<id> --pass-num 1 --type causal --ingest audit/pass_01.md --author <declared_causal_reviewer_id>
      ```
    - **Contract Audit**: Invoke `contract-checker`. Report filed via:
      ```bash
-     python scripts/run_preexec_audits.py --study studies/<id> --pass-num 1 --type contract --ingest audit/contract_pass_01.md --author contract-checker
+     python scripts/run_preexec_audits.py --study studies/<id> --pass-num 1 --type contract --ingest audit/contract_pass_01.md --author <declared_contract_reviewer_id>
      ```
    *Requirement*: Causal and contract reviews MUST be conducted by distinct declared auditor identities. Each report MUST declare:
    - `audit_type`: (`causal` | `contract`)
-   - `auditor`: (agent/reviewer identity)
-   - `study`: (study directory name)
-   - `audited_execution_composite_sha256`: (composite hash verified against `resolve_execution_manifest.py`)
+   - `auditor`: `<actual declared reviewer identity>`
+   - `study`: `<study id>`
+   - `audited_execution_composite_sha256`: `<declared composite>`
+
+   > [!IMPORTANT]
+   > - `lookahead-auditor` and `contract-checker` are audit **ROLES**, not mandatory reviewer identity strings.
+   > - Do not substitute the role name for reviewer identity unless that role name is genuinely the externally declared identity for the invocation.
+   > - Causal and contract reviews MUST use **DISTINCT** declared reviewer identities.
+   > - One reviewer/session must NOT author both audit roles.
+   > - The reviewer declares the composite; tooling verifies it against `resolve_execution_manifest.py` and must never self-generate or stamp it.
 
 4. **Generate Preexec Cryptographic Seal**:
    `run_preexec_audits.py` verifies report hashes and code composite hashes, issuing `artifacts/preexec_audit_seal.json`.
@@ -256,6 +263,23 @@ OOS EVALUATION & METRIC CALCULATION
     ↓
 STUDY REPORT (`STUDY_REPORT.md`)
 ```
+
+### Canonical Analysis Package Location
+
+```
+Canonical validated analysis package:
+    research/analysis/
+
+If it is not present in the current checkout, it is maintained on the
+analysis-harness branch/worktree pending integration.
+
+Do NOT recreate equivalent analysis loading/modeling/reporting plumbing
+locally. Use/integrate the validated harness rather than building a
+parallel implementation.
+```
+
+> [!NOTE]
+> Low-level engines in `research/engines/` (`feature_binding_engine.py`, `target_engine.py`, `lineage_engine.py`) provide specific data transformation utilities consumed by the analysis harness, but are not a standalone replacement for the complete `research/analysis/` package.
 
 ### Analysis Harness Controls
 
@@ -360,11 +384,12 @@ END SESSION
 | **Study Compilation** | `scripts/compile_study.py` | `compile_study()` | `python scripts/compile_study.py --study studies/<id>` | `compiled_study.json` |
 | **Fidelity Check** | `scripts/check_research_decision_fidelity.py` | `check_decision_fidelity()` | `python scripts/check_research_decision_fidelity.py --study studies/<id>` | Fidelity stdout / exit code |
 | **Research Preflight** | `scripts/research_preflight.py` | `run_preflight()` | `python scripts/research_preflight.py --study studies/<id>` | `audit/preflight.json` |
-| **Audit Report Filing** | `scripts/run_preexec_audits.py` | `_extract_v2_summary()` | `python scripts/run_preexec_audits.py --study studies/<id> --type causal --ingest audit/pass_01.md --author lookahead-auditor` | `audit/status.json` |
+| **Audit Report Filing** | `scripts/run_preexec_audits.py` | `_extract_v2_summary()` | `python scripts/run_preexec_audits.py --study studies/<id> --type causal --ingest audit/pass_01.md --author <declared_reviewer_id>` | `audit/status.json` |
 | **Preexec Audit Seal** | `scripts/preexec_audit_seal.py` | `generate_preexec_audit_seal()` | `python scripts/preexec_audit_seal.py` (called via preexec parser) | `artifacts/preexec_audit_seal.json` |
 | **Collector Runner** | `backtests/run_nt_study.py` | `run_collect_mode()` | `python backtests/run_nt_study.py --study studies/<id> --mode collect --stage day` | `runs/<timestamp>_collect_day/` |
 | **Smoke Validation** | `scripts/validate_smoke.py` | `validate_smoke_run()` | `python scripts/validate_smoke.py --run-dir runs/...` | `validation_report.json` |
 | **Standalone Backtest** | `backtests/run_backtest.py` | `run_backtest_mode()` | `python backtests/run_backtest.py --config backtests/configs/<name>.yaml` | `runs/<timestamp>_<strategy>/` |
+| **Analysis Harness** | `research/analysis/` | Analysis package API | Python import (`research.analysis`) | Fit models, thresholds, reports |
 | **Agent Parity Sync** | `scripts/sync_agents.py` | `main()` | `python scripts/sync_agents.py` (`--check` to verify) | `.agents/` and `.codex/` agent files |
 | **Feature Registry** | `features/registry.py` | `FEATURE_REGISTRY` | Python import `from features.registry import FEATURE_REGISTRY` | Feature metadata dictionary |
 | **Engine Construction** | `backtests/nt_runtime/engine_builder.py` | `build_engine()` | Python import in runtime harness | `BacktestEngine` instance |

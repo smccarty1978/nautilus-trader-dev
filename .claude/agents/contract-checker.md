@@ -94,11 +94,15 @@ exactly one machine-parsed summary block, which is what
 
 ```
 <!-- AUDIT_SUMMARY_V2_START -->
-{"verdict": "CLEAR", "audit_type": "contract", "auditor": "contract-checker", "blocking": 0, "warning": 0, "note": 0, "study": "<study_dir_name>", "audited_execution_composite_sha256": "<composite>"}
+{"verdict": "CLEAR", "audit_type": "contract", "auditor": "<actual declared reviewer identity>", "blocking": 0, "warning": 0, "note": 0, "study": "<study_id>", "audited_execution_composite_sha256": "<declared composite>"}
 <!-- AUDIT_SUMMARY_V2_END -->
 ```
 
-`audit_type`, `auditor`, `study`, and `audited_execution_composite_sha256` bind the report to a specific audit type, auditor identity, study, and specific execution composite hash.
+*Auditor Identity Rules*:
+- `contract-checker` is the audit **ROLE**, not a mandatory reviewer identity string.
+- Do not substitute the role name for reviewer identity unless that role name is genuinely the externally declared identity for the invocation.
+- Causal and contract reviews MUST use **DISTINCT** declared reviewer identities. One reviewer/session must NOT author both audit roles.
+- The reviewer declares the composite; tooling verifies it against the resolved execution manifest and must never self-generate or stamp it.
 
 Formatting rule enforced by the parser: a line is counted as a finding only when
 it is a heading or bullet of the form `SEVERITY: <title>` — e.g.

@@ -2,7 +2,7 @@
 name: results-triager
 description: Runs explicitly assigned pytest commands and summarizes failures, metrics, and artifact locations. Use proactively after bounded code changes, not for implementation.
 tools: [Read, Grep, Glob, Bash]
-model: claude-haiku-4-5
+model: claude-haiku-4-5-20251001
 effort: low
 maxTurns: 15
 hooks:

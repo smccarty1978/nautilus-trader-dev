@@ -2,7 +2,7 @@
 name: repo-scout
 description: Read-only codebase mapper. Use proactively to locate files, trace call paths, identify dependencies, and gather implementation evidence before planning.
 tools: [Read, Grep, Glob]
-model: claude-haiku-4-5
+model: claude-haiku-4-5-20251001
 effort: low
 maxTurns: 12
 ---
