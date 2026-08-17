@@ -24,6 +24,7 @@ from features.trackers.ohlcv_delta import OHLCVDeltaTracker
 from features.trackers.price_levels import PriceLevelTracker
 from features.trackers.rolling_5m_productivity import Rolling5mProductivityTracker
 from features.trackers.structural_regime_geometry import StructuralRegimeGeometryTracker
+from features.trackers.wick import WickTracker
 from features.registry import FEATURE_REGISTRY
 
 from datetime import datetime, timezone
@@ -168,6 +169,7 @@ class FlipPredictionCollector(Strategy):
         self.price_level_tracker = PriceLevelTracker()
         self.structural_geometry_tracker = StructuralRegimeGeometryTracker()
         self.rolling_productivity_tracker = Rolling5mProductivityTracker(window_seconds=300)
+        self.wick_tracker = WickTracker()
 
         if self._is_targeted_60:
             self.ring = FastOHLCVRingBuffer(capacity=3600)
@@ -311,6 +313,7 @@ class FlipPredictionCollector(Strategy):
         self.minute_1s_buffer = []
 
         self.price_level_tracker.update_1m(ts_avail, o, h, l, c, is_rth_now)
+        self.wick_tracker.update(o, h, l, c)
         self.bars_since_breach_1m.append(bar)
 
     def _on_regime_flip(self, new_regime: int, flip_ts: int, open_price: float, close_price: float, atr_val: float) -> None:
@@ -705,6 +708,7 @@ class FlipPredictionCollector(Strategy):
             self.bars_since_breach_1m, breach_ref, touch_price, atr, trade_dir
         )
         context_feats = self._get_context_features(T, atr)
+        wick_feats = self.wick_tracker.calculate()
 
         merged_raw = {
             **ohlcv_feats,
@@ -716,6 +720,7 @@ class FlipPredictionCollector(Strategy):
             **pullback_1s_feats,
             **pullback_1m_feats,
             **context_feats,
+            **wick_feats,
         }
 
         study_universe = self.cfg.feature_list or [

@@ -1,0 +1,26 @@
+{
+  "run_id": "20260817_125237_es_wick_imbalance_exploratory_day",
+  "study_id": "es_wick_imbalance_exploratory",
+  "study_type": "flip_prediction",
+  "spec_sha256": "7151bc7640ebb98526b28d07b673317aa6009975b142e277b0851d572e3eeb08",
+  "composite_seal_hash": "cf80295f7bd46af473e69b57e0c2566e07f728c51516816846b0a4f4324c3787",
+  "execution_manifest_sha256": "cf80295f7bd46af473e69b57e0c2566e07f728c51516816846b0a4f4324c3787",
+  "stage": "day",
+  "dates": {
+    "start": "2024-09-03",
+    "end": "2024-09-03",
+    "warmup_start": "2024-08-29T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "ES",
+    "venue": "XCME",
+    "instrument_id": "ES.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-17T12:52:37.585687+00:00",
+  "status": "RUNNING"
+}

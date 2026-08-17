@@ -267,6 +267,16 @@ FEATURE_REGISTRY: Dict[str, FeatureDefinition] = {
     'ema_slope_long': FeatureDefinition(name='ema_slope_long', status='verified', family='context', source_timeframe='1m'),
     'is_rth': FeatureDefinition(name='is_rth', status='verified', family='context', stateful=False),
     'minutes_since_rth_open': FeatureDefinition(name='minutes_since_rth_open', status='verified', family='context', stateful=False),
+    'latest_1m_wick_imbalance': FeatureDefinition(
+        name='latest_1m_wick_imbalance',
+        status='verified',
+        family='wick_imbalance',
+        implementation='features.trackers.wick.WickTracker',
+        tests=('tests/test_feature_library.py',),
+        source_timeframe='1m',
+        update_anchor='completed_1m_bar',
+        null_policy='allow',
+    ),
 }
 
 # ---------------------------------------------------------------------------

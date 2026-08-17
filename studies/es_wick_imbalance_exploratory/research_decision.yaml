@@ -1,0 +1,29 @@
+research_question: "Descriptive exploratory study of latest_1m_wick_imbalance on ES RTH September 2024 TRAIN data."
+
+baseline:
+  short: "latest_1m_wick_imbalance"
+  long: "latest_1m_wick_imbalance"
+
+baseline_feature_selection:
+  mode: "train_only"
+
+model_arms:
+  A: "latest_1m_wick_imbalance_descriptive"
+
+variable_being_tested:
+  - "latest_1m_wick_imbalance"
+
+prohibited_changes:
+  - "unauthorized_feature_discovery"
+  - "use_2024_to_change_model_design"
+
+allowed_changes:
+  - "descriptive_feature_analysis"
+
+chronology:
+  train: [2024]
+  dev: []
+  prohibited: [2025, 2026]
+
+primary_comparison: "Descriptive distribution and directional breakdown of latest_1m_wick_imbalance against canonical flip target."
+terminal_question: "What are the empirical distribution and target relationships of latest_1m_wick_imbalance on complete ES RTH train days in September 2024?"

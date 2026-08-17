@@ -247,3 +247,33 @@ def test_ohlcv_delta_regime_transition_buffers_and_replays_correctly():
     engine.update_1m(m3, regime2)
     assert engine._ohlcv_delta_tracker._regime_vol_sum == pytest.approx(0.0)
     assert engine._ohlcv_delta_tracker._regime_anchor_price == pytest.approx(105.0)  # new regime bar's OPEN
+
+
+def test_wick_tracker():
+    from features.trackers.wick import WickTracker, compute_wick_imbalance
+
+    # Test flat bar (high == low)
+    assert compute_wick_imbalance(100.0, 100.0, 100.0, 100.0) == 0.0
+
+    # Test bullish bar with upper wick 2.0, lower wick 1.0, range 5.0
+    # open 101.0, high 105.0, low 100.0, close 103.0
+    # upper_wick = 105 - max(101, 103) = 2.0
+    # lower_wick = min(101, 103) - 100 = 1.0
+    # feature = (2.0 - 1.0) / 5.0 = 0.2
+    val = compute_wick_imbalance(101.0, 105.0, 100.0, 103.0)
+    assert val == pytest.approx(0.2)
+
+    # Test bearish bar with upper wick 1.0, lower wick 3.0, range 6.0
+    # open 104.0, high 105.0, low 99.0, close 101.0
+    # upper_wick = 105 - max(104, 101) = 1.0
+    # lower_wick = min(104, 101) - 99 = 2.0
+    # feature = (1.0 - 2.0) / 6.0 = -1/6
+    val2 = compute_wick_imbalance(104.0, 105.0, 99.0, 101.0)
+    assert val2 == pytest.approx(-1.0 / 6.0)
+
+    # Test tracker update & calculate
+    tracker = WickTracker()
+    assert tracker.calculate()["latest_1m_wick_imbalance"] == 0.0
+    tracker.update(101.0, 105.0, 100.0, 103.0)
+    assert tracker.calculate()["latest_1m_wick_imbalance"] == pytest.approx(0.2)
+
