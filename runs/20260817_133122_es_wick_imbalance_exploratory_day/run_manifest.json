@@ -1,0 +1,47 @@
+{
+  "run_id": "20260817_133122_es_wick_imbalance_exploratory_day",
+  "study_id": "es_wick_imbalance_exploratory",
+  "study_type": "flip_prediction",
+  "spec_sha256": "7151bc7640ebb98526b28d07b673317aa6009975b142e277b0851d572e3eeb08",
+  "composite_seal_hash": "5232e5cd840825ffb22665127e155584024a94a494aa419355cf11ccc0be738e",
+  "execution_manifest_sha256": "5232e5cd840825ffb22665127e155584024a94a494aa419355cf11ccc0be738e",
+  "stage": "day",
+  "dates": {
+    "start": "2024-09-04",
+    "end": "2024-09-04",
+    "warmup_start": "2024-08-30T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "ES",
+    "venue": "XCME",
+    "instrument_id": "ES.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-17T13:31:22.053966+00:00",
+  "status": "COMPLETED",
+  "telemetry": {
+    "wall_time_seconds": 339.2137081999681,
+    "total_bars_processed": 0,
+    "throughput_bars_per_sec": 0.0,
+    "baseline_process_rss_mb": 189.31,
+    "peak_process_rss_mb": 290.91,
+    "rss_delta_mb": 101.6,
+    "python_tracemalloc_peak_mb": 41.51,
+    "bars_loaded": {
+      "1s": 153074,
+      "1m": 5275
+    },
+    "callbacks": {}
+  },
+  "outputs": {
+    "candidates_count": 2233,
+    "candidates_sha256": "33719c369d9aa643624c4fae1f3f146a9e7475b032224ddd0422fe8430a225a2",
+    "observations_count": 2233,
+    "observations_sha256": "31cf463328574d2d4d41c27538abf0afa017cd1b7ae32881b6d2302be05562a0"
+  },
+  "end_time_utc": "2026-08-17T13:37:01.361604+00:00"
+}
