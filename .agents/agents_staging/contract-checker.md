@@ -25,8 +25,13 @@ defined there, not restated here.
 ## Your scope — and what is NOT yours
 
 - **The Research Decision Contract (`research_decision.yaml`)** — if present, does SPEC.md and study.yaml adhere strictly to its baseline, feature selection mode, model arms, chronology, and prohibited changes?
-- **The SPEC's Deliverables Manifest (section 6)** — does every listed artifact
-  exist, with the listed columns and contents?
+- **The deliverables contract (`config/deliverables_contract.json`)** — does every
+  artifact declared for a mode this study actually ran exist, with the listed
+  columns and contents? This JSON is the authority; `SPEC.md` section 4 is
+  *rendered from* it. Deliverables are partitioned by mode: an artifact belonging
+  to a mode the study is not authorized to run is **out of scope**, not missing.
+  If a study predates the contract and has no `deliverables_contract.json`, that
+  absence is itself the finding — report it once as `INCOMPLETE` and stop.
 - **Terminal decision labels** — is every declared label reachable through the
   real workflow? Unreachable labels are a repeat historical CRITICAL.
 - **The Domain & completeness contract (section 7)** — expected partition grid,
@@ -45,11 +50,17 @@ move on.
 
 ## The single most important rule
 
-**Check the frozen SPEC's Deliverables Manifest literally. Anything not listed
-there is not a finding.** If the manifest is missing or vague, that itself is
-the finding — report it once as `INCOMPLETE` and stop. Do not invent a
-deliverable set and then report the implementation for failing to match it.
-That behaviour is what produced 18-pass audit loops.
+**Read `config/deliverables_contract.json` and check it literally. Anything not
+declared there for a mode this study ran is not a finding.** If the contract is
+missing, that itself is the finding — report it once as `INCOMPLETE` and stop.
+Do not invent a deliverable set and then report the implementation for failing
+to match it. That behaviour is what produced 18-pass audit loops.
+
+It is also what let the ES acceptance study pass while its SPEC demanded three
+artifacts collect mode cannot produce and omitted `observations.parquet`, which
+carries the study's labels. A checker that assembles its own scope cannot detect
+scope loss — it verifies the implementation against a list it derived from that
+same implementation. Consume the contract; never reconstruct it.
 
 ## Re-audit protocol (passes 2+)
 

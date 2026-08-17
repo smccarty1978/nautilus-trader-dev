@@ -1,0 +1,67 @@
+research_question: "Descriptive characterisation of latest_1m_wick_imbalance on ES RTH for the three authorized September 2024 TRAIN days."
+
+purpose: >-
+  This study exists to exercise the repaired research workflow end-to-end, not to reach a
+  conclusion about the wick feature. The feature is the vehicle; the workflow is the
+  subject. No economic interpretation is authorized.
+
+baseline:
+  short: "latest_1m_wick_imbalance"
+  long: "latest_1m_wick_imbalance"
+
+baseline_feature_selection:
+  mode: "train_only"
+
+model_arms:
+  A: "latest_1m_wick_imbalance_descriptive"
+
+variable_being_tested:
+  - "latest_1m_wick_imbalance"
+
+prohibited_changes:
+  - "unauthorized_feature_discovery"
+  - "use_2024_to_change_model_design"
+  - "expansion_beyond_authorized_dates"
+
+# Stated as a caveat rather than a `prohibited_changes` token: the fidelity checker's
+# prohibition vocabulary is a closed, machine-checked set, and inventing tokens it cannot
+# enforce would put unenforceable text where enforceable text belongs.
+scope_caveats:
+  - "No economic interpretation of latest_1m_wick_imbalance is authorized by this study."
+  - "No model fitting, threshold tuning, or trading backtest."
+
+allowed_changes:
+  - "descriptive_feature_analysis"
+
+chronology:
+  train: [2024]
+  dev: []
+  prohibited: [2025, 2026]
+
+authorized_dates:
+  - "2024-09-03"
+  - "2024-09-04"
+  - "2024-09-05"
+
+session:
+  name: "RTH"
+  window_ct: "08:30:00-15:15:00"
+  attribution: "half-open (start, end] on completed-bar close timestamps"
+  authority: "utils/session_boundaries.py"
+
+target_censoring:
+  session_end_censoring: true
+  rule: >-
+    A candidate whose 300s forward horizon extends past its own session close is CENSORED,
+    not labeled. Every emitted candidate reaches exactly one terminal disposition:
+    LABELED_POSITIVE, LABELED_NEGATIVE, or CENSORED.
+
+feature_status_caveat: >-
+  latest_1m_wick_imbalance is 'provisional', not 'verified'. It has deterministic test
+  coverage but no look-ahead auditor clearance, so it may not enter a verified-only
+  candidate universe. It is named explicitly here because characterising it is the point
+  of the study. Its declared null_policy is 'allow': the feature is genuinely unavailable
+  (None) until the first completed 1m bar of the run.
+
+primary_comparison: "Descriptive distribution and directional breakdown of latest_1m_wick_imbalance against the canonical flip target."
+terminal_question: "What are the empirical distribution and target relationships of latest_1m_wick_imbalance on the authorized ES RTH days in September 2024?"

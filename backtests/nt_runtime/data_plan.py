@@ -19,6 +19,69 @@ class UnauthorizedExecutionDomainError(ValueError):
     pass
 
 
+def resolve_authorized_dates(compiled_data) -> Optional[List[str]]:
+    """Reads a study's exact authorized calendar dates, if it declares any.
+
+    Declared under ``execution.data_requirements.authorized_dates`` as ``YYYY-MM-DD``
+    strings. That location is deliberate: ``data_requirements`` is an existing free-form
+    field on ``ExecutionSpec``, so a study that sets it changes only *its own*
+    ``spec_sha256``. Adding a new top-level schema field would instead alter
+    ``StudySpec.compute_sha256`` for every study in the repository -- because
+    ``compute_sha256`` hashes ``model_dump(exclude_none=False)``, an unset optional field
+    still appears -- marking every existing ``compiled_study.json`` stale and
+    invalidating seals and audits far outside the scope of a date-bounding change.
+
+    Returns ``None`` when the study declares no exact dates, in which case the
+    pre-existing year-level chronology gates remain the only date authority.
+    """
+    reqs = getattr(compiled_data.spec.execution, "data_requirements", None) or {}
+    dates = reqs.get("authorized_dates")
+    if not dates:
+        return None
+    if not isinstance(dates, list) or not all(isinstance(d, str) for d in dates):
+        raise UnauthorizedExecutionDomainError(
+            "MALFORMED_AUTHORIZED_DATES: execution.data_requirements.authorized_dates must be "
+            "a list of 'YYYY-MM-DD' strings"
+        )
+    for d in dates:
+        try:
+            pd.Timestamp(d)
+        except Exception as err:
+            raise UnauthorizedExecutionDomainError(
+                f"MALFORMED_AUTHORIZED_DATES: {d!r} is not a valid date ({err})"
+            )
+    return sorted(dates)
+
+
+def enforce_authorized_dates(
+    compiled_data,
+    start_date: str,
+    end_date: str,
+) -> Optional[List[str]]:
+    """Refuses any run window containing a date the study did not explicitly authorize.
+
+    Year-level chronology cannot express "these three September days". The acceptance
+    request intended 2024-09-03/04/05 while ``train: [2024]`` authorized all of 2024, and
+    a reviewer reading the contract had no way to tell the intended scope from the
+    permitted one. This closes that gap: when exact dates are declared, every calendar day
+    in the requested window must appear among them.
+    """
+    authorized = resolve_authorized_dates(compiled_data)
+    if authorized is None:
+        return None
+
+    requested = pd.date_range(start=start_date, end=end_date, freq="D")
+    requested_strs = [d.strftime("%Y-%m-%d") for d in requested]
+    unauthorized = [d for d in requested_strs if d not in set(authorized)]
+    if unauthorized:
+        raise UnauthorizedExecutionDomainError(
+            f"UNAUTHORIZED_EXECUTION_DATE: requested window [{start_date} to {end_date}] "
+            f"includes {unauthorized}, which this study does not authorize. "
+            f"Authorized dates: {authorized}"
+        )
+    return authorized
+
+
 PRODUCT_CATALOGS: Dict[str, Dict[str, Any]] = {
     "NQ": {
         "symbol": "NQ",
@@ -192,6 +255,10 @@ def resolve_data_plan(
                 f"fall outside authorized study chronology (authorized: {sorted(authorized_years)}, "
                 f"requested contains: {sorted(unauthorized)})"
             )
+
+    # 2b. Exact authorized-date check. Runs after the year gates because a date outside
+    # the authorized years should still be reported as a chronology violation first.
+    enforce_authorized_dates(compiled_data, start_date, end_date)
 
     # 3. OOS / Dev Phase Lock check
     dev_years = set(chrono.dev or [])

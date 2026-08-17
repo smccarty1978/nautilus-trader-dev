@@ -125,6 +125,13 @@ def check_research_decision_fidelity(study_dir: Path) -> Dict[str, Any]:
             "use_2024_to_change_model_design",
             "introduce_unconstrained_search",
             "unauthorized_feature_discovery",
+            # Counterpart of exact bounded date authorization
+            # (execution.data_requirements.authorized_dates, enforced in
+            # backtests/nt_runtime/data_plan.py::enforce_authorized_dates). A study that
+            # declares exact dates needs a way to say that widening them is prohibited;
+            # without this token the decision contract could not express the constraint
+            # the runtime enforces.
+            "expansion_beyond_authorized_dates",
         }
         for prohibited in decision.prohibited_changes:
             if prohibited not in KNOWN_PROHIBITIONS:

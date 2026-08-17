@@ -102,6 +102,12 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
     bound_trackers: set = set()
     families: set = set()
     timeframes: set = set()
+    # An explicit feature_list bypasses the verified-universe filter above, so the
+    # lifecycle status of each named feature is recorded here. Without it a contract can
+    # name a `provisional` feature while the study's `features.source` claims a verified
+    # universe, and nothing in the compiled artifacts contradicts the claim.
+    feature_statuses: Dict[str, str] = {}
+    null_policies: Dict[str, str] = {}
 
     for name in feature_list:
         if name not in FEATURE_REGISTRY:
@@ -114,6 +120,8 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
                 families.add(feat_def.family)
             if feat_def.source_timeframe:
                 timeframes.add(feat_def.source_timeframe)
+            feature_statuses[name] = feat_def.status
+            null_policies[name] = feat_def.null_policy
 
     if unregistered:
         raise FeatureBindingError(
@@ -129,6 +137,11 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
         "bound_trackers": sorted(list(bound_trackers)),
         "families": sorted(list(families)),
         "source_timeframes": sorted(list(timeframes)),
+        "feature_statuses": feature_statuses,
+        "feature_null_policies": null_policies,
+        "contains_provisional_features": sorted(
+            n for n, s in feature_statuses.items() if s != "verified"
+        ),
         "directional_mapping": features_spec.directional_mapping or "direction_normalized",
         "timing_contract": features_spec.timing_contract or "verified",
     }

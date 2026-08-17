@@ -26,12 +26,22 @@ from features.trackers.rolling_5m_productivity import Rolling5mProductivityTrack
 from features.trackers.structural_regime_geometry import StructuralRegimeGeometryTracker
 from features.trackers.wick import WickTracker
 from features.registry import FEATURE_REGISTRY
+from utils.session_boundaries import is_in_session, session_close_ns
 
 from datetime import datetime, timezone
 import pytz
 
 NS = 1_000_000_000
 CT = pytz.timezone("America/Chicago")
+
+# Terminal dispositions. Every emitted candidate reaches exactly one of these.
+DISPOSITION_POSITIVE = "LABELED_POSITIVE"
+DISPOSITION_NEGATIVE = "LABELED_NEGATIVE"
+DISPOSITION_CENSORED = "CENSORED"
+
+# Why a candidate was censored rather than labeled.
+CENSOR_SESSION_END = "SESSION_END"
+CENSOR_DATA_END = "DATA_END"
 PROGRESS_GAP_NS = 120 * NS
 CANDIDATE_STEP_NS = 5 * NS
 CANDIDATE_TIMEOUT_NS = 1800 * NS
@@ -149,6 +159,8 @@ class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
     established_required: bool = True
     checkpoint_interval_seconds: int = 5
     feature_list: Optional[List[str]] = None
+    session: str = "RTH"                     # resolved via utils.session_boundaries
+    session_end_censoring: bool = True       # from target_contract.censoring_policy
 
 
 class FlipPredictionCollector(Strategy):
@@ -210,6 +222,8 @@ class FlipPredictionCollector(Strategy):
         self.minute_1s_buffer: List[Tuple[int, float, float, float, float]] = []
         self.was_rth: bool = False
         self.last_close: Optional[float] = None
+        # Latest observed event time, used to stamp when a run-end censoring occurred.
+        self.last_ts_seen: Optional[int] = None
 
         # Telemetry & Output logs
         self.candidates_log: List[Dict[str, Any]] = []
@@ -269,7 +283,7 @@ class FlipPredictionCollector(Strategy):
             self._current_5m_low = float("inf")
 
         # 3. Handle session and RTH transitions for OHLCV Tracker
-        is_rth_now = (ts_pd.hour > 8 or (ts_pd.hour == 8 and ts_pd.minute >= 30)) and (ts_pd.hour < 15 or (ts_pd.hour == 15 and ts_pd.minute <= 15))
+        is_rth_now = is_in_session(ts_avail, self.cfg.session)
         if is_rth_now and not self.was_rth:
             self.ohlcv_tracker.reset_rth(ts_avail)
             if self.ring:
@@ -316,24 +330,143 @@ class FlipPredictionCollector(Strategy):
         self.wick_tracker.update(o, h, l, c)
         self.bars_since_breach_1m.append(bar)
 
+    def _track_pending(self, cand_record: Dict[str, Any], T: int) -> None:
+        """Registers a freshly emitted candidate for terminal disposition.
+
+        Deliberately a separate, narrow dict rather than the candidate record itself:
+        ``horizon_end_ts``/``session_close_ts`` are resolution bookkeeping, and the output
+        contract in ``OutputManager.persist_collection`` rejects columns the study never
+        declared. They belong to the observation surface, not the feature surface.
+        """
+        self.pending_candidates.append({
+            "observation_ts": cand_record["observation_ts"],
+            "regime_start_ns": cand_record["regime_start_ns"],
+            "regime_direction": cand_record["regime_direction"],
+            "checkpoint_index": cand_record["checkpoint_index"],
+            "horizon_end_ts": T + int(self.cfg.horizon_seconds) * NS,
+            "session_close_ts": (
+                session_close_ns(T, self.cfg.session)
+                if self.cfg.session_end_censoring else None
+            ),
+        })
+
+    def _emit_observation(
+        self,
+        cand: Dict[str, Any],
+        disposition: str,
+        flip_ts: Optional[int],
+        censor_reason: Optional[str] = None,
+        censored_at_ts: Optional[int] = None,
+    ) -> None:
+        """Records the single terminal disposition of one candidate.
+
+        Every emitted candidate passes through here exactly once. A candidate that simply
+        stopped being tracked -- which is what used to happen to anything still pending
+        when the run ended -- has no row at all, and a population that silently loses its
+        unresolved members is conditioned on the future.
+        """
+        cand_ts = cand["observation_ts"]
+        time_to_flip_s = ((flip_ts - cand_ts) / NS) if flip_ts is not None else None
+
+        self.observations_log.append({
+            "observation_ts": cand_ts,
+            "regime_start_ns": cand["regime_start_ns"],
+            "regime_direction": cand["regime_direction"],
+            "checkpoint_index": cand["checkpoint_index"],
+            "flip_ts": flip_ts,
+            "time_to_flip_seconds": time_to_flip_s,
+            "target_flip_within_horizon": (
+                1 if disposition == DISPOSITION_POSITIVE
+                else 0 if disposition == DISPOSITION_NEGATIVE
+                else None
+            ),
+            "disposition": disposition,
+            "censored": int(disposition == DISPOSITION_CENSORED),
+            "censor_reason": censor_reason,
+            "horizon_end_ts": cand.get("horizon_end_ts"),
+            "session_close_ts": cand.get("session_close_ts"),
+            "resolved_at_ts": censored_at_ts if flip_ts is None else flip_ts,
+        })
+
+    def _sweep_elapsed_horizons(self, now_ts: int) -> None:
+        """Resolves pending candidates whose horizon has fully elapsed with no flip.
+
+        Called on every completed 1s bar. Resolving at horizon expiry rather than at the
+        next flip matters for two reasons: the label stops depending on an event outside
+        the horizon, and the recorded ``flip_ts`` stops carrying a timestamp the candidate
+        was never entitled to see.
+        """
+        if not self.pending_candidates:
+            return
+        still_pending: List[Dict[str, Any]] = []
+        for cand in self.pending_candidates:
+            horizon_end = cand["horizon_end_ts"]
+            if horizon_end > now_ts:
+                still_pending.append(cand)
+                continue
+            # Horizon fully elapsed without an opposing flip.
+            if self._is_censored_by_session(cand):
+                self._emit_observation(
+                    cand, DISPOSITION_CENSORED, None,
+                    censor_reason=CENSOR_SESSION_END, censored_at_ts=now_ts,
+                )
+            else:
+                self._emit_observation(cand, DISPOSITION_NEGATIVE, None, censored_at_ts=horizon_end)
+        self.pending_candidates = still_pending
+
+    def _is_censored_by_session(self, cand: Dict[str, Any]) -> bool:
+        """True when the candidate's horizon extends past its own session close.
+
+        ``target_contract.censoring_policy.session_end_censoring`` declares this. Such a
+        candidate cannot be labeled from in-session data: a 'no flip' verdict would rest
+        on a window the session never covered, and a 'flip' verdict would rest on price
+        action from the next session.
+        """
+        if not self.cfg.session_end_censoring:
+            return False
+        session_close = cand.get("session_close_ts")
+        if session_close is None:
+            return False
+        return cand["horizon_end_ts"] > session_close
+
+    def on_stop(self) -> None:
+        """Disposes every still-pending candidate before the run ends.
+
+        Without this the collector simply dropped them. The candidates were already in
+        ``candidates.parquet``; their absence from ``observations.parquet`` is exactly the
+        future-conditioned selection the censoring policy exists to prevent.
+        """
+        for cand in self.pending_candidates:
+            reason = (
+                CENSOR_SESSION_END if self._is_censored_by_session(cand) else CENSOR_DATA_END
+            )
+            self._emit_observation(
+                cand, DISPOSITION_CENSORED, None,
+                censor_reason=reason, censored_at_ts=self.last_ts_seen,
+            )
+        self.pending_candidates = []
+
     def _on_regime_flip(self, new_regime: int, flip_ts: int, open_price: float, close_price: float, atr_val: float) -> None:
         # Resolve pending observations on opposing flip
         target_dir = -self.active_regime_dir if self.is_both_directions else self.target_dir
         if (self.active_regime_dir in (-1, 1)) and new_regime == target_dir:
             for cand in self.pending_candidates:
                 cand_ts = cand["observation_ts"]
-                time_to_flip_s = (flip_ts - cand_ts) / NS
-                flip_within_horizon = 0.0 <= time_to_flip_s <= self.cfg.horizon_seconds
+                within_horizon = cand_ts <= flip_ts <= cand["horizon_end_ts"]
 
-                self.observations_log.append({
-                    "observation_ts": cand_ts,
-                    "regime_start_ns": cand["regime_start_ns"],
-                    "regime_direction": cand["regime_direction"],
-                    "checkpoint_index": cand["checkpoint_index"],
-                    "flip_ts": flip_ts,
-                    "time_to_flip_seconds": time_to_flip_s,
-                    "target_flip_within_horizon": int(flip_within_horizon),
-                })
+                if self._is_censored_by_session(cand):
+                    # The horizon reached past the session close, so this candidate is
+                    # censored whether or not a flip happened to land inside it.
+                    self._emit_observation(
+                        cand, DISPOSITION_CENSORED, None,
+                        censor_reason=CENSOR_SESSION_END, censored_at_ts=flip_ts,
+                    )
+                elif within_horizon:
+                    self._emit_observation(cand, DISPOSITION_POSITIVE, flip_ts)
+                else:
+                    # Horizon already elapsed; the sweep should normally have caught it.
+                    self._emit_observation(cand, DISPOSITION_NEGATIVE, None,
+                                           censored_at_ts=cand["horizon_end_ts"])
             self.pending_candidates.clear()
 
         # Reset regime state
@@ -403,7 +536,13 @@ class FlipPredictionCollector(Strategy):
                 self._evaluate_checkpoint(T, price_at_T=c, direction=self.active_regime_dir, triggering_1s_ts_init=ts_avail)
                 self.next_checkpoint_index += 1
 
+        # Resolve any candidate whose forward horizon has now fully elapsed. Ordered
+        # after checkpoint evaluation so a candidate declared at T is never swept by the
+        # same bar that created it.
+        self._sweep_elapsed_horizons(ts_avail)
+
         self.last_close = c
+        self.last_ts_seen = ts_avail
 
     def _compute_running_mfe(self, direction: int) -> float:
         atr = self.regime_frozen_atr
@@ -434,7 +573,9 @@ class FlipPredictionCollector(Strategy):
 
         ts_pd = pd.Timestamp(T, tz="UTC").tz_convert("America/Chicago")
         minutes_since_open = (ts_pd.hour - 8) * 60 + (ts_pd.minute - 30)
-        is_rth = 1.0 if (ts_pd.hour > 8 or (ts_pd.hour == 8 and ts_pd.minute >= 30)) and (ts_pd.hour < 15) else 0.0
+        # Canonical boundary, not a third inline re-derivation (this one previously
+        # ended RTH at 15:00 while the accumulator above ended it at 15:15).
+        is_rth = 1.0 if is_in_session(T, self.cfg.session) else 0.0
 
         return {
             "ema_slope_short": float(ema_slope_short),
@@ -471,11 +612,10 @@ class FlipPredictionCollector(Strategy):
             if not (regime_age_s >= self.cfg.age_gate_seconds and current_mfe >= 1.0 and self.mfe_progress_count >= 2 and retained >= 0.5):
                 return
 
-        # RTH session check (08:30 - 15:00 CT)
-        dt_utc = datetime.fromtimestamp(T / 1e9, tz=timezone.utc)
-        dt_ct = dt_utc.astimezone(CT)
-        minute_of_day = dt_ct.hour * 60 + dt_ct.minute
-        if not (510 <= minute_of_day < 900):
+        # Declared-session gate, resolved through the canonical boundary module.
+        # This previously read `510 <= minute_of_day < 900` (08:30-15:00), silently
+        # disagreeing with the 08:30-15:15 window used elsewhere in this same file.
+        if not is_in_session(T, self.cfg.session):
             return
 
         trade_dir = -direction
@@ -676,7 +816,7 @@ class FlipPredictionCollector(Strategy):
                 cand_record[col] = all_computed_60.get(col, None)
 
             self.candidates_log.append(cand_record)
-            self.pending_candidates.append(cand_record)
+            self._track_pending(cand_record, T)
             return
 
         # Extract features causally from all trackers (general exploratory fallback)
@@ -747,7 +887,7 @@ class FlipPredictionCollector(Strategy):
         }
 
         self.candidates_log.append(cand_record)
-        self.pending_candidates.append(cand_record)
+        self._track_pending(cand_record, T)
 
     def get_candidates_dataframe(self) -> pd.DataFrame:
         if not self.candidates_log:

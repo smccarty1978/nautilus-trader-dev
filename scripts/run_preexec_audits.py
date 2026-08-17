@@ -23,10 +23,11 @@ import argparse
 import datetime
 import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -497,6 +498,167 @@ def _reject_report_reuse(
             )
 
 
+PASS_LEDGER_NAME = "pass_ledger.json"
+
+
+def _read_pass_ledger(study_dir: Path) -> List[Dict[str, Any]]:
+    """Reads the append-only pass ledger, failing closed on corruption."""
+    ledger_p = study_dir / "audit" / PASS_LEDGER_NAME
+    if not ledger_p.is_file():
+        return []
+    try:
+        data = json.loads(ledger_p.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as err:
+        raise AuditArtifactParseError(
+            f"PASS_LEDGER_UNREADABLE: {ledger_p} exists but could not be parsed ({err}). "
+            f"An unreadable immutability ledger is not a satisfied control."
+        )
+    if not isinstance(data, dict) or not isinstance(data.get("entries"), list):
+        raise AuditArtifactParseError(
+            f"PASS_LEDGER_MALFORMED: {ledger_p} must be an object with an 'entries' list."
+        )
+    return data["entries"]
+
+
+def enforce_pass_immutability(
+    study_dir: Path,
+    audit_type: str,
+    pass_num: int,
+    composite_sha256: str,
+    report_sha256: str,
+) -> None:
+    """A pass number, once issued, describes one composite forever (B1).
+
+    The failed acceptance test rewrote ``pass_01.md`` in place after execution-affecting
+    code changed, then re-issued a status against it. Every existing control passed: the
+    report declared the *new* composite, so the freshness check was satisfied, and the
+    status pointed at a real file whose SHA matched. What was lost is that pass 01 had
+    ever described anything else. Audit history became a single mutable slot.
+
+    Two rules restore it, both read from an append-only ledger:
+
+    ``AUDIT_PASS_IMMUTABLE``
+        (audit_type, pass) is already recorded against different content. Re-issuing the
+        *identical* report for the identical composite stays allowed, so a retry is not
+        punished; changing either is refused.
+    ``AUDIT_PASS_NUMBER_STALE``
+        a new composite must take a *new* pass number, higher than every pass already
+        issued for that gate. This is what makes `pass_01 -> composite A`,
+        `pass_02 -> composite B` the only expressible ordering.
+    """
+    entries = _read_pass_ledger(study_dir)
+    same_gate = [e for e in entries if e.get("audit_type") == audit_type]
+
+    for e in same_gate:
+        if e.get("pass") != pass_num:
+            continue
+        if e.get("audited_execution_composite_sha256") == composite_sha256 and \
+                e.get("audit_report_sha256") == report_sha256:
+            return  # byte-identical re-issue of the same evidence
+        raise AuditArtifactParseError(
+            f"AUDIT_PASS_IMMUTABLE: {audit_type} pass {pass_num:02d} is already recorded against "
+            f"composite {str(e.get('audited_execution_composite_sha256'))[:12]}... "
+            f"(report {str(e.get('audit_report_sha256'))[:12]}...). This issuance carries composite "
+            f"{composite_sha256[:12]}... (report {report_sha256[:12]}...). Existing audit evidence is "
+            f"immutable - file this review under a new pass number."
+        )
+
+    prior_composites = {
+        e.get("audited_execution_composite_sha256") for e in same_gate
+    }
+    if prior_composites and composite_sha256 not in prior_composites:
+        max_pass = max(int(e.get("pass", 0)) for e in same_gate)
+        if pass_num <= max_pass:
+            raise AuditArtifactParseError(
+                f"AUDIT_PASS_NUMBER_STALE: composite {composite_sha256[:12]}... has not been audited "
+                f"under the {audit_type} gate, and pass {pass_num:02d} is not greater than the "
+                f"highest issued pass ({max_pass:02d}). A new audited composite requires a new "
+                f"immutable pass artifact; use pass {max_pass + 1:02d}."
+            )
+
+
+def append_pass_ledger_entry(
+    study_dir: Path,
+    audit_type: str,
+    pass_num: int,
+    composite_sha256: str,
+    report_sha256: str,
+    auditor: str,
+    reviewer_provenance: Dict[str, Any],
+) -> None:
+    """Appends an issuance record. Never rewrites or removes an existing entry."""
+    ledger_p = study_dir / "audit" / PASS_LEDGER_NAME
+    entries = _read_pass_ledger(study_dir)
+
+    for e in entries:
+        if e.get("audit_type") == audit_type and e.get("pass") == pass_num:
+            return  # already recorded; enforce_pass_immutability proved it identical
+
+    entries.append({
+        "audit_type": audit_type,
+        "pass": pass_num,
+        "audited_execution_composite_sha256": composite_sha256,
+        "audit_report_sha256": report_sha256,
+        "audit_report_path": f"audit/{REPORT_FILENAMES[audit_type].format(n=pass_num)}",
+        "auditor": auditor,
+        "reviewer_provenance_strength": reviewer_provenance.get("provenance_strength"),
+        "issued_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    })
+
+    ledger_p.parent.mkdir(parents=True, exist_ok=True)
+    tmp = ledger_p.with_suffix(".json.tmp")
+    tmp.write_text(
+        json.dumps({"ledger_version": 1, "entries": entries}, indent=2), encoding="utf-8"
+    )
+    os.replace(tmp, ledger_p)
+
+
+def build_reviewer_provenance(
+    auditor: str,
+    identity_source: str,
+    transcript_path: Optional[Path],
+) -> Dict[str, Any]:
+    """Records exactly how strongly the reviewer identity is evidenced (B2).
+
+    Distinct-auditor enforcement is, and remains, a comparison of two declared strings.
+    It cannot prove two humans. Rather than dress that up, this records the strength
+    explicitly so a consumer can never read silence as authentication:
+
+    ``DECLARED_IDENTITY_ONLY``
+        a name was declared and is distinct from the sibling gate's. Nothing binds it
+        to a session. This is the honest default.
+    ``SESSION_BOUND``
+        a real transcript artifact was supplied and hashed, so the review is bound to
+        a concrete session artifact that exists on disk.
+
+    ``independence_proven`` is always False: neither level proves human independence,
+    and a field that sometimes claimed otherwise would be the defect this replaces.
+    No fake transcript is ever synthesised to reach the higher level.
+    """
+    session_evidence = None
+    if transcript_path is not None and Path(transcript_path).is_file():
+        session_evidence = {
+            "transcript_path": str(transcript_path),
+            "transcript_sha256": _hash_file(Path(transcript_path)),
+        }
+
+    return {
+        "declared_auditor": auditor,
+        "identity_source": identity_source,
+        "provenance_strength": "SESSION_BOUND" if session_evidence else "DECLARED_IDENTITY_ONLY",
+        "session_evidence": session_evidence,
+        "independence_basis": "distinct_declared_identity_strings",
+        "independence_proven": False,
+        "limitations": [
+            "A declared identity string is not an authenticated reviewer.",
+            "Distinctness across the two gates is enforced; human independence is not proven.",
+        ] + ([] if session_evidence else [
+            "No session/transcript artifact was supplied; absence of session evidence is "
+            "recorded explicitly and must not be read as authenticated independence.",
+        ]),
+    }
+
+
 class AuditReportMissing(AuditArtifactParseError, FileNotFoundError):
     """The report a gate must parse does not exist.
 
@@ -544,12 +706,17 @@ def _validate_gate_report(
 
     report_sha256 = _hash_file(report_file)
     _reject_report_reuse(study_dir, audit_type, report_sha256, report_file)
+    # B1: a new audited composite requires a new immutable pass artifact. Checked in
+    # validation (not issuance) so `--type both` refuses before either status is written.
+    enforce_pass_immutability(study_dir, audit_type, pass_num, composite_sha, report_sha256)
 
     return {
         "audit_type": audit_type,
+        "pass_num": pass_num,
         "report_file": report_file,
         "summary": summary,
         "auditor": resolved_auditor,
+        "identity_source": "cli_author" if auditor else "report_summary",
         "composite_sha256": composite_sha,
         "verdict": verdict,
         "primary": primary,        # critical (causal) / blocking (contract)
@@ -581,7 +748,13 @@ def issue_causal_audit_status_from_report(
     report_sha256 = checked["report_sha256"]
     _, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
 
-    transcript_sha = _hash_file(transcript_path) if transcript_path and transcript_path.exists() else None
+    reviewer_provenance = build_reviewer_provenance(
+        resolved_auditor, checked["identity_source"], transcript_path
+    )
+    transcript_sha = (
+        reviewer_provenance["session_evidence"]["transcript_sha256"]
+        if reviewer_provenance["session_evidence"] else None
+    )
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     status_data = {
@@ -597,6 +770,7 @@ def issue_causal_audit_status_from_report(
         "audit_report_sha256": report_sha256,
         "audit_report_path": f"audit/pass_{pass_num:02d}.md",
         "transcript_sha256": transcript_sha,
+        "reviewer_provenance": reviewer_provenance,
         "derived_by_parser": "scripts/run_preexec_audits.py",
         "audit_provenance_version": AUDIT_PROVENANCE_VERSION,
         "audited_files": file_hashes,
@@ -607,6 +781,10 @@ def issue_causal_audit_status_from_report(
     with open(status_file, "w", encoding="utf-8") as f:
         json.dump(status_data, f, indent=2)
 
+    append_pass_ledger_entry(
+        study_dir, "causal", pass_num, composite_sha, report_sha256,
+        resolved_auditor, reviewer_provenance,
+    )
     return status_data
 
 
@@ -632,7 +810,13 @@ def issue_contract_audit_status_from_report(
     report_sha256 = checked["report_sha256"]
     _, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
 
-    transcript_sha = _hash_file(transcript_path) if transcript_path and transcript_path.exists() else None
+    reviewer_provenance = build_reviewer_provenance(
+        resolved_auditor, checked["identity_source"], transcript_path
+    )
+    transcript_sha = (
+        reviewer_provenance["session_evidence"]["transcript_sha256"]
+        if reviewer_provenance["session_evidence"] else None
+    )
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     status_data = {
@@ -648,6 +832,7 @@ def issue_contract_audit_status_from_report(
         "audit_report_sha256": report_sha256,
         "audit_report_path": f"audit/contract_pass_{pass_num:02d}.md",
         "transcript_sha256": transcript_sha,
+        "reviewer_provenance": reviewer_provenance,
         "derived_by_parser": "scripts/run_preexec_audits.py",
         "audit_provenance_version": AUDIT_PROVENANCE_VERSION,
         "audited_files": file_hashes,
@@ -658,6 +843,10 @@ def issue_contract_audit_status_from_report(
     with open(status_file, "w", encoding="utf-8") as f:
         json.dump(status_data, f, indent=2)
 
+    append_pass_ledger_entry(
+        study_dir, "contract", pass_num, composite_sha, report_sha256,
+        resolved_auditor, reviewer_provenance,
+    )
     return status_data
 
 
@@ -857,8 +1046,17 @@ def main() -> int:
                         help="Identity of the independent auditor supplying --ingest (required with --ingest).")
     parser.add_argument("--allow-overwrite", action="store_true",
                         help="Permit --ingest to replace an existing pass artifact.")
+    parser.add_argument("--transcript", type=str, default=None,
+                        help="Path to a real reviewer session/transcript artifact. When supplied it "
+                             "is hashed and the status records provenance_strength=SESSION_BOUND. "
+                             "Absent, the status records DECLARED_IDENTITY_ONLY explicitly.")
     parser.add_argument("--type", choices=["causal", "contract", "both"], default="both", help="Audit type")
     args = parser.parse_args()
+    transcript_p = Path(args.transcript) if args.transcript else None
+    if transcript_p is not None and not transcript_p.is_file():
+        print(f"[ERROR] TRANSCRIPT_MISSING: {transcript_p} does not exist. A session artifact "
+              f"is never synthesised to satisfy provenance.", file=sys.stderr)
+        return 2
 
     study_dir = Path(args.study).resolve()
 
@@ -906,7 +1104,7 @@ def main() -> int:
 
         if args.type in ("causal", "both"):
             c_status = issue_causal_audit_status_from_report(
-                study_dir, args.pass_num, auditor=args.author
+                study_dir, args.pass_num, auditor=args.author, transcript_path=transcript_p
             )
             print(f"CAUSAL AUDIT STATUS (Pass {args.pass_num:02d}): Verdict={c_status['verdict']} "
                   f"(Critical: {c_status['critical']}, Warning: {c_status['warning']}) "
@@ -914,7 +1112,7 @@ def main() -> int:
 
         if args.type in ("contract", "both"):
             k_status = issue_contract_audit_status_from_report(
-                study_dir, args.pass_num, auditor=args.author
+                study_dir, args.pass_num, auditor=args.author, transcript_path=transcript_p
             )
             print(f"CONTRACT AUDIT STATUS (Pass {args.pass_num:02d}): Verdict={k_status['verdict']} "
                   f"(Blocking: {k_status['blocking']}, Warning: {k_status['warning']}) "

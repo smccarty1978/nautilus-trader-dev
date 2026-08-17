@@ -271,9 +271,12 @@ def test_wick_tracker():
     val2 = compute_wick_imbalance(104.0, 105.0, 99.0, 101.0)
     assert val2 == pytest.approx(-1.0 / 6.0)
 
-    # Test tracker update & calculate
+    # Test tracker update & calculate.
+    # Before any completed 1m bar the feature is UNAVAILABLE, not zero: 0.0 is a real
+    # reading (balanced wick, or a zero-range bar) and the two must stay distinguishable.
+    # See scripts/tests/test_wick_availability.py for the full four-state matrix.
     tracker = WickTracker()
-    assert tracker.calculate()["latest_1m_wick_imbalance"] == 0.0
+    assert tracker.calculate()["latest_1m_wick_imbalance"] is None
     tracker.update(101.0, 105.0, 100.0, 103.0)
     assert tracker.calculate()["latest_1m_wick_imbalance"] == pytest.approx(0.2)
 

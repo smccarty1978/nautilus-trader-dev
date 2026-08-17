@@ -47,8 +47,18 @@ def resolve_run_plan(
     auth_years = sorted((chrono.train or []) + (chrono.dev or []))
     default_year = train_years[-1] if train_years else (auth_years[-1] if auth_years else 2023)
 
+    # When a study declares exact authorized dates, they are the default reference too.
+    # Otherwise a bounded study would still default to `<year>-03-03` and be refused
+    # downstream for a date the caller never chose.
+    from backtests.nt_runtime.data_plan import resolve_authorized_dates
+
+    authorized_dates = resolve_authorized_dates(compiled_data)
+
     if reference_date is None:
-        ref_dt = pd.Timestamp(f"{default_year}-03-03", tz="UTC")
+        if authorized_dates:
+            ref_dt = pd.Timestamp(authorized_dates[0], tz="UTC")
+        else:
+            ref_dt = pd.Timestamp(f"{default_year}-03-03", tz="UTC")
     else:
         ref_dt = pd.Timestamp(reference_date, tz="UTC")
 
@@ -67,7 +77,12 @@ def resolve_run_plan(
         # End of month
         end_date = (ref_dt.replace(day=1) + pd.offsets.MonthEnd(1)).strftime("%Y-%m-%d")
     elif stage_enum == RunStage.FULL:
-        if train_years:
+        if authorized_dates:
+            # 'full' for a date-bounded study means its authorized dates, not its years.
+            # Expanding to a whole calendar year would silently exceed the authorization.
+            start_date = authorized_dates[0]
+            end_date = authorized_dates[-1]
+        elif train_years:
             start_date = f"{train_years[0]}-01-01"
             end_date = f"{train_years[-1]}-12-31"
         elif auth_years:

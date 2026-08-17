@@ -25,17 +25,100 @@ For bars labeled at completed CLOSE time $T$:
 from __future__ import annotations
 
 import datetime
-from typing import Sequence, Tuple, Union
+from typing import List, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 import pytz
 
 CT = pytz.timezone("America/Chicago")
 
+# ---------------------------------------------------------------------------
+# The single authoritative session window definition.
+#
+# These constants exist because `strategies/flip_prediction_collector.py` carried
+# THREE different inline session boundaries at once: the OHLCV accumulator used
+# 08:30-15:15, the candidate emission gate used `510 <= minute_of_day < 900`
+# (08:30-15:00), and the `is_rth` context feature used `hour < 15` (08:30-15:00).
+# The population contract said only `session: "RTH"`, which cannot arbitrate between
+# them. Anything asking "is this RTH?" must import from here rather than re-deriving
+# a boundary inline.
+#
+# 08:30-15:15 CT is the project-canonical RTH window (AGENTS.md, "Session Definitions").
+# ---------------------------------------------------------------------------
+RTH_START = datetime.time(8, 30, 0)
+RTH_END = datetime.time(15, 15, 0)
+
+SESSION_WINDOWS = {
+    "RTH": (RTH_START, RTH_END),
+    "ETH": None,   # the complement of RTH; not a single contiguous daily window
+    "ALL": None,   # no session restriction
+}
+
 
 class SessionBoundaryViolation(AssertionError):
     """Raised when a boundary timestamp is misattributed."""
     pass
+
+
+class UnknownSessionError(ValueError):
+    """Raised when a study declares a session this module cannot resolve."""
+    pass
+
+
+def resolve_session_window(session: str) -> Tuple[datetime.time, datetime.time]:
+    """Resolves a declared session name to explicit CT open/close times.
+
+    Fails closed on an unknown name: a session the runtime cannot resolve must never
+    silently degrade to "no restriction", which would widen the study population.
+    """
+    key = (session or "").strip().upper()
+    if key not in SESSION_WINDOWS:
+        raise UnknownSessionError(
+            f"UNKNOWN_SESSION: {session!r} is not a resolvable session. Known: "
+            f"{sorted(SESSION_WINDOWS)}"
+        )
+    window = SESSION_WINDOWS[key]
+    if window is None:
+        raise UnknownSessionError(
+            f"SESSION_NOT_A_CONTIGUOUS_WINDOW: {key!r} has no single daily open/close window. "
+            f"Only 'RTH' defines one."
+        )
+    return window
+
+
+def _to_ct(ts_ns: int) -> pd.Timestamp:
+    return pd.Timestamp(int(ts_ns), tz="UTC").tz_convert(CT)
+
+
+def is_in_session(ts_ns: int, session: str = "RTH") -> bool:
+    """Is a completed-bar close timestamp (ns, UTC) inside the declared session?
+
+    Uses the same half-open ``(start, end]`` attribution as the classifiers above: a bar
+    closing exactly at the open belongs to the period *before* the open.
+    """
+    key = (session or "").strip().upper()
+    if key == "ALL":
+        return True
+    if key == "ETH":
+        return not is_in_session(ts_ns, "RTH")
+    start, end = resolve_session_window(key)
+    ts = _to_ct(ts_ns)
+    t = ts.time()
+    return (t > start) and (t <= end) and (ts.weekday() < 5)
+
+
+def session_close_ns(ts_ns: int, session: str = "RTH") -> int:
+    """Nanosecond UTC timestamp of the session close on the CT calendar day of ``ts_ns``.
+
+    This is what makes ``session_end_censoring`` computable: a candidate whose forward
+    horizon extends past this instant cannot be resolved from in-session data alone.
+    """
+    _start, end = resolve_session_window(session)
+    ts = _to_ct(ts_ns)
+    close_ct = ts.normalize() + pd.Timedelta(
+        hours=end.hour, minutes=end.minute, seconds=end.second
+    )
+    return int(close_ct.tz_convert("UTC").value)
 
 
 def is_rth_completed_bar_1m(ts: Union[pd.Timestamp, datetime.datetime, int]) -> bool:

@@ -1,0 +1,52 @@
+study:
+  id: es_wick_imbalance_acceptance_v2
+  type: flip_prediction
+  risk_tier: 2
+  description: Workflow acceptance re-test of latest_1m_wick_imbalance on ES RTH,
+    bounded to 2024-09-03/04/05. Descriptive only; no economic interpretation, no
+    model fitting. Supersedes es_wick_imbalance_exploratory, whose artifacts are preserved
+    unchanged as forensic evidence of the first (failed) acceptance attempt.
+operation:
+  kind: train_evaluate
+  target_metric: roc_auc
+instrument:
+  symbol: ES
+  venue: XCME
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+target:
+  type: flip
+  event: prevailing_1m_regime_transition
+  direction: both
+  horizon_seconds: 300
+features:
+  source: explicit_feature_list
+  feature_list:
+  - latest_1m_wick_imbalance
+  timing_contract: verified
+model:
+  mode: scoring
+  family: HistGradientBoostingClassifier
+chronology:
+  train:
+  - 2024
+  dev: []
+  prohibited:
+  - 2025
+  - 2026
+stratification: {}
+baseline: {}
+lineage: {}
+execution:
+  runtime: nautilustrader
+  data_requirements:
+    authorized_dates:
+    - '2024-09-03'
+    - '2024-09-04'
+    - '2024-09-05'
+  progress_seconds: 60
+  bounded: true
+acceptance: {}
+bespoke: {}

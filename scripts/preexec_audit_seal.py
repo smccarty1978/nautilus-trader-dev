@@ -174,6 +174,44 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
             f"Run a new Contract Audit pass against the updated code before sealing."
         )
 
+    # 2b. Reviewer provenance must be recorded, and must not overclaim (B2).
+    # The seal is where "two independent reviewers cleared this" is asserted, so it is
+    # where the strength of that assertion has to be carried rather than assumed.
+    provenance_summary = {}
+    for label, data in (("causal", status_data), ("contract", contract_status_data)):
+        rp = data.get("reviewer_provenance")
+        if not isinstance(rp, dict):
+            raise PreexecAuditStaleError(
+                f"REVIEWER_PROVENANCE_ABSENT: {label} status records no 'reviewer_provenance'. "
+                f"Re-issue the status with scripts/run_preexec_audits.py so the strength of the "
+                f"reviewer identity is stated explicitly instead of being inferred from a role name."
+            )
+        if rp.get("independence_proven") is True:
+            raise PreexecAuditStaleError(
+                f"REVIEWER_PROVENANCE_OVERCLAIM: {label} status asserts independence_proven=True. "
+                f"This workflow enforces distinct declared identities; it does not prove human "
+                f"independence, and no artifact may claim that it does."
+            )
+        strength = rp.get("provenance_strength")
+        if strength not in ("DECLARED_IDENTITY_ONLY", "SESSION_BOUND"):
+            raise PreexecAuditStaleError(
+                f"REVIEWER_PROVENANCE_INVALID: {label} status declares unknown "
+                f"provenance_strength={strength!r}"
+            )
+        if strength == "SESSION_BOUND":
+            ev = rp.get("session_evidence") or {}
+            if not ev.get("transcript_sha256"):
+                raise PreexecAuditStaleError(
+                    f"REVIEWER_PROVENANCE_INVALID: {label} status claims SESSION_BOUND without a "
+                    f"transcript hash."
+                )
+        provenance_summary[label] = {
+            "declared_auditor": rp.get("declared_auditor"),
+            "provenance_strength": strength,
+            "independence_proven": False,
+            "independence_basis": rp.get("independence_basis"),
+        }
+
     # 3. Include audit files in overall sealed file hashes
     all_sealed_hashes = dict(exec_file_hashes)
     all_sealed_hashes["study:audit/status.json"] = _hash_file(status_file)
@@ -195,6 +233,7 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
         "study_name": study_dir.name,
         "seal_status": "LOCKED",
         "composite_seal_hash": current_composite_sha,
+        "reviewer_provenance": provenance_summary,
         "causal_audit_verdict": status_data,
         "contract_audit_verdict": contract_status_data,
         "file_hashes": all_sealed_hashes,

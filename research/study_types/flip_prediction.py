@@ -14,6 +14,7 @@ from research.engines.feature_binding_engine import compile_feature_contract
 from research.engines.timestamp_engine import compile_timestamp_contract
 from research.engines.lineage_engine import validate_lineage
 from research.engines.baseline_engine import validate_baseline
+from research.engines.deliverables_engine import compile_deliverables_contract, modes_for_operation
 
 
 class FlipPredictionCompiler(BaseStudyCompiler):
@@ -72,12 +73,19 @@ class FlipPredictionCompiler(BaseStudyCompiler):
             },
         }
 
+        # Deliverables are mode-partitioned and machine-readable so the contract-checker
+        # consumes an authority instead of assembling its own checklist (F1).
+        deliverables_contract = compile_deliverables_contract(
+            modes=modes_for_operation(spec.operation.kind)
+        )
+
         contracts = {
             "population_contract": pop_contract,
             "target_contract": target_contract,
             "feature_contract": feat_contract,
             "execution_contract": exec_contract,
             "timestamp_contract": ts_contract,
+            "deliverables_contract": deliverables_contract,
             "lineage": lineage_info,
             "baseline": baseline_info,
         }
@@ -113,6 +121,18 @@ class FlipPredictionCompiler(BaseStudyCompiler):
         target = spec.target
         feat = contracts["feature_contract"]
         chrono = spec.chronology
+
+        deliv = contracts["deliverables_contract"]
+        authorized_modes = ", ".join(f"`{m}`" for m in deliv["authorized_modes"])
+        lines = []
+        for mode, artifacts in deliv["deliverables_by_mode"].items():
+            lines.append(f"### Mode `{mode}`")
+            lines.append("")
+            for a in artifacts:
+                meta = deliv["artifact_metadata"][a]
+                lines.append(f"- `{a}` -- written to `{meta['relative_to']}` by `{meta['producer']}`")
+            lines.append("")
+        deliverables_section = "\n".join(lines).rstrip()
 
         return f"""# SPEC: {spec.study.id}
 
@@ -152,12 +172,19 @@ class FlipPredictionCompiler(BaseStudyCompiler):
 
 ---
 
-## 4. Deliverables & Acceptance
+## 4. Deliverables Manifest & Acceptance
 
-- `candidates.parquet`
-- `scores.parquet`
-- `triggers.parquet`
-- `metrics.json`
+Authoritative source: `config/deliverables_contract.json`. This section is **rendered
+from** that contract, never hand-listed. The contract-checker consumes the JSON, not this
+prose, so the two cannot drift and the checker cannot substitute a scope of its own.
+
+Deliverables are partitioned by mode: a mode is only accountable for artifacts it can
+actually produce, and an artifact belonging to a mode this study is not authorized to run
+is out of scope rather than missing.
+
+**Authorized modes:** {authorized_modes}
+
+{deliverables_section}
 """
 
     def _render_task_packet(self, spec: StudySpec, spec_hash: str, contracts: Dict[str, Any]) -> Dict[str, Any]:

@@ -91,20 +91,67 @@ def measure_catalog_bar_semantics(
     }
 
 
+def resolve_catalog_for_symbol(instrument_symbol: str) -> str:
+    """Resolves a product symbol to its catalog, using the runtime's own registry.
+
+    ``PRODUCT_CATALOGS`` in ``backtests/nt_runtime/data_plan.py`` is what actually decides
+    which catalog a run loads. Compiling the timestamp contract from a *different* source
+    of truth is how an ES study came to carry NQ measurements: the previous signature
+    accepted ``instrument_symbol`` and then ignored it, defaulting the catalog path to
+    ``data/catalog/NQ_v0_2020_2026`` for every instrument.
+    """
+    from backtests.nt_runtime.data_plan import PRODUCT_CATALOGS
+
+    sym = (instrument_symbol or "").strip().upper()
+    if sym not in PRODUCT_CATALOGS:
+        raise CatalogTimestampSemanticError(
+            f"UNSUPPORTED_INSTRUMENT: no catalog registered for {instrument_symbol!r}. "
+            f"Known products: {sorted(PRODUCT_CATALOGS)}. A timestamp contract must be "
+            f"measured on the instrument's own catalog, never on another product's."
+        )
+    return PRODUCT_CATALOGS[sym]["catalog_rel_path"]
+
+
 def compile_timestamp_contract(
     instrument_symbol: str = "NQ",
-    catalog_path: str = "data/catalog/NQ_v0_2020_2026",
+    catalog_path: Optional[str] = None,
     repo_root: Optional[Path] = None,
 ) -> Dict[str, Any]:
-    """Compiles the authoritative timestamp and availability contract backed by empirical measurements."""
+    """Compiles the authoritative timestamp and availability contract backed by empirical measurements.
+
+    The catalog is resolved *from the instrument* unless one is passed explicitly.
+    """
     if repo_root is None:
         repo_root = Path(__file__).resolve().parents[2]
+
+    if catalog_path is None:
+        catalog_path = resolve_catalog_for_symbol(instrument_symbol)
 
     cat_p = (repo_root / catalog_path).resolve()
     measurements = measure_catalog_bar_semantics(cat_p)
 
+    # An instrument contract must carry its own instrument's evidence. Measuring the
+    # right catalog is not enough if the measurement came back empty -- that would leave
+    # the contract asserting a timestamp invariant nothing had checked.
+    measured_types = [k for k in measurements.get("measurements", {})]
+    sym = (instrument_symbol or "").strip().upper()
+    foreign = [k for k in measured_types if not k.upper().startswith(f"{sym}.")]
+    if foreign:
+        raise CatalogTimestampSemanticError(
+            f"FOREIGN_INSTRUMENT_EVIDENCE: timestamp contract for {sym} would record "
+            f"measurements for {foreign}. Evidence must come from the study's own instrument."
+        )
+    if measurements.get("status") != "MEASURED" or not measured_types:
+        raise CatalogTimestampSemanticError(
+            f"TIMESTAMP_EVIDENCE_UNMEASURED: no bar-timestamp measurements could be taken for "
+            f"{sym} at {cat_p} (status={measurements.get('status')}). A contract may not assert "
+            f"an availability invariant it never measured."
+        )
+
     contract = {
         "source": "databento_glbx_mdp3",
+        "instrument_symbol": sym,
+        "measured_catalog_rel_path": catalog_path,
         "raw_timestamp_semantic": "OPEN_STAMPED",
         "raw_index_field": "ts_event",
         "timezone": "UTC",

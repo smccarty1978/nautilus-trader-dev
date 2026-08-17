@@ -172,6 +172,33 @@ def run_collect_mode(
     telemetry = CausalTelemetry()
     telemetry.start()
 
+    # Everything from here on can fail, and a failure must leave a terminal status behind.
+    # Without this the run directory keeps the RUNNING it was created with, and an
+    # abandoned run becomes indistinguishable from one still in flight (H2).
+    try:
+        return _execute_collect(
+            study_data, spec, data_plan, run_plan, strategy_binding,
+            output_mgr, telemetry, log_level,
+        )
+    except KeyboardInterrupt as exc:
+        output_mgr.finalize_failed(exc, status="ABORTED")
+        raise
+    except BaseException as exc:
+        output_mgr.finalize_failed(exc, status="FAILED")
+        raise
+
+
+def _execute_collect(
+    study_data,
+    spec,
+    data_plan,
+    run_plan,
+    strategy_binding,
+    output_mgr,
+    telemetry,
+    log_level: str,
+) -> Dict[str, Any]:
+    """Runs the engine and persists results. Split out so the caller owns failure status."""
     # 5. Construct BacktestEngine and load bars in causal order
     engine, instrument = build_engine(data_plan, log_level=log_level, telemetry=telemetry)
 
@@ -189,6 +216,14 @@ def run_collect_mode(
         cfg_kwargs["horizon_seconds"] = spec.target.horizon_seconds or 300
     if hasattr(strategy_binding.config_cls, "feature_list"):
         cfg_kwargs["feature_list"] = spec.features.feature_list
+    # Session and censoring come from the compiled contracts, not from strategy defaults:
+    # the runtime previously hard-coded a session window that disagreed with the contract,
+    # and ignored the declared censoring policy entirely.
+    if hasattr(strategy_binding.config_cls, "session"):
+        cfg_kwargs["session"] = spec.population.session or "RTH"
+    if hasattr(strategy_binding.config_cls, "session_end_censoring"):
+        censoring = (study_data.contracts.get("target_contract", {}) or {}).get("censoring_policy", {})
+        cfg_kwargs["session_end_censoring"] = bool(censoring.get("session_end_censoring", True))
 
     strategy_config = strategy_binding.config_cls(**cfg_kwargs)
     strategy = strategy_binding.strategy_cls(strategy_config)

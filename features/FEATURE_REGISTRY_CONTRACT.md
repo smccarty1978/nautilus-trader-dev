@@ -29,7 +29,7 @@ To maintain performance, reproducibility, and prevent look-ahead bias:
 
 A feature must move through four explicit statuses:
 * **`archived`:** Legacy calculations preserved in `archive/` or inactive.
-* **`provisional`:** New calculations implemented but not fully verified against historical baselines or look-ahead audits.
+* **`provisional`:** New calculations implemented but not fully verified against historical baselines or look-ahead audits. **Every new feature starts here.**
 * **`verified`:** Validated via:
   - Formula review.
   - Warmup review.
@@ -37,6 +37,34 @@ A feature must move through four explicit statuses:
   - Parity comparison with historical implementations.
   - Look-ahead auditor clearance.
 * **`deprecated`:** Older names or calculations that have been succeeded by a canonical feature. Trigger a runtime `DeprecationWarning` upon query and should be completely avoided in new studies.
+
+### Promotion is enforced, not advisory
+
+This list was prose only until `latest_1m_wick_imbalance` was registered as `verified` in
+the same change that implemented it — the registry entry asserted the outcome of reviews
+that had not run. `scripts/check_feature_promotion.py` now enforces the lifecycle:
+
+```
+NEW FEATURE -> provisional -> deterministic evidence -> explicit promotion -> verified
+```
+
+A feature reaching `verified` must satisfy all three, and the check fails closed:
+
+1. `implementation` resolves to a module that exists on disk.
+2. At least one declared test file exists **and names the feature**. A test that never
+   mentions the feature is not evidence about that feature.
+3. An entry in `features/feature_lifecycle_promotions.json` naming the `causal_audit_artifact` that cleared
+   it, the `audited_execution_composite_sha256` reviewed, and `promoted_by`. Auditor
+   clearance cannot be inferred from the tree, so it is required explicitly rather than
+   assumed from silence.
+
+`features/feature_lifecycle_baseline.json` grandfathers the 502 features that already carried
+`verified` when this check was introduced. That list may **shrink** as evidence is added;
+adding a name to it is refused, so it cannot be used to launder a new feature.
+
+The gate runs in `scripts/research_preflight.py` and again in
+`scripts/build_phase0_manifest.py`, which is where `verified` becomes an eligible
+candidate universe. Regression coverage: `scripts/tests/test_feature_promotion.py`.
 
 ---
 

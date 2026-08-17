@@ -19,6 +19,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import json
 import os
@@ -129,6 +130,23 @@ def run_preflight(
             else:
                 failure_ids = ["SCHEMA_ERROR"]
 
+    # 2-lifecycle: Feature promotion evidence (D).
+    # A registry entry may not assert 'verified' without the evidence that status means.
+    if not failed_gate:
+        checks_run.append("FEATURE_PROMOTION")
+        promo_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "check_feature_promotion.py"),
+                     "--json", str(audit_dir / "feature_lifecycle.json")]
+        promo_res = subprocess.run(promo_cmd, capture_output=True, text=True)
+        if promo_res.returncode != 0:
+            failed_gate = "FEATURE_PROMOTION"
+            failure_ids = ["FEATURE_PROMOTION_UNSUPPORTED"]
+            try:
+                pdata = json.loads((audit_dir / "feature_lifecycle.json").read_text(encoding="utf-8"))
+                failure_ids = [v["code"] for v in pdata.get("violations", [])] or failure_ids
+                failure_details = pdata.get("violations", [])
+            except Exception:
+                failure_details = [{"message": promo_res.stdout[-500:]}]
+
     # 2a. Stage 2a: Research Decision Contract Fidelity
     if not failed_gate and study_dir:
         decision_file = study_dir / "research_decision.yaml"
@@ -183,35 +201,75 @@ def run_preflight(
     spec_p = (study_dir / "SPEC.md") if study_dir else None
     spec_hash = hashlib.sha256(spec_p.read_bytes()).hexdigest() if spec_p and spec_p.exists() else ""
 
+    # Every preflight artifact carries the identity of the run that produced it (H1).
+    # The failed acceptance study held a BLOCKED failure_packet.json next to a CLEAR
+    # preflight.json, with nothing in either to say which was current: no generation id,
+    # no timestamp, no binding hash. A consumer could not order them.
+    preflight_run_id = (
+        f"{datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}_"
+        f"{(code_hash or 'nostudy')[:12]}"
+    )
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
     result = {
         "status": status,
+        "preflight_run_id": preflight_run_id,
+        "generated_at_utc": now_iso,
         "elapsed_seconds": elapsed,
         "code_hash": code_hash,
         "spec_hash": spec_hash,
         "checks_run": checks_run,
         "failed_gate": failed_gate,
         "failure_ids": failure_ids,
+        "failure_packet": None,   # set below when this run produced one
         "required_next_action": "FIX_BEFORE_AUDIT" if status == "BLOCKED" else "READY_FOR_AUDIT",
     }
 
-    # Write preflight.json
-    target_preflight = out_json or (audit_dir / "preflight.json")
-    target_preflight.parent.mkdir(parents=True, exist_ok=True)
-    with open(target_preflight, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2)
+    packet_p = audit_dir / "failure_packet.json"
 
-    # If BLOCKED, write failure_packet.json
     if status == "BLOCKED":
         failure_packet = {
             "status": "BLOCKED",
+            "preflight_run_id": preflight_run_id,
+            "generated_at_utc": now_iso,
+            "code_hash": code_hash,
+            "superseded": False,
             "failed_gate": failed_gate,
             "failure_ids": failure_ids,
             "failure_details": failure_details,
             "recommended_smallest_investigation_scope": f"Inspect findings in {failed_gate} and fix locally before requesting audit.",
         }
-        packet_p = audit_dir / "failure_packet.json"
         with open(packet_p, "w", encoding="utf-8") as f:
             json.dump(failure_packet, f, indent=2)
+        result["failure_packet"] = "audit/failure_packet.json"
+    elif packet_p.exists():
+        # A CLEAR preflight supersedes any earlier failure packet. The packet is a
+        # forensic artifact and is NOT deleted -- it is tombstoned in place, so the
+        # history survives while the current state stays unambiguous.
+        try:
+            with open(packet_p, "r", encoding="utf-8") as f:
+                stale_packet = json.load(f)
+        except Exception:
+            stale_packet = {}
+        stale_packet.update({
+            "superseded": True,
+            "superseded_by_preflight_run_id": preflight_run_id,
+            "superseded_at_utc": now_iso,
+            "note": (
+                "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT "
+                "the current state: audit/preflight.json is authoritative, and a consumer "
+                "must treat superseded=true as historical."
+            ),
+        })
+        with open(packet_p, "w", encoding="utf-8") as f:
+            json.dump(stale_packet, f, indent=2)
+        result["superseded_failure_packet"] = "audit/failure_packet.json"
+
+    # Write preflight.json (after packet handling so it can reference it)
+    target_preflight = out_json or (audit_dir / "preflight.json")
+    target_preflight.parent.mkdir(parents=True, exist_ok=True)
+    with open(target_preflight, "w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2)
 
     # Print summary card
     print("=" * 60)

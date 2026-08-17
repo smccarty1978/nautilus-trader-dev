@@ -269,13 +269,24 @@ FEATURE_REGISTRY: Dict[str, FeatureDefinition] = {
     'minutes_since_rth_open': FeatureDefinition(name='minutes_since_rth_open', status='verified', family='context', stateful=False),
     'latest_1m_wick_imbalance': FeatureDefinition(
         name='latest_1m_wick_imbalance',
-        status='verified',
+        # Provisional until the promotion validator's evidence requirements are met.
+        # A feature may not self-grant 'verified' in the change that implements it --
+        # see scripts/check_feature_promotion.py and FEATURE_REGISTRY_CONTRACT.md s1.
+        status='provisional',
         family='wick_imbalance',
         implementation='features.trackers.wick.WickTracker',
-        tests=('tests/test_feature_library.py',),
+        tests=('tests/test_feature_library.py', 'scripts/tests/test_wick_availability.py'),
         source_timeframe='1m',
         update_anchor='completed_1m_bar',
+        # 'allow' is load-bearing: the feature is genuinely unavailable (None) until the
+        # first completed 1m bar. It is NOT a licence for an all-null column, which the
+        # surface validator rejects as never-emitted regardless of null policy.
         null_policy='allow',
+        warmup=1,
+        window=1,
+        window_unit='bars',
+        reset_policy='none',
+        direction_normalized=False,
     ),
 }
 

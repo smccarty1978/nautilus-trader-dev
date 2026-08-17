@@ -7,6 +7,22 @@ Computes wick imbalance on completed 1-minute bars:
   otherwise: feature = (upper_wick - lower_wick) / (high - low)
 
 Only complete 1-minute bars passed to update() are incorporated.
+
+Availability
+------------
+Before any completed 1m bar has been observed the feature is **unavailable**, and
+``calculate()`` reports ``None`` for it. It previously reported ``0.0``, which made
+three different states indistinguishable in the emitted surface:
+
+  * no completed 1m bar yet          -- the feature does not exist yet
+  * a completed zero-range bar       -- 0.0 by the formula's ``high == low`` branch
+  * a completed perfectly balanced bar -- 0.0 because upper and lower wicks are equal
+
+Only the first is unavailability. The latter two are real observations that the frozen
+formula defines as 0.0, and they remain 0.0. ``None`` is the correct representation for
+the first because the registry declares ``null_policy='allow'`` for this feature; the
+tracker must not manufacture an in-range value to fill a gap the contract already
+permits to be empty.
 """
 from __future__ import annotations
 
@@ -40,9 +56,19 @@ class WickTracker:
         self.bar_count += 1
         return val
 
-    def calculate(self) -> Dict[str, float]:
-        """Return current feature values dictionary."""
-        val = self.latest_wick_imbalance if self.latest_wick_imbalance is not None else 0.0
+    @property
+    def is_available(self) -> bool:
+        """True once at least one completed 1m bar has been incorporated."""
+        return self.bar_count > 0
+
+    def calculate(self) -> Dict[str, Optional[float]]:
+        """Return current feature values dictionary.
+
+        Returns ``None`` for the feature while it is unavailable (no completed 1m bar
+        yet). See the module docstring for why this is not ``0.0``.
+        """
+        if not self.is_available:
+            return {"latest_1m_wick_imbalance": None}
         return {
-            "latest_1m_wick_imbalance": float(val),
+            "latest_1m_wick_imbalance": float(self.latest_wick_imbalance),
         }

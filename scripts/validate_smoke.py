@@ -29,6 +29,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from backtests.nt_runtime.output_manager import reconcile_candidate_dispositions
 from scripts.preexec_audit_seal import verify_preexec_audit_seal, _hash_file
 from scripts.resolve_execution_manifest import resolve_execution_manifest
 
@@ -220,6 +221,39 @@ def validate_smoke_run(
             f"FEATURE_HASH_MISMATCH: Emitted feature hash ({emitted_feature_sha256}) != expected ({expected_feature_sha256})"
         )
 
+    # 9b. Declared feature contract <=> produced VALUES (C1).
+    # Steps 9 and 9a above compare names, counts and an ordered hash; all three pass on a
+    # column that is null in every row, which is exactly how the historical 100%-NULL
+    # wick collection was accepted. This re-derives the surface check independently of
+    # the value recorded by the collector -- a deliberate second gate, not a duplicate.
+    from scripts.check_feature_surface import validate_feature_surface
+
+    surface_report = validate_feature_surface(cand_df, expected_feature_list)
+    if not surface_report.passed:
+        detail = "; ".join(f"[{f['code']}] {f['message']}" for f in surface_report.findings)
+        raise SmokeValidationError(f"FEATURE_SURFACE_INVALID: {detail}")
+
+    # The run itself must not have been filed as valid on a failing surface.
+    if run_status.get("feature_surface_validation", {}).get("passed") is False:
+        raise SmokeValidationError(
+            "RUN_FEATURE_SURFACE_FAILED: the run recorded a failing feature surface validation"
+        )
+
+    # 9c. Candidate/observation reconciliation (E), re-derived from the artifacts.
+    obs_file = run_dir / "collection" / "observations.parquet"
+    if not obs_file.exists():
+        raise SmokeValidationError(
+            f"MISSING_OBSERVATIONS_PARQUET: {obs_file}. A collect run's observation surface "
+            f"is a required deliverable; without it no candidate can be shown to have "
+            f"reached a terminal disposition."
+        )
+    obs_df = pd.read_parquet(obs_file)
+    reconciliation = reconcile_candidate_dispositions(cand_df, obs_df)
+    if not reconciliation["passed"]:
+        raise SmokeValidationError(
+            "CANDIDATE_RECONCILIATION_FAILED: " + "; ".join(reconciliation["findings"])
+        )
+
     # 10. Verify Direction / Population Coverage if configured
     if "regime_direction" in target_day_df.columns and study_cfg.get("population", {}).get("prevailing_regime") == "both":
         directions_present = list(target_day_df["regime_direction"].unique())
@@ -250,6 +284,9 @@ def validate_smoke_run(
         "exact_timestamp_equality_verified": exact_timestamp_equality_verified,
         "feature_count": len(emitted_feature_cols),
         "feature_list_sha256": emitted_feature_sha256,
+        "feature_surface_validation": surface_report.to_dict(),
+        "candidate_disposition_reconciliation": reconciliation,
+        "observations_count": int(len(obs_df)),
         "deterministic_validation_verified": True,
         "status": "ACCEPTED",
         "validated_at": now_iso,

@@ -257,6 +257,13 @@ class ExecutionSpec(BaseModel):
     observation_policy: Optional[Dict[str, Any]] = Field(
         default=None, description="Observation timing policy (exact_grid, parent_bar_close, event_driven)"
     )
+    # NOTE: authorized modes are deliberately NOT a StudySpec field.
+    # `compute_sha256` hashes `model_dump(exclude_none=False)`, so any additional field --
+    # even an unset optional one -- changes every study's spec hash and marks every
+    # existing compiled_study.json stale. The mode-partitioned deliverables contract
+    # therefore derives its modes from `operation.kind` in the compiler instead
+    # (research/engines/deliverables_engine.py). Adding a declarative override here needs
+    # a deliberate spec-version bump and a recompile of every study.
 
 
 class AcceptanceSpec(BaseModel):

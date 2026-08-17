@@ -69,11 +69,60 @@ def resolve_module_to_path(module_name: str, current_file: Path, repo_root: Path
 REPO_LOCAL_ROOT_PACKAGES = ("backtests", "research", "features", "strategies", "utils", "scripts")
 
 
+def ancestor_package_inits(module_path: Path, repo_root: Path) -> List[Path]:
+    """Returns every package ``__init__.py`` Python executes to reach ``module_path``.
+
+    Importing ``features.trackers.wick`` executes ``features/__init__.py`` first, and
+    ``features/__init__.py`` may import further modules — as it does here, pulling in
+    ``features/engine.py``, ``features/library.py`` and ``features/collector.py``. A
+    closure that records only the leaf module therefore omits code that provably runs,
+    and the omission is invisible: the seal still reports 100% coverage.
+
+    Walking ancestors is what makes the fix generic. Returning the ``__init__.py``
+    files into the same AST work-queue means their own imports are followed
+    transitively by the existing traversal, with no per-package special-casing.
+
+    Directories without an ``__init__.py`` (PEP 420 namespace packages, e.g.
+    ``features/trackers``) contribute nothing, which is correct: nothing executes.
+    """
+    inits: List[Path] = []
+    try:
+        rel_parent = module_path.resolve().parent.relative_to(repo_root.resolve())
+    except ValueError:
+        return inits  # outside the repository -- not a repo-local dependency
+
+    current = repo_root.resolve()
+    for part in rel_parent.parts:
+        current = current / part
+        init_p = current / "__init__.py"
+        if init_p.exists():
+            inits.append(init_p.resolve())
+    return inits
+
+
 def compute_ast_closure(seed_files: List[Path], repo_root: Path) -> Tuple[Set[Path], List[Dict[str, str]]]:
     """Computes transitive closure of repo-local Python files using AST import analysis."""
     visited: Set[Path] = set()
-    queue: List[Path] = [p.resolve() for p in seed_files if p.exists()]
+    queue: List[Path] = []
+    for p in seed_files:
+        if not p.exists():
+            continue
+        resolved_seed = p.resolve()
+        # A seed inside a package executes that package's __init__ chain too.
+        for init_p in ancestor_package_inits(resolved_seed, repo_root):
+            if init_p not in queue:
+                queue.append(init_p)
+        if resolved_seed not in queue:
+            queue.append(resolved_seed)
     unresolved: List[Dict[str, str]] = []
+
+    def _enqueue(path: Path) -> None:
+        """Adds a resolved module and every package __init__ its import executes."""
+        for init_p in ancestor_package_inits(path, repo_root):
+            if init_p not in visited and init_p not in queue:
+                queue.append(init_p)
+        if path not in visited and path not in queue:
+            queue.append(path)
 
     while queue:
         curr_file = queue.pop(0)
@@ -95,8 +144,7 @@ def compute_ast_closure(seed_files: List[Path], repo_root: Path) -> Tuple[Set[Pa
                     mod_name = alias.name
                     resolved = resolve_module_to_path(mod_name, curr_file, repo_root)
                     if resolved:
-                        if resolved not in visited and resolved not in queue:
-                            queue.append(resolved)
+                        _enqueue(resolved)
                     elif any(mod_name.startswith(pkg) for pkg in REPO_LOCAL_ROOT_PACKAGES):
                         unresolved.append({"source_file": str(curr_file), "import_target": mod_name})
 
@@ -110,23 +158,27 @@ def compute_ast_closure(seed_files: List[Path], repo_root: Path) -> Tuple[Set[Pa
                     target_parts = mod_base.split(".") if mod_base else []
                     cand_p = parent_dir.joinpath(*target_parts).with_suffix(".py")
                     if cand_p.exists():
-                        if cand_p.resolve() not in visited and cand_p.resolve() not in queue:
-                            queue.append(cand_p.resolve())
+                        _enqueue(cand_p.resolve())
                         continue
 
                 if mod_base:
                     resolved = resolve_module_to_path(mod_base, curr_file, repo_root)
                     if resolved:
-                        if resolved not in visited and resolved not in queue:
-                            queue.append(resolved)
+                        _enqueue(resolved)
+                        # `from pkg import submodule` also executes the submodule.
+                        for alias in node.names:
+                            sub_res = resolve_module_to_path(
+                                f"{mod_base}.{alias.name}", curr_file, repo_root
+                            )
+                            if sub_res:
+                                _enqueue(sub_res)
                     else:
                         # Check sub-modules imported via from ... import sub_module
                         for alias in node.names:
                             full_mod = f"{mod_base}.{alias.name}"
                             sub_res = resolve_module_to_path(full_mod, curr_file, repo_root)
                             if sub_res:
-                                if sub_res not in visited and sub_res not in queue:
-                                    queue.append(sub_res)
+                                _enqueue(sub_res)
                                 break
                         else:
                             if any(mod_base.startswith(pkg) for pkg in REPO_LOCAL_ROOT_PACKAGES):
@@ -210,11 +262,33 @@ def resolve_study_files(study_dir: Path) -> Dict[str, Path]:
     return files
 
 
+def _coverage_pct(resolved: int, unresolved: int) -> float:
+    """Coverage measured against what the graph *demanded*, not what it returned.
+
+    ``resolved / resolved`` is always 100% and can never report a gap. Denominating by
+    ``resolved + unresolved`` is what lets the number fall below 100 when a required
+    executable file could not be resolved.
+    """
+    expected = resolved + unresolved
+    if expected == 0:
+        return 0.0
+    return round(resolved / expected * 100.0, 4)
+
+
 def resolve_execution_manifest(
     study_dir: Path,
     repo_root: Optional[Path] = None,
+    strict: bool = True,
 ) -> Tuple[str, Dict[str, str], Dict[str, Any]]:
     """Dynamically resolves the full transitive closure across Runtime, Contract Authority, and Governance graphs.
+
+    Args:
+        strict: When True (the default, and the only value any gate uses) an
+            unresolvable repo-local import raises ``UnresolvedDependencyError``.
+            When False the manifest is still produced but reports honest sub-100%
+            coverage and lists the unresolved imports. The non-strict path exists
+            so a caller can *observe* an incomplete closure; it is never used to
+            authorise execution.
 
     Returns:
         composite_sha256: Hex string of the sorted composite hash
@@ -277,7 +351,7 @@ def resolve_execution_manifest(
     gov_closure_set, gov_unres = compute_ast_closure(governance_seeds, repo_root)
     all_unresolved.extend(gov_unres)
 
-    if all_unresolved:
+    if all_unresolved and strict:
         raise UnresolvedDependencyError(
             f"UNRESOLVED_DEPENDENCIES: Found {len(all_unresolved)} unresolvable repo-local imports: {all_unresolved}"
         )
@@ -322,26 +396,32 @@ def resolve_execution_manifest(
     gov_count = len(gov_keys)
     files_count = len(file_hashes)
 
+    n_runtime_unres = len(runtime_unres)
+    n_contract_unres = len(contract_unres)
+    n_gov_unres = len(gov_unres)
+    n_unres = len(all_unresolved)
+
     manifest_data = {
         "study_name": study_dir.name,
         "entrypoint": "backtests/nt_runtime/modes/collect.py",
         "composite_sha256": composite_sha256,
-        "runtime_expected": runtime_count,
+        "closure_includes_package_inits": True,
+        "runtime_expected": runtime_count + n_runtime_unres,
         "runtime_resolved": runtime_count,
-        "runtime_coverage_pct": 100.0,
-        "contract_expected": contract_count,
+        "runtime_coverage_pct": _coverage_pct(runtime_count, n_runtime_unres),
+        "contract_expected": contract_count + n_contract_unres,
         "contract_resolved": contract_count,
-        "contract_coverage_pct": 100.0,
-        "governance_expected": gov_count,
+        "contract_coverage_pct": _coverage_pct(contract_count, n_contract_unres),
+        "governance_expected": gov_count + n_gov_unres,
         "governance_resolved": gov_count,
-        "governance_coverage_pct": 100.0,
-        "combined_expected": files_count,
+        "governance_coverage_pct": _coverage_pct(gov_count, n_gov_unres),
+        "combined_expected": files_count + n_unres,
         "combined_resolved": files_count,
-        "combined_coverage_pct": 100.0,
-        "files_expected": files_count,
+        "combined_coverage_pct": _coverage_pct(files_count, n_unres),
+        "files_expected": files_count + n_unres,
         "files_resolved": files_count,
-        "coverage_pct": 100.0,
-        "unresolved_dependencies": [],
+        "coverage_pct": _coverage_pct(files_count, n_unres),
+        "unresolved_dependencies": all_unresolved,
         "runtime_closure": runtime_keys,
         "contract_authority_closure": contract_keys,
         "governance_closure": gov_keys,
