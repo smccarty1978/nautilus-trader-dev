@@ -129,10 +129,67 @@ def validate_smoke_run(
 
     actual_smoke_date = expected_smoke_date or study_cfg.get("chronology", {}).get("smoke_date", "2023-03-03")
 
+    # W4: the smoke date is an operator-supplied CLI value with a hard-coded default. It
+    # must be checked against the study's own authorization, or a validator can bless a
+    # run on a date the study was never permitted to load.
+    authorized_dates = (
+        (study_cfg.get("execution", {}) or {}).get("data_requirements", {}) or {}
+    ).get("authorized_dates")
+    if authorized_dates:
+        if actual_smoke_date not in set(authorized_dates):
+            raise SmokeValidationError(
+                f"UNAUTHORIZED_SMOKE_DATE: {actual_smoke_date} is not among this study's "
+                f"authorized dates {sorted(authorized_dates)}. The CLI date is not an "
+                f"authority; the compiled study is."
+            )
+
+    # W1: the deliverables contract is the authority for what a collect run must produce.
+    # The validator previously checked only the two parquets it happened to know about,
+    # which is the same "checker derives its own scope" defect the contract was created to
+    # remove -- a missing collection_manifest.json passed silently.
+    deliverables_p = study_dir / "config" / "deliverables_contract.json"
+    if not deliverables_p.is_file():
+        raise SmokeValidationError(
+            f"DELIVERABLES_CONTRACT_MISSING: {deliverables_p}. Without it this validator "
+            f"would have to invent its own deliverable list, which is precisely what it "
+            f"must not do."
+        )
+    deliverables_contract = json.loads(deliverables_p.read_text(encoding="utf-8"))
+    collect_deliverables = (deliverables_contract.get("deliverables_by_mode") or {}).get("collect")
+    if not collect_deliverables:
+        raise SmokeValidationError(
+            "DELIVERABLES_CONTRACT_EMPTY: the contract declares no collect-mode deliverables"
+        )
+
+    artifact_meta = deliverables_contract.get("artifact_metadata") or {}
+    missing_deliverables = []
+    for artifact in collect_deliverables:
+        rel_to = (artifact_meta.get(artifact) or {}).get("relative_to", "run_dir")
+        base = run_dir / "collection" if rel_to.endswith("collection") else run_dir
+        if not (base / artifact).is_file():
+            missing_deliverables.append(f"{rel_to}/{artifact}")
+    if missing_deliverables:
+        raise SmokeValidationError(
+            f"MISSING_DECLARED_DELIVERABLE: the deliverables contract requires "
+            f"{missing_deliverables}, which the run did not produce"
+        )
+
     # observation_ts is nanoseconds UTC
     dt_utc = pd.to_datetime(cand_df["observation_ts"], unit="ns", utc=True)
     dt_ct = dt_utc.dt.tz_convert("America/Chicago")
     day_strings = dt_ct.dt.strftime("%Y-%m-%d")
+
+    # W4 (second half): nothing in the emitted surface may fall outside the study's
+    # authorization either. Placed here because it needs the decoded candidate days.
+    if authorized_dates:
+        unauthorized_days = [
+            d for d in sorted(set(day_strings.unique())) if d not in set(authorized_dates)
+        ]
+        if unauthorized_days:
+            raise SmokeValidationError(
+                f"UNAUTHORIZED_CANDIDATE_DATES: candidates were emitted on {unauthorized_days}, "
+                f"outside the study's authorized dates {sorted(authorized_dates)}"
+            )
 
     target_day_mask = day_strings == actual_smoke_date
     target_day_df = cand_df[target_day_mask]
@@ -228,7 +285,10 @@ def validate_smoke_run(
     # the value recorded by the collector -- a deliberate second gate, not a duplicate.
     from scripts.check_feature_surface import validate_feature_surface
 
-    surface_report = validate_feature_surface(cand_df, expected_feature_list)
+    declared_metadata = (study_cfg.get("features", {}) or {}).get("metadata_columns")
+    surface_report = validate_feature_surface(
+        cand_df, expected_feature_list, metadata_columns=declared_metadata
+    )
     if not surface_report.passed:
         detail = "; ".join(f"[{f['code']}] {f['message']}" for f in surface_report.findings)
         raise SmokeValidationError(f"FEATURE_SURFACE_INVALID: {detail}")

@@ -34,6 +34,88 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 
+# ---------------------------------------------------------------------------
+# Preflight completeness contract (RT-1)
+#
+# `--skip-tests` used to omit CAUSAL_INVARIANTS entirely and still report
+# status=CLEAR / required_next_action=READY_FOR_AUDIT, because the verdict was derived
+# purely from "did any gate that actually ran fail?". A check that never executed cannot
+# fail, so skipping one made the preflight *more* likely to advertise audit readiness.
+#
+# Readiness is now a two-part claim: every required check executed, AND every one passed.
+# Diagnostic partial runs remain available -- they simply cannot claim readiness.
+# ---------------------------------------------------------------------------
+REQUIRED_STUDY_CHECKS = (
+    "EXECUTION_MANIFEST",
+    "CAUSAL_LINT",
+    "ARTIFACT_SCHEMA",
+    "FEATURE_PROMOTION",
+    "RESEARCH_DECISION_FIDELITY",
+    "CAUSAL_INVARIANTS",
+)
+
+# Outcomes that count as "this check actually ran and was satisfied".
+PASSING_OUTCOMES = ("PASSED",)
+
+STATUS_CLEAR = "CLEAR"
+STATUS_BLOCKED = "BLOCKED"
+STATUS_INCOMPLETE = "INCOMPLETE"
+
+ACTION_READY = "READY_FOR_AUDIT"
+ACTION_FIX = "FIX_BEFORE_AUDIT"
+ACTION_RUN_FULL = "RUN_FULL_PREFLIGHT_BEFORE_AUDIT"
+
+
+class PreflightEvidenceError(RuntimeError):
+    """Raised when downstream tooling is handed preflight evidence it cannot rely on."""
+
+
+def load_preflight_evidence(study_dir: Path) -> Dict[str, Any]:
+    """Reads a study's current preflight artifact, failing closed on absence/corruption."""
+    p = Path(study_dir) / "audit" / "preflight.json"
+    if not p.is_file():
+        raise PreflightEvidenceError(
+            f"PREFLIGHT_EVIDENCE_MISSING: {p} does not exist. Run "
+            f"`python scripts/research_preflight.py --study {study_dir}` to completion first."
+        )
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except ValueError as err:
+        raise PreflightEvidenceError(f"PREFLIGHT_EVIDENCE_MALFORMED: {p}: {err}")
+    if not isinstance(data, dict):
+        raise PreflightEvidenceError(f"PREFLIGHT_EVIDENCE_MALFORMED: {p} is not a JSON object")
+    return data
+
+
+def assert_preflight_audit_ready(study_dir: Path) -> Dict[str, Any]:
+    """Refuses to proceed unless the study's preflight is complete AND passing.
+
+    This is the downstream half of RT-1. Without it, a diagnostic `--skip-tests` run could
+    still be the evidence an audit status or a seal was issued against.
+
+    ``audit_ready`` is the single field consumers read. It is deliberately not inferred
+    from ``status`` alone: an older artifact predating this contract has no ``audit_ready``
+    key, and is refused rather than assumed ready.
+    """
+    data = load_preflight_evidence(study_dir)
+
+    if "audit_ready" not in data:
+        raise PreflightEvidenceError(
+            "PREFLIGHT_EVIDENCE_OBSOLETE: audit/preflight.json predates the preflight "
+            "completeness contract (no 'audit_ready' field). Re-run the full preflight; an "
+            "artifact that cannot state its own completeness is not evidence of it."
+        )
+
+    if not data.get("audit_ready"):
+        missing = data.get("required_checks_missing") or []
+        raise PreflightEvidenceError(
+            f"PREFLIGHT_NOT_AUDIT_READY: status={data.get('status')!r}, "
+            f"action={data.get('required_next_action')!r}, missing/incomplete checks="
+            f"{missing}. A partial or diagnostic preflight cannot authorise an audit or seal."
+        )
+    return data
+
+
 def calculate_dir_hash(dir_path: Path) -> str:
     sha = hashlib.sha256()
     for root, _, files in sorted(os.walk(dir_path)):
@@ -61,13 +143,23 @@ def run_preflight(
     failure_ids = []
     failure_details = []
 
+    # Per-check outcome, so "did not run" is distinguishable from "ran and passed".
+    check_outcomes: Dict[str, str] = {}
+
+    def _begin(name: str) -> None:
+        checks_run.append(name)
+        check_outcomes[name] = "PASSED"          # demoted below on failure
+
+    def _mark(name: str, outcome: str) -> None:
+        check_outcomes[name] = outcome
+
     study_dir = study_path if study_path and study_path.exists() else None
     audit_dir = (study_dir / "audit") if study_dir else (REPO_ROOT / "audit")
     audit_dir.mkdir(parents=True, exist_ok=True)
 
     # 0. Stage 0: Canonical Execution Manifest Resolution
     if study_dir and (study_dir / "study.yaml").exists():
-        checks_run.append("EXECUTION_MANIFEST")
+        _begin("EXECUTION_MANIFEST")
         try:
             from scripts.resolve_execution_manifest import resolve_execution_manifest
             comp_sha, fhashes, mdata = resolve_execution_manifest(study_dir, REPO_ROOT)
@@ -76,12 +168,13 @@ def run_preflight(
                 json.dump(mdata, f, indent=2)
         except Exception as e:
             failed_gate = "EXECUTION_MANIFEST"
+            _mark("EXECUTION_MANIFEST", "FAILED")
             failure_ids = ["MANIFEST_RESOLUTION_FAILED"]
             failure_details = [{"message": f"Failed to resolve execution manifest: {e}"}]
 
     # 1. Stage 1: Causal Lint with Complete Coverage
     if not failed_gate:
-        checks_run.append("CAUSAL_LINT")
+        _begin("CAUSAL_LINT")
         lint_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "causal_lint.py")]
         if study_dir:
             lint_cmd.extend(["--study", str(study_dir)])
@@ -94,6 +187,7 @@ def run_preflight(
         lint_res = subprocess.run(lint_cmd, capture_output=True, text=True)
         if lint_res.returncode != 0:
             failed_gate = "CAUSAL_LINT"
+            _mark("CAUSAL_LINT", "FAILED")
             if lint_json.exists():
                 try:
                     with open(lint_json, "r", encoding="utf-8") as f:
@@ -109,7 +203,7 @@ def run_preflight(
 
     # 2. Stage 2: Artifact & Schema Validation
     if not failed_gate:
-        checks_run.append("ARTIFACT_SCHEMA")
+        _begin("ARTIFACT_SCHEMA")
         schema_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "check_artifact_schema.py")]
         if study_dir:
             schema_cmd.extend(["--study", str(study_dir)])
@@ -119,6 +213,7 @@ def run_preflight(
         schema_res = subprocess.run(schema_cmd, capture_output=True, text=True)
         if schema_res.returncode != 0:
             failed_gate = "ARTIFACT_SCHEMA"
+            _mark("ARTIFACT_SCHEMA", "FAILED")
             if schema_json.exists():
                 try:
                     with open(schema_json, "r", encoding="utf-8") as f:
@@ -133,12 +228,13 @@ def run_preflight(
     # 2-lifecycle: Feature promotion evidence (D).
     # A registry entry may not assert 'verified' without the evidence that status means.
     if not failed_gate:
-        checks_run.append("FEATURE_PROMOTION")
+        _begin("FEATURE_PROMOTION")
         promo_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "check_feature_promotion.py"),
                      "--json", str(audit_dir / "feature_lifecycle.json")]
         promo_res = subprocess.run(promo_cmd, capture_output=True, text=True)
         if promo_res.returncode != 0:
             failed_gate = "FEATURE_PROMOTION"
+            _mark("FEATURE_PROMOTION", "FAILED")
             failure_ids = ["FEATURE_PROMOTION_UNSUPPORTED"]
             try:
                 pdata = json.loads((audit_dir / "feature_lifecycle.json").read_text(encoding="utf-8"))
@@ -151,27 +247,33 @@ def run_preflight(
     if not failed_gate and study_dir:
         decision_file = study_dir / "research_decision.yaml"
         if decision_file.exists():
-            checks_run.append("RESEARCH_DECISION_FIDELITY")
+            _begin("RESEARCH_DECISION_FIDELITY")
             dec_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "check_research_decision_fidelity.py"), "--study", str(study_dir)]
             dec_res = subprocess.run(dec_cmd, capture_output=True, text=True)
             if dec_res.returncode != 0:
                 failed_gate = "RESEARCH_DECISION_FIDELITY"
+                _mark("RESEARCH_DECISION_FIDELITY", "FAILED")
                 failure_ids = ["RESEARCH_DECISION_FIDELITY_MISMATCH"]
                 failure_details = [{"message": line} for line in dec_res.stdout.splitlines() if "[CRITICAL]" in line or "FAIL" in line]
 
     # 2b. Stage 2b: SPEC to StudySpec Fidelity Validation
     if not failed_gate and study_dir and (study_dir / "study_clauses.yaml").exists():
-        checks_run.append("SPEC_FIDELITY")
+        _begin("SPEC_FIDELITY")
         fid_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "check_spec_fidelity.py"), "--study", str(study_dir)]
         fid_res = subprocess.run(fid_cmd, capture_output=True, text=True)
         if fid_res.returncode != 0:
             failed_gate = "SPEC_FIDELITY"
+            _mark("SPEC_FIDELITY", "FAILED")
             failure_ids = ["SPEC_FIDELITY_MISMATCH"]
             failure_details = [{"message": line} for line in fid_res.stdout.splitlines() if "[FAIL]" in line or "Unmapped" in line]
 
     # 3. Stage 3: Fast Invariant Tests
+    if skip_tests:
+        # Recorded, never omitted: an absent entry reads as "nothing to see here",
+        # which is exactly how a skipped mandatory gate used to reach READY_FOR_AUDIT.
+        _mark("CAUSAL_INVARIANTS", "SKIPPED")
     if not failed_gate and not skip_tests:
-        checks_run.append("CAUSAL_INVARIANTS")
+        _begin("CAUSAL_INVARIANTS")
         test_select_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "select_required_tests.py")]
         select_res = subprocess.run(test_select_cmd, capture_output=True, text=True)
         tests_to_run = [l.strip() for l in select_res.stdout.splitlines() if l.strip()]
@@ -188,15 +290,52 @@ def run_preflight(
                 )
                 if test_run_res.returncode != 0:
                     failed_gate = "CAUSAL_INVARIANTS"
+                    _mark("CAUSAL_INVARIANTS", "FAILED")
                     failure_ids = ["INVARIANT_TEST_FAILURE"]
                     failure_details = [{"message": line} for line in test_run_res.stdout.splitlines()[-5:]]
             except subprocess.TimeoutExpired:
                 failed_gate = "CAUSAL_INVARIANTS"
+                _mark("CAUSAL_INVARIANTS", "TIMEOUT")
                 failure_ids = ["INVARIANT_TEST_TIMEOUT"]
                 failure_details = [{"message": "Fast invariant test execution exceeded timeout limit (120s)."}]
+        else:
+            _mark("CAUSAL_INVARIANTS", "NO_TESTS_SELECTED")
 
     elapsed = round(time.time() - start_time, 2)
-    status = "CLEAR" if not failed_gate else "BLOCKED"
+
+    # --- Completeness verdict (RT-1) -------------------------------------
+    # A study preflight is audit-ready only when every required check both EXECUTED and
+    # PASSED. Anything else -- skipped, timed out, no tests selected, never reached
+    # because an earlier gate failed -- is incomplete, and incomplete is not ready.
+    # The required-check set applies to a COMPILED study. A bare directory (a path lint,
+    # or a scratch folder) has no compiled contracts for most of these gates to read, so
+    # demanding them there would be a false alarm -- and it could never be audit-ready
+    # anyway, because there is no study to audit.
+    is_compiled_study = bool(study_dir and (study_dir / "study.yaml").exists())
+
+    required = list(REQUIRED_STUDY_CHECKS) if is_compiled_study else []
+    incomplete = [
+        name for name in required
+        if check_outcomes.get(name, "NOT_EXECUTED") not in PASSING_OUTCOMES
+    ]
+    checks_complete = not incomplete
+
+    if failed_gate:
+        status = STATUS_BLOCKED
+        action = ACTION_FIX
+    elif not checks_complete:
+        status = STATUS_INCOMPLETE
+        action = ACTION_RUN_FULL
+    else:
+        status = STATUS_CLEAR
+        action = ACTION_READY
+
+    # Readiness needs all three: nothing failed, every required check ran and passed, and
+    # there is actually a compiled study to be ready for.
+    audit_ready = (
+        status == STATUS_CLEAR and checks_complete and not failed_gate and is_compiled_study
+    )
+
     code_hash = calculate_dir_hash(study_dir) if study_dir else ""
     spec_p = (study_dir / "SPEC.md") if study_dir else None
     spec_hash = hashlib.sha256(spec_p.read_bytes()).hexdigest() if spec_p and spec_p.exists() else ""
@@ -213,23 +352,32 @@ def run_preflight(
 
     result = {
         "status": status,
+        # The single field downstream tooling reads. Never infer readiness from `status`
+        # alone -- a diagnostic run can legitimately have no failing gate.
+        "audit_ready": audit_ready,
         "preflight_run_id": preflight_run_id,
         "generated_at_utc": now_iso,
         "elapsed_seconds": elapsed,
         "code_hash": code_hash,
         "spec_hash": spec_hash,
         "checks_run": checks_run,
+        "check_outcomes": check_outcomes,
+        "is_compiled_study": is_compiled_study,
+        "required_checks": required,
+        "required_checks_missing": incomplete,
+        "checks_complete": checks_complete,
+        "diagnostic_mode": bool(skip_tests),
         "failed_gate": failed_gate,
         "failure_ids": failure_ids,
         "failure_packet": None,   # set below when this run produced one
-        "required_next_action": "FIX_BEFORE_AUDIT" if status == "BLOCKED" else "READY_FOR_AUDIT",
+        "required_next_action": action,
     }
 
     packet_p = audit_dir / "failure_packet.json"
 
-    if status == "BLOCKED":
+    if status == STATUS_BLOCKED:
         failure_packet = {
-            "status": "BLOCKED",
+            "status": STATUS_BLOCKED,
             "preflight_run_id": preflight_run_id,
             "generated_at_utc": now_iso,
             "code_hash": code_hash,
@@ -242,8 +390,9 @@ def run_preflight(
         with open(packet_p, "w", encoding="utf-8") as f:
             json.dump(failure_packet, f, indent=2)
         result["failure_packet"] = "audit/failure_packet.json"
-    elif packet_p.exists():
-        # A CLEAR preflight supersedes any earlier failure packet. The packet is a
+    elif audit_ready and packet_p.exists():
+        # Only a COMPLETE, passing preflight supersedes an earlier failure packet.
+        # A diagnostic partial run must not retire evidence it never re-checked. The packet is a
         # forensic artifact and is NOT deleted -- it is tombstoned in place, so the
         # history survives while the current state stays unambiguous.
         try:
@@ -274,16 +423,22 @@ def run_preflight(
     # Print summary card
     print("=" * 60)
     print(f"RESEARCH PREFLIGHT VERDICT: {status} ({elapsed}s)")
-    print(f"Checks Run: {', '.join(checks_run)}")
-    if status == "BLOCKED":
+    print(f"Checks Run: {', '.join(checks_run) or '(none)'}")
+    print(f"Audit Ready: {audit_ready}")
+    if status == STATUS_BLOCKED:
         print(f"Failed Gate: {failed_gate}")
         print(f"Failure IDs: {', '.join(failure_ids)}")
         print(f"Failure Packet: {audit_dir / 'failure_packet.json'}")
+    elif status == STATUS_INCOMPLETE:
+        print(f"Incomplete Required Checks: {', '.join(incomplete)}")
+        print("NOT ready for audit: re-run the full preflight without --skip-tests.")
     else:
         print("Ready for internal causal review gate.")
     print("=" * 60)
 
-    return 0 if status == "CLEAR" else 1, result
+    # Exit status reflects "did anything fail or go missing", not audit readiness:
+    # a path lint of a non-study directory can legitimately be CLEAR.
+    return 0 if status == STATUS_CLEAR else 1, result
 
 
 def main() -> int:

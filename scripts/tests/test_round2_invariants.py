@@ -68,9 +68,13 @@ def _plant_compliant_audit_reports(tmp_study, pass_num=10):
     import json as _json
     from scripts.resolve_execution_manifest import resolve_execution_manifest as _rem
 
+    from scripts.tests._preflight_fixture import plant_audit_ready_preflight
+
     composite, _, _ = _rem(tmp_study, repo_root=REPO_ROOT)
     audit = tmp_study / "audit"
     audit.mkdir(parents=True, exist_ok=True)
+    # RT-1: issuance and sealing now require audit-ready preflight evidence.
+    plant_audit_ready_preflight(tmp_study)
     for kind, fname, extra in (
         ("causal", f"pass_{pass_num:02d}.md", {"critical": 0}),
         ("contract", f"contract_pass_{pass_num:02d}.md", {"blocking": 0}),

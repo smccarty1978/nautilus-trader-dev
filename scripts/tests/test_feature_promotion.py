@@ -216,18 +216,94 @@ def test_complete_promotion_record_admits_a_new_feature(evidence_repo: Path, tmp
             tests=("tests/test_thing.py",),
         )
     }
+    import hashlib
+    from scripts.check_feature_promotion import feature_implementation_sha256
+
+    impl_sha = feature_implementation_sha256(
+        "my_feature", registry["my_feature"], evidence_repo
+    )
     promotions = {
         "my_feature": {
             "feature": "my_feature",
             "causal_audit_artifact": audit_rel,
             "audited_execution_composite_sha256": "a" * 64,
             "promoted_by": "reviewer-name",
+            "reviewed_implementation_sha256": impl_sha,
         }
     }
     report = check_feature_promotions(
         registry=registry, baseline=set(), repo_root=evidence_repo, promotions=promotions
     )
     assert report["passed"], report["violations"]
+
+
+def test_promotion_does_not_survive_a_changed_implementation(evidence_repo: Path):
+    """W3 -- old promotion evidence must not authorize changed feature code."""
+    from scripts.check_feature_promotion import feature_implementation_sha256
+
+    audit_rel = "audit/pass_07.md"
+    (evidence_repo / "audit").mkdir(parents=True, exist_ok=True)
+    (evidence_repo / audit_rel).write_bytes(b"cleared\n")
+
+    registry = {
+        "my_feature": _FDef(
+            "my_feature",
+            implementation="features.trackers.thing.T",
+            tests=("tests/test_thing.py",),
+        )
+    }
+    impl_sha = feature_implementation_sha256("my_feature", registry["my_feature"], evidence_repo)
+    promotions = {
+        "my_feature": {
+            "feature": "my_feature",
+            "causal_audit_artifact": audit_rel,
+            "audited_execution_composite_sha256": "a" * 64,
+            "promoted_by": "reviewer-name",
+            "reviewed_implementation_sha256": impl_sha,
+        }
+    }
+    assert check_feature_promotions(
+        registry=registry, baseline=set(), repo_root=evidence_repo, promotions=promotions
+    )["passed"]
+
+    # The tracker is rewritten after promotion. The clearance must not follow it.
+    (evidence_repo / "features" / "trackers" / "thing.py").write_bytes(
+        b"class T:\n    def calculate(self):\n        return 1\n"
+    )
+    report = check_feature_promotions(
+        registry=registry, baseline=set(), repo_root=evidence_repo, promotions=promotions
+    )
+    assert not report["passed"]
+    assert "PROMOTION_RECORD_INCOMPLETE" in _codes(report)
+    assert any("does not authorise changed feature code" in v["message"]
+               for v in report["violations"])
+
+
+def test_promotion_without_implementation_binding_is_refused(evidence_repo: Path):
+    """A record that never says which code it reviewed is not composite-bound evidence."""
+    audit_rel = "audit/pass_07.md"
+    (evidence_repo / "audit").mkdir(parents=True, exist_ok=True)
+    (evidence_repo / audit_rel).write_bytes(b"cleared\n")
+    registry = {
+        "my_feature": _FDef(
+            "my_feature",
+            implementation="features.trackers.thing.T",
+            tests=("tests/test_thing.py",),
+        )
+    }
+    promotions = {
+        "my_feature": {
+            "feature": "my_feature",
+            "causal_audit_artifact": audit_rel,
+            "audited_execution_composite_sha256": "a" * 64,
+            "promoted_by": "x",
+        }
+    }
+    report = check_feature_promotions(
+        registry=registry, baseline=set(), repo_root=evidence_repo, promotions=promotions
+    )
+    assert not report["passed"]
+    assert "PROMOTION_RECORD_INCOMPLETE" in _codes(report)
 
 
 def test_incomplete_promotion_record_is_refused(evidence_repo: Path):

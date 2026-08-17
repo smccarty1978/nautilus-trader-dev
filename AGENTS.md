@@ -344,8 +344,35 @@ For significant results, create a tagged release with:
 5. **Regime change bar can be breach bar** - Don't return early on regime change
 6. **Touch counting resets only on regime change** - Not on new breaches
 7. **Collector MFE/MAE blind spot** - 1s bars process before parent 1m bar in NT. Swing breakout collector showed +$70/trade but NT backtest showed -$3/trade. Root cause: 44% of trades hit SL in the first 60s that were invisible to the collector. Trades surviving 60s matched collector exactly (62% WR, +$63/trade). Fix: buffer 1s bars and replay from fill time.
+8. **Recursive deletion escaped a disposable workspace and destroyed real data** - a cleanup of what was believed to be a throwaway worktree followed a link out of it. On Windows this is easy to miss: junctions and other reparse points are not symlinks and do not look like them.
 
 ---
+
+## DESTRUCTIVE FILESYSTEM SAFETY (mandatory)
+
+**Never recursively delete, clean up, or remove a worktree/path without first checking
+every descendant for symlinks, junctions, mount points, or Windows reparse points that
+escape the disposable workspace.**
+
+Recursive deletion must **fail closed**: if any descendant resolves outside the intended
+disposable root, abort the whole operation rather than deleting "the safe part". A partial
+delete of a tree you did not fully understand is how the incident above happened.
+
+Concretely:
+
+- **Do not use `rm -rf` against repo or worktree trees containing external data
+  junctions.** `data/catalog/` in particular may be a link to storage that lives outside
+  the repository.
+- Resolve before you delete. A path that *looks* inside the root is not necessarily
+  inside it — `Path.resolve()` is what decides, not the string.
+- On Windows, check for reparse points, not just symlinks. `os.path.islink()` returns
+  False for a directory junction.
+- `scripts/safe_cleanup.py::assert_safe_to_delete` implements this check. Use it, or
+  replicate it, before any recursive removal of a directory you did not create in this
+  session.
+
+This is a safety rule, not a framework. It is deliberately one function and one
+prohibition.
 
 <!-- BEGIN SUBAGENT ROUTING -->
 ## Subagent Routing & Lean Workflow

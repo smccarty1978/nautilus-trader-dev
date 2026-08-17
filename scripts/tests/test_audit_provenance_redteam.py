@@ -33,8 +33,14 @@ STUDY = REPO_ROOT / "studies" / "Gemini_clean_maturity_flip_rolling_5m_productiv
 
 @pytest.fixture
 def scratch_study(tmp_path):
+    from scripts.tests._preflight_fixture import plant_audit_ready_preflight
+
     dest = tmp_path / STUDY.name
     shutil.copytree(STUDY, dest, dirs_exist_ok=True)
+    # RT-1: issuance requires audit-ready preflight evidence. These tests exercise audit
+    # provenance mechanics, not the preflight, so they supply a compliant artifact -- the
+    # same reason they supply compliant audit reports.
+    plant_audit_ready_preflight(dest)
     return dest
 
 

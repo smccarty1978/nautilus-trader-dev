@@ -38,6 +38,25 @@ if str(REPO_ROOT) not in sys.path:
 
 _NUMERIC_DTYPES = {"float64", "float32", "int64", "int32"}
 
+# Legitimate non-feature columns emitted by the canonical collector: candidate identity,
+# timing, causality metadata and running state. Anything outside this set AND outside the
+# declared feature list is an undeclared feature column.
+DEFAULT_METADATA_COLUMNS = (
+    "observation_ts",
+    "regime_start_ns",
+    "regime_direction",
+    "checkpoint_index",
+    "regime_age_seconds",
+    "close",
+    "atr",
+    "running_mfe_atr",
+    "running_mae_atr",
+    "current_pnl_atr",
+    "new_progress_windows",
+    "retained_mfe_ratio",
+    "triggering_1s_ts_init",
+)
+
 
 class FeatureSurfaceError(RuntimeError):
     """Raised when the produced feature surface contradicts the declared contract."""
@@ -50,6 +69,8 @@ class SurfaceReport:
     per_feature: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     declared_features: List[str] = field(default_factory=list)
     emitted_features: List[str] = field(default_factory=list)
+    metadata_columns: List[str] = field(default_factory=list)
+    undeclared_columns: List[str] = field(default_factory=list)
     rows: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
@@ -58,6 +79,8 @@ class SurfaceReport:
             "rows": self.rows,
             "declared_features": self.declared_features,
             "emitted_features": self.emitted_features,
+            "metadata_columns": self.metadata_columns,
+            "undeclared_columns": self.undeclared_columns,
             "per_feature": self.per_feature,
             "findings": self.findings,
         }
@@ -89,8 +112,19 @@ def validate_feature_surface(
     registry: Optional[Dict[str, Any]] = None,
     *,
     strict_order: bool = True,
+    metadata_columns: Optional[List[str]] = None,
 ) -> SurfaceReport:
-    """Validates a produced candidate surface against its declared feature contract."""
+    """Validates a produced candidate surface against its declared feature contract.
+
+    Both directions are enforced (W2): every declared feature must be present, AND no
+    undeclared *feature* column may appear. Checking only the forward direction lets an
+    unreviewed feature ride along into the surface -- it satisfies every contract check,
+    because no contract check ever looks at it.
+
+    ``metadata_columns`` names the legitimate non-feature columns (identity, timing,
+    target, bookkeeping). They are explicitly distinguished rather than guessed, so a
+    real metadata column is never rejected as a stowaway feature.
+    """
     if registry is None:
         from features.registry import FEATURE_REGISTRY as registry  # noqa: N806
 
@@ -105,8 +139,26 @@ def validate_feature_surface(
         report.passed = False
         report.findings.append({"code": code, "feature": feature, "message": message})
 
+    meta = set(metadata_columns if metadata_columns is not None else DEFAULT_METADATA_COLUMNS)
+    report.metadata_columns = sorted(meta)
+
+    # W2 (reverse direction): no undeclared feature column may enter the surface.
+    # Runs whether or not features are declared -- a study declaring none must emit none.
+    undeclared = [
+        c for c in candidates_df.columns
+        if c not in set(declared_features) and c not in meta
+    ]
+    if undeclared:
+        report.undeclared_columns = sorted(undeclared)
+        fail(
+            "UNDECLARED_FEATURE_COLUMN", None,
+            f"columns {sorted(undeclared)} are neither declared features nor declared "
+            f"metadata. An undeclared feature satisfies every contract check because no "
+            f"contract check looks at it.",
+        )
+
     if not declared_features:
-        return report  # nothing declared, nothing to bind
+        return report  # nothing else to bind
 
     emitted = [c for c in candidates_df.columns if c in set(declared_features)]
     report.emitted_features = emitted

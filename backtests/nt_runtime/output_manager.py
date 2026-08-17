@@ -278,7 +278,9 @@ class OutputManager:
         # registry's null policy rather than banning nulls outright.
         from scripts.check_feature_surface import validate_feature_surface
 
-        surface_report = validate_feature_surface(candidates_df, expected_feats)
+        surface_report = validate_feature_surface(
+            candidates_df, expected_feats, metadata_columns=declared_metadata
+        )
 
         # Candidate/observation reconciliation (E). A candidate that quietly failed to
         # reach a terminal disposition used to vanish from the observation surface

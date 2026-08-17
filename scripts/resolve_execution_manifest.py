@@ -34,13 +34,39 @@ class UnresolvedStrategyError(RuntimeError):
     pass
 
 
+# Source extensions whose line endings are a checkout artifact, not content (W7).
+CANONICAL_TEXT_EXTENSIONS = frozenset({
+    ".py", ".json", ".yaml", ".yml", ".md", ".txt", ".toml", ".cfg", ".ini",
+})
+
+
+def canonical_file_sha256(file_path: Path) -> str:
+    """SHA-256 of a file's *logical* content.
+
+    W7: this repository is checked out with ``core.autocrlf=true`` and carries no
+    ``.gitattributes``, so committed blobs hold LF while the working tree holds CRLF. A
+    byte-exact hash therefore produced a different execution composite on a Windows
+    checkout than on a Linux one **for identical committed source** -- the seal was not
+    reproducible across legitimate checkouts, and a valid seal could look stale purely
+    because of a git config setting.
+
+    Text sources are hashed with line endings normalised to LF, so the seal binds content
+    rather than checkout policy. Everything else -- parquet, joblib, images -- is hashed
+    byte-exact, because for those a byte difference IS a content difference and
+    normalisation would silently corrupt the comparison.
+
+    Normalising line endings for source files loses nothing: no Python, JSON, YAML or
+    Markdown semantics depend on CR.
+    """
+    data = file_path.read_bytes()
+    if file_path.suffix.lower() in CANONICAL_TEXT_EXTENSIONS:
+        data = data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(data).hexdigest()
+
+
 def _hash_file(file_path: Path) -> str:
-    """Computes SHA-256 hash of a file."""
-    h = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        while chunk := f.read(65536):
-            h.update(chunk)
-    return h.hexdigest()
+    """Computes the canonical SHA-256 hash of a file (see canonical_file_sha256)."""
+    return canonical_file_sha256(file_path)
 
 
 def resolve_module_to_path(module_name: str, current_file: Path, repo_root: Path) -> Optional[Path]:
@@ -150,16 +176,65 @@ def compute_ast_closure(seed_files: List[Path], repo_root: Path) -> Tuple[Set[Pa
 
             elif isinstance(node, ast.ImportFrom):
                 mod_base = node.module
-                # Handle relative imports (e.g. from .data_plan import ...)
+                # --- Relative imports (RT-2) ---------------------------------
+                # The previous implementation only handled `from .pkg import x` where
+                # `.pkg` was itself a module file. Three forms escaped entirely:
+                #
+                #   from . import x          mod_base is None, so it built
+                #                            `<parent_dir>.py` and never matched
+                #   from .. import x         same, one level up
+                #   from ..pkg import x      base resolved to a package DIRECTORY, and
+                #                            only `.py` was probed
+                #
+                # A module reached only that way executed without entering the closure,
+                # so editing it left the composite -- and any seal -- unchanged.
+                #
+                # The base of a relative import is a directory; what may live there is a
+                # module file, a package `__init__`, or a submodule named by the alias.
+                # All three are probed, because Python executes whichever exists.
                 if node.level > 0:
-                    parent_dir = curr_file.parent
+                    base_dir = curr_file.parent
                     for _ in range(node.level - 1):
-                        parent_dir = parent_dir.parent
-                    target_parts = mod_base.split(".") if mod_base else []
-                    cand_p = parent_dir.joinpath(*target_parts).with_suffix(".py")
-                    if cand_p.exists():
-                        _enqueue(cand_p.resolve())
-                        continue
+                        base_dir = base_dir.parent
+                    if mod_base:
+                        base_dir = base_dir.joinpath(*mod_base.split("."))
+
+                    resolved_any = False
+
+                    # `from .mod import name` -- the base itself is a module file.
+                    base_module = base_dir.with_suffix(".py")
+                    if base_module.exists():
+                        _enqueue(base_module.resolve())
+                        resolved_any = True
+
+                    # `from .pkg import name` / `from . import name` -- the base is a
+                    # package directory whose __init__ executes.
+                    base_init = base_dir / "__init__.py"
+                    if base_init.exists():
+                        _enqueue(base_init.resolve())
+                        resolved_any = True
+
+                    # Each imported name may itself be a submodule or subpackage.
+                    for alias in node.names:
+                        sub_mod = base_dir / f"{alias.name}.py"
+                        if sub_mod.exists():
+                            _enqueue(sub_mod.resolve())
+                            resolved_any = True
+                        sub_init = base_dir / alias.name / "__init__.py"
+                        if sub_init.exists():
+                            _enqueue(sub_init.resolve())
+                            resolved_any = True
+
+                    if not resolved_any:
+                        # A relative import is always repo-local by construction, so an
+                        # unresolvable one is a real gap and must lower coverage rather
+                        # than pass silently.
+                        dots = "." * node.level
+                        unresolved.append({
+                            "source_file": str(curr_file),
+                            "import_target": f"{dots}{mod_base or ''}",
+                        })
+                    continue
 
                 if mod_base:
                     resolved = resolve_module_to_path(mod_base, curr_file, repo_root)

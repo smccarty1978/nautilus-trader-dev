@@ -13,21 +13,24 @@ from features.trackers.median_center import MedianCenterTracker
 from features.trackers.rolling_5m_productivity import Rolling5mProductivityTracker
 from features.trackers.wick import WickTracker
 from features.registry import FEATURE_REGISTRY, resolve_feature_name
+from utils.session_boundaries import is_in_session
 
 CT = pytz.timezone('America/Chicago')
 
 
 def _is_rth(ts_init_ns: int) -> bool:
-    # Intentional local copy of the project-canonical RTH boundary
-    # (08:30-15:00 America/Chicago, evaluated on the close/available
-    # timestamp) also used by
-    # studies/CODEX_5_X_weakness_atlas_repair/CODEX_5_X_run_established_fade.py:is_rth()
-    # and studies/ohlcv_volume_delta_price_level_features/attach_features.py.
-    # Not imported directly: `features/` is shared production code and
-    # should not depend on a specific study's module. If this boundary ever
-    # changes, update both call sites in lockstep.
-    dt = datetime.fromtimestamp(ts_init_ns / 1e9, tz=pytz.utc).astimezone(CT)
-    return (dt.hour > 8 or (dt.hour == 8 and dt.minute >= 30)) and (dt.hour < 15)
+    """RTH membership for a completed-bar close timestamp.
+
+    This was a local copy of the boundary ending at 15:00, kept deliberately so that
+    `features/` would not depend on a study module, with a comment asking future editors
+    to "update both call sites in lockstep". They were not updated in lockstep: the
+    canonical project window is 08:30-15:15 CT (`utils/session_boundaries.py`,
+    AGENTS.md), and this copy silently disagreed with it by 15 minutes.
+
+    `utils/` is shared infrastructure, not a study, so importing it introduces no
+    study coupling -- which removes the reason the copy existed.
+    """
+    return is_in_session(int(ts_init_ns), "RTH")
 
 
 def _coerce(val):
@@ -308,7 +311,9 @@ class FeatureEngine:
         # Databento aggregation shift: RTH checks always run close-time based
         dt = datetime.fromtimestamp(touch_bar.ts_init / 1e9, tz=pytz.utc).astimezone(CT)
         minutes_since_open = (dt.hour - 8) * 60 + (dt.minute - 30)
-        is_rth = 1.0 if (dt.hour > 8 or (dt.hour == 8 and dt.minute >= 30)) and (dt.hour < 15) else 0.0
+        # Canonical boundary, not a second inline re-derivation (this one also
+        # ended RTH at 15:00 while the project window ends at 15:15).
+        is_rth = 1.0 if _is_rth(int(touch_bar.ts_init)) else 0.0
 
         return {
             'ema_slope_short': float(ema_slope_short),

@@ -242,6 +242,47 @@ python backtests/run_backtest.py --config backtests/configs/w4_exit_b1_2023.yaml
 
 Post-backtest and post-collection analysis processes candidate parquet matrices, fits ML models, and evaluates out-of-sample performance under strict partition guards.
 
+### Pandas/Polars are libraries, not an alternate governed workflow
+
+Pandas and Polars are computation libraries. They are **not** a second, parallel route to
+an authoritative research result. The governed path is the only one that produces one:
+
+```
+validated collection
+    ↓
+research/analysis/
+    ↓
+AnalysisSpec / validation contracts
+    ↓
+authoritative result
+```
+
+Scratch pandas/Polars work is legitimate and encouraged for **debugging, forensic
+inspection and diagnostics**. Its outputs are **NON-AUTHORITATIVE** and must be labelled
+as such — they may not be quoted as a study result, entered into a report as a finding, or
+used to close a research question.
+
+If `research/analysis/` cannot express the analysis a study requires, that is a gap in the
+harness, not a licence to route around it. Stop and report:
+
+    ANALYSIS_HARNESS_GAP
+
+naming the specific capability that is missing. Do not silently substitute scratch
+analysis for the governed path — a result nobody can reproduce through the contracts is
+not a result.
+
+### Do not wrap or duplicate canonical runners
+
+- **No scratch wrappers around canonical runners** merely to retry, monitor, or babysit a
+  run. Use `scripts/run_bounded_study.py` and read its status card. A wrapper becomes a
+  second runner with none of the governance the first one carries.
+- **Do not launch another identical run while one is `RUNNING`** unless the previous
+  process is confirmed terminal. Confirm with `python scripts/reconcile_runs.py`, which
+  classifies a run as `RUNNING` only when its recorded PID is genuinely alive; anything
+  else is `ABANDONED`, `FAILED`, `ABORTED` or `SUCCESS`. Concurrent identical runs produce
+  two run directories competing for the same identity and make the resulting evidence
+  ambiguous.
+
 ```
 VALIDATED COLLECTION / TRADES PARQUET
     ↓

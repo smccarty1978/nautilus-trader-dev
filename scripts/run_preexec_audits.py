@@ -500,6 +500,110 @@ def _reject_report_reuse(
 
 PASS_LEDGER_NAME = "pass_ledger.json"
 
+# Durable lineage anchor (RT-3).
+#
+# The local ledger lives inside the study's own `audit/` directory, so `rm -rf` on that
+# directory -- or rebuilding the study -- reset a study's audit history to empty and made
+# pass 01 available again. "No ledger" was read as "no history", which is precisely the
+# state an attacker (or a careless rebuild) can manufacture.
+#
+# The anchor therefore lives OUTSIDE any study directory, keyed by study identity, and is
+# authoritative for the high-water mark. Deleting the study's audit directory can no
+# longer erase the fact that a pass was issued.
+LINEAGE_DIR_NAME = "audit_lineage"
+LINEAGE_VERSION = 1
+
+
+#: Overrides where anchors are stored. Set by the test suite so that scratch studies --
+#: which very often share the name "study" -- do not collide in one shared directory and
+#: report each other as lineage resets. Production never sets it.
+LINEAGE_DIR_ENV = "NT_AUDIT_LINEAGE_DIR"
+
+
+def _lineage_path(study_dir: Path, repo_root: Optional[Path] = None) -> Path:
+    """Location of a study's durable anchor, keyed by study identity.
+
+    Deliberately outside the study directory: that is the whole point of RT-3. The
+    anchor is keyed by study *name*, matching every other identity check in the workflow
+    (the `study` field in audit summaries, `study_id` in manifests).
+    """
+    override = os.environ.get(LINEAGE_DIR_ENV)
+    if override:
+        return Path(override) / f"{Path(study_dir).name}.json"
+    root = Path(repo_root) if repo_root else REPO_ROOT
+    return root / LINEAGE_DIR_NAME / f"{Path(study_dir).name}.json"
+
+
+def _lineage_integrity(entries: List[Dict[str, Any]]) -> str:
+    """Hash over the anchor's entries, so silent edits are detectable."""
+    return hashlib.sha256(
+        json.dumps(entries, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
+def read_lineage_anchor(
+    study_dir: Path, repo_root: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
+    """Reads the durable anchor. Returns None only when none has ever been written."""
+    p = _lineage_path(study_dir, repo_root)
+    if not p.is_file():
+        return None
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as err:
+        raise AuditArtifactParseError(
+            f"AUDIT_LINEAGE_UNREADABLE: {p} exists but could not be parsed ({err}). "
+            f"An unreadable lineage anchor is not a satisfied control."
+        )
+    if not isinstance(data, dict) or not isinstance(data.get("entries"), list):
+        raise AuditArtifactParseError(
+            f"AUDIT_LINEAGE_MALFORMED: {p} must be an object with an 'entries' list."
+        )
+    expected = data.get("integrity_sha256")
+    actual = _lineage_integrity(data["entries"])
+    if expected != actual:
+        raise AuditArtifactParseError(
+            f"AUDIT_LINEAGE_TAMPERED: {p} integrity hash does not match its entries "
+            f"(recorded {str(expected)[:12]}..., recomputed {actual[:12]}...). The lineage "
+            f"anchor has been edited outside the issuer."
+        )
+    if data.get("study_id") != Path(study_dir).name:
+        raise AuditArtifactParseError(
+            f"AUDIT_LINEAGE_IDENTITY_MISMATCH: {p} records study_id "
+            f"{data.get('study_id')!r} but is being read for {Path(study_dir).name!r}."
+        )
+    return data
+
+
+def _write_lineage_anchor(
+    study_dir: Path,
+    entries: List[Dict[str, Any]],
+    repo_root: Optional[Path] = None,
+    bootstrapped: bool = False,
+) -> None:
+    p = _lineage_path(study_dir, repo_root)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    high_water: Dict[str, int] = {}
+    for e in entries:
+        t = e.get("audit_type")
+        high_water[t] = max(high_water.get(t, 0), int(e.get("pass", 0)))
+    payload = {
+        "lineage_version": LINEAGE_VERSION,
+        "study_id": Path(study_dir).name,
+        "bootstrapped_from_local_ledger": bootstrapped,
+        "high_water": high_water,
+        "entries": entries,
+        "integrity_sha256": _lineage_integrity(entries),
+        "note": (
+            "Durable audit lineage anchor. Lives outside the study directory so that "
+            "deleting or rebuilding studies/<id>/audit/ cannot reset the audit "
+            "high-water mark. Authoritative over the study-local pass_ledger.json."
+        ),
+    }
+    tmp = p.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    os.replace(tmp, p)
+
 
 def _read_pass_ledger(study_dir: Path) -> List[Dict[str, Any]]:
     """Reads the append-only pass ledger, failing closed on corruption."""
@@ -520,12 +624,69 @@ def _read_pass_ledger(study_dir: Path) -> List[Dict[str, Any]]:
     return data["entries"]
 
 
+def _entry_key(e: Dict[str, Any]) -> Tuple[str, int]:
+    return (str(e.get("audit_type")), int(e.get("pass", 0)))
+
+
+def resolve_effective_lineage(
+    study_dir: Path, repo_root: Optional[Path] = None
+) -> List[Dict[str, Any]]:
+    """Returns the authoritative pass history, reconciling anchor against local ledger.
+
+    Three states are distinguished, and two of them are refusals:
+
+    ``AUDIT_LINEAGE_RESET_DETECTED``
+        the anchor knows about passes the local ledger does not. The audit directory was
+        deleted, rebuilt, or rolled back. History is not erasable by removing a file.
+    ``AUDIT_LINEAGE_UNANCHORED``
+        the local ledger claims passes the anchor never recorded -- a copied study
+        directory, or a hand-edited ledger. Refused rather than silently adopted.
+
+    Otherwise the anchor is authoritative. On first sight of a study that has a local
+    ledger but no anchor yet, the anchor is bootstrapped from it: that is the one-time
+    migration for studies predating this control, and it is recorded explicitly.
+    """
+    local = _read_pass_ledger(study_dir)
+    anchor = read_lineage_anchor(study_dir, repo_root)
+
+    if anchor is None:
+        if local:
+            _write_lineage_anchor(study_dir, local, repo_root, bootstrapped=True)
+        return local
+
+    anchor_entries = anchor["entries"]
+    anchor_keys = {_entry_key(e) for e in anchor_entries}
+    local_keys = {_entry_key(e) for e in local}
+
+    missing_locally = sorted(anchor_keys - local_keys)
+    if missing_locally:
+        raise AuditArtifactParseError(
+            f"AUDIT_LINEAGE_RESET_DETECTED: the durable anchor records audit passes that "
+            f"{study_dir.name}'s local ledger no longer contains: {missing_locally}. The "
+            f"study's audit directory was deleted, rebuilt or rolled back. Audit history is "
+            f"not reset by removing a file -- issue the next pass above the recorded "
+            f"high-water mark {anchor.get('high_water')}, or restore the ledger."
+        )
+
+    unanchored = sorted(local_keys - anchor_keys)
+    if unanchored:
+        raise AuditArtifactParseError(
+            f"AUDIT_LINEAGE_UNANCHORED: {study_dir.name}'s local ledger claims audit passes "
+            f"{unanchored} that the durable anchor never recorded. This is what a copied or "
+            f"hand-edited study directory looks like. A pass is only real if the issuer "
+            f"wrote it to both."
+        )
+
+    return anchor_entries
+
+
 def enforce_pass_immutability(
     study_dir: Path,
     audit_type: str,
     pass_num: int,
     composite_sha256: str,
     report_sha256: str,
+    repo_root: Optional[Path] = None,
 ) -> None:
     """A pass number, once issued, describes one composite forever (B1).
 
@@ -546,7 +707,7 @@ def enforce_pass_immutability(
         issued for that gate. This is what makes `pass_01 -> composite A`,
         `pass_02 -> composite B` the only expressible ordering.
     """
-    entries = _read_pass_ledger(study_dir)
+    entries = resolve_effective_lineage(study_dir, repo_root)
     same_gate = [e for e in entries if e.get("audit_type") == audit_type]
 
     for e in same_gate:
@@ -585,10 +746,15 @@ def append_pass_ledger_entry(
     report_sha256: str,
     auditor: str,
     reviewer_provenance: Dict[str, Any],
+    repo_root: Optional[Path] = None,
 ) -> None:
-    """Appends an issuance record. Never rewrites or removes an existing entry."""
+    """Appends an issuance record to the local ledger AND the durable anchor.
+
+    Both, always. A pass recorded in only one of them is exactly the inconsistency
+    `resolve_effective_lineage` refuses.
+    """
     ledger_p = study_dir / "audit" / PASS_LEDGER_NAME
-    entries = _read_pass_ledger(study_dir)
+    entries = resolve_effective_lineage(study_dir, repo_root)
 
     for e in entries:
         if e.get("audit_type") == audit_type and e.get("pass") == pass_num:
@@ -611,6 +777,9 @@ def append_pass_ledger_entry(
         json.dumps({"ledger_version": 1, "entries": entries}, indent=2), encoding="utf-8"
     )
     os.replace(tmp, ledger_p)
+
+    # Durable anchor, outside the study directory (RT-3).
+    _write_lineage_anchor(study_dir, entries, repo_root, bootstrapped=False)
 
 
 def build_reviewer_provenance(
@@ -635,24 +804,45 @@ def build_reviewer_provenance(
     and a field that sometimes claimed otherwise would be the defect this replaces.
     No fake transcript is ever synthesised to reach the higher level.
     """
+    # W5: an arbitrary existing file is not session provenance.
+    #
+    # Previously any readable path promoted the record to SESSION_BOUND -- `--transcript
+    # README.md` would have done it. Hashing a file proves the file existed, not that a
+    # review session happened. There is currently no supported audit-session evidence
+    # contract in this repository, so rather than invent proof the system does not
+    # possess, a supplied transcript is recorded as an *attachment* and the strength
+    # stays DECLARED_IDENTITY_ONLY.
     session_evidence = None
+    attached_artifact = None
     if transcript_path is not None and Path(transcript_path).is_file():
-        session_evidence = {
-            "transcript_path": str(transcript_path),
-            "transcript_sha256": _hash_file(Path(transcript_path)),
+        attached_artifact = {
+            "path": str(transcript_path),
+            "sha256": _hash_file(Path(transcript_path)),
+            "interpretation": (
+                "Operator-supplied file, hashed for reference only. It is NOT treated as "
+                "authenticated session provenance: no audit-session evidence contract "
+                "exists for this workflow, so nothing distinguishes a genuine transcript "
+                "from any other readable file."
+            ),
         }
 
     return {
         "declared_auditor": auditor,
         "identity_source": identity_source,
-        "provenance_strength": "SESSION_BOUND" if session_evidence else "DECLARED_IDENTITY_ONLY",
+        # Always DECLARED_IDENTITY_ONLY: this workflow has no mechanism that could earn
+        # a stronger level. SESSION_BOUND remains defined for a future evidence contract
+        # and is deliberately unreachable until one exists.
+        "provenance_strength": "DECLARED_IDENTITY_ONLY",
         "session_evidence": session_evidence,
+        "attached_artifact": attached_artifact,
         "independence_basis": "distinct_declared_identity_strings",
         "independence_proven": False,
         "limitations": [
             "A declared identity string is not an authenticated reviewer.",
             "Distinctness across the two gates is enforced; human independence is not proven.",
-        ] + ([] if session_evidence else [
+            "No audit-session evidence contract exists, so no supplied file can raise the "
+            "provenance strength above DECLARED_IDENTITY_ONLY.",
+        ] + ([] if attached_artifact else [
             "No session/transcript artifact was supplied; absence of session evidence is "
             "recorded explicitly and must not be read as authenticated independence.",
         ]),
@@ -704,11 +894,22 @@ def _validate_gate_report(
     parser = parse_causal_audit_report if audit_type == "causal" else parse_contract_audit_report
     verdict, primary, warning, tertiary = parser(report_file)
 
+    # RT-1: an audit may not be issued against incomplete preflight evidence. A
+    # diagnostic `--skip-tests` run has no failing gate and therefore used to look
+    # indistinguishable from a full pass.
+    from scripts.research_preflight import PreflightEvidenceError, assert_preflight_audit_ready
+    try:
+        assert_preflight_audit_ready(study_dir)
+    except PreflightEvidenceError as err:
+        raise AuditArtifactParseError(str(err))
+
     report_sha256 = _hash_file(report_file)
     _reject_report_reuse(study_dir, audit_type, report_sha256, report_file)
     # B1: a new audited composite requires a new immutable pass artifact. Checked in
     # validation (not issuance) so `--type both` refuses before either status is written.
-    enforce_pass_immutability(study_dir, audit_type, pass_num, composite_sha, report_sha256)
+    enforce_pass_immutability(
+        study_dir, audit_type, pass_num, composite_sha, report_sha256, repo_root
+    )
 
     return {
         "audit_type": audit_type,
@@ -752,8 +953,8 @@ def issue_causal_audit_status_from_report(
         resolved_auditor, checked["identity_source"], transcript_path
     )
     transcript_sha = (
-        reviewer_provenance["session_evidence"]["transcript_sha256"]
-        if reviewer_provenance["session_evidence"] else None
+        reviewer_provenance["attached_artifact"]["sha256"]
+        if reviewer_provenance.get("attached_artifact") else None
     )
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
@@ -783,7 +984,7 @@ def issue_causal_audit_status_from_report(
 
     append_pass_ledger_entry(
         study_dir, "causal", pass_num, composite_sha, report_sha256,
-        resolved_auditor, reviewer_provenance,
+        resolved_auditor, reviewer_provenance, repo_root,
     )
     return status_data
 
@@ -814,8 +1015,8 @@ def issue_contract_audit_status_from_report(
         resolved_auditor, checked["identity_source"], transcript_path
     )
     transcript_sha = (
-        reviewer_provenance["session_evidence"]["transcript_sha256"]
-        if reviewer_provenance["session_evidence"] else None
+        reviewer_provenance["attached_artifact"]["sha256"]
+        if reviewer_provenance.get("attached_artifact") else None
     )
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
@@ -845,7 +1046,7 @@ def issue_contract_audit_status_from_report(
 
     append_pass_ledger_entry(
         study_dir, "contract", pass_num, composite_sha, report_sha256,
-        resolved_auditor, reviewer_provenance,
+        resolved_auditor, reviewer_provenance, repo_root,
     )
     return status_data
 

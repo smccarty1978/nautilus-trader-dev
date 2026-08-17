@@ -137,8 +137,49 @@ def test_incompatible_dtype_blocks():
     assert "FEATURE_DTYPE_INCOMPATIBLE" in _codes(report)
 
 
-def test_no_declared_features_is_a_no_op():
-    assert validate_feature_surface(pd.DataFrame({"x": [1]}), [], {}).passed
+def test_no_declared_features_and_no_feature_columns_is_a_no_op():
+    """A study declaring no features must emit none. `x` here is declared metadata."""
+    r = validate_feature_surface(pd.DataFrame({"x": [1]}), [], {}, metadata_columns=["x"])
+    assert r.passed, r.findings
+
+
+# ---------------------------------------------------------------------------
+# W2 -- the reverse direction: no undeclared feature may ride along
+# ---------------------------------------------------------------------------
+
+def test_undeclared_feature_column_is_refused():
+    """W2 -- an unreviewed column entering the surface satisfies every other check."""
+    df = pd.DataFrame({"observation_ts": [1, 2], "f": [0.1, 0.2], "stowaway": [9.0, 9.1]})
+    report = validate_feature_surface(df, ["f"], ALLOW, metadata_columns=["observation_ts"])
+    assert not report.passed
+    assert "UNDECLARED_FEATURE_COLUMN" in _codes(report)
+    assert report.undeclared_columns == ["stowaway"]
+
+
+def test_declared_metadata_columns_are_not_treated_as_features():
+    """Legitimate non-feature columns must not be rejected as stowaways."""
+    df = pd.DataFrame({
+        "observation_ts": [1], "regime_start_ns": [0], "checkpoint_index": [0],
+        "atr": [1.0], "f": [0.5],
+    })
+    report = validate_feature_surface(df, ["f"], ALLOW)   # default metadata set
+    assert report.passed, report.findings
+    assert report.undeclared_columns == []
+
+
+def test_target_and_bookkeeping_columns_can_be_declared_explicitly():
+    df = pd.DataFrame({"observation_ts": [1], "target": [1], "f": [0.5]})
+    report = validate_feature_surface(
+        df, ["f"], ALLOW, metadata_columns=["observation_ts", "target"]
+    )
+    assert report.passed, report.findings
+
+
+def test_undeclared_column_is_refused_even_with_no_declared_features():
+    df = pd.DataFrame({"observation_ts": [1], "sneaky": [1.0]})
+    report = validate_feature_surface(df, [], {}, metadata_columns=["observation_ts"])
+    assert not report.passed
+    assert "UNDECLARED_FEATURE_COLUMN" in _codes(report)
 
 
 def test_constant_column_is_reported_but_not_failed():

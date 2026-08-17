@@ -40,6 +40,7 @@ added); adding a name is refused, so the baseline cannot be used to launder a ne
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -50,6 +51,29 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 BASELINE_PATH = REPO_ROOT / "features" / "feature_lifecycle_baseline.json"
+
+# Durable pin for the grandfather set (RT-4).
+#
+# The previous guard compared `baseline - registry`, which flags a *stale* baseline name
+# but is blind to the actual attack: adding a brand-new feature to BOTH features/registry.py
+# and the baseline file, which granted it verified status with no evidence at all. The
+# escape hatch was the exploit.
+#
+# The baseline file now carries two lists. `pinned_original_verified` is the immutable
+# historical set, hashed here in source. `baseline_verified` is the ACTIVE set and must be
+# a SUBSET of it -- so names may be removed as features earn real evidence, but never
+# added. Growing the pinned set requires editing this constant, which lives in the
+# governance closure: it moves the execution composite, invalidates seals and forces
+# re-audit. That is the "explicit governed baseline migration".
+BASELINE_PINNED_SHA256 = "434666ef18090f2eb4cc6a667aed8dd148d18fe7aeea5023f4dfae0f94a0c1d3"
+
+
+def _name_set_hash(names) -> str:
+    return hashlib.sha256(
+        json.dumps(sorted(names), sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
 PROMOTIONS_PATH = REPO_ROOT / "features" / "feature_lifecycle_promotions.json"
 
 VALID_STATUSES = ("archived", "provisional", "verified", "deprecated")
@@ -75,6 +99,33 @@ def load_baseline(baseline_path: Optional[Path] = None) -> Set[str]:
     if not isinstance(names, list):
         raise FeaturePromotionError(
             f"PROMOTION_BASELINE_MALFORMED: {p} has no 'baseline_verified' list"
+        )
+    pinned = data.get("pinned_original_verified")
+    if not isinstance(pinned, list):
+        raise FeaturePromotionError(
+            f"PROMOTION_BASELINE_MALFORMED: {p} has no 'pinned_original_verified' list. "
+            f"Without the pinned historical set the active set cannot be shown not to have "
+            f"grown."
+        )
+
+    # The pinned historical set must match the constant in this file.
+    actual_pin = _name_set_hash(pinned)
+    if actual_pin != BASELINE_PINNED_SHA256:
+        raise FeaturePromotionError(
+            f"PROMOTION_BASELINE_TAMPERED: {p} pinned_original_verified hashes to "
+            f"{actual_pin[:12]}... but scripts/check_feature_promotion.py pins "
+            f"{BASELINE_PINNED_SHA256[:12]}.... The grandfather set was edited outside a "
+            f"governed migration."
+        )
+
+    # The active set may shrink, never grow.
+    added = sorted(set(names) - set(pinned))
+    if added:
+        raise FeaturePromotionError(
+            f"PROMOTION_BASELINE_EXTENDED: {added} appear in the active grandfather set but "
+            f"not in the pinned historical set. The baseline records features that already "
+            f"carried 'verified'; it is not a place to grandfather new ones. Leave the "
+            f"feature 'provisional' and record real promotion evidence instead."
         )
     return set(names)
 
@@ -104,8 +155,38 @@ def load_promotions(promotions_path: Optional[Path] = None) -> Dict[str, Dict[st
     return out
 
 
-def _promotion_record_is_complete(rec: Dict[str, Any], repo_root: Path) -> Optional[str]:
-    """Returns a reason string when a promotion record is not usable evidence."""
+def feature_implementation_sha256(name: str, fdef: Any, repo_root: Path) -> Optional[str]:
+    """Hash of the implementation module actually backing this feature.
+
+    This is what a promotion is a statement *about*. Recording only the execution
+    composite is too coarse in one direction and too brittle in the other: the composite
+    moves whenever any governance file changes, yet says nothing specific about whether
+    this feature's own code is the code that was reviewed.
+    """
+    impl = getattr(fdef, "implementation", "") or ""
+    if not impl:
+        return None
+    mod = impl.rsplit(".", 1)[0]
+    p = repo_root.joinpath(*mod.split(".")).with_suffix(".py")
+    if not p.exists():
+        p = repo_root.joinpath(*mod.split(".")) / "__init__.py"
+    if not p.exists():
+        return None
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def _promotion_record_is_complete(
+    rec: Dict[str, Any],
+    repo_root: Path,
+    current_impl_sha256: Optional[str] = None,
+) -> Optional[str]:
+    """Returns a reason string when a promotion record is not usable evidence.
+
+    W3: promotion evidence must identify the exact implementation that was reviewed, and
+    must stop authorising it once that implementation changes. Otherwise a feature is
+    promoted once and the clearance silently follows arbitrary later rewrites of its
+    tracker -- the wick tracker's own body changed twice during this remediation.
+    """
     audit_ref = rec.get("causal_audit_artifact")
     if not audit_ref:
         return "record names no 'causal_audit_artifact'"
@@ -115,6 +196,21 @@ def _promotion_record_is_complete(rec: Dict[str, Any], repo_root: Path) -> Optio
         return "record names no 'audited_execution_composite_sha256'"
     if not rec.get("promoted_by"):
         return "record names no 'promoted_by'"
+
+    reviewed_impl = rec.get("reviewed_implementation_sha256")
+    if not reviewed_impl:
+        return (
+            "record names no 'reviewed_implementation_sha256'; promotion evidence must "
+            "identify the exact feature implementation that was reviewed"
+        )
+    if current_impl_sha256 is None:
+        return "the feature's implementation module could not be resolved to hash it"
+    if reviewed_impl != current_impl_sha256:
+        return (
+            f"promotion reviewed implementation {reviewed_impl[:12]}... but the feature's "
+            f"implementation is now {current_impl_sha256[:12]}.... Old promotion evidence "
+            f"does not authorise changed feature code; re-review and re-record"
+        )
     return None
 
 
@@ -224,7 +320,9 @@ def check_feature_promotions(
                            f"evidence-backed promotion is recorded.",
             })
         else:
-            reason = _promotion_record_is_complete(rec, repo_root)
+            reason = _promotion_record_is_complete(
+                rec, repo_root, feature_implementation_sha256(name, fdef, repo_root)
+            )
             if reason:
                 violations.append({
                     "feature": name,
@@ -254,22 +352,29 @@ def assert_feature_promotions(**kwargs) -> Dict[str, Any]:
 def assert_baseline_not_extended(
     registry: Optional[Dict[str, Any]] = None,
     baseline: Optional[Set[str]] = None,
+    pinned: Optional[Set[str]] = None,
 ) -> None:
-    """The grandfather list may shrink, never grow.
+    """The grandfather set may shrink, never grow (RT-4).
 
-    Otherwise the escape hatch becomes the exploit: adding a new feature's name to the
-    baseline would grant it verified status with no evidence at all.
+    Growth is measured against the PINNED HISTORICAL set, not against the registry. The
+    earlier version compared `baseline - registry`, which only ever caught a stale name;
+    a new feature added to both the registry and the baseline sailed through, because the
+    difference it computed was empty precisely in the attack case.
     """
-    if registry is None:
-        from features.registry import FEATURE_REGISTRY as registry  # noqa: N806
+    if pinned is None:
+        p = BASELINE_PATH
+        if not p.is_file():
+            raise FeaturePromotionError(f"PROMOTION_BASELINE_MISSING: {p}")
+        pinned = set(json.loads(p.read_text(encoding="utf-8")).get("pinned_original_verified", []))
     if baseline is None:
         baseline = load_baseline()
-    unknown = sorted(baseline - set(registry))
-    if unknown:
+
+    added = sorted(set(baseline) - set(pinned))
+    if added:
         raise FeaturePromotionError(
-            f"PROMOTION_BASELINE_EXTENDED: {unknown} appear in the grandfather baseline but not "
-            f"in the registry. The baseline records features that already existed; it is not a "
-            f"place to pre-authorise new ones."
+            f"PROMOTION_BASELINE_EXTENDED: {added} are not in the pinned historical "
+            f"grandfather set. A new feature cannot become grandfathered by editing the "
+            f"baseline file."
         )
 
 

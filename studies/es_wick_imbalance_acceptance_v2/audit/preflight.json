@@ -1,9 +1,10 @@
 {
-  "status": "CLEAR",
-  "preflight_run_id": "20260817T173620Z_d3cc6561bf28",
-  "generated_at_utc": "2026-08-17T17:36:20.086412+00:00",
-  "elapsed_seconds": 4.22,
-  "code_hash": "d3cc6561bf283ae4fbd1e95ce4a9abec81b0c887868dfb4e095d1da42c028ad6",
+  "status": "INCOMPLETE",
+  "audit_ready": false,
+  "preflight_run_id": "20260817T225403Z_5d76352c2dc1",
+  "generated_at_utc": "2026-08-17T22:54:03.398700+00:00",
+  "elapsed_seconds": 4.16,
+  "code_hash": "5d76352c2dc17f4b6f4a833dbf3d0de7739688c6e74608e9d60ff3a62ac277b0",
   "spec_hash": "3d9f64b42fc53c441cca4e3c18831f6c6c8cbab50093b91d75f6c7874c290a15",
   "checks_run": [
     "EXECUTION_MANIFEST",
@@ -12,8 +13,30 @@
     "FEATURE_PROMOTION",
     "RESEARCH_DECISION_FIDELITY"
   ],
+  "check_outcomes": {
+    "EXECUTION_MANIFEST": "PASSED",
+    "CAUSAL_LINT": "PASSED",
+    "ARTIFACT_SCHEMA": "PASSED",
+    "FEATURE_PROMOTION": "PASSED",
+    "RESEARCH_DECISION_FIDELITY": "PASSED",
+    "CAUSAL_INVARIANTS": "SKIPPED"
+  },
+  "is_compiled_study": true,
+  "required_checks": [
+    "EXECUTION_MANIFEST",
+    "CAUSAL_LINT",
+    "ARTIFACT_SCHEMA",
+    "FEATURE_PROMOTION",
+    "RESEARCH_DECISION_FIDELITY",
+    "CAUSAL_INVARIANTS"
+  ],
+  "required_checks_missing": [
+    "CAUSAL_INVARIANTS"
+  ],
+  "checks_complete": false,
+  "diagnostic_mode": true,
   "failed_gate": null,
   "failure_ids": [],
   "failure_packet": null,
-  "required_next_action": "READY_FOR_AUDIT"
+  "required_next_action": "RUN_FULL_PREFLIGHT_BEFORE_AUDIT"
 }

@@ -22,6 +22,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from scripts.tests._preflight_fixture import plant_audit_ready_preflight  # noqa: E402
 from scripts.run_preexec_audits import (  # noqa: E402
     AuditArtifactParseError,
     AuditIngestionError,
@@ -241,6 +242,7 @@ def scratch_study(tmp_path):
 
     dest = tmp_path / STUDY.name
     shutil.copytree(STUDY, dest, dirs_exist_ok=True)
+    plant_audit_ready_preflight(dest)
     return dest
 
 
@@ -347,6 +349,7 @@ def test_ingest_accepts_a_well_formed_independent_report(tmp_path):
 
     scratch = tmp_path / STUDY.name
     shutil.copytree(STUDY, scratch, dirs_exist_ok=True)
+    plant_audit_ready_preflight(scratch)
     # Remove the target pass so ingestion has a clean destination.
     for stale in (scratch / "audit").glob("contract_pass_99.md"):
         stale.unlink()

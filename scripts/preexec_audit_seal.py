@@ -29,11 +29,15 @@ class PreexecAuditStaleError(RuntimeError):
 
 
 def _hash_file(file_path: Path) -> str:
-    h = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        while chunk := f.read(65536):
-            h.update(chunk)
-    return h.hexdigest()
+    """Canonical hash, shared with the execution manifest resolver (W7).
+
+    The seal and the manifest must agree byte-for-byte on what a file's identity is, so
+    they use one implementation. Text sources hash line-ending-normalised; binary
+    artifacts hash byte-exact.
+    """
+    from scripts.resolve_execution_manifest import canonical_file_sha256
+
+    return canonical_file_sha256(Path(file_path))
 
 
 def compute_execution_files_manifest(
@@ -63,6 +67,14 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
     """Generates and writes artifacts/preexec_audit_seal.json after verifying audits are CLEAR and fresh."""
     if repo_root is None:
         repo_root = Path(__file__).resolve().parents[1]
+
+    # RT-1: the seal is the strongest claim in the workflow, so it may not rest on a
+    # partial preflight. Checked before anything else is computed.
+    from scripts.research_preflight import PreflightEvidenceError, assert_preflight_audit_ready
+    try:
+        assert_preflight_audit_ready(study_dir)
+    except PreflightEvidenceError as err:
+        raise PreexecAuditStaleError(str(err))
 
     # 1. Compute current execution code manifest & composite hash
     current_composite_sha, exec_file_hashes = compute_execution_files_manifest(study_dir, repo_root)

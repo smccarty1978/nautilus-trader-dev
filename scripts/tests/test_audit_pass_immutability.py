@@ -27,9 +27,20 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 @pytest.fixture()
 def study(tmp_path: Path) -> Path:
-    d = tmp_path / "some_study"
+    """Study inside an isolated repo root.
+
+    The durable lineage anchor (RT-3) is keyed by study NAME under the repo root, so
+    tests sharing a name must not also share a root -- otherwise one test's anchor is
+    correctly reported as a reset of the next test's empty ledger.
+    """
+    d = tmp_path / "repo" / "studies" / "some_study"
     (d / "audit").mkdir(parents=True)
     return d
+
+
+@pytest.fixture()
+def repo(study: Path) -> Path:
+    return study.parents[1]
 
 
 def _ledger(study: Path) -> dict:
@@ -40,7 +51,7 @@ def _ledger(study: Path) -> dict:
 def _record(study: Path, audit_type: str, n: int, composite: str, report_sha: str):
     rpa.append_pass_ledger_entry(
         study, audit_type, n, composite, report_sha, "alice",
-        {"provenance_strength": "DECLARED_IDENTITY_ONLY"},
+        {"provenance_strength": "DECLARED_IDENTITY_ONLY"}, study.parents[1],
     )
 
 
@@ -49,27 +60,27 @@ def _record(study: Path, audit_type: str, n: int, composite: str, report_sha: st
 # ---------------------------------------------------------------------------
 
 def test_first_issuance_of_a_pass_is_permitted(study: Path):
-    rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "R1" * 32)
+    rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "R1" * 32, study.parents[1])
 
 
 def test_identical_reissue_is_idempotent(study: Path):
     """A retry of byte-identical evidence must not be punished."""
     _record(study, "causal", 1, "A" * 64, "R1" * 32)
-    rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "R1" * 32)
+    rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "R1" * 32, study.parents[1])
 
 
 def test_overwriting_pass_01_for_a_new_composite_is_refused(study: Path):
     """B1.1 -- the exact historical failure: pass_01 rewritten to describe composite B."""
     _record(study, "causal", 1, "A" * 64, "R1" * 32)
     with pytest.raises(rpa.AuditArtifactParseError, match="AUDIT_PASS_IMMUTABLE"):
-        rpa.enforce_pass_immutability(study, "causal", 1, "B" * 64, "R2" * 32)
+        rpa.enforce_pass_immutability(study, "causal", 1, "B" * 64, "R2" * 32, study.parents[1])
 
 
 def test_rewriting_the_report_under_the_same_composite_is_refused(study: Path):
     """Silent replacement of audit history is refused even when the composite matches."""
     _record(study, "causal", 1, "A" * 64, "R1" * 32)
     with pytest.raises(rpa.AuditArtifactParseError, match="AUDIT_PASS_IMMUTABLE"):
-        rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "DIFFERENT" + "0" * 55)
+        rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "DIFFERENT" + "0" * 55, study.parents[1])
 
 
 def test_new_composite_requires_a_higher_pass_number(study: Path):
@@ -81,9 +92,9 @@ def test_new_composite_requires_a_higher_pass_number(study: Path):
     _record(study, "causal", 1, "A" * 64, "R1" * 32)
     _record(study, "causal", 3, "B" * 64, "R2" * 32)
     with pytest.raises(rpa.AuditArtifactParseError, match="AUDIT_PASS_NUMBER_STALE"):
-        rpa.enforce_pass_immutability(study, "causal", 2, "C" * 64, "R3" * 32)
+        rpa.enforce_pass_immutability(study, "causal", 2, "C" * 64, "R3" * 32, study.parents[1])
     # A number above the high-water mark is accepted.
-    rpa.enforce_pass_immutability(study, "causal", 4, "C" * 64, "R3" * 32)
+    rpa.enforce_pass_immutability(study, "causal", 4, "C" * 64, "R3" * 32, study.parents[1])
 
 
 def test_occupied_pass_number_is_refused_before_the_ordering_rule(study: Path):
@@ -91,13 +102,13 @@ def test_occupied_pass_number_is_refused_before_the_ordering_rule(study: Path):
     _record(study, "causal", 1, "A" * 64, "R1" * 32)
     _record(study, "causal", 2, "B" * 64, "R2" * 32)
     with pytest.raises(rpa.AuditArtifactParseError, match="AUDIT_PASS_IMMUTABLE"):
-        rpa.enforce_pass_immutability(study, "causal", 2, "C" * 64, "R3" * 32)
+        rpa.enforce_pass_immutability(study, "causal", 2, "C" * 64, "R3" * 32, study.parents[1])
 
 
 def test_contract_gate_has_an_independent_pass_sequence(study: Path):
     """A causal pass 01 must not constrain the contract gate's pass 01."""
     _record(study, "causal", 1, "A" * 64, "R1" * 32)
-    rpa.enforce_pass_immutability(study, "contract", 1, "A" * 64, "K1" * 32)
+    rpa.enforce_pass_immutability(study, "contract", 1, "A" * 64, "K1" * 32, study.parents[1])
 
 
 def test_ledger_is_append_only(study: Path):
@@ -112,13 +123,13 @@ def test_corrupt_ledger_fails_closed(study: Path):
     """An unreadable immutability control is not a satisfied one."""
     (study / "audit" / rpa.PASS_LEDGER_NAME).write_text("{not json", encoding="utf-8")
     with pytest.raises(rpa.AuditArtifactParseError, match="PASS_LEDGER_UNREADABLE"):
-        rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "R" * 64)
+        rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "R" * 64, study.parents[1])
 
 
 def test_malformed_ledger_fails_closed(study: Path):
     (study / "audit" / rpa.PASS_LEDGER_NAME).write_text('{"entries": "nope"}', encoding="utf-8")
     with pytest.raises(rpa.AuditArtifactParseError, match="PASS_LEDGER_MALFORMED"):
-        rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "R" * 64)
+        rpa.enforce_pass_immutability(study, "causal", 1, "A" * 64, "R" * 64, study.parents[1])
 
 
 # ---------------------------------------------------------------------------
@@ -134,14 +145,21 @@ def test_absent_transcript_is_recorded_explicitly_not_silently(tmp_path: Path):
     assert any("absence of session evidence" in lim.lower() for lim in p["limitations"])
 
 
-def test_real_transcript_upgrades_strength_and_is_hashed(tmp_path: Path):
-    """B2.2 -- when a genuine session artifact exists, it is bound by hash."""
+def test_supplied_transcript_is_attached_not_promoted(tmp_path: Path):
+    """W5 -- a supplied file is hashed for reference; it does not raise the strength.
+
+    Superseded B2.2, which awarded SESSION_BOUND to any readable path. Hashing a file
+    proves the file existed, not that a review session happened, and this repository has
+    no audit-session evidence contract that could tell the two apart. SESSION_BOUND is
+    therefore deliberately unreachable rather than cheaply granted.
+    """
     t = tmp_path / "session.md"
     t.write_bytes(b"reviewer session transcript\n")
     p = rpa.build_reviewer_provenance("bob", "cli_author", t)
-    assert p["provenance_strength"] == "SESSION_BOUND"
-    assert p["session_evidence"]["transcript_sha256"]
-    assert p["independence_proven"] is False, "session binding still does not prove independence"
+    assert p["provenance_strength"] == "DECLARED_IDENTITY_ONLY"
+    assert p["session_evidence"] is None
+    assert p["attached_artifact"]["sha256"]
+    assert p["independence_proven"] is False
 
 
 def test_nonexistent_transcript_does_not_upgrade_strength(tmp_path: Path):
@@ -158,6 +176,7 @@ def test_independence_is_never_claimed_as_proven(tmp_path: Path):
     for transcript in (None, t):
         p = rpa.build_reviewer_provenance("a", "report_summary", transcript)
         assert p["independence_proven"] is False
+        assert p["provenance_strength"] == "DECLARED_IDENTITY_ONLY"
         assert p["independence_basis"] == "distinct_declared_identity_strings"
 
 
