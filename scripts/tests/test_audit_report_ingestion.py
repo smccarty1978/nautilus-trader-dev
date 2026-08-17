@@ -42,7 +42,23 @@ def summary_block(**fields) -> str:
     )
 
 
-def write_report(path: Path, body: str, **summary) -> Path:
+def write_report(path: Path, body: str, *, omit=(), **summary) -> Path:
+    """Writes a report, injecting the mandatory binding fields unless omitted.
+
+    `audit_type`, `study`, `auditor` and `audited_execution_composite_sha256` are
+    mandatory on every route (B1/B2). Tests that assert their absence is rejected
+    pass e.g. `omit=("study",)`.
+    """
+    defaults = {
+        "audit_type": "causal",
+        "study": STUDY.name,
+        "auditor": "test:auditor",
+        "audited_execution_composite_sha256": "0" * 64,
+    }
+    for key, value in defaults.items():
+        summary.setdefault(key, value)
+    for key in omit:
+        summary.pop(key, None)
     path.write_text(body + "\n" + summary_block(**summary), encoding="utf-8")
     return path
 
@@ -256,18 +272,18 @@ def test_ingest_rejects_malformed_summary(tmp_path, scratch_study):
 
 def test_ingest_rejects_report_without_study_binding(tmp_path, scratch_study):
     src = write_report(
-        tmp_path / "r.md", "body",
-        verdict="CLEAR", blocking=0, warning=0, note=0,
+        tmp_path / "r.md", "body", omit=("study",),
+        audit_type="contract", verdict="CLEAR", blocking=0, warning=0, note=0,
         audited_execution_composite_sha256=current_composite(),
     )
-    with pytest.raises(AuditIngestionError, match="INGEST_STUDY_UNDECLARED"):
+    with pytest.raises(AuditArtifactParseError, match="INGEST_STUDY_UNDECLARED"):
         ingest_external_audit_report(scratch_study, 99, "contract", src, author="redteam")
 
 
 def test_ingest_rejects_wrong_study(tmp_path, scratch_study):
     src = write_report(
         tmp_path / "r.md", "body",
-        verdict="CLEAR", blocking=0, warning=0, note=0,
+        audit_type="contract", verdict="CLEAR", blocking=0, warning=0, note=0,
         study="some_other_study",
         audited_execution_composite_sha256=current_composite(),
     )
@@ -277,10 +293,10 @@ def test_ingest_rejects_wrong_study(tmp_path, scratch_study):
 
 def test_ingest_rejects_report_without_composite_binding(tmp_path, scratch_study):
     src = write_report(
-        tmp_path / "r.md", "body",
-        verdict="CLEAR", blocking=0, warning=0, note=0, study=STUDY.name,
+        tmp_path / "r.md", "body", omit=("audited_execution_composite_sha256",),
+        audit_type="contract", verdict="CLEAR", blocking=0, warning=0, note=0, study=STUDY.name,
     )
-    with pytest.raises(AuditIngestionError, match="INGEST_COMPOSITE_UNDECLARED"):
+    with pytest.raises(AuditArtifactParseError, match="INGEST_COMPOSITE_UNDECLARED"):
         ingest_external_audit_report(scratch_study, 99, "contract", src, author="redteam")
 
 
@@ -288,7 +304,7 @@ def test_ingest_rejects_stale_audit(tmp_path, scratch_study):
     """An audit of older code must not be filed against the current tree."""
     src = write_report(
         tmp_path / "r.md", "body",
-        verdict="CLEAR", blocking=0, warning=0, note=0, study=STUDY.name,
+        audit_type="contract", verdict="CLEAR", blocking=0, warning=0, note=0, study=STUDY.name,
         audited_execution_composite_sha256="0" * 64,
     )
     with pytest.raises(AuditIngestionError, match="INGEST_STALE_AUDIT"):
@@ -308,7 +324,7 @@ def test_ingest_rejects_summary_mismatch(tmp_path, scratch_study):
     src = write_report(
         tmp_path / "r.md",
         "### BLOCKING: deliverable missing\ndetail\n",
-        verdict="CLEAR", blocking=0, warning=0, note=0, study=STUDY.name,
+        audit_type="contract", verdict="CLEAR", blocking=0, warning=0, note=0, study=STUDY.name,
         audited_execution_composite_sha256=current_composite(),
     )
     with pytest.raises(AuditArtifactParseError, match="FINDING_COUNT_MISMATCH|INVALID_CLEAR_VERDICT"):
@@ -318,7 +334,7 @@ def test_ingest_rejects_summary_mismatch(tmp_path, scratch_study):
 def test_ingest_refuses_to_overwrite_existing_pass(tmp_path, scratch_study):
     src = write_report(
         tmp_path / "r.md", "body",
-        verdict="CLEAR", blocking=0, warning=0, note=0, study=STUDY.name,
+        audit_type="contract", verdict="CLEAR", blocking=0, warning=0, note=0, study=STUDY.name,
         audited_execution_composite_sha256=current_composite(),
     )
     with pytest.raises(AuditIngestionError, match="INGEST_DESTINATION_EXISTS"):
@@ -338,7 +354,8 @@ def test_ingest_accepts_a_well_formed_independent_report(tmp_path):
     src = write_report(
         tmp_path / "independent.md",
         "# Independent contract review\n\n## Findings by severity\n\nNothing blocking.\n",
-        verdict="CLEAR", blocking=0, warning=0, note=1, study=STUDY.name,
+        audit_type="contract", verdict="CLEAR", blocking=0, warning=0, note=1, study=STUDY.name,
+        auditor="redteam:contract-checker",
         audited_execution_composite_sha256=current_composite(),
     )
     status = ingest_external_audit_report(

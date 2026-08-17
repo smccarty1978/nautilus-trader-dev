@@ -257,6 +257,21 @@ def extract_simulated_outputs(engine: Any, strategy: Any) -> Dict[str, Any]:
     }
 
 
+def _count_evaluator_trades(strategy: Any) -> int:
+    """Counts virtual evaluator trades a strategy is holding, if any.
+
+    Used to detect a virtual strategy running under `simulated_orders` (W1).
+    """
+    evaluators = getattr(strategy, "evaluators", None)
+    if not evaluators:
+        return 0
+    total = 0
+    for evaluator in evaluators:
+        total += len(list(getattr(evaluator, "trade_history", []) or []))
+        total += len(list(getattr(evaluator, "active_trades", []) or []))
+    return total
+
+
 def summarize_simulated(outputs: Dict[str, Any]) -> Dict[str, Any]:
     closed = outputs["closed_positions"]
     pnl = (
@@ -556,14 +571,29 @@ def run_backtest_mode(
         summary["evaluator_tables_empty"] = sorted(n for n, df in tables.items() if df.empty)
     else:
         outputs = extract_simulated_outputs(engine, strategy_obj)
+
+        # W1: the counterpart to the virtual assertion. A strategy that keeps
+        # virtual evaluator trades but places no broker orders is a `virtual`
+        # strategy; reporting SUCCESS with an empty trades.parquet silently
+        # discards its real output.
+        evaluator_trades = _count_evaluator_trades(strategy_obj)
+        if evaluator_trades > 0 and outputs["positions_report_rows"] == 0:
+            raise BacktestContractError(
+                f"SIMULATED_CONTRACT_VIOLATED: strategy produced {evaluator_trades} virtual "
+                f"evaluator trades and zero NT positions. Its output is virtual evaluator "
+                f"tables, not a broker position stream — declare order_handling='virtual'."
+            )
+
         closed_path = backtest_dir / "trades.parquet"
         outputs["closed_positions"].to_parquet(closed_path, index=False)
         artifacts["trades"] = closed_path.as_posix()
 
-        if not outputs["strategy_trades"].empty:
-            st_path = backtest_dir / "strategy_trades.parquet"
-            outputs["strategy_trades"].to_parquet(st_path, index=False)
-            artifacts["strategy_trades"] = st_path.as_posix()
+        # W4: strategy_trades is a REQUIRED artifact of this contract, not an
+        # optional extra. Writing it only when non-empty let the golden assertion
+        # silently pass if the harness stopped producing it.
+        st_path = backtest_dir / "strategy_trades.parquet"
+        outputs["strategy_trades"].to_parquet(st_path, index=False)
+        artifacts["strategy_trades"] = st_path.as_posix()
 
         if not outputs["open_positions"].empty:
             op_path = backtest_dir / "open_positions.parquet"
@@ -588,7 +618,33 @@ def run_backtest_mode(
     }
     _write_json(run_dir / "execution_metrics.json", metrics)
 
-    summary.update({"run_id": run_id, "status": "SUCCESS", "artifacts": artifacts})
+    # M3: validate BEFORE any SUCCESS is persisted. The assertion previously ran
+    # after the manifest was written, so an incomplete run exited non-zero but left
+    # a SUCCESS manifest on disk — the artifact a later reader would trust.
+    summary.update({"run_id": run_id, "artifacts": artifacts})
+    try:
+        _assert_required_artifacts(
+            run_dir, plan.execution_mode.order_handling, artifacts,
+            require_summary=False,
+        )
+    except MissingArtifactError as err:
+        manifest.update(
+            {
+                "status": "FAILED_INCOMPLETE_ARTIFACTS",
+                "end_time_utc": finished.isoformat(),
+                "artifacts": artifacts,
+                "execution_metrics": metrics,
+                "failure": str(err),
+            }
+        )
+        _write_json(run_dir / "run_manifest.json", manifest)
+        summary["status"] = "FAILED_INCOMPLETE_ARTIFACTS"
+        summary["failure"] = str(err)
+        _write_json(run_dir / "summary.json", summary)
+        engine.dispose()
+        raise
+
+    summary["status"] = "SUCCESS"
     _write_json(run_dir / "summary.json", summary)
 
     manifest.update(
@@ -600,8 +656,6 @@ def run_backtest_mode(
         }
     )
     _write_json(run_dir / "run_manifest.json", manifest)
-
-    _assert_required_artifacts(run_dir, plan.execution_mode.order_handling, artifacts)
 
     engine.dispose()
 
@@ -623,9 +677,23 @@ REQUIRED_ARTIFACT_FILES: Tuple[str, ...] = (
 )
 
 
-def _assert_required_artifacts(run_dir: Path, order_handling: str, artifacts: Dict[str, str]) -> None:
-    """A run is not SUCCESS unless its declared artifact set actually exists."""
-    missing = [name for name in REQUIRED_ARTIFACT_FILES if not (run_dir / name).is_file()]
+def _assert_required_artifacts(
+    run_dir: Path,
+    order_handling: str,
+    artifacts: Dict[str, str],
+    *,
+    require_summary: bool = True,
+) -> None:
+    """A run is not SUCCESS unless its declared artifact set actually exists.
+
+    ``require_summary=False`` is used by the in-run check, which deliberately runs
+    *before* ``summary.json`` is written so that no SUCCESS is ever persisted ahead
+    of validation. Post-hoc callers keep the full set.
+    """
+    required = REQUIRED_ARTIFACT_FILES
+    if not require_summary:
+        required = tuple(n for n in required if n != "summary.json")
+    missing = [name for name in required if not (run_dir / name).is_file()]
     if not (run_dir / "logs").is_dir():
         missing.append("logs/")
     if order_handling == "simulated_orders" and "trades" not in artifacts:

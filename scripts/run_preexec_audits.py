@@ -5,6 +5,16 @@ can ONLY be issued by deterministically parsing actual auditor report/transcript
 
 The orchestrator CANNOT declare or override the verdict, critical counts, or warning counts.
 All metrics and verdicts are derived directly from the immutable auditor markdown artifact.
+
+Reviewer independence (B1), stated honestly:
+
+    The pre-execution workflow requires distinct declared auditor identities for the
+    causal and contract review roles. Identity authenticity remains an external
+    workflow responsibility.
+
+This is a mechanical constraint on two strings, not cryptographic proof that two
+people reviewed the code. The external independent red team remains the final
+verification layer.
 """
 
 from __future__ import annotations
@@ -33,8 +43,31 @@ class AuditArtifactParseError(RuntimeError):
     pass
 
 
-def _extract_v2_summary(text: str, report_path: Path) -> Dict[str, Any]:
-    """Extracts and parses strict V2 audit summary JSON block."""
+VALID_AUDIT_TYPES = ("causal", "contract")
+
+
+def _extract_v2_summary(
+    text: str,
+    report_path: Path,
+    *,
+    expected_audit_type: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Extracts and parses the strict V2 audit summary block.
+
+    Four fields are mandatory on **every** route, not just ``--ingest``:
+
+    ``verdict``
+        CLEAR or BLOCKED.
+    ``audit_type``
+        ``causal`` or ``contract``. Without it one report satisfies both mandatory
+        independent gates, and the seal names two reviewers that never existed.
+    ``study``
+        The study the auditor reviewed, so a report cannot be filed against another.
+    ``audited_execution_composite_sha256``
+        The composite the auditor states they reviewed. The issuer *verifies* this
+        against the resolved manifest; it never stamps the current value. A stamped
+        composite makes the seal's anti-staleness guarantee self-generated.
+    """
     start_tag = "<!-- AUDIT_SUMMARY_V2_START -->"
     end_tag = "<!-- AUDIT_SUMMARY_V2_END -->"
 
@@ -64,7 +97,80 @@ def _extract_v2_summary(text: str, report_path: Path) -> Dict[str, Any]:
     if verdict not in ("CLEAR", "BLOCKED"):
         raise AuditArtifactParseError(f"MALFORMED_AUDIT_SUMMARY_V2: Invalid verdict '{verdict}' in {report_path.name}")
 
+    # --- B1: a report belongs to exactly one gate ------------------------
+    audit_type = data.get("audit_type")
+    if audit_type is None:
+        raise AuditArtifactParseError(
+            f"AUDIT_TYPE_UNDECLARED: {report_path.name} must declare 'audit_type' in its "
+            f"AUDIT_SUMMARY_V2 block, one of {list(VALID_AUDIT_TYPES)}. Without it a single "
+            f"report can satisfy both mandatory independent gates."
+        )
+    if audit_type not in VALID_AUDIT_TYPES:
+        raise AuditArtifactParseError(
+            f"AUDIT_TYPE_INVALID: {report_path.name} declares audit_type={audit_type!r}; "
+            f"valid values are {list(VALID_AUDIT_TYPES)}"
+        )
+    if expected_audit_type is not None and audit_type != expected_audit_type:
+        raise AuditArtifactParseError(
+            f"AUDIT_TYPE_MISMATCH: {report_path.name} declares audit_type={audit_type!r} but is "
+            f"being processed as {expected_audit_type!r}. A causal report cannot satisfy the "
+            f"contract gate, or vice versa."
+        )
+
+    # --- B1: a real author, never a hard-coded label ---------------------
+    auditor = data.get("auditor") or data.get("author")
+    if auditor is not None and (not isinstance(auditor, str) or not auditor.strip()):
+        raise AuditArtifactParseError(
+            f"AUDITOR_INVALID: {report_path.name} declares an empty 'auditor'"
+        )
+
+    # --- B2: the auditor declares what they reviewed ---------------------
+    study = data.get("study")
+    if not study or not isinstance(study, str):
+        raise AuditArtifactParseError(
+            f"INGEST_STUDY_UNDECLARED: {report_path.name} must declare 'study' in its "
+            f"AUDIT_SUMMARY_V2 block so a report cannot be filed against the wrong study."
+        )
+    composite = data.get("audited_execution_composite_sha256")
+    if not composite or not isinstance(composite, str):
+        raise AuditArtifactParseError(
+            f"INGEST_COMPOSITE_UNDECLARED: {report_path.name} must declare "
+            f"'audited_execution_composite_sha256' identifying the code that was reviewed. "
+            f"The issuer verifies this value; it is never stamped from the current tree."
+        )
+
     return data
+
+
+def _verify_declared_binding(
+    summary: Dict[str, Any],
+    study_dir: Path,
+    report_path: Path,
+    repo_root: Path,
+    error_cls: type = None,
+) -> str:
+    """Verifies the auditor's declared study and composite against reality (B2).
+
+    Returns the verified composite. Raises rather than substituting, so freshness
+    is always an auditor assertion the tool confirmed, never a value the tool
+    generated.
+    """
+    err = error_cls or AuditArtifactParseError
+    declared_study = summary["study"]
+    if declared_study != study_dir.name:
+        raise err(
+            f"INGEST_STUDY_MISMATCH: {report_path.name} declares study {declared_study!r} but is "
+            f"being filed under {study_dir.name!r}."
+        )
+    declared = summary["audited_execution_composite_sha256"]
+    current, _file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+    if declared != current:
+        raise err(
+            f"INGEST_STALE_AUDIT: {report_path.name} reviewed execution composite "
+            f"{declared[:12]}… but the current tree resolves to {current[:12]}…. "
+            f"Re-audit against the current tree; the composite is never re-stamped."
+        )
+    return current
 
 
 # A finding heading is `<marker> SEVERITY: <title>`:
@@ -77,30 +183,90 @@ def _extract_v2_summary(text: str, report_path: Path) -> Dict[str, Any]:
 # that previously rejected valid reports:
 #   `## Critical findings`  -> section label, no colon        -> not a finding
 #   `- Critical: 0`         -> count bullet, numeric title    -> not a finding
+# A finding may legitimately be written several ways. Under-inclusive detection is
+# the dangerous direction: it lets a report claim zero findings while listing them,
+# so each of these forms is recognised.
+#
+#   ### CRITICAL: title              heading
+#     - BLOCKING: title              INDENTED bullet          (M4)
+#   > - CRITICAL: title              blockquoted bullet       (M4)
+#   ### BLOCKING — title             em/en-dash separator     (M4)
+#   | F1 | BLOCKING | title |        table row                (M4)
+#   ### Finding 1 / Severity: BLOCKING   next-line severity   (M4)
+#
+# And each of these is NOT a finding:
+#   ## Critical findings             section label, no separator
+#   - Critical: 0                    count bullet
+#   - **Critical:** 0                emphasis around the colon
+#   - Critical: 0 (none found)       count with a parenthetical  (W7)
+#   - Critical: none / N/A / zero    zero-count language
+
+_SEPARATOR = r"[:–—-]"          # colon, en dash, em dash, hyphen
+
 _FINDING_HEADING = (
-    r"^(?:#{1,4}|[-*])\s+"                 # heading or bullet marker
-    r"[\[\*_`]{0,3}\s*"                    # optional [ / ** / __ / ` decoration
+    r"^[ \t]*(?:>[ \t]*)*"                 # optional blockquote / indentation
+    r"(?:#{1,4}|[-*+])[ \t]+"              # heading or bullet marker
+    r"[\[\*_`]{0,3}[ \t]*"                 # optional [ / ** / __ / ` decoration
     r"(?:%s)"                              # severity token
-    r"\s*[\]\*_`]{0,3}"                    # closing decoration
-    r"\s*:\s*"                             # MANDATORY colon
+    r"[ \t]*[\]\*_`]{0,3}"                 # closing decoration
+    r"[ \t]*" + _SEPARATOR + r"[ \t]*"     # MANDATORY separator
     r"(?P<title>\S.*)$"                    # non-empty title
 )
 
-_COUNT_ONLY_TITLE = re.compile(r"^(?:\d+|none|n/?a|zero)\b\.?$", re.IGNORECASE)
+# `| F1 | BLOCKING | closure omits X |`
+_FINDING_TABLE_ROW = (
+    r"^[ \t]*\|[^|\n]*\|[ \t]*[\[\*_`]{0,3}[ \t]*(?:%s)[ \t]*[\]\*_`]{0,3}[ \t]*\|"
+)
+
+# A standalone `Severity: BLOCKING` line (the severity is on the row below a
+# neutral `### Finding 1` heading).
+_FINDING_SEVERITY_LINE = (
+    r"^[ \t]*(?:>[ \t]*)*(?:[-*+][ \t]+)?(?:\*\*|__)?[ \t]*severity[ \t]*(?:\*\*|__)?"
+    r"[ \t]*" + _SEPARATOR + r"[ \t]*(?:\*\*|__|`|\[)?[ \t]*(?:%s)\b"
+)
+
+# A title that is only a count is a summary line, not a finding. Trailing
+# parentheticals and words are tolerated: `0 (none found)`, `none observed`.
+_COUNT_ONLY_TITLE = re.compile(
+    r"^(?:\d+|none|n/?a|zero|nil)\b[\s.()\w,'\-/]*$", re.IGNORECASE
+)
 
 
 def _count_severity_headings(text: str, severities: str) -> int:
-    pattern = re.compile(_FINDING_HEADING % severities, re.MULTILINE | re.IGNORECASE)
+    """Counts genuine findings of the given severities, excluding summary furniture."""
     count = 0
-    for match in pattern.finditer(text):
+    seen_lines = set()
+
+    heading_re = re.compile(_FINDING_HEADING % severities, re.MULTILINE | re.IGNORECASE)
+    for match in heading_re.finditer(text):
         # Strip markdown emphasis from BOTH ends: a count bullet is often written
         # `- **Critical:** 0`, where the colon sits inside the emphasis and the
         # captured title begins with the closing `**`.
         title = match.group("title").strip().strip("*_`").strip()
-        # `- Critical: 0` / `- Warning: none` are summary counts, not findings.
         if _COUNT_ONLY_TITLE.match(title):
             continue
+        seen_lines.add(match.start())
         count += 1
+
+    table_re = re.compile(_FINDING_TABLE_ROW % severities, re.MULTILINE | re.IGNORECASE)
+    for match in table_re.finditer(text):
+        if match.start() in seen_lines:
+            continue
+        # A table header/separator row is not a finding.
+        line = text[match.start(): text.find("\n", match.start()) if "\n" in text[match.start():]
+                    else len(text)]
+        if set(line.replace("|", "").strip()) <= set("-: "):
+            continue
+        seen_lines.add(match.start())
+        count += 1
+
+    severity_re = re.compile(_FINDING_SEVERITY_LINE % severities, re.MULTILINE | re.IGNORECASE)
+    for match in severity_re.finditer(text):
+        if match.start() in seen_lines:
+            continue
+        seen_lines.add(match.start())
+        count += 1
+
     return count
 
 
@@ -197,10 +363,144 @@ def parse_contract_audit_report(report_path: Path) -> Tuple[str, int, int, int]:
     return derived_verdict, block_sum, warn_sum, nv_sum
 
 
+def _resolve_auditor(summary: Dict[str, Any], author: Optional[str], report_path: Path) -> str:
+    """The recorded auditor must be a real declared identity (B1).
+
+    Previously this defaulted to a hard-coded label, so a seal could name a
+    reviewer that never existed. The identity now comes from the report's own
+    `auditor`/`author` field or from an explicit `--author`, and the two must agree
+    when both are present.
+    """
+    declared = summary.get("auditor") or summary.get("author")
+    if declared and author and declared.strip() != author.strip():
+        raise AuditArtifactParseError(
+            f"AUDITOR_MISMATCH: {report_path.name} declares auditor {declared!r} but "
+            f"--author was given as {author!r}."
+        )
+    resolved = (author or declared or "").strip()
+    if not resolved:
+        raise AuditArtifactParseError(
+            f"AUDITOR_UNDECLARED: {report_path.name} declares no 'auditor' and no --author was "
+            f"supplied. A status artifact must name a real reviewer; there is no default."
+        )
+    return resolved
+
+
+def _sibling_status_name(audit_type: str) -> str:
+    return "contract_status.json" if audit_type == "causal" else "status.json"
+
+
+def _read_sibling_status(study_dir: Path, audit_type: str) -> Tuple[Path, Optional[Dict[str, Any]]]:
+    """Reads the *other* gate's status artifact, failing closed (N3).
+
+    Returns ``(path, None)`` only when the sibling genuinely does not exist. If it
+    exists but cannot be read, parsed, or does not carry the fields the
+    independence controls read, this raises: an unreadable control is not a
+    satisfied control. "Could not determine the sibling identity" must never be
+    interpreted as "safe to proceed" — that is precisely the state an attacker
+    can manufacture by corrupting one byte.
+    """
+    sibling_name = _sibling_status_name(audit_type)
+    sibling = study_dir / "audit" / sibling_name
+    if not sibling.is_file():
+        return sibling, None
+
+    def _invalid(reason: str) -> AuditArtifactParseError:
+        return AuditArtifactParseError(
+            f"SIBLING_AUDIT_STATUS_INVALID: {sibling_name} exists but {reason}. The causal and "
+            f"contract gates cannot be shown to be independent, so issuance fails closed. "
+            f"Repair or remove the sibling status and re-issue it from its report."
+        )
+
+    try:
+        raw = sibling.read_text(encoding="utf-8")
+    except OSError as err:
+        raise _invalid(f"could not be read ({err})")
+    try:
+        data = json.loads(raw)
+    except ValueError as err:
+        raise _invalid(f"is not valid JSON ({err})")
+    if not isinstance(data, dict):
+        raise _invalid("does not contain a JSON object")
+
+    expected_type = "contract" if audit_type == "causal" else "causal"
+    if data.get("audit_type") != expected_type:
+        raise _invalid(
+            f"declares audit_type={data.get('audit_type')!r}, expected {expected_type!r}"
+        )
+    auditor = data.get("auditor")
+    if not isinstance(auditor, str) or not auditor.strip():
+        raise _invalid("names no auditor, so reviewer independence cannot be checked")
+    return sibling, data
+
+
+def _normalise_identity(identity: str) -> str:
+    """Identities compare case- and whitespace-insensitively.
+
+    `Alice` and `alice` are one declared reviewer; treating them as two would make
+    the control bypassable by pressing shift.
+    """
+    return " ".join(identity.split()).casefold()
+
+
+def _reject_auditor_role_reuse(
+    study_dir: Path, audit_type: str, auditor: str, report_path: Path
+) -> None:
+    """The causal reviewer and the contract reviewer must be different (B1).
+
+    Report-type binding stops one *file* from satisfying both gates, but not one
+    *reviewer* from authoring both reports — and two reports by the same author is
+    a one-reviewer workflow wearing a two-reviewer seal. Report SHA cannot carry
+    this control: two reports that differ only in their declared `audit_type`
+    necessarily differ in bytes, so their SHAs differ by construction. Declared
+    identity is therefore the primary cross-gate control.
+
+    This enforces *distinct declared identities*. It cannot prove that two strings
+    correspond to two different people; that remains an external workflow
+    responsibility.
+    """
+    sibling_name = _sibling_status_name(audit_type)
+    _sibling, data = _read_sibling_status(study_dir, audit_type)
+    if data is None:
+        return
+    other = data["auditor"]
+    if _normalise_identity(other) == _normalise_identity(auditor):
+        raise AuditArtifactParseError(
+            f"AUDITOR_ROLE_REUSE: {report_path.name} is authored by {auditor!r}, who is already "
+            f"recorded in {sibling_name} as the {data['audit_type']} reviewer. The causal and "
+            f"contract reviews are independent roles and require distinct declared auditors; "
+            f"there is no override."
+        )
+
+
+def _reject_report_reuse(
+    study_dir: Path, audit_type: str, report_sha256: str, report_path: Path
+) -> None:
+    """One report may not satisfy both mandatory gates (B1, defence in depth).
+
+    Checks the *sibling* status artifact for the same report/source SHA. This
+    catches tampering and literal reuse, but it is no longer the primary
+    independence control — see `_reject_auditor_role_reuse` for why a relabelled
+    twin can never collide on SHA.
+    """
+    sibling_name = _sibling_status_name(audit_type)
+    _sibling, data = _read_sibling_status(study_dir, audit_type)
+    if data is None:
+        return
+    for field in ("audit_report_sha256", "source_sha256"):
+        other = data.get(field)
+        if other and other == report_sha256:
+            raise AuditArtifactParseError(
+                f"AUDIT_REPORT_REUSED: {report_path.name} (sha {report_sha256[:12]}…) is already "
+                f"recorded in {sibling_name} as {field}. The causal and contract gates are "
+                f"independent; one report cannot satisfy both."
+            )
+
+
 def issue_causal_audit_status_from_report(
     study_dir: Path,
     pass_num: int,
-    auditor: str = "lookahead_auditor",
+    auditor: Optional[str] = None,
     transcript_path: Optional[Path] = None,
     repo_root: Optional[Path] = None,
 ) -> Dict[str, Any]:
@@ -213,16 +513,26 @@ def issue_causal_audit_status_from_report(
     if not report_file.exists():
         raise FileNotFoundError(f"Causal audit report missing: {report_file}")
 
+    summary = _extract_v2_summary(
+        report_file.read_text(encoding="utf-8"), report_file, expected_audit_type="causal"
+    )
+    resolved_auditor = _resolve_auditor(summary, auditor, report_file)
+    # B1: the contract reviewer may not also be the causal reviewer.
+    _reject_auditor_role_reuse(study_dir, "causal", resolved_auditor, report_file)
+    # B2: verify the auditor's declared composite; never stamp the current one.
+    composite_sha = _verify_declared_binding(summary, study_dir, report_file, repo_root)
+    _, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+
     verdict, critical, warning, note = parse_causal_audit_report(report_file)
     report_sha256 = _hash_file(report_file)
-    composite_sha, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+    _reject_report_reuse(study_dir, "causal", report_sha256, report_file)
 
     transcript_sha = _hash_file(transcript_path) if transcript_path and transcript_path.exists() else None
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     status_data = {
         "audit_type": "causal",
-        "auditor": auditor,
+        "auditor": resolved_auditor,
         "pass": pass_num,
         "verdict": verdict,
         "critical": critical,
@@ -249,7 +559,7 @@ def issue_causal_audit_status_from_report(
 def issue_contract_audit_status_from_report(
     study_dir: Path,
     pass_num: int,
-    auditor: str = "contract_checker",
+    auditor: Optional[str] = None,
     transcript_path: Optional[Path] = None,
     repo_root: Optional[Path] = None,
 ) -> Dict[str, Any]:
@@ -262,16 +572,26 @@ def issue_contract_audit_status_from_report(
     if not report_file.exists():
         raise FileNotFoundError(f"Contract audit report missing: {report_file}")
 
+    summary = _extract_v2_summary(
+        report_file.read_text(encoding="utf-8"), report_file, expected_audit_type="contract"
+    )
+    resolved_auditor = _resolve_auditor(summary, auditor, report_file)
+    # B1: the causal reviewer may not also be the contract reviewer.
+    _reject_auditor_role_reuse(study_dir, "contract", resolved_auditor, report_file)
+    # B2: verify the auditor's declared composite; never stamp the current one.
+    composite_sha = _verify_declared_binding(summary, study_dir, report_file, repo_root)
+    _, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+
     verdict, blocking, warning, not_verified = parse_contract_audit_report(report_file)
     report_sha256 = _hash_file(report_file)
-    composite_sha, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+    _reject_report_reuse(study_dir, "contract", report_sha256, report_file)
 
     transcript_sha = _hash_file(transcript_path) if transcript_path and transcript_path.exists() else None
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     status_data = {
         "audit_type": "contract",
-        "auditor": auditor,
+        "auditor": resolved_auditor,
         "pass": pass_num,
         "verdict": verdict,
         "critical": blocking,
@@ -378,38 +698,21 @@ def ingest_external_audit_report(
     # the summary-vs-heading consistency check, otherwise a self-contradictory report
     # would be filed into audit/ and only rejected afterwards, leaving the bad
     # artifact behind.
-    summary = _extract_v2_summary(text, source_path)
+    # `_extract_v2_summary` now enforces audit_type, study and composite declaration
+    # on every route, so the ingest path and the default path share one contract.
+    summary = _extract_v2_summary(text, source_path, expected_audit_type=audit_type)
     if audit_type == "causal":
         parse_causal_audit_report(source_path)
     else:
         parse_contract_audit_report(source_path)
 
-    # (3) study binding
-    declared_study = summary.get("study")
-    if not declared_study:
-        raise AuditIngestionError(
-            "INGEST_STUDY_UNDECLARED: the AUDIT_SUMMARY_V2 block must carry a 'study' field "
-            "naming the audited study, so a report cannot be filed against the wrong study."
-        )
-    if declared_study != study_dir.name:
-        raise AuditIngestionError(
-            f"INGEST_STUDY_MISMATCH: report declares study '{declared_study}' but is being "
-            f"filed under '{study_dir.name}'."
-        )
+    # (3)+(4) study and freshness binding, verified against the resolved manifest.
+    _verify_declared_binding(summary, study_dir, source_path, repo_root,
+                             error_cls=AuditIngestionError)
 
-    # (4) freshness binding
-    declared_composite = summary.get("audited_execution_composite_sha256")
-    if not declared_composite:
-        raise AuditIngestionError(
-            "INGEST_COMPOSITE_UNDECLARED: the AUDIT_SUMMARY_V2 block must carry "
-            "'audited_execution_composite_sha256' identifying the code that was reviewed."
-        )
-    current_composite, _file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
-    if declared_composite != current_composite:
-        raise AuditIngestionError(
-            f"INGEST_STALE_AUDIT: report reviewed execution composite {declared_composite[:12]}… "
-            f"but current code is {current_composite[:12]}…. Re-audit against the current tree."
-        )
+    # (4b) the report may not already have satisfied the sibling gate
+    source_sha = _hash_file(source_path)
+    _reject_report_reuse(study_dir, audit_type, source_sha, source_path)
 
     # (5) destination
     if dest.exists() and not allow_overwrite:
@@ -418,7 +721,13 @@ def ingest_external_audit_report(
             f"than overwriting existing audit evidence."
         )
 
-    source_sha = _hash_file(source_path)
+    # (6) the author may not already hold the sibling reviewer role. Checked here,
+    # after the report's own validity and before it is written into audit/, so a
+    # rejected ingest leaves nothing behind.
+    _reject_auditor_role_reuse(
+        study_dir, audit_type, _resolve_auditor(summary, author, source_path), source_path
+    )
+
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(text, encoding="utf-8")
 
@@ -427,7 +736,7 @@ def ingest_external_audit_report(
         if audit_type == "causal"
         else issue_contract_audit_status_from_report
     )
-    status = issue(study_dir, pass_num, repo_root=repo_root)
+    status = issue(study_dir, pass_num, auditor=author, repo_root=repo_root)
     status.update(
         {
             "ingested_from": str(source_path),
@@ -439,6 +748,7 @@ def ingest_external_audit_report(
                 "summary_heading_consistency",
                 "study_binding",
                 "execution_composite_freshness",
+                "distinct_gate_auditors",
                 "destination_not_overwritten",
             ],
         }
@@ -490,13 +800,35 @@ def main() -> int:
         )
         return 0
 
-    if args.type in ("causal", "both"):
-        c_status = issue_causal_audit_status_from_report(study_dir, args.pass_num)
-        print(f"CAUSAL AUDIT STATUS (Pass {args.pass_num:02d}): Verdict={c_status['verdict']} (Critical: {c_status['critical']}, Warning: {c_status['warning']})")
+    if args.type == "both" and args.author:
+        # --author names one reviewer, and one reviewer cannot hold both roles.
+        print(
+            "[ERROR] AUDITOR_ROLE_REUSE: --author names a single reviewer, but the causal and "
+            "contract gates require distinct auditors. Issue each gate separately with its own "
+            "--type and --author, or let each report declare its own 'auditor'.",
+            file=sys.stderr,
+        )
+        return 2
 
-    if args.type in ("contract", "both"):
-        k_status = issue_contract_audit_status_from_report(study_dir, args.pass_num)
-        print(f"CONTRACT AUDIT STATUS (Pass {args.pass_num:02d}): Verdict={k_status['verdict']} (Blocking: {k_status['blocking']}, Warning: {k_status['warning']})")
+    try:
+        if args.type in ("causal", "both"):
+            c_status = issue_causal_audit_status_from_report(
+                study_dir, args.pass_num, auditor=args.author
+            )
+            print(f"CAUSAL AUDIT STATUS (Pass {args.pass_num:02d}): Verdict={c_status['verdict']} "
+                  f"(Critical: {c_status['critical']}, Warning: {c_status['warning']}) "
+                  f"auditor={c_status['auditor']}")
+
+        if args.type in ("contract", "both"):
+            k_status = issue_contract_audit_status_from_report(
+                study_dir, args.pass_num, auditor=args.author
+            )
+            print(f"CONTRACT AUDIT STATUS (Pass {args.pass_num:02d}): Verdict={k_status['verdict']} "
+                  f"(Blocking: {k_status['blocking']}, Warning: {k_status['warning']}) "
+                  f"auditor={k_status['auditor']}")
+    except AuditArtifactParseError as err:
+        print(f"[ERROR] {err}", file=sys.stderr)
+        return 2
 
     return 0
 

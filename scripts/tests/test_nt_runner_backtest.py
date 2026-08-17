@@ -588,11 +588,13 @@ def _baseline_or_fail(fixture_id: str):
 
 
 def _ref_identities(baseline) -> dict:
-    return {
-        Path(t["target_path"]).name: t
-        for t in baseline["targets"]
-        if t.get("normalized_identity") and "normalized_sha256" in t["normalized_identity"]
-    }
+    """Only genuinely produced artifacts may serve as golden references (M1).
+
+    Delegates to the capture runner's own rule so the test cannot drift from it.
+    """
+    from scripts.capture_baseline_fixtures import produced_reference_identities
+
+    return produced_reference_identities(baseline)
 
 
 def test_both_fixtures_have_valid_baselines():
@@ -705,10 +707,15 @@ def test_w4_harness_matches_frozen_baseline(tmp_path):
         f"baseline={baseline['_capture_dir']}\nharness run={result['run_dir']}"
     )
 
-    # The strategy's own blended-PnL log must match too, not just the positions report.
-    if "strategy_trades.parquet" in ref and "strategy_trades" in result["artifacts"]:
-        st = normalized_parquet_identity(Path(result["artifacts"]["strategy_trades"]))
-        st_cmp = compare_normalized(ref["strategy_trades.parquet"]["normalized_identity"], st)
-        assert st_cmp["equivalent"], (
-            f"GOLDEN_EQUIVALENCE_FAILED for strategy_trades.parquet: {st_cmp['differences']}"
-        )
+    # W4: the strategy's own blended-PnL log is REQUIRED and compared unconditionally.
+    # Guarding this behind `if ... in artifacts` let it pass silently if the harness
+    # ever stopped producing the artifact.
+    assert "strategy_trades.parquet" in ref, "baseline has no produced strategy_trades identity"
+    assert "strategy_trades" in result["artifacts"], (
+        "harness produced no strategy_trades artifact; the simulated_orders contract requires it"
+    )
+    st = normalized_parquet_identity(Path(result["artifacts"]["strategy_trades"]))
+    st_cmp = compare_normalized(ref["strategy_trades.parquet"]["normalized_identity"], st)
+    assert st_cmp["equivalent"], (
+        f"GOLDEN_EQUIVALENCE_FAILED for strategy_trades.parquet: {st_cmp['differences']}"
+    )

@@ -51,9 +51,14 @@ python backtests/run_backtest.py \
   --symbol NQ \
   --start-date 2023-03-03 --end-date 2023-03-03 \
   --warmup-days 5 \
-  --order-handling virtual \
-  --param policies_preset=r5_r25
+  --order-handling virtual
 ```
+
+`--param` sets **scalar** fields declared by the strategy's config class, e.g.
+`--param theta=0.62`. It cannot set a structured field: `ScoreFanningConfig.policies` is a
+list of dicts, so it is configured in a standalone config YAML (or left at its default,
+which is already the legacy `R5 @ 0.62 / R2.5 @ 0.50` list). An undeclared name is rejected
+with `UNKNOWN_PARAMETER` and the full list of valid fields.
 
 Add `--dry-run` to print the fully resolved execution plan (data window, instrument, venue,
 execution mode, parameters, output identity) without replaying any data.

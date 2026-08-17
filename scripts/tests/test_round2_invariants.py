@@ -54,6 +54,40 @@ from scripts.validate_smoke import SmokeValidationError, validate_smoke_run
 STUDY_DIR = REPO_ROOT / "studies" / "Gemini_clean_maturity_flip_rolling_5m_productivity"
 
 
+
+def _plant_compliant_audit_reports(tmp_study, pass_num=10):
+    """Writes AUDIT_SUMMARY_V2-compliant pass reports into a scratch study.
+
+    The live `pass_10.md` / `contract_pass_10.md` predate the B1/B2 contract and
+    declare neither `audit_type`, `study`, `auditor` nor
+    `audited_execution_composite_sha256`. Backfilling real audit evidence is
+    forbidden, so these tests supply their own compliant reports for the mechanics
+    they exercise (seal tampering, smoke gating) — the declared composite is read
+    from the resolved manifest, not stamped by the issuer.
+    """
+    import json as _json
+    from scripts.resolve_execution_manifest import resolve_execution_manifest as _rem
+
+    composite, _, _ = _rem(tmp_study, repo_root=REPO_ROOT)
+    audit = tmp_study / "audit"
+    audit.mkdir(parents=True, exist_ok=True)
+    for kind, fname, extra in (
+        ("causal", f"pass_{pass_num:02d}.md", {"critical": 0}),
+        ("contract", f"contract_pass_{pass_num:02d}.md", {"blocking": 0}),
+    ):
+        payload = {
+            "audit_type": kind, "verdict": "CLEAR", "warning": 0, "note": 0,
+            "study": tmp_study.name, "auditor": f"test:{kind}",
+            "audited_execution_composite_sha256": composite, **extra,
+        }
+        (audit / fname).write_text(
+            f"# {kind} pass {pass_num}\n\n## Findings by severity\n\nNone.\n\n"
+            "<!-- AUDIT_SUMMARY_V2_START -->\n" + _json.dumps(payload)
+            + "\n<!-- AUDIT_SUMMARY_V2_END -->\n",
+            encoding="utf-8",
+        )
+
+
 def test_independent_ast_closure_subset_of_manifest():
     """Calculates repo-local closure from entrypoints independently and verifies it is a subset of the manifest."""
     seeds = [
@@ -121,6 +155,7 @@ def test_seal_fails_closed_on_authority_and_governance_tampering(target_rel, tmp
 
     tmp_study = tmp_path / "study"
     shutil.copytree(STUDY_DIR, tmp_study)
+    _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     issue_contract_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     generate_preexec_audit_seal(tmp_study, repo_root=REPO_ROOT)
@@ -143,6 +178,7 @@ def test_full_stage_rejects_missing_smoke_acceptance(tmp_path):
     if sacc_file.exists():
         sacc_file.unlink()
 
+    _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     issue_contract_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     generate_preexec_audit_seal(tmp_study, repo_root=REPO_ROOT)
@@ -168,6 +204,7 @@ def test_full_stage_rejects_stale_smoke_acceptance(tmp_path):
             "deterministic_validation_verified": True,
         }, f)
 
+    _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     issue_contract_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     generate_preexec_audit_seal(tmp_study, repo_root=REPO_ROOT)
@@ -185,6 +222,7 @@ def test_full_stage_accepts_valid_smoke_acceptance(tmp_path, monkeypatch):
     tmp_study = tmp_path / "study"
     shutil.copytree(STUDY_DIR, tmp_study)
 
+    _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     issue_contract_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     seal_info = generate_preexec_audit_seal(tmp_study, repo_root=REPO_ROOT)
@@ -251,6 +289,7 @@ def test_gate_rejects_contradictory_acceptance(tmp_path):
     tmp_study = tmp_path / "study"
     shutil.copytree(STUDY_DIR, tmp_study)
 
+    _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     issue_contract_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     seal_info = generate_preexec_audit_seal(tmp_study, repo_root=REPO_ROOT)
@@ -336,7 +375,9 @@ def test_audit_status_requires_real_auditor_artifact(tmp_path):
     failing_report.write_text(
         "# Causal Audit Pass 99\n\n## Findings\n### CRITICAL: CAUSAL_LEAK: Found lookahead\n\n"
         "<!-- AUDIT_SUMMARY_V2_START -->\n"
-        '{"verdict": "BLOCKED", "critical": 1, "warning": 0, "note": 0}\n'
+        '{"audit_type": "causal", "verdict": "BLOCKED", "critical": 1, "warning": 0, '
+        '"note": 0, "study": "probe", "auditor": "test:probe", '
+        '"audited_execution_composite_sha256": "0"}\n'
         "<!-- AUDIT_SUMMARY_V2_END -->\n",
         encoding="utf-8"
     )

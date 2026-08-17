@@ -113,8 +113,19 @@ class TargetSpec:
 
     @property
     def quarantine_required(self) -> bool:
-        # Quarantine only where required to prove a fresh expected absence (§2A).
-        return self.expectation == "conditional"
+        """Every declared target is quarantined before an authoritative capture.
+
+        Originally only `conditional` targets were quarantined, on the reasoning
+        that quarantine exists to prove a fresh *absence*. Red Team M2 showed that
+        leaves `produced` targets attributable on modification time alone: both
+        primary baselines pre-existed, were byte-identical afterwards, and were
+        never moved aside, so the "post-run hash comparison" half of the plan's
+        attribution rule was degenerate.
+
+        Quarantining a `produced` target makes `path_was_clean` true, so its
+        presence after the run *is* the proof that this run created it.
+        """
+        return self.expectation in ("produced", "conditional")
 
 
 @dataclass(frozen=True)
@@ -302,6 +313,27 @@ def _write_json_file(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
 
 
+# Third-party packages whose version changes the replayed result. Red Team W3: a
+# baseline that hashes only repo-local Python is blind to an NT or pandas upgrade.
+PROVENANCE_PACKAGES = ("nautilus_trader", "pandas", "pyarrow", "numpy", "msgspec")
+
+
+def dependency_versions() -> Dict[str, Optional[str]]:
+    """Records the installed versions of every dependency that affects the replay."""
+    import importlib.metadata as md
+
+    out: Dict[str, Optional[str]] = {"python": sys.version.split()[0]}
+    for pkg in PROVENANCE_PACKAGES:
+        try:
+            out[pkg] = md.version(pkg)
+        except Exception:  # noqa: BLE001 - absence is itself provenance
+            try:
+                out[pkg] = __import__(pkg).__version__
+            except Exception:  # noqa: BLE001
+                out[pkg] = None
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Worktree gates (plan §3B)
 # ---------------------------------------------------------------------------
@@ -318,6 +350,7 @@ class GateResult:
     disallowed_untracked_py: List[str] = field(default_factory=list)
     untracked_py_outside_closure: List[str] = field(default_factory=list)
     protected_path_count: int = 0
+    dirty_tracked_in_closure: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -330,6 +363,7 @@ class GateResult:
             "disallowed_untracked_py": self.disallowed_untracked_py,
             "untracked_py_outside_closure": self.untracked_py_outside_closure,
             "protected_path_count": self.protected_path_count,
+            "dirty_tracked_in_closure": self.dirty_tracked_in_closure,
             "gate_3_rule": (
                 "An untracked .py BLOCKS only if it is inside a selected fixture's resolved "
                 "repo-local import closure. Because the closure is resolved by module name "
@@ -382,7 +416,16 @@ def check_worktree_gates(
     disallowed = sorted(p for p in candidates if p in protected_paths)
     outside = sorted(p for p in candidates if p not in protected_paths)
 
-    passed = not disallowed
+    # Red Team W2: a MODIFIED or STAGED tracked file inside the closure changes what
+    # the entrypoint executes just as surely as an untracked one. Treating gates 1/2
+    # as purely advisory meant an "authoritative unmodified baseline run" was
+    # unmodified only at the entrypoint. Closure members are now blocking; files
+    # outside every closure stay advisory.
+    dirty_in_closure = sorted(
+        {p for p in modified if p in protected_paths} | {p for p in staged if p in protected_paths}
+    )
+
+    passed = not disallowed and not dirty_in_closure
     reason = None
     if disallowed:
         reason = (
@@ -390,6 +433,13 @@ def check_worktree_gates(
             + ", ".join(disallowed)
             + ". These files are inside a selected fixture's import closure, so they can change "
             "what the legacy entrypoint executes. Commit, archive, or remove them before capture."
+        )
+    elif dirty_in_closure:
+        reason = (
+            "MODIFIED_TRACKED_FILE_IN_FIXTURE_CLOSURE: "
+            + ", ".join(dirty_in_closure)
+            + ". An authoritative baseline must be captured from an unmodified closure, not "
+            "merely an unmodified entrypoint. Commit or revert these before capture."
         )
 
     return GateResult(
@@ -402,6 +452,7 @@ def check_worktree_gates(
         disallowed_untracked_py=disallowed,
         untracked_py_outside_closure=outside,
         protected_path_count=len(protected_paths),
+        dirty_tracked_in_closure=dirty_in_closure,
     )
 
 
@@ -727,17 +778,15 @@ def classify_target(
             return STATUS_PRODUCED, None
         if pre_sha256 is not None and post_sha256 != pre_sha256:
             return STATUS_PRODUCED, "Overwrote a pre-existing file; original preserved and restored."
-        if pre_mtime is not None and post_mtime is not None and post_mtime > pre_mtime:
-            return (
-                STATUS_PRODUCED,
-                "Content is byte-identical to the pre-existing file; production is evidenced by "
-                "the modification timestamp only, consistent with a deterministic re-run.",
-            )
-        # Untouched: no write evidence, and absence could not be tested either.
+        # Red Team M2: modification time alone is NOT evidence of production. An
+        # mtime can advance without a write, and a byte-identical file at an
+        # unquarantined path is indistinguishable from a stale one. Attribution
+        # requires either a content change or a demonstrably clean start.
         return (
             STATUS_ABSENT_UNVERIFIED,
-            "Pre-existing file was not modified by the run and was not quarantined; neither "
-            "production nor a fresh absence can be verified for this target.",
+            "Pre-existing file is byte-identical after the run and the target was not "
+            "quarantined; production cannot be established. Modification time is not accepted "
+            "as evidence of production.",
         )
 
     # Not present after the run.
@@ -837,7 +886,59 @@ def _run_catalog_probe(probe: Dict[str, Any]) -> Dict[str, Any]:
         else:
             out["bar_types"][bt] = {"row_count": 0}
         del bars
+
+    # Red Team W3: row counts and ts bounds do not detect a changed bar VALUE inside
+    # the window. Hash the content of every catalog parquet partition that could
+    # supply data to this fixture.
+    out["partitions"] = _hash_catalog_partitions(Path(probe["catalog"]), start, end)
     return out
+
+
+_PARTITION_TS_RE = re.compile(r"(\d{16,19})")
+
+
+def _partition_intersects_window(path: Path, start_ns: int, end_ns: int) -> bool:
+    """True when a partition filename's embedded ts range overlaps the window.
+
+    NT names bar partitions with epoch-nanosecond bounds. When a filename carries
+    no parseable range we keep the partition: over-inclusion is the safe direction
+    for provenance.
+    """
+    stamps = [int(s) for s in _PARTITION_TS_RE.findall(path.stem)]
+    if len(stamps) < 2:
+        return True
+    lo, hi = min(stamps), max(stamps)
+    return not (hi < start_ns or lo > end_ns)
+
+
+def _hash_catalog_partitions(catalog: Path, start, end) -> Dict[str, Any]:
+    start_ns, end_ns = int(start.value), int(end.value)
+    entries: List[Dict[str, Any]] = []
+    if not catalog.is_dir():
+        return {"status": "catalog_not_found", "path": str(catalog), "files": []}
+
+    for parquet in sorted(catalog.rglob("*.parquet")):
+        if not _partition_intersects_window(parquet, start_ns, end_ns):
+            continue
+        entries.append({
+            "path": parquet.relative_to(catalog).as_posix(),
+            "sha256": sha256_file(parquet),
+            "size_bytes": parquet.stat().st_size,
+        })
+
+    composite = hashlib.sha256(
+        json.dumps([(e["path"], e["sha256"]) for e in entries], sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    return {
+        "status": "ok",
+        "file_count": len(entries),
+        "composite_sha256": composite,
+        "selection_rule": (
+            "every *.parquet under the catalog whose filename ts range intersects the load "
+            "window; partitions with no parseable range are included"
+        ),
+        "files": entries,
+    }
 
 
 def probe_external_input(rel_path: str, repo_root: Path) -> Dict[str, Any]:
@@ -1116,9 +1217,19 @@ def capture_fixture(
 
     _cleanup_quarantine(quarantine_dir)
 
+    # Red Team M1: a declared `produced` target that was not actually produced by
+    # this run invalidates the fixture. Previously the fixture reported SUCCESS and
+    # baseline_valid while a stale file's identity was published as the reference.
+    unproduced = [
+        s.spec.path for s in states
+        if s.spec.expectation == "produced" and s.status != STATUS_PRODUCED
+    ]
+
     status = "SUCCESS" if run_ok and source_stable else "FAILED_UNMODIFIED"
     if run_ok and not source_stable:
         status = "INVALIDATED_SOURCE_CHANGED_DURING_RUN"
+    if status == "SUCCESS" and unproduced:
+        status = "FAILED_REQUIRED_TARGET_NOT_PRODUCED"
 
     section = {
         "fixture_id": fixture.fixture_id,
@@ -1155,6 +1266,7 @@ def capture_fixture(
         "resolved_config": resolved_config,
         "fill_evidence": build_fill_evidence(fixture),
         "warmup_evidence": warmup,
+        "required_targets_not_produced": unproduced,
         "targets": [s.to_dict() for s in states],
         "preexisting_stale_unmanaged": stale,
         "undeclared_side_effects": undeclared,
@@ -1378,6 +1490,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         },
         "worktree_gates": gates.to_dict(),
         "python": {"executable": sys.executable, "version": sys.version},
+        "dependency_versions": dependency_versions(),
         "comparison_rules": {
             "exact_match_required": [
                 "row counts", "event timestamps", "order sides", "quantities",
@@ -1415,6 +1528,24 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     print(json.dumps(pointer, indent=2))
     return {"VALID": 0, "PARTIALLY_VALID": 1}.get(overall, 2)
+
+
+def produced_reference_identities(section: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """Golden-reference identities, restricted to genuinely produced artifacts.
+
+    Red Team M1: a stale pre-existing file's normalized identity was published as
+    the reference and fed straight into golden equivalence. Only a target with
+    ``status == produced_by_current_run`` may serve as a reference.
+    """
+    out: Dict[str, Dict[str, Any]] = {}
+    for target in section.get("targets", []):
+        if target.get("status") != STATUS_PRODUCED:
+            continue
+        identity = target.get("normalized_identity") or {}
+        if "normalized_sha256" not in identity:
+            continue
+        out[Path(target["target_path"]).name] = target
+    return out
 
 
 def find_latest_baseline(

@@ -6,7 +6,7 @@ name = "contract_checker"
 description = "Compliance reviewer. Owns deliverable completeness, seal integrity, terminal-label reachability, and train/serve contract compliance against an explicit frozen SPEC. Writes only its own audit artifacts."
 model = "gpt-5.6-sol"
 model_reasoning_effort = "medium"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 approval_policy = "never"
 
 developer_instructions = '''

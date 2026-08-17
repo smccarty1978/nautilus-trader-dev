@@ -29,7 +29,8 @@ study_id: Gemini_clean_maturity_flip_rolling_5m_productivity
 | `composite_seal_hash` | `f01abb545ab4c76fe633b21588cdd606382d5cd2362494401e834211d04f4e30` |
 | `candidates_sha256` | `1ab64a105a9c7e0a5a92552ad9217cf90ecc654e1f990f1c7a7c4d0f523c4375` |
 | `observations_sha256` | `f300195044a0199e3fda0a449941baaccde70b7c73695027963a082520b1979d` |
-| `collection_manifest` file sha256 | `f4f8c027d0ffb6486c11ecb52941feffd96d213ba39460589da5c2f82ccff1c7` |
+| `collection_manifest_sha256` (identity input, **canonical JSON**) | `47694865a3ebafaa8f1f426afa41f857418ba345b99b7bd9f8db5f63a5483568` |
+| `collection_manifest` raw file sha256 (Windows/CRLF checkout — **not** an identity input) | `f4f8c027d0ffb6486c11ecb52941feffd96d213ba39460589da5c2f82ccff1c7` |
 | shape | candidates `(2002, 73)` · observations `(2002, 7)` |
 | features | 60, ordered, `feature_list_sha256 = 2a744cfa3acfa437ae0ff8219c56451e176a170ae83450c52b8ca42842b0cba5` |
 | metadata columns | 13, **declared** in `study.yaml` |
@@ -57,15 +58,39 @@ study_id: reconstructed_long_rth_strict_retrain
 | `composite_seal_hash` | **`None`** — this collection is *not* sealed |
 | `candidates_sha256` | `192c0f21d04127012bb6f7c51692df6c92a9efb539b3603f7a7960f5a4efd71e` |
 | `observations_sha256` | `1ebe6720ff9f710ee90d4cf0acafa89acaaf36745b90fb346eda4761e656d2e4` |
-| `collection_manifest` file sha256 | `88160dc66088bcbdb7cba2f2f4fc7dccf96b6359e6c7419c51d9b8b619de4821` |
+| `collection_manifest_sha256` (identity input, **canonical JSON**) | `650f5e88a9e7073ebf9c65e12a0a65bb72080e2ab6e1823fe367f508455da554` |
+| `collection_manifest` raw file sha256 (Windows/CRLF checkout — **not** an identity input) | `88160dc66088bcbdb7cba2f2f4fc7dccf96b6359e6c7419c51d9b8b619de4821` |
 | shape | candidates `(3112, 37)` · observations `(3112, 6)` |
 | features | 25, ordered, `feature_list_sha256 = 8bcfeb74ab3b5453635ad9895fa9d15fd65866044f23fa0415bfc796e5fd6299` |
 | metadata columns | 12, **NOT declared** — falls back to the `OutputManager` default list |
 | join key | `observation_ts, regime_start_ns, checkpoint_index` (3 cols — **no `regime_direction`**) |
-| target base rate | **0.1793** (558/3112) |
+| target base rate | **0.1621** (177/1092) **in-window**; see the warmup note below |
+| pooled base rate (all 3112 rows) | 0.1793 (558/3112) — **contaminated**, do not quote |
 | `regime_direction` values | `[-1]` only — constant, therefore not a usable slice |
 | chronology | train `[2021,2022,2023,2024]` · dev `[2025]` · prohibited `[2026]` |
 | stage / window | `day` · 2025-03-03 (a DEV year **for this study**, prohibited for Fixture A) |
+
+> [!WARNING]
+> **Fixture B emits 65% of its candidates during its own declared warmup window.**
+> This is a second, independent failure alongside the `STALE_COMPILED_STUDY` case below, found by
+> check 14 (`no_warmup_leakage`) — the check working as contracted on a real artifact. Measured:
+>
+> | | value |
+> |---|---|
+> | declared run window | `start=2025-03-03`, `end=2025-03-03`, `warmup_start=2025-02-26T00:00:00+00:00` |
+> | `observation_ts` range | 2025-02-26 14:30 UTC .. 2025-03-03 20:45 UTC |
+> | rows by UTC date | 02-26: 518 · 02-27: 1122 · 02-28: 380 · **03-03: 1092** |
+> | `validate_collection(FixtureB)` | `FAIL no_warmup_leakage` — `rows_outside_window = 2020` of 3112 |
+> | base rate, in-window only (2025-03-03) | **0.1621**, n = **1,092** |
+> | base rate, warmup rows only | 0.1886, n = 2,020 |
+>
+> Consequently the "3112 rows · base rate 0.1793" figure is a **warmup-pooled** number and must not
+> be used as this collection's population statistic. Any future use of Fixture B as a "3112-row"
+> fixture inherits the contamination. The usable in-window population is 1,092 rows at 0.1621.
+>
+> Fixture B therefore fails **two** checks, not one: `STALE_COMPILED_STUDY` **and**
+> `WARMUP_LEAKAGE`. Both must be resolved before it could serve as a clean positive fixture
+> (blocker #7 in §10).
 
 **Why these two.** Anything that works on both cannot have hardcoded: the feature count, the join key,
 the presence of `regime_direction`, the metadata list, the chronology, the target base rate, or the
@@ -123,7 +148,7 @@ An analysis binds to exactly one collection run. **There is no `latest`.** Resol
 | `composite_seal_hash` | `run_manifest.json:composite_seal_hash` (may be `null`; see §7 failure `UNSEALED_COLLECTION`) |
 | `candidates_sha256` | `collection_manifest.json` |
 | `observations_sha256` | `collection_manifest.json` |
-| `collection_manifest_sha256` | sha256 of the manifest file itself |
+| `collection_manifest_sha256` | sha256 of the manifest's **parsed canonical JSON** (see rule 5) |
 | `feature_list_sha256` | `study.yaml:features.feature_list_sha256` |
 | `stage`, `start_date`, `end_date`, `warmup_start` | `run_manifest.json:stage`, `:dates` |
 | `timestamp_contract` | `run_manifest.json:timestamp_contract` |
@@ -141,6 +166,25 @@ value is what a reviewer compares to answer "is this the same data?".
 4. `composite_seal_hash` is recorded but is **not** silently required — Fixture B has none. Whether an
    unsealed collection may be analysed is an explicit flag in the analysis spec
    (`allow_unsealed_collection`), defaulting to `false`.
+5. **Hashing is per artifact class, and the classes are not interchangeable.**
+   - *Generated binary data* (`candidates.parquet`, `observations.parquet`): **raw byte hash**, no
+     normalisation, ever. These files are gitignored and never EOL-translated.
+   - *Structured text* (`collection_manifest.json` and any JSON/YAML manifest): hash of the
+     **parsed canonical form** (sorted keys, no whitespace). These files are git-tracked, so under
+     `core.autocrlf` a Windows checkout and a Linux checkout hold byte-different but semantically
+     identical text. A raw byte hash there makes `collection_identity_sha256` platform-dependent
+     for byte-identical collection *data*, which both breaks "identity is stable for equivalent
+     data" and raises a false `IDENTITY_MISMATCH` off-platform. This is the same convention
+     `spec_sha256` already uses (`StudySpec.model_validate(...).compute_sha256()`).
+   - *Harness-written artifacts* (`dataset_identity.json`, `analysis_context.json`,
+     `model_manifest.json`, table CSV/JSON) are emitted with `newline="\n"` so their own bytes do
+     not depend on the host OS.
+6. The run directory is resolved under `runs_root` and **containment is asserted**: a `run_id` is a
+   plain directory name, never a path. Anything containing `/`, `\`, `..`, `.` or `:` is rejected
+   (`INVALID_RUN_ID`), and `run_dir.resolve().parent` must equal `runs_root.resolve()`. The resolved
+   absolute directory is recorded in `dataset_identity.json` — but deliberately *outside* the hashed
+   identity tuple, because an absolute path is machine-specific and rule 2 requires the identity to
+   be portable.
 
 ---
 
@@ -207,10 +251,39 @@ two collections with different `horizon_seconds` do not have comparable targets 
 They are never features. A1 must expose them as outcome metadata and must refuse to return them from
 `get_features_targets_metadata(...)` in the feature block.
 
-**Join key is per-study, derived, never hardcoded.** It is the intersection of the declared metadata
-columns with the observations columns. Fixture A yields 4 keys, Fixture B yields 3. Hardcoding A's key
-raises `JOIN_KEY_MISSING` on B; hardcoding B's key silently produces a many-to-many join on A whenever
-a timestamp carries both directions.
+**Join key is per-study, DECLARED, never hardcoded and never read off the observation frame.**
+Fixture A's key is 4 columns, Fixture B's is 3. Hardcoding A's key raises `JOIN_KEY_MISSING` on B;
+hardcoding B's key silently produces a many-to-many join on A whenever a timestamp carries both
+directions — so the key must be resolved per study.
+
+But it must not be resolved *from the live observations frame*. A key defined as "declared metadata ∩
+observation columns" is unfalsifiable by construction: every derived column is trivially present in
+observations, so `JOIN_KEY_MISSING` can only fire on an empty intersection, and a key column that goes
+missing from observations silently shortens the key from 4 to 3 while validation reports zero
+failures. The only remaining backstop, `join_key_unique`, is *data-dependent*: whenever the shortened
+key happens to stay unique, direction-crossing target assignment is accepted silently. Fixture A — the
+collection with both directions present — is precisely the population at risk.
+
+The key of record is therefore resolved in this order, strongest declaration first:
+
+1. `collection.expected_join_key` pinned in the analysis spec;
+2. `features.join_key` declared in the study contract;
+3. the observation columns the **collection manifest records having emitted**, intersected with the
+   declared metadata columns — the producer's own declaration, fixed at collection time and covered
+   by `collection_manifest_sha256`;
+4. declared metadata ∩ **candidate** columns — last resort, and still not the frame whose scope loss
+   is being checked.
+
+Every resolved key column must then be present in **both** frames; any absence is `JOIN_KEY_MISSING`,
+naming the missing columns and the frame they are missing from. The resolution source is recorded on
+the validation report (`join_key_source`) and in `dataset_identity.json`.
+
+Note the residual: a tampered collection that *also* rewrites `columns.observations` in its manifest
+is internally self-consistent and resolves at level 3 to the shortened key. That rewrite moves
+`collection_manifest_sha256` and therefore `collection_identity_sha256`, so a spec pinning the
+identity (§10 prerequisite 4) detects it; pinning `expected_join_key` refuses it outright. An analysis
+that pins neither is trusting the producer's declaration, which is a choice the spec should make
+explicitly.
 
 **Metadata contract.** Fixture A declares 13 `metadata_columns`. Fixture B declares none, so the
 `OutputManager` default list applies (the same 13 minus `triggering_1s_ts_init`, which B does not
@@ -317,6 +390,7 @@ join row loss `0`, target base rate `0.3492`. A check that only ever prints PASS
 | Failure | Trigger |
 |---|---|
 | `MISSING_ARTIFACT` | any required file absent |
+| `INVALID_RUN_ID` | `run_id` is not a plain directory name inside `runs_root` (path syntax, or resolves outside it). A subclass of `MISSING_ARTIFACT` |
 | `COLLECTION_NOT_SUCCESSFUL` | `status.json` not SUCCESS |
 | `ARTIFACT_HASH_MISMATCH` | recomputed parquet hash ≠ manifest |
 | `STALE_COMPILED_STUDY` | `study.yaml` hash ≠ `compiled_study.json` — study dir not self-consistent (Fixture B today) |
@@ -335,12 +409,26 @@ join row loss `0`, target base rate `0.3492`. A check that only ever prints PASS
 | `PROHIBITED_PARTITION_PRESENT` | any row in a prohibited year |
 | `OOS_LOCKED` | DEV requested without a valid unlock token |
 | `PARTITION_MIXING` | TRAIN and DEV in one fitted arm |
+| `PARTITION_PROVENANCE_MISSING` | a fit was requested with no `_partition` record and no explicit, recorded opt-out. A subclass of `PARTITION_MIXING` |
 | `CROSS_STUDY_POOLING` | two `study_id`s without an explicit declaration |
-| `METRIC_NOT_COMPUTABLE` | one-class or empty slice — reported as such, never as a score |
+| `VALIDATION_NOT_RUN` | extraction attempted with no report, or with a report produced under a different (or no) analysis spec |
+| `METRIC_NOT_COMPUTABLE` | one-class, empty, or **non-finite** slice — reported as such, never as a score |
 
 `METRIC_NOT_COMPUTABLE` matters at this sample size: a slice of a 2002-row single-day collection can
 easily be one-class, and an AUC of `0.5` or `nan` presented as a number is worse than an explicit
-refusal.
+refusal. The same applies to a computed-but-non-finite value: emitting it as a bare `null` under
+`status: ok` makes it byte-identical on the wire to a metric that was never computed, which collapses
+exactly the distinction this layer exists to draw. Non-finite results are downgraded to
+`not_computable` with a reason, and a single `inf` score must never abort a whole table build.
+
+**A validation report is an authorisation, not a fact.** `validate_collection(collection)` without a
+spec cannot run `seal_policy`, `oos_unlocked`, `no_partition_mixing` or any of the identity bindings —
+it has nothing to bind them to. Such a report may still be produced (it is useful for triage), but it
+carries `spec_supplied: false` plus the list of checks it skipped, and
+`get_features_targets_metadata` refuses it: extraction requires a report whose
+`analysis_spec_sha256` equals the spec being used. Otherwise the two most natural lines a researcher
+would write — `rep = validate_collection(c)` then `get_features_targets_metadata(c, dev_spec, rep)` —
+return DEV rows with `OOS_LOCKED` never emitted.
 
 ---
 
@@ -389,8 +477,9 @@ the loader.
 | 7 | Join key resolved per study | 4 cols | 3 cols | — |
 | 8 | Duplicate join keys | 0 → P | 0 → P | — |
 | 9 | Join 1:1, no row loss | 2002 → P | 3112 → P | `F:EMPTY_OBSERVATIONS` |
-| 10 | Target present, `{0,1}`, no nulls | P (rate 0.3492) | P (rate 0.1793) | `F:TARGET_MISSING` |
+| 10 | Target present, `{0,1}`, no nulls | P (rate 0.3492) | P (in-window rate **0.1621**, n=1,092; pooled 0.1793 is warmup-contaminated) | `F:TARGET_MISSING` |
 | 11 | Rows match manifest counts | 2002 → P | 3112 → P | `F:ROW_COUNT_MISMATCH` |
+| 11b | No rows outside the declared run window (check 14) | P | **`F:WARMUP_LEAKAGE`** (2,020 of 3,112 rows precede 2025-03-03) | — |
 | 12 | No prohibited-year rows | P (2023 ∈ TRAIN) | P (2025 ∈ DEV) | — |
 | 13 | Load DEV without unlock token | `F:OOS_LOCKED` | `F:OOS_LOCKED` | — |
 | 14 | Unsealed collection, default spec | P (sealed) | `F:UNSEALED_COLLECTION` | — |

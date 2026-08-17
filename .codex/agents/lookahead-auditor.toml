@@ -6,7 +6,7 @@ name = "lookahead_auditor"
 description = "Use proactively before any backtest, study, or strategy review to audit for look-ahead bias and NautilusTrader timestamp misuse. Performs a read-only static analysis and writes a per-pass Markdown report plus a machine-readable status.json."
 model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 approval_policy = "never"
 
 developer_instructions = '''

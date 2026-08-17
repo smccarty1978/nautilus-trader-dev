@@ -286,8 +286,10 @@ def test_no_year_derived_status_exists_in_module():
         (True, False, False, "h0", None, 50.0, None, STATUS_ABSENT_UNVERIFIED),
         # pre-existing, content changed -> produced
         (True, False, True, "h0", "h1", 50.0, 100.0, STATUS_PRODUCED),
-        # pre-existing, identical content but rewritten (mtime advanced) -> produced
-        (True, False, True, "h0", "h0", 50.0, 100.0, STATUS_PRODUCED),
+        # pre-existing, identical content, mtime advanced -> NOT produced (M2).
+        # An mtime can advance without a write; only a content change or a clean
+        # start attributes production.
+        (True, False, True, "h0", "h0", 50.0, 100.0, STATUS_ABSENT_UNVERIFIED),
         # pre-existing, untouched -> neither produced nor provably absent
         (True, False, True, "h0", "h0", 50.0, 50.0, STATUS_ABSENT_UNVERIFIED),
     ],
@@ -300,16 +302,17 @@ def test_classify_target_matrix(
     assert status in VALID_STATUSES
 
 
-def test_identical_content_rewritten_is_attributed_via_mtime():
+def test_modification_time_is_not_evidence_of_production():
+    """Red Team M2: mtime-only attribution is removed."""
     status, note = classify_target(True, False, True, "same", "same", 50.0, 100.0)
-    assert status == STATUS_PRODUCED
-    assert note is not None and "modification timestamp" in note
+    assert status == STATUS_ABSENT_UNVERIFIED
+    assert note is not None and "not accepted" in note
 
 
 def test_untouched_preexisting_file_is_not_attributed_to_the_run():
     status, note = classify_target(True, False, True, "same", "same", 50.0, 50.0)
     assert status == STATUS_ABSENT_UNVERIFIED
-    assert note is not None and "not modified by the run" in note
+    assert note is not None and "byte-identical" in note
 
 
 # ---------------------------------------------------------------------------
@@ -376,8 +379,12 @@ def test_preexisting_conditional_target_is_quarantined_and_restored(tmp_path):
     assert t["restored_to_original_state"] is True
 
 
-def test_untouched_preexisting_target_is_not_attributed(tmp_path):
-    """A 'produced' target the run never wrote must not be claimed as output."""
+def test_untouched_produced_target_fails_the_fixture(tmp_path):
+    """Red Team M1: a declared `produced` target that is not produced must not pass.
+
+    The target is now quarantined, so the run starts from a clean path; producing
+    nothing yields a provable absence, and the fixture must not be SUCCESS.
+    """
     repo = make_fake_repo(tmp_path)
     (repo / "out" / "p.txt").write_text("X", encoding="utf-8")
 
@@ -386,8 +393,11 @@ def test_untouched_preexisting_target_is_not_attributed(tmp_path):
                               runner=writer_runner({}), collect_catalog_bounds=False)
 
     t = section["targets"][0]
-    assert t["status"] == STATUS_ABSENT_UNVERIFIED
-    assert "not modified by the run" in t["attribution_note"]
+    assert t["quarantined_to_prove_absence"] is True
+    assert t["status"] == STATUS_ABSENT_VERIFIED       # provably absent...
+    assert section["status"] != "SUCCESS"              # ...but that is a FAILURE for `produced`
+    assert section["baseline_valid"] is False
+    # The pre-existing file is restored untouched.
     assert (repo / "out" / "p.txt").read_text() == "X"
 
 
