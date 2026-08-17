@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -222,6 +223,148 @@ def test_corrupt_sibling_also_fails_closed_for_the_report_reuse_check(unaudited_
     with pytest.raises(AuditArtifactParseError, match="SIBLING_AUDIT_STATUS_INVALID"):
         _reject_report_reuse(unaudited_study, "contract", "f" * 64,
                              unaudited_study / "audit" / "contract_pass_76.md")
+
+
+def _run_cli(study_dir: Path, pass_num: int, *args: str):
+    return subprocess.run(
+        [sys.executable, str(REPO_ROOT / "scripts" / "run_preexec_audits.py"),
+         "--study", str(study_dir), "--pass-num", str(pass_num), *args],
+        capture_output=True, text=True, cwd=str(REPO_ROOT),
+    )
+
+
+def test_type_both_same_declared_auditor_is_atomic(unaudited_study):
+    """`--type both` is one operation: a refused run must leave no partial artifact.
+
+    The policy decision was always correct — causal was issued, contract raised
+    AUDITOR_ROLE_REUSE, the command exited 2 — but a CLEAR causal status was left
+    behind by a command that failed. A half-written two-gate operation is exactly the
+    state a later reader cannot distinguish from a deliberate one.
+    """
+    audit = unaudited_study / "audit"
+    report(audit / "pass_60.md", audit_type="causal", auditor="redteam:solo")
+    report(audit / "contract_pass_60.md", audit_type="contract",
+           auditor="redteam:solo", blocking=0)
+    before = {p.name for p in audit.iterdir()}
+
+    proc = _run_cli(unaudited_study, 60, "--type", "both")
+
+    assert "AUDITOR_ROLE_REUSE" in proc.stderr, proc.stderr
+    _assert_nothing_written(audit, before, proc)
+
+
+def test_type_both_distinct_declared_auditors_still_succeeds(unaudited_study):
+    """The valid path must survive the pre-check: two reviewers, one command."""
+    audit = unaudited_study / "audit"
+    report(audit / "pass_61.md", audit_type="causal", auditor="redteam:alice")
+    report(audit / "contract_pass_61.md", audit_type="contract",
+           auditor="redteam:bob", blocking=0)
+
+    proc = _run_cli(unaudited_study, 61, "--type", "both")
+
+    assert proc.returncode == 0, proc.stderr
+    causal = json.loads((audit / "status.json").read_text(encoding="utf-8"))
+    contract = json.loads((audit / "contract_status.json").read_text(encoding="utf-8"))
+    assert causal["auditor"] == "redteam:alice" and causal["verdict"] == "CLEAR"
+    assert contract["auditor"] == "redteam:bob" and contract["verdict"] == "CLEAR"
+
+
+def _assert_nothing_written(audit: Path, before: set, proc) -> None:
+    """A refused two-gate run must leave the audit directory exactly as it found it."""
+    assert proc.returncode == 2, f"expected a policy refusal (2), got {proc.returncode}"
+    assert "Traceback" not in proc.stderr, f"crashed instead of refusing:\n{proc.stderr}"
+    assert not (audit / "status.json").exists(), "causal status written by a failed run"
+    assert not (audit / "contract_status.json").exists(), "contract status written by a failed run"
+    assert {p.name for p in audit.iterdir()} == before, "a failed run wrote new artifacts"
+
+
+def test_type_both_missing_contract_report_leaves_no_causal_status(unaudited_study):
+    """Same atomicity property, reached by a different failure — and it must be a
+    refusal, not a traceback. The contract report was previously opened only after
+    the causal status had been written, so atomicity here happened by accident."""
+    audit = unaudited_study / "audit"
+    report(audit / "pass_62.md", audit_type="causal", auditor="redteam:alice")
+    before = {p.name for p in audit.iterdir()}
+
+    proc = _run_cli(unaudited_study, 62, "--type", "both")
+
+    assert "AUDIT_REPORT_MISSING" in proc.stderr, proc.stderr
+    _assert_nothing_written(audit, before, proc)
+
+
+@pytest.mark.parametrize(
+    "defect,expected",
+    [
+        ({"audited_execution_composite_sha256": "0" * 64}, "INGEST_STALE_AUDIT"),
+        ({"study": "some_other_study"}, "INGEST_STUDY_MISMATCH"),
+        ({"body": "### BLOCKING: sealed closure omits X\n"}, "FINDING_COUNT_MISMATCH"),
+    ],
+    ids=["stale_composite", "wrong_study", "hidden_blocking_finding"],
+)
+def test_type_both_defective_contract_report_writes_nothing(unaudited_study, defect, expected):
+    """A, B, C: the causal gate is valid and the contract gate is not.
+
+    Each of these previously passed the identity preflight, so the causal status was
+    written and the contract gate failed afterwards. The preflight now runs the same
+    checks issuance does, so the failure lands before anything is on disk.
+    """
+    audit = unaudited_study / "audit"
+    body = defect.pop("body", "Body.\n")
+    report(audit / "pass_63.md", audit_type="causal", auditor="redteam:alice")
+    report(audit / "contract_pass_63.md", body=body, audit_type="contract",
+           auditor="redteam:bob", blocking=0, **defect)
+    before = {p.name for p in audit.iterdir()}
+
+    proc = _run_cli(unaudited_study, 63, "--type", "both")
+
+    assert expected in proc.stderr, proc.stderr
+    _assert_nothing_written(audit, before, proc)
+
+
+@pytest.mark.parametrize(
+    "defect,expected",
+    [
+        ({"audited_execution_composite_sha256": "0" * 64}, "INGEST_STALE_AUDIT"),
+        ({"study": "some_other_study"}, "INGEST_STUDY_MISMATCH"),
+    ],
+    ids=["stale_composite", "wrong_study"],
+)
+def test_type_both_defective_causal_report_writes_nothing(unaudited_study, defect, expected):
+    """D, reverse direction: the CAUSAL gate is the defective one."""
+    audit = unaudited_study / "audit"
+    report(audit / "pass_64.md", audit_type="causal", auditor="redteam:alice", **defect)
+    report(audit / "contract_pass_64.md", audit_type="contract",
+           auditor="redteam:bob", blocking=0)
+    before = {p.name for p in audit.iterdir()}
+
+    proc = _run_cli(unaudited_study, 64, "--type", "both")
+
+    assert expected in proc.stderr, proc.stderr
+    _assert_nothing_written(audit, before, proc)
+
+
+def test_type_both_malformed_report_writes_nothing(unaudited_study):
+    """A report whose summary block will not parse is a refusal, not a crash."""
+    audit = unaudited_study / "audit"
+    report(audit / "pass_65.md", audit_type="causal", auditor="redteam:alice")
+    (audit / "contract_pass_65.md").write_text(
+        "Body.\n<!-- AUDIT_SUMMARY_V2_START -->\n{ not json\n"
+        "<!-- AUDIT_SUMMARY_V2_END -->\n", encoding="utf-8")
+    before = {p.name for p in audit.iterdir()}
+
+    proc = _run_cli(unaudited_study, 65, "--type", "both")
+
+    assert "MALFORMED_AUDIT_SUMMARY_V2" in proc.stderr, proc.stderr
+    _assert_nothing_written(audit, before, proc)
+
+
+def test_single_gate_missing_report_is_also_a_clean_refusal(unaudited_study):
+    """The single-gate routes are unchanged in policy, but a missing report there is
+    now the same refusal rather than a traceback."""
+    proc = _run_cli(unaudited_study, 66, "--type", "causal")
+    assert proc.returncode == 2
+    assert "AUDIT_REPORT_MISSING" in proc.stderr
+    assert "Traceback" not in proc.stderr
 
 
 def test_raw_report_sha_reuse_is_still_detected(unaudited_study):

@@ -497,6 +497,68 @@ def _reject_report_reuse(
             )
 
 
+class AuditReportMissing(AuditArtifactParseError, FileNotFoundError):
+    """The report a gate must parse does not exist.
+
+    Deliberately both an `AuditArtifactParseError` — so the CLI reports it as a
+    refusal with the contract's own code and exits 2 instead of printing a traceback
+    — and a `FileNotFoundError`, so existing callers that catch the file error keep
+    working. A missing report is a policy refusal, not a crash.
+    """
+
+
+def _validate_gate_report(
+    study_dir: Path,
+    pass_num: int,
+    audit_type: str,
+    *,
+    auditor: Optional[str],
+    repo_root: Path,
+) -> Dict[str, Any]:
+    """Every deterministic check that must pass before a gate's status may be written.
+
+    Both the single-gate issuance path and the `--type both` preflight call this, so
+    the preflight cannot validate less than issuance enforces. That drift is exactly
+    what let a valid causal status be written before the contract gate failed on a
+    stale composite, the wrong study, or a hidden BLOCKING finding.
+
+    Returns the material the issuer needs; writes nothing.
+    """
+    report_file = study_dir / "audit" / REPORT_FILENAMES[audit_type].format(n=pass_num)
+    if not report_file.exists():
+        raise AuditReportMissing(
+            f"AUDIT_REPORT_MISSING: {audit_type} audit report not found: {report_file}"
+        )
+
+    summary = _extract_v2_summary(
+        report_file.read_text(encoding="utf-8"), report_file, expected_audit_type=audit_type
+    )
+    resolved_auditor = _resolve_auditor(summary, auditor, report_file)
+    # B1: the two review roles require distinct declared auditors.
+    _reject_auditor_role_reuse(study_dir, audit_type, resolved_auditor, report_file)
+    # B2: verify the auditor's declared study and composite; never stamp the current one.
+    composite_sha = _verify_declared_binding(summary, study_dir, report_file, repo_root)
+
+    parser = parse_causal_audit_report if audit_type == "causal" else parse_contract_audit_report
+    verdict, primary, warning, tertiary = parser(report_file)
+
+    report_sha256 = _hash_file(report_file)
+    _reject_report_reuse(study_dir, audit_type, report_sha256, report_file)
+
+    return {
+        "audit_type": audit_type,
+        "report_file": report_file,
+        "summary": summary,
+        "auditor": resolved_auditor,
+        "composite_sha256": composite_sha,
+        "verdict": verdict,
+        "primary": primary,        # critical (causal) / blocking (contract)
+        "warning": warning,
+        "tertiary": tertiary,      # note (causal) / not_verified (contract)
+        "report_sha256": report_sha256,
+    }
+
+
 def issue_causal_audit_status_from_report(
     study_dir: Path,
     pass_num: int,
@@ -509,23 +571,15 @@ def issue_causal_audit_status_from_report(
         repo_root = REPO_ROOT
 
     study_dir = study_dir.resolve()
-    report_file = study_dir / "audit" / f"pass_{pass_num:02d}.md"
-    if not report_file.exists():
-        raise FileNotFoundError(f"Causal audit report missing: {report_file}")
-
-    summary = _extract_v2_summary(
-        report_file.read_text(encoding="utf-8"), report_file, expected_audit_type="causal"
+    checked = _validate_gate_report(study_dir, pass_num, "causal",
+                                    auditor=auditor, repo_root=repo_root)
+    resolved_auditor = checked["auditor"]
+    composite_sha = checked["composite_sha256"]
+    verdict, critical, warning, note = (
+        checked["verdict"], checked["primary"], checked["warning"], checked["tertiary"]
     )
-    resolved_auditor = _resolve_auditor(summary, auditor, report_file)
-    # B1: the contract reviewer may not also be the causal reviewer.
-    _reject_auditor_role_reuse(study_dir, "causal", resolved_auditor, report_file)
-    # B2: verify the auditor's declared composite; never stamp the current one.
-    composite_sha = _verify_declared_binding(summary, study_dir, report_file, repo_root)
+    report_sha256 = checked["report_sha256"]
     _, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
-
-    verdict, critical, warning, note = parse_causal_audit_report(report_file)
-    report_sha256 = _hash_file(report_file)
-    _reject_report_reuse(study_dir, "causal", report_sha256, report_file)
 
     transcript_sha = _hash_file(transcript_path) if transcript_path and transcript_path.exists() else None
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -568,23 +622,15 @@ def issue_contract_audit_status_from_report(
         repo_root = REPO_ROOT
 
     study_dir = study_dir.resolve()
-    report_file = study_dir / "audit" / f"contract_pass_{pass_num:02d}.md"
-    if not report_file.exists():
-        raise FileNotFoundError(f"Contract audit report missing: {report_file}")
-
-    summary = _extract_v2_summary(
-        report_file.read_text(encoding="utf-8"), report_file, expected_audit_type="contract"
+    checked = _validate_gate_report(study_dir, pass_num, "contract",
+                                    auditor=auditor, repo_root=repo_root)
+    resolved_auditor = checked["auditor"]
+    composite_sha = checked["composite_sha256"]
+    verdict, blocking, warning, not_verified = (
+        checked["verdict"], checked["primary"], checked["warning"], checked["tertiary"]
     )
-    resolved_auditor = _resolve_auditor(summary, auditor, report_file)
-    # B1: the causal reviewer may not also be the contract reviewer.
-    _reject_auditor_role_reuse(study_dir, "contract", resolved_auditor, report_file)
-    # B2: verify the auditor's declared composite; never stamp the current one.
-    composite_sha = _verify_declared_binding(summary, study_dir, report_file, repo_root)
+    report_sha256 = checked["report_sha256"]
     _, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
-
-    verdict, blocking, warning, not_verified = parse_contract_audit_report(report_file)
-    report_sha256 = _hash_file(report_file)
-    _reject_report_reuse(study_dir, "contract", report_sha256, report_file)
 
     transcript_sha = _hash_file(transcript_path) if transcript_path and transcript_path.exists() else None
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -759,6 +805,48 @@ def ingest_external_audit_report(
     return status
 
 
+def preflight_both_gates(
+    study_dir: Path,
+    pass_num: int,
+    author: Optional[str] = None,
+    repo_root: Optional[Path] = None,
+) -> Dict[str, Dict[str, Any]]:
+    """Proves BOTH gates are individually issuable before either status is written.
+
+    `--type both` is one operation and must not half-succeed. Previously the causal
+    status was written first and the contract gate failed afterwards — on role reuse,
+    a stale composite, the wrong study, or a hidden BLOCKING finding — leaving a CLEAR
+    causal status behind from a command that exited 2. A half-written two-gate
+    operation is indistinguishable from a deliberate one to whoever reads it next.
+
+    Every per-gate check runs through the same `_validate_gate_report` the issuers
+    use, so this cannot silently validate less than issuance enforces. Nothing here
+    writes; the issuers then re-run their own checks unchanged, so this is an ordering
+    guard, not a second copy of the policy.
+
+    Returns the validated material keyed by gate.
+    """
+    if repo_root is None:
+        repo_root = REPO_ROOT
+    study_dir = study_dir.resolve()
+
+    checked: Dict[str, Dict[str, Any]] = {}
+    for audit_type in ("causal", "contract"):
+        checked[audit_type] = _validate_gate_report(
+            study_dir, pass_num, audit_type, auditor=author, repo_root=repo_root
+        )
+
+    causal_auditor = checked["causal"]["auditor"]
+    contract_auditor = checked["contract"]["auditor"]
+    if _normalise_identity(causal_auditor) == _normalise_identity(contract_auditor):
+        raise AuditArtifactParseError(
+            f"AUDITOR_ROLE_REUSE: both reports for pass {pass_num:02d} are authored by "
+            f"{causal_auditor!r}. The causal and contract reviews are independent roles and "
+            f"require distinct declared auditors. No status was issued for either gate."
+        )
+    return checked
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Parse auditor artifacts and issue authenticated audit status.")
     parser.add_argument("--study", "-s", type=str, required=True, help="Path to study directory")
@@ -811,6 +899,11 @@ def main() -> int:
         return 2
 
     try:
+        if args.type == "both":
+            # Decide reviewer independence before anything is written, so a refused
+            # combined run leaves no partial status behind.
+            preflight_both_gates(study_dir, args.pass_num, args.author)
+
         if args.type in ("causal", "both"):
             c_status = issue_causal_audit_status_from_report(
                 study_dir, args.pass_num, auditor=args.author
