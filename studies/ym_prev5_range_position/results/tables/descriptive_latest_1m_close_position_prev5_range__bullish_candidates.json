@@ -1,0 +1,37 @@
+{
+  "table": "descriptive_latest_1m_close_position_prev5_range__bullish_candidates",
+  "slice": "none",
+  "reporting_version": "1.0.0",
+  "n_rows_in_table": 1,
+  "total_sample_count": 397,
+  "n_input_rows": 397,
+  "row_reconciliation": "not applicable to this table",
+  "filters": {
+    "column": "latest_1m_close_position_prev5_range__bullish_candidates"
+  },
+  "dataset_identity_sha256": "6a2040d282f80ccd44a579c2d2d0e669cf6c48bd3b039f810699ff47cd8346c3",
+  "analysis_spec_sha256": "4a321a6b7c2d5b3a8f802a431cdb03f9721ef631fbf04c684fb1cef000fad1e1",
+  "metric_definitions": {
+    "descriptive_summary": "count_available, count_null, distinct_count, mean, std, min, max, plus the p10/p25/median/p75/p90 quantile ladder (delegated to quantiles())."
+  },
+  "caveats": [],
+  "rows": [
+    {
+      "column": "latest_1m_close_position_prev5_range__bullish_candidates",
+      "n": 397,
+      "n_missing": 0,
+      "count_available": 397,
+      "count_null": 0,
+      "distinct_count": 51,
+      "mean": 0.7762237562675594,
+      "std": 0.31975324120185916,
+      "min": -0.058823529411764705,
+      "max": 1.4605263157894737,
+      "q10": 0.375,
+      "q25": 0.55,
+      "q50": 0.8026315789473685,
+      "q75": 0.9902912621359223,
+      "q90": 1.2181818181818183
+    }
+  ]
+}

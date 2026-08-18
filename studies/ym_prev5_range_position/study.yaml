@@ -1,0 +1,50 @@
+study:
+  id: ym_prev5_range_position
+  type: flip_prediction
+  risk_tier: 2
+  description: One-day descriptive TRAIN pilot of latest_1m_close_position_prev5_range
+    on YM RTH, bounded to 2024-09-03. Descriptive only; no economic interpretation,
+    no model fitting. Population/target/censoring mechanics inherited unchanged from
+    es_wick_imbalance_acceptance_v2; only instrument and feature differ.
+operation:
+  kind: train_evaluate
+  target_metric: roc_auc
+instrument:
+  symbol: YM
+  venue: XCBT
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+target:
+  type: flip
+  event: prevailing_1m_regime_transition
+  direction: both
+  horizon_seconds: 300
+features:
+  source: explicit_feature_list
+  feature_list:
+  - latest_1m_close_position_prev5_range
+  timing_contract: verified
+model:
+  mode: scoring
+  family: HistGradientBoostingClassifier
+chronology:
+  train:
+  - 2024
+  dev: []
+  prohibited:
+  - 2025
+  - 2026
+stratification: {}
+baseline: {}
+lineage: {}
+execution:
+  runtime: nautilustrader
+  data_requirements:
+    authorized_dates:
+    - '2024-09-03'
+  progress_seconds: 60
+  bounded: true
+acceptance: {}
+bespoke: {}

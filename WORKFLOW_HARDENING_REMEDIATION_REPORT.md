@@ -1,4 +1,4 @@
-# Workflow Hardening Remediation Report
+ p# Workflow Hardening Remediation Report
 
 **Trigger:** independent Red Team failure of the first workflow acceptance test of
 `studies/es_wick_imbalance_exploratory`.

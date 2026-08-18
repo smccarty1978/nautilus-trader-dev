@@ -168,7 +168,11 @@ def create_futures_instrument(data_plan: DataPlan) -> FuturesContract:
     d["expiration_ns"] = pd.Timestamp("2027-12-31 23:59:59", tz="UTC").value
     d["ts_event"] = d["ts_init"] = pd.Timestamp("2019-01-01", tz="UTC").value
     d["multiplier"] = str(data_plan.multiplier)
-    d["price_increment"] = str(data_plan.price_increment)
+    price_increment_str = str(data_plan.price_increment)
+    d["price_increment"] = price_increment_str
+    d["price_precision"] = (
+        len(price_increment_str.split(".")[1]) if "." in price_increment_str else 0
+    )
     return FuturesContract.from_dict(d)
 
 

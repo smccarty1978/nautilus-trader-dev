@@ -1,0 +1,72 @@
+{
+  "table": "by_target_disposition",
+  "slice": "target_disposition",
+  "reporting_version": "1.0.0",
+  "n_rows_in_table": 3,
+  "total_sample_count": 1038,
+  "n_input_rows": 1038,
+  "row_reconciliation": "sum(group n) == n_input_rows",
+  "filters": {
+    "slice": "target_disposition",
+    "slice_definition": "Positive (target==1) vs negative (target==0) slice of the declared target column. Null/unresolved (censored) target values are excluded from BOTH groups -- they are never folded into 'negative' -- and surface as build_slice_table's separate 'unassigned' row instead.",
+    "target_column": "target_flip_within_horizon"
+  },
+  "dataset_identity_sha256": "6a2040d282f80ccd44a579c2d2d0e669cf6c48bd3b039f810699ff47cd8346c3",
+  "analysis_spec_sha256": "4a321a6b7c2d5b3a8f802a431cdb03f9721ef631fbf04c684fb1cef000fad1e1",
+  "metric_definitions": {
+    "sample_count": "Number of rows in the slice after all declared filters.",
+    "positive_rate": "Mean of the binary target; the slice's base rate.",
+    "roc_auc": "Area under the ROC curve. Undefined unless both classes are present.",
+    "pr_auc": "Average precision (area under the precision-recall curve). Undefined unless both classes are present.",
+    "brier": "Mean squared error between predicted probability and the binary outcome. Lower is better."
+  },
+  "caveats": [
+    "slice 'target_disposition' left 11 of 1038 rows in no group (value outside the slice's declared bins, or null); they are reported as 'unassigned' and are NOT part of any comparison group",
+    "groups with n<30 (metrics are unstable at this size): ['unassigned']"
+  ],
+  "rows": [
+    {
+      "group": "negative",
+      "n": 706,
+      "sample_count": 706.0,
+      "positive_rate": 0.0,
+      "roc_auc": null,
+      "roc_auc_status": "not_computable",
+      "roc_auc_reason": "single-class slice (all y=0); roc_auc is undefined",
+      "pr_auc": null,
+      "pr_auc_status": "not_computable",
+      "pr_auc_reason": "single-class slice (all y=0); pr_auc is undefined",
+      "brier": 0.36731809457252274
+    },
+    {
+      "group": "positive",
+      "n": 321,
+      "sample_count": 321.0,
+      "positive_rate": 1.0,
+      "roc_auc": null,
+      "roc_auc_status": "not_computable",
+      "roc_auc_reason": "single-class slice (all y=1); roc_auc is undefined",
+      "pr_auc": null,
+      "pr_auc_status": "not_computable",
+      "pr_auc_reason": "single-class slice (all y=1); pr_auc is undefined",
+      "brier": 0.24076364909698753
+    },
+    {
+      "group": "unassigned",
+      "n": 11,
+      "sample_count": 11.0,
+      "positive_rate": null,
+      "positive_rate_status": "not_computable",
+      "positive_rate_reason": "empty slice",
+      "roc_auc": null,
+      "roc_auc_status": "not_computable",
+      "roc_auc_reason": "empty slice",
+      "pr_auc": null,
+      "pr_auc_status": "not_computable",
+      "pr_auc_reason": "empty slice",
+      "brier": null,
+      "brier_status": "not_computable",
+      "brier_reason": "empty slice"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "ledger_version": 1,
+  "entries": [
+    {
+      "audit_type": "causal",
+      "pass": 2,
+      "audited_execution_composite_sha256": "9b6b51243d215f3c6d83909c84d06c9805b2091d1eb23fe96bdad1d0b48d187a",
+      "audit_report_sha256": "bffc70fc47b1b68f2fc53ca655f8d5e49681aead057b4c84f4dee40d2d70ac0a",
+      "audit_report_path": "audit/pass_02.md",
+      "auditor": "causal-audit-scottm-ym-prev5-pass02",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-18T12:55:26.239868+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 2,
+      "audited_execution_composite_sha256": "9b6b51243d215f3c6d83909c84d06c9805b2091d1eb23fe96bdad1d0b48d187a",
+      "audit_report_sha256": "de5f9afe28f9229bc051f7e434e9fc4ee9a2dd0c911371ce3dad4564c653c23b",
+      "audit_report_path": "audit/contract_pass_02.md",
+      "auditor": "contract-checker-pass02-2026-08-18",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-18T12:55:28.072384+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 3,
+      "audited_execution_composite_sha256": "4f28b073556e060e91079706473f837aaa7e7bb09b82a5bbbc61d25ff410c758",
+      "audit_report_sha256": "d99b7fbf1b53579b9b2fd9984df68a7d01e34a3fc97ff8ae201548d29c89a61a",
+      "audit_report_path": "audit/pass_03.md",
+      "auditor": "causal-audit-scottm-ym-prev5-pass03",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-18T13:13:44.014742+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 3,
+      "audited_execution_composite_sha256": "4f28b073556e060e91079706473f837aaa7e7bb09b82a5bbbc61d25ff410c758",
+      "audit_report_sha256": "ebea980c25666c17746b578c88c3cb5c529a5cc8878ceeb0b22b399752a3b700",
+      "audit_report_path": "audit/contract_pass_03.md",
+      "auditor": "contract-checker-pass03-2026-08-18",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-18T13:13:45.815415+00:00"
+    }
+  ]
+}

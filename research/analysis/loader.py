@@ -172,7 +172,14 @@ def load_collection(
         if cs.is_file():
             compiled_study = json.loads(cs.read_text(encoding="utf-8"))
 
-    feature_sha = (study_yaml.get("features") or {}).get("feature_list_sha256")
+    # study.yaml's own features.feature_list_sha256 is an optional author-supplied
+    # field the study factory never backfills; the authoritative computed hash lives
+    # in compiled_study.json's feature_contract (research/schemas/study_spec.py /
+    # research/study_types/flip_prediction.py), so prefer that before falling back to
+    # whatever (if anything) study.yaml declares directly.
+    feature_sha = (
+        (compiled_study.get("contracts") or {}).get("feature_contract") or {}
+    ).get("feature_list_sha256") or (study_yaml.get("features") or {}).get("feature_list_sha256")
 
     candidates = pd.read_parquet(paths.candidates)
     try:

@@ -1,0 +1,4105 @@
+{
+  "study_id": "ym_prev5_range_position",
+  "git_commit_hash": "e020bc94743d1bd3e680f2559d38efdc23d8b7f6",
+  "source_state_binding": {
+    "provenance_strength": "WORKING_TREE",
+    "git_commit_hash": "e020bc94743d1bd3e680f2559d38efdc23d8b7f6",
+    "git_commit_is_sufficient_provenance": false,
+    "working_tree_dirty": true,
+    "source_state_sha256": "f58888c2997b285d689e043aa1753943123882c3412b5c58518987ed42ba61d7",
+    "dependencies_diverging_from_commit": [
+      "studies/ym_prev5_range_position/SPEC.md",
+      "studies/ym_prev5_range_position/study.yaml"
+    ],
+    "source_files": {
+      "features/registry.py": {
+        "sha256": "a891f04c481f4cef01eff526d07d3886bc8d609d9fa89e36574337485b0a5188",
+        "state": "COMMITTED"
+      },
+      "features/trackers/ohlcv_delta.py": {
+        "sha256": "33096e1d58bdb24ffcfa89e4b403e82fe996b836fa820e44bb3e83c067497b63",
+        "state": "COMMITTED"
+      },
+      "features/trackers/price_levels.py": {
+        "sha256": "32f503d926f25fc5d66c5a89f35e1223b4d282d991527c0acfb49101e3fab028",
+        "state": "COMMITTED"
+      },
+      "features/trackers/pullback.py": {
+        "sha256": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00",
+        "state": "COMMITTED"
+      },
+      "features/trackers/velocity.py": {
+        "sha256": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d",
+        "state": "COMMITTED"
+      },
+      "features/trackers/volume.py": {
+        "sha256": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b",
+        "state": "COMMITTED"
+      },
+      "studies/ym_prev5_range_position/SPEC.md": {
+        "sha256": "f1676df19e16a2183f14b4e22cb588981c531a9a8d7906dbf379be86118de88a",
+        "state": "UNTRACKED_OR_NEW"
+      },
+      "studies/ym_prev5_range_position/study.yaml": {
+        "sha256": "e8de173381194e781424d5e2a0888853c8e4cb6489c798efdbc4f3d55abdb3af",
+        "state": "UNTRACKED_OR_NEW"
+      }
+    }
+  },
+  "study_yaml_sha256": "e8de173381194e781424d5e2a0888853c8e4cb6489c798efdbc4f3d55abdb3af",
+  "spec_md_sha256": "f1676df19e16a2183f14b4e22cb588981c531a9a8d7906dbf379be86118de88a",
+  "clean_lineage_start": null,
+  "invalidated_prior_runs_count": 0,
+  "invalidated_prior_runs": [],
+  "forbidden_lineage": [],
+  "provenance_certifications": {
+    "f3_scored_tables_read": false,
+    "2024_read_since_clean_lineage_reset": false,
+    "2025_read_in_selection_or_training": false,
+    "2026_read_in_selection_or_training": false
+  },
+  "candidate_feature_universe": {
+    "source": "features.registry.FEATURE_REGISTRY",
+    "status_filter": "verified",
+    "total_candidates_count": 502,
+    "candidate_names_sha256": "35e80758e7994dd11576739e63c662597ae490e175dc5026a5c602e9f92b582a",
+    "candidates": {
+      "abs_delta_per_atr_moved_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_atr_moved_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_atr_moved_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_atr_moved_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_atr_moved_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_atr_moved_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_atr_moved_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_atr_moved_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_point_moved_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_point_moved_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_point_moved_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_point_moved_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_point_moved_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_point_moved_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_point_moved_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "abs_delta_per_point_moved_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "arrival_accel_10s": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "arrival_accel_5s": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "arrival_jerk": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "arrival_vel_10s": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "arrival_vel_20s": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "arrival_vel_30s": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "arrival_vel_5s": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "bar_est_bear_volume": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "bar_est_bull_volume": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "bar_est_delta": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "bar_est_delta_ratio": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "bar_volume": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "bar_zero_range": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "clean_pullback_score_1m": {
+        "version": "1.0",
+        "family": "pullback_1m",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "close_vs_range_30s": {
+        "version": "1.0",
+        "family": "pullback_1s",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "consecutive_down_1s": {
+        "version": "1.0",
+        "family": "pullback_1s",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "consecutive_up_1s": {
+        "version": "1.0",
+        "family": "pullback_1s",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "directional_space_balance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "distance_above_full_envelope_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "distance_below_full_envelope_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "down_vol_ratio_10s": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "downbar_vol_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "downbar_vol_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "downbar_vol_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "downbar_vol_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "downbar_vol_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "downbar_vol_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "downbar_vol_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "downbar_vol_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "ema_slope_long": {
+        "version": "1.0",
+        "family": "context",
+        "dtype": "float64",
+        "implementation": "",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "ema_slope_short": {
+        "version": "1.0",
+        "family": "context",
+        "dtype": "float64",
+        "implementation": "",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "est_abs_delta_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_abs_delta_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_abs_delta_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_abs_delta_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_abs_delta_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_abs_delta_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_abs_delta_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_abs_delta_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bear_vol_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bear_vol_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bear_vol_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bear_vol_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bear_vol_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bear_vol_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bear_vol_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bear_vol_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bull_vol_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bull_vol_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bull_vol_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bull_vol_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bull_vol_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bull_vol_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bull_vol_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_bull_vol_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_neg_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_neg_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_neg_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_neg_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_neg_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_neg_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_neg_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_neg_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_pos_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_pos_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_pos_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_pos_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_pos_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_pos_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_pos_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_pos_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_15s_minus_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_30s_minus_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_60s_minus_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_ratio_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_15s_minus_60s_scaled": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_30s_minus_120s_scaled": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_60s_minus_300s_scaled": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "est_delta_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "full_level_envelope_width_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "full_level_envelope_width_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "higher_lows_count_1m": {
+        "version": "1.0",
+        "family": "pullback_1m",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "higher_lows_count_1s": {
+        "version": "1.0",
+        "family": "pullback_1s",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "highest_available_level": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "inverse_distance_density": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "is_decelerating": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "is_rth": {
+        "version": "1.0",
+        "family": "context",
+        "dtype": "float64",
+        "implementation": "",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "level_balance": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "level_density_025a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "level_density_050a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "level_density_100a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "level_density_200a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_above_within_025a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_above_within_050a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_above_within_100a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_above_within_200a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_ahead_of_trade": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_behind_trade": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_below_within_025a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_below_within_050a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_below_within_100a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "levels_below_within_200a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "lower_highs_count_1m": {
+        "version": "1.0",
+        "family": "pullback_1m",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "lower_highs_count_1s": {
+        "version": "1.0",
+        "family": "pullback_1s",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "lowest_available_level": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "max_cluster_strength": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "max_nearby_cluster_strength_050a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "max_nearby_cluster_strength_100a": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "max_vel_30s": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "minutes_since_rth_open": {
+        "version": "1.0",
+        "family": "context",
+        "dtype": "float64",
+        "implementation": "",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "n_level_clusters_above": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_level_clusters_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_level_clusters_below": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_level_clusters_touched": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_levels_above": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_levels_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_levels_below": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_levels_touched": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_prior_day_levels_above": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_prior_day_levels_below": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_rolling_levels_above": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_rolling_levels_below": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_session_levels_above": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "n_session_levels_below": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_cluster_above_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_cluster_above_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_cluster_above_strength": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_cluster_ahead_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_cluster_behind_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_cluster_below_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_cluster_below_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_cluster_below_strength": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_above_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_above_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_above_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_above_name": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_above_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_ahead_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_behind_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_below_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_below_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_below_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_below_name": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_level_below_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_space_balance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_space_total_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "nearest_upside_downside_ratio": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_elapsed_seconds": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_developing_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_developing_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_developing_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_developing_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_developing_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_developing_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_final_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_final_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_final_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_final_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_final_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_high_final_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_is_developing": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_is_final": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_developing_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_developing_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_developing_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_developing_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_developing_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_developing_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_final_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_final_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_final_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_final_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_final_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "opening_range_30m_low_final_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_developing_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_developing_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_developing_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_developing_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_developing_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_developing_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_final_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_final_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_final_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_final_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_final_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_high_final_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_developing_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_developing_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_developing_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_developing_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_developing_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_developing_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_final_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_final_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_final_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_final_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_final_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "overnight_low_final_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "pct_levels_above": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "pct_levels_ahead_of_trade": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "pct_levels_behind_trade": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "pct_levels_below": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "pct_levels_touched": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "price_change_atr_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_atr_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_atr_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_atr_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_atr_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_atr_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_atr_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_atr_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_points_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_points_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_points_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_points_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_points_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_points_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_points_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_change_points_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "price_position_in_full_envelope": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_close_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_close_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_close_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_close_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_close_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_close_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_high_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_high_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_high_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_high_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_high_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_high_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_low_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_low_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_low_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_low_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_low_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_low_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_open_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_open_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_open_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_open_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_open_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "prior_day_open_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "pullback_bars_1m": {
+        "version": "1.0",
+        "family": "pullback_1m",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "pullback_depth_atr": {
+        "version": "1.0",
+        "family": "pullback_1m",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "pullback_efficiency_1m": {
+        "version": "1.0",
+        "family": "pullback_1m",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "pullback_linearity_1s": {
+        "version": "1.0",
+        "family": "pullback_1s",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_30s_atr": {
+        "version": "1.0",
+        "family": "pullback_1s",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_atr_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_atr_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_atr_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_atr_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_atr_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_atr_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_atr_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_atr_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_points_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_points_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_points_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_points_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_points_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_points_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_points_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "range_points_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "regime_abs_delta_per_atr_moved": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_age_bars": {
+        "version": "1.0",
+        "family": "context",
+        "dtype": "float64",
+        "implementation": "",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_available": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_elapsed_seconds": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_est_abs_delta_sum": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_est_delta_ratio": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_est_delta_sum": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_first_half_est_delta_ratio": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_first_half_vol": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_late_minus_early_delta_ratio": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_late_vs_early_vol_ratio": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_price_change_atr": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_range_atr": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_second_half_est_delta_ratio": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_second_half_vol": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_vol_sum": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_volume_per_atr_moved": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "regime_volume_per_second": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "retracement_pct": {
+        "version": "1.0",
+        "family": "pullback_1m",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rolling_15m_close_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_close_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_close_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_close_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_close_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_close_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_high_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_high_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_high_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_high_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_high_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_high_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_low_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_low_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_low_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_low_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_low_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_low_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_open_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_open_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_open_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_open_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_open_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_15m_open_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_close_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_close_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_close_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_close_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_close_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_close_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_high_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_high_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_high_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_high_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_high_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_high_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_low_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_low_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_low_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_low_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_low_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_low_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_open_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_open_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_open_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_open_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_open_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_30m_open_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_close_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_close_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_close_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_close_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_close_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_close_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_high_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_high_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_high_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_high_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_high_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_high_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_low_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_low_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_low_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_low_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_low_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_low_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_open_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_open_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_open_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_open_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_open_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_5m_open_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_close_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_close_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_close_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_close_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_close_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_close_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_high_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_high_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_high_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_high_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_high_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_high_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_low_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_low_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_low_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_low_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_low_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_low_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_open_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_open_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_open_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_open_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_open_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rolling_60m_open_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rth_abs_delta_cum": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rth_available": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rth_elapsed_seconds": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rth_est_delta_cum": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rth_est_delta_ratio_cum": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rth_open_available": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rth_open_elapsed_seconds": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rth_open_position": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rth_open_price": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rth_open_signed_distance_atr": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rth_open_signed_distance_points": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rth_open_signed_distance_ticks": {
+        "version": "1.0",
+        "family": "price_level_context",
+        "dtype": "float64",
+        "implementation": "features.trackers.price_levels.PriceLevelTracker",
+        "source_timeframe": "1m",
+        "direction_normalized": true
+      },
+      "rth_vol_cum": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rth_volume_per_second": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rvol_10s": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rvol_1s": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "rvol_5s": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "swing_count_1m": {
+        "version": "1.0",
+        "family": "pullback_1m",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "swing_count_1s": {
+        "version": "1.0",
+        "family": "pullback_1s",
+        "dtype": "float64",
+        "implementation": "features.trackers.pullback.PullbackTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_down_vol_ratio_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_down_vol_ratio_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_down_vol_ratio_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_down_vol_ratio_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_down_vol_ratio_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_down_vol_ratio_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_down_vol_ratio_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_down_vol_ratio_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "up_vol_ratio_10s": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "upbar_vol_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "upbar_vol_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "upbar_vol_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "upbar_vol_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "upbar_vol_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "upbar_vol_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "upbar_vol_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "upbar_vol_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vel_ratio_5_20": {
+        "version": "1.0",
+        "family": "arrival_velocity",
+        "dtype": "float64",
+        "implementation": "features.trackers.velocity.ArrivalVelocityTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_accel": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_climax": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_max_1s_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_max_1s_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_max_1s_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_max_1s_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_max_1s_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_max_1s_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_max_1s_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_max_1s_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_mean_1s_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_mean_1s_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_mean_1s_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_mean_1s_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_mean_1s_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_mean_1s_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_mean_1s_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_mean_1s_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_price_corr_10s": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_spike": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_30s_vs_300s_ratio": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_60s_vs_900s_ratio": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_sum_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "vol_trend_10s": {
+        "version": "1.0",
+        "family": "arrival_volume",
+        "dtype": "float64",
+        "implementation": "features.trackers.volume.ArrivalVolumeTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_atr_moved_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_atr_moved_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_atr_moved_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_atr_moved_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_atr_moved_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_atr_moved_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_atr_moved_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_atr_moved_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_point_moved_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_point_moved_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_point_moved_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_point_moved_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_point_moved_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_point_moved_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_point_moved_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "volume_per_point_moved_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "window_available_120s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "window_available_15s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "window_available_1800s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "window_available_300s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "window_available_30s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "window_available_5s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "window_available_60s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      },
+      "window_available_900s": {
+        "version": "1.0",
+        "family": "ohlcv_est_delta",
+        "dtype": "float64",
+        "implementation": "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "source_timeframe": "1s",
+        "direction_normalized": true
+      }
+    }
+  },
+  "selection_contract": {
+    "mode": "train_only",
+    "years": [
+      2024
+    ],
+    "direction_specific": true,
+    "feature_count_per_direction": 25,
+    "ranking_method": "frozen_train_only_temporal_rank"
+  },
+  "chronology": {
+    "train": [
+      2024
+    ],
+    "dev": [],
+    "prohibited": [
+      2025,
+      2026
+    ]
+  },
+  "manifest_sha256": "daec527a6a3d9ccca5e565be1d0d8f05a230bd9b64a673d4766144d2896d3d02"
+}

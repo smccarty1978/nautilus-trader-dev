@@ -1,0 +1,43 @@
+{
+  "table": "by_direction",
+  "slice": "direction",
+  "reporting_version": "1.0.0",
+  "n_rows_in_table": 2,
+  "total_sample_count": 1038,
+  "n_input_rows": 1038,
+  "row_reconciliation": "sum(group n) == n_input_rows",
+  "filters": {
+    "slice": "direction",
+    "slice_definition": "regime_direction as emitted by the collector: -1 short / +1 long."
+  },
+  "dataset_identity_sha256": "6a2040d282f80ccd44a579c2d2d0e669cf6c48bd3b039f810699ff47cd8346c3",
+  "analysis_spec_sha256": "4a321a6b7c2d5b3a8f802a431cdb03f9721ef631fbf04c684fb1cef000fad1e1",
+  "metric_definitions": {
+    "sample_count": "Number of rows in the slice after all declared filters.",
+    "positive_rate": "Mean of the binary target; the slice's base rate.",
+    "roc_auc": "Area under the ROC curve. Undefined unless both classes are present.",
+    "pr_auc": "Average precision (area under the precision-recall curve). Undefined unless both classes are present.",
+    "brier": "Mean squared error between predicted probability and the binary outcome. Lower is better."
+  },
+  "caveats": [],
+  "rows": [
+    {
+      "group": "long",
+      "n": 397,
+      "sample_count": 397.0,
+      "positive_rate": 0.39896373056994816,
+      "roc_auc": 0.5583435960591134,
+      "pr_auc": 0.4790297816000118,
+      "brier": 0.46106447925180244
+    },
+    {
+      "group": "short",
+      "n": 641,
+      "sample_count": 641.0,
+      "positive_rate": 0.26053042121684866,
+      "roc_auc": 0.6433209530306476,
+      "pr_auc": 0.34224864524924636,
+      "brier": 0.24748957431690843
+    }
+  ]
+}

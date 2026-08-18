@@ -1,0 +1,41 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\ym_prev5_range_position",
+  "decision_contract": {
+    "research_question": "Does latest_1m_close_position_prev5_range show enough descriptive separation between YM observations that do and do not experience the existing prevailing 1-minute regime transition within 300 seconds to justify expanding the TRAIN sample?",
+    "baseline": {
+      "short": "latest_1m_close_position_prev5_range",
+      "long": "latest_1m_close_position_prev5_range"
+    },
+    "baseline_feature_selection": {
+      "mode": "train_only"
+    },
+    "model_arms": {
+      "A": "latest_1m_close_position_prev5_range_descriptive"
+    },
+    "variable_being_tested": [
+      "latest_1m_close_position_prev5_range"
+    ],
+    "prohibited_changes": [
+      "unauthorized_feature_discovery",
+      "use_2024_to_change_model_design",
+      "expansion_beyond_authorized_dates"
+    ],
+    "allowed_changes": [
+      "descriptive_feature_analysis"
+    ],
+    "chronology": {
+      "train": [
+        2024
+      ],
+      "dev": [],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": "Descriptive distribution and directional breakdown of latest_1m_close_position_prev5_range against the canonical flip target, on YM 2024-09-03 RTH only.",
+    "terminal_question": "What are the empirical distribution and target relationships of latest_1m_close_position_prev5_range on YM RTH 2024-09-03, and is a one-day TRAIN sample sufficient descriptive evidence to justify expanding the TRAIN sample?"
+  },
+  "findings": []
+}

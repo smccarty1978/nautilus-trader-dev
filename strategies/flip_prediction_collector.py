@@ -25,6 +25,7 @@ from features.trackers.price_levels import PriceLevelTracker
 from features.trackers.rolling_5m_productivity import Rolling5mProductivityTracker
 from features.trackers.structural_regime_geometry import StructuralRegimeGeometryTracker
 from features.trackers.wick import WickTracker
+from features.trackers.range_position import RangePositionTracker
 from features.registry import FEATURE_REGISTRY
 from utils.session_boundaries import is_in_session, session_close_ns
 
@@ -182,6 +183,7 @@ class FlipPredictionCollector(Strategy):
         self.structural_geometry_tracker = StructuralRegimeGeometryTracker()
         self.rolling_productivity_tracker = Rolling5mProductivityTracker(window_seconds=300)
         self.wick_tracker = WickTracker()
+        self.range_position_tracker = RangePositionTracker()
 
         if self._is_targeted_60:
             self.ring = FastOHLCVRingBuffer(capacity=3600)
@@ -328,6 +330,7 @@ class FlipPredictionCollector(Strategy):
 
         self.price_level_tracker.update_1m(ts_avail, o, h, l, c, is_rth_now)
         self.wick_tracker.update(o, h, l, c)
+        self.range_position_tracker.update(h, l, c)
         self.bars_since_breach_1m.append(bar)
 
     def _track_pending(self, cand_record: Dict[str, Any], T: int) -> None:
@@ -868,6 +871,7 @@ class FlipPredictionCollector(Strategy):
         )
         context_feats = self._get_context_features(T, atr)
         wick_feats = self.wick_tracker.calculate()
+        range_position_feats = self.range_position_tracker.calculate()
 
         merged_raw = {
             **ohlcv_feats,
@@ -880,6 +884,7 @@ class FlipPredictionCollector(Strategy):
             **pullback_1m_feats,
             **context_feats,
             **wick_feats,
+            **range_position_feats,
         }
 
         study_universe = self.cfg.feature_list or [

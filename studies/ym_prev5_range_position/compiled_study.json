@@ -1,0 +1,291 @@
+{
+  "study_id": "ym_prev5_range_position",
+  "study_type": "flip_prediction",
+  "spec_sha256": "7ab2a506ed27ab8d68572e7492fdae2b06dc6b7f39fb33c967807b58f4864ccb",
+  "spec": {
+    "study": {
+      "id": "ym_prev5_range_position",
+      "type": "flip_prediction",
+      "risk_tier": 2,
+      "description": "One-day descriptive TRAIN pilot of latest_1m_close_position_prev5_range on YM RTH, bounded to 2024-09-03. Descriptive only; no economic interpretation, no model fitting. Population/target/censoring mechanics inherited unchanged from es_wick_imbalance_acceptance_v2; only instrument and feature differ."
+    },
+    "operation": {
+      "kind": "train_evaluate",
+      "target_metric": "roc_auc",
+      "reconciliation_target": null
+    },
+    "instrument": {
+      "symbol": "YM",
+      "venue": "XCBT"
+    },
+    "population": {
+      "type": "regime_state",
+      "prevailing_regime": "both",
+      "session": "RTH",
+      "qualification": null
+    },
+    "target": {
+      "type": "flip",
+      "event": "prevailing_1m_regime_transition",
+      "direction": "both",
+      "horizon_seconds": 300,
+      "confirmation": null
+    },
+    "features": {
+      "source_manifest": null,
+      "source": "explicit_feature_list",
+      "source_key": null,
+      "selection": null,
+      "forbidden_lineage": null,
+      "feature_list": [
+        "latest_1m_close_position_prev5_range"
+      ],
+      "feature_list_sha256": null,
+      "directional_mapping": null,
+      "timing_contract": "verified",
+      "metadata_columns": null
+    },
+    "model": {
+      "mode": "scoring",
+      "family": "HistGradientBoostingClassifier",
+      "arms": null,
+      "artifact_path": null,
+      "artifact_sha256": null,
+      "params": null
+    },
+    "chronology": {
+      "train": [
+        2024
+      ],
+      "dev": [],
+      "diagnostic": null,
+      "prohibited": [
+        2025,
+        2026
+      ],
+      "warmup": null
+    },
+    "stratification": {
+      "column": null,
+      "buckets": null,
+      "extrapolation_bucket": null
+    },
+    "baseline": {
+      "study": null,
+      "manifest_sha256": null,
+      "results_sha256": null
+    },
+    "lineage": {
+      "parent_study": null,
+      "parent_manifest_sha256": null,
+      "clean_lineage_start": null,
+      "invalidated_prior_runs": null,
+      "intended_changes": null,
+      "frozen": null
+    },
+    "execution": {
+      "runtime": "nautilustrader",
+      "strategy_class": null,
+      "data_requirements": {
+        "authorized_dates": [
+          "2024-09-03"
+        ]
+      },
+      "checkpoint": null,
+      "progress_seconds": 60,
+      "bounded": true,
+      "observation_policy": null
+    },
+    "acceptance": {
+      "criteria": null
+    },
+    "bespoke": {
+      "reason": null,
+      "unsupported_contract_element": null,
+      "canonical_type_considered": null,
+      "reusable_extension_considered": null,
+      "custom_scope": null
+    }
+  },
+  "contracts": {
+    "population_contract": {
+      "instrument": {
+        "symbol": "YM",
+        "venue": "XCBT"
+      },
+      "population_type": "regime_state",
+      "prevailing_regime": "both",
+      "session": "RTH",
+      "qualification": {},
+      "causal_checkpoint": {
+        "checkpoint_frequency": "5s",
+        "checkpoint_grid_origin": "regime_start_ns",
+        "triggering_stream": "completed_1s_bar",
+        "observation_timing": "interval_close"
+      }
+    },
+    "target_contract": {
+      "target_type": "flip",
+      "event": "prevailing_1m_regime_transition",
+      "direction": "both",
+      "horizon_seconds": 300,
+      "confirmation": {
+        "mode": "bar_close",
+        "confirmation_bars": 1
+      },
+      "censoring_policy": {
+        "session_end_censoring": true,
+        "max_horizon_seconds": 300
+      }
+    },
+    "feature_contract": {
+      "source_key": null,
+      "feature_count": 1,
+      "feature_list": [
+        "latest_1m_close_position_prev5_range"
+      ],
+      "feature_list_sha256": "0a4200c7db88216fa0a5a5b9761052b51d26e70fb169ea4ae19cd0d646cfb300",
+      "bound_trackers": [
+        "features.trackers.range_position.RangePositionTracker"
+      ],
+      "families": [
+        "range_position"
+      ],
+      "source_timeframes": [
+        "1m"
+      ],
+      "feature_statuses": {
+        "latest_1m_close_position_prev5_range": "provisional"
+      },
+      "feature_null_policies": {
+        "latest_1m_close_position_prev5_range": "allow"
+      },
+      "contains_provisional_features": [
+        "latest_1m_close_position_prev5_range"
+      ],
+      "directional_mapping": "direction_normalized",
+      "timing_contract": "verified"
+    },
+    "execution_contract": {
+      "runtime": "nautilustrader",
+      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "bounded_execution": true,
+      "progress_seconds": 60,
+      "checkpoint": null,
+      "chronology": {
+        "train": [
+          2024
+        ],
+        "dev": [],
+        "diagnostic": [],
+        "prohibited": [
+          2025,
+          2026
+        ]
+      }
+    },
+    "timestamp_contract": {
+      "source": "databento_glbx_mdp3",
+      "instrument_symbol": "YM",
+      "measured_catalog_rel_path": "data/catalog/YM_v0_2024",
+      "raw_timestamp_semantic": "OPEN_STAMPED",
+      "raw_index_field": "ts_event",
+      "timezone": "UTC",
+      "offline_research_aggregation": {
+        "pandas_rule": "resample(rule, label='right', closed='left')",
+        "semantic": "CLOSE_STAMPED"
+      },
+      "nautilus_catalog": {
+        "ts_event_semantic": "OPEN_STAMPED",
+        "ts_init_semantic": "CLOSE_STAMPED",
+        "causal_dispatch_field": "ts_init",
+        "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
+        "timeframe_deltas_ns": {
+          "1-SECOND": 1000000000,
+          "1-MINUTE": 60000000000,
+          "3-MINUTE": 180000000000,
+          "5-MINUTE": 300000000000
+        },
+        "empirical_measurement": {
+          "status": "MEASURED",
+          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\YM_v0_2024",
+          "measurements": {
+            "YM.XCBT-1-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 60000000000,
+              "observed_deltas_ns": [
+                60000000000
+              ],
+              "pass": true
+            },
+            "YM.XCBT-1-SECOND-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 1000000000,
+              "observed_deltas_ns": [
+                1000000000
+              ],
+              "pass": true
+            }
+          }
+        }
+      },
+      "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "deliverables_contract": {
+      "contract_version": 1,
+      "authorized_modes": [
+        "collect"
+      ],
+      "deliverables_by_mode": {
+        "collect": [
+          "candidates.parquet",
+          "observations.parquet",
+          "collection_manifest.json",
+          "run_manifest.json",
+          "status.json"
+        ]
+      },
+      "artifact_metadata": {
+        "candidates.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "observations.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "collection_manifest.json": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "run_manifest.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::OutputManager",
+          "relative_to": "run_dir"
+        },
+        "status.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir"
+        }
+      },
+      "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
+    },
+    "lineage": {
+      "has_parent": false
+    },
+    "baseline": {
+      "has_baseline": false
+    }
+  },
+  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector"
+}

@@ -1,0 +1,87 @@
+research_question: >-
+  Does latest_1m_close_position_prev5_range show enough descriptive separation between
+  YM observations that do and do not experience the existing prevailing 1-minute regime
+  transition within 300 seconds to justify expanding the TRAIN sample?
+
+purpose: >-
+  One-day descriptive TRAIN pilot on YM. The population and target mechanics are
+  inherited unchanged from studies/es_wick_imbalance_acceptance_v2 -- only the
+  instrument (YM/XCBT) and the feature under study differ. No economic
+  interpretation, no model fitting, no threshold tuning is authorized.
+
+baseline:
+  short: "latest_1m_close_position_prev5_range"
+  long: "latest_1m_close_position_prev5_range"
+
+baseline_feature_selection:
+  mode: "train_only"
+
+model_arms:
+  A: "latest_1m_close_position_prev5_range_descriptive"
+
+variable_being_tested:
+  - "latest_1m_close_position_prev5_range"
+
+prohibited_changes:
+  - "unauthorized_feature_discovery"
+  - "use_2024_to_change_model_design"
+  - "expansion_beyond_authorized_dates"
+
+# Stated as a caveat rather than a `prohibited_changes` token: the fidelity checker's
+# prohibition vocabulary is a closed, machine-checked set (see
+# scripts/check_research_decision_fidelity.py::KNOWN_PROHIBITIONS), and inventing
+# tokens it cannot enforce would put unenforceable text where enforceable text belongs.
+scope_caveats:
+  - "No economic interpretation of latest_1m_close_position_prev5_range is authorized."
+  - "No model fitting, threshold tuning, alternative-lookback testing, or trading economics."
+  - "No post-hoc binning: only the predeclared buckets (<0, [0,1], >1) are reported."
+  - >-
+    Population, target, confirmation, observation timing, censoring and terminal
+    disposition semantics are inherited unchanged from
+    studies/es_wick_imbalance_acceptance_v2; only instrument and feature differ.
+  - "Single-day TRAIN pilot: does not by itself constitute proof of predictive value."
+
+allowed_changes:
+  - "descriptive_feature_analysis"
+
+chronology:
+  train: [2024]
+  dev: []
+  prohibited: [2025, 2026]
+
+authorized_dates:
+  - "2024-09-03"
+
+session:
+  name: "RTH"
+  window_ct: "08:30:00-15:15:00"
+  attribution: "half-open (start, end] on completed-bar close timestamps"
+  authority: "utils/session_boundaries.py"
+
+target_censoring:
+  session_end_censoring: true
+  rule: >-
+    A candidate whose 300s forward horizon extends past its own session close is CENSORED,
+    not labeled. Every emitted candidate reaches exactly one terminal disposition:
+    LABELED_POSITIVE, LABELED_NEGATIVE, or CENSORED. Inherited unchanged from
+    studies/es_wick_imbalance_acceptance_v2.
+
+feature_status_caveat: >-
+  latest_1m_close_position_prev5_range is 'provisional', not 'verified'. It has
+  deterministic test coverage (tests/test_feature_library.py,
+  scripts/tests/test_range_position_availability.py) but no look-ahead auditor
+  clearance under this study yet, so it may not enter a verified-only candidate
+  universe. It is named explicitly here because characterising it is the point of the
+  study. It must not affect candidate selection, labels, candidate timing, censoring,
+  regime state, or direction eligibility -- descriptive only. Its declared null_policy
+  is 'allow': the feature is genuinely unavailable (None) until 5 prior completed 1m
+  bars exist, and also None for a flat prior 5-bar range.
+
+primary_comparison: >-
+  Descriptive distribution and directional breakdown of
+  latest_1m_close_position_prev5_range against the canonical flip target, on YM
+  2024-09-03 RTH only.
+terminal_question: >-
+  What are the empirical distribution and target relationships of
+  latest_1m_close_position_prev5_range on YM RTH 2024-09-03, and is a one-day TRAIN
+  sample sufficient descriptive evidence to justify expanding the TRAIN sample?

@@ -1,0 +1,28 @@
+{
+  "source_key": null,
+  "feature_count": 1,
+  "feature_list": [
+    "latest_1m_close_position_prev5_range"
+  ],
+  "feature_list_sha256": "0a4200c7db88216fa0a5a5b9761052b51d26e70fb169ea4ae19cd0d646cfb300",
+  "bound_trackers": [
+    "features.trackers.range_position.RangePositionTracker"
+  ],
+  "families": [
+    "range_position"
+  ],
+  "source_timeframes": [
+    "1m"
+  ],
+  "feature_statuses": {
+    "latest_1m_close_position_prev5_range": "provisional"
+  },
+  "feature_null_policies": {
+    "latest_1m_close_position_prev5_range": "allow"
+  },
+  "contains_provisional_features": [
+    "latest_1m_close_position_prev5_range"
+  ],
+  "directional_mapping": "direction_normalized",
+  "timing_contract": "verified"
+}
