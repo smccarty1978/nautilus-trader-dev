@@ -280,3 +280,20 @@ def test_wick_tracker():
     tracker.update(101.0, 105.0, 100.0, 103.0)
     assert tracker.calculate()["latest_1m_wick_imbalance"] == pytest.approx(0.2)
 
+
+def test_range_position_tracker():
+    from features.trackers.range_position import RangePositionTracker
+
+    # Before 5 prior completed 1m bars exist the feature is UNAVAILABLE, not zero.
+    # See scripts/tests/test_range_position_availability.py for the full case matrix.
+    tracker = RangePositionTracker()
+    assert tracker.calculate()["latest_1m_close_position_prev5_range"] is None
+
+    for _ in range(5):
+        tracker.update(high=110.0, low=100.0, close=105.0)
+    assert tracker.calculate()["latest_1m_close_position_prev5_range"] is None  # bar t not yet observed
+
+    tracker.update(high=108.0, low=104.0, close=105.0)
+    # prev5_high=110, prev5_low=100 (bar t itself excluded) -> (105-100)/(110-100) = 0.5
+    assert tracker.calculate()["latest_1m_close_position_prev5_range"] == pytest.approx(0.5)
+

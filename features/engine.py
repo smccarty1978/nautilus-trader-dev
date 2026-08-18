@@ -12,6 +12,7 @@ from features.trackers.price_levels import PriceLevelTracker
 from features.trackers.median_center import MedianCenterTracker
 from features.trackers.rolling_5m_productivity import Rolling5mProductivityTracker
 from features.trackers.wick import WickTracker
+from features.trackers.range_position import RangePositionTracker
 from features.registry import FEATURE_REGISTRY, resolve_feature_name
 from utils.session_boundaries import is_in_session
 
@@ -61,6 +62,7 @@ class FeatureEngine:
         self._rolling_productivity_tracker = Rolling5mProductivityTracker(
             window_seconds=rolling_productivity_window_seconds)
         self._wick_tracker = WickTracker()
+        self._range_position_tracker = RangePositionTracker()
         self.last_atr = 1.0
 
         # 1s price streams
@@ -196,6 +198,7 @@ class FeatureEngine:
 
         self._median_center_tracker.update_1m(bar, regime)
         self._wick_tracker.update(float(bar.open), float(bar.high), float(bar.low), float(bar.close))
+        self._range_position_tracker.update(float(bar.high), float(bar.low), float(bar.close))
 
     def update_5m(self, bar) -> None:
         """Explicitly update 5m data stream (optional placeholder)."""
@@ -269,6 +272,9 @@ class FeatureEngine:
 
         # 9. Wick Imbalance
         raw_features.update(self._wick_tracker.calculate())
+
+        # 10. Close position within prior 5-bar 1m range
+        raw_features.update(self._range_position_tracker.calculate())
 
         # Study collectors supply the fixed current-regime-start ATR and the
         # already-causal structural lifetime speed at their decision boundary.

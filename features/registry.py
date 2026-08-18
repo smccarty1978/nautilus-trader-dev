@@ -288,6 +288,28 @@ FEATURE_REGISTRY: Dict[str, FeatureDefinition] = {
         reset_policy='none',
         direction_normalized=False,
     ),
+    'latest_1m_close_position_prev5_range': FeatureDefinition(
+        name='latest_1m_close_position_prev5_range',
+        # Provisional until the promotion validator's evidence requirements are met.
+        # A feature may not self-grant 'verified' in the change that implements it --
+        # see scripts/check_feature_promotion.py and FEATURE_REGISTRY_CONTRACT.md s1.
+        status='provisional',
+        family='range_position',
+        implementation='features.trackers.range_position.RangePositionTracker',
+        tests=('tests/test_feature_library.py', 'scripts/tests/test_range_position_availability.py'),
+        source_timeframe='1m',
+        update_anchor='completed_1m_bar',
+        # 'allow' is load-bearing: unavailable (None) until 5 prior completed 1m bars
+        # exist, and also None for a flat prior 5-bar range (prev5_high == prev5_low).
+        # Neither is an all-null column -- the surface validator still requires the
+        # feature to emit real values once warmup is satisfied on a non-flat range.
+        null_policy='allow',
+        warmup=6,
+        window=5,
+        window_unit='bars',
+        reset_policy='none',
+        direction_normalized=False,
+    ),
 }
 
 # ---------------------------------------------------------------------------

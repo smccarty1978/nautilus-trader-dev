@@ -109,6 +109,19 @@ PRODUCT_CATALOGS: Dict[str, Dict[str, Any]] = {
         "ts_init_delta_1s_ns": 1_000_000_000,
         "ts_init_delta_1m_ns": 60_000_000_000,
     },
+    "YM": {
+        "symbol": "YM",
+        "venue": "XCBT",
+        "instrument_id": "YM.XCBT",
+        "multiplier": "5.0",
+        "price_increment": "1",
+        "catalog_rel_path": "data/catalog/YM_v0_2024",
+        "bar_type_1s": "YM.XCBT-1-SECOND-LAST-EXTERNAL",
+        "bar_type_1m": "YM.XCBT-1-MINUTE-LAST-EXTERNAL",
+        "raw_timestamp_semantic": "OPEN_STAMPED",
+        "ts_init_delta_1s_ns": 1_000_000_000,
+        "ts_init_delta_1m_ns": 60_000_000_000,
+    },
 }
 
 
