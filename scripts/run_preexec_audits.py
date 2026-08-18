@@ -514,24 +514,127 @@ LINEAGE_DIR_NAME = "audit_lineage"
 LINEAGE_VERSION = 1
 
 
-#: Overrides where anchors are stored. Set by the test suite so that scratch studies --
-#: which very often share the name "study" -- do not collide in one shared directory and
-#: report each other as lineage resets. Production never sets it.
-LINEAGE_DIR_ENV = "NT_AUDIT_LINEAGE_DIR"
+# ---------------------------------------------------------------------------
+# Where durability actually comes from (RT3-B1)
+#
+# The previous anchor was an untracked file under an environment-redirectable directory,
+# so three attacks reset a study's audit history without a trace: delete the anchor,
+# roll anchor and ledger back together, or export NT_AUDIT_LINEAGE_DIR at an empty
+# directory. "Durable" was the ephemeral half of the pair -- the ledger was committed;
+# the anchor was not.
+#
+# This repository has exactly one durable, integrity-bound, repository-visible store:
+# **git**. So git is the substrate, and the durability boundary is stated plainly rather
+# than dressed up:
+#
+#   * the anchor lives at `audit_lineage/<study_id>.json`, INSIDE the repository, and is
+#     committed alongside the audit artifacts it anchors (the workflow already requires
+#     committing code together with its audit/pass_NN.md + status.json);
+#   * `HEAD`'s copy of the anchor and of the study's pass ledger is consulted on every
+#     read. A working-tree file that has gone missing, gone backwards, or dropped an
+#     entry that HEAD records is a refusal;
+#   * the anchor carries a monotonic `issuance_counter` and a `chain_sha256` hash chain,
+#     so an internally valid OLD anchor is distinguishable from the current one -- which
+#     is what made rollback undetectable before.
+#
+# What this does NOT claim: no cryptographic signature, no trusted time, no protection
+# against someone who rewrites git history. Those need a key or a server, and this repo
+# has neither. Within a git-based workflow, once an issuance is committed, deleting or
+# rewinding working-tree files cannot silently restore an earlier high-water mark.
+# ---------------------------------------------------------------------------
+
+#: Explicit, in-process, test-only anchor relocation.
+#:
+#: Deliberately NOT an environment variable. An env var is settable from outside the
+#: process, which is exactly how the Red Team removed anchor protection from a production
+#: run with no filesystem change and no record in any artifact. A module global can only
+#: be set by code running inside the interpreter, it does not cross a subprocess boundary,
+#: and `set_test_lineage_dir` refuses unless pytest is loaded. A production entrypoint
+#: cannot reach this state without editing this file, which is inside the governance
+#: closure and therefore moves the execution composite.
+#:
+#: Most tests do not need it: see `_lineage_path`, where a study outside the repository
+#: already anchors beside itself.
+_TEST_LINEAGE_DIR: Optional[Path] = None
+
+
+def set_test_lineage_dir(path: Optional[Path]) -> None:
+    """Redirects anchor storage. Test-only; refuses outside a pytest process."""
+    global _TEST_LINEAGE_DIR
+    if path is not None and "pytest" not in sys.modules:
+        raise RuntimeError(
+            "LINEAGE_TEST_OVERRIDE_REFUSED: set_test_lineage_dir is a test-only hook and "
+            "may not be used to relocate production audit lineage."
+        )
+    _TEST_LINEAGE_DIR = Path(path) if path is not None else None
 
 
 def _lineage_path(study_dir: Path, repo_root: Optional[Path] = None) -> Path:
     """Location of a study's durable anchor, keyed by study identity.
 
-    Deliberately outside the study directory: that is the whole point of RT-3. The
-    anchor is keyed by study *name*, matching every other identity check in the workflow
-    (the `study` field in audit summaries, `study_id` in manifests).
+    Outside the study directory (so `rm -rf studies/<id>/audit/` cannot erase history)
+    but INSIDE the repository (so git can make it durable). Keyed by study *name*,
+    matching every other identity check in the workflow.
+
+    A study that lies OUTSIDE the repository anchors beside itself instead, in
+    ``<study>/../audit_lineage/``. This is not an override and takes no input from the
+    environment or the command line -- it is derived from the study path alone, so
+    production behaviour is fixed and unredirectable: every governed study lives under
+    ``<repo>/studies/``, so every governed study anchors in the repository. A scratch
+    copy in a temp directory is, by construction, not a governed study, and giving it its
+    own anchor directory is what keeps one scratch study from being read as a lineage
+    reset of the next. Escaping the repository is not a bypass either: carrying the
+    resulting audit artifacts back into `studies/<id>/` produces a local ledger the
+    repository anchor never recorded, which is refused as AUDIT_LINEAGE_UNANCHORED.
     """
-    override = os.environ.get(LINEAGE_DIR_ENV)
-    if override:
-        return Path(override) / f"{Path(study_dir).name}.json"
+    if _TEST_LINEAGE_DIR is not None:
+        return Path(_TEST_LINEAGE_DIR) / f"{Path(study_dir).name}.json"
     root = Path(repo_root) if repo_root else REPO_ROOT
-    return root / LINEAGE_DIR_NAME / f"{Path(study_dir).name}.json"
+    study_dir = Path(study_dir)
+    try:
+        study_dir.resolve().relative_to(Path(root).resolve())
+    except ValueError:
+        return study_dir.resolve().parent / LINEAGE_DIR_NAME / f"{study_dir.name}.json"
+    return Path(root) / LINEAGE_DIR_NAME / f"{study_dir.name}.json"
+
+
+def _lineage_rel_path(study_dir: Path) -> str:
+    """Repo-relative POSIX path of the anchor, as git would name it."""
+    return f"{LINEAGE_DIR_NAME}/{Path(study_dir).name}.json"
+
+
+def _git_show(repo_root: Path, rel_path: str) -> Optional[str]:
+    """Contents of ``HEAD:<rel_path>``, or None when git or the path is unavailable.
+
+    Returning None for "not a git repo" / "path not committed" is deliberate: a fresh
+    study is legitimately uncommitted, and the suite's temp fixtures are not repos. The
+    committed copy is used to STRENGTHEN checks, never as the sole source of truth.
+    """
+    import subprocess
+    try:
+        res = subprocess.run(
+            ["git", "-C", str(repo_root), "show", f"HEAD:{rel_path}"],
+            capture_output=True, text=True, timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if res.returncode != 0:
+        return None
+    return res.stdout
+
+
+def _committed_entries(repo_root: Path, rel_path: str) -> Tuple[Optional[List[Dict[str, Any]]], Optional[Dict[str, Any]]]:
+    """Parses a committed anchor/ledger blob into (entries, full_payload)."""
+    raw = _git_show(repo_root, rel_path)
+    if raw is None:
+        return None, None
+    try:
+        data = json.loads(raw)
+    except ValueError:
+        return None, None
+    if not isinstance(data, dict) or not isinstance(data.get("entries"), list):
+        return None, None
+    return data["entries"], data
 
 
 def _lineage_integrity(entries: List[Dict[str, Any]]) -> str:
@@ -575,6 +678,22 @@ def read_lineage_anchor(
     return data
 
 
+def _chain_sha256(prev_chain: str, entries: List[Dict[str, Any]], counter: int) -> str:
+    """Hash-chains each issuance onto the previous one.
+
+    The old integrity hash covered `entries` alone, so an older internally-valid anchor
+    was indistinguishable from the current one and rolling both files back was
+    undetectable. Chaining the previous head plus a monotonic counter gives the anchor a
+    position in a sequence, not just a content hash.
+    """
+    return hashlib.sha256(
+        json.dumps(
+            {"prev": prev_chain, "counter": counter, "entries": entries},
+            sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+
+
 def _write_lineage_anchor(
     study_dir: Path,
     entries: List[Dict[str, Any]],
@@ -587,17 +706,35 @@ def _write_lineage_anchor(
     for e in entries:
         t = e.get("audit_type")
         high_water[t] = max(high_water.get(t, 0), int(e.get("pass", 0)))
+
+    prev_counter = 0
+    prev_chain = ""
+    if p.is_file():
+        try:
+            prior = json.loads(p.read_text(encoding="utf-8"))
+            prev_counter = int(prior.get("issuance_counter", 0))
+            prev_chain = str(prior.get("chain_sha256", ""))
+        except (OSError, ValueError, TypeError):
+            prev_counter, prev_chain = 0, ""
+    counter = prev_counter + 1
+
     payload = {
         "lineage_version": LINEAGE_VERSION,
         "study_id": Path(study_dir).name,
         "bootstrapped_from_local_ledger": bootstrapped,
+        "issuance_counter": counter,
+        "prev_chain_sha256": prev_chain,
+        "chain_sha256": _chain_sha256(prev_chain, entries, counter),
         "high_water": high_water,
         "entries": entries,
         "integrity_sha256": _lineage_integrity(entries),
         "note": (
             "Durable audit lineage anchor. Lives outside the study directory so that "
             "deleting or rebuilding studies/<id>/audit/ cannot reset the audit "
-            "high-water mark. Authoritative over the study-local pass_ledger.json."
+            "high-water mark, and INSIDE the repository so that committing it makes it "
+            "durable. COMMIT THIS FILE with the audit artifacts it anchors -- an "
+            "uncommitted anchor is only as durable as the working tree. Authoritative "
+            "over the study-local pass_ledger.json."
         ),
     }
     tmp = p.with_suffix(".json.tmp")
@@ -646,15 +783,84 @@ def resolve_effective_lineage(
     ledger but no anchor yet, the anchor is bootstrapped from it: that is the one-time
     migration for studies predating this control, and it is recorded explicitly.
     """
+    root = Path(repo_root) if repo_root else REPO_ROOT
     local = _read_pass_ledger(study_dir)
     anchor = read_lineage_anchor(study_dir, repo_root)
 
+    anchor_rel = _lineage_rel_path(study_dir)
+    ledger_rel = None
+    try:
+        ledger_rel = (
+            Path(study_dir).resolve().relative_to(root.resolve()).as_posix()
+            + f"/audit/{PASS_LEDGER_NAME}"
+        )
+    except ValueError:
+        ledger_rel = None  # study outside the repo (test fixture); no git evidence
+
+    committed_anchor_entries, committed_anchor = _committed_entries(root, anchor_rel)
+    committed_ledger_entries = None
+    if ledger_rel:
+        committed_ledger_entries, _ = _committed_entries(root, ledger_rel)
+
     if anchor is None:
-        if local:
-            _write_lineage_anchor(study_dir, local, repo_root, bootstrapped=True)
+        # A: a study that has demonstrably issued passes may not silently re-bootstrap.
+        # "Demonstrably" means evidence that survives deleting the anchor: a local
+        # ledger with entries, or a committed anchor/ledger in git history.
+        established = bool(local) or bool(committed_anchor_entries) or bool(
+            committed_ledger_entries
+        )
+        if established:
+            raise AuditArtifactParseError(
+                f"AUDIT_LINEAGE_ANCHOR_MISSING: {study_dir.name} has issued audit passes "
+                f"(local ledger entries: {len(local)}; committed anchor: "
+                f"{committed_anchor_entries is not None}; committed ledger: "
+                f"{committed_ledger_entries is not None}) but its durable anchor "
+                f"{anchor_rel} does not exist. Deleting the anchor does not reset audit "
+                f"history. If this is a legitimate first migration or a deliberately "
+                f"copied study identity, run "
+                f"`python scripts/bootstrap_audit_lineage.py --study {study_dir}` and "
+                f"commit the anchor -- bootstrap is an explicit, recorded act, not a "
+                f"silent default."
+            )
         return local
 
     anchor_entries = anchor["entries"]
+
+    # D: rollback detection. The committed copy in git HEAD is the durable reference
+    # point; a working-tree anchor that has gone backwards from it -- lower issuance
+    # counter, or missing entries HEAD already records -- is a rewind, not a state.
+    if committed_anchor is not None:
+        committed_counter = int(committed_anchor.get("issuance_counter", 0) or 0)
+        current_counter = int(anchor.get("issuance_counter", 0) or 0)
+        if current_counter < committed_counter:
+            raise AuditArtifactParseError(
+                f"AUDIT_LINEAGE_ROLLBACK_DETECTED: the working-tree anchor for "
+                f"{study_dir.name} is at issuance {current_counter}, but the copy "
+                f"committed in HEAD is at issuance {committed_counter}. Anchor and "
+                f"ledger were rolled back together to an earlier snapshot. Restore the "
+                f"committed anchor ({anchor_rel}) or issue the next pass above the "
+                f"recorded high-water mark {committed_anchor.get('high_water')}."
+            )
+        committed_keys = {_entry_key(e) for e in (committed_anchor_entries or [])}
+        dropped = sorted(committed_keys - {_entry_key(e) for e in anchor_entries})
+        if dropped:
+            raise AuditArtifactParseError(
+                f"AUDIT_LINEAGE_ROLLBACK_DETECTED: the anchor committed in HEAD records "
+                f"audit passes {dropped} that the working-tree anchor no longer "
+                f"contains. Committed audit history is not removable by editing a file."
+            )
+
+    # The committed ledger is a second, independent durable witness: it catches the case
+    # where anchor and ledger are rewound together but the anchor was never committed.
+    if committed_ledger_entries:
+        committed_ledger_keys = {_entry_key(e) for e in committed_ledger_entries}
+        dropped = sorted(committed_ledger_keys - {_entry_key(e) for e in anchor_entries})
+        if dropped:
+            raise AuditArtifactParseError(
+                f"AUDIT_LINEAGE_ROLLBACK_DETECTED: {study_dir.name}'s committed pass "
+                f"ledger records audit passes {dropped} that the durable anchor no "
+                f"longer contains. Audit history is not reset by rewinding files."
+            )
     anchor_keys = {_entry_key(e) for e in anchor_entries}
     local_keys = {_entry_key(e) for e in local}
 
@@ -899,7 +1105,7 @@ def _validate_gate_report(
     # indistinguishable from a full pass.
     from scripts.research_preflight import PreflightEvidenceError, assert_preflight_audit_ready
     try:
-        assert_preflight_audit_ready(study_dir)
+        assert_preflight_audit_ready(study_dir, repo_root)
     except PreflightEvidenceError as err:
         raise AuditArtifactParseError(str(err))
 

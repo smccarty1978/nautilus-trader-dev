@@ -10,6 +10,7 @@ if str(REPO_ROOT) not in sys.path:
 from scripts.preexec_audit_seal import verify_preexec_audit_seal, generate_preexec_audit_seal, PreexecAuditStaleError
 from scripts.resolve_execution_manifest import compute_ast_closure, resolve_execution_manifest
 from scripts.tests._preflight_fixture import plant_audit_ready_preflight
+from scripts.tests._study_copy import copy_study_as_fresh_identity
 
 STUDY_DIR = REPO_ROOT / "studies" / "Gemini_clean_maturity_flip_rolling_5m_productivity"
 
@@ -77,7 +78,7 @@ def test_audit_seal_refuses_stale_audit_on_code_change(tmp_path):
     import shutil
     # Copy study to temp directory
     tmp_study = tmp_path / "study"
-    shutil.copytree(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
     plant_audit_ready_preflight(tmp_study)
 
     # 1. Tamper status.json to have mismatched audited_execution_composite_sha256

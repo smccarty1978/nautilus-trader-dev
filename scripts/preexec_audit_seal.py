@@ -72,7 +72,7 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
     # partial preflight. Checked before anything else is computed.
     from scripts.research_preflight import PreflightEvidenceError, assert_preflight_audit_ready
     try:
-        assert_preflight_audit_ready(study_dir)
+        assert_preflight_audit_ready(study_dir, repo_root)
     except PreflightEvidenceError as err:
         raise PreexecAuditStaleError(str(err))
 

@@ -15,6 +15,7 @@ RT-4  the grandfather guard compared `baseline - registry`, which is empty preci
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -39,6 +40,34 @@ from scripts.resolve_execution_manifest import (  # noqa: E402
 # RT-1 -- preflight completeness
 # ===========================================================================
 
+ES_STUDY = REPO_ROOT / "studies" / "es_wick_imbalance_acceptance_v2"
+
+
+def _bound_study(tmp_path: Path, **overrides) -> Path:
+    """A scratch study whose preflight evidence is genuinely BOUND to its own state.
+
+    RT1-B1 made unbound evidence inadmissible, so these tests can no longer hand the
+    consumer a bare `{...}` dict: that is now refused for the wrong reason
+    (PREFLIGHT_EVIDENCE_OBSOLETE) and would stop exercising the completeness contract
+    RT-1 is about. Each test therefore starts from valid, self-consistent evidence and
+    changes exactly the one field under test -- recomputing the self-binding hash so
+    the artifact stays internally consistent and the *completeness* check is what fires.
+    """
+    from scripts.research_preflight import compute_evidence_sha256
+    from scripts.tests._preflight_fixture import plant_audit_ready_preflight
+
+    s = tmp_path / "study"
+    if not s.exists():
+        shutil.copytree(ES_STUDY, s)
+    p = plant_audit_ready_preflight(s)
+    if overrides:
+        data = json.loads(p.read_text(encoding="utf-8"))
+        data.update(overrides)
+        data["evidence_sha256"] = compute_evidence_sha256(data)
+        p.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    return s
+
+
 def _write_preflight(study: Path, **fields) -> Path:
     (study / "audit").mkdir(parents=True, exist_ok=True)
     p = study / "audit" / "preflight.json"
@@ -48,36 +77,35 @@ def _write_preflight(study: Path, **fields) -> Path:
 
 def test_rt1_complete_and_passing_preflight_is_audit_ready(tmp_path):
     """1 -- all required checks pass -> READY_FOR_AUDIT."""
-    s = tmp_path / "study"
-    _write_preflight(
-        s, status="CLEAR", audit_ready=True, required_next_action="READY_FOR_AUDIT",
-        required_checks=list(REQUIRED_STUDY_CHECKS), required_checks_missing=[],
-    )
-    assert assert_preflight_audit_ready(s)["audit_ready"] is True
+    s = _bound_study(tmp_path)
+    assert assert_preflight_audit_ready(s, REPO_ROOT)["audit_ready"] is True
 
 
 def test_rt2_skipped_mandatory_check_is_not_audit_ready(tmp_path):
     """2 -- mandatory check skipped -> NOT_READY, even with no failing gate."""
-    s = tmp_path / "study"
-    _write_preflight(
-        s, status="INCOMPLETE", audit_ready=False,
+    s = _bound_study(
+        tmp_path,
+        status="INCOMPLETE", audit_ready=False,
         required_next_action="RUN_FULL_PREFLIGHT_BEFORE_AUDIT",
         required_checks_missing=["CAUSAL_INVARIANTS"], failed_gate=None,
+        check_outcomes={c: "PASSED" for c in REQUIRED_STUDY_CHECKS
+                        if c != "CAUSAL_INVARIANTS"} | {"CAUSAL_INVARIANTS": "SKIPPED"},
     )
-    with pytest.raises(PreflightEvidenceError, match="PREFLIGHT_NOT_AUDIT_READY"):
-        assert_preflight_audit_ready(s)
+    with pytest.raises(PreflightEvidenceError, match="PREFLIGHT_REQUIRED_CHECKS_INCOMPLETE"):
+        assert_preflight_audit_ready(s, REPO_ROOT)
 
 
 def test_rt1_timeout_is_not_audit_ready(tmp_path):
     """3 -- a timed-out mandatory check is incomplete, not passed."""
-    s = tmp_path / "study"
-    _write_preflight(
-        s, status="BLOCKED", audit_ready=False, required_next_action="FIX_BEFORE_AUDIT",
+    s = _bound_study(
+        tmp_path,
+        status="BLOCKED", audit_ready=False, required_next_action="FIX_BEFORE_AUDIT",
         required_checks_missing=["CAUSAL_INVARIANTS"],
-        check_outcomes={"CAUSAL_INVARIANTS": "TIMEOUT"},
+        check_outcomes={c: "PASSED" for c in REQUIRED_STUDY_CHECKS
+                        if c != "CAUSAL_INVARIANTS"} | {"CAUSAL_INVARIANTS": "TIMEOUT"},
     )
-    with pytest.raises(PreflightEvidenceError, match="PREFLIGHT_NOT_AUDIT_READY"):
-        assert_preflight_audit_ready(s)
+    with pytest.raises(PreflightEvidenceError, match="PREFLIGHT_REQUIRED_CHECKS_INCOMPLETE"):
+        assert_preflight_audit_ready(s, REPO_ROOT)
 
 
 def test_rt1_obsolete_artifact_without_audit_ready_is_refused(tmp_path):
@@ -85,14 +113,14 @@ def test_rt1_obsolete_artifact_without_audit_ready_is_refused(tmp_path):
     s = tmp_path / "study"
     _write_preflight(s, status="CLEAR", required_next_action="READY_FOR_AUDIT")
     with pytest.raises(PreflightEvidenceError, match="PREFLIGHT_EVIDENCE_OBSOLETE"):
-        assert_preflight_audit_ready(s)
+        assert_preflight_audit_ready(s, REPO_ROOT)
 
 
 def test_rt1_missing_preflight_is_refused(tmp_path):
     s = tmp_path / "study"
     (s / "audit").mkdir(parents=True)
     with pytest.raises(PreflightEvidenceError, match="PREFLIGHT_EVIDENCE_MISSING"):
-        assert_preflight_audit_ready(s)
+        assert_preflight_audit_ready(s, REPO_ROOT)
 
 
 def test_rt1_corrupt_preflight_fails_closed(tmp_path):
@@ -100,7 +128,7 @@ def test_rt1_corrupt_preflight_fails_closed(tmp_path):
     (s / "audit").mkdir(parents=True)
     (s / "audit" / "preflight.json").write_text("{broken", encoding="utf-8")
     with pytest.raises(PreflightEvidenceError, match="PREFLIGHT_EVIDENCE_MALFORMED"):
-        assert_preflight_audit_ready(s)
+        assert_preflight_audit_ready(s, REPO_ROOT)
 
 
 def test_rt1_diagnostic_run_cannot_masquerade_as_full_clear():
@@ -359,8 +387,16 @@ def test_rt3_copied_study_directory_is_explicit(lineage_env, tmp_path):
 
     copy = repo / "studies" / "s1_copy"
     shutil.copytree(study, copy)
-    # The copy's own anchor does not exist, so its local ledger bootstraps one under the
-    # NEW identity -- a different study, explicitly recorded as bootstrapped.
+
+    # RT3-B1: this used to bootstrap SILENTLY from the copied ledger. Silent bootstrap is
+    # indistinguishable from `rm audit_lineage/<id>.json`, which is exactly how the anchor
+    # was reset. The copy now fails closed and the operator must state the intent --
+    # `--adopt-ledger` (this identity owns that history) or `--fresh-identity` (it does
+    # not). Guessing either way is a real failure: one launders history, the other loses it.
+    with pytest.raises(rpa.AuditArtifactParseError, match="AUDIT_LINEAGE_ANCHOR_MISSING"):
+        rpa.resolve_effective_lineage(copy, repo)
+
+    rpa._write_lineage_anchor(copy, rpa._read_pass_ledger(copy), repo, bootstrapped=True)
     entries = rpa.resolve_effective_lineage(copy, repo)
     assert [(e["audit_type"], e["pass"]) for e in entries] == [("causal", 1)]
     anchor = rpa.read_lineage_anchor(copy, repo)

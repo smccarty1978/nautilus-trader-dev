@@ -95,6 +95,74 @@ def resolve_module_to_path(module_name: str, current_file: Path, repo_root: Path
 REPO_LOCAL_ROOT_PACKAGES = ("backtests", "research", "features", "strategies", "utils", "scripts")
 
 
+# ---------------------------------------------------------------------------
+# Subprocess-invoked governance gates (RT2-B2)
+#
+# The closure follows AST imports. `scripts/research_preflight.py` does not import its
+# gates -- it shells out to them with `subprocess.run([sys.executable, <script>, ...])`.
+# An import edge the AST cannot see is an execution edge all the same, so two mandatory
+# gates ran from outside the sealed composite: editing `select_required_tests.py` to
+# narrow the mandatory test selection, or `check_feature_promotion.py` to move the
+# lifecycle pin, changed a mandatory verdict without moving the composite and without
+# making any seal stale.
+#
+# These are DERIVED from the preflight source rather than re-listed by hand, because a
+# hand-maintained second list is the same defect one edit later. `governance_test.py`
+# asserts the derived set is a subset of the closure, so adding a new subprocess gate to
+# the preflight cannot silently escape the seal.
+# ---------------------------------------------------------------------------
+GOVERNANCE_SUBPROCESS_SOURCES = ("scripts/research_preflight.py",)
+
+#: Static files that are themselves an authority a mandatory gate reads -- not code, but
+#: capable of changing a mandatory verdict. `feature_lifecycle_baseline.json` IS the
+#: grandfather set `check_feature_promotion.py` enforces against.
+GOVERNANCE_AUTHORITY_DATA_FILES = (
+    "features/feature_lifecycle_baseline.json",
+    "features/feature_lifecycle_promotions.json",
+)
+
+
+def discover_subprocess_gate_scripts(
+    repo_root: Path, sources: Tuple[str, ...] = GOVERNANCE_SUBPROCESS_SOURCES
+) -> List[Path]:
+    """Extracts every repo-local script an orchestrator launches by subprocess.
+
+    Matches the one shape the orchestrators use -- ``REPO_ROOT / "scripts" / "<name>.py"``
+    inside a command list -- by walking the AST rather than grepping, so a commented-out
+    or string-interpolated mention cannot inflate the set.
+
+    Returned paths are the *scripts*; the caller seeds them into the same AST closure, so
+    each gate's own transitive imports are followed exactly like an imported module.
+    """
+    found: Dict[str, Path] = {}
+    for src_rel in sources:
+        src = repo_root / src_rel
+        if not src.exists():
+            continue
+        tree = ast.parse(src.read_text(encoding="utf-8"), filename=str(src))
+        for node in ast.walk(tree):
+            # REPO_ROOT / "scripts" / "check_feature_promotion.py"
+            if not isinstance(node, ast.BinOp) or not isinstance(node.op, ast.Div):
+                continue
+            parts: List[str] = []
+            cur: Any = node
+            while isinstance(cur, ast.BinOp) and isinstance(cur.op, ast.Div):
+                if isinstance(cur.right, ast.Constant) and isinstance(cur.right.value, str):
+                    parts.insert(0, cur.right.value)
+                else:
+                    parts = []
+                    break
+                cur = cur.left
+            if not parts or not parts[-1].endswith(".py"):
+                continue
+            if not (isinstance(cur, ast.Name) and cur.id == "REPO_ROOT"):
+                continue
+            candidate = repo_root.joinpath(*parts)
+            if candidate.exists():
+                found[candidate.as_posix()] = candidate.resolve()
+    return [found[k] for k in sorted(found)]
+
+
 def ancestor_package_inits(module_path: Path, repo_root: Path) -> List[Path]:
     """Returns every package ``__init__.py`` Python executes to reach ``module_path``.
 
@@ -215,20 +283,39 @@ def compute_ast_closure(seed_files: List[Path], repo_root: Path) -> Tuple[Set[Pa
                         resolved_any = True
 
                     # Each imported name may itself be a submodule or subpackage.
+                    # EVERY alias is probed and enqueued -- never just the first (RT2-B1).
+                    # `from . import a, b` executes both, so both must enter the closure.
+                    base_executes = resolved_any
                     for alias in node.names:
+                        alias_resolved = False
                         sub_mod = base_dir / f"{alias.name}.py"
                         if sub_mod.exists():
                             _enqueue(sub_mod.resolve())
-                            resolved_any = True
+                            alias_resolved = True
                         sub_init = base_dir / alias.name / "__init__.py"
                         if sub_init.exists():
                             _enqueue(sub_init.resolve())
-                            resolved_any = True
+                            alias_resolved = True
+                        resolved_any = resolved_any or alias_resolved
+                        if not alias_resolved and not base_executes and alias.name != "*":
+                            # The base contributed no executable file, so it is a PEP 420
+                            # namespace directory (or absent). A namespace package has no
+                            # __init__, therefore it can expose nothing but submodules --
+                            # an alias that resolves to no file is a genuine gap and must
+                            # lower coverage. When the base DOES execute an __init__, the
+                            # alias may legitimately be an attribute defined there, so it
+                            # is not reported.
+                            dots = "." * node.level
+                            unresolved.append({
+                                "source_file": str(curr_file),
+                                "import_target": f"{dots}{mod_base + '.' if mod_base else ''}{alias.name}",
+                            })
 
-                    if not resolved_any:
-                        # A relative import is always repo-local by construction, so an
-                        # unresolvable one is a real gap and must lower coverage rather
-                        # than pass silently.
+                    if not resolved_any and not node.names:
+                        # Unreachable under the Python grammar (an ImportFrom always names
+                        # at least one alias); kept so a future AST change cannot make an
+                        # unresolvable relative import pass silently. A relative import is
+                        # repo-local by construction, so it must lower coverage.
                         dots = "." * node.level
                         unresolved.append({
                             "source_file": str(curr_file),
@@ -248,16 +335,49 @@ def compute_ast_closure(seed_files: List[Path], repo_root: Path) -> Tuple[Set[Pa
                             if sub_res:
                                 _enqueue(sub_res)
                     else:
-                        # Check sub-modules imported via from ... import sub_module
+                        # `mod_base` resolved to no executable file, so it is a PEP 420
+                        # namespace package (``features/trackers`` is one) or is absent.
+                        #
+                        # RT2-B1: this loop used to `break` on the first alias that
+                        # resolved, and the honesty signal lived in the `for`/`else`, so a
+                        # single successful alias both dropped every later module from the
+                        # closure AND suppressed the unresolved report. One edit turning
+                        # nine single-alias imports into `from features.trackers import
+                        # velocity, volume, wick` would have silently removed eight
+                        # trackers from the sealed identity at 100% reported coverage.
+                        #
+                        # Every alias is now resolved independently: all that resolve are
+                        # enqueued, and each that does not is reported. A namespace package
+                        # has no `__init__`, so it can expose nothing but submodules --
+                        # an unresolvable alias there is a real gap, not an attribute.
+                        repo_local = any(
+                            mod_base.startswith(pkg) for pkg in REPO_LOCAL_ROOT_PACKAGES
+                        )
+                        any_alias_resolved = False
+                        alias_gaps: List[str] = []
                         for alias in node.names:
                             full_mod = f"{mod_base}.{alias.name}"
                             sub_res = resolve_module_to_path(full_mod, curr_file, repo_root)
                             if sub_res:
                                 _enqueue(sub_res)
-                                break
-                        else:
-                            if any(mod_base.startswith(pkg) for pkg in REPO_LOCAL_ROOT_PACKAGES):
-                                unresolved.append({"source_file": str(curr_file), "import_target": mod_base})
+                                any_alias_resolved = True
+                            elif alias.name != "*":
+                                alias_gaps.append(full_mod)
+
+                        if repo_local:
+                            if any_alias_resolved:
+                                # Partially resolvable: the base really is a package
+                                # directory, so each missing alias is its own gap.
+                                for gap in alias_gaps:
+                                    unresolved.append(
+                                        {"source_file": str(curr_file), "import_target": gap}
+                                    )
+                            else:
+                                # Nothing about this import could be located at all;
+                                # report the base, which is the actionable target.
+                                unresolved.append(
+                                    {"source_file": str(curr_file), "import_target": mod_base}
+                                )
 
     return visited, unresolved
 
@@ -326,6 +446,17 @@ def resolve_study_files(study_dir: Path) -> Dict[str, Path]:
     clauses_p = study_dir / "study_clauses.yaml"
     if clauses_p.exists():
         files["study:study_clauses.yaml"] = clauses_p.resolve()
+
+    # W-A: generated study contracts under config/. `compiled_study.json` is the
+    # authority consumers read (see validate_smoke), but these files are the compiler's
+    # rendered form of the same contracts and are read by generated study tests. Sealing
+    # them means a post-seal edit to config/deliverables_contract.json invalidates the
+    # seal instead of silently changing what a validator requires.
+    config_dir = study_dir / "config"
+    if config_dir.exists():
+        for cf in sorted(config_dir.glob("*.json")):
+            rel = cf.relative_to(study_dir).as_posix()
+            files[f"study:{rel}"] = cf.resolve()
 
     # Include any study test files
     tests_dir = study_dir / "tests"
@@ -423,8 +554,23 @@ def resolve_execution_manifest(
         repo_root / "scripts/check_model_binding.py",
         repo_root / "scripts/run_preexec_audits.py",
     ]
+    # RT2-B2: every script the preflight launches by subprocess, derived from the
+    # preflight's own source. A gate that decides a mandatory verdict is governance code
+    # whether it is reached by `import` or by `subprocess.run`.
+    governance_seeds.extend(discover_subprocess_gate_scripts(repo_root))
+
     gov_closure_set, gov_unres = compute_ast_closure(governance_seeds, repo_root)
     all_unresolved.extend(gov_unres)
+
+    # RT2-B2: static authority files. These are data, so no AST edge reaches them, but
+    # `check_feature_promotion.py` treats the lifecycle baseline as authoritative -- it is
+    # the grandfather set itself. A file that can change a mandatory verdict belongs in
+    # the composite.
+    governance_data_paths: Dict[str, Path] = {}
+    for rel in GOVERNANCE_AUTHORITY_DATA_FILES:
+        p = repo_root / rel
+        if p.exists():
+            governance_data_paths[f"repo:{rel}"] = p.resolve()
 
     if all_unresolved and strict:
         raise UnresolvedDependencyError(
@@ -450,6 +596,9 @@ def resolve_execution_manifest(
         rel = p.relative_to(repo_root).as_posix()
         combined_paths[f"repo:{rel}"] = p
 
+    for k, p in governance_data_paths.items():
+        combined_paths[k] = p
+
     # Compute SHA-256 for all resolved files
     for key in sorted(combined_paths.keys()):
         p = combined_paths[key]
@@ -459,7 +608,10 @@ def resolve_execution_manifest(
 
     runtime_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in runtime_closure_set])
     contract_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in contract_closure_set])
-    gov_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in gov_closure_set])
+    gov_keys = sorted(
+        [f"repo:{p.relative_to(repo_root).as_posix()}" for p in gov_closure_set]
+        + list(governance_data_paths.keys())
+    )
     study_keys = sorted(list(study_files_map.keys()))
     tracker_keys = sorted([k for k in runtime_keys if "features/trackers" in k or "features/registry" in k])
 

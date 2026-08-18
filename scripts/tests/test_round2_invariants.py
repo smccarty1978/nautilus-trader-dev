@@ -50,6 +50,7 @@ from scripts.run_preexec_audits import (
     parse_causal_audit_report,
 )
 from scripts.validate_smoke import SmokeValidationError, validate_smoke_run
+from scripts.tests._study_copy import copy_study_as_fresh_identity
 
 STUDY_DIR = REPO_ROOT / "studies" / "Gemini_clean_maturity_flip_rolling_5m_productivity"
 
@@ -158,7 +159,7 @@ def test_seal_fails_closed_on_authority_and_governance_tampering(target_rel, tmp
     original_bytes = target_p.read_bytes()
 
     tmp_study = tmp_path / "study"
-    shutil.copytree(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
     _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
     issue_contract_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
@@ -176,7 +177,7 @@ def test_seal_fails_closed_on_authority_and_governance_tampering(target_rel, tmp
 def test_full_stage_rejects_missing_smoke_acceptance(tmp_path):
     """Verifies that collect mode rejects stage=FULL when smoke_acceptance.json is missing."""
     tmp_study = tmp_path / "study"
-    shutil.copytree(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
 
     sacc_file = tmp_study / "artifacts" / "smoke_acceptance.json"
     if sacc_file.exists():
@@ -196,7 +197,7 @@ def test_full_stage_rejects_missing_smoke_acceptance(tmp_path):
 def test_full_stage_rejects_stale_smoke_acceptance(tmp_path):
     """Verifies that collect mode rejects stage=FULL when smoke_acceptance.json has a mismatched seal hash."""
     tmp_study = tmp_path / "study"
-    shutil.copytree(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
 
     sacc_file = tmp_study / "artifacts" / "smoke_acceptance.json"
     sacc_file.parent.mkdir(parents=True, exist_ok=True)
@@ -224,7 +225,7 @@ def test_full_stage_accepts_valid_smoke_acceptance(tmp_path, monkeypatch):
     passing all 11 smoke gates and reaching the post-gate execution logic without NameError.
     """
     tmp_study = tmp_path / "study"
-    shutil.copytree(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
 
     _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
@@ -291,7 +292,7 @@ def test_gate_rejects_contradictory_acceptance(tmp_path):
     future_source_violations_count == 0 but exact_timestamp_equality_verified is False.
     """
     tmp_study = tmp_path / "study"
-    shutil.copytree(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
 
     _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
@@ -411,7 +412,7 @@ def test_agent_tool_grants_match_policy():
 def test_baseline_substitution_attack_detected(tmp_path):
     """Scenario: Modifying the frozen baseline features triggers BASELINE_FEATURE_HASH_MISMATCH."""
     tmp_study = tmp_path / "study"
-    shutil.copytree(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
 
     # Modify first feature in study.yaml
     study_yaml_p = tmp_study / "study.yaml"

@@ -22,6 +22,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from scripts.resolve_execution_manifest import resolve_execution_manifest  # noqa: E402
 from scripts.preexec_audit_seal import _hash_file  # noqa: E402
+from scripts.tests._study_copy import copy_study_as_fresh_identity  # noqa: E402
 from scripts.run_preexec_audits import (  # noqa: E402
     AuditArtifactParseError, AuditIngestionError, _count_independent_headings,
     _reject_report_reuse, ingest_external_audit_report,
@@ -36,7 +37,7 @@ def scratch_study(tmp_path):
     from scripts.tests._preflight_fixture import plant_audit_ready_preflight
 
     dest = tmp_path / STUDY.name
-    shutil.copytree(STUDY, dest, dirs_exist_ok=True)
+    copy_study_as_fresh_identity(STUDY, dest)
     # RT-1: issuance requires audit-ready preflight evidence. These tests exercise audit
     # provenance mechanics, not the preflight, so they supply a compliant artifact -- the
     # same reason they supply compliant audit reports.

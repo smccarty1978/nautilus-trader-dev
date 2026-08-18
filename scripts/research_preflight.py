@@ -66,8 +66,104 @@ ACTION_FIX = "FIX_BEFORE_AUDIT"
 ACTION_RUN_FULL = "RUN_FULL_PREFLIGHT_BEFORE_AUDIT"
 
 
+# ---------------------------------------------------------------------------
+# Preflight evidence binding (RT1-B1)
+#
+# `audit_ready` used to be the whole contract, so a two-key file --
+# `{"audit_ready": true}` -- satisfied the gate that authorises both audit issuance and
+# sealing. Every other piece of audit evidence in this workflow is bound to the state it
+# describes (`status.json` carries `audit_report_sha256` and is composite-pinned);
+# preflight evidence was the only mandatory artifact with none.
+#
+# Evidence must now state *what execution state it validated*, and the consumer verifies
+# that state independently instead of trusting a field:
+#
+#   evidence_schema_version         the artifact declares its own contract
+#   study_id                        which study this is evidence about
+#   execution_composite_sha256      which code state was checked
+#   check_outcomes                  what actually ran, per check
+#   evidence_sha256                 self-binding over the material fields
+#
+# The required-check SET is deliberately NOT read from the artifact. Reading expected and
+# actual from the same mutable file is circular: an attacker who can write the file can
+# write both halves. REQUIRED_STUDY_CHECKS in this module -- inside the governance
+# closure, so editing it moves the composite -- is the only authority for what must run.
+#
+# Honest limit: this binds evidence to state; it does not authenticate the producer.
+# There is no key in this repository, so anyone who can run the resolver can compute a
+# consistent forgery. What it removes is the far larger class of stale, partial,
+# hand-edited and cross-study evidence -- and forgery now requires reproducing the
+# current composite, not typing two keys.
+# ---------------------------------------------------------------------------
+EVIDENCE_SCHEMA_VERSION = 2
+
+
+# ---------------------------------------------------------------------------
+# Mandatory-gate execution budget (W-B)
+#
+# CAUSAL_INVARIANTS ran under a 120 s subprocess timeout while the selected suite needs
+# roughly twice that, so the gate could not finish -- it reported BLOCKED /
+# INVARIANT_TEST_TIMEOUT every time. The timeout logic was correct; the number was
+# fiction. A mandatory gate that no compliant study can pass is the exact pressure that
+# produces `--skip-tests` runs and hand-edited evidence.
+#
+# Measured on the reference machine (Windows 11, this repository, 2026-08-17), running
+# exactly what the gate runs -- `select_required_tests.py` output, `-m "not slow"`:
+#
+#     test files selected        36
+#     tests executed             680  (671 passed, 7 skipped, 2 deselected)
+#     wall clock                 385.1 s
+#     slowest single test        3.6 s  (no dominant outlier; cost is broad and flat)
+#
+# The suite is 36 files of deterministic framework governance tests with no single hot
+# spot, so there is nothing redundant to remove: narrowing the selection would be
+# "weakening required tests", which is explicitly not the fix. The budget is therefore
+# set from the measurement with headroom for a slower machine and for growth:
+#
+#     900 s = 2.34x the measured 385.1 s
+#
+# It is a constant in this file -- inside the governance closure -- so raising it moves
+# the execution composite and invalidates every seal, which is what makes "just bump the
+# timeout" an auditable act rather than a silent one. Timeout still fails CLOSED: an
+# overrun is BLOCKED with INVARIANT_TEST_TIMEOUT, never a pass.
+# ---------------------------------------------------------------------------
+CAUSAL_INVARIANTS_BUDGET_SECONDS = 900
+
+#: The measurement the budget is derived from. Recorded so the number is falsifiable:
+#: a regression asserts the budget still exceeds this with margin, and re-measuring is
+#: the only legitimate way to change it.
+CAUSAL_INVARIANTS_MEASURED_SECONDS = 385.1
+
+#: Fields the self-binding hash covers. Editing any of them without recomputing
+#: `evidence_sha256` is detected.
+EVIDENCE_BOUND_FIELDS = (
+    "evidence_schema_version",
+    "study_id",
+    "status",
+    "audit_ready",
+    "preflight_run_id",
+    "generated_at_utc",
+    "execution_composite_sha256",
+    "check_outcomes",
+    "required_checks",
+    "required_checks_missing",
+    "checks_complete",
+    "diagnostic_mode",
+    "failed_gate",
+    "is_compiled_study",
+)
+
+
 class PreflightEvidenceError(RuntimeError):
     """Raised when downstream tooling is handed preflight evidence it cannot rely on."""
+
+
+def compute_evidence_sha256(data: Dict[str, Any]) -> str:
+    """Self-binding hash over the fields that decide readiness."""
+    payload = {k: data.get(k) for k in EVIDENCE_BOUND_FIELDS}
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+    ).hexdigest()
 
 
 def load_preflight_evidence(study_dir: Path) -> Dict[str, Any]:
@@ -87,32 +183,136 @@ def load_preflight_evidence(study_dir: Path) -> Dict[str, Any]:
     return data
 
 
-def assert_preflight_audit_ready(study_dir: Path) -> Dict[str, Any]:
-    """Refuses to proceed unless the study's preflight is complete AND passing.
+def _current_execution_composite(study_dir: Path, repo_root: Optional[Path] = None) -> str:
+    """Recomputes the study's execution composite from the tree as it stands NOW."""
+    from scripts.resolve_execution_manifest import resolve_execution_manifest
 
-    This is the downstream half of RT-1. Without it, a diagnostic `--skip-tests` run could
-    still be the evidence an audit status or a seal was issued against.
+    comp_sha, _, _ = resolve_execution_manifest(Path(study_dir), repo_root or REPO_ROOT)
+    return comp_sha
 
-    ``audit_ready`` is the single field consumers read. It is deliberately not inferred
-    from ``status`` alone: an older artifact predating this contract has no ``audit_ready``
-    key, and is refused rather than assumed ready.
+
+def assert_preflight_audit_ready(
+    study_dir: Path, repo_root: Optional[Path] = None
+) -> Dict[str, Any]:
+    """Refuses to proceed unless the preflight evidence binds to the CURRENT state.
+
+    Seven independent checks, none of which trusts ``audit_ready`` on its own. The
+    ordering matters only for message quality; any one of them refusing is a refusal.
+
+    1. schema version -- the artifact declares which contract it was written under;
+    2. study identity -- evidence about study A cannot authorise study B;
+    3. self-binding hash -- a hand-edited artifact no longer hashes to its own value;
+    4. required-gate completeness against ``REQUIRED_STUDY_CHECKS`` *in this module*,
+       never against the artifact's own ``required_checks`` list (that would be circular);
+    5. every required gate actually PASSED, and no gate failed;
+    6. the recorded execution composite equals the one recomputed from the tree now, so
+       stale evidence from an earlier code state cannot authorise the current one;
+    7. no live (non-superseded) BLOCKED failure packet sits beside it contradicting it.
     """
+    study_dir = Path(study_dir)
     data = load_preflight_evidence(study_dir)
 
-    if "audit_ready" not in data:
+    # 1. Schema version.
+    schema = data.get("evidence_schema_version")
+    if schema != EVIDENCE_SCHEMA_VERSION:
         raise PreflightEvidenceError(
-            "PREFLIGHT_EVIDENCE_OBSOLETE: audit/preflight.json predates the preflight "
-            "completeness contract (no 'audit_ready' field). Re-run the full preflight; an "
-            "artifact that cannot state its own completeness is not evidence of it."
+            f"PREFLIGHT_EVIDENCE_OBSOLETE: audit/preflight.json declares "
+            f"evidence_schema_version={schema!r}, this consumer requires "
+            f"{EVIDENCE_SCHEMA_VERSION}. Re-run the full preflight; an artifact that "
+            f"cannot state which contract it was written under is not evidence of it."
         )
 
+    # 2. Study identity.
+    if data.get("study_id") != study_dir.name:
+        raise PreflightEvidenceError(
+            f"PREFLIGHT_EVIDENCE_FOREIGN: artifact records study_id "
+            f"{data.get('study_id')!r} but is being read as evidence for "
+            f"{study_dir.name!r}. A preflight from another study authorises nothing here."
+        )
+
+    # 3. Self-binding hash.
+    recorded = data.get("evidence_sha256")
+    recomputed = compute_evidence_sha256(data)
+    if recorded != recomputed:
+        raise PreflightEvidenceError(
+            f"PREFLIGHT_EVIDENCE_TAMPERED: evidence_sha256 recorded "
+            f"{str(recorded)[:12]}... but the artifact's own fields hash to "
+            f"{recomputed[:12]}.... The file was edited after the preflight wrote it."
+        )
+
+    # 4/5. Completeness and outcomes, against this module's constant -- not the file's.
+    if not data.get("is_compiled_study"):
+        raise PreflightEvidenceError(
+            "PREFLIGHT_NOT_A_STUDY: the artifact records is_compiled_study=false. A "
+            "bare-directory preflight has no compiled contracts to check and cannot "
+            "authorise an audit or a seal."
+        )
+    outcomes = data.get("check_outcomes")
+    if not isinstance(outcomes, dict):
+        raise PreflightEvidenceError(
+            "PREFLIGHT_EVIDENCE_MALFORMED: check_outcomes must be an object mapping "
+            "each check to its outcome."
+        )
+    deficient = [
+        name for name in REQUIRED_STUDY_CHECKS
+        if outcomes.get(name, "NOT_EXECUTED") not in PASSING_OUTCOMES
+    ]
+    if deficient:
+        raise PreflightEvidenceError(
+            f"PREFLIGHT_REQUIRED_CHECKS_INCOMPLETE: {deficient} did not run-and-pass "
+            f"(outcomes recorded: { {k: outcomes.get(k, 'NOT_EXECUTED') for k in deficient} }). "
+            f"The required set is defined by REQUIRED_STUDY_CHECKS in scripts/"
+            f"research_preflight.py, not by the artifact."
+        )
+    if data.get("failed_gate"):
+        raise PreflightEvidenceError(
+            f"PREFLIGHT_GATE_FAILED: {data.get('failed_gate')!r} failed in the run that "
+            f"produced this evidence (failure_ids={data.get('failure_ids')})."
+        )
     if not data.get("audit_ready"):
-        missing = data.get("required_checks_missing") or []
         raise PreflightEvidenceError(
             f"PREFLIGHT_NOT_AUDIT_READY: status={data.get('status')!r}, "
             f"action={data.get('required_next_action')!r}, missing/incomplete checks="
-            f"{missing}. A partial or diagnostic preflight cannot authorise an audit or seal."
+            f"{data.get('required_checks_missing') or []}. A partial or diagnostic "
+            f"preflight cannot authorise an audit or seal."
         )
+
+    # 6. Freshness: evidence must describe the code state that exists now.
+    evidence_composite = data.get("execution_composite_sha256")
+    if not evidence_composite:
+        raise PreflightEvidenceError(
+            "PREFLIGHT_EVIDENCE_UNBOUND: the artifact records no "
+            "execution_composite_sha256, so there is nothing tying it to the code it "
+            "supposedly validated."
+        )
+    current_composite = _current_execution_composite(study_dir, repo_root)
+    if evidence_composite != current_composite:
+        raise PreflightEvidenceError(
+            f"PREFLIGHT_EVIDENCE_STALE: preflight validated execution composite "
+            f"{evidence_composite[:12]}..., the tree now resolves to "
+            f"{current_composite[:12]}.... Execution-affecting code changed after the "
+            f"preflight ran; re-run it."
+        )
+
+    # 7. A live BLOCKED packet beside CLEAR evidence is a contradiction, not a detail.
+    packet_p = study_dir / "audit" / "failure_packet.json"
+    if packet_p.is_file():
+        try:
+            packet = json.loads(packet_p.read_text(encoding="utf-8"))
+        except ValueError as err:
+            raise PreflightEvidenceError(
+                f"PREFLIGHT_FAILURE_PACKET_UNREADABLE: {packet_p}: {err}. An unreadable "
+                f"failure packet cannot be shown to be superseded."
+            )
+        if isinstance(packet, dict) and not packet.get("superseded", False):
+            raise PreflightEvidenceError(
+                f"PREFLIGHT_CONTRADICTED_BY_FAILURE_PACKET: {packet_p} records a live "
+                f"BLOCKED preflight (failed_gate={packet.get('failed_gate')!r}, "
+                f"run_id={packet.get('preflight_run_id')!r}) that no passing preflight "
+                f"has superseded. Two artifacts disagree about the current state; the "
+                f"failing one wins."
+            )
+
     return data
 
 
@@ -157,12 +357,17 @@ def run_preflight(
     audit_dir = (study_dir / "audit") if study_dir else (REPO_ROOT / "audit")
     audit_dir.mkdir(parents=True, exist_ok=True)
 
+    # The execution composite this preflight validated. Recorded in the artifact so a
+    # consumer can tell whether the evidence still describes the tree (RT1-B1).
+    execution_composite: Optional[str] = None
+
     # 0. Stage 0: Canonical Execution Manifest Resolution
     if study_dir and (study_dir / "study.yaml").exists():
         _begin("EXECUTION_MANIFEST")
         try:
             from scripts.resolve_execution_manifest import resolve_execution_manifest
             comp_sha, fhashes, mdata = resolve_execution_manifest(study_dir, REPO_ROOT)
+            execution_composite = comp_sha
             manifest_p = audit_dir / "execution_manifest.json"
             with open(manifest_p, "w", encoding="utf-8") as f:
                 json.dump(mdata, f, indent=2)
@@ -286,7 +491,7 @@ def run_preflight(
                     capture_output=True,
                     text=True,
                     cwd=str(REPO_ROOT),
-                    timeout=120,
+                    timeout=CAUSAL_INVARIANTS_BUDGET_SECONDS,
                 )
                 if test_run_res.returncode != 0:
                     failed_gate = "CAUSAL_INVARIANTS"
@@ -297,7 +502,14 @@ def run_preflight(
                 failed_gate = "CAUSAL_INVARIANTS"
                 _mark("CAUSAL_INVARIANTS", "TIMEOUT")
                 failure_ids = ["INVARIANT_TEST_TIMEOUT"]
-                failure_details = [{"message": "Fast invariant test execution exceeded timeout limit (120s)."}]
+                failure_details = [{
+                    "message": (
+                        f"Mandatory invariant test execution exceeded its measured budget "
+                        f"of {CAUSAL_INVARIANTS_BUDGET_SECONDS}s "
+                        f"(reference measurement: {CAUSAL_INVARIANTS_MEASURED_SECONDS}s). "
+                        f"An overrun is BLOCKED, never a pass."
+                    )
+                }]
         else:
             _mark("CAUSAL_INVARIANTS", "NO_TESTS_SELECTED")
 
@@ -351,10 +563,16 @@ def run_preflight(
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     result = {
+        "evidence_schema_version": EVIDENCE_SCHEMA_VERSION,
+        "study_id": study_dir.name if study_dir else None,
         "status": status,
-        # The single field downstream tooling reads. Never infer readiness from `status`
-        # alone -- a diagnostic run can legitimately have no failing gate.
+        # NOT sufficient on its own. `assert_preflight_audit_ready` re-derives readiness
+        # from check_outcomes and re-checks the composite; this field is a summary, not
+        # an authority (RT1-B1).
         "audit_ready": audit_ready,
+        # Which code state was validated. This is what makes the evidence falsifiable:
+        # a consumer recomputes it and refuses on any drift.
+        "execution_composite_sha256": execution_composite,
         "preflight_run_id": preflight_run_id,
         "generated_at_utc": now_iso,
         "elapsed_seconds": elapsed,
@@ -372,6 +590,7 @@ def run_preflight(
         "failure_packet": None,   # set below when this run produced one
         "required_next_action": action,
     }
+    result["evidence_sha256"] = compute_evidence_sha256(result)
 
     packet_p = audit_dir / "failure_packet.json"
 

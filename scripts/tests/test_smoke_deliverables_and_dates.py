@@ -124,7 +124,13 @@ def test_w1_validator_reads_the_contract_not_its_own_list():
 def test_w1_absent_contract_is_refused_rather_than_substituted():
     """With no contract the validator must stop, not invent a deliverable list."""
     src = (REPO_ROOT / "scripts" / "validate_smoke.py").read_text(encoding="utf-8")
-    assert "would have to invent its own deliverable list" in src
+    # W-A moved the authority from the loose sidecar to the SEALED compiled study, so the
+    # refusal is now about a missing compiled contract rather than a missing sidecar. The
+    # invariant under test is unchanged: with no contract the validator stops.
+    assert "COMPILED_STUDY_MISSING" in src
+    assert "DELIVERABLES_CONTRACT_MISSING" in src
+    assert "have to invent its own deliverable list" in src
+    assert "derive its own scope" in src
 
 
 # ---------------------------------------------------------------------------

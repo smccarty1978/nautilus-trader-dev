@@ -147,14 +147,46 @@ def validate_smoke_run(
     # The validator previously checked only the two parquets it happened to know about,
     # which is the same "checker derives its own scope" defect the contract was created to
     # remove -- a missing collection_manifest.json passed silently.
-    deliverables_p = study_dir / "config" / "deliverables_contract.json"
-    if not deliverables_p.is_file():
+    # W-A: read it from the SEALED artifact, not the loose sidecar.
+    #
+    # `config/deliverables_contract.json` was the authority here while sitting outside
+    # the sealed study identity, so reducing `deliverables_by_mode.collect` to
+    # `["candidates.parquet"]` after sealing restored the original W1 defect -- a missing
+    # collection_manifest.json passing silently -- with the seal still reporting valid.
+    # A mutable sidecar overriding sealed state is the same shape as every other defect
+    # in this family.
+    #
+    # `compiled_study.json` already carries the compiler's own output at
+    # `contracts.deliverables_contract`, and it IS sealed. That is the authority. The
+    # sidecar is kept as the human/test-readable rendering and is verified to MATCH; it
+    # is never consulted for a decision, so there are not two authorities.
+    compiled_p = study_dir / "compiled_study.json"
+    if not compiled_p.is_file():
         raise SmokeValidationError(
-            f"DELIVERABLES_CONTRACT_MISSING: {deliverables_p}. Without it this validator "
-            f"would have to invent its own deliverable list, which is precisely what it "
-            f"must not do."
+            f"COMPILED_STUDY_MISSING: {compiled_p}. The sealed compiled study is the "
+            f"authority for what a run must deliver; without it this validator would "
+            f"have to invent its own deliverable list."
         )
-    deliverables_contract = json.loads(deliverables_p.read_text(encoding="utf-8"))
+    compiled = json.loads(compiled_p.read_text(encoding="utf-8"))
+    deliverables_contract = (compiled.get("contracts") or {}).get("deliverables_contract")
+    if not isinstance(deliverables_contract, dict):
+        raise SmokeValidationError(
+            "DELIVERABLES_CONTRACT_MISSING: compiled_study.json declares no "
+            "contracts.deliverables_contract. Recompile the study; a validator may not "
+            "derive its own scope."
+        )
+
+    deliverables_p = study_dir / "config" / "deliverables_contract.json"
+    if deliverables_p.is_file():
+        sidecar = json.loads(deliverables_p.read_text(encoding="utf-8"))
+        if sidecar != deliverables_contract:
+            raise SmokeValidationError(
+                f"DELIVERABLES_CONTRACT_DRIFT: {deliverables_p} does not match "
+                f"contracts.deliverables_contract in compiled_study.json. The compiled "
+                f"study is authoritative; the sidecar has been edited or the study was "
+                f"not recompiled after a contract change."
+            )
+
     collect_deliverables = (deliverables_contract.get("deliverables_by_mode") or {}).get("collect")
     if not collect_deliverables:
         raise SmokeValidationError(

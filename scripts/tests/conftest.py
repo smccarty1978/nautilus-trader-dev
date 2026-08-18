@@ -1,24 +1,47 @@
-"""Test isolation for the durable audit lineage anchor (RT-3).
+"""Audit-lineage isolation for the test suite (RT-3 / RT3-B1).
 
-The anchor is keyed by study *name* and deliberately lives outside the study directory,
-so `rm -rf studies/<id>/audit/` cannot erase a study's audit history. Scratch studies in
-this suite are very often all named `study`, so without isolation one test's anchor is
-correctly reported as a lineage reset of the next test's empty ledger -- a true positive
-about a false situation.
+The durable anchor is keyed by study *name* and lives outside the study directory, so
+`rm -rf studies/<id>/audit/` cannot erase a study's audit history. Scratch studies in
+this suite are often named after the study they were copied from, so without isolation
+one test's anchor is correctly reported as a lineage reset of the next test's ledger --
+a true positive about a false situation.
 
-Redirecting the anchor per test keeps every production code path intact: the anchor is
-still written, still read, still integrity-checked. Only its directory moves.
+Isolation is now structural rather than configured: `_lineage_path` anchors a study that
+lies OUTSIDE the repository beside itself, and every scratch study lives under a unique
+`tmp_path`. Nothing needs to be set, nothing can be forgotten, and -- unlike the previous
+`NT_AUDIT_LINEAGE_DIR` environment variable -- the mechanism does not exist as a way to
+relocate a real study's anchor, in this process or in a subprocess.
+
+This fixture asserts that isolation holds instead of creating it: a test that anchors a
+scratch study inside the repository is polluting `audit_lineage/`, which is exactly what
+the subprocess-driven CLI tests silently did while the override was an env var.
 """
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
-from scripts.run_preexec_audits import LINEAGE_DIR_ENV
+REPO_ROOT = Path(__file__).resolve().parents[2]
+LIVE_ANCHOR_DIR = REPO_ROOT / "audit_lineage"
 
 
 @pytest.fixture(autouse=True)
-def _isolated_audit_lineage(tmp_path_factory, monkeypatch):
-    lineage_dir = tmp_path_factory.mktemp("audit_lineage")
-    monkeypatch.setenv(LINEAGE_DIR_ENV, str(lineage_dir))
-    yield lineage_dir
+def _no_test_may_touch_live_audit_lineage():
+    """Fails any test that writes or deletes a real anchor in `audit_lineage/`."""
+    def snapshot() -> dict:
+        if not LIVE_ANCHOR_DIR.is_dir():
+            return {}
+        return {p.name: p.read_bytes() for p in LIVE_ANCHOR_DIR.glob("*.json")}
+
+    before = snapshot()
+    yield
+    after = snapshot()
+    assert after == before, (
+        "a test modified the repository's durable audit lineage: "
+        f"added={sorted(set(after) - set(before))}, "
+        f"removed={sorted(set(before) - set(after))}, "
+        f"changed={sorted(k for k in set(after) & set(before) if after[k] != before[k])}. "
+        "Scratch studies must live under tmp_path so they anchor beside themselves."
+    )

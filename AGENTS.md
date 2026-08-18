@@ -143,7 +143,7 @@ anchor to the code they audited.
 | Trigger | Message prefix | Must include |
 |---|---|---|
 | SPEC frozen (before implementation) | `spec(<study>):` | `SPEC.md`, `config/*.yaml` |
-| Phase gate passed (`status.json` clean) | `phase(<study>): <phase> <verdict>` | code + `audit/pass_NN.md` + `audit/status.json` |
+| Phase gate passed (`status.json` clean) | `phase(<study>): <phase> <verdict>` | code + `audit/pass_NN.md` + `audit/status.json` + `audit/pass_ledger.json` + `audit_lineage/<study>.json` |
 | Study accepted | `study(<study>): ACCEPTED` | `BUILD_REPORT.md` / `STUDY_REPORT.md` + manifests |
 | Tooling / governance change | `chore:` or `docs:` | — |
 
@@ -154,12 +154,18 @@ Rules:
 2. **The audit artifact commits with the code it audited.** A `pass_NN.md`
    committed separately from its code is unanchored — the scope hash it records
    must correspond to the tree in that same commit.
-3. **Never commit generated data.** `canonical_*/`, `_work/`, `results/*.parquet`,
+3. **The durable audit anchor commits with the pass it anchors.**
+   `audit_lineage/<study>.json` is the half of the audit-immutability control that
+   survives deleting `studies/<id>/audit/`, and git is what makes it durable — an
+   uncommitted anchor is only as durable as the working tree. `git clean -xdf` on an
+   uncommitted anchor is a silent audit-history reset. It is **not** generated data and
+   is exempt from rule 4; see `audit_lineage/README.md`.
+4. **Never commit generated data.** `canonical_*/`, `_work/`, `results/*.parquet`,
    `artifacts/**/model.joblib` stay untracked. Commit the *manifests* and hashes
    that identify them, not the bytes.
-4. Run `python scripts/causal_lint.py` and `python scripts/sync_agents.py --check`
+5. Run `python scripts/causal_lint.py` and `python scripts/sync_agents.py --check`
    before committing. Both must exit 0.
-5. Do not use `--no-verify` or skip hooks.
+6. Do not use `--no-verify` or skip hooks.
 
 ### Agent definition parity (all three harnesses)
 
