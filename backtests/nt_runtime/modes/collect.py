@@ -5,7 +5,7 @@ Executes live ML research surface generation inside NautilusTrader event loop.
 
 import hashlib
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 
@@ -224,6 +224,14 @@ def _execute_collect(
     if hasattr(strategy_binding.config_cls, "session_end_censoring"):
         censoring = (study_data.contracts.get("target_contract", {}) or {}).get("censoring_policy", {})
         cfg_kwargs["session_end_censoring"] = bool(censoring.get("session_end_censoring", True))
+    # Phase-zero authentication gate (fail-closed). A collector that declares this field
+    # authenticates itself against a manifest at a study-relative path; this runtime never
+    # knew about the field before, so it was always left at its "" default and every such
+    # collector failed closed with "phase-zero authorization missing" regardless of whether
+    # a valid manifest existed. The path is derived generically from study_data.study_dir,
+    # not from any collector's own __file__, so this applies to any study using the pattern.
+    if hasattr(strategy_binding.config_cls, "phase0_manifest_path"):
+        cfg_kwargs["phase0_manifest_path"] = str(study_data.study_dir / "artifacts" / "phase0_source_manifest.json")
 
     strategy_config = strategy_binding.config_cls(**cfg_kwargs)
     strategy = strategy_binding.strategy_cls(strategy_config)
@@ -232,21 +240,49 @@ def _execute_collect(
     # 7. Execute in NautilusTrader event loop
     engine.run()
 
-    # Extract collected surfaces from Strategy generically
-    def _extract_df(strat: Any, attr_names: List[str]) -> pd.DataFrame:
+    # Extract collected surfaces from Strategy generically. Returns whether any
+    # matching attribute/method was found at all, distinct from "found but empty" --
+    # a strategy with no output interface is unverifiable, not merely unproductive.
+    def _extract_df(strat: Any, attr_names: List[str]) -> Tuple[pd.DataFrame, bool]:
         for name in attr_names:
             val = getattr(strat, name, None)
             if val is not None:
                 if callable(val):
                     res = val()
                     if isinstance(res, pd.DataFrame):
-                        return res
+                        return res, True
                 elif isinstance(val, pd.DataFrame):
-                    return val
-        return pd.DataFrame()
+                    return val, True
+        return pd.DataFrame(), False
 
-    candidates_df = _extract_df(strategy, ["get_candidates_dataframe", "get_candidates_df", "candidates_df", "candidates_dataframe"])
-    observations_df = _extract_df(strategy, ["get_observations_dataframe", "get_observations_df", "observations_df", "observations_dataframe"])
+    candidates_df, candidates_interface_found = _extract_df(
+        strategy, ["get_candidates_dataframe", "get_candidates_df", "candidates_df", "candidates_dataframe"]
+    )
+    observations_df, observations_interface_found = _extract_df(
+        strategy, ["get_observations_dataframe", "get_observations_df", "observations_df", "observations_dataframe"]
+    )
+
+    # Fail closed rather than silently report zero activity: if the engine genuinely
+    # loaded bars but the strategy exposes no output interface at all, we cannot tell
+    # a legitimately empty result apart from real processing that was never surfaced
+    # (see runs/20260818_174901_..._day, where 213K+ bars loaded and real regime
+    # transitions were processed internally, yet candidates/observations silently
+    # extracted as empty because the strategy predates this interface convention).
+    bars_loaded_total = sum(telemetry.bars_loaded_by_tf.values())
+    if bars_loaded_total > 0 and not candidates_interface_found:
+        raise RuntimeError(
+            f"STRATEGY_OUTPUT_INTERFACE_MISSING: {bars_loaded_total} bars were loaded into the "
+            f"engine but {type(strategy).__name__} implements none of get_candidates_dataframe/"
+            f"get_candidates_df/candidates_df/candidates_dataframe. Cannot verify whether the "
+            f"loaded bars were processed; refusing to report a candidates count."
+        )
+    if bars_loaded_total > 0 and not observations_interface_found:
+        raise RuntimeError(
+            f"STRATEGY_OUTPUT_INTERFACE_MISSING: {bars_loaded_total} bars were loaded into the "
+            f"engine but {type(strategy).__name__} implements none of get_observations_dataframe/"
+            f"get_observations_df/observations_df/observations_dataframe. Cannot verify whether "
+            f"the loaded bars were processed; refusing to report an observations count."
+        )
 
     # Record bar callback breakdown
     b1s = getattr(strategy, "bars_1s_count", 0)

@@ -1,0 +1,27 @@
+{
+  "original_eth_gaps": 202894,
+  "original_missing_seconds": 11129600,
+  "reclassifications": {
+    "SPARSE_NO_TRADE_INTERVAL": 178661,
+    "CONTRACT_ROLL_EFFECT": 22954,
+    "PARTITION_BOUNDARY": 1027,
+    "OPEN_SESSION_UNEXPLAINED": 245,
+    "HOLIDAY_OR_SPECIAL_SESSION": 4,
+    "HISTORICAL_SCHEDULED_CLOSURE": 3
+  },
+  "severities": {
+    "BENIGN": 202894
+  },
+  "unexplained_open_session": {
+    "count": 245,
+    "total_seconds": 175250,
+    "median": 360.0,
+    "p99": 4688.800000000001,
+    "max": 38745
+  },
+  "impacts_1m": {
+    "COMPLETE_EMPTY_MINUTE": 4572,
+    "EXACT_1M_MATCH": 466,
+    "NO_REFERENCE_1M": 6
+  }
+}

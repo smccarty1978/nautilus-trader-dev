@@ -1,0 +1,851 @@
+{
+  "seal_id": "preexec_seal_Codex_clean_maturity_flip_rolling_5m_productivity_44a42f5fc16b7a93",
+  "study_name": "Codex_clean_maturity_flip_rolling_5m_productivity",
+  "seal_status": "LOCKED",
+  "composite_seal_hash": "44a42f5fc16b7a933689e4f755632521eba13f665a2e887c04c0b3bf0328a8fc",
+  "reviewer_provenance": {
+    "causal": {
+      "declared_auditor": "lookahead-auditor",
+      "provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "independence_proven": false,
+      "independence_basis": "distinct_declared_identity_strings"
+    },
+    "contract": {
+      "declared_auditor": "contract-checker-pass20-smccarty",
+      "provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "independence_proven": false,
+      "independence_basis": "distinct_declared_identity_strings"
+    }
+  },
+  "causal_audit_verdict": {
+    "audit_type": "causal",
+    "auditor": "lookahead-auditor",
+    "pass": 18,
+    "verdict": "CLEAR",
+    "critical": 0,
+    "warning": 0,
+    "note": 1,
+    "causal_contract": "ts_avail <= T (latest_source_ts_init <= observation_ts)",
+    "audited_execution_composite_sha256": "44a42f5fc16b7a933689e4f755632521eba13f665a2e887c04c0b3bf0328a8fc",
+    "audit_report_sha256": "d8f3a5b370fe48676673055de7fb6a4a6f9305d40b35c230088bcc6c115f8fce",
+    "audit_report_path": "audit/pass_18.md",
+    "transcript_sha256": null,
+    "reviewer_provenance": {
+      "declared_auditor": "lookahead-auditor",
+      "identity_source": "cli_author",
+      "provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "session_evidence": null,
+      "attached_artifact": null,
+      "independence_basis": "distinct_declared_identity_strings",
+      "independence_proven": false,
+      "limitations": [
+        "A declared identity string is not an authenticated reviewer.",
+        "Distinctness across the two gates is enforced; human independence is not proven.",
+        "No audit-session evidence contract exists, so no supplied file can raise the provenance strength above DECLARED_IDENTITY_ONLY.",
+        "No session/transcript artifact was supplied; absence of session evidence is recorded explicitly and must not be read as authenticated independence."
+      ]
+    },
+    "derived_by_parser": "scripts/run_preexec_audits.py",
+    "audit_provenance_version": 2,
+    "audited_files": {
+      "repo:backtests/nt_runtime/__init__.py": "0c1ab7dde14bca4b2fff20377a4caa44eda6e3ff903c7a74381d310946fe11c9",
+      "repo:backtests/nt_runtime/compiled_study_loader.py": "409c32ad7e7f3bf48947f4d8e6d2894503e87131b0b32c8af468e128dd00944d",
+      "repo:backtests/nt_runtime/data_plan.py": "37773bf692a8cd1add369e3899d4c5fd839ba3abce3a02ba46610e1db61158a0",
+      "repo:backtests/nt_runtime/engine_builder.py": "8df12bfcd570830e3e1d259f35ba0339d5ce11a5deb919e64c218c1c9e882f50",
+      "repo:backtests/nt_runtime/modes/__init__.py": "7699281dd37cdfbb152a55cefc325119d0502fb25b7d2414e5cf3f5467340ce4",
+      "repo:backtests/nt_runtime/modes/collect.py": "5da667f0bcd1abf62d27d002facee14ef152dcc9cab7c255df5d996592220aaa",
+      "repo:backtests/nt_runtime/output_manager.py": "94029694b3570d1d1fbad2c713cdfbe3db58bc614f34fd197989a475d0e5b9a5",
+      "repo:backtests/nt_runtime/run_plan.py": "aea4bfdbb1baa83538165d363e37742ccfc111b1d536230d66e843766d10d5c9",
+      "repo:backtests/nt_runtime/strategy_binding.py": "7d8ee6a0108a16e59a9ede76c706baf10adadbd706ac7cdab1b0e028b90b94fc",
+      "repo:backtests/nt_runtime/telemetry.py": "916b2dcc7776f836fbbdb747980d48b301da992d60679fc0b30c0d01df38fd1f",
+      "repo:backtests/run_nt_study.py": "30097869c9b55087500f659a905a0ce24fb323e4ad4264cb7c757f6f05ff8bff",
+      "repo:collectors/collector_v2/__init__.py": "536833208bd03e265b5cdc59111d927ec08cfe038efc36c031e752091257eed8",
+      "repo:collectors/collector_v2/aggregator.py": "dc22a39d45323984dc10c171e5d569a89869cc50327b6a5bad8c779b56dbb31c",
+      "repo:collectors/collector_v2/regime_engine.py": "75b416f91615d51782b999e73186b3b941ebb1c36a2ea8b57445c58b39dd862e",
+      "repo:collectors/collector_v2/registry.py": "a2d559a6cab3261c606f0a074a827de19d60ce92c50f931bd562c6a2b00c2dbe",
+      "repo:features/__init__.py": "31fd80153af796a780c8971cb3bed3d13e1034a15f05b788d3a35ba8c3048d4a",
+      "repo:features/collector.py": "a71360e6a1e8a423d383100d6cc7e40ee35ecb338fcdbceeb7e66024191508fa",
+      "repo:features/engine.py": "df9a9cab1b08243170ff6288ee410a574aedef981e131267ac2c07b74ba0e913",
+      "repo:features/feature_lifecycle_baseline.json": "36750ebdba6057539f038f8eea549d68191eec7900e2873b4ffe2cd03e822364",
+      "repo:features/library.py": "e638f784bd6da02141cb8f242af33178c8ee9443a1b31366aaac43cc4a99311a",
+      "repo:features/registry.py": "7eaac1b9c04bf64f7375d696226d2fb04a646a5ee57152460ce0a5856a3edd0b",
+      "repo:features/trackers/median_center.py": "b800317b95f7d744d311eb93a590ee745a7ec17b9e1475cf84726366eacee3d0",
+      "repo:features/trackers/ohlcv_delta.py": "33096e1d58bdb24ffcfa89e4b403e82fe996b836fa820e44bb3e83c067497b63",
+      "repo:features/trackers/price_levels.py": "32f503d926f25fc5d66c5a89f35e1223b4d282d991527c0acfb49101e3fab028",
+      "repo:features/trackers/pullback.py": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00",
+      "repo:features/trackers/range_position.py": "192d3eb4d2fa47894438de8d043c5aa4570e8cb1ce3e5e5f0764386f4cf1cbbe",
+      "repo:features/trackers/rolling_5m_productivity.py": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "repo:features/trackers/structural_regime_geometry.py": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "repo:features/trackers/velocity.py": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d",
+      "repo:features/trackers/volume.py": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b",
+      "repo:features/trackers/wick.py": "5252e26577986d8531fbf71007eb65e77cbd9982d4d8551b71b21b167e7b3134",
+      "repo:research/__init__.py": "f957119862e2b9c65dd4027893ff8ea216cfd49dd94c60c0fc9f8f16737199b7",
+      "repo:research/engines/__init__.py": "2f739c5b6379888668939063db72ab9f9c70396f9b96afa47ac206e9d7238d75",
+      "repo:research/engines/baseline_engine.py": "7fe8a0df346321a80343f5342071a3a2e634fa55e6d35302c3a0cc295a2c0f2a",
+      "repo:research/engines/deliverables_engine.py": "0663438f39522eb2dddce1e77728f80cc0e01aba4ceb9c314fb84234b2e2d8b5",
+      "repo:research/engines/feature_binding_engine.py": "da7e7c25f21aa96b630931bca0a03ac3097d0172ec502b88169d7de804b8afcd",
+      "repo:research/engines/lineage_engine.py": "67e12565375fdcbdfde4314cd5b5547cc0c5498fae051fc0d2065099bf2663b7",
+      "repo:research/engines/population_engine.py": "8644f25ac0b7985a37dc2eda55842f9b944061a27d25f8b1f6a33a07159c1b72",
+      "repo:research/engines/target_engine.py": "645712909522d209237b4716a5c6b6b5fcd09ee3b75040dd46b5acf7675069d6",
+      "repo:research/engines/timestamp_engine.py": "2cec4679b29ae37302f8921ca36a5a1bfc06ecf2883f5b757d51529c04eab2d9",
+      "repo:research/schemas/__init__.py": "72fa30c417fe691ed4dd900294cf7e610ae9ed531e69aa247b12a45ffa145516",
+      "repo:research/schemas/study_spec.py": "2ae70919fdeae9dca0758742e43dca76db18e4eabdf3ca928575ae7c164ebc45",
+      "repo:research/study_types/__init__.py": "10ad3c895db1107ebe726c5bce73e2da17de50571acead65b2ac6edb5c66779e",
+      "repo:research/study_types/base.py": "b2a8b1b2cda27db859d0e74feb50b430aa373d566baae5d75ca07aa45517737d",
+      "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
+      "repo:research/study_types/flip_prediction.py": "b26f016013348b5e43d318c8dbdcc00a2f31d464fb7b30158269df7dd326d34b",
+      "repo:scripts/causal_lint.py": "9f27fe82aca1010ff9aa800428de4b6309813a12b0ab68d1821f920f395f646b",
+      "repo:scripts/check_artifact_schema.py": "c215722f91d76f9600565e2ba16b6f46bf52a238f2f02927f6169059f4822240",
+      "repo:scripts/check_collect_equivalence.py": "45f2954ed41bc039ea48e4d2376a7845296ce18afdd4845093e3c685630f83cc",
+      "repo:scripts/check_feature_promotion.py": "5224191eab08caf70afc41008400532b2af18a8bd985b2bd29fd212d4cd8fe45",
+      "repo:scripts/check_feature_surface.py": "81691451fc67c7d9afc22291141cea40cdaef8a5ce71b1b78f26b10d783091ef",
+      "repo:scripts/check_model_binding.py": "2e3fe29b623d1435e6d6fff7a53137d50351a6b47605e834ea43c49150ca3ad4",
+      "repo:scripts/check_research_decision_fidelity.py": "2ffc34811b0c5061c4dec076f9ddbe74057f0af011703286acce8f723a85f844",
+      "repo:scripts/check_spec_fidelity.py": "b35f0ace6231287d7eddfe78a985088fae145d7b0323b6b241d72cf57ae828a1",
+      "repo:scripts/compile_study.py": "45627784250834414b520ae1af467f43fa28c033369f3e68c0497670551a14b8",
+      "repo:scripts/create_study.py": "cd59453f43061698e438a6e4096b43913dcd7f449543396e3bfc966b4e9b15b0",
+      "repo:scripts/generate_oos_unlock.py": "b3d316d0ffa7f9d7899838c053cb9d92d74425cdfbc8d1794b1f2d01a7abf937",
+      "repo:scripts/preexec_audit_seal.py": "0763759f981b9f70b001d5e4fee8deb05865a8e2a23519d3f01a6cbf63faeff8",
+      "repo:scripts/research_preflight.py": "b88e74452eb9630cdeb78fbbac29bed8c46b9bf7beabf73cc831bad281b1198e",
+      "repo:scripts/resolve_execution_manifest.py": "a1c1042011f2d86d3486ae832c90d460b35ee5cbec0aa382a4f80c44c1e70f1d",
+      "repo:scripts/run_preexec_audits.py": "561b3da1099da23108201885d39e17d3d1bc039987081e9afe51f49d20ddb011",
+      "repo:scripts/select_required_tests.py": "afa2ef88f0ff7d8d40eea08495a029c87d71cbbd5d39028a4870dd66b1695162",
+      "repo:scripts/validate_smoke.py": "1354af434e4177463f1a4c081f7664354592990eb67fb27106f82f593cf4b964",
+      "repo:strategies/flip_prediction_collector.py": "ba2c3c9666db94eaebd4d2b779628bd8a21a689a8c6a80fd8f757dd31bf305cd",
+      "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/__init__.py": "48f5227d68eefdc2cfc40f16bfeb743f180c5325c210de3fe20f2eccac9666cb",
+      "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/collector.py": "fe7f3509fe7f554239b1aa387a28b358cb566cc1f12fd6576c0168952df6de1d",
+      "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/phase0.py": "28ef17c5c35cd57548d99a6a308d3c06b5315c9c982f0bde4fe4c4ed9c0d7b1e",
+      "repo:studies/fable5_pre_flip_d10_reversal_entry/strategy.py": "b2868dffd763c937f14e6015790460edaca7adb5674e1a1e6722b2d4c11b334d",
+      "repo:utils/__init__.py": "f5bfd4d288959f97f3474f0cdb69a118186a5c4ae18a52f25108e9f2860d12fe",
+      "repo:utils/causal_registration.py": "d01d3f8440cef4d15716d1195ff3c01b4b8697edabc30ac8783bbee968a205c8",
+      "repo:utils/causality.py": "5c2ca50858d2d7adeae9f348299416058691b20bcfa8ef2786d24dbe9b1b00f6",
+      "repo:utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+      "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
+      "study:SPEC.md": "aced28d76f44e74c94c2826dfe1c60e991b2e1e41e98e1188d444a4245098d46",
+      "study:artifacts/phase0_source_manifest.json": "7dc0ac57867c2f4901e5e4ae9a5d23db65745d88f4297c188fe8260d07b5bc8b",
+      "study:compiled_study.json": "dd2ddfb056b699608aeb7ac49a78794e6331299d70909a68ed0371b188975f1f",
+      "study:research_decision.yaml": "1a9bf1e013e08a0a4ac52398e6b62f01dcf75e49d3c77fd5d7c636bdfc5fa4fa",
+      "study:study.yaml": "44ea8ffe0fbeda5eada6a4959ccac27c43700c4609cfd7d53e15cab2e762a7bb",
+      "study:tests/test_completed_5m_coverage.py": "067748ea275ca009880b22b5384e616e885b5fc6d48c37729c5ab67716557e54",
+      "study:tests/test_contracts.py": "fe5492a8a1fd20a812d180dff6f59ff922b3c5f9623bb8ec81eec55b43fedf11",
+      "study:tests/test_delayed_label_resolution.py": "44ea26858a45807e26b8c817f4484e83684e05742a53e3919828cfbaeb35edb8",
+      "study:tests/test_phase0.py": "bddfc6c616d4f8b9fec42c0acf040b3bc05d3fcb64a7714d7dcd2b2cb89138f2",
+      "study:tests/test_rolling_5m_productivity.py": "07551bf25fa0725c7a02d5056a01c996e5a86dd936242fa04359653688118b0d",
+      "study:tests/test_run_exploratory_runner_integration.py": "412e11a103be94e9bece467b0e06fbc5c6f624037a0217d98de3e64f6c7f8501",
+      "study:tests/test_shared_bar_quality_gate.py": "f1f9a692ae59d2ca129e7db39bc9c5c04fe4fa069c4bcc49dcbcdc3428c528a7",
+      "study:tests/test_structural_coverage_gate.py": "93fd7a16e2c54f72387fbca587d692e1d45c471ebfaf4f3ff0ead850289e7d7f",
+      "study:tests/test_validation.py": "77fbd9413971f63e86e7bad87e45384ad2547ccb15f07bdcd69a0ea55ba9e691"
+    },
+    "timestamp": "2026-08-18T17:48:45.784591+00:00"
+  },
+  "contract_audit_verdict": {
+    "audit_type": "contract",
+    "auditor": "contract-checker-pass20-smccarty",
+    "pass": 20,
+    "verdict": "CLEAR",
+    "critical": 0,
+    "blocking": 0,
+    "warning": 0,
+    "not_verified": 0,
+    "audited_execution_composite_sha256": "44a42f5fc16b7a933689e4f755632521eba13f665a2e887c04c0b3bf0328a8fc",
+    "audit_report_sha256": "d0616913cbc92dc78c706b456c438fdbc63b0d2d18cce06ac555e2ef3f48a6f7",
+    "audit_report_path": "audit/contract_pass_20.md",
+    "transcript_sha256": null,
+    "reviewer_provenance": {
+      "declared_auditor": "contract-checker-pass20-smccarty",
+      "identity_source": "cli_author",
+      "provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "session_evidence": null,
+      "attached_artifact": null,
+      "independence_basis": "distinct_declared_identity_strings",
+      "independence_proven": false,
+      "limitations": [
+        "A declared identity string is not an authenticated reviewer.",
+        "Distinctness across the two gates is enforced; human independence is not proven.",
+        "No audit-session evidence contract exists, so no supplied file can raise the provenance strength above DECLARED_IDENTITY_ONLY.",
+        "No session/transcript artifact was supplied; absence of session evidence is recorded explicitly and must not be read as authenticated independence."
+      ]
+    },
+    "derived_by_parser": "scripts/run_preexec_audits.py",
+    "audit_provenance_version": 2,
+    "audited_files": {
+      "repo:backtests/nt_runtime/__init__.py": "0c1ab7dde14bca4b2fff20377a4caa44eda6e3ff903c7a74381d310946fe11c9",
+      "repo:backtests/nt_runtime/compiled_study_loader.py": "409c32ad7e7f3bf48947f4d8e6d2894503e87131b0b32c8af468e128dd00944d",
+      "repo:backtests/nt_runtime/data_plan.py": "37773bf692a8cd1add369e3899d4c5fd839ba3abce3a02ba46610e1db61158a0",
+      "repo:backtests/nt_runtime/engine_builder.py": "8df12bfcd570830e3e1d259f35ba0339d5ce11a5deb919e64c218c1c9e882f50",
+      "repo:backtests/nt_runtime/modes/__init__.py": "7699281dd37cdfbb152a55cefc325119d0502fb25b7d2414e5cf3f5467340ce4",
+      "repo:backtests/nt_runtime/modes/collect.py": "5da667f0bcd1abf62d27d002facee14ef152dcc9cab7c255df5d996592220aaa",
+      "repo:backtests/nt_runtime/output_manager.py": "94029694b3570d1d1fbad2c713cdfbe3db58bc614f34fd197989a475d0e5b9a5",
+      "repo:backtests/nt_runtime/run_plan.py": "aea4bfdbb1baa83538165d363e37742ccfc111b1d536230d66e843766d10d5c9",
+      "repo:backtests/nt_runtime/strategy_binding.py": "7d8ee6a0108a16e59a9ede76c706baf10adadbd706ac7cdab1b0e028b90b94fc",
+      "repo:backtests/nt_runtime/telemetry.py": "916b2dcc7776f836fbbdb747980d48b301da992d60679fc0b30c0d01df38fd1f",
+      "repo:backtests/run_nt_study.py": "30097869c9b55087500f659a905a0ce24fb323e4ad4264cb7c757f6f05ff8bff",
+      "repo:collectors/collector_v2/__init__.py": "536833208bd03e265b5cdc59111d927ec08cfe038efc36c031e752091257eed8",
+      "repo:collectors/collector_v2/aggregator.py": "dc22a39d45323984dc10c171e5d569a89869cc50327b6a5bad8c779b56dbb31c",
+      "repo:collectors/collector_v2/regime_engine.py": "75b416f91615d51782b999e73186b3b941ebb1c36a2ea8b57445c58b39dd862e",
+      "repo:collectors/collector_v2/registry.py": "a2d559a6cab3261c606f0a074a827de19d60ce92c50f931bd562c6a2b00c2dbe",
+      "repo:features/__init__.py": "31fd80153af796a780c8971cb3bed3d13e1034a15f05b788d3a35ba8c3048d4a",
+      "repo:features/collector.py": "a71360e6a1e8a423d383100d6cc7e40ee35ecb338fcdbceeb7e66024191508fa",
+      "repo:features/engine.py": "df9a9cab1b08243170ff6288ee410a574aedef981e131267ac2c07b74ba0e913",
+      "repo:features/feature_lifecycle_baseline.json": "36750ebdba6057539f038f8eea549d68191eec7900e2873b4ffe2cd03e822364",
+      "repo:features/library.py": "e638f784bd6da02141cb8f242af33178c8ee9443a1b31366aaac43cc4a99311a",
+      "repo:features/registry.py": "7eaac1b9c04bf64f7375d696226d2fb04a646a5ee57152460ce0a5856a3edd0b",
+      "repo:features/trackers/median_center.py": "b800317b95f7d744d311eb93a590ee745a7ec17b9e1475cf84726366eacee3d0",
+      "repo:features/trackers/ohlcv_delta.py": "33096e1d58bdb24ffcfa89e4b403e82fe996b836fa820e44bb3e83c067497b63",
+      "repo:features/trackers/price_levels.py": "32f503d926f25fc5d66c5a89f35e1223b4d282d991527c0acfb49101e3fab028",
+      "repo:features/trackers/pullback.py": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00",
+      "repo:features/trackers/range_position.py": "192d3eb4d2fa47894438de8d043c5aa4570e8cb1ce3e5e5f0764386f4cf1cbbe",
+      "repo:features/trackers/rolling_5m_productivity.py": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "repo:features/trackers/structural_regime_geometry.py": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "repo:features/trackers/velocity.py": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d",
+      "repo:features/trackers/volume.py": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b",
+      "repo:features/trackers/wick.py": "5252e26577986d8531fbf71007eb65e77cbd9982d4d8551b71b21b167e7b3134",
+      "repo:research/__init__.py": "f957119862e2b9c65dd4027893ff8ea216cfd49dd94c60c0fc9f8f16737199b7",
+      "repo:research/engines/__init__.py": "2f739c5b6379888668939063db72ab9f9c70396f9b96afa47ac206e9d7238d75",
+      "repo:research/engines/baseline_engine.py": "7fe8a0df346321a80343f5342071a3a2e634fa55e6d35302c3a0cc295a2c0f2a",
+      "repo:research/engines/deliverables_engine.py": "0663438f39522eb2dddce1e77728f80cc0e01aba4ceb9c314fb84234b2e2d8b5",
+      "repo:research/engines/feature_binding_engine.py": "da7e7c25f21aa96b630931bca0a03ac3097d0172ec502b88169d7de804b8afcd",
+      "repo:research/engines/lineage_engine.py": "67e12565375fdcbdfde4314cd5b5547cc0c5498fae051fc0d2065099bf2663b7",
+      "repo:research/engines/population_engine.py": "8644f25ac0b7985a37dc2eda55842f9b944061a27d25f8b1f6a33a07159c1b72",
+      "repo:research/engines/target_engine.py": "645712909522d209237b4716a5c6b6b5fcd09ee3b75040dd46b5acf7675069d6",
+      "repo:research/engines/timestamp_engine.py": "2cec4679b29ae37302f8921ca36a5a1bfc06ecf2883f5b757d51529c04eab2d9",
+      "repo:research/schemas/__init__.py": "72fa30c417fe691ed4dd900294cf7e610ae9ed531e69aa247b12a45ffa145516",
+      "repo:research/schemas/study_spec.py": "2ae70919fdeae9dca0758742e43dca76db18e4eabdf3ca928575ae7c164ebc45",
+      "repo:research/study_types/__init__.py": "10ad3c895db1107ebe726c5bce73e2da17de50571acead65b2ac6edb5c66779e",
+      "repo:research/study_types/base.py": "b2a8b1b2cda27db859d0e74feb50b430aa373d566baae5d75ca07aa45517737d",
+      "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
+      "repo:research/study_types/flip_prediction.py": "b26f016013348b5e43d318c8dbdcc00a2f31d464fb7b30158269df7dd326d34b",
+      "repo:scripts/causal_lint.py": "9f27fe82aca1010ff9aa800428de4b6309813a12b0ab68d1821f920f395f646b",
+      "repo:scripts/check_artifact_schema.py": "c215722f91d76f9600565e2ba16b6f46bf52a238f2f02927f6169059f4822240",
+      "repo:scripts/check_collect_equivalence.py": "45f2954ed41bc039ea48e4d2376a7845296ce18afdd4845093e3c685630f83cc",
+      "repo:scripts/check_feature_promotion.py": "5224191eab08caf70afc41008400532b2af18a8bd985b2bd29fd212d4cd8fe45",
+      "repo:scripts/check_feature_surface.py": "81691451fc67c7d9afc22291141cea40cdaef8a5ce71b1b78f26b10d783091ef",
+      "repo:scripts/check_model_binding.py": "2e3fe29b623d1435e6d6fff7a53137d50351a6b47605e834ea43c49150ca3ad4",
+      "repo:scripts/check_research_decision_fidelity.py": "2ffc34811b0c5061c4dec076f9ddbe74057f0af011703286acce8f723a85f844",
+      "repo:scripts/check_spec_fidelity.py": "b35f0ace6231287d7eddfe78a985088fae145d7b0323b6b241d72cf57ae828a1",
+      "repo:scripts/compile_study.py": "45627784250834414b520ae1af467f43fa28c033369f3e68c0497670551a14b8",
+      "repo:scripts/create_study.py": "cd59453f43061698e438a6e4096b43913dcd7f449543396e3bfc966b4e9b15b0",
+      "repo:scripts/generate_oos_unlock.py": "b3d316d0ffa7f9d7899838c053cb9d92d74425cdfbc8d1794b1f2d01a7abf937",
+      "repo:scripts/preexec_audit_seal.py": "0763759f981b9f70b001d5e4fee8deb05865a8e2a23519d3f01a6cbf63faeff8",
+      "repo:scripts/research_preflight.py": "b88e74452eb9630cdeb78fbbac29bed8c46b9bf7beabf73cc831bad281b1198e",
+      "repo:scripts/resolve_execution_manifest.py": "a1c1042011f2d86d3486ae832c90d460b35ee5cbec0aa382a4f80c44c1e70f1d",
+      "repo:scripts/run_preexec_audits.py": "561b3da1099da23108201885d39e17d3d1bc039987081e9afe51f49d20ddb011",
+      "repo:scripts/select_required_tests.py": "afa2ef88f0ff7d8d40eea08495a029c87d71cbbd5d39028a4870dd66b1695162",
+      "repo:scripts/validate_smoke.py": "1354af434e4177463f1a4c081f7664354592990eb67fb27106f82f593cf4b964",
+      "repo:strategies/flip_prediction_collector.py": "ba2c3c9666db94eaebd4d2b779628bd8a21a689a8c6a80fd8f757dd31bf305cd",
+      "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/__init__.py": "48f5227d68eefdc2cfc40f16bfeb743f180c5325c210de3fe20f2eccac9666cb",
+      "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/collector.py": "fe7f3509fe7f554239b1aa387a28b358cb566cc1f12fd6576c0168952df6de1d",
+      "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/phase0.py": "28ef17c5c35cd57548d99a6a308d3c06b5315c9c982f0bde4fe4c4ed9c0d7b1e",
+      "repo:studies/fable5_pre_flip_d10_reversal_entry/strategy.py": "b2868dffd763c937f14e6015790460edaca7adb5674e1a1e6722b2d4c11b334d",
+      "repo:utils/__init__.py": "f5bfd4d288959f97f3474f0cdb69a118186a5c4ae18a52f25108e9f2860d12fe",
+      "repo:utils/causal_registration.py": "d01d3f8440cef4d15716d1195ff3c01b4b8697edabc30ac8783bbee968a205c8",
+      "repo:utils/causality.py": "5c2ca50858d2d7adeae9f348299416058691b20bcfa8ef2786d24dbe9b1b00f6",
+      "repo:utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+      "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
+      "study:SPEC.md": "aced28d76f44e74c94c2826dfe1c60e991b2e1e41e98e1188d444a4245098d46",
+      "study:artifacts/phase0_source_manifest.json": "7dc0ac57867c2f4901e5e4ae9a5d23db65745d88f4297c188fe8260d07b5bc8b",
+      "study:compiled_study.json": "dd2ddfb056b699608aeb7ac49a78794e6331299d70909a68ed0371b188975f1f",
+      "study:research_decision.yaml": "1a9bf1e013e08a0a4ac52398e6b62f01dcf75e49d3c77fd5d7c636bdfc5fa4fa",
+      "study:study.yaml": "44ea8ffe0fbeda5eada6a4959ccac27c43700c4609cfd7d53e15cab2e762a7bb",
+      "study:tests/test_completed_5m_coverage.py": "067748ea275ca009880b22b5384e616e885b5fc6d48c37729c5ab67716557e54",
+      "study:tests/test_contracts.py": "fe5492a8a1fd20a812d180dff6f59ff922b3c5f9623bb8ec81eec55b43fedf11",
+      "study:tests/test_delayed_label_resolution.py": "44ea26858a45807e26b8c817f4484e83684e05742a53e3919828cfbaeb35edb8",
+      "study:tests/test_phase0.py": "bddfc6c616d4f8b9fec42c0acf040b3bc05d3fcb64a7714d7dcd2b2cb89138f2",
+      "study:tests/test_rolling_5m_productivity.py": "07551bf25fa0725c7a02d5056a01c996e5a86dd936242fa04359653688118b0d",
+      "study:tests/test_run_exploratory_runner_integration.py": "412e11a103be94e9bece467b0e06fbc5c6f624037a0217d98de3e64f6c7f8501",
+      "study:tests/test_shared_bar_quality_gate.py": "f1f9a692ae59d2ca129e7db39bc9c5c04fe4fa069c4bcc49dcbcdc3428c528a7",
+      "study:tests/test_structural_coverage_gate.py": "93fd7a16e2c54f72387fbca587d692e1d45c471ebfaf4f3ff0ead850289e7d7f",
+      "study:tests/test_validation.py": "77fbd9413971f63e86e7bad87e45384ad2547ccb15f07bdcd69a0ea55ba9e691"
+    },
+    "timestamp": "2026-08-18T17:48:48.250950+00:00"
+  },
+  "file_hashes": {
+    "repo:backtests/nt_runtime/__init__.py": "0c1ab7dde14bca4b2fff20377a4caa44eda6e3ff903c7a74381d310946fe11c9",
+    "repo:backtests/nt_runtime/compiled_study_loader.py": "409c32ad7e7f3bf48947f4d8e6d2894503e87131b0b32c8af468e128dd00944d",
+    "repo:backtests/nt_runtime/data_plan.py": "37773bf692a8cd1add369e3899d4c5fd839ba3abce3a02ba46610e1db61158a0",
+    "repo:backtests/nt_runtime/engine_builder.py": "8df12bfcd570830e3e1d259f35ba0339d5ce11a5deb919e64c218c1c9e882f50",
+    "repo:backtests/nt_runtime/modes/__init__.py": "7699281dd37cdfbb152a55cefc325119d0502fb25b7d2414e5cf3f5467340ce4",
+    "repo:backtests/nt_runtime/modes/collect.py": "5da667f0bcd1abf62d27d002facee14ef152dcc9cab7c255df5d996592220aaa",
+    "repo:backtests/nt_runtime/output_manager.py": "94029694b3570d1d1fbad2c713cdfbe3db58bc614f34fd197989a475d0e5b9a5",
+    "repo:backtests/nt_runtime/run_plan.py": "aea4bfdbb1baa83538165d363e37742ccfc111b1d536230d66e843766d10d5c9",
+    "repo:backtests/nt_runtime/strategy_binding.py": "7d8ee6a0108a16e59a9ede76c706baf10adadbd706ac7cdab1b0e028b90b94fc",
+    "repo:backtests/nt_runtime/telemetry.py": "916b2dcc7776f836fbbdb747980d48b301da992d60679fc0b30c0d01df38fd1f",
+    "repo:backtests/run_nt_study.py": "30097869c9b55087500f659a905a0ce24fb323e4ad4264cb7c757f6f05ff8bff",
+    "repo:collectors/collector_v2/__init__.py": "536833208bd03e265b5cdc59111d927ec08cfe038efc36c031e752091257eed8",
+    "repo:collectors/collector_v2/aggregator.py": "dc22a39d45323984dc10c171e5d569a89869cc50327b6a5bad8c779b56dbb31c",
+    "repo:collectors/collector_v2/regime_engine.py": "75b416f91615d51782b999e73186b3b941ebb1c36a2ea8b57445c58b39dd862e",
+    "repo:collectors/collector_v2/registry.py": "a2d559a6cab3261c606f0a074a827de19d60ce92c50f931bd562c6a2b00c2dbe",
+    "repo:features/__init__.py": "31fd80153af796a780c8971cb3bed3d13e1034a15f05b788d3a35ba8c3048d4a",
+    "repo:features/collector.py": "a71360e6a1e8a423d383100d6cc7e40ee35ecb338fcdbceeb7e66024191508fa",
+    "repo:features/engine.py": "df9a9cab1b08243170ff6288ee410a574aedef981e131267ac2c07b74ba0e913",
+    "repo:features/feature_lifecycle_baseline.json": "36750ebdba6057539f038f8eea549d68191eec7900e2873b4ffe2cd03e822364",
+    "repo:features/library.py": "e638f784bd6da02141cb8f242af33178c8ee9443a1b31366aaac43cc4a99311a",
+    "repo:features/registry.py": "7eaac1b9c04bf64f7375d696226d2fb04a646a5ee57152460ce0a5856a3edd0b",
+    "repo:features/trackers/median_center.py": "b800317b95f7d744d311eb93a590ee745a7ec17b9e1475cf84726366eacee3d0",
+    "repo:features/trackers/ohlcv_delta.py": "33096e1d58bdb24ffcfa89e4b403e82fe996b836fa820e44bb3e83c067497b63",
+    "repo:features/trackers/price_levels.py": "32f503d926f25fc5d66c5a89f35e1223b4d282d991527c0acfb49101e3fab028",
+    "repo:features/trackers/pullback.py": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00",
+    "repo:features/trackers/range_position.py": "192d3eb4d2fa47894438de8d043c5aa4570e8cb1ce3e5e5f0764386f4cf1cbbe",
+    "repo:features/trackers/rolling_5m_productivity.py": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+    "repo:features/trackers/structural_regime_geometry.py": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+    "repo:features/trackers/velocity.py": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d",
+    "repo:features/trackers/volume.py": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b",
+    "repo:features/trackers/wick.py": "5252e26577986d8531fbf71007eb65e77cbd9982d4d8551b71b21b167e7b3134",
+    "repo:research/__init__.py": "f957119862e2b9c65dd4027893ff8ea216cfd49dd94c60c0fc9f8f16737199b7",
+    "repo:research/engines/__init__.py": "2f739c5b6379888668939063db72ab9f9c70396f9b96afa47ac206e9d7238d75",
+    "repo:research/engines/baseline_engine.py": "7fe8a0df346321a80343f5342071a3a2e634fa55e6d35302c3a0cc295a2c0f2a",
+    "repo:research/engines/deliverables_engine.py": "0663438f39522eb2dddce1e77728f80cc0e01aba4ceb9c314fb84234b2e2d8b5",
+    "repo:research/engines/feature_binding_engine.py": "da7e7c25f21aa96b630931bca0a03ac3097d0172ec502b88169d7de804b8afcd",
+    "repo:research/engines/lineage_engine.py": "67e12565375fdcbdfde4314cd5b5547cc0c5498fae051fc0d2065099bf2663b7",
+    "repo:research/engines/population_engine.py": "8644f25ac0b7985a37dc2eda55842f9b944061a27d25f8b1f6a33a07159c1b72",
+    "repo:research/engines/target_engine.py": "645712909522d209237b4716a5c6b6b5fcd09ee3b75040dd46b5acf7675069d6",
+    "repo:research/engines/timestamp_engine.py": "2cec4679b29ae37302f8921ca36a5a1bfc06ecf2883f5b757d51529c04eab2d9",
+    "repo:research/schemas/__init__.py": "72fa30c417fe691ed4dd900294cf7e610ae9ed531e69aa247b12a45ffa145516",
+    "repo:research/schemas/study_spec.py": "2ae70919fdeae9dca0758742e43dca76db18e4eabdf3ca928575ae7c164ebc45",
+    "repo:research/study_types/__init__.py": "10ad3c895db1107ebe726c5bce73e2da17de50571acead65b2ac6edb5c66779e",
+    "repo:research/study_types/base.py": "b2a8b1b2cda27db859d0e74feb50b430aa373d566baae5d75ca07aa45517737d",
+    "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
+    "repo:research/study_types/flip_prediction.py": "b26f016013348b5e43d318c8dbdcc00a2f31d464fb7b30158269df7dd326d34b",
+    "repo:scripts/causal_lint.py": "9f27fe82aca1010ff9aa800428de4b6309813a12b0ab68d1821f920f395f646b",
+    "repo:scripts/check_artifact_schema.py": "c215722f91d76f9600565e2ba16b6f46bf52a238f2f02927f6169059f4822240",
+    "repo:scripts/check_collect_equivalence.py": "45f2954ed41bc039ea48e4d2376a7845296ce18afdd4845093e3c685630f83cc",
+    "repo:scripts/check_feature_promotion.py": "5224191eab08caf70afc41008400532b2af18a8bd985b2bd29fd212d4cd8fe45",
+    "repo:scripts/check_feature_surface.py": "81691451fc67c7d9afc22291141cea40cdaef8a5ce71b1b78f26b10d783091ef",
+    "repo:scripts/check_model_binding.py": "2e3fe29b623d1435e6d6fff7a53137d50351a6b47605e834ea43c49150ca3ad4",
+    "repo:scripts/check_research_decision_fidelity.py": "2ffc34811b0c5061c4dec076f9ddbe74057f0af011703286acce8f723a85f844",
+    "repo:scripts/check_spec_fidelity.py": "b35f0ace6231287d7eddfe78a985088fae145d7b0323b6b241d72cf57ae828a1",
+    "repo:scripts/compile_study.py": "45627784250834414b520ae1af467f43fa28c033369f3e68c0497670551a14b8",
+    "repo:scripts/create_study.py": "cd59453f43061698e438a6e4096b43913dcd7f449543396e3bfc966b4e9b15b0",
+    "repo:scripts/generate_oos_unlock.py": "b3d316d0ffa7f9d7899838c053cb9d92d74425cdfbc8d1794b1f2d01a7abf937",
+    "repo:scripts/preexec_audit_seal.py": "0763759f981b9f70b001d5e4fee8deb05865a8e2a23519d3f01a6cbf63faeff8",
+    "repo:scripts/research_preflight.py": "b88e74452eb9630cdeb78fbbac29bed8c46b9bf7beabf73cc831bad281b1198e",
+    "repo:scripts/resolve_execution_manifest.py": "a1c1042011f2d86d3486ae832c90d460b35ee5cbec0aa382a4f80c44c1e70f1d",
+    "repo:scripts/run_preexec_audits.py": "561b3da1099da23108201885d39e17d3d1bc039987081e9afe51f49d20ddb011",
+    "repo:scripts/select_required_tests.py": "afa2ef88f0ff7d8d40eea08495a029c87d71cbbd5d39028a4870dd66b1695162",
+    "repo:scripts/validate_smoke.py": "1354af434e4177463f1a4c081f7664354592990eb67fb27106f82f593cf4b964",
+    "repo:strategies/flip_prediction_collector.py": "ba2c3c9666db94eaebd4d2b779628bd8a21a689a8c6a80fd8f757dd31bf305cd",
+    "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/__init__.py": "48f5227d68eefdc2cfc40f16bfeb743f180c5325c210de3fe20f2eccac9666cb",
+    "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/collector.py": "fe7f3509fe7f554239b1aa387a28b358cb566cc1f12fd6576c0168952df6de1d",
+    "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/phase0.py": "28ef17c5c35cd57548d99a6a308d3c06b5315c9c982f0bde4fe4c4ed9c0d7b1e",
+    "repo:studies/fable5_pre_flip_d10_reversal_entry/strategy.py": "b2868dffd763c937f14e6015790460edaca7adb5674e1a1e6722b2d4c11b334d",
+    "repo:utils/__init__.py": "f5bfd4d288959f97f3474f0cdb69a118186a5c4ae18a52f25108e9f2860d12fe",
+    "repo:utils/causal_registration.py": "d01d3f8440cef4d15716d1195ff3c01b4b8697edabc30ac8783bbee968a205c8",
+    "repo:utils/causality.py": "5c2ca50858d2d7adeae9f348299416058691b20bcfa8ef2786d24dbe9b1b00f6",
+    "repo:utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+    "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
+    "study:SPEC.md": "aced28d76f44e74c94c2826dfe1c60e991b2e1e41e98e1188d444a4245098d46",
+    "study:artifacts/phase0_source_manifest.json": "7dc0ac57867c2f4901e5e4ae9a5d23db65745d88f4297c188fe8260d07b5bc8b",
+    "study:compiled_study.json": "dd2ddfb056b699608aeb7ac49a78794e6331299d70909a68ed0371b188975f1f",
+    "study:research_decision.yaml": "1a9bf1e013e08a0a4ac52398e6b62f01dcf75e49d3c77fd5d7c636bdfc5fa4fa",
+    "study:study.yaml": "44ea8ffe0fbeda5eada6a4959ccac27c43700c4609cfd7d53e15cab2e762a7bb",
+    "study:tests/test_completed_5m_coverage.py": "067748ea275ca009880b22b5384e616e885b5fc6d48c37729c5ab67716557e54",
+    "study:tests/test_contracts.py": "fe5492a8a1fd20a812d180dff6f59ff922b3c5f9623bb8ec81eec55b43fedf11",
+    "study:tests/test_delayed_label_resolution.py": "44ea26858a45807e26b8c817f4484e83684e05742a53e3919828cfbaeb35edb8",
+    "study:tests/test_phase0.py": "bddfc6c616d4f8b9fec42c0acf040b3bc05d3fcb64a7714d7dcd2b2cb89138f2",
+    "study:tests/test_rolling_5m_productivity.py": "07551bf25fa0725c7a02d5056a01c996e5a86dd936242fa04359653688118b0d",
+    "study:tests/test_run_exploratory_runner_integration.py": "412e11a103be94e9bece467b0e06fbc5c6f624037a0217d98de3e64f6c7f8501",
+    "study:tests/test_shared_bar_quality_gate.py": "f1f9a692ae59d2ca129e7db39bc9c5c04fe4fa069c4bcc49dcbcdc3428c528a7",
+    "study:tests/test_structural_coverage_gate.py": "93fd7a16e2c54f72387fbca587d692e1d45c471ebfaf4f3ff0ead850289e7d7f",
+    "study:tests/test_validation.py": "77fbd9413971f63e86e7bad87e45384ad2547ccb15f07bdcd69a0ea55ba9e691",
+    "study:audit/status.json": "94ed544af78b92d19f4ff84f43fcc3b63db5d68d8c1f2c93c0e236f25d3f5838",
+    "study:audit/contract_status.json": "0a34a00eb639f46728843baedec767c313f0f99c5bf97d70660ce10da141ca80",
+    "study:audit/contract_pass_01.md": "414b95dc80aa230de3c6d71021651ca50ca54e2a7c05a88fb0abadd79d0ba2a2",
+    "study:audit/contract_pass_02.md": "d40e9fee55c9e78984a6437feafc21ca1e0ade47f1c41defed7c253d88d754eb",
+    "study:audit/contract_pass_12.md": "5755a3db2ae72d4483f7f7501d65e9a782d30c917a7ae901544a858a18fc3e9b",
+    "study:audit/contract_pass_13.md": "a4deac76ac61f66a8cf8214ea5c8257cab2b4cb15f34d4c187a31aee04263613",
+    "study:audit/contract_pass_14.md": "9459877eb67e856b63df16c976e4d783652258b7b6d4bdaeef414f3c9887af33",
+    "study:audit/contract_pass_16.md": "90b0e1378793ff4e731c101edca26b2b8d359ff2fadd2e134c4420935c7a3507",
+    "study:audit/contract_pass_17.md": "d654ab6b4a7879225f1e2e14ffa34c48f0caa6b94f9ffdc8b8d17a0257152020",
+    "study:audit/contract_pass_18.md": "14a8975df173a8b3cb7eb31a794024851c9b256c93fb3354052939e1efeae09c",
+    "study:audit/contract_pass_19.md": "491e5bf4cfbae01af92f4b9d04d7c306697786e7b0b4098491a62b6676667075",
+    "study:audit/contract_pass_20.md": "d0616913cbc92dc78c706b456c438fdbc63b0d2d18cce06ac555e2ef3f48a6f7",
+    "study:audit/pass_01.md": "ee32151a359b20608cfba38ebf55920188e117b637219c5865c3d76dbe8adc90",
+    "study:audit/pass_02.md": "94d23c9e75728f9ae78e5e8570c5440bf39bb037ccf4a4f39afb2e1cd275085e",
+    "study:audit/pass_03.md": "9a57e898a207b3c77aa2291e2c91f40ce62721ba4d0f7a1b71a7cc7e8fd9d818",
+    "study:audit/pass_04.md": "dc410f4f1cc230ac10d7de7a16c61f6c2e4822e8cc7a2819532a3f1b7f2899e0",
+    "study:audit/pass_05.md": "a447e1cec604383693161fda04361d6eba371705bd9bb4544f3519cb6a645e3d",
+    "study:audit/pass_06.md": "e5311e1766f2da9740abcfc514b9ddad208a73f1d878d9c4321ab3413a7fae43",
+    "study:audit/pass_07.md": "c724b1bfad03720277ecd038ead6cd06c2378f905ff2ac3d899f5b2e36a7871b",
+    "study:audit/pass_08.md": "f2961fa51f24d477ba84fddd08a37f3d32d5a8afdff424d42a9175a8abe78b09",
+    "study:audit/pass_09.md": "c9b7bd080f515e26d280c692262afe6149f7c747ed6da2508d795c08296d61fc",
+    "study:audit/pass_10.md": "bdc3e8e3f980081f8947311e285f89ac8269554bbdd0c5f8890e7ece2f221843",
+    "study:audit/pass_11.md": "dc96988db63b755e25eda1d1d405cf94ee1abc2a1f7b4158118a106f41cf865e",
+    "study:audit/pass_12.md": "2abe50a63a7935737471d3277c10f42ac5bb68e106639313cf156b35cdd65463",
+    "study:audit/pass_13.md": "f6d67375a73c55602e27b5dccfd22fdc7941887c388ee28f44b087dbe0ad756b",
+    "study:audit/pass_14.md": "e960ae776e4aef4ea9de27f69dfcd88d4c3b46185d68a37bb8ec04ee58436cfa",
+    "study:audit/pass_15.md": "6cdaf558564ef8c82bce0cb04510811fad324802985fb8bdfb524713887beff0",
+    "study:audit/pass_16.md": "c97a05d6629aab01f59141c2379950a0e86ba1c9b39f7392bdafaeccfa492c75",
+    "study:audit/pass_17.md": "997b6361c86a8d59309f0e485ee45ad8ff68aa43c98d104fc741a38d8580df10",
+    "study:audit/pass_18.md": "d8f3a5b370fe48676673055de7fb6a4a6f9305d40b35c230088bcc6c115f8fce"
+  },
+  "evidence": {
+    "repo_backtests_nt_runtime___init___py": {
+      "path": "repo:backtests/nt_runtime/__init__.py",
+      "sha256": "0c1ab7dde14bca4b2fff20377a4caa44eda6e3ff903c7a74381d310946fe11c9"
+    },
+    "repo_backtests_nt_runtime_compiled_study_loader_py": {
+      "path": "repo:backtests/nt_runtime/compiled_study_loader.py",
+      "sha256": "409c32ad7e7f3bf48947f4d8e6d2894503e87131b0b32c8af468e128dd00944d"
+    },
+    "repo_backtests_nt_runtime_data_plan_py": {
+      "path": "repo:backtests/nt_runtime/data_plan.py",
+      "sha256": "37773bf692a8cd1add369e3899d4c5fd839ba3abce3a02ba46610e1db61158a0"
+    },
+    "repo_backtests_nt_runtime_engine_builder_py": {
+      "path": "repo:backtests/nt_runtime/engine_builder.py",
+      "sha256": "8df12bfcd570830e3e1d259f35ba0339d5ce11a5deb919e64c218c1c9e882f50"
+    },
+    "repo_backtests_nt_runtime_modes___init___py": {
+      "path": "repo:backtests/nt_runtime/modes/__init__.py",
+      "sha256": "7699281dd37cdfbb152a55cefc325119d0502fb25b7d2414e5cf3f5467340ce4"
+    },
+    "repo_backtests_nt_runtime_modes_collect_py": {
+      "path": "repo:backtests/nt_runtime/modes/collect.py",
+      "sha256": "5da667f0bcd1abf62d27d002facee14ef152dcc9cab7c255df5d996592220aaa"
+    },
+    "repo_backtests_nt_runtime_output_manager_py": {
+      "path": "repo:backtests/nt_runtime/output_manager.py",
+      "sha256": "94029694b3570d1d1fbad2c713cdfbe3db58bc614f34fd197989a475d0e5b9a5"
+    },
+    "repo_backtests_nt_runtime_run_plan_py": {
+      "path": "repo:backtests/nt_runtime/run_plan.py",
+      "sha256": "aea4bfdbb1baa83538165d363e37742ccfc111b1d536230d66e843766d10d5c9"
+    },
+    "repo_backtests_nt_runtime_strategy_binding_py": {
+      "path": "repo:backtests/nt_runtime/strategy_binding.py",
+      "sha256": "7d8ee6a0108a16e59a9ede76c706baf10adadbd706ac7cdab1b0e028b90b94fc"
+    },
+    "repo_backtests_nt_runtime_telemetry_py": {
+      "path": "repo:backtests/nt_runtime/telemetry.py",
+      "sha256": "916b2dcc7776f836fbbdb747980d48b301da992d60679fc0b30c0d01df38fd1f"
+    },
+    "repo_backtests_run_nt_study_py": {
+      "path": "repo:backtests/run_nt_study.py",
+      "sha256": "30097869c9b55087500f659a905a0ce24fb323e4ad4264cb7c757f6f05ff8bff"
+    },
+    "repo_collectors_collector_v2___init___py": {
+      "path": "repo:collectors/collector_v2/__init__.py",
+      "sha256": "536833208bd03e265b5cdc59111d927ec08cfe038efc36c031e752091257eed8"
+    },
+    "repo_collectors_collector_v2_aggregator_py": {
+      "path": "repo:collectors/collector_v2/aggregator.py",
+      "sha256": "dc22a39d45323984dc10c171e5d569a89869cc50327b6a5bad8c779b56dbb31c"
+    },
+    "repo_collectors_collector_v2_regime_engine_py": {
+      "path": "repo:collectors/collector_v2/regime_engine.py",
+      "sha256": "75b416f91615d51782b999e73186b3b941ebb1c36a2ea8b57445c58b39dd862e"
+    },
+    "repo_collectors_collector_v2_registry_py": {
+      "path": "repo:collectors/collector_v2/registry.py",
+      "sha256": "a2d559a6cab3261c606f0a074a827de19d60ce92c50f931bd562c6a2b00c2dbe"
+    },
+    "repo_features___init___py": {
+      "path": "repo:features/__init__.py",
+      "sha256": "31fd80153af796a780c8971cb3bed3d13e1034a15f05b788d3a35ba8c3048d4a"
+    },
+    "repo_features_collector_py": {
+      "path": "repo:features/collector.py",
+      "sha256": "a71360e6a1e8a423d383100d6cc7e40ee35ecb338fcdbceeb7e66024191508fa"
+    },
+    "repo_features_engine_py": {
+      "path": "repo:features/engine.py",
+      "sha256": "df9a9cab1b08243170ff6288ee410a574aedef981e131267ac2c07b74ba0e913"
+    },
+    "repo_features_feature_lifecycle_baseline_json": {
+      "path": "repo:features/feature_lifecycle_baseline.json",
+      "sha256": "36750ebdba6057539f038f8eea549d68191eec7900e2873b4ffe2cd03e822364"
+    },
+    "repo_features_library_py": {
+      "path": "repo:features/library.py",
+      "sha256": "e638f784bd6da02141cb8f242af33178c8ee9443a1b31366aaac43cc4a99311a"
+    },
+    "repo_features_registry_py": {
+      "path": "repo:features/registry.py",
+      "sha256": "7eaac1b9c04bf64f7375d696226d2fb04a646a5ee57152460ce0a5856a3edd0b"
+    },
+    "repo_features_trackers_median_center_py": {
+      "path": "repo:features/trackers/median_center.py",
+      "sha256": "b800317b95f7d744d311eb93a590ee745a7ec17b9e1475cf84726366eacee3d0"
+    },
+    "repo_features_trackers_ohlcv_delta_py": {
+      "path": "repo:features/trackers/ohlcv_delta.py",
+      "sha256": "33096e1d58bdb24ffcfa89e4b403e82fe996b836fa820e44bb3e83c067497b63"
+    },
+    "repo_features_trackers_price_levels_py": {
+      "path": "repo:features/trackers/price_levels.py",
+      "sha256": "32f503d926f25fc5d66c5a89f35e1223b4d282d991527c0acfb49101e3fab028"
+    },
+    "repo_features_trackers_pullback_py": {
+      "path": "repo:features/trackers/pullback.py",
+      "sha256": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00"
+    },
+    "repo_features_trackers_range_position_py": {
+      "path": "repo:features/trackers/range_position.py",
+      "sha256": "192d3eb4d2fa47894438de8d043c5aa4570e8cb1ce3e5e5f0764386f4cf1cbbe"
+    },
+    "repo_features_trackers_rolling_5m_productivity_py": {
+      "path": "repo:features/trackers/rolling_5m_productivity.py",
+      "sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b"
+    },
+    "repo_features_trackers_structural_regime_geometry_py": {
+      "path": "repo:features/trackers/structural_regime_geometry.py",
+      "sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4"
+    },
+    "repo_features_trackers_velocity_py": {
+      "path": "repo:features/trackers/velocity.py",
+      "sha256": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d"
+    },
+    "repo_features_trackers_volume_py": {
+      "path": "repo:features/trackers/volume.py",
+      "sha256": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b"
+    },
+    "repo_features_trackers_wick_py": {
+      "path": "repo:features/trackers/wick.py",
+      "sha256": "5252e26577986d8531fbf71007eb65e77cbd9982d4d8551b71b21b167e7b3134"
+    },
+    "repo_research___init___py": {
+      "path": "repo:research/__init__.py",
+      "sha256": "f957119862e2b9c65dd4027893ff8ea216cfd49dd94c60c0fc9f8f16737199b7"
+    },
+    "repo_research_engines___init___py": {
+      "path": "repo:research/engines/__init__.py",
+      "sha256": "2f739c5b6379888668939063db72ab9f9c70396f9b96afa47ac206e9d7238d75"
+    },
+    "repo_research_engines_baseline_engine_py": {
+      "path": "repo:research/engines/baseline_engine.py",
+      "sha256": "7fe8a0df346321a80343f5342071a3a2e634fa55e6d35302c3a0cc295a2c0f2a"
+    },
+    "repo_research_engines_deliverables_engine_py": {
+      "path": "repo:research/engines/deliverables_engine.py",
+      "sha256": "0663438f39522eb2dddce1e77728f80cc0e01aba4ceb9c314fb84234b2e2d8b5"
+    },
+    "repo_research_engines_feature_binding_engine_py": {
+      "path": "repo:research/engines/feature_binding_engine.py",
+      "sha256": "da7e7c25f21aa96b630931bca0a03ac3097d0172ec502b88169d7de804b8afcd"
+    },
+    "repo_research_engines_lineage_engine_py": {
+      "path": "repo:research/engines/lineage_engine.py",
+      "sha256": "67e12565375fdcbdfde4314cd5b5547cc0c5498fae051fc0d2065099bf2663b7"
+    },
+    "repo_research_engines_population_engine_py": {
+      "path": "repo:research/engines/population_engine.py",
+      "sha256": "8644f25ac0b7985a37dc2eda55842f9b944061a27d25f8b1f6a33a07159c1b72"
+    },
+    "repo_research_engines_target_engine_py": {
+      "path": "repo:research/engines/target_engine.py",
+      "sha256": "645712909522d209237b4716a5c6b6b5fcd09ee3b75040dd46b5acf7675069d6"
+    },
+    "repo_research_engines_timestamp_engine_py": {
+      "path": "repo:research/engines/timestamp_engine.py",
+      "sha256": "2cec4679b29ae37302f8921ca36a5a1bfc06ecf2883f5b757d51529c04eab2d9"
+    },
+    "repo_research_schemas___init___py": {
+      "path": "repo:research/schemas/__init__.py",
+      "sha256": "72fa30c417fe691ed4dd900294cf7e610ae9ed531e69aa247b12a45ffa145516"
+    },
+    "repo_research_schemas_study_spec_py": {
+      "path": "repo:research/schemas/study_spec.py",
+      "sha256": "2ae70919fdeae9dca0758742e43dca76db18e4eabdf3ca928575ae7c164ebc45"
+    },
+    "repo_research_study_types___init___py": {
+      "path": "repo:research/study_types/__init__.py",
+      "sha256": "10ad3c895db1107ebe726c5bce73e2da17de50571acead65b2ac6edb5c66779e"
+    },
+    "repo_research_study_types_base_py": {
+      "path": "repo:research/study_types/base.py",
+      "sha256": "b2a8b1b2cda27db859d0e74feb50b430aa373d566baae5d75ca07aa45517737d"
+    },
+    "repo_research_study_types_bespoke_py": {
+      "path": "repo:research/study_types/bespoke.py",
+      "sha256": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0"
+    },
+    "repo_research_study_types_flip_prediction_py": {
+      "path": "repo:research/study_types/flip_prediction.py",
+      "sha256": "b26f016013348b5e43d318c8dbdcc00a2f31d464fb7b30158269df7dd326d34b"
+    },
+    "repo_scripts_causal_lint_py": {
+      "path": "repo:scripts/causal_lint.py",
+      "sha256": "9f27fe82aca1010ff9aa800428de4b6309813a12b0ab68d1821f920f395f646b"
+    },
+    "repo_scripts_check_artifact_schema_py": {
+      "path": "repo:scripts/check_artifact_schema.py",
+      "sha256": "c215722f91d76f9600565e2ba16b6f46bf52a238f2f02927f6169059f4822240"
+    },
+    "repo_scripts_check_collect_equivalence_py": {
+      "path": "repo:scripts/check_collect_equivalence.py",
+      "sha256": "45f2954ed41bc039ea48e4d2376a7845296ce18afdd4845093e3c685630f83cc"
+    },
+    "repo_scripts_check_feature_promotion_py": {
+      "path": "repo:scripts/check_feature_promotion.py",
+      "sha256": "5224191eab08caf70afc41008400532b2af18a8bd985b2bd29fd212d4cd8fe45"
+    },
+    "repo_scripts_check_feature_surface_py": {
+      "path": "repo:scripts/check_feature_surface.py",
+      "sha256": "81691451fc67c7d9afc22291141cea40cdaef8a5ce71b1b78f26b10d783091ef"
+    },
+    "repo_scripts_check_model_binding_py": {
+      "path": "repo:scripts/check_model_binding.py",
+      "sha256": "2e3fe29b623d1435e6d6fff7a53137d50351a6b47605e834ea43c49150ca3ad4"
+    },
+    "repo_scripts_check_research_decision_fidelity_py": {
+      "path": "repo:scripts/check_research_decision_fidelity.py",
+      "sha256": "2ffc34811b0c5061c4dec076f9ddbe74057f0af011703286acce8f723a85f844"
+    },
+    "repo_scripts_check_spec_fidelity_py": {
+      "path": "repo:scripts/check_spec_fidelity.py",
+      "sha256": "b35f0ace6231287d7eddfe78a985088fae145d7b0323b6b241d72cf57ae828a1"
+    },
+    "repo_scripts_compile_study_py": {
+      "path": "repo:scripts/compile_study.py",
+      "sha256": "45627784250834414b520ae1af467f43fa28c033369f3e68c0497670551a14b8"
+    },
+    "repo_scripts_create_study_py": {
+      "path": "repo:scripts/create_study.py",
+      "sha256": "cd59453f43061698e438a6e4096b43913dcd7f449543396e3bfc966b4e9b15b0"
+    },
+    "repo_scripts_generate_oos_unlock_py": {
+      "path": "repo:scripts/generate_oos_unlock.py",
+      "sha256": "b3d316d0ffa7f9d7899838c053cb9d92d74425cdfbc8d1794b1f2d01a7abf937"
+    },
+    "repo_scripts_preexec_audit_seal_py": {
+      "path": "repo:scripts/preexec_audit_seal.py",
+      "sha256": "0763759f981b9f70b001d5e4fee8deb05865a8e2a23519d3f01a6cbf63faeff8"
+    },
+    "repo_scripts_research_preflight_py": {
+      "path": "repo:scripts/research_preflight.py",
+      "sha256": "b88e74452eb9630cdeb78fbbac29bed8c46b9bf7beabf73cc831bad281b1198e"
+    },
+    "repo_scripts_resolve_execution_manifest_py": {
+      "path": "repo:scripts/resolve_execution_manifest.py",
+      "sha256": "a1c1042011f2d86d3486ae832c90d460b35ee5cbec0aa382a4f80c44c1e70f1d"
+    },
+    "repo_scripts_run_preexec_audits_py": {
+      "path": "repo:scripts/run_preexec_audits.py",
+      "sha256": "561b3da1099da23108201885d39e17d3d1bc039987081e9afe51f49d20ddb011"
+    },
+    "repo_scripts_select_required_tests_py": {
+      "path": "repo:scripts/select_required_tests.py",
+      "sha256": "afa2ef88f0ff7d8d40eea08495a029c87d71cbbd5d39028a4870dd66b1695162"
+    },
+    "repo_scripts_validate_smoke_py": {
+      "path": "repo:scripts/validate_smoke.py",
+      "sha256": "1354af434e4177463f1a4c081f7664354592990eb67fb27106f82f593cf4b964"
+    },
+    "repo_strategies_flip_prediction_collector_py": {
+      "path": "repo:strategies/flip_prediction_collector.py",
+      "sha256": "ba2c3c9666db94eaebd4d2b779628bd8a21a689a8c6a80fd8f757dd31bf305cd"
+    },
+    "repo_studies_Codex_clean_maturity_flip_rolling_5m_productivity_implementation___init___py": {
+      "path": "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/__init__.py",
+      "sha256": "48f5227d68eefdc2cfc40f16bfeb743f180c5325c210de3fe20f2eccac9666cb"
+    },
+    "repo_studies_Codex_clean_maturity_flip_rolling_5m_productivity_implementation_collector_py": {
+      "path": "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/collector.py",
+      "sha256": "fe7f3509fe7f554239b1aa387a28b358cb566cc1f12fd6576c0168952df6de1d"
+    },
+    "repo_studies_Codex_clean_maturity_flip_rolling_5m_productivity_implementation_phase0_py": {
+      "path": "repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/phase0.py",
+      "sha256": "28ef17c5c35cd57548d99a6a308d3c06b5315c9c982f0bde4fe4c4ed9c0d7b1e"
+    },
+    "repo_studies_fable5_pre_flip_d10_reversal_entry_strategy_py": {
+      "path": "repo:studies/fable5_pre_flip_d10_reversal_entry/strategy.py",
+      "sha256": "b2868dffd763c937f14e6015790460edaca7adb5674e1a1e6722b2d4c11b334d"
+    },
+    "repo_utils___init___py": {
+      "path": "repo:utils/__init__.py",
+      "sha256": "f5bfd4d288959f97f3474f0cdb69a118186a5c4ae18a52f25108e9f2860d12fe"
+    },
+    "repo_utils_causal_registration_py": {
+      "path": "repo:utils/causal_registration.py",
+      "sha256": "d01d3f8440cef4d15716d1195ff3c01b4b8697edabc30ac8783bbee968a205c8"
+    },
+    "repo_utils_causality_py": {
+      "path": "repo:utils/causality.py",
+      "sha256": "5c2ca50858d2d7adeae9f348299416058691b20bcfa8ef2786d24dbe9b1b00f6"
+    },
+    "repo_utils_runner_data_py": {
+      "path": "repo:utils/runner/data.py",
+      "sha256": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a"
+    },
+    "repo_utils_session_boundaries_py": {
+      "path": "repo:utils/session_boundaries.py",
+      "sha256": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59"
+    },
+    "study_SPEC_md": {
+      "path": "study:SPEC.md",
+      "sha256": "aced28d76f44e74c94c2826dfe1c60e991b2e1e41e98e1188d444a4245098d46"
+    },
+    "study_artifacts_phase0_source_manifest_json": {
+      "path": "study:artifacts/phase0_source_manifest.json",
+      "sha256": "7dc0ac57867c2f4901e5e4ae9a5d23db65745d88f4297c188fe8260d07b5bc8b"
+    },
+    "study_compiled_study_json": {
+      "path": "study:compiled_study.json",
+      "sha256": "dd2ddfb056b699608aeb7ac49a78794e6331299d70909a68ed0371b188975f1f"
+    },
+    "study_research_decision_yaml": {
+      "path": "study:research_decision.yaml",
+      "sha256": "1a9bf1e013e08a0a4ac52398e6b62f01dcf75e49d3c77fd5d7c636bdfc5fa4fa"
+    },
+    "study_study_yaml": {
+      "path": "study:study.yaml",
+      "sha256": "44ea8ffe0fbeda5eada6a4959ccac27c43700c4609cfd7d53e15cab2e762a7bb"
+    },
+    "study_tests_test_completed_5m_coverage_py": {
+      "path": "study:tests/test_completed_5m_coverage.py",
+      "sha256": "067748ea275ca009880b22b5384e616e885b5fc6d48c37729c5ab67716557e54"
+    },
+    "study_tests_test_contracts_py": {
+      "path": "study:tests/test_contracts.py",
+      "sha256": "fe5492a8a1fd20a812d180dff6f59ff922b3c5f9623bb8ec81eec55b43fedf11"
+    },
+    "study_tests_test_delayed_label_resolution_py": {
+      "path": "study:tests/test_delayed_label_resolution.py",
+      "sha256": "44ea26858a45807e26b8c817f4484e83684e05742a53e3919828cfbaeb35edb8"
+    },
+    "study_tests_test_phase0_py": {
+      "path": "study:tests/test_phase0.py",
+      "sha256": "bddfc6c616d4f8b9fec42c0acf040b3bc05d3fcb64a7714d7dcd2b2cb89138f2"
+    },
+    "study_tests_test_rolling_5m_productivity_py": {
+      "path": "study:tests/test_rolling_5m_productivity.py",
+      "sha256": "07551bf25fa0725c7a02d5056a01c996e5a86dd936242fa04359653688118b0d"
+    },
+    "study_tests_test_run_exploratory_runner_integration_py": {
+      "path": "study:tests/test_run_exploratory_runner_integration.py",
+      "sha256": "412e11a103be94e9bece467b0e06fbc5c6f624037a0217d98de3e64f6c7f8501"
+    },
+    "study_tests_test_shared_bar_quality_gate_py": {
+      "path": "study:tests/test_shared_bar_quality_gate.py",
+      "sha256": "f1f9a692ae59d2ca129e7db39bc9c5c04fe4fa069c4bcc49dcbcdc3428c528a7"
+    },
+    "study_tests_test_structural_coverage_gate_py": {
+      "path": "study:tests/test_structural_coverage_gate.py",
+      "sha256": "93fd7a16e2c54f72387fbca587d692e1d45c471ebfaf4f3ff0ead850289e7d7f"
+    },
+    "study_tests_test_validation_py": {
+      "path": "study:tests/test_validation.py",
+      "sha256": "77fbd9413971f63e86e7bad87e45384ad2547ccb15f07bdcd69a0ea55ba9e691"
+    },
+    "study_audit_status_json": {
+      "path": "study:audit/status.json",
+      "sha256": "94ed544af78b92d19f4ff84f43fcc3b63db5d68d8c1f2c93c0e236f25d3f5838"
+    },
+    "study_audit_contract_status_json": {
+      "path": "study:audit/contract_status.json",
+      "sha256": "0a34a00eb639f46728843baedec767c313f0f99c5bf97d70660ce10da141ca80"
+    },
+    "study_audit_contract_pass_01_md": {
+      "path": "study:audit/contract_pass_01.md",
+      "sha256": "414b95dc80aa230de3c6d71021651ca50ca54e2a7c05a88fb0abadd79d0ba2a2"
+    },
+    "study_audit_contract_pass_02_md": {
+      "path": "study:audit/contract_pass_02.md",
+      "sha256": "d40e9fee55c9e78984a6437feafc21ca1e0ade47f1c41defed7c253d88d754eb"
+    },
+    "study_audit_contract_pass_12_md": {
+      "path": "study:audit/contract_pass_12.md",
+      "sha256": "5755a3db2ae72d4483f7f7501d65e9a782d30c917a7ae901544a858a18fc3e9b"
+    },
+    "study_audit_contract_pass_13_md": {
+      "path": "study:audit/contract_pass_13.md",
+      "sha256": "a4deac76ac61f66a8cf8214ea5c8257cab2b4cb15f34d4c187a31aee04263613"
+    },
+    "study_audit_contract_pass_14_md": {
+      "path": "study:audit/contract_pass_14.md",
+      "sha256": "9459877eb67e856b63df16c976e4d783652258b7b6d4bdaeef414f3c9887af33"
+    },
+    "study_audit_contract_pass_16_md": {
+      "path": "study:audit/contract_pass_16.md",
+      "sha256": "90b0e1378793ff4e731c101edca26b2b8d359ff2fadd2e134c4420935c7a3507"
+    },
+    "study_audit_contract_pass_17_md": {
+      "path": "study:audit/contract_pass_17.md",
+      "sha256": "d654ab6b4a7879225f1e2e14ffa34c48f0caa6b94f9ffdc8b8d17a0257152020"
+    },
+    "study_audit_contract_pass_18_md": {
+      "path": "study:audit/contract_pass_18.md",
+      "sha256": "14a8975df173a8b3cb7eb31a794024851c9b256c93fb3354052939e1efeae09c"
+    },
+    "study_audit_contract_pass_19_md": {
+      "path": "study:audit/contract_pass_19.md",
+      "sha256": "491e5bf4cfbae01af92f4b9d04d7c306697786e7b0b4098491a62b6676667075"
+    },
+    "study_audit_contract_pass_20_md": {
+      "path": "study:audit/contract_pass_20.md",
+      "sha256": "d0616913cbc92dc78c706b456c438fdbc63b0d2d18cce06ac555e2ef3f48a6f7"
+    },
+    "study_audit_pass_01_md": {
+      "path": "study:audit/pass_01.md",
+      "sha256": "ee32151a359b20608cfba38ebf55920188e117b637219c5865c3d76dbe8adc90"
+    },
+    "study_audit_pass_02_md": {
+      "path": "study:audit/pass_02.md",
+      "sha256": "94d23c9e75728f9ae78e5e8570c5440bf39bb037ccf4a4f39afb2e1cd275085e"
+    },
+    "study_audit_pass_03_md": {
+      "path": "study:audit/pass_03.md",
+      "sha256": "9a57e898a207b3c77aa2291e2c91f40ce62721ba4d0f7a1b71a7cc7e8fd9d818"
+    },
+    "study_audit_pass_04_md": {
+      "path": "study:audit/pass_04.md",
+      "sha256": "dc410f4f1cc230ac10d7de7a16c61f6c2e4822e8cc7a2819532a3f1b7f2899e0"
+    },
+    "study_audit_pass_05_md": {
+      "path": "study:audit/pass_05.md",
+      "sha256": "a447e1cec604383693161fda04361d6eba371705bd9bb4544f3519cb6a645e3d"
+    },
+    "study_audit_pass_06_md": {
+      "path": "study:audit/pass_06.md",
+      "sha256": "e5311e1766f2da9740abcfc514b9ddad208a73f1d878d9c4321ab3413a7fae43"
+    },
+    "study_audit_pass_07_md": {
+      "path": "study:audit/pass_07.md",
+      "sha256": "c724b1bfad03720277ecd038ead6cd06c2378f905ff2ac3d899f5b2e36a7871b"
+    },
+    "study_audit_pass_08_md": {
+      "path": "study:audit/pass_08.md",
+      "sha256": "f2961fa51f24d477ba84fddd08a37f3d32d5a8afdff424d42a9175a8abe78b09"
+    },
+    "study_audit_pass_09_md": {
+      "path": "study:audit/pass_09.md",
+      "sha256": "c9b7bd080f515e26d280c692262afe6149f7c747ed6da2508d795c08296d61fc"
+    },
+    "study_audit_pass_10_md": {
+      "path": "study:audit/pass_10.md",
+      "sha256": "bdc3e8e3f980081f8947311e285f89ac8269554bbdd0c5f8890e7ece2f221843"
+    },
+    "study_audit_pass_11_md": {
+      "path": "study:audit/pass_11.md",
+      "sha256": "dc96988db63b755e25eda1d1d405cf94ee1abc2a1f7b4158118a106f41cf865e"
+    },
+    "study_audit_pass_12_md": {
+      "path": "study:audit/pass_12.md",
+      "sha256": "2abe50a63a7935737471d3277c10f42ac5bb68e106639313cf156b35cdd65463"
+    },
+    "study_audit_pass_13_md": {
+      "path": "study:audit/pass_13.md",
+      "sha256": "f6d67375a73c55602e27b5dccfd22fdc7941887c388ee28f44b087dbe0ad756b"
+    },
+    "study_audit_pass_14_md": {
+      "path": "study:audit/pass_14.md",
+      "sha256": "e960ae776e4aef4ea9de27f69dfcd88d4c3b46185d68a37bb8ec04ee58436cfa"
+    },
+    "study_audit_pass_15_md": {
+      "path": "study:audit/pass_15.md",
+      "sha256": "6cdaf558564ef8c82bce0cb04510811fad324802985fb8bdfb524713887beff0"
+    },
+    "study_audit_pass_16_md": {
+      "path": "study:audit/pass_16.md",
+      "sha256": "c97a05d6629aab01f59141c2379950a0e86ba1c9b39f7392bdafaeccfa492c75"
+    },
+    "study_audit_pass_17_md": {
+      "path": "study:audit/pass_17.md",
+      "sha256": "997b6361c86a8d59309f0e485ee45ad8ff68aa43c98d104fc741a38d8580df10"
+    },
+    "study_audit_pass_18_md": {
+      "path": "study:audit/pass_18.md",
+      "sha256": "d8f3a5b370fe48676673055de7fb6a4a6f9305d40b35c230088bcc6c115f8fce"
+    }
+  }
+}

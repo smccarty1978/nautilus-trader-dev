@@ -1,0 +1,31 @@
+{
+  "total_gaps": 623,
+  "total_missing_seconds": 28503,
+  "median_duration": 38.0,
+  "p99_duration": 122.13999999999965,
+  "max_duration": 874,
+  "classifications": {
+    "SPARSE_NO_TRADE_INTERVAL": 579,
+    "UNRESOLVED": 27,
+    "CONTRACT_ROLL_EFFECT": 16,
+    "CALENDAR_OR_SESSION_EDGE": 1
+  },
+  "severities": {
+    "BENIGN": 596,
+    "REVIEW": 27
+  },
+  "impacts": {
+    "EXACT_1M_MATCH": 1025,
+    "NO_REFERENCE_1M": 54
+  },
+  "roll_association": {
+    "roll_associated": 18,
+    "non_roll": 605
+  },
+  "price_jump": {
+    "median_abs_jump": 0.25,
+    "p90_abs_jump": 0.25,
+    "p99_abs_jump": 0.75,
+    "max_abs_jump": 167.25
+  }
+}

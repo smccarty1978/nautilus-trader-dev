@@ -6,12 +6,18 @@ from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.co
 def _collector_with_pending(checkpoint: int) -> CleanFlipCollector:
     collector = CleanFlipCollector.__new__(CleanFlipCollector)
     collector._pending_labels = deque([{
-        "row": {"checkpoint_decision_ns": checkpoint},
+        "row": {
+            "checkpoint_decision_ns": checkpoint,
+            "observation_ts": checkpoint,
+            "regime_start_ns": checkpoint,
+            "checkpoint_index": 0,
+        },
         "target_observable": True,
     }])
     collector._flip_times_ns = deque()
     collector._last_seen_1m_init_ns = checkpoint
     collector.feature_rows = []
+    collector.observations_log = []
     return collector
 
 

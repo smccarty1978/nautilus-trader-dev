@@ -1,7 +1,7 @@
 {
   "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
   "study_type": "flip_prediction",
-  "spec_sha256": "d479b3004f9b4f726b624b492d385ea581e94e51209a9aa29314ce0a85cdb0d5",
+  "spec_sha256": "97d7759d7b4044178c839f1815fed30ffeb929d595c282d6b4b372a9a0a88016",
   "spec": {
     "study": {
       "id": "Codex_clean_maturity_flip_rolling_5m_productivity",
@@ -65,7 +65,8 @@
       "feature_list": null,
       "feature_list_sha256": null,
       "directional_mapping": "prevailing_bullish_to_short__prevailing_bearish_to_long",
-      "timing_contract": "verified"
+      "timing_contract": "verified",
+      "metadata_columns": null
     },
     "model": {
       "mode": "training",
@@ -97,7 +98,8 @@
       "prohibited": [
         2025,
         2026
-      ]
+      ],
+      "warmup": null
     },
     "stratification": {
       "column": "regime_age_seconds",
@@ -140,10 +142,19 @@
     "execution": {
       "runtime": "nautilustrader",
       "strategy_class": "studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.collector.CleanFlipCollector",
-      "data_requirements": null,
+      "data_requirements": {
+        "authorized_dates": [
+          "2023-10-02",
+          "2023-10-03",
+          "2023-10-04",
+          "2023-10-05",
+          "2023-10-06"
+        ]
+      },
       "checkpoint": null,
       "progress_seconds": 60,
-      "bounded": true
+      "bounded": true,
+      "observation_policy": null
     },
     "acceptance": {
       "criteria": {
@@ -177,6 +188,8 @@
       },
       "causal_checkpoint": {
         "checkpoint_frequency": "5s",
+        "checkpoint_grid_origin": "regime_start_ns",
+        "triggering_stream": "completed_1s_bar",
         "observation_timing": "interval_close"
       }
     },
@@ -233,6 +246,8 @@
     },
     "timestamp_contract": {
       "source": "databento_glbx_mdp3",
+      "instrument_symbol": "NQ",
+      "measured_catalog_rel_path": "data/catalog/NQ_v0_2020_2026",
       "raw_timestamp_semantic": "OPEN_STAMPED",
       "raw_index_field": "ts_event",
       "timezone": "UTC",
@@ -246,13 +261,92 @@
         "causal_dispatch_field": "ts_init",
         "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
         "timeframe_deltas_ns": {
-          "1s": 1000000000,
-          "1m": 60000000000,
-          "3m": 180000000000,
-          "5m": 300000000000
+          "1-SECOND": 1000000000,
+          "1-MINUTE": 60000000000,
+          "3-MINUTE": 180000000000,
+          "5-MINUTE": 300000000000
+        },
+        "empirical_measurement": {
+          "status": "MEASURED",
+          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+          "measurements": {
+            "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 60000000000,
+              "observed_deltas_ns": [
+                60000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 1000000000,
+              "observed_deltas_ns": [
+                1000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-5-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 300000000000,
+              "observed_deltas_ns": [
+                300000000000
+              ],
+              "pass": true
+            }
+          }
         }
       },
       "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "deliverables_contract": {
+      "contract_version": 1,
+      "authorized_modes": [
+        "collect"
+      ],
+      "deliverables_by_mode": {
+        "collect": [
+          "candidates.parquet",
+          "observations.parquet",
+          "collection_manifest.json",
+          "run_manifest.json",
+          "status.json"
+        ]
+      },
+      "artifact_metadata": {
+        "candidates.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "observations.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "collection_manifest.json": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "run_manifest.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::OutputManager",
+          "relative_to": "run_dir"
+        },
+        "status.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir"
+        }
+      },
+      "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
     },
     "lineage": {
       "has_parent": true,

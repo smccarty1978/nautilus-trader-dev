@@ -4,15 +4,19 @@ Validates compiled study loader, data plan, engine builder, run plan, telemetry,
 output manager, CLI runner, and golden equivalence against reference collector.
 """
 
+import dataclasses
 import json
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
 import pytest
 import yaml
+from nautilus_trader.config import StrategyConfig
+from nautilus_trader.trading.strategy import Strategy
 
 from backtests.nt_runtime.compiled_study_loader import (
     CompiledStudyData,
@@ -26,7 +30,7 @@ from backtests.nt_runtime.data_plan import (
     resolve_data_plan,
 )
 from backtests.nt_runtime.engine_builder import build_engine, create_futures_instrument
-from backtests.nt_runtime.modes.collect import run_collect_mode
+from backtests.nt_runtime.modes.collect import _execute_collect, run_collect_mode
 from backtests.nt_runtime.output_manager import OutputManager
 from backtests.nt_runtime.run_plan import RunPlan, RunStage, resolve_run_plan
 from backtests.nt_runtime.strategy_binding import (
@@ -382,3 +386,330 @@ def test_end_to_end_1day_collect_run_nonzero_candidates():
             assert report["population"]["reference_coverage"] == 1.0
             assert report["divergence_classes"]["unknown"] == 0
             assert report["verdict"] == "GENERIC_RUNNER_CANONICAL_PARITY"
+
+
+# =============================================================================
+# 10. Phase-Zero Manifest Path Wiring Tests (generic collect.py cfg_kwargs fix)
+# =============================================================================
+# A collector's StrategyConfig may declare `phase0_manifest_path`, a fail-closed
+# phase-zero authentication gate (see studies/Codex_clean_maturity_flip_rolling_5m_
+# productivity/implementation/phase0.py). _execute_collect must resolve that path
+# generically from study_data.study_dir -- the same hasattr-gated convention already
+# used for prevailing_regime/target_direction/etc -- rather than leaving it at the
+# declaring config's "" default, which always failed closed regardless of study.
+
+
+class _Phase0GatedTestConfig(StrategyConfig, frozen=True):
+    """Minimal StrategyConfig declaring the phase-zero field, for exercising the
+    shared collect-mode wiring without constructing the full CleanFlipCollector."""
+    instrument_id: str = "NQ.XCME"
+    bar_type_1s: str = "NQ.XCME-1-SECOND-LAST-EXTERNAL"
+    bar_type_1m: str = "NQ.XCME-1-MINUTE-LAST-EXTERNAL"
+    phase0_manifest_path: str = ""
+
+
+class _Phase0GatedTestStrategy(Strategy):
+    """Calls the real, unmodified Codex phase0.authorize_execution gate on construction,
+    so negative-path tests exercise the actual fail-closed refusal without paying for
+    CleanFlipCollector's full feature-engine setup."""
+
+    def __init__(self, config: _Phase0GatedTestConfig) -> None:
+        super().__init__(config)
+        from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.phase0 import (
+            authorize_execution,
+        )
+        authorize_execution(Path(config.phase0_manifest_path))
+
+
+def _plans_for(study_data, reference_date="2023-03-03"):
+    run_plan = resolve_run_plan(study_data, stage="day", reference_date=reference_date)
+    data_plan = resolve_data_plan(study_data, start_date=run_plan.start_date, end_date=run_plan.end_date)
+    return run_plan, data_plan
+
+
+def test_execute_collect_resolves_phase0_manifest_path_generically(mock_study_dir):
+    """cfg_kwargs must receive study-directory-relative phase0_manifest_path, not the
+    declaring config's "" default, and must not be hardcoded to any particular study."""
+    study_data = load_compiled_study(mock_study_dir)
+    run_plan, data_plan = _plans_for(study_data)
+
+    config_cls = MagicMock(name="ConfigClsWithPhase0")
+    config_cls.phase0_manifest_path = ""  # declared field marker so hasattr(...) is True
+    strategy_cls = MagicMock(name="StrategyClsWithPhase0")
+    strategy_cls.return_value = MagicMock(spec=[])
+    strategy_binding = SimpleNamespace(config_cls=config_cls, strategy_cls=strategy_cls)
+
+    telemetry = CausalTelemetry()
+    telemetry.start()
+    output_mgr = MagicMock()
+
+    with patch("backtests.nt_runtime.modes.collect.build_engine", return_value=(MagicMock(), MagicMock())):
+        _execute_collect(
+            study_data, study_data.spec, data_plan, run_plan, strategy_binding,
+            output_mgr, telemetry, "ERROR",
+        )
+
+    resolved_path = config_cls.call_args.kwargs["phase0_manifest_path"]
+    expected_path = str(study_data.study_dir / "artifacts" / "phase0_source_manifest.json")
+    assert resolved_path == expected_path
+    # Study-directory-relative, not hardcoded to any particular study name: this fixture's
+    # study is named "test_collect_study", nowhere near any real study on disk.
+    assert resolved_path.startswith(str(study_data.study_dir))
+    assert resolved_path.endswith("test_collect_study\\artifacts\\phase0_source_manifest.json") or \
+        resolved_path.endswith("test_collect_study/artifacts/phase0_source_manifest.json")
+    assert "Codex_clean_maturity_flip_rolling_5m_productivity" not in resolved_path
+
+
+def test_execute_collect_fails_closed_when_phase0_manifest_missing(mock_study_dir):
+    """No artifacts/phase0_source_manifest.json at the resolved path -> the existing
+    'phase-zero authorization missing' refusal fires, reached via the correct path."""
+    study_data = load_compiled_study(mock_study_dir)
+    run_plan, data_plan = _plans_for(study_data)
+    assert not (mock_study_dir / "artifacts" / "phase0_source_manifest.json").exists()
+
+    strategy_binding = SimpleNamespace(
+        config_cls=_Phase0GatedTestConfig, strategy_cls=_Phase0GatedTestStrategy,
+    )
+    telemetry = CausalTelemetry()
+    telemetry.start()
+    output_mgr = MagicMock()
+
+    with patch("backtests.nt_runtime.modes.collect.build_engine", return_value=(MagicMock(), MagicMock())):
+        with pytest.raises(RuntimeError, match="phase-zero authorization missing"):
+            _execute_collect(
+                study_data, study_data.spec, data_plan, run_plan, strategy_binding,
+                output_mgr, telemetry, "ERROR",
+            )
+
+
+def test_execute_collect_fails_closed_when_phase0_manifest_stale(mock_study_dir):
+    """A syntactically-valid but tampered manifest at the resolved path still fails via
+    the existing authorize_execution 'stale or altered' refusal."""
+    study_data = load_compiled_study(mock_study_dir)
+    run_plan, data_plan = _plans_for(study_data)
+
+    artifacts_dir = mock_study_dir / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    tampered_manifest = artifacts_dir / "phase0_source_manifest.json"
+    tampered_manifest.write_text(json.dumps({
+        "schema_version": 1, "authenticated": True, "tampered_by_test": True,
+    }))
+
+    strategy_binding = SimpleNamespace(
+        config_cls=_Phase0GatedTestConfig, strategy_cls=_Phase0GatedTestStrategy,
+    )
+    telemetry = CausalTelemetry()
+    telemetry.start()
+    output_mgr = MagicMock()
+
+    with patch("backtests.nt_runtime.modes.collect.build_engine", return_value=(MagicMock(), MagicMock())):
+        with pytest.raises(RuntimeError, match="stale or altered"):
+            _execute_collect(
+                study_data, study_data.spec, data_plan, run_plan, strategy_binding,
+                output_mgr, telemetry, "ERROR",
+            )
+
+
+def test_execute_collect_leaves_non_phase0_config_unaffected(mock_study_dir):
+    """A config_cls that does NOT declare phase0_manifest_path (the pre-existing
+    FlipPredictionCollector binding) is completely unaffected by the wiring change:
+    cfg_kwargs gets no such key and construction proceeds exactly as before."""
+    study_data = load_compiled_study(mock_study_dir)
+    run_plan, data_plan = _plans_for(study_data)
+
+    binding = resolve_strategy_binding("flip_prediction_collector", mode="collect")
+    assert not hasattr(binding.config_cls, "phase0_manifest_path")
+    fake_strategy_instance = MagicMock(spec=[])
+    strategy_binding = dataclasses.replace(
+        binding, strategy_cls=MagicMock(return_value=fake_strategy_instance),
+    )
+
+    telemetry = CausalTelemetry()
+    telemetry.start()
+    output_mgr = MagicMock()
+
+    with patch("backtests.nt_runtime.modes.collect.build_engine", return_value=(MagicMock(), MagicMock())):
+        _execute_collect(
+            study_data, study_data.spec, data_plan, run_plan, strategy_binding,
+            output_mgr, telemetry, "ERROR",
+        )
+
+    constructed_config = strategy_binding.strategy_cls.call_args.args[0]
+    assert not hasattr(constructed_config, "phase0_manifest_path")
+    assert type(constructed_config).__name__ == "FlipPredictionCollectorConfig"
+
+
+def test_clean_flip_collector_constructs_via_generic_wiring():
+    """Proves the wiring is correct for the real governed study: CleanFlipCollector.__init__
+    completes without raising when driven through _execute_collect's real cfg_kwargs-building
+    logic. build_engine/engine.run() are stubbed so this exercises config-building and
+    strategy construction only -- no real market data is loaded and no NT event loop runs,
+    so this stays fast and deterministic (not marked slow).
+    """
+    study_path = Path("studies/Codex_clean_maturity_flip_rolling_5m_productivity")
+    if not study_path.exists():
+        pytest.skip("Codex_clean_maturity_flip_rolling_5m_productivity study not present")
+
+    from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation import phase0 as codex_phase0
+
+    study_data = load_compiled_study(study_path)
+    run_plan, data_plan = _plans_for(study_data, reference_date="2023-10-02")
+    strategy_binding = resolve_strategy_binding(
+        study_data.spec.execution.strategy_class,
+        study_type=study_data.spec.study.type,
+        mode="collect",
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # A freshly authenticated manifest, generated by phase0's own (unmodified)
+        # authenticate() at test time -- not asserted/fabricated by the test -- so this
+        # test is independent of whether the repo's committed artifact happens to have
+        # drifted stale relative to the current tree (an unrelated, pre-existing concern).
+        fresh_manifest_path = Path(tmpdir) / "artifacts" / "phase0_source_manifest.json"
+        codex_phase0.write_manifest(fresh_manifest_path)
+        study_data_for_run = dataclasses.replace(study_data, study_dir=Path(tmpdir))
+
+        class _StopAfterConstruction(Exception):
+            pass
+
+        mock_engine = MagicMock()
+        mock_engine.run.side_effect = _StopAfterConstruction("stubbed after strategy construction")
+        telemetry = CausalTelemetry()
+        telemetry.start()
+        output_mgr = MagicMock()
+
+        with patch(
+            "backtests.nt_runtime.modes.collect.build_engine",
+            return_value=(mock_engine, MagicMock()),
+        ):
+            with pytest.raises(_StopAfterConstruction):
+                _execute_collect(
+                    study_data_for_run, study_data.spec, data_plan, run_plan, strategy_binding,
+                    output_mgr, telemetry, "ERROR",
+                )
+
+        # engine.run() was reached, so CleanFlipCollector.__init__ (which calls
+        # authorize_execution before any other setup) completed without raising.
+        mock_engine.add_strategy.assert_called_once()
+        constructed_strategy = mock_engine.add_strategy.call_args.args[0]
+        assert type(constructed_strategy).__name__ == "CleanFlipCollector"
+
+
+# =============================================================================
+# 11. Fail-Closed Output-Interface Verification
+# =============================================================================
+# A run where the engine genuinely loaded bars (backtests/nt_runtime/engine_builder.py
+# calls telemetry.record_loaded_bars, independent of any collector's own instrumentation)
+# but the strategy exposes no candidates/observations extraction interface at all is
+# unverifiable, not merely unproductive: there is no way to distinguish "legitimately
+# found nothing" from "processed real data and never surfaced it" (observed live:
+# runs/20260818_174901_..._day loaded 213K+ bars and internally produced 409 regime
+# transitions, yet silently reported 0 candidates/observations because the strategy
+# predated this output-interface convention). bars_1s_count/bars_1m_count telemetry is
+# deliberately NOT included in this fail-closed check: it is unimplemented even by the
+# known-working strategies/flip_prediction_collector.py reference and asserted nowhere,
+# so hardening it would break every existing study's collect run.
+
+def test_execute_collect_fails_closed_when_bars_loaded_but_no_candidates_interface(mock_study_dir):
+    study_data = load_compiled_study(mock_study_dir)
+    run_plan, data_plan = _plans_for(study_data)
+
+    strategy_binding = SimpleNamespace(
+        config_cls=MagicMock(spec=[]),
+        strategy_cls=MagicMock(return_value=MagicMock(spec=[])),  # no output interface at all
+    )
+
+    telemetry = CausalTelemetry()
+    telemetry.start()
+    telemetry.record_loaded_bars("1s", 100)
+    output_mgr = MagicMock()
+
+    with patch("backtests.nt_runtime.modes.collect.build_engine", return_value=(MagicMock(), MagicMock())):
+        with pytest.raises(RuntimeError, match="STRATEGY_OUTPUT_INTERFACE_MISSING"):
+            _execute_collect(
+                study_data, study_data.spec, data_plan, run_plan, strategy_binding,
+                output_mgr, telemetry, "ERROR",
+            )
+
+
+def test_execute_collect_fails_closed_when_bars_loaded_but_no_observations_interface(mock_study_dir):
+    study_data = load_compiled_study(mock_study_dir)
+    run_plan, data_plan = _plans_for(study_data)
+
+    # Candidates interface present; observations interface absent.
+    strategy_instance = MagicMock(spec=["get_candidates_dataframe"])
+    strategy_instance.get_candidates_dataframe.return_value = pd.DataFrame()
+    strategy_binding = SimpleNamespace(
+        config_cls=MagicMock(spec=[]),
+        strategy_cls=MagicMock(return_value=strategy_instance),
+    )
+
+    telemetry = CausalTelemetry()
+    telemetry.start()
+    telemetry.record_loaded_bars("1m", 5)
+    output_mgr = MagicMock()
+
+    with patch("backtests.nt_runtime.modes.collect.build_engine", return_value=(MagicMock(), MagicMock())):
+        with pytest.raises(RuntimeError, match="STRATEGY_OUTPUT_INTERFACE_MISSING"):
+            _execute_collect(
+                study_data, study_data.spec, data_plan, run_plan, strategy_binding,
+                output_mgr, telemetry, "ERROR",
+            )
+
+
+def test_execute_collect_succeeds_when_interface_present_but_legitimately_empty(mock_study_dir):
+    """A strategy that DOES implement both extraction methods but finds nothing (a
+    valid population can legitimately produce zero candidates) must NOT be treated
+    as a defect -- this proves the check targets interface absence, not row count."""
+    study_data = load_compiled_study(mock_study_dir)
+    run_plan, data_plan = _plans_for(study_data)
+
+    strategy_instance = MagicMock(spec=["get_candidates_dataframe", "get_observations_dataframe"])
+    strategy_instance.get_candidates_dataframe.return_value = pd.DataFrame()
+    strategy_instance.get_observations_dataframe.return_value = pd.DataFrame()
+    strategy_binding = SimpleNamespace(
+        config_cls=MagicMock(spec=[]),
+        strategy_cls=MagicMock(return_value=strategy_instance),
+    )
+
+    telemetry = CausalTelemetry()
+    telemetry.start()
+    telemetry.record_loaded_bars("1s", 100)
+    telemetry.record_loaded_bars("1m", 5)
+    output_mgr = MagicMock()
+
+    with patch("backtests.nt_runtime.modes.collect.build_engine", return_value=(MagicMock(), MagicMock())):
+        status_data = _execute_collect(
+            study_data, study_data.spec, data_plan, run_plan, strategy_binding,
+            output_mgr, telemetry, "ERROR",
+        )
+
+    assert status_data is output_mgr.persist_collection.return_value
+    persisted_candidates_df = output_mgr.persist_collection.call_args.args[0]
+    assert len(persisted_candidates_df) == 0
+
+
+def test_execute_collect_does_not_fail_closed_when_no_bars_loaded(mock_study_dir):
+    """No bars loaded at all (telemetry.bars_loaded_by_tf stays empty, exactly as in
+    every pre-existing test in this file where build_engine is mocked) -- nothing to
+    verify, so a strategy without the interface must not be treated as a defect here.
+    This is also what proves the new check cannot regress any existing test above."""
+    study_data = load_compiled_study(mock_study_dir)
+    run_plan, data_plan = _plans_for(study_data)
+
+    strategy_binding = SimpleNamespace(
+        config_cls=MagicMock(spec=[]),
+        strategy_cls=MagicMock(return_value=MagicMock(spec=[])),
+    )
+
+    telemetry = CausalTelemetry()
+    telemetry.start()
+    output_mgr = MagicMock()
+
+    with patch("backtests.nt_runtime.modes.collect.build_engine", return_value=(MagicMock(), MagicMock())):
+        _execute_collect(
+            study_data, study_data.spec, data_plan, run_plan, strategy_binding,
+            output_mgr, telemetry, "ERROR",
+        )  # must not raise
+
+    output_mgr.persist_collection.assert_called_once()

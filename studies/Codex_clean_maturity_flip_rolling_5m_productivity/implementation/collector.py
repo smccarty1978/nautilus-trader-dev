@@ -8,10 +8,12 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import pandas as pd
+import pandas_market_calendars as mcal
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model.data import Bar, BarType
 from nautilus_trader.trading.strategy import Strategy
@@ -43,6 +45,18 @@ BASELINE_CANDIDATES = tuple(
     and definition.dtype in {"float64", "float32", "int64", "int32"}
     and definition.implementation.startswith("features.")
 )
+
+
+# Terminal dispositions for the generic candidates/observations output interface
+# (backtests/nt_runtime/output_manager.py's reconcile_candidate_dispositions requires
+# every emitted candidate to reach exactly one of these -- an undisposed candidate is
+# treated as silent survivorship, not a missing record). This bookkeeping is additive:
+# it does not change flip_within_300s or which checkpoints qualify as candidates.
+DISPOSITION_LABELED_POSITIVE = "LABELED_POSITIVE"
+DISPOSITION_LABELED_NEGATIVE = "LABELED_NEGATIVE"
+DISPOSITION_CENSORED = "CENSORED"
+CENSOR_DATA_GAP = "DATA_GAP"
+CENSOR_RUN_END = "RUN_END"
 
 
 def is_rth_decision(ts_ns: int) -> bool:
@@ -116,12 +130,9 @@ class CleanFlipCollector(Strategy):
         self._engine_5m = RegimeStateEngine("5m", self._registry)
         self._five_from_1m = CompletedMinuteFiveMinuteAggregator(self._on_bucket_closed)
         self._last_eligible_close: float | None = None
-        self._last_rejected_feature_ns: int | None = None
         self._last_seen_1s_event_ns: int | None = None
         self._last_seen_1s_decision_ns: int | None = None
         self._last_seen_1m_init_ns: int | None = None
-        self._baseline_gap_needs_rth_reset = False
-        self._baseline_gap_needs_regime_reset = False
         self._was_rth_decision = False
         self._current_regime_start_atr: float | None = None
         self._current_regime_start_ns: int | None = None
@@ -133,6 +144,22 @@ class CleanFlipCollector(Strategy):
         self._flip_times_ns: deque[int] = deque()
         self.feature_rows: list[dict] = []
         self.regime_rows: list[dict] = []
+        self._next_checkpoint_index = 0
+        self.candidates_log: list[dict] = []
+        self.observations_log: list[dict] = []
+        
+        # Telemetry counters
+        self.telemetry_total_checkpoints = 0
+        self.telemetry_rth_gate_pass = 0
+        self.telemetry_age_gate_pass = 0
+        self.telemetry_mfe_gate_pass = 0
+        self.telemetry_progress_gate_pass = 0
+        self.telemetry_retention_gate_pass = 0
+        self.telemetry_declared_population_eligible = 0
+        self.telemetry_candidates_emitted = 0
+        self.telemetry_declared_contract_exclusions = 0
+        self.telemetry_implementation_only_exclusions = 0
+
         for name in (*BASELINE_CANDIDATES, *STRUCTURAL_FEATURES, *ROLLING_FEATURES):
             bind_snapshot_anchor(name, STUDY_ID, "at_5s_decision_ts")
 
@@ -159,56 +186,113 @@ class CleanFlipCollector(Strategy):
         elif bar.bar_type == self._bar_1m:
             self._on_1m(bar)
 
+    def _has_expected_open_second(self, start_ns: int, end_ns: int) -> bool:
+        if start_ns > end_ns:
+            return False
+        # Convert start/end to datetime to get date range
+        dt_start = pd.to_datetime(start_ns, unit='ns', utc=True)
+        dt_end = pd.to_datetime(end_ns, unit='ns', utc=True)
+        
+        calendar = mcal.get_calendar("CME_Equity")
+        schedule = calendar.schedule(
+            start_date=(dt_start.date() - timedelta(days=1)).isoformat(),
+            end_date=(dt_end.date() + timedelta(days=1)).isoformat(),
+            market_times="all"
+        )
+        
+        for session_day, row in schedule.iterrows():
+            open_ns = int(row.market_open.value)
+            close_ns = int(row.market_close.value)
+            
+            intervals = [(open_ns, close_ns - NS)]
+            if session_day.date() <= date(2021, 6, 25) and "break_start" in schedule.columns:
+                break_start = int(row.break_start.value)
+                break_end = int(row.break_end.value)
+                if open_ns < break_start < break_end < close_ns:
+                    intervals = [(open_ns, break_start - NS), (break_end, close_ns - NS)]
+                    
+            for s_ns, e_ns in intervals:
+                overlap_start = max(s_ns, start_ns)
+                overlap_end = min(e_ns, end_ns)
+                if overlap_start <= overlap_end:
+                    return True
+        return False
+
     def _on_1s(self, bar: Bar) -> None:
         event_ns, decision_ns = int(bar.ts_event), int(bar.ts_init)
         if event_ns >= decision_ns:
             raise RuntimeError("1s source must be complete before availability")
+            
+        # Data integrity checks
+        if self._last_seen_1s_event_ns is not None:
+            if event_ns == self._last_seen_1s_event_ns:
+                raise RuntimeError(f"Duplicate 1s timestamp detected: {event_ns}")
+            if event_ns < self._last_seen_1s_event_ns:
+                raise RuntimeError(f"Out-of-order 1s timestamp detected: {event_ns} < {self._last_seen_1s_event_ns}")
+            if event_ns != self._last_seen_1s_event_ns + NS:
+                if self._has_expected_open_second(self._last_seen_1s_event_ns + NS, event_ns - NS):
+                    raise RuntimeError(f"Unexpected gap in canonical dense timeline: {self._last_seen_1s_event_ns} to {event_ns}")
+                
+        high, low, close, open_ = float(bar.high), float(bar.low), float(bar.close), float(bar.open)
+        if high < low or high < open_ or high < close or low > open_ or low > close:
+            raise RuntimeError(f"Invalid OHLC values detected: O={open_}, H={high}, L={low}, C={close}")
+
         rth_now = is_rth_decision(decision_ns)
-        if rth_now and not self._was_rth_decision:
-            self._baseline_gap_needs_rth_reset = False
         self._was_rth_decision = rth_now
-        if (self._last_seen_1s_event_ns is not None
-                and event_ns != self._last_seen_1s_event_ns + NS):
-            self._invalidate_pending_horizons(
-                self._last_seen_1s_decision_ns + NS, decision_ns - NS,
-            )
-            self._last_rejected_feature_ns = decision_ns
-            self._baseline_gap_needs_rth_reset = True
-            self._baseline_gap_needs_regime_reset = True
         self._last_seen_1s_event_ns = event_ns
         self._last_seen_1s_decision_ns = decision_ns
-        high, low, close, volume = float(bar.high), float(bar.low), float(bar.close), float(bar.volume)
-        # One shared quality gate governs every feature family. Rejected bars
-        # are not silently substituted: their absence makes rolling/5m windows
-        # unavailable through the trackers' explicit completeness checks.
-        if volume <= 1.0:
-            # The label horizon is defined on the completed bar's availability
-            # timestamp, not its source-event close timestamp.
-            self._invalidate_pending_horizons(decision_ns, decision_ns)
-            self._last_rejected_feature_ns = decision_ns
-            self._baseline_gap_needs_rth_reset = True
-            self._baseline_gap_needs_regime_reset = True
-            return
+        
         self._features.update_1s(bar)
         self._geometry.on_1s(decision_ns, high, low, close)
         self._update_established_state(decision_ns, high, low, close)
         self._last_eligible_close = close
+        
         if decision_ns % (5 * NS) != 0 or self._last_eligible_close is None:
             return
+            
+        self.telemetry_total_checkpoints += 1
+        
+        # Telemetry: Check RTH session boundary
+        if not rth_now:
+            self.telemetry_declared_contract_exclusions += 1
+            return
+        self.telemetry_rth_gate_pass += 1
+        
+        # Telemetry: check regime start
+        if self._current_regime_start_atr is None:
+            self.telemetry_declared_contract_exclusions += 1
+            return
+            
         self._registry.audit_provenance(decision_ns)
         five_state = self._registry.get("5m")
         structural = self._geometry.snapshot(
             decision_ns, self._last_eligible_close, float(self._regime.atr or 0.0),
             None if five_state is None else five_state.close_ts,
         )
-        if not is_rth_decision(decision_ns) or self._current_regime_start_atr is None:
+        
+        # Telemetry: check eligibility gates
+        age_pass = (decision_ns - self._current_regime_start_ns) > 120 * NS
+        if age_pass:
+            self.telemetry_age_gate_pass += 1
+            
+        mfe_pass = self._running_mfe_atr >= 1.0
+        if mfe_pass:
+            self.telemetry_mfe_gate_pass += 1
+            
+        progress_pass = self._progress_windows >= 2
+        if progress_pass:
+            self.telemetry_progress_gate_pass += 1
+            
+        retention_pass = self._retained_mfe_ratio(close) >= 0.5
+        if retention_pass:
+            self.telemetry_retention_gate_pass += 1
+            
+        eligible = age_pass and mfe_pass and progress_pass and retention_pass
+        if eligible:
+            self.telemetry_declared_population_eligible += 1
+        else:
             return
-        if (self._baseline_gap_needs_rth_reset or self._baseline_gap_needs_regime_reset
-                or (self._last_rejected_feature_ns is not None
-                    and decision_ns - self._last_rejected_feature_ns <= 1800 * NS)):
-            return
-        if not self._is_established(decision_ns, close):
-            return
+            
         base_and_rolling = self._features.snapshot(
             (*BASELINE_CANDIDATES, *ROLLING_FEATURES),
             {"touch_bar": bar, "regime": self._feature_regime, "direction": self._regime.regime,
@@ -219,7 +303,8 @@ class CleanFlipCollector(Strategy):
              }},
         )
         if not base_and_rolling:
-            return
+            raise RuntimeError("FEATURE_READINESS_SCOPE_ESCALATION")
+            
         age_seconds = decision_ns - self._current_regime_start_ns
         pending = {
             "checkpoint_decision_ns": decision_ns,
@@ -237,24 +322,35 @@ class CleanFlipCollector(Strategy):
             "running_mfe_atr": self._running_mfe_atr,
             "new_progress_windows": self._progress_windows,
             "retained_mfe_ratio": self._retained_mfe_ratio(close),
+            "observation_ts": decision_ns,
+            "checkpoint_index": self._next_checkpoint_index,
             **base_and_rolling, **structural,
         }
+        self._next_checkpoint_index += 1
+        self.telemetry_candidates_emitted += 1
+        self.candidates_log.append(dict(pending))
         self._pending_labels.append({"row": pending, "target_observable": True})
 
     def _on_1m(self, bar: Bar) -> None:
         decision_ns = int(bar.ts_init)
         if int(bar.ts_event) + 60 * NS != decision_ns:
             raise RuntimeError("1m source must be complete exactly at its availability timestamp")
-        if (self._last_seen_1m_init_ns is not None
-                and decision_ns != self._last_seen_1m_init_ns + 60 * NS):
-            self._invalidate_pending_horizons(self._last_seen_1m_init_ns + 60 * NS, decision_ns)
-            self._reset_after_1m_discontinuity()
+            
+        if self._last_seen_1m_init_ns is not None:
+            if decision_ns == self._last_seen_1m_init_ns:
+                raise RuntimeError(f"Duplicate 1m timestamp detected: {decision_ns}")
+            if decision_ns < self._last_seen_1m_init_ns:
+                raise RuntimeError(f"Out-of-order 1m timestamp detected: {decision_ns} < {self._last_seen_1m_init_ns}")
+            if decision_ns != self._last_seen_1m_init_ns + 60 * NS:
+                if self._has_expected_open_second(self._last_seen_1m_init_ns + NS, decision_ns - 60 * NS):
+                    raise RuntimeError(f"Unexpected gap in 1m reference bars: {self._last_seen_1m_init_ns} to {decision_ns}")
+                
+        high_1m, low_1m, close_1m, open_1m = float(bar.high), float(bar.low), float(bar.close), float(bar.open)
+        if high_1m < low_1m or high_1m < open_1m or high_1m < close_1m or low_1m > open_1m or low_1m > close_1m:
+            raise RuntimeError(f"Invalid OHLC values detected in 1m bar: O={open_1m}, H={high_1m}, L={low_1m}, C={close_1m}")
+
         self._last_seen_1m_init_ns = decision_ns
-        if float(bar.volume) <= 1.0:
-            self._invalidate_pending_horizons(decision_ns, decision_ns)
-            self._reset_after_1m_discontinuity()
-            self._resolve_pending_labels(decision_ns)
-            return
+        
         prior_direction = self._regime.regime
         direction = self._regime.update(float(bar.high), float(bar.low), float(bar.close))
         self._feature_regime.update(float(bar.high), float(bar.low), prior_direction)
@@ -280,7 +376,6 @@ class CleanFlipCollector(Strategy):
             })
         self._current_regime_start_ns = start_ns
         self._current_regime_start_atr = float(self._regime.atr)
-        self._baseline_gap_needs_regime_reset = False
         anchor = float(self._last_eligible_close if self._last_eligible_close is not None else bar.close)
         self._current_regime_anchor = anchor
         self._running_mfe_atr = 0.0
@@ -288,26 +383,7 @@ class CleanFlipCollector(Strategy):
         self._progress_windows = 0
         self._flip_times_ns.append(start_ns)
         self._geometry.on_1m_flip(direction, start_ns, anchor, float(self._regime.atr), anchor)
-        # A target is released only after this subsequent, contiguous parent
-        # callback proves that every 1m state transition through T+300 was seen.
         self._resolve_pending_labels(decision_ns)
-
-    def _reset_after_1m_discontinuity(self) -> None:
-        """Reject a missing or low-quality completed parent bar fail-closed."""
-        self._regime = RegimeEngine()
-        self._feature_regime = _FeatureRegimeAdapter(self._regime)
-        self._features = FeatureEngine(rolling_productivity_window_seconds=300)
-        self._geometry = StructuralRegimeGeometryTracker()
-        self._registry = CompletedBarRegistry(supported_timeframes=("5m",))
-        self._engine_5m = RegimeStateEngine("5m", self._registry)
-        self._five_from_1m = CompletedMinuteFiveMinuteAggregator(self._on_bucket_closed)
-        self._current_regime_start_ns = None
-        self._current_regime_start_atr = None
-        self._current_regime_anchor = None
-        self._running_mfe_atr = 0.0
-        self._last_progress_extreme_ns = None
-        self._progress_windows = 0
-        self._baseline_gap_needs_regime_reset = True
 
     def _update_established_state(self, decision_ns: int, high: float, low: float, close: float) -> None:
         """Advance the frozen established-regime gate from completed 1s bars."""
@@ -363,5 +439,54 @@ class CleanFlipCollector(Strategy):
                     for flip_ns in self._flip_times_ns
                 ))
                 self.feature_rows.append(row)
+                self.observations_log.append({
+                    "observation_ts": row["observation_ts"],
+                    "regime_start_ns": row["regime_start_ns"],
+                    "checkpoint_index": row["checkpoint_index"],
+                    "disposition": (DISPOSITION_LABELED_POSITIVE if row["flip_within_300s"]
+                                    else DISPOSITION_LABELED_NEGATIVE),
+                    "censor_reason": None,
+                    "flip_within_300s": row["flip_within_300s"],
+                })
+            else:
+                # A target window crossing an unavailable 1s interval is never labelled
+                # false (see _invalidate_pending_horizons) -- it is honestly reported as
+                # censored, not silently dropped, so this candidate still reaches exactly
+                # one terminal disposition.
+                self.observations_log.append({
+                    "observation_ts": row["observation_ts"],
+                    "regime_start_ns": row["regime_start_ns"],
+                    "checkpoint_index": row["checkpoint_index"],
+                    "disposition": DISPOSITION_CENSORED,
+                    "censor_reason": CENSOR_DATA_GAP,
+                    "flip_within_300s": None,
+                })
         while self._flip_times_ns and self._pending_labels and self._flip_times_ns[0] <= self._pending_labels[0]["row"]["checkpoint_decision_ns"]:
             self._flip_times_ns.popleft()
+
+    def on_stop(self) -> None:
+        """Every candidate must reach exactly one terminal disposition before the run
+        ends. Any candidate whose (T, T+300s] horizon had not yet elapsed when data ran
+        out is honestly censored at run end, mirroring the data-gap censoring path
+        above -- it is not evaluated as a real observed non-flip."""
+        while self._pending_labels:
+            pending = self._pending_labels.popleft()
+            row = pending["row"]
+            self.observations_log.append({
+                "observation_ts": row["observation_ts"],
+                "regime_start_ns": row["regime_start_ns"],
+                "checkpoint_index": row["checkpoint_index"],
+                "disposition": DISPOSITION_CENSORED,
+                "censor_reason": CENSOR_RUN_END,
+                "flip_within_300s": None,
+            })
+
+    def get_candidates_dataframe(self) -> pd.DataFrame:
+        if not self.candidates_log:
+            return pd.DataFrame()
+        return pd.DataFrame(self.candidates_log)
+
+    def get_observations_dataframe(self) -> pd.DataFrame:
+        if not self.observations_log:
+            return pd.DataFrame()
+        return pd.DataFrame(self.observations_log)

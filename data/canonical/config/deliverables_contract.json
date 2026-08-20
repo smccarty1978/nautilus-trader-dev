@@ -1,0 +1,60 @@
+{
+  "contract_id": "nq_canonical_dense_1s_v1",
+  "status": "FROZEN",
+  "purpose": "Build exactly one dense NQ 1-second canonical market-clock data set from immutable raw v0 source Parquets, preserving authoritative native rows even when generic calendar windows disagree.",
+  "authorized_source": {
+    "glob": "data/raw/NQ_v0_1s_*.parquet",
+    "symbol": "NQ",
+    "required_coverage": "2016 through available 2026 YTD",
+    "forbidden_inputs": ["NT catalogs", "legacy catalogs", "previously densified data", "backtest outputs", "derived bars"],
+    "immutability_check": "SHA256 of every source file must match before and after build"
+  },
+  "calendar": {
+    "name": "CME_Equity",
+    "timezone": "America/Chicago",
+    "package": "pandas-market-calendars",
+    "regimes": [
+      {"start": "2016-01-03", "end": "2021-06-25", "exclude_15_15_to_15_30_ct": true, "exclude_16_00_to_17_00_ct": true},
+      {"start": "2021-06-28", "end": "available_data_end", "exclude_15_15_to_15_30_ct": false, "exclude_16_00_to_17_00_ct": true}
+    ],
+    "endpoint_convention": "The exact terminal session-close boundary second is valid and included (normal 16:00 CT and calendar-provided early closes); the relevant closure begins after that boundary. In regime 1, exact 15:15:00 CT is valid and the halt begins after that boundary.",
+    "closure_native_exception_policy": "Calendar windows guide synthetic fill generation only. Every native row outside a generic calendar window is preserved exactly as a native-only singleton observation and recorded as CALENDAR_CONFLICT_NATIVE_PRESENT; calendar disagreement never blocks publication. Synthetic rows are still omitted from the declared maintenance, halt, weekend, and holiday closures unless an authoritative native row is present.",
+    "required_schedule_cases": ["weekends", "Sunday reopen", "CME holidays", "holiday early closes", "delayed/special opens", "DST", "partial 2026 YTD end"]
+  },
+  "dense_row_contract": {
+    "native_row": "Copy every native source value exactly and set is_fill=false.",
+    "missing_expected_second": "Set OHLC to the previous canonical close, volume=0, is_fill=true; carry prior non-price metadata causally; never use a future price.",
+    "scheduled_closure": "Emit zero rows. At a reopen, a missing first second may carry the last canonical close from before the closure.",
+    "timestamp": "Preserve native UTC open-stamped ts_event semantics. No ts_init exists in the frozen source schema.",
+    "ytd_limit": "Do not emit a row after the final native 2026/YTD timestamp."
+  },
+  "deliverables": {
+    "builder": "scripts/build_dense_1s.py",
+    "tests": "scripts/tests/test_build_dense_1s.py",
+    "preflight": "scripts/preflight_dense_1s.py",
+    "output": "data/canonical/NQ_dense_1s_2016_2026.parquet",
+    "manifest": "data/canonical/NQ_dense_1s_2016_2026.manifest.json",
+    "boundary_report": "data/canonical/NQ_dense_1s_2016_2026.boundary_validation.json",
+    "calendar_conflicts": "data/canonical/NQ_dense_1s_2016_2026_calendar_conflicts.csv",
+    "format": "SINGLE_PARQUET unless a documented writer/filesystem failure requires partitioned fallback",
+    "parquet": {"compression": "zstd", "streaming": true, "row_group_size": 250000, "minimum_new_field": {"name": "is_fill", "type": "boolean"}}
+  },
+  "required_manifest_fields": [
+    "build_timestamp_utc", "output_path", "output_sha256", "cleaner_script_sha256", "source_files", "source_hashes_unchanged", "calendar_conflict_artifact", "calendar_conflict_rows",
+    "first_timestamp", "last_timestamp", "native_rows", "fill_rows", "total_rows", "fill_percentage", "calendar",
+    "historical_schedule_regimes", "parquet", "validations"
+  ],
+  "required_validations": [
+    "source hashes unchanged", "strict chronological order", "no duplicates", "one row per expected tradable second", "no synthetic scheduled-closure rows",
+    "native value parity", "synthetic OHLC/volume/prior-close validity", "timestamp semantics", "historical regime boundaries",
+    "year/source boundaries", "no 2026 YTD overrun", "5s aggregation smoke", "30s aggregation smoke", "1m aggregation smoke"
+  ],
+  "acceptance": {
+    "terminal_success": "CANONICAL_DENSE_1S_READY",
+    "terminal_failure": "CANONICAL_DENSE_1S_BLOCKED",
+    "zero_required": ["native mismatches", "fill violations", "duplicates", "out-of-order", "missing expected open seconds", "YTD overrun rows"],
+    "calendar_conflicts": "Count and report native/calendar conflicts; they are diagnostic warnings and do not block publication.",
+    "aggregation_smoke": "All PASS",
+    "tests": "All focused deterministic tests PASS"
+  }
+}

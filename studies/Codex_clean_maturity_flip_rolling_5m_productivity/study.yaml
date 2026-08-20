@@ -69,6 +69,13 @@ lineage:
 execution:
   runtime: nautilustrader
   strategy_class: studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.collector.CleanFlipCollector
+  data_requirements:
+    authorized_dates:
+      - '2023-10-02'
+      - '2023-10-03'
+      - '2023-10-04'
+      - '2023-10-05'
+      - '2023-10-06'
   progress_seconds: 60
   bounded: true
 acceptance:

@@ -1,17 +1,29 @@
 {
   "status": "BLOCKED",
-  "failed_gate": "EXECUTION_MANIFEST",
+  "preflight_run_id": "20260820T205334Z_903249557802",
+  "generated_at_utc": "2026-08-20T20:53:34.258883+00:00",
+  "code_hash": "903249557802b7f3e8f30e06f3b63a4e0499d736c41bb8801728ffa1dde85f98",
+  "superseded": false,
+  "failed_gate": "CAUSAL_INVARIANTS",
   "failure_ids": [
-    "MANIFEST_RESOLUTION_FAILED"
+    "INVARIANT_TEST_FAILURE"
   ],
   "failure_details": [
     {
-      "message": "Failed to resolve execution manifest: Mandatory study file missing: C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\Codex_clean_maturity_flip_rolling_5m_productivity\\artifacts\\phase0_source_manifest.json"
+      "message": "ERROR scripts/tests/test_rt_final_blockers.py::test_rt1b1_evidence_from_another_study_is_refused"
+    },
+    {
+      "message": "FAILED scripts/tests/test_audit_provenance_redteam.py::test_raw_report_sha_reuse_is_still_detected"
+    },
+    {
+      "message": "FAILED scripts/tests/test_audit_provenance_redteam.py::test_b1_auditor_is_never_a_hard_coded_label"
+    },
+    {
+      "message": "FAILED scripts/tests/test_audit_provenance_redteam.py::test_b2_status_records_the_declared_composite_not_a_stamped_one"
+    },
+    {
+      "message": "3 failed, 922 passed, 7 skipped, 2 deselected, 3 warnings, 1 error in 545.27s (0:09:05)"
     }
   ],
-  "recommended_smallest_investigation_scope": "Inspect findings in EXECUTION_MANIFEST and fix locally before requesting audit.",
-  "superseded": true,
-  "superseded_by_preflight_run_id": "20260818T144653Z_fd46e2fdeb7c",
-  "superseded_at_utc": "2026-08-18T14:46:53.739736+00:00",
-  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit."
 }
