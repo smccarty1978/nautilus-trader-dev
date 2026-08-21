@@ -1,0 +1,62 @@
+{
+  "code_hash": "137c1c4c49dd8845c3ffc9f31188046c35a7207ab1aa6a0d0a92a9651a3c5e06",
+  "inputs": {
+    "scores": "data/canonical/regime_complete_v1/canonical_regime_scores_all.parquet",
+    "regimes": "data/canonical/regime_complete_v1/canonical_regimes_all.parquet",
+    "paths": "data/canonical/regime_complete_v1/canonical_regime_paths_all.parquet"
+  },
+  "in_domain_scored_observations": 2028394,
+  "frozen_thresholds_top_10": {
+    "bullish": 0.43167249785595935,
+    "bearish": 0.44559149246408103
+  },
+  "threshold_overlap_waiver": "studies/full_trade_path_builder/THRESHOLD_OVERLAP_WAIVER.json",
+  "frozen_age_edges": [
+    [
+      120.0,
+      240.0
+    ],
+    [
+      240.0,
+      300.0
+    ],
+    [
+      300.0,
+      600.0
+    ],
+    [
+      600.0,
+      900.0
+    ],
+    [
+      900.0,
+      Infinity
+    ]
+  ],
+  "frozen_mfe_edges": [
+    [
+      1.0,
+      2.0
+    ],
+    [
+      2.0,
+      3.0
+    ],
+    [
+      3.0,
+      5.0
+    ],
+    [
+      5.0,
+      Infinity
+    ]
+  ],
+  "frozen_velocity_quartile_edges": [
+    0.15981553536563123,
+    0.21198186834146257,
+    0.2838638493445646
+  ],
+  "stop_atr": 1.0,
+  "thin_cell_n": 30,
+  "elapsed_s": 5.7
+}

@@ -267,6 +267,49 @@ FEATURE_REGISTRY: Dict[str, FeatureDefinition] = {
     'ema_slope_long': FeatureDefinition(name='ema_slope_long', status='verified', family='context', source_timeframe='1m'),
     'is_rth': FeatureDefinition(name='is_rth', status='verified', family='context', stateful=False),
     'minutes_since_rth_open': FeatureDefinition(name='minutes_since_rth_open', status='verified', family='context', stateful=False),
+    'latest_1m_wick_imbalance': FeatureDefinition(
+        name='latest_1m_wick_imbalance',
+        # Provisional until the promotion validator's evidence requirements are met.
+        # A feature may not self-grant 'verified' in the change that implements it --
+        # see scripts/check_feature_promotion.py and FEATURE_REGISTRY_CONTRACT.md s1.
+        status='provisional',
+        family='wick_imbalance',
+        implementation='features.trackers.wick.WickTracker',
+        tests=('tests/test_feature_library.py', 'scripts/tests/test_wick_availability.py'),
+        source_timeframe='1m',
+        update_anchor='completed_1m_bar',
+        # 'allow' is load-bearing: the feature is genuinely unavailable (None) until the
+        # first completed 1m bar. It is NOT a licence for an all-null column, which the
+        # surface validator rejects as never-emitted regardless of null policy.
+        null_policy='allow',
+        warmup=1,
+        window=1,
+        window_unit='bars',
+        reset_policy='none',
+        direction_normalized=False,
+    ),
+    'latest_1m_close_position_prev5_range': FeatureDefinition(
+        name='latest_1m_close_position_prev5_range',
+        # Provisional until the promotion validator's evidence requirements are met.
+        # A feature may not self-grant 'verified' in the change that implements it --
+        # see scripts/check_feature_promotion.py and FEATURE_REGISTRY_CONTRACT.md s1.
+        status='provisional',
+        family='range_position',
+        implementation='features.trackers.range_position.RangePositionTracker',
+        tests=('tests/test_feature_library.py', 'scripts/tests/test_range_position_availability.py'),
+        source_timeframe='1m',
+        update_anchor='completed_1m_bar',
+        # 'allow' is load-bearing: unavailable (None) until 5 prior completed 1m bars
+        # exist, and also None for a flat prior 5-bar range (prev5_high == prev5_low).
+        # Neither is an all-null column -- the surface validator still requires the
+        # feature to emit real values once warmup is satisfied on a non-flat range.
+        null_policy='allow',
+        warmup=6,
+        window=5,
+        window_unit='bars',
+        reset_policy='none',
+        direction_normalized=False,
+    ),
 }
 
 # ---------------------------------------------------------------------------
@@ -587,6 +630,57 @@ for _K in (3, 5, 8, 12):
             window_unit='bars',
             reset_policy='none'
         )
+
+# Structural-regime geometry is provisional until the owning study's parity,
+# prefix-invariance, and causal audits clear. Its study-specific snapshot binding is
+# declared by the collector; the registry records update ownership and formulas.
+_STRUCTURAL_IMPL = 'features.trackers.structural_regime_geometry.StructuralRegimeGeometryTracker'
+_STRUCTURAL_TESTS = ('studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py',)
+for _col in (
+    'structural_max_expansion_atr', 'structural_current_expansion_atr',
+    'structural_giveback_atr', 'structural_retention_ratio',
+    'structural_expansion_atr_per_min', 'regime_expansion_atr_per_min',
+    'prior_1m_regime_duration_min', 'prior_1m_regime_range_atr',
+    'prior_1m_regime_net_directional_move_atr', 'prior_1m_regime_mfe_atr',
+    'prior_1m_regime_range_atr_per_min', 'prior_1m_regime_net_move_atr_per_min',
+    'prior_1m_regime_efficiency', 'current_5m_regime_age_min',
+    'current_5m_regime_range_atr', 'current_5m_directional_displacement_atr',
+    'current_5m_regime_range_atr_per_min', 'prior_5m_regime_duration_min',
+    'prior_5m_regime_range_atr', 'prior_5m_regime_net_directional_move_atr',
+    'prior_5m_regime_mfe_atr', 'prior_5m_regime_range_atr_per_min',
+    'prior_5m_regime_net_move_atr_per_min', 'prior_5m_regime_efficiency',
+    'distance_to_completed_5m_high_atr', 'distance_to_completed_5m_low_atr',
+    'current_1m_move_outside_completed_5m_range',
+):
+    FEATURE_REGISTRY[_col] = FeatureDefinition(
+        name=_col, status='provisional', family='structural_regime_geometry',
+        implementation=_STRUCTURAL_IMPL, tests=_STRUCTURAL_TESTS,
+        source_timeframe='1s+1m+5m',
+        update_anchor='completed_1s_completed_5m_then_1m_flip',
+        normalizer='study_contract', window_unit='since_regime_flip',
+        reset_policy='event_start', null_policy='allow',
+    )
+
+# Study-owned rolling productivity.  It is provisional until this study's
+# pre-execution and completion audits, deterministic boundary tests, and NT
+# collection validation have all cleared.  The tracker has no hidden label or
+# outcome input: every value comes from completed 1s bars at the checkpoint.
+_ROLLING_PRODUCTIVITY_IMPL = 'features.trackers.rolling_5m_productivity.Rolling5mProductivityTracker'
+_ROLLING_PRODUCTIVITY_TESTS = ('studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py',)
+for _col in (
+    'rolling_5m_max_progress_atr', 'rolling_5m_current_progress_atr',
+    'rolling_5m_giveback_atr', 'rolling_5m_retention_ratio',
+    'rolling_5m_max_speed_atr_per_min', 'rolling_5m_current_speed_atr_per_min',
+    'rolling_5m_max_speed_vs_lifetime',
+    'rolling_5m_current_speed_vs_lifetime',
+):
+    FEATURE_REGISTRY[_col] = FeatureDefinition(
+        name=_col, status='provisional', family='rolling_5m_productivity',
+        implementation=_ROLLING_PRODUCTIVITY_IMPL, tests=_ROLLING_PRODUCTIVITY_TESTS,
+        source_timeframe='1s', update_anchor='completed_1s_at_or_before_checkpoint',
+        snapshot_anchor='at_5s_decision_ts', normalizer='current_1m_regime_start_atr',
+        window=300, window_unit='seconds', reset_policy='none', null_policy='allow',
+    )
 
 # Reverse mapping for alias lookup
 _ALIAS_TO_CANONICAL: Dict[str, str] = {}

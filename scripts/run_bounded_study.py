@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -32,13 +33,18 @@ def monitor_process(
     # Ensure parents directories for status output exist
     out_status_path.parent.mkdir(parents=True, exist_ok=True)
     
-    # Run subprocess
+    # Run subprocess.  Do not leave a PIPE undrained while the supervisor
+    # monitors progress: verbose, long-running children can fill that pipe and
+    # deadlock even though their work is otherwise healthy.  A temporary spool
+    # preserves the combined diagnostic log without imposing back-pressure.
+    run_output = ""
+    output_spool = tempfile.TemporaryFile(mode="w+", encoding="utf-8")
     proc = subprocess.Popen(
         cmd_args,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=output_spool,
+        stderr=subprocess.STDOUT,
         text=True,
-        bufsize=1
+        bufsize=1,
     )
 
     peak_memory_mb = 0.0
@@ -103,17 +109,18 @@ def monitor_process(
         print("[RUNNER] Interrupted by user.")
 
     elapsed_seconds = time.time() - start_time
-    stdout_data, stderr_data = proc.communicate()
+    proc.communicate()
+    output_spool.seek(0)
+    run_output = output_spool.read()
+    output_spool.close()
 
     # Capture logs to run output log
     log_dir = out_status_path.parent / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     run_log_path = log_dir / f"run_{int(start_time)}.log"
     with open(run_log_path, "w", encoding="utf-8") as f:
-        f.write("=== STDOUT ===\n")
-        f.write(stdout_data)
-        f.write("\n=== STDERR ===\n")
-        f.write(stderr_data)
+        f.write("=== COMBINED OUTPUT ===\n")
+        f.write(run_output)
 
     # Compile final execution card
     status_card = {

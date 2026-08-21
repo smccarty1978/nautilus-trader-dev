@@ -1,0 +1,24 @@
+{
+  "expected_vs_observed": {
+    "n_a": 9189,
+    "n_b": 8950,
+    "n_in_both": 8950,
+    "n_same_timestamp": 8596,
+    "n_different_timestamp": 354,
+    "n_only_a": 239,
+    "n_only_b": 0,
+    "n_a_arms_excluded_by_600s_gate": 593,
+    "n_a_arms_strictly_below_600s": 581,
+    "diff_median_a_age_s": 507.5,
+    "diff_median_b_age_s": 707.5
+  },
+  "tiling": {
+    "n_armed_regimes": 9189,
+    "n_checked": 9189,
+    "n_null_end_censored": 0,
+    "n_mismatches": 0,
+    "pass": true
+  },
+  "n_unique_simulated_events": 9543,
+  "note": "B is NOT a clean subset: 354 regimes appear in both populations at DIFFERENT arm timestamps (population A fires earlier). Only-in-B is 0."
+}

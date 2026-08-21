@@ -10,22 +10,28 @@ from features.trackers.pullback import PullbackTracker
 from features.trackers.ohlcv_delta import OHLCVDeltaTracker
 from features.trackers.price_levels import PriceLevelTracker
 from features.trackers.median_center import MedianCenterTracker
+from features.trackers.rolling_5m_productivity import Rolling5mProductivityTracker
+from features.trackers.wick import WickTracker
+from features.trackers.range_position import RangePositionTracker
 from features.registry import FEATURE_REGISTRY, resolve_feature_name
+from utils.session_boundaries import is_in_session
 
 CT = pytz.timezone('America/Chicago')
 
 
 def _is_rth(ts_init_ns: int) -> bool:
-    # Intentional local copy of the project-canonical RTH boundary
-    # (08:30-15:00 America/Chicago, evaluated on the close/available
-    # timestamp) also used by
-    # studies/CODEX_5_X_weakness_atlas_repair/CODEX_5_X_run_established_fade.py:is_rth()
-    # and studies/ohlcv_volume_delta_price_level_features/attach_features.py.
-    # Not imported directly: `features/` is shared production code and
-    # should not depend on a specific study's module. If this boundary ever
-    # changes, update both call sites in lockstep.
-    dt = datetime.fromtimestamp(ts_init_ns / 1e9, tz=pytz.utc).astimezone(CT)
-    return (dt.hour > 8 or (dt.hour == 8 and dt.minute >= 30)) and (dt.hour < 15)
+    """RTH membership for a completed-bar close timestamp.
+
+    This was a local copy of the boundary ending at 15:00, kept deliberately so that
+    `features/` would not depend on a study module, with a comment asking future editors
+    to "update both call sites in lockstep". They were not updated in lockstep: the
+    canonical project window is 08:30-15:15 CT (`utils/session_boundaries.py`,
+    AGENTS.md), and this copy silently disagreed with it by 15 minutes.
+
+    `utils/` is shared infrastructure, not a study, so importing it introduces no
+    study coupling -- which removes the reason the copy existed.
+    """
+    return is_in_session(int(ts_init_ns), "RTH")
 
 
 def _coerce(val):
@@ -46,12 +52,17 @@ class FeatureEngine:
     Ensures clear call ordering and explicit stream updates.
     """
 
-    def __init__(self, buffer_size_1s: int = 60, buffer_size_1m: int = 30):
+    def __init__(self, buffer_size_1s: int = 60, buffer_size_1m: int = 30,
+                 rolling_productivity_window_seconds: int = 300):
         self._velocity_tracker = ArrivalVelocityTracker(maxlen=buffer_size_1s)
         self._volume_tracker = ArrivalVolumeTracker(maxlen=buffer_size_1s)
         self._ohlcv_delta_tracker = OHLCVDeltaTracker()
         self._price_level_tracker = PriceLevelTracker()
         self._median_center_tracker = MedianCenterTracker()
+        self._rolling_productivity_tracker = Rolling5mProductivityTracker(
+            window_seconds=rolling_productivity_window_seconds)
+        self._wick_tracker = WickTracker()
+        self._range_position_tracker = RangePositionTracker()
         self.last_atr = 1.0
 
         # 1s price streams
@@ -95,6 +106,12 @@ class FeatureEngine:
         self._volume_tracker.update(volume_val, open_px, close_px)
         b_est = self._ohlcv_delta_tracker.update(
             int(bar.ts_init), open_px, high_px, low_px, close_px, volume_val)
+        # Production NT bars always carry a positive availability timestamp.
+        # Some legacy unit fixtures deliberately use zero as an unspecified
+        # ts_init; do not invent a completed-bar timestamp for those fixtures.
+        if int(bar.ts_init) > 0:
+            self._rolling_productivity_tracker.on_completed_1s(
+                int(bar.ts_init), high_px, low_px, close_px)
         self._median_center_tracker.update_1s(bar, self.last_regime, self.last_atr)
         # Regime/RTH context for this bar is not yet knowable (see the
         # buffer's docstring in __init__) -- buffer for retroactive replay
@@ -112,6 +129,29 @@ class FeatureEngine:
 
     def update_1m(self, bar, regime) -> None:
         """Explicitly update 1m data stream after regime calculations close."""
+        had_active_regime = self.last_regime_id != 0
+        buffered_minute = self._minute_1s_buffer
+        self._minute_1s_buffer = []
+        # Session attribution uses the completed parent-minute close boundary.
+        # It must be transitioned before flushing its completed 1s members.
+        is_rth_now = _is_rth(int(bar.ts_init))
+        if is_rth_now and not self._was_rth:
+            self._ohlcv_delta_tracker.reset_rth(int(bar.ts_init))
+        elif not is_rth_now and self._was_rth:
+            self._ohlcv_delta_tracker.end_rth()
+        self._was_rth = is_rth_now
+
+        # A real flip has an active prior regime, so its already-completed
+        # minute is flushed before the reset below. A first regime has no
+        # declared start before this close; discard its pre-start buffer.
+        if had_active_regime:
+            for buf_ts, buf_high, buf_low, buf_vol, buf_delta in buffered_minute:
+                self._ohlcv_delta_tracker.accumulate_regime(
+                    buf_ts, buf_high, buf_low, buf_vol, buf_delta)
+        # Valid completed RTH minutes are session data even before the first
+        # 1m regime exists; never couple them to regime initialization.
+        for _buf_ts, _buf_high, _buf_low, buf_vol, buf_delta in buffered_minute:
+            self._ohlcv_delta_tracker.accumulate_rth(buf_vol, buf_delta)
         if regime.regime_id != self.last_regime_id:
             self.bars_in_regime = 0
             self.bars_since_breach_1m = []
@@ -145,13 +185,6 @@ class FeatureEngine:
 
         self.last_atr = regime.atr.value if regime.atr.value > 0 else 1.0
 
-        is_rth_now = _is_rth(int(bar.ts_init))
-        if is_rth_now and not self._was_rth:
-            self._ohlcv_delta_tracker.reset_rth(int(bar.ts_init))
-        elif not is_rth_now and self._was_rth:
-            self._ohlcv_delta_tracker.end_rth()
-        self._was_rth = is_rth_now
-
         # Retroactively attribute this minute's buffered 1s bars to whichever
         # regime/RTH state is active AFTER the reset decisions above -- their
         # true membership was only knowable now, not when update_1s() ran.
@@ -164,6 +197,8 @@ class FeatureEngine:
             float(bar.close), is_rth_now)
 
         self._median_center_tracker.update_1m(bar, regime)
+        self._wick_tracker.update(float(bar.open), float(bar.high), float(bar.low), float(bar.close))
+        self._range_position_tracker.update(float(bar.high), float(bar.low), float(bar.close))
 
     def update_5m(self, bar) -> None:
         """Explicitly update 5m data stream (optional placeholder)."""
@@ -235,6 +270,25 @@ class FeatureEngine:
         raw_features.update(self._median_center_tracker.calculate(
             self.last_regime, atr, touch_bar))
 
+        # 9. Wick Imbalance
+        raw_features.update(self._wick_tracker.calculate())
+
+        # 10. Close position within prior 5-bar 1m range
+        raw_features.update(self._range_position_tracker.calculate())
+
+        # Study collectors supply the fixed current-regime-start ATR and the
+        # already-causal structural lifetime speed at their decision boundary.
+        # The engine owns the completed-1s routing; the study owns when this
+        # block is requested and how its companion structural state is formed.
+        rolling_context = snap_context.get("rolling_productivity")
+        if rolling_context is not None:
+            raw_features.update(self._rolling_productivity_tracker.snapshot(
+                checkpoint_ns=int(rolling_context["checkpoint_ns"]),
+                direction=direction,
+                current_regime_start_atr=float(rolling_context["current_regime_start_atr"]),
+                regime_expansion_atr_per_min=rolling_context.get("regime_expansion_atr_per_min"),
+            ))
+
         # Filter, map aliases, and deduplicate
         output = {}
         target_keys = FEATURE_REGISTRY.keys() if feature_set == "all" else feature_set
@@ -263,7 +317,9 @@ class FeatureEngine:
         # Databento aggregation shift: RTH checks always run close-time based
         dt = datetime.fromtimestamp(touch_bar.ts_init / 1e9, tz=pytz.utc).astimezone(CT)
         minutes_since_open = (dt.hour - 8) * 60 + (dt.minute - 30)
-        is_rth = 1.0 if (dt.hour > 8 or (dt.hour == 8 and dt.minute >= 30)) and (dt.hour < 15) else 0.0
+        # Canonical boundary, not a second inline re-derivation (this one also
+        # ended RTH at 15:00 while the project window ends at 15:15).
+        is_rth = 1.0 if _is_rth(int(touch_bar.ts_init)) else 0.0
 
         return {
             'ema_slope_short': float(ema_slope_short),

@@ -1,0 +1,363 @@
+{
+  "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "97d7759d7b4044178c839f1815fed30ffeb929d595c282d6b4b372a9a0a88016",
+  "spec": {
+    "study": {
+      "id": "Codex_clean_maturity_flip_rolling_5m_productivity",
+      "type": "flip_prediction",
+      "risk_tier": 2,
+      "description": "Clean maturity-conditioned prevailing-1m flip prediction with structural and rolling 5m productivity ablations."
+    },
+    "operation": {
+      "kind": "train_evaluate",
+      "target_metric": "roc_auc",
+      "reconciliation_target": null
+    },
+    "instrument": {
+      "symbol": "NQ",
+      "venue": "XCME"
+    },
+    "population": {
+      "type": "regime_state",
+      "prevailing_regime": "both",
+      "session": "RTH",
+      "qualification": {
+        "age_gate_seconds": 120,
+        "running_mfe_atr_gte": 1.0,
+        "new_progress_windows_gte": 2,
+        "retained_mfe_ratio_gte": 0.5,
+        "cadence_seconds": 5,
+        "established": true
+      }
+    },
+    "target": {
+      "type": "flip",
+      "event": "prevailing_1m_regime_transition",
+      "direction": "both",
+      "horizon_seconds": 300,
+      "confirmation": {
+        "mode": "completed_1m_bar",
+        "confirmation_bars": 1
+      }
+    },
+    "features": {
+      "source_manifest": null,
+      "source": "verified_registry_numeric_universe",
+      "source_key": null,
+      "selection": {
+        "mode": "train_only",
+        "source": "verified_registry_numeric_universe",
+        "years": [
+          2021,
+          2022,
+          2023
+        ],
+        "feature_count": 25,
+        "direction_specific": true,
+        "ranking_method": "frozen_train_only_temporal_rank"
+      },
+      "forbidden_lineage": [
+        "F3_top25_gbt_v1",
+        "F3_selected",
+        "2025_outcome_selected"
+      ],
+      "feature_list": null,
+      "feature_list_sha256": null,
+      "directional_mapping": "prevailing_bullish_to_short__prevailing_bearish_to_long",
+      "timing_contract": "verified",
+      "metadata_columns": null
+    },
+    "model": {
+      "mode": "training",
+      "family": "HistGradientBoostingClassifier",
+      "arms": [
+        "BASELINE_A",
+        "STRUCTURAL_B",
+        "ROLLING_PRODUCTIVITY_C"
+      ],
+      "artifact_path": null,
+      "artifact_sha256": null,
+      "params": {
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "max_iter": 200,
+        "random_state": 42
+      }
+    },
+    "chronology": {
+      "train": [
+        2021,
+        2022,
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "diagnostic": null,
+      "prohibited": [
+        2025,
+        2026
+      ],
+      "warmup": null
+    },
+    "stratification": {
+      "column": "regime_age_seconds",
+      "buckets": [
+        [
+          300,
+          600
+        ],
+        [
+          600,
+          900
+        ],
+        [
+          900,
+          1800
+        ]
+      ],
+      "extrapolation_bucket": ">=1800s"
+    },
+    "baseline": {
+      "study": null,
+      "manifest_sha256": null,
+      "results_sha256": null
+    },
+    "lineage": {
+      "parent_study": "Codex_structural_regime_geometry_maturity",
+      "parent_manifest_sha256": null,
+      "clean_lineage_start": "2026-08-15T00:45:00Z",
+      "invalidated_prior_runs": [
+        {
+          "study": "Codex_structural_regime_geometry_maturity",
+          "research_status": "EXPLORATORY_ONLY",
+          "reason": "Prior F3 lineage selected with post-2024 outcomes; excluded from this study's selection, fitting, scoring, and acceptance evidence.",
+          "usable_for_research": false
+        }
+      ],
+      "intended_changes": null,
+      "frozen": null
+    },
+    "execution": {
+      "runtime": "nautilustrader",
+      "strategy_class": "studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.collector.CleanFlipCollector",
+      "data_requirements": {
+        "authorized_dates": [
+          "2023-10-02",
+          "2023-10-03",
+          "2023-10-04",
+          "2023-10-05",
+          "2023-10-06"
+        ]
+      },
+      "checkpoint": null,
+      "progress_seconds": 60,
+      "bounded": true,
+      "observation_policy": null
+    },
+    "acceptance": {
+      "criteria": {
+        "minimum_structural_block_coverage": 0.9
+      }
+    },
+    "bespoke": {
+      "reason": null,
+      "unsupported_contract_element": null,
+      "canonical_type_considered": null,
+      "reusable_extension_considered": null,
+      "custom_scope": null
+    }
+  },
+  "contracts": {
+    "population_contract": {
+      "instrument": {
+        "symbol": "NQ",
+        "venue": "XCME"
+      },
+      "population_type": "regime_state",
+      "prevailing_regime": "both",
+      "session": "RTH",
+      "qualification": {
+        "age_gate_seconds": 120,
+        "running_mfe_atr_gte": 1.0,
+        "new_progress_windows_gte": 2,
+        "retained_mfe_ratio_gte": 0.5,
+        "cadence_seconds": 5,
+        "established": true
+      },
+      "causal_checkpoint": {
+        "checkpoint_frequency": "5s",
+        "checkpoint_grid_origin": "regime_start_ns",
+        "triggering_stream": "completed_1s_bar",
+        "observation_timing": "interval_close"
+      }
+    },
+    "target_contract": {
+      "target_type": "flip",
+      "event": "prevailing_1m_regime_transition",
+      "direction": "both",
+      "horizon_seconds": 300,
+      "confirmation": {
+        "mode": "completed_1m_bar",
+        "confirmation_bars": 1
+      },
+      "censoring_policy": {
+        "session_end_censoring": true,
+        "max_horizon_seconds": 300
+      }
+    },
+    "feature_contract": {
+      "source_universe": "verified_registry_numeric_universe",
+      "selection_mode": "train_only",
+      "selection_years": [
+        2021,
+        2022,
+        2023
+      ],
+      "feature_count": 25,
+      "direction_specific": true,
+      "ranking_method": "frozen_train_only_temporal_rank",
+      "candidate_universe_count": 502,
+      "candidate_universe_hash": "35e80758e7994dd11576739e63c662597ae490e175dc5026a5c602e9f92b582a",
+      "timing_contract": "verified"
+    },
+    "execution_contract": {
+      "runtime": "nautilustrader",
+      "strategy_class": "studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.collector.CleanFlipCollector",
+      "bounded_execution": true,
+      "progress_seconds": 60,
+      "checkpoint": null,
+      "chronology": {
+        "train": [
+          2021,
+          2022,
+          2023
+        ],
+        "dev": [
+          2024
+        ],
+        "diagnostic": [],
+        "prohibited": [
+          2025,
+          2026
+        ]
+      }
+    },
+    "timestamp_contract": {
+      "source": "databento_glbx_mdp3",
+      "instrument_symbol": "NQ",
+      "measured_catalog_rel_path": "data/catalog/NQ_v0_2020_2026",
+      "raw_timestamp_semantic": "OPEN_STAMPED",
+      "raw_index_field": "ts_event",
+      "timezone": "UTC",
+      "offline_research_aggregation": {
+        "pandas_rule": "resample(rule, label='right', closed='left')",
+        "semantic": "CLOSE_STAMPED"
+      },
+      "nautilus_catalog": {
+        "ts_event_semantic": "OPEN_STAMPED",
+        "ts_init_semantic": "CLOSE_STAMPED",
+        "causal_dispatch_field": "ts_init",
+        "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
+        "timeframe_deltas_ns": {
+          "1-SECOND": 1000000000,
+          "1-MINUTE": 60000000000,
+          "3-MINUTE": 180000000000,
+          "5-MINUTE": 300000000000
+        },
+        "empirical_measurement": {
+          "status": "MEASURED",
+          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+          "measurements": {
+            "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 60000000000,
+              "observed_deltas_ns": [
+                60000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 1000000000,
+              "observed_deltas_ns": [
+                1000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-5-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 300000000000,
+              "observed_deltas_ns": [
+                300000000000
+              ],
+              "pass": true
+            }
+          }
+        }
+      },
+      "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "deliverables_contract": {
+      "contract_version": 1,
+      "authorized_modes": [
+        "collect"
+      ],
+      "deliverables_by_mode": {
+        "collect": [
+          "candidates.parquet",
+          "observations.parquet",
+          "collection_manifest.json",
+          "run_manifest.json",
+          "status.json"
+        ]
+      },
+      "artifact_metadata": {
+        "candidates.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "observations.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "collection_manifest.json": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "run_manifest.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::OutputManager",
+          "relative_to": "run_dir"
+        },
+        "status.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir"
+        }
+      },
+      "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
+    },
+    "lineage": {
+      "has_parent": true,
+      "parent_study": "Codex_structural_regime_geometry_maturity",
+      "parent_dir_exists": true,
+      "parent_compiled_contract_exists": false,
+      "frozen_dimensions": []
+    },
+    "baseline": {
+      "has_baseline": false
+    }
+  },
+  "strategy_class": "studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.collector.CleanFlipCollector"
+}

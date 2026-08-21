@@ -1,0 +1,13 @@
+{
+  "status": "BLOCKED",
+  "failed_gate": "EXECUTION_MANIFEST",
+  "failure_ids": [
+    "MANIFEST_RESOLUTION_FAILED"
+  ],
+  "failure_details": [
+    {
+      "message": "Failed to resolve execution manifest: Mandatory study contract file missing: C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\es_wick_imbalance_exploratory\\artifacts\\phase0_source_manifest.json"
+    }
+  ],
+  "recommended_smallest_investigation_scope": "Inspect findings in EXECUTION_MANIFEST and fix locally before requesting audit."
+}

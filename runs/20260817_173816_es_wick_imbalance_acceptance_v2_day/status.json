@@ -1,0 +1,70 @@
+{
+  "run_id": "20260817_173816_es_wick_imbalance_acceptance_v2_day",
+  "study_id": "es_wick_imbalance_acceptance_v2",
+  "status": "SUCCESS",
+  "feature_surface_validation": {
+    "passed": true,
+    "rows": 1893,
+    "declared_features": [
+      "latest_1m_wick_imbalance"
+    ],
+    "emitted_features": [
+      "latest_1m_wick_imbalance"
+    ],
+    "per_feature": {
+      "latest_1m_wick_imbalance": {
+        "registered": true,
+        "status": "provisional",
+        "null_policy": "allow",
+        "declared_dtype": "float64",
+        "rows": 1893,
+        "null_count": 0,
+        "null_fraction": 0.0,
+        "produced_dtype": "float64",
+        "distinct_non_null": 89
+      }
+    },
+    "findings": []
+  },
+  "candidate_disposition_reconciliation": {
+    "candidates": 1893,
+    "observations": 1893,
+    "passed": true,
+    "findings": [],
+    "undisposed_candidates": 0,
+    "orphaned_observations": 0,
+    "duplicate_observations": 0,
+    "disposition_counts": {
+      "LABELED_NEGATIVE": 1507,
+      "LABELED_POSITIVE": 328,
+      "CENSORED": 58
+    }
+  },
+  "stage": "day",
+  "wall_time_seconds": 97.289,
+  "total_bars_processed": 0,
+  "candidates_count": 1893,
+  "observations_count": 1893,
+  "throughput_bars_per_sec": 0.0,
+  "memory": {
+    "baseline_process_rss_mb": 189.96,
+    "peak_process_rss_mb": 291.5,
+    "rss_delta_mb": 101.54,
+    "python_tracemalloc_peak_mb": 41.85
+  },
+  "bars_breakdown": {
+    "loaded": {
+      "1s": 146228,
+      "1m": 5275
+    },
+    "callbacks": {},
+    "ts_event_ranges": {},
+    "ts_init_ranges": {}
+  },
+  "output_artifacts": {
+    "candidates_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260817_173816_es_wick_imbalance_acceptance_v2_day\\collection\\candidates.parquet",
+    "observations_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260817_173816_es_wick_imbalance_acceptance_v2_day\\collection\\observations.parquet",
+    "collection_manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260817_173816_es_wick_imbalance_acceptance_v2_day\\collection\\collection_manifest.json"
+  },
+  "end_time_utc": "2026-08-17T17:39:54.085736+00:00"
+}

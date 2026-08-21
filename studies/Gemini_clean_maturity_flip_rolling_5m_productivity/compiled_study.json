@@ -1,0 +1,450 @@
+{
+  "study_id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "2ce0817ac7df4c9ad5e16fd83f77fc5b865e9229eaa8265c9c6d134bac18b0a5",
+  "spec": {
+    "study": {
+      "id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
+      "type": "flip_prediction",
+      "risk_tier": 2,
+      "description": "Clean Maturity-Conditioned Flip Model with Rolling 5m Productivity."
+    },
+    "operation": {
+      "kind": "train_evaluate",
+      "target_metric": "pr_auc",
+      "reconciliation_target": null
+    },
+    "instrument": {
+      "symbol": "NQ",
+      "venue": "XCME"
+    },
+    "population": {
+      "type": "regime_state",
+      "prevailing_regime": "both",
+      "session": "RTH",
+      "qualification": {
+        "age_gate_seconds": 120,
+        "running_mfe_atr_gte": 1.0,
+        "new_progress_windows_gte": 2,
+        "retained_mfe_ratio_gte": 0.5,
+        "cadence_seconds": 5,
+        "established": true
+      }
+    },
+    "target": {
+      "type": "flip",
+      "event": "confirmed_flip",
+      "direction": "both",
+      "horizon_seconds": 300,
+      "confirmation": {
+        "mode": "bar_close",
+        "confirmation_bars": 1
+      }
+    },
+    "features": {
+      "source_manifest": null,
+      "source": "scoped_feature_union",
+      "source_key": null,
+      "selection": {
+        "mode": "none",
+        "source": "frozen_top25_plus_structural_plus_rolling",
+        "years": null,
+        "feature_count": 60,
+        "direction_specific": false,
+        "ranking_method": "frozen_train_only_temporal_rank"
+      },
+      "forbidden_lineage": null,
+      "feature_list": [
+        "rolling_5m_low_signed_distance_atr",
+        "rth_elapsed_seconds",
+        "rolling_15m_high_signed_distance_atr",
+        "rolling_60m_high_signed_distance_atr",
+        "rolling_15m_low_signed_distance_atr",
+        "rolling_30m_low_signed_distance_atr",
+        "price_change_points_60s",
+        "rolling_30m_high_signed_distance_atr",
+        "range_points_1800s",
+        "opening_range_30m_low_developing_signed_distance_points",
+        "est_bear_vol_sum_300s",
+        "full_level_envelope_width_atr",
+        "rth_vol_cum",
+        "est_delta_sum_1800s",
+        "price_change_atr_60s",
+        "prior_day_close_signed_distance_atr",
+        "up_down_vol_ratio_1800s",
+        "price_change_atr_30s",
+        "pct_levels_behind_trade",
+        "prior_day_low_signed_distance_points",
+        "opening_range_30m_low_final_signed_distance_points",
+        "vol_max_1s_1800s",
+        "price_position_in_full_envelope",
+        "rth_abs_delta_cum",
+        "n_levels_below",
+        "current_1m_move_outside_completed_5m_range",
+        "current_5m_directional_displacement_atr",
+        "current_5m_regime_age_min",
+        "current_5m_regime_range_atr",
+        "current_5m_regime_range_atr_per_min",
+        "distance_to_completed_5m_high_atr",
+        "distance_to_completed_5m_low_atr",
+        "prior_1m_regime_duration_min",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_net_directional_move_atr",
+        "prior_1m_regime_net_move_atr_per_min",
+        "prior_1m_regime_range_atr",
+        "prior_1m_regime_range_atr_per_min",
+        "prior_5m_regime_duration_min",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_net_directional_move_atr",
+        "prior_5m_regime_net_move_atr_per_min",
+        "prior_5m_regime_range_atr",
+        "prior_5m_regime_range_atr_per_min",
+        "regime_expansion_atr_per_min",
+        "structural_current_expansion_atr",
+        "structural_expansion_atr_per_min",
+        "structural_giveback_atr",
+        "structural_max_expansion_atr",
+        "structural_retention_ratio",
+        "rolling_5m_current_progress_atr",
+        "rolling_5m_current_speed_atr_per_min",
+        "rolling_5m_current_speed_vs_lifetime",
+        "rolling_5m_giveback_atr",
+        "rolling_5m_max_progress_atr",
+        "rolling_5m_max_speed_atr_per_min",
+        "rolling_5m_max_speed_vs_lifetime",
+        "rolling_5m_retention_ratio"
+      ],
+      "feature_list_sha256": "2a744cfa3acfa437ae0ff8219c56451e176a170ae83450c52b8ca42842b0cba5",
+      "directional_mapping": "direction_normalized",
+      "timing_contract": "verified",
+      "metadata_columns": [
+        "observation_ts",
+        "regime_start_ns",
+        "regime_direction",
+        "checkpoint_index",
+        "regime_age_seconds",
+        "close",
+        "atr",
+        "running_mfe_atr",
+        "running_mae_atr",
+        "current_pnl_atr",
+        "new_progress_windows",
+        "retained_mfe_ratio",
+        "triggering_1s_ts_init"
+      ]
+    },
+    "model": {
+      "mode": "training",
+      "family": "HistGradientBoostingClassifier",
+      "arms": [
+        "BASELINE_A",
+        "STRUCTURAL_B",
+        "ROLLING_PRODUCTIVITY_C"
+      ],
+      "artifact_path": null,
+      "artifact_sha256": null,
+      "params": {
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "max_iter": 200,
+        "random_state": 42
+      }
+    },
+    "chronology": {
+      "train": [
+        2021,
+        2022,
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "diagnostic": null,
+      "prohibited": [
+        2025,
+        2026
+      ],
+      "warmup": {
+        "days_before_partition": 5,
+        "allowed": true,
+        "candidate_emission": false,
+        "target_generation": false,
+        "permitted_partition_relationship": "pre_train_only"
+      }
+    },
+    "stratification": {
+      "column": "regime_age_seconds",
+      "buckets": [
+        [
+          300,
+          600
+        ],
+        [
+          600,
+          900
+        ],
+        [
+          900,
+          1800
+        ]
+      ],
+      "extrapolation_bucket": ">=1800s"
+    },
+    "baseline": {
+      "study": null,
+      "manifest_sha256": null,
+      "results_sha256": null
+    },
+    "lineage": {
+      "parent_study": "Codex_clean_maturity_flip_rolling_5m_productivity",
+      "parent_manifest_sha256": null,
+      "clean_lineage_start": "2026-08-15T00:45:00Z",
+      "invalidated_prior_runs": [
+        {
+          "run_id": "20260815_003408_Gemini_clean_maturity_flip_rolling_5m_productivity_day",
+          "year_accessed": 2024,
+          "research_status": "INVALIDATED",
+          "reason": "PREMATURE_OOS_ACCESS_BEFORE_FEATURE_FREEZE",
+          "usable_for_research": false,
+          "included_in_selection": false,
+          "included_in_training": false,
+          "included_in_evaluation": false
+        }
+      ],
+      "intended_changes": null,
+      "frozen": null
+    },
+    "execution": {
+      "runtime": "nautilustrader",
+      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "data_requirements": null,
+      "checkpoint": null,
+      "progress_seconds": 60,
+      "bounded": true,
+      "observation_policy": {
+        "required_source_relation": "equal"
+      }
+    },
+    "acceptance": {
+      "criteria": null
+    },
+    "bespoke": {
+      "reason": null,
+      "unsupported_contract_element": null,
+      "canonical_type_considered": null,
+      "reusable_extension_considered": null,
+      "custom_scope": null
+    }
+  },
+  "contracts": {
+    "population_contract": {
+      "instrument": {
+        "symbol": "NQ",
+        "venue": "XCME"
+      },
+      "population_type": "regime_state",
+      "prevailing_regime": "both",
+      "session": "RTH",
+      "qualification": {
+        "age_gate_seconds": 120,
+        "running_mfe_atr_gte": 1.0,
+        "new_progress_windows_gte": 2,
+        "retained_mfe_ratio_gte": 0.5,
+        "cadence_seconds": 5,
+        "established": true
+      },
+      "causal_checkpoint": {
+        "checkpoint_frequency": "5s",
+        "observation_timing": "interval_close"
+      }
+    },
+    "target_contract": {
+      "target_type": "flip",
+      "event": "confirmed_flip",
+      "direction": "both",
+      "horizon_seconds": 300,
+      "confirmation": {
+        "mode": "bar_close",
+        "confirmation_bars": 1
+      },
+      "censoring_policy": {
+        "session_end_censoring": true,
+        "max_horizon_seconds": 300
+      }
+    },
+    "feature_contract": {
+      "source_key": null,
+      "feature_count": 60,
+      "feature_list": [
+        "rolling_5m_low_signed_distance_atr",
+        "rth_elapsed_seconds",
+        "rolling_15m_high_signed_distance_atr",
+        "rolling_60m_high_signed_distance_atr",
+        "rolling_15m_low_signed_distance_atr",
+        "rolling_30m_low_signed_distance_atr",
+        "price_change_points_60s",
+        "rolling_30m_high_signed_distance_atr",
+        "range_points_1800s",
+        "opening_range_30m_low_developing_signed_distance_points",
+        "est_bear_vol_sum_300s",
+        "full_level_envelope_width_atr",
+        "rth_vol_cum",
+        "est_delta_sum_1800s",
+        "price_change_atr_60s",
+        "prior_day_close_signed_distance_atr",
+        "up_down_vol_ratio_1800s",
+        "price_change_atr_30s",
+        "pct_levels_behind_trade",
+        "prior_day_low_signed_distance_points",
+        "opening_range_30m_low_final_signed_distance_points",
+        "vol_max_1s_1800s",
+        "price_position_in_full_envelope",
+        "rth_abs_delta_cum",
+        "n_levels_below",
+        "current_1m_move_outside_completed_5m_range",
+        "current_5m_directional_displacement_atr",
+        "current_5m_regime_age_min",
+        "current_5m_regime_range_atr",
+        "current_5m_regime_range_atr_per_min",
+        "distance_to_completed_5m_high_atr",
+        "distance_to_completed_5m_low_atr",
+        "prior_1m_regime_duration_min",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_net_directional_move_atr",
+        "prior_1m_regime_net_move_atr_per_min",
+        "prior_1m_regime_range_atr",
+        "prior_1m_regime_range_atr_per_min",
+        "prior_5m_regime_duration_min",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_net_directional_move_atr",
+        "prior_5m_regime_net_move_atr_per_min",
+        "prior_5m_regime_range_atr",
+        "prior_5m_regime_range_atr_per_min",
+        "regime_expansion_atr_per_min",
+        "structural_current_expansion_atr",
+        "structural_expansion_atr_per_min",
+        "structural_giveback_atr",
+        "structural_max_expansion_atr",
+        "structural_retention_ratio",
+        "rolling_5m_current_progress_atr",
+        "rolling_5m_current_speed_atr_per_min",
+        "rolling_5m_current_speed_vs_lifetime",
+        "rolling_5m_giveback_atr",
+        "rolling_5m_max_progress_atr",
+        "rolling_5m_max_speed_atr_per_min",
+        "rolling_5m_max_speed_vs_lifetime",
+        "rolling_5m_retention_ratio"
+      ],
+      "feature_list_sha256": "2a744cfa3acfa437ae0ff8219c56451e176a170ae83450c52b8ca42842b0cba5",
+      "bound_trackers": [
+        "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
+        "features.trackers.price_levels.PriceLevelTracker",
+        "features.trackers.rolling_5m_productivity.Rolling5mProductivityTracker",
+        "features.trackers.structural_regime_geometry.StructuralRegimeGeometryTracker"
+      ],
+      "families": [
+        "ohlcv_est_delta",
+        "price_level_context",
+        "rolling_5m_productivity",
+        "structural_regime_geometry"
+      ],
+      "source_timeframes": [
+        "1m",
+        "1s",
+        "1s+1m+5m"
+      ],
+      "directional_mapping": "direction_normalized",
+      "timing_contract": "verified"
+    },
+    "execution_contract": {
+      "runtime": "nautilustrader",
+      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "bounded_execution": true,
+      "progress_seconds": 60,
+      "checkpoint": null,
+      "chronology": {
+        "train": [
+          2021,
+          2022,
+          2023
+        ],
+        "dev": [
+          2024
+        ],
+        "diagnostic": [],
+        "prohibited": [
+          2025,
+          2026
+        ]
+      }
+    },
+    "timestamp_contract": {
+      "source": "databento_glbx_mdp3",
+      "raw_timestamp_semantic": "OPEN_STAMPED",
+      "raw_index_field": "ts_event",
+      "timezone": "UTC",
+      "offline_research_aggregation": {
+        "pandas_rule": "resample(rule, label='right', closed='left')",
+        "semantic": "CLOSE_STAMPED"
+      },
+      "nautilus_catalog": {
+        "ts_event_semantic": "OPEN_STAMPED",
+        "ts_init_semantic": "CLOSE_STAMPED",
+        "causal_dispatch_field": "ts_init",
+        "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
+        "timeframe_deltas_ns": {
+          "1-SECOND": 1000000000,
+          "1-MINUTE": 60000000000,
+          "3-MINUTE": 180000000000,
+          "5-MINUTE": 300000000000
+        },
+        "empirical_measurement": {
+          "status": "MEASURED",
+          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+          "measurements": {
+            "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 60000000000,
+              "observed_deltas_ns": [
+                60000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 1000000000,
+              "observed_deltas_ns": [
+                1000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-5-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 300000000000,
+              "observed_deltas_ns": [
+                300000000000
+              ],
+              "pass": true
+            }
+          }
+        }
+      },
+      "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "lineage": {
+      "has_parent": true,
+      "parent_study": "Codex_clean_maturity_flip_rolling_5m_productivity",
+      "parent_dir_exists": true,
+      "frozen_dimensions": [],
+      "status": "VALIDATED"
+    },
+    "baseline": {
+      "has_baseline": false
+    }
+  },
+  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector"
+}

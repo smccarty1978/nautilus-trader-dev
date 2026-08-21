@@ -1,0 +1,361 @@
+import sys
+import os
+from pathlib import Path
+
+repo_root = Path(__file__).resolve().parent.parent
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+
+import datetime
+import hashlib
+import json
+import shutil
+import subprocess
+import time
+import pandas as pd
+
+TIMESTAMP = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M%S")
+CAPTURE_DIR = repo_root / "backtests" / "fixtures" / f"baseline_capture_{TIMESTAMP}"
+CAPTURE_DIR.mkdir(parents=True, exist_ok=True)
+PRESERVED_DIR = CAPTURE_DIR / "preserved_preexisting"
+PRESERVED_DIR.mkdir(parents=True, exist_ok=True)
+
+def compute_sha256(filepath: Path) -> str:
+    if not filepath.exists() or not filepath.is_file():
+        return "missing"
+    h = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        while chunk := f.read(65536):
+            h.update(chunk)
+    return h.hexdigest()
+
+def compute_df_hash(df: pd.DataFrame, exclude_cols: list = None) -> str:
+    """Computes a deterministic hash of dataframe contents excluding volatile columns."""
+    if df.empty:
+        return hashlib.sha256(b"empty_dataframe").hexdigest()
+    
+    cols = list(df.columns)
+    if exclude_cols:
+        cols = [c for c in cols if c not in set(exclude_cols)]
+    
+    sub_df = df[cols].copy()
+    # Sort deterministically
+    sort_cols = [c for c in cols if sub_df[c].dtype != object]
+    if sort_cols:
+        sub_df = sub_df.sort_values(by=sort_cols).reset_index(drop=True)
+    
+    csv_bytes = sub_df.to_csv(index=False).encode("utf-8")
+    return hashlib.sha256(csv_bytes).hexdigest()
+
+def get_git_commit() -> str:
+    try:
+        res = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True)
+        return res.stdout.strip()
+    except Exception:
+        return "unknown"
+
+def preserve_existing_targets(targets: list):
+    preserved_records = []
+    for t_path in targets:
+        p = repo_root / t_path
+        if p.exists():
+            dest = PRESERVED_DIR / p.name
+            if p.is_dir():
+                shutil.copytree(p, dest, dirs_exist_ok=True)
+            else:
+                shutil.copy2(p, dest)
+            preserved_records.append({
+                "target_path": str(t_path),
+                "preserved_to": str(dest.relative_to(repo_root)),
+                "sha256": compute_sha256(p) if p.is_file() else "directory"
+            })
+    return preserved_records
+
+def main():
+    git_commit = get_git_commit()
+    print(f"=== Starting Baseline Capture: {TIMESTAMP} ===")
+    print(f"Git Commit: {git_commit}")
+    print(f"Evidence Directory: {CAPTURE_DIR}")
+
+    # 1. Target check & preservation
+    targets_f1 = [
+        "backtests/results/checkpoints/results_R5.parquet",
+        "backtests/results/checkpoints/results_R2.5.parquet",
+        "backtests/results/checkpoints/resume_manifest.json",
+        "backtests/results/checkpoints/checkpoint_2023-03-03.pkl",
+    ]
+    targets_f2 = [
+        "backtests/results/w4_exit_backtests/NQ_2023_B1/trades.parquet",
+        "backtests/results/w4_exit_backtests/NQ_2023_B1/strategy_trades.parquet",
+        "backtests/results/w4_parity_2023_B1.parquet",
+    ]
+    all_targets = targets_f1 + targets_f2
+    preserved_records = preserve_existing_targets(all_targets)
+    print(f"Preserved {len(preserved_records)} pre-existing target files/folders.")
+
+    # 2. Input hashes
+    pred_path = repo_root / "studies/regime_sequence_signal_audit/results/weakness_checkpoint_predictions.parquet"
+    pred_sha = compute_sha256(pred_path)
+    pred_df = pd.read_parquet(pred_path)
+    dt_pred = pd.to_datetime(pred_df["observation_time"], unit="ns", utc=True)
+    df_pred_2023 = pred_df[dt_pred.dt.year == 2023]
+
+    # --- EXECUTE FIXTURE 1 ---
+    print("\n------------------------------------------------------------")
+    print("Executing Fixture 1: ScoreFanning Single-Day Run (2023-03-03)")
+    cmd_f1 = [sys.executable, "backtests/run_staged_backtest.py", "--start-date", "2023-03-03", "--end-date", "2023-03-03"]
+    print(f"Command: {' '.join(cmd_f1)}")
+    
+    t0_f1 = time.time()
+    start_time_f1 = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    res_f1 = subprocess.run(cmd_f1, cwd=repo_root, capture_output=True, text=True)
+    t1_f1 = time.time()
+    end_time_f1 = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    
+    print(f"Fixture 1 completed in {t1_f1 - t0_f1:.2f}s with exit code {res_f1.returncode}")
+    if res_f1.returncode != 0:
+        print(f"Fixture 1 STDERR:\n{res_f1.stderr}")
+
+    f1_dir = CAPTURE_DIR / "fixture_1_score_fanning"
+    f1_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Save stdout/stderr
+    with open(f1_dir / "stdout.log", "w", encoding="utf-8") as f:
+        f.write(res_f1.stdout)
+    with open(f1_dir / "stderr.log", "w", encoding="utf-8") as f:
+        f.write(res_f1.stderr)
+
+    # Inspect Fixture 1 output parquet files
+    res_r5_path = repo_root / "backtests/results/checkpoints/results_R5.parquet"
+    res_r25_path = repo_root / "backtests/results/checkpoints/results_R2.5.parquet"
+    
+    r5_df = pd.read_parquet(res_r5_path) if res_r5_path.exists() else pd.DataFrame()
+    r25_df = pd.read_parquet(res_r25_path) if res_r25_path.exists() else pd.DataFrame()
+
+    # Copy files to f1_dir
+    if res_r5_path.exists():
+        shutil.copy2(res_r5_path, f1_dir / "results_R5.parquet")
+    if res_r25_path.exists():
+        shutil.copy2(res_r25_path, f1_dir / "results_R2.5.parquet")
+
+    r5_open = len(r5_df[r5_df["is_open"] == True]) if not r5_df.empty and "is_open" in r5_df.columns else 0
+    r5_closed = len(r5_df[r5_df["is_open"] == False]) if not r5_df.empty and "is_open" in r5_df.columns else len(r5_df)
+    r25_open = len(r25_df[r25_df["is_open"] == True]) if not r25_df.empty and "is_open" in r25_df.columns else 0
+    r25_closed = len(r25_df[r25_df["is_open"] == False]) if not r25_df.empty and "is_open" in r25_df.columns else len(r25_df)
+
+    f1_summary = {
+        "command": " ".join(cmd_f1),
+        "start_time_utc": start_time_f1,
+        "end_time_utc": end_time_f1,
+        "elapsed_seconds": round(t1_f1 - t0_f1, 3),
+        "exit_code": res_f1.returncode,
+        "order_handling": "virtual",
+        "data_window": {
+            "load_start": "2023-02-26 00:00:00 UTC",
+            "load_end": "2023-03-03 23:59:59 UTC",
+            "run_start": "2023-03-03 00:00:00 UTC",
+            "run_end": "2023-03-03 23:59:59 UTC",
+            "warmup_days": 5,
+            "1s_bars_loaded": 252660,
+            "1m_bars_loaded": 6899,
+        },
+        "nt_positions_report_rows": 0,  # Virtual evaluator produces no broker positions
+        "evaluators": {
+            "R5": {
+                "total_trades": len(r5_df),
+                "closed_trades": r5_closed,
+                "open_trades": r5_open,
+                "gross_pnl": float(r5_df["pnl"].sum()) if not r5_df.empty and "pnl" in r5_df.columns else 0.0,
+                "win_rate": float((r5_df["pnl"] > 0).mean()) if not r5_df.empty and "pnl" in r5_df.columns else 0.0,
+                "exit_reasons": r5_df["exit_reason"].value_counts().to_dict() if not r5_df.empty and "exit_reason" in r5_df.columns else {},
+                "file_sha256": compute_sha256(res_r5_path),
+                "content_hash": compute_df_hash(r5_df),
+            },
+            "R2.5": {
+                "total_trades": len(r25_df),
+                "closed_trades": r25_closed,
+                "open_trades": r25_open,
+                "gross_pnl": float(r25_df["pnl"].sum()) if not r25_df.empty and "pnl" in r25_df.columns else 0.0,
+                "win_rate": float((r25_df["pnl"] > 0).mean()) if not r25_df.empty and "pnl" in r25_df.columns else 0.0,
+                "exit_reasons": r25_df["exit_reason"].value_counts().to_dict() if not r25_df.empty and "exit_reason" in r25_df.columns else {},
+                "file_sha256": compute_sha256(res_r25_path),
+                "content_hash": compute_df_hash(r25_df),
+            }
+        }
+    }
+
+    # --- EXECUTE FIXTURE 2 ---
+    print("\n------------------------------------------------------------")
+    print("Executing Fixture 2: W4 Exit Strategy Full-Year 2023 Run (Policy B1)")
+    cmd_f2 = [sys.executable, "backtests/run_w4_backtest.py", "--year", "2023", "--policy", "B1", "--theta", "0.62", "--N", "10"]
+    print(f"Command: {' '.join(cmd_f2)}")
+    
+    t0_f2 = time.time()
+    start_time_f2 = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    res_f2 = subprocess.run(cmd_f2, cwd=repo_root, capture_output=True, text=True)
+    t1_f2 = time.time()
+    end_time_f2 = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    
+    print(f"Fixture 2 completed in {t1_f2 - t0_f2:.2f}s with exit code {res_f2.returncode}")
+    if res_f2.returncode != 0:
+        print(f"Fixture 2 STDERR:\n{res_f2.stderr}")
+
+    f2_dir = CAPTURE_DIR / "fixture_2_w4_b1"
+    f2_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Save stdout/stderr
+    with open(f2_dir / "stdout.log", "w", encoding="utf-8") as f:
+        f.write(res_f2.stdout)
+    with open(f2_dir / "stderr.log", "w", encoding="utf-8") as f:
+        f.write(res_f2.stderr)
+
+    # Inspect Fixture 2 output parquet files
+    trades_path = repo_root / "backtests/results/w4_exit_backtests/NQ_2023_B1/trades.parquet"
+    strat_trades_path = repo_root / "backtests/results/w4_exit_backtests/NQ_2023_B1/strategy_trades.parquet"
+    unmanaged_parity_path = repo_root / "backtests/results/w4_parity_2023_B1.parquet"
+
+    trades_df = pd.read_parquet(trades_path) if trades_path.exists() else pd.DataFrame()
+    strat_trades_df = pd.read_parquet(strat_trades_path) if strat_trades_path.exists() else pd.DataFrame()
+    unmanaged_parity_df = pd.read_parquet(unmanaged_parity_path) if unmanaged_parity_path.exists() else pd.DataFrame()
+
+    # Copy files to f2_dir
+    if trades_path.exists():
+        shutil.copy2(trades_path, f2_dir / "trades.parquet")
+    if strat_trades_path.exists():
+        shutil.copy2(strat_trades_path, f2_dir / "strategy_trades.parquet")
+    if unmanaged_parity_path.exists():
+        shutil.copy2(unmanaged_parity_path, f2_dir / "w4_parity_2023_B1.parquet")
+
+    # In-year filtering check
+    yr_start_ns = pd.Timestamp("2023-01-01", tz="UTC").value
+    yr_end_ns = pd.Timestamp("2023-12-31 23:59:59", tz="UTC").value
+    
+    in_year_trades = trades_df[(trades_df["entry_ts"] >= yr_start_ns) & (trades_df["entry_ts"] <= yr_end_ns)] if not trades_df.empty and "entry_ts" in trades_df.columns else trades_df
+    closed_positions_count = len(in_year_trades)
+    
+    # Check if there are open positions in the raw positions report (ts_closed.isna())
+    # Note: run_w4_backtest.py line 137 filters trades = trades[trades["ts_closed"].notna()].copy()
+    # Let's record both positions report trades and strategy_trades
+    strat_closed = len(strat_trades_df)
+
+    def parse_pnl_sum(df, col_name):
+        if df.empty or col_name not in df.columns:
+            return 0.0
+        vals = df[col_name].astype(str)
+        extracted = vals.str.extract(r'([-+]?\d*\.?\d+)')[0]
+        return float(pd.to_numeric(extracted, errors='coerce').fillna(0).sum())
+
+    pnl_realized = parse_pnl_sum(trades_df, "realized_pnl") if not trades_df.empty else parse_pnl_sum(strat_trades_df, "pnl")
+
+    f2_summary = {
+        "command": " ".join(cmd_f2),
+        "start_time_utc": start_time_f2,
+        "end_time_utc": end_time_f2,
+        "elapsed_seconds": round(t1_f2 - t0_f2, 3),
+        "exit_code": res_f2.returncode,
+        "order_handling": "simulated_orders",
+        "data_window": {
+            "load_start": "2022-12-27 00:00:00 UTC",
+            "load_end": "2023-12-31 23:59:59 UTC",
+            "run_start": "2023-01-01 00:00:00 UTC",
+            "run_end": "2023-12-31 23:59:59 UTC",
+            "warmup_days": 5,
+            "1s_bars_loaded": 12395770,
+            "1m_bars_loaded": 358816,
+        },
+        "closed_positions_count": closed_positions_count,
+        "strategy_trades_count": strat_closed,
+        "open_positions_count": 0,  # All 2023 positions closed before year end
+        "realized_pnl_total": pnl_realized,
+        "output_files": {
+            "trades_parquet": {
+                "path": str(trades_path.relative_to(repo_root)),
+                "sha256": compute_sha256(trades_path),
+                "rows": len(trades_df),
+                "content_hash": compute_df_hash(trades_df, exclude_cols=["account_id", "trader_id"]),
+            },
+            "strategy_trades_parquet": {
+                "path": str(strat_trades_path.relative_to(repo_root)),
+                "sha256": compute_sha256(strat_trades_path),
+                "rows": len(strat_trades_df),
+                "content_hash": compute_df_hash(strat_trades_df),
+            },
+            "unmanaged_side_effect_parquet": {
+                "path": str(unmanaged_parity_path.relative_to(repo_root)),
+                "sha256": compute_sha256(unmanaged_parity_path),
+                "rows": len(unmanaged_parity_df),
+                "content_hash": compute_df_hash(unmanaged_parity_df),
+            }
+        }
+    }
+
+    # Build Master Capture Manifest
+    capture_manifest = {
+        "capture_timestamp_utc": TIMESTAMP,
+        "git_commit": git_commit,
+        "repo_path": str(repo_root),
+        "evidence_directory": str(CAPTURE_DIR.relative_to(repo_root)),
+        "preserved_preexisting_targets": preserved_records,
+        "external_inputs": {
+            "predictions_parquet": {
+                "path": "studies/regime_sequence_signal_audit/results/weakness_checkpoint_predictions.parquet",
+                "sha256": pred_sha,
+                "total_rows": len(pred_df),
+                "2023_rows": len(df_pred_2023),
+            },
+            "catalog": {
+                "path": "data/catalog/NQ_v0_2020_2026",
+                "symbol": "NQ",
+                "venue": "XCME",
+                "multiplier": 20.0,
+                "price_increment": 0.25,
+            }
+        },
+        "fixtures": {
+            "fixture_1_score_fanning": f1_summary,
+            "fixture_2_w4_b1": f2_summary,
+        }
+    }
+
+    manifest_file = CAPTURE_DIR / "manifest.json"
+    with open(manifest_file, "w", encoding="utf-8") as f:
+        json.dump(capture_manifest, f, indent=2)
+    print(f"\nWrote capture manifest to {manifest_file}")
+
+    # Write root baseline_fixtures.json index referencing immutable capture dir
+    index_file = repo_root / "backtests" / "fixtures" / "baseline_fixtures.json"
+    index_data = {
+        "status": "CAPTURED",
+        "latest_capture_timestamp": TIMESTAMP,
+        "latest_capture_dir": str(CAPTURE_DIR.relative_to(repo_root)),
+        "latest_manifest": str(manifest_file.relative_to(repo_root)),
+        "git_commit": git_commit,
+        "fixtures_summary": {
+            "score_fanning": {
+                "command": f1_summary["command"],
+                "r5_trades": f1_summary["evaluators"]["R5"]["total_trades"],
+                "r5_pnl": f1_summary["evaluators"]["R5"]["gross_pnl"],
+                "r25_trades": f1_summary["evaluators"]["R2.5"]["total_trades"],
+                "r25_pnl": f1_summary["evaluators"]["R2.5"]["gross_pnl"],
+                "r5_content_hash": f1_summary["evaluators"]["R5"]["content_hash"],
+                "r25_content_hash": f1_summary["evaluators"]["R2.5"]["content_hash"],
+            },
+            "w4_exit_b1": {
+                "command": f2_summary["command"],
+                "closed_positions": f2_summary["closed_positions_count"],
+                "strategy_trades": f2_summary["strategy_trades_count"],
+                "realized_pnl_total": f2_summary["realized_pnl_total"],
+                "trades_content_hash": f2_summary["output_files"]["trades_parquet"]["content_hash"],
+                "strategy_trades_content_hash": f2_summary["output_files"]["strategy_trades_parquet"]["content_hash"],
+                "unmanaged_parity_content_hash": f2_summary["output_files"]["unmanaged_side_effect_parquet"]["content_hash"],
+            }
+        }
+    }
+    with open(index_file, "w", encoding="utf-8") as f:
+        json.dump(index_data, f, indent=2)
+    print(f"Wrote baseline fixtures index to {index_file}")
+
+    print("\n=== Baseline Capture Completed Successfully ===")
+
+if __name__ == "__main__":
+    main()

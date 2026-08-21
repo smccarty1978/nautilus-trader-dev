@@ -1,0 +1,16 @@
+{
+  "instrument": {
+    "symbol": "YM",
+    "venue": "XCBT"
+  },
+  "population_type": "regime_state",
+  "prevailing_regime": "both",
+  "session": "RTH",
+  "qualification": {},
+  "causal_checkpoint": {
+    "checkpoint_frequency": "5s",
+    "checkpoint_grid_origin": "regime_start_ns",
+    "triggering_stream": "completed_1s_bar",
+    "observation_timing": "interval_close"
+  }
+}

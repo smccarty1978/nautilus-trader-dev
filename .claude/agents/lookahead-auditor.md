@@ -1,7 +1,7 @@
 ---
 name: lookahead-auditor
 description: Use proactively before any backtest, study, or strategy review to audit for look-ahead bias and NautilusTrader timestamp misuse. Performs a read-only static analysis and writes a per-pass Markdown report plus a machine-readable status.json.
-tools: [Read, Grep, Glob, Bash, Write]
+tools: [Read, Grep, Glob, Write]
 model: claude-sonnet-5
 effort: high
 ---
@@ -33,16 +33,15 @@ stopping point for them; one study ran 18 audit passes as a result. If you spot
 a completeness problem, write one line under `## Referred to contract-checker`
 and move on. Do not block on it. Do not itemize it. Do not re-raise it later.
 
-## Step 1 — read the deterministic lint first
+## Step 1 — verify deterministic preflight passed first
+
+Read `<study_dir>/audit/preflight.json`. Preflight must be `CLEAR`.
 
 ```bash
-python scripts/causal_lint.py --study <study_dir> --json <study_dir>/audit/lint.json
+python scripts/research_preflight.py --study <study_dir>
 ```
 
-Everything the lint already caught is **out of your scope** — it is reported
-and tracked without your tokens. Your job is what grep cannot see: state flow,
-callback ordering, cross-file convention conflicts, train/serve divergence.
-Do not re-report a lint finding.
+Everything deterministic checks (AST lint, schema checks, model binding, invariant canaries) already proved is **out of your scope** — it is proven without your tokens. Your job is what deterministic gates cannot fully resolve: complex state flow, callback ordering, cross-file convention conflicts, train/serve divergence. Do not re-report a preflight finding.
 
 ## Step 2 — diff-first review
 
@@ -78,37 +77,38 @@ validation would fail. Speculative hardening is a `NOTE`.
 previous pass's file. Append-only audit files grew to 1,240 lines and made the
 verdict unparseable by any automated gate.
 
-**2. `<study_dir>/audit/status.json`** — overwrite each pass:
+It MUST contain the V2 audit summary block parsed by `scripts/run_preexec_audits.py`:
 
-```json
-{
-  "agent": "lookahead-auditor",
-  "pass": 3,
-  "date": "<ISO-8601>",
-  "scope_hash": "<sha256 of ordered file list>",
-  "critical": 0,
-  "warning": 1,
-  "note": 2,
-  "verdict": "PASS",
-  "report": "audit/pass_03.md",
-  "prior_findings_adjudicated": true,
-  "referred_to_contract_checker": 2
-}
+```
+<!-- AUDIT_SUMMARY_V2_START -->
+{"verdict": "CLEAR", "audit_type": "causal", "auditor": "<actual declared reviewer identity>", "critical": 0, "warning": 0, "note": 0, "study": "<study_id>", "audited_execution_composite_sha256": "<declared composite>"}
+<!-- AUDIT_SUMMARY_V2_END -->
 ```
 
-`verdict` is exactly one of `PASS`, `BLOCKED`, `INCOMPLETE`. Gates read this
-file, not the prose.
+*Auditor Identity Rules*:
+- `lookahead-auditor` is the audit **ROLE**, not a mandatory reviewer identity string.
+- Do not substitute the role name for reviewer identity unless that role name is genuinely the externally declared identity for the invocation.
+- Causal and contract reviews MUST use **DISTINCT** declared reviewer identities. One reviewer/session must NOT author both audit roles.
+- The reviewer declares the composite; tooling verifies it against the resolved execution manifest and must never self-generate or stamp it.
+
+**2. `<study_dir>/audit/status.json`** — issued via `run_preexec_audits.py` or written as a convenience copy.
+
+`verdict` is strictly `CLEAR` or `BLOCKED` (or `INCOMPLETE`). Gates read this block, not prose.
 
 ## Report template
 
 ```markdown
+<!-- AUDIT_SUMMARY_V2_START -->
+{"verdict": "CLEAR", "audit_type": "causal", "auditor": "<actual declared reviewer identity>", "critical": 0, "warning": 0, "note": 0, "study": "<study_id>", "audited_execution_composite_sha256": "<declared composite>"}
+<!-- AUDIT_SUMMARY_V2_END -->
+
 # Look-Ahead & Timestamp Audit — Pass <NN>
 
 **Date:** <ISO-8601>
 **Scope:** <files inspected>
 **Scope hash:** <sha256>
 **Lint:** <N critical / N warning from causal_lint.py>
-**Verdict:** <PASS | BLOCKED | INCOMPLETE>
+**Verdict:** <CLEAR | BLOCKED | INCOMPLETE>
 
 ## Summary
 - Critical: N

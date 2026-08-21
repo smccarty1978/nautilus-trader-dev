@@ -1,0 +1,176 @@
+{
+  "version": 2,
+  "last_updated": "2026-08-14",
+  "defects": [
+    {
+      "id": "H4_TRIGGER_PRICE_FILL",
+      "rule_id": "H4",
+      "severity": "CRITICAL",
+      "name": "PnL or fill calculated directly from trigger/stop price level",
+      "root_cause": "Assuming an order fills at the exact trigger price rather than the actual simulated bar fill / next-bar open.",
+      "invariant": "All order fills and PnL must be derived from actual execution bar prices or NT BacktestEngine reports, never trigger levels.",
+      "detection": "scripts/causal_lint.py (Rule H4)",
+      "regression_test": "scripts/tests/test_causal_lint.py::test_rule_fires"
+    },
+    {
+      "id": "A1_TS_EVENT_SESSION_GATE",
+      "rule_id": "A1/F1",
+      "severity": "CRITICAL",
+      "name": "Session classification reads bar open timestamp (.ts_event)",
+      "root_cause": "Reading ts_event allows decisions at interval start to know the bar outcome before it completes.",
+      "invariant": "Session attribution and indicator calculations must use completed bar timestamp (.ts_init).",
+      "detection": "scripts/causal_lint.py (Rule A1/F1)",
+      "regression_test": "scripts/tests/test_causal_lint.py::test_rule_fires"
+    },
+    {
+      "id": "A5_RIGHT_CLOSED_RESAMPLE_LOOKAHEAD",
+      "rule_id": "A5/G3",
+      "severity": "CRITICAL",
+      "name": "Resampling open-stamped 1s data with closed='right'",
+      "root_cause": "closed='right' includes the tick at timestamp T into the interval closing at T, looking 1 second into the future.",
+      "invariant": "For raw unshifted open-stamped Databento data, resample must use label='right', closed='left'.",
+      "detection": "utils/resampling.py, scripts/causal_lint.py (Rule A5/G3)",
+      "regression_test": "scripts/tests/test_resampling.py::test_open_stamped_1s_resample_boundary"
+    },
+    {
+      "id": "PARTIAL_AUTHORIZED_DOMAIN_GUARD",
+      "rule_id": "DOMAIN_GUARD",
+      "severity": "CRITICAL",
+      "name": "Multi-stream domain guard asymmetry (1s protected, 1m unprotected)",
+      "root_cause": "Filtering 1s data by authorized year/date while leaving coincident 1m data unfiltered.",
+      "invariant": "All coincident streams in a collector/study must apply identical authorized domain filtering.",
+      "detection": "scripts/check_authorized_domain.py",
+      "regression_test": "scripts/tests/test_guardrail_mutations.py::test_partial_authorized_domain_guard_mutation_blocked"
+    },
+    {
+      "id": "MIXED_TIMEFRAME_CALLBACK_INVERSION",
+      "rule_id": "E1_REGISTRATION",
+      "severity": "CRITICAL",
+      "name": "Mixed 1s/1m bar streams registered out of causal order",
+      "root_cause": "Adding coincident 1m bars before 1s bars causes 1m triggers to execute before 1s bars at that timestamp run.",
+      "invariant": "At coincident close timestamp T, 1s bars MUST process before parent 1m bar.",
+      "detection": "utils/causal_registration.py (add_bars_causal_order)",
+      "regression_test": "scripts/tests/test_guardrail_mutations.py::test_mixed_timeframe_callback_inversion_mutation_detected"
+    },
+    {
+      "id": "TS_INIT_DELTA_BAR_CLOSE_TIMING",
+      "rule_id": "A2_BAR_TIMING",
+      "severity": "CRITICAL",
+      "name": "Databento open-stamped bars loaded into NT without appropriate ts_init_delta",
+      "root_cause": "Missing delta causes NT event loop to process bars at open timestamp instead of bar close.",
+      "invariant": "Databento bars must add duration delta (1m: +60s, 3m: +180s, 5m: +300s) when creating NT catalog bars.",
+      "detection": "utils/resampling.py, scripts/causal_lint.py",
+      "regression_test": "scripts/tests/test_guardrail_mutations.py::test_ts_init_delta_bar_timing_contract"
+    },
+    {
+      "id": "STALE_AUDIT_BINDING",
+      "rule_id": "SEAL_AUDIT_BINDING",
+      "severity": "CRITICAL",
+      "name": "Seal references audit conducted on older/different code hash",
+      "root_cause": "Promoting model or strategy using stale pass_NN.md from prior modified tree.",
+      "invariant": "Promoted seal must bind to audit_status whose audited_code_sha256 matches current code hash.",
+      "detection": "scripts/check_artifact_schema.py",
+      "regression_test": "scripts/tests/test_guardrail_mutations.py::test_stale_audit_binding_mutation_blocked"
+    },
+    {
+      "id": "STALE_VALIDATION_BINDING",
+      "rule_id": "SEAL_VALIDATION_BINDING",
+      "severity": "CRITICAL",
+      "name": "Seal references validation report for different model hash",
+      "root_cause": "Promoting model artifact using validation metrics from a different model run.",
+      "invariant": "Promoted seal must bind to validation report whose validated_model_sha256 matches model_sha256.",
+      "detection": "scripts/check_artifact_schema.py",
+      "regression_test": "scripts/tests/test_guardrail_mutations.py::test_stale_validation_binding_mutation_blocked"
+    },
+    {
+      "id": "INCOMPLETE_TERMINAL_PROMOTION_EVIDENCE",
+      "rule_id": "PROMOTION_COMPLETENESS",
+      "severity": "CRITICAL",
+      "name": "Promotion manifest missing mandatory terminal evidence hashes",
+      "root_cause": "Promoting without complete cryptographic chain (missing preflight, code, spec, model, or test hashes).",
+      "invariant": "All 9 mandatory terminal evidence fields must be present and verified in promotion manifest.",
+      "detection": "scripts/check_artifact_schema.py",
+      "regression_test": "scripts/tests/test_guardrail_mutations.py::test_incomplete_terminal_evidence_mutation_blocked"
+    },
+    {
+      "id": "SESSION_BOUNDARY_MISATTRIBUTION",
+      "rule_id": "SESSION_BOUNDARY",
+      "severity": "CRITICAL",
+      "name": "Misclassifying 08:30:00 CT close as RTH or 15:15:00 CT close as ETH",
+      "root_cause": "Inclusive >= or strict < inequality error on close-timestamped session boundaries.",
+      "invariant": "1m bar at 08:30:00 CT close is ETH; first RTH 1m bar is 08:31:00 CT close. Final RTH 1m bar is 15:15:00 CT close.",
+      "detection": "utils/session_boundaries.py",
+      "regression_test": "scripts/tests/test_guardrail_mutations.py::test_mutated_0830_session_boundary_turns_red"
+    },
+    {
+      "id": "B1_CENTERED_ROLLING_WINDOW",
+      "rule_id": "B1",
+      "severity": "CRITICAL",
+      "name": "Rolling window with center=True",
+      "root_cause": "Centered rolling window aggregates future observations symmetrically.",
+      "invariant": "All rolling calculations must be strictly backward-looking (center=False).",
+      "detection": "scripts/causal_lint.py (Rule B1), utils/causal_canaries.py",
+      "regression_test": "scripts/tests/test_causal_canaries.py::test_noncausal_centered_rolling_fails_canaries"
+    },
+    {
+      "id": "B4_NEGATIVE_SHIFT_FEATURE_LEAK",
+      "rule_id": "B4",
+      "severity": "CRITICAL",
+      "name": "Negative shift (.shift(-N)) in feature path",
+      "root_cause": "Pulling future prices backward into feature calculation columns.",
+      "invariant": "Negative shift is strictly forbidden in feature engineering; legal only in supervised target label construction with explicit pragma.",
+      "detection": "scripts/causal_lint.py (Rule B4), utils/causal_canaries.py",
+      "regression_test": "scripts/tests/test_causal_canaries.py::test_negative_shift_fails_future_mutation_canary"
+    },
+    {
+      "id": "B5_BACKWARD_FILL",
+      "rule_id": "B5",
+      "severity": "CRITICAL",
+      "name": "Backward fill (.bfill() or method='bfill')",
+      "root_cause": "Propagating future valid values into past missing values.",
+      "invariant": "Missing values must use forward fill (.ffill()), interpolation on past values, or explicit drop, never backfill.",
+      "detection": "scripts/causal_lint.py (Rule B5)",
+      "regression_test": "scripts/tests/test_causal_lint.py::test_rule_fires"
+    },
+    {
+      "id": "B6_UNCONSTRAINED_ASOF_MERGE",
+      "rule_id": "B6",
+      "severity": "CRITICAL",
+      "name": "pd.merge_asof without explicit direction='backward'",
+      "root_cause": "Default merge direction or forward/nearest directions align with future timestamps.",
+      "invariant": "All merge_asof operations must explicitly state direction='backward'.",
+      "detection": "scripts/causal_lint.py (Rule B6)",
+      "regression_test": "scripts/tests/test_causal_lint.py::test_rule_fires"
+    },
+    {
+      "id": "C3_RANDOM_CV_SPLIT_LEAK",
+      "rule_id": "C3",
+      "severity": "CRITICAL",
+      "name": "Random shuffling in cross-validation or train_test_split",
+      "root_cause": "Shuffling time-series samples leaks future regime and volatility data into training sets.",
+      "invariant": "All time-series model evaluations must use temporal splits (TimeSeriesSplit or shuffle=False).",
+      "detection": "scripts/causal_lint.py (Rule C3)",
+      "regression_test": "scripts/tests/test_causal_lint.py::test_timeseries_split_does_not_suppress_a_separate_random_splitter"
+    },
+    {
+      "id": "SEAL_DAG_CYCLE_OR_SELF_REFERENCE",
+      "rule_id": "SEAL_DAG",
+      "severity": "CRITICAL",
+      "name": "Self-referential seal or circular dependency in promotion DAG",
+      "root_cause": "Seal artifact claiming itself as evidence or cyclical promotion dependencies.",
+      "invariant": "Artifact DAG must be strictly acyclic: source/model -> validation -> audit -> seal -> promotion.",
+      "detection": "scripts/check_artifact_schema.py",
+      "regression_test": "scripts/tests/test_artifact_schema.py::test_seal_dag_cycle_rejected"
+    },
+    {
+      "id": "MODEL_FEATURE_ORDER_MISMATCH",
+      "rule_id": "MODEL_BINDING",
+      "severity": "CRITICAL",
+      "name": "Model feature count or ordering mismatch at inference runtime",
+      "root_cause": "Inference passing feature vectors in different column order than training matrix.",
+      "invariant": "Feature vectors must match model.feature_names_in_ exactly by name and sequence.",
+      "detection": "scripts/check_model_binding.py",
+      "regression_test": "scripts/tests/test_model_binding.py::test_feature_count_mismatch"
+    }
+  ]
+}

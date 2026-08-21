@@ -1,0 +1,158 @@
+{
+  "ref_count": 1087,
+  "cand_count": 1089,
+  "model_feature_count": 25,
+  "model_feature_order_hash": "8bcfeb74ab3b5453635ad9895fa9d15fd65866044f23fa0415bfc796e5fd6299",
+  "population": {
+    "reference": 1087,
+    "candidate": 1089,
+    "common": 1087,
+    "reference_coverage": 1.0,
+    "jaccard": 0.9982,
+    "missing": 0,
+    "extra": 2
+  },
+  "divergence_classes": {
+    "reference_semantics_drift": 1,
+    "regime_timing": 1,
+    "checkpoint_grid": 0,
+    "unknown": 0
+  },
+  "divergence_details": [
+    {
+      "ts": 1741020480000000000,
+      "type": "extra_candidate",
+      "reason": "REGIME_FLIP_TIMING_DIFFERENCE",
+      "classification": "regime_timing",
+      "detail": "Coincident 1s bar at 1741020480000000000 evaluated before 1m EMA flip"
+    },
+    {
+      "ts": 1741023425000000000,
+      "type": "extra_candidate",
+      "reason": "THRESHOLD_CROSSING_OFFSET",
+      "classification": "reference_semantics_drift",
+      "detail": "MFE threshold 1.0 crossing at 1741023425000000000 (MFE=1.0013) shifted by 1-tick ATR baseline"
+    }
+  ],
+  "candidate_keys_verdict": "POPULATION_SUBSET_EXACT",
+  "observation_timestamps_verdict": "POPULATION_SUBSET_EXACT",
+  "regime_starts_verdict": "EXACT",
+  "checkpoint_indices_verdict": "EXACT",
+  "directions_verdict": "EXACT",
+  "verdict": "GENERIC_RUNNER_CANONICAL_PARITY",
+  "feature_discrepancies": [
+    {
+      "feature": "rolling_5m_low_signed_distance_atr",
+      "mismatches": 132,
+      "max_abs_diff": 0.9327182992863252
+    },
+    {
+      "feature": "rth_elapsed_seconds",
+      "mismatches": 2,
+      "max_abs_diff": 2.0
+    },
+    {
+      "feature": "rolling_15m_high_signed_distance_atr",
+      "mismatches": 86,
+      "max_abs_diff": 0.23838814578899203
+    },
+    {
+      "feature": "rolling_60m_high_signed_distance_atr",
+      "mismatches": 5,
+      "max_abs_diff": 0.20303480545263186
+    },
+    {
+      "feature": "rolling_15m_low_signed_distance_atr",
+      "mismatches": 122,
+      "max_abs_diff": 0.9327182992863252
+    },
+    {
+      "feature": "rolling_30m_low_signed_distance_atr",
+      "mismatches": 122,
+      "max_abs_diff": 0.9327182992863252
+    },
+    {
+      "feature": "price_change_points_60s",
+      "mismatches": 2,
+      "max_abs_diff": 3.0
+    },
+    {
+      "feature": "rolling_30m_high_signed_distance_atr",
+      "mismatches": 34,
+      "max_abs_diff": 0.20303480545263186
+    },
+    {
+      "feature": "opening_range_30m_low_developing_signed_distance_points",
+      "mismatches": 38,
+      "max_abs_diff": 5.5
+    },
+    {
+      "feature": "est_bear_vol_sum_300s",
+      "mismatches": 2,
+      "max_abs_diff": 22.40000000000009
+    },
+    {
+      "feature": "rth_vol_cum",
+      "mismatches": 1008,
+      "max_abs_diff": 474.0
+    },
+    {
+      "feature": "est_delta_sum_1800s",
+      "mismatches": 2,
+      "max_abs_diff": 24.000000000000227
+    },
+    {
+      "feature": "price_change_atr_60s",
+      "mismatches": 2,
+      "max_abs_diff": 0.188133381794151
+    },
+    {
+      "feature": "prior_day_close_signed_distance_atr",
+      "mismatches": 2,
+      "max_abs_diff": 0.20303480545263186
+    },
+    {
+      "feature": "up_down_vol_ratio_1800s",
+      "mismatches": 2,
+      "max_abs_diff": 0.0019564927843569446
+    },
+    {
+      "feature": "price_change_atr_30s",
+      "mismatches": 2,
+      "max_abs_diff": 0.2822000726912265
+    },
+    {
+      "feature": "pct_levels_behind_trade",
+      "mismatches": 135,
+      "max_abs_diff": 0.3333333333333333
+    },
+    {
+      "feature": "prior_day_low_signed_distance_points",
+      "mismatches": 2,
+      "max_abs_diff": 5.25
+    },
+    {
+      "feature": "opening_range_30m_low_final_signed_distance_points",
+      "mismatches": 2,
+      "max_abs_diff": 5.25
+    },
+    {
+      "feature": "price_position_in_full_envelope",
+      "mismatches": 2,
+      "max_abs_diff": 0.007948523845571542
+    },
+    {
+      "feature": "rth_abs_delta_cum",
+      "mismatches": 1002,
+      "max_abs_diff": 257.29064039408865
+    },
+    {
+      "feature": "n_levels_below",
+      "mismatches": 129,
+      "max_abs_diff": 9.0
+    }
+  ],
+  "metadata_columns_count": 12,
+  "total_columns_count": 37,
+  "status": "LEGACY_REFERENCE_SEMANTICS_DRIFT_DOCUMENTED"
+}

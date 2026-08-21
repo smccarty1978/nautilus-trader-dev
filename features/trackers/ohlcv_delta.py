@@ -119,10 +119,9 @@ class OHLCVDeltaTracker:
         self.est_deltas.append(b["bar_est_delta"])
         return b
 
-    def accumulate_regime_rth(self, ts_event: int, high: float, low: float,
-                              volume: float, est_delta: float) -> None:
-        """Attribute one bar's volume/delta to the currently-active regime/RTH
-        state. See `update()`'s docstring for why this is a separate call."""
+    def accumulate_regime(self, ts_event: int, high: float, low: float,
+                          volume: float, est_delta: float) -> None:
+        """Attribute a completed bar to an already-active 1m regime only."""
         if self._regime_start_ts is not None:
             self._regime_vol_sum += volume
             self._regime_delta_sum += est_delta
@@ -131,14 +130,22 @@ class OHLCVDeltaTracker:
             self._regime_low = low if self._regime_low is None else min(self._regime_low, low)
             self._regime_bar_log.append((int(ts_event), float(volume), est_delta))
 
+    def accumulate_rth(self, volume: float, est_delta: float) -> None:
+        """Attribute a completed bar to the close-time RTH session only."""
         if self._rth_active:
             self._rth_vol_cum += volume
             self._rth_delta_cum += est_delta
             self._rth_abs_delta_cum += abs(est_delta)
 
-    def reset_regime(self, ts_event: int, anchor_price: float) -> None:
+    def accumulate_regime_rth(self, ts_avail: int, high: float, low: float,
+                              volume: float, est_delta: float) -> None:
+        """Backward-compatible combined attribution for legacy callers."""
+        self.accumulate_regime(ts_avail, high, low, volume, est_delta)
+        self.accumulate_rth(volume, est_delta)
+
+    def reset_regime(self, ts_avail: int, anchor_price: float) -> None:
         """Call when the prevailing 1m regime changes (new regime start)."""
-        self._regime_start_ts = int(ts_event)
+        self._regime_start_ts = int(ts_avail)
         self._regime_anchor_price = float(anchor_price)
         self._regime_vol_sum = 0.0
         self._regime_delta_sum = 0.0
@@ -147,10 +154,10 @@ class OHLCVDeltaTracker:
         self._regime_low = None
         self._regime_bar_log = []
 
-    def reset_rth(self, ts_event: int) -> None:
+    def reset_rth(self, ts_avail: int) -> None:
         """Call at the first bar of a new RTH session."""
         self._rth_active = True
-        self._rth_start_ts = int(ts_event)
+        self._rth_start_ts = int(ts_avail)
         self._rth_vol_cum = 0.0
         self._rth_delta_cum = 0.0
         self._rth_abs_delta_cum = 0.0

@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0.0",
+  "analysis_id": "ym_prev5_range_position_train_pilot",
+  "question": "Does latest_1m_close_position_prev5_range show enough descriptive separation between YM observations that do and do not experience the prevailing 1m regime transition within 300s to justify expanding TRAIN?",
+  "generated_utc": "2026-08-18T13:25:41.371946+00:00",
+  "identity": {
+    "collection_identity_sha256": "6a2040d282f80ccd44a579c2d2d0e669cf6c48bd3b039f810699ff47cd8346c3",
+    "analysis_spec_sha256": "4a321a6b7c2d5b3a8f802a431cdb03f9721ef631fbf04c684fb1cef000fad1e1",
+    "run_id": "20260818_132043_ym_prev5_range_position_day",
+    "study_id": "ym_prev5_range_position",
+    "sealed": true,
+    "allow_unsealed_collection": false,
+    "stage": "day",
+    "window": [
+      "2024-09-03",
+      "2024-09-03"
+    ]
+  },
+  "validation": {
+    "passed": true,
+    "failed_checks": [],
+    "spec_supplied": true,
+    "skipped_checks": [],
+    "partition_row_counts": {
+      "train": 1038
+    },
+    "join_key": [
+      "observation_ts",
+      "regime_start_ns",
+      "regime_direction",
+      "checkpoint_index"
+    ],
+    "join_key_source": "collection_manifest.columns.observations",
+    "metadata_source": "fallback"
+  },
+  "headline_metrics": {
+    "feature_as_score_roc_auc": {
+      "metric": "roc_auc",
+      "value": 0.6268433454237378,
+      "status": "ok",
+      "reason": "",
+      "n": 1027,
+      "n_missing": 11,
+      "definition": "Area under the ROC curve. Undefined unless both classes are present."
+    },
+    "feature_as_score_pr_auc": {
+      "metric": "pr_auc",
+      "value": 0.4187302813487934,
+      "status": "ok",
+      "reason": "",
+      "n": 1027,
+      "n_missing": 11,
+      "definition": "Average precision (area under the precision-recall curve). Undefined unless both classes are present."
+    },
+    "positive_rate": {
+      "metric": "positive_rate",
+      "value": 0.31256085686465435,
+      "status": "ok",
+      "reason": "",
+      "n": 1027,
+      "n_missing": 11,
+      "definition": "Mean of the binary target; the slice's base rate."
+    }
+  },
+  "tables": {
+    "descriptive_all": {
+      "slice": "none",
+      "n_groups": 1,
+      "total_sample_count": 1038,
+      "n_input_rows": 1038,
+      "reconciles_rows": false,
+      "unassigned_rows": null,
+      "paths": {
+        "csv": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range.csv",
+        "json": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range.json"
+      }
+    },
+    "descriptive_positive": {
+      "slice": "none",
+      "n_groups": 1,
+      "total_sample_count": 321,
+      "n_input_rows": 321,
+      "reconciles_rows": false,
+      "unassigned_rows": null,
+      "paths": {
+        "csv": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range__target_positive.csv",
+        "json": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range__target_positive.json"
+      }
+    },
+    "descriptive_negative": {
+      "slice": "none",
+      "n_groups": 1,
+      "total_sample_count": 706,
+      "n_input_rows": 706,
+      "reconciles_rows": false,
+      "unassigned_rows": null,
+      "paths": {
+        "csv": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range__target_negative.csv",
+        "json": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range__target_negative.json"
+      }
+    },
+    "descriptive_bullish": {
+      "slice": "none",
+      "n_groups": 1,
+      "total_sample_count": 397,
+      "n_input_rows": 397,
+      "reconciles_rows": false,
+      "unassigned_rows": null,
+      "paths": {
+        "csv": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range__bullish_candidates.csv",
+        "json": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range__bullish_candidates.json"
+      }
+    },
+    "descriptive_bearish": {
+      "slice": "none",
+      "n_groups": 1,
+      "total_sample_count": 641,
+      "n_input_rows": 641,
+      "reconciles_rows": false,
+      "unassigned_rows": null,
+      "paths": {
+        "csv": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range__bearish_candidates.csv",
+        "json": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/descriptive_latest_1m_close_position_prev5_range__bearish_candidates.json"
+      }
+    },
+    "by_target_disposition": {
+      "slice": "target_disposition",
+      "n_groups": 3,
+      "total_sample_count": 1038,
+      "n_input_rows": 1038,
+      "reconciles_rows": true,
+      "unassigned_rows": 0,
+      "paths": {
+        "csv": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/by_target_disposition.csv",
+        "json": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/by_target_disposition.json"
+      }
+    },
+    "by_direction": {
+      "slice": "direction",
+      "n_groups": 2,
+      "total_sample_count": 1038,
+      "n_input_rows": 1038,
+      "reconciles_rows": true,
+      "unassigned_rows": 0,
+      "paths": {
+        "csv": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/by_direction.csv",
+        "json": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/by_direction.json"
+      }
+    },
+    "by_fixed_edges": {
+      "slice": "fixed_edges",
+      "n_groups": 3,
+      "total_sample_count": 1038,
+      "n_input_rows": 1038,
+      "reconciles_rows": true,
+      "unassigned_rows": 0,
+      "paths": {
+        "csv": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/by_fixed_edges.csv",
+        "json": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/ym_prev5_range_position/results/tables/by_fixed_edges.json"
+      }
+    }
+  },
+  "metric_definitions": {
+    "sample_count": "Number of rows in the slice after all declared filters.",
+    "positive_rate": "Mean of the binary target; the slice's base rate.",
+    "roc_auc": "Area under the ROC curve. Undefined unless both classes are present.",
+    "pr_auc": "Average precision (area under the precision-recall curve). Undefined unless both classes are present.",
+    "brier": "Mean squared error between predicted probability and the binary outcome. Lower is better.",
+    "win_rate": "Fraction of resolved trades with a positive return.",
+    "expected_value": "Mean return per row, in the units of the supplied return column.",
+    "mfe": "Maximum favourable excursion; reported as mean and the declared quantiles.",
+    "mae": "Maximum adverse excursion; reported as mean and the declared quantiles.",
+    "drawdown": "Maximum peak-to-trough decline of the cumulative return series.",
+    "quantiles": "Empirical quantiles of a numeric series, NaNs excluded and counted.",
+    "descriptive_summary": "count_available, count_null, distinct_count, mean, std, min, max, plus the p10/p25/median/p75/p90 quantile ladder (delegated to quantiles())."
+  },
+  "caveats": [
+    "One-day TRAIN pilot (2024-09-03 only). Not proof of predictive value.",
+    "Feature is descriptive-only; it did not influence candidate selection, labels, timing, censoring, regime state, or direction eligibility.",
+    "roc_auc/pr_auc here use the raw feature value as a 'score' with no fit and no threshold -- a distribution-separation statistic, not a model.",
+    "[by_target_disposition] slice 'target_disposition' left 11 of 1038 rows in no group (value outside the slice's declared bins, or null); they are reported as 'unassigned' and are NOT part of any comparison group",
+    "[by_target_disposition] groups with n<30 (metrics are unstable at this size): ['unassigned']"
+  ],
+  "data_access_note": "This packet references artifacts; it does not embed row-level data. Open the referenced tables only if an anomaly needs investigation.",
+  "report_completeness_problems": []
+}

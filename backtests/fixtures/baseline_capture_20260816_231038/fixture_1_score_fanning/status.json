@@ -1,0 +1,309 @@
+{
+  "fixture_id": "fixture_1_score_fanning",
+  "description": "ScoreFanningStrategy multi-policy virtual evaluator, single day 2023-03-03. Places zero NT orders; its real output is per-policy virtual trade tables.",
+  "status": "SUCCESS",
+  "baseline_valid": true,
+  "command": [
+    "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "backtests/run_staged_backtest.py",
+    "--start-date",
+    "2023-03-03",
+    "--end-date",
+    "2023-03-03"
+  ],
+  "command_display": "python.exe backtests/run_staged_backtest.py --start-date 2023-03-03 --end-date 2023-03-03",
+  "returncode": 0,
+  "started_utc": "2026-08-16T23:10:41.587830+00:00",
+  "finished_utc": "2026-08-16T23:10:47.041665+00:00",
+  "entrypoint": "backtests/run_staged_backtest.py",
+  "source_closure": {
+    "file_count": 8,
+    "stable_across_run": true,
+    "drifted_files": [],
+    "discovery": {
+      "backtests/run_staged_backtest.py": "entrypoint",
+      "strategies/score_fanning_strategy.py": "static_import",
+      "utils/__init__.py": "package_init",
+      "utils/runner/checkpoint.py": "static_import",
+      "utils/runner/data.py": "static_import",
+      "utils/runner/fanning.py": "static_import",
+      "utils/runner/progress.py": "static_import",
+      "utils/runner/registry.py": "static_import"
+    },
+    "discovery_counts": {
+      "entrypoint": 1,
+      "package_init": 1,
+      "static_import": 6
+    },
+    "resolver": "AST transitive walk over repo-local imports, including ancestor package __init__.py files and dotted module paths appearing as string literals (dynamic strategy/config resolution). Not a curated filename list.",
+    "hashes_before": {
+      "backtests/run_staged_backtest.py": "2ac163029d7b3c88c1c853685c289c5a53a4640680da5b6f1b6ede0ee8a88df7",
+      "strategies/score_fanning_strategy.py": "412bfda3b12b17d983e66ffe254a7d72820df9e7b6065bd4508ce4240b948370",
+      "utils/__init__.py": "f5bfd4d288959f97f3474f0cdb69a118186a5c4ae18a52f25108e9f2860d12fe",
+      "utils/runner/checkpoint.py": "9e24e74446f72c1114b44f5ad359f92fd89fdabf2c8b858d4a4ac437220c6404",
+      "utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+      "utils/runner/fanning.py": "8b23d34fd1579126a8ad2ff579d8483f9cb7531c936363c190abc5bc60488355",
+      "utils/runner/progress.py": "9bc8b06102803bc10fd180d10416dbe13af7d3c6e3470dbb5c423fc1d4f0a0c2",
+      "utils/runner/registry.py": "eb52847d1b362015df4b96b9b456385df11cb6200f94f54fa517af1f811df9df"
+    },
+    "hashes_after": {
+      "backtests/run_staged_backtest.py": "2ac163029d7b3c88c1c853685c289c5a53a4640680da5b6f1b6ede0ee8a88df7",
+      "strategies/score_fanning_strategy.py": "412bfda3b12b17d983e66ffe254a7d72820df9e7b6065bd4508ce4240b948370",
+      "utils/__init__.py": "f5bfd4d288959f97f3474f0cdb69a118186a5c4ae18a52f25108e9f2860d12fe",
+      "utils/runner/checkpoint.py": "9e24e74446f72c1114b44f5ad359f92fd89fdabf2c8b858d4a4ac437220c6404",
+      "utils/runner/data.py": "c2aa3d77523c050c817eeea6be54186da02e17156a90872c863e0b5b72f0463a",
+      "utils/runner/fanning.py": "8b23d34fd1579126a8ad2ff579d8483f9cb7531c936363c190abc5bc60488355",
+      "utils/runner/progress.py": "9bc8b06102803bc10fd180d10416dbe13af7d3c6e3470dbb5c423fc1d4f0a0c2",
+      "utils/runner/registry.py": "eb52847d1b362015df4b96b9b456385df11cb6200f94f54fa517af1f811df9df"
+    }
+  },
+  "external_inputs": [],
+  "catalog_bounds": {
+    "status": "ok",
+    "catalog_path": "data/catalog/NQ_v0_2020_2026",
+    "window_start": "2023-02-26 00:00:00+00:00",
+    "window_end": "2023-03-03 23:59:59+00:00",
+    "bar_types": {
+      "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+        "row_count": 252660,
+        "first_ts_event": 1677452400000000000,
+        "last_ts_event": 1677880799000000000,
+        "first_ts_init": 1677452401000000000,
+        "last_ts_init": 1677880800000000000
+      },
+      "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+        "row_count": 6899,
+        "first_ts_event": 1677452400000000000,
+        "last_ts_event": 1677880740000000000,
+        "first_ts_init": 1677452460000000000,
+        "last_ts_init": 1677880800000000000
+      }
+    },
+    "partitions": {
+      "status": "ok",
+      "file_count": 4,
+      "composite_sha256": "028d52ac55dc72826200caaffcda3dba3b88cebc444da8f2592039e9e34e6a8c",
+      "selection_rule": "every *.parquet under the catalog whose filename ts range intersects the load window; partitions with no parseable range are included",
+      "files": [
+        {
+          "path": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2020-01-01T23-01-00-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+          "sha256": "42c22aa2dd677652e99e2e3bf6b7a9ec9d1c6b372c62933f64c5affb99b5822c",
+          "size_bytes": 75891497
+        },
+        {
+          "path": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2020-01-01T23-00-01-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+          "sha256": "55c36ad6bc5c6045d71405aa919769f6b503f501ea0375827cb947469ce16057",
+          "size_bytes": 1837841186
+        },
+        {
+          "path": "data/bar/NQ.XCME-5-MINUTE-LAST-EXTERNAL/2020-01-01T23-05-00-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+          "sha256": "cf8f3769d934a0d86835a335acd371b68570186a560fe6ac0ba8701942aa432c",
+          "size_bytes": 18863024
+        },
+        {
+          "path": "data/futures_contract/NQ.XCME/2020-01-01T00-00-00-000000000Z_2020-01-01T00-00-00-000000000Z.parquet",
+          "sha256": "fb4c710813a7d9e3530795d3851f548c8fca9c7c0100e558bfc74bb989c22aed",
+          "size_bytes": 5937
+        }
+      ]
+    }
+  },
+  "resolved_config": {
+    "status": "observed_from_config_class",
+    "config_class": "strategies.score_fanning_strategy.ScoreFanningConfig",
+    "entrypoint_kwargs": {
+      "instrument_id": "NQ.XCME",
+      "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+      "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+      "checkpoint_dir": "backtests/results/checkpoints",
+      "policies": [
+        {
+          "name": "R5",
+          "threshold": 0.62,
+          "sl_atr_mult": 1.5,
+          "pt_atr_mult": 2.0
+        },
+        {
+          "name": "R2.5",
+          "threshold": 0.5,
+          "sl_atr_mult": 1.5,
+          "pt_atr_mult": 2.0
+        }
+      ]
+    },
+    "kwargs_provenance": "backtests/run_staged_backtest.py:68-77 (strat_cfg_dict literal)",
+    "resolved_fields": {
+      "instrument_id": "NQ.XCME",
+      "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+      "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+      "checkpoint_dir": "backtests/results/checkpoints",
+      "policies": [
+        {
+          "name": "R5",
+          "threshold": 0.62,
+          "sl_atr_mult": 1.5,
+          "pt_atr_mult": 2.0
+        },
+        {
+          "name": "R2.5",
+          "threshold": 0.5,
+          "sl_atr_mult": 1.5,
+          "pt_atr_mult": 2.0
+        }
+      ],
+      "strategy_id": null,
+      "order_id_tag": null,
+      "use_uuid_client_order_ids": false,
+      "use_hyphens_in_client_order_ids": true,
+      "oms_type": null,
+      "external_order_claims": null,
+      "manage_contingent_orders": false,
+      "manage_gtd_expiry": false,
+      "manage_stop": false,
+      "market_exit_interval_ms": 100,
+      "market_exit_max_attempts": 100,
+      "market_exit_time_in_force": 1,
+      "market_exit_reduce_only": true,
+      "log_events": true,
+      "log_commands": true,
+      "log_rejected_due_post_only_as_warning": true
+    },
+    "resolved_field_count": 21
+  },
+  "fill_evidence": {
+    "fill_artifact_present": false,
+    "statement": "No fills exist: ScoreFanningStrategy submits no NT orders, so the positions report is empty by construction and that emptiness is part of the baseline.",
+    "rationale": "The legacy entrypoint does not call generate_order_fills_report() and does not persist fills. Producing one would require instrumenting the run, which Phase 1 forbids. Absence of a fill artifact is therefore stated explicitly rather than left as a silent gap."
+  },
+  "warmup_evidence": {
+    "bars_loaded_by_timeframe": {
+      "1s": 252660,
+      "1m": 6899
+    },
+    "bar_callbacks_dispatched": "unavailable_uninstrumented",
+    "rationale": "Phase 1 executes the legacy entrypoint verbatim; observing per-bar callbacks would require instrumenting it, which would invalidate the authoritative run.",
+    "derived_observations": [
+      {
+        "observation": "daily_checkpoint_files_present",
+        "value": [
+          "checkpoint_2023-03-02.pkl"
+        ],
+        "interpretation": "ScoreFanningStrategy.save_daily_checkpoint fires on a ts_event day rollover. A checkpoint for the day before --start-date indicates at least one pre-start bar was dispatched by ts_event labelling (bars are OPEN-stamped, ts_init=close), and is NOT by itself proof that the full 5-day lead-in was replayed."
+      }
+    ]
+  },
+  "required_targets_not_produced": [],
+  "targets": [
+    {
+      "target_path": "backtests/results/checkpoints/results_R2.5.parquet",
+      "expectation": "produced",
+      "status": "produced_by_current_run",
+      "preexisting_before_run": true,
+      "pre_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+      "pre_size_bytes": 7344,
+      "quarantined_to_prove_absence": true,
+      "preserved_to": "preserved_preexisting/fixture_1_score_fanning/results_R2.5.parquet",
+      "post_run_exists": true,
+      "post_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+      "evidence_copy": "fixture_1_score_fanning/results_R2.5.parquet",
+      "normalized_identity": {
+        "row_count": 20,
+        "columns": [
+          "trade_id",
+          "entry_time",
+          "entry_px",
+          "direction",
+          "qty",
+          "atr",
+          "exit_time",
+          "exit_px",
+          "exit_reason",
+          "pnl",
+          "is_open"
+        ],
+        "columns_hashed": [
+          "trade_id",
+          "entry_time",
+          "entry_px",
+          "direction",
+          "qty",
+          "atr",
+          "exit_time",
+          "exit_px",
+          "exit_reason",
+          "pnl",
+          "is_open"
+        ],
+        "columns_excluded_volatile": [],
+        "normalized_sha256": "5fc80964515084819e8d34698154eca20f447b65b29adcf9c0e1fb3caa3cd07d",
+        "file_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+        "file_size_bytes": 7344
+      },
+      "absence_cause": null,
+      "attribution_note": null,
+      "restored_to_original_state": true,
+      "restore_verified_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857"
+    },
+    {
+      "target_path": "backtests/results/checkpoints/results_R5.parquet",
+      "expectation": "conditional",
+      "status": "expected_absent_verified",
+      "preexisting_before_run": false,
+      "pre_sha256": null,
+      "pre_size_bytes": null,
+      "quarantined_to_prove_absence": false,
+      "preserved_to": null,
+      "post_run_exists": false,
+      "post_sha256": null,
+      "evidence_copy": null,
+      "normalized_identity": null,
+      "absence_cause": "ScoreFanningStrategy.on_bar emits a constant dummy_score=0.55 which is below the R5 threshold of 0.62, so the R5 evaluator opens no trades and run_staged_backtest.py:148 `if trades_list:` is False.",
+      "attribution_note": null,
+      "restored_to_original_state": true,
+      "restore_verified_sha256": null
+    },
+    {
+      "target_path": "backtests/results/checkpoints/resume_manifest.json",
+      "expectation": "conditional",
+      "status": "produced_by_current_run",
+      "preexisting_before_run": true,
+      "pre_sha256": "28e23fef483a888ede2153d26bc386bc62d359e025cf5800e487329f4bf623cc",
+      "pre_size_bytes": 1375,
+      "quarantined_to_prove_absence": true,
+      "preserved_to": "preserved_preexisting/fixture_1_score_fanning/resume_manifest.json",
+      "post_run_exists": true,
+      "post_sha256": "64d0eaabe1f73ef67da80563cf077ae03b0ad0a83ce047b506d0d0a9f59cdd7a",
+      "evidence_copy": "fixture_1_score_fanning/resume_manifest.json",
+      "normalized_identity": null,
+      "absence_cause": null,
+      "attribution_note": null,
+      "restored_to_original_state": true,
+      "restore_verified_sha256": "28e23fef483a888ede2153d26bc386bc62d359e025cf5800e487329f4bf623cc"
+    }
+  ],
+  "preexisting_stale_unmanaged": [
+    {
+      "path": "backtests/results/checkpoints/checkpoint_2023-03-02.pkl",
+      "status": "preexisting_stale_unmanaged",
+      "sha256": "f6e85ea76eb4ad4c1272c826671ff28b864216a7ff803652dea279b1d70311f8",
+      "size_bytes": 321,
+      "note": "Not produced by this run configuration. Preserved in place; never attributed."
+    }
+  ],
+  "undeclared_side_effects": {
+    "created": [
+      "backtests/results/checkpoints/logs/STAGED-BACKTESTER_2026-08-16_4df0939f-2328-42ce-aea4-3f14d698ab16.log",
+      "backtests/results/checkpoints/results_R2.5.parquet",
+      "backtests/results/checkpoints/resume_manifest.json"
+    ],
+    "modified": [
+      "backtests/results/checkpoints/checkpoint_2023-03-02.pkl"
+    ],
+    "note": "Undeclared side effects (NT logs, daily checkpoints) are recorded for provenance and intentionally left in place; they are not attributed as fixture outputs."
+  },
+  "notes": [
+    "Legacy defaults: --checkpoint-dir=backtests/results/checkpoints, --resume absent.",
+    "checkpoint_dir is BOTH an input location and the output location for results_*.parquet.",
+    "NT positions report is expected empty; that emptiness is part of the baseline."
+  ]
+}

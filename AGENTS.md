@@ -34,6 +34,17 @@ This repository follows strict methodology to ensure all backtests, studies, and
 - Strategies: Config-driven, indicator-agnostic
 - Backtests: Strategy-agnostic runners
 - Analysis: Works on any backtest output
+
+### 5. Factory-first study creation
+- Every new study MUST be configured via `study.yaml`, scaffolded via `python scripts/create_study.py --config <study.yaml>`, and validated via `python scripts/compile_study.py`.
+- Coding agents MUST NOT create study-specific implementations for behavior already representable by a canonical study type (e.g. `flip_prediction`).
+- A coding agent proposing bespoke code must provide `BESPOKE_JUSTIFICATION` before implementation.
+
+### 6. Research Decision Contract Authority & Fidelity
+- Precedence: `research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code`.
+- BEFORE drafting or modifying `SPEC.md`: Create or verify `research_decision.yaml`.
+- `SPEC.md` must be derived from `research_decision.yaml`. No study may compile or pass preflight unless decision-contract fidelity passes (`python scripts/check_research_decision_fidelity.py --study studies/<name>`).
+- Behavioral Rule: Never improve, broaden, clean up, or make a study more statistically pure by changing a fixed baseline or adding feature discovery unless the Research Decision Contract explicitly permits it. If a design concern exists, surface it as a caveat; do not silently alter the experiment.
 ---
 
 ## DOCUMENTATION INDEX
@@ -44,6 +55,7 @@ not restate them.
 
 | Topic | Spec |
 |---|---|
+| End-to-end research workflow, stage gates, CLI reference, escalation rules | `docs/RESEARCH_WORKFLOW.md` |
 | Wrangling, catalog build, validation, timestamp convention | `docs/DATA_CATALOG.md` |
 | Runner setup, StrategyConfig, parameter sweeps, logging | `docs/BACKTEST_EXECUTION.md` |
 | NT built-in reports, tearsheets, key metrics | `docs/ANALYSIS_REPORTING.md` |
@@ -52,13 +64,20 @@ not restate them.
 | Profiling, Cython/Rust thresholds, ONNX inference | `docs/PERFORMANCE.md` |
 | Feature registry contract | `features/FEATURE_REGISTRY_CONTRACT.md` |
 
+
 ---
 
 ## AGENT GOVERNANCE
 
-### Audit gate (mandatory)
+### Audit gates (mandatory: pre-execution and completion)
 
-Before declaring any of the following "done", invoke the causal audit subagent (`lookahead-auditor` in Claude; `lookahead_auditor` in Codex):
+For any of the following, the split audit is required **before the first study
+collector, label builder, model-training script, backtest, or staged runner is
+executed**. Unit tests and deterministic lint may run first so the audit has a
+testable code surface. After execution, `contract-checker` verifies the
+materialized deliverables; a completion causal re-audit is required only if the
+audited code/configuration surface changed.
+
 - A new strategy file or material edit to an existing one
 - A new study/research script that produces results you'll act on
 - Any change to data loading, feature engineering, or label construction
@@ -77,29 +96,37 @@ natural stopping point for them —
 `studies/codex_5.6_short_rth_enriched_volume_level_retrain/` ran **18 passes**
 and produced a 1,240-line append-only `audit.md`.
 
-Workflow:
+Pre-execution workflow:
 
-1. **Run the free lint first.** `python scripts/causal_lint.py --study studies/<name> --json studies/<name>/audit/lint.json`.
-   It catches the known-recurring defect classes (H4 trigger-price fills, session
-   gates on `ts_event`, `center=True`, `.shift(-N)`, `bfill`, `merge_asof`
-   without `direction=`, non-`*.v.0` symbols) deterministically and for free.
-   Fix everything it reports before spending an agent turn.
-2. Invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
+1. Freeze the SPEC/config and implement the smallest testable code surface. Do
+   not run collection, label construction, model fitting, backtesting, or a
+   staged runner yet.
+2. **Run deterministic preflight first.** `python scripts/research_preflight.py --study studies/<name>`.
+   It orchestrates AST causal linting (`causal_lint.py`), artifact schema checks (`check_artifact_schema.py`),
+   model/feature binding (`check_model_binding.py`), and fast causal canaries (`select_required_tests.py` -> pytest)
+   deterministically and for free.
+   - If preflight is `BLOCKED`, inspect `audit/failure_packet.json` and resolve all issues locally.
+   - Coding agents may NOT bypass a `BLOCKED` preflight or request an audit while preflight is failing.
+3. Once preflight is `CLEAR`, invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
    on the Deliverables Manifest. They are independent and may run in parallel.
-3. Each writes a **new** `audit/pass_<NN>.md` plus a machine-readable
+4. Each writes a **new** `audit/pass_<NN>.md` plus a machine-readable
    `audit/status.json` (`contract_status.json` for the contract-checker).
    **Never append to a previous pass's report** — append-only files make the
    verdict unparseable, and a gate that greps for "critical" and "0" will pass
    on a failing report that merely contains an earlier clean summary.
-4. Address every CRITICAL finding by editing the code (do not dismiss without
+5. Address every CRITICAL finding by editing the code (do not dismiss without
    explicit user approval). Address WARNINGs unless out of scope or waived.
-5. Re-invoke on the same scope, **passing the previous pass's findings**. The
+6. Re-invoke on the same scope, **passing the previous pass's findings**. The
    auditor must adjudicate every prior finding (`FIXED` / `NOT FIXED` /
    `WITHDRAWN`) *before* raising anything new, and may raise **at most 3 new
    CRITICAL findings per pass.**
-6. Repeat 4–5 until `status.json` shows `critical: 0` and either zero WARNING or
+7. Repeat 5–6 until `status.json` shows `critical: 0` and either zero WARNING or
    user-acknowledged WARNING.
-7. Only then report back to the user.
+8. Only after both statuses are clean may the study/model execution begin. If
+   code or configuration changes afterward, re-run lint and the affected audit
+   before executing the changed pipeline. Before acceptance, run
+   `contract-checker` against the materialized deliverables and re-run the causal
+   audit if the audited code/configuration surface changed.
 
 Gates read `audit/status.json`. Do not parse prose for a verdict.
 
@@ -116,7 +143,7 @@ anchor to the code they audited.
 | Trigger | Message prefix | Must include |
 |---|---|---|
 | SPEC frozen (before implementation) | `spec(<study>):` | `SPEC.md`, `config/*.yaml` |
-| Phase gate passed (`status.json` clean) | `phase(<study>): <phase> <verdict>` | code + `audit/pass_NN.md` + `audit/status.json` |
+| Phase gate passed (`status.json` clean) | `phase(<study>): <phase> <verdict>` | code + `audit/pass_NN.md` + `audit/status.json` + `audit/pass_ledger.json` + `audit_lineage/<study>.json` |
 | Study accepted | `study(<study>): ACCEPTED` | `BUILD_REPORT.md` / `STUDY_REPORT.md` + manifests |
 | Tooling / governance change | `chore:` or `docs:` | — |
 
@@ -127,12 +154,18 @@ Rules:
 2. **The audit artifact commits with the code it audited.** A `pass_NN.md`
    committed separately from its code is unanchored — the scope hash it records
    must correspond to the tree in that same commit.
-3. **Never commit generated data.** `canonical_*/`, `_work/`, `results/*.parquet`,
+3. **The durable audit anchor commits with the pass it anchors.**
+   `audit_lineage/<study>.json` is the half of the audit-immutability control that
+   survives deleting `studies/<id>/audit/`, and git is what makes it durable — an
+   uncommitted anchor is only as durable as the working tree. `git clean -xdf` on an
+   uncommitted anchor is a silent audit-history reset. It is **not** generated data and
+   is exempt from rule 4; see `audit_lineage/README.md`.
+4. **Never commit generated data.** `canonical_*/`, `_work/`, `results/*.parquet`,
    `artifacts/**/model.joblib` stay untracked. Commit the *manifests* and hashes
    that identify them, not the bytes.
-4. Run `python scripts/causal_lint.py` and `python scripts/sync_agents.py --check`
+5. Run `python scripts/causal_lint.py` and `python scripts/sync_agents.py --check`
    before committing. Both must exit 0.
-5. Do not use `--no-verify` or skip hooks.
+6. Do not use `--no-verify` or skip hooks.
 
 ### Agent definition parity (all three harnesses)
 
@@ -186,7 +219,11 @@ If a mandatory gate and a session-level restriction appear to conflict, the orch
 
 Passing criteria remain governed by the applicable frozen contract or SPEC. Standing authorization to invoke an auditor does not relax the audit acceptance standard. Do not mark the work finalized unless the audit satisfies the acceptance gate defined by the applicable frozen SPEC. At minimum, any CRITICAL finding blocks finalization. Any WARNING must either be remediated or explicitly adjudicated according to the SPEC; do not silently treat an unresolved WARNING as cleared.
 
-**Pre-execution trigger for complex causal/matching logic.** The completion gate above catches bugs only after the full pipeline has already run once — expensive when a multi-phase study (smoothing, matched-donor placebos, permutation/shuffle controls, stop-timing mechanics) has to be entirely rerun after the fact. For any of the following, invoke the harness-specific lookahead auditor (`lookahead_auditor` in Codex) on that component's code BEFORE its first execution, not only before declaring the study done:
+**Immediate component audit for high-risk logic.** The universal pre-execution
+gate above applies to every study and model-training pipeline. For the following
+components, invoke the harness-specific lookahead auditor immediately after that
+component is implemented, before any dependent code is added or any execution
+occurs:
 - state-smoothing / hysteresis state machines
 - matched-donor or nearest-neighbor selection logic (placebos, controls)
 - any shuffle/permutation/circular-shift control
@@ -201,64 +238,60 @@ If the component reuses another study's execution stack "verbatim," audit it any
 ```
 {repo_root}/
 │
-├── AGENTS.md                    # This file - framework rules
+├── AGENTS.md                    # Framework rules & governance
+├── CLAUDE.md                    # Core invariants & quick reference
 │
-├── data/
-│   ├── raw/                     # Raw parquet from Databento
-│   └── catalog/                 # NT catalog (generated)
+├── docs/                        # Operational specs & workflow manuals
+│   ├── RESEARCH_WORKFLOW.md     # Primary end-to-end research workflow manual
+│   ├── CAUSAL_CHECKLIST.md      # Disjoint ruleset for causal & contract auditors
+│   └── DATA_CATALOG.md          # Catalog wrangling & timestamp conventions
 │
-├── indicators/
-│   ├── __init__.py
-│   ├── {indicator_name}/
-│   │   ├── indicator.py         # NT Indicator class
-│   │   ├── config.py            # IndicatorConfig if needed
-│   │   └── SPEC.md              # Indicator specification
-│   └── registry.py              # Indicator registry
+├── backtests/                   # Standalone & generic study backtest execution
+│   ├── nt_runtime/              # Canonical NT engine builder & modes
+│   ├── run_backtest.py          # Supported standalone CLI entrypoint
+│   ├── run_nt_study.py          # Supported declarative study collection CLI
+│   └── configs/                 # Config YAMLs for standalone runs
 │
-├── strategies/
-│   ├── __init__.py
-│   ├── {strategy_name}/
-│   │   ├── strategy.py          # NT Strategy class
-│   │   ├── config.py            # StrategyConfig dataclass
-│   │   └── SPEC.md              # Strategy specification
-│   └── registry.py              # Strategy registry
+├── features/                    # Central feature registry & stateful trackers
+│   ├── registry.py              # Canonical feature definitions & metadata
+│   ├── FEATURE_REGISTRY_CONTRACT.md
+│   └── trackers/                # Real-time stateful feature tracker implementations
 │
-├── backtests/
-│   ├── engine.py                # Reusable backtest runner
-│   ├── configs/
-│   │   └── {strategy}_{version}.yaml
-│   └── results/
-│       └── {timestamp}_{strategy}_{config}/
-│           ├── config.yaml      # Exact config used
-│           ├── trades.parquet   # All trades
-│           ├── metrics.yaml     # Summary metrics
-│           ├── equity.parquet   # Equity curve
-│           └── tearsheet.html   # Interactive report
+├── indicators/                  # Reusable indicator definitions & registry
+│   └── registry.py
 │
-├── studies/
-│   ├── {study_name}/
-│   │   ├── SPEC.md              # Study design document
-│   │   ├── collect.py           # Data collection (IN NT)
-│   │   ├── analyze.py           # Analysis (on NT output)
-│   │   └── results/
+├── strategies/                  # Reusable NT strategy implementations & registry
+│   └── registry.py
 │
-├── models/
-│   ├── {model_name}/
-│   │   ├── SPEC.md              # Model specification
-│   │   ├── train.py             # Training script
-│   │   ├── config.yaml          # Hyperparameters
-│   │   └── artifacts/           # Saved models
+├── research/                    # Analysis schemas, contract compilers, engines & harness
+│   ├── analysis/                # Canonical validated analysis package (on analysis-harness branch if unmerged)
+│   ├── schemas/study_spec.py    # Authoritative StudySpec pydantic model
+│   └── engines/                 # Low-level feature binding, target & lineage engines
 │
-├── logs/                        # Log files (generated)
+├── studies/                     # Declarative research studies
+│   └── {study_name}/
+│       ├── research_decision.yaml # Authoritative decision contract
+│       ├── study.yaml           # Machine-readable spec
+│       ├── SPEC.md              # Rendered specification
+│       ├── compiled_study.json  # Compiled sha256-bound contract
+│       ├── audit/               # Audit pass reports & status.json
+│       ├── artifacts/           # Sealed execution manifests & frozen weights
+│       └── results/             # Study reports & analysis artifacts
 │
-└── scripts/
-    ├── download_data.py         # Databento download
-    ├── build_catalog.py         # Build NT catalog
-    └── validate_data.py         # Data validation
+├── models/                      # Trained models & frozen artifacts
+│   └── artifacts/               # Joblib / ONNX weights
+│
+└── scripts/                     # Preflight, audit, sync, and orchestration scripts
+    ├── create_study.py          # Scaffold new study from study.yaml
+    ├── compile_study.py         # Compile & validate study contracts
+    ├── research_preflight.py    # Deterministic AST lint, schema & test preflight
+    ├── run_preexec_audits.py    # Deterministic audit provenance & status parser
+    ├── preexec_audit_seal.py    # Cryptographic pre-execution seal manager
+    └── sync_agents.py           # Cross-harness agent definition generator
 ```
 ---
 
-## TIMEZONE CONVENTION
+## TIMEZONE & TIMESTAMP CONVENTION
 
 All timestamps in Central Time (America/Chicago) for display/analysis.
 Internal NT uses UTC. Convert for human-readable output.
@@ -271,7 +304,12 @@ def to_ct(utc_timestamp):
     return utc_timestamp.astimezone(CT)
 ```
 
-RTH (Regular Trading Hours): 8:30 CT - 15:00 CT
+RTH (Regular Trading Hours): 08:30 CT - 15:15 CT
+
+### Canonical Bar-Availability & Timestamp Contract
+- **Raw Databento OHLCV:** OPEN-stamped (`ts_event`). Complete OHLCV becomes usable only at interval close.
+- **Offline Research:** Normalize derived bars to CLOSE-stamped indices (`label='right', closed='left'`).
+- **NautilusTrader Catalog:** Preserve open-stamped `ts_event` and set `ts_init = ts_event + bar_duration_ns` (1s: +1s, 1m: +60s, 3m: +180s, 5m: +300s) so the NT event loop dispatches completed bars at interval close.
 
 ---
 
@@ -306,14 +344,41 @@ For significant results, create a tagged release with:
 ## LESSONS LEARNED
 
 1. **Pandas validation is invalid** - Breakdown strategy showed 63% WR in pandas, 11% in NT due to look-ahead
-2. **Timestamp handling is critical** - Databento OPEN timestamps caused massive look-ahead bias
+2. **Timestamp handling is critical** - Databento OPEN timestamps require ts_init = ts_event + bar_duration_ns in NT catalog to prevent look-ahead bias
 3. **MFE/MAE from pandas may be inflated** - Only trust NT backtest results
 4. **CTB checked at touch time, not breach time** - Order of operations matters
 5. **Regime change bar can be breach bar** - Don't return early on regime change
 6. **Touch counting resets only on regime change** - Not on new breaches
 7. **Collector MFE/MAE blind spot** - 1s bars process before parent 1m bar in NT. Swing breakout collector showed +$70/trade but NT backtest showed -$3/trade. Root cause: 44% of trades hit SL in the first 60s that were invisible to the collector. Trades surviving 60s matched collector exactly (62% WR, +$63/trade). Fix: buffer 1s bars and replay from fill time.
+8. **Recursive deletion escaped a disposable workspace and destroyed real data** - a cleanup of what was believed to be a throwaway worktree followed a link out of it. On Windows this is easy to miss: junctions and other reparse points are not symlinks and do not look like them.
 
 ---
+
+## DESTRUCTIVE FILESYSTEM SAFETY (mandatory)
+
+**Never recursively delete, clean up, or remove a worktree/path without first checking
+every descendant for symlinks, junctions, mount points, or Windows reparse points that
+escape the disposable workspace.**
+
+Recursive deletion must **fail closed**: if any descendant resolves outside the intended
+disposable root, abort the whole operation rather than deleting "the safe part". A partial
+delete of a tree you did not fully understand is how the incident above happened.
+
+Concretely:
+
+- **Do not use `rm -rf` against repo or worktree trees containing external data
+  junctions.** `data/catalog/` in particular may be a link to storage that lives outside
+  the repository.
+- Resolve before you delete. A path that *looks* inside the root is not necessarily
+  inside it — `Path.resolve()` is what decides, not the string.
+- On Windows, check for reparse points, not just symlinks. `os.path.islink()` returns
+  False for a directory junction.
+- `scripts/safe_cleanup.py::assert_safe_to_delete` implements this check. Use it, or
+  replicate it, before any recursive removal of a directory you did not create in this
+  session.
+
+This is a safety rule, not a framework. It is deliberately one function and one
+prohibition.
 
 <!-- BEGIN SUBAGENT ROUTING -->
 ## Subagent Routing & Lean Workflow
@@ -322,21 +387,28 @@ Keep architecture, causal interpretation, integration, and final approval in the
 
 ### Roster
 
-| Agent | Codex `agent_type` | Role | Output cap | Available in |
-|---|---|---|---|---|
-| `repo-scout` | `repo_scout` | Locate files, trace execution paths | 700w — paths, symbols, line ranges only | Claude, Codex |
-| `contract-checker` | `contract_checker` | Compare code/tests against explicit specs | 1,000w — compliance table + findings only | Claude, Codex |
-| `results-triager` | `results_triager` | Run exact approved pytest commands | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
-| `lookahead-auditor` | `lookahead_auditor` | Independent causal / look-ahead audit | 1,500w — complete Markdown report, parent persists | Claude, Codex |
-| `implementation-worker` | `implementation_worker` | Implement one frozen, bounded task packet | — | **Codex only** |
+| Agent | Codex `agent_type` | Role | Model tier | Output cap | Available in |
+|---|---|---|---|---|---|
+| `repo-scout` | `repo_scout` | Locate files, trace execution paths | Haiku / low | 700w — paths, symbols, line ranges only | Claude, Codex |
+| `contract-checker` | `contract_checker` | Compare code/tests against explicit specs | Sonnet / medium | 1,000w — compliance table + findings only | Claude, Codex |
+| `results-triager` | `results_triager` | Run exact approved pytest commands | Haiku / low | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
+| `lookahead-auditor` | `lookahead_auditor` | Internal causal / look-ahead review (self-attested) | Sonnet / high | 1,500w — complete Markdown report, parent persists | Claude, Codex |
+| `Explore` | — | Broad fan-out location sweep; prefer `repo-scout` | Haiku / low | 700w — paths and symbols only | **Claude only** |
+| `implementation-worker` | `implementation_worker` | Implement one frozen, bounded task packet | Sonnet-class / medium | — | **Codex only** |
+
+Tier rationale and the no-escalate-for-length rule: `CLAUDE.md` § LEAN WORKFLOW
+(*Model tiering*). Exact model ids live in the `.claude/agents/*.md` frontmatter
+(canonical) and in `CODEX_META` in `scripts/sync_agents.py` (per-harness). The
+`Explore` definition exists only to pin the model — the built-in agent inherits
+the orchestrator's model, which is Opus.
 
 ### Risk tiers
 
 Not every task needs the full ceremony.
 
 * **Tier 1 — small diagnostic / local fix:** main session → deterministic tests → local smoke. No planning agent or auditor unless the change touches core causal or timing logic.
-* **Tier 2 — normal research study:** planning → main-session implementation → staged runner → independent completion audit.
-* **Tier 3 — model freeze / deployment:** `repo-scout` → `contract-checker` → main-session implementation → staged runner → independent completion audit.
+* **Tier 2 — normal research study:** planning → freeze SPEC → main-session implementation + tests → split pre-execution audit → staged runner → completion contract check; causal re-audit only if the audited surface changes.
+* **Tier 3 — model freeze / deployment:** `repo-scout` → freeze SPEC → main-session implementation + tests → split pre-execution audit → staged runner → completion contract check; causal re-audit only if the audited surface changes.
 
 ### Coordination rules
 

@@ -1,0 +1,23 @@
+{
+  "status": "BLOCKED",
+  "preflight_run_id": "20260818T124331Z_7a57e510557a",
+  "generated_at_utc": "2026-08-18T12:43:31.945130+00:00",
+  "code_hash": "7a57e510557a5021e749bbbee0713df84958af446ebd846f06730682e7b70b7f",
+  "superseded": true,
+  "failed_gate": "ARTIFACT_SCHEMA",
+  "failure_ids": [
+    "STATUS_SCHEMA"
+  ],
+  "failure_details": [
+    {
+      "severity": "CRITICAL",
+      "code": "STATUS_SCHEMA",
+      "artifact": "studies\\ym_prev5_range_position\\audit\\contract_status.json",
+      "message": "Missing or non-integer field 'critical'"
+    }
+  ],
+  "recommended_smallest_investigation_scope": "Inspect findings in ARTIFACT_SCHEMA and fix locally before requesting audit.",
+  "superseded_by_preflight_run_id": "20260818T132030Z_02f3877c87e1",
+  "superseded_at_utc": "2026-08-18T13:20:30.142586+00:00",
+  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+}

@@ -639,10 +639,12 @@ class FeatureLibrary:
         # Day of week (0=Monday, 4=Friday)
         features['day_of_week'] = dt.weekday()
 
-        # Is RTH (8:30 - 15:00 CT)
-        rth_start = dt.replace(hour=8, minute=30, second=0)
-        rth_end = dt.replace(hour=15, minute=0, second=0)
-        is_rth = rth_start <= dt <= rth_end
+        # Is RTH -- canonical project window, 08:30-15:15 CT.
+        # This previously ended RTH at 15:00 via its own inline replace(), a third
+        # independent copy of the boundary that disagreed with utils/session_boundaries.py.
+        from utils.session_boundaries import is_in_session
+
+        is_rth = is_in_session(int(dt.timestamp() * 1_000_000_000), "RTH")
         features['is_rth'] = 1 if is_rth else 0
 
         # Minutes since RTH open

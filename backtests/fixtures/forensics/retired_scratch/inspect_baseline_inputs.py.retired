@@ -1,0 +1,76 @@
+import sys
+import os
+from pathlib import Path
+
+repo_root = Path(__file__).resolve().parent.parent
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+
+import hashlib
+import json
+import pandas as pd
+
+def compute_sha256(file_path: Path) -> str:
+    h = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        while chunk := f.read(65536):
+            h.update(chunk)
+    return h.hexdigest()
+
+def main():
+    # 1. Weakness Predictions
+    pred_path = repo_root / "studies/regime_sequence_signal_audit/results/weakness_checkpoint_predictions.parquet"
+    pred_sha = compute_sha256(pred_path)
+    pred_df = pd.read_parquet(pred_path)
+    dt = pd.to_datetime(pred_df["observation_time"], unit="ns", utc=True)
+    df_2023 = pred_df[dt.dt.year == 2023]
+    
+    print("=== External Input: Weakness Checkpoint Predictions ===")
+    print(f"File Path: {pred_path}")
+    print(f"SHA256:    {pred_sha}")
+    print(f"Total Rows: {len(pred_df):,}")
+    print(f"2023 Rows:  {len(df_2023):,}")
+    
+    # 2. Catalog inspection
+    from utils.runner.data import CausalDataLoader
+    catalog_path = repo_root / "data/catalog/NQ_v0_2020_2026"
+    print("\n=== Data Catalog: NQ_v0_2020_2026 ===")
+    print(f"Catalog Path: {catalog_path}")
+    
+    loader = CausalDataLoader(catalog_path)
+    
+    # Fixture 1 range: 2023-02-26 to 2023-03-03
+    f1_start = pd.Timestamp("2023-02-26 00:00:00", tz="UTC")
+    f1_end = pd.Timestamp("2023-03-03 23:59:59.999999999", tz="UTC")
+    bars_1s_f1 = loader.load_bars("NQ.XCME-1-SECOND-LAST-EXTERNAL", f1_start, f1_end)
+    bars_1m_f1 = loader.load_bars("NQ.XCME-1-MINUTE-LAST-EXTERNAL", f1_start, f1_end)
+    
+    print(f"Fixture 1 Load Window ({f1_start.date()} .. {f1_end.date()}):")
+    print(f"  1s Bars Loaded: {len(bars_1s_f1):,}")
+    print(f"  1m Bars Loaded: {len(bars_1m_f1):,}")
+    if bars_1s_f1:
+        print(f"  1s First ts_init: {bars_1s_f1[0].ts_init} ({pd.to_datetime(bars_1s_f1[0].ts_init, unit='ns', utc=True)})")
+        print(f"  1s Last  ts_init: {bars_1s_f1[-1].ts_init} ({pd.to_datetime(bars_1s_f1[-1].ts_init, unit='ns', utc=True)})")
+    if bars_1m_f1:
+        print(f"  1m First ts_init: {bars_1m_f1[0].ts_init} ({pd.to_datetime(bars_1m_f1[0].ts_init, unit='ns', utc=True)})")
+        print(f"  1m Last  ts_init: {bars_1m_f1[-1].ts_init} ({pd.to_datetime(bars_1m_f1[-1].ts_init, unit='ns', utc=True)})")
+
+    # Fixture 2 range: 2022-12-27 to 2023-12-31
+    CausalDataLoader.clear_cache()
+    f2_start = pd.Timestamp("2022-12-27 00:00:00", tz="UTC")
+    f2_end = pd.Timestamp("2023-12-31 23:59:59.999999999", tz="UTC")
+    bars_1s_f2 = loader.load_bars("NQ.XCME-1-SECOND-LAST-EXTERNAL", f2_start, f2_end)
+    bars_1m_f2 = loader.load_bars("NQ.XCME-1-MINUTE-LAST-EXTERNAL", f2_start, f2_end)
+    
+    print(f"\nFixture 2 Load Window ({f2_start.date()} .. {f2_end.date()}):")
+    print(f"  1s Bars Loaded: {len(bars_1s_f2):,}")
+    print(f"  1m Bars Loaded: {len(bars_1m_f2):,}")
+    if bars_1s_f2:
+        print(f"  1s First ts_init: {bars_1s_f2[0].ts_init} ({pd.to_datetime(bars_1s_f2[0].ts_init, unit='ns', utc=True)})")
+        print(f"  1s Last  ts_init: {bars_1s_f2[-1].ts_init} ({pd.to_datetime(bars_1s_f2[-1].ts_init, unit='ns', utc=True)})")
+    if bars_1m_f2:
+        print(f"  1m First ts_init: {bars_1m_f2[0].ts_init} ({pd.to_datetime(bars_1m_f2[0].ts_init, unit='ns', utc=True)})")
+        print(f"  1m Last  ts_init: {bars_1m_f2[-1].ts_init} ({pd.to_datetime(bars_1m_f2[-1].ts_init, unit='ns', utc=True)})")
+
+if __name__ == "__main__":
+    main()

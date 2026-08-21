@@ -1,0 +1,36 @@
+{
+  "lineage_version": 1,
+  "study_id": "es_wick_imbalance_acceptance_v2",
+  "bootstrapped_from_local_ledger": true,
+  "issuance_counter": 1,
+  "prev_chain_sha256": "",
+  "chain_sha256": "f8ca2898229c979f4ca91c8000fc67bb64e9a2ec2b1a79150f9aaa1ad8321509",
+  "high_water": {
+    "causal": 3,
+    "contract": 2
+  },
+  "entries": [
+    {
+      "audit_type": "causal",
+      "pass": 3,
+      "audited_execution_composite_sha256": "a580bc38bcda6b03fd96e63dfe47374314ee59c558eff2763f9fe55ebdc1ce98",
+      "audit_report_sha256": "20151fbf099c9c26c0fa7753cbb613c1c7decbadcab73fc641e0efbed66a5b80",
+      "audit_report_path": "audit/pass_03.md",
+      "auditor": "causal-audit-scottm-pass01",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-17T17:37:54.470658+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 2,
+      "audited_execution_composite_sha256": "a580bc38bcda6b03fd96e63dfe47374314ee59c558eff2763f9fe55ebdc1ce98",
+      "audit_report_sha256": "fb34fe84929828efb90c3f5a8c591fbb1b32a126444e276817b60567221f4d72",
+      "audit_report_path": "audit/contract_pass_02.md",
+      "auditor": "contract-audit-mccarty-2026-08-17-p01",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-17T17:37:56.087230+00:00"
+    }
+  ],
+  "integrity_sha256": "7c24a0ef67f3807e012ff4721eb1d61b9cac03c019969cd99fc3063c8d64c953",
+  "note": "Durable audit lineage anchor. Lives outside the study directory so that deleting or rebuilding studies/<id>/audit/ cannot reset the audit high-water mark, and INSIDE the repository so that committing it makes it durable. COMMIT THIS FILE with the audit artifacts it anchors -- an uncommitted anchor is only as durable as the working tree. Authoritative over the study-local pass_ledger.json."
+}

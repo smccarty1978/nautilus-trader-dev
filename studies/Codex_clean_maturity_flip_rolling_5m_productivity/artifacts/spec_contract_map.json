@@ -1,0 +1,47 @@
+{
+  "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
+  "spec_clause_coverage_pct": 100.0,
+  "total_mandatory_clauses": 9,
+  "satisfied_clauses_count": 9,
+  "unmapped_required_clauses_count": 0,
+  "unmapped_clauses": [],
+  "clauses": {
+    "train_partition_years": {
+      "description": "TRAIN restricted to 2021-2023",
+      "satisfied": true
+    },
+    "dev_partition_years": {
+      "description": "DEV / OOS restricted to 2024",
+      "satisfied": true
+    },
+    "prohibited_years_sealed": {
+      "description": "2025 and 2026 sealed or prohibited from training/selection",
+      "satisfied": true
+    },
+    "model_arms_abc": {
+      "description": "Three model feature blocks (A: Top-25, B: Structural, C: Rolling Productivity)",
+      "satisfied": true
+    },
+    "primary_maturity_buckets": {
+      "description": "Three primary maturity buckets: 300-600s, 600-900s, 900-1800s",
+      "satisfied": true
+    },
+    "clean_lineage_reset": {
+      "description": "Clean lineage boundary declared with invalidated dry-run quarantine ledger",
+      "satisfied": true
+    },
+    "registry_numeric_universe": {
+      "description": "Baseline universe collected from verified FEATURE_REGISTRY numeric universe",
+      "satisfied": true
+    },
+    "forbidden_f3_lineage": {
+      "description": "Prohibits prior F3/2025-selected feature inheritance",
+      "satisfied": true
+    },
+    "train_only_direction_selection": {
+      "description": "Direction-specific Top-25 selected separately on TRAIN only",
+      "satisfied": true
+    }
+  },
+  "verdict": "PASS"
+}

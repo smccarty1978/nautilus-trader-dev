@@ -1,0 +1,33 @@
+{
+  "run_id": "20260815_033826_Gemini_clean_maturity_flip_rolling_5m_productivity_day",
+  "study_id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
+  "status": "SUCCESS",
+  "stage": "day",
+  "wall_time_seconds": 199.748,
+  "total_bars_processed": 0,
+  "candidates_count": 2032,
+  "observations_count": 2032,
+  "throughput_bars_per_sec": 0.0,
+  "memory": {
+    "baseline_process_rss_mb": 184.94,
+    "peak_process_rss_mb": 602.42,
+    "rss_delta_mb": 417.48,
+    "python_tracemalloc_peak_mb": 454.33
+  },
+  "bars_breakdown": {
+    "loaded": {
+      "1s": 252660,
+      "1m": 6899
+    },
+    "callbacks": {},
+    "ts_event_ranges": {},
+    "ts_init_ranges": {}
+  },
+  "output_artifacts": {
+    "candidates_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260815_033826_Gemini_clean_maturity_flip_rolling_5m_productivity_day\\collection\\candidates.parquet",
+    "observations_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260815_033826_Gemini_clean_maturity_flip_rolling_5m_productivity_day\\collection\\observations.parquet",
+    "collection_manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260815_033826_Gemini_clean_maturity_flip_rolling_5m_productivity_day\\collection\\collection_manifest.json"
+  },
+  "end_time_utc": "2026-08-15T03:41:47.005790+00:00",
+  "lineage_status": "SUPERSEDED"
+}

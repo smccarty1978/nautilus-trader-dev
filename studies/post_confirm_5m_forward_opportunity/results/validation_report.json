@@ -1,0 +1,69 @@
+{
+  "gates": [
+    {
+      "gate": "V1_V2_predecessor_reproduction",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V_ANCHOR_time_zero_is_confirmation",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V_CAUSAL_age_at_confirm_nonnegative",
+      "expected": 0,
+      "observed": 0,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V_NOFUTURE_no_reclassification",
+      "expected": [],
+      "observed": [],
+      "pass": true,
+      "note": "with_5m_at_p90/at_confirm must only ever be read, never recomputed, in this study"
+    },
+    {
+      "gate": "V_LABEL_group_values_clean",
+      "expected": {},
+      "observed": {},
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V_SURVIVAL_attrition_reported",
+      "expected": true,
+      "observed": true,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V_MATCH_confirmation_time_only",
+      "expected": [],
+      "observed": [],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V_SEALED_2026",
+      "expected": "max <= 2025",
+      "observed": 2025,
+      "pass": true,
+      "note": ""
+    },
+    {
+      "gate": "V_RACE_probabilities_sum_to_one",
+      "expected": [],
+      "observed": [],
+      "pass": true,
+      "note": ""
+    }
+  ],
+  "n_gates": 9,
+  "n_failed": 0
+}

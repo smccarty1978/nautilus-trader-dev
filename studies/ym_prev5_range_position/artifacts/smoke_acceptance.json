@@ -1,0 +1,78 @@
+{
+  "study_name": "ym_prev5_range_position",
+  "validator_version": 2,
+  "validator_file_sha256": "1354af434e4177463f1a4c081f7664354592990eb67fb27106f82f593cf4b964",
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260818_132043_ym_prev5_range_position_day",
+  "candidates_parquet_sha256": "84d3584088e17f3a566c173fd3c7d504b0e3894570f44e30b27614c0aae040d7",
+  "sealed_composite_sha256": "4f28b073556e060e91079706473f837aaa7e7bb09b82a5bbbc61d25ff410c758",
+  "execution_manifest_composite_sha256": "4f28b073556e060e91079706473f837aaa7e7bb09b82a5bbbc61d25ff410c758",
+  "smoke_date": "2024-09-03",
+  "candidate_rows_total": 1038,
+  "candidates_count_total": 1038,
+  "candidates_count_target_day": 1038,
+  "duplicate_candidates_count": 0,
+  "causality_rows_examined": 1038,
+  "causality_coverage_pct": 100.0,
+  "future_source_violations_count": 0,
+  "exact_timestamp_equality_verified": true,
+  "feature_count": 1,
+  "feature_list_sha256": "0a4200c7db88216fa0a5a5b9761052b51d26e70fb169ea4ae19cd0d646cfb300",
+  "feature_surface_validation": {
+    "passed": true,
+    "rows": 1038,
+    "declared_features": [
+      "latest_1m_close_position_prev5_range"
+    ],
+    "emitted_features": [
+      "latest_1m_close_position_prev5_range"
+    ],
+    "metadata_columns": [
+      "atr",
+      "checkpoint_index",
+      "close",
+      "current_pnl_atr",
+      "new_progress_windows",
+      "observation_ts",
+      "regime_age_seconds",
+      "regime_direction",
+      "regime_start_ns",
+      "retained_mfe_ratio",
+      "running_mae_atr",
+      "running_mfe_atr",
+      "triggering_1s_ts_init"
+    ],
+    "undeclared_columns": [],
+    "per_feature": {
+      "latest_1m_close_position_prev5_range": {
+        "registered": true,
+        "status": "provisional",
+        "null_policy": "allow",
+        "declared_dtype": "float64",
+        "rows": 1038,
+        "null_count": 0,
+        "null_fraction": 0.0,
+        "produced_dtype": "float64",
+        "distinct_non_null": 111
+      }
+    },
+    "findings": []
+  },
+  "candidate_disposition_reconciliation": {
+    "candidates": 1038,
+    "observations": 1038,
+    "passed": true,
+    "findings": [],
+    "undisposed_candidates": 0,
+    "orphaned_observations": 0,
+    "duplicate_observations": 0,
+    "disposition_counts": {
+      "LABELED_NEGATIVE": 706,
+      "LABELED_POSITIVE": 321,
+      "CENSORED": 11
+    }
+  },
+  "observations_count": 1038,
+  "deterministic_validation_verified": true,
+  "status": "ACCEPTED",
+  "validated_at": "2026-08-18T13:22:09.641063+00:00"
+}

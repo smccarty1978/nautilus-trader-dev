@@ -1,0 +1,38 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\test_level_break_collector",
+  "decision_contract": {
+    "research_question": "Can a 1m bar-close level break test collector capture multi-timeframe micro-velocity features?",
+    "baseline": {
+      "short": "level_break_baseline",
+      "long": "Level break 1m bar-close baseline"
+    },
+    "baseline_feature_selection": {
+      "mode": "none"
+    },
+    "model_arms": {
+      "model_level_break": "7-feature level break model"
+    },
+    "variable_being_tested": [
+      "1m bar-close observation",
+      "7 micro-velocity features"
+    ],
+    "prohibited_changes": [],
+    "allowed_changes": [],
+    "chronology": {
+      "train": [
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": "level_break_vs_baseline",
+    "terminal_question": "Does the level break collector compile, execute, and validate cleanly in NautilusTrader?"
+  },
+  "findings": []
+}

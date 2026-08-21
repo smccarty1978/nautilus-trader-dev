@@ -1,0 +1,357 @@
+<title>NT Research Flow — Red Team Round 4</title>
+<style>
+  :root{
+    --ground:#EEF1F5; --surface:#FFFFFF; --surface-2:#F7F9FB;
+    --ink:#131A24; --ink-2:#3F4A59; --ink-3:#6B7787;
+    --rule:#D3DAE3; --rule-soft:#E4E9EF;
+    --accent:#2F5D8C; --accent-soft:#E2EAF3;
+    --crit:#A81F26; --crit-bg:#FBE9EA;
+    --warn:#8A5A0B; --warn-bg:#FBF1DF;
+    --note:#3B5A78; --note-bg:#E8EEF4;
+    --ok:#256B4A;  --ok-bg:#E3F1E9;
+    --term-bg:#141B25; --term-ink:#C8D3E0; --term-dim:#7E8DA0;
+    --term-go:#79C08E; --term-no:#E58388;
+    --shadow:0 1px 2px rgba(19,26,36,.06), 0 6px 18px -10px rgba(19,26,36,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+      --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+      --rule:#2A3543; --rule-soft:#212B37;
+      --accent:#7FAAD8; --accent-soft:#1B2735;
+      --crit:#FF8087; --crit-bg:#2B171A;
+      --warn:#E5AE5C; --warn-bg:#2A2117;
+      --note:#8FB0CE; --note-bg:#1A222C;
+      --ok:#6FC095;  --ok-bg:#152420;
+      --term-bg:#0A0F16; --term-dim:#6F7E90;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+    --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+    --rule:#2A3543; --rule-soft:#212B37;
+    --accent:#7FAAD8; --accent-soft:#1B2735;
+    --crit:#FF8087; --crit-bg:#2B171A;
+    --warn:#E5AE5C; --warn-bg:#2A2117;
+    --note:#8FB0CE; --note-bg:#1A222C;
+    --ok:#6FC095;  --ok-bg:#152420;
+    --term-bg:#0A0F16; --term-dim:#6F7E90;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px 96px;}
+  header.mast{border-bottom:1px solid var(--rule);background:var(--surface);}
+  .mast-inner{max-width:1080px;margin:0 auto;padding:38px 28px 30px;display:flex;flex-direction:column;gap:20px;}
+  .eyebrow{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-3);}
+  h1{margin:0;font-size:clamp(30px,4.4vw,46px);line-height:1.06;letter-spacing:-.022em;font-weight:700;text-wrap:balance;}
+  .dek{margin:0;max-width:64ch;color:var(--ink-2);font-size:17px;}
+  .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:18px 20px;border-radius:3px;
+    background:var(--crit-bg);border:1px solid var(--crit);border-left-width:5px;}
+  .verdict-stamp{font-family:ui-monospace,Consolas,monospace;font-size:clamp(20px,3vw,28px);
+    font-weight:700;letter-spacing:.04em;color:var(--crit);}
+  .verdict-why{color:var(--ink-2);font-size:14.5px;max-width:58ch;margin:0;}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
+    background:var(--rule);border:1px solid var(--rule);}
+  .fact{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:3px;}
+  .fact dt{font-family:ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);}
+  .fact dd{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .fact dd.c-crit{color:var(--crit);} .fact dd.c-warn{color:var(--warn);} .fact dd.c-ok{color:var(--ok);}
+  section{margin-top:56px;}
+  h2{margin:0 0 6px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-family:ui-monospace,Consolas,monospace;color:var(--accent);font-weight:700;}
+  h2 + .sub{margin:0 0 22px;font-size:24px;font-weight:660;letter-spacing:-.018em;text-wrap:balance;}
+  h3{font-size:17px;font-weight:650;margin:32px 0 10px;letter-spacing:-.01em;}
+  p{margin:0 0 14px;max-width:72ch;}
+  code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.875em;
+    background:var(--surface-2);border:1px solid var(--rule-soft);padding:1px 5px;border-radius:2px;
+    color:var(--ink);overflow-wrap:anywhere;}
+  .tscroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;}
+  thead th{background:var(--surface-2);font-family:ui-monospace,Consolas,monospace;font-size:10.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--rule);white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.vd{white-space:nowrap;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;}
+  .v-fail{color:var(--crit);} .v-weak{color:var(--warn);} .v-pass{color:var(--ok);}
+  td.fid-cell{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:var(--ink-3);white-space:nowrap;}
+  .find{background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--rule);
+    margin-bottom:16px;box-shadow:var(--shadow);}
+  .find.crit{border-left-color:var(--crit);}
+  .find.warn{border-left-color:var(--warn);}
+  .find.ok{border-left-color:var(--ok);}
+  .find-head{padding:15px 20px 13px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--rule-soft);}
+  .find-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+  .pill{font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;padding:3px 8px;border-radius:2px;}
+  .pill.crit{background:var(--crit-bg);color:var(--crit);}
+  .pill.warn{background:var(--warn-bg);color:var(--warn);}
+  .pill.ok{background:var(--ok-bg);color:var(--ok);}
+  .fid{font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;}
+  .find-title{font-size:17.5px;font-weight:650;letter-spacing:-.012em;margin:0;text-wrap:balance;}
+  .loc{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--ink-2);overflow-wrap:anywhere;}
+  .find-body{padding:4px 20px 16px;display:grid;gap:0;}
+  .row{display:grid;grid-template-columns:132px 1fr;gap:16px;padding:11px 0;border-bottom:1px solid var(--rule-soft);}
+  .row:last-child{border-bottom:none;}
+  .row dt{font-family:ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-3);padding-top:3px;}
+  .row dd{margin:0;font-size:14.5px;color:var(--ink-2);}
+  .row dd strong{color:var(--ink);font-weight:640;}
+  @media (max-width:640px){ .row{grid-template-columns:1fr;gap:4px;} }
+  .term{background:var(--term-bg);color:var(--term-ink);
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12.5px;line-height:1.68;
+    padding:16px 18px;overflow-x:auto;border-radius:3px;border:1px solid rgba(127,170,216,.18);
+    margin:0 0 18px;white-space:pre;}
+  .term .c{color:var(--term-dim);} .term .g{color:var(--term-go);} .term .r{color:var(--term-no);font-weight:600;}
+  .term-cap{font-family:ui-monospace,Consolas,monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 7px;}
+  ul,ol{max-width:72ch;padding-left:22px;margin:0 0 16px;}
+  li{margin-bottom:7px;}
+  .callout{background:var(--accent-soft);border-left:4px solid var(--accent);padding:14px 18px;margin:0 0 18px;}
+  .callout.good{background:var(--ok-bg);border-left-color:var(--ok);}
+  .callout.alert{background:var(--crit-bg);border-left-color:var(--crit);}
+  .callout p:last-child{margin-bottom:0;}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  @page{ margin:14mm 12mm; }
+  @media print{
+    :root, :root[data-theme="dark"]{
+      --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F6F9;
+      --ink:#0E141C; --ink-2:#2E3844; --ink-3:#5C6775;
+      --rule:#B9C2CD; --rule-soft:#D8DEE6;
+      --accent:#23507D; --accent-soft:#EAF0F7;
+      --crit:#8E161D; --crit-bg:#FBE9EA;
+      --warn:#6F470A; --warn-bg:#FAF0DC;
+      --note:#2F4A64; --note-bg:#EAF0F5;
+      --ok:#1C5739;  --ok-bg:#E4F1E9;
+      --term-bg:#F4F6F9; --term-ink:#161D26; --term-dim:#5C6775;
+      --term-go:#1C5739; --term-no:#8E161D; --shadow:none;
+    }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body{ background:#fff; font-size:10.5pt; line-height:1.5; }
+    .wrap{ max-width:none; padding:0 0 8mm; }
+    .mast-inner{ max-width:none; padding:0 0 8mm; }
+    header.mast{ border-bottom:2px solid var(--ink); }
+    h1{ font-size:24pt; } .dek{ font-size:11pt; }
+    .tscroll{ overflow:visible; }
+    table{ min-width:0; width:100%; font-size:8.6pt; table-layout:fixed; }
+    th,td{ padding:5px 7px; overflow-wrap:anywhere; }
+    .term{ white-space:pre-wrap; overflow-wrap:anywhere; overflow:visible; font-size:8.2pt;
+      line-height:1.5; padding:9px 11px; border:1px solid var(--rule); }
+    code{ overflow-wrap:anywhere; }
+    .find,.fact,tr,.callout,.row{ break-inside:avoid; page-break-inside:avoid; }
+    h2,h3,.sub{ break-after:avoid; page-break-after:avoid; }
+    section{ margin-top:9mm; }
+    footer{ break-before:avoid; }
+  }
+</style>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="eyebrow">Red Team Round 4 · NautilusTrader ML Research Flow · 2026-08-15</div>
+    <h1>The collector is causally correct. The evidence that says so was never measured.</h1>
+    <p class="dek">Fourth independent pass. The seal now defends code well. But the validator that certifies the data reports a number it never computes — and I proved it by getting it to bless the pre-remediation run.</p>
+
+    <div class="verdict">
+      <div class="verdict-stamp">FLOW_BLOCKED</div>
+      <p class="verdict-why">One command made the smoke validator accept the run I measured <em>30 look-ahead violations</em> in, report <span class="mono">Future Source Violations: 0</span>, and stamp it with today's seal. All three round-3 criticals also remain open, unmodified.</p>
+    </div>
+
+    <dl class="facts">
+      <div class="fact"><dt>New criticals</dt><dd class="c-crit">2</dd></div>
+      <div class="fact"><dt>R3 criticals open</dt><dd class="c-crit">3 / 3</dd></div>
+      <div class="fact"><dt>New warnings</dt><dd class="c-warn">3</dd></div>
+      <div class="fact"><dt>Tests preflight runs</dt><dd class="c-warn">6 / 14</dd></div>
+      <div class="fact"><dt>Causal code</dt><dd class="c-ok">CORRECT</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>Executive verdict</h2>
+  <p class="sub">A widening gap between what the code does and what the framework can prove</p>
+
+  <p>I independently re-verified the current smoke run against the raw catalog: <strong>2,002 rows, 2,002 exactly aligned, zero look-ahead violations.</strong> The F3 fix is real and it holds. The collector is doing the right thing.</p>
+
+  <p>The problem is that <em>the framework cannot demonstrate this</em>, and reports that it has. <code>validate_smoke.py</code> guards its entire causality check behind <code>if "triggering_1s_ts_init" in cand_df.columns:</code> — and that column is never persisted. The collector passes <code>triggering_1s_ts_init</code> into <code>_evaluate_checkpoint()</code> as a parameter for a runtime <code>assert</code>, then never writes it to the record. So the branch is dead, and <code>future_source_violations_count: 0</code> plus <code>exact_timestamp_equality_verified: true</code> are <strong>Python defaults presented in the acceptance artifact as measurements</strong>.</p>
+
+  <p>That is not a theoretical concern. I pointed the validator at the June-era run containing the 30 violations I measured in round 2, and it printed <span class="mono">Future Source Violations: 0</span>, <span class="mono">Status: ACCEPTED</span>, and stamped the run with the <em>current</em> composite seal hash — code from 09:22 certifying a run from 06:46. One command, three failures: the causality check is vacuous, there is no run-to-seal binding, and the numbers in the acceptance are fabricated by default.</p>
+
+  <div class="callout alert">
+    <p><strong>The three round-3 criticals were not addressed.</strong> I re-ran all three verbatim; all three still land. <code>collect.py</code>'s smoke gate is byte-identical, the provenance check is still <code>not in (1, 2)</code>, and the report parser still reads two <code>### CRITICAL:</code> findings as <code>verdict=CLEAR, critical=0</code>. This round's changes went to generality instead — a <code>_extract_df</code> helper for alternative strategy attribute names, and validator version 2.</p>
+  </div>
+
+  <p>There is also a quiet structural problem underneath all of this. <strong>Preflight runs 6 of the 14 test files that exist</strong>, selected by a hardcoded map in <code>select_required_tests.py</code>. Every regression test written in response to rounds 1–3 — the seal tamper canaries, the round-2 invariants, the runner-collect suite, the OOS-lock suite — is outside that map and has never run under a gate. And <code>pytest scripts/tests/</code> currently <em>cannot collect at all</em>, because <code>test_guardrail_mutations.py</code> imports <code>scripts.check_authorized_domain</code>, deleted in round 3. Preflight still reports <span class="mono">CLEAR</span> with <span class="mono">CAUSAL_INVARIANTS</span> in its checklist.</p>
+</section>
+
+<section>
+  <h2>Bypass attempts</h2>
+  <p class="sub">Executed against the live repository, then reverted</p>
+
+  <p class="term-cap">New — the validator blesses the pre-remediation run</p>
+  <div class="term"><span class="c">$ python scripts/validate_smoke.py --study studies/&lt;s&gt; \
+      --run-dir runs/20260815_064656_..._day        # the run I measured 30 violations in</span>
+
+SMOKE VALIDATION PASSED: Gemini_clean_maturity_flip_rolling_5m_productivity
+Status:                      <span class="r">ACCEPTED</span>
+Candidates (Target Day):     <span class="r">2032</span>          <span class="c">&lt;- pre-F3-fix count</span>
+Future Source Violations:    <span class="r">0</span>             <span class="c">&lt;- never computed; 30 measured</span>
+Exact Timestamp Equality:    <span class="r">True</span>          <span class="c">&lt;- never checked</span>
+Emitted Feature Count:       60 (SHA: 2a744cfa3acfa437...)
+Sealed Composite Hash:       <span class="r">1cf24f6678df5cc8...</span>  <span class="c">&lt;- TODAY's code, on a 06:46 run</span>
+Emitted Acceptance File:     .../artifacts/smoke_acceptance.json</div>
+
+  <p class="term-cap">Independent re-measurement of the same two runs, against the raw catalog</p>
+  <div class="term">pre-fix run  (06:46, 2032 rows) : look-ahead violations = <span class="r">30</span>   <span class="c">(validator said 0)</span>
+current run  (14:22, 2002 rows) : look-ahead violations = <span class="g">0</span>    <span class="c">(genuinely correct)</span></div>
+
+  <p class="term-cap">All three round-3 criticals, re-run verbatim</p>
+  <div class="term">R3-1 forged smoke acceptance   -&gt; <span class="r">STILL BYPASSED</span> (reached engine build)
+R3-2 hand-written status.json  -&gt; <span class="r">STILL BYPASSED</span> (seal LOCKED, provenance v1 accepted)
+R3-3 prose-CRITICAL report     -&gt; verdict=<span class="r">CLEAR</span> critical=<span class="r">0</span> (STILL FAIL-OPEN)</div>
+
+  <p class="term-cap">The test suite cannot be collected</p>
+  <div class="term"><span class="c">$ python -m pytest scripts/tests/ -q</span>
+ERROR collecting scripts/tests/test_guardrail_mutations.py
+E   <span class="r">ModuleNotFoundError: No module named 'scripts.check_authorized_domain'</span>
+!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!
+
+<span class="c">$ python scripts/research_preflight.py --study studies/&lt;s&gt;   # tests ENABLED</span>
+RESEARCH PREFLIGHT VERDICT: <span class="r">CLEAR</span> (8.65s)
+Checks Run: EXECUTION_MANIFEST, CAUSAL_LINT, ARTIFACT_SCHEMA,
+            RESEARCH_DECISION_FIDELITY, SPEC_FIDELITY, <span class="r">CAUSAL_INVARIANTS</span></div>
+</section>
+
+<section>
+  <h2>Findings</h2>
+  <p class="sub">Two criticals, three warnings, plus three carried forward</p>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">R4-1</span></div>
+      <p class="find-title">The smoke validator's causality check is dead code, and its result is fabricated</p>
+      <div class="loc">scripts/validate_smoke.py:145–159 &nbsp;·&nbsp; strategies/flip_prediction_collector.py:400, :449–453, :622</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The check is <code>if "triggering_1s_ts_init" in cand_df.columns:</code>. The collector passes <code>triggering_1s_ts_init=ts_avail</code> into <code>_evaluate_checkpoint()</code>, where it is consumed only by an <code>assert</code> at line 452 — it is never added to <code>cand_record</code>, so it cannot reach the parquet. I confirmed the column is absent from <strong>both</strong> the pre-fix and the current run. The guard is therefore always False, leaving <code>future_source_violations_count = 0</code> and <code>exact_timestamp_equality_verified = True</code> at their initialised values, which are then written into <code>smoke_acceptance.json</code> as findings.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Demonstrated above: the validator accepted a run with 30 independently measured violations and reported zero. Because <code>collect.py</code>'s smoke gate reads <code>deterministic_validation_verified</code> from this same artifact, the entire chain from "validator ran" to "full run authorized" carries a number nothing produced.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>The absent-column path is silent by design — a column-presence guard is indistinguishable from a passing check in the output. And the collector's <code>assert triggering_1s_ts_init == T</code> looks like the enforcement, so the persistence gap reads as redundant rather than load-bearing.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Two lines and one guard. (1) Add <code>"triggering_1s_ts_init": triggering_1s_ts_init</code> to <code>cand_record</code> in both emission paths, and add it to the metadata column set so it does not disturb the feature contract. (2) In <code>validate_smoke.py</code>, invert the guard: <code>raise SmokeValidationError</code> when the column is <em>absent</em>, rather than skipping. A causality check that cannot run must block, not pass.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_validate_smoke_blocks_when_causality_column_absent</code>, and <code>test_validate_smoke_rejects_prefix_run</code> — point the validator at the 2,032-row run and assert <code>SmokeValidationError</code>. Both fail today.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">R4-2</span></div>
+      <p class="find-title">Nothing binds a run to the seal it is validated against</p>
+      <div class="loc">backtests/nt_runtime/output_manager.py:64–90 &nbsp;·&nbsp; scripts/validate_smoke.py:57–66, :80–88</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>run_manifest.json</code> records <code>run_id</code>, <code>spec_sha256</code>, dates, instrument and telemetry — but <strong>no composite seal hash</strong>. The validator verifies that the seal matches the manifest <em>as of validation time</em> (a good check), then picks <code>sorted(runs_dir.glob("*_&lt;study&gt;_day"))[-1]</code>, or whatever <code>--run-dir</code> names, and stamps the current composite onto it. There is no field to compare, so no comparison is possible.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>A run produced by any earlier code version can be certified against today's seal, which is precisely the staleness the smoke gate exists to prevent. Demonstrated: a 06:46 run certified with the 09:22 composite. In practice today's acceptance happens to be honest — the 14:22 run does postdate the code changes — but that is workflow discipline, not a control.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Have <code>OutputManager._write_initial_manifest()</code> record the composite from the seal it verified at launch (<code>collect.py</code> already holds <code>seal_data</code>), then have the validator require <code>run_manifest["composite_seal_hash"] == seal_hash</code> and refuse otherwise. This also closes F17 from round 1 — stale runs in <code>runs/</code> become self-identifying.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_validate_smoke_rejects_run_from_different_seal</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">R4-3</span></div>
+      <p class="find-title">Preflight runs 6 of 14 test files, and the suite currently cannot be collected</p>
+      <div class="loc">scripts/select_required_tests.py:23–34, :74–79 &nbsp;·&nbsp; scripts/tests/test_guardrail_mutations.py:26</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>Test selection is a hardcoded path→test map plus a hardcoded default list of six. The eight files it never selects include <code>test_audit_seal_guard.py</code>, <code>test_round2_invariants.py</code>, <code>test_nt_runner_collect.py</code>, <code>test_spec_fidelity_and_oos_lock.py</code>, <code>test_research_preflight.py</code>, <code>test_study_factory.py</code>, <code>test_test_selection.py</code> and <code>test_guardrail_mutations.py</code> — that is, essentially every test written in response to this audit series. Separately, <code>test_guardrail_mutations.py</code> imports <code>scripts.check_authorized_domain</code>, which round 3 deleted, so a whole-directory pytest run aborts during collection.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>The tamper canaries that prove the seal works have never executed under a gate. A developer running the obvious command gets <code>Interrupted: 1 error during collection</code> and no test results at all, while preflight reports <code>CLEAR</code> with <code>CAUSAL_INVARIANTS</code> listed among its checks.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>Same shape as F4 in round 1 — a check whose <em>selection</em> is a hardcoded list that drifted from reality. The lint was converted to manifest-driven selection; the test selector was not.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Delete <code>test_guardrail_mutations.py</code> or repoint it at a live module. Then replace the default list with a glob of <code>scripts/tests/test_*.py</code>, and have preflight fail if the collected count is lower than the number of files on disk — the same coverage-reporting discipline that made the lint fix work.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_all_test_files_are_selectable</code> — assert the selector's output covers <code>glob("scripts/tests/test_*.py")</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">R4-4</span></div>
+      <p class="find-title">The feature-contract check was weakened from exclusion to intersection, hiding extra columns</p>
+      <div class="loc">backtests/nt_runtime/output_manager.py:118–119</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>Removing the hardcoded <code>meta_cols</code> set was the right call for study-agnosticism (F14). But the replacement is <code>emitted_feats = [c for c in candidates_df.columns if c in set(expected_feats)]</code> — an intersection. Previously the list was built by <em>excluding</em> known metadata, so any unexpected column appeared in <code>emitted_feats</code> and broke the ordered-list equality. Now unexpected columns are invisible to the check.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>The contract still guarantees the 60 expected features are present, correct and correctly ordered — that part is sound. What it no longer detects is <em>additional</em> columns: a leaked label, an outcome field, or a debug column would pass silently. Given that this project's recorded history includes labels leaking into feature surfaces, that is the wrong direction to relax.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Keep the intersection for the ordered-identity check, and add an explicit surplus check: declare <code>metadata_columns</code> in the compiled contract and raise on any column that is in neither that set nor <code>expected_feats</code>. That keeps the study-agnosticism win and restores the strictness.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_persist_rejects_unexpected_column</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">R4-5</span></div>
+      <p class="find-title">The causality assert is a tautology, and disappears under -O</p>
+      <div class="loc">strategies/flip_prediction_collector.py:449–453 &nbsp;·&nbsp; :386–401</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>assert triggering_1s_ts_init == T</code> sits inside <code>_evaluate_checkpoint()</code>, which is only reachable after <code>if T &gt; ts_avail: break</code> and <code>if T &lt; ts_avail: continue</code>. By the time the call is made, <code>T == ts_avail</code> holds by construction and the argument is <code>ts_avail</code>, so the assertion cannot fail regardless of correctness. It is also removed entirely when Python runs with <code>-O</code>.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Not a defect on its own — the enclosing control flow is correct. The problem is that it <em>looks</em> like the causality enforcement, which is part of why the missing persistence in R4-1 went unnoticed. The real check has to happen on the emitted data, not on a value the caller just derived.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Once R4-1 persists the column, this assert becomes redundant; keep it or drop it, but do not treat it as the causality guarantee. If retained, make it a raised exception rather than an <code>assert</code> so <code>-O</code> cannot strip it.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd>Covered by R4-1's tests.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">R3-1/2/3</span></div>
+      <p class="find-title">Carried forward unchanged from round 3</p>
+      <div class="loc">collect.py:41–75 · preexec_audit_seal.py:84–87 · run_preexec_audits.py:46–70</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>R3-1</dt><dd>Forged <code>smoke_acceptance.json</code> — unsealed, and the gate still checks only <code>status</code>, <code>study_name</code>, <code>sealed_composite_sha256</code> and <code>deterministic_validation_verified</code>. Note the honest artifact already records <code>validator_file_sha256</code>, and I confirmed it matches the real <code>validate_smoke.py</code> hash — <strong>the binding data is present and simply not checked</strong>. That is a two-line fix.</dd></div>
+      <div class="row"><dt>R3-2</dt><dd>Hand-written <code>status.json</code> with <code>audit_provenance_version: 1</code> still produces <code>seal_status: LOCKED</code>. The parser remains optional; the seal never re-derives.</dd></div>
+      <div class="row"><dt>R3-3</dt><dd>A report with two <code>### CRITICAL:</code> headings plus the word "CLEAR" in unrelated prose still parses as <code>verdict=CLEAR, critical=0</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find ok">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill ok">Verified sound</span><span class="fid">—</span></div>
+      <p class="find-title">What is genuinely working, and should not be disturbed</p>
+      <div class="loc">independent measurement · scripts/validate_smoke.py:80–139, :162–195</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Causal code</dt><dd>Re-measured against the raw catalog: the current run is <strong>2,002 / 2,002 exactly aligned, 0 violations</strong>. F3 holds. The skip-on-gap logic and the <code>obs_ts = T</code> anchor both survived this round's edits.</dd></div>
+      <div class="row"><dt>The rest of the validator</dt><dd>Everything other than the causality branch is real and well built: seal verification, seal-versus-manifest equality, run <code>status == SUCCESS</code>, non-zero candidates, target-date filtering in Chicago time, <strong>rejection of any DEV/prohibited year appearing in candidate timestamps</strong>, duplicate-key detection, feature count and ordered SHA, and both-directions coverage. Each of these would have caught a real defect.</dd></div>
+      <div class="row"><dt>Seal and closure</dt><dd>53-file AST closure intact; <code>PREEXEC_AUDIT_SEAL_VALID</code>; lint 46/46 at 100%. Every code-tampering bypass from rounds 1–3 remains blocked.</dd></div>
+    </dl>
+  </article>
+</section>
+
+<section>
+  <h2>Recommended order</h2>
+  <p class="sub">Five items, none larger than a few lines</p>
+  <ol>
+    <li><strong>R4-1</strong> — persist <code>triggering_1s_ts_init</code> and invert the guard so an unrunnable causality check blocks. This is the one finding that makes the framework's central claim unverifiable, and it is two lines plus a guard.</li>
+    <li><strong>R4-2</strong> — record the composite in <code>run_manifest.json</code> and require the match. Closes F17 at the same time.</li>
+    <li><strong>R3-1</strong> — verify <code>validator_file_sha256</code> against the sealed validator, and enforce the counts the acceptance already carries. The data is there; the gate just needs to read it.</li>
+    <li><strong>R3-3, then R3-2</strong> — require a structured <code>audit-summary</code> block; require provenance version 2 and have the seal re-parse.</li>
+    <li><strong>R4-3</strong> — delete or repoint the broken test, glob the selector, and fail preflight when collected tests are fewer than files on disk.</li>
+  </ol>
+
+  <p>A pattern worth naming, because it has now recurred four times in different places. Round 1: the lint reported CLEAR having scanned one file. Round 2: the closure test asserted seven filenames. Round 3: <code>coverage_pct</code> was the literal <code>100.0</code>. Round 4: the acceptance reports <code>violations: 0</code> from an uninitialised default. <strong>In every case a control reported a favourable result it had not computed, and in every case the reason was that "check skipped" and "check passed" render identically.</strong> The single most valuable convention this framework could adopt is that every check emits what it examined alongside its verdict, and that a check which cannot run raises rather than returns. The lint fix already does exactly this — it is the template.</p>
+</section>
+
+<footer>
+  Red team round 4, 2026-08-15 · study <span class="mono">Gemini_clean_maturity_flip_rolling_5m_productivity</span> · seal composite <span class="mono">1cf24f6678df5cc8…</span> · 53 sealed files · lint 46/46.
+  All bypasses executed against the live working tree and reverted; <span class="mono">PREEXEC_AUDIT_SEAL_VALID</span> and clean file state reconfirmed after restore.
+  The genuine <span class="mono">smoke_acceptance.json</span> (run 20260815_142237, 2,002 candidates) was backed up before testing and restored intact.
+</footer>
+
+</div>

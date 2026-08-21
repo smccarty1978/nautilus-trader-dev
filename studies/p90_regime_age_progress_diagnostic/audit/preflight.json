@@ -1,0 +1,14 @@
+{
+  "status": "CLEAR",
+  "elapsed_seconds": 6.23,
+  "code_hash": "f58283e0ca45a3763ccae62af117e297c77bcc4ce4707370ffc36d885ee62444",
+  "spec_hash": "5dce087bf4ab3f65312426273df6ff8db5852ee9401bbf1b1e520a2d170cd65f",
+  "checks_run": [
+    "CAUSAL_LINT",
+    "ARTIFACT_SCHEMA",
+    "CAUSAL_INVARIANTS"
+  ],
+  "failed_gate": null,
+  "failure_ids": [],
+  "required_next_action": "READY_FOR_AUDIT"
+}

@@ -1,0 +1,194 @@
+{
+  "source_artifacts": {
+    "bullish": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+    "long": "studies\\freeze_long_strict_models_v2\\artifacts\\LONG_STRICT_top25_gbt_v2\\manifest.json",
+    "store": "data\\canonical\\regime_complete_v1"
+  },
+  "contract_rows": [
+    {
+      "item": "age_min_seconds",
+      "config_value": "120",
+      "observed_value": 125.0,
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": "realized floor 125.0s on a 5s grid => the gate is applied strictly (>120), not >=120. Recorded, not adjusted (SPEC 1.2a)."
+    },
+    {
+      "item": "running_mfe_min_atr",
+      "config_value": "1.0",
+      "observed_value": 1.0000176903480393,
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": "THE reason no 0.5-1.0 progress bucket is created (SPEC 1.3)."
+    },
+    {
+      "item": "progress_windows_min",
+      "config_value": "2",
+      "observed_value": 2,
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "retained_mfe_ratio_min",
+      "config_value": "0.5",
+      "observed_value": 0.5,
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "progress_gap_seconds",
+      "config_value": "120",
+      "observed_value": "not observable per-row",
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": "carried on the contract; the store exposes the resulting window COUNT, not the gap, so this row verifies the artifact value exists, not the data."
+    },
+    {
+      "item": "excursion_direction",
+      "config_value": "prevailing_regime",
+      "observed_value": "prevailing_regime",
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "atr_anchor",
+      "config_value": "confirmed_regime_start",
+      "observed_value": "confirmed_regime_start",
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "established_regime_gate",
+      "config_value": "implied by population block",
+      "observed_value": true,
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "session",
+      "config_value": "RTH",
+      "observed_value": "RTH on 100% of in-domain rows",
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "scoring_cadence_seconds",
+      "config_value": "5",
+      "observed_value": 5,
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "target",
+      "config_value": "bearish_regime_flip_within_300s",
+      "observed_value": "bearish_regime_flip_within_300s",
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "target_horizon_seconds",
+      "config_value": "300",
+      "observed_value": 300,
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "positive_flip_interval",
+      "config_value": "\"(T,T+300s]\"",
+      "observed_value": "(T,T+300s]",
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": "half-open; reproduced exactly by Outcome 1's `0 < dt <= X` test."
+    },
+    {
+      "item": "model_direction_partition",
+      "config_value": "bullish=+1 / bearish=-1",
+      "observed_value": "both_in_domain=0",
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": "direction and model are one partition."
+    },
+    {
+      "item": "is_regime_confirmed",
+      "config_value": "implied",
+      "observed_value": true,
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": ""
+    },
+    {
+      "item": "age_column_identity",
+      "config_value": "regime_age_seconds == seconds_from_regime_start",
+      "observed_value": "0 disagreements",
+      "match": true,
+      "source_artifact": "studies\\full_trade_path_builder\\artifacts\\BULLISH_STRICT_top25_gbt_v2\\config.yaml",
+      "note": "Phase 0 measures the contract on one column and the study buckets the other; this row proves they are the same quantity."
+    }
+  ],
+  "observed": {
+    "n_in_domain": 2205823,
+    "age_min": 125.0,
+    "age_max": 8760.0,
+    "running_mfe_min": 1.0000176903480393,
+    "current_progress_min": 0.5004091021730822,
+    "progress_windows_min": 2,
+    "retained_mfe_ratio_min": 0.5,
+    "established_gate_all_true": true,
+    "both_in_domain": 0,
+    "all_rth": true,
+    "all_confirmed": true,
+    "n_age_ge_1800": 430767,
+    "n_age_column_disagreements": 0,
+    "implied_retained_min": 0.5,
+    "frac_current_progress_0_5_to_2_0": 0.2747786200434033,
+    "year_min": 2021,
+    "year_max": 2025
+  },
+  "discrepancies": [
+    {
+      "id": "D_AGE_FLOOR",
+      "summary": "config age_min_seconds=120 but the realized in-domain floor is 125.0s",
+      "evidence": {
+        "config": "120",
+        "observed_min": 125.0,
+        "grid_cadence_s": 5
+      },
+      "resolution": "The 5s checkpoint grid with a strict `> 120` gate. The first frozen age bucket is LABELLED 120-240s and is in fact 125-240s. Not widened, not re-optimised."
+    },
+    {
+      "id": "D_TRAINING_AGE_CEILING",
+      "summary": "config freezes checkpoint_grid ...through_less_than_1800s, but the canonical store scores in-domain checkpoints far beyond it",
+      "evidence": {
+        "config_checkpoint_grid": "regime_start_plus_5s_through_less_than_1800s_at_1s_ts_init",
+        "store_max_age_s": 8760.0,
+        "n_in_domain_age_ge_1800": 430767,
+        "pct_in_domain_age_ge_1800": 0.19528629450323076
+      },
+      "resolution": "Events armed at age >= 1800s are OUTSIDE the model's training age range. Not corrected for; disclosed as pct_age_ge_1800s on every table touching the >900s bucket."
+    },
+    {
+      "id": "D_PROGRESS_BUCKET_0_5",
+      "summary": "prior discovery reported a 0.5-2 ATR progress bucket even though training eligibility requires running MFE >= 1 ATR",
+      "evidence": {
+        "prior_family": "model_driven_entry_exit_discovery.candidates.path_development",
+        "column_it_buckets": "current_progress_atr",
+        "column_eligibility_gates": "running_mfe_atr",
+        "min_running_mfe_atr": 1.0000176903480393,
+        "min_current_progress_atr": 0.5004091021730822,
+        "min_implied_retained_ratio": 0.5,
+        "frac_in_domain_current_progress_in_0_5_2_0": 0.2747786200434033
+      },
+      "resolution": "NOT a contradiction. They are different columns. running_mfe_atr is the running MAXIMUM favorable excursion (floor 1.0); current_progress_atr is the CURRENT excursion, whose floor is DERIVED as running_mfe_min * retained_mfe_ratio_min = 1.0 * 0.5 = 0.5, matching the observed 0.5004 exactly. This study buckets running_mfe_atr and therefore creates NO 0.5-1.0 bucket."
+    }
+  ],
+  "no_refit": "No model artifact is loaded anywhere in this study; probabilities are read from canonical_regime_scores_all.parquet as collected."
+}

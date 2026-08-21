@@ -1,0 +1,37 @@
+{
+  "table": "descriptive_latest_1m_close_position_prev5_range",
+  "slice": "none",
+  "reporting_version": "1.0.0",
+  "n_rows_in_table": 1,
+  "total_sample_count": 1038,
+  "n_input_rows": 1038,
+  "row_reconciliation": "not applicable to this table",
+  "filters": {
+    "column": "latest_1m_close_position_prev5_range"
+  },
+  "dataset_identity_sha256": "6a2040d282f80ccd44a579c2d2d0e669cf6c48bd3b039f810699ff47cd8346c3",
+  "analysis_spec_sha256": "4a321a6b7c2d5b3a8f802a431cdb03f9721ef631fbf04c684fb1cef000fad1e1",
+  "metric_definitions": {
+    "descriptive_summary": "count_available, count_null, distinct_count, mean, std, min, max, plus the p10/p25/median/p75/p90 quantile ladder (delegated to quantiles())."
+  },
+  "caveats": [],
+  "rows": [
+    {
+      "column": "latest_1m_close_position_prev5_range",
+      "n": 1038,
+      "n_missing": 0,
+      "count_available": 1038,
+      "count_null": 0,
+      "distinct_count": 111,
+      "mean": 0.5029080362606797,
+      "std": 0.3901209523068803,
+      "min": -0.8918918918918919,
+      "max": 1.4605263157894737,
+      "q10": 0.06666666666666667,
+      "q25": 0.2777777777777778,
+      "q50": 0.4915254237288136,
+      "q75": 0.8,
+      "q90": 0.9491525423728814
+    }
+  ]
+}

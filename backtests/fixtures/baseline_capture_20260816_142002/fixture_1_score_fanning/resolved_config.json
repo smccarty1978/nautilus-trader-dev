@@ -1,0 +1,26 @@
+{
+  "status": "unavailable_config_class_unimportable",
+  "config_class": "strategies.score_fanning_strategy.ScoreFanningConfig",
+  "entrypoint_kwargs": {
+    "instrument_id": "NQ.XCME",
+    "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+    "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+    "checkpoint_dir": "backtests/results/checkpoints",
+    "policies": [
+      {
+        "name": "R5",
+        "threshold": 0.62,
+        "sl_atr_mult": 1.5,
+        "pt_atr_mult": 2.0
+      },
+      {
+        "name": "R2.5",
+        "threshold": 0.5,
+        "sl_atr_mult": 1.5,
+        "pt_atr_mult": 2.0
+      }
+    ]
+  },
+  "kwargs_provenance": "backtests/run_staged_backtest.py:68-77 (strat_cfg_dict literal)",
+  "error": "TypeError: Using a non-empty mutable collection ([{'name': 'R5', 'threshold': 0.62, 'sl_atr_mult': 1.5, 'pt_atr_mult': 2.0}, {'name': 'R2.5', 'threshold': 0.5, 'sl_atr_mult': 1.5, 'pt_atr_mult': 2.0}]) as a default value is unsafe. Instead configure a `default_factory` for this field."
+}

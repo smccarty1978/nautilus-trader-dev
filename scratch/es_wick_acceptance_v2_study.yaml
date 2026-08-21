@@ -1,0 +1,56 @@
+study:
+  id: es_wick_imbalance_acceptance_v2
+  type: flip_prediction
+  risk_tier: 2
+  description: >-
+    Workflow acceptance re-test of latest_1m_wick_imbalance on ES RTH, bounded to
+    2024-09-03/04/05. Descriptive only; no economic interpretation, no model fitting.
+    Supersedes es_wick_imbalance_exploratory, whose artifacts are preserved unchanged as
+    forensic evidence of the first (failed) acceptance attempt.
+operation:
+  kind: train_evaluate
+  target_metric: roc_auc
+instrument:
+  symbol: ES
+  venue: XCME
+population:
+  type: regime_state
+  prevailing_regime: both
+  # Resolved by utils/session_boundaries.py to 08:30:00-15:15:00 America/Chicago,
+  # half-open (start, end]. This is the project-canonical RTH window (AGENTS.md).
+  session: RTH
+target:
+  type: flip
+  event: prevailing_1m_regime_transition
+  direction: both
+  horizon_seconds: 300
+features:
+  # NOT the verified universe: latest_1m_wick_imbalance is 'provisional' pending
+  # look-ahead auditor clearance (features/promotions.json). It is named explicitly
+  # because characterising it is the entire point of the study.
+  source: explicit_feature_list
+  feature_list:
+  - latest_1m_wick_imbalance
+  timing_contract: verified
+model:
+  mode: scoring
+  family: HistGradientBoostingClassifier
+chronology:
+  train:
+  - 2024
+  dev: []
+  prohibited:
+  - 2025
+  - 2026
+execution:
+  runtime: nautilustrader
+  progress_seconds: 60
+  bounded: true
+  data_requirements:
+    # Exact bounded authorization. `train: [2024]` permits all of 2024; these three days
+    # are what this study is actually authorized to load. Enforced in
+    # backtests/nt_runtime/data_plan.py::enforce_authorized_dates.
+    authorized_dates:
+    - '2024-09-03'
+    - '2024-09-04'
+    - '2024-09-05'

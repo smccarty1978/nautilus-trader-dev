@@ -1,0 +1,55 @@
+# Standalone backtest contract — ScoreFanning multi-policy virtual evaluator, 2023-03-03.
+#
+# Harness equivalent of the legacy fixture:
+#   python backtests/run_staged_backtest.py --start-date 2023-03-03 --end-date 2023-03-03
+#
+# ---------------------------------------------------------------------------
+# STATUS: BASELINE VALID — golden equivalence PASSES
+# ---------------------------------------------------------------------------
+# The legacy entrypoint runs unmodified and this config reproduces it exactly:
+# results_R2.5.parquet matches the frozen baseline's normalized content hash
+# (20 rows, 5fc8096451508481). See BACKTEST_HARNESS_IMPLEMENTATION_REPORT.md §3.
+#
+# Reaching that required three NautilusTrader-compatibility repairs in
+# strategies/score_fanning_strategy.py (no semantic changes):
+#   1. `policies` used a mutable list as a msgspec field default -> default_factory
+#   2. __init__ read self.cache before the strategy was registered -> parse
+#      InstrumentId/BarType from the declared config strings instead
+#   3. on_start called request_data_subscription(), which does not exist on
+#      NT 1.230.0's Strategy -> subscribe_bars()
+#
+# results_R5.parquet is legitimately absent: the strategy emits a constant
+# dummy_score of 0.55, below R5's 0.62 threshold, so that evaluator opens no
+# trades and the runner's `if trades_list:` is False.
+name: score_fanning_2023_03_03
+strategy: score_fanning_strategy
+symbol: NQ
+
+# Legacy loads 2023-02-26 .. 2023-03-03 23:59:59 and calls
+# engine.run(start=2023-03-03, end=2023-03-03 23:59:59) -> bounded.
+start_date: "2023-03-03"
+end_date: "2023-03-03"
+warmup_days: 5
+
+execution_mode:
+  order_handling: virtual
+  fill_model: bar
+  bar_execution: true
+  bar_adaptive_high_low_ordering: true
+  oms_type: NETTING
+  account_type: MARGIN
+  base_currency: USD
+  starting_balance: 1000000
+  commission_model: none
+  slippage_model: none
+  run_window_mode: bounded
+
+# ScoreFanningStrategy places no NT orders; bar_execution has no effect on it.
+# Its output is one virtual trade table per policy. The legacy policy list is
+# R5 @ 0.62 and R2.5 @ 0.50, both sl_atr_mult=1.5 / pt_atr_mult=2.0.
+#
+# NOTE: `policies` is a structured (list-of-dict) field and cannot be supplied
+# through --param key=value scalar overrides. It is left to the strategy default,
+# which is exactly the legacy list. `checkpoint_dir` is routed into the run
+# directory automatically by modes/backtest.py.
+params: {}

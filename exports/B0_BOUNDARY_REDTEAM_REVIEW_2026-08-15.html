@@ -1,0 +1,334 @@
+<title>B0 Boundary — Red Team Review</title>
+<style>
+  :root{
+    --ground:#EEF1F5; --surface:#FFFFFF; --surface-2:#F7F9FB;
+    --ink:#131A24; --ink-2:#3F4A59; --ink-3:#6B7787;
+    --rule:#D3DAE3; --rule-soft:#E4E9EF;
+    --accent:#2F5D8C; --accent-soft:#E2EAF3;
+    --crit:#A81F26; --crit-bg:#FBE9EA;
+    --warn:#8A5A0B; --warn-bg:#FBF1DF;
+    --ok:#256B4A;  --ok-bg:#E3F1E9;
+    --term-bg:#141B25; --term-ink:#C8D3E0; --term-dim:#7E8DA0;
+    --term-go:#79C08E; --term-no:#E58388;
+    --shadow:0 1px 2px rgba(19,26,36,.06), 0 6px 18px -10px rgba(19,26,36,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+      --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+      --rule:#2A3543; --rule-soft:#212B37;
+      --accent:#7FAAD8; --accent-soft:#1B2735;
+      --crit:#FF8087; --crit-bg:#2B171A;
+      --warn:#E5AE5C; --warn-bg:#2A2117;
+      --ok:#6FC095;  --ok-bg:#152420;
+      --term-bg:#0A0F16; --term-dim:#6F7E90;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+    --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+    --rule:#2A3543; --rule-soft:#212B37;
+    --accent:#7FAAD8; --accent-soft:#1B2735;
+    --crit:#FF8087; --crit-bg:#2B171A;
+    --warn:#E5AE5C; --warn-bg:#2A2117;
+    --ok:#6FC095;  --ok-bg:#152420;
+    --term-bg:#0A0F16; --term-dim:#6F7E90;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 28px 96px;}
+  header.mast{border-bottom:1px solid var(--rule);background:var(--surface);}
+  .mast-inner{max-width:1060px;margin:0 auto;padding:38px 28px 30px;display:flex;flex-direction:column;gap:20px;}
+  .eyebrow{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-3);}
+  h1{margin:0;font-size:clamp(29px,4.2vw,44px);line-height:1.07;letter-spacing:-.022em;font-weight:700;text-wrap:balance;}
+  .dek{margin:0;max-width:64ch;color:var(--ink-2);font-size:17px;}
+  .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:18px 20px;border-radius:3px;
+    background:var(--crit-bg);border:1px solid var(--crit);border-left-width:5px;}
+  .verdict-stamp{font-family:ui-monospace,Consolas,monospace;font-size:clamp(20px,3vw,28px);
+    font-weight:700;letter-spacing:.04em;color:var(--crit);}
+  .verdict-why{color:var(--ink-2);font-size:14.5px;max-width:56ch;margin:0;}
+  section{margin-top:52px;}
+  h2{margin:0 0 6px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-family:ui-monospace,Consolas,monospace;color:var(--accent);font-weight:700;}
+  h2 + .sub{margin:0 0 22px;font-size:23px;font-weight:660;letter-spacing:-.018em;text-wrap:balance;}
+  h3{font-size:16.5px;font-weight:650;margin:28px 0 9px;letter-spacing:-.01em;}
+  p{margin:0 0 14px;max-width:72ch;}
+  code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.875em;
+    background:var(--surface-2);border:1px solid var(--rule-soft);padding:1px 5px;border-radius:2px;
+    color:var(--ink);overflow-wrap:anywhere;}
+  .tscroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:700px;font-size:14px;}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--rule-soft);vertical-align:top;}
+  thead th{background:var(--surface-2);font-family:ui-monospace,Consolas,monospace;font-size:10.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--rule);white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.vd{white-space:nowrap;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;}
+  .v-fail{color:var(--crit);} .v-weak{color:var(--warn);} .v-pass{color:var(--ok);}
+  .q{background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--accent);
+    margin-bottom:18px;box-shadow:var(--shadow);}
+  .q-head{padding:14px 20px 12px;border-bottom:1px solid var(--rule-soft);}
+  .q-num{font-family:ui-monospace,Consolas,monospace;font-size:11px;font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:5px;}
+  .q-title{font-size:17.5px;font-weight:650;letter-spacing:-.012em;margin:0;text-wrap:balance;}
+  .q-ans{display:inline-block;margin-top:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;
+    font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:2px;
+    background:var(--crit-bg);color:var(--crit);}
+  .q-ans.warn{background:var(--warn-bg);color:var(--warn);}
+  .q-ans.ok{background:var(--ok-bg);color:var(--ok);}
+  .q-body{padding:14px 20px 18px;}
+  .q-body p:last-child{margin-bottom:0;}
+  .term{background:var(--term-bg);color:var(--term-ink);
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12.5px;line-height:1.66;
+    padding:15px 17px;overflow-x:auto;border-radius:3px;border:1px solid rgba(127,170,216,.18);
+    margin:0 0 16px;white-space:pre;}
+  .term .c{color:var(--term-dim);} .term .g{color:var(--term-go);} .term .r{color:var(--term-no);font-weight:600;}
+  ul,ol{max-width:72ch;padding-left:22px;margin:0 0 16px;}
+  li{margin-bottom:7px;}
+  .callout{background:var(--accent-soft);border-left:4px solid var(--accent);padding:14px 18px;margin:0 0 18px;}
+  .callout.alert{background:var(--crit-bg);border-left-color:var(--crit);}
+  .callout p:last-child{margin-bottom:0;}
+  .rev{background:var(--surface);border:1px solid var(--rule);padding:0;margin-bottom:14px;box-shadow:var(--shadow);}
+  .rev-h{display:flex;gap:12px;align-items:baseline;padding:13px 18px 11px;border-bottom:1px solid var(--rule-soft);}
+  .rev-n{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:var(--crit);font-size:13px;white-space:nowrap;}
+  .rev-t{font-size:16px;font-weight:650;letter-spacing:-.01em;margin:0;}
+  .rev-b{padding:12px 18px 15px;font-size:14.5px;color:var(--ink-2);}
+  .rev-b p{margin:0 0 10px;} .rev-b p:last-child{margin-bottom:0;}
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  @page{ margin:14mm 12mm; }
+  @media print{
+    :root, :root[data-theme="dark"]{
+      --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F6F9;
+      --ink:#0E141C; --ink-2:#2E3844; --ink-3:#5C6775;
+      --rule:#B9C2CD; --rule-soft:#D8DEE6; --accent:#23507D; --accent-soft:#EAF0F7;
+      --crit:#8E161D; --crit-bg:#FBE9EA; --warn:#6F470A; --warn-bg:#FAF0DC;
+      --ok:#1C5739; --ok-bg:#E4F1E9;
+      --term-bg:#F4F6F9; --term-ink:#161D26; --term-dim:#5C6775;
+      --term-go:#1C5739; --term-no:#8E161D; --shadow:none;
+    }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body{ background:#fff; font-size:10.5pt; line-height:1.5; }
+    .wrap,.mast-inner{ max-width:none; padding-left:0; padding-right:0; }
+    header.mast{ border-bottom:2px solid var(--ink); }
+    h1{ font-size:23pt; } .dek{ font-size:11pt; }
+    .tscroll{ overflow:visible; }
+    table{ min-width:0; width:100%; font-size:8.6pt; table-layout:fixed; }
+    th,td{ padding:5px 7px; overflow-wrap:anywhere; }
+    .term{ white-space:pre-wrap; overflow-wrap:anywhere; overflow:visible; font-size:8.2pt;
+      line-height:1.5; padding:9px 11px; border:1px solid var(--rule); }
+    code{ overflow-wrap:anywhere; }
+    .q,.rev,tr,.callout{ break-inside:avoid; page-break-inside:avoid; }
+    h2,h3,.sub{ break-after:avoid; page-break-after:avoid; }
+    section{ margin-top:8mm; }
+    footer{ break-before:avoid; }
+  }
+</style>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="eyebrow">Red-team review · BACKTEST_HARNESS_B0_BOUNDARY.md · 2026-08-15</div>
+    <h1>The two fixtures don't share an execution model, and neither belongs to the study they'd be run under.</h1>
+    <p class="dek">Review of the Phase B0 boundary against the actual legacy scripts and strategy code. Question: can the proposed B1 facade reproduce both backtests without changing their research behavior?</p>
+
+    <div class="verdict">
+      <div class="verdict-stamp">BLOCKED</div>
+      <p class="verdict-why">Fixture 1 places <strong>zero</strong> NT orders, so the proposed <code>trades.parquet</code> artifact is empty for it. Fixture 2's one-day command cannot represent a year-level policy run. And both would run under a sealed collector study whose contract they don't satisfy.</p>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>The blocking observation</h2>
+  <p class="sub">The two fixtures were chosen to prove generality, and they prove the opposite</p>
+
+  <div class="term"><span class="c">$ # does each strategy place real NT orders?</span>
+strategies/score_fanning_strategy.py          submit_order / order_factory : <span class="r">0</span>
+strategies/w4_exit_strategy.py                submit_order / order_factory : 0
+backtests/baseline_flip_parity/strategy.py    submit_order / order_factory : <span class="g">22</span>   <span class="c">(W4's base class)</span></div>
+
+  <p><code>ScoreFanningStrategy</code> is a <strong>virtual evaluator</strong>: it holds <code>self.evaluators: List[ThresholdEvaluator]</code> and dispatches 1s bars to them. It never submits an order. <code>engine.trader.generate_positions_report()</code> therefore returns an empty frame, and <code>bar_execution=True</code> — the sole justification given for modifying <code>engine_builder.py</code> — has no effect on it whatsoever. Its real output is per-policy virtual trade tables written from evaluator state:</p>
+
+  <div class="term"><span class="c">run_staged_backtest.py:146-167</span>
+for evalr in strategy.evaluators:
+    trades_list = evalr.trade_history + evalr.active_trades
+    df = pd.DataFrame([{trade_id, entry_time, entry_px, direction, qty, atr,
+                        exit_time, exit_px, exit_reason, pnl, <span class="g">is_open</span>} ...])
+    df.to_parquet(checkpoint_path / f"<span class="g">results_{evalr.name}.parquet</span>")   <span class="c"># R5, R2.5</span></div>
+
+  <p><code>W4ExitStrategy</code> inherits <code>BaselineFlipParityStrategy</code>, which does place orders, so it produces a genuine position stream <em>and</em> its own blended-PnL log. The two fixtures are on opposite sides of the execution boundary. A single <code>backtest/trades.parquet</code> + <code>metrics.json</code> contract cannot serve both, and B0 does not acknowledge the split.</p>
+</section>
+
+<section>
+  <h2>Answers</h2>
+  <p class="sub">The five questions asked</p>
+
+  <article class="q">
+    <div class="q-head">
+      <span class="q-num">Question 1</span>
+      <p class="q-title">Can these strategies legitimately run under <code>studies/Gemini_clean_maturity_flip_rolling_5m_productivity</code>?</p>
+      <span class="q-ans">No — it forces collector semantics and breaks the seal</span>
+    </div>
+    <div class="q-body">
+      <p><strong>Strategy identity leaves the sealed set.</strong> The execution manifest resolves the strategy from the compiled contract — <code>spec.execution.strategy_class = strategies.flip_prediction_collector.FlipPredictionCollector</code> — not from <code>--strategy</code>. A <code>--strategy</code> override therefore executes code the seal does not cover, while <code>verify_preexec_audit_seal</code> still reports <code>VALID</code>. That directly reintroduces the class of defect closed in rounds 2–3.</p>
+      <p><strong>Chronology is the collector's, not the strategy's.</strong> <code>train=[2021,2022,2023] · dev=[2024] · prohibited=[2025,2026]</code>. <code>run_staged_backtest.py</code> defaults to <code>2025-03-01 .. 2025-03-31</code> — prohibited under this contract. Worse, <code>BaselineFlipParityConfig.year</code> defaults to <strong>2025</strong>, and the proposed W4 command passes <code>policy</code>, <code>theta</code>, <code>N</code> but <strong>not <code>year</code></strong>. The strategy would load 2025 predictions while replaying 2023 bars — a prohibited-year read that <code>data_plan</code> cannot see, because the strategy opens the parquet directly rather than through the catalog.</p>
+      <p><strong>Other contract terms that don't apply:</strong> <code>observation_policy.required_source_relation: equal</code>, the 60-name <code>feature_list</code> + <code>feature_list_sha256</code> enforced by <code>OutputManager.persist_collection</code>, and the <code>population</code> / <code>target</code> / <code>stratification</code> / <code>baseline</code> / <code>lineage</code> blocks. Under <code>--stage full</code> the collector's smoke gate would also demand <code>smoke_acceptance.json</code> — a collector artifact — before a W4 backtest could run.</p>
+      <p><strong>The B1 file list invalidates the seal.</strong> <code>engine_builder.py</code> and <code>strategy_binding.py</code> are both inside the 53-file AST closure. B0's note that "no collector code will be modified" is true of the collector module and false in effect: any byte change to those two files changes the composite and invalidates the Gemini seal, both audit statuses, and the current smoke acceptance.</p>
+    </div>
+  </article>
+
+  <article class="q">
+    <div class="q-head">
+      <span class="q-num">Question 2</span>
+      <p class="q-title">Are the one-day harness commands equivalent to the legacy fixtures?</p>
+      <span class="q-ans">No for both — and structurally impossible for W4</span>
+    </div>
+    <div class="q-body">
+      <p><strong>W4 cannot be represented by a one-day command.</strong> The legacy run is <code>--year 2023</code>: it loads <code>2022-12-27 .. 2023-12-31</code> and calls <code>engine.run(start=2023-01-01)</code> with <em>no end</em>. <code>year</code> is not a date filter — it is a strategy config field that selects the offline prediction universe (<code>weakness_checkpoint_predictions.parquet</code>, 222 MB, filtered <code>dt.dt.year == cfg.year</code>). A single day replays roughly 1/250th of the population, so every policy metric the W4 line exists to produce — win rate, profit factor, total PnL, B0–B5 comparison — is a different statistic. A one-day run is a smoke test of the plumbing, not a reproduction of the fixture.</p>
+      <p><strong>Two config facts the proposed command drops.</strong> <code>entry_qty = 2 if policy == "B4" else 1</code> is derived in the runner, not the strategy; passing <code>--param policy=B4</code> alone silently trades 1 lot and breaks the scale-out policy. And 12 further <code>BaselineFlipParityConfig</code> fields (<code>sl_atr</code>, <code>tp_atr</code>, <code>ma_period</code>, <code>ma_type</code>, <code>trade_side</code>, <code>use_trailing_stop</code>, <code>be_trigger_atr</code>, …) are taken as class defaults by the legacy runner and must be pinned, not re-defaulted.</p>
+      <p><strong>Undeclared side-effect write.</strong> <code>w4_exit_strategy.py:266</code> writes <code>backtests/results/w4_parity_{year}_{policy}.parquet</code> on stop, outside <code>runs/</code> and outside <code>OutputManager</code>'s control. A one-day harness run would silently overwrite the year-level artifact at that fixed path.</p>
+      <p><strong>Fixture 1's command is closer but still not equivalent</strong> — the legacy invocation carries <code>--checkpoint-dir</code> (both an input and the output location) and a <code>--resume</code> path via <code>DailyStateCheckpointer.verify_manifest</code> plus <code>strategy.load_daily_checkpoint</code>. The proposed facade signature has no parameter for either.</p>
+      <p><strong>Run-window semantics are unspecified and decisive.</strong> <code>collect.py</code> calls <code>engine.run()</code> with no arguments, replaying warmup bars as live. Both legacy scripts load a 5-day lead-in and then bound the run (<code>run(start=…)</code> for W4, <code>run(start=…, end=…)</code> for fanning). Whether NT dispatches pre-<code>start</code> data determines whether the lead-in warms indicators or is discarded — and the answer changes both fixtures' results. B0 must state the intended semantics and the baseline must record which one the legacy actually exhibits.</p>
+    </div>
+  </article>
+
+  <article class="q">
+    <div class="q-head">
+      <span class="q-num">Question 3</span>
+      <p class="q-title">Minimum fixture baseline that must be captured before B1</p>
+      <span class="q-ans warn">Specified below — none of it exists yet</span>
+    </div>
+    <div class="q-body">
+      <p>Capture by running each legacy command <em>unmodified</em> and freezing the result. Both fixtures need every row; the shapes differ only in the output section.</p>
+      <div class="tscroll">
+      <table>
+        <thead><tr><th style="width:23%">Item</th><th>Fixture 1 — ScoreFanning</th><th>Fixture 2 — W4</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Command</strong></td><td><code>run_staged_backtest.py --start-date 2023-03-03 --end-date 2023-03-03</code>, verbatim, plus <code>--checkpoint-dir</code> value</td><td><code>run_w4_backtest.py --year 2023 --policy B1 --theta 0.62 --N 10</code>, verbatim</td></tr>
+          <tr><td><strong>Data window</strong></td><td>load <code>2023-02-26 .. 2023-03-03 23:59:59</code>; run window <code>start=2023-03-03, end=2023-03-03 23:59:59</code></td><td>load <code>2022-12-27 .. 2023-12-31 23:59:59</code>; run <code>start=2023-01-01</code>, <strong>no end</strong></td></tr>
+          <tr><td><strong>Warmup</strong></td><td colspan="2">5 calendar days, applied as <em>load</em> extent only. Record bar counts loaded vs bar callbacks received per timeframe, so lead-in dispatch behaviour is pinned as an observation rather than an assumption.</td></tr>
+          <tr><td><strong>External inputs</strong></td><td><code>checkpoint_dir</code> contents + <code>DailyStateCheckpointer</code> manifest state (and whether <code>--resume</code> was inactive)</td><td>SHA-256 of <code>studies/regime_sequence_signal_audit/results/weakness_checkpoint_predictions.parquet</code>, plus the post-filter row count for <code>year==2023</code></td></tr>
+          <tr><td><strong>Catalog</strong></td><td colspan="2"><code>data/catalog/NQ_v0_2020_2026</code>; per-bar-type row counts and first/last <code>ts_event</code> and <code>ts_init</code> for the loaded window</td></tr>
+          <tr><td><strong>Instrument / venue</strong></td><td colspan="2"><code>NQ.XCME</code>, multiplier <code>20</code>, price increment <code>0.25</code>, activation <code>2019-01-01</code>, expiration <code>2027-12-31 23:59:59</code>; venue <code>XCME</code>, <code>OmsType.NETTING</code>, <code>AccountType.MARGIN</code>, base <code>USD</code>, starting balance <code>1,000,000 USD</code>, <code>bar_execution=True</code>, <code>bar_adaptive_high_low_ordering=True</code>. Record <code>trader_id</code> (<code>STAGED-BACKTESTER</code> / <code>W4-BACKTESTER</code>) and exclude it from comparison hashes.</td></tr>
+          <tr><td><strong>Strategy config</strong></td><td>full resolved <code>ScoreFanningConfig</code> including the exact <code>policies</code> list (R5 @0.62, R2.5 @0.50, both <code>sl_atr_mult=1.5</code>, <code>pt_atr_mult=2.0</code>)</td><td>full resolved <code>W4ExitConfig</code> — all 19 inherited fields, with <code>year=2023</code> and <code>entry_qty</code> as derived, not as defaulted</td></tr>
+          <tr><td><strong>Fills</strong></td><td><strong>None</strong> — assert the NT positions report is empty; that emptiness is part of the baseline</td><td>every fill: ts, side, qty, price, liquidity side, order type, commission</td></tr>
+          <tr><td><strong>Closed positions</strong></td><td>n/a — virtual trades only</td><td><code>generate_positions_report()</code> filtered to <code>ts_closed.notna()</code>; row count and per-row fields</td></tr>
+          <tr><td><strong>Open positions</strong></td><td>count of evaluator trades with <code>is_open == True</code> at end of run</td><td>count of positions with <code>ts_closed</code> NA — recorded separately, since the legacy artifact <em>excludes</em> them</td></tr>
+          <tr><td><strong>P&amp;L / cost</strong></td><td>per-policy: trade count, gross PnL, win rate, and the <code>exit_reason</code> distribution</td><td>total and per-trade PnL from both the positions report and <code>strategy.all_trades</code> (blended PnL for partial exits); commission and slippage totals</td></tr>
+          <tr><td><strong>Outputs to hash</strong></td><td><code>results_R5.parquet</code>, <code>results_R2.5.parquet</code></td><td><code>trades.parquet</code>, <code>strategy_trades.parquet</code>, <code>w4_parity_2023_B1.parquet</code></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <h3>Tolerances</h3>
+      <p>Timestamps, order/position counts, sides, quantities and <code>exit_reason</code> values must match <strong>exactly</strong> — a differing count is a behavioral change, not drift. Prices are tick-quantised at 0.25, so they should also match exactly; treat any deviation as a failure rather than a tolerance. Only aggregate float metrics (PnL sums, profit factor) may carry a tolerance, and <code>1e-9</code> relative is sufficient given identical inputs — a wider band would mask exactly the fill-model differences this exercise exists to detect. Hash the parquet <em>contents</em> (sorted, with volatile columns such as <code>trader_id</code> and run timestamps excluded), not the file bytes.</p>
+    </div>
+  </article>
+
+  <article class="q">
+    <div class="q-head">
+      <span class="q-num">Question 4</span>
+      <p class="q-title">Should generic backtest execution reuse all of <code>data_plan.py</code>?</p>
+      <span class="q-ans warn">No — reuse the catalog/instrument half only</span>
+    </div>
+    <div class="q-body">
+      <p><code>resolve_data_plan</code> bundles two unrelated responsibilities. The generic half is reusable: <code>PRODUCT_CATALOGS</code>, instrument and bar-type resolution, catalog path, the <code>ts_init</code> delta contract, and warmup arithmetic. Both legacy scripts hand-roll exactly this, and consolidating removes real duplication.</p>
+      <p>The governance half is not generic. Prohibited-year rejection, authorized-domain membership, the DEV/OOS unlock check and the warmup partition lock all derive from <em>the collector study's</em> <code>chronology</code> block. Applying them to an unrelated backtest imports one study's research partition into another's, and the score-fanning default window (2025-03) is already prohibited under it.</p>
+      <p>Recommended split, without new packages: extract the generic resolution into <code>resolve_catalog_plan(symbol, start, end, warmup_days)</code> inside the existing <code>data_plan.py</code>, and keep <code>resolve_data_plan</code> as the study-bound wrapper that calls it and then applies the chronology gates. Collect mode keeps calling the wrapper unchanged; backtest mode calls the inner function and applies whatever window its own contract declares. Enforcement stays attached to the contract that declares it.</p>
+    </div>
+  </article>
+
+  <article class="q">
+    <div class="q-head">
+      <span class="q-num">Question 5</span>
+      <p class="q-title">Execution-mode contract instead of a <code>bar_execution</code> boolean</p>
+      <span class="q-ans warn">Required — and it must be recorded, not just set</span>
+    </div>
+    <div class="q-body">
+      <p>A boolean records a switch position, not a semantic. This repository already has a recorded finding that bar-mode bracket simulation overstates fade strategies by $15–25K/yr — the fill model is a research-behavior parameter, so it belongs in the manifest as declared and hashed state.</p>
+      <p>Declare it in the study/run contract and echo it into <code>run_manifest.json</code>:</p>
+      <div class="term">execution_mode:
+  order_handling: <span class="g">virtual</span> | <span class="g">simulated_orders</span>     <span class="c"># fixture 1 vs fixture 2 — decides the output shape</span>
+  fill_model:     bar | tick
+  bar_execution:  true
+  bar_adaptive_high_low_ordering: true
+  oms_type:       NETTING
+  account_type:   MARGIN
+  base_currency:  USD
+  starting_balance: 1_000_000
+  commission_model: &lt;name or none&gt;
+  slippage_model:   &lt;name or none&gt;
+  run_window:
+    mode: <span class="g">bounded</span> | <span class="g">all_loaded</span>          <span class="c"># run(start,end) vs run() — differs from collect mode</span>
+    warmup_days: 5
+    warmup_dispatched: <span class="g">true</span> | <span class="g">false</span>       <span class="c"># observed, not assumed</span></div>
+      <p><code>order_handling</code> is the field that resolves the blocking finding: it selects which output contract applies, so a virtual-evaluator strategy is never asked to produce a position report and a real-order strategy can never silently emit an empty one.</p>
+    </div>
+  </article>
+</section>
+
+<section>
+  <h2>Required B0 revisions</h2>
+  <p class="sub">Smallest set that unblocks B1 — document changes only, no new framework</p>
+
+  <div class="rev">
+    <div class="rev-h"><span class="rev-n">R1</span><p class="rev-t">Declare two output contracts, keyed by <code>order_handling</code></p></div>
+    <div class="rev-b"><p>Replace the single <code>backtest/trades.parquet</code> + <code>metrics.json</code> block in §3 with two shapes: <em>virtual</em> (per-evaluator tables, one file per policy, carrying <code>is_open</code> and <code>exit_reason</code>) and <em>simulated_orders</em> (positions report filtered to closed, plus the strategy's own trade log, plus an explicit open-position count). State which fixture exercises which.</p></div>
+  </div>
+
+  <div class="rev">
+    <div class="rev-h"><span class="rev-n">R2</span><p class="rev-t">Stop hosting these fixtures under the collector study</p></div>
+    <div class="rev-b"><p>Remove <code>--study studies/Gemini_clean_maturity_flip_rolling_5m_productivity</code> from both fixture commands. Either give each fixture a minimal execution-only contract declaring its own instrument, window and strategy, or have backtest mode take those from the CLI. Also state explicitly that <code>--strategy</code> must never override a sealed study's declared <code>strategy_class</code> — if a study is sealed, the strategy it seals is the strategy that runs.</p></div>
+  </div>
+
+  <div class="rev">
+    <div class="rev-h"><span class="rev-n">R3</span><p class="rev-t">Correct Fixture 2 to a year-level command and pin its config</p></div>
+    <div class="rev-b"><p>The harness equivalent must be a 2023 full-year run with <code>--param year=2023</code> present. Document that <code>entry_qty</code> is policy-derived (<code>2</code> for B4, else <code>1</code>) and that the remaining 12 inherited config fields are pinned to their legacy-default values. Note the <code>w4_parity_{year}_{policy}.parquet</code> side-effect write as a known unmanaged output. If a one-day run is wanted as a plumbing smoke, label it as such — not as the fixture.</p></div>
+  </div>
+
+  <div class="rev">
+    <div class="rev-h"><span class="rev-n">R4</span><p class="rev-t">Add a seal-invalidation note to §6</p></div>
+    <div class="rev-b"><p><code>engine_builder.py</code> and <code>strategy_binding.py</code> are inside the collector's 53-file sealed closure. State that modifying them invalidates the Gemini seal, both audit statuses and the smoke acceptance, and sequence the re-audit / re-seal / re-smoke as part of B1 rather than discovering it at execution time. The current note — "no collector code will be modified" — is misleading and should be corrected.</p></div>
+  </div>
+
+  <div class="rev">
+    <div class="rev-h"><span class="rev-n">R5</span><p class="rev-t">Add the fixture baseline as a B0 deliverable</p></div>
+    <div class="rev-b"><p>The table in Question 3 must be captured from unmodified legacy runs and frozen <em>before</em> any B1 code exists. Without it there is nothing to compare against, and "reproduces the legacy backtest" is unfalsifiable.</p></div>
+  </div>
+
+  <div class="rev">
+    <div class="rev-h"><span class="rev-n">R6</span><p class="rev-t">Specify run-window semantics and the <code>data_plan</code> split</p></div>
+    <div class="rev-b"><p>State whether backtest mode calls <code>engine.run(start, end)</code> or <code>engine.run()</code>, and record whether warmup bars are dispatched — this differs from collect mode and changes both fixtures. Add the <code>resolve_catalog_plan</code> / <code>resolve_data_plan</code> split from Question 4 to §6's file table.</p></div>
+  </div>
+
+  <div class="rev">
+    <div class="rev-h"><span class="rev-n">R7</span><p class="rev-t">Fix two inventory errors and one omission</p></div>
+    <div class="rev-b"><p>§1 names the telemetry class <code>ExecutionTelemetry</code>; the class is <code>CausalTelemetry</code>. §1 also omits <code>utils/runner/checkpoint.py</code> (<code>DailyStateCheckpointer</code>), which Fixture 1 requires for both its config identity and its <code>--resume</code> path. Add checkpoint/resume to §5 as an explicitly unsupported case if B1 will not carry it.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>What B0 gets right</h2>
+  <p class="sub">Worth preserving through the revision</p>
+  <ul>
+    <li>The core judgement — reuse <code>backtests/nt_runtime/</code> and <code>utils/runner/</code> rather than creating a <code>common/</code> package — is correct. Both legacy scripts duplicate <code>create_instrument()</code> and the venue block nearly verbatim; that duplication is real and worth removing.</li>
+    <li>Mirroring <code>modes/collect.py</code> as <code>modes/backtest.py</code> keeps the new path parallel to a structure that has now survived six red-team rounds.</li>
+    <li>The §5 exclusions (non-futures, sweeps, tick/MBP-1, live) are accurate and honestly scoped.</li>
+    <li>Both legacy scripts already add 1s before 1m, so <code>add_bars_causal_order</code> is a faithful consolidation rather than a behavioral change.</li>
+    <li>The venue settings identified for the <code>engine_builder</code> change (<code>bar_execution</code>, <code>bar_adaptive_high_low_ordering</code>) are exactly the two that differ from current <code>build_engine</code>.</li>
+  </ul>
+</section>
+
+<footer>
+  Red-team review of <span class="mono">BACKTEST_HARNESS_B0_BOUNDARY.md</span> · 2026-08-15 · verdict <strong>BLOCKED</strong>, 7 required revisions, all document-level.
+  Verified against <span class="mono">run_staged_backtest.py</span>, <span class="mono">run_w4_backtest.py</span>, <span class="mono">score_fanning_strategy.py</span>, <span class="mono">w4_exit_strategy.py</span>, <span class="mono">baseline_flip_parity/strategy.py</span>, the Gemini study contract and the current 53-file execution closure. No code was modified.
+</footer>
+
+</div>

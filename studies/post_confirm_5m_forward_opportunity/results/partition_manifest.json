@@ -1,0 +1,79 @@
+{
+  "study": "post_confirm_5m_forward_opportunity",
+  "predecessors": [
+    "studies/p90_5m_regime_context",
+    "studies/post_confirm_forward_opportunity"
+  ],
+  "inputs": {
+    "studies/armed_fade_score_path_progression/results/armed_regime_score_paths.parquet": {
+      "exists": true,
+      "size_bytes": 4230195,
+      "rows": 8950
+    },
+    "studies/p90_5m_regime_context/results/p90_classification.parquet": {
+      "exists": true,
+      "size_bytes": 228687,
+      "rows": 8950
+    },
+    "studies/p90_5m_regime_context/_work/regime_5m_flips.parquet": {
+      "exists": true,
+      "size_bytes": 193250,
+      "rows": 25757
+    },
+    "studies/post_confirm_forward_opportunity/results/observation_panel.parquet": {
+      "exists": true,
+      "size_bytes": 16539439,
+      "rows": 140929
+    }
+  },
+  "code_sha256": "d41920a228a0eef21a6ed24f8d7d7f22bb991189c471d5c4cfb83b1768e956e2",
+  "seed": 20260811,
+  "landmarks_s": [
+    30,
+    60,
+    120,
+    180,
+    300,
+    600
+  ],
+  "capture_thresholds": [
+    0.25,
+    0.5,
+    0.75,
+    0.9
+  ],
+  "confirm_mfe_edges": [
+    1.0,
+    2.0,
+    3.0
+  ],
+  "confirm_mae_edges": [
+    0.33,
+    0.6,
+    0.9
+  ],
+  "confirm_return_edges": [
+    0.5,
+    1.0,
+    1.5
+  ],
+  "confirm_speed_edges": [
+    60,
+    120,
+    300
+  ],
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "sealed_years": [
+    2026
+  ],
+  "generated_not_committed": [
+    "results/*.parquet",
+    "results/*.csv"
+  ]
+}

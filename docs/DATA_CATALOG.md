@@ -1,14 +1,19 @@
 ## DATA HANDLING
 
-### Timestamp Convention (CRITICAL)
+### Canonical Bar-Availability & Timestamp Contract (CRITICAL)
 
-Databento timestamps bars at OPEN time. NT must process at CLOSE time.
+**Core Invariant:** Complete bar OHLCV must not be observable or processed before interval close.
+
+- **Raw Databento OHLCV:** OPEN-stamped (`ts_event`). A record at timestamp $T$ represents $[T, T + \text{duration})$.
+- **Offline Research:** Normalize derived bars to CLOSE-stamped indices (`resample(rule, label='right', closed='left')`).
+- **NautilusTrader Catalogs:** Preserve open-stamped `ts_event` and apply `ts_init_delta = bar_duration_ns` so that `ts_init` represents the interval close (causal dispatch time in the event loop).
 
 ```python
-# When loading data, ALWAYS apply ts_init_delta:
-# 1m bars: ts_init_delta = 60_000_000_000 (nanoseconds)
-# 5m bars: ts_init_delta = 300_000_000_000 (nanoseconds)
-# 1s bars: No adjustment needed
+# When wrangling raw open-stamped Databento data for NT catalogs, ALWAYS apply ts_init_delta = bar_duration:
+# 1s bars: ts_init_delta =   1_000_000_000 (1 second)
+# 1m bars: ts_init_delta =  60_000_000_000 (60 seconds)
+# 3m bars: ts_init_delta = 180_000_000_000 (180 seconds)
+# 5m bars: ts_init_delta = 300_000_000_000 (300 seconds)
 
 from nautilus_trader.persistence.wranglers import BarDataWrangler
 

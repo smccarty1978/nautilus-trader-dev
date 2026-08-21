@@ -1,0 +1,130 @@
+{
+  "terminal_label": "ABORT_CONTRACT_OR_CAUSAL_FAILURE",
+  "criteria": {
+    "material_auc_delta": 0.001,
+    "primary_evidence_direction_bucket_cells": 6,
+    "discrimination_positive_cells": [
+      {
+        "direction": "SHORT",
+        "maturity_bucket": "300-600s",
+        "auc_delta": 0.004030679456901276
+      },
+      {
+        "direction": "LONG",
+        "maturity_bucket": "600-900s",
+        "auc_delta": 0.005687587411174144
+      }
+    ],
+    "timing_positive_cells": [
+      {
+        "direction": "LONG",
+        "maturity_bucket": "300-600s"
+      },
+      {
+        "direction": "LONG",
+        "maturity_bucket": "600-900s"
+      },
+      {
+        "direction": "LONG",
+        "maturity_bucket": "900-1800s"
+      },
+      {
+        "direction": "SHORT",
+        "maturity_bucket": "300-600s"
+      },
+      {
+        "direction": "SHORT",
+        "maturity_bucket": "600-900s"
+      },
+      {
+        "direction": "SHORT",
+        "maturity_bucket": "900-1800s"
+      }
+    ],
+    "economics_nonworse_at_p90": false,
+    "economic_tail_only": false,
+    "younger_only": false,
+    "validation_pass": true,
+    "phase0_contract_pass": true,
+    "lint_pass": true,
+    "causal_audit_pass": true,
+    "contract_audit_pass": false
+  },
+  "primary_comparisons": [
+    {
+      "direction": "SHORT",
+      "maturity_bucket": "300-600s",
+      "n": 35871,
+      "base_auc": 0.6183214929245611,
+      "roc_auc": 0.6223521723814623,
+      "auc_delta": 0.004030679456901276
+    },
+    {
+      "direction": "SHORT",
+      "maturity_bucket": "600-900s",
+      "n": 47015,
+      "base_auc": 0.6441044423520543,
+      "roc_auc": 0.6449179527748008,
+      "auc_delta": 0.0008135104227464662
+    },
+    {
+      "direction": "SHORT",
+      "maturity_bucket": "900-1800s",
+      "n": 108083,
+      "base_auc": 0.666338887058066,
+      "roc_auc": 0.6644547001679701,
+      "auc_delta": -0.0018841868900958403
+    },
+    {
+      "direction": "SHORT",
+      "maturity_bucket": ">=1800s",
+      "n": 64894,
+      "base_auc": 0.6821746581943171,
+      "roc_auc": 0.6789912749560856,
+      "auc_delta": -0.0031833832382315297
+    },
+    {
+      "direction": "LONG",
+      "maturity_bucket": "300-600s",
+      "n": 31438,
+      "base_auc": 0.6186987661978443,
+      "roc_auc": 0.617140769464998,
+      "auc_delta": -0.0015579967328462896
+    },
+    {
+      "direction": "LONG",
+      "maturity_bucket": "600-900s",
+      "n": 39682,
+      "base_auc": 0.6276736372359265,
+      "roc_auc": 0.6333612246471007,
+      "auc_delta": 0.005687587411174144
+    },
+    {
+      "direction": "LONG",
+      "maturity_bucket": "900-1800s",
+      "n": 79116,
+      "base_auc": 0.6732728398855161,
+      "roc_auc": 0.6719935857403222,
+      "auc_delta": -0.0012792541451939199
+    },
+    {
+      "direction": "LONG",
+      "maturity_bucket": ">=1800s",
+      "n": 34639,
+      "base_auc": 0.6826503714073169,
+      "roc_auc": 0.6776528504078527,
+      "auc_delta": -0.004997520999464156
+    }
+  ],
+  "sealed_2026": true,
+  "acceptance": "PROMOTION_GATE_PENDING",
+  "attrition": {
+    "all_nt_snapshots": 4551280,
+    "available_snapshots": 4551256,
+    "unavailable_snapshots": 24,
+    "unavailable_reasons": {
+      "NONPOSITIVE_STRUCTURAL_DENOMINATOR": 24
+    },
+    "missing_prior_1m_anchor": 0
+  }
+}

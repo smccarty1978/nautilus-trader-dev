@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "collection_identity_sha256": "6a2040d282f80ccd44a579c2d2d0e669cf6c48bd3b039f810699ff47cd8346c3",
+  "identity": {
+    "run_id": "20260818_132043_ym_prev5_range_position_day",
+    "study_id": "ym_prev5_range_position",
+    "spec_sha256": "7ab2a506ed27ab8d68572e7492fdae2b06dc6b7f39fb33c967807b58f4864ccb",
+    "composite_seal_hash": "4f28b073556e060e91079706473f837aaa7e7bb09b82a5bbbc61d25ff410c758",
+    "candidates_sha256": "84d3584088e17f3a566c173fd3c7d504b0e3894570f44e30b27614c0aae040d7",
+    "observations_sha256": "cf51c744128c415389363e29f5596dbee36edadc11a54b76ede8277f8a1008d3",
+    "collection_manifest_sha256": "94ebee00a747be2f54e9c3530fd024e9623dc65835d7eec7b584308789dfc5ac",
+    "feature_list_sha256": "0a4200c7db88216fa0a5a5b9761052b51d26e70fb169ea4ae19cd0d646cfb300",
+    "stage": "day",
+    "start_date": "2024-09-03",
+    "end_date": "2024-09-03",
+    "warmup_start": "2024-08-29T00:00:00+00:00",
+    "timestamp_contract": {
+      "raw_timestamp_semantic": "OPEN_STAMPED",
+      "ts_init_delta_1s_ns": 1000000000,
+      "ts_init_delta_1m_ns": 60000000000
+    }
+  },
+  "recomputed": {
+    "candidates_sha256": "84d3584088e17f3a566c173fd3c7d504b0e3894570f44e30b27614c0aae040d7",
+    "observations_sha256": "cf51c744128c415389363e29f5596dbee36edadc11a54b76ede8277f8a1008d3"
+  },
+  "sealed": true,
+  "loader_version": "1.0.0",
+  "validation_passed": true,
+  "validation_spec_supplied": true,
+  "validation_skipped_checks": [],
+  "join_key": [
+    "observation_ts",
+    "regime_start_ns",
+    "regime_direction",
+    "checkpoint_index"
+  ],
+  "join_key_source": "collection_manifest.columns.observations",
+  "metadata_source": "fallback",
+  "partition_row_counts": {
+    "train": 1038
+  },
+  "feature_null_counts": {},
+  "analysis_spec_sha256": "4a321a6b7c2d5b3a8f802a431cdb03f9721ef631fbf04c684fb1cef000fad1e1",
+  "analysis_id": "ym_prev5_range_position_train_pilot",
+  "resolved_run_dir": "C:/Users/Scott McCarty/Projects/Nautilus Trader/runs/20260818_132043_ym_prev5_range_position_day"
+}

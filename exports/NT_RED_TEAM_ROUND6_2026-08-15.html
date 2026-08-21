@@ -1,0 +1,290 @@
+<title>NT Research Flow — Red Team Round 6</title>
+<style>
+  :root{
+    --ground:#EEF1F5; --surface:#FFFFFF; --surface-2:#F7F9FB;
+    --ink:#131A24; --ink-2:#3F4A59; --ink-3:#6B7787;
+    --rule:#D3DAE3; --rule-soft:#E4E9EF;
+    --accent:#2F5D8C; --accent-soft:#E2EAF3;
+    --crit:#A81F26; --crit-bg:#FBE9EA;
+    --warn:#8A5A0B; --warn-bg:#FBF1DF;
+    --note:#3B5A78; --note-bg:#E8EEF4;
+    --ok:#256B4A;  --ok-bg:#E3F1E9;
+    --term-bg:#141B25; --term-ink:#C8D3E0; --term-dim:#7E8DA0;
+    --term-go:#79C08E; --term-no:#E58388;
+    --shadow:0 1px 2px rgba(19,26,36,.06), 0 6px 18px -10px rgba(19,26,36,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+      --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+      --rule:#2A3543; --rule-soft:#212B37;
+      --accent:#7FAAD8; --accent-soft:#1B2735;
+      --crit:#FF8087; --crit-bg:#2B171A;
+      --warn:#E5AE5C; --warn-bg:#2A2117;
+      --note:#8FB0CE; --note-bg:#1A222C;
+      --ok:#6FC095;  --ok-bg:#152420;
+      --term-bg:#0A0F16; --term-dim:#6F7E90;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+    --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+    --rule:#2A3543; --rule-soft:#212B37;
+    --accent:#7FAAD8; --accent-soft:#1B2735;
+    --crit:#FF8087; --crit-bg:#2B171A;
+    --warn:#E5AE5C; --warn-bg:#2A2117;
+    --note:#8FB0CE; --note-bg:#1A222C;
+    --ok:#6FC095;  --ok-bg:#152420;
+    --term-bg:#0A0F16; --term-dim:#6F7E90;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px 96px;}
+  header.mast{border-bottom:1px solid var(--rule);background:var(--surface);}
+  .mast-inner{max-width:1080px;margin:0 auto;padding:38px 28px 30px;display:flex;flex-direction:column;gap:20px;}
+  .eyebrow{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-3);}
+  h1{margin:0;font-size:clamp(30px,4.4vw,46px);line-height:1.06;letter-spacing:-.022em;font-weight:700;text-wrap:balance;}
+  .dek{margin:0;max-width:64ch;color:var(--ink-2);font-size:17px;}
+  .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:18px 20px;border-radius:3px;
+    background:var(--ok-bg);border:1px solid var(--ok);border-left-width:5px;}
+  .verdict-stamp{font-family:ui-monospace,Consolas,monospace;font-size:clamp(18px,2.6vw,25px);
+    font-weight:700;letter-spacing:.04em;color:var(--ok);}
+  .verdict-why{color:var(--ink-2);font-size:14.5px;max-width:56ch;margin:0;}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
+    background:var(--rule);border:1px solid var(--rule);}
+  .fact{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:3px;}
+  .fact dt{font-family:ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);}
+  .fact dd{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .fact dd.c-crit{color:var(--crit);} .fact dd.c-warn{color:var(--warn);} .fact dd.c-ok{color:var(--ok);}
+  section{margin-top:56px;}
+  h2{margin:0 0 6px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-family:ui-monospace,Consolas,monospace;color:var(--accent);font-weight:700;}
+  h2 + .sub{margin:0 0 22px;font-size:24px;font-weight:660;letter-spacing:-.018em;text-wrap:balance;}
+  h3{font-size:17px;font-weight:650;margin:32px 0 10px;letter-spacing:-.01em;}
+  p{margin:0 0 14px;max-width:72ch;}
+  code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.875em;
+    background:var(--surface-2);border:1px solid var(--rule-soft);padding:1px 5px;border-radius:2px;
+    color:var(--ink);overflow-wrap:anywhere;}
+  .tscroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:700px;font-size:14px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;}
+  thead th{background:var(--surface-2);font-family:ui-monospace,Consolas,monospace;font-size:10.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--rule);white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.vd{white-space:nowrap;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;}
+  .v-fail{color:var(--crit);} .v-weak{color:var(--warn);} .v-pass{color:var(--ok);}
+  td.fid-cell{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:var(--ink-3);white-space:nowrap;}
+  .find{background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--rule);
+    margin-bottom:16px;box-shadow:var(--shadow);}
+  .find.crit{border-left-color:var(--crit);}
+  .find.warn{border-left-color:var(--warn);}
+  .find.ok{border-left-color:var(--ok);}
+  .find-head{padding:15px 20px 13px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--rule-soft);}
+  .find-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+  .pill{font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;padding:3px 8px;border-radius:2px;}
+  .pill.crit{background:var(--crit-bg);color:var(--crit);}
+  .pill.warn{background:var(--warn-bg);color:var(--warn);}
+  .pill.ok{background:var(--ok-bg);color:var(--ok);}
+  .fid{font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;}
+  .find-title{font-size:17.5px;font-weight:650;letter-spacing:-.012em;margin:0;text-wrap:balance;}
+  .loc{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--ink-2);overflow-wrap:anywhere;}
+  .find-body{padding:4px 20px 16px;display:grid;gap:0;}
+  .row{display:grid;grid-template-columns:132px 1fr;gap:16px;padding:11px 0;border-bottom:1px solid var(--rule-soft);}
+  .row:last-child{border-bottom:none;}
+  .row dt{font-family:ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-3);padding-top:3px;}
+  .row dd{margin:0;font-size:14.5px;color:var(--ink-2);}
+  .row dd strong{color:var(--ink);font-weight:640;}
+  @media (max-width:640px){ .row{grid-template-columns:1fr;gap:4px;} }
+  .term{background:var(--term-bg);color:var(--term-ink);
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12.5px;line-height:1.68;
+    padding:16px 18px;overflow-x:auto;border-radius:3px;border:1px solid rgba(127,170,216,.18);
+    margin:0 0 18px;white-space:pre;}
+  .term .c{color:var(--term-dim);} .term .g{color:var(--term-go);} .term .r{color:var(--term-no);font-weight:600;}
+  .term-cap{font-family:ui-monospace,Consolas,monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 7px;}
+  ul,ol{max-width:72ch;padding-left:22px;margin:0 0 16px;}
+  li{margin-bottom:7px;}
+  .callout{background:var(--accent-soft);border-left:4px solid var(--accent);padding:14px 18px;margin:0 0 18px;}
+  .callout.good{background:var(--ok-bg);border-left-color:var(--ok);}
+  .callout.alert{background:var(--warn-bg);border-left-color:var(--warn);}
+  .callout p:last-child{margin-bottom:0;}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  @page{ margin:14mm 12mm; }
+  @media print{
+    :root, :root[data-theme="dark"]{
+      --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F6F9;
+      --ink:#0E141C; --ink-2:#2E3844; --ink-3:#5C6775;
+      --rule:#B9C2CD; --rule-soft:#D8DEE6;
+      --accent:#23507D; --accent-soft:#EAF0F7;
+      --crit:#8E161D; --crit-bg:#FBE9EA;
+      --warn:#6F470A; --warn-bg:#FAF0DC;
+      --note:#2F4A64; --note-bg:#EAF0F5;
+      --ok:#1C5739;  --ok-bg:#E4F1E9;
+      --term-bg:#F4F6F9; --term-ink:#161D26; --term-dim:#5C6775;
+      --term-go:#1C5739; --term-no:#8E161D; --shadow:none;
+    }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body{ background:#fff; font-size:10.5pt; line-height:1.5; }
+    .wrap{ max-width:none; padding:0 0 8mm; }
+    .mast-inner{ max-width:none; padding:0 0 8mm; }
+    header.mast{ border-bottom:2px solid var(--ink); }
+    h1{ font-size:24pt; } .dek{ font-size:11pt; }
+    .tscroll{ overflow:visible; }
+    table{ min-width:0; width:100%; font-size:8.6pt; table-layout:fixed; }
+    th,td{ padding:5px 7px; overflow-wrap:anywhere; }
+    .term{ white-space:pre-wrap; overflow-wrap:anywhere; overflow:visible; font-size:8.2pt;
+      line-height:1.5; padding:9px 11px; border:1px solid var(--rule); }
+    code{ overflow-wrap:anywhere; }
+    .find,.fact,tr,.callout,.row{ break-inside:avoid; page-break-inside:avoid; }
+    h2,h3,.sub{ break-after:avoid; page-break-after:avoid; }
+    section{ margin-top:9mm; }
+    footer{ break-before:avoid; }
+  }
+</style>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="eyebrow">Red Team Round 6 · NautilusTrader ML Research Flow · 2026-08-15</div>
+    <h1>The gate runs, and nine of its ten checks provably enforce. First round with no critical finding.</h1>
+    <p class="dek">Sixth independent pass. R5-1 is fixed, so I could finally exercise the smoke gate's accept path — then mutate it one field at a time to prove each check individually. One check is inert.</p>
+
+    <div class="verdict">
+      <div class="verdict-stamp">FLOW_CLEAR_WITH_WARNINGS</div>
+      <p class="verdict-why">No critical findings and no bypass landed. Three items remain: one newly-found inert check, the preflight runtime regression from round 5, and the governance question open since round 2.</p>
+    </div>
+
+    <dl class="facts">
+      <div class="fact"><dt>Criticals</dt><dd class="c-ok">0</dd></div>
+      <div class="fact"><dt>Gate checks proven</dt><dd class="c-ok">9 / 10</dd></div>
+      <div class="fact"><dt>New warnings</dt><dd class="c-warn">1</dd></div>
+      <div class="fact"><dt>Carried forward</dt><dd class="c-warn">3</dd></div>
+      <div class="fact"><dt>Tests</dt><dd class="c-ok">131</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>Executive verdict</h2>
+  <p class="sub">The first clean round, and why the verdict changed</p>
+
+  <p><strong>R5-1 is fixed.</strong> <code>repo_root</code> and <code>hashlib</code> are now module-level in <code>collect.py</code>, and for the first time in this series the smoke gate's accept path executes: a genuine acceptance passes all ten checks and reaches engine construction. That unblocked the test I have been unable to run — mutating the genuine acceptance one field at a time to prove each newly-reachable check actually rejects.</p>
+
+  <p><strong>Nine of ten do.</strong> Validator SHA, violation count, coverage percentage, rows-examined consistency, and run-directory existence each blocked with a distinct, correct error. The tenth — <code>exact_timestamp_equality_verified</code> — is inert, for a reason worth reading carefully (R6-1). It is mitigated: the substantive claim it duplicates is enforced unconditionally two lines above it.</p>
+
+  <p>I am moving the verdict to <strong>FLOW_CLEAR_WITH_WARNINGS</strong>. Across six rounds the framework now mechanically prevents the failure classes the brief asked about: look-ahead is measured rather than asserted and independently confirmed at 2,002/2,002 exact; audited code cannot change without the seal going stale across a 53-file AST closure; DEV/OOS cannot be reached, including through warmup; a full run cannot proceed without a validated, seal-bound smoke; and exact ordered feature identity is enforced. I attacked all of these and landed nothing.</p>
+
+  <div class="callout alert">
+    <p><strong>This verdict is conditional on one thing.</strong> F2 — audit independence — is unresolved, and the artifacts still describe themselves as independent verification while being self-attestation. As a <em>known and documented</em> limitation that is a warning. If those artifacts continue to claim independence they do not have, that alone is grounds to return to BLOCKED, because it misleads exactly the reader the seal exists to inform.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The check-by-check probe</h2>
+  <p class="sub">Genuine acceptance, mutated one field at a time</p>
+
+  <div class="term"><span class="c">$ # T1 — the accept path, never executed before R5-1 was fixed</span>
+T1 ACCEPT PATH: genuine acceptance -&gt; <span class="g">PASSED all 10 gate checks, reached engine build. WORKS.</span>
+
+<span class="c">$ # then mutate exactly one field of that same genuine acceptance</span>
+  check 6: validator SHA             -&gt; <span class="g">BLOCKED</span> (SMOKE_VALIDATOR_STALE)
+  check 7: violations &gt; 0            -&gt; <span class="g">BLOCKED</span> (SMOKE_ACCEPTANCE_INVALID)
+  check 8: coverage &lt; 100            -&gt; <span class="g">BLOCKED</span> (SMOKE_ACCEPTANCE_INVALID)
+  check 9: rows examined short       -&gt; <span class="g">BLOCKED</span> (SMOKE_ACCEPTANCE_INVALID)
+  check 9b: exact-equality False     -&gt; <span class="r">reached engine build  &lt;== NOT ENFORCED</span>
+  check 10: run_dir missing          -&gt; <span class="g">BLOCKED</span> (SMOKE_RUN_DIR_MISSING)
+
+genuine acceptance restored</div>
+
+  <p>Checks 1–5 (status, study name, sealed composite, execution manifest composite, <code>deterministic_validation_verified</code>) were already proven in earlier rounds and use the same fail-closed <code>.get(...) != expected</code> form, which raises on a missing key rather than defaulting.</p>
+</section>
+
+<section>
+  <h2>Findings</h2>
+  <p class="sub">One new warning, three carried forward</p>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">R6-1</span></div>
+      <p class="find-title">Producer and gate read the same config key with opposite defaults, leaving one check inert</p>
+      <div class="loc">backtests/nt_runtime/modes/collect.py:119–124 &nbsp;·&nbsp; scripts/validate_smoke.py:171 &nbsp;·&nbsp; studies/&lt;s&gt;/study.yaml</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>Both sides key off <code>execution.observation_policy.required_source_relation</code>. The validator reads it as <code>obs_policy.get("required_source_relation", "equal")</code> — <strong>defaulting to strict</strong>. The gate reads it as <code>if obs_pol.get("required_source_relation") == "equal":</code> — <strong>requiring it to be set explicitly</strong>. The key is absent from <code>study.yaml</code> and resolves to <code>None</code> in the compiled contract, so <code>obs_pol</code> is <code>{}</code>, the condition is false, and the enclosed assertion never evaluates.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Demonstrated: an acceptance with <code>exact_timestamp_equality_verified: False</code> passes the gate. That combination is one the honest validator can never emit — it sets the flag as <code>bool(future_source_violations_count == 0)</code> — so the gate accepts a self-contradictory artifact.</dd></div>
+      <div class="row"><dt>Severity</dt><dd>Warning, not critical. Check 7 enforces <code>future_source_violations_count != 0</code> unconditionally two lines above, and that is the substantive claim; the inert check is defence in depth on a derived flag. Recorded because the <em>pattern</em> — an optional config key silently deciding whether a safety check applies — is the same shape as R4-1's column-presence guard, and it defaults the wrong way.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Match the validator's default: <code>obs_pol.get("required_source_relation", "equal") == "equal"</code>. Better, add an internal-consistency check independent of config — <code>exact_timestamp_equality_verified</code> must equal <code>future_source_violations_count == 0</code> — so a contradictory acceptance is rejected on its own terms. Best, declare <code>observation_policy</code> explicitly in <code>study.yaml</code> so neither side has to default.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_gate_rejects_contradictory_acceptance</code> — <code>violations=0</code> with <code>exact_timestamp_equality_verified=False</code> must raise regardless of observation policy.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">R5-2</span></div>
+      <p class="find-title">Preflight still carries a 17-minute market replay and still has no subprocess timeout</p>
+      <div class="loc">scripts/research_preflight.py:162–163 &nbsp;·&nbsp; pytest.ini &nbsp;·&nbsp; scripts/select_required_tests.py:58</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Status</dt><dd>Unchanged. The pytest invocation is byte-identical — no <code>timeout=</code>, no <code>-m "not slow"</code>. <code>pytest.ini</code> declares no markers and no test carries <code>@pytest.mark.slow</code>. Measured last round: <code>test_nt_runner_collect.py</code> is <strong>16 passed in 1008.03s (16m 48s)</strong>; the full suite is 131 passed in ~17m 49s, and preflight runs all 14 files.</dd></div>
+      <div class="row"><dt>Why it still matters</dt><dd>Nothing is failing — this is purely cost. The risk is second-order: a seventeen-minute "fast gate" invites <code>--skip-tests</code> as standing practice, which silently disables <code>CAUSAL_INVARIANTS</code> and reproduces the R4-3 condition by a different route. And with no timeout, a hung replay hangs preflight with no diagnostic.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Mark the end-to-end tests <code>slow</code>; run <code>-m "not slow"</code> in preflight and the full set at the pre-execution gate; pass <code>timeout=</code> to <code>subprocess.run</code> and treat expiry as <code>BLOCKED</code> with its own failure id.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">F2 / F13</span></div>
+      <p class="find-title">Audit independence and agent permissions — open since rounds 2 and 1</p>
+      <div class="loc">scripts/preexec_audit_seal.py &nbsp;·&nbsp; .claude/agents/lookahead-auditor.md:3 &nbsp;·&nbsp; .claude/settings.local.json</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>F2 status</dt><dd><code>transcript_sha256</code> appears <strong>zero times</strong> in the seal — it is neither required nor checked. The parsing layer is genuinely strong now (structured summary, heading cross-check, v1 retired, seal re-derives), but the report is authored by whoever runs the flow, so the chain remains self-attestation with good formatting.</dd></div>
+      <div class="row"><dt>F13 status</dt><dd><code>lookahead-auditor</code> still declares <code>tools: [Read, Grep, Glob, Bash, Write]</code>. <code>settings.local.json</code> is unchanged since June and still has no <code>hooks</code> key, so <code>.claude/hooks/validate-results-triager-command.py</code> never executes. An auditor with shell access can issue its own status.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>F2: either require a non-null <code>transcript_sha256</code> bound to an invocation record the orchestrator does not author, or rename the artifacts to <code>self_attested_*</code> and drop "independent" from <code>CLAUDE.md</code>, <code>AGENTS.md</code> and the seal's field names. F13: restrict the auditor to <code>[Read, Grep, Glob, Write]</code> with Write scoped to <code>audit/</code>, and register the existing hook under <code>hooks.PreToolUse</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find ok">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill ok">Verified</span><span class="fid">R5-1</span></div>
+      <p class="find-title">The gate is functional, and its checks are individually proven</p>
+      <div class="loc">backtests/nt_runtime/modes/collect.py</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Evidence</dt><dd>Symtable analysis confirms both names now resolve at module level. The accept path reaches engine construction on the genuine acceptance, and five of the six previously-unreachable checks each reject their own mutation with a distinct error. This is the first time any check beyond number five has executed.</dd></div>
+      <div class="row"><dt>Note on method</dt><dd>The round-5 recommendation was to pair every rejection test with an acceptance test. That is exactly what made this probe possible — and what would have caught the <code>NameError</code> before I did. It is worth adding to the suite rather than leaving as a manual procedure.</dd></div>
+    </dl>
+  </article>
+</section>
+
+<section>
+  <h2>Where this leaves things</h2>
+  <p class="sub">Three items, none of them mechanical defects</p>
+
+  <ol>
+    <li><strong>R6-1</strong> — one-line default alignment, plus the internal-consistency check that makes the gate independent of config.</li>
+    <li><strong>R5-2</strong> — slow markers and a subprocess timeout. The longer this sits, the more likely <code>--skip-tests</code> becomes habit.</li>
+    <li><strong>F2</strong> — the decision, not the code. Bind a transcript or rename the artifacts.</li>
+  </ol>
+
+  <p>A closing note on the arc. Round 1 found five criticals and three landed bypasses; this round found none of either, and the difference is not that I looked less hard — it is that the controls now measure rather than assert. Each round's residue has been the same defect in a new place: a check that reports a favourable result it did not compute. R6-1 is that defect one more time, in its mildest form yet, caught only because a neighbouring check happens to cover it. <strong>The convention that would retire the whole family is to make every safety check unconditional by default and require config to <em>relax</em> it, never to enable it.</strong> Both R4-1 and R6-1 were checks that config had to switch on; the validator's own <code>get(..., "equal")</code> default is the correct pattern already present in the codebase.</p>
+</section>
+
+<footer>
+  Red team round 6, 2026-08-15 · study <span class="mono">Gemini_clean_maturity_flip_rolling_5m_productivity</span> · 53 sealed files · 131 tests passing · <span class="mono">PREEXEC_AUDIT_SEAL_VALID</span> · preflight <span class="mono">CLEAR</span>.
+  All mutations executed against the live working tree; the genuine <span class="mono">smoke_acceptance.json</span> was backed up first and verified byte-identical after restore, with the 27-file modified set unchanged from session start.
+</footer>
+
+</div>

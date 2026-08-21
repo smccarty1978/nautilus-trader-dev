@@ -1,0 +1,576 @@
+{
+  "status": "PASS",
+  "collection_root": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\Codex_structural_regime_geometry_maturity\\_work\\collection_audit_fix_v2",
+  "expected_partition_keys": [
+    "2021-01",
+    "2021-02",
+    "2021-03",
+    "2021-04",
+    "2021-05",
+    "2021-06",
+    "2021-07",
+    "2021-08",
+    "2021-09",
+    "2021-10",
+    "2021-11",
+    "2021-12",
+    "2022-01",
+    "2022-02",
+    "2022-03",
+    "2022-04",
+    "2022-05",
+    "2022-06",
+    "2022-07",
+    "2022-08",
+    "2022-09",
+    "2022-10",
+    "2022-11",
+    "2022-12",
+    "2023-01",
+    "2023-02",
+    "2023-03",
+    "2023-04",
+    "2023-05",
+    "2023-06",
+    "2023-07",
+    "2023-08",
+    "2023-09",
+    "2023-10",
+    "2023-11",
+    "2023-12",
+    "2024-01",
+    "2024-02",
+    "2024-03",
+    "2024-04",
+    "2024-05",
+    "2024-06",
+    "2024-07",
+    "2024-08",
+    "2024-09",
+    "2024-10",
+    "2024-11",
+    "2024-12"
+  ],
+  "partition_count": 48,
+  "partition_checks": {
+    "2021-01": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 34297,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-02": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 34620,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-03": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 39063,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-04": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 35640,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-05": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 34300,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-06": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 35746,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-07": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 37532,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-08": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 34529,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-09": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33846,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-10": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33611,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-11": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33919,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2021-12": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 32198,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-01": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 35944,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-02": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33459,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-03": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 40767,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-04": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 38420,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-05": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 38889,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-06": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 39359,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-07": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 36708,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-08": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 39832,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-09": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 38315,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-10": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 39705,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-11": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 35338,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2022-12": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 34528,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-01": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33797,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-02": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 34388,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-03": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 41637,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-04": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 31864,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-05": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 38972,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-06": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 34618,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-07": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 35034,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-08": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 41508,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-09": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 36245,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-10": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 38503,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-11": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33383,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2023-12": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 31459,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-01": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 39917,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-02": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 37157,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-03": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33151,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-04": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 40880,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-05": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 40703,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-06": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33668,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-07": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 39378,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-08": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 39599,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-09": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 35426,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-10": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 36527,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-11": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 31433,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    },
+    "2024-12": {
+      "present": true,
+      "exact_bounds": true,
+      "base_eligible_rows": 33653,
+      "zero_row_allowed": true,
+      "hash_matches": true,
+      "boundary_membership": true,
+      "sealed": true
+    }
+  },
+  "join": {
+    "accepted_base_rows": 4551280,
+    "missing_snapshot_rows": 0,
+    "off_5s_grid_rows": 0,
+    "duplicate_decision_regime_keys": 0,
+    "duplicate_snapshot_keys": 0,
+    "snapshots_without_canonical_regime": 0,
+    "unavailable_snapshot_rows": 24
+  },
+  "causal_completed_bar_checks": {
+    "completed_5m_not_after_checkpoint": true,
+    "registry_not_after_checkpoint": true,
+    "no_2025_or_2026_rows": true,
+    "duplicate_available_geometry_keys": 0,
+    "unavailable_reasons": {
+      "NONPOSITIVE_STRUCTURAL_DENOMINATOR": 24
+    }
+  },
+  "required_artifact_checks": {
+    "row_metrics": {
+      "exists": true,
+      "rows": 16,
+      "columns_present": [
+        "direction",
+        "maturity_bucket",
+        "model_set",
+        "n",
+        "positives",
+        "roc_auc"
+      ],
+      "pass": true
+    },
+    "timing": {
+      "exists": true,
+      "rows": 16,
+      "columns_present": [
+        "direction",
+        "maturity_bucket",
+        "mean_final_preflip_score_pct",
+        "median_top_score_secs_to_flip",
+        "model_set",
+        "n_regimes",
+        "spearman_score_pct_vs_neg_secs_to_flip"
+      ],
+      "pass": true
+    },
+    "deciles": {
+      "exists": true,
+      "rows": 160,
+      "columns_present": [
+        "direction",
+        "maturity_bucket",
+        "model_set",
+        "p_confirm_before_1atr",
+        "p_flip_le_300s",
+        "train_score_decile"
+      ],
+      "pass": true
+    }
+  },
+  "crossing_artifact_check": {
+    "exists": true,
+    "rows": 8644,
+    "required_columns": [
+      "checkpoint_decision_ns",
+      "confirmed",
+      "direction",
+      "eventual_max_mfe_atr",
+      "model_set",
+      "regime_id",
+      "score",
+      "structural_max_expansion_atr",
+      "threshold_quantile"
+    ],
+    "duplicate_arms": 0,
+    "null_label_rows": 0,
+    "pass": true
+  },
+  "denominator_checks": {
+    "expected_model_direction_bucket_cells": 16,
+    "observed_model_direction_bucket_cells": 16,
+    "nonpositive_cells": 0
+  },
+  "notes": [
+    "Collection uses NautilusTrader's event loop.",
+    "Unavailable snapshots remain explicit rows; only missing or duplicate decision/regime snapshot keys fail the exact join."
+  ]
+}

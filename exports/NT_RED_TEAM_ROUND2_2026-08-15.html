@@ -1,0 +1,436 @@
+<title>NT Research Flow — Red Team Round 2</title>
+<style>
+  :root{
+    --ground:#EEF1F5; --surface:#FFFFFF; --surface-2:#F7F9FB;
+    --ink:#131A24; --ink-2:#3F4A59; --ink-3:#6B7787;
+    --rule:#D3DAE3; --rule-soft:#E4E9EF;
+    --accent:#2F5D8C; --accent-soft:#E2EAF3;
+    --crit:#A81F26; --crit-bg:#FBE9EA;
+    --warn:#8A5A0B; --warn-bg:#FBF1DF;
+    --note:#3B5A78; --note-bg:#E8EEF4;
+    --ok:#256B4A;  --ok-bg:#E3F1E9;
+    --term-bg:#141B25; --term-ink:#C8D3E0; --term-dim:#7E8DA0;
+    --term-go:#79C08E; --term-no:#E58388;
+    --shadow:0 1px 2px rgba(19,26,36,.06), 0 6px 18px -10px rgba(19,26,36,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+      --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+      --rule:#2A3543; --rule-soft:#212B37;
+      --accent:#7FAAD8; --accent-soft:#1B2735;
+      --crit:#FF8087; --crit-bg:#2B171A;
+      --warn:#E5AE5C; --warn-bg:#2A2117;
+      --note:#8FB0CE; --note-bg:#1A222C;
+      --ok:#6FC095;  --ok-bg:#152420;
+      --term-bg:#0A0F16; --term-dim:#6F7E90;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D131B; --surface:#151D27; --surface-2:#111822;
+    --ink:#E4EAF1; --ink-2:#B0BCCA; --ink-3:#7E8B9B;
+    --rule:#2A3543; --rule-soft:#212B37;
+    --accent:#7FAAD8; --accent-soft:#1B2735;
+    --crit:#FF8087; --crit-bg:#2B171A;
+    --warn:#E5AE5C; --warn-bg:#2A2117;
+    --note:#8FB0CE; --note-bg:#1A222C;
+    --ok:#6FC095;  --ok-bg:#152420;
+    --term-bg:#0A0F16; --term-dim:#6F7E90;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px 96px;}
+
+  header.mast{border-bottom:1px solid var(--rule);background:var(--surface);}
+  .mast-inner{max-width:1080px;margin:0 auto;padding:38px 28px 30px;display:flex;flex-direction:column;gap:20px;}
+  .eyebrow{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-3);}
+  h1{margin:0;font-size:clamp(30px,4.4vw,46px);line-height:1.06;letter-spacing:-.022em;
+    font-weight:700;text-wrap:balance;}
+  .dek{margin:0;max-width:64ch;color:var(--ink-2);font-size:17px;}
+  .verdict{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:18px 20px;border-radius:3px;
+    background:var(--crit-bg);border:1px solid var(--crit);border-left-width:5px;}
+  .verdict-stamp{font-family:ui-monospace,Consolas,monospace;font-size:clamp(20px,3vw,28px);
+    font-weight:700;letter-spacing:.04em;color:var(--crit);}
+  .verdict-why{color:var(--ink-2);font-size:14.5px;max-width:58ch;margin:0;}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
+    background:var(--rule);border:1px solid var(--rule);}
+  .fact{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:3px;}
+  .fact dt{font-family:ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);}
+  .fact dd{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .fact dd.c-crit{color:var(--crit);} .fact dd.c-warn{color:var(--warn);} .fact dd.c-ok{color:var(--ok);}
+
+  section{margin-top:56px;}
+  h2{margin:0 0 6px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-family:ui-monospace,Consolas,monospace;color:var(--accent);font-weight:700;}
+  h2 + .sub{margin:0 0 22px;font-size:24px;font-weight:660;letter-spacing:-.018em;text-wrap:balance;}
+  h3{font-size:17px;font-weight:650;margin:32px 0 10px;letter-spacing:-.01em;}
+  p{margin:0 0 14px;max-width:72ch;}
+  code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.875em;
+    background:var(--surface-2);border:1px solid var(--rule-soft);padding:1px 5px;border-radius:2px;
+    color:var(--ink);overflow-wrap:anywhere;}
+
+  .tscroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;}
+  thead th{background:var(--surface-2);font-family:ui-monospace,Consolas,monospace;font-size:10.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--rule);white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.vd{white-space:nowrap;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;font-weight:700;letter-spacing:.05em;}
+  .v-fail{color:var(--crit);} .v-weak{color:var(--warn);} .v-pass{color:var(--ok);}
+  td.fid-cell{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:var(--ink-3);white-space:nowrap;}
+
+  .find{background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--rule);
+    margin-bottom:16px;box-shadow:var(--shadow);}
+  .find.crit{border-left-color:var(--crit);}
+  .find.warn{border-left-color:var(--warn);}
+  .find.ok{border-left-color:var(--ok);}
+  .find-head{padding:15px 20px 13px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--rule-soft);}
+  .find-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+  .pill{font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;padding:3px 8px;border-radius:2px;}
+  .pill.crit{background:var(--crit-bg);color:var(--crit);}
+  .pill.warn{background:var(--warn-bg);color:var(--warn);}
+  .pill.ok{background:var(--ok-bg);color:var(--ok);}
+  .fid{font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;}
+  .find-title{font-size:17.5px;font-weight:650;letter-spacing:-.012em;margin:0;text-wrap:balance;}
+  .loc{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--ink-2);overflow-wrap:anywhere;}
+  .find-body{padding:4px 20px 16px;display:grid;gap:0;}
+  .row{display:grid;grid-template-columns:132px 1fr;gap:16px;padding:11px 0;border-bottom:1px solid var(--rule-soft);}
+  .row:last-child{border-bottom:none;}
+  .row dt{font-family:ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-3);padding-top:3px;}
+  .row dd{margin:0;font-size:14.5px;color:var(--ink-2);}
+  .row dd strong{color:var(--ink);font-weight:640;}
+  @media (max-width:640px){ .row{grid-template-columns:1fr;gap:4px;} }
+
+  .term{background:var(--term-bg);color:var(--term-ink);
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12.5px;line-height:1.68;
+    padding:16px 18px;overflow-x:auto;border-radius:3px;border:1px solid rgba(127,170,216,.18);
+    margin:0 0 18px;white-space:pre;}
+  .term .c{color:var(--term-dim);} .term .g{color:var(--term-go);} .term .r{color:var(--term-no);font-weight:600;}
+  .term-cap{font-family:ui-monospace,Consolas,monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 7px;}
+
+  ul,ol{max-width:72ch;padding-left:22px;margin:0 0 16px;}
+  li{margin-bottom:7px;}
+  .callout{background:var(--accent-soft);border-left:4px solid var(--accent);padding:14px 18px;margin:0 0 18px;}
+  .callout.alert{background:var(--warn-bg);border-left-color:var(--warn);}
+  .callout p:last-child{margin-bottom:0;}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+  @page{ margin:14mm 12mm; }
+  @media print{
+    :root, :root[data-theme="dark"]{
+      --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F6F9;
+      --ink:#0E141C; --ink-2:#2E3844; --ink-3:#5C6775;
+      --rule:#B9C2CD; --rule-soft:#D8DEE6;
+      --accent:#23507D; --accent-soft:#EAF0F7;
+      --crit:#8E161D; --crit-bg:#FBE9EA;
+      --warn:#6F470A; --warn-bg:#FAF0DC;
+      --note:#2F4A64; --note-bg:#EAF0F5;
+      --ok:#1C5739;  --ok-bg:#E4F1E9;
+      --term-bg:#F4F6F9; --term-ink:#161D26; --term-dim:#5C6775;
+      --term-go:#1C5739; --term-no:#8E161D; --shadow:none;
+    }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body{ background:#fff; font-size:10.5pt; line-height:1.5; }
+    .wrap{ max-width:none; padding:0 0 8mm; }
+    .mast-inner{ max-width:none; padding:0 0 8mm; }
+    header.mast{ border-bottom:2px solid var(--ink); }
+    h1{ font-size:24pt; } .dek{ font-size:11pt; }
+    .tscroll{ overflow:visible; }
+    table{ min-width:0; width:100%; font-size:8.6pt; table-layout:fixed; }
+    th,td{ padding:5px 7px; overflow-wrap:anywhere; }
+    .term{ white-space:pre-wrap; overflow-wrap:anywhere; overflow:visible; font-size:8.2pt;
+      line-height:1.5; padding:9px 11px; border:1px solid var(--rule); }
+    code{ overflow-wrap:anywhere; }
+    .find,.fact,tr,.callout,.row{ break-inside:avoid; page-break-inside:avoid; }
+    h2,h3,.sub{ break-after:avoid; page-break-after:avoid; }
+    section{ margin-top:9mm; }
+    footer{ break-before:avoid; }
+  }
+</style>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="eyebrow">Red Team Round 2 · Re-audit of remediations · NautilusTrader ML Research Flow · 2026-08-15</div>
+    <h1>Real causal fixes landed. The governance fixes were written to my report, not to the invariant.</h1>
+    <p class="dek">Independent re-audit of the revisions made in response to round 1. Every claimed fix was re-tested by tampering with live files and re-running the real gates. Repository restored afterward — with one exception disclosed below.</p>
+
+    <div class="verdict">
+      <div class="verdict-stamp">FLOW_BLOCKED</div>
+      <p class="verdict-why">Three of five criticals are genuinely fixed and independently verified. But the OOS control that <em>held</em> in round 1 is now bypassable, the newly-added smoke gate is a no-op due to a key-name mismatch, and audit provenance was not touched at all.</p>
+    </div>
+
+    <dl class="facts">
+      <div class="fact"><dt>R1 fixed</dt><dd class="c-ok">9</dd></div>
+      <div class="fact"><dt>R1 partial</dt><dd class="c-warn">2</dd></div>
+      <div class="fact"><dt>R1 still open</dt><dd class="c-crit">7</dd></div>
+      <div class="fact"><dt>New findings</dt><dd class="c-crit">6</dd></div>
+      <div class="fact"><dt>Bypasses landed</dt><dd class="c-crit">4 / 9</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>Executive verdict</h2>
+  <p class="sub">Where the remediation genuinely moved the needle — and where it only appears to</p>
+
+  <p><strong>The causal work is excellent.</strong> F3 — the look-ahead violation I measured inside the sealed fixture — is fixed properly, at the right layer, and I verified it end-to-end: a fresh collection run produces <span class="mono">2,002</span> candidates against the previous <span class="mono">2,032</span>, exactly the 30-row drop I predicted, with zero rows now sourced from a later bar. F4 is fixed the right way too: the causal lint is now manifest-driven and reports <span class="mono">31/31 files, 100.0% coverage</span>, and fails closed when coverage is incomplete. Two dead scripts were deleted as recommended. That is real, verifiable engineering.</p>
+
+  <p><strong>The governance work has a consistent failure signature.</strong> Each control was repaired to satisfy the specific <em>examples</em> in my report rather than the <em>property</em> the example illustrated. Three independent instances:</p>
+
+  <ul>
+    <li>The seal's file list was expanded to include the eight files I <em>named</em> — but it is still a hardcoded list, and two other files in the entrypoint's real import closure remain unsealed.</li>
+    <li>The new module is called <code>resolve_execution_manifest.py</code>, its docstring promises "full transitive closure … entrypoint import closure", and it imports <code>ast</code> and <code>importlib.util</code>. It uses neither. It is two literal lists.</li>
+    <li>The new test <code>test_seal_covers_full_import_closure()</code> computes no closure. It asserts that seven hardcoded keys — the seven filenames from my report — are present, plus <code>len(file_hashes) &gt;= 35</code>. It passes today while the closure is demonstrably incomplete.</li>
+  </ul>
+
+  <p>The consequence is concrete rather than theoretical: <strong>the OOS lock — the one control that survived round 1 intact — is now bypassable</strong>, because <code>scripts/generate_oos_unlock.py</code> holds <code>verify_oos_unlock_token()</code>, sits in <code>data_plan.py</code>'s import path, and is not in the seal. I opened 2024 with no unlock token while the seal reported VALID and preflight reported CLEAR.</p>
+
+  <div class="callout">
+    <p><strong>The single highest-value change now is one line of test code.</strong> Replace the seven hardcoded keys in <code>test_seal_covers_full_import_closure</code> with an actual AST walk of <code>collect.py</code>'s import graph, asserted as a subset of the manifest. That test fails immediately on today's tree and names both missing files. It is the invariant the whole seal depends on, and it is currently asserted by a checklist.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Disclosure</h2>
+  <p class="sub">I destroyed one artifact during testing</p>
+  <div class="callout alert">
+    <p>While testing the new smoke gate I wrote a forged <code>smoke_acceptance.json</code> into <code>studies/Gemini_clean_maturity_flip_rolling_5m_productivity/artifacts/</code>. My cleanup logic only removed the file if it had not pre-existed — <strong>it had</strong>, so the original was overwritten and is not recoverable (the study directory is untracked, and no other copy or generator exists in the repo).</p>
+    <p>I removed the forged file rather than leaving a fabricated <code>"status": "ACCEPTED"</code> authorization in your tree, and rather than authoring a replacement acceptance myself — that judgement is yours, not mine. <strong>The study currently has no smoke acceptance on record, which fails closed.</strong> Re-issue it through your normal flow before the next <code>--stage full</code> run. Note that its only load-bearing fields are <code>status</code> and <code>sealed_composite_sha256</code>; the current composite is <code>92fafbd3e9059e5d…</code>.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Round-1 scorecard</h2>
+  <p class="sub">All 18 findings, re-tested</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:52px">ID</th><th>Finding</th><th>Evidence</th><th style="width:104px">Status</th></tr></thead>
+    <tbody>
+      <tr><td class="fid-cell">F1</td><td>Seal omits load-bearing execution files</td><td>36 → 37 files, now via <code>resolve_execution_manifest</code>; all 8 named files added. <strong>2 closure members still missing</strong> (N2, N3)</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F2</td><td>Audit provenance self-issued, no auditor invoked</td><td><code>run_preexec_audits.py</code> byte-identical in logic. Re-demonstrated: manufactured CLEAR causal + contract verdicts with no auditing</td><td class="vd v-fail">OPEN</td></tr>
+      <tr><td class="fid-cell">F3</td><td>30 rows priced after their observation_ts</td><td>Skip-on-gap implemented at <code>collector:393–397</code>; <code>obs_ts = T</code> at <code>:500</code>. New run: 2,002 rows, <strong>0 violations</strong></td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F4</td><td>Causal lint scanned 1 file</td><td><code>causal_lint.py</code> now resolves the manifest itself; <code>files_scanned: 31, coverage_pct: 100.0</code>, fails closed on shortfall</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F5a</td><td>No smoke gate</td><td>Gate added at <code>collect.py:42–57</code> — but its staleness binding is dead (N1)</td><td class="vd v-fail">REGRESSED</td></tr>
+      <tr><td class="fid-cell">F5b</td><td>Seal tests never modify a source file</td><td><code>test_seal_fails_closed_when_source_code_tampered</code> added, parametrized over 6 real files. Genuine test, passes</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F6</td><td>Warmup crosses unauthorized years</td><td>Check added — but tests <code>prohibited</code> only. Demonstrated warmup into a <strong>locked DEV year</strong>, and real study still warms from unauthorized 2020</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F7</td><td>SPEC fidelity never opens SPEC.md</td><td>Still never opens it; clause map literals <code>[2021,2022,2023]</code>, <code>[2024]</code>, <code>[300,600]</code> unchanged</td><td class="vd v-fail">OPEN</td></tr>
+      <tr><td class="fid-cell">F8</td><td>Prohibitions unenforced; baseline unbound</td><td><code>UNKNOWN_PROHIBITION</code> added with a <code>KNOWN_PROHIBITIONS</code> set; baseline now bound via <code>EXPECTED_BASE25_SHA</code> over the first 25 features</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F9</td><td>Compiled contract states wrong cadence</td><td><code>population_engine</code> now derives <code>chk_freq</code> from <code>qualification.cadence_seconds</code></td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F10</td><td>Domain guard scans no runtime code</td><td><code>check_authorized_domain.py</code> deleted; removed from preflight stages</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F11</td><td>OOS unlock on a hand-typed boolean</td><td>Unchanged. Now materially worse, since the module enforcing it is unsealed (N2)</td><td class="vd v-fail">OPEN</td></tr>
+      <tr><td class="fid-cell">F12</td><td>Timestamp engine asserts, doesn't measure</td><td>Byte-identical constant emitter; still accepts an unread <code>catalog_path</code></td><td class="vd v-fail">OPEN</td></tr>
+      <tr><td class="fid-cell">F13</td><td>Auditor has Bash+Write; hook unwired</td><td><code>tools: [Read, Grep, Glob, Bash, Write]</code> unchanged; <code>settings.local.json</code> still has no <code>hooks</code> key</td><td class="vd v-fail">OPEN</td></tr>
+      <tr><td class="fid-cell">F14</td><td>Study-specific literals in framework code</td><td><code>feature_universe_count: int = 60</code> and <code>meta_cols</code> both unchanged; seal list no longer names trackers (globs them instead)</td><td class="vd v-weak">PARTIAL</td></tr>
+      <tr><td class="fid-cell">F15</td><td><code>verify_feature_surface.py</code> orphaned</td><td>Deleted</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F16</td><td><code>Optional</code> used but not imported</td><td>Imported in both modules</td><td class="vd v-pass">FIXED</td></tr>
+      <tr><td class="fid-cell">F17</td><td>Stale runs indistinguishable in <code>runs/</code></td><td>No lineage marker added; a 10th run now sits alongside the 549-column pre-remediation artifacts</td><td class="vd v-fail">OPEN</td></tr>
+      <tr><td class="fid-cell">F18</td><td>Timestamps / scratch / parity clean</td><td>Still clean — no regression</td><td class="vd v-pass">HOLDS</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>Bypass attempts</h2>
+  <p class="sub">Executed against the live repository, then reverted</p>
+
+  <p class="term-cap">Bypass 1 — the OOS lock, via an unsealed module in the entrypoint's import path</p>
+  <div class="term"><span class="c">$ # make verify_oos_unlock_token() unconditionally return True, then run the gates</span>
+tampered: scripts/generate_oos_unlock.py (OOS lock), research/schemas/study_spec.py
+
+<span class="c">$ python scripts/preexec_audit_seal.py --study studies/&lt;s&gt; --verify-only</span>
+<span class="r">PREEXEC_AUDIT_SEAL_VALID</span>
+<span class="c">$ python scripts/research_preflight.py --study studies/&lt;s&gt; --skip-tests</span>
+<span class="r">RESEARCH PREFLIGHT VERDICT: CLEAR (3.35s)</span>
+
+<span class="c">$ # now request the locked OOS year</span>
+oos_unlock.json on disk: False
+2024 OOS REQUEST -&gt; <span class="r">ALLOWED</span>, catalog window: 2024-06-03  warmup from 2024-05-29</div>
+
+  <p class="term-cap">Bypass 2 — the new smoke gate, using a deliberately stale acceptance</p>
+  <div class="term"><span class="c">$ # collect.py:52 reads seal_data.get("composite_sha256")</span>
+<span class="c">$ # the seal file's key is "composite_seal_hash"</span>
+verify returns type: dict
+keys present: ['composite_seal_hash']
+collect.py reads  seal_data.get('composite_sha256')  -&gt; <span class="r">None</span>
+smoke staleness check trips on a WRONG hash? <span class="r">False</span>   <span class="c">&lt;-- must be True to be a gate</span>
+
+<span class="c">$ # end-to-end with a forged acceptance naming a pre-remediation hash:</span>
+RESULT: stage=FULL passed BOTH the smoke gate and the seal gate on a FORGED,
+        deliberately stale smoke_acceptance.json -&gt; reached engine build.</div>
+
+  <p class="term-cap">Bypass 3 — warmup into a locked DEV partition</p>
+  <div class="term">REAL STUDY  stage=full -&gt; warmup loads from 2020-12-27 (year 2020); authorized=[2021,2022,2023,2024] -&gt; authorized? <span class="r">False</span>
+
+DEV-ADJACENT train=[2025], dev=[2024] (locked, no unlock token):
+   active window 2025-01-01..2025-12-31 -&gt; WARMUP LOADS FROM <span class="r">2024-12-27  (year 2024 = LOCKED DEV YEAR)</span>
+   -&gt; OOS lock NOT consulted for the warmup window. LEAK CONFIRMED.</div>
+
+  <p class="term-cap">Bypass 4 — audit verdicts, unchanged from round 1</p>
+  <div class="term">F2 RECHECK -- audit verdicts manufactured with no auditor:
+   causal   : <span class="r">CLEAR</span> | auditor field = lookahead_auditor | provenance v 1
+   contract : <span class="r">CLEAR</span> | auditor field = contract_checker | feature_universe_count = 60
+   both carry a real report SHA + real execution composite SHA -&gt; seal will accept them.</div>
+
+  <div class="tscroll">
+  <table>
+    <thead><tr><th>Attempt</th><th>Round 1</th><th>Round 2</th></tr></thead>
+    <tbody>
+      <tr><td>Reversed 1s/1m registration</td><td class="v-fail">BYPASSED</td><td class="v-pass">BLOCKED — now sealed</td></tr>
+      <tr><td>Delete seal check from <code>collect.py</code></td><td class="v-fail">BYPASSED</td><td class="v-pass">BLOCKED — now sealed</td></tr>
+      <tr><td>Tamper <code>utils/runner/data.py</code></td><td class="v-fail">BYPASSED</td><td class="v-pass">BLOCKED — now sealed</td></tr>
+      <tr><td>Neuter OOS lock via <code>generate_oos_unlock.py</code></td><td class="v-pass">n/a — held</td><td class="v-fail"><strong>BYPASSED</strong></td></tr>
+      <tr><td>Neuter staleness via <code>study_spec.py</code></td><td class="v-pass">n/a — held</td><td class="v-fail"><strong>BYPASSED</strong></td></tr>
+      <tr><td>Full run on forged stale smoke acceptance</td><td class="v-fail">n/a — no gate</td><td class="v-fail"><strong>BYPASSED</strong></td></tr>
+      <tr><td>Manufacture CLEAR audit with no auditor</td><td class="v-fail">TRIVIAL</td><td class="v-fail"><strong>TRIVIAL</strong></td></tr>
+      <tr><td>Warmup into locked DEV year</td><td class="v-fail">BYPASSED</td><td class="v-fail"><strong>BYPASSED</strong></td></tr>
+      <tr><td>Wrong feature, same count</td><td class="v-pass">BLOCKED</td><td class="v-pass">BLOCKED</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>New findings</h2>
+  <p class="sub">Introduced or revealed by the remediation</p>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">N1</span></div>
+      <p class="find-title">The new smoke gate reads a key the seal does not have, silently disabling its own staleness binding</p>
+      <div class="loc">backtests/nt_runtime/modes/collect.py:52–57 &nbsp;·&nbsp; scripts/preexec_audit_seal.py:159</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The gate does <code>seal_data.get("composite_sha256")</code>, but <code>verify_preexec_audit_seal()</code> returns the seal file, whose key is <code>composite_seal_hash</code>. <code>composite_sha256</code> is the key on <code>manifest_data</code> from the resolver — a different dict. So <code>seal_sha</code> is always <code>None</code>, and the guard <code>(seal_sha and sacc.get(...) != seal_sha)</code> short-circuits to <code>False</code>. Only <code>status == "ACCEPTED"</code> is ever evaluated.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Verified end-to-end: <code>--stage full</code> with an acceptance naming <code>"0000_STALE_HASH_FROM_PRE_REMEDIATION_CODE_0000"</code> passed both the smoke gate and the seal gate and reached engine construction. A smoke run from any prior code version authorizes a full run on today's code — precisely the chain the brief says must break.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>The <code>and</code> short-circuit makes the mistake fail open rather than raise. No test covers the gate; the file it needs did not exist when the code was written.</dd></div>
+      <div class="row"><dt>Fix</dt><dd><code>seal_sha = seal_data["composite_seal_hash"]</code> — subscript, not <code>.get()</code>, so a future rename raises instead of disabling the check. Then compare unconditionally rather than behind <code>seal_sha and …</code>.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_full_stage_rejects_stale_smoke_acceptance</code> — write an acceptance with a wrong hash, assert <code>SMOKE_ACCEPTANCE_STALE</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">N2</span></div>
+      <p class="find-title">The OOS lock lives in an unsealed module — the one control that held in round 1 is now bypassable</p>
+      <div class="loc">scripts/generate_oos_unlock.py:83–103 &nbsp;·&nbsp; backtests/nt_runtime/data_plan.py:127 &nbsp;·&nbsp; scripts/resolve_execution_manifest.py:33–59</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>data_plan.py</code> imports <code>verify_oos_unlock_token</code> from <code>scripts.generate_oos_unlock</code> at the point of the dev-year check. That module appears in neither <code>CORE_GOVERNANCE_SCRIPTS</code> nor <code>CORE_RUNTIME_MODULES</code>, so it is outside the composite and outside the lint's file set.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Made the function return <code>True</code> unconditionally. Seal: <code>PREEXEC_AUDIT_SEAL_VALID</code>. Preflight: <code>CLEAR</code>. 2024 opened with <code>oos_unlock.json</code> absent from disk entirely. Note the existing <code>except ImportError: pass</code> at <code>data_plan.py:135</code> gives a second, independent fail-open on the same control.</dd></div>
+      <div class="row"><dt>Why missed</dt><dd>The manifest is a hardcoded list, and the test that should have caught the omission is itself a hardcoded list (N4).</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Add it to <code>CORE_GOVERNANCE_SCRIPTS</code> immediately as a stopgap; fix N4 so this class cannot recur. Separately, change <code>except ImportError: pass</code> to re-raise — a missing lock module must block, not waive.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd>Add <code>scripts/generate_oos_unlock.py</code> to the <code>test_seal_fails_closed_when_source_code_tampered</code> parametrize list. It fails today.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find crit">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill crit">Critical</span><span class="fid">N3</span></div>
+      <p class="find-title">The schema module that computes the compiled-study hash is unsealed</p>
+      <div class="loc">research/schemas/study_spec.py &nbsp;·&nbsp; backtests/nt_runtime/compiled_study_loader.py:72–96</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>load_compiled_study</code> calls <code>StudySpec.model_validate()</code> and <code>spec.compute_sha256()</code>; the comparison of that value against <code>compiled_study.json</code> is the entire <code>STALE_COMPILED_STUDY</code> control. The module defining both is not in the manifest.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Tampering it verified clean under both seal and preflight. A <code>compute_sha256</code> that returns the stored value defeats staleness detection for every study, and the schema itself defines which <code>study.yaml</code> fields are even validated.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Seal <code>research/schemas/study_spec.py</code>, and — since the compile path is authority-bearing — <code>research/engines/*.py</code> and <code>research/study_types/*.py</code> as well.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd>Covered by the corrected closure test in N4.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">N4</span></div>
+      <p class="find-title">The closure test asserts a checklist of filenames, not a closure</p>
+      <div class="loc">scripts/tests/test_audit_seal_guard.py:92–110 &nbsp;·&nbsp; scripts/resolve_execution_manifest.py:14–16</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd><code>test_seal_covers_full_import_closure()</code> asserts seven hardcoded keys are present and <code>len(file_hashes) &gt;= 35</code>. It parses nothing. The seven keys are the filenames from my round-1 report, so the test is a restatement of the finding rather than of the invariant. The resolver it guards has the same shape: it imports <code>ast</code> and <code>importlib.util</code> at lines 14–16 and never calls either, while its docstring claims "full transitive closure … entrypoint import closure".</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Both N2 and N3 sit inside the true closure and the test passes anyway. It will keep passing as new imports are added. The <code>&gt;= 35</code> floor is satisfied trivially by the tracker glob.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Make the test compute what its name claims — AST-walk <code>collect.py</code>'s import graph, resolve repo-local modules, assert the closure is a subset of the manifest. Roughly 25 lines; it fails today and names both missing files. Then either make the resolver do the same walk, or correct the docstring and delete the unused imports so the mechanism isn't misrepresented.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd>The corrected test is the regression test.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">N5</span></div>
+      <p class="find-title">Dynamic strategy resolution builds an impossible path and silently skips it</p>
+      <div class="loc">scripts/resolve_execution_manifest.py:129–141</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The resolver reads <code>spec.execution.strategy_class</code> — which is a dotted path, <code>"strategies.flip_prediction_collector.FlipPredictionCollector"</code> — and interpolates it as <code>f"strategies/{strat_class}.py"</code>, producing <code>strategies/strategies.flip_prediction_collector.FlipPredictionCollector.py</code>. That never exists, and the loop guards with <code>if sfp.exists()</code>, so it is dropped without a word. The manifest only contains the collector because line 129 hardcodes it.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>Any study using a different strategy class gets its strategy silently excluded from the seal. Note the asymmetry: governance and runtime entries <code>raise FileNotFoundError</code> when absent, but strategy resolution fails open.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Split the dotted path (<code>strat_class.rsplit(".", 1)[0].replace(".", "/") + ".py"</code>) and raise when the resolved file is missing, matching the other two categories.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_manifest_resolves_non_default_strategy</code> — compile a study naming another strategy, assert it appears in <code>file_hashes</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find warn">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill warn">Warning</span><span class="fid">N6</span></div>
+      <p class="find-title">The warmup guard checks prohibited years but not authorized or locked ones</p>
+      <div class="loc">backtests/nt_runtime/data_plan.py:139–144</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>Mechanism</dt><dd>The added check is <code>if warmup_start_dt.year in prohibited_years</code>. The active-window guard tests three things — prohibited, authorized-set membership, and the dev/OOS lock — but the warmup guard tests only the first.</dd></div>
+      <div class="row"><dt>Failure</dt><dd>The specific scenario named in round 1 is still open: with <code>train=[2025], dev=[2024]</code>, the warmup window resolves to <strong>2024-12-27</strong> and loads five days of locked DEV data with the unlock never consulted. The current study also still warms from <strong>2020-12-27</strong>, outside its authorized set.</dd></div>
+      <div class="row"><dt>Fix</dt><dd>Compute <code>warmup_start_dt</code> before validation and fold its year into <code>run_years</code>, so all three checks apply uniformly. If pre-partition warmup is legitimate, express it as an explicit <code>chronology.warmup</code> allowance rather than as an unchecked default.</dd></div>
+      <div class="row"><dt>Regression test</dt><dd><code>test_warmup_cannot_enter_locked_dev_year</code>.</dd></div>
+    </dl>
+  </article>
+
+  <article class="find ok">
+    <div class="find-head">
+      <div class="find-meta"><span class="pill ok">Verified fixed</span><span class="fid">F3 / F4</span></div>
+      <p class="find-title">Confirming the two fixes that were done right</p>
+      <div class="loc">strategies/flip_prediction_collector.py:386–401, :500 &nbsp;·&nbsp; scripts/causal_lint.py:469–559</div>
+    </div>
+    <dl class="find-body">
+      <div class="row"><dt>F3 evidence</dt><dd>The loop now skips a checkpoint whose grid time has no matching 1s bar, advancing the index rather than back-stamping — the conservative option, and the correct one. The second anchor was corrected too: <code>obs_ts = T</code>, replacing <code>int(ot.ts[-1])</code>. Re-measured against the catalog:
+        <div class="term" style="margin-top:10px">post-fix run: 20260815_123230_..._day
+  rows: <span class="g">2002</span>   <span class="c">(was 2032 — exactly the 30 predicted rows dropped)</span>
+  rows with a 1s bar exactly at observation_ts : <span class="g">2002</span>
+  rows sourced from a LATER bar (violation)    : <span class="g">0</span>
+  VERDICT: F3 <span class="g">FIXED</span></div></dd></div>
+      <div class="row"><dt>F4 evidence</dt><dd><code>causal_lint.py</code> now resolves the execution manifest itself and lints that file set, emitting <code>files_scanned</code>, <code>files_expected</code>, <code>coverage_pct</code>, and an <code>invocation_valid</code> flag that gates <code>blocking_clean</code>. Measured: <code>31 / 31, 100.0%</code>. Preflight surfaces <code>LINT_COVERAGE_INCOMPLETE</code>. This is the "report coverage, not just verdict" recommendation implemented properly — and it is the model the seal and its test should now follow.</dd></div>
+    </dl>
+  </article>
+</section>
+
+<section>
+  <h2>Recommended order</h2>
+  <p class="sub">Smallest changes with the largest effect</p>
+  <ol>
+    <li><strong>N4 first.</strong> Make the closure test compute the closure. It immediately surfaces N2 and N3 and prevents the whole class from recurring. Everything else on this list is downstream of it.</li>
+    <li><strong>N1</strong> — one-character class of fix (<code>.get()</code> → subscript, correct key), plus the stale-acceptance test. Currently your only defence against a full run on unaudited code.</li>
+    <li><strong>N2 + N3</strong> — seal the two modules; change <code>data_plan.py:135</code>'s <code>except ImportError: pass</code> to re-raise.</li>
+    <li><strong>N6</strong> — fold warmup into the existing three-way validation.</li>
+    <li><strong>F2</strong> — still the largest unaddressed item. Either bind a real auditor transcript, or rename the artifacts to <code>self_attested_*</code> and stop describing them as independent. Leaving it as-is means the seal's authority rests on an unverified claim.</li>
+    <li><strong>N5, F7, F11, F12, F13</strong> — each small and self-contained.</li>
+  </ol>
+
+  <p>One observation to carry forward. F4's fix works because it made the check <em>report its own coverage</em> and fail when coverage is short. The seal's fix does not, and that is the entire difference between the two outcomes in this round. Apply F4's shape to the seal: have <code>resolve_execution_manifest</code> emit a coverage number against a computed closure, and have preflight refuse anything below 100%.</p>
+</section>
+
+<footer>
+  Red team round 2, 2026-08-15 · study <span class="mono">Gemini_clean_maturity_flip_rolling_5m_productivity</span> · seal composite <span class="mono">92fafbd3e9059e5d…</span>
+  All bypasses executed against the live working tree and reverted; <span class="mono">PREEXEC_AUDIT_SEAL_VALID</span> and clean file state reconfirmed after restore.
+  One exception, disclosed above: the pre-existing <span class="mono">smoke_acceptance.json</span> was overwritten during testing and removed rather than fabricated.
+</footer>
+
+</div>

@@ -1,0 +1,25 @@
+{
+  "ledger_version": 1,
+  "entries": [
+    {
+      "audit_type": "causal",
+      "pass": 3,
+      "audited_execution_composite_sha256": "a580bc38bcda6b03fd96e63dfe47374314ee59c558eff2763f9fe55ebdc1ce98",
+      "audit_report_sha256": "20151fbf099c9c26c0fa7753cbb613c1c7decbadcab73fc641e0efbed66a5b80",
+      "audit_report_path": "audit/pass_03.md",
+      "auditor": "causal-audit-scottm-pass01",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-17T17:37:54.470658+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 2,
+      "audited_execution_composite_sha256": "a580bc38bcda6b03fd96e63dfe47374314ee59c558eff2763f9fe55ebdc1ce98",
+      "audit_report_sha256": "fb34fe84929828efb90c3f5a8c591fbb1b32a126444e276817b60567221f4d72",
+      "audit_report_path": "audit/contract_pass_02.md",
+      "auditor": "contract-audit-mccarty-2026-08-17-p01",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-17T17:37:56.087230+00:00"
+    }
+  ]
+}

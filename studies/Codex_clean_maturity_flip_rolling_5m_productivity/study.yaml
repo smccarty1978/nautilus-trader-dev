@@ -1,0 +1,84 @@
+study:
+  id: Codex_clean_maturity_flip_rolling_5m_productivity
+  type: flip_prediction
+  risk_tier: 2
+  description: Clean maturity-conditioned prevailing-1m flip prediction with structural and rolling 5m productivity ablations.
+operation:
+  kind: train_evaluate
+  target_metric: roc_auc
+instrument:
+  symbol: NQ
+  venue: XCME
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+  qualification:
+    age_gate_seconds: 120
+    running_mfe_atr_gte: 1.0
+    new_progress_windows_gte: 2
+    retained_mfe_ratio_gte: 0.5
+    cadence_seconds: 5
+    established: true
+target:
+  type: flip
+  event: prevailing_1m_regime_transition
+  direction: both
+  horizon_seconds: 300
+  confirmation:
+    mode: completed_1m_bar
+    confirmation_bars: 1
+features:
+  source: verified_registry_numeric_universe
+  selection:
+    mode: train_only
+    source: verified_registry_numeric_universe
+    years: [2021, 2022, 2023]
+    feature_count: 25
+    direction_specific: true
+    ranking_method: frozen_train_only_temporal_rank
+  forbidden_lineage: [F3_top25_gbt_v1, F3_selected, 2025_outcome_selected]
+  directional_mapping: prevailing_bullish_to_short__prevailing_bearish_to_long
+  timing_contract: verified
+model:
+  mode: training
+  family: HistGradientBoostingClassifier
+  arms: [BASELINE_A, STRUCTURAL_B, ROLLING_PRODUCTIVITY_C]
+  params:
+    learning_rate: 0.05
+    max_depth: 3
+    max_iter: 200
+    random_state: 42
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+stratification:
+  column: regime_age_seconds
+  buckets: [[300, 600], [600, 900], [900, 1800]]
+  extrapolation_bucket: '>=1800s'
+baseline: {}
+lineage:
+  parent_study: Codex_structural_regime_geometry_maturity
+  clean_lineage_start: '2026-08-15T00:45:00Z'
+  invalidated_prior_runs:
+    - study: Codex_structural_regime_geometry_maturity
+      research_status: EXPLORATORY_ONLY
+      reason: Prior F3 lineage selected with post-2024 outcomes; excluded from this study's selection, fitting, scoring, and acceptance evidence.
+      usable_for_research: false
+execution:
+  runtime: nautilustrader
+  strategy_class: studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.collector.CleanFlipCollector
+  data_requirements:
+    authorized_dates:
+      - '2023-10-02'
+      - '2023-10-03'
+      - '2023-10-04'
+      - '2023-10-05'
+      - '2023-10-06'
+  progress_seconds: 60
+  bounded: true
+acceptance:
+  criteria:
+    minimum_structural_block_coverage: 0.90
+bespoke: {}

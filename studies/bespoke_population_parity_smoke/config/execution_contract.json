@@ -1,0 +1,21 @@
+{
+  "runtime": "nautilustrader",
+  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+  "bounded_execution": true,
+  "progress_seconds": 60,
+  "checkpoint": null,
+  "custom_scope": [
+    "implementation/reconcile.py",
+    "implementation/candidate_tracker.py"
+  ],
+  "chronology": {
+    "train": [],
+    "dev": [
+      2025
+    ],
+    "diagnostic": [],
+    "prohibited": [
+      2026
+    ]
+  }
+}

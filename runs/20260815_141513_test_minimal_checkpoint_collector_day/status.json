@@ -1,0 +1,32 @@
+{
+  "run_id": "20260815_141513_test_minimal_checkpoint_collector_day",
+  "study_id": "test_minimal_checkpoint_collector",
+  "status": "SUCCESS",
+  "stage": "day",
+  "wall_time_seconds": 154.907,
+  "total_bars_processed": 0,
+  "candidates_count": 3152,
+  "observations_count": 3152,
+  "throughput_bars_per_sec": 0.0,
+  "memory": {
+    "baseline_process_rss_mb": 187.58,
+    "peak_process_rss_mb": 304.33,
+    "rss_delta_mb": 116.75,
+    "python_tracemalloc_peak_mb": 67.02
+  },
+  "bars_breakdown": {
+    "loaded": {
+      "1s": 252660,
+      "1m": 6899
+    },
+    "callbacks": {},
+    "ts_event_ranges": {},
+    "ts_init_ranges": {}
+  },
+  "output_artifacts": {
+    "candidates_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260815_141513_test_minimal_checkpoint_collector_day\\collection\\candidates.parquet",
+    "observations_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260815_141513_test_minimal_checkpoint_collector_day\\collection\\observations.parquet",
+    "collection_manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260815_141513_test_minimal_checkpoint_collector_day\\collection\\collection_manifest.json"
+  },
+  "end_time_utc": "2026-08-15T14:17:48.345649+00:00"
+}

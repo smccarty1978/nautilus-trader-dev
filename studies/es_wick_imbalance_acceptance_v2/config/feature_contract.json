@@ -1,0 +1,28 @@
+{
+  "source_key": null,
+  "feature_count": 1,
+  "feature_list": [
+    "latest_1m_wick_imbalance"
+  ],
+  "feature_list_sha256": "f5cddfd93e1bda3b8ff3db0524413c3d8f1fd3fca62490806c3aeb640cf8aa20",
+  "bound_trackers": [
+    "features.trackers.wick.WickTracker"
+  ],
+  "families": [
+    "wick_imbalance"
+  ],
+  "source_timeframes": [
+    "1m"
+  ],
+  "feature_statuses": {
+    "latest_1m_wick_imbalance": "provisional"
+  },
+  "feature_null_policies": {
+    "latest_1m_wick_imbalance": "allow"
+  },
+  "contains_provisional_features": [
+    "latest_1m_wick_imbalance"
+  ],
+  "directional_mapping": "direction_normalized",
+  "timing_contract": "verified"
+}

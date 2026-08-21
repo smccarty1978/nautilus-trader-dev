@@ -1,0 +1,14 @@
+{
+  "target_type": "flip",
+  "event": "confirmed_flip",
+  "direction": "bullish",
+  "horizon_seconds": 300,
+  "confirmation": {
+    "mode": "bar_close",
+    "confirmation_bars": 1
+  },
+  "censoring_policy": {
+    "session_end_censoring": true,
+    "max_horizon_seconds": 300
+  }
+}

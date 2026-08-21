@@ -1,0 +1,30 @@
+{
+  "run_id": "20260818_150958_Codex_clean_maturity_flip_rolling_5m_productivity_day",
+  "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "97d7759d7b4044178c839f1815fed30ffeb929d595c282d6b4b372a9a0a88016",
+  "composite_seal_hash": "278ae56d33371fbc15f2278834bdd8057d86a9863f3532fa616e123827c13b64",
+  "execution_manifest_sha256": "278ae56d33371fbc15f2278834bdd8057d86a9863f3532fa616e123827c13b64",
+  "stage": "day",
+  "dates": {
+    "start": "2023-10-02",
+    "end": "2023-10-02",
+    "warmup_start": "2023-09-27T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME",
+    "instrument_id": "NQ.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-18T15:09:58.282529+00:00",
+  "status": "FAILED",
+  "pid": 133296,
+  "error_type": "RuntimeError",
+  "error_message": "phase-zero authorization missing; collection and fit are refused",
+  "end_time_utc": "2026-08-18T15:09:59.269956+00:00"
+}

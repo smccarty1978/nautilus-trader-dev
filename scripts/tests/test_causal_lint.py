@@ -109,7 +109,7 @@ def test_attribute_access_is_critical_but_bare_name_is_only_a_warning(tmp_path):
     crit = scan_src(tmp_path, "in_rth = classify_session(bar.ts_event)")
     assert [f.severity for f in crit] == ["CRITICAL"]
 
-    warn = scan_src(tmp_path, "def reset_rth(self, ts_event: int) -> None:")
+    warn = scan_src(tmp_path, "def reset_rth(self, ts_event: int) -> None:\n    pass")
     assert [f.severity for f in warn] == ["WARNING"]
 
 
@@ -133,3 +133,88 @@ def test_bare_pragma_is_itself_reported(tmp_path):
 def test_pragma_does_not_suppress_other_rules(tmp_path):
     src = "df['y'] = df.c.rolling(3, center=True).mean()  # causal-lint: ignore[B4] unrelated"
     assert "B1" in rule_ids(scan_src(tmp_path, src))
+
+
+def test_strings_and_docstrings_do_not_trigger_lexical_rules(tmp_path):
+    src = '''
+"""Never use df.shift(-1), center=True, or direction='forward'."""
+EXAMPLE = "df.merge_asof(a, b, direction='forward')"
+x = 1
+'''
+    assert scan_src(tmp_path, src) == []
+
+
+def test_multiline_calls_are_checked_structurally(tmp_path):
+    src = '''
+out = pd.merge_asof(
+    left,
+    right,
+    direction="forward",
+)
+split = train_test_split(
+    X,
+    y,
+    shuffle=True,
+)
+bars = df.resample(
+    "1min",
+    label="right",
+    closed="right",
+).last()
+'''
+    ids = rule_ids(scan_src(tmp_path, src))
+    assert {"A5/G3", "B6", "C3"} <= ids
+
+
+def test_timeseries_split_does_not_suppress_a_separate_random_splitter(tmp_path):
+    src = '''
+safe_cv = TimeSeriesSplit(n_splits=5)
+bad_cv = KFold(n_splits=5)
+scores = cross_val_score(model, X, y, cv=bad_cv)
+'''
+    assert "C3" in rule_ids(scan_src(tmp_path, src))
+
+
+def test_unknown_suppression_is_critical(tmp_path):
+    src = "x = 1  # causal-lint: ignore[B99] typo"
+    findings = scan_src(tmp_path, src)
+    assert any(f.rule_id == "LINT" and f.severity == "CRITICAL" for f in findings)
+
+
+def test_suppression_inventory_is_persisted(tmp_path):
+    f = tmp_path / "mod.py"
+    f.write_text("x = close.shift(-1)  # causal-lint: ignore[B4] label construction", encoding="utf-8")
+    outcome = causal_lint.scan_file_details(f)
+    assert outcome.findings == []
+    assert [(item.rule, item.line, item.reason) for item in outcome.suppressions] == [
+        ("B4", 1, "label construction")
+    ]
+
+
+@pytest.mark.parametrize("src,expected", [
+    ("bars = w_1m.process(df, ts_init_delta=0)", "CRITICAL"),
+    ("bars = w_5m.process(df)", "WARNING"),
+    ("bars = w_1s.process(df, ts_init_delta=0)", None),
+])
+def test_aggregated_wrangling_requires_explicit_close_time_delta(tmp_path, src, expected):
+    findings = [f for f in scan_src(tmp_path, src) if f.rule_id == "A2"]
+    if expected is None:
+        assert findings == []
+    else:
+        assert [f.severity for f in findings] == [expected]
+
+
+def test_missing_or_empty_roots_fail_closed(tmp_path, monkeypatch):
+    output = tmp_path / "lint.json"
+    monkeypatch.setattr(sys, "argv", ["causal_lint.py", "--path", str(tmp_path / "missing"), "--json", str(output)])
+    assert causal_lint.main() == 2
+    payload = __import__("json").loads(output.read_text(encoding="utf-8"))
+    assert not payload["invocation_valid"]
+    assert not payload["blocking_clean"]
+
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    monkeypatch.setattr(sys, "argv", ["causal_lint.py", "--path", str(empty), "--json", str(output)])
+    assert causal_lint.main() == 2
+    payload = __import__("json").loads(output.read_text(encoding="utf-8"))
+    assert any("no eligible Python files" in item for item in payload["invocation_errors"])

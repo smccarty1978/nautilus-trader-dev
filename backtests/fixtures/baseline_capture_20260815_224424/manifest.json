@@ -1,0 +1,138 @@
+{
+  "status": "INVALIDATED",
+  "reason": "source code was modified during the capture workflow and the manifest lacks per-source hashes proving the exact executed tree",
+  "incomplete_required_fields": [
+    "warmup bars loaded versus callbacks actually dispatched",
+    "full resolved config snapshots",
+    "per-bar-type catalog timestamp bounds (ts_event and ts_init)",
+    "explicit expected absence versus missing output for ScoreFanning R5",
+    "fill-level evidence or an explicit statement that no fill artifact exists"
+  ],
+  "capture_timestamp_utc": "20260815_224424",
+  "git_commit": "97b97dbab60ddf65ba29e631cba105c585d1206b",
+  "repo_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader",
+  "evidence_directory": "backtests\\fixtures\\baseline_capture_20260815_224424",
+  "preserved_preexisting_targets": [
+    {
+      "target_path": "backtests/results/checkpoints/results_R2.5.parquet",
+      "preserved_to": "backtests\\fixtures\\baseline_capture_20260815_224424\\preserved_preexisting\\results_R2.5.parquet",
+      "sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857"
+    },
+    {
+      "target_path": "backtests/results/checkpoints/resume_manifest.json",
+      "preserved_to": "backtests\\fixtures\\baseline_capture_20260815_224424\\preserved_preexisting\\resume_manifest.json",
+      "sha256": "28e23fef483a888ede2153d26bc386bc62d359e025cf5800e487329f4bf623cc"
+    },
+    {
+      "target_path": "backtests/results/w4_exit_backtests/NQ_2023_B1/trades.parquet",
+      "preserved_to": "backtests\\fixtures\\baseline_capture_20260815_224424\\preserved_preexisting\\trades.parquet",
+      "sha256": "050d5a5890bff0868f5d79f89ca8f39ab75ee5a7a7540b3080914a9faa18b5c9"
+    },
+    {
+      "target_path": "backtests/results/w4_exit_backtests/NQ_2023_B1/strategy_trades.parquet",
+      "preserved_to": "backtests\\fixtures\\baseline_capture_20260815_224424\\preserved_preexisting\\strategy_trades.parquet",
+      "sha256": "7e06844732d35aab86140356bcdee9e713ab2f220b7dc213ec9242fce96bfc28"
+    }
+  ],
+  "external_inputs": {
+    "predictions_parquet": {
+      "path": "studies/regime_sequence_signal_audit/results/weakness_checkpoint_predictions.parquet",
+      "sha256": "d66a761bd5dbc2c2b7f05d9d74e57a685cc4f12de6eb59f3dcbcd3b3248efdb8",
+      "total_rows": 7910451,
+      "2023_rows": 664162
+    },
+    "catalog": {
+      "path": "data/catalog/NQ_v0_2020_2026",
+      "symbol": "NQ",
+      "venue": "XCME",
+      "multiplier": 20.0,
+      "price_increment": 0.25
+    }
+  },
+  "fixtures": {
+    "fixture_1_score_fanning": {
+      "command": "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe backtests/run_staged_backtest.py --start-date 2023-03-03 --end-date 2023-03-03",
+      "start_time_utc": "2026-08-15T22:44:25.027082+00:00",
+      "end_time_utc": "2026-08-15T22:44:30.259826+00:00",
+      "elapsed_seconds": 5.233,
+      "exit_code": 0,
+      "order_handling": "virtual",
+      "data_window": {
+        "load_start": "2023-02-26 00:00:00 UTC",
+        "load_end": "2023-03-03 23:59:59 UTC",
+        "run_start": "2023-03-03 00:00:00 UTC",
+        "run_end": "2023-03-03 23:59:59 UTC",
+        "warmup_days": 5,
+        "1s_bars_loaded": 252660,
+        "1m_bars_loaded": 6899
+      },
+      "nt_positions_report_rows": 0,
+      "evaluators": {
+        "R5": {
+          "total_trades": 0,
+          "closed_trades": 0,
+          "open_trades": 0,
+          "gross_pnl": 0.0,
+          "win_rate": 0.0,
+          "exit_reasons": {},
+          "file_sha256": "missing",
+          "content_hash": "ea105b5c18066a0ab7530bf16a8f9f1d8eab778d6e816405b40c331178278ab0"
+        },
+        "R2.5": {
+          "total_trades": 20,
+          "closed_trades": 19,
+          "open_trades": 1,
+          "gross_pnl": -268.0,
+          "win_rate": 0.15,
+          "exit_reasons": {
+            "SL": 16,
+            "PT": 3
+          },
+          "file_sha256": "fe232582df230b5c1a44dcf5a19137b28f5bac3ed55ca10d920edfd902b2d857",
+          "content_hash": "3cad64e9513f07ae7d64a7529883b6fb7f3f8a03368f7d4594f471657efc76dc"
+        }
+      }
+    },
+    "fixture_2_w4_b1": {
+      "command": "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe backtests/run_w4_backtest.py --year 2023 --policy B1 --theta 0.62 --N 10",
+      "start_time_utc": "2026-08-15T22:44:30.301217+00:00",
+      "end_time_utc": "2026-08-15T22:50:00.892008+00:00",
+      "elapsed_seconds": 330.591,
+      "exit_code": 0,
+      "order_handling": "simulated_orders",
+      "data_window": {
+        "load_start": "2022-12-27 00:00:00 UTC",
+        "load_end": "2023-12-31 23:59:59 UTC",
+        "run_start": "2023-01-01 00:00:00 UTC",
+        "run_end": "2023-12-31 23:59:59 UTC",
+        "warmup_days": 5,
+        "1s_bars_loaded": 12395770,
+        "1m_bars_loaded": 358816
+      },
+      "closed_positions_count": 18372,
+      "strategy_trades_count": 18372,
+      "open_positions_count": 0,
+      "realized_pnl_total": -10875.0,
+      "output_files": {
+        "trades_parquet": {
+          "path": "backtests\\results\\w4_exit_backtests\\NQ_2023_B1\\trades.parquet",
+          "sha256": "050d5a5890bff0868f5d79f89ca8f39ab75ee5a7a7540b3080914a9faa18b5c9",
+          "rows": 18372,
+          "content_hash": "052bbda4908d43b4ef1f446e9d56e230b16b821d1785febedfb75722de616a51"
+        },
+        "strategy_trades_parquet": {
+          "path": "backtests\\results\\w4_exit_backtests\\NQ_2023_B1\\strategy_trades.parquet",
+          "sha256": "7e06844732d35aab86140356bcdee9e713ab2f220b7dc213ec9242fce96bfc28",
+          "rows": 18372,
+          "content_hash": "2688144415ec3c1471dca12624afbde8ed956e88df12fe3fb337e92e25f4f06a"
+        },
+        "unmanaged_side_effect_parquet": {
+          "path": "backtests\\results\\w4_parity_2023_B1.parquet",
+          "sha256": "missing",
+          "rows": 0,
+          "content_hash": "ea105b5c18066a0ab7530bf16a8f9f1d8eab778d6e816405b40c331178278ab0"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+study: Codex_structural_regime_geometry_maturity
+instrument: NQ.XCME
+session: RTH
+timezone: America/Chicago
+train_years: [2021, 2022, 2023]
+oos_year: 2024
+unused_years: [2025]
+sealed_years: [2026]
+checkpoint_cadence_seconds: 5
+target_horizon_seconds: 300
+maturity_buckets_seconds:
+  - [300, 600]
+  - [600, 900]
+  - [900, 1800]
+  - [1800, null]
+first_crossing_train_quantiles: [0.90, 0.95, 0.975]
+model:
+  class: HistGradientBoostingClassifier
+  max_depth: 3
+  learning_rate: 0.05
+  max_iter: 200
+  random_state: 42
+walk_a:
+  entry_anchor: checkpoint_reference_price
+  stop_atr: 1.0
+  same_bar_resolution: adverse
+  labels: accepted_existing_lineage

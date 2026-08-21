@@ -41,33 +41,34 @@ BANNER = (
 
 # Per-harness metadata that is NOT derived from the Claude definition.
 # Codex/Antigravity run different models, so only the instructions are shared.
+# NOTE: `sandbox_mode` is deliberately absent -- it is DERIVED from the Claude
+# definition's declared tools by `derive_sandbox_mode`. It used to live here and
+# drifted out of sync when contract-checker gained Write (Red Team W5).
 CODEX_META: dict[str, dict[str, str]] = {
     "lookahead-auditor": {
         "name": "lookahead_auditor",
-        "model": "gemini-3.5-pro",
+        # GPT-5.6 Sol is Codex's frontier model for complex professional work;
+        # it replaces the unavailable Gemini 3.5 Pro target for causal audits.
+        "model": "gpt-5.6-sol",
         "model_reasoning_effort": "high",
-        "sandbox_mode": "read-only",
         "approval_policy": "never",
     },
     "contract-checker": {
         "name": "contract_checker",
-        "model": "gemini-3.5-pro",
+        "model": "gpt-5.6-sol",
         "model_reasoning_effort": "medium",
-        "sandbox_mode": "read-only",
         "approval_policy": "never",
     },
     "repo-scout": {
         "name": "repo_scout",
         "model": "gemini-3.6-flash",
         "model_reasoning_effort": "low",
-        "sandbox_mode": "read-only",
         "approval_policy": "never",
     },
     "results-triager": {
         "name": "results_triager",
         "model": "gemini-3.6-flash",
         "model_reasoning_effort": "low",
-        "sandbox_mode": "workspace-write",
         "approval_policy": "never",
     },
 }
@@ -97,10 +98,32 @@ def render_antigravity(stem: str, body: str) -> str:
     return f"{comment}\n\n{body.rstrip()}\n"
 
 
+# Tools that make an agent capable of changing the workspace. `Bash` counts: an
+# agent that can run arbitrary commands is not read-only in any meaningful sense,
+# and `results-triager` runs pytest, which writes caches and artifacts.
+WRITE_TOOLS = ("Write", "Edit", "NotebookEdit", "MultiEdit", "Bash")
+
+
+def derive_sandbox_mode(stem: str, fm: dict[str, str]) -> str:
+    """Derives the Codex sandbox from the Claude definition's declared tools.
+
+    This must not come from a hand-maintained table. It previously did, and the
+    table was not updated when `contract-checker` gained `Write`, so the generated
+    Codex artifact asserted `sandbox_mode = "read-only"` while its own instructions
+    said *"You have `Write` for exactly this reason."* An agent that writes its own
+    audit artifact cannot be rendered read-only, or the harness that runs it will
+    silently be unable to comply with its instructions.
+    """
+    tools_raw = fm.get("tools", "")
+    tools = {t.strip().strip("[]'\"") for t in tools_raw.replace("[", "").replace("]", "").split(",")}
+    return "workspace-write" if tools & set(WRITE_TOOLS) else "read-only"
+
+
 def render_codex(stem: str, fm: dict[str, str], body: str) -> str:
     meta = CODEX_META[stem]
     desc = fm.get("description", "").replace('"', r"\"")
     comment = "\n".join(f"# {ln}" for ln in BANNER.format(stem=stem).splitlines())
+    sandbox_mode = derive_sandbox_mode(stem, fm)
 
     # Codex reads Read/Grep/Glob natively; the body references a "Read tool"
     # generically, which is accurate on all three harnesses.
@@ -113,7 +136,7 @@ def render_codex(stem: str, fm: dict[str, str], body: str) -> str:
         f'description = "{desc}"\n'
         f'model = "{meta["model"]}"\n'
         f'model_reasoning_effort = "{meta["model_reasoning_effort"]}"\n'
-        f'sandbox_mode = "{meta["sandbox_mode"]}"\n'
+        f'sandbox_mode = "{sandbox_mode}"\n'
         f'approval_policy = "{meta["approval_policy"]}"\n'
         f"\n"
         f"developer_instructions = '''\n"

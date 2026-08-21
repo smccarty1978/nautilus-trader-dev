@@ -1,0 +1,10 @@
+{
+  "reason": "Live runtime candidate and score reconciliation against offline reference. Operation is runtime parity validation rather than model training.",
+  "unsupported_contract_element": "offline_vs_live_candidate_score_reconciliation",
+  "canonical_type_considered": "flip_prediction",
+  "reusable_extension_considered": "Planned for future population_parity canonical study type.",
+  "custom_scope": [
+    "implementation/reconcile.py",
+    "implementation/candidate_tracker.py"
+  ]
+}

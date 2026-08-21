@@ -1,9 +1,11 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import msgspec
 import pandas as pd
 from nautilus_trader.config import StrategyConfig
-from nautilus_trader.model.data import Bar
+from nautilus_trader.model.data import Bar, BarType
+from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.trading.strategy import Strategy
 
 from utils.runner.checkpoint import DailyStateCheckpointer
@@ -18,11 +20,20 @@ class ScoreFanningConfig(StrategyConfig, frozen=True):
     bar_type_1m: str
     checkpoint_dir: str = "backtests/results/checkpoints"
     
-    # Policies to evaluate concurrently (name, threshold, sl_atr_mult, pt_atr_mult)
-    policies: List[Dict[str, Any]] = [
-        {"name": "R5", "threshold": 0.62, "sl_atr_mult": 1.5, "pt_atr_mult": 2.0},
-        {"name": "R2.5", "threshold": 0.50, "sl_atr_mult": 1.5, "pt_atr_mult": 2.0}
-    ]
+    # Policies to evaluate concurrently (name, threshold, sl_atr_mult, pt_atr_mult).
+    #
+    # NautilusTrader's StrategyConfig is a msgspec.Struct, and msgspec rejects a
+    # non-empty mutable collection as a field default at class-creation time
+    # (a shared mutable default would leak state between config instances).
+    # The framework-correct mechanism is msgspec.field(default_factory=...),
+    # which builds a fresh list per instance. The values below are unchanged
+    # from the original literal default.
+    policies: List[Dict[str, Any]] = msgspec.field(
+        default_factory=lambda: [
+            {"name": "R5", "threshold": 0.62, "sl_atr_mult": 1.5, "pt_atr_mult": 2.0},
+            {"name": "R2.5", "threshold": 0.50, "sl_atr_mult": 1.5, "pt_atr_mult": 2.0},
+        ]
+    )
 
 
 class ScoreFanningStrategy(Strategy):
@@ -31,10 +42,15 @@ class ScoreFanningStrategy(Strategy):
     def __init__(self, config: ScoreFanningConfig):
         super().__init__(config)
         self.cfg = config
-        
-        self.inst_id = self.cache.instrument(config.instrument_id).id
-        self.bt_1s = self.cache.bar_type(config.bar_type_1s)
-        self.bt_1m = self.cache.bar_type(config.bar_type_1m)
+
+        # Identifiers are parsed from the config, not looked up in the cache.
+        # `self.cache` is only populated once the strategy is registered with a
+        # trader, which happens after __init__ returns, so a cache lookup here
+        # raises AttributeError on NoneType. Parsing the declared strings gives
+        # the same identifiers without depending on registration order.
+        self.inst_id = InstrumentId.from_str(config.instrument_id)
+        self.bt_1s = BarType.from_str(config.bar_type_1s)
+        self.bt_1m = BarType.from_str(config.bar_type_1m)
 
         # Composition-based components
         self.bar_registry = CompletedBarRegistry()
@@ -58,9 +74,11 @@ class ScoreFanningStrategy(Strategy):
 
     def on_start(self):
         super().on_start()
-        # Request data subscriptions
-        self.request_data_subscription(self.bt_1s)
-        self.request_data_subscription(self.bt_1m)
+        # Subscribe to the pre-loaded backtest bar streams. `request_data_subscription`
+        # does not exist on nautilus_trader.trading.strategy.Strategy; `subscribe_bars`
+        # is the supported call and is what the collector strategies use.
+        self.subscribe_bars(self.bt_1s)
+        self.subscribe_bars(self.bt_1m)
 
     def on_bar(self, bar: Bar):
         # Enforce CompletedBarRegistry close checks (A1 rule)

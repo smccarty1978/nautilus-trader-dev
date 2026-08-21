@@ -6,10 +6,10 @@
 |---|---|---|---|---|
 | Main session | Current session model | Current session effort | User-selected permission mode | Plan, orchestrate, integrate, approve |
 | `repo_scout` | `gemini-3.6-flash` | Low | Read-only | Repository discovery (Max 700w) |
-| `contract_checker` | `gemini-3.5-pro` | Medium | Read-only | Specification compliance (Max 1000w) |
+| `contract_checker` | `gpt-5.6-sol` | Medium | Read-only | Specification compliance (Max 1000w) |
 | `implementation_worker` | `gemini-3.5-pro` | Medium | Workspace write | Bounded implementation |
 | `results_triager` | `gemini-3.6-flash` | Low | Guarded pytest only | Test-output reduction (Max 500w) |
-| `lookahead_auditor` | `gemini-3.5-pro` | High | Read-only | Independent audit; parent persists report (Max 1500w, diff-first) |
+| `lookahead_auditor` | `gpt-5.6-sol` | High | Read-only | Independent pre-execution audit; parent persists report (Max 1500w, diff-first) |
 
 ---
 
@@ -18,8 +18,8 @@
 Before running subagents, classify the task into a risk tier:
 
 * **Tier 1 (Diagnostic / Utility)**: Main session $\rightarrow$ run deterministic tests $\rightarrow$ local smoke check. No planning or audit agents.
-* **Tier 2 (Normal Research Study)**: Main-session planning (`repo_scout` only if discovery is needed) $\rightarrow$ Main implementation $\rightarrow$ Staged runner (`scripts/run_bounded_study.py`) $\rightarrow$ Independent auditor (`lookahead_auditor`).
-* **Tier 3 (Model Freeze / Deployment)**: `repo_scout` + `contract_checker` $\rightarrow$ Frozen task packet $\rightarrow$ Main-session implementation (or one bounded `implementation_worker`) $\rightarrow$ Staged runner $\rightarrow$ Independent auditor (`lookahead_auditor`).
+* **Tier 2 (Normal Research Study)**: Main-session planning (`repo_scout` only if discovery is needed) $\rightarrow$ Main implementation + tests $\rightarrow$ split pre-execution audit $\rightarrow$ Staged runner (`scripts/run_bounded_study.py`) $\rightarrow$ completion contract check. Re-audit causality only after an audited-surface change.
+* **Tier 3 (Model Freeze / Deployment)**: `repo_scout` $\rightarrow$ Frozen task packet $\rightarrow$ Main-session implementation (or one bounded `implementation_worker`) + tests $\rightarrow$ split pre-execution audit $\rightarrow$ Staged runner $\rightarrow$ completion contract check. Re-audit causality only after an audited-surface change.
 
 ---
 

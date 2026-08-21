@@ -1,0 +1,62 @@
+# Standalone backtest contract — W4 Exit Policy B1, full-year 2023.
+#
+# This is the harness equivalent of the frozen legacy fixture:
+#   python backtests/run_w4_backtest.py --year 2023 --policy B1 --theta 0.62 --N 10
+#
+# It is a STANDALONE contract on purpose. It does not execute under any collector
+# study directory: a sealed study binds its own strategy_class, chronology and
+# feature contract, none of which apply to this backtest.
+#
+# Every inherited BaselineFlipParityConfig field is pinned explicitly rather than
+# left to a class default, so the run is reproducible from this file alone.
+name: w4_exit_b1_2023
+strategy: w4_exit_strategy
+symbol: NQ
+
+# Legacy loads 2022-12-27 .. 2023-12-31 23:59:59 and calls engine.run(start=2023-01-01)
+# with NO end, so the run window mode is `from_start`, not `bounded`.
+start_date: "2023-01-01"
+end_date: "2023-12-31"
+warmup_days: 5
+
+execution_mode:
+  order_handling: simulated_orders
+  fill_model: bar
+  bar_execution: true
+  bar_adaptive_high_low_ordering: true
+  oms_type: NETTING
+  account_type: MARGIN
+  base_currency: USD
+  starting_balance: 1000000
+  commission_model: none
+  slippage_model: none
+  run_window_mode: from_start
+
+params:
+  # `year` selects the offline prediction universe
+  # (weakness_checkpoint_predictions.parquet filtered to observation_time.year),
+  # it is NOT a date filter. It must be present.
+  year: 2023
+  policy: B1
+  theta: 0.62
+  N: 10
+
+  # entry_qty is policy-derived in the legacy runner: 2 for B4, 1 otherwise.
+  # B1 therefore trades 1 lot. Changing `policy` here does NOT re-derive it.
+  entry_qty: 1
+
+  # Remaining inherited fields, pinned to their legacy-default values.
+  sl_atr: 1.0
+  tp_atr: 1.0
+  ma_period: 9
+  ma_type: SMA
+  trade_side: both
+  entry_type: flip
+  entry_prob: 0.040
+  use_stall_protection: false
+  gate_atr: 0.5
+  stall_thresh: 3
+  use_trailing_stop: false
+  trail_distance_atr: 0.25
+  be_trigger_atr: 0.25
+  be_level_atr: 0.25
