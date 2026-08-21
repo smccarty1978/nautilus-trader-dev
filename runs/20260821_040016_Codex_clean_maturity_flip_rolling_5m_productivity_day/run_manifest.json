@@ -1,0 +1,30 @@
+{
+  "run_id": "20260821_040016_Codex_clean_maturity_flip_rolling_5m_productivity_day",
+  "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "97d7759d7b4044178c839f1815fed30ffeb929d595c282d6b4b372a9a0a88016",
+  "composite_seal_hash": "b1c6baaa0de1e9fa29dd7f2035c72e74b53eed1161bb9c7309c969cf88d1f7b9",
+  "execution_manifest_sha256": "b1c6baaa0de1e9fa29dd7f2035c72e74b53eed1161bb9c7309c969cf88d1f7b9",
+  "stage": "day",
+  "dates": {
+    "start": "2023-10-02",
+    "end": "2023-10-02",
+    "warmup_start": "2023-09-27T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME",
+    "instrument_id": "NQ.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-21T04:00:16.598871+00:00",
+  "status": "FAILED",
+  "pid": 127724,
+  "error_type": "ValueError",
+  "error_message": "UNEXPECTED_OUTPUT_COLUMN: candidates dataframe contains undeclared columns: ['abs_delta_per_atr_moved_120s', 'abs_delta_per_atr_moved_15s', 'abs_delta_per_atr_moved_1800s', 'abs_delta_per_atr_moved_300s', 'abs_delta_per_atr_moved_30s', 'abs_delta_per_atr_moved_5s', 'abs_delta_per_atr_moved_60s', 'abs_delta_per_atr_moved_900s', 'abs_delta_per_point_moved_120s', 'abs_delta_per_point_moved_15s', 'abs_delta_per_point_moved_1800s', 'abs_delta_per_point_moved_300s', 'abs_delta_per_point_moved_30s', 'abs_delta_per_point_moved_5s', 'abs_delta_per_point_moved_60s', 'abs_delta_per_point_moved_900s', 'arrival_accel_10s', 'arrival_accel_5s', 'arrival_jerk', 'arrival_vel_10s', 'arrival_vel_20s', 'arrival_vel_30s', 'arrival_vel_5s', 'atr_at_regime_start', 'bar_est_bear_volume', 'bar_est_bull_volume', 'bar_est_delta', 'bar_est_delta_ratio', 'bar_volume', 'bar_zero_range', 'checkpoint_decision_ns', 'checkpoint_event_ns', 'clean_pullback_score_1m', 'close_vs_range_30s', 'consecutive_down_1s', 'consecutive_up_1s', 'current_1m_move_outside_completed_5m_range', 'current_5m_completed_close_ts', 'current_5m_directional_displacement_atr', 'current_5m_regime_age_min', 'current_5m_regime_range_atr', 'current_5m_regime_range_atr_per_min', 'current_5m_regime_range_checkpoint_atr', 'current_5m_regime_start_ns', 'current_5m_regime_started_rth', 'directional_space_balance_atr', 'distance_above_full_envelope_atr', 'distance_below_full_envelope_atr', 'distance_to_completed_5m_high_atr', 'distance_to_completed_5m_low_atr', 'down_vol_ratio_10s', 'downbar_vol_sum_120s', 'downbar_vol_sum_15s', 'downbar_vol_sum_1800s', 'downbar_vol_sum_300s', 'downbar_vol_sum_30s', 'downbar_vol_sum_5s', 'downbar_vol_sum_60s', 'downbar_vol_sum_900s', 'est_abs_delta_sum_120s', 'est_abs_delta_sum_15s', 'est_abs_delta_sum_1800s', 'est_abs_delta_sum_300s', 'est_abs_delta_sum_30s', 'est_abs_delta_sum_5s', 'est_abs_delta_sum_60s', 'est_abs_delta_sum_900s', 'est_bear_vol_sum_120s', 'est_bear_vol_sum_15s', 'est_bear_vol_sum_180",
+  "end_time_utc": "2026-08-21T04:05:38.738323+00:00"
+}

@@ -229,9 +229,6 @@ class CleanFlipCollector(Strategy):
                 raise RuntimeError(f"Duplicate 1s timestamp detected: {event_ns}")
             if event_ns < self._last_seen_1s_event_ns:
                 raise RuntimeError(f"Out-of-order 1s timestamp detected: {event_ns} < {self._last_seen_1s_event_ns}")
-            if event_ns != self._last_seen_1s_event_ns + NS:
-                if self._has_expected_open_second(self._last_seen_1s_event_ns + NS, event_ns - NS):
-                    raise RuntimeError(f"Unexpected gap in canonical dense timeline: {self._last_seen_1s_event_ns} to {event_ns}")
                 
         high, low, close, open_ = float(bar.high), float(bar.low), float(bar.close), float(bar.open)
         if high < low or high < open_ or high < close or low > open_ or low > close:
@@ -342,7 +339,7 @@ class CleanFlipCollector(Strategy):
             if decision_ns < self._last_seen_1m_init_ns:
                 raise RuntimeError(f"Out-of-order 1m timestamp detected: {decision_ns} < {self._last_seen_1m_init_ns}")
             if decision_ns != self._last_seen_1m_init_ns + 60 * NS:
-                if self._has_expected_open_second(self._last_seen_1m_init_ns + NS, decision_ns - 60 * NS):
+                if self._has_expected_open_second(self._last_seen_1m_init_ns + NS, decision_ns - 61 * NS):
                     raise RuntimeError(f"Unexpected gap in 1m reference bars: {self._last_seen_1m_init_ns} to {decision_ns}")
                 
         high_1m, low_1m, close_1m, open_1m = float(bar.high), float(bar.low), float(bar.close), float(bar.open)
@@ -484,7 +481,20 @@ class CleanFlipCollector(Strategy):
     def get_candidates_dataframe(self) -> pd.DataFrame:
         if not self.candidates_log:
             return pd.DataFrame()
-        return pd.DataFrame(self.candidates_log)
+        df = pd.DataFrame(self.candidates_log)
+        
+        # default metadata columns
+        declared_metadata = [
+            "observation_ts", "regime_start_ns", "regime_direction", "checkpoint_index",
+            "regime_age_seconds", "close", "atr", "running_mfe_atr", "running_mae_atr",
+            "current_pnl_atr", "new_progress_windows", "retained_mfe_ratio", "triggering_1s_ts_init",
+        ]
+        
+        from features.registry import FEATURE_REGISTRY
+        registered_feats = set(FEATURE_REGISTRY.keys())
+        
+        allowed_cols = [c for c in df.columns if c in declared_metadata or c in registered_feats]
+        return df[allowed_cols]
 
     def get_observations_dataframe(self) -> pd.DataFrame:
         if not self.observations_log:

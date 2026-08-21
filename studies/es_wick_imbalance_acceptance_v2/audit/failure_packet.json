@@ -1,0 +1,17 @@
+{
+  "status": "BLOCKED",
+  "preflight_run_id": "blocked_es_wick_imbalance_acceptance_v2",
+  "generated_at_utc": "2026-08-21T03:23:23.340654+00:00",
+  "code_hash": "",
+  "superseded": false,
+  "failed_gate": "EXECUTION_MANIFEST",
+  "failure_ids": [
+    "POST_FREEZE_MUTATION"
+  ],
+  "failure_details": [
+    {
+      "message": "POST_FREEZE_MUTATION: Frozen execution manifest missing."
+    }
+  ],
+  "recommended_smallest_investigation_scope": "Inspect and revert post-freeze mutations."
+}

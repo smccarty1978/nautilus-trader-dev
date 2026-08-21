@@ -1,0 +1,9 @@
+{
+  "run_id": "20260821_041413_Codex_clean_maturity_flip_rolling_5m_productivity_day",
+  "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
+  "status": "FAILED",
+  "stage": "day",
+  "error_type": "ValueError",
+  "error_message": "UNEXPECTED_OUTPUT_COLUMN: candidates dataframe contains unregistered/undeclared columns: ['atr_at_regime_start', 'checkpoint_decision_ns', 'checkpoint_event_ns', 'current_5m_completed_close_ts', 'current_5m_regime_range_checkpoint_atr', 'current_5m_regime_start_ns', 'current_5m_regime_started_rth', 'five_registry_close_ts', 'prevailing_direction', 'rolling_5m_crosses_rth_boundary', 'structural_available', 'structural_current_1m_direction', 'structural_current_1m_start_ns', 'structural_current_expansion_checkpoint_atr', 'structural_max_expansion_checkpoint_atr', 'structural_origin_ns', 'structural_origin_price', 'structural_unavailable_reason']",
+  "end_time_utc": "2026-08-21T04:19:33.180232+00:00"
+}

@@ -9,6 +9,32 @@
     "forbidden_inputs": ["NT catalogs", "legacy catalogs", "previously densified data", "backtest outputs", "derived bars"],
     "immutability_check": "SHA256 of every source file must match before and after build"
   },
+  "authorized_variants": {
+    "NQ": {
+      "source_glob": "data/raw/NQ_v0_1s_*.parquet",
+      "symbol": "NQ",
+      "output": "data/canonical/NQ_dense_1s_2016_2026.parquet",
+      "manifest": "data/canonical/NQ_dense_1s_2016_2026.manifest.json",
+      "boundary_report": "data/canonical/NQ_dense_1s_2016_2026.boundary_validation.json",
+      "calendar_conflicts": "data/canonical/NQ_dense_1s_2016_2026_calendar_conflicts.csv"
+    },
+    "ES": {
+      "source_glob": "data/raw/ES_v0_1s_*.parquet",
+      "symbol": "ES",
+      "output": "data/canonical/ES_dense_1s_2016_2026.parquet",
+      "manifest": "data/canonical/ES_dense_1s_2016_2026.manifest.json",
+      "boundary_report": "data/canonical/ES_dense_1s_2016_2026.boundary_validation.json",
+      "calendar_conflicts": "data/canonical/ES_dense_1s_2016_2026_calendar_conflicts.csv"
+    },
+    "YM": {
+      "source_glob": "data/raw/YM_v0_1s_*.parquet",
+      "symbol": "YM",
+      "output": "data/canonical/YM_dense_1s_2016_2026.parquet",
+      "manifest": "data/canonical/YM_dense_1s_2016_2026.manifest.json",
+      "boundary_report": "data/canonical/YM_dense_1s_2016_2026.boundary_validation.json",
+      "calendar_conflicts": "data/canonical/YM_dense_1s_2016_2026_calendar_conflicts.csv"
+    }
+  },
   "calendar": {
     "name": "CME_Equity",
     "timezone": "America/Chicago",
