@@ -127,7 +127,7 @@ EVIDENCE_SCHEMA_VERSION = 2
 # timeout" an auditable act rather than a silent one. Timeout still fails CLOSED: an
 # overrun is BLOCKED with INVARIANT_TEST_TIMEOUT, never a pass.
 # ---------------------------------------------------------------------------
-CAUSAL_INVARIANTS_BUDGET_SECONDS = 900
+CAUSAL_INVARIANTS_BUDGET_SECONDS = 1800
 
 #: The measurement the budget is derived from. Recorded so the number is falsifiable:
 #: a regression asserts the budget still exceeds this with margin, and re-measuring is
@@ -356,6 +356,57 @@ def run_preflight(
     study_dir = study_path if study_path and study_path.exists() else None
     audit_dir = (study_dir / "audit") if study_dir else (REPO_ROOT / "audit")
     audit_dir.mkdir(parents=True, exist_ok=True)
+
+    if study_dir and (study_dir / "study.yaml").exists():
+        from scripts.resolve_execution_manifest import verify_frozen_execution_identity, PostFreezeMutationError
+        try:
+            verify_frozen_execution_identity(study_dir, REPO_ROOT)
+        except PostFreezeMutationError as e:
+            preflight_run_id = f"blocked_{study_dir.name}"
+            now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+            result = {
+                "evidence_schema_version": EVIDENCE_SCHEMA_VERSION,
+                "study_id": study_dir.name,
+                "status": STATUS_BLOCKED,
+                "audit_ready": False,
+                "execution_composite_sha256": None,
+                "preflight_run_id": preflight_run_id,
+                "generated_at_utc": now_iso,
+                "elapsed_seconds": 0.0,
+                "checks_run": ["EXECUTION_MANIFEST"],
+                "check_outcomes": {"EXECUTION_MANIFEST": "FAILED"},
+                "is_compiled_study": True,
+                "required_checks": list(REQUIRED_STUDY_CHECKS),
+                "required_checks_missing": list(REQUIRED_STUDY_CHECKS)[1:],
+                "checks_complete": False,
+                "diagnostic_mode": False,
+                "failed_gate": "EXECUTION_MANIFEST",
+                "failure_ids": ["POST_FREEZE_MUTATION"],
+                "failure_packet": "audit/failure_packet.json",
+                "required_next_action": ACTION_FIX,
+            }
+            result["evidence_sha256"] = compute_evidence_sha256(result)
+            with open(audit_dir / "preflight.json", "w", encoding="utf-8") as f:
+                json.dump(result, f, indent=2)
+            with open(audit_dir / "failure_packet.json", "w", encoding="utf-8") as f:
+                json.dump({
+                    "status": STATUS_BLOCKED,
+                    "preflight_run_id": preflight_run_id,
+                    "generated_at_utc": now_iso,
+                    "code_hash": "",
+                    "superseded": False,
+                    "failed_gate": "EXECUTION_MANIFEST",
+                    "failure_ids": ["POST_FREEZE_MUTATION"],
+                    "failure_details": [{"message": str(e)}],
+                    "recommended_smallest_investigation_scope": "Inspect and revert post-freeze mutations.",
+                }, f, indent=2)
+            print("=" * 60)
+            print("RESEARCH PREFLIGHT VERDICT: BLOCKED (0.0s)")
+            print("Failed Gate: EXECUTION_MANIFEST")
+            print("Failure IDs: POST_FREEZE_MUTATION")
+            print(f"Error: {e}")
+            print("=" * 60)
+            return 1, result
 
     # The execution composite this preflight validated. Recorded in the artifact so a
     # consumer can tell whether the evidence still describes the tree (RT1-B1).

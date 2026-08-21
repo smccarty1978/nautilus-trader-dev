@@ -35,6 +35,9 @@ def run_collect_mode(
     spec = study_data.spec
 
     # 2. Cryptographic Pre-Execution Audit Seal Check (fail-closed)
+    from scripts.resolve_execution_manifest import verify_frozen_execution_identity
+    verify_frozen_execution_identity(study_data.study_dir, REPO_ROOT)
+
     seal_data = verify_preexec_audit_seal(study_data.study_dir)
 
     # 3. Resolve bounded run plan & data plan

@@ -68,6 +68,13 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
     if repo_root is None:
         repo_root = Path(__file__).resolve().parents[1]
 
+    # Verify frozen execution identity first!
+    from scripts.resolve_execution_manifest import verify_frozen_execution_identity
+    try:
+        verify_frozen_execution_identity(study_dir, repo_root)
+    except Exception as err:
+        raise PreexecAuditStaleError(str(err))
+
     # RT-1: the seal is the strongest claim in the workflow, so it may not rest on a
     # partial preflight. Checked before anything else is computed.
     from scripts.research_preflight import PreflightEvidenceError, assert_preflight_audit_ready
@@ -264,6 +271,10 @@ def verify_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = None)
     """Verifies that all files match the cryptographic seal on disk. Raises PreexecAuditStaleError if stale."""
     if repo_root is None:
         repo_root = Path(__file__).resolve().parents[1]
+
+    # Verify frozen execution identity first!
+    from scripts.resolve_execution_manifest import verify_frozen_execution_identity
+    verify_frozen_execution_identity(study_dir, repo_root)
 
     seal_file = study_dir / "artifacts" / "preexec_audit_seal.json"
     if not seal_file.exists():

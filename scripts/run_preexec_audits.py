@@ -164,7 +164,15 @@ def _verify_declared_binding(
             f"being filed under {study_dir.name!r}."
         )
     declared = summary["audited_execution_composite_sha256"]
-    current, _file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+
+    # NEW: verify frozen execution identity first!
+    from scripts.resolve_execution_manifest import verify_frozen_execution_identity
+    try:
+        frozen_data = verify_frozen_execution_identity(study_dir, repo_root=repo_root)
+        current = frozen_data["frozen_execution_composite_sha256"]
+    except Exception as e:
+        raise err(str(e))
+
     if declared != current:
         raise err(
             f"INGEST_STALE_AUDIT: {report_path.name} reviewed execution composite "

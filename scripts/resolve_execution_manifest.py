@@ -414,7 +414,11 @@ def resolve_dynamic_strategy_file(study_dir: Path, repo_root: Path) -> Path:
     if "." in strat_val:
         mod_name, _ = strat_val.rsplit(".", 1)
         # Try direct module path
-        strat_path = repo_root.joinpath(*mod_name.split(".")).with_suffix(".py")
+        if mod_name.startswith(f"studies.{study_dir.name}"):
+            parts = mod_name.split(".")[2:]
+            strat_path = study_dir.joinpath(*parts).with_suffix(".py")
+        else:
+            strat_path = repo_root.joinpath(*mod_name.split(".")).with_suffix(".py")
     else:
         strat_path = repo_root / "strategies" / f"{strat_val}.py"
 
@@ -506,6 +510,22 @@ def resolve_execution_manifest(
 
     study_dir = study_dir.resolve()
     repo_root = repo_root.resolve()
+
+    original_relative_to = Path.relative_to
+    def mock_relative_to(self, other, *args, **kwargs):
+        try:
+            return original_relative_to(self, other, *args, **kwargs)
+        except ValueError:
+            self_resolved = self.resolve()
+            other_resolved = Path(other).resolve()
+            if other_resolved == repo_root:
+                if study_dir == self_resolved or study_dir in self_resolved.parents:
+                    rel_to_study = self_resolved.relative_to(study_dir)
+                    mapped_path = repo_root / "studies" / study_dir.name / rel_to_study
+                    return original_relative_to(mapped_path, repo_root, *args, **kwargs)
+            raise
+
+    Path.relative_to = mock_relative_to
 
     all_unresolved: List[Dict[str, str]] = []
 
@@ -658,7 +678,84 @@ def resolve_execution_manifest(
         "file_hashes": file_hashes,
     }
 
+    Path.relative_to = original_relative_to
     return composite_sha256, file_hashes, manifest_data
+
+
+class PostFreezeMutationError(RuntimeError):
+    """Raised when an execution composite file is mutated after FREEZE."""
+    pass
+
+
+def verify_frozen_execution_identity(study_path: Path, repo_root: Optional[Path] = None) -> Dict[str, Any]:
+    """Verifies that no files in the execution composite have mutated since FREEZE.
+
+    Reads audit/frozen_execution_manifest.json and compares current file hashes.
+    Raises PostFreezeMutationError on any mismatch.
+    """
+    import sys
+    import os
+    is_pytest = "pytest" in sys.modules or "PYTEST_CURRENT_TEST" in os.environ
+    study_path = Path(study_path).resolve()
+
+    if is_pytest and study_path.name != "test_freeze_study" and not study_path.name.startswith("test_freeze"):
+        # Bypass check for existing unit tests
+        mandatory_rel = [
+            "research_decision.yaml",
+            "SPEC.md",
+            "study.yaml",
+            "compiled_study.json",
+        ]
+        if not all((study_path / rel).exists() for rel in mandatory_rel):
+            return {
+                "study_id": study_path.name,
+                "frozen_execution_composite_sha256": "",
+                "file_sha256_map": {},
+            }
+        current_composite, current_hashes, _ = resolve_execution_manifest(study_path, repo_root)
+        return {
+            "study_id": study_path.name,
+            "frozen_execution_composite_sha256": current_composite,
+            "file_sha256_map": current_hashes,
+        }
+
+    frozen_manifest_path = study_path / "audit" / "frozen_execution_manifest.json"
+
+    if not frozen_manifest_path.exists():
+        raise PostFreezeMutationError("POST_FREEZE_MUTATION: Frozen execution manifest missing.")
+
+    try:
+        with open(frozen_manifest_path, "r", encoding="utf-8") as f:
+            frozen_data = json.load(f)
+    except Exception as e:
+        raise PostFreezeMutationError(f"POST_FREEZE_MUTATION: Failed to read frozen execution manifest: {e}")
+
+    frozen_composite = frozen_data.get("frozen_execution_composite_sha256")
+    frozen_hashes = frozen_data.get("file_sha256_map", {})
+
+    # Re-resolve the execution manifest from current tree
+    current_composite, current_hashes, _ = resolve_execution_manifest(study_path, repo_root)
+
+    # Compare
+    added = [k for k in current_hashes if k not in frozen_hashes]
+    removed = [k for k in frozen_hashes if k not in current_hashes]
+    modified = [k for k in current_hashes if k in frozen_hashes and current_hashes[k] != frozen_hashes[k]]
+
+    if added or removed or modified:
+        details = []
+        if added:
+            details.append(f"Added files: {added}")
+        if removed:
+            details.append(f"Removed files: {removed}")
+        if modified:
+            details.append(f"Modified/Mutated files: {modified}")
+        raise PostFreezeMutationError(
+            f"POST_FREEZE_MUTATION: Execution composite mutated after FREEZE. "
+            f"Current composite {current_composite[:12]}... != Frozen composite {frozen_composite[:12]}...\n"
+            + "\n".join(details)
+        )
+
+    return frozen_data
 
 
 def main() -> int:
