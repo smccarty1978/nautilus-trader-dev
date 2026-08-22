@@ -706,6 +706,47 @@ def resolve_feature_name(name: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Collection-time source universe resolution (Phase 1 Packet D2)
+#
+# `StudySpec.features.source` names a collection-time candidate feature universe --
+# distinct from the later frozen `features.feature_list` (a small, ordered, hash-pinned
+# Top-N selection that exists only after TRAIN-stage feature selection). A study whose
+# `source` is set but whose `feature_list` is still null is not missing configuration; it
+# is correctly declaring "collect from this universe, freeze the model list later."
+#
+# "verified_registry_numeric_universe" is the exact filter already used to authenticate
+# the collection-time candidate set elsewhere in the repo (see
+# studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/phase0.py
+# :verified_numeric_candidates and that study's collector.py:BASELINE_CANDIDATES). This
+# function gives the output-contract path (OutputManager, check_feature_surface) the same
+# resolution without either of those study-local copies importing framework code, or the
+# framework importing study-local code.
+# ---------------------------------------------------------------------------
+_NUMERIC_DTYPES = {"float64", "float32", "int64", "int32"}
+
+
+def resolve_source_universe(source: Optional[str]) -> List[str]:
+    """Resolves a StudySpec `features.source` name to its collection-time candidate list.
+
+    Returns ``[]`` when `source` is unset (``None``/empty) -- a study that has not
+    declared a collection-time source is unaffected, not an error. An explicitly set but
+    unrecognized `source` string fails closed rather than silently resolving to nothing.
+    """
+    if not source:
+        return []
+    if source == "verified_registry_numeric_universe":
+        return sorted(
+            name for name, definition in FEATURE_REGISTRY.items()
+            if definition.status == "verified"
+            and definition.dtype in _NUMERIC_DTYPES
+            and definition.implementation.startswith("features.")
+        )
+    raise ValueError(
+        f"UNKNOWN_FEATURE_SOURCE: '{source}' is not a recognized features.source value"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Snapshot-anchor binding (nt_live_scoring_infra_prereqs Phase 2) -- codifies
 # FEATURE_REGISTRY_CONTRACT.md section 6's existing deferral ("Exact snapshot
 # timings must remain part of the study-specific contract") as actual data

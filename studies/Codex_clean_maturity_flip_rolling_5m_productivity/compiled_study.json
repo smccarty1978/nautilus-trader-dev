@@ -1,7 +1,7 @@
 {
   "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
   "study_type": "flip_prediction",
-  "spec_sha256": "97d7759d7b4044178c839f1815fed30ffeb929d595c282d6b4b372a9a0a88016",
+  "spec_sha256": "cb1be4e6fe54459f250d69dd18a274d769e877396c45bd70bba30e17369ea580",
   "spec": {
     "study": {
       "id": "Codex_clean_maturity_flip_rolling_5m_productivity",
@@ -66,7 +66,15 @@
       "feature_list_sha256": null,
       "directional_mapping": "prevailing_bullish_to_short__prevailing_bearish_to_long",
       "timing_contract": "verified",
-      "metadata_columns": null
+      "metadata_columns": [
+        "observation_ts",
+        "regime_start_ns",
+        "checkpoint_index",
+        "regime_age_seconds",
+        "running_mfe_atr",
+        "new_progress_windows",
+        "retained_mfe_ratio"
+      ]
     },
     "model": {
       "mode": "training",
@@ -143,6 +151,7 @@
       "runtime": "nautilustrader",
       "strategy_class": "studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.collector.CleanFlipCollector",
       "data_requirements": {
+        "dataset_id": "NQ_v0_2020_2026",
         "authorized_dates": [
           "2023-10-02",
           "2023-10-03",

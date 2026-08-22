@@ -20,11 +20,14 @@ import pytest
 from scripts.resolve_execution_manifest import (
     ancestor_package_inits,
     compute_ast_closure,
+    resolve_declared_dataset_id,
     resolve_execution_manifest,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ES_STUDY = REPO_ROOT / "studies" / "es_wick_imbalance_exploratory"
+CLEAN_FLIP_STUDY = REPO_ROOT / "studies" / "Codex_clean_maturity_flip_rolling_5m_productivity"
+NQ_DATASET_YAML = REPO_ROOT / "research" / "datasets" / "NQ_v0_2020_2026.yaml"
 
 
 # ---------------------------------------------------------------------------
@@ -212,3 +215,123 @@ def test_coverage_cannot_report_100_when_a_dependency_is_unresolved(tmp_path: Pa
         )
     finally:
         target.write_bytes(original)
+
+
+# ---------------------------------------------------------------------------
+# Packet A1 -- DatasetSpec closure scoping (RFC section 6.8)
+# ---------------------------------------------------------------------------
+
+from scripts.resolve_execution_manifest import resolve_study_files  # noqa: E402
+
+
+def _mk_synthetic_study(study_dir: Path, dataset_id: str | None) -> None:
+    """Minimal mandatory study-contract skeleton for resolve_study_files()."""
+    _mk(study_dir / "research_decision.yaml", "id: synthetic\n")
+    _mk(study_dir / "SPEC.md", "# synthetic spec\n")
+    dataset_line = f"    dataset_id: {dataset_id}\n" if dataset_id else ""
+    _mk(
+        study_dir / "study.yaml",
+        f"execution:\n  data_requirements:\n{dataset_line}",
+    )
+    _mk(study_dir / "compiled_study.json", "{}\n")
+    _mk(study_dir / "artifacts" / "phase0_source_manifest.json", "{}\n")
+
+
+def test_declared_dataset_id_with_no_authority_yaml_raises(tmp_path: Path):
+    """A study that declares a dataset_id with no matching YAML must fail closed."""
+    study_dir = tmp_path / "synthetic_study"
+    repo_root = tmp_path / "synthetic_repo"
+    _mk_synthetic_study(study_dir, dataset_id="MISSING_DATASET")
+    with pytest.raises(FileNotFoundError):
+        resolve_study_files(study_dir, repo_root)
+
+
+def test_declared_dataset_id_with_authority_yaml_is_included(tmp_path: Path):
+    """The referenced DatasetSpec enters the study-scoped closure under a stable key."""
+    study_dir = tmp_path / "synthetic_study"
+    repo_root = tmp_path / "synthetic_repo"
+    _mk_synthetic_study(study_dir, dataset_id="SYNTH_DATASET")
+    _mk(repo_root / "research" / "datasets" / "SYNTH_DATASET.yaml", "dataset_id: SYNTH_DATASET\n")
+
+    files = resolve_study_files(study_dir, repo_root)
+    assert "study:dataset:SYNTH_DATASET" in files
+    assert files["study:dataset:SYNTH_DATASET"] == (
+        repo_root / "research" / "datasets" / "SYNTH_DATASET.yaml"
+    ).resolve()
+
+
+def test_no_declared_dataset_id_adds_nothing(tmp_path: Path):
+    """A study that declares no dataset_id is not forced onto DatasetSpec by this packet."""
+    study_dir = tmp_path / "synthetic_study"
+    repo_root = tmp_path / "synthetic_repo"
+    _mk_synthetic_study(study_dir, dataset_id=None)
+    files = resolve_study_files(study_dir, repo_root)
+    assert not any(k.startswith("study:dataset:") for k in files)
+
+
+def test_unrelated_dataset_spec_does_not_change_declaring_study_closure(tmp_path: Path):
+    """RFC 6.8: editing an unrelated instrument's DatasetSpec must not move this closure."""
+    study_dir = tmp_path / "synthetic_study"
+    repo_root = tmp_path / "synthetic_repo"
+    _mk_synthetic_study(study_dir, dataset_id="SYNTH_DATASET")
+    _mk(repo_root / "research" / "datasets" / "SYNTH_DATASET.yaml", "dataset_id: SYNTH_DATASET\n")
+    unrelated = _mk(repo_root / "research" / "datasets" / "UNRELATED_DATASET.yaml", "dataset_id: UNRELATED_DATASET\n")
+
+    before = resolve_study_files(study_dir, repo_root)
+    unrelated.write_text("dataset_id: UNRELATED_DATASET\nedited: true\n", encoding="utf-8")
+    after = resolve_study_files(study_dir, repo_root)
+
+    assert set(before.keys()) == set(after.keys())
+    assert not any(k.startswith("study:dataset:UNRELATED") for k in before)
+
+
+# ---------------------------------------------------------------------------
+# Packet A1 -- real-repository regression (Codex_clean_maturity_flip_rolling_5m_productivity)
+# ---------------------------------------------------------------------------
+
+_clean_flip_present = (CLEAN_FLIP_STUDY / "study.yaml").exists() and NQ_DATASET_YAML.exists()
+
+
+@pytest.mark.skipif(not _clean_flip_present, reason="CleanFlip study or NQ DatasetSpec absent")
+def test_declared_dataset_id_resolves_for_clean_flip_study():
+    assert resolve_declared_dataset_id(CLEAN_FLIP_STUDY) == "NQ_v0_2020_2026"
+
+
+@pytest.mark.skipif(not _clean_flip_present, reason="CleanFlip study or NQ DatasetSpec absent")
+def test_referenced_dataset_spec_is_in_the_real_closure():
+    _sha, _fh, md = resolve_execution_manifest(CLEAN_FLIP_STUDY, REPO_ROOT)
+    assert "study:dataset:NQ_v0_2020_2026" in md["combined_files"]
+    assert "study:dataset:NQ_v0_2020_2026" in md["study_contract_files"]
+
+
+@pytest.mark.skipif(not _clean_flip_present, reason="CleanFlip study or NQ DatasetSpec absent")
+def test_post_freeze_edit_to_referenced_dataset_spec_moves_the_composite():
+    """RFC 6.8 acceptance test: editing the referenced DatasetSpec must stale the seal."""
+    original = NQ_DATASET_YAML.read_bytes()
+    try:
+        before, _, _ = resolve_execution_manifest(CLEAN_FLIP_STUDY, REPO_ROOT)
+        NQ_DATASET_YAML.write_bytes(original + b"\n# execution-affecting edit\n")
+        after, _, _ = resolve_execution_manifest(CLEAN_FLIP_STUDY, REPO_ROOT)
+    finally:
+        NQ_DATASET_YAML.write_bytes(original)
+    assert before != after, "editing the referenced DatasetSpec did not move the composite"
+
+    restored, _, _ = resolve_execution_manifest(CLEAN_FLIP_STUDY, REPO_ROOT)
+    assert restored == before, "composite is not a pure function of file content"
+
+
+@pytest.mark.skipif(not (ES_STUDY / "study.yaml").exists(), reason="ES study absent")
+def test_unrelated_study_without_dataset_id_is_unaffected_by_nq_dataset_spec(tmp_path: Path):
+    """ES declares no dataset_id; editing the NQ DatasetSpec must not move ES's composite."""
+    if not NQ_DATASET_YAML.exists():
+        pytest.skip("NQ DatasetSpec absent")
+    assert resolve_declared_dataset_id(ES_STUDY) is None
+
+    original = NQ_DATASET_YAML.read_bytes()
+    try:
+        before, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
+        NQ_DATASET_YAML.write_bytes(original + b"\n# unrelated-study probe edit\n")
+        after, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
+    finally:
+        NQ_DATASET_YAML.write_bytes(original)
+    assert before == after, "editing an unrelated study's DatasetSpec moved ES's composite"

@@ -10,11 +10,11 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import pandas as pd
 
 from backtests.nt_runtime.compiled_study_loader import load_compiled_study
-from backtests.nt_runtime.data_plan import resolve_data_plan
+from backtests.nt_runtime.data_plan import DataPlan, resolve_data_plan
 from backtests.nt_runtime.engine_builder import build_engine
-from backtests.nt_runtime.output_manager import OutputManager
-from backtests.nt_runtime.run_plan import RunStage, resolve_run_plan
-from backtests.nt_runtime.strategy_binding import resolve_strategy_binding
+from backtests.nt_runtime.output_manager import OutputManager, verify_strategy_output_interface
+from backtests.nt_runtime.run_plan import RunPlan, RunStage, resolve_run_plan
+from backtests.nt_runtime.strategy_binding import StrategyBinding, resolve_strategy_binding
 from backtests.nt_runtime.telemetry import CausalTelemetry
 from scripts.preexec_audit_seal import verify_preexec_audit_seal
 
@@ -191,22 +191,19 @@ def run_collect_mode(
         raise
 
 
-def _execute_collect(
-    study_data,
-    spec,
-    data_plan,
-    run_plan,
-    strategy_binding,
-    output_mgr,
-    telemetry,
-    log_level: str,
+def build_collector_config_kwargs(
+    strategy_binding: StrategyBinding,
+    spec: Any,
+    study_data: Any,
+    data_plan: DataPlan,
 ) -> Dict[str, Any]:
-    """Runs the engine and persists results. Split out so the caller owns failure status."""
-    # 5. Construct BacktestEngine and load bars in causal order
-    engine, instrument = build_engine(data_plan, log_level=log_level, telemetry=telemetry)
+    """Resolves the StrategyConfig kwargs a governed collector is constructed with.
 
-    # 6. Build StrategyConfig
-    cfg_kwargs = {
+    Split out of ``_execute_collect`` so a second caller (READINESS R5) can construct the
+    real collector's config identically -- through the same generic hasattr-gated wiring,
+    not a second hand-maintained copy -- without running the NT event loop.
+    """
+    cfg_kwargs: Dict[str, Any] = {
         "instrument_id": data_plan.instrument_id,
         "bar_type_1s": data_plan.bar_type_1s,
         "bar_type_1m": data_plan.bar_type_1m,
@@ -219,6 +216,12 @@ def _execute_collect(
         cfg_kwargs["horizon_seconds"] = spec.target.horizon_seconds or 300
     if hasattr(strategy_binding.config_cls, "feature_list"):
         cfg_kwargs["feature_list"] = spec.features.feature_list
+    # D2.3: only override when the study actually declares metadata_columns -- unlike
+    # feature_list, a collector generally cannot function with an empty/None metadata set,
+    # so a study that hasn't declared one keeps the config class's own default rather than
+    # having it overwritten with nothing.
+    if hasattr(strategy_binding.config_cls, "metadata_columns") and spec.features.metadata_columns:
+        cfg_kwargs["metadata_columns"] = tuple(spec.features.metadata_columns)
     # Session and censoring come from the compiled contracts, not from strategy defaults:
     # the runtime previously hard-coded a session window that disagreed with the contract,
     # and ignored the declared censoring policy entirely.
@@ -235,6 +238,25 @@ def _execute_collect(
     # not from any collector's own __file__, so this applies to any study using the pattern.
     if hasattr(strategy_binding.config_cls, "phase0_manifest_path"):
         cfg_kwargs["phase0_manifest_path"] = str(study_data.study_dir / "artifacts" / "phase0_source_manifest.json")
+    return cfg_kwargs
+
+
+def _execute_collect(
+    study_data,
+    spec,
+    data_plan,
+    run_plan,
+    strategy_binding,
+    output_mgr,
+    telemetry,
+    log_level: str,
+) -> Dict[str, Any]:
+    """Runs the engine and persists results. Split out so the caller owns failure status."""
+    # 5. Construct BacktestEngine and load bars in causal order
+    engine, instrument = build_engine(data_plan, log_level=log_level, telemetry=telemetry)
+
+    # 6. Build StrategyConfig
+    cfg_kwargs = build_collector_config_kwargs(strategy_binding, spec, study_data, data_plan)
 
     strategy_config = strategy_binding.config_cls(**cfg_kwargs)
     strategy = strategy_binding.strategy_cls(strategy_config)
@@ -243,49 +265,15 @@ def _execute_collect(
     # 7. Execute in NautilusTrader event loop
     engine.run()
 
-    # Extract collected surfaces from Strategy generically. Returns whether any
-    # matching attribute/method was found at all, distinct from "found but empty" --
-    # a strategy with no output interface is unverifiable, not merely unproductive.
-    def _extract_df(strat: Any, attr_names: List[str]) -> Tuple[pd.DataFrame, bool]:
-        for name in attr_names:
-            val = getattr(strat, name, None)
-            if val is not None:
-                if callable(val):
-                    res = val()
-                    if isinstance(res, pd.DataFrame):
-                        return res, True
-                elif isinstance(val, pd.DataFrame):
-                    return val, True
-        return pd.DataFrame(), False
-
-    candidates_df, candidates_interface_found = _extract_df(
-        strategy, ["get_candidates_dataframe", "get_candidates_df", "candidates_df", "candidates_dataframe"]
-    )
-    observations_df, observations_interface_found = _extract_df(
-        strategy, ["get_observations_dataframe", "get_observations_df", "observations_df", "observations_dataframe"]
-    )
-
-    # Fail closed rather than silently report zero activity: if the engine genuinely
-    # loaded bars but the strategy exposes no output interface at all, we cannot tell
-    # a legitimately empty result apart from real processing that was never surfaced
-    # (see runs/20260818_174901_..._day, where 213K+ bars loaded and real regime
-    # transitions were processed internally, yet candidates/observations silently
-    # extracted as empty because the strategy predates this interface convention).
+    # Extract collected surfaces from Strategy generically, failing closed rather than
+    # silently reporting zero activity if bars genuinely loaded but the strategy exposes
+    # no output interface at all (see runs/20260818_174901_..._day, where 213K+ bars
+    # loaded and real regime transitions were processed internally, yet candidates/
+    # observations silently extracted as empty because the strategy predated this
+    # interface convention). Shared with READINESS R6 via output_manager.py so this
+    # contract has exactly one implementation.
     bars_loaded_total = sum(telemetry.bars_loaded_by_tf.values())
-    if bars_loaded_total > 0 and not candidates_interface_found:
-        raise RuntimeError(
-            f"STRATEGY_OUTPUT_INTERFACE_MISSING: {bars_loaded_total} bars were loaded into the "
-            f"engine but {type(strategy).__name__} implements none of get_candidates_dataframe/"
-            f"get_candidates_df/candidates_df/candidates_dataframe. Cannot verify whether the "
-            f"loaded bars were processed; refusing to report a candidates count."
-        )
-    if bars_loaded_total > 0 and not observations_interface_found:
-        raise RuntimeError(
-            f"STRATEGY_OUTPUT_INTERFACE_MISSING: {bars_loaded_total} bars were loaded into the "
-            f"engine but {type(strategy).__name__} implements none of get_observations_dataframe/"
-            f"get_observations_df/observations_df/observations_dataframe. Cannot verify whether "
-            f"the loaded bars were processed; refusing to report an observations count."
-        )
+    candidates_df, observations_df = verify_strategy_output_interface(strategy, bars_loaded_total)
 
     # Record bar callback breakdown
     b1s = getattr(strategy, "bars_1s_count", 0)
@@ -295,6 +283,20 @@ def _execute_collect(
     if b1m > 0:
         telemetry.callbacks_by_tf["1m"] = b1m
     telemetry.update_candidates(len(candidates_df))
+
+    # Population funnel (Packet E). Only strategies that implement
+    # get_population_funnel() (currently the representative collector) contribute a
+    # funnel; anything else leaves telemetry's population_* fields at None, which
+    # OutputManager.persist_collection treats as "nothing to reconcile".
+    get_funnel = getattr(strategy, "get_population_funnel", None)
+    if callable(get_funnel):
+        funnel = get_funnel()
+        telemetry.record_population_funnel(
+            total_checkpoints=funnel["total_population_checkpoints"],
+            declared_contract_exclusions=funnel["declared_contract_exclusions"],
+            implementation_only_exclusions=funnel["implementation_only_exclusions"],
+            candidates_emitted_raw=funnel["candidates_emitted"],
+        )
 
     snapshot = telemetry.stop()
 

@@ -17,6 +17,14 @@ from research.schemas.study_spec import (
     AcceptanceSpec,
     BespokeSpec,
 )
+from research.schemas.dataset_spec import (
+    DatasetSpec,
+    DatasetProvenance,
+    DatasetCoverage,
+    ExternalStreamSpec,
+    DerivedStreamSpec,
+    load_dataset_spec,
+)
 
 __all__ = [
     "StudySpec",
@@ -34,4 +42,10 @@ __all__ = [
     "ExecutionSpec",
     "AcceptanceSpec",
     "BespokeSpec",
+    "DatasetSpec",
+    "DatasetProvenance",
+    "DatasetCoverage",
+    "ExternalStreamSpec",
+    "DerivedStreamSpec",
+    "load_dataset_spec",
 ]

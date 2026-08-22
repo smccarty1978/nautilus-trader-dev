@@ -52,10 +52,12 @@ BASELINE_CANDIDATES = tuple(
 # every emitted candidate to reach exactly one of these -- an undisposed candidate is
 # treated as silent survivorship, not a missing record). This bookkeeping is additive:
 # it does not change flip_within_300s or which checkpoints qualify as candidates.
+# Note: a DATA_GAP censor reason previously existed here but was removed as a stale,
+# production-unreachable contract member (see research_decision.yaml) -- unexpected
+# 1s/1m timestamp gaps during expected trading time hard-fail the run instead.
 DISPOSITION_LABELED_POSITIVE = "LABELED_POSITIVE"
 DISPOSITION_LABELED_NEGATIVE = "LABELED_NEGATIVE"
 DISPOSITION_CENSORED = "CENSORED"
-CENSOR_DATA_GAP = "DATA_GAP"
 CENSOR_RUN_END = "RUN_END"
 
 
@@ -109,6 +111,18 @@ class CleanFlipCollectorConfig(StrategyConfig, frozen=True):
     bar_type_1m: str = "NQ.XCME-1-MINUTE-LAST-EXTERNAL"
     phase0_manifest_path: str = ""
     authorized_years: tuple[int, ...] = (2021, 2022, 2023, 2024)
+    # D2.3: single canonical metadata authority. backtests/nt_runtime/modes/collect.py
+    # wires execution.data_requirements-adjacent StudySpec fields into strategy config
+    # generically (see its `feature_list`/`session` wiring); this field is that same
+    # pattern for features.metadata_columns, so the collector no longer hardcodes an
+    # independent copy of the study's declared metadata contract. The literal default
+    # here matches study.yaml's declared features.metadata_columns and is reached only
+    # when the collector is constructed directly (e.g. tests) rather than through the
+    # governed collect entrypoint.
+    metadata_columns: tuple[str, ...] = (
+        "observation_ts", "regime_start_ns", "checkpoint_index",
+        "regime_age_seconds", "running_mfe_atr", "new_progress_windows", "retained_mfe_ratio",
+    )
 
 
 class CleanFlipCollector(Strategy):
@@ -120,6 +134,10 @@ class CleanFlipCollector(Strategy):
         if set(config.authorized_years) - {2021, 2022, 2023, 2024}:
             raise RuntimeError("collector config contains forbidden collection years")
         self._authorized_years = set(config.authorized_years)
+        # D2.3: single canonical metadata authority. NT's Actor.config is a read-only
+        # Cython attribute unavailable to a __new__-constructed test double, so the
+        # declared value is copied onto a plain instance attribute here instead.
+        self._metadata_columns = tuple(config.metadata_columns)
         self._bar_1s = BarType.from_str(config.bar_type_1s)
         self._bar_1m = BarType.from_str(config.bar_type_1m)
         self._regime = RegimeEngine()
@@ -158,6 +176,13 @@ class CleanFlipCollector(Strategy):
         self.telemetry_declared_population_eligible = 0
         self.telemetry_candidates_emitted = 0
         self.telemetry_declared_contract_exclusions = 0
+        # Population-funnel terminal bucket (Packet E). Every early `return` in `_on_1s`
+        # after the total_checkpoints increment already increments declared_contract_
+        # exclusions (non-RTH, missing established regime, qualification-fail); there is
+        # no other early-return branch in that method, so this counter has no reachable
+        # increment site to attach to. It is kept, at 0, as the terminal bucket the funnel
+        # identity requires -- see test_population_funnel.py::test_implementation_only_
+        # exclusion_branch_is_structurally_unreachable for the structural proof.
         self.telemetry_implementation_only_exclusions = 0
 
         for name in (*BASELINE_CANDIDATES, *STRUCTURAL_FEATURES, *ROLLING_FEATURES):
@@ -288,6 +313,11 @@ class CleanFlipCollector(Strategy):
         if eligible:
             self.telemetry_declared_population_eligible += 1
         else:
+            # Population-funnel accounting only (Packet E) -- this is the existing
+            # qualification-fail branch, unchanged in position or condition. A checkpoint
+            # rejected by the declared age/MFE/progress/retention gates is a declared
+            # study qualification exclusion, not an implementation-only suppression.
+            self.telemetry_declared_contract_exclusions += 1
             return
             
         base_and_rolling = self._features.snapshot(
@@ -326,7 +356,7 @@ class CleanFlipCollector(Strategy):
         self._next_checkpoint_index += 1
         self.telemetry_candidates_emitted += 1
         self.candidates_log.append(dict(pending))
-        self._pending_labels.append({"row": pending, "target_observable": True})
+        self._pending_labels.append({"row": pending})
 
     def _on_1m(self, bar: Bar) -> None:
         decision_ns = int(bar.ts_init)
@@ -413,13 +443,6 @@ class CleanFlipCollector(Strategy):
                 and self._progress_windows >= 2
                 and self._retained_mfe_ratio(close) >= 0.5)
 
-    def _invalidate_pending_horizons(self, gap_start_ns: int, gap_end_ns: int) -> None:
-        """A target window crossing an unavailable 1s interval is not labelled false."""
-        for pending in getattr(self, "_pending_labels", ()):
-            checkpoint = pending["row"]["checkpoint_decision_ns"]
-            if checkpoint <= gap_end_ns and checkpoint + 300 * NS >= gap_start_ns:
-                pending["target_observable"] = False
-
     def _resolve_pending_labels(self, available_ns: int) -> None:
         """Resolve only horizons whose full (T, T+300s] interval is in the past."""
         while self._pending_labels:
@@ -430,42 +453,28 @@ class CleanFlipCollector(Strategy):
                     or getattr(self, "_last_seen_1m_init_ns", -1) <= checkpoint + 300 * NS):
                 break
             self._pending_labels.popleft()
-            if pending["target_observable"]:
-                row["flip_within_300s"] = int(any(
-                    checkpoint < flip_ns <= checkpoint + 300 * NS
-                    for flip_ns in self._flip_times_ns
-                ))
-                self.feature_rows.append(row)
-                self.observations_log.append({
-                    "observation_ts": row["observation_ts"],
-                    "regime_start_ns": row["regime_start_ns"],
-                    "checkpoint_index": row["checkpoint_index"],
-                    "disposition": (DISPOSITION_LABELED_POSITIVE if row["flip_within_300s"]
-                                    else DISPOSITION_LABELED_NEGATIVE),
-                    "censor_reason": None,
-                    "flip_within_300s": row["flip_within_300s"],
-                })
-            else:
-                # A target window crossing an unavailable 1s interval is never labelled
-                # false (see _invalidate_pending_horizons) -- it is honestly reported as
-                # censored, not silently dropped, so this candidate still reaches exactly
-                # one terminal disposition.
-                self.observations_log.append({
-                    "observation_ts": row["observation_ts"],
-                    "regime_start_ns": row["regime_start_ns"],
-                    "checkpoint_index": row["checkpoint_index"],
-                    "disposition": DISPOSITION_CENSORED,
-                    "censor_reason": CENSOR_DATA_GAP,
-                    "flip_within_300s": None,
-                })
+            row["flip_within_300s"] = int(any(
+                checkpoint < flip_ns <= checkpoint + 300 * NS
+                for flip_ns in self._flip_times_ns
+            ))
+            self.feature_rows.append(row)
+            self.observations_log.append({
+                "observation_ts": row["observation_ts"],
+                "regime_start_ns": row["regime_start_ns"],
+                "checkpoint_index": row["checkpoint_index"],
+                "disposition": (DISPOSITION_LABELED_POSITIVE if row["flip_within_300s"]
+                                else DISPOSITION_LABELED_NEGATIVE),
+                "censor_reason": None,
+                "flip_within_300s": row["flip_within_300s"],
+            })
         while self._flip_times_ns and self._pending_labels and self._flip_times_ns[0] <= self._pending_labels[0]["row"]["checkpoint_decision_ns"]:
             self._flip_times_ns.popleft()
 
     def on_stop(self) -> None:
         """Every candidate must reach exactly one terminal disposition before the run
         ends. Any candidate whose (T, T+300s] horizon had not yet elapsed when data ran
-        out is honestly censored at run end, mirroring the data-gap censoring path
-        above -- it is not evaluated as a real observed non-flip."""
+        out is honestly censored at run end -- it is not evaluated as a real observed
+        non-flip."""
         while self._pending_labels:
             pending = self._pending_labels.popleft()
             row = pending["row"]
@@ -479,24 +488,44 @@ class CleanFlipCollector(Strategy):
             })
 
     def get_candidates_dataframe(self) -> pd.DataFrame:
+        # D2.3: single canonical metadata authority -- self._metadata_columns, sourced
+        # from the study's declared features.metadata_columns (see
+        # CleanFlipCollectorConfig.metadata_columns), not a second hardcoded copy.
+        declared_metadata = list(self._metadata_columns)
         if not self.candidates_log:
-            return pd.DataFrame()
+            # D1: a zero-candidate run is still a governed output and must declare its
+            # schema -- a bare columnless DataFrame is not automatically a valid governed
+            # output (OutputManager.persist_collection now enforces this non-vacuously).
+            return pd.DataFrame(columns=declared_metadata)
         df = pd.DataFrame(self.candidates_log)
-        
-        # default metadata columns
-        declared_metadata = [
-            "observation_ts", "regime_start_ns", "regime_direction", "checkpoint_index",
-            "regime_age_seconds", "close", "atr", "running_mfe_atr", "running_mae_atr",
-            "current_pnl_atr", "new_progress_windows", "retained_mfe_ratio", "triggering_1s_ts_init",
-        ]
-        
+
         from features.registry import FEATURE_REGISTRY
         registered_feats = set(FEATURE_REGISTRY.keys())
-        
+
         allowed_cols = [c for c in df.columns if c in declared_metadata or c in registered_feats]
         return df[allowed_cols]
 
     def get_observations_dataframe(self) -> pd.DataFrame:
         if not self.observations_log:
-            return pd.DataFrame()
+            # D1: must still carry the matching key contract OutputManager requires
+            # (see backtests.nt_runtime.output_manager.CANDIDATE_KEY_COLUMNS) even at
+            # zero rows.
+            from backtests.nt_runtime.output_manager import CANDIDATE_KEY_COLUMNS
+            return pd.DataFrame(columns=list(CANDIDATE_KEY_COLUMNS))
         return pd.DataFrame(self.observations_log)
+
+    def get_population_funnel(self) -> dict:
+        """Raw, whole-run population-funnel counters (Packet E, D8 denominator).
+
+        Scoped to every 5s-aligned checkpoint for which a completed 1s bar was
+        dispatched to this strategy -- this includes the engine's pre-start warmup
+        window, exactly like candidates_log/observations_log do. The governed
+        persistence path (backtests/nt_runtime/output_manager.py) is responsible for
+        reconciling this against the warmup-filtered persisted candidate count.
+        """
+        return {
+            "total_population_checkpoints": self.telemetry_total_checkpoints,
+            "declared_contract_exclusions": self.telemetry_declared_contract_exclusions,
+            "implementation_only_exclusions": self.telemetry_implementation_only_exclusions,
+            "candidates_emitted": self.telemetry_candidates_emitted,
+        }

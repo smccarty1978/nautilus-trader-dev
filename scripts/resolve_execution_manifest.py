@@ -430,8 +430,47 @@ def resolve_dynamic_strategy_file(study_dir: Path, repo_root: Path) -> Path:
     return strat_path.resolve()
 
 
-def resolve_study_files(study_dir: Path) -> Dict[str, Path]:
+def resolve_declared_dataset_id(study_dir: Path) -> Optional[str]:
+    """Reads the study-declared dataset id from execution.data_requirements.dataset_id.
+
+    Prefers ``compiled_study.json`` (the authority downstream consumers read); falls back
+    to ``study.yaml`` if the study has not been compiled yet. Returns ``None`` when the
+    study declares no dataset id -- Phase 1 leaves that legal so unrelated studies are not
+    forced to adopt DatasetSpec on this packet's schedule.
+    """
+    compiled_file = study_dir / "compiled_study.json"
+    if compiled_file.exists():
+        try:
+            with open(compiled_file, "r", encoding="utf-8") as f:
+                cdata = json.load(f)
+            reqs = cdata.get("spec", cdata).get("execution", {}).get("data_requirements") or {}
+            dataset_id = reqs.get("dataset_id")
+            if dataset_id:
+                return str(dataset_id)
+        except Exception:
+            pass
+
+    study_yaml = study_dir / "study.yaml"
+    if study_yaml.exists():
+        import yaml
+        try:
+            with open(study_yaml, "r", encoding="utf-8") as f:
+                ydata = yaml.safe_load(f)
+            reqs = (ydata.get("execution", {}) or {}).get("data_requirements") or {}
+            dataset_id = reqs.get("dataset_id")
+            if dataset_id:
+                return str(dataset_id)
+        except Exception:
+            pass
+
+    return None
+
+
+def resolve_study_files(study_dir: Path, repo_root: Optional[Path] = None) -> Dict[str, Path]:
     """Resolves all study-specific contract, spec, clause, and test files."""
+    if repo_root is None:
+        repo_root = Path(__file__).resolve().parents[1]
+
     files: Dict[str, Path] = {}
     mandatory_rel = [
         "research_decision.yaml",
@@ -450,6 +489,20 @@ def resolve_study_files(study_dir: Path) -> Dict[str, Path]:
     clauses_p = study_dir / "study_clauses.yaml"
     if clauses_p.exists():
         files["study:study_clauses.yaml"] = clauses_p.resolve()
+
+    # A1: the referenced DatasetSpec authority YAML, scoped to exactly this study's
+    # declared dataset_id -- never a glob over research/datasets/. Editing an unrelated
+    # instrument's DatasetSpec must not move this study's composite; only the one this
+    # study actually declares belongs in its closure.
+    declared_dataset_id = resolve_declared_dataset_id(study_dir)
+    if declared_dataset_id:
+        dataset_spec_path = (repo_root / "research" / "datasets" / f"{declared_dataset_id}.yaml").resolve()
+        if not dataset_spec_path.exists():
+            raise FileNotFoundError(
+                f"Declared dataset_id '{declared_dataset_id}' has no DatasetSpec authority file: "
+                f"{dataset_spec_path}"
+            )
+        files[f"study:dataset:{declared_dataset_id}"] = dataset_spec_path
 
     # W-A: generated study contracts under config/. `compiled_study.json` is the
     # authority consumers read (see validate_smoke), but these files are the compiler's
@@ -485,6 +538,160 @@ def _coverage_pct(resolved: int, unresolved: int) -> float:
     return round(resolved / expected * 100.0, 4)
 
 
+def resolve_execution_file_paths(
+    study_dir: Path,
+    repo_root: Optional[Path] = None,
+    strict: bool = True,
+) -> Tuple[Dict[str, Path], Dict[str, Any]]:
+    """Resolves every execution-closure composite key to its authoritative physical Path.
+
+    This is the single source of truth for "what file does this key mean" -- a composite
+    key is a semantic identity, not a filesystem-relative path, and the two coincide only
+    for the ordinary ``study:<relpath>`` / ``repo:<relpath>`` cases. Pseudo-scoped keys
+    such as ``study:dataset:<id>`` (see ``resolve_study_files``' DatasetSpec-authority
+    entry) name a file that lives elsewhere entirely. Any caller that needs to re-open a
+    specific closure entry by key (seal verification, targeted re-hashing) must resolve
+    through here rather than reconstructing a path by splitting the key string.
+
+    ``resolve_execution_manifest`` calls this once and hashes the result; it does not
+    re-derive paths on its own, so there is exactly one place a key's physical meaning is
+    defined.
+
+    Returns:
+        combined_paths: Mapping from canonical key to its resolved physical Path
+        closure_data: Categorized closure sets/unresolved lists needed for the manifest
+            breakdown (runtime/contract/governance), so a caller building a full manifest
+            never has to recompute the AST closures a second time.
+    """
+    if repo_root is None:
+        repo_root = Path(__file__).resolve().parents[1]
+
+    study_dir = study_dir.resolve()
+    repo_root = repo_root.resolve()
+
+    original_relative_to = Path.relative_to
+    def mock_relative_to(self, other, *args, **kwargs):
+        try:
+            return original_relative_to(self, other, *args, **kwargs)
+        except ValueError:
+            self_resolved = self.resolve()
+            other_resolved = Path(other).resolve()
+            if other_resolved == repo_root:
+                if study_dir == self_resolved or study_dir in self_resolved.parents:
+                    rel_to_study = self_resolved.relative_to(study_dir)
+                    mapped_path = repo_root / "studies" / study_dir.name / rel_to_study
+                    return original_relative_to(mapped_path, repo_root, *args, **kwargs)
+            raise
+
+    Path.relative_to = mock_relative_to
+    try:
+        all_unresolved: List[Dict[str, str]] = []
+
+        # 1. Study Contract Files
+        study_files_map = resolve_study_files(study_dir, repo_root)
+
+        # 2. Dynamic Strategy File Resolution
+        strategy_file = resolve_dynamic_strategy_file(study_dir, repo_root)
+
+        # 3. Runtime Execution Graph Seeds
+        runtime_seeds = [
+            repo_root / "backtests/run_nt_study.py",
+            repo_root / "backtests/nt_runtime/modes/collect.py",
+            strategy_file,
+        ]
+        runtime_closure_set, runtime_unres = compute_ast_closure(runtime_seeds, repo_root)
+        all_unresolved.extend(runtime_unres)
+
+        # 4. Contract Authority Graph Seeds
+        contract_seeds = [
+            repo_root / "scripts/compile_study.py",
+            repo_root / "scripts/create_study.py",
+            repo_root / "research/schemas/study_spec.py",
+        ]
+        engines_dir = repo_root / "research" / "engines"
+        if engines_dir.exists():
+            contract_seeds.extend(engines_dir.glob("*.py"))
+        study_types_dir = repo_root / "research" / "study_types"
+        if study_types_dir.exists():
+            contract_seeds.extend(study_types_dir.glob("*.py"))
+
+        contract_closure_set, contract_unres = compute_ast_closure(contract_seeds, repo_root)
+        all_unresolved.extend(contract_unres)
+
+        # 5. Governance Graph Seeds
+        governance_seeds = [
+            repo_root / "scripts/preexec_audit_seal.py",
+            repo_root / "scripts/validate_smoke.py",
+            repo_root / "scripts/generate_oos_unlock.py",
+            repo_root / "scripts/resolve_execution_manifest.py",
+            repo_root / "scripts/causal_lint.py",
+            repo_root / "scripts/research_preflight.py",
+            repo_root / "scripts/check_research_decision_fidelity.py",
+            repo_root / "scripts/check_spec_fidelity.py",
+            repo_root / "scripts/check_artifact_schema.py",
+            repo_root / "scripts/check_model_binding.py",
+            repo_root / "scripts/run_preexec_audits.py",
+        ]
+        # RT2-B2: every script the preflight launches by subprocess, derived from the
+        # preflight's own source. A gate that decides a mandatory verdict is governance
+        # code whether it is reached by `import` or by `subprocess.run`.
+        governance_seeds.extend(discover_subprocess_gate_scripts(repo_root))
+
+        gov_closure_set, gov_unres = compute_ast_closure(governance_seeds, repo_root)
+        all_unresolved.extend(gov_unres)
+
+        # RT2-B2: static authority files. These are data, so no AST edge reaches them,
+        # but `check_feature_promotion.py` treats the lifecycle baseline as authoritative
+        # -- it is the grandfather set itself. A file that can change a mandatory verdict
+        # belongs in the composite.
+        governance_data_paths: Dict[str, Path] = {}
+        for rel in GOVERNANCE_AUTHORITY_DATA_FILES:
+            p = repo_root / rel
+            if p.exists():
+                governance_data_paths[f"repo:{rel}"] = p.resolve()
+
+        if all_unresolved and strict:
+            raise UnresolvedDependencyError(
+                f"UNRESOLVED_DEPENDENCIES: Found {len(all_unresolved)} unresolvable repo-local imports: {all_unresolved}"
+            )
+
+        # 6. Build categorized path map
+        combined_paths: Dict[str, Path] = {}
+
+        for k, p in study_files_map.items():
+            combined_paths[k] = p
+
+        for p in runtime_closure_set:
+            rel = p.relative_to(repo_root).as_posix()
+            combined_paths[f"repo:{rel}"] = p
+
+        for p in contract_closure_set:
+            rel = p.relative_to(repo_root).as_posix()
+            combined_paths[f"repo:{rel}"] = p
+
+        for p in gov_closure_set:
+            rel = p.relative_to(repo_root).as_posix()
+            combined_paths[f"repo:{rel}"] = p
+
+        for k, p in governance_data_paths.items():
+            combined_paths[k] = p
+
+        closure_data = {
+            "study_files_map": study_files_map,
+            "runtime_closure_set": runtime_closure_set,
+            "contract_closure_set": contract_closure_set,
+            "gov_closure_set": gov_closure_set,
+            "governance_data_paths": governance_data_paths,
+            "runtime_unresolved": runtime_unres,
+            "contract_unresolved": contract_unres,
+            "governance_unresolved": gov_unres,
+            "all_unresolved": all_unresolved,
+        }
+        return combined_paths, closure_data
+    finally:
+        Path.relative_to = original_relative_to
+
+
 def resolve_execution_manifest(
     study_dir: Path,
     repo_root: Optional[Path] = None,
@@ -511,6 +718,13 @@ def resolve_execution_manifest(
     study_dir = study_dir.resolve()
     repo_root = repo_root.resolve()
 
+    # resolve_execution_file_paths installs and restores its own Path.relative_to
+    # monkeypatch internally, so by the time it returns the true original is back in
+    # place. The categorization below needs the SAME redirect (a closure member whose
+    # physical file lives under a temp study_dir rather than repo_root -- e.g. a
+    # synthetic study exercising resolve_dynamic_strategy_file's fallback -- is not a
+    # real subpath of repo_root either), so this function installs its own instance of
+    # the identical patch around the whole body, nesting correctly with the callee's.
     original_relative_to = Path.relative_to
     def mock_relative_to(self, other, *args, **kwargs):
         try:
@@ -526,114 +740,37 @@ def resolve_execution_manifest(
             raise
 
     Path.relative_to = mock_relative_to
+    try:
+        combined_paths, closure_data = resolve_execution_file_paths(study_dir, repo_root, strict=strict)
 
-    all_unresolved: List[Dict[str, str]] = []
+        study_files_map = closure_data["study_files_map"]
+        runtime_closure_set = closure_data["runtime_closure_set"]
+        contract_closure_set = closure_data["contract_closure_set"]
+        gov_closure_set = closure_data["gov_closure_set"]
+        governance_data_paths = closure_data["governance_data_paths"]
+        runtime_unres = closure_data["runtime_unresolved"]
+        contract_unres = closure_data["contract_unresolved"]
+        gov_unres = closure_data["governance_unresolved"]
+        all_unresolved = closure_data["all_unresolved"]
 
-    # 1. Study Contract Files
-    study_files_map = resolve_study_files(study_dir)
+        # Compute SHA-256 for all resolved files
+        file_hashes: Dict[str, str] = {}
+        for key in sorted(combined_paths.keys()):
+            p = combined_paths[key]
+            if not p.exists():
+                raise FileNotFoundError(f"Resolved execution dependency does not exist on disk: {p}")
+            file_hashes[key] = _hash_file(p)
 
-    # 2. Dynamic Strategy File Resolution
-    strategy_file = resolve_dynamic_strategy_file(study_dir, repo_root)
-
-    # 3. Runtime Execution Graph Seeds
-    runtime_seeds = [
-        repo_root / "backtests/run_nt_study.py",
-        repo_root / "backtests/nt_runtime/modes/collect.py",
-        strategy_file,
-    ]
-    runtime_closure_set, runtime_unres = compute_ast_closure(runtime_seeds, repo_root)
-    all_unresolved.extend(runtime_unres)
-
-    # 4. Contract Authority Graph Seeds
-    contract_seeds = [
-        repo_root / "scripts/compile_study.py",
-        repo_root / "scripts/create_study.py",
-        repo_root / "research/schemas/study_spec.py",
-    ]
-    engines_dir = repo_root / "research" / "engines"
-    if engines_dir.exists():
-        contract_seeds.extend(engines_dir.glob("*.py"))
-    study_types_dir = repo_root / "research" / "study_types"
-    if study_types_dir.exists():
-        contract_seeds.extend(study_types_dir.glob("*.py"))
-
-    contract_closure_set, contract_unres = compute_ast_closure(contract_seeds, repo_root)
-    all_unresolved.extend(contract_unres)
-
-    # 5. Governance Graph Seeds
-    governance_seeds = [
-        repo_root / "scripts/preexec_audit_seal.py",
-        repo_root / "scripts/validate_smoke.py",
-        repo_root / "scripts/generate_oos_unlock.py",
-        repo_root / "scripts/resolve_execution_manifest.py",
-        repo_root / "scripts/causal_lint.py",
-        repo_root / "scripts/research_preflight.py",
-        repo_root / "scripts/check_research_decision_fidelity.py",
-        repo_root / "scripts/check_spec_fidelity.py",
-        repo_root / "scripts/check_artifact_schema.py",
-        repo_root / "scripts/check_model_binding.py",
-        repo_root / "scripts/run_preexec_audits.py",
-    ]
-    # RT2-B2: every script the preflight launches by subprocess, derived from the
-    # preflight's own source. A gate that decides a mandatory verdict is governance code
-    # whether it is reached by `import` or by `subprocess.run`.
-    governance_seeds.extend(discover_subprocess_gate_scripts(repo_root))
-
-    gov_closure_set, gov_unres = compute_ast_closure(governance_seeds, repo_root)
-    all_unresolved.extend(gov_unres)
-
-    # RT2-B2: static authority files. These are data, so no AST edge reaches them, but
-    # `check_feature_promotion.py` treats the lifecycle baseline as authoritative -- it is
-    # the grandfather set itself. A file that can change a mandatory verdict belongs in
-    # the composite.
-    governance_data_paths: Dict[str, Path] = {}
-    for rel in GOVERNANCE_AUTHORITY_DATA_FILES:
-        p = repo_root / rel
-        if p.exists():
-            governance_data_paths[f"repo:{rel}"] = p.resolve()
-
-    if all_unresolved and strict:
-        raise UnresolvedDependencyError(
-            f"UNRESOLVED_DEPENDENCIES: Found {len(all_unresolved)} unresolvable repo-local imports: {all_unresolved}"
+        runtime_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in runtime_closure_set])
+        contract_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in contract_closure_set])
+        gov_keys = sorted(
+            [f"repo:{p.relative_to(repo_root).as_posix()}" for p in gov_closure_set]
+            + list(governance_data_paths.keys())
         )
-
-    # 6. Build categorized file lists and compute hashes
-    file_hashes: Dict[str, str] = {}
-    combined_paths: Dict[str, Path] = {}
-
-    for k, p in study_files_map.items():
-        combined_paths[k] = p
-
-    for p in runtime_closure_set:
-        rel = p.relative_to(repo_root).as_posix()
-        combined_paths[f"repo:{rel}"] = p
-
-    for p in contract_closure_set:
-        rel = p.relative_to(repo_root).as_posix()
-        combined_paths[f"repo:{rel}"] = p
-
-    for p in gov_closure_set:
-        rel = p.relative_to(repo_root).as_posix()
-        combined_paths[f"repo:{rel}"] = p
-
-    for k, p in governance_data_paths.items():
-        combined_paths[k] = p
-
-    # Compute SHA-256 for all resolved files
-    for key in sorted(combined_paths.keys()):
-        p = combined_paths[key]
-        if not p.exists():
-            raise FileNotFoundError(f"Resolved execution dependency does not exist on disk: {p}")
-        file_hashes[key] = _hash_file(p)
-
-    runtime_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in runtime_closure_set])
-    contract_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in contract_closure_set])
-    gov_keys = sorted(
-        [f"repo:{p.relative_to(repo_root).as_posix()}" for p in gov_closure_set]
-        + list(governance_data_paths.keys())
-    )
-    study_keys = sorted(list(study_files_map.keys()))
-    tracker_keys = sorted([k for k in runtime_keys if "features/trackers" in k or "features/registry" in k])
+        study_keys = sorted(list(study_files_map.keys()))
+        tracker_keys = sorted([k for k in runtime_keys if "features/trackers" in k or "features/registry" in k])
+    finally:
+        Path.relative_to = original_relative_to
 
     composite_payload = json.dumps(file_hashes, sort_keys=True)
     composite_sha256 = hashlib.sha256(composite_payload.encode("utf-8")).hexdigest()
@@ -678,7 +815,6 @@ def resolve_execution_manifest(
         "file_hashes": file_hashes,
     }
 
-    Path.relative_to = original_relative_to
     return composite_sha256, file_hashes, manifest_data
 
 

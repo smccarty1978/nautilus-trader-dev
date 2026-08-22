@@ -10,7 +10,7 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
@@ -21,6 +21,71 @@ from backtests.nt_runtime.telemetry import TelemetrySnapshot
 
 
 CANDIDATE_KEY_COLUMNS = ["observation_ts", "regime_start_ns", "checkpoint_index"]
+
+# Single canonical output-interface contract (STRATEGY_OUTPUT_INTERFACE_MISSING). Named
+# here -- not in backtests/nt_runtime/modes/collect.py -- so a second consumer (READINESS
+# R6) can verify the same contract against a strategy instance without either reimplementing
+# the attribute list or importing the collect-mode orchestrator.
+CANDIDATES_INTERFACE_ATTRS = (
+    "get_candidates_dataframe", "get_candidates_df", "candidates_df", "candidates_dataframe",
+)
+OBSERVATIONS_INTERFACE_ATTRS = (
+    "get_observations_dataframe", "get_observations_df", "observations_df", "observations_dataframe",
+)
+
+
+def extract_strategy_dataframe(strat: Any, attr_names: Tuple[str, ...]) -> Tuple[pd.DataFrame, bool]:
+    """Extracts a collected surface from a strategy generically.
+
+    Returns whether any matching attribute/method was found at all, distinct from "found
+    but empty" -- a strategy with no output interface is unverifiable, not merely
+    unproductive.
+    """
+    for name in attr_names:
+        val = getattr(strat, name, None)
+        if val is not None:
+            if callable(val):
+                res = val()
+                if isinstance(res, pd.DataFrame):
+                    return res, True
+            elif isinstance(val, pd.DataFrame):
+                return val, True
+    return pd.DataFrame(), False
+
+
+def verify_strategy_output_interface(
+    strategy: Any, bars_loaded_total: int
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Fails closed rather than silently reporting zero activity: if bars genuinely
+    loaded but the strategy exposes no output interface at all, we cannot tell a
+    legitimately empty result apart from real processing that was never surfaced.
+
+    Returns (candidates_df, observations_df) extracted from the strategy. Raises
+    RuntimeError("STRATEGY_OUTPUT_INTERFACE_MISSING: ...") when bars loaded but an
+    interface is absent.
+    """
+    candidates_df, candidates_interface_found = extract_strategy_dataframe(
+        strategy, CANDIDATES_INTERFACE_ATTRS
+    )
+    observations_df, observations_interface_found = extract_strategy_dataframe(
+        strategy, OBSERVATIONS_INTERFACE_ATTRS
+    )
+
+    if bars_loaded_total > 0 and not candidates_interface_found:
+        raise RuntimeError(
+            f"STRATEGY_OUTPUT_INTERFACE_MISSING: {bars_loaded_total} bars were loaded into the "
+            f"engine but {type(strategy).__name__} implements none of "
+            f"{'/'.join(CANDIDATES_INTERFACE_ATTRS)}. Cannot verify whether the loaded bars "
+            f"were processed; refusing to report a candidates count."
+        )
+    if bars_loaded_total > 0 and not observations_interface_found:
+        raise RuntimeError(
+            f"STRATEGY_OUTPUT_INTERFACE_MISSING: {bars_loaded_total} bars were loaded into the "
+            f"engine but {type(strategy).__name__} implements none of "
+            f"{'/'.join(OBSERVATIONS_INTERFACE_ATTRS)}. Cannot verify whether the loaded bars "
+            f"were processed; refusing to report an observations count."
+        )
+    return candidates_df, observations_df
 
 
 def reconcile_candidate_dispositions(
@@ -49,19 +114,33 @@ def reconcile_candidate_dispositions(
         "findings": [],
     }
 
+    # D1: the full candidate key is required on both sides, at any row count -- including
+    # zero rows. A key derived from whichever columns happen to survive on both sides can
+    # silently narrow (even to an empty key set) instead of failing closed. This check runs
+    # before the n_cand == 0 branch below, so a malformed empty observations_df (missing
+    # the matching key contract) cannot reach the "0 candidates == 0 observations" identity
+    # by accident -- that identity is only valid once both schemas are proven sound.
+    missing_cand_key = [c for c in CANDIDATE_KEY_COLUMNS if c not in candidates_df.columns]
+    missing_obs_key = [c for c in CANDIDATE_KEY_COLUMNS if c not in observations_df.columns]
+    if missing_cand_key or missing_obs_key:
+        report["passed"] = False
+        if missing_cand_key:
+            report["findings"].append(
+                f"candidates dataframe missing required candidate key column(s): {missing_cand_key}"
+            )
+        if missing_obs_key:
+            report["findings"].append(
+                f"observations dataframe missing required matching key column(s): {missing_obs_key}"
+            )
+        return report
+
     if n_cand == 0:
         report["passed"] = n_obs == 0
         if n_obs:
             report["findings"].append("observations emitted with no candidates")
         return report
 
-    key_cols = [c for c in CANDIDATE_KEY_COLUMNS if c in candidates_df.columns
-                and c in observations_df.columns]
-    if not key_cols:
-        report["passed"] = False
-        report["findings"].append("no shared candidate key columns to reconcile on")
-        return report
-
+    key_cols = CANDIDATE_KEY_COLUMNS
     cand_keys = set(map(tuple, candidates_df[key_cols].itertuples(index=False, name=None)))
     obs_keys = list(map(tuple, observations_df[key_cols].itertuples(index=False, name=None)))
     obs_key_set = set(obs_keys)
@@ -99,6 +178,87 @@ def reconcile_candidate_dispositions(
     else:
         report["disposition_counts"] = None
 
+    return report
+
+
+def reconcile_population_funnel(
+    total_population_checkpoints: Optional[int],
+    declared_contract_exclusions_in_run: Optional[int],
+    implementation_only_exclusions: Optional[int],
+    candidates_emitted_raw: Optional[int],
+    candidates_raw_count: int,
+    candidates_persisted_count: int,
+) -> Optional[Dict[str, Any]]:
+    """Proves the collector's observed population funnel (D8) reconciles exactly.
+
+    Required identity::
+
+        total_population_checkpoints
+        == declared_contract_exclusions + implementation_only_exclusions + candidates_emitted
+
+    D8 defines total_population_checkpoints over every 5s-aligned checkpoint for which a
+    completed 1s bar was actually dispatched -- this includes the engine's pre-start
+    warmup window (see engine_builder.ExecutionMode.warmup_dispatched), which this
+    function's caller separately trims candidates_df/observations_df against
+    [start_dt, end_dt] for. A candidate emitted during warmup is still a real population
+    member: it did not fail a declared eligibility gate, it was excluded from the
+    persisted surface by the study's own declared collection-window contract. It is
+    therefore folded into declared_contract_exclusions (not silently dropped, and not
+    counted as a candidate the persisted output never contains) so the identity above
+    holds against the actual persisted row count (candidates_persisted_count), per
+    Packet E's exact-parity requirement.
+
+    Returns None when the strategy does not expose population-funnel telemetry
+    (total_population_checkpoints is None) -- there is nothing to reconcile, and this is
+    not a defect for the majority of strategies that predate this instrumentation.
+
+    Raises ValueError (hard fail, never a warning) if the observed counts are internally
+    inconsistent or the identity does not balance exactly.
+    """
+    if total_population_checkpoints is None:
+        return None
+
+    declared_contract_exclusions_in_run = declared_contract_exclusions_in_run or 0
+    implementation_only_exclusions = implementation_only_exclusions or 0
+    candidates_emitted_raw = candidates_emitted_raw or 0
+
+    if candidates_raw_count != candidates_emitted_raw:
+        raise ValueError(
+            f"POPULATION_FUNNEL_INCONSISTENT: strategy reported {candidates_emitted_raw} "
+            f"raw candidates emitted but the extracted candidates dataframe had "
+            f"{candidates_raw_count} rows before the collection-window filter."
+        )
+
+    candidates_outside_window = candidates_raw_count - candidates_persisted_count
+    if candidates_outside_window < 0:
+        raise ValueError(
+            "POPULATION_FUNNEL_INCONSISTENT: the collection-window filter produced more "
+            "candidate rows than it started with."
+        )
+
+    declared_contract_exclusions = declared_contract_exclusions_in_run + candidates_outside_window
+    reconciled_total = (
+        declared_contract_exclusions + implementation_only_exclusions + candidates_persisted_count
+    )
+    passed = reconciled_total == total_population_checkpoints
+
+    report: Dict[str, Any] = {
+        "total_population_checkpoints": total_population_checkpoints,
+        "declared_contract_exclusions": declared_contract_exclusions,
+        "declared_contract_exclusions_in_run": declared_contract_exclusions_in_run,
+        "candidates_outside_collection_window": candidates_outside_window,
+        "implementation_only_exclusions": implementation_only_exclusions,
+        "candidates_emitted": candidates_persisted_count,
+        "reconciliation_passed": passed,
+    }
+    if not passed:
+        raise ValueError(
+            f"POPULATION_FUNNEL_RECONCILIATION_FAILED: total_population_checkpoints="
+            f"{total_population_checkpoints} != declared_contract_exclusions("
+            f"{declared_contract_exclusions}) + implementation_only_exclusions("
+            f"{implementation_only_exclusions}) + candidates_emitted("
+            f"{candidates_persisted_count}) = {reconciled_total}"
+        )
     return report
 
 
@@ -222,6 +382,11 @@ class OutputManager:
         telemetry: TelemetrySnapshot,
     ) -> Dict[str, Any]:
         """Saves collection parquets, updates status and manifest."""
+        # Packet E: captured before the warmup-window filter below reassigns
+        # candidates_df, so reconcile_population_funnel can see how many raw candidates
+        # existed prior to that filter.
+        candidates_raw_count = len(candidates_df)
+
         # Filter out warmup candidates strictly before start_dt or after end_dt
         start_ns = int(self.data_plan.start_dt.value)
         end_ns = int(self.data_plan.end_dt.value)
@@ -244,21 +409,60 @@ class OutputManager:
             "regime_age_seconds", "close", "atr", "running_mfe_atr", "running_mae_atr",
             "current_pnl_atr", "new_progress_windows", "retained_mfe_ratio", "triggering_1s_ts_init",
         ]
-        allowed_columns = set(expected_feats) | set(declared_metadata)
 
-        # Check for duplicate column names
+        # D2: collection candidate universe != frozen model feature list. A study may
+        # declare features.source (e.g. "verified_registry_numeric_universe") to collect
+        # from a registry-defined candidate set BEFORE its later TRAIN-stage feature_list
+        # is frozen. Resolving that source is what makes those columns allowed at
+        # collection time; expected_feats (the frozen list) stays exactly as declared --
+        # empty here is not a defect, it is "not yet selected".
+        from features.registry import resolve_source_universe
+
+        collection_universe = resolve_source_universe(self.study_data.spec.features.source)
+
+        allowed_columns = set(expected_feats) | set(declared_metadata) | set(collection_universe)
+
+        # Check for duplicate column names. D1: this already ran unconditionally regardless
+        # of row count -- a duplicate column name is a schema defect, not a data defect --
+        # so zero rows was never a reason to skip it.
         if len(candidates_df.columns) != len(set(candidates_df.columns)):
             raise ValueError("DUPLICATE_OUTPUT_COLUMNS: Candidates dataframe has duplicate column names!")
+        if len(observations_df.columns) != len(set(observations_df.columns)):
+            raise ValueError("DUPLICATE_OUTPUT_COLUMNS: Observations dataframe has duplicate column names!")
 
         # Check for unexpected surplus columns
         extra_cols = set(candidates_df.columns) - allowed_columns
         if extra_cols:
             raise ValueError(f"UNEXPECTED_OUTPUT_COLUMN: candidates dataframe contains undeclared columns: {sorted(list(extra_cols))}")
 
-        # Check required metadata columns
+        # D1: required metadata columns must be present at ANY row count, including zero.
+        # `len(candidates_df) == 0` used to skip this check entirely, so an empty DataFrame
+        # with the wrong (or no) columns still filed as a valid governed output -- the
+        # schema check was vacuous exactly when it mattered most: a genuinely empty
+        # collection run.
         missing_meta = set(declared_metadata) - set(candidates_df.columns)
-        if missing_meta and not candidates_df.empty:
+        if missing_meta:
             raise ValueError(f"MISSING_OUTPUT_METADATA: candidates dataframe missing declared metadata columns: {sorted(list(missing_meta))}")
+
+        # D1: the full candidate key (research_decision-authoritative, D1.2) must be present
+        # on candidates regardless of `declared_metadata` contents -- a study whose declared
+        # metadata list omits a key column must not silently lose key enforcement.
+        missing_cand_key = [c for c in CANDIDATE_KEY_COLUMNS if c not in candidates_df.columns]
+        if missing_cand_key:
+            raise ValueError(
+                f"MISSING_CANDIDATE_KEY_COLUMN: candidates dataframe missing required candidate "
+                f"key column(s): {missing_cand_key}"
+            )
+
+        # D1.2: "The observation side must carry the required matching key contract as
+        # defined by the existing system" -- the existing system's matching key contract is
+        # CANDIDATE_KEY_COLUMNS, the same triple reconcile_candidate_dispositions joins on.
+        missing_obs_key = [c for c in CANDIDATE_KEY_COLUMNS if c not in observations_df.columns]
+        if missing_obs_key:
+            raise ValueError(
+                f"MISSING_OBSERVATION_KEY_COLUMN: observations dataframe missing required "
+                f"matching key column(s): {missing_obs_key}"
+            )
 
         # Strict feature parity validation against StudySpec
         if expected_feats:
@@ -279,13 +483,26 @@ class OutputManager:
         from scripts.check_feature_surface import validate_feature_surface
 
         surface_report = validate_feature_surface(
-            candidates_df, expected_feats, metadata_columns=declared_metadata
+            candidates_df, expected_feats, metadata_columns=declared_metadata,
+            collection_universe=collection_universe,
         )
 
         # Candidate/observation reconciliation (E). A candidate that quietly failed to
         # reach a terminal disposition used to vanish from the observation surface
         # entirely, which is future-conditioned selection rather than a missing row.
         reconciliation = reconcile_candidate_dispositions(candidates_df, observations_df)
+
+        # Population funnel (Packet E, D8). None when the strategy exposes no funnel
+        # telemetry; otherwise hard-fails closed (raises) rather than persisting a
+        # warning-only mismatch.
+        population_funnel = reconcile_population_funnel(
+            total_population_checkpoints=telemetry.population_total_checkpoints,
+            declared_contract_exclusions_in_run=telemetry.population_declared_contract_exclusions_in_run,
+            implementation_only_exclusions=telemetry.population_implementation_only_exclusions,
+            candidates_emitted_raw=telemetry.population_candidates_emitted_raw,
+            candidates_raw_count=candidates_raw_count,
+            candidates_persisted_count=len(candidates_df),
+        )
 
         cand_path = self.collection_dir / "candidates.parquet"
         obs_path = self.collection_dir / "observations.parquet"
@@ -309,6 +526,7 @@ class OutputManager:
             },
             "feature_surface_validation": surface_report.to_dict(),
             "candidate_disposition_reconciliation": reconciliation,
+            "population_funnel": population_funnel,
         }
         col_manifest_path = self.collection_dir / "collection_manifest.json"
         with open(col_manifest_path, "w", encoding="utf-8") as f:
@@ -329,6 +547,7 @@ class OutputManager:
             "status": run_status,
             "feature_surface_validation": surface_report.to_dict(),
             "candidate_disposition_reconciliation": reconciliation,
+            "population_funnel": population_funnel,
             "stage": self.run_plan.stage.value,
             "wall_time_seconds": round(telemetry.elapsed_seconds, 3),
             "total_bars_processed": telemetry.total_bars_processed,
@@ -366,6 +585,9 @@ class OutputManager:
             "status": "COMPLETED" if run_status == "SUCCESS" else "FAILED_VALIDATION",
             "feature_surface_passed": surface_report.passed,
             "candidate_reconciliation_passed": reconciliation["passed"],
+            "population_funnel_reconciliation_passed": (
+                population_funnel["reconciliation_passed"] if population_funnel else None
+            ),
             "telemetry": {
                 "wall_time_seconds": telemetry.elapsed_seconds,
                 "total_bars_processed": telemetry.total_bars_processed,

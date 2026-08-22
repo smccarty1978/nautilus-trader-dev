@@ -1,0 +1,30 @@
+{
+  "run_id": "20260822_052216_Codex_clean_maturity_flip_rolling_5m_productivity_day",
+  "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "cb1be4e6fe54459f250d69dd18a274d769e877396c45bd70bba30e17369ea580",
+  "composite_seal_hash": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+  "execution_manifest_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+  "stage": "day",
+  "dates": {
+    "start": "2023-10-02",
+    "end": "2023-10-02",
+    "warmup_start": "2023-09-27T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME",
+    "instrument_id": "NQ.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-22T05:22:16.246124+00:00",
+  "status": "FAILED",
+  "pid": 27108,
+  "error_type": "ValueError",
+  "error_message": "UNEXPECTED_OUTPUT_COLUMN: candidates dataframe contains undeclared columns: ['current_1m_move_outside_completed_5m_range', 'current_5m_directional_displacement_atr', 'current_5m_regime_age_min', 'current_5m_regime_range_atr', 'current_5m_regime_range_atr_per_min', 'distance_to_completed_5m_high_atr', 'distance_to_completed_5m_low_atr', 'prior_1m_regime_duration_min', 'prior_1m_regime_efficiency', 'prior_1m_regime_mfe_atr', 'prior_1m_regime_net_directional_move_atr', 'prior_1m_regime_net_move_atr_per_min', 'prior_1m_regime_range_atr', 'prior_1m_regime_range_atr_per_min', 'prior_5m_regime_duration_min', 'prior_5m_regime_efficiency', 'prior_5m_regime_mfe_atr', 'prior_5m_regime_net_directional_move_atr', 'prior_5m_regime_net_move_atr_per_min', 'prior_5m_regime_range_atr', 'prior_5m_regime_range_atr_per_min', 'regime_expansion_atr_per_min', 'rolling_5m_current_progress_atr', 'rolling_5m_current_speed_atr_per_min', 'rolling_5m_current_speed_vs_lifetime', 'rolling_5m_giveback_atr', 'rolling_5m_max_progress_atr', 'rolling_5m_max_speed_atr_per_min', 'rolling_5m_max_speed_vs_lifetime', 'rolling_5m_retention_ratio', 'structural_current_expansion_atr', 'structural_expansion_atr_per_min', 'structural_giveback_atr', 'structural_max_expansion_atr', 'structural_retention_ratio']",
+  "end_time_utc": "2026-08-22T05:27:13.303114+00:00"
+}

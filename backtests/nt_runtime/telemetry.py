@@ -29,6 +29,12 @@ class TelemetrySnapshot:
     callbacks_by_tf: Dict[str, int] = field(default_factory=dict)
     ts_event_ranges_by_tf: Dict[str, Dict[str, Optional[int]]] = field(default_factory=dict)
     ts_init_ranges_by_tf: Dict[str, Dict[str, Optional[int]]] = field(default_factory=dict)
+    # Population funnel (Packet E). None unless the strategy exposes
+    # get_population_funnel() -- most strategies predate this instrumentation.
+    population_total_checkpoints: Optional[int] = None
+    population_declared_contract_exclusions_in_run: Optional[int] = None
+    population_implementation_only_exclusions: Optional[int] = None
+    population_candidates_emitted_raw: Optional[int] = None
 
 
 class CausalTelemetry:
@@ -47,6 +53,12 @@ class CausalTelemetry:
         self.first_ts_init: Dict[str, Optional[int]] = {}
         self.last_ts_init: Dict[str, Optional[int]] = {}
         self.candidates_count: int = 0
+        # Population funnel (Packet E) -- set via record_population_funnel(), left None
+        # (not persisted / not reconciled) when the strategy does not expose one.
+        self.population_total_checkpoints: Optional[int] = None
+        self.population_declared_contract_exclusions_in_run: Optional[int] = None
+        self.population_implementation_only_exclusions: Optional[int] = None
+        self.population_candidates_emitted_raw: Optional[int] = None
 
     def start(self) -> None:
         tracemalloc.start()
@@ -76,6 +88,24 @@ class CausalTelemetry:
 
     def update(self, bars_increment: int = 0, candidates_increment: int = 0) -> None:
         self.candidates_count += candidates_increment
+
+    def record_population_funnel(
+        self,
+        *,
+        total_checkpoints: int,
+        declared_contract_exclusions: int,
+        implementation_only_exclusions: int,
+        candidates_emitted_raw: int,
+    ) -> None:
+        """Records the raw, whole-run population-funnel counters from a collector
+        that implements get_population_funnel() (Packet E). Left unset for any
+        strategy that does not expose one; the persistence path treats that as
+        "no funnel to reconcile", not a defect.
+        """
+        self.population_total_checkpoints = total_checkpoints
+        self.population_declared_contract_exclusions_in_run = declared_contract_exclusions
+        self.population_implementation_only_exclusions = implementation_only_exclusions
+        self.population_candidates_emitted_raw = candidates_emitted_raw
 
     def stop(self) -> TelemetrySnapshot:
         self.end_time = time.perf_counter()
@@ -113,4 +143,8 @@ class CausalTelemetry:
             callbacks_by_tf=self.callbacks_by_tf,
             ts_event_ranges_by_tf=ts_event_ranges,
             ts_init_ranges_by_tf=ts_init_ranges,
+            population_total_checkpoints=self.population_total_checkpoints,
+            population_declared_contract_exclusions_in_run=self.population_declared_contract_exclusions_in_run,
+            population_implementation_only_exclusions=self.population_implementation_only_exclusions,
+            population_candidates_emitted_raw=self.population_candidates_emitted_raw,
         )

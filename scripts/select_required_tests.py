@@ -2,20 +2,23 @@
 =================================
 
 Determines the minimal set of mandatory deterministic fast tests based on
-changed files in git diff.
+changed files in git diff, plus (Phase 1 Packet C) a study's own mandatory
+local tests whenever a study is being preflighted.
 
 Usage:
   python scripts/select_required_tests.py
   python scripts/select_required_tests.py --files file1.py file2.py
+  python scripts/select_required_tests.py --study studies/<name>
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Set
+from typing import Any, Dict, List, Optional, Set
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -58,11 +61,47 @@ def discover_all_framework_tests(repo_root: Optional[Path] = None) -> List[str]:
     return sorted([p.relative_to(repo_root).as_posix() for p in test_dir.glob("test_*.py")])
 
 
-def select_tests_for_files(files: List[str], repo_root: Optional[Path] = None) -> List[str]:
+def discover_study_tests(study_dir: Optional[Path], repo_root: Optional[Path] = None) -> List[str]:
+    """Discovers a study's own mandatory tests: studies/<study>/tests/test_*.py.
+
+    Phase 1 Packet C: the study-test surface was effectively zero inside the mandatory
+    selector -- `discover_all_framework_tests` only ever looked at `scripts/tests/`, so a
+    study's own local tests never entered the CAUSAL_INVARIANTS gate regardless of what
+    changed. Returns repo-relative POSIX paths when `study_dir` is under `repo_root` (the
+    normal governed case, matching the style of `discover_all_framework_tests`); falls
+    back to an absolute path string when the study lives outside the repo tree (e.g. a
+    `tmp_path`-copied study in a test fixture), so pytest can still locate the file either
+    way. Returns ``[]`` when no study is given or the study has no `tests/` directory --
+    this does not force every study to adopt a `tests/` directory.
+    """
+    if study_dir is None:
+        return []
+    study_dir = Path(study_dir)
+    if repo_root is None:
+        repo_root = REPO_ROOT
+    tests_dir = study_dir / "tests"
+    if not tests_dir.exists():
+        return []
+    result: List[str] = []
+    for p in sorted(tests_dir.glob("test_*.py")):
+        resolved = p.resolve()
+        try:
+            result.append(resolved.relative_to(repo_root.resolve()).as_posix())
+        except ValueError:
+            result.append(str(resolved))
+    return result
+
+
+def select_tests_for_files(
+    files: List[str],
+    repo_root: Optional[Path] = None,
+    study_dir: Optional[Path] = None,
+) -> List[str]:
     if repo_root is None:
         repo_root = REPO_ROOT
 
     all_tests = discover_all_framework_tests(repo_root)
+    study_tests = discover_study_tests(study_dir, repo_root)
     selected: Set[str] = set()
     unresolved = False
 
@@ -82,27 +121,37 @@ def select_tests_for_files(files: List[str], repo_root: Optional[Path] = None) -
         if not matched and f_norm.endswith(".py"):
             unresolved = True
 
-    # If unresolved changes, empty selection, or explicitly requested full suite, run all discovered tests
-    if unresolved or not selected:
-        return all_tests
+    # If unresolved changes, empty selection, or explicitly requested full suite, run all
+    # discovered framework tests (the existing fail-safe broad fallback, preserved as-is).
+    framework_selected = all_tests if (unresolved or not selected) else sorted(selected)
 
-    return sorted(list(selected))
+    # Packet C: a study's own tests are always part of the mandatory selected surface when
+    # preflighting that study -- not conditioned on the diff/mapping outcome above, and not
+    # lost inside the fallback branch either.
+    return sorted(set(framework_selected) | set(study_tests))
 
 
-def get_test_selection_report(files: List[str], repo_root: Optional[Path] = None) -> Dict[str, Any]:
+def get_test_selection_report(
+    files: List[str],
+    repo_root: Optional[Path] = None,
+    study_dir: Optional[Path] = None,
+) -> Dict[str, Any]:
     if repo_root is None:
         repo_root = REPO_ROOT
 
     all_tests = discover_all_framework_tests(repo_root)
-    selected_tests = select_tests_for_files(files, repo_root=repo_root)
-    coverage_pct = round(len(selected_tests) / len(all_tests) * 100.0, 2) if all_tests else 100.0
+    study_tests = discover_study_tests(study_dir, repo_root)
+    all_discoverable = sorted(set(all_tests) | set(study_tests))
+    selected_tests = select_tests_for_files(files, repo_root=repo_root, study_dir=study_dir)
+    coverage_pct = round(len(selected_tests) / len(all_discoverable) * 100.0, 2) if all_discoverable else 100.0
 
     return {
-        "test_files_discovered": len(all_tests),
+        "test_files_discovered": len(all_discoverable),
         "test_files_selected": len(selected_tests),
         "coverage_pct": coverage_pct,
         "selected_tests": selected_tests,
-        "all_tests": all_tests,
+        "all_tests": all_discoverable,
+        "study_tests_discovered": len(study_tests),
     }
 
 
@@ -111,14 +160,22 @@ def main() -> int:
     ap.add_argument("--files", nargs="*", help="Explicit list of changed files")
     ap.add_argument("--all", action="store_true", help="Select all discovered test files")
     ap.add_argument("--json", action="store_true", help="Print structured JSON output")
+    ap.add_argument(
+        "--study", type=str, default=None,
+        help="Study directory whose tests/test_*.py are always included in the mandatory selection",
+    )
     args = ap.parse_args()
 
+    study_dir = Path(args.study).resolve() if args.study else None
     files = args.files if args.files is not None else get_git_changed_files()
     if args.json:
-        report = get_test_selection_report([] if args.all else files)
+        report = get_test_selection_report([] if args.all else files, study_dir=study_dir)
         print(json.dumps(report, indent=2))
     else:
-        tests = discover_all_framework_tests() if args.all else select_tests_for_files(files)
+        if args.all:
+            tests = sorted(set(discover_all_framework_tests()) | set(discover_study_tests(study_dir)))
+        else:
+            tests = select_tests_for_files(files, study_dir=study_dir)
         for t in tests:
             print(t)
     return 0

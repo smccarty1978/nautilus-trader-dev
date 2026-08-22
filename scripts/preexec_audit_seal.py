@@ -272,9 +272,16 @@ def verify_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = None)
     if repo_root is None:
         repo_root = Path(__file__).resolve().parents[1]
 
-    # Verify frozen execution identity first!
+    # Verify frozen execution identity first! Mirrors generate_preexec_audit_seal's own
+    # handling of this same call: a deleted DatasetSpec authority (or any other closure
+    # file) raises FileNotFoundError/UnresolvedDependencyError from the resolver, not
+    # PreexecAuditStaleError, and that must still fail the seal closed rather than
+    # propagate an unrelated exception type.
     from scripts.resolve_execution_manifest import verify_frozen_execution_identity
-    verify_frozen_execution_identity(study_dir, repo_root)
+    try:
+        verify_frozen_execution_identity(study_dir, repo_root)
+    except Exception as err:
+        raise PreexecAuditStaleError(f"PREEXEC_AUDIT_STALE: {err}")
 
     seal_file = study_dir / "artifacts" / "preexec_audit_seal.json"
     if not seal_file.exists():
@@ -290,12 +297,38 @@ def verify_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = None)
     if not file_hashes:
         raise PreexecAuditStaleError(f"PREEXEC_AUDIT_STALE: Corrupt audit seal in {seal_file}")
 
+    # A composite key is a semantic identity, not a filesystem-relative path (W7/A1): a
+    # key like `study:dataset:<id>` names a DatasetSpec authority file that lives outside
+    # study_dir entirely. Resolve every execution-closure key through the same
+    # authoritative resolver `resolve_execution_manifest` itself uses, instead of
+    # reconstructing a path by splitting the key string -- that reconstruction is exactly
+    # what broke on the dataset-authority pseudo-scope.
+    from scripts.resolve_execution_manifest import resolve_execution_file_paths
+    try:
+        exec_paths, _ = resolve_execution_file_paths(study_dir, repo_root)
+    except Exception as err:
+        raise PreexecAuditStaleError(f"PREEXEC_AUDIT_STALE: {err}")
+
     for key, expected_hash in file_hashes.items():
-        scope, rel = key.split(":", 1)
-        if scope == "study":
-            fp = study_dir / rel
+        if key in exec_paths:
+            fp = exec_paths[key]
         else:
-            fp = repo_root / rel
+            # Seal-only additive entries (audit/status.json, audit/contract_status.json,
+            # audit/pass_*.md, audit/contract_pass_*.md) are stamped in by
+            # generate_preexec_audit_seal after the execution closure is computed, so they
+            # never appear in exec_paths. They are always literal `study:<relative-path>`
+            # keys with no further scope grammar -- unlike the dataset-authority key, the
+            # portion after the first colon IS the path.
+            scope, sep, rel = key.partition(":")
+            if scope == "study" and sep and rel:
+                fp = study_dir / rel
+            elif scope == "repo" and sep and rel:
+                fp = repo_root / rel
+            else:
+                raise PreexecAuditStaleError(
+                    f"PREEXEC_AUDIT_STALE: Unresolvable sealed entry key: {key!r} "
+                    f"(not part of the execution closure and not a recognised study:/repo: path)."
+                )
 
         if not fp.exists():
             raise PreexecAuditStaleError(f"PREEXEC_AUDIT_STALE: Sealed file missing from disk: {fp}")
@@ -303,7 +336,7 @@ def verify_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = None)
         current_hash = _hash_file(fp)
         if current_hash != expected_hash:
             raise PreexecAuditStaleError(
-                f"PREEXEC_AUDIT_STALE: File '{rel}' was modified after audit seal! "
+                f"PREEXEC_AUDIT_STALE: File '{key}' was modified after audit seal! "
                 f"(Sealed hash: {expected_hash[:12]}..., Current hash: {current_hash[:12]}...). "
                 f"Code changes require re-auditing and re-sealing."
             )

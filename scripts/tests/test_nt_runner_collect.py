@@ -84,7 +84,7 @@ def mock_study_dir():
                 "source_key": "F3_top25_gbt_v1",
                 "feature_list_sha256": "5e8b5cfd125b7b6dd030dba26126b57d51616014095e70cb8a357ebbf06e2cea",
                 "feature_list": ["rth_vol_cum", "rth_elapsed_seconds", "pct_levels_behind_trade"],
-                "metadata_columns": ["observation_ts", "close", "atr"],
+                "metadata_columns": ["observation_ts", "regime_start_ns", "checkpoint_index", "close", "atr"],
             },
             "chronology": {
                 "train": [2021, 2022, 2023, 2024],
@@ -240,10 +240,15 @@ def test_output_manager_persists_artifacts(mock_study_dir):
         mgr = OutputManager(study_data, data_plan, run_plan, output_base_dir=Path(tmp_out))
         assert (mgr.run_dir / "run_manifest.json").exists()
 
-        # Create dummy dataframes
+        # Create dummy dataframes. regime_start_ns/checkpoint_index are part of the
+        # authoritative candidate key (backtests.nt_runtime.output_manager.CANDIDATE_KEY_COLUMNS,
+        # Phase 1 D1.2) and must be present on both sides regardless of what a study's own
+        # declared metadata_columns happens to list.
         cands_df = pd.DataFrame([
             {
                 "observation_ts": 1740993000000000000,
+                "regime_start_ns": 1740992000000000000,
+                "checkpoint_index": 0,
                 "close": 21000.0,
                 "atr": 10.0,
                 "rth_vol_cum": 100.0,
@@ -252,7 +257,13 @@ def test_output_manager_persists_artifacts(mock_study_dir):
             }
         ])
         obs_df = pd.DataFrame([
-            {"observation_ts": 1740993000000000000, "flip_ts": 1740993120000000000, "target_flip_within_horizon": 1}
+            {
+                "observation_ts": 1740993000000000000,
+                "regime_start_ns": 1740992000000000000,
+                "checkpoint_index": 0,
+                "flip_ts": 1740993120000000000,
+                "target_flip_within_horizon": 1,
+            }
         ])
 
         telemetry = CausalTelemetry()
