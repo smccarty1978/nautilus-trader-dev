@@ -20,6 +20,8 @@ Checks (see ML_Trend_Analysis_Workflow_V2_Phase1_FINAL.md §8):
   R7  a synthetic candidate/observation fixture validated through the real OutputManager
   R8  the execution identity resolves twice with exact equality, no mutation
   R9  zero alternate (ungoverned) catalog openers under studies/<study>/**/*.py
+  R10 bounded real first-nonempty collector output parity against OutputManager's
+      collection-time feature contract
 
 Every check fails closed: a failure raises a specific, deterministic exception, which
 ``run_readiness`` converts into a ``passed: False`` result rather than a warning. A failed
@@ -33,6 +35,8 @@ artifact, and is not itself a second execution-identity authority.
 from __future__ import annotations
 
 import argparse
+import dataclasses
+import importlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -47,7 +51,9 @@ from backtests.nt_runtime.compiled_study_loader import CompiledStudyData, load_c
 from backtests.nt_runtime.data_plan import DataPlan, resolve_data_plan
 from backtests.nt_runtime.engine_builder import ExecutionMode, build_engine, create_futures_instrument
 from backtests.nt_runtime.modes.collect import build_collector_config_kwargs
-from backtests.nt_runtime.output_manager import OutputManager, verify_strategy_output_interface
+from backtests.nt_runtime.output_manager import (
+    OutputManager, resolve_collection_allowed_feature_aliases, verify_strategy_output_interface,
+)
 from backtests.nt_runtime.run_plan import RunPlan, resolve_run_plan
 from backtests.nt_runtime.strategy_binding import resolve_strategy_binding
 from backtests.nt_runtime.telemetry import CausalTelemetry
@@ -92,6 +98,14 @@ class IdentityInstabilityError(RuntimeError):
 
 class AlternateCatalogOpenerFound(RuntimeError):
     """ALTERNATE_CATALOG_OPENER_VIOLATION (R9)."""
+
+
+class RealNonemptyOutputParityFailed(RuntimeError):
+    """REAL_NONEMPTY_OUTPUT_PARITY (R10)."""
+
+
+class _ReadinessFirstCandidateComplete(RuntimeError):
+    """Private bounded-probe terminal signal; never persisted as a study result."""
 
 
 class ReadinessCheckFailed(RuntimeError):
@@ -460,6 +474,86 @@ def build_synthetic_schema_fixture(
 
 
 # ---------------------------------------------------------------------------
+# R10 -- bounded real productive first-nonempty collector parity
+# ---------------------------------------------------------------------------
+
+def evaluate_real_output_parity(candidates_df: pd.DataFrame, features_spec: Any) -> Dict[str, Any]:
+    """Compare a real emitted surface using OutputManager's exact allowed-alias rule."""
+    metadata = set(getattr(features_spec, "metadata_columns", None) or [])
+    emitted = sorted(set(candidates_df.columns) - metadata)
+    allowed = resolve_collection_allowed_feature_aliases(features_spec)
+    unexpected = sorted(set(emitted) - set(allowed))
+    if unexpected:
+        raise RealNonemptyOutputParityFailed(
+            f"REAL_NONEMPTY_OUTPUT_PARITY: emitted aliases outside OutputManager contract: {unexpected}"
+        )
+    return _result(True, "REAL_NONEMPTY_OUTPUT_PARITY", "first real non-empty candidate surface is contained in OutputManager's resolved collection universe",
+                   candidate_rows_observed=len(candidates_df), emitted_feature_count=len(emitted),
+                   resolved_universe_count=len(allowed), metadata_count=len(metadata),
+                   recognized_metadata_columns=sorted(metadata & set(candidates_df.columns)),
+                   unexpected_columns=[], emitted_features=emitted)
+
+
+def run_real_nonempty_output_parity(
+    study_data: CompiledStudyData, data_plan: DataPlan, *, log_level: str = "ERROR",
+) -> Dict[str, Any]:
+    """Run only until the first in-window non-empty real collector dataframe exists.
+
+    This is an integration gate, not a research run: its terminal signal interrupts the
+    same NT event loop used by collection before labels/results are persisted.  The
+    strategy's candidate conditions and timestamps are untouched.
+    """
+    spec = study_data.spec
+    binding_key = spec.execution.strategy_class or "flip_prediction_collector"
+    binding = resolve_strategy_binding(binding_key, study_type=spec.study.type, mode="collect")
+    # READINESS precedes FREEZE.  A collector with phase-zero authorization therefore
+    # receives a fresh, disposable manifest rather than overwriting the frozen study
+    # artifact.  This is a source-authentication input only; no result is persisted.
+    probe_study_data = study_data
+    if hasattr(binding.config_cls, "phase0_manifest_path"):
+        phase0_module_name = f"{binding.strategy_cls.__module__.rsplit('.', 1)[0]}.phase0"
+        phase0_module = importlib.import_module(phase0_module_name)
+        if not hasattr(phase0_module, "write_manifest"):
+            raise RealNonemptyOutputParityFailed(
+                f"REAL_NONEMPTY_OUTPUT_PARITY: {phase0_module_name} does not expose write_manifest"
+            )
+        work_study_dir = study_data.study_dir / "_work" / "real_nonempty_output_parity"
+        phase0_module.write_manifest(work_study_dir / "artifacts" / "phase0_source_manifest.json")
+        probe_study_data = dataclasses.replace(study_data, study_dir=work_study_dir)
+    cfg_kwargs = build_collector_config_kwargs(binding, spec, probe_study_data, data_plan)
+    in_scope_start_ns = int(data_plan.start_dt.value)
+    base_cls = binding.strategy_cls
+
+    class FirstInScopeCandidateProbe(base_cls):
+        def __init__(self, config):
+            super().__init__(config)
+            self.readiness_probe_completed = False
+
+        def _on_1s(self, bar):
+            super()._on_1s(bar)
+            if self.candidates_log and int(self.candidates_log[-1]["observation_ts"]) >= in_scope_start_ns:
+                self.readiness_probe_completed = True
+                raise _ReadinessFirstCandidateComplete("bounded readiness probe reached first in-window candidate")
+
+    probe = FirstInScopeCandidateProbe(binding.config_cls(**cfg_kwargs))
+    engine, _instrument = build_engine(data_plan, log_level=log_level, execution_mode=ExecutionMode.collector_default())
+    engine.add_strategy(probe)
+    try:
+        engine.run()
+    except _ReadinessFirstCandidateComplete:
+        # Some NT versions propagate strategy exceptions while others terminate the
+        # engine after recording them.  Both paths are bounded and inspected below.
+        pass
+    if not probe.readiness_probe_completed:
+        raise RealNonemptyOutputParityFailed(
+            "REAL_NONEMPTY_OUTPUT_PARITY: no in-window candidate was observed before the bounded engine window ended"
+        )
+    # The helper intentionally consumes the exact FeaturesSpec object OutputManager
+    # consumes; passing StudySpec here would silently erase source and metadata fields.
+    return evaluate_real_output_parity(probe.get_candidates_dataframe(), spec.features)
+
+
+# ---------------------------------------------------------------------------
 # R8 -- double identity resolution, no mutation
 # ---------------------------------------------------------------------------
 
@@ -562,8 +656,8 @@ def run_readiness(
         r1 = _result(False, type(exc).__name__, str(exc))
 
     if data_plan is None:
-        skip = _result(False, "R1_PREREQUISITE_FAILED", "R1 did not resolve a data plan; R2-R7 not attempted")
-        r2_1s = r2_1m = r2_5m = r3 = r4 = r5 = r6 = r7 = skip
+        skip = _result(False, "R1_PREREQUISITE_FAILED", "R1 did not resolve a data plan; R2-R7/R10 not attempted")
+        r2_1s = r2_1m = r2_5m = r3 = r4 = r5 = r6 = r7 = r10 = skip
     else:
         bars_1s: List[Any] = []
         bars_1m: List[Any] = []
@@ -623,6 +717,11 @@ def run_readiness(
         except Exception as exc:
             r7 = _result(False, type(exc).__name__, str(exc))
 
+        try:
+            r10 = run_real_nonempty_output_parity(study_data, data_plan, log_level=log_level)
+        except Exception as exc:
+            r10 = _result(False, type(exc).__name__, str(exc))
+
     try:
         r8 = verify_identity_double_resolution(study_path, repo_root)
     except Exception as exc:
@@ -645,6 +744,7 @@ def run_readiness(
         "r7_synthetic_schema": r7,
         "r8_double_identity": r8,
         "r9_alternate_opener": r9,
+        "r10_real_nonempty_output_parity": r10,
     }
     overall_status = "PASS" if all(c["passed"] for c in checks.values()) else "BLOCKED"
 
@@ -682,6 +782,7 @@ def main() -> int:
             "r1_dataset_identity", "r2_1s_timestamp", "r2_1m_timestamp", "r2_derived_5m",
             "r3_instrument_precision", "r4_callback_order", "r5_real_collector",
             "r6_output_interface", "r7_synthetic_schema", "r8_double_identity", "r9_alternate_opener",
+            "r10_real_nonempty_output_parity",
         ):
             check = result[name]
             print(f"  {name}: {'PASS' if check['passed'] else 'FAIL'} - {check['detail']}")

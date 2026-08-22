@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Set
+from typing import Any, Dict, List, Mapping, Optional, Tuple, Set
+import re
+import hashlib
 import warnings
 
 @dataclass
@@ -31,6 +33,43 @@ class FeatureDefinition:
     window: Optional[float] = None
     window_unit: Optional[str] = None  # bars|seconds|minutes|events|session|since_signal|since_regime_flip
     reset_policy: str = "none"  # e.g. event_start, session_boundary, none
+    # V2 additions.  Legacy physical entries leave these empty; canonical definitions
+    # declare their supported instance parameters here.  This deliberately extends the
+    # existing registry record rather than creating a parallel metadata authority.
+    parameter_schema: Tuple[str, ...] = ()
+    supported_bar_states: Tuple[str, ...] = ("completed",)
+    supported_timeframes: Tuple[str, ...] = ()
+    temporal_identity_exception: bool = False
+    coverage_family: str = ""
+
+
+class FeatureInstanceError(ValueError):
+    """Fail-closed instance/configuration error."""
+
+
+_DURATION_RE = re.compile(r"^(?P<value>[1-9][0-9]*)(?P<unit>s|m)$")
+_TEMPORAL_NAME_RE = re.compile(r"(?:^|_)[0-9]+(?:s|m)(?:_|$)|(?:^|_)rolling_[0-9]+(?:s|m)(?:_|$)")
+
+
+@dataclass(frozen=True)
+class FeatureInstance:
+    """A study-local request for one canonical definition.
+
+    Instances are intentionally not a registry and have no lifecycle state.  The
+    physical alias is an output-compatibility name, while verification remains on the
+    canonical FeatureDefinition.
+    """
+    canonical_name: str
+    parameters: Mapping[str, Any] = field(default_factory=dict)
+    physical_alias: Optional[str] = None
+
+
+def _duration_seconds(value: str) -> int:
+    match = _DURATION_RE.fullmatch(value)
+    if not match:
+        raise FeatureInstanceError(f"INVALID_TEMPORAL_PARAMETER: {value!r}; expected '<positive>s' or '<positive>m'")
+    number = int(match.group("value"))
+    return number * (60 if match.group("unit") == "m" else 1)
 
 # Centralized canonical registry
 FEATURE_REGISTRY: Dict[str, FeatureDefinition] = {
@@ -636,6 +675,11 @@ for _K in (3, 5, 8, 12):
 # declared by the collector; the registry records update ownership and formulas.
 _STRUCTURAL_IMPL = 'features.trackers.structural_regime_geometry.StructuralRegimeGeometryTracker'
 _STRUCTURAL_TESTS = ('studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py',)
+# Declared here as well as consumed by the legacy physical-alias loop below so V2
+# canonical definitions can be constructed before that loop.  They intentionally name
+# the existing provider and test surface; no formula is moved or duplicated.
+_ROLLING_PRODUCTIVITY_IMPL = 'features.trackers.rolling_5m_productivity.Rolling5mProductivityTracker'
+_ROLLING_PRODUCTIVITY_TESTS = ('studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py',)
 for _col in (
     'structural_max_expansion_atr', 'structural_current_expansion_atr',
     'structural_giveback_atr', 'structural_retention_ratio',
@@ -660,6 +704,259 @@ for _col in (
         normalizer='study_contract', window_unit='since_regime_flip',
         reset_policy='event_start', null_policy='allow',
     )
+
+
+# ---------------------------------------------------------------------------
+# Feature System V2 -- canonical building blocks for the first two migrated
+# families.  FEATURE_REGISTRY remains the compatibility registry of physical
+# output aliases; these definitions are the one lifecycle/promotion authority.
+# ---------------------------------------------------------------------------
+_CANONICAL_PROMOTIONS_PATH = __import__("pathlib").Path(__file__).with_name("feature_definition_promotions.json")
+
+
+def _canonical_definition(
+    name: str, *, family: str, implementation: str, tests: Tuple[str, ...],
+    parameters: Tuple[str, ...], source_timeframe: str, update_anchor: str,
+    normalizer: str, window_unit: Optional[str], reset_policy: str,
+    null_policy: str = "allow", supported_timeframes: Tuple[str, ...] = (),
+) -> FeatureDefinition:
+    return FeatureDefinition(
+        name=name, status="provisional", family=family, implementation=implementation,
+        tests=tests, source_timeframe=source_timeframe, update_anchor=update_anchor,
+        normalizer=normalizer, window_unit=window_unit, reset_policy=reset_policy,
+        null_policy=null_policy, parameter_schema=parameters, coverage_family=family,
+        supported_timeframes=supported_timeframes,
+    )
+
+
+CANONICAL_FEATURE_DEFINITIONS: Dict[str, FeatureDefinition] = {}
+for _name in (
+    "regime_duration_min", "regime_range_atr", "regime_net_directional_move_atr",
+    "regime_mfe_atr", "regime_range_atr_per_min", "regime_net_move_atr_per_min",
+    "regime_efficiency", "regime_age_min", "regime_directional_displacement_atr",
+    "distance_to_completed_range_high_atr", "distance_to_completed_range_low_atr",
+    "move_outside_completed_range", "structural_max_expansion_atr",
+    "structural_current_expansion_atr", "structural_giveback_atr",
+    "structural_retention_ratio", "structural_expansion_atr_per_min",
+    "regime_expansion_atr_per_min",
+):
+    _params = ("timeframe", "context", "regime", "bar_state")
+    if _name.startswith("distance_to_completed_range"):
+        _params = ("reference_timeframe", "bar_state")
+    elif _name == "move_outside_completed_range":
+        _params = ("source_timeframe", "reference_timeframe", "context", "source_bar_state", "reference_bar_state")
+    elif _name.startswith("structural_") or _name == "regime_expansion_atr_per_min":
+        _params = ("context",)
+    CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
+        _name, family="structural_regime_geometry", implementation=_STRUCTURAL_IMPL,
+        tests=_STRUCTURAL_TESTS, parameters=_params, source_timeframe="1s+1m+5m",
+        update_anchor="completed_1s_completed_5m_then_1m_flip",
+        normalizer="study_contract", window_unit="since_regime_flip", reset_policy="event_start",
+        supported_timeframes=("1m", "5m"),
+    )
+
+for _name in (
+    "rolling_max_progress_atr", "rolling_current_progress_atr", "rolling_giveback_atr",
+    "rolling_retention_ratio", "rolling_max_speed_atr_per_min",
+    "rolling_current_speed_atr_per_min", "rolling_max_speed_vs_lifetime",
+    "rolling_current_speed_vs_lifetime",
+):
+    CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
+        _name, family="rolling_productivity", implementation=_ROLLING_PRODUCTIVITY_IMPL,
+        tests=_ROLLING_PRODUCTIVITY_TESTS, parameters=("window", "update_every"),
+        source_timeframe="1s", update_anchor="completed_1s_at_or_before_checkpoint",
+        normalizer="current_1m_regime_start_atr", window_unit="seconds", reset_policy="none",
+    )
+
+
+# The 35 existing physical aliases are deliberately a small compatibility map, not an
+# instance registry.  New aliases are generated deterministically below; these preserve
+# historical parquet/model contracts whose legacy spelling uses 5m for a 300s window.
+LEGACY_FEATURE_INSTANCE_OVERRIDES: Dict[str, FeatureInstance] = {}
+for _metric in (
+    "duration_min", "range_atr", "net_directional_move_atr", "mfe_atr",
+    "range_atr_per_min", "net_move_atr_per_min", "efficiency",
+):
+    for _tf in ("1m", "5m"):
+        _alias = f"prior_{_tf}_regime_{_metric}"
+        LEGACY_FEATURE_INSTANCE_OVERRIDES[_alias] = FeatureInstance(
+            f"regime_{_metric}", {"timeframe": _tf, "context": "prior", "bar_state": "completed"}, _alias,
+        )
+LEGACY_FEATURE_INSTANCE_OVERRIDES.update({
+    "current_5m_regime_age_min": FeatureInstance("regime_age_min", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
+    "current_5m_regime_range_atr": FeatureInstance("regime_range_atr", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
+    "current_5m_directional_displacement_atr": FeatureInstance("regime_directional_displacement_atr", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
+    "current_5m_regime_range_atr_per_min": FeatureInstance("regime_range_atr_per_min", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
+    "distance_to_completed_5m_high_atr": FeatureInstance("distance_to_completed_range_high_atr", {"reference_timeframe": "5m", "bar_state": "completed"}),
+    "distance_to_completed_5m_low_atr": FeatureInstance("distance_to_completed_range_low_atr", {"reference_timeframe": "5m", "bar_state": "completed"}),
+    "current_1m_move_outside_completed_5m_range": FeatureInstance("move_outside_completed_range", {"source_timeframe": "1m", "reference_timeframe": "5m", "context": "current", "source_bar_state": "completed", "reference_bar_state": "completed"}),
+})
+for _name in (
+    "structural_max_expansion_atr", "structural_current_expansion_atr",
+    "structural_giveback_atr", "structural_retention_ratio",
+    "structural_expansion_atr_per_min", "regime_expansion_atr_per_min",
+):
+    LEGACY_FEATURE_INSTANCE_OVERRIDES[_name] = FeatureInstance(_name, {"context": "current"}, _name)
+for _suffix in (
+    "max_progress_atr", "current_progress_atr", "giveback_atr", "retention_ratio",
+    "max_speed_atr_per_min", "current_speed_atr_per_min", "max_speed_vs_lifetime",
+    "current_speed_vs_lifetime",
+):
+    _alias = f"rolling_5m_{_suffix}"
+    LEGACY_FEATURE_INSTANCE_OVERRIDES[_alias] = FeatureInstance(
+        f"rolling_{_suffix}", {"window": "300s", "update_every": "1s"}, _alias,
+    )
+
+
+def canonical_definition_status(name: str) -> str:
+    """Effective V2 lifecycle status backed by a generated promotion record."""
+    definition = CANONICAL_FEATURE_DEFINITIONS[name]
+    if definition.status == "verified":
+        return "verified"
+    try:
+        import json
+        records = json.loads(_CANONICAL_PROMOTIONS_PATH.read_text(encoding="utf-8")).get("promotions", [])
+    except (OSError, ValueError):
+        return definition.status
+    record = next((item for item in records if isinstance(item, dict) and item.get("feature") == name), None)
+    if record is None:
+        return definition.status
+    module = definition.implementation.rsplit(".", 1)[0]
+    implementation_path = __import__("pathlib").Path(__file__).resolve().parents[1].joinpath(*module.split(".")).with_suffix(".py")
+    try:
+        implementation_hash = hashlib.sha256(implementation_path.read_bytes()).hexdigest()
+    except OSError:
+        return definition.status
+    audit_path = __import__("pathlib").Path(__file__).resolve().parents[1] / str(record.get("causal_audit_artifact", ""))
+    if (not audit_path.is_file() or not record.get("audited_execution_composite_sha256")
+            or not record.get("promoted_by")
+            or record.get("reviewed_implementation_sha256") != implementation_hash
+            or list(record.get("supported_parameter_schema", ())) != list(definition.parameter_schema)):
+        return definition.status
+    return "verified"
+
+
+def validate_feature_instance(instance: FeatureInstance) -> Dict[str, Any]:
+    """Validate a canonical instance and return normalized parameters.
+
+    The raw parameter membership check is important: a 1m request updated every second
+    without an explicit bar_state is ambiguous, rather than silently becoming a completed
+    bar request.
+    """
+    if instance.canonical_name not in CANONICAL_FEATURE_DEFINITIONS:
+        raise FeatureInstanceError(f"UNKNOWN_CANONICAL_FEATURE: {instance.canonical_name!r}")
+    definition = CANONICAL_FEATURE_DEFINITIONS[instance.canonical_name]
+    params = dict(instance.parameters)
+    if "timeframe" in params and "update_every" in params and "bar_state" not in params:
+        raise FeatureInstanceError("AMBIGUOUS_TEMPORAL_SEMANTICS: timeframe plus update_every requires bar_state=forming, or declare a rolling window")
+    # Reject an unimplemented temporal state before reporting incidental
+    # parameter membership.  This keeps the causal contract diagnostic exact.
+    requested_bar_state = params.get("bar_state")
+    if requested_bar_state is not None and requested_bar_state not in definition.supported_bar_states:
+        raise FeatureInstanceError(
+            f"FORMING_BAR_UNSUPPORTED: {instance.canonical_name} supports "
+            f"{list(definition.supported_bar_states)} bar states only"
+        )
+    unknown = sorted(set(params) - set(definition.parameter_schema))
+    if unknown:
+        raise FeatureInstanceError(f"UNKNOWN_FEATURE_PARAMETER: {instance.canonical_name}: {unknown}")
+    if "timeframe" in params:
+        _duration_seconds(str(params["timeframe"]))
+        if definition.supported_timeframes and params["timeframe"] not in definition.supported_timeframes:
+            raise FeatureInstanceError(
+                f"UNSUPPORTED_TIMEFRAME_PARAMETER: {instance.canonical_name} supports "
+                f"{list(definition.supported_timeframes)}, not {params['timeframe']!r}"
+            )
+        params.setdefault("bar_state", "completed")
+        if params["bar_state"] not in {"completed", "forming"}:
+            raise FeatureInstanceError("INVALID_BAR_STATE: expected 'completed' or 'forming'")
+        if params["bar_state"] == "forming":
+            if "update_every" not in params:
+                raise FeatureInstanceError("FORMING_BAR_UPDATE_REQUIRED: forming calendar bars require update_every")
+            if _duration_seconds(str(params["update_every"])) > _duration_seconds(str(params["timeframe"])):
+                raise FeatureInstanceError("FORMING_BAR_UPDATE_INVALID: update_every cannot exceed timeframe")
+        elif "update_every" in params:
+            raise FeatureInstanceError("COMPLETED_BAR_UPDATE_FREQUENCY_INVALID: completed calendar bars update only on completion")
+    if "window" in params:
+        if "timeframe" in params:
+            raise FeatureInstanceError("AMBIGUOUS_TEMPORAL_SEMANTICS: use either calendar timeframe or rolling window")
+        _duration_seconds(str(params["window"]))
+        if "update_every" not in params:
+            raise FeatureInstanceError("ROLLING_WINDOW_UPDATE_REQUIRED: rolling windows require update_every")
+        _duration_seconds(str(params["update_every"]))
+    for key in ("source_timeframe", "reference_timeframe"):
+        if key in params:
+            _duration_seconds(str(params[key]))
+    return params
+
+
+def generate_physical_alias(instance: FeatureInstance) -> str:
+    """Deterministically render a V2 instance, retaining explicit legacy aliases."""
+    params = validate_feature_instance(instance)
+    if instance.physical_alias:
+        return instance.physical_alias
+    name = instance.canonical_name
+    if name.startswith("regime_") and "timeframe" in params:
+        prefix = f"{params.get('context', 'current')}_{params['timeframe']}_"
+        return f"{prefix}{name}"
+    if name.startswith("rolling_") and "window" in params:
+        return f"rolling_{params['window']}_{name[len('rolling_'):]}"
+    if name.startswith("distance_to_completed_range_"):
+        return f"distance_to_completed_{params['reference_timeframe']}_{name[len('distance_to_completed_range_'):]}"
+    if name == "move_outside_completed_range":
+        return f"{params.get('context', 'current')}_{params['source_timeframe']}_move_outside_completed_{params['reference_timeframe']}_range"
+    return name
+
+
+def derive_instance_input_requirements(instance: FeatureInstance) -> Dict[str, Any]:
+    """Describe the runtime streams/availability contract derived from an instance."""
+    params = validate_feature_instance(instance)
+    definition = CANONICAL_FEATURE_DEFINITIONS[instance.canonical_name]
+    if params.get("bar_state") == "forming":
+        return {"provider": definition.implementation, "required_streams": ["completed_1s"],
+                "calendar_timeframe": params["timeframe"], "bar_state": "forming",
+                "update_every": params["update_every"]}
+    if "window" in params:
+        return {"provider": definition.implementation, "required_streams": ["completed_1s"],
+                "window_type": "rolling", "window": params["window"], "update_every": params["update_every"]}
+    return {"provider": definition.implementation, "required_streams": [f"completed_{params.get('timeframe', definition.source_timeframe)}"],
+            "bar_state": params.get("bar_state", "completed")}
+
+
+def resolve_feature_instances(source: Optional[str], instances: Optional[Tuple[FeatureInstance, ...]] = None) -> List[Dict[str, Any]]:
+    """The single collection-time resolver used by compiler, phase0, runtime and output.
+
+    Without explicit instances it returns the declared verified physical universe,
+    including verified canonical definitions rendered through their compatibility aliases.
+    """
+    if not source:
+        return []
+    if source != "verified_registry_numeric_universe":
+        raise ValueError(f"UNKNOWN_FEATURE_SOURCE: '{source}' is not a recognized features.source value")
+    resolved: List[Dict[str, Any]] = []
+    if instances is not None:
+        for instance in instances:
+            params = validate_feature_instance(instance)
+            definition = CANONICAL_FEATURE_DEFINITIONS[instance.canonical_name]
+            if canonical_definition_status(instance.canonical_name) != "verified":
+                raise FeatureInstanceError(f"UNVERIFIED_CANONICAL_FEATURE: {instance.canonical_name}")
+            resolved.append({"canonical_name": instance.canonical_name, "parameters": params,
+                             "physical_alias": generate_physical_alias(instance), "provider": definition.implementation,
+                             "status": "verified", "causal_input_requirements": definition.update_anchor})
+        return sorted(resolved, key=lambda item: item["physical_alias"])
+    for name, definition in FEATURE_REGISTRY.items():
+        if definition.status == "verified" and definition.dtype in _NUMERIC_DTYPES and definition.implementation.startswith("features."):
+            resolved.append({"canonical_name": name, "parameters": {}, "physical_alias": name,
+                             "provider": definition.implementation, "status": "verified",
+                             "causal_input_requirements": definition.update_anchor})
+    for alias, instance in LEGACY_FEATURE_INSTANCE_OVERRIDES.items():
+        canonical = instance.canonical_name
+        if canonical_definition_status(canonical) == "verified":
+            definition = CANONICAL_FEATURE_DEFINITIONS[canonical]
+            resolved.append({"canonical_name": canonical, "parameters": validate_feature_instance(instance),
+                             "physical_alias": alias, "provider": definition.implementation, "status": "verified",
+                             "causal_input_requirements": definition.update_anchor})
+    return sorted(resolved, key=lambda item: item["physical_alias"])
 
 # Study-owned rolling productivity.  It is provisional until this study's
 # pre-execution and completion audits, deterministic boundary tests, and NT
@@ -732,18 +1029,21 @@ def resolve_source_universe(source: Optional[str]) -> List[str]:
     declared a collection-time source is unaffected, not an error. An explicitly set but
     unrecognized `source` string fails closed rather than silently resolving to nothing.
     """
-    if not source:
-        return []
-    if source == "verified_registry_numeric_universe":
-        return sorted(
-            name for name, definition in FEATURE_REGISTRY.items()
-            if definition.status == "verified"
-            and definition.dtype in _NUMERIC_DTYPES
-            and definition.implementation.startswith("features.")
+    return [item["physical_alias"] for item in resolve_feature_instances(source)]
+
+
+def validate_canonical_feature_name(definition: FeatureDefinition) -> None:
+    """Reject temporal instance tokens in new canonical names unless documented.
+
+    Existing physical FEATURE_REGISTRY aliases predate V2 and are intentionally not
+    subjected to this rule.  New canonical definitions must keep time/window/context
+    in FeatureInstance.parameters, with an explicit exception for a genuinely intrinsic
+    temporal formula.
+    """
+    if _TEMPORAL_NAME_RE.search(definition.name) and not definition.temporal_identity_exception:
+        raise FeatureInstanceError(
+            f"FEATURE_NAME_EMBEDS_TEMPORAL_INSTANCE: {definition.name!r}; move timeframe/window to FeatureInstance parameters or document temporal_identity_exception"
         )
-    raise ValueError(
-        f"UNKNOWN_FEATURE_SOURCE: '{source}' is not a recognized features.source value"
-    )
 
 
 # ---------------------------------------------------------------------------

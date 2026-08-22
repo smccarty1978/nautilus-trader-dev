@@ -65,6 +65,14 @@ def compile_study(study_path: Path) -> int:
         compiled_json_path = study_path / "compiled_study.json"
         with open(compiled_json_path, "w", encoding="utf-8") as f:
             json.dump(compiled_data, f, indent=2)
+        # This is derived authority, never a hand-maintained study artifact.  The
+        # compiler is the only place that already has the validated StudySpec and
+        # its mode-partitioned deliverables contract in hand.
+        config_dir = study_path / "config"
+        config_dir.mkdir(exist_ok=True)
+        deliverables_path = config_dir / "deliverables_contract.json"
+        with open(deliverables_path, "w", encoding="utf-8") as f:
+            json.dump(result.contracts["deliverables_contract"], f, indent=2)
 
     print(result.summary_card)
     return 0

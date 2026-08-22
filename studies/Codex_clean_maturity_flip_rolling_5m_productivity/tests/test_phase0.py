@@ -1,6 +1,6 @@
 import pytest
 
-from features.registry import FEATURE_REGISTRY
+from features.registry import FEATURE_REGISTRY, LEGACY_FEATURE_INSTANCE_OVERRIDES, canonical_definition_status
 from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation import phase0
 from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.execution import authorize_stage
 
@@ -13,7 +13,11 @@ def test_phase0_authenticates_actual_config_and_clean_registry_inventory():
     assert manifest["candidate_count"] >= 25
     assert manifest["study_yaml_sha256"]
     assert manifest["collection_input_allowlist"]["years"] == [2021, 2022, 2023, 2024]
-    assert all(FEATURE_REGISTRY[name].status == "verified" for name in manifest["candidate_features"])
+    assert all(
+        canonical_definition_status(LEGACY_FEATURE_INSTANCE_OVERRIDES[name].canonical_name) == "verified"
+        if name in LEGACY_FEATURE_INSTANCE_OVERRIDES else FEATURE_REGISTRY[name].status == "verified"
+        for name in manifest["candidate_features"]
+    )
 
 
 def test_phase0_rejects_noncentral_implementation(monkeypatch):

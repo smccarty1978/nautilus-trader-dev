@@ -35,11 +35,13 @@ from backtests.nt_runtime.readiness import (
     IdentityInstabilityError,
     InstrumentPrecisionMismatch,
     OutputSchemaContractFailed,
+    RealNonemptyOutputParityFailed,
     RealCollectorInstantiationFailed,
     TimestampContractViolation,
     assert_callback_order_or_raise,
     build_synthetic_schema_fixture,
     check_r1_dataset_identity,
+    evaluate_real_output_parity,
     instantiate_real_collector,
     persist_readiness_artifact,
     run_readiness,
@@ -389,7 +391,30 @@ def test_r9_injected_alternate_catalog_opener_fails(tmp_path: Path):
 
 
 # =============================================================================
-# 18 -- readiness artifact is persisted
+# 18 -- R10 real-output parity shares the OutputManager contract
+# =============================================================================
+
+def test_r10_parity_reports_real_surface_counts_and_catches_injected_bad_alias():
+    from features.registry import resolve_source_universe
+    study_data = load_compiled_study(CLEAN_FLIP_STUDY)
+    features = study_data.spec.features  # exact FeaturesSpec consumed by OutputManager
+    aliases = resolve_source_universe(features.source)
+    row = {name: 1.0 for name in aliases}
+    row.update({name: 0 for name in features.metadata_columns})
+    passing = evaluate_real_output_parity(pd.DataFrame([row]), features)
+    assert passing["passed"] and passing["unexpected_columns"] == []
+    assert passing["emitted_feature_count"] == len(aliases) == 532
+    assert passing["resolved_universe_count"] == len(aliases) == 532
+    assert passing["metadata_count"] == len(features.metadata_columns) == 7
+    assert set(passing["recognized_metadata_columns"]) == set(features.metadata_columns)
+    with pytest.raises(RealNonemptyOutputParityFailed, match="injected_bad_feature"):
+        evaluate_real_output_parity(pd.DataFrame([{**row, "injected_bad_feature": 1.0}]), features)
+    with pytest.raises(RealNonemptyOutputParityFailed, match="undeclared_metadata_like"):
+        evaluate_real_output_parity(pd.DataFrame([{**row, "undeclared_metadata_like": 1.0}]), features)
+
+
+# =============================================================================
+# 19 -- readiness artifact is persisted
 # =============================================================================
 
 def test_readiness_artifact_is_persisted(tmp_path: Path):

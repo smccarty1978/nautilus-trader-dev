@@ -34,6 +34,14 @@ OBSERVATIONS_INTERFACE_ATTRS = (
 )
 
 
+def resolve_collection_allowed_feature_aliases(features_spec: Any) -> List[str]:
+    """Shared collection contract surface for persistence and productive READINESS."""
+    from features.registry import resolve_source_universe
+    source = getattr(features_spec, "source", None)
+    feature_list = getattr(features_spec, "feature_list", None) or []
+    return sorted(set(feature_list) | set(resolve_source_universe(source)))
+
+
 def extract_strategy_dataframe(strat: Any, attr_names: Tuple[str, ...]) -> Tuple[pd.DataFrame, bool]:
     """Extracts a collected surface from a strategy generically.
 
@@ -416,9 +424,7 @@ class OutputManager:
         # is frozen. Resolving that source is what makes those columns allowed at
         # collection time; expected_feats (the frozen list) stays exactly as declared --
         # empty here is not a defect, it is "not yet selected".
-        from features.registry import resolve_source_universe
-
-        collection_universe = resolve_source_universe(self.study_data.spec.features.source)
+        collection_universe = resolve_collection_allowed_feature_aliases(self.study_data.spec.features)
 
         allowed_columns = set(expected_feats) | set(declared_metadata) | set(collection_universe)
 

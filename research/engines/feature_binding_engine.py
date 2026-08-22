@@ -59,15 +59,13 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
     # Handle unselected candidate universe mode (e.g. verified_registry_numeric_universe)
     if features_spec.selection and features_spec.selection.mode == "train_only" and not features_spec.feature_list:
         try:
-            from features.registry import FEATURE_REGISTRY
+            from features.registry import resolve_source_universe
         except ImportError as e:
             raise FeatureBindingError(f"Unable to import features.registry: {e}")
 
-        # Catalog verified numeric features from registry
-        verified_feats = [
-            k for k, v in sorted(FEATURE_REGISTRY.items())
-            if v.status == "verified" and v.dtype in ("float64", "int64", "float32", "int32")
-        ]
+        # One canonical resolver; compiler must not recreate a local status/dtype/
+        # implementation predicate that can drift from runtime collection.
+        verified_feats = resolve_source_universe(features_spec.selection.source)
         return {
             "source_universe": features_spec.selection.source,
             "selection_mode": "train_only",

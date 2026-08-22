@@ -19,10 +19,10 @@ import pytest
 
 from backtests.nt_runtime.compiled_study_loader import CompiledStudyData
 from backtests.nt_runtime.data_plan import DataPlan
-from backtests.nt_runtime.output_manager import CANDIDATE_KEY_COLUMNS, OutputManager
+from backtests.nt_runtime.output_manager import CANDIDATE_KEY_COLUMNS, OutputManager, resolve_collection_allowed_feature_aliases
 from backtests.nt_runtime.run_plan import RunPlan, RunStage
 from backtests.nt_runtime.telemetry import CausalTelemetry
-from features.registry import FEATURE_REGISTRY, resolve_source_universe
+from features.registry import FEATURE_REGISTRY, LEGACY_FEATURE_INSTANCE_OVERRIDES, resolve_feature_instances, resolve_source_universe
 from research.schemas.study_spec import StudySpec
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -114,6 +114,32 @@ def test_resolve_source_universe_matches_phase0_authentication():
     )
     assert resolve_source_universe("verified_registry_numeric_universe") == verified_numeric_candidates()
     assert len(REGISTRY_UNIVERSE) >= 25
+
+
+def test_exact_formerly_rejected_aliases_are_in_the_single_canonical_universe():
+    assert len(LEGACY_FEATURE_INSTANCE_OVERRIDES) == 35
+    assert set(LEGACY_FEATURE_INSTANCE_OVERRIDES) <= set(REGISTRY_UNIVERSE)
+    resolved = resolve_feature_instances("verified_registry_numeric_universe")
+    assert {item["physical_alias"] for item in resolved} == set(REGISTRY_UNIVERSE)
+
+
+def test_exact_formerly_rejected_aliases_are_admitted_by_output_manager(tmp_path: Path):
+    mgr = _output_manager(tmp_path, metadata_columns=CLEAN_FLIP_METADATA, source="verified_registry_numeric_universe")
+    assert set(LEGACY_FEATURE_INSTANCE_OVERRIDES) <= set(resolve_collection_allowed_feature_aliases(mgr.study_data.spec.features))
+    row = {"observation_ts": 1, "regime_start_ns": 0, "checkpoint_index": 0,
+           "regime_age_seconds": 150.0, "running_mfe_atr": 1.2, "new_progress_windows": 3,
+           "retained_mfe_ratio": 0.6}
+    row.update({column: 1.0 for column in LEGACY_FEATURE_INSTANCE_OVERRIDES})
+    obs = pd.DataFrame([{"observation_ts": 1, "regime_start_ns": 0, "checkpoint_index": 0}])
+    assert mgr.persist_collection(pd.DataFrame([row]), obs, _telemetry())["status"] == "SUCCESS"
+
+
+def test_compiler_and_runtime_use_the_same_canonical_universe():
+    from research.engines.feature_binding_engine import compile_feature_contract
+    from backtests.nt_runtime.compiled_study_loader import load_compiled_study
+    compiled = load_compiled_study(CLEAN_FLIP_STUDY)
+    contract = compile_feature_contract(compiled.spec.features)
+    assert contract["candidate_universe_count"] == len(REGISTRY_UNIVERSE) == 532
 
 
 def test_resolve_source_universe_none_is_a_noop():

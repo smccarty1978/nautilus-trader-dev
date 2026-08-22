@@ -1,0 +1,139 @@
+{
+  "archive_date": "2026-08-22",
+  "archive_format": 1,
+  "files": [
+    {
+      "bytes": 54567,
+      "path": "features/registry.py",
+      "sha256": "9eff9c65fdad7a2b07888fb9d337f70e725f34ff8ad1872cccfa136ee983d5ef"
+    },
+    {
+      "bytes": 7369,
+      "path": "features/FEATURE_REGISTRY_CONTRACT.md",
+      "sha256": "e9c1b52ba53799ccabf0dab9b74ba87f02b2503bbe667c09281701ccd02f1450"
+    },
+    {
+      "bytes": 35310,
+      "path": "features/feature_lifecycle_baseline.json",
+      "sha256": "014b3dd719e7318b1cf9d3cc2f6b633eaef937ccefc02cfa472b8ae50a7e6f63"
+    },
+    {
+      "bytes": 17640,
+      "path": "features/feature_definition_promotions.json",
+      "sha256": "8d9b7382ee053099376780438f268c0bf02e31bbbfc5f581581e51fc3268b1c3"
+    },
+    {
+      "bytes": 517,
+      "path": "features/coverage.py",
+      "sha256": "b576b68d68845d61fb09c6b87a15f550f893f77ae6f6f80106dd7afa00ea0753"
+    },
+    {
+      "bytes": 1391,
+      "path": "features/calendar_aggregation.py",
+      "sha256": "ebbdece335887482e4187347b678925be6175538f2e48e07d576a91873347849"
+    },
+    {
+      "bytes": 23194,
+      "path": "scripts/check_feature_promotion.py",
+      "sha256": "4272693dd9f9a36586ac901695a811df64b7073ec72409dccc41b027ca25bf31"
+    },
+    {
+      "bytes": 481100,
+      "path": "scratch/feature_system_v2_registry_mapping.json",
+      "sha256": "626b0abd03e500fa5a6c73a553977d1fc23cb2d602fff4f109c63b0726ac1279"
+    },
+    {
+      "bytes": 29349,
+      "path": "features/trackers/median_center.py",
+      "sha256": "b800317b95f7d744d311eb93a590ee745a7ec17b9e1475cf84726366eacee3d0"
+    },
+    {
+      "bytes": 19004,
+      "path": "features/trackers/ohlcv_delta.py",
+      "sha256": "33096e1d58bdb24ffcfa89e4b403e82fe996b836fa820e44bb3e83c067497b63"
+    },
+    {
+      "bytes": 22539,
+      "path": "features/trackers/price_levels.py",
+      "sha256": "32f503d926f25fc5d66c5a89f35e1223b4d282d991527c0acfb49101e3fab028"
+    },
+    {
+      "bytes": 4530,
+      "path": "features/trackers/pullback.py",
+      "sha256": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00"
+    },
+    {
+      "bytes": 3210,
+      "path": "features/trackers/range_position.py",
+      "sha256": "192d3eb4d2fa47894438de8d043c5aa4570e8cb1ce3e5e5f0764386f4cf1cbbe"
+    },
+    {
+      "bytes": 5477,
+      "path": "features/trackers/rolling_5m_productivity.py",
+      "sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b"
+    },
+    {
+      "bytes": 8510,
+      "path": "features/trackers/structural_regime_geometry.py",
+      "sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4"
+    },
+    {
+      "bytes": 1865,
+      "path": "features/trackers/velocity.py",
+      "sha256": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d"
+    },
+    {
+      "bytes": 3157,
+      "path": "features/trackers/volume.py",
+      "sha256": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b"
+    },
+    {
+      "bytes": 2887,
+      "path": "features/trackers/wick.py",
+      "sha256": "0e6442f91905633d7f90f998be8ae0330d4f139deae02e5a20ef85fbda5c897e"
+    }
+  ],
+  "migration_artifact": "scratch/feature_system_v2_full_migration_inventory.json",
+  "reason": "Feature System V2 full canonical-registry migration rollback/reference snapshot",
+  "runtime_dependency": false,
+  "source_commit": "dce66d491b34c33ef9bade881968b363f99e60f5",
+  "source_dirty_paths": [
+    "M audit_lineage/Codex_clean_maturity_flip_rolling_5m_productivity.json",
+    " M backtests/nt_runtime/output_manager.py",
+    " M backtests/nt_runtime/readiness.py",
+    " M features/registry.py",
+    " M research/engines/feature_binding_engine.py",
+    " M scripts/check_feature_promotion.py",
+    " M scripts/tests/test_readiness.py",
+    " M scripts/tests/test_registry_universe_output_contract.py",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/artifacts/phase0_source_manifest.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/contract_status.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/execution_manifest.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/failure_packet.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/frozen_execution_manifest.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_ledger.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/preflight.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/readiness.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/status.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/compiled_study.json",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/collector.py",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/phase0.py",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_phase0.py",
+    " M studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py",
+    " M studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py",
+    " M studies/es_wick_imbalance_acceptance_v2/audit/execution_manifest.json",
+    " M studies/es_wick_imbalance_acceptance_v2/audit/preflight.json",
+    "?? features/archive/",
+    "?? features/calendar_aggregation.py",
+    "?? features/coverage.py",
+    "?? features/feature_definition_promotions.json",
+    "?? features/tests/",
+    "?? runs/20260822_151708_Gemini_clean_maturity_flip_rolling_5m_productivity_full/",
+    "?? scratch/feature_system_v2_registry_mapping.json",
+    "?? scratch/generate_feature_system_v2_mapping.py",
+    "?? scripts/archive_legacy_feature_registry.py",
+    "?? scripts/feature_ctl.py",
+    "?? studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/contract_pass_28.md",
+    "?? studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_27.md"
+  ]
+}

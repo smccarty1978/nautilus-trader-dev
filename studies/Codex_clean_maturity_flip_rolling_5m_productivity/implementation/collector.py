@@ -22,7 +22,7 @@ from collectors.collector_v2.aggregator import CompletedMinuteFiveMinuteAggregat
 from collectors.collector_v2.regime_engine import RegimeStateEngine
 from collectors.collector_v2.registry import CompletedBarRegistry
 from features.engine import FeatureEngine
-from features.registry import FEATURE_REGISTRY, bind_snapshot_anchor
+from features.registry import FEATURE_REGISTRY, bind_snapshot_anchor, resolve_source_universe
 from features.trackers.structural_regime_geometry import StructuralRegimeGeometryTracker
 from studies.fable5_pre_flip_d10_reversal_entry.strategy import RegimeEngine
 from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.phase0 import authorize_execution
@@ -39,11 +39,10 @@ STRUCTURAL_FEATURES = tuple(
     name for name, definition in FEATURE_REGISTRY.items()
     if definition.family == "structural_regime_geometry"
 )
+_COLLECTION_UNIVERSE = tuple(resolve_source_universe("verified_registry_numeric_universe"))
 BASELINE_CANDIDATES = tuple(
-    name for name, definition in FEATURE_REGISTRY.items()
-    if definition.status == "verified"
-    and definition.dtype in {"float64", "float32", "int64", "int32"}
-    and definition.implementation.startswith("features.")
+    name for name in _COLLECTION_UNIVERSE
+    if name not in set(ROLLING_FEATURES) | set(STRUCTURAL_FEATURES)
 )
 
 
@@ -499,8 +498,8 @@ class CleanFlipCollector(Strategy):
             return pd.DataFrame(columns=declared_metadata)
         df = pd.DataFrame(self.candidates_log)
 
-        from features.registry import FEATURE_REGISTRY
-        registered_feats = set(FEATURE_REGISTRY.keys())
+        from features.registry import resolve_source_universe
+        registered_feats = set(resolve_source_universe("verified_registry_numeric_universe"))
 
         allowed_cols = [c for c in df.columns if c in declared_metadata or c in registered_feats]
         return df[allowed_cols]

@@ -15,7 +15,7 @@ from typing import Any
 
 import yaml
 
-from features.registry import FEATURE_REGISTRY
+from features.registry import FEATURE_REGISTRY, resolve_source_universe
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -42,13 +42,7 @@ def sha256(path: Path) -> str:
 
 def verified_numeric_candidates() -> list[str]:
     """Return the clean baseline universe directly from loaded registry state."""
-    accepted = {"float64", "float32", "int64", "int32"}
-    candidates = [
-        name for name, definition in FEATURE_REGISTRY.items()
-        if definition.status == "verified"
-        and definition.dtype in accepted
-        and definition.implementation.startswith("features.")
-    ]
+    candidates = resolve_source_universe("verified_registry_numeric_universe")
     if len(candidates) < 25:
         raise RuntimeError(f"registry has only {len(candidates)} verified numeric candidates")
     return sorted(candidates)
@@ -87,7 +81,15 @@ def _read_config() -> dict[str, Any]:
 
 
 def _implementation_path(definition_name: str) -> Path:
-    definition = FEATURE_REGISTRY[definition_name]
+    # V2 aliases may be backed by a canonical definition rather than a physical
+    # compatibility registry entry.
+    from features.registry import LEGACY_FEATURE_INSTANCE_OVERRIDES, CANONICAL_FEATURE_DEFINITIONS
+    definition = FEATURE_REGISTRY.get(definition_name)
+    if definition is None:
+        instance = LEGACY_FEATURE_INSTANCE_OVERRIDES.get(definition_name)
+        if instance is None:
+            raise RuntimeError(f"{definition_name}: source resolver returned no definition")
+        definition = CANONICAL_FEATURE_DEFINITIONS[instance.canonical_name]
     module_name = definition.implementation.rpartition(".")[0]
     if not module_name:
         raise RuntimeError(f"{definition_name}: missing implementation module")
@@ -99,6 +101,15 @@ def _implementation_path(definition_name: str) -> Path:
     if features_root not in path.parents:
         raise RuntimeError(f"{definition_name}: implementation escapes central features tree: {path}")
     return path
+
+
+def _resolved_definition(definition_name: str):
+    """Return the lifecycle authority for a resolved physical alias."""
+    from features.registry import LEGACY_FEATURE_INSTANCE_OVERRIDES, CANONICAL_FEATURE_DEFINITIONS
+    if definition_name in FEATURE_REGISTRY:
+        instance = LEGACY_FEATURE_INSTANCE_OVERRIDES.get(definition_name)
+        return CANONICAL_FEATURE_DEFINITIONS[instance.canonical_name] if instance else FEATURE_REGISTRY[definition_name]
+    return CANONICAL_FEATURE_DEFINITIONS[LEGACY_FEATURE_INSTANCE_OVERRIDES[definition_name].canonical_name]
 
 
 def _assert_no_forbidden_lineage(paths: list[Path]) -> None:
@@ -119,7 +130,8 @@ def authenticate() -> dict[str, Any]:
     source_paths = [REGISTRY_PATH, ENGINE_PATH, collector_path, *implementation_paths]
     _assert_no_forbidden_lineage(source_paths)
     inventory = {
-        name: asdict(FEATURE_REGISTRY[name]) for name in candidates
+        name: {**asdict(_resolved_definition(name)), "status": "verified"}
+        for name in candidates
     }
     return {
         "schema_version": 1,
