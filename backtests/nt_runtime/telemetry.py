@@ -40,8 +40,19 @@ class TelemetrySnapshot:
 class CausalTelemetry:
     """Tracks execution performance and process resource utilization."""
 
-    def __init__(self) -> None:
+    def __init__(self, trace_allocations: Optional[bool] = None) -> None:
         self.process = psutil.Process(os.getpid())
+        # Python allocation tracing (tracemalloc) instruments every allocation in
+        # the process and captures a traceback for each one.  Left always-on it
+        # cost this collector ~6-7x replay wall time (measured 2026-08-24: full
+        # surface 5.73s -> 35.24s on the 213,431-event smoke day), which is the
+        # dominant term in every historical throughput number for this runtime.
+        # It is a memory *diagnostic*, so it is opt-in; process RSS telemetry
+        # below is always collected and is cheap.
+        if trace_allocations is None:
+            trace_allocations = os.environ.get("NT_TELEMETRY_TRACEMALLOC", "") == "1"
+        self.trace_allocations = bool(trace_allocations)
+        self._tracing_started = False
         self.start_time: float = 0.0
         self.end_time: float = 0.0
         self.baseline_rss_mb: float = 0.0
@@ -61,7 +72,9 @@ class CausalTelemetry:
         self.population_candidates_emitted_raw: Optional[int] = None
 
     def start(self) -> None:
-        tracemalloc.start()
+        if self.trace_allocations and not tracemalloc.is_tracing():
+            tracemalloc.start()
+            self._tracing_started = True
         self.baseline_rss_mb = self.process.memory_info().rss / (1024 * 1024)
         self.peak_rss_mb = self.baseline_rss_mb
         self.start_time = time.perf_counter()
@@ -109,8 +122,13 @@ class CausalTelemetry:
 
     def stop(self) -> TelemetrySnapshot:
         self.end_time = time.perf_counter()
-        current_mem, tm_peak = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
+        # 0.0 is the defined "allocation tracing was not run" value; the field
+        # stays in the telemetry card so the persisted schema is unchanged.
+        tm_peak = 0.0
+        if self._tracing_started:
+            _current_mem, tm_peak = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+            self._tracing_started = False
 
         final_rss = self.process.memory_info().rss / (1024 * 1024)
         if final_rss > self.peak_rss_mb:
