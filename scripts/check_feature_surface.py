@@ -138,8 +138,7 @@ def validate_feature_surface(
     frozen model feature list, so a wide collection-time universe can never be mistaken
     for a frozen, ordered model input list.
     """
-    if registry is None:
-        from features.registry import FEATURE_REGISTRY as registry  # noqa: N806
+    resolver_mode = registry is None
 
     declared_features = list(declared_features or [])
     report = SurfaceReport(
@@ -191,7 +190,14 @@ def validate_feature_surface(
         entry: Dict[str, Any] = {}
 
         # 2. Registry binding must resolve.
-        fdef = registry.get(name)
+        try:
+            if resolver_mode:
+                from features.registry import resolve_runtime_feature_definition
+                fdef = resolve_runtime_feature_definition(name)
+            else:
+                fdef = registry.get(name)
+        except Exception:
+            fdef = None
         if fdef is None:
             fail("FEATURE_NOT_REGISTERED", name,
                  f"'{name}' is declared by the study but absent from the feature registry")

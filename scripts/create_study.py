@@ -137,11 +137,11 @@ def test_declared_features_resolve_in_the_central_registry():
     import sys
     if str(REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(REPO_ROOT))
-    from features.registry import FEATURE_REGISTRY
+    from features.registry import resolve_feature_request
 
     for name in (_config("feature_contract")["feature_list"] or []):
-        assert name in FEATURE_REGISTRY, f"declared feature {{name!r}} is not registered"
-        impl = FEATURE_REGISTRY[name].implementation
+        resolved = resolve_feature_request(name)
+        impl = resolved["provider"]
         assert impl, f"{{name!r}} has no implementation binding"
         import importlib
         module_name = impl.rsplit(".", 1)[0]

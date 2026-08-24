@@ -139,7 +139,7 @@ target:
 features:
   source: verified_registry_numeric_universe
   feature_list:
-  - latest_1m_wick_imbalance
+  - wick_imbalance
   timing_contract: verified
 model:
   mode: scoring

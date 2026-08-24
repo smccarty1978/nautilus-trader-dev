@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Mapping, Optional, Tuple, Set
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, Set
 import re
 import hashlib
 import warnings
@@ -39,6 +39,10 @@ class FeatureDefinition:
     parameter_schema: Tuple[str, ...] = ()
     supported_bar_states: Tuple[str, ...] = ("completed",)
     supported_timeframes: Tuple[str, ...] = ()
+    supported_update_every: Tuple[str, ...] = ()
+    supported_parameter_values: Mapping[str, Tuple[Any, ...]] = field(default_factory=dict)
+    required_parameters: Tuple[str, ...] = ()
+    supported_parameter_combinations: Tuple[Mapping[str, Any], ...] = ()
     temporal_identity_exception: bool = False
     coverage_family: str = ""
 
@@ -49,6 +53,11 @@ class FeatureInstanceError(ValueError):
 
 _DURATION_RE = re.compile(r"^(?P<value>[1-9][0-9]*)(?P<unit>s|m)$")
 _TEMPORAL_NAME_RE = re.compile(r"(?:^|_)[0-9]+(?:s|m)(?:_|$)|(?:^|_)rolling_[0-9]+(?:s|m)(?:_|$)")
+_INSTANCE_NAME_RE = re.compile(
+    r"(?:^|_)(?:ema|sma|wma|rsi|median|atr)_[1-9][0-9]*(?:_|$)|"
+    r"(?:^|_)(?:period|window|lookback)_[1-9][0-9]*(?:_|$)|"
+    r"(?:^|_)seq_[1-9][0-9]*r(?:_|$)"
+)
 
 
 @dataclass(frozen=True)
@@ -719,13 +728,20 @@ def _canonical_definition(
     parameters: Tuple[str, ...], source_timeframe: str, update_anchor: str,
     normalizer: str, window_unit: Optional[str], reset_policy: str,
     null_policy: str = "allow", supported_timeframes: Tuple[str, ...] = (),
+    supported_update_every: Tuple[str, ...] = (),
+    supported_parameter_values: Optional[Mapping[str, Tuple[Any, ...]]] = None,
+    required_parameters: Tuple[str, ...] = (),
+    supported_parameter_combinations: Tuple[Mapping[str, Any], ...] = (),
 ) -> FeatureDefinition:
     return FeatureDefinition(
         name=name, status="provisional", family=family, implementation=implementation,
         tests=tests, source_timeframe=source_timeframe, update_anchor=update_anchor,
         normalizer=normalizer, window_unit=window_unit, reset_policy=reset_policy,
         null_policy=null_policy, parameter_schema=parameters, coverage_family=family,
-        supported_timeframes=supported_timeframes,
+        supported_timeframes=supported_timeframes, supported_update_every=supported_update_every,
+        supported_parameter_values=dict(supported_parameter_values or {}),
+        required_parameters=required_parameters,
+        supported_parameter_combinations=tuple(dict(item) for item in supported_parameter_combinations),
     )
 
 
@@ -747,12 +763,42 @@ for _name in (
         _params = ("source_timeframe", "reference_timeframe", "context", "source_bar_state", "reference_bar_state")
     elif _name.startswith("structural_") or _name == "regime_expansion_atr_per_min":
         _params = ("context",)
+    _value_domain: Mapping[str, Tuple[Any, ...]] = {"bar_state": ("completed",)}
+    _required: Tuple[str, ...] = ("timeframe", "context")
+    _combinations: Tuple[Mapping[str, Any], ...] = (
+        {"timeframe": "1m", "context": "prior", "bar_state": "completed"},
+        {"timeframe": "5m", "context": "prior", "bar_state": "completed"},
+    )
+    if _name.startswith("distance_to_completed_range"):
+        _value_domain = {"reference_timeframe": ("5m",), "bar_state": ("completed",)}
+        _required = ("reference_timeframe",)
+        _combinations = ({"reference_timeframe": "5m", "bar_state": "completed"},)
+    elif _name == "move_outside_completed_range":
+        _value_domain = {"source_timeframe": ("1m",), "reference_timeframe": ("5m",),
+                         "context": ("current",), "source_bar_state": ("completed",),
+                         "reference_bar_state": ("completed",)}
+        _required = ("source_timeframe", "reference_timeframe", "context")
+        _combinations = ({"source_timeframe": "1m", "reference_timeframe": "5m", "context": "current",
+                          "source_bar_state": "completed", "reference_bar_state": "completed"},)
+    elif _name.startswith("structural_") or _name == "regime_expansion_atr_per_min":
+        _value_domain = {"context": ("current",)}
+        _required = ("context",)
+        _combinations = ({"context": "current"},)
+    else:
+        # ``regime`` remains in the historical schema for promotion-record
+        # compatibility, but no active completed-bar provider consumes it;
+        # an empty domain makes every supplied value fail closed.
+        _value_domain = {"timeframe": ("1m", "5m"), "bar_state": ("completed",), "regime": ()}
+        if _name in {"regime_age_min", "regime_range_atr", "regime_directional_displacement_atr", "regime_range_atr_per_min"}:
+            _combinations = (*_combinations, {"timeframe": "5m", "context": "current", "bar_state": "completed"})
     CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
         _name, family="structural_regime_geometry", implementation=_STRUCTURAL_IMPL,
         tests=_STRUCTURAL_TESTS, parameters=_params, source_timeframe="1s+1m+5m",
         update_anchor="completed_1s_completed_5m_then_1m_flip",
         normalizer="study_contract", window_unit="since_regime_flip", reset_policy="event_start",
         supported_timeframes=("1m", "5m"),
+        supported_parameter_values=_value_domain,
+        required_parameters=_required, supported_parameter_combinations=_combinations,
     )
 
 for _name in (
@@ -766,6 +812,9 @@ for _name in (
         tests=_ROLLING_PRODUCTIVITY_TESTS, parameters=("window", "update_every"),
         source_timeframe="1s", update_anchor="completed_1s_at_or_before_checkpoint",
         normalizer="current_1m_regime_start_atr", window_unit="seconds", reset_policy="none",
+        supported_update_every=("1s",),
+        supported_parameter_values={"update_every": ("1s",)},
+        required_parameters=("window", "update_every"),
     )
 
 
@@ -844,22 +893,74 @@ def validate_feature_instance(instance: FeatureInstance) -> Dict[str, Any]:
     bar request.
     """
     if instance.canonical_name not in CANONICAL_FEATURE_DEFINITIONS:
-        raise FeatureInstanceError(f"UNKNOWN_CANONICAL_FEATURE: {instance.canonical_name!r}")
+        # The active V2 bundle is authoritative after cutover; the historical
+        # Python catalog is intentionally only a compatibility surface.  Keep
+        # validation fail-closed while accepting bundle definitions without
+        # duplicating a second registry in code.
+        bundle = _canonical_bundle("active")
+        bundle_def = _canonical_definition_by_name(bundle, instance.canonical_name) if bundle else None
+        if bundle_def is None:
+            raise FeatureInstanceError(f"UNKNOWN_CANONICAL_FEATURE: {instance.canonical_name!r}")
+        params = dict(instance.parameters)
+        schema = set(bundle_def.get("parameter_schema", ()))
+        unknown = sorted(set(params) - schema)
+        if unknown:
+            raise FeatureInstanceError(f"UNKNOWN_FEATURE_PARAMETER: {instance.canonical_name}: {unknown}")
+        for state_key in ("bar_state", "source_bar_state", "reference_bar_state"):
+            if state_key in schema:
+                params.setdefault(state_key, "completed")
+        for state_key in ("bar_state", "source_bar_state", "reference_bar_state"):
+            if params.get(state_key) not in {None, "completed"}:
+                raise FeatureInstanceError(
+                    f"FORMING_BAR_UNSUPPORTED: {instance.canonical_name} supports completed bar states only"
+                )
+        return params
     definition = CANONICAL_FEATURE_DEFINITIONS[instance.canonical_name]
     params = dict(instance.parameters)
     if "timeframe" in params and "update_every" in params and "bar_state" not in params:
         raise FeatureInstanceError("AMBIGUOUS_TEMPORAL_SEMANTICS: timeframe plus update_every requires bar_state=forming, or declare a rolling window")
+    # Bar-state defaults belong to definitions; a temporal update cadence is
+    # separately validated below and cannot silently turn a calendar bar into
+    # a forming stream.
+    for state_key in ("bar_state", "source_bar_state", "reference_bar_state"):
+        if state_key in definition.parameter_schema:
+            params.setdefault(state_key, "completed")
+    for state_key in ("bar_state", "source_bar_state", "reference_bar_state"):
+        requested_bar_state = params.get(state_key)
+        if requested_bar_state is None:
+            continue
+        if requested_bar_state not in {"completed", "forming"}:
+            raise FeatureInstanceError("INVALID_BAR_STATE: expected 'completed' or 'forming'")
+        if requested_bar_state not in definition.supported_bar_states:
+            raise FeatureInstanceError(
+                f"FORMING_BAR_UNSUPPORTED: {instance.canonical_name} supports "
+                f"{list(definition.supported_bar_states)} bar states only"
+            )
     # Reject an unimplemented temporal state before reporting incidental
-    # parameter membership.  This keeps the causal contract diagnostic exact.
-    requested_bar_state = params.get("bar_state")
-    if requested_bar_state is not None and requested_bar_state not in definition.supported_bar_states:
-        raise FeatureInstanceError(
-            f"FORMING_BAR_UNSUPPORTED: {instance.canonical_name} supports "
-            f"{list(definition.supported_bar_states)} bar states only"
-        )
+    # parameter membership. This keeps the causal contract diagnostic exact.
     unknown = sorted(set(params) - set(definition.parameter_schema))
     if unknown:
         raise FeatureInstanceError(f"UNKNOWN_FEATURE_PARAMETER: {instance.canonical_name}: {unknown}")
+    for key, allowed in definition.supported_parameter_values.items():
+        if key in params and params[key] not in allowed:
+            if (key in {"timeframe", "source_timeframe", "reference_timeframe"}
+                    and params[key] not in definition.supported_timeframes):
+                raise FeatureInstanceError(
+                    f"UNSUPPORTED_TIMEFRAME_PARAMETER: {instance.canonical_name} supports "
+                    f"{list(definition.supported_timeframes)}, not {params[key]!r}"
+                )
+            if key == "update_every":
+                raise FeatureInstanceError(
+                    f"UNSUPPORTED_UPDATE_CADENCE: {instance.canonical_name} supports "
+                    f"{list(allowed)}, not {params[key]!r}"
+                )
+            raise FeatureInstanceError(
+                f"UNSUPPORTED_FEATURE_PARAMETER_VALUE: {instance.canonical_name} "
+                f"requires {key} in {list(allowed)}, not {params[key]!r}"
+            )
+    missing_required = [key for key in definition.required_parameters if key not in params]
+    if missing_required:
+        raise FeatureInstanceError(f"MISSING_REQUIRED_FEATURE_PARAMETER: {instance.canonical_name}: {missing_required}")
     if "timeframe" in params:
         _duration_seconds(str(params["timeframe"]))
         if definition.supported_timeframes and params["timeframe"] not in definition.supported_timeframes:
@@ -868,8 +969,6 @@ def validate_feature_instance(instance: FeatureInstance) -> Dict[str, Any]:
                 f"{list(definition.supported_timeframes)}, not {params['timeframe']!r}"
             )
         params.setdefault("bar_state", "completed")
-        if params["bar_state"] not in {"completed", "forming"}:
-            raise FeatureInstanceError("INVALID_BAR_STATE: expected 'completed' or 'forming'")
         if params["bar_state"] == "forming":
             if "update_every" not in params:
                 raise FeatureInstanceError("FORMING_BAR_UPDATE_REQUIRED: forming calendar bars require update_every")
@@ -884,9 +983,25 @@ def validate_feature_instance(instance: FeatureInstance) -> Dict[str, Any]:
         if "update_every" not in params:
             raise FeatureInstanceError("ROLLING_WINDOW_UPDATE_REQUIRED: rolling windows require update_every")
         _duration_seconds(str(params["update_every"]))
+        if definition.supported_update_every and params["update_every"] not in definition.supported_update_every:
+            raise FeatureInstanceError(
+                f"UNSUPPORTED_UPDATE_CADENCE: {instance.canonical_name} supports "
+                f"{list(definition.supported_update_every)}, not {params['update_every']!r}"
+            )
     for key in ("source_timeframe", "reference_timeframe"):
         if key in params:
             _duration_seconds(str(params[key]))
+            if definition.supported_timeframes and params[key] not in definition.supported_timeframes:
+                raise FeatureInstanceError(
+                    f"UNSUPPORTED_TIMEFRAME_PARAMETER: {instance.canonical_name} supports "
+                    f"{list(definition.supported_timeframes)}, not {params[key]!r}"
+                )
+    if definition.supported_parameter_combinations and not any(
+            all(params.get(key) == value for key, value in allowed.items())
+            for allowed in definition.supported_parameter_combinations):
+        raise FeatureInstanceError(
+            f"UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: {instance.canonical_name}: {params}"
+        )
     return params
 
 
@@ -916,23 +1031,56 @@ def derive_instance_input_requirements(instance: FeatureInstance) -> Dict[str, A
         return {"provider": definition.implementation, "required_streams": ["completed_1s"],
                 "calendar_timeframe": params["timeframe"], "bar_state": "forming",
                 "update_every": params["update_every"]}
-    if "window" in params:
+    rolling_legacy = params.get("context") == "rolling" and "timeframe" in params
+    if "window" in params or rolling_legacy:
+        window = params.get("window", params.get("timeframe"))
         return {"provider": definition.implementation, "required_streams": ["completed_1s"],
-                "window_type": "rolling", "window": params["window"], "update_every": params["update_every"]}
+                "window_type": "rolling", "window": window, "update_every": params.get("update_every", "1s")}
+    if "source_timeframe" in params or "reference_timeframe" in params:
+        streams = []
+        for key, state_key in (("source_timeframe", "source_bar_state"), ("reference_timeframe", "reference_bar_state")):
+            if key in params:
+                state = params.get(state_key, "completed")
+                streams.append(f"{state}_{params[key]}")
+        return {"provider": definition.implementation, "required_streams": sorted(set(streams)),
+                "source_timeframe": params.get("source_timeframe"),
+                "reference_timeframe": params.get("reference_timeframe"),
+                "source_bar_state": params.get("source_bar_state", "completed"),
+                "reference_bar_state": params.get("reference_bar_state", "completed")}
     return {"provider": definition.implementation, "required_streams": [f"completed_{params.get('timeframe', definition.source_timeframe)}"],
             "bar_state": params.get("bar_state", "completed")}
 
 
-def resolve_feature_instances(source: Optional[str], instances: Optional[Tuple[FeatureInstance, ...]] = None) -> List[Dict[str, Any]]:
+def resolve_feature_instances(source: Optional[str], instances: Optional[Tuple[FeatureInstance, ...]] = None, *, legacy_mode: bool = False) -> List[Dict[str, Any]]:
     """The single collection-time resolver used by compiler, phase0, runtime and output.
 
-    Without explicit instances it returns the declared verified physical universe,
-    including verified canonical definitions rendered through their compatibility aliases.
+    Active resolution returns canonical definitions/instances only.  The historical
+    physical universe is available solely through explicit ``legacy_mode``.
     """
     if not source:
         return []
+    if source == "canonical_verified_definition_universe":
+        bundle = _canonical_bundle("active")
+        definitions = (bundle or {}).get("registry", {}).get("definitions", [])
+        if instances is not None:
+            resolved = []
+            for instance in instances:
+                params = validate_feature_instance(instance)
+                definition = _canonical_definition_by_name(bundle, instance.canonical_name) if bundle else None
+                if definition is None or definition.get("status") != "verified":
+                    raise FeatureInstanceError(f"UNVERIFIED_CANONICAL_FEATURE: {instance.canonical_name}")
+                resolved.append({"canonical_name": instance.canonical_name, "parameters": params,
+                                 "physical_alias": generate_physical_alias(instance), "provider": definition.get("provider", ""),
+                                 "status": "verified", "causal_input_requirements": definition.get("input_availability_contracts", [])})
+            return sorted(resolved, key=lambda item: item["physical_alias"])
+        return [{"canonical_name": item["canonical_name"], "parameters": {},
+                 "physical_alias": item["canonical_name"], "provider": item.get("provider", ""),
+                 "status": item.get("status"), "causal_input_requirements": item.get("input_availability_contracts", [])}
+                for item in definitions if item.get("status") == "verified"]
     if source != "verified_registry_numeric_universe":
         raise ValueError(f"UNKNOWN_FEATURE_SOURCE: '{source}' is not a recognized features.source value")
+    if not legacy_mode:
+        raise FeatureInstanceError("LEGACY_FEATURE_ALIAS_NOT_ALLOWED: use canonical FeatureInstances or explicit legacy replay mode")
     resolved: List[Dict[str, Any]] = []
     if instances is not None:
         for instance in instances:
@@ -1022,14 +1170,303 @@ def resolve_feature_name(name: str) -> str:
 _NUMERIC_DTYPES = {"float64", "float32", "int64", "int32"}
 
 
-def resolve_source_universe(source: Optional[str]) -> List[str]:
+def resolve_source_universe(source: Optional[str], *, authority: str = "active", legacy_mode: bool = False) -> List[str]:
     """Resolves a StudySpec `features.source` name to its collection-time candidate list.
 
     Returns ``[]`` when `source` is unset (``None``/empty) -- a study that has not
     declared a collection-time source is unaffected, not an error. An explicitly set but
     unrecognized `source` string fails closed rather than silently resolving to nothing.
     """
+    if not source:
+        return []
+    # Candidate authority is explicit and inert by default. Once activation has
+    # written the sole active pointer, the exact same resolver reads that
+    # reviewed bundle; before then, active preserves the existing authority.
+    from features.candidate_authority import ACTIVE_POINTER, resolve_candidate_aliases
+    if source == "canonical_verified_definition_universe":
+        bundle = _canonical_bundle(authority)
+        if bundle is None:
+            return sorted(CANONICAL_FEATURE_DEFINITIONS)
+        return sorted(item["canonical_name"] for item in bundle["registry"].get("definitions", [])
+                      if item.get("status") == "verified")
+    if source != "verified_registry_numeric_universe":
+        raise FeatureInstanceError(f"UNKNOWN_FEATURE_SOURCE: {source!r}")
+    if not legacy_mode:
+        raise FeatureInstanceError(
+            "LEGACY_FEATURE_ALIAS_NOT_ALLOWED: verified_registry_numeric_universe is a legacy alias source; "
+            "declare canonical FeatureInstances or use explicit legacy replay mode"
+        )
+    if authority == "legacy":
+        return sorted(LEGACY_FEATURE_INSTANCE_OVERRIDES)
+    if authority == "candidate":
+        # Explicit candidate selection is never substitutable.  A malformed or
+        # incomplete candidate must surface its own fail-closed authority error.
+        return resolve_candidate_aliases(source or "", authority="candidate", legacy_mode=True)
+    if authority not in {"active", "legacy"}:
+        raise FeatureInstanceError(f"UNKNOWN_FEATURE_AUTHORITY: {authority!r}")
+    if ACTIVE_POINTER.is_file():
+        # Once cut over, active is the reviewed bundle.  Do not resurrect the
+        # legacy registry if its pointer/bundle is damaged.
+        return resolve_candidate_aliases(source or "", authority="active", legacy_mode=True)
     return [item["physical_alias"] for item in resolve_feature_instances(source)]
+
+
+# ---------------------------------------------------------------------------
+# Active pipeline resolution API
+# ---------------------------------------------------------------------------
+# FEATURE_REGISTRY above is retained as a compatibility implementation catalog
+# until the old source file can be retired.  It is deliberately not exposed to
+# pipeline callers as an authority: membership, lifecycle and alias identity
+# below come from the activated canonical bundle (or the explicitly requested
+# candidate bundle).  Keeping the compatibility lookup here avoids each caller
+# reimplementing a partial alias/verified/provider predicate.
+
+def _canonical_bundle(authority: str) -> Optional[Dict[str, Any]]:
+    """Return an explicitly selected canonical bundle when one is authoritative.
+
+    Before the one-shot cutover normal ``active`` continues to use the legacy
+    authority so existing studies remain runnable. Candidate is always
+    explicit and never falls back. After cutover, active reads exactly the
+    bundle selected by the active pointer.
+    """
+    from features.candidate_authority import ACTIVE_POINTER, load_authority
+    if authority == "legacy":
+        return None
+    if authority == "candidate":
+        return load_authority("candidate")
+    if authority != "active":
+        raise FeatureInstanceError(f"UNKNOWN_FEATURE_AUTHORITY: {authority!r}")
+    return load_authority("active") if ACTIVE_POINTER.is_file() else None
+
+
+def _canonical_definition_by_name(bundle: Mapping[str, Any], name: str) -> Optional[Mapping[str, Any]]:
+    for definition in bundle["registry"].get("definitions", []):
+        if definition.get("canonical_name") == name:
+            return definition
+    return None
+
+
+def resolve_feature_request(
+    requested: str,
+    parameters: Optional[Mapping[str, Any]] = None,
+    *,
+    authority: str = "active",
+    physical_alias: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Resolve a canonical request or compatibility alias through one API.
+
+    The returned ``physical_alias`` is an output name only.  No caller should
+    infer lifecycle, provider, timing or parameters from that spelling.
+    """
+    bundle = _canonical_bundle(authority)
+    supplied = dict(parameters or {})
+    if bundle is None:
+        if authority == "legacy" and requested in LEGACY_FEATURE_INSTANCE_OVERRIDES:
+            instance = LEGACY_FEATURE_INSTANCE_OVERRIDES[requested]
+            resolved = resolve_feature_request(instance.canonical_name, instance.parameters, authority="active")
+            resolved.update({"requested": requested, "physical_alias": requested,
+                             "parameters": dict(instance.parameters), "legacy_mode": True})
+            return resolved
+        # Compatibility path is available only for explicit legacy replay.
+        if requested not in FEATURE_REGISTRY:
+            raise FeatureInstanceError(f"FEATURE_NOT_REGISTERED: {requested!r}")
+        definition = FEATURE_REGISTRY[requested]
+        return {
+            "requested": requested, "canonical_name": requested,
+            "parameters": supplied, "physical_alias": requested,
+            "provider": definition.implementation, "family": definition.family,
+            "dtype": definition.dtype, "status": definition.status,
+            "input_requirements": {"required_streams": [f"completed_{definition.source_timeframe}"]},
+        }
+
+    definition = None
+    canonical_definition = _canonical_definition_by_name(bundle, requested)
+    # Explicit study instances may retain a historical physical output alias.
+    # Resolve it only through the active bundle's deterministic compatibility
+    # record; this is not a legacy-universe fallback and never consults the
+    # archived registry.
+    if canonical_definition is None and requested in bundle.get("aliases", {}).get("aliases", {}):
+        record = bundle["aliases"]["aliases"][requested]
+        canonical_name = str(record["canonical_feature"])
+        definition = _canonical_definition_by_name(bundle, canonical_name)
+        supplied = dict(record.get("parameters", {})) | supplied
+        physical_alias = physical_alias or requested
+        resolved_parameters = validate_feature_instance(FeatureInstance(canonical_name, supplied))
+    elif canonical_definition is None and (_INSTANCE_NAME_RE.search(requested) or _TEMPORAL_NAME_RE.search(requested)):
+        # Active resolution intentionally does not load or consult the legacy
+        # alias map.  Migration guidance is provided by feature_ctl; runtime
+        # rejects the instance-shaped request fail-closed.
+        raise FeatureInstanceError(
+            f"LEGACY_FEATURE_ALIAS_NOT_ALLOWED: {requested!r}; declare canonical "
+            "FeatureInstances or invoke explicit legacy replay mode"
+        )
+    elif definition is None:
+        canonical_name = requested
+        definition = canonical_definition or _canonical_definition_by_name(bundle, canonical_name)
+        if definition is None:
+            raise FeatureInstanceError(f"UNKNOWN_CANONICAL_FEATURE: {requested!r}")
+        # Canonical instances must be validated at the authority boundary.  A
+        # bare canonical name is retained only for collection-universe
+        # enumeration (where the caller is asking for definitions, not an
+        # executable instance); any request carrying parameters is a real
+        # FeatureInstance and must fail closed on unsupported temporal/domain
+        # combinations.
+        if supplied:
+            normalized = validate_feature_instance(
+                FeatureInstance(canonical_name, supplied)
+            )
+            resolved_parameters = normalized
+        else:
+            resolved_parameters = supplied
+        # Active canonical requests never resolve through the historical alias
+        # map.  A physical alias is only an explicit legacy-replay concern.
+        physical_alias = physical_alias or canonical_name
+    if definition is None or definition.get("status") != "verified":
+        raise FeatureInstanceError(f"UNVERIFIED_CANONICAL_FEATURE: {canonical_name}")
+    return {
+        "requested": requested, "canonical_name": canonical_name,
+        "parameters": resolved_parameters, "physical_alias": physical_alias,
+        "provider": definition.get("provider", ""), "family": definition.get("family", ""),
+        "dtype": definition.get("dtype", "float64"), "status": definition.get("status"),
+        "input_requirements": derive_resolved_input_requirements(
+            canonical_name, resolved_parameters, definition),
+    }
+
+
+def derive_resolved_input_requirements(
+    canonical_name: str, parameters: Mapping[str, Any], definition: Mapping[str, Any],
+) -> Dict[str, Any]:
+    """Derive runtime requirements from instance parameters, never alias text."""
+    params = dict(parameters)
+    streams: Set[str] = set()
+    # OHLCV rolling aliases historically encoded the trailing duration in the
+    # `timeframe` parameter.  The provider consumes completed 1s bars; expose
+    # that true causal requirement without changing the historical alias or
+    # values.  New instances should use `window` explicitly.
+    rolling_legacy = params.get("context") == "rolling" and "timeframe" in params
+    if "window" in params or rolling_legacy:
+        window = params.get("window", params.get("timeframe"))
+        streams.add("completed_1s")
+        temporal = {"window_type": "rolling", "window": window,
+                    "update_every": params.get("update_every", "1s")}
+    else:
+        temporal = {}
+        for key, state_key in (("timeframe", "bar_state"), ("source_timeframe", "source_bar_state"),
+                               ("reference_timeframe", "reference_bar_state")):
+            if key in params:
+                streams.add(f"{params.get(state_key, 'completed')}_{params[key]}")
+        if not streams:
+            for requirement in definition.get("input_availability_contracts", []):
+                streams.add(f"completed_{requirement}")
+    return {"canonical_name": canonical_name, "provider": definition.get("provider", ""),
+            "required_streams": sorted(streams), **temporal}
+
+
+def resolve_runtime_feature_definition(requested: str, *, authority: str = "active") -> FeatureDefinition:
+    """Return canonical-authorized metadata for a pipeline binding.
+
+    This intentionally constructs the narrow legacy-compatible record required
+    by older tracker binders while authorization remains canonical.  Direct
+    consumers must call this rather than indexing ``FEATURE_REGISTRY``.
+    """
+    resolved = resolve_feature_request(requested, authority=authority)
+    return FeatureDefinition(
+        name=resolved["physical_alias"], status=resolved["status"],
+        family=resolved["family"], implementation=resolved["provider"],
+        dtype=resolved["dtype"], source_timeframe="1s",
+        update_anchor="canonical_instance_contract", null_policy="allow",
+    )
+
+
+def resolve_runtime_feature_aliases(
+    source: Optional[str] = "canonical_verified_definition_universe", *, authority: str = "active",
+) -> List[str]:
+    """Return the physical output aliases permitted by the selected authority."""
+    return resolve_source_universe(source, authority=authority)
+
+
+def resolve_runtime_family_aliases(families: Set[str], *, authority: str = "active") -> List[str]:
+    """Filter resolved aliases by canonical family without alias-name parsing."""
+    bundle = _canonical_bundle(authority)
+    if bundle is None:
+        return sorted(name for name, definition in FEATURE_REGISTRY.items() if definition.family in families)
+    definitions = {item["canonical_name"]: item for item in bundle["registry"].get("definitions", [])}
+    return sorted(name for name, definition in definitions.items()
+                  if set(definition.get("family", [])) & set(families)
+                  and definition.get("status") == "verified")
+
+
+def resolve_feature_engine_output_aliases(*, authority: str = "active") -> List[str]:
+    """Resolve the physical surface implemented by the shared FeatureEngine.
+
+    The canonical universe has 693 compatible aliases, while this particular
+    engine deliberately implements the historical 532-column collector
+    surface. Its capability is declared once here from compatibility
+    implementation metadata and intersected with canonical authority; callers
+    neither parse names nor widen a collector merely because an alias exists.
+    """
+    bundle = _canonical_bundle(authority)
+    if bundle is not None:
+        implemented = {item["canonical_name"] for item in bundle["registry"].get("definitions", [])
+                       if item.get("status") == "verified"}
+    else:
+        implemented = {name for name, definition in FEATURE_REGISTRY.items()
+                       if definition.status == "verified" and definition.implementation}
+    allowed = set(resolve_runtime_feature_aliases(authority=authority))
+    return sorted(implemented & allowed)
+
+
+def provider_compatibility_keys(canonical_name: str, *, authority: str = "active") -> List[str]:
+    """Implementation-only adapter for providers retaining historical field labels."""
+    bundle = _canonical_bundle(authority)
+    if bundle is None:
+        return []
+    return sorted(alias for alias, record in bundle.get("aliases", {}).get("aliases", {}).items()
+                  if record.get("canonical_feature") == canonical_name)
+
+
+def canonicalize_provider_columns(columns: Iterable[str], *, authority: str = "active") -> Dict[str, str]:
+    """Map provider compatibility labels to canonical output labels at the boundary."""
+    bundle = _canonical_bundle(authority)
+    if bundle is None:
+        return {name: name for name in columns}
+    aliases = bundle.get("aliases", {}).get("aliases", {})
+    return {name: aliases.get(name, {}).get("canonical_feature", name) for name in columns}
+
+
+def derive_study_feature_requirements(features_spec: Any, *, authority: str = "active") -> Dict[str, Any]:
+    """Derive collector streams/windows exclusively from study-local instances.
+
+    A legacy feature_list is resolved through compatibility mapping.  A source
+    universe without explicit instances returns its declared aliases but does
+    not guess provider-internal requirements from alias text.
+    """
+    requests: List[Tuple[str, Mapping[str, Any], Optional[str]]] = []
+    for item in (getattr(features_spec, "instances", None) or []):
+        requests.append((str(item["feature"]), dict(item.get("parameters", {})), item.get("physical_alias")))
+    for alias in (getattr(features_spec, "feature_list", None) or []):
+        requests.append((str(alias), {}, None))
+    resolved = []
+    for name, params, alias in requests:
+        item = resolve_feature_request(name, params, authority=authority, physical_alias=alias)
+        # Canonical instances receive the deterministic compatibility/output alias
+        # generated from their parameters.  A caller-provided physical_alias remains
+        # an explicit compatibility override.
+        if alias is None and name in CANONICAL_FEATURE_DEFINITIONS:
+            item["physical_alias"] = generate_physical_alias(
+                FeatureInstance(name, params)
+            )
+        resolved.append(item)
+    streams: Set[str] = set()
+    rolling_windows: Set[str] = set()
+    for item in resolved:
+        requirements = item["input_requirements"]
+        streams.update(requirements.get("required_streams", []))
+        if requirements.get("window"):
+            rolling_windows.add(str(requirements["window"]))
+    return {"resolved_instances": resolved, "required_streams": sorted(streams),
+            "rolling_windows": sorted(rolling_windows),
+            "aliases": [item["physical_alias"] for item in resolved]}
 
 
 def validate_canonical_feature_name(definition: FeatureDefinition) -> None:
@@ -1040,7 +1477,7 @@ def validate_canonical_feature_name(definition: FeatureDefinition) -> None:
     in FeatureInstance.parameters, with an explicit exception for a genuinely intrinsic
     temporal formula.
     """
-    if _TEMPORAL_NAME_RE.search(definition.name) and not definition.temporal_identity_exception:
+    if (_TEMPORAL_NAME_RE.search(definition.name) or _INSTANCE_NAME_RE.search(definition.name)) and not definition.temporal_identity_exception:
         raise FeatureInstanceError(
             f"FEATURE_NAME_EMBEDS_TEMPORAL_INSTANCE: {definition.name!r}; move timeframe/window to FeatureInstance parameters or document temporal_identity_exception"
         )
@@ -1064,18 +1501,25 @@ def bind_snapshot_anchor(feature_name: str, study_name: str, anchor: str) -> Non
     'at_signal_decision_ts', 'at_touch_time', 'at_fill_time'). Raises if
     the feature isn't registered -- a study cannot bind a snapshot anchor
     for a feature that doesn't exist."""
-    if feature_name not in FEATURE_REGISTRY:
-        raise KeyError(f"cannot bind snapshot anchor for unregistered feature {feature_name!r}")
-    _SNAPSHOT_ANCHOR_BINDINGS[(feature_name, study_name)] = anchor
+    try:
+        resolved = resolve_feature_request(feature_name)
+    except FeatureInstanceError as exc:
+        raise KeyError(f"cannot bind snapshot anchor for unregistered feature {feature_name!r}") from exc
+    _SNAPSHOT_ANCHOR_BINDINGS[(resolved["physical_alias"], study_name)] = anchor
 
 
 def effective_snapshot_anchor(feature_name: str, study_name: str) -> str:
     """The snapshot anchor `study_name` actually uses for `feature_name`:
     its own declared binding if one was made via `bind_snapshot_anchor`,
     else the registry entry's shared class-level default."""
-    if feature_name not in FEATURE_REGISTRY:
-        raise KeyError(f"unregistered feature {feature_name!r}")
-    key = (feature_name, study_name)
+    try:
+        resolved = resolve_feature_request(feature_name)
+    except FeatureInstanceError as exc:
+        raise KeyError(f"unregistered feature {feature_name!r}") from exc
+    key = (resolved["physical_alias"], study_name)
     if key in _SNAPSHOT_ANCHOR_BINDINGS:
         return _SNAPSHOT_ANCHOR_BINDINGS[key]
-    return FEATURE_REGISTRY[feature_name].snapshot_anchor
+    # Canonical definitions place timing in their instance input contract;
+    # legacy pre-cutover records retain their historical default only behind
+    # this boundary.
+    return "canonical_instance_contract" if _canonical_bundle("active") else FEATURE_REGISTRY[feature_name].snapshot_anchor

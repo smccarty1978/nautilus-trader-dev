@@ -34,12 +34,24 @@ OBSERVATIONS_INTERFACE_ATTRS = (
 )
 
 
-def resolve_collection_allowed_feature_aliases(features_spec: Any) -> List[str]:
+def resolve_collection_allowed_feature_aliases(features_spec: Any, *, authority: str = "active") -> List[str]:
     """Shared collection contract surface for persistence and productive READINESS."""
-    from features.registry import resolve_source_universe
+    from features.registry import FeatureInstance, resolve_feature_instances, resolve_source_universe
     source = getattr(features_spec, "source", None)
     feature_list = getattr(features_spec, "feature_list", None) or []
-    return sorted(set(feature_list) | set(resolve_source_universe(source)))
+    instances = []
+    for item in (getattr(features_spec, "instances", None) or []):
+        instances.append(FeatureInstance(
+            str(item["feature"]), dict(item.get("parameters", {})), item.get("physical_alias")
+        ))
+    resolved = resolve_feature_instances(source, tuple(instances), legacy_mode=False) if instances else []
+    # Explicit FeatureInstances define a study's bounded output contract.  Do not
+    # silently expand it to the global canonical definition universe merely because
+    # ``selection.source`` is present; that would reintroduce the instance-vs-library
+    # ambiguity this resolver is meant to eliminate.
+    if instances:
+        return sorted(set(feature_list) | {item["physical_alias"] for item in resolved})
+    return sorted(set(feature_list) | set(resolve_source_universe(source, authority=authority)))
 
 
 def extract_strategy_dataframe(strat: Any, attr_names: Tuple[str, ...]) -> Tuple[pd.DataFrame, bool]:
@@ -290,12 +302,14 @@ class OutputManager:
         output_base_dir: Optional[Path] = None,
         composite_seal_hash: Optional[str] = None,
         execution_manifest_sha256: Optional[str] = None,
+        feature_authority: str = "active",
     ) -> None:
         self.study_data = study_data
         self.data_plan = data_plan
         self.run_plan = run_plan
         self.composite_seal_hash = composite_seal_hash
         self.execution_manifest_sha256 = execution_manifest_sha256
+        self.feature_authority = feature_authority
 
         if output_base_dir is None:
             repo_root = Path(__file__).resolve().parents[2]
@@ -324,6 +338,7 @@ class OutputManager:
             "spec_sha256": self.study_data.spec_sha256,
             "composite_seal_hash": self.composite_seal_hash,
             "execution_manifest_sha256": self.execution_manifest_sha256,
+            "feature_authority": self.feature_authority,
             "stage": self.run_plan.stage.value,
             "dates": {
                 "start": self.run_plan.start_date,
@@ -424,7 +439,9 @@ class OutputManager:
         # is frozen. Resolving that source is what makes those columns allowed at
         # collection time; expected_feats (the frozen list) stays exactly as declared --
         # empty here is not a defect, it is "not yet selected".
-        collection_universe = resolve_collection_allowed_feature_aliases(self.study_data.spec.features)
+        collection_universe = resolve_collection_allowed_feature_aliases(
+            self.study_data.spec.features, authority=self.feature_authority,
+        )
 
         allowed_columns = set(expected_feats) | set(declared_metadata) | set(collection_universe)
 

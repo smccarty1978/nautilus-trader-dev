@@ -1,7 +1,7 @@
 {
   "study_id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
   "study_type": "flip_prediction",
-  "spec_sha256": "2ce0817ac7df4c9ad5e16fd83f77fc5b865e9229eaa8265c9c6d134bac18b0a5",
+  "spec_sha256": "4c779f5ef35d4035a9db311d2b7125eb10c74f8d275401b10713754657475802",
   "spec": {
     "study": {
       "id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
@@ -116,6 +116,7 @@
         "rolling_5m_max_speed_vs_lifetime",
         "rolling_5m_retention_ratio"
       ],
+      "instances": null,
       "feature_list_sha256": "2a744cfa3acfa437ae0ff8219c56451e176a170ae83450c52b8ca42842b0cba5",
       "directional_mapping": "direction_normalized",
       "timing_contract": "verified",
@@ -257,6 +258,8 @@
       },
       "causal_checkpoint": {
         "checkpoint_frequency": "5s",
+        "checkpoint_grid_origin": "regime_start_ns",
+        "triggering_stream": "completed_1s_bar",
         "observation_timing": "interval_close"
       }
     },
@@ -339,26 +342,2191 @@
         "rolling_5m_max_speed_vs_lifetime",
         "rolling_5m_retention_ratio"
       ],
+      "resolved_feature_instances": [
+        {
+          "requested": "rolling_5m_low_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_low",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "5m"
+          },
+          "physical_alias": "rolling_5m_low_signed_distance_atr"
+        },
+        {
+          "requested": "rth_elapsed_seconds",
+          "canonical_name": "elapsed_seconds",
+          "parameters": {
+            "context": "RTH"
+          },
+          "physical_alias": "rth_elapsed_seconds"
+        },
+        {
+          "requested": "rolling_15m_high_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_high",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "15m"
+          },
+          "physical_alias": "rolling_15m_high_signed_distance_atr"
+        },
+        {
+          "requested": "rolling_60m_high_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_high",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "60m"
+          },
+          "physical_alias": "rolling_60m_high_signed_distance_atr"
+        },
+        {
+          "requested": "rolling_15m_low_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_low",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "15m"
+          },
+          "physical_alias": "rolling_15m_low_signed_distance_atr"
+        },
+        {
+          "requested": "rolling_30m_low_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_low",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "30m"
+          },
+          "physical_alias": "rolling_30m_low_signed_distance_atr"
+        },
+        {
+          "requested": "price_change_points_60s",
+          "canonical_name": "price_change_points",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "60s"
+          },
+          "physical_alias": "price_change_points_60s"
+        },
+        {
+          "requested": "rolling_30m_high_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_high",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "30m"
+          },
+          "physical_alias": "rolling_30m_high_signed_distance_atr"
+        },
+        {
+          "requested": "range_points_1800s",
+          "canonical_name": "range_points",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "1800s"
+          },
+          "physical_alias": "range_points_1800s"
+        },
+        {
+          "requested": "opening_range_30m_low_developing_signed_distance_points",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "opening_range_low_developing",
+            "level_context": "session",
+            "normalization": "points",
+            "timeframe": "30m"
+          },
+          "physical_alias": "opening_range_30m_low_developing_signed_distance_points"
+        },
+        {
+          "requested": "est_bear_vol_sum_300s",
+          "canonical_name": "est_bear_vol_sum",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "300s"
+          },
+          "physical_alias": "est_bear_vol_sum_300s"
+        },
+        {
+          "requested": "full_level_envelope_width_atr",
+          "canonical_name": "price_level_aggregate",
+          "parameters": {
+            "level_context": "session",
+            "metric": "full_level_envelope_width_atr"
+          },
+          "physical_alias": "full_level_envelope_width_atr"
+        },
+        {
+          "requested": "rth_vol_cum",
+          "canonical_name": "vol_cum",
+          "parameters": {
+            "context": "RTH"
+          },
+          "physical_alias": "rth_vol_cum"
+        },
+        {
+          "requested": "est_delta_sum_1800s",
+          "canonical_name": "est_delta_sum",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "1800s"
+          },
+          "physical_alias": "est_delta_sum_1800s"
+        },
+        {
+          "requested": "price_change_atr_60s",
+          "canonical_name": "price_change_atr",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "60s"
+          },
+          "physical_alias": "price_change_atr_60s"
+        },
+        {
+          "requested": "prior_day_close_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "prior_day_close",
+            "level_context": "prior_day",
+            "normalization": "atr"
+          },
+          "physical_alias": "prior_day_close_signed_distance_atr"
+        },
+        {
+          "requested": "up_down_vol_ratio_1800s",
+          "canonical_name": "up_down_vol_ratio",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "1800s"
+          },
+          "physical_alias": "up_down_vol_ratio_1800s"
+        },
+        {
+          "requested": "price_change_atr_30s",
+          "canonical_name": "price_change_atr",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "30s"
+          },
+          "physical_alias": "price_change_atr_30s"
+        },
+        {
+          "requested": "pct_levels_behind_trade",
+          "canonical_name": "price_level_aggregate",
+          "parameters": {
+            "level_context": "session",
+            "metric": "pct_levels_behind_trade"
+          },
+          "physical_alias": "pct_levels_behind_trade"
+        },
+        {
+          "requested": "prior_day_low_signed_distance_points",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "prior_day_low",
+            "level_context": "prior_day",
+            "normalization": "points"
+          },
+          "physical_alias": "prior_day_low_signed_distance_points"
+        },
+        {
+          "requested": "opening_range_30m_low_final_signed_distance_points",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "opening_range_low_final",
+            "level_context": "session",
+            "normalization": "points",
+            "timeframe": "30m"
+          },
+          "physical_alias": "opening_range_30m_low_final_signed_distance_points"
+        },
+        {
+          "requested": "vol_max_1s_1800s",
+          "canonical_name": "vol_max",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "1s",
+            "timeframe_2": "1800s"
+          },
+          "physical_alias": "vol_max_1s_1800s"
+        },
+        {
+          "requested": "price_position_in_full_envelope",
+          "canonical_name": "price_level_aggregate",
+          "parameters": {
+            "level_context": "session",
+            "metric": "price_position_in_full_envelope"
+          },
+          "physical_alias": "price_position_in_full_envelope"
+        },
+        {
+          "requested": "rth_abs_delta_cum",
+          "canonical_name": "abs_delta_cum",
+          "parameters": {
+            "context": "RTH"
+          },
+          "physical_alias": "rth_abs_delta_cum"
+        },
+        {
+          "requested": "n_levels_below",
+          "canonical_name": "price_level_aggregate",
+          "parameters": {
+            "level_context": "session",
+            "metric": "n_levels_below"
+          },
+          "physical_alias": "n_levels_below"
+        },
+        {
+          "requested": "current_1m_move_outside_completed_5m_range",
+          "canonical_name": "move_outside_completed_range",
+          "parameters": {
+            "context": "current",
+            "reference_bar_state": "completed",
+            "reference_timeframe": "5m",
+            "source_bar_state": "completed",
+            "source_timeframe": "1m"
+          },
+          "physical_alias": "current_1m_move_outside_completed_5m_range"
+        },
+        {
+          "requested": "current_5m_directional_displacement_atr",
+          "canonical_name": "regime_directional_displacement_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "current",
+            "timeframe": "5m"
+          },
+          "physical_alias": "current_5m_directional_displacement_atr"
+        },
+        {
+          "requested": "current_5m_regime_age_min",
+          "canonical_name": "regime_age_min",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "current",
+            "timeframe": "5m"
+          },
+          "physical_alias": "current_5m_regime_age_min"
+        },
+        {
+          "requested": "current_5m_regime_range_atr",
+          "canonical_name": "regime_range_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "current",
+            "timeframe": "5m"
+          },
+          "physical_alias": "current_5m_regime_range_atr"
+        },
+        {
+          "requested": "current_5m_regime_range_atr_per_min",
+          "canonical_name": "regime_range_atr_per_min",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "current",
+            "timeframe": "5m"
+          },
+          "physical_alias": "current_5m_regime_range_atr_per_min"
+        },
+        {
+          "requested": "distance_to_completed_5m_high_atr",
+          "canonical_name": "distance_to_completed_range_high_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "reference_timeframe": "5m"
+          },
+          "physical_alias": "distance_to_completed_5m_high_atr"
+        },
+        {
+          "requested": "distance_to_completed_5m_low_atr",
+          "canonical_name": "distance_to_completed_range_low_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "reference_timeframe": "5m"
+          },
+          "physical_alias": "distance_to_completed_5m_low_atr"
+        },
+        {
+          "requested": "prior_1m_regime_duration_min",
+          "canonical_name": "regime_duration_min",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "1m"
+          },
+          "physical_alias": "prior_1m_regime_duration_min"
+        },
+        {
+          "requested": "prior_1m_regime_efficiency",
+          "canonical_name": "regime_efficiency",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "1m"
+          },
+          "physical_alias": "prior_1m_regime_efficiency"
+        },
+        {
+          "requested": "prior_1m_regime_mfe_atr",
+          "canonical_name": "regime_mfe_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "1m"
+          },
+          "physical_alias": "prior_1m_regime_mfe_atr"
+        },
+        {
+          "requested": "prior_1m_regime_net_directional_move_atr",
+          "canonical_name": "regime_net_directional_move_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "1m"
+          },
+          "physical_alias": "prior_1m_regime_net_directional_move_atr"
+        },
+        {
+          "requested": "prior_1m_regime_net_move_atr_per_min",
+          "canonical_name": "regime_net_move_atr_per_min",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "1m"
+          },
+          "physical_alias": "prior_1m_regime_net_move_atr_per_min"
+        },
+        {
+          "requested": "prior_1m_regime_range_atr",
+          "canonical_name": "regime_range_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "1m"
+          },
+          "physical_alias": "prior_1m_regime_range_atr"
+        },
+        {
+          "requested": "prior_1m_regime_range_atr_per_min",
+          "canonical_name": "regime_range_atr_per_min",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "1m"
+          },
+          "physical_alias": "prior_1m_regime_range_atr_per_min"
+        },
+        {
+          "requested": "prior_5m_regime_duration_min",
+          "canonical_name": "regime_duration_min",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "5m"
+          },
+          "physical_alias": "prior_5m_regime_duration_min"
+        },
+        {
+          "requested": "prior_5m_regime_efficiency",
+          "canonical_name": "regime_efficiency",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "5m"
+          },
+          "physical_alias": "prior_5m_regime_efficiency"
+        },
+        {
+          "requested": "prior_5m_regime_mfe_atr",
+          "canonical_name": "regime_mfe_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "5m"
+          },
+          "physical_alias": "prior_5m_regime_mfe_atr"
+        },
+        {
+          "requested": "prior_5m_regime_net_directional_move_atr",
+          "canonical_name": "regime_net_directional_move_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "5m"
+          },
+          "physical_alias": "prior_5m_regime_net_directional_move_atr"
+        },
+        {
+          "requested": "prior_5m_regime_net_move_atr_per_min",
+          "canonical_name": "regime_net_move_atr_per_min",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "5m"
+          },
+          "physical_alias": "prior_5m_regime_net_move_atr_per_min"
+        },
+        {
+          "requested": "prior_5m_regime_range_atr",
+          "canonical_name": "regime_range_atr",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "5m"
+          },
+          "physical_alias": "prior_5m_regime_range_atr"
+        },
+        {
+          "requested": "prior_5m_regime_range_atr_per_min",
+          "canonical_name": "regime_range_atr_per_min",
+          "parameters": {
+            "bar_state": "completed",
+            "context": "prior",
+            "timeframe": "5m"
+          },
+          "physical_alias": "prior_5m_regime_range_atr_per_min"
+        },
+        {
+          "requested": "regime_expansion_atr_per_min",
+          "canonical_name": "regime_expansion_atr_per_min",
+          "parameters": {
+            "context": "current"
+          },
+          "physical_alias": "regime_expansion_atr_per_min"
+        },
+        {
+          "requested": "structural_current_expansion_atr",
+          "canonical_name": "structural_current_expansion_atr",
+          "parameters": {
+            "context": "current"
+          },
+          "physical_alias": "structural_current_expansion_atr"
+        },
+        {
+          "requested": "structural_expansion_atr_per_min",
+          "canonical_name": "structural_expansion_atr_per_min",
+          "parameters": {
+            "context": "current"
+          },
+          "physical_alias": "structural_expansion_atr_per_min"
+        },
+        {
+          "requested": "structural_giveback_atr",
+          "canonical_name": "structural_giveback_atr",
+          "parameters": {
+            "context": "current"
+          },
+          "physical_alias": "structural_giveback_atr"
+        },
+        {
+          "requested": "structural_max_expansion_atr",
+          "canonical_name": "structural_max_expansion_atr",
+          "parameters": {
+            "context": "current"
+          },
+          "physical_alias": "structural_max_expansion_atr"
+        },
+        {
+          "requested": "structural_retention_ratio",
+          "canonical_name": "structural_retention_ratio",
+          "parameters": {
+            "context": "current"
+          },
+          "physical_alias": "structural_retention_ratio"
+        },
+        {
+          "requested": "rolling_5m_current_progress_atr",
+          "canonical_name": "rolling_current_progress_atr",
+          "parameters": {
+            "update_every": "1s",
+            "window": "300s"
+          },
+          "physical_alias": "rolling_5m_current_progress_atr"
+        },
+        {
+          "requested": "rolling_5m_current_speed_atr_per_min",
+          "canonical_name": "rolling_current_speed_atr_per_min",
+          "parameters": {
+            "update_every": "1s",
+            "window": "300s"
+          },
+          "physical_alias": "rolling_5m_current_speed_atr_per_min"
+        },
+        {
+          "requested": "rolling_5m_current_speed_vs_lifetime",
+          "canonical_name": "rolling_current_speed_vs_lifetime",
+          "parameters": {
+            "update_every": "1s",
+            "window": "300s"
+          },
+          "physical_alias": "rolling_5m_current_speed_vs_lifetime"
+        },
+        {
+          "requested": "rolling_5m_giveback_atr",
+          "canonical_name": "rolling_giveback_atr",
+          "parameters": {
+            "update_every": "1s",
+            "window": "300s"
+          },
+          "physical_alias": "rolling_5m_giveback_atr"
+        },
+        {
+          "requested": "rolling_5m_max_progress_atr",
+          "canonical_name": "rolling_max_progress_atr",
+          "parameters": {
+            "update_every": "1s",
+            "window": "300s"
+          },
+          "physical_alias": "rolling_5m_max_progress_atr"
+        },
+        {
+          "requested": "rolling_5m_max_speed_atr_per_min",
+          "canonical_name": "rolling_max_speed_atr_per_min",
+          "parameters": {
+            "update_every": "1s",
+            "window": "300s"
+          },
+          "physical_alias": "rolling_5m_max_speed_atr_per_min"
+        },
+        {
+          "requested": "rolling_5m_max_speed_vs_lifetime",
+          "canonical_name": "rolling_max_speed_vs_lifetime",
+          "parameters": {
+            "update_every": "1s",
+            "window": "300s"
+          },
+          "physical_alias": "rolling_5m_max_speed_vs_lifetime"
+        },
+        {
+          "requested": "rolling_5m_retention_ratio",
+          "canonical_name": "rolling_retention_ratio",
+          "parameters": {
+            "update_every": "1s",
+            "window": "300s"
+          },
+          "physical_alias": "rolling_5m_retention_ratio"
+        }
+      ],
       "feature_list_sha256": "2a744cfa3acfa437ae0ff8219c56451e176a170ae83450c52b8ca42842b0cba5",
       "bound_trackers": [
-        "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
-        "features.trackers.price_levels.PriceLevelTracker",
-        "features.trackers.rolling_5m_productivity.Rolling5mProductivityTracker",
-        "features.trackers.structural_regime_geometry.StructuralRegimeGeometryTracker"
+        "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+        "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider"
       ],
       "families": [
-        "ohlcv_est_delta",
-        "price_level_context",
-        "rolling_5m_productivity",
-        "structural_regime_geometry"
+        "['ohlcv_est_delta']",
+        "['price_level_context']",
+        "['rolling_5m_productivity']",
+        "['structural_regime_geometry']"
       ],
       "source_timeframes": [
-        "1m",
-        "1s",
-        "1s+1m+5m"
+        "completed_15m",
+        "completed_1800s",
+        "completed_1m",
+        "completed_1s",
+        "completed_1s+1m+5m",
+        "completed_300s",
+        "completed_30m",
+        "completed_30s",
+        "completed_5m",
+        "completed_60m",
+        "completed_60s"
       ],
+      "feature_statuses": {
+        "rolling_5m_low_signed_distance_atr": "verified",
+        "rth_elapsed_seconds": "verified",
+        "rolling_15m_high_signed_distance_atr": "verified",
+        "rolling_60m_high_signed_distance_atr": "verified",
+        "rolling_15m_low_signed_distance_atr": "verified",
+        "rolling_30m_low_signed_distance_atr": "verified",
+        "price_change_points_60s": "verified",
+        "rolling_30m_high_signed_distance_atr": "verified",
+        "range_points_1800s": "verified",
+        "opening_range_30m_low_developing_signed_distance_points": "verified",
+        "est_bear_vol_sum_300s": "verified",
+        "full_level_envelope_width_atr": "verified",
+        "rth_vol_cum": "verified",
+        "est_delta_sum_1800s": "verified",
+        "price_change_atr_60s": "verified",
+        "prior_day_close_signed_distance_atr": "verified",
+        "up_down_vol_ratio_1800s": "verified",
+        "price_change_atr_30s": "verified",
+        "pct_levels_behind_trade": "verified",
+        "prior_day_low_signed_distance_points": "verified",
+        "opening_range_30m_low_final_signed_distance_points": "verified",
+        "vol_max_1s_1800s": "verified",
+        "price_position_in_full_envelope": "verified",
+        "rth_abs_delta_cum": "verified",
+        "n_levels_below": "verified",
+        "current_1m_move_outside_completed_5m_range": "verified",
+        "current_5m_directional_displacement_atr": "verified",
+        "current_5m_regime_age_min": "verified",
+        "current_5m_regime_range_atr": "verified",
+        "current_5m_regime_range_atr_per_min": "verified",
+        "distance_to_completed_5m_high_atr": "verified",
+        "distance_to_completed_5m_low_atr": "verified",
+        "prior_1m_regime_duration_min": "verified",
+        "prior_1m_regime_efficiency": "verified",
+        "prior_1m_regime_mfe_atr": "verified",
+        "prior_1m_regime_net_directional_move_atr": "verified",
+        "prior_1m_regime_net_move_atr_per_min": "verified",
+        "prior_1m_regime_range_atr": "verified",
+        "prior_1m_regime_range_atr_per_min": "verified",
+        "prior_5m_regime_duration_min": "verified",
+        "prior_5m_regime_efficiency": "verified",
+        "prior_5m_regime_mfe_atr": "verified",
+        "prior_5m_regime_net_directional_move_atr": "verified",
+        "prior_5m_regime_net_move_atr_per_min": "verified",
+        "prior_5m_regime_range_atr": "verified",
+        "prior_5m_regime_range_atr_per_min": "verified",
+        "regime_expansion_atr_per_min": "verified",
+        "structural_current_expansion_atr": "verified",
+        "structural_expansion_atr_per_min": "verified",
+        "structural_giveback_atr": "verified",
+        "structural_max_expansion_atr": "verified",
+        "structural_retention_ratio": "verified",
+        "rolling_5m_current_progress_atr": "verified",
+        "rolling_5m_current_speed_atr_per_min": "verified",
+        "rolling_5m_current_speed_vs_lifetime": "verified",
+        "rolling_5m_giveback_atr": "verified",
+        "rolling_5m_max_progress_atr": "verified",
+        "rolling_5m_max_speed_atr_per_min": "verified",
+        "rolling_5m_max_speed_vs_lifetime": "verified",
+        "rolling_5m_retention_ratio": "verified"
+      },
+      "feature_null_policies": {
+        "rolling_5m_low_signed_distance_atr": "allow",
+        "rth_elapsed_seconds": "allow",
+        "rolling_15m_high_signed_distance_atr": "allow",
+        "rolling_60m_high_signed_distance_atr": "allow",
+        "rolling_15m_low_signed_distance_atr": "allow",
+        "rolling_30m_low_signed_distance_atr": "allow",
+        "price_change_points_60s": "allow",
+        "rolling_30m_high_signed_distance_atr": "allow",
+        "range_points_1800s": "allow",
+        "opening_range_30m_low_developing_signed_distance_points": "allow",
+        "est_bear_vol_sum_300s": "allow",
+        "full_level_envelope_width_atr": "allow",
+        "rth_vol_cum": "allow",
+        "est_delta_sum_1800s": "allow",
+        "price_change_atr_60s": "allow",
+        "prior_day_close_signed_distance_atr": "allow",
+        "up_down_vol_ratio_1800s": "allow",
+        "price_change_atr_30s": "allow",
+        "pct_levels_behind_trade": "allow",
+        "prior_day_low_signed_distance_points": "allow",
+        "opening_range_30m_low_final_signed_distance_points": "allow",
+        "vol_max_1s_1800s": "allow",
+        "price_position_in_full_envelope": "allow",
+        "rth_abs_delta_cum": "allow",
+        "n_levels_below": "allow",
+        "current_1m_move_outside_completed_5m_range": "allow",
+        "current_5m_directional_displacement_atr": "allow",
+        "current_5m_regime_age_min": "allow",
+        "current_5m_regime_range_atr": "allow",
+        "current_5m_regime_range_atr_per_min": "allow",
+        "distance_to_completed_5m_high_atr": "allow",
+        "distance_to_completed_5m_low_atr": "allow",
+        "prior_1m_regime_duration_min": "allow",
+        "prior_1m_regime_efficiency": "allow",
+        "prior_1m_regime_mfe_atr": "allow",
+        "prior_1m_regime_net_directional_move_atr": "allow",
+        "prior_1m_regime_net_move_atr_per_min": "allow",
+        "prior_1m_regime_range_atr": "allow",
+        "prior_1m_regime_range_atr_per_min": "allow",
+        "prior_5m_regime_duration_min": "allow",
+        "prior_5m_regime_efficiency": "allow",
+        "prior_5m_regime_mfe_atr": "allow",
+        "prior_5m_regime_net_directional_move_atr": "allow",
+        "prior_5m_regime_net_move_atr_per_min": "allow",
+        "prior_5m_regime_range_atr": "allow",
+        "prior_5m_regime_range_atr_per_min": "allow",
+        "regime_expansion_atr_per_min": "allow",
+        "structural_current_expansion_atr": "allow",
+        "structural_expansion_atr_per_min": "allow",
+        "structural_giveback_atr": "allow",
+        "structural_max_expansion_atr": "allow",
+        "structural_retention_ratio": "allow",
+        "rolling_5m_current_progress_atr": "allow",
+        "rolling_5m_current_speed_atr_per_min": "allow",
+        "rolling_5m_current_speed_vs_lifetime": "allow",
+        "rolling_5m_giveback_atr": "allow",
+        "rolling_5m_max_progress_atr": "allow",
+        "rolling_5m_max_speed_atr_per_min": "allow",
+        "rolling_5m_max_speed_vs_lifetime": "allow",
+        "rolling_5m_retention_ratio": "allow"
+      },
+      "contains_provisional_features": [],
       "directional_mapping": "direction_normalized",
-      "timing_contract": "verified"
+      "timing_contract": "verified",
+      "runtime_data_requirements": {
+        "resolved_instances": [
+          {
+            "requested": "rolling_5m_low_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_low",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "5m"
+            },
+            "physical_alias": "rolling_5m_low_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "rth_elapsed_seconds",
+            "canonical_name": "elapsed_seconds",
+            "parameters": {
+              "context": "RTH"
+            },
+            "physical_alias": "rth_elapsed_seconds",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "elapsed_seconds",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1m",
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_15m_high_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_high",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "15m"
+            },
+            "physical_alias": "rolling_15m_high_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_15m"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_60m_high_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_high",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "60m"
+            },
+            "physical_alias": "rolling_60m_high_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_60m"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_15m_low_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_low",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "15m"
+            },
+            "physical_alias": "rolling_15m_low_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_15m"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_30m_low_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_low",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "30m"
+            },
+            "physical_alias": "rolling_30m_low_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_30m"
+              ]
+            }
+          },
+          {
+            "requested": "price_change_points_60s",
+            "canonical_name": "price_change_points",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "60s"
+            },
+            "physical_alias": "price_change_points_60s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_change_points",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_60s"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_30m_high_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_high",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "30m"
+            },
+            "physical_alias": "rolling_30m_high_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_30m"
+              ]
+            }
+          },
+          {
+            "requested": "range_points_1800s",
+            "canonical_name": "range_points",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "1800s"
+            },
+            "physical_alias": "range_points_1800s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "range_points",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1800s"
+              ]
+            }
+          },
+          {
+            "requested": "opening_range_30m_low_developing_signed_distance_points",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "opening_range_low_developing",
+              "level_context": "session",
+              "normalization": "points",
+              "timeframe": "30m"
+            },
+            "physical_alias": "opening_range_30m_low_developing_signed_distance_points",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_30m"
+              ]
+            }
+          },
+          {
+            "requested": "est_bear_vol_sum_300s",
+            "canonical_name": "est_bear_vol_sum",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "300s"
+            },
+            "physical_alias": "est_bear_vol_sum_300s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "est_bear_vol_sum",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_300s"
+              ]
+            }
+          },
+          {
+            "requested": "full_level_envelope_width_atr",
+            "canonical_name": "price_level_aggregate",
+            "parameters": {
+              "level_context": "session",
+              "metric": "full_level_envelope_width_atr"
+            },
+            "physical_alias": "full_level_envelope_width_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_level_aggregate",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "rth_vol_cum",
+            "canonical_name": "vol_cum",
+            "parameters": {
+              "context": "RTH"
+            },
+            "physical_alias": "rth_vol_cum",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "vol_cum",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "est_delta_sum_1800s",
+            "canonical_name": "est_delta_sum",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "1800s"
+            },
+            "physical_alias": "est_delta_sum_1800s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "est_delta_sum",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1800s"
+              ]
+            }
+          },
+          {
+            "requested": "price_change_atr_60s",
+            "canonical_name": "price_change_atr",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "60s"
+            },
+            "physical_alias": "price_change_atr_60s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_change_atr",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_60s"
+              ]
+            }
+          },
+          {
+            "requested": "prior_day_close_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "prior_day_close",
+              "level_context": "prior_day",
+              "normalization": "atr"
+            },
+            "physical_alias": "prior_day_close_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "up_down_vol_ratio_1800s",
+            "canonical_name": "up_down_vol_ratio",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "1800s"
+            },
+            "physical_alias": "up_down_vol_ratio_1800s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "up_down_vol_ratio",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1800s"
+              ]
+            }
+          },
+          {
+            "requested": "price_change_atr_30s",
+            "canonical_name": "price_change_atr",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "30s"
+            },
+            "physical_alias": "price_change_atr_30s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_change_atr",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_30s"
+              ]
+            }
+          },
+          {
+            "requested": "pct_levels_behind_trade",
+            "canonical_name": "price_level_aggregate",
+            "parameters": {
+              "level_context": "session",
+              "metric": "pct_levels_behind_trade"
+            },
+            "physical_alias": "pct_levels_behind_trade",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_level_aggregate",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_day_low_signed_distance_points",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "prior_day_low",
+              "level_context": "prior_day",
+              "normalization": "points"
+            },
+            "physical_alias": "prior_day_low_signed_distance_points",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "opening_range_30m_low_final_signed_distance_points",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "opening_range_low_final",
+              "level_context": "session",
+              "normalization": "points",
+              "timeframe": "30m"
+            },
+            "physical_alias": "opening_range_30m_low_final_signed_distance_points",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_30m"
+              ]
+            }
+          },
+          {
+            "requested": "vol_max_1s_1800s",
+            "canonical_name": "vol_max",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "1s",
+              "timeframe_2": "1800s"
+            },
+            "physical_alias": "vol_max_1s_1800s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "vol_max",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "price_position_in_full_envelope",
+            "canonical_name": "price_level_aggregate",
+            "parameters": {
+              "level_context": "session",
+              "metric": "price_position_in_full_envelope"
+            },
+            "physical_alias": "price_position_in_full_envelope",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_level_aggregate",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "rth_abs_delta_cum",
+            "canonical_name": "abs_delta_cum",
+            "parameters": {
+              "context": "RTH"
+            },
+            "physical_alias": "rth_abs_delta_cum",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "abs_delta_cum",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "n_levels_below",
+            "canonical_name": "price_level_aggregate",
+            "parameters": {
+              "level_context": "session",
+              "metric": "n_levels_below"
+            },
+            "physical_alias": "n_levels_below",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_level_aggregate",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "current_1m_move_outside_completed_5m_range",
+            "canonical_name": "move_outside_completed_range",
+            "parameters": {
+              "context": "current",
+              "reference_bar_state": "completed",
+              "reference_timeframe": "5m",
+              "source_bar_state": "completed",
+              "source_timeframe": "1m"
+            },
+            "physical_alias": "current_1m_move_outside_completed_5m_range",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "move_outside_completed_range",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m",
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "current_5m_directional_displacement_atr",
+            "canonical_name": "regime_directional_displacement_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "current",
+              "timeframe": "5m"
+            },
+            "physical_alias": "current_5m_directional_displacement_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_directional_displacement_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "current_5m_regime_age_min",
+            "canonical_name": "regime_age_min",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "current",
+              "timeframe": "5m"
+            },
+            "physical_alias": "current_5m_regime_age_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_age_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "current_5m_regime_range_atr",
+            "canonical_name": "regime_range_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "current",
+              "timeframe": "5m"
+            },
+            "physical_alias": "current_5m_regime_range_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_range_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "current_5m_regime_range_atr_per_min",
+            "canonical_name": "regime_range_atr_per_min",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "current",
+              "timeframe": "5m"
+            },
+            "physical_alias": "current_5m_regime_range_atr_per_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_range_atr_per_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "distance_to_completed_5m_high_atr",
+            "canonical_name": "distance_to_completed_range_high_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "reference_timeframe": "5m"
+            },
+            "physical_alias": "distance_to_completed_5m_high_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_completed_range_high_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "distance_to_completed_5m_low_atr",
+            "canonical_name": "distance_to_completed_range_low_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "reference_timeframe": "5m"
+            },
+            "physical_alias": "distance_to_completed_5m_low_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_completed_range_low_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_1m_regime_duration_min",
+            "canonical_name": "regime_duration_min",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_duration_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_duration_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_1m_regime_efficiency",
+            "canonical_name": "regime_efficiency",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_efficiency",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_efficiency",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_1m_regime_mfe_atr",
+            "canonical_name": "regime_mfe_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_mfe_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_mfe_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_1m_regime_net_directional_move_atr",
+            "canonical_name": "regime_net_directional_move_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_net_directional_move_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_net_directional_move_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_1m_regime_net_move_atr_per_min",
+            "canonical_name": "regime_net_move_atr_per_min",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_net_move_atr_per_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_net_move_atr_per_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_1m_regime_range_atr",
+            "canonical_name": "regime_range_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_range_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_range_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_1m_regime_range_atr_per_min",
+            "canonical_name": "regime_range_atr_per_min",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_range_atr_per_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_range_atr_per_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_5m_regime_duration_min",
+            "canonical_name": "regime_duration_min",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_duration_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_duration_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_5m_regime_efficiency",
+            "canonical_name": "regime_efficiency",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_efficiency",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_efficiency",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_5m_regime_mfe_atr",
+            "canonical_name": "regime_mfe_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_mfe_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_mfe_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_5m_regime_net_directional_move_atr",
+            "canonical_name": "regime_net_directional_move_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_net_directional_move_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_net_directional_move_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_5m_regime_net_move_atr_per_min",
+            "canonical_name": "regime_net_move_atr_per_min",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_net_move_atr_per_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_net_move_atr_per_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_5m_regime_range_atr",
+            "canonical_name": "regime_range_atr",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_range_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_range_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_5m_regime_range_atr_per_min",
+            "canonical_name": "regime_range_atr_per_min",
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_range_atr_per_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_range_atr_per_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "regime_expansion_atr_per_min",
+            "canonical_name": "regime_expansion_atr_per_min",
+            "parameters": {
+              "context": "current"
+            },
+            "physical_alias": "regime_expansion_atr_per_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_expansion_atr_per_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1s+1m+5m"
+              ]
+            }
+          },
+          {
+            "requested": "structural_current_expansion_atr",
+            "canonical_name": "structural_current_expansion_atr",
+            "parameters": {
+              "context": "current"
+            },
+            "physical_alias": "structural_current_expansion_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "structural_current_expansion_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1s+1m+5m"
+              ]
+            }
+          },
+          {
+            "requested": "structural_expansion_atr_per_min",
+            "canonical_name": "structural_expansion_atr_per_min",
+            "parameters": {
+              "context": "current"
+            },
+            "physical_alias": "structural_expansion_atr_per_min",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "structural_expansion_atr_per_min",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1s+1m+5m"
+              ]
+            }
+          },
+          {
+            "requested": "structural_giveback_atr",
+            "canonical_name": "structural_giveback_atr",
+            "parameters": {
+              "context": "current"
+            },
+            "physical_alias": "structural_giveback_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "structural_giveback_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1s+1m+5m"
+              ]
+            }
+          },
+          {
+            "requested": "structural_max_expansion_atr",
+            "canonical_name": "structural_max_expansion_atr",
+            "parameters": {
+              "context": "current"
+            },
+            "physical_alias": "structural_max_expansion_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "structural_max_expansion_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1s+1m+5m"
+              ]
+            }
+          },
+          {
+            "requested": "structural_retention_ratio",
+            "canonical_name": "structural_retention_ratio",
+            "parameters": {
+              "context": "current"
+            },
+            "physical_alias": "structural_retention_ratio",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "structural_retention_ratio",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1s+1m+5m"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_5m_current_progress_atr",
+            "canonical_name": "rolling_current_progress_atr",
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_5m_current_progress_atr",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "family": [
+              "rolling_5m_productivity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "rolling_current_progress_atr",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "rolling_5m_current_speed_atr_per_min",
+            "canonical_name": "rolling_current_speed_atr_per_min",
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_5m_current_speed_atr_per_min",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "family": [
+              "rolling_5m_productivity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "rolling_current_speed_atr_per_min",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "rolling_5m_current_speed_vs_lifetime",
+            "canonical_name": "rolling_current_speed_vs_lifetime",
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_5m_current_speed_vs_lifetime",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "family": [
+              "rolling_5m_productivity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "rolling_current_speed_vs_lifetime",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "rolling_5m_giveback_atr",
+            "canonical_name": "rolling_giveback_atr",
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_5m_giveback_atr",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "family": [
+              "rolling_5m_productivity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "rolling_giveback_atr",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "rolling_5m_max_progress_atr",
+            "canonical_name": "rolling_max_progress_atr",
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_5m_max_progress_atr",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "family": [
+              "rolling_5m_productivity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "rolling_max_progress_atr",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "rolling_5m_max_speed_atr_per_min",
+            "canonical_name": "rolling_max_speed_atr_per_min",
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_5m_max_speed_atr_per_min",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "family": [
+              "rolling_5m_productivity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "rolling_max_speed_atr_per_min",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "rolling_5m_max_speed_vs_lifetime",
+            "canonical_name": "rolling_max_speed_vs_lifetime",
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_5m_max_speed_vs_lifetime",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "family": [
+              "rolling_5m_productivity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "rolling_max_speed_vs_lifetime",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "rolling_5m_retention_ratio",
+            "canonical_name": "rolling_retention_ratio",
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_5m_retention_ratio",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "family": [
+              "rolling_5m_productivity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "rolling_retention_ratio",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          }
+        ],
+        "required_streams": [
+          "completed_15m",
+          "completed_1800s",
+          "completed_1m",
+          "completed_1s",
+          "completed_1s+1m+5m",
+          "completed_300s",
+          "completed_30m",
+          "completed_30s",
+          "completed_5m",
+          "completed_60m",
+          "completed_60s"
+        ],
+        "rolling_windows": [
+          "300s"
+        ],
+        "aliases": [
+          "rolling_5m_low_signed_distance_atr",
+          "rth_elapsed_seconds",
+          "rolling_15m_high_signed_distance_atr",
+          "rolling_60m_high_signed_distance_atr",
+          "rolling_15m_low_signed_distance_atr",
+          "rolling_30m_low_signed_distance_atr",
+          "price_change_points_60s",
+          "rolling_30m_high_signed_distance_atr",
+          "range_points_1800s",
+          "opening_range_30m_low_developing_signed_distance_points",
+          "est_bear_vol_sum_300s",
+          "full_level_envelope_width_atr",
+          "rth_vol_cum",
+          "est_delta_sum_1800s",
+          "price_change_atr_60s",
+          "prior_day_close_signed_distance_atr",
+          "up_down_vol_ratio_1800s",
+          "price_change_atr_30s",
+          "pct_levels_behind_trade",
+          "prior_day_low_signed_distance_points",
+          "opening_range_30m_low_final_signed_distance_points",
+          "vol_max_1s_1800s",
+          "price_position_in_full_envelope",
+          "rth_abs_delta_cum",
+          "n_levels_below",
+          "current_1m_move_outside_completed_5m_range",
+          "current_5m_directional_displacement_atr",
+          "current_5m_regime_age_min",
+          "current_5m_regime_range_atr",
+          "current_5m_regime_range_atr_per_min",
+          "distance_to_completed_5m_high_atr",
+          "distance_to_completed_5m_low_atr",
+          "prior_1m_regime_duration_min",
+          "prior_1m_regime_efficiency",
+          "prior_1m_regime_mfe_atr",
+          "prior_1m_regime_net_directional_move_atr",
+          "prior_1m_regime_net_move_atr_per_min",
+          "prior_1m_regime_range_atr",
+          "prior_1m_regime_range_atr_per_min",
+          "prior_5m_regime_duration_min",
+          "prior_5m_regime_efficiency",
+          "prior_5m_regime_mfe_atr",
+          "prior_5m_regime_net_directional_move_atr",
+          "prior_5m_regime_net_move_atr_per_min",
+          "prior_5m_regime_range_atr",
+          "prior_5m_regime_range_atr_per_min",
+          "regime_expansion_atr_per_min",
+          "structural_current_expansion_atr",
+          "structural_expansion_atr_per_min",
+          "structural_giveback_atr",
+          "structural_max_expansion_atr",
+          "structural_retention_ratio",
+          "rolling_5m_current_progress_atr",
+          "rolling_5m_current_speed_atr_per_min",
+          "rolling_5m_current_speed_vs_lifetime",
+          "rolling_5m_giveback_atr",
+          "rolling_5m_max_progress_atr",
+          "rolling_5m_max_speed_atr_per_min",
+          "rolling_5m_max_speed_vs_lifetime",
+          "rolling_5m_retention_ratio"
+        ]
+      }
     },
     "execution_contract": {
       "runtime": "nautilustrader",
@@ -384,6 +2552,8 @@
     },
     "timestamp_contract": {
       "source": "databento_glbx_mdp3",
+      "instrument_symbol": "NQ",
+      "measured_catalog_rel_path": "data/catalog/NQ_v0_2020_2026",
       "raw_timestamp_semantic": "OPEN_STAMPED",
       "raw_index_field": "ts_event",
       "timezone": "UTC",
@@ -434,6 +2604,55 @@
         }
       },
       "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "deliverables_contract": {
+      "contract_version": 1,
+      "authorized_modes": [
+        "collect"
+      ],
+      "deliverables_by_mode": {
+        "collect": [
+          "candidates.parquet",
+          "observations.parquet",
+          "collection_manifest.json",
+          "run_manifest.json",
+          "status.json"
+        ]
+      },
+      "artifact_metadata": {
+        "candidates.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "observations.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "collection_manifest.json": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "run_manifest.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::OutputManager",
+          "relative_to": "run_dir"
+        },
+        "status.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir"
+        }
+      },
+      "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
     },
     "lineage": {
       "has_parent": true,

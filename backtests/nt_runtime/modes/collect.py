@@ -28,6 +28,7 @@ def run_collect_mode(
     date_override: Optional[str] = None,
     output_dir: Optional[Union[str, Path]] = None,
     log_level: str = "ERROR",
+    feature_authority: str = "active",
 ) -> Dict[str, Any]:
     """Runs a study in 'collect' mode through the NautilusTrader BacktestEngine."""
     # 1. Load and validate compiled study
@@ -35,10 +36,17 @@ def run_collect_mode(
     spec = study_data.spec
 
     # 2. Cryptographic Pre-Execution Audit Seal Check (fail-closed)
-    from scripts.resolve_execution_manifest import verify_frozen_execution_identity
-    verify_frozen_execution_identity(study_data.study_dir, REPO_ROOT)
-
-    seal_data = verify_preexec_audit_seal(study_data.study_dir)
+    if feature_authority not in {"active", "candidate"}:
+        raise ValueError(f"UNKNOWN_FEATURE_AUTHORITY: {feature_authority!r}")
+    if feature_authority == "active":
+        from scripts.resolve_execution_manifest import verify_frozen_execution_identity
+        verify_frozen_execution_identity(study_data.study_dir, REPO_ROOT)
+        seal_data = verify_preexec_audit_seal(study_data.study_dir)
+    else:
+        # Candidate runs are explicit governance probes, never default runtime.
+        from features.candidate_authority import load_authority
+        load_authority("candidate")
+        seal_data = {}
 
     # 3. Resolve bounded run plan & data plan
     run_plan = resolve_run_plan(study_data, stage=stage, reference_date=date_override)
@@ -171,6 +179,7 @@ def run_collect_mode(
         output_base_dir=out_dir_path,
         composite_seal_hash=launch_seal_hash,
         execution_manifest_sha256=launch_manifest_hash,
+        feature_authority=feature_authority,
     )
     telemetry = CausalTelemetry()
     telemetry.start()
@@ -181,7 +190,7 @@ def run_collect_mode(
     try:
         return _execute_collect(
             study_data, spec, data_plan, run_plan, strategy_binding,
-            output_mgr, telemetry, log_level,
+            output_mgr, telemetry, log_level, feature_authority,
         )
     except KeyboardInterrupt as exc:
         output_mgr.finalize_failed(exc, status="ABORTED")
@@ -196,6 +205,7 @@ def build_collector_config_kwargs(
     spec: Any,
     study_data: Any,
     data_plan: DataPlan,
+    *, feature_authority: str = "active",
 ) -> Dict[str, Any]:
     """Resolves the StrategyConfig kwargs a governed collector is constructed with.
 
@@ -214,8 +224,26 @@ def build_collector_config_kwargs(
         cfg_kwargs["target_direction"] = spec.target.direction or "bearish"
     if hasattr(strategy_binding.config_cls, "horizon_seconds"):
         cfg_kwargs["horizon_seconds"] = spec.target.horizon_seconds or 300
+    qualification = spec.population.qualification or {}
+    if hasattr(strategy_binding.config_cls, "age_gate_seconds"):
+        cfg_kwargs["age_gate_seconds"] = int(qualification.get("age_gate_seconds", 120))
+    if hasattr(strategy_binding.config_cls, "established_required"):
+        cfg_kwargs["established_required"] = bool(qualification.get("established", True))
+    if hasattr(strategy_binding.config_cls, "checkpoint_interval_seconds"):
+        cfg_kwargs["checkpoint_interval_seconds"] = int(qualification.get("cadence_seconds", 5))
+    if hasattr(strategy_binding.config_cls, "running_mfe_atr_gte"):
+        cfg_kwargs["running_mfe_atr_gte"] = float(qualification.get("running_mfe_atr_gte", 1.0))
+    if hasattr(strategy_binding.config_cls, "new_progress_windows_gte"):
+        cfg_kwargs["new_progress_windows_gte"] = int(qualification.get("new_progress_windows_gte", 2))
+    if hasattr(strategy_binding.config_cls, "retained_mfe_ratio_gte"):
+        cfg_kwargs["retained_mfe_ratio_gte"] = float(qualification.get("retained_mfe_ratio_gte", 0.5))
     if hasattr(strategy_binding.config_cls, "feature_list"):
         cfg_kwargs["feature_list"] = spec.features.feature_list
+    if hasattr(strategy_binding.config_cls, "feature_requirements"):
+        from features.registry import derive_study_feature_requirements
+        cfg_kwargs["feature_requirements"] = derive_study_feature_requirements(
+            spec.features, authority=feature_authority,
+        )
     # D2.3: only override when the study actually declares metadata_columns -- unlike
     # feature_list, a collector generally cannot function with an empty/None metadata set,
     # so a study that hasn't declared one keeps the config class's own default rather than
@@ -238,6 +266,8 @@ def build_collector_config_kwargs(
     # not from any collector's own __file__, so this applies to any study using the pattern.
     if hasattr(strategy_binding.config_cls, "phase0_manifest_path"):
         cfg_kwargs["phase0_manifest_path"] = str(study_data.study_dir / "artifacts" / "phase0_source_manifest.json")
+    if hasattr(strategy_binding.config_cls, "feature_authority"):
+        cfg_kwargs["feature_authority"] = feature_authority
     return cfg_kwargs
 
 
@@ -250,13 +280,16 @@ def _execute_collect(
     output_mgr,
     telemetry,
     log_level: str,
+    feature_authority: str = "active",
 ) -> Dict[str, Any]:
     """Runs the engine and persists results. Split out so the caller owns failure status."""
     # 5. Construct BacktestEngine and load bars in causal order
     engine, instrument = build_engine(data_plan, log_level=log_level, telemetry=telemetry)
 
     # 6. Build StrategyConfig
-    cfg_kwargs = build_collector_config_kwargs(strategy_binding, spec, study_data, data_plan)
+    cfg_kwargs = build_collector_config_kwargs(
+        strategy_binding, spec, study_data, data_plan, feature_authority=feature_authority,
+    )
 
     strategy_config = strategy_binding.config_cls(**cfg_kwargs)
     strategy = strategy_binding.strategy_cls(strategy_config)

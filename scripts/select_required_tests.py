@@ -37,6 +37,39 @@ DIR_MAPPINGS = {
     "utils/runner/": ["scripts/tests/test_model_binding.py", "scripts/tests/test_resampling.py"],
 }
 
+# Bounded study-preflight surface.  A compiled study must not inherit the
+# repository-wide CI suite merely because unrelated files are dirty.
+STUDY_CORE_TESTS = {
+    "scripts/tests/test_artifact_schema.py",
+    "scripts/tests/test_causal_lint.py",
+    "scripts/tests/test_causal_canaries.py",
+    "scripts/tests/test_execution_closure.py",
+    "scripts/tests/test_freeze_boundary.py",
+    "scripts/tests/test_research_preflight.py",
+    "scripts/tests/test_study_test_inclusion.py",
+    "scripts/tests/test_spec_fidelity_and_oos_lock.py",
+    "scripts/tests/test_run_lifecycle_and_dates.py",
+    "scripts/tests/test_deliverables_and_generated_contracts.py",
+    "scripts/tests/test_output_manager_zero_row.py",
+    "scripts/tests/test_registry_universe_output_contract.py",
+    "scripts/tests/test_readiness.py",
+    "scripts/tests/test_phase0_source_lineage.py",
+    "scripts/tests/test_population_funnel.py",
+    "scripts/tests/test_target_censoring.py",
+    "scripts/tests/test_smoke_deliverables_and_dates.py",
+    "scripts/tests/test_round2_invariants.py",
+    "scripts/tests/test_rt_blockers.py",
+    "scripts/tests/test_rt_final_blockers.py",
+}
+
+STUDY_PROVIDER_TESTS = {
+    "scripts/tests/test_feature_promotion.py",
+    "scripts/tests/test_feature_surface_validation.py",
+    "scripts/tests/test_nt_runner_collect.py",
+    "scripts/tests/test_range_position_availability.py",
+    "scripts/tests/test_wick_availability.py",
+}
+
 
 def get_git_changed_files() -> List[str]:
     try:
@@ -100,8 +133,15 @@ def select_tests_for_files(
     if repo_root is None:
         repo_root = REPO_ROOT
 
-    all_tests = discover_all_framework_tests(repo_root)
     study_tests = discover_study_tests(study_dir, repo_root)
+
+    # A compiled study has an explicit execution closure.  Keep preflight bounded
+    # to its contract/provider surface; the old unresolved-diff fallback selected
+    # every repository test (1,125 tests for CleanFlip).
+    if study_dir is not None and (Path(study_dir) / "compiled_study.json").exists():
+        return sorted((STUDY_CORE_TESTS | STUDY_PROVIDER_TESTS) | set(study_tests))
+
+    all_tests = discover_all_framework_tests(repo_root)
     selected: Set[str] = set()
     unresolved = False
 
@@ -145,6 +185,12 @@ def get_test_selection_report(
     selected_tests = select_tests_for_files(files, repo_root=repo_root, study_dir=study_dir)
     coverage_pct = round(len(selected_tests) / len(all_discoverable) * 100.0, 2) if all_discoverable else 100.0
 
+    governed = bool(study_dir and (Path(study_dir) / "compiled_study.json").exists())
+    group_files = {
+        "study_local": sorted(set(study_tests) & set(selected_tests)),
+        "core_governance": sorted(set(STUDY_CORE_TESTS) & set(selected_tests)) if governed else [],
+        "provider_relevant": sorted(set(STUDY_PROVIDER_TESTS) & set(selected_tests)) if governed else [],
+    }
     return {
         "test_files_discovered": len(all_discoverable),
         "test_files_selected": len(selected_tests),
@@ -152,6 +198,9 @@ def get_test_selection_report(
         "selected_tests": selected_tests,
         "all_tests": all_discoverable,
         "study_tests_discovered": len(study_tests),
+        "selection_groups": {key: len(value) for key, value in group_files.items()},
+        "selection_group_files": group_files,
+        "global_ci_excluded": max(0, len(all_discoverable) - len(selected_tests)) if governed else 0,
     }
 
 

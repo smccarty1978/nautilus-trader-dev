@@ -143,6 +143,10 @@ Feature collection extracts dataset matrices directly from the NautilusTrader ev
    python scripts/create_study.py --config study.yaml
    python scripts/compile_study.py --study studies/<id>
    ```
+   New studies use the shared generic collector and generic phase-zero
+   authenticator. Declare canonical `FeatureInstance` objects in `study.yaml`;
+   add only small predicate/target hooks when required. Never start a study by
+   importing, wrapping, or subclassing a historical study collector.
 2. **Run Deterministic Preflight**:
    ```bash
    python scripts/research_preflight.py --study studies/<id>
@@ -452,7 +456,7 @@ studies/<study_id>/
 │   ├── feature_contract.json
 │   ├── population_contract.json
 │   └── target_contract.json
-├── implementation/          # Study-specific strategy or custom collectors (if bespoke)
+├── implementation/          # Optional declarative hooks only; use the generic collector
 ├── tests/                   # Auto-generated & study-specific contract tests
 │   └── test_study_contracts.py
 ├── audit/                   # Machine-parsed audit artifacts & status files

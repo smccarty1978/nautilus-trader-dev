@@ -336,6 +336,7 @@ def run_preflight(
     extra_paths: List[Path],
     out_json: Optional[Path] = None,
     skip_tests: bool = False,
+    feature_authority: str = "active",
 ) -> Tuple[int, Dict[str, Any]]:
     start_time = time.time()
     checks_run = []
@@ -354,10 +355,11 @@ def run_preflight(
         check_outcomes[name] = outcome
 
     study_dir = study_path if study_path and study_path.exists() else None
-    audit_dir = (study_dir / "audit") if study_dir else (REPO_ROOT / "audit")
+    audit_dir = ((study_dir / "audit" / "candidate") if feature_authority == "candidate"
+                 else ((study_dir / "audit") if study_dir else (REPO_ROOT / "audit")))
     audit_dir.mkdir(parents=True, exist_ok=True)
 
-    if study_dir and (study_dir / "study.yaml").exists():
+    if feature_authority == "active" and study_dir and (study_dir / "study.yaml").exists():
         from scripts.resolve_execution_manifest import verify_frozen_execution_identity, PostFreezeMutationError
         try:
             verify_frozen_execution_identity(study_dir, REPO_ROOT)
@@ -417,7 +419,7 @@ def run_preflight(
         _begin("EXECUTION_MANIFEST")
         try:
             from scripts.resolve_execution_manifest import resolve_execution_manifest
-            comp_sha, fhashes, mdata = resolve_execution_manifest(study_dir, REPO_ROOT)
+            comp_sha, fhashes, mdata = resolve_execution_manifest(study_dir, REPO_ROOT, feature_authority=feature_authority)
             execution_composite = comp_sha
             manifest_p = audit_dir / "execution_manifest.json"
             with open(manifest_p, "w", encoding="utf-8") as f:
@@ -463,6 +465,8 @@ def run_preflight(
         schema_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "check_artifact_schema.py")]
         if study_dir:
             schema_cmd.extend(["--study", str(study_dir)])
+        if feature_authority == "candidate":
+            schema_cmd.append("--candidate-authority")
         schema_json = audit_dir / "schema_check.json"
         schema_cmd.extend(["--json", str(schema_json)])
 
@@ -485,8 +489,13 @@ def run_preflight(
     # A registry entry may not assert 'verified' without the evidence that status means.
     if not failed_gate:
         _begin("FEATURE_PROMOTION")
+        # Keep the active lifecycle checker as a literal authority dependency:
+        # the execution-closure AST guards intentionally require it. Candidate
+        # mode substitutes only the checker path, not the governing predicate.
         promo_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "check_feature_promotion.py"),
                      "--json", str(audit_dir / "feature_lifecycle.json")]
+        if feature_authority == "candidate":
+            promo_cmd[1] = str(REPO_ROOT / "scripts" / "check_candidate_promotion.py")
         promo_res = subprocess.run(promo_cmd, capture_output=True, text=True)
         if promo_res.returncode != 0:
             failed_gate = "FEATURE_PROMOTION"
@@ -530,13 +539,26 @@ def run_preflight(
         _mark("CAUSAL_INVARIANTS", "SKIPPED")
     if not failed_gate and not skip_tests:
         _begin("CAUSAL_INVARIANTS")
-        test_select_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "select_required_tests.py")]
+        test_select_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "select_required_tests.py"), "--json"]
         if study_dir:
             # Packet C: a study's own tests/test_*.py must always be part of the mandatory
             # selected surface when preflighting that study.
             test_select_cmd += ["--study", str(study_dir)]
         select_res = subprocess.run(test_select_cmd, capture_output=True, text=True)
-        tests_to_run = [l.strip() for l in select_res.stdout.splitlines() if l.strip()]
+        try:
+            selection = json.loads(select_res.stdout)
+            tests_to_run = [str(p) for p in selection.get("selected_tests", [])]
+        except (json.JSONDecodeError, TypeError):
+            # Compatibility with older selector fixtures that emit one path per line.
+            selection = {"selected_tests": [l.strip() for l in select_res.stdout.splitlines() if l.strip()]}
+            tests_to_run = selection["selected_tests"]
+        if study_dir:
+            print(
+                "[CAUSAL_INVARIANTS] selected "
+                f"{len(tests_to_run)} tests; groups="
+                f"{selection.get('selection_groups', {})}; "
+                "global CI/legacy suites excluded"
+            )
 
         if tests_to_run:
             pytest_cmd = [sys.executable, "-m", "pytest"] + tests_to_run + ["-m", "not slow", "-q"]
@@ -721,12 +743,13 @@ def main() -> int:
     ap.add_argument("--path", type=str, nargs="*", default=[], help="Additional paths to scan")
     ap.add_argument("--json", type=str, help="Output JSON path")
     ap.add_argument("--skip-tests", action="store_true", help="Skip pytest invariant stage")
+    ap.add_argument("--feature-authority", choices=("active", "candidate"), default="active")
     args = ap.parse_args()
 
     study_p = Path(args.study) if args.study else None
     extra_paths = [Path(p) for p in args.path]
 
-    exit_code, _ = run_preflight(study_p, extra_paths, Path(args.json) if args.json else None, args.skip_tests)
+    exit_code, _ = run_preflight(study_p, extra_paths, Path(args.json) if args.json else None, args.skip_tests, args.feature_authority)
     return exit_code
 
 

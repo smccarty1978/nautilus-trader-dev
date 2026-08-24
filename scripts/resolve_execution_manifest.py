@@ -696,6 +696,7 @@ def resolve_execution_manifest(
     study_dir: Path,
     repo_root: Optional[Path] = None,
     strict: bool = True,
+    feature_authority: str = "active",
 ) -> Tuple[str, Dict[str, str], Dict[str, Any]]:
     """Dynamically resolves the full transitive closure across Runtime, Contract Authority, and Governance graphs.
 
@@ -741,7 +742,41 @@ def resolve_execution_manifest(
 
     Path.relative_to = mock_relative_to
     try:
+        if feature_authority not in {"active", "candidate"}:
+            raise ValueError(f"UNKNOWN_FEATURE_AUTHORITY: {feature_authority!r}")
         combined_paths, closure_data = resolve_execution_file_paths(study_dir, repo_root, strict=strict)
+        if feature_authority in {"active", "candidate"}:
+            from features.candidate_authority import (
+                ACTIVE_POINTER, AUTHORITY_ROOT, CANDIDATE_DIR,
+                REQUIRED_BUNDLE_FILES, bundle_hashes, load_authority,
+            )
+            authority_dir = CANDIDATE_DIR if feature_authority == "candidate" else None
+            if feature_authority == "active":
+                if not ACTIVE_POINTER.is_file():
+                    raise UnresolvedDependencyError("ACTIVE_CANONICAL_AUTHORITY_ABSENT")
+                combined_paths["repo:features/authority/active.json"] = ACTIVE_POINTER
+                pointer = json.loads(ACTIVE_POINTER.read_text(encoding="utf-8"))
+                authority_dir = AUTHORITY_ROOT / str(pointer.get("bundle", ""))
+            assert authority_dir is not None
+            bundle_hashes(authority_dir)
+            for name in REQUIRED_BUNDLE_FILES:
+                combined_paths[f"repo:{authority_dir.relative_to(repo_root).as_posix()}/{name}"] = authority_dir / name
+            if feature_authority == "candidate":
+                candidate_checker = repo_root / "scripts" / "check_candidate_promotion.py"
+                if not candidate_checker.is_file():
+                    raise UnresolvedDependencyError("CANDIDATE_PROMOTION_CHECKER_UNRESOLVED")
+                combined_paths["repo:scripts/check_candidate_promotion.py"] = candidate_checker
+            # Provider bindings are execution authority too. Hash every provider
+            # module advertised by the exact selected registry, active or candidate.
+            selected = load_authority(feature_authority)
+            for definition in selected["registry"]["definitions"]:
+                module = str(definition["provider"]).rpartition(".")[0]
+                provider_path = repo_root / (module.replace(".", "/") + ".py")
+                if not provider_path.is_file():
+                    raise UnresolvedDependencyError(
+                        f"CANDIDATE_PROVIDER_UNRESOLVED: {definition['canonical_name']} -> {module}"
+                    )
+                combined_paths[f"repo:{provider_path.relative_to(repo_root).as_posix()}"] = provider_path
 
         study_files_map = closure_data["study_files_map"]
         runtime_closure_set = closure_data["runtime_closure_set"]
@@ -787,6 +822,7 @@ def resolve_execution_manifest(
 
     manifest_data = {
         "study_name": study_dir.name,
+        "feature_authority": feature_authority,
         "entrypoint": "backtests/nt_runtime/modes/collect.py",
         "composite_sha256": composite_sha256,
         "closure_includes_package_inits": True,

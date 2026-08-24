@@ -115,6 +115,17 @@ def test_clean_flip_study_tests_are_selected_when_preflighting_that_study():
     assert study_test_names <= selected_names
 
 
+@pytest.mark.skipif(not (CLEAN_FLIP_STUDY / "compiled_study.json").exists(), reason="compiled study absent")
+def test_compiled_study_selection_is_bounded_and_excludes_global_legacy_surface():
+    selected = select_tests_for_files(
+        ["unrelated/dirty_file.py"], repo_root=REPO_ROOT, study_dir=CLEAN_FLIP_STUDY,
+    )
+    assert len(selected) < 100
+    assert all("Codex_clean_maturity_flip_rolling_5m_productivity" in p or p.startswith("scripts/tests/") for p in selected)
+    assert "scripts/tests/test_audit_provenance_redteam.py" not in selected
+    assert "scripts/tests/test_analysis_reporting.py" not in selected
+
+
 # ---------------------------------------------------------------------------
 # Preserve the six mandatory gates / discoverable surface
 # ---------------------------------------------------------------------------

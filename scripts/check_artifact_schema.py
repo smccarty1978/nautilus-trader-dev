@@ -38,14 +38,19 @@ def validate_status_json(data: Dict[str, Any], path: Path) -> List[ValidationIss
     issues: List[ValidationIssue] = []
     rel = str(path)
     
-    # Required fields
-    if "verdict" not in data:
+    # ``contract_status.json`` predates the common status schema and used
+    # ``status`` as its terminal field.  Accept that established artifact shape
+    # while new writers emit ``verdict``; this is validation compatibility, not
+    # a reinterpretation of its blocking count.
+    verdict = data.get("verdict", data.get("status"))
+    if verdict is None:
         issues.append(ValidationIssue("CRITICAL", "STATUS_SCHEMA", rel, "Missing required field 'verdict'"))
-    elif data["verdict"] not in {"PASS", "CLEAR", "BLOCKED", "FAIL", "ACCEPTED"}:
-        issues.append(ValidationIssue("WARNING", "STATUS_VERDICT", rel, f"Unusual verdict value: {data['verdict']}"))
+    elif verdict not in {"PASS", "CLEAR", "BLOCKED", "FAIL", "ACCEPTED"}:
+        issues.append(ValidationIssue("WARNING", "STATUS_VERDICT", rel, f"Unusual verdict value: {verdict}"))
 
-    if "critical" not in data or not isinstance(data["critical"], int):
-        issues.append(ValidationIssue("CRITICAL", "STATUS_SCHEMA", rel, "Missing or non-integer field 'critical'"))
+    severity_key = "blocking" if path.name.lower() == "contract_status.json" else "critical"
+    if severity_key not in data or not isinstance(data[severity_key], int):
+        issues.append(ValidationIssue("CRITICAL", "STATUS_SCHEMA", rel, f"Missing or non-integer field '{severity_key}'"))
     if "warning" not in data or not isinstance(data["warning"], int):
         issues.append(ValidationIssue("CRITICAL", "STATUS_SCHEMA", rel, "Missing or non-integer field 'warning'"))
 
@@ -170,12 +175,19 @@ def validate_run_status_json(data: Dict[str, Any], path: Path) -> List[Validatio
     return issues
 
 
-def scan_artifacts(root: Path) -> Tuple[List[ValidationIssue], Dict[str, Any]]:
+def scan_artifacts(root: Path, *, candidate_authority: bool = False) -> Tuple[List[ValidationIssue], Dict[str, Any]]:
     issues: List[ValidationIssue] = []
     scanned = {"status_json": 0, "run_status_json": 0, "audit_packets": 0, "seal_manifests": 0}
 
     for json_file in root.rglob("*.json"):
         if any(part in json_file.parts for part in ("__pycache__", ".git", ".pytest_cache", "_work")):
+            continue
+        # Candidate governance is intentionally isolated from the stale active
+        # audit namespace.  It still validates every study artifact plus the
+        # candidate audit namespace; only top-level active review statuses are
+        # excluded because they cannot authorize an inactive bundle.
+        if (candidate_authority and json_file.parent == root / "audit"
+                and json_file.name.lower() in {"status.json", "contract_status.json"}):
             continue
         try:
             with open(json_file, "r", encoding="utf-8") as f:
@@ -206,6 +218,8 @@ def main() -> int:
     ap.add_argument("--study", type=str, help="Study folder to validate")
     ap.add_argument("--path", type=str, nargs="*", default=[], help="Additional paths to scan")
     ap.add_argument("--json", type=str, help="Output JSON results path")
+    ap.add_argument("--candidate-authority", action="store_true",
+                    help="Validate inactive-candidate artifacts without consuming active audit statuses")
     args = ap.parse_args()
 
     roots = []
@@ -229,7 +243,7 @@ def main() -> int:
     total_scanned = {"status_json": 0, "run_status_json": 0, "audit_packets": 0, "seal_manifests": 0}
 
     for r in roots:
-        issues, counts = scan_artifacts(r)
+        issues, counts = scan_artifacts(r, candidate_authority=args.candidate_authority)
         all_issues.extend(issues)
         for k, v in counts.items():
             total_scanned[k] = total_scanned.get(k, 0) + v

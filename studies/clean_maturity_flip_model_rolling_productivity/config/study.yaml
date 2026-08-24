@@ -1,0 +1,18 @@
+study_id: clean_maturity_flip_model_rolling_productivity
+instrument_id: NQ.XCME
+session: RTH
+train_years: [2021, 2022, 2023]
+oos_year: 2024
+unused_years: [2025]
+sealed_years: [2026]
+candidate_universe:
+  source: explicit_canonical_instances
+  allowed_status: verified
+  selection_years: [2021, 2022, 2023]
+  feature_count: 13
+  selection_method: explicit_instances
+rolling_productivity:
+  window_seconds: 300
+  source_timeframe: 1s_completed
+  atr_normalizer: current_1m_regime_start
+models: [BASELINE, BASELINE_PLUS_STRUCTURAL, BASELINE_PLUS_STRUCTURAL_PLUS_ROLLING_5M]

@@ -46,7 +46,7 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
                 f"but found source_key='{source_key}'"
             )
 
-    if not features_spec or (not features_spec.feature_list and not features_spec.selection):
+    if not features_spec or (not features_spec.feature_list and not features_spec.instances and not features_spec.selection):
         return {
             "source_key": getattr(features_spec, "source_key", None) if features_spec else None,
             "feature_count": 0,
@@ -57,7 +57,7 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
         }
 
     # Handle unselected candidate universe mode (e.g. verified_registry_numeric_universe)
-    if features_spec.selection and features_spec.selection.mode == "train_only" and not features_spec.feature_list:
+    if features_spec.selection and features_spec.selection.mode == "train_only" and not features_spec.feature_list and not features_spec.instances:
         try:
             from features.registry import resolve_source_universe
         except ImportError as e:
@@ -65,9 +65,15 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
 
         # One canonical resolver; compiler must not recreate a local status/dtype/
         # implementation predicate that can drift from runtime collection.
-        verified_feats = resolve_source_universe(features_spec.selection.source)
+        source = features_spec.selection.source
+        if source == "verified_registry_numeric_universe":
+            raise FeatureBindingError(
+                "LEGACY_FEATURE_ALIAS_NOT_ALLOWED: declare canonical_verified_definition_universe "
+                "and canonical FeatureInstances for new studies"
+            )
+        verified_feats = resolve_source_universe(source)
         return {
-            "source_universe": features_spec.selection.source,
+            "source_universe": source,
             "selection_mode": "train_only",
             "selection_years": features_spec.selection.years or [],
             "feature_count": features_spec.selection.feature_count,
@@ -78,13 +84,27 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
             "timing_contract": "verified",
         }
 
-    # Import central registry
+    # Resolve every requested output name through the single canonical feature
+    # authority.  A physical alias is compatibility/output vocabulary, never a
+    # registry identity owned by this compiler.
     try:
-        from features.registry import FEATURE_REGISTRY
+        from features.registry import resolve_feature_request
     except ImportError as e:
         raise FeatureBindingError(f"Unable to import features.registry: {e}")
 
-    feature_list = features_spec.feature_list
+    instance_requests = list(features_spec.instances or [])
+    if features_spec.feature_list and instance_requests:
+        raise FeatureBindingError("FEATURE_LIST_AND_INSTANCES_CONFLICT: choose aliases or canonical instances")
+    try:
+        instance_aliases = [resolve_feature_request(
+            str(item["feature"]), item.get("parameters", {}),
+            physical_alias=item.get("physical_alias"),
+        )["physical_alias"] for item in instance_requests]
+    except KeyError as exc:
+        raise FeatureBindingError(f"INVALID_FEATURE_INSTANCE: missing {exc.args[0]!r}") from exc
+    except Exception as exc:
+        raise FeatureBindingError(f"INVALID_FEATURE_INSTANCE: {exc}") from exc
+    feature_list = list(features_spec.feature_list or instance_aliases)
     computed_hash = compute_feature_list_sha256(feature_list)
 
     # Hash verification if pinned in spec
@@ -95,7 +115,7 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
                 f"but computed sha256='{computed_hash}' for {len(feature_list)} features"
             )
 
-    # Validate all features against registry
+    # Validate all features against the selected authority.
     unregistered: List[str] = []
     bound_trackers: set = set()
     families: set = set()
@@ -107,19 +127,43 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
     feature_statuses: Dict[str, str] = {}
     null_policies: Dict[str, str] = {}
 
+    resolved_instances: List[Dict[str, Any]] = []
+    instance_by_alias = {
+        resolve_feature_request(str(item["feature"]), item.get("parameters", {}),
+                                physical_alias=item.get("physical_alias"))["physical_alias"]: item
+        for item in instance_requests
+    }
     for name in feature_list:
-        if name not in FEATURE_REGISTRY:
+        try:
+            # Preserve an explicitly declared compatibility/output alias only
+            # as the instance's physical output name; canonical identity and
+            # validation remain parameter-driven.
+            item_for_name = instance_by_alias.get(name)
+            resolved = resolve_feature_request(
+                (item_for_name or {}).get("feature", name),
+                (item_for_name or {}).get("parameters", {}) if item_for_name else {},
+                physical_alias=(item_for_name or {}).get("physical_alias") if item_for_name else None,
+            )
+        except Exception:
             unregistered.append(name)
-        else:
-            feat_def = FEATURE_REGISTRY[name]
-            if feat_def.implementation:
-                bound_trackers.add(feat_def.implementation)
-            if feat_def.family:
-                families.add(feat_def.family)
-            if feat_def.source_timeframe:
-                timeframes.add(feat_def.source_timeframe)
-            feature_statuses[name] = feat_def.status
-            null_policies[name] = feat_def.null_policy
+            continue
+        if resolved["provider"]:
+            bound_trackers.add(resolved["provider"])
+        if resolved["family"]:
+            families.add(str(resolved["family"]))
+        for stream in resolved["input_requirements"].get("required_streams", []):
+            timeframes.add(stream)
+        feature_statuses[name] = str(resolved["status"])
+        # Canonical candidate records preserve the existing allow/null
+        # contract through the parity matrix; compiler records the resolved
+        # contract without inspecting a legacy registry entry.
+        null_policies[name] = "allow"
+        resolved_instances.append({
+            "requested": name,
+            "canonical_name": resolved["canonical_name"],
+            "parameters": resolved["parameters"],
+            "physical_alias": resolved["physical_alias"],
+        })
 
     if unregistered:
         raise FeatureBindingError(
@@ -131,6 +175,7 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
         "source_key": features_spec.source_key,
         "feature_count": len(feature_list),
         "feature_list": feature_list,
+        "resolved_feature_instances": resolved_instances,
         "feature_list_sha256": computed_hash,
         "bound_trackers": sorted(list(bound_trackers)),
         "families": sorted(list(families)),
@@ -143,4 +188,18 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
         "directional_mapping": features_spec.directional_mapping or "direction_normalized",
         "timing_contract": features_spec.timing_contract or "verified",
     }
+    # Explicit instances are the execution surface, while train-only
+    # selection still needs the canonical candidate universe for ranking. Keep
+    # both facts in the compiled contract without reverting to alias-driven
+    # instance inference.
+    if features_spec.selection and features_spec.selection.mode == "train_only":
+        from features.registry import resolve_source_universe
+        candidate = resolve_source_universe(features_spec.selection.source)
+        contract["source_universe"] = features_spec.selection.source
+        contract["candidate_universe_count"] = len(candidate)
+        contract["candidate_universe_hash"] = hashlib.sha256(
+            json.dumps(candidate).encode("utf-8")
+        ).hexdigest()
+    from features.registry import derive_study_feature_requirements
+    contract["runtime_data_requirements"] = derive_study_feature_requirements(features_spec)
     return contract

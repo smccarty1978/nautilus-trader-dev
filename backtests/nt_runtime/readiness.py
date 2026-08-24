@@ -104,8 +104,14 @@ class RealNonemptyOutputParityFailed(RuntimeError):
     """REAL_NONEMPTY_OUTPUT_PARITY (R10)."""
 
 
-class _ReadinessFirstCandidateComplete(RuntimeError):
-    """Private bounded-probe terminal signal; never persisted as a study result."""
+class _ReadinessFirstCandidateComplete(BaseException):
+    """Private bounded-probe terminal signal; never persisted as a study result.
+
+    Nautilus wraps strategy callbacks with ``except Exception`` in the installed
+    runtime, which logs a ``RuntimeError`` and continues the engine.  This marker
+    deliberately derives from ``BaseException`` so the outer readiness runner,
+    not the strategy wrapper, owns the bounded first-candidate termination.
+    """
 
 
 class ReadinessCheckFailed(RuntimeError):
@@ -378,7 +384,9 @@ def run_callback_order_probe(data_plan: DataPlan, log_level: str = "ERROR") -> D
 # R5 -- real representative collector instantiation
 # ---------------------------------------------------------------------------
 
-def instantiate_real_collector(study_data: CompiledStudyData, data_plan: DataPlan) -> Any:
+def instantiate_real_collector(
+    study_data: CompiledStudyData, data_plan: DataPlan, *, feature_authority: str = "active",
+) -> Any:
     """R5: constructs the real representative collector via the same generic
     strategy-binding + config-kwargs wiring ``collect.py`` uses (``build_collector_config_
     kwargs``), including real phase0/source-manifest authorization. Proves construction
@@ -388,7 +396,15 @@ def instantiate_real_collector(study_data: CompiledStudyData, data_plan: DataPla
     binding_key = spec.execution.strategy_class or "flip_prediction_collector"
     try:
         strategy_binding = resolve_strategy_binding(binding_key, study_type=spec.study.type, mode="collect")
-        cfg_kwargs = build_collector_config_kwargs(strategy_binding, spec, study_data, data_plan)
+        probe_study_data = study_data
+        if feature_authority == "candidate" and hasattr(strategy_binding.config_cls, "phase0_manifest_path"):
+            work_study_dir = study_data.study_dir / "_work" / "candidate_readiness_r5"
+            from scripts.build_phase0_manifest import build_phase0_manifest
+            build_phase0_manifest(work_study_dir)
+            probe_study_data = dataclasses.replace(study_data, study_dir=work_study_dir)
+        cfg_kwargs = build_collector_config_kwargs(
+            strategy_binding, spec, probe_study_data, data_plan, feature_authority=feature_authority,
+        )
         strategy_config = strategy_binding.config_cls(**cfg_kwargs)
         collector = strategy_binding.strategy_cls(strategy_config)
     except Exception as exc:
@@ -404,6 +420,7 @@ def instantiate_real_collector(study_data: CompiledStudyData, data_plan: DataPla
 
 def build_synthetic_schema_fixture(
     study_data: CompiledStudyData, data_plan: DataPlan, run_plan: RunPlan,
+    *, feature_authority: str = "active",
 ) -> Dict[str, Any]:
     """R7: a small deterministic candidate/observation fixture built from the real
     metadata contract, the real candidate key, and a valid registry-universe feature,
@@ -412,11 +429,11 @@ def build_synthetic_schema_fixture(
     establish a productive real population.
     """
     from backtests.nt_runtime.output_manager import CANDIDATE_KEY_COLUMNS
-    from features.registry import resolve_source_universe
+    from backtests.nt_runtime.output_manager import resolve_collection_allowed_feature_aliases
 
     spec = study_data.spec
     declared_metadata = list(spec.features.metadata_columns or [])
-    collection_universe = resolve_source_universe(spec.features.source)
+    collection_universe = resolve_collection_allowed_feature_aliases(spec.features, authority=feature_authority)
     if not collection_universe:
         raise OutputSchemaContractFailed(
             "OUTPUT_SCHEMA_CONTRACT_FAILED: study declares no registry-universe feature source; "
@@ -454,7 +471,8 @@ def build_synthetic_schema_fixture(
     snapshot = telemetry.stop()
 
     output_base_dir = study_data.study_dir / "_work" / "readiness_schema_fixture"
-    output_mgr = OutputManager(study_data, data_plan, run_plan, output_base_dir=output_base_dir)
+    output_mgr = OutputManager(study_data, data_plan, run_plan, output_base_dir=output_base_dir,
+                               feature_authority=feature_authority)
     try:
         status = output_mgr.persist_collection(candidates_df, observations_df, snapshot)
     except Exception as exc:
@@ -477,11 +495,14 @@ def build_synthetic_schema_fixture(
 # R10 -- bounded real productive first-nonempty collector parity
 # ---------------------------------------------------------------------------
 
-def evaluate_real_output_parity(candidates_df: pd.DataFrame, features_spec: Any) -> Dict[str, Any]:
+def evaluate_real_output_parity(candidates_df: pd.DataFrame, features_spec: Any, *, authority: str = "active") -> Dict[str, Any]:
     """Compare a real emitted surface using OutputManager's exact allowed-alias rule."""
     metadata = set(getattr(features_spec, "metadata_columns", None) or [])
     emitted = sorted(set(candidates_df.columns) - metadata)
-    allowed = resolve_collection_allowed_feature_aliases(features_spec)
+    allowed = resolve_collection_allowed_feature_aliases(features_spec, authority=authority)
+    # The resolved count is the same bounded explicit-instance contract consumed
+    # by OutputManager, never the size of the global canonical library.
+    resolved_count = len(allowed)
     unexpected = sorted(set(emitted) - set(allowed))
     if unexpected:
         raise RealNonemptyOutputParityFailed(
@@ -489,13 +510,13 @@ def evaluate_real_output_parity(candidates_df: pd.DataFrame, features_spec: Any)
         )
     return _result(True, "REAL_NONEMPTY_OUTPUT_PARITY", "first real non-empty candidate surface is contained in OutputManager's resolved collection universe",
                    candidate_rows_observed=len(candidates_df), emitted_feature_count=len(emitted),
-                   resolved_universe_count=len(allowed), metadata_count=len(metadata),
+                   resolved_universe_count=resolved_count, metadata_count=len(metadata),
                    recognized_metadata_columns=sorted(metadata & set(candidates_df.columns)),
                    unexpected_columns=[], emitted_features=emitted)
 
 
 def run_real_nonempty_output_parity(
-    study_data: CompiledStudyData, data_plan: DataPlan, *, log_level: str = "ERROR",
+    study_data: CompiledStudyData, data_plan: DataPlan, *, log_level: str = "ERROR", feature_authority: str = "active",
 ) -> Dict[str, Any]:
     """Run only until the first in-window non-empty real collector dataframe exists.
 
@@ -511,16 +532,14 @@ def run_real_nonempty_output_parity(
     # artifact.  This is a source-authentication input only; no result is persisted.
     probe_study_data = study_data
     if hasattr(binding.config_cls, "phase0_manifest_path"):
-        phase0_module_name = f"{binding.strategy_cls.__module__.rsplit('.', 1)[0]}.phase0"
-        phase0_module = importlib.import_module(phase0_module_name)
-        if not hasattr(phase0_module, "write_manifest"):
-            raise RealNonemptyOutputParityFailed(
-                f"REAL_NONEMPTY_OUTPUT_PARITY: {phase0_module_name} does not expose write_manifest"
-            )
-        work_study_dir = study_data.study_dir / "_work" / "real_nonempty_output_parity"
-        phase0_module.write_manifest(work_study_dir / "artifacts" / "phase0_source_manifest.json")
-        probe_study_data = dataclasses.replace(study_data, study_dir=work_study_dir)
-    cfg_kwargs = build_collector_config_kwargs(binding, spec, probe_study_data, data_plan)
+        # Phase-zero is shared infrastructure.  The generic builder authenticates
+        # the supplied compiled study; no strategy-module ``phase0`` convention is
+        # required or imported.
+        from scripts.build_phase0_manifest import build_phase0_manifest
+        build_phase0_manifest(study_data.study_dir)
+    cfg_kwargs = build_collector_config_kwargs(
+        binding, spec, probe_study_data, data_plan, feature_authority=feature_authority,
+    )
     in_scope_start_ns = int(data_plan.start_dt.value)
     base_cls = binding.strategy_cls
 
@@ -529,14 +548,52 @@ def run_real_nonempty_output_parity(
             super().__init__(config)
             self.readiness_probe_completed = False
 
-        def _on_1s(self, bar):
-            super()._on_1s(bar)
+        def on_bar(self, bar):
+            # Generic collectors may expose either private timeframe handlers or
+            # a single public ``on_bar`` dispatcher.  Probe the shared entry point
+            # so readiness does not encode a historical collector callback name.
+            super().on_bar(bar)
             if self.candidates_log and int(self.candidates_log[-1]["observation_ts"]) >= in_scope_start_ns:
                 self.readiness_probe_completed = True
+                # NT 1.219 logs strategy callback exceptions and may continue
+                # dispatching the engine.  Stopping the probe strategy makes the
+                # bounded result independent of that version detail; the raised
+                # private signal still short-circuits versions that propagate it.
+                self.stop()
                 raise _ReadinessFirstCandidateComplete("bounded readiness probe reached first in-window candidate")
 
     probe = FirstInScopeCandidateProbe(binding.config_cls(**cfg_kwargs))
-    engine, _instrument = build_engine(data_plan, log_level=log_level, execution_mode=ExecutionMode.collector_default())
+    # ``BacktestEngine`` versions differ in whether they propagate a strategy
+    # callback exception.  Keep the terminal signal for versions that do, but
+    # make the probe independently bounded for versions that log and continue.
+    # This is a readiness-only execution bound: it leaves the study's declared
+    # run window, collector logic, and candidate population untouched.
+    # R10 is a non-persisting output-surface probe, not a research collection.
+    # Start the real collector at the known productive date's RTH open and bound
+    # it through the declared 15:15 CT RTH close.  This preserves the collector, completed-bar routing,
+    # source authority, and OutputManager contract while avoiding an irrelevant
+    # five-day warmup/full-session replay before proving the first real output.
+    # The governed smoke still uses the unmodified production DataPlan.
+    probe_open_ct = (
+        pd.Timestamp(data_plan.start_dt.date(), tz="America/Chicago")
+        + pd.Timedelta(hours=8, minutes=30)
+    ).tz_convert("UTC")
+    probe_close_ct = (
+        pd.Timestamp(data_plan.start_dt.date(), tz="America/Chicago")
+        + pd.Timedelta(hours=15, minutes=15)
+    ).tz_convert("UTC")
+    probe_start_dt = max(data_plan.start_dt, probe_open_ct)
+    probe_data_plan = dataclasses.replace(
+        data_plan,
+        warmup_start_dt=probe_start_dt,
+        start_dt=probe_start_dt,
+        end_dt=min(probe_close_ct, data_plan.end_dt),
+    )
+    engine, _instrument = build_engine(
+        probe_data_plan,
+        log_level=log_level,
+        execution_mode=ExecutionMode.collector_default(),
+    )
     engine.add_strategy(probe)
     try:
         engine.run()
@@ -550,18 +607,18 @@ def run_real_nonempty_output_parity(
         )
     # The helper intentionally consumes the exact FeaturesSpec object OutputManager
     # consumes; passing StudySpec here would silently erase source and metadata fields.
-    return evaluate_real_output_parity(probe.get_candidates_dataframe(), spec.features)
+    return evaluate_real_output_parity(probe.get_candidates_dataframe(), spec.features, authority=feature_authority)
 
 
 # ---------------------------------------------------------------------------
 # R8 -- double identity resolution, no mutation
 # ---------------------------------------------------------------------------
 
-def verify_identity_double_resolution(study_dir: Path, repo_root: Path) -> Dict[str, Any]:
+def verify_identity_double_resolution(study_dir: Path, repo_root: Path, *, feature_authority: str = "active") -> Dict[str, Any]:
     from scripts.resolve_execution_manifest import resolve_execution_manifest
 
-    composite_1, hashes_1, manifest_1 = resolve_execution_manifest(study_dir, repo_root, strict=True)
-    composite_2, hashes_2, manifest_2 = resolve_execution_manifest(study_dir, repo_root, strict=True)
+    composite_1, hashes_1, manifest_1 = resolve_execution_manifest(study_dir, repo_root, strict=True, feature_authority=feature_authority)
+    composite_2, hashes_2, manifest_2 = resolve_execution_manifest(study_dir, repo_root, strict=True, feature_authority=feature_authority)
 
     if manifest_1["unresolved_dependencies"] or manifest_2["unresolved_dependencies"]:
         raise IdentityInstabilityError(
@@ -636,6 +693,7 @@ def run_readiness(
     reference_date: Optional[str] = None,
     warmup_days: int = 5,
     log_level: str = "ERROR",
+    feature_authority: str = "active",
 ) -> Dict[str, Any]:
     """Runs R1-R9 and persists the READINESS artifact. Does not raise on a failed check
     (that is the artifact's job to report); the CLI (``main``) is what turns an overall
@@ -695,7 +753,7 @@ def run_readiness(
 
         collector = None
         try:
-            collector = instantiate_real_collector(study_data, data_plan)
+            collector = instantiate_real_collector(study_data, data_plan, feature_authority=feature_authority)
             r5 = _result(True, "REAL_COLLECTOR_INSTANTIATED", "constructor + phase0 authorization succeeded",
                           collector_class=type(collector).__name__)
         except Exception as exc:
@@ -713,17 +771,17 @@ def run_readiness(
             r6 = _result(False, "R5_PREREQUISITE_FAILED", "no collector instance to check (R5 failed)")
 
         try:
-            r7 = build_synthetic_schema_fixture(study_data, data_plan, run_plan)
+            r7 = build_synthetic_schema_fixture(study_data, data_plan, run_plan, feature_authority=feature_authority)
         except Exception as exc:
             r7 = _result(False, type(exc).__name__, str(exc))
 
         try:
-            r10 = run_real_nonempty_output_parity(study_data, data_plan, log_level=log_level)
+            r10 = run_real_nonempty_output_parity(study_data, data_plan, log_level=log_level, feature_authority=feature_authority)
         except Exception as exc:
             r10 = _result(False, type(exc).__name__, str(exc))
 
     try:
-        r8 = verify_identity_double_resolution(study_path, repo_root)
+        r8 = verify_identity_double_resolution(study_path, repo_root, feature_authority=feature_authority)
     except Exception as exc:
         r8 = _result(False, type(exc).__name__, str(exc))
 
@@ -754,6 +812,7 @@ def run_readiness(
         "generated_at_utc": _now_iso(),
         "run_window": {"start_date": run_plan.start_date, "end_date": run_plan.end_date, "stage": run_plan.stage.value},
         "prepared_execution_identity": r8.get("composite_sha256"),
+        "feature_authority": feature_authority,
         "dataset_id": (study_data.spec.execution.data_requirements or {}).get("dataset_id"),
         "resolved_catalog": str(data_plan.catalog_path) if data_plan is not None else None,
         **checks,
@@ -770,9 +829,10 @@ def main() -> int:
     ap.add_argument("--study", required=True, help="Path to study directory")
     ap.add_argument("--reference-date", default=None, help="YYYY-MM-DD; defaults to the study's first authorized date")
     ap.add_argument("--json", action="store_true", help="Print the full readiness artifact as JSON")
+    ap.add_argument("--feature-authority", choices=("active", "candidate"), default="active")
     args = ap.parse_args()
 
-    result = run_readiness(Path(args.study), reference_date=args.reference_date)
+    result = run_readiness(Path(args.study), reference_date=args.reference_date, feature_authority=args.feature_authority)
 
     if args.json:
         print(json.dumps(result, indent=2, default=str))

@@ -29,7 +29,7 @@ target:
     mode: completed_1m_bar
     confirmation_bars: 1
 features:
-  source: verified_registry_numeric_universe
+  source: canonical_verified_definition_universe
   metadata_columns:
     - observation_ts
     - regime_start_ns
@@ -38,9 +38,1606 @@ features:
     - running_mfe_atr
     - new_progress_windows
     - retained_mfe_ratio
+  instances:
+    - feature: arrival_velocity
+      parameters: {"bar_state": "completed", "input_timeframe": "1s", "lookback": 5}
+      physical_alias: arrival_vel_5s
+    - feature: arrival_velocity
+      parameters: {"bar_state": "completed", "input_timeframe": "1s", "lookback": 10}
+      physical_alias: arrival_vel_10s
+    - feature: arrival_velocity
+      parameters: {"bar_state": "completed", "input_timeframe": "1s", "lookback": 20}
+      physical_alias: arrival_vel_20s
+    - feature: arrival_velocity
+      parameters: {"bar_state": "completed", "input_timeframe": "1s", "lookback": 30}
+      physical_alias: arrival_vel_30s
+    - feature: arrival_acceleration
+      parameters: {"bar_state": "completed", "input_timeframe": "1s", "short_lookback": 5}
+      physical_alias: arrival_accel_5s
+    - feature: arrival_acceleration
+      parameters: {"bar_state": "completed", "input_timeframe": "1s", "short_lookback": 10}
+      physical_alias: arrival_accel_10s
+    - feature: arrival_jerk
+      parameters: {"derivative_order": 3}
+      physical_alias: arrival_jerk
+    - feature: arrival_velocity_max
+      parameters: {"bar_state": "completed", "input_timeframe": "1s", "lookback": 30, "velocity_lookback": 5}
+      physical_alias: max_vel_30s
+    - feature: arrival_velocity_ratio
+      parameters: {"bar_state": "completed", "input_timeframe": "1s", "long_lookback": 20, "short_lookback": 5}
+      physical_alias: vel_ratio_5_20
+    - feature: arrival_deceleration
+      parameters: {}
+      physical_alias: is_decelerating
+    - feature: relative_volume
+      parameters: {"aggregation_lookback": 1, "bar_state": "completed", "baseline_lookback": 10, "input_timeframe": "1s"}
+      physical_alias: rvol_1s
+    - feature: relative_volume
+      parameters: {"aggregation_lookback": 5, "bar_state": "completed", "baseline_lookback": 5, "input_timeframe": "1s"}
+      physical_alias: rvol_5s
+    - feature: relative_volume
+      parameters: {"aggregation_lookback": 10, "bar_state": "completed", "baseline_lookback": 10, "input_timeframe": "1s"}
+      physical_alias: rvol_10s
+    - feature: volume_trend
+      parameters: {"window": "10s"}
+      physical_alias: vol_trend_10s
+    - feature: spike
+      parameters: {}
+      physical_alias: vol_spike
+    - feature: climax
+      parameters: {}
+      physical_alias: vol_climax
+    - feature: accel
+      parameters: {}
+      physical_alias: vol_accel
+    - feature: directional_volume_ratio
+      parameters: {"direction": "up", "window": "10s"}
+      physical_alias: up_vol_ratio_10s
+    - feature: directional_volume_ratio
+      parameters: {"direction": "down", "window": "10s"}
+      physical_alias: down_vol_ratio_10s
+    - feature: volume_price_correlation
+      parameters: {"window": "10s"}
+      physical_alias: vol_price_corr_10s
+    - feature: higher_lows_count
+      parameters: {"scope": "trailing", "timeframe": "1s"}
+      physical_alias: higher_lows_count_1s
+    - feature: lower_highs_count
+      parameters: {"scope": "trailing", "timeframe": "1s"}
+      physical_alias: lower_highs_count_1s
+    - feature: swing_count
+      parameters: {"scope": "trailing", "timeframe": "1s"}
+      physical_alias: swing_count_1s
+    - feature: pullback_linearity
+      parameters: {"scope": "trailing", "timeframe": "1s"}
+      physical_alias: pullback_linearity_1s
+    - feature: consecutive_down
+      parameters: {"scope": "trailing", "timeframe": "1s"}
+      physical_alias: consecutive_down_1s
+    - feature: consecutive_up
+      parameters: {"scope": "trailing", "timeframe": "1s"}
+      physical_alias: consecutive_up_1s
+    - feature: range_atr
+      parameters: {"scope": "trailing", "timeframe": "30s"}
+      physical_alias: range_30s_atr
+    - feature: close_vs_range
+      parameters: {"scope": "trailing", "timeframe": "30s"}
+      physical_alias: close_vs_range_30s
+    - feature: higher_lows_count
+      parameters: {"scope": "trailing", "timeframe": "1m"}
+      physical_alias: higher_lows_count_1m
+    - feature: lower_highs_count
+      parameters: {"scope": "trailing", "timeframe": "1m"}
+      physical_alias: lower_highs_count_1m
+    - feature: swing_count
+      parameters: {"scope": "trailing", "timeframe": "1m"}
+      physical_alias: swing_count_1m
+    - feature: pullback_depth_atr
+      parameters: {"scope": "since_breach"}
+      physical_alias: pullback_depth_atr
+    - feature: pullback_bars
+      parameters: {"scope": "since_breach", "timeframe": "1m"}
+      physical_alias: pullback_bars_1m
+    - feature: pullback_efficiency
+      parameters: {"scope": "since_breach", "timeframe": "1m"}
+      physical_alias: pullback_efficiency_1m
+    - feature: retracement_pct
+      parameters: {"scope": "since_breach"}
+      physical_alias: retracement_pct
+    - feature: clean_score
+      parameters: {"scope": "since_breach", "timeframe": "1m"}
+      physical_alias: clean_pullback_score_1m
+    - feature: bar_volume
+      parameters: {"context": "bar"}
+      physical_alias: bar_volume
+    - feature: bar_est_bull_volume
+      parameters: {"context": "bar"}
+      physical_alias: bar_est_bull_volume
+    - feature: bar_est_bear_volume
+      parameters: {"context": "bar"}
+      physical_alias: bar_est_bear_volume
+    - feature: bar_est_delta
+      parameters: {"context": "bar"}
+      physical_alias: bar_est_delta
+    - feature: bar_est_delta_ratio
+      parameters: {"context": "bar"}
+      physical_alias: bar_est_delta_ratio
+    - feature: bar_zero_range
+      parameters: {"context": "bar"}
+      physical_alias: bar_zero_range
+    - feature: window_available
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: window_available_5s
+    - feature: vol_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: vol_sum_5s
+    - feature: vol_mean
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "5s"}
+      physical_alias: vol_mean_1s_5s
+    - feature: vol_max
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "5s"}
+      physical_alias: vol_max_1s_5s
+    - feature: est_bull_vol_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: est_bull_vol_sum_5s
+    - feature: est_bear_vol_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: est_bear_vol_sum_5s
+    - feature: est_delta_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: est_delta_sum_5s
+    - feature: est_abs_delta_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: est_abs_delta_sum_5s
+    - feature: est_delta_ratio
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: est_delta_ratio_5s
+    - feature: est_delta_pos_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: est_delta_pos_sum_5s
+    - feature: est_delta_neg_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: est_delta_neg_sum_5s
+    - feature: upbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: upbar_vol_sum_5s
+    - feature: downbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: downbar_vol_sum_5s
+    - feature: up_down_vol_ratio
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: up_down_vol_ratio_5s
+    - feature: price_change_points
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: price_change_points_5s
+    - feature: price_change_atr
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: price_change_atr_5s
+    - feature: range_points
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: range_points_5s
+    - feature: range_atr
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: range_atr_5s
+    - feature: volume_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: volume_per_point_moved_5s
+    - feature: volume_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: volume_per_atr_moved_5s
+    - feature: abs_delta_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: abs_delta_per_point_moved_5s
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "5s"}
+      physical_alias: abs_delta_per_atr_moved_5s
+    - feature: window_available
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: window_available_15s
+    - feature: vol_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: vol_sum_15s
+    - feature: vol_mean
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "15s"}
+      physical_alias: vol_mean_1s_15s
+    - feature: vol_max
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "15s"}
+      physical_alias: vol_max_1s_15s
+    - feature: est_bull_vol_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: est_bull_vol_sum_15s
+    - feature: est_bear_vol_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: est_bear_vol_sum_15s
+    - feature: est_delta_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: est_delta_sum_15s
+    - feature: est_abs_delta_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: est_abs_delta_sum_15s
+    - feature: est_delta_ratio
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: est_delta_ratio_15s
+    - feature: est_delta_pos_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: est_delta_pos_sum_15s
+    - feature: est_delta_neg_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: est_delta_neg_sum_15s
+    - feature: upbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: upbar_vol_sum_15s
+    - feature: downbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: downbar_vol_sum_15s
+    - feature: up_down_vol_ratio
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: up_down_vol_ratio_15s
+    - feature: price_change_points
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: price_change_points_15s
+    - feature: price_change_atr
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: price_change_atr_15s
+    - feature: range_points
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: range_points_15s
+    - feature: range_atr
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: range_atr_15s
+    - feature: volume_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: volume_per_point_moved_15s
+    - feature: volume_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: volume_per_atr_moved_15s
+    - feature: abs_delta_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: abs_delta_per_point_moved_15s
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "15s"}
+      physical_alias: abs_delta_per_atr_moved_15s
+    - feature: window_available
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: window_available_30s
+    - feature: vol_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: vol_sum_30s
+    - feature: vol_mean
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "30s"}
+      physical_alias: vol_mean_1s_30s
+    - feature: vol_max
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "30s"}
+      physical_alias: vol_max_1s_30s
+    - feature: est_bull_vol_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: est_bull_vol_sum_30s
+    - feature: est_bear_vol_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: est_bear_vol_sum_30s
+    - feature: est_delta_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: est_delta_sum_30s
+    - feature: est_abs_delta_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: est_abs_delta_sum_30s
+    - feature: est_delta_ratio
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: est_delta_ratio_30s
+    - feature: est_delta_pos_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: est_delta_pos_sum_30s
+    - feature: est_delta_neg_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: est_delta_neg_sum_30s
+    - feature: upbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: upbar_vol_sum_30s
+    - feature: downbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: downbar_vol_sum_30s
+    - feature: up_down_vol_ratio
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: up_down_vol_ratio_30s
+    - feature: price_change_points
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: price_change_points_30s
+    - feature: price_change_atr
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: price_change_atr_30s
+    - feature: range_points
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: range_points_30s
+    - feature: range_atr
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: range_atr_30s
+    - feature: volume_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: volume_per_point_moved_30s
+    - feature: volume_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: volume_per_atr_moved_30s
+    - feature: abs_delta_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: abs_delta_per_point_moved_30s
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "30s"}
+      physical_alias: abs_delta_per_atr_moved_30s
+    - feature: window_available
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: window_available_60s
+    - feature: vol_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: vol_sum_60s
+    - feature: vol_mean
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "60s"}
+      physical_alias: vol_mean_1s_60s
+    - feature: vol_max
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "60s"}
+      physical_alias: vol_max_1s_60s
+    - feature: est_bull_vol_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: est_bull_vol_sum_60s
+    - feature: est_bear_vol_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: est_bear_vol_sum_60s
+    - feature: est_delta_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: est_delta_sum_60s
+    - feature: est_abs_delta_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: est_abs_delta_sum_60s
+    - feature: est_delta_ratio
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: est_delta_ratio_60s
+    - feature: est_delta_pos_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: est_delta_pos_sum_60s
+    - feature: est_delta_neg_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: est_delta_neg_sum_60s
+    - feature: upbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: upbar_vol_sum_60s
+    - feature: downbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: downbar_vol_sum_60s
+    - feature: up_down_vol_ratio
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: up_down_vol_ratio_60s
+    - feature: price_change_points
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: price_change_points_60s
+    - feature: price_change_atr
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: price_change_atr_60s
+    - feature: range_points
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: range_points_60s
+    - feature: range_atr
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: range_atr_60s
+    - feature: volume_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: volume_per_point_moved_60s
+    - feature: volume_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: volume_per_atr_moved_60s
+    - feature: abs_delta_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: abs_delta_per_point_moved_60s
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "60s"}
+      physical_alias: abs_delta_per_atr_moved_60s
+    - feature: window_available
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: window_available_120s
+    - feature: vol_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: vol_sum_120s
+    - feature: vol_mean
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "120s"}
+      physical_alias: vol_mean_1s_120s
+    - feature: vol_max
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "120s"}
+      physical_alias: vol_max_1s_120s
+    - feature: est_bull_vol_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: est_bull_vol_sum_120s
+    - feature: est_bear_vol_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: est_bear_vol_sum_120s
+    - feature: est_delta_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: est_delta_sum_120s
+    - feature: est_abs_delta_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: est_abs_delta_sum_120s
+    - feature: est_delta_ratio
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: est_delta_ratio_120s
+    - feature: est_delta_pos_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: est_delta_pos_sum_120s
+    - feature: est_delta_neg_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: est_delta_neg_sum_120s
+    - feature: upbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: upbar_vol_sum_120s
+    - feature: downbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: downbar_vol_sum_120s
+    - feature: up_down_vol_ratio
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: up_down_vol_ratio_120s
+    - feature: price_change_points
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: price_change_points_120s
+    - feature: price_change_atr
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: price_change_atr_120s
+    - feature: range_points
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: range_points_120s
+    - feature: range_atr
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: range_atr_120s
+    - feature: volume_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: volume_per_point_moved_120s
+    - feature: volume_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: volume_per_atr_moved_120s
+    - feature: abs_delta_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: abs_delta_per_point_moved_120s
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "120s"}
+      physical_alias: abs_delta_per_atr_moved_120s
+    - feature: window_available
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: window_available_300s
+    - feature: vol_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: vol_sum_300s
+    - feature: vol_mean
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "300s"}
+      physical_alias: vol_mean_1s_300s
+    - feature: vol_max
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "300s"}
+      physical_alias: vol_max_1s_300s
+    - feature: est_bull_vol_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: est_bull_vol_sum_300s
+    - feature: est_bear_vol_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: est_bear_vol_sum_300s
+    - feature: est_delta_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: est_delta_sum_300s
+    - feature: est_abs_delta_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: est_abs_delta_sum_300s
+    - feature: est_delta_ratio
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: est_delta_ratio_300s
+    - feature: est_delta_pos_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: est_delta_pos_sum_300s
+    - feature: est_delta_neg_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: est_delta_neg_sum_300s
+    - feature: upbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: upbar_vol_sum_300s
+    - feature: downbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: downbar_vol_sum_300s
+    - feature: up_down_vol_ratio
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: up_down_vol_ratio_300s
+    - feature: price_change_points
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: price_change_points_300s
+    - feature: price_change_atr
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: price_change_atr_300s
+    - feature: range_points
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: range_points_300s
+    - feature: range_atr
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: range_atr_300s
+    - feature: volume_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: volume_per_point_moved_300s
+    - feature: volume_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: volume_per_atr_moved_300s
+    - feature: abs_delta_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: abs_delta_per_point_moved_300s
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "300s"}
+      physical_alias: abs_delta_per_atr_moved_300s
+    - feature: window_available
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: window_available_900s
+    - feature: vol_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: vol_sum_900s
+    - feature: vol_mean
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "900s"}
+      physical_alias: vol_mean_1s_900s
+    - feature: vol_max
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "900s"}
+      physical_alias: vol_max_1s_900s
+    - feature: est_bull_vol_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: est_bull_vol_sum_900s
+    - feature: est_bear_vol_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: est_bear_vol_sum_900s
+    - feature: est_delta_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: est_delta_sum_900s
+    - feature: est_abs_delta_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: est_abs_delta_sum_900s
+    - feature: est_delta_ratio
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: est_delta_ratio_900s
+    - feature: est_delta_pos_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: est_delta_pos_sum_900s
+    - feature: est_delta_neg_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: est_delta_neg_sum_900s
+    - feature: upbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: upbar_vol_sum_900s
+    - feature: downbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: downbar_vol_sum_900s
+    - feature: up_down_vol_ratio
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: up_down_vol_ratio_900s
+    - feature: price_change_points
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: price_change_points_900s
+    - feature: price_change_atr
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: price_change_atr_900s
+    - feature: range_points
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: range_points_900s
+    - feature: range_atr
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: range_atr_900s
+    - feature: volume_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: volume_per_point_moved_900s
+    - feature: volume_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: volume_per_atr_moved_900s
+    - feature: abs_delta_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: abs_delta_per_point_moved_900s
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "900s"}
+      physical_alias: abs_delta_per_atr_moved_900s
+    - feature: window_available
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: window_available_1800s
+    - feature: vol_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: vol_sum_1800s
+    - feature: vol_mean
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "1800s"}
+      physical_alias: vol_mean_1s_1800s
+    - feature: vol_max
+      parameters: {"context": "rolling", "timeframe": "1s", "timeframe_2": "1800s"}
+      physical_alias: vol_max_1s_1800s
+    - feature: est_bull_vol_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: est_bull_vol_sum_1800s
+    - feature: est_bear_vol_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: est_bear_vol_sum_1800s
+    - feature: est_delta_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: est_delta_sum_1800s
+    - feature: est_abs_delta_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: est_abs_delta_sum_1800s
+    - feature: est_delta_ratio
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: est_delta_ratio_1800s
+    - feature: est_delta_pos_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: est_delta_pos_sum_1800s
+    - feature: est_delta_neg_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: est_delta_neg_sum_1800s
+    - feature: upbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: upbar_vol_sum_1800s
+    - feature: downbar_vol_sum
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: downbar_vol_sum_1800s
+    - feature: up_down_vol_ratio
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: up_down_vol_ratio_1800s
+    - feature: price_change_points
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: price_change_points_1800s
+    - feature: price_change_atr
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: price_change_atr_1800s
+    - feature: range_points
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: range_points_1800s
+    - feature: range_atr
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: range_atr_1800s
+    - feature: volume_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: volume_per_point_moved_1800s
+    - feature: volume_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: volume_per_atr_moved_1800s
+    - feature: abs_delta_per_point_moved
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: abs_delta_per_point_moved_1800s
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "rolling", "timeframe": "1800s"}
+      physical_alias: abs_delta_per_atr_moved_1800s
+    - feature: est_delta_sum_minus_scaled
+      parameters: {"context": "rolling", "timeframe": "15s", "timeframe_2": "60s"}
+      physical_alias: est_delta_sum_15s_minus_60s_scaled
+    - feature: est_delta_sum_minus_scaled
+      parameters: {"context": "rolling", "timeframe": "30s", "timeframe_2": "120s"}
+      physical_alias: est_delta_sum_30s_minus_120s_scaled
+    - feature: est_delta_sum_minus_scaled
+      parameters: {"context": "rolling", "timeframe": "60s", "timeframe_2": "300s"}
+      physical_alias: est_delta_sum_60s_minus_300s_scaled
+    - feature: est_delta_ratio_minus
+      parameters: {"context": "rolling", "timeframe": "15s", "timeframe_2": "60s"}
+      physical_alias: est_delta_ratio_15s_minus_60s
+    - feature: est_delta_ratio_minus
+      parameters: {"context": "rolling", "timeframe": "30s", "timeframe_2": "120s"}
+      physical_alias: est_delta_ratio_30s_minus_120s
+    - feature: est_delta_ratio_minus
+      parameters: {"context": "rolling", "timeframe": "60s", "timeframe_2": "300s"}
+      physical_alias: est_delta_ratio_60s_minus_300s
+    - feature: vol_sum_vs_ratio
+      parameters: {"context": "rolling", "timeframe": "30s", "timeframe_2": "300s"}
+      physical_alias: vol_sum_30s_vs_300s_ratio
+    - feature: vol_sum_vs_ratio
+      parameters: {"context": "rolling", "timeframe": "60s", "timeframe_2": "900s"}
+      physical_alias: vol_sum_60s_vs_900s_ratio
+    - feature: available
+      parameters: {"context": "regime"}
+      physical_alias: regime_available
+    - feature: vol_sum
+      parameters: {"context": "regime"}
+      physical_alias: regime_vol_sum
+    - feature: est_delta_sum
+      parameters: {"context": "regime"}
+      physical_alias: regime_est_delta_sum
+    - feature: est_delta_ratio
+      parameters: {"context": "regime"}
+      physical_alias: regime_est_delta_ratio
+    - feature: est_abs_delta_sum
+      parameters: {"context": "regime"}
+      physical_alias: regime_est_abs_delta_sum
+    - feature: elapsed_seconds
+      parameters: {"context": "regime"}
+      physical_alias: regime_elapsed_seconds
+    - feature: volume_per_second
+      parameters: {"context": "regime"}
+      physical_alias: regime_volume_per_second
+    - feature: price_change_atr
+      parameters: {"context": "regime"}
+      physical_alias: regime_price_change_atr
+    - feature: range_atr
+      parameters: {"context": "regime"}
+      physical_alias: regime_range_atr
+    - feature: volume_per_atr_moved
+      parameters: {"context": "regime"}
+      physical_alias: regime_volume_per_atr_moved
+    - feature: abs_delta_per_atr_moved
+      parameters: {"context": "regime"}
+      physical_alias: regime_abs_delta_per_atr_moved
+    - feature: first_half_est_delta_ratio
+      parameters: {"context": "regime"}
+      physical_alias: regime_first_half_est_delta_ratio
+    - feature: second_half_est_delta_ratio
+      parameters: {"context": "regime"}
+      physical_alias: regime_second_half_est_delta_ratio
+    - feature: late_minus_early_delta_ratio
+      parameters: {"context": "regime"}
+      physical_alias: regime_late_minus_early_delta_ratio
+    - feature: first_half_vol
+      parameters: {"context": "regime"}
+      physical_alias: regime_first_half_vol
+    - feature: second_half_vol
+      parameters: {"context": "regime"}
+      physical_alias: regime_second_half_vol
+    - feature: late_vs_early_vol_ratio
+      parameters: {"context": "regime"}
+      physical_alias: regime_late_vs_early_vol_ratio
+    - feature: available
+      parameters: {"context": "RTH"}
+      physical_alias: rth_available
+    - feature: elapsed_seconds
+      parameters: {"context": "RTH"}
+      physical_alias: rth_elapsed_seconds
+    - feature: vol_cum
+      parameters: {"context": "RTH"}
+      physical_alias: rth_vol_cum
+    - feature: est_delta_cum
+      parameters: {"context": "RTH"}
+      physical_alias: rth_est_delta_cum
+    - feature: est_delta_ratio_cum
+      parameters: {"context": "RTH"}
+      physical_alias: rth_est_delta_ratio_cum
+    - feature: abs_delta_cum
+      parameters: {"context": "RTH"}
+      physical_alias: rth_abs_delta_cum
+    - feature: volume_per_second
+      parameters: {"context": "RTH"}
+      physical_alias: rth_volume_per_second
+    - feature: price_level_value
+      parameters: {"level": "prior_day_open", "level_context": "prior_day"}
+      physical_alias: prior_day_open_price
+    - feature: price_level_available
+      parameters: {"level": "prior_day_open", "level_context": "prior_day"}
+      physical_alias: prior_day_open_available
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_open", "level_context": "prior_day", "normalization": "points"}
+      physical_alias: prior_day_open_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_open", "level_context": "prior_day", "normalization": "ticks"}
+      physical_alias: prior_day_open_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_open", "level_context": "prior_day", "normalization": "atr"}
+      physical_alias: prior_day_open_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "prior_day_open", "level_context": "prior_day"}
+      physical_alias: prior_day_open_position
+    - feature: price_level_value
+      parameters: {"level": "prior_day_high", "level_context": "prior_day"}
+      physical_alias: prior_day_high_price
+    - feature: price_level_available
+      parameters: {"level": "prior_day_high", "level_context": "prior_day"}
+      physical_alias: prior_day_high_available
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_high", "level_context": "prior_day", "normalization": "points"}
+      physical_alias: prior_day_high_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_high", "level_context": "prior_day", "normalization": "ticks"}
+      physical_alias: prior_day_high_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_high", "level_context": "prior_day", "normalization": "atr"}
+      physical_alias: prior_day_high_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "prior_day_high", "level_context": "prior_day"}
+      physical_alias: prior_day_high_position
+    - feature: price_level_value
+      parameters: {"level": "prior_day_low", "level_context": "prior_day"}
+      physical_alias: prior_day_low_price
+    - feature: price_level_available
+      parameters: {"level": "prior_day_low", "level_context": "prior_day"}
+      physical_alias: prior_day_low_available
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_low", "level_context": "prior_day", "normalization": "points"}
+      physical_alias: prior_day_low_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_low", "level_context": "prior_day", "normalization": "ticks"}
+      physical_alias: prior_day_low_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_low", "level_context": "prior_day", "normalization": "atr"}
+      physical_alias: prior_day_low_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "prior_day_low", "level_context": "prior_day"}
+      physical_alias: prior_day_low_position
+    - feature: price_level_value
+      parameters: {"level": "prior_day_close", "level_context": "prior_day"}
+      physical_alias: prior_day_close_price
+    - feature: price_level_available
+      parameters: {"level": "prior_day_close", "level_context": "prior_day"}
+      physical_alias: prior_day_close_available
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_close", "level_context": "prior_day", "normalization": "points"}
+      physical_alias: prior_day_close_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_close", "level_context": "prior_day", "normalization": "ticks"}
+      physical_alias: prior_day_close_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "prior_day_close", "level_context": "prior_day", "normalization": "atr"}
+      physical_alias: prior_day_close_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "prior_day_close", "level_context": "prior_day"}
+      physical_alias: prior_day_close_position
+    - feature: price_level_value
+      parameters: {"level": "overnight_high_developing", "level_context": "session"}
+      physical_alias: overnight_high_developing_price
+    - feature: price_level_available
+      parameters: {"level": "overnight_high_developing", "level_context": "session"}
+      physical_alias: overnight_high_developing_available
+    - feature: distance_to_level
+      parameters: {"level": "overnight_high_developing", "level_context": "session", "normalization": "points"}
+      physical_alias: overnight_high_developing_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "overnight_high_developing", "level_context": "session", "normalization": "ticks"}
+      physical_alias: overnight_high_developing_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "overnight_high_developing", "level_context": "session", "normalization": "atr"}
+      physical_alias: overnight_high_developing_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "overnight_high_developing", "level_context": "session"}
+      physical_alias: overnight_high_developing_position
+    - feature: price_level_value
+      parameters: {"level": "overnight_low_developing", "level_context": "session"}
+      physical_alias: overnight_low_developing_price
+    - feature: price_level_available
+      parameters: {"level": "overnight_low_developing", "level_context": "session"}
+      physical_alias: overnight_low_developing_available
+    - feature: distance_to_level
+      parameters: {"level": "overnight_low_developing", "level_context": "session", "normalization": "points"}
+      physical_alias: overnight_low_developing_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "overnight_low_developing", "level_context": "session", "normalization": "ticks"}
+      physical_alias: overnight_low_developing_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "overnight_low_developing", "level_context": "session", "normalization": "atr"}
+      physical_alias: overnight_low_developing_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "overnight_low_developing", "level_context": "session"}
+      physical_alias: overnight_low_developing_position
+    - feature: price_level_value
+      parameters: {"level": "overnight_high_final", "level_context": "session"}
+      physical_alias: overnight_high_final_price
+    - feature: price_level_available
+      parameters: {"level": "overnight_high_final", "level_context": "session"}
+      physical_alias: overnight_high_final_available
+    - feature: distance_to_level
+      parameters: {"level": "overnight_high_final", "level_context": "session", "normalization": "points"}
+      physical_alias: overnight_high_final_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "overnight_high_final", "level_context": "session", "normalization": "ticks"}
+      physical_alias: overnight_high_final_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "overnight_high_final", "level_context": "session", "normalization": "atr"}
+      physical_alias: overnight_high_final_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "overnight_high_final", "level_context": "session"}
+      physical_alias: overnight_high_final_position
+    - feature: price_level_value
+      parameters: {"level": "overnight_low_final", "level_context": "session"}
+      physical_alias: overnight_low_final_price
+    - feature: price_level_available
+      parameters: {"level": "overnight_low_final", "level_context": "session"}
+      physical_alias: overnight_low_final_available
+    - feature: distance_to_level
+      parameters: {"level": "overnight_low_final", "level_context": "session", "normalization": "points"}
+      physical_alias: overnight_low_final_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "overnight_low_final", "level_context": "session", "normalization": "ticks"}
+      physical_alias: overnight_low_final_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "overnight_low_final", "level_context": "session", "normalization": "atr"}
+      physical_alias: overnight_low_final_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "overnight_low_final", "level_context": "session"}
+      physical_alias: overnight_low_final_position
+    - feature: price_level_value
+      parameters: {"level": "rth_open", "level_context": "session"}
+      physical_alias: rth_open_price
+    - feature: price_level_available
+      parameters: {"level": "rth_open", "level_context": "session"}
+      physical_alias: rth_open_available
+    - feature: distance_to_level
+      parameters: {"level": "rth_open", "level_context": "session", "normalization": "points"}
+      physical_alias: rth_open_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rth_open", "level_context": "session", "normalization": "ticks"}
+      physical_alias: rth_open_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rth_open", "level_context": "session", "normalization": "atr"}
+      physical_alias: rth_open_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rth_open", "level_context": "session"}
+      physical_alias: rth_open_position
+    - feature: price_level_value
+      parameters: {"level": "opening_range_high_developing", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_developing_price
+    - feature: price_level_available
+      parameters: {"level": "opening_range_high_developing", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_developing_available
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_high_developing", "level_context": "session", "normalization": "points", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_developing_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_high_developing", "level_context": "session", "normalization": "ticks", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_developing_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_high_developing", "level_context": "session", "normalization": "atr", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_developing_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "opening_range_high_developing", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_developing_position
+    - feature: price_level_value
+      parameters: {"level": "opening_range_low_developing", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_developing_price
+    - feature: price_level_available
+      parameters: {"level": "opening_range_low_developing", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_developing_available
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_low_developing", "level_context": "session", "normalization": "points", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_developing_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_low_developing", "level_context": "session", "normalization": "ticks", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_developing_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_low_developing", "level_context": "session", "normalization": "atr", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_developing_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "opening_range_low_developing", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_developing_position
+    - feature: price_level_value
+      parameters: {"level": "opening_range_high_final", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_final_price
+    - feature: price_level_available
+      parameters: {"level": "opening_range_high_final", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_final_available
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_high_final", "level_context": "session", "normalization": "points", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_final_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_high_final", "level_context": "session", "normalization": "ticks", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_final_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_high_final", "level_context": "session", "normalization": "atr", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_final_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "opening_range_high_final", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_high_final_position
+    - feature: price_level_value
+      parameters: {"level": "opening_range_low_final", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_final_price
+    - feature: price_level_available
+      parameters: {"level": "opening_range_low_final", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_final_available
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_low_final", "level_context": "session", "normalization": "points", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_final_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_low_final", "level_context": "session", "normalization": "ticks", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_final_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "opening_range_low_final", "level_context": "session", "normalization": "atr", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_final_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "opening_range_low_final", "level_context": "session", "timeframe": "30m"}
+      physical_alias: opening_range_30m_low_final_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_open_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_open_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "points", "timeframe": "5m"}
+      physical_alias: rolling_5m_open_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "ticks", "timeframe": "5m"}
+      physical_alias: rolling_5m_open_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "atr", "timeframe": "5m"}
+      physical_alias: rolling_5m_open_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_open_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_high_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_high_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "points", "timeframe": "5m"}
+      physical_alias: rolling_5m_high_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "ticks", "timeframe": "5m"}
+      physical_alias: rolling_5m_high_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "atr", "timeframe": "5m"}
+      physical_alias: rolling_5m_high_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_high_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_low_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_low_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "points", "timeframe": "5m"}
+      physical_alias: rolling_5m_low_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "ticks", "timeframe": "5m"}
+      physical_alias: rolling_5m_low_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "atr", "timeframe": "5m"}
+      physical_alias: rolling_5m_low_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_low_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_close_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_close_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "points", "timeframe": "5m"}
+      physical_alias: rolling_5m_close_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "ticks", "timeframe": "5m"}
+      physical_alias: rolling_5m_close_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "atr", "timeframe": "5m"}
+      physical_alias: rolling_5m_close_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "5m"}
+      physical_alias: rolling_5m_close_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_open_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_open_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "points", "timeframe": "15m"}
+      physical_alias: rolling_15m_open_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "ticks", "timeframe": "15m"}
+      physical_alias: rolling_15m_open_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "atr", "timeframe": "15m"}
+      physical_alias: rolling_15m_open_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_open_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_high_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_high_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "points", "timeframe": "15m"}
+      physical_alias: rolling_15m_high_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "ticks", "timeframe": "15m"}
+      physical_alias: rolling_15m_high_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "atr", "timeframe": "15m"}
+      physical_alias: rolling_15m_high_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_high_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_low_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_low_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "points", "timeframe": "15m"}
+      physical_alias: rolling_15m_low_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "ticks", "timeframe": "15m"}
+      physical_alias: rolling_15m_low_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "atr", "timeframe": "15m"}
+      physical_alias: rolling_15m_low_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_low_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_close_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_close_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "points", "timeframe": "15m"}
+      physical_alias: rolling_15m_close_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "ticks", "timeframe": "15m"}
+      physical_alias: rolling_15m_close_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "atr", "timeframe": "15m"}
+      physical_alias: rolling_15m_close_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "15m"}
+      physical_alias: rolling_15m_close_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_open_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_open_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "points", "timeframe": "30m"}
+      physical_alias: rolling_30m_open_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "ticks", "timeframe": "30m"}
+      physical_alias: rolling_30m_open_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "atr", "timeframe": "30m"}
+      physical_alias: rolling_30m_open_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_open_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_high_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_high_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "points", "timeframe": "30m"}
+      physical_alias: rolling_30m_high_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "ticks", "timeframe": "30m"}
+      physical_alias: rolling_30m_high_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "atr", "timeframe": "30m"}
+      physical_alias: rolling_30m_high_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_high_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_low_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_low_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "points", "timeframe": "30m"}
+      physical_alias: rolling_30m_low_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "ticks", "timeframe": "30m"}
+      physical_alias: rolling_30m_low_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "atr", "timeframe": "30m"}
+      physical_alias: rolling_30m_low_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_low_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_close_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_close_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "points", "timeframe": "30m"}
+      physical_alias: rolling_30m_close_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "ticks", "timeframe": "30m"}
+      physical_alias: rolling_30m_close_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "atr", "timeframe": "30m"}
+      physical_alias: rolling_30m_close_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "30m"}
+      physical_alias: rolling_30m_close_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_open_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_open_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "points", "timeframe": "60m"}
+      physical_alias: rolling_60m_open_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "ticks", "timeframe": "60m"}
+      physical_alias: rolling_60m_open_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_open", "level_context": "rolling", "normalization": "atr", "timeframe": "60m"}
+      physical_alias: rolling_60m_open_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_open", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_open_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_high_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_high_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "points", "timeframe": "60m"}
+      physical_alias: rolling_60m_high_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "ticks", "timeframe": "60m"}
+      physical_alias: rolling_60m_high_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_high", "level_context": "rolling", "normalization": "atr", "timeframe": "60m"}
+      physical_alias: rolling_60m_high_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_high", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_high_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_low_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_low_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "points", "timeframe": "60m"}
+      physical_alias: rolling_60m_low_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "ticks", "timeframe": "60m"}
+      physical_alias: rolling_60m_low_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_low", "level_context": "rolling", "normalization": "atr", "timeframe": "60m"}
+      physical_alias: rolling_60m_low_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_low", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_low_position
+    - feature: price_level_value
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_close_price
+    - feature: price_level_available
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_close_available
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "points", "timeframe": "60m"}
+      physical_alias: rolling_60m_close_signed_distance_points
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "ticks", "timeframe": "60m"}
+      physical_alias: rolling_60m_close_signed_distance_ticks
+    - feature: distance_to_level
+      parameters: {"level": "rolling_close", "level_context": "rolling", "normalization": "atr", "timeframe": "60m"}
+      physical_alias: rolling_60m_close_signed_distance_atr
+    - feature: price_level_position
+      parameters: {"level": "rolling_close", "level_context": "rolling", "timeframe": "60m"}
+      physical_alias: rolling_60m_close_position
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "opening_range_is_developing", "timeframe": "30m"}
+      physical_alias: opening_range_30m_is_developing
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "opening_range_is_final", "timeframe": "30m"}
+      physical_alias: opening_range_30m_is_final
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "opening_range_elapsed_seconds", "timeframe": "30m"}
+      physical_alias: opening_range_30m_elapsed_seconds
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "rth_open_elapsed_seconds"}
+      physical_alias: rth_open_elapsed_seconds
+    - feature: price_level_available
+      parameters: {"level": "n_levels", "level_context": "session"}
+      physical_alias: n_levels_available
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_levels_above"}
+      physical_alias: n_levels_above
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_levels_below"}
+      physical_alias: n_levels_below
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_levels_touched"}
+      physical_alias: n_levels_touched
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "pct_levels_above"}
+      physical_alias: pct_levels_above
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "pct_levels_below"}
+      physical_alias: pct_levels_below
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "pct_levels_touched"}
+      physical_alias: pct_levels_touched
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "level_balance"}
+      physical_alias: level_balance
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_prior_day_levels_above"}
+      physical_alias: n_prior_day_levels_above
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_prior_day_levels_below"}
+      physical_alias: n_prior_day_levels_below
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_session_levels_above"}
+      physical_alias: n_session_levels_above
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_session_levels_below"}
+      physical_alias: n_session_levels_below
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_rolling_levels_above"}
+      physical_alias: n_rolling_levels_above
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_rolling_levels_below"}
+      physical_alias: n_rolling_levels_below
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_above_name"}
+      physical_alias: nearest_level_above_name
+    - feature: price_level_value
+      parameters: {"level": "nearest_level_above", "level_context": "session"}
+      physical_alias: nearest_level_above_price
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_above_distance_points"}
+      physical_alias: nearest_level_above_distance_points
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_above_distance_ticks"}
+      physical_alias: nearest_level_above_distance_ticks
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_above_distance_atr"}
+      physical_alias: nearest_level_above_distance_atr
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_below_name"}
+      physical_alias: nearest_level_below_name
+    - feature: price_level_value
+      parameters: {"level": "nearest_level_below", "level_context": "session"}
+      physical_alias: nearest_level_below_price
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_below_distance_points"}
+      physical_alias: nearest_level_below_distance_points
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_below_distance_ticks"}
+      physical_alias: nearest_level_below_distance_ticks
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_below_distance_atr"}
+      physical_alias: nearest_level_below_distance_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_space_balance_atr"}
+      physical_alias: nearest_space_balance_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_space_total_atr"}
+      physical_alias: nearest_space_total_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_upside_downside_ratio"}
+      physical_alias: nearest_upside_downside_ratio
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "level_density_025a"}
+      physical_alias: level_density_025a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_above_within_025a"}
+      physical_alias: levels_above_within_025a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_below_within_025a"}
+      physical_alias: levels_below_within_025a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "level_density_050a"}
+      physical_alias: level_density_050a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_above_within_050a"}
+      physical_alias: levels_above_within_050a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_below_within_050a"}
+      physical_alias: levels_below_within_050a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "level_density_100a"}
+      physical_alias: level_density_100a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_above_within_100a"}
+      physical_alias: levels_above_within_100a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_below_within_100a"}
+      physical_alias: levels_below_within_100a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "level_density_200a"}
+      physical_alias: level_density_200a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_above_within_200a"}
+      physical_alias: levels_above_within_200a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_below_within_200a"}
+      physical_alias: levels_below_within_200a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "inverse_distance_density"}
+      physical_alias: inverse_distance_density
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "lowest_available_level"}
+      physical_alias: lowest_available_level
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "highest_available_level"}
+      physical_alias: highest_available_level
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "full_level_envelope_width_points"}
+      physical_alias: full_level_envelope_width_points
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "full_level_envelope_width_atr"}
+      physical_alias: full_level_envelope_width_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "price_position_in_full_envelope"}
+      physical_alias: price_position_in_full_envelope
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "distance_above_full_envelope_atr"}
+      physical_alias: distance_above_full_envelope_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "distance_below_full_envelope_atr"}
+      physical_alias: distance_below_full_envelope_atr
+    - feature: price_level_available
+      parameters: {"level": "n_level_clusters", "level_context": "session"}
+      physical_alias: n_level_clusters_available
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_level_clusters_above"}
+      physical_alias: n_level_clusters_above
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_level_clusters_below"}
+      physical_alias: n_level_clusters_below
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "n_level_clusters_touched"}
+      physical_alias: n_level_clusters_touched
+    - feature: price_level_value
+      parameters: {"level": "nearest_cluster_above", "level_context": "session"}
+      physical_alias: nearest_cluster_above_price
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_cluster_above_distance_atr"}
+      physical_alias: nearest_cluster_above_distance_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_cluster_above_strength"}
+      physical_alias: nearest_cluster_above_strength
+    - feature: price_level_value
+      parameters: {"level": "nearest_cluster_below", "level_context": "session"}
+      physical_alias: nearest_cluster_below_price
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_cluster_below_distance_atr"}
+      physical_alias: nearest_cluster_below_distance_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_cluster_below_strength"}
+      physical_alias: nearest_cluster_below_strength
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "max_cluster_strength"}
+      physical_alias: max_cluster_strength
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "max_nearby_cluster_strength_050a"}
+      physical_alias: max_nearby_cluster_strength_050a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "max_nearby_cluster_strength_100a"}
+      physical_alias: max_nearby_cluster_strength_100a
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_ahead_of_trade"}
+      physical_alias: levels_ahead_of_trade
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "levels_behind_trade"}
+      physical_alias: levels_behind_trade
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "pct_levels_ahead_of_trade"}
+      physical_alias: pct_levels_ahead_of_trade
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "pct_levels_behind_trade"}
+      physical_alias: pct_levels_behind_trade
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_ahead_distance_atr"}
+      physical_alias: nearest_level_ahead_distance_atr
+    - feature: nearest_level_geometry
+      parameters: {"level_context": "session", "metric": "nearest_level_behind_distance_atr"}
+      physical_alias: nearest_level_behind_distance_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_cluster_ahead_distance_atr"}
+      physical_alias: nearest_cluster_ahead_distance_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "nearest_cluster_behind_distance_atr"}
+      physical_alias: nearest_cluster_behind_distance_atr
+    - feature: price_level_aggregate
+      parameters: {"level_context": "session", "metric": "directional_space_balance_atr"}
+      physical_alias: directional_space_balance_atr
+    - feature: rolling_max_progress_atr
+      parameters: {"update_every": "1s", "window": "300s"}
+      physical_alias: rolling_5m_max_progress_atr
+    - feature: rolling_current_progress_atr
+      parameters: {"update_every": "1s", "window": "300s"}
+      physical_alias: rolling_5m_current_progress_atr
+    - feature: rolling_giveback_atr
+      parameters: {"update_every": "1s", "window": "300s"}
+      physical_alias: rolling_5m_giveback_atr
+    - feature: rolling_retention_ratio
+      parameters: {"update_every": "1s", "window": "300s"}
+      physical_alias: rolling_5m_retention_ratio
+    - feature: rolling_max_speed_atr_per_min
+      parameters: {"update_every": "1s", "window": "300s"}
+      physical_alias: rolling_5m_max_speed_atr_per_min
+    - feature: rolling_current_speed_atr_per_min
+      parameters: {"update_every": "1s", "window": "300s"}
+      physical_alias: rolling_5m_current_speed_atr_per_min
+    - feature: rolling_max_speed_vs_lifetime
+      parameters: {"update_every": "1s", "window": "300s"}
+      physical_alias: rolling_5m_max_speed_vs_lifetime
+    - feature: rolling_current_speed_vs_lifetime
+      parameters: {"update_every": "1s", "window": "300s"}
+      physical_alias: rolling_5m_current_speed_vs_lifetime
+    - feature: structural_max_expansion_atr
+      parameters: {"context": "current"}
+      physical_alias: structural_max_expansion_atr
+    - feature: structural_current_expansion_atr
+      parameters: {"context": "current"}
+      physical_alias: structural_current_expansion_atr
+    - feature: structural_giveback_atr
+      parameters: {"context": "current"}
+      physical_alias: structural_giveback_atr
+    - feature: structural_retention_ratio
+      parameters: {"context": "current"}
+      physical_alias: structural_retention_ratio
+    - feature: structural_expansion_atr_per_min
+      parameters: {"context": "current"}
+      physical_alias: structural_expansion_atr_per_min
+    - feature: regime_expansion_atr_per_min
+      parameters: {"context": "current"}
+      physical_alias: regime_expansion_atr_per_min
+    - feature: regime_duration_min
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "1m"}
+      physical_alias: prior_1m_regime_duration_min
+    - feature: regime_range_atr
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "1m"}
+      physical_alias: prior_1m_regime_range_atr
+    - feature: regime_net_directional_move_atr
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "1m"}
+      physical_alias: prior_1m_regime_net_directional_move_atr
+    - feature: regime_mfe_atr
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "1m"}
+      physical_alias: prior_1m_regime_mfe_atr
+    - feature: regime_range_atr_per_min
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "1m"}
+      physical_alias: prior_1m_regime_range_atr_per_min
+    - feature: regime_net_move_atr_per_min
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "1m"}
+      physical_alias: prior_1m_regime_net_move_atr_per_min
+    - feature: regime_efficiency
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "1m"}
+      physical_alias: prior_1m_regime_efficiency
+    - feature: regime_age_min
+      parameters: {"bar_state": "completed", "context": "current", "timeframe": "5m"}
+      physical_alias: current_5m_regime_age_min
+    - feature: regime_range_atr
+      parameters: {"bar_state": "completed", "context": "current", "timeframe": "5m"}
+      physical_alias: current_5m_regime_range_atr
+    - feature: regime_directional_displacement_atr
+      parameters: {"bar_state": "completed", "context": "current", "timeframe": "5m"}
+      physical_alias: current_5m_directional_displacement_atr
+    - feature: regime_range_atr_per_min
+      parameters: {"bar_state": "completed", "context": "current", "timeframe": "5m"}
+      physical_alias: current_5m_regime_range_atr_per_min
+    - feature: distance_to_completed_range_high_atr
+      parameters: {"bar_state": "completed", "reference_timeframe": "5m"}
+      physical_alias: distance_to_completed_5m_high_atr
+    - feature: distance_to_completed_range_low_atr
+      parameters: {"bar_state": "completed", "reference_timeframe": "5m"}
+      physical_alias: distance_to_completed_5m_low_atr
+    - feature: move_outside_completed_range
+      parameters: {"context": "current", "reference_bar_state": "completed", "reference_timeframe": "5m", "source_bar_state": "completed", "source_timeframe": "1m"}
+      physical_alias: current_1m_move_outside_completed_5m_range
+    - feature: regime_duration_min
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "5m"}
+      physical_alias: prior_5m_regime_duration_min
+    - feature: regime_range_atr
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "5m"}
+      physical_alias: prior_5m_regime_range_atr
+    - feature: regime_net_directional_move_atr
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "5m"}
+      physical_alias: prior_5m_regime_net_directional_move_atr
+    - feature: regime_mfe_atr
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "5m"}
+      physical_alias: prior_5m_regime_mfe_atr
+    - feature: regime_range_atr_per_min
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "5m"}
+      physical_alias: prior_5m_regime_range_atr_per_min
+    - feature: regime_net_move_atr_per_min
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "5m"}
+      physical_alias: prior_5m_regime_net_move_atr_per_min
+    - feature: regime_efficiency
+      parameters: {"bar_state": "completed", "context": "prior", "timeframe": "5m"}
+      physical_alias: prior_5m_regime_efficiency
   selection:
     mode: train_only
-    source: verified_registry_numeric_universe
+    source: canonical_verified_definition_universe
     years: [2021, 2022, 2023]
     feature_count: 25
     direction_specific: true

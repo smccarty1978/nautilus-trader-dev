@@ -22,7 +22,9 @@ from collectors.collector_v2.aggregator import CompletedMinuteFiveMinuteAggregat
 from collectors.collector_v2.regime_engine import RegimeStateEngine
 from collectors.collector_v2.registry import CompletedBarRegistry
 from features.engine import FeatureEngine
-from features.registry import FEATURE_REGISTRY, bind_snapshot_anchor, resolve_source_universe
+from features.registry import (
+    bind_snapshot_anchor, resolve_feature_engine_output_aliases, resolve_runtime_family_aliases, resolve_source_universe,
+)
 from features.trackers.structural_regime_geometry import StructuralRegimeGeometryTracker
 from studies.fable5_pre_flip_d10_reversal_entry.strategy import RegimeEngine
 from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.phase0 import authorize_execution
@@ -31,15 +33,9 @@ from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.ph
 NS = 1_000_000_000
 CT = ZoneInfo("America/Chicago")
 STUDY_ID = "Codex_clean_maturity_flip_rolling_5m_productivity"
-ROLLING_FEATURES = tuple(
-    name for name, definition in FEATURE_REGISTRY.items()
-    if definition.family == "rolling_5m_productivity"
-)
-STRUCTURAL_FEATURES = tuple(
-    name for name, definition in FEATURE_REGISTRY.items()
-    if definition.family == "structural_regime_geometry"
-)
-_COLLECTION_UNIVERSE = tuple(resolve_source_universe("verified_registry_numeric_universe"))
+ROLLING_FEATURES = tuple(resolve_runtime_family_aliases({"rolling_5m_productivity", "rolling_productivity"}))
+STRUCTURAL_FEATURES = tuple(resolve_runtime_family_aliases({"structural_regime_geometry"}))
+_COLLECTION_UNIVERSE = tuple(resolve_feature_engine_output_aliases())
 BASELINE_CANDIDATES = tuple(
     name for name in _COLLECTION_UNIVERSE
     if name not in set(ROLLING_FEATURES) | set(STRUCTURAL_FEATURES)
@@ -109,6 +105,8 @@ class CleanFlipCollectorConfig(StrategyConfig, frozen=True):
     bar_type_1s: str = "NQ.XCME-1-SECOND-LAST-EXTERNAL"
     bar_type_1m: str = "NQ.XCME-1-MINUTE-LAST-EXTERNAL"
     phase0_manifest_path: str = ""
+    feature_authority: str = "active"
+    feature_requirements: dict = {}
     authorized_years: tuple[int, ...] = (2021, 2022, 2023, 2024)
     # D2.3: single canonical metadata authority. backtests/nt_runtime/modes/collect.py
     # wires execution.data_requirements-adjacent StudySpec fields into strategy config
@@ -129,7 +127,10 @@ class CleanFlipCollector(Strategy):
 
     def __init__(self, config: CleanFlipCollectorConfig):
         super().__init__(config)
-        authorize_execution(Path(config.phase0_manifest_path))
+        phase0 = authorize_execution(Path(config.phase0_manifest_path))
+        self._feature_authority = phase0.get("feature_authority", "active")
+        if config.feature_authority != self._feature_authority:
+            raise RuntimeError("FEATURE_AUTHORITY_PROPAGATION_MISMATCH")
         if set(config.authorized_years) - {2021, 2022, 2023, 2024}:
             raise RuntimeError("collector config contains forbidden collection years")
         self._authorized_years = set(config.authorized_years)
@@ -137,6 +138,7 @@ class CleanFlipCollector(Strategy):
         # Cython attribute unavailable to a __new__-constructed test double, so the
         # declared value is copied onto a plain instance attribute here instead.
         self._metadata_columns = tuple(config.metadata_columns)
+        self._feature_requirements = dict(config.feature_requirements)
         self._bar_1s = BarType.from_str(config.bar_type_1s)
         self._bar_1m = BarType.from_str(config.bar_type_1m)
         self._regime = RegimeEngine()
@@ -184,7 +186,24 @@ class CleanFlipCollector(Strategy):
         # exclusion_branch_is_structurally_unreachable for the structural proof.
         self.telemetry_implementation_only_exclusions = 0
 
-        for name in (*BASELINE_CANDIDATES, *STRUCTURAL_FEATURES, *ROLLING_FEATURES):
+        declared_aliases = tuple(self._feature_requirements.get("aliases", ()))
+        self._collection_universe = declared_aliases or tuple(resolve_feature_engine_output_aliases(
+            authority=self._feature_authority,
+        ))
+        # Family membership is resolved from the same selected authority as
+        # output persistence; aliases never encode runtime identity.
+        self._rolling_features = tuple(resolve_runtime_family_aliases(
+            {"rolling_5m_productivity", "rolling_productivity"}, authority=self._feature_authority,
+        ))
+        self._structural_features = tuple(resolve_runtime_family_aliases(
+            {"structural_regime_geometry"}, authority=self._feature_authority,
+        ))
+        structural = set(self._structural_features)
+        rolling = set(self._rolling_features)
+        self._baseline_candidates = tuple(
+            name for name in self._collection_universe if name not in structural | rolling
+        )
+        for name in (*self._baseline_candidates, *self._structural_features, *self._rolling_features):
             bind_snapshot_anchor(name, STUDY_ID, "at_5s_decision_ts")
 
     def on_start(self) -> None:
@@ -320,7 +339,8 @@ class CleanFlipCollector(Strategy):
             return
             
         base_and_rolling = self._features.snapshot(
-            (*BASELINE_CANDIDATES, *ROLLING_FEATURES),
+            (*getattr(self, "_baseline_candidates", BASELINE_CANDIDATES),
+             *getattr(self, "_rolling_features", ROLLING_FEATURES)),
             {"touch_bar": bar, "regime": self._feature_regime, "direction": self._regime.regime,
              "rolling_productivity": {
                  "checkpoint_ns": decision_ns,
@@ -498,8 +518,13 @@ class CleanFlipCollector(Strategy):
             return pd.DataFrame(columns=declared_metadata)
         df = pd.DataFrame(self.candidates_log)
 
-        from features.registry import resolve_source_universe
-        registered_feats = set(resolve_source_universe("verified_registry_numeric_universe"))
+        from features.registry import canonicalize_provider_columns, resolve_source_universe
+        rename = canonicalize_provider_columns(df.columns, authority=getattr(self, "_feature_authority", "active"))
+        if any(old != new for old, new in rename.items()):
+            df = df.rename(columns=rename)
+        registered_feats = set(resolve_source_universe(
+            "canonical_verified_definition_universe", authority=getattr(self, "_feature_authority", "active"),
+        ))
 
         allowed_cols = [c for c in df.columns if c in declared_metadata or c in registered_feats]
         return df[allowed_cols]

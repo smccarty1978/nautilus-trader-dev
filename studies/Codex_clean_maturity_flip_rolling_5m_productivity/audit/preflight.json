@@ -1,13 +1,13 @@
 {
   "evidence_schema_version": 2,
   "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
-  "status": "CLEAR",
-  "audit_ready": true,
-  "execution_composite_sha256": "cda6a8e680f742815ddb8a0be4a0c83c927366841a524b5685f9019e5fab5b32",
-  "preflight_run_id": "20260822T152209Z_443aeb660c91",
-  "generated_at_utc": "2026-08-22T15:22:09.283511+00:00",
-  "elapsed_seconds": 715.12,
-  "code_hash": "443aeb660c9131304b914b441929bd2bdc4276982dda3ff2301ffc80c148e6a0",
+  "status": "BLOCKED",
+  "audit_ready": false,
+  "execution_composite_sha256": "1f4b3b1a9d480262f66781e176187d3ac327f0186aa97ff92fe6cfbbd97b3543",
+  "preflight_run_id": "20260824T041606Z_83c64b1b1985",
+  "generated_at_utc": "2026-08-24T04:16:06.463950+00:00",
+  "elapsed_seconds": 555.27,
+  "code_hash": "83c64b1b19856048b0945e3a4acdd724cd1580375ef576586f68e2d7d8fa3e7e",
   "spec_hash": "aced28d76f44e74c94c2826dfe1c60e991b2e1e41e98e1188d444a4245098d46",
   "checks_run": [
     "EXECUTION_MANIFEST",
@@ -23,7 +23,7 @@
     "ARTIFACT_SCHEMA": "PASSED",
     "FEATURE_PROMOTION": "PASSED",
     "RESEARCH_DECISION_FIDELITY": "PASSED",
-    "CAUSAL_INVARIANTS": "PASSED"
+    "CAUSAL_INVARIANTS": "FAILED"
   },
   "is_compiled_study": true,
   "required_checks": [
@@ -34,13 +34,16 @@
     "RESEARCH_DECISION_FIDELITY",
     "CAUSAL_INVARIANTS"
   ],
-  "required_checks_missing": [],
-  "checks_complete": true,
+  "required_checks_missing": [
+    "CAUSAL_INVARIANTS"
+  ],
+  "checks_complete": false,
   "diagnostic_mode": false,
-  "failed_gate": null,
-  "failure_ids": [],
-  "failure_packet": null,
-  "required_next_action": "READY_FOR_AUDIT",
-  "evidence_sha256": "b7638aacd08bf76dd9d9ec0d0ca06d3b1e100916f6f69b2f44e542f355f4db0a",
-  "superseded_failure_packet": "audit/failure_packet.json"
+  "failed_gate": "CAUSAL_INVARIANTS",
+  "failure_ids": [
+    "INVARIANT_TEST_FAILURE"
+  ],
+  "failure_packet": "audit/failure_packet.json",
+  "required_next_action": "FIX_BEFORE_AUDIT",
+  "evidence_sha256": "be20a9ee2f310be80f30e57868e627dc21b462f9916c3ec84a108eb0aa708c86"
 }

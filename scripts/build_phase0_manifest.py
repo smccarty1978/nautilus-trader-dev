@@ -21,7 +21,7 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 from research.schemas.study_spec import StudySpec
-from features.registry import FEATURE_REGISTRY
+from features.registry import FeatureInstance, resolve_feature_request, resolve_feature_instances
 
 
 def compute_file_sha256(path: Path) -> str:
@@ -245,29 +245,45 @@ def build_phase0_manifest(study_dir: Path) -> dict:
     assert_feature_promotions()
     assert_baseline_not_extended()
 
-    # 1. Enumerate verified numeric candidate inventory from central registry
+    # 1. Enumerate only the study's explicit canonical instances.  Phase-zero is
+    # generic infrastructure: it authenticates the compiled study closure rather
+    # than importing a study-owned phase0 module or expanding the global registry.
     verified_candidates = {}
     verified_names = []
     # Every module whose content this manifest's generated section depends on. The
     # registry itself, plus the implementation module backing each enumerated feature.
     dependency_paths = {(project_root / "features" / "registry.py")}
 
-    for name, feat_def in sorted(FEATURE_REGISTRY.items()):
-        if feat_def.status == "verified" and feat_def.dtype in ("float64", "int64", "float32", "int32"):
-            verified_names.append(name)
-            if feat_def.implementation:
-                impl_mod = feat_def.implementation.rsplit(".", 1)[0]
-                impl_p = project_root.joinpath(*impl_mod.split(".")).with_suffix(".py")
-                if impl_p.exists():
-                    dependency_paths.add(impl_p)
-            verified_candidates[name] = {
-                "version": feat_def.version,
-                "family": feat_def.family,
-                "dtype": feat_def.dtype,
-                "implementation": feat_def.implementation,
-                "source_timeframe": feat_def.source_timeframe,
-                "direction_normalized": feat_def.direction_normalized,
-            }
+    declared = tuple(
+        FeatureInstance(
+            canonical_name=str(item["feature"]),
+            parameters=dict(item.get("parameters", {})),
+            physical_alias=item.get("physical_alias"),
+        )
+        for item in (spec.features.instances or [])
+    )
+    if not declared:
+        raise RuntimeError("PHASE0_EXPLICIT_INSTANCES_REQUIRED: study declares no canonical FeatureInstances")
+    resolved_instances = resolve_feature_instances(
+        "canonical_verified_definition_universe", declared,
+    )
+    for resolved in resolved_instances:
+        name = str(resolved["canonical_name"])
+        feat = resolve_feature_request(name, resolved.get("parameters", {}))
+        alias = str(resolved["physical_alias"])
+        verified_names.append(alias)
+        if feat["provider"]:
+            impl_mod = feat["provider"].rsplit(".", 1)[0]
+            impl_p = project_root.joinpath(*impl_mod.split(".")).with_suffix(".py")
+            if impl_p.exists():
+                dependency_paths.add(impl_p)
+        verified_candidates[alias] = {
+            "canonical_name": name,
+            "family": feat["family"], "dtype": feat["dtype"],
+            "implementation": feat["provider"],
+            "parameters": resolved.get("parameters", feat["parameters"]),
+            "input_requirements": feat["input_requirements"],
+        }
 
     candidate_universe_hash = hashlib.sha256(
         json.dumps(verified_names).encode("utf-8")
@@ -283,6 +299,8 @@ def build_phase0_manifest(study_dir: Path) -> dict:
 
     manifest = {
         "study_id": spec.study.id,
+        "authenticated": True,
+        "feature_authority": "active",
         # Retained at the top level for backwards compatibility with existing readers.
         # It is a label, not proof -- `source_state_binding` is the binding.
         "git_commit_hash": source_binding["git_commit_hash"],
@@ -300,7 +318,7 @@ def build_phase0_manifest(study_dir: Path) -> dict:
             "2026_read_in_selection_or_training": False,
         },
         "candidate_feature_universe": {
-            "source": "features.registry.FEATURE_REGISTRY",
+            "source": "features.registry.resolve_feature_instances",
             "status_filter": "verified",
             "total_candidates_count": len(verified_names),
             "candidate_names_sha256": candidate_universe_hash,
@@ -342,11 +360,21 @@ def main():
     try:
         manifest = build_phase0_manifest(study_dir)
         print("=" * 65)
-        print(f"PHASE-0 SOURCE MANIFEST GENERATED: {manifest['study_id']}")
-        print(f"Verified candidate features: {manifest['candidate_feature_universe']['total_candidates_count']}")
-        print(f"Candidate universe SHA-256:  {manifest['candidate_feature_universe']['candidate_names_sha256'][:16]}...")
-        print(f"Clean lineage reset:         {manifest['clean_lineage_start']}")
-        print(f"Manifest SHA-256:            {manifest['manifest_sha256'][:16]}...")
+        print(f"PHASE-0 SOURCE MANIFEST GENERATED: {manifest.get('study_id', study_dir.name)}")
+        if "candidate_feature_universe" in manifest:
+            count = manifest["candidate_feature_universe"]["total_candidates_count"]
+            universe_hash = manifest["candidate_feature_universe"]["candidate_names_sha256"]
+        else:
+            count = manifest.get("candidate_count", 0)
+            universe_hash = hashlib.sha256(
+                json.dumps(manifest.get("candidate_features", []), sort_keys=True).encode("utf-8")
+            ).hexdigest()
+        manifest_hash = manifest.get("manifest_sha256") or hashlib.sha256(
+            json.dumps(manifest, sort_keys=True).encode("utf-8")
+        ).hexdigest()
+        print(f"Verified candidate features: {count}")
+        print(f"Candidate universe SHA-256:  {universe_hash[:16]}...")
+        print(f"Manifest SHA-256:            {manifest_hash[:16]}...")
         print("=" * 65)
     except Exception as e:
         print(f"[ERROR] Phase-0 manifest generation failed: {e}")

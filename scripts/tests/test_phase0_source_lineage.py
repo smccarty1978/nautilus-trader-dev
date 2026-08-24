@@ -185,14 +185,14 @@ def test_real_manifest_generation_records_a_binding(tmp_path: Path):
     # Every implementation module backing an enumerated verified feature is bound. The
     # wick tracker is deliberately NOT expected here: the feature is 'provisional', so it
     # is not part of the verified candidate universe this manifest enumerates.
-    from features.registry import FEATURE_REGISTRY
+    from features.registry import resolve_feature_request
 
     enumerated = manifest["candidate_feature_universe"]["candidates"]
     assert "latest_1m_wick_imbalance" not in enumerated, (
         "a provisional feature must not appear in the verified candidate universe"
     )
     sample = next(iter(enumerated))
-    impl = FEATURE_REGISTRY[sample].implementation
+    impl = resolve_feature_request(sample)["provider"]
     if impl:
         rel = "/".join(impl.rsplit(".", 1)[0].split(".")) + ".py"
         assert rel in binding["source_files"], (

@@ -1,20 +1,29 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "blocked_Codex_clean_maturity_flip_rolling_5m_productivity",
-  "generated_at_utc": "2026-08-22T14:31:43.397217+00:00",
-  "code_hash": "",
-  "superseded": true,
-  "failed_gate": "EXECUTION_MANIFEST",
+  "preflight_run_id": "20260824T041606Z_83c64b1b1985",
+  "generated_at_utc": "2026-08-24T04:16:06.463950+00:00",
+  "code_hash": "83c64b1b19856048b0945e3a4acdd724cd1580375ef576586f68e2d7d8fa3e7e",
+  "superseded": false,
+  "failed_gate": "CAUSAL_INVARIANTS",
   "failure_ids": [
-    "POST_FREEZE_MUTATION"
+    "INVARIANT_TEST_FAILURE"
   ],
   "failure_details": [
     {
-      "message": "POST_FREEZE_MUTATION: Execution composite mutated after FREEZE. Current composite ca7c70c7ba41... != Frozen composite 3be6c8711aad...\nModified/Mutated files: ['repo:backtests/nt_runtime/output_manager.py', 'repo:features/registry.py', 'repo:research/engines/feature_binding_engine.py', 'repo:scripts/check_feature_promotion.py', 'repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/collector.py', 'repo:studies/Codex_clean_maturity_flip_rolling_5m_productivity/implementation/phase0.py', 'study:compiled_study.json', 'study:tests/test_phase0.py', 'study:tests/test_rolling_5m_productivity.py']"
+      "message": "=========================== short test summary info ==========================="
+    },
+    {
+      "message": "FAILED scripts/tests/test_readiness.py::test_r7_synthetic_valid_output_schema_passes"
+    },
+    {
+      "message": "FAILED scripts/tests/test_readiness.py::test_r10_parity_reports_real_surface_counts_and_catches_injected_bad_alias"
+    },
+    {
+      "message": "FAILED scripts/tests/test_readiness.py::test_r10_candidate_authority_uses_the_same_outputmanager_resolver_path"
+    },
+    {
+      "message": "3 failed, 499 passed, 2 deselected in 544.85s (0:09:04)"
     }
   ],
-  "recommended_smallest_investigation_scope": "Inspect and revert post-freeze mutations.",
-  "superseded_by_preflight_run_id": "20260822T152209Z_443aeb660c91",
-  "superseded_at_utc": "2026-08-22T15:22:09.283511+00:00",
-  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit."
 }

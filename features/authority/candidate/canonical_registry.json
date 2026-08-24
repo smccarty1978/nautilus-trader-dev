@@ -1,0 +1,3089 @@
+{
+  "definitions": [
+    {
+      "canonical_name": "abs_delta_cum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 9,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "accel",
+      "dtype": "float64",
+      "family": [
+        "arrival_volume"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "activity_duration_median",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 5,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "activity_flip_count",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "activity_regime_count",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 5,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "activity_regime_count_std",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "aligned_price_minus_center",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "arrival_acceleration",
+      "dtype": "float64",
+      "family": [
+        "arrival_velocity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "input_timeframe",
+        "short_lookback"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "arrival_deceleration",
+      "dtype": "float64",
+      "family": [
+        "arrival_velocity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "arrival_jerk",
+      "dtype": "float64",
+      "family": [
+        "arrival_velocity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "derivative_order"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "arrival_velocity",
+      "dtype": "float64",
+      "family": [
+        "arrival_velocity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 4,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "input_timeframe",
+        "lookback"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "arrival_velocity_max",
+      "dtype": "float64",
+      "family": [
+        "arrival_velocity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "input_timeframe",
+        "lookback",
+        "velocity_lookback"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "arrival_velocity_ratio",
+      "dtype": "float64",
+      "family": [
+        "arrival_velocity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "input_timeframe",
+        "long_lookback",
+        "short_lookback"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "available",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "bar_est_bear_volume",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "bar_est_bull_volume",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "bar_est_delta",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "bar_est_delta_ratio",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "bar_volume",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "bar_zero_range",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "center_slope_acceleration",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "center_slope_change",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "center_spread",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe",
+        "timeframe_2"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "clean_score",
+      "dtype": "float64",
+      "family": [
+        "pullback_1m"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "climax",
+      "dtype": "float64",
+      "family": [
+        "arrival_volume"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "close_vs_range",
+      "dtype": "float64",
+      "family": [
+        "pullback_1s"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "consecutive_down",
+      "dtype": "float64",
+      "family": [
+        "pullback_1s"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "consecutive_up",
+      "dtype": "float64",
+      "family": [
+        "pullback_1s"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "cross_family_slope_vs_reg_count",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "cross_family_spread_vs_reg_count",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "crosses_per_minute",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "directional_volume_ratio",
+      "dtype": "float64",
+      "family": [
+        "arrival_volume"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "direction",
+        "window"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "distance_to_completed_range_high_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "reference_timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "distance_to_completed_range_low_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "reference_timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "dtype": "float64",
+      "family": [
+        "price_level_context"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 87,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level",
+        "level_context",
+        "normalization",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "duration_median",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "lookback"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "duration_ratio",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "denominator_lookback",
+        "numerator_lookback"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "elapsed_seconds",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "ema_slope",
+      "dtype": "float64",
+      "family": [
+        "context"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "ema_role",
+        "lookback"
+      ],
+      "provider": "features.trackers.generic_context.GenericContextProvider",
+      "provider_sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 9,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_delta_cum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 9,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_delta_ratio_cum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_delta_ratio_minus",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 9,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "est_delta_sum_minus_scaled",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "first_half_est_delta_ratio",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "first_half_vol",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "fraction_of_time_on_adverse_side",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "fraction_of_time_on_favorable_side",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "higher_lows_count",
+      "dtype": "float64",
+      "family": [
+        "pullback_1m",
+        "pullback_1s"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "late_minus_early_delta_ratio",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "late_vs_early_vol_ratio",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "lower_highs_count",
+      "dtype": "float64",
+      "family": [
+        "pullback_1m",
+        "pullback_1s"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "move_outside_completed_range",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "reference_bar_state",
+        "reference_timeframe",
+        "source_bar_state",
+        "source_timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "dtype": "float64",
+      "family": [
+        "price_level_context"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 10,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level_context",
+        "metric"
+      ],
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "ordering_changes",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "ordering_state",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 9,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "price_cross_count",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "dtype": "float64",
+      "family": [
+        "price_level_context"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 57,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level_context",
+        "metric",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "dtype": "float64",
+      "family": [
+        "price_level_context"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 31,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level",
+        "level_context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "dtype": "float64",
+      "family": [
+        "price_level_context"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 29,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level",
+        "level_context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "dtype": "float64",
+      "family": [
+        "price_level_context"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 33,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level",
+        "level_context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "pullback_bars",
+      "dtype": "float64",
+      "family": [
+        "pullback_1m"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "pullback_depth_atr",
+      "dtype": "float64",
+      "family": [
+        "pullback_1m"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "pullback_efficiency",
+      "dtype": "float64",
+      "family": [
+        "pullback_1m"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "pullback_linearity",
+      "dtype": "float64",
+      "family": [
+        "pullback_1s"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "range_atr",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta",
+        "pullback_1s"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 10,
+      "null_policies": [
+        "allow",
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context",
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_bar_geometry.GenericRangeATRProvider",
+      "provider_sha256": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "range_points",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "range_position",
+      "dtype": "float64",
+      "family": [
+        "range_position"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "lookback",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_bar_geometry.GenericRangePositionProvider",
+      "provider_sha256": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_age",
+      "dtype": "float64",
+      "family": [
+        "context"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "unit"
+      ],
+      "provider": "features.trackers.generic_context.GenericContextProvider",
+      "provider_sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_age_min",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_directional_displacement_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_duration_min",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_efficiency",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_expansion_atr_per_min",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_mfe_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_net_directional_move_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_net_move_atr_per_min",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_range_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_range_atr_per_min",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "regime_sequence_metric",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 100,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "lookback",
+        "metric"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "relative_volume",
+      "dtype": "float64",
+      "family": [
+        "arrival_volume"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "aggregation_lookback",
+        "bar_state",
+        "baseline_lookback",
+        "input_timeframe"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "retracement_pct",
+      "dtype": "float64",
+      "family": [
+        "pullback_1m"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "rolling_current_progress_atr",
+      "dtype": "float64",
+      "family": [
+        "rolling_5m_productivity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "rolling_current_speed_atr_per_min",
+      "dtype": "float64",
+      "family": [
+        "rolling_5m_productivity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "rolling_current_speed_vs_lifetime",
+      "dtype": "float64",
+      "family": [
+        "rolling_5m_productivity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "rolling_giveback_atr",
+      "dtype": "float64",
+      "family": [
+        "rolling_5m_productivity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "rolling_max_progress_atr",
+      "dtype": "float64",
+      "family": [
+        "rolling_5m_productivity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "rolling_max_speed_atr_per_min",
+      "dtype": "float64",
+      "family": [
+        "rolling_5m_productivity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "rolling_max_speed_vs_lifetime",
+      "dtype": "float64",
+      "family": [
+        "rolling_5m_productivity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "rolling_retention_ratio",
+      "dtype": "float64",
+      "family": [
+        "rolling_5m_productivity"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "second_half_est_delta_ratio",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "second_half_vol",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "seconds_in_current_ordering",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "session_elapsed",
+      "dtype": "float64",
+      "family": [
+        "context"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "session",
+        "unit"
+      ],
+      "provider": "features.trackers.generic_context.GenericContextProvider",
+      "provider_sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "session_membership",
+      "dtype": "float64",
+      "family": [
+        "context"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "session"
+      ],
+      "provider": "features.trackers.generic_context.GenericContextProvider",
+      "provider_sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "slope__aligned_atr",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 9,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe",
+        "timeframe_2"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "spike",
+      "dtype": "float64",
+      "family": [
+        "arrival_volume"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "spread_change",
+      "dtype": "float64",
+      "family": [
+        "regime_median_center_slope_alignment"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 3,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe",
+        "timeframe_2"
+      ],
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "structural_current_expansion_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "structural_expansion_atr_per_min",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "structural_giveback_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "structural_max_expansion_atr",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "structural_retention_ratio",
+      "dtype": "float64",
+      "family": [
+        "structural_regime_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "swing_count",
+      "dtype": "float64",
+      "family": [
+        "pullback_1m",
+        "pullback_1s"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "vol_cum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "vol_max",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 9,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "vol_sum_vs_ratio",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 9,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "volume_per_second",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "legacy_alias_count": 2,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "session_boundary"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "volume_price_correlation",
+      "dtype": "float64",
+      "family": [
+        "arrival_volume"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "window"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "volume_trend",
+      "dtype": "float64",
+      "family": [
+        "arrival_volume"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "window"
+      ],
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "wick_imbalance",
+      "dtype": "float64",
+      "family": [
+        "wick_imbalance"
+      ],
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "legacy_alias_count": 1,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+      "provider_sha256": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    },
+    {
+      "canonical_name": "window_available",
+      "dtype": "float64",
+      "family": [
+        "ohlcv_est_delta"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 8,
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "status": "verified"
+    }
+  ],
+  "schema_version": 1
+}

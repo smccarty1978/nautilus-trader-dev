@@ -1,0 +1,24 @@
+research_question: "Do explicitly declared completed-bar structural regime and rolling productivity features add information for imminent prevailing-1m flips across maturity buckets?"
+baseline:
+  short: "explicit canonical feature instances"
+  long: "explicit canonical feature instances"
+baseline_feature_selection:
+  mode: "none"
+model_arms:
+  A: "explicit canonical baseline"
+  B: "baseline plus completed-bar structural regime geometry"
+  C: "B plus completed-1s rolling productivity"
+variable_being_tested:
+  - completed_bar_structural_regime_geometry
+  - rolling_productivity
+prohibited_changes:
+  - use_2024_to_change_model_design
+allowed_changes:
+  - evaluate_model_arms_a_b_c
+  - stratify_by_maturity_buckets
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+primary_comparison: "Model C versus Model B versus Model A on 2024 OOS maturity buckets."
+terminal_question: "Do the explicitly declared canonical features add clean OOS discrimination?"

@@ -8,6 +8,7 @@ from __future__ import annotations
 import re
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pandas as pd
 
@@ -16,7 +17,7 @@ ROOT = HERE.parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from features.registry import FEATURE_REGISTRY  # noqa: E402
+from features.registry import resolve_feature_request, resolve_runtime_feature_aliases  # noqa: E402
 
 NEW_FAMILIES = ("ohlcv_est_delta", "price_level_context")
 
@@ -84,12 +85,17 @@ def infer_availability_rule(subfamily: str, name: str) -> str:
 
 def main() -> None:
     rows = []
-    for name, d in FEATURE_REGISTRY.items():
-        if d.family not in NEW_FAMILIES:
+    for name in resolve_runtime_feature_aliases():
+        resolved = resolve_feature_request(name)
+        d = SimpleNamespace(family=resolved["family"], dtype=resolved["dtype"],
+                            source_timeframe=",".join(resolved["input_requirements"].get("required_streams", [])),
+                            normalizer="canonical_instance_contract", status=resolved["status"],
+                            implementation=resolved["provider"])
+        if not set(d.family if isinstance(d.family, list) else (d.family,)) & set(NEW_FAMILIES):
             continue
         # subfamily inferred from the registry-generation loop structure in
         # registry.py (family + a small set of naming patterns).
-        if d.family == "ohlcv_est_delta":
+        if "ohlcv_est_delta" in (d.family if isinstance(d.family, list) else (d.family,)):
             if name.startswith("bar_"):
                 subfamily = "bar_level"
             elif name.startswith("window_available_") or any(
@@ -126,7 +132,7 @@ def main() -> None:
                 subfamily = "per_level_distance"
 
         direction_or_absolute = "directional" if (
-            d.family == "price_level_context" and subfamily == "direction_normalized"
+            "price_level_context" in (d.family if isinstance(d.family, list) else (d.family,)) and subfamily == "direction_normalized"
         ) else "absolute"
 
         rows.append({

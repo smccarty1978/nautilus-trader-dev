@@ -58,7 +58,11 @@ def valid_flip_yaml_dict():
         },
         "features": {
             "source_key": "velocity_test_v1",
-            "feature_list": ["arrival_vel_5s", "arrival_vel_10s", "arrival_vel_20s"],
+            "instances": [
+                {"feature": "arrival_velocity", "parameters": {"lookback": 5}},
+                {"feature": "arrival_velocity", "parameters": {"lookback": 10}},
+                {"feature": "arrival_velocity", "parameters": {"lookback": 20}},
+            ],
             "timing_contract": "verified",
         },
         "model": {
@@ -170,6 +174,7 @@ def test_bespoke_inherits_and_enforces_global_invariants(valid_flip_yaml_dict):
     bad_feat = copy.deepcopy(valid_flip_yaml_dict)
     bad_feat["study"]["type"] = "bespoke"
     bad_feat["features"]["feature_list"] = ["unregistered_feature_abc"]
+    bad_feat["features"]["instances"] = None
     bad_feat["bespoke"] = {
         "reason": "Testing bespoke features not in registry.",
         "unsupported_contract_element": "unregistered_features",
@@ -206,6 +211,7 @@ def test_unsupported_runtime_rejected(valid_flip_yaml_dict):
 def test_unregistered_feature_fails_compilation(valid_flip_yaml_dict):
     bad_feat_dict = valid_flip_yaml_dict.copy()
     bad_feat_dict["features"]["feature_list"] = ["unregistered_bogus_feature_xyz"]
+    bad_feat_dict["features"]["instances"] = None
     spec = StudySpec.model_validate(bad_feat_dict)
     compiler = FlipPredictionCompiler()
     with pytest.raises(FeatureBindingError, match="FEATURE_NOT_REGISTERED"):

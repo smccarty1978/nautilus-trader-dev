@@ -56,57 +56,65 @@ def missing_feature_yaml(request: str) -> str:
     ))
 
 
-def resolve_request(request: str) -> Dict[str, Any]:
+def resolve_request(request: str, *, legacy_mode: bool = False) -> Dict[str, Any]:
     """Resolve an existing canonical definition or a deterministic legacy alias.
 
     This is intentionally lifecycle-neutral: recognising an existing building
     block never promotes it, and an unknown name receives a YAML draft rather
     than a speculative new registry entry.
     """
-    from features.registry import (
-        CANONICAL_FEATURE_DEFINITIONS, FeatureInstance,
-        LEGACY_FEATURE_INSTANCE_OVERRIDES, validate_feature_instance,
-    )
-    if request in LEGACY_FEATURE_INSTANCE_OVERRIDES:
-        instance = LEGACY_FEATURE_INSTANCE_OVERRIDES[request]
-        return {"result": "EXISTING_CANONICAL_FEATURE", "requested": request,
-                "feature": instance.canonical_name, "parameters": validate_feature_instance(instance),
-                "physical_alias": request, "resolution": "legacy_alias"}
-    if request in CANONICAL_FEATURE_DEFINITIONS:
+    from features.candidate_authority import ACTIVE_POINTER, load_authority
+    from features.registry import resolve_feature_request
+    if legacy_mode:
+        resolved = resolve_feature_request(request, authority="legacy")
+        return {"result": "LEGACY_REPLAY_FEATURE", "requested": request,
+                "feature": resolved["canonical_name"], "parameters": resolved["parameters"],
+                "physical_alias": resolved["physical_alias"], "resolution": "explicit_legacy_replay",
+                "legacy_mode": True}
+    authority = "active" if ACTIVE_POINTER.is_file() else "candidate"
+    bundle = load_authority(authority)
+    canonical_names = {item["canonical_name"] for item in bundle["registry"]["definitions"]}
+    aliases = bundle["aliases"]["aliases"]
+    # Canonical vocabulary is always first: a request for a building block is
+    # not rewritten through a historical alias.
+    if request in canonical_names:
         return {"result": "EXISTING_CANONICAL_FEATURE", "requested": request,
                 "feature": request, "parameters": {}, "physical_alias": None,
                 "resolution": "canonical_name"}
+    # Explicit V2 legacy overrides carry already-audited compatibility details.
+    if request in aliases:
+        record = aliases[request]
+        return {"result": "LEGACY_ALIAS", "requested": request,
+                "feature": record["canonical_feature"], "parameters": record.get("parameters", {}),
+                "physical_alias": request, "resolution": "legacy_migration_guidance",
+                "error": "LEGACY_FEATURE_ALIAS_NOT_ALLOWED",
+                "guidance": "declare the canonical feature and parameters in the study"}
     match = _PRIOR_REGIME.fullmatch(request)
     if match:
         canonical = f"regime_{match.group('metric')}"
-        if canonical in CANONICAL_FEATURE_DEFINITIONS:
-            instance = FeatureInstance(canonical, {
-                "timeframe": match.group("timeframe"), "context": "prior", "bar_state": "completed",
-            })
-            try:
-                parameters = validate_feature_instance(instance)
-            except Exception as exc:
-                return {"result": "PENDING_PROVIDER_CUTOVER", "requested": request,
-                        "feature": canonical, "parameters": dict(instance.parameters),
-                        "reason": str(exc)}
-            return {"result": "EXISTING_CANONICAL_FEATURE", "requested": request,
-                    "feature": canonical, "parameters": parameters,
+        if canonical in canonical_names:
+            result = {"result": "EXISTING_CANONICAL_FEATURE", "requested": request,
+                    "feature": canonical, "parameters": {"timeframe": match.group("timeframe"),
+                    "context": "prior", "bar_state": "completed"},
                     "physical_alias": request, "resolution": "deterministic_alias"}
+            if not ACTIVE_POINTER.is_file():
+                result["execution_status"] = "STAGED_PROVIDER_PENDING_AUTHORITY_CUTOVER"
+            return result
     match = _ROLLING.fullmatch(request)
     if match:
         canonical = f"rolling_{match.group('metric')}"
-        if canonical in CANONICAL_FEATURE_DEFINITIONS:
-            instance = FeatureInstance(canonical, {"window": match.group("window"), "update_every": "1s"})
+        if canonical in canonical_names:
             return {"result": "EXISTING_CANONICAL_FEATURE", "requested": request,
-                    "feature": canonical, "parameters": validate_feature_instance(instance),
+                    "feature": canonical, "parameters": {"window": match.group("window"), "update_every": "1s"},
                     "physical_alias": request, "resolution": "deterministic_alias"}
     return {"result": "MISSING_CANONICAL_FEATURE", "requested": request,
             "yaml_template": missing_feature_yaml(request)}
 
 
 def _select(features: Iterable[str] | None, family: str | None) -> Dict[str, Any]:
-    from features.registry import CANONICAL_FEATURE_DEFINITIONS
-    selected = dict(CANONICAL_FEATURE_DEFINITIONS)
+    from features.candidate_authority import ACTIVE_POINTER, load_authority
+    bundle = load_authority("active" if ACTIVE_POINTER.is_file() else "candidate")
+    selected = {item["canonical_name"]: item for item in bundle["registry"]["definitions"]}
     if features:
         requested = set(features)
         missing = sorted(requested - set(selected))
@@ -114,53 +122,32 @@ def _select(features: Iterable[str] | None, family: str | None) -> Dict[str, Any
             raise ValueError(f"UNKNOWN_CANONICAL_FEATURE: {missing}")
         selected = {name: selected[name] for name in requested}
     if family:
-        selected = {name: definition for name, definition in selected.items() if definition.family == family}
+        selected = {name: definition for name, definition in selected.items() if family in definition.get("family", [])}
         if not selected:
             raise ValueError(f"UNKNOWN_FEATURE_FAMILY: {family!r}")
     return selected
 
 
 def check(features: Iterable[str] | None = None, family: str | None = None) -> Dict[str, Any]:
-    from features.registry import validate_canonical_feature_name
     selected = _select(features, family)
-    report = check_canonical_feature_promotions(repo_root=REPO_ROOT, require_promoted=False)
-    selected_names = set(selected)
-    report["features"] = sorted(selected)
-    report["violations"] = [v for v in report["violations"] if v.get("feature") in selected_names]
+    from features.candidate_authority import ACTIVE_POINTER, load_authority
+    bundle = load_authority("active" if ACTIVE_POINTER.is_file() else "candidate")
+    facts = {item["canonical_name"]: item for item in bundle["promotion_facts"]["definitions"]}
+    report = {"features": sorted(selected), "violations": []}
     for name, definition in selected.items():
-        try:
-            validate_canonical_feature_name(definition)
-        except Exception as exc:
-            report["violations"].append({"feature": name, "code": "FEATURE_NAME_EMBEDS_TEMPORAL_INSTANCE", "message": str(exc)})
+        if definition.get("status") != "verified" or facts.get(name, {}).get("lifecycle_status") != "verified":
+            report["violations"].append({"feature": name, "code": "PROMOTION_FACTS_INCOMPLETE", "message": "canonical definition is not verified"})
+        if re.search(r"(?:^|_)(?:[0-9]+[sm]|ema_[0-9]+|atr_[0-9]+|median_[0-9]+)(?:_|$)", name):
+            report["violations"].append({"feature": name, "code": "FEATURE_NAME_EMBEDS_TEMPORAL_INSTANCE", "message": "canonical names must be parameterized"})
     report["passed"] = not report["violations"]
     return report
 
 
 def promote(features: Iterable[str] | None = None, family: str | None = None) -> Dict[str, Any]:
-    selected = _select(features, family)
-    checked = check(selected, None)
-    if not checked["passed"]:
-        return checked
-    existing: Dict[str, Dict[str, Any]] = {}
-    if CANONICAL_PROMOTIONS_PATH.exists():
-        existing = {r["feature"]: r for r in json.loads(CANONICAL_PROMOTIONS_PATH.read_text(encoding="utf-8")).get("promotions", [])}
-    for name, definition in selected.items():
-        evidence = canonical_definition_evidence(name, definition, REPO_ROOT)
-        audit = AUDIT_EVIDENCE.get(definition.family)
-        if audit is None:
-            raise ValueError(f"PROMOTION_AUDIT_EVIDENCE_ABSENT: {definition.family}")
-        existing[name] = {
-            "feature": name,
-            "causal_audit_artifact": audit["causal_audit_artifact"],
-            "audited_execution_composite_sha256": audit["audited_execution_composite_sha256"],
-            "promoted_by": "feature_ctl promote",
-            "reviewed_implementation_sha256": evidence["implementation_sha256"],
-            "test_evidence": evidence["structural_coverage"],
-            "supported_parameter_schema": list(definition.parameter_schema),
-        }
-    payload = {"schema_version": 2, "promotions": [existing[name] for name in sorted(existing)]}
-    CANONICAL_PROMOTIONS_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    return check_canonical_feature_promotions(repo_root=REPO_ROOT, require_promoted=True)
+    # Candidate promotion facts are mechanically materialized with the
+    # canonical bundle.  This command validates that evidence; it never makes
+    # per-alias promotion records or mutates active authority.
+    return check(features, family)
 
 
 def main() -> int:
@@ -171,11 +158,12 @@ def main() -> int:
         item.add_argument("--feature", action="append")
         item.add_argument("--family")
         item.add_argument("--request", action="append", help="Resolve a canonical/legacy/deterministic feature request")
+        item.add_argument("--legacy-study", action="store_true", help="Explicitly resolve archived legacy aliases for historical replay")
     args = parser.parse_args()
     if args.request:
         if args.command != "check":
             parser.error("--request is supported by feature_ctl check only")
-        report = {"passed": True, "requests": [resolve_request(request) for request in args.request]}
+        report = {"passed": True, "requests": [resolve_request(request, legacy_mode=args.legacy_study) for request in args.request]}
     else:
         report = check(args.feature, args.family) if args.command == "check" else promote(args.feature, args.family)
     print(json.dumps(report, indent=2, sort_keys=True))

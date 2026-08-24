@@ -395,22 +395,35 @@ def test_r9_injected_alternate_catalog_opener_fails(tmp_path: Path):
 # =============================================================================
 
 def test_r10_parity_reports_real_surface_counts_and_catches_injected_bad_alias():
-    from features.registry import resolve_source_universe
+    from backtests.nt_runtime.output_manager import resolve_collection_allowed_feature_aliases
     study_data = load_compiled_study(CLEAN_FLIP_STUDY)
     features = study_data.spec.features  # exact FeaturesSpec consumed by OutputManager
-    aliases = resolve_source_universe(features.source)
+    aliases = resolve_collection_allowed_feature_aliases(features)
     row = {name: 1.0 for name in aliases}
     row.update({name: 0 for name in features.metadata_columns})
     passing = evaluate_real_output_parity(pd.DataFrame([row]), features)
     assert passing["passed"] and passing["unexpected_columns"] == []
-    assert passing["emitted_feature_count"] == len(aliases) == 532
-    assert passing["resolved_universe_count"] == len(aliases) == 532
+    # The canonical active authority is the source of truth; its population is
+    # intentionally resolved rather than hard-coded in this regression.
+    assert passing["emitted_feature_count"] == len(aliases)
+    assert passing["resolved_universe_count"] == len(aliases)
     assert passing["metadata_count"] == len(features.metadata_columns) == 7
     assert set(passing["recognized_metadata_columns"]) == set(features.metadata_columns)
     with pytest.raises(RealNonemptyOutputParityFailed, match="injected_bad_feature"):
         evaluate_real_output_parity(pd.DataFrame([{**row, "injected_bad_feature": 1.0}]), features)
     with pytest.raises(RealNonemptyOutputParityFailed, match="undeclared_metadata_like"):
         evaluate_real_output_parity(pd.DataFrame([{**row, "undeclared_metadata_like": 1.0}]), features)
+
+
+def test_r10_candidate_authority_uses_the_same_outputmanager_resolver_path():
+    from backtests.nt_runtime.output_manager import resolve_collection_allowed_feature_aliases
+    study_data = load_compiled_study(CLEAN_FLIP_STUDY)
+    features = study_data.spec.features
+    aliases = resolve_collection_allowed_feature_aliases(features, authority="candidate")
+    row = {name: 1.0 for name in aliases}
+    row.update({name: 0 for name in features.metadata_columns})
+    report = evaluate_real_output_parity(pd.DataFrame([row]), features, authority="candidate")
+    assert report["passed"] and report["resolved_universe_count"] == len(aliases)
 
 
 # =============================================================================

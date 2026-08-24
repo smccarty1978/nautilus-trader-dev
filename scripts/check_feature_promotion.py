@@ -337,7 +337,14 @@ def check_feature_promotions(
     if repo_root is None:
         repo_root = REPO_ROOT
     if registry is None:
-        from features.registry import FEATURE_REGISTRY as registry  # noqa: N806
+        from features.registry import resolve_runtime_feature_aliases, resolve_runtime_feature_definition
+        # Active pipeline promotion checks resolve compatibility aliases through
+        # canonical authority.  The old physical registry remains reachable
+        # only when a unit test explicitly supplies a synthetic registry.
+        registry = {
+            name: resolve_runtime_feature_definition(name)
+            for name in resolve_runtime_feature_aliases()
+        }
     if baseline is None:
         baseline = load_baseline()
     if promotions is None:
@@ -422,6 +429,28 @@ def check_feature_promotions(
 
 def assert_feature_promotions(**kwargs) -> Dict[str, Any]:
     """Fail-closed wrapper used by the preflight gate."""
+    # After V2 cutover lifecycle authority is the activated canonical bundle.
+    # The historical per-physical-alias validator remains for explicit legacy
+    # or synthetic-registry tests, but must not reintroduce a second active
+    # promotion authority into phase-zero/build paths.
+    if not kwargs:
+        try:
+            from features.candidate_authority import ACTIVE_POINTER, load_authority
+            if ACTIVE_POINTER.is_file():
+                bundle = load_authority("active")
+                definitions = {item["canonical_name"] for item in bundle["registry"]["definitions"]}
+                facts = {item["canonical_name"]: item for item in bundle["promotion_facts"]["definitions"]}
+                missing = sorted(definitions - set(facts))
+                unverified = sorted(name for name, item in facts.items()
+                                    if name in definitions and item.get("lifecycle_status") != "verified")
+                if missing or unverified:
+                    raise FeaturePromotionError(
+                        f"CANONICAL_PROMOTION_FACTS_INCOMPLETE: missing={missing}, unverified={unverified}"
+                    )
+                return {"passed": True, "authority": "canonical_active",
+                        "canonical_definition_count": len(definitions), "violations": []}
+        except ImportError:
+            pass
     report = check_feature_promotions(**kwargs)
     # The normal preflight path uses the authoritative registry.  Unit tests that pass
     # a synthetic registry exercise the legacy lifecycle in isolation and must not be
@@ -472,13 +501,10 @@ def main() -> int:
     ap.add_argument("--json", help="Write the promotion report to this path")
     args = ap.parse_args()
 
-    report = check_feature_promotions()
     try:
-        assert_baseline_not_extended()
+        report = assert_feature_promotions()
     except FeaturePromotionError as err:
-        report["passed"] = False
-        report["violations"].append({"feature": None, "code": "PROMOTION_BASELINE_EXTENDED",
-                                     "message": str(err)})
+        report = {"passed": False, "violations": [{"feature": None, "code": "PROMOTION_UNSUPPORTED", "message": str(err)}]}
 
     if args.json:
         Path(args.json).parent.mkdir(parents=True, exist_ok=True)
@@ -486,8 +512,8 @@ def main() -> int:
 
     print("=" * 60)
     print(f"FEATURE PROMOTION VALIDATION: {'PASS' if report['passed'] else 'BLOCKED'}")
-    print(f"Grandfathered baseline:      {report['baseline_size']}")
-    print(f"Requiring fresh evidence:    {len(report['features_requiring_evidence'])}")
+    print(f"Grandfathered baseline:      {report.get('baseline_size', 0)}")
+    print(f"Requiring fresh evidence:    {len(report.get('features_requiring_evidence', []))}")
     for v in report["violations"]:
         print(f"  [{v['code']}] {v['message']}")
     print("=" * 60)

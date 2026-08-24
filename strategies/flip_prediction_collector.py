@@ -26,7 +26,8 @@ from features.trackers.rolling_5m_productivity import Rolling5mProductivityTrack
 from features.trackers.structural_regime_geometry import StructuralRegimeGeometryTracker
 from features.trackers.wick import WickTracker
 from features.trackers.range_position import RangePositionTracker
-from features.registry import FEATURE_REGISTRY
+from features.registry import resolve_runtime_feature_aliases
+from backtests.nt_runtime.phase0 import authorize_execution
 from utils.session_boundaries import is_in_session, session_close_ns
 
 from datetime import datetime, timezone
@@ -159,7 +160,14 @@ class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
     age_gate_seconds: int = 120              # minimum regime age before candidate declaration
     established_required: bool = True
     checkpoint_interval_seconds: int = 5
+    running_mfe_atr_gte: float = 1.0
+    new_progress_windows_gte: int = 2
+    retained_mfe_ratio_gte: float = 0.5
     feature_list: Optional[List[str]] = None
+    feature_requirements: dict = {}
+    metadata_columns: tuple[str, ...] = ()
+    phase0_manifest_path: str = ""
+    feature_authority: str = "active"
     session: str = "RTH"                     # resolved via utils.session_boundaries
     session_end_censoring: bool = True       # from target_contract.censoring_policy
 
@@ -170,6 +178,17 @@ class FlipPredictionCollector(Strategy):
     def __init__(self, config: FlipPredictionCollectorConfig) -> None:
         super().__init__(config)
         self.cfg = config
+        if not config.phase0_manifest_path:
+            raise RuntimeError("phase-zero authorization missing; collection and fit are refused")
+        phase0 = authorize_execution(Path(config.phase0_manifest_path), feature_authority=config.feature_authority)
+        self._feature_authority = phase0.get("feature_authority", "active")
+        requirements = config.feature_requirements if isinstance(config.feature_requirements, dict) else {}
+        resolved_instances = requirements.get("resolved_instances", ())
+        self._study_feature_aliases = tuple(dict.fromkeys(
+            str(item.get("physical_alias")) for item in resolved_instances
+            if item.get("physical_alias")
+        )) or tuple(dict.fromkeys(requirements.get("aliases", ())))
+        self._metadata_columns = tuple(config.metadata_columns)
         self.is_both_directions = config.prevailing_regime == "both"
         self.prevailing_dir = 0 if self.is_both_directions else (1 if config.prevailing_regime == "bullish" else -1)
         self.target_dir = 0 if self.is_both_directions else (1 if config.target_direction == "bullish" else -1)
@@ -231,6 +250,14 @@ class FlipPredictionCollector(Strategy):
         self.candidates_log: List[Dict[str, Any]] = []
         self.observations_log: List[Dict[str, Any]] = []
         self.pending_candidates: List[Dict[str, Any]] = []
+
+    def _append_candidate(self, record: Dict[str, Any]) -> None:
+        """Emit only the study-declared surface plus canonical key/metadata fields."""
+        aliases = set(self._study_feature_aliases or self.cfg.feature_list or ())
+        keep = {"observation_ts", "regime_start_ns", "checkpoint_index"}
+        keep.update(self._metadata_columns)
+        keep.update(aliases)
+        self.candidates_log.append({key: value for key, value in record.items() if key in keep})
 
     def on_start(self) -> None:
         self.subscribe_bars(BarType.from_str(self.cfg.bar_type_1s))
@@ -542,7 +569,9 @@ class FlipPredictionCollector(Strategy):
                 self.mfe_progress_previous_extreme = current_mfe
 
             while self.regime_start_ns > 0:
-                T = self.regime_start_ns + (self.next_checkpoint_index + 1) * CANDIDATE_STEP_NS
+                T = self.regime_start_ns + (
+                    self.next_checkpoint_index + 1
+                ) * int(self.cfg.checkpoint_interval_seconds) * NS
                 if T > ts_avail:
                     break
                 if (T - self.regime_start_ns) > CANDIDATE_TIMEOUT_NS:
@@ -631,7 +660,12 @@ class FlipPredictionCollector(Strategy):
 
         # Established filter
         if self.cfg.established_required:
-            if not (regime_age_s >= self.cfg.age_gate_seconds and current_mfe >= 1.0 and self.mfe_progress_count >= 2 and retained >= 0.5):
+            if not (
+                regime_age_s >= self.cfg.age_gate_seconds
+                and current_mfe >= self.cfg.running_mfe_atr_gte
+                and self.mfe_progress_count >= self.cfg.new_progress_windows_gte
+                and retained >= self.cfg.retained_mfe_ratio_gte
+            ):
                 return
 
         # Declared-session gate, resolved through the canonical boundary module.
@@ -834,10 +868,10 @@ class FlipPredictionCollector(Strategy):
                 **rolling_feats,
             }
 
-            for col in (self.cfg.feature_list or all_computed_60.keys()):
+            for col in (self._study_feature_aliases or self.cfg.feature_list or all_computed_60.keys()):
                 cand_record[col] = all_computed_60.get(col, None)
 
-            self.candidates_log.append(cand_record)
+            self._append_candidate(cand_record)
             self._track_pending(cand_record, T)
             return
 
@@ -887,10 +921,7 @@ class FlipPredictionCollector(Strategy):
             **range_position_feats,
         }
 
-        study_universe = self.cfg.feature_list or [
-            name for name, d in FEATURE_REGISTRY.items()
-            if (d.status == "verified" or d.family in ("structural_regime_geometry", "rolling_5m_productivity"))
-        ]
+        study_universe = self._study_feature_aliases or self.cfg.feature_list or resolve_runtime_feature_aliases()
         feats_to_log = {k: merged_raw.get(k, None) for k in study_universe}
 
         cand_record = {
@@ -910,7 +941,7 @@ class FlipPredictionCollector(Strategy):
             **feats_to_log,
         }
 
-        self.candidates_log.append(cand_record)
+        self._append_candidate(cand_record)
         self._track_pending(cand_record, T)
 
     def get_candidates_dataframe(self) -> pd.DataFrame:

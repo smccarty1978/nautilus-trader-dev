@@ -82,8 +82,8 @@ def mock_study_dir():
             },
             "features": {
                 "source_key": "F3_top25_gbt_v1",
-                "feature_list_sha256": "5e8b5cfd125b7b6dd030dba26126b57d51616014095e70cb8a357ebbf06e2cea",
-                "feature_list": ["rth_vol_cum", "rth_elapsed_seconds", "pct_levels_behind_trade"],
+                "feature_list_sha256": "369e44a4991571075ff32b2736336278a635ad71dd7284dc89020f1074867cc7",
+                "feature_list": ["vol_cum", "elapsed_seconds", "price_level_aggregate"],
                 "metadata_columns": ["observation_ts", "regime_start_ns", "checkpoint_index", "close", "atr"],
             },
             "chronology": {
@@ -251,9 +251,9 @@ def test_output_manager_persists_artifacts(mock_study_dir):
                 "checkpoint_index": 0,
                 "close": 21000.0,
                 "atr": 10.0,
-                "rth_vol_cum": 100.0,
-                "rth_elapsed_seconds": 60.0,
-                "pct_levels_behind_trade": 0.5,
+                    "vol_cum": 100.0,
+                    "elapsed_seconds": 60.0,
+                    "price_level_aggregate": 0.5,
             }
         ])
         obs_df = pd.DataFrame([

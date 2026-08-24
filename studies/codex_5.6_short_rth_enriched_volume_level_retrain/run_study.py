@@ -141,19 +141,20 @@ def f0_features() -> list[str]:
 
 
 def registry_features() -> tuple[list[str], list[str], dict[str, Any]]:
-    from features.registry import FEATURE_REGISTRY
-    f1 = [n for n, d in FEATURE_REGISTRY.items() if d.family == "ohlcv_est_delta"]
-    all_f2 = [n for n, d in FEATURE_REGISTRY.items() if d.family == "price_level_context"]
+    from features.registry import resolve_feature_request, resolve_runtime_feature_aliases
+    resolved = {name: resolve_feature_request(name) for name in resolve_runtime_feature_aliases()}
+    f1 = [n for n, d in resolved.items() if "ohlcv_est_delta" in str(d["family"])]
+    all_f2 = [n for n, d in resolved.items() if "price_level_context" in str(d["family"])]
     raw_f2 = [n for n in all_f2 if n not in IDENTITY]
-    bad = [n for n in f1 + raw_f2 if FEATURE_REGISTRY[n].status != "verified"]
+    bad = [n for n in f1 + raw_f2 if resolved[n]["status"] != "verified"]
     positions = [n for n in raw_f2 if n.endswith("_position")]
     numeric_f2 = [n for n in raw_f2 if n not in positions]
     if len(f1) != 214 or len(all_f2) != 247 or len(raw_f2) != 245 or len(positions) != 29 or len(numeric_f2) != 216:
         raise RuntimeError("registered family counts/status do not meet the frozen contract")
     if bad:
         raise RuntimeError(f"non-verified registered features: {bad}")
-    metadata = {n: {"family": FEATURE_REGISTRY[n].family, "status": FEATURE_REGISTRY[n].status,
-                    "version": FEATURE_REGISTRY[n].version} for n in f1 + raw_f2}
+    metadata = {n: {"family": resolved[n]["family"], "status": resolved[n]["status"],
+                    "version": "canonical_v2"} for n in f1 + raw_f2}
     return f1, numeric_f2, {"positions": positions, "metadata": metadata}
 
 

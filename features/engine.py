@@ -13,7 +13,12 @@ from features.trackers.median_center import MedianCenterTracker
 from features.trackers.rolling_5m_productivity import Rolling5mProductivityTracker
 from features.trackers.wick import WickTracker
 from features.trackers.range_position import RangePositionTracker
-from features.registry import FEATURE_REGISTRY, resolve_feature_name
+from features.registry import (
+    resolve_feature_engine_output_aliases,
+    resolve_feature_request,
+    canonicalize_provider_columns,
+    provider_compatibility_keys,
+)
 from utils.session_boundaries import is_in_session
 
 CT = pytz.timezone('America/Chicago')
@@ -289,16 +294,38 @@ class FeatureEngine:
                 regime_expansion_atr_per_min=rolling_context.get("regime_expansion_atr_per_min"),
             ))
 
+        # Providers may still expose historical field labels internally.  Map
+        # those labels once at the provider boundary; never choose an
+        # arbitrary compatibility key while resolving a parameterized
+        # canonical feature.
+        canonical_raw_features = canonicalize_provider_columns(raw_features)
+
         # Filter, map aliases, and deduplicate
         output = {}
-        target_keys = FEATURE_REGISTRY.keys() if feature_set == "all" else feature_set
+        target_keys = resolve_feature_engine_output_aliases() if feature_set == "all" else feature_set
 
         for raw_key in target_keys:
-            canonical_key = resolve_feature_name(raw_key)
-            if canonical_key in FEATURE_REGISTRY:
-                # Ensure values are fetched and mapped
-                val = raw_features.get(raw_key, raw_features.get(canonical_key, None))
-                output[canonical_key] = _coerce(val)
+            resolved = resolve_feature_request(raw_key)
+            # Values remain keyed by their historical physical aliases inside
+            # trackers.  The resolver, rather than the alias spelling, owns
+            # identity and compatibility translation.
+            alias = resolved["physical_alias"]
+            canonical = resolved["canonical_name"]
+            val = canonical_raw_features.get(canonical,
+                    raw_features.get(alias, raw_features.get(raw_key, None)))
+            if val is None:
+                # A canonical definition may have exactly one historical
+                # provider label.  That one-to-one binding is deterministic;
+                # never select from an ambiguous compatibility set.
+                keys = provider_compatibility_keys(canonical)
+                if len(keys) == 1:
+                    val = raw_features.get(keys[0])
+            # Never select an arbitrary historical compatibility key for a
+            # parameterized canonical definition.  The requested instance (or
+            # the provider's canonical output) is the sole execution identity;
+            # silently taking the first alias can change timeframe, lookback,
+            # reset, and availability semantics.
+            output[alias] = _coerce(val)
 
         # Return a deep copy to guarantee snapshot immutability
         return copy.deepcopy(output)

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 import pytz
@@ -54,10 +54,22 @@ def _position(reference: float, level: float, tolerance: float) -> str:
 class PriceLevelTracker:
     """Stateful tracker over completed 1-minute bars. See module docstring."""
 
-    def __init__(self, tick_size: float = 0.25, touch_tolerance_ticks: float = 1.0):
+    def __init__(self, tick_size: float = 0.25, touch_tolerance_ticks: float = 1.0,
+                 rolling_windows_min: Optional[Iterable[int]] = None):
+        """Create a causal completed-1m level provider.
+
+        The legacy 5/15/30/60-minute catalogue remains the default.  Window
+        duration is now a validated provider parameter: it changes the
+        completed-bar input interval, never the calculation, availability,
+        session reset, or output semantics.
+        """
+        requested = ROLLING_WINDOWS_MIN if rolling_windows_min is None else tuple(int(value) for value in rolling_windows_min)
+        if not requested or any(value <= 0 for value in requested):
+            raise ValueError("rolling_windows_min must contain positive completed-minute durations")
         self.tick_size = tick_size
         self.touch_tolerance_ticks = touch_tolerance_ticks
-        max_window = max(ROLLING_WINDOWS_MIN)
+        self.rolling_windows_min = tuple(sorted(set(requested)))
+        max_window = max(self.rolling_windows_min)
         self.bars_1m: deque = deque(maxlen=max_window + 5)
 
         self.current_trading_day: Optional[str] = None
@@ -149,7 +161,7 @@ class PriceLevelTracker:
             self._opening_range_final["low"] if self._opening_range_final else None, "session")
 
         n = len(self.bars_1m)
-        for W in ROLLING_WINDOWS_MIN:
+        for W in self.rolling_windows_min:
             window = list(self.bars_1m)[-W:] if n >= W else []
             # Require the window to actually SPAN W minutes gaplessly (bars
             # are 1-minute apart) -- a real feed gap must not silently mark
