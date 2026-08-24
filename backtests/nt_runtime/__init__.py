@@ -26,7 +26,7 @@ from backtests.nt_runtime.run_plan import (
     RunStage,
 )
 from backtests.nt_runtime.telemetry import CausalTelemetry
-from backtests.nt_runtime.output_manager import OutputManager
+from research_workflow.output_manager import OutputManager
 
 __all__ = [
     "load_compiled_study",

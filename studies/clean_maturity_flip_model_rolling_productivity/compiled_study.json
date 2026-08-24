@@ -1,7 +1,7 @@
 {
   "study_id": "clean_maturity_flip_model_rolling_productivity",
   "study_type": "flip_prediction",
-  "spec_sha256": "067cc78a11f55d344562a867405e0fb2885a19a4cb0f6d837760026e1dee8c4d",
+  "spec_sha256": "4f3b003e95ed208a51a7d33e95355cad81b2d416cae031fe1d8946c3d16acf7d",
   "spec": {
     "study": {
       "id": "clean_maturity_flip_model_rolling_productivity",
@@ -222,7 +222,7 @@
     },
     "execution": {
       "runtime": "nautilustrader",
-      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
       "data_requirements": {
         "dataset_id": "NQ_v0_2020_2026",
         "authorized_dates": [
@@ -811,7 +811,7 @@
     },
     "execution_contract": {
       "runtime": "nautilustrader",
-      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
       "bounded_execution": true,
       "progress_seconds": 60,
       "checkpoint": null,
@@ -942,5 +942,5 @@
       "has_baseline": false
     }
   },
-  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector"
+  "strategy_class": "research_workflow.generic_collector.GenericStudyCollector"
 }

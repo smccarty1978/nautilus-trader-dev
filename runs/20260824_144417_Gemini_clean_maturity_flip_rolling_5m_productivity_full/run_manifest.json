@@ -1,0 +1,31 @@
+{
+  "run_id": "20260824_144417_Gemini_clean_maturity_flip_rolling_5m_productivity_full",
+  "study_id": "Gemini_clean_maturity_flip_rolling_5m_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "4c779f5ef35d4035a9db311d2b7125eb10c74f8d275401b10713754657475802",
+  "composite_seal_hash": "4f364c2667e42b591512f361f92769e116bc8cb2d6430ae3e96aceb55e5c06e0",
+  "execution_manifest_sha256": "4f364c2667e42b591512f361f92769e116bc8cb2d6430ae3e96aceb55e5c06e0",
+  "feature_authority": "active",
+  "stage": "full",
+  "dates": {
+    "start": "2021-01-01",
+    "end": "2023-12-31",
+    "warmup_start": "2020-12-27T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME",
+    "instrument_id": "NQ.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-24T14:44:17.103767+00:00",
+  "status": "FAILED",
+  "pid": 90496,
+  "error_type": "RuntimeError",
+  "error_message": "POST_GATE_SENTINEL_REACHED",
+  "end_time_utc": "2026-08-24T14:44:17.105106+00:00"
+}

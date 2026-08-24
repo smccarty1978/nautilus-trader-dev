@@ -134,7 +134,7 @@ baseline: {}
 lineage: {}
 execution:
   runtime: nautilustrader
-  strategy_class: strategies.flip_prediction_collector.FlipPredictionCollector
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
   data_requirements:
     dataset_id: NQ_v0_2020_2026
     authorized_dates:

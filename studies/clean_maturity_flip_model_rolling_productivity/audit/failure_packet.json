@@ -1,17 +1,20 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "20260824T044703Z_82097ba40f4f",
-  "generated_at_utc": "2026-08-24T04:47:03.195049+00:00",
-  "code_hash": "82097ba40f4f7e99d4c9bc24435aa476ba622e66ff0653d7287f5c3b398ea227",
-  "superseded": false,
-  "failed_gate": "RESEARCH_DECISION_FIDELITY",
+  "preflight_run_id": "blocked_clean_maturity_flip_model_rolling_productivity",
+  "generated_at_utc": "2026-08-24T14:50:36.250083+00:00",
+  "code_hash": "",
+  "superseded": true,
+  "failed_gate": "EXECUTION_MANIFEST",
   "failure_ids": [
-    "RESEARCH_DECISION_FIDELITY_MISMATCH"
+    "POST_FREEZE_MUTATION"
   ],
   "failure_details": [
     {
-      "message": "  [CRITICAL] INVALID_RESEARCH_DECISION_SCHEMA: Failed to parse research_decision.yaml: 1 validation error for ResearchDecisionContract"
+      "message": "POST_FREEZE_MUTATION: Execution composite mutated after FREEZE. Current composite 0dd652ba1c73... != Frozen composite 9b4fc71ebe91...\nModified/Mutated files: ['study:tests/test_study_contracts.py']"
     }
   ],
-  "recommended_smallest_investigation_scope": "Inspect findings in RESEARCH_DECISION_FIDELITY and fix locally before requesting audit."
+  "recommended_smallest_investigation_scope": "Inspect and revert post-freeze mutations.",
+  "superseded_by_preflight_run_id": "20260824T150354Z_f562d183c475",
+  "superseded_at_utc": "2026-08-24T15:03:54.631057+00:00",
+  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
 }

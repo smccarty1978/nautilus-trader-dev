@@ -22,6 +22,7 @@ if str(project_root) not in sys.path:
 
 from research.schemas.study_spec import StudySpec
 from features.registry import FeatureInstance, resolve_feature_request, resolve_feature_instances
+from backtests.nt_runtime.phase0 import authorize_execution
 
 
 def compute_file_sha256(path: Path) -> str:

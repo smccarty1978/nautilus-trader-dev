@@ -1,5 +1,5 @@
 """Run preparation through the existing governed CLI."""
-from scripts.prepare_and_freeze import main
+from research_workflow.prepare import main
 
 if __name__ == "__main__":
     main()

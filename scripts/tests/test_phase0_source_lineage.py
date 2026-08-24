@@ -26,7 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 def _load_module(project_root: Path):
     """Loads build_phase0_manifest bound to an arbitrary project root."""
     spec = importlib.util.spec_from_file_location(
-        f"bp0_{abs(hash(str(project_root)))}", REPO_ROOT / "scripts" / "build_phase0_manifest.py"
+        f"bp0_{abs(hash(str(project_root)))}", REPO_ROOT / "research_workflow" / "phase0.py"
     )
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -165,10 +165,12 @@ def test_real_manifest_generation_records_a_binding(tmp_path: Path):
     """The generator must actually emit the binding for a real study."""
     import shutil
 
-    src = REPO_ROOT / "studies" / "es_wick_imbalance_exploratory"
+    # Exercise the active V2 phase-zero contract: legacy studies without
+    # explicit canonical instances are intentionally not valid here.
+    src = REPO_ROOT / "studies" / "clean_maturity_flip_model_rolling_productivity"
     if not (src / "study.yaml").exists():
         pytest.skip("ES study absent")
-    probe = tmp_path / "es_probe"
+    probe = tmp_path / "canonical_probe"
     shutil.copytree(src, probe)
 
     mod = _load_module(REPO_ROOT)
@@ -182,15 +184,10 @@ def test_real_manifest_generation_records_a_binding(tmp_path: Path):
     assert any(k.endswith("study.yaml") for k in binding["source_files"])
     assert any(k.endswith("SPEC.md") for k in binding["source_files"])
 
-    # Every implementation module backing an enumerated verified feature is bound. The
-    # wick tracker is deliberately NOT expected here: the feature is 'provisional', so it
-    # is not part of the verified candidate universe this manifest enumerates.
+    # Every implementation module backing an enumerated verified feature is bound.
     from features.registry import resolve_feature_request
 
     enumerated = manifest["candidate_feature_universe"]["candidates"]
-    assert "latest_1m_wick_imbalance" not in enumerated, (
-        "a provisional feature must not appear in the verified candidate universe"
-    )
     sample = next(iter(enumerated))
     impl = resolve_feature_request(sample)["provider"]
     if impl:

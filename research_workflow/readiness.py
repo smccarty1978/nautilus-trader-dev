@@ -51,7 +51,7 @@ from backtests.nt_runtime.compiled_study_loader import CompiledStudyData, load_c
 from backtests.nt_runtime.data_plan import DataPlan, resolve_data_plan
 from backtests.nt_runtime.engine_builder import ExecutionMode, build_engine, create_futures_instrument
 from backtests.nt_runtime.modes.collect import build_collector_config_kwargs
-from backtests.nt_runtime.output_manager import (
+from research_workflow.output_manager import (
     OutputManager, resolve_collection_allowed_feature_aliases, verify_strategy_output_interface,
 )
 from backtests.nt_runtime.run_plan import RunPlan, resolve_run_plan
@@ -399,7 +399,7 @@ def instantiate_real_collector(
         probe_study_data = study_data
         if feature_authority == "candidate" and hasattr(strategy_binding.config_cls, "phase0_manifest_path"):
             work_study_dir = study_data.study_dir / "_work" / "candidate_readiness_r5"
-            from scripts.build_phase0_manifest import build_phase0_manifest
+            from research_workflow.phase0 import build_phase0_manifest
             build_phase0_manifest(work_study_dir)
             probe_study_data = dataclasses.replace(study_data, study_dir=work_study_dir)
         cfg_kwargs = build_collector_config_kwargs(
@@ -428,8 +428,8 @@ def build_synthetic_schema_fixture(
     schema/feature-source/metadata/candidate-key/observation-key validity; does not
     establish a productive real population.
     """
-    from backtests.nt_runtime.output_manager import CANDIDATE_KEY_COLUMNS
-    from backtests.nt_runtime.output_manager import resolve_collection_allowed_feature_aliases
+    from research_workflow.output_manager import CANDIDATE_KEY_COLUMNS
+    from research_workflow.output_manager import resolve_collection_allowed_feature_aliases
 
     spec = study_data.spec
     declared_metadata = list(spec.features.metadata_columns or [])
@@ -535,7 +535,7 @@ def run_real_nonempty_output_parity(
         # Phase-zero is shared infrastructure.  The generic builder authenticates
         # the supplied compiled study; no strategy-module ``phase0`` convention is
         # required or imported.
-        from scripts.build_phase0_manifest import build_phase0_manifest
+        from research_workflow.phase0 import build_phase0_manifest
         build_phase0_manifest(study_data.study_dir)
     cfg_kwargs = build_collector_config_kwargs(
         binding, spec, probe_study_data, data_plan, feature_authority=feature_authority,
@@ -701,7 +701,8 @@ def run_readiness(
     """
     study_path = Path(study_path).resolve()
     if repo_root is None:
-        repo_root = Path(__file__).resolve().parents[2]
+        # This implementation now lives directly under research_workflow/.
+        repo_root = Path(__file__).resolve().parents[1]
     repo_root = Path(repo_root).resolve()
 
     study_data = load_compiled_study(study_path)

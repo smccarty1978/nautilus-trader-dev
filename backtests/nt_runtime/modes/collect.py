@@ -12,7 +12,7 @@ import pandas as pd
 from backtests.nt_runtime.compiled_study_loader import load_compiled_study
 from backtests.nt_runtime.data_plan import DataPlan, resolve_data_plan
 from backtests.nt_runtime.engine_builder import build_engine
-from backtests.nt_runtime.output_manager import OutputManager, verify_strategy_output_interface
+from research_workflow.output_manager import OutputManager, verify_strategy_output_interface
 from backtests.nt_runtime.run_plan import RunPlan, RunStage, resolve_run_plan
 from backtests.nt_runtime.strategy_binding import StrategyBinding, resolve_strategy_binding
 from backtests.nt_runtime.telemetry import CausalTelemetry

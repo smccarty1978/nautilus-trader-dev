@@ -539,19 +539,9 @@ def run_preflight(
         _mark("CAUSAL_INVARIANTS", "SKIPPED")
     if not failed_gate and not skip_tests:
         _begin("CAUSAL_INVARIANTS")
-        test_select_cmd = [sys.executable, str(REPO_ROOT / "scripts" / "select_required_tests.py"), "--json"]
-        if study_dir:
-            # Packet C: a study's own tests/test_*.py must always be part of the mandatory
-            # selected surface when preflighting that study.
-            test_select_cmd += ["--study", str(study_dir)]
-        select_res = subprocess.run(test_select_cmd, capture_output=True, text=True)
-        try:
-            selection = json.loads(select_res.stdout)
-            tests_to_run = [str(p) for p in selection.get("selected_tests", [])]
-        except (json.JSONDecodeError, TypeError):
-            # Compatibility with older selector fixtures that emit one path per line.
-            selection = {"selected_tests": [l.strip() for l in select_res.stdout.splitlines() if l.strip()]}
-            tests_to_run = selection["selected_tests"]
+        from research_workflow.test_selection import get_test_selection_report
+        selection = get_test_selection_report([], study_dir=study_dir)
+        tests_to_run = [str(p) for p in selection.get("selected_tests", [])]
         if study_dir:
             print(
                 "[CAUSAL_INVARIANTS] selected "

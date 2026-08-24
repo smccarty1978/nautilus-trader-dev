@@ -5,7 +5,7 @@ from research_workflow.schemas.study_spec import StudySpec
 
 
 def test_public_workflow_surface_uses_shared_implementations():
-    assert GenericStudyCollector.__module__ == "strategies.flip_prediction_collector"
+    assert GenericStudyCollector.__module__ == "research_workflow.generic_collector"
     assert callable(authorize_execution)
     assert callable(build_phase0_manifest)
     assert callable(resolve_collection_allowed_feature_aliases)

@@ -953,3 +953,10 @@ class FlipPredictionCollector(Strategy):
         if not self.observations_log:
             return pd.DataFrame()
         return pd.DataFrame(self.observations_log)
+
+
+# Canonical names for new studies.  The legacy class names remain available only
+# inside this implementation module so historical behavior and old imports can
+# be shimmed without making them active study identities.
+GenericStudyCollector = FlipPredictionCollector
+GenericStudyCollectorConfig = FlipPredictionCollectorConfig

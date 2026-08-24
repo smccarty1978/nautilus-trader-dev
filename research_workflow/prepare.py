@@ -20,7 +20,7 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 from scripts.resolve_execution_manifest import resolve_execution_manifest
-from scripts.compile_study import compile_study
+from research_workflow.compiler import compile_study
 
 
 def run_prepare_and_freeze(study_dir: Path):

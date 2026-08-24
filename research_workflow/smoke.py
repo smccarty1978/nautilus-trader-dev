@@ -1,4 +1,19 @@
-"""Smoke validation facade."""
-from scripts.validate_smoke import main
+"""Structured NT smoke API."""
+from __future__ import annotations
+from pathlib import Path
+from typing import Any, Iterable
 
-__all__ = ["main"]
+def run_smoke(study_path: str | Path, authorized_dates: Iterable[str], **kwargs: Any) -> dict[str, Any]:
+    """Execute the bounded generic collector and return structured validation."""
+    from backtests.nt_runtime.modes.collect import run_collect_mode
+    from scripts.validate_smoke import validate_smoke_run
+    study = Path(study_path).resolve()
+    date = next(iter(authorized_dates), None)
+    if not date:
+        raise ValueError("authorized_dates must contain at least one date")
+    run_result = run_collect_mode(study, stage="day", date_override=date, **kwargs)
+    validation = validate_smoke_run(study, expected_smoke_date=date)
+    return {"status": "PASS" if validation.get("passed", validation.get("status") == "ACCEPTED") else "FAIL",
+            "run": run_result, "validation": validation}
+
+__all__ = ["run_smoke"]

@@ -72,8 +72,10 @@ def test_feature_hash_equals_hash_recomputed_from_the_ordered_list():
     recomputed = hashlib.sha256(json.dumps(declared).encode("utf-8")).hexdigest()
     assert fc["feature_list_sha256"] == recomputed
     assert fc["feature_count"] == len(declared)
-    # And the compiled spec must carry the same ordered list.
-    assert _compiled()["spec"]["features"]["feature_list"] == declared
+    # V2 specs carry explicit canonical instances rather than a legacy physical
+    # feature list. Preserve the ordered surface through those instances.
+    instances = _compiled()["spec"]["features"].get("instances", [])
+    assert [item["feature"] for item in instances] == declared
 
 
 def test_declared_features_resolve_in_the_central_registry():

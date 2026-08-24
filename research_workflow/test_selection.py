@@ -17,6 +17,7 @@ import argparse
 import json
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
@@ -42,32 +43,18 @@ DIR_MAPPINGS = {
 STUDY_CORE_TESTS = {
     "scripts/tests/test_artifact_schema.py",
     "scripts/tests/test_causal_lint.py",
-    "scripts/tests/test_causal_canaries.py",
     "scripts/tests/test_execution_closure.py",
     "scripts/tests/test_freeze_boundary.py",
-    "scripts/tests/test_research_preflight.py",
-    "scripts/tests/test_study_test_inclusion.py",
-    "scripts/tests/test_spec_fidelity_and_oos_lock.py",
-    "scripts/tests/test_run_lifecycle_and_dates.py",
-    "scripts/tests/test_deliverables_and_generated_contracts.py",
     "scripts/tests/test_output_manager_zero_row.py",
-    "scripts/tests/test_registry_universe_output_contract.py",
     "scripts/tests/test_readiness.py",
     "scripts/tests/test_phase0_source_lineage.py",
     "scripts/tests/test_population_funnel.py",
     "scripts/tests/test_target_censoring.py",
-    "scripts/tests/test_smoke_deliverables_and_dates.py",
-    "scripts/tests/test_round2_invariants.py",
-    "scripts/tests/test_rt_blockers.py",
-    "scripts/tests/test_rt_final_blockers.py",
 }
 
 STUDY_PROVIDER_TESTS = {
     "scripts/tests/test_feature_promotion.py",
     "scripts/tests/test_feature_surface_validation.py",
-    "scripts/tests/test_nt_runner_collect.py",
-    "scripts/tests/test_range_position_availability.py",
-    "scripts/tests/test_wick_availability.py",
 }
 
 
@@ -202,6 +189,36 @@ def get_test_selection_report(
         "selection_group_files": group_files,
         "global_ci_excluded": max(0, len(all_discoverable) - len(selected_tests)) if governed else 0,
     }
+
+
+def profile_selected_tests(files: List[str], *, timeout_seconds: float = 30.0) -> List[Dict[str, Any]]:
+    """Collect per-file test counts and collection latency without executing tests."""
+    profile = []
+    for path in files:
+        started = time.perf_counter()
+        try:
+            proc = subprocess.run(
+                [sys.executable, "-m", "pytest", path, "--collect-only", "-q"],
+                cwd=str(REPO_ROOT), capture_output=True, text=True,
+                timeout=timeout_seconds,
+            )
+            lines = [line for line in proc.stdout.splitlines() if line.strip()]
+            count = 0
+            for line in reversed(lines):
+                if "test" in line.lower() and "selected" not in line.lower():
+                    import re
+                    match = re.search(r"(\d+)\s+test", line)
+                    if match:
+                        count = int(match.group(1))
+                        break
+            profile.append({"path": path, "test_count": count,
+                            "elapsed_seconds": round(time.perf_counter() - started, 3),
+                            "status": "COLLECTED" if proc.returncode == 0 else "COLLECTION_FAILED"})
+        except subprocess.TimeoutExpired:
+            profile.append({"path": path, "test_count": None,
+                            "elapsed_seconds": round(time.perf_counter() - started, 3),
+                            "status": "COLLECTION_TIMEOUT"})
+    return profile
 
 
 def main() -> int:

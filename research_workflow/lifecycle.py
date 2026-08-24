@@ -9,16 +9,24 @@ from research_workflow.phase0 import build_phase0_manifest
 from research_workflow.readiness import run_readiness
 from research_workflow.preflight import run_preflight
 from research_workflow.seal import generate_preexec_audit_seal, verify_preexec_audit_seal
-from research_workflow.smoke import main as smoke_cli
-from scripts.prepare_and_freeze import run_prepare_and_freeze
+from research_workflow.smoke import run_smoke
+from research_workflow.prepare import run_prepare_and_freeze
 
 
-def prepare(study_path: str | Path) -> None:
+def prepare(study_path: str | Path) -> dict[str, Any]:
     """Compile and materialize generic phase-zero before freezing."""
     study = Path(study_path).resolve()
     compile_study(study)
     build_phase0_manifest(study)
     run_prepare_and_freeze(study)
+    frozen = study / "audit" / "frozen_execution_manifest.json"
+    payload = __import__("json").loads(frozen.read_text(encoding="utf-8")) if frozen.exists() else {}
+    return {
+        "stage": "prepare",
+        "status": "PASS" if payload.get("frozen_execution_composite_sha256") else "UNKNOWN",
+        "artifact": str(frozen),
+        "composite": payload.get("frozen_execution_composite_sha256"),
+    }
 
 
 def readiness(study_path: str | Path, **kwargs: Any) -> dict[str, Any]:
@@ -26,6 +34,8 @@ def readiness(study_path: str | Path, **kwargs: Any) -> dict[str, Any]:
 
 
 def bounded_preflight(study_path: str | Path, **kwargs: Any):
+    if "out_json" in kwargs and kwargs["out_json"] is not None:
+        kwargs["out_json"] = Path(kwargs["out_json"])
     return run_preflight(Path(study_path).resolve(), [], **kwargs)
 
 
@@ -36,4 +46,4 @@ def seal(study_path: str | Path) -> dict[str, Any]:
     return artifact
 
 
-__all__ = ["prepare", "readiness", "bounded_preflight", "seal", "smoke_cli"]
+__all__ = ["prepare", "readiness", "bounded_preflight", "seal", "run_smoke"]

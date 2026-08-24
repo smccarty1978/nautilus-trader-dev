@@ -77,7 +77,7 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
 
     # RT-1: the seal is the strongest claim in the workflow, so it may not rest on a
     # partial preflight. Checked before anything else is computed.
-    from scripts.research_preflight import PreflightEvidenceError, assert_preflight_audit_ready
+    from research_workflow.preflight import PreflightEvidenceError, assert_preflight_audit_ready
     try:
         assert_preflight_audit_ready(study_dir, repo_root)
     except PreflightEvidenceError as err:
