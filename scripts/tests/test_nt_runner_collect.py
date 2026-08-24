@@ -191,7 +191,7 @@ def test_resolve_data_plan_rejects_unauthorized_years(mock_study_dir):
 def test_resolve_strategy_binding_success():
     binding = resolve_strategy_binding("flip_prediction_collector", mode="collect")
     assert binding.binding_id == "flip_prediction_collector"
-    assert binding.class_name == "FlipPredictionCollector"
+    assert binding.class_name == "GenericStudyCollector"
     assert "collect" in binding.supported_modes
 
 
@@ -529,7 +529,9 @@ def test_execute_collect_leaves_non_phase0_config_unaffected(mock_study_dir):
     run_plan, data_plan = _plans_for(study_data)
 
     binding = resolve_strategy_binding("flip_prediction_collector", mode="collect")
-    assert not hasattr(binding.config_cls, "phase0_manifest_path")
+    # The generic collector declares the phase-zero field so the public runtime
+    # can bind every study through the same path.
+    assert hasattr(binding.config_cls, "phase0_manifest_path")
     fake_strategy_instance = MagicMock(spec=[])
     strategy_binding = dataclasses.replace(
         binding, strategy_cls=MagicMock(return_value=fake_strategy_instance),
@@ -546,7 +548,7 @@ def test_execute_collect_leaves_non_phase0_config_unaffected(mock_study_dir):
         )
 
     constructed_config = strategy_binding.strategy_cls.call_args.args[0]
-    assert not hasattr(constructed_config, "phase0_manifest_path")
+    assert hasattr(constructed_config, "phase0_manifest_path")
     assert type(constructed_config).__name__ == "FlipPredictionCollectorConfig"
 
 

@@ -1,0 +1,71 @@
+{
+  "study_name": "clean_maturity_flip_model_rolling_productivity",
+  "validator_version": 2,
+  "validator_file_sha256": "27963595a43309cd6e17e5b7106750e2e34748c1a3f17c903ad8396ff53bc874",
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260824_190723_clean_maturity_flip_model_rolling_productivity_day",
+  "candidates_parquet_sha256": "12c7252fb903ea54026269a00eb25fd59f6f224a2206d22eed404a45ee635a76",
+  "sealed_composite_sha256": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
+  "execution_manifest_composite_sha256": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
+  "smoke_date": "2023-10-02",
+  "candidate_rows_total": 1698,
+  "candidates_count_total": 1698,
+  "candidates_count_target_day": 1698,
+  "duplicate_candidates_count": 0,
+  "causality_rows_examined": 1698,
+  "causality_coverage_pct": 100.0,
+  "future_source_violations_count": 0,
+  "exact_timestamp_equality_verified": true,
+  "feature_count": 13,
+  "feature_list_sha256": "38c0201fe2b0fec3070b7a226353d7782778aa82bace3b6070de8844d9d04d32",
+  "feature_surface_validation": {
+    "passed": true,
+    "rows": 1698,
+    "declared_features": [],
+    "emitted_features": [],
+    "metadata_columns": [
+      "checkpoint_index",
+      "new_progress_windows",
+      "observation_ts",
+      "regime_age_seconds",
+      "regime_start_ns",
+      "retained_mfe_ratio",
+      "running_mfe_atr",
+      "triggering_1s_ts_init"
+    ],
+    "collection_universe_columns": [
+      "arrival_acceleration",
+      "arrival_velocity",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_giveback_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_retention_ratio"
+    ],
+    "undeclared_columns": [],
+    "per_feature": {},
+    "findings": []
+  },
+  "candidate_disposition_reconciliation": {
+    "candidates": 1698,
+    "observations": 1698,
+    "passed": true,
+    "findings": [],
+    "undisposed_candidates": 0,
+    "orphaned_observations": 0,
+    "duplicate_observations": 0,
+    "disposition_counts": {
+      "LABELED_NEGATIVE": 1343,
+      "LABELED_POSITIVE": 355
+    }
+  },
+  "observations_count": 1698,
+  "deterministic_validation_verified": true,
+  "status": "ACCEPTED",
+  "validated_at": "2026-08-24T19:09:13.713412+00:00"
+}

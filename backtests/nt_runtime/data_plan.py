@@ -92,6 +92,7 @@ def enforce_authorized_dates(
     compiled_data,
     start_date: str,
     end_date: str,
+    authorized_dates_override: Optional[List[str]] = None,
 ) -> Optional[List[str]]:
     """Refuses any run window containing a date the study did not explicitly authorize.
 
@@ -101,7 +102,7 @@ def enforce_authorized_dates(
     permitted one. This closes that gap: when exact dates are declared, every calendar day
     in the requested window must appear among them.
     """
-    authorized = resolve_authorized_dates(compiled_data)
+    authorized = authorized_dates_override if authorized_dates_override is not None else resolve_authorized_dates(compiled_data)
     if authorized is None:
         return None
 
@@ -296,6 +297,7 @@ def resolve_data_plan(
     end_date: str,
     warmup_days: int = 5,
     repo_root: Optional[Path] = None,
+    authorized_dates_override: Optional[List[str]] = None,
 ) -> DataPlan:
     """Resolves data plan and validates date domain against study chronology.
 
@@ -376,7 +378,7 @@ def resolve_data_plan(
 
     # 2b. Exact authorized-date check. Runs after the year gates because a date outside
     # the authorized years should still be reported as a chronology violation first.
-    enforce_authorized_dates(compiled_data, start_date, end_date)
+    enforce_authorized_dates(compiled_data, start_date, end_date, authorized_dates_override)
 
     # 3. OOS / Dev Phase Lock check
     dev_years = set(chrono.dev or [])

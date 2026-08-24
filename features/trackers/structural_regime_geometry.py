@@ -58,7 +58,15 @@ class StructuralRegimeGeometryTracker:
 
     def on_1s(self, ts_ns: int, high: float, low: float, close: float) -> None:
         if self._one is not None:
-            self._one.update(ts_ns, high, low, close)
+            # Inline the tiny state update for the compiled collector path.  The
+            # operation is identical to _Regime.update but avoids a Python method
+            # dispatch on every completed 1s bar.
+            regime = self._one
+            if high > regime.high:
+                regime.high, regime.high_ns = high, ts_ns
+            if low < regime.low:
+                regime.low, regime.low_ns = low, ts_ns
+            regime.last_close = close
 
     def on_1m_flip(self, direction: int, start_ns: int, start_price: float,
                    atr_start: float, prior_end_close: float) -> None:
@@ -150,3 +158,17 @@ class StructuralRegimeGeometryTracker:
         out.update(self._completed("prior_5m_regime", self._prior_five))
         out["structural_available"] = True
         return out
+
+    def can_snapshot(self, checkpoint_ns: int, five_provenance_close_ts: int | None) -> bool:
+        """Cheap gate for checkpoints that cannot have structural outputs."""
+        if self._one is None or self._prior_one is None or self._origin_price is None:
+            return False
+        if self._five is None or self._prior_five is None:
+            return False
+        if five_provenance_close_ts is None or five_provenance_close_ts > checkpoint_ns:
+            return False
+        r = self._one
+        if not math.isfinite(r.atr_start) or r.atr_start <= 0.0:
+            return False
+        maximum = (r.high - self._origin_price) if r.direction == 1 else (self._origin_price - r.low)
+        return maximum > 0.0 and checkpoint_ns > r.start_ns and checkpoint_ns > self._origin_ns

@@ -152,6 +152,9 @@ def validate_feature_surface(
         report.findings.append({"code": code, "feature": feature, "message": message})
 
     meta = set(metadata_columns if metadata_columns is not None else DEFAULT_METADATA_COLUMNS)
+    # Collector causality provenance is metadata even when an older study's
+    # explicit metadata list predates this required runtime column.
+    meta.add("triggering_1s_ts_init")
     report.metadata_columns = sorted(meta)
 
     collection_universe_set = set(collection_universe or ())

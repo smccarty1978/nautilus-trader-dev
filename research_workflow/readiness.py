@@ -498,6 +498,10 @@ def build_synthetic_schema_fixture(
 def evaluate_real_output_parity(candidates_df: pd.DataFrame, features_spec: Any, *, authority: str = "active") -> Dict[str, Any]:
     """Compare a real emitted surface using OutputManager's exact allowed-alias rule."""
     metadata = set(getattr(features_spec, "metadata_columns", None) or [])
+    # Causality provenance is runtime metadata, never a feature alias. Treat it
+    # as metadata when the collector emits it; legacy fixtures may omit it.
+    if "triggering_1s_ts_init" in candidates_df.columns:
+        metadata.add("triggering_1s_ts_init")
     emitted = sorted(set(candidates_df.columns) - metadata)
     allowed = resolve_collection_allowed_feature_aliases(features_spec, authority=authority)
     # The resolved count is the same bounded explicit-instance contract consumed

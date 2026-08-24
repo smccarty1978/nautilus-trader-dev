@@ -5,4 +5,5 @@ provides one stable import surface without creating parallel implementations.
 """
 
 __all__ = ["study_factory", "compiler", "generic_collector", "phase0", "readiness", "preflight",
-           "causal_audit", "contract_audit", "smoke", "lifecycle"]
+           "causal_audit", "contract_audit", "smoke", "lifecycle", "experiment", "collection",
+           "modeling", "analysis"]

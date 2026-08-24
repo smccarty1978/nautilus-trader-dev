@@ -1,9 +1,9 @@
 {
   "dataset_id": "NQ_v0_2020_2026",
   "feature_authority": "active",
-  "generated_at_utc": "2026-08-24T15:02:37.459989+00:00",
+  "generated_at_utc": "2026-08-24T16:57:17.971140+00:00",
   "overall_status": "PASS",
-  "prepared_execution_identity": "bc79c69f0fffc433135d49b0fc5e73f8ddbf921cf1023ab54d420bc3bae08161",
+  "prepared_execution_identity": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
   "r10_real_nonempty_output_parity": {
     "candidate_rows_observed": 1,
     "code": "REAL_NONEMPTY_OUTPUT_PARITY",
@@ -24,7 +24,7 @@
       "rolling_300s_max_progress_atr",
       "rolling_300s_retention_ratio"
     ],
-    "metadata_count": 7,
+    "metadata_count": 8,
     "passed": true,
     "recognized_metadata_columns": [
       "checkpoint_index",
@@ -33,7 +33,8 @@
       "regime_age_seconds",
       "regime_start_ns",
       "retained_mfe_ratio",
-      "running_mfe_atr"
+      "running_mfe_atr",
+      "triggering_1s_ts_init"
     ],
     "resolved_universe_count": 13,
     "unexpected_columns": []
@@ -104,15 +105,15 @@
     "detail": "synthetic candidate/observation fixture validated through the real OutputManager path (schema, feature source, metadata, candidate key, observation key)",
     "feature_checked": "arrival_acceleration",
     "passed": true,
-    "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_rolling_productivity\\_work\\readiness_schema_fixture\\20260824_150235_clean_maturity_flip_model_rolling_productivity_day",
-    "run_id": "20260824_150235_clean_maturity_flip_model_rolling_productivity_day"
+    "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_rolling_productivity\\_work\\readiness_schema_fixture\\20260824_165715_clean_maturity_flip_model_rolling_productivity_day",
+    "run_id": "20260824_165715_clean_maturity_flip_model_rolling_productivity_day"
   },
   "r8_double_identity": {
     "code": "IDENTITY_STABLE",
-    "composite_sha256": "bc79c69f0fffc433135d49b0fc5e73f8ddbf921cf1023ab54d420bc3bae08161",
+    "composite_sha256": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
     "coverage_pct": 100.0,
     "detail": "execution identity resolved twice with exact equality",
-    "files_resolved": 100,
+    "files_resolved": 107,
     "passed": true,
     "unresolved_dependencies": []
   },

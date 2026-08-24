@@ -29,6 +29,7 @@ def run_collect_mode(
     output_dir: Optional[Union[str, Path]] = None,
     log_level: str = "ERROR",
     feature_authority: str = "active",
+    experiment_authorization: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Runs a study in 'collect' mode through the NautilusTrader BacktestEngine."""
     # 1. Load and validate compiled study
@@ -49,7 +50,22 @@ def run_collect_mode(
         seal_data = {}
 
     # 3. Resolve bounded run plan & data plan
-    run_plan = resolve_run_plan(study_data, stage=stage, reference_date=date_override)
+    authorized_dates_override = None
+    if experiment_authorization is not None:
+        from research_workflow.experiment import verify_runtime_authorization
+        # Verify against the chronology-derived date range before asking the
+        # lower-level planner to construct its bounded plan.
+        period = str(experiment_authorization.get("period"))
+        years = sorted(study_data.spec.chronology.train if period == "train" else study_data.spec.chronology.dev or [])
+        if not years:
+            raise RuntimeError(f"EXPERIMENT_AUTHORIZATION_EMPTY: {period}")
+        requested_start, requested_end = f"{years[0]}-01-01", f"{years[-1]}-12-31"
+        verified = verify_runtime_authorization(study_data.study_dir, experiment_authorization, requested_start, requested_end)
+        authorized_dates_override = verified["dates"]
+    run_plan = resolve_run_plan(
+        study_data, stage=stage, reference_date=date_override,
+        authorized_dates=authorized_dates_override,
+    )
 
     # Enforce strict smoke gate before stage=FULL (R3-1)
     if run_plan.stage == RunStage.FULL:
@@ -103,7 +119,11 @@ def run_collect_mode(
         val_script_path = repo_root / "scripts" / "validate_smoke.py"
         if not val_script_path.exists():
             raise RuntimeError(f"SMOKE_VALIDATOR_MISSING: {val_script_path} does not exist")
-        current_val_sha = hashlib.sha256(val_script_path.read_bytes()).hexdigest()
+        # Use the same canonical file hashing contract as validate_smoke_run;
+        # Windows newline normalization must not make a freshly-issued acceptance
+        # appear stale.
+        from research_workflow.seal import _hash_file
+        current_val_sha = _hash_file(val_script_path)
         if sacc.get("validator_file_sha256") != current_val_sha:
             raise RuntimeError(
                 f"SMOKE_VALIDATOR_STALE: Validator SHA in smoke acceptance ({sacc.get('validator_file_sha256')}) "
@@ -157,7 +177,10 @@ def run_collect_mode(
                 f"!= current seal ({seal_sha})"
             )
 
-    data_plan = resolve_data_plan(study_data, start_date=run_plan.start_date, end_date=run_plan.end_date)
+    data_plan = resolve_data_plan(
+        study_data, start_date=run_plan.start_date, end_date=run_plan.end_date,
+        authorized_dates_override=authorized_dates_override,
+    )
 
     # 3. Resolve strategy binding
     binding_key = spec.execution.strategy_class or "flip_prediction_collector"

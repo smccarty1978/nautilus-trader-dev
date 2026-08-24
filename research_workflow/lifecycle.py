@@ -4,6 +4,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from research_workflow.collection import collect_period
+from research_workflow.experiment import (
+    assert_oos_open,
+    authorize_experiment,
+    write_train_freeze,
+)
+
 from research_workflow.compiler import compile_study
 from research_workflow.phase0 import build_phase0_manifest
 from research_workflow.readiness import run_readiness
@@ -44,6 +51,20 @@ def seal(study_path: str | Path) -> dict[str, Any]:
     artifact = generate_preexec_audit_seal(study)
     verify_preexec_audit_seal(study)
     return artifact
+
+
+# Generic train/OOS experiment surface.  These wrappers intentionally contain no
+# study-specific branching; the study contract and supplied frames are authoritative.
+def authorize_experiment_stage(study_path: str | Path):
+    return authorize_experiment(study_path)
+
+
+def collect_experiment_period(study_path: str | Path, period: str, **kwargs: Any):
+    return collect_period(study_path, period, **kwargs)
+
+
+def open_oos(study_path: str | Path):
+    return assert_oos_open(study_path)
 
 
 __all__ = ["prepare", "readiness", "bounded_preflight", "seal", "run_smoke"]

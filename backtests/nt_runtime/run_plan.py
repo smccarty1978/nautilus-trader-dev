@@ -35,6 +35,7 @@ def resolve_run_plan(
     compiled_data: CompiledStudyData,
     stage: Union[str, RunStage],
     reference_date: Optional[str] = None,
+    authorized_dates: Optional[list[str]] = None,
 ) -> RunPlan:
     """Resolves bounded date ranges for a requested execution stage."""
     if isinstance(stage, str):
@@ -52,7 +53,7 @@ def resolve_run_plan(
     # downstream for a date the caller never chose.
     from backtests.nt_runtime.data_plan import resolve_authorized_dates
 
-    authorized_dates = resolve_authorized_dates(compiled_data)
+    authorized_dates = authorized_dates or resolve_authorized_dates(compiled_data)
 
     if reference_date is None:
         if authorized_dates:

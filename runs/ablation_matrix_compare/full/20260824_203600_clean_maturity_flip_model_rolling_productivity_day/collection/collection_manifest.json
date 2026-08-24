@@ -1,0 +1,96 @@
+{
+  "run_id": "20260824_203600_clean_maturity_flip_model_rolling_productivity_day",
+  "study_id": "clean_maturity_flip_model_rolling_productivity",
+  "candidates_count": 1704,
+  "observations_count": 1704,
+  "candidates_sha256": "47824443ba08f14f7a6b0bd4ed1af51ba31ec9ebce1db900986ed3107c576124",
+  "observations_sha256": "517797b826aea681f9b38dfd3d656eee963e19239497ceeb9ddfc8b38c24a3aa",
+  "columns": {
+    "candidates": [
+      "observation_ts",
+      "regime_start_ns",
+      "checkpoint_index",
+      "regime_age_seconds",
+      "running_mfe_atr",
+      "new_progress_windows",
+      "retained_mfe_ratio",
+      "triggering_1s_ts_init",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "observations": [
+      "observation_ts",
+      "regime_start_ns",
+      "regime_direction",
+      "checkpoint_index",
+      "flip_ts",
+      "time_to_flip_seconds",
+      "target_flip_within_horizon",
+      "disposition",
+      "censored",
+      "censor_reason",
+      "horizon_end_ts",
+      "session_close_ts",
+      "resolved_at_ts"
+    ]
+  },
+  "feature_surface_validation": {
+    "passed": true,
+    "rows": 1704,
+    "declared_features": [],
+    "emitted_features": [],
+    "metadata_columns": [
+      "checkpoint_index",
+      "new_progress_windows",
+      "observation_ts",
+      "regime_age_seconds",
+      "regime_start_ns",
+      "retained_mfe_ratio",
+      "running_mfe_atr",
+      "triggering_1s_ts_init"
+    ],
+    "collection_universe_columns": [
+      "arrival_acceleration",
+      "arrival_velocity",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_giveback_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_retention_ratio"
+    ],
+    "undeclared_columns": [],
+    "per_feature": {},
+    "findings": []
+  },
+  "candidate_disposition_reconciliation": {
+    "candidates": 1704,
+    "observations": 1704,
+    "passed": true,
+    "findings": [],
+    "undisposed_candidates": 0,
+    "orphaned_observations": 0,
+    "duplicate_observations": 0,
+    "disposition_counts": {
+      "LABELED_NEGATIVE": 1343,
+      "LABELED_POSITIVE": 361
+    }
+  },
+  "population_funnel": null
+}

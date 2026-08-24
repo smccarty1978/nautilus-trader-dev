@@ -6,6 +6,7 @@ and forward outcome observation inside the NT event loop on streaming bars.
 
 from __future__ import annotations
 
+import os
 from collections import deque
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -29,6 +30,7 @@ from features.trackers.range_position import RangePositionTracker
 from features.registry import resolve_runtime_feature_aliases
 from backtests.nt_runtime.phase0 import authorize_execution
 from utils.session_boundaries import is_in_session, session_close_ns
+from research_workflow.execution_plan import CompiledExecutionPlan
 
 from datetime import datetime, timezone
 import pytz
@@ -178,6 +180,20 @@ class FlipPredictionCollector(Strategy):
     def __init__(self, config: FlipPredictionCollectorConfig) -> None:
         super().__init__(config)
         self.cfg = config
+        # Benchmark-only ablation switch.  It is unset for all governed/runtime
+        # executions and exists solely to measure marginal replay costs without
+        # creating alternate production collectors.
+        self._benchmark_mode = os.environ.get("NT_COLLECTOR_ABLATION", "")
+        self._benchmark_bars_1s = 0
+        self._benchmark_bars_1m = 0
+        self.bars_1s_count = 0
+        self.bars_1m_count = 0
+        # Bind the two subscribed bar types once.  Converting ``bar_type.spec``
+        # to a string for every 1s callback was a hot-loop tax introduced by
+        # the generic dispatch path; equality against the immutable BarType is
+        # both clearer and substantially cheaper.
+        self._bar_type_1s = BarType.from_str(config.bar_type_1s)
+        self._bar_type_1m = BarType.from_str(config.bar_type_1m)
         if not config.phase0_manifest_path:
             raise RuntimeError("phase-zero authorization missing; collection and fit are refused")
         phase0 = authorize_execution(Path(config.phase0_manifest_path), feature_authority=config.feature_authority)
@@ -189,6 +205,21 @@ class FlipPredictionCollector(Strategy):
             if item.get("physical_alias")
         )) or tuple(dict.fromkeys(requirements.get("aliases", ())))
         self._metadata_columns = tuple(config.metadata_columns)
+        # V2-native studies declare a small explicit surface.  Keep this fast
+        # path deliberately narrow: it is only enabled when every requested
+        # alias is produced by the structural/rolling/arrival/context providers
+        # below.  All other studies retain the historical full-surface path.
+        self._compact_supported = {
+            "prior_1m_regime_efficiency", "prior_1m_regime_mfe_atr",
+            "prior_1m_regime_range_atr", "prior_5m_regime_efficiency",
+            "prior_5m_regime_mfe_atr", "prior_5m_regime_range_atr",
+            "rolling_300s_retention_ratio", "rolling_300s_current_progress_atr",
+            "rolling_300s_max_progress_atr", "rolling_300s_giveback_atr",
+            "arrival_velocity", "arrival_acceleration", "ema_slope",
+        }
+        self._compact_surface = bool(self._study_feature_aliases) and set(
+            self._study_feature_aliases
+        ).issubset(self._compact_supported)
         self.is_both_directions = config.prevailing_regime == "both"
         self.prevailing_dir = 0 if self.is_both_directions else (1 if config.prevailing_regime == "bullish" else -1)
         self.target_dir = 0 if self.is_both_directions else (1 if config.target_direction == "bullish" else -1)
@@ -250,24 +281,44 @@ class FlipPredictionCollector(Strategy):
         self.candidates_log: List[Dict[str, Any]] = []
         self.observations_log: List[Dict[str, Any]] = []
         self.pending_candidates: List[Dict[str, Any]] = []
+        self._next_pending_horizon_ns: Optional[int] = None
+        # Compile the declared surface after all providers exist.  The resulting
+        # immutable plan is the only object consulted by the compact hot path.
+        self._execution_plan = CompiledExecutionPlan.for_collector(
+            self, self._study_feature_aliases
+        )
 
     def _append_candidate(self, record: Dict[str, Any]) -> None:
         """Emit only the study-declared surface plus canonical key/metadata fields."""
+        if self._benchmark_mode in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
+            return
         aliases = set(self._study_feature_aliases or self.cfg.feature_list or ())
-        keep = {"observation_ts", "regime_start_ns", "checkpoint_index"}
+        # Causality evidence is a runtime metadata field, not a feature.  It is
+        # required by the smoke validator to prove source availability for every
+        # persisted candidate row.
+        keep = {"observation_ts", "regime_start_ns", "checkpoint_index", "triggering_1s_ts_init"}
         keep.update(self._metadata_columns)
         keep.update(aliases)
         self.candidates_log.append({key: value for key, value in record.items() if key in keep})
 
     def on_start(self) -> None:
-        self.subscribe_bars(BarType.from_str(self.cfg.bar_type_1s))
-        self.subscribe_bars(BarType.from_str(self.cfg.bar_type_1m))
+        self.subscribe_bars(self._bar_type_1s)
+        self.subscribe_bars(self._bar_type_1m)
 
     def on_bar(self, bar: Bar) -> None:
-        spec = bar.bar_type.spec
-        if "1-SECOND" in str(spec):
+        if bar.bar_type == self._bar_type_1s:
+            self._benchmark_bars_1s += 1
+            self.bars_1s_count = self._benchmark_bars_1s
+        elif bar.bar_type == self._bar_type_1m:
+            self._benchmark_bars_1m += 1
+            self.bars_1m_count = self._benchmark_bars_1m
+        if self._benchmark_mode == "empty_generic":
+            return
+        if self._benchmark_mode == "regime_state" and bar.bar_type == self._bar_type_1s:
+            return
+        if bar.bar_type == self._bar_type_1s:
             self._handle_1s_bar(bar)
-        elif "1-MINUTE" in str(spec):
+        elif bar.bar_type == self._bar_type_1m:
             self._handle_1m_bar(bar)
 
     def _handle_1m_bar(self, bar: Bar) -> None:
@@ -313,20 +364,21 @@ class FlipPredictionCollector(Strategy):
 
         # 3. Handle session and RTH transitions for OHLCV Tracker
         is_rth_now = is_in_session(ts_avail, self.cfg.session)
-        if is_rth_now and not self.was_rth:
-            self.ohlcv_tracker.reset_rth(ts_avail)
-            if self.ring:
-                self.ring.on_rth_open(ts_avail)
-        elif not is_rth_now and self.was_rth:
-            self.ohlcv_tracker.end_rth()
-            if self.ring:
-                self.ring.on_rth_close()
-        self.was_rth = is_rth_now
+        if not self._compact_surface:
+            if is_rth_now and not self.was_rth:
+                self.ohlcv_tracker.reset_rth(ts_avail)
+                if self.ring:
+                    self.ring.on_rth_open(ts_avail)
+            elif not is_rth_now and self.was_rth:
+                self.ohlcv_tracker.end_rth()
+                if self.ring:
+                    self.ring.on_rth_close()
+            self.was_rth = is_rth_now
 
-        for buf_ts, buf_h, buf_l, buf_v, buf_d in self.minute_1s_buffer:
-            if old_regime != 0:
-                self.ohlcv_tracker.accumulate_regime(buf_ts, buf_h, buf_l, buf_v, buf_d)
-            self.ohlcv_tracker.accumulate_rth(buf_v, buf_d)
+            for buf_ts, buf_h, buf_l, buf_v, buf_d in self.minute_1s_buffer:
+                if old_regime != 0:
+                    self.ohlcv_tracker.accumulate_regime(buf_ts, buf_h, buf_l, buf_v, buf_d)
+                self.ohlcv_tracker.accumulate_rth(buf_v, buf_d)
 
         # 4. Handle regime transition (flips)
         if new_regime != old_regime and new_regime != 0:
@@ -337,7 +389,8 @@ class FlipPredictionCollector(Strategy):
                 close_price=c,
                 atr_val=atr_val,
             )
-            self.ohlcv_tracker.reset_regime(ts_avail, o)
+            if not self._compact_surface:
+                self.ohlcv_tracker.reset_regime(ts_avail, o)
             self.structural_geometry_tracker.on_1m_flip(
                 direction=new_regime,
                 start_ns=ts_avail,
@@ -351,14 +404,15 @@ class FlipPredictionCollector(Strategy):
         else:
             self.bars_in_regime += 1
 
-        for buf_ts, buf_h, buf_l, buf_v, buf_d in self.minute_1s_buffer:
-            self.ohlcv_tracker.accumulate_regime_rth(buf_ts, buf_h, buf_l, buf_v, buf_d)
-        self.minute_1s_buffer = []
+        if not self._compact_surface:
+            for buf_ts, buf_h, buf_l, buf_v, buf_d in self.minute_1s_buffer:
+                self.ohlcv_tracker.accumulate_regime_rth(buf_ts, buf_h, buf_l, buf_v, buf_d)
+            self.minute_1s_buffer = []
 
-        self.price_level_tracker.update_1m(ts_avail, o, h, l, c, is_rth_now)
-        self.wick_tracker.update(o, h, l, c)
-        self.range_position_tracker.update(h, l, c)
-        self.bars_since_breach_1m.append(bar)
+            self.price_level_tracker.update_1m(ts_avail, o, h, l, c, is_rth_now)
+            self.wick_tracker.update(o, h, l, c)
+            self.range_position_tracker.update(h, l, c)
+            self.bars_since_breach_1m.append(bar)
 
     def _track_pending(self, cand_record: Dict[str, Any], T: int) -> None:
         """Registers a freshly emitted candidate for terminal disposition.
@@ -368,6 +422,8 @@ class FlipPredictionCollector(Strategy):
         contract in ``OutputManager.persist_collection`` rejects columns the study never
         declared. They belong to the observation surface, not the feature surface.
         """
+        if self._benchmark_mode in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
+            return
         self.pending_candidates.append({
             "observation_ts": cand_record["observation_ts"],
             "regime_start_ns": cand_record["regime_start_ns"],
@@ -379,6 +435,9 @@ class FlipPredictionCollector(Strategy):
                 if self.cfg.session_end_censoring else None
             ),
         })
+        horizon_end = T + int(self.cfg.horizon_seconds) * NS
+        if self._next_pending_horizon_ns is None or horizon_end < self._next_pending_horizon_ns:
+            self._next_pending_horizon_ns = horizon_end
 
     def _emit_observation(
         self,
@@ -439,7 +498,12 @@ class FlipPredictionCollector(Strategy):
         giving the same-timestamp 1m flip its chance. ``final=True`` (run end) resolves
         those, because by then no further bar can arrive to change the answer.
         """
+        if self._benchmark_mode in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
+            return
         if not self.pending_candidates:
+            self._next_pending_horizon_ns = None
+            return
+        if not final and self._next_pending_horizon_ns is not None and now_ts < self._next_pending_horizon_ns:
             return
         still_pending: List[Dict[str, Any]] = []
         for cand in self.pending_candidates:
@@ -456,6 +520,9 @@ class FlipPredictionCollector(Strategy):
             else:
                 self._emit_observation(cand, DISPOSITION_NEGATIVE, None, censored_at_ts=horizon_end)
         self.pending_candidates = still_pending
+        self._next_pending_horizon_ns = (
+            min((c["horizon_end_ts"] for c in still_pending), default=None)
+        )
 
     def _is_censored_by_session(self, cand: Dict[str, Any]) -> bool:
         """True when the candidate's horizon extends past its own session close.
@@ -540,22 +607,37 @@ class FlipPredictionCollector(Strategy):
         v = float(bar.volume)
 
         if not self._is_targeted_60:
-            if self.velocity_tracker:
+            if self.velocity_tracker and self._benchmark_mode not in {"checkpoint_only", "baseline"}:
                 self.velocity_tracker.update(c)
-            if self.volume_tracker:
+            if self.volume_tracker and not self._compact_surface:
                 self.volume_tracker.update(v, o, c)
-            self.highs_1s.append(h)
-            self.lows_1s.append(l)
-            self.closes_1s.append(c)
+            if not self._compact_surface:
+                self.highs_1s.append(h)
+                self.lows_1s.append(l)
+                self.closes_1s.append(c)
 
-        b_est = self.ohlcv_tracker.update(ts_avail, o, h, l, c, v)
+        if self._compact_surface and self._benchmark_mode not in {"checkpoint_only", "baseline"}:
+            # The selected V2 surface does not consume OHLCV-delta, price-level,
+            # wick, range-position, pullback, or volume snapshots.  Structural,
+            # rolling, and arrival providers maintain their own causal state.
+            # Do not materialize an unused OHLCV dictionary or buffer entry on
+            # every 1s bar; this preserves the selected feature values while
+            # removing legacy exploratory work from the hot loop.
+            b_est = None
+        else:
+            b_est = self.ohlcv_tracker.update(ts_avail, o, h, l, c, v)
         if self._is_targeted_60 and self.ring:
             self.ring.append(ts_avail, o, h, l, c, v, b_est["bar_est_delta"])
 
-        self.minute_1s_buffer.append((ts_avail, h, l, v, b_est["bar_est_delta"]))
+        if not self._compact_surface:
+            self.minute_1s_buffer.append((ts_avail, h, l, v, b_est["bar_est_delta"]))
 
-        self.structural_geometry_tracker.on_1s(ts_avail, h, l, c)
-        self.rolling_productivity_tracker.on_completed_1s(ts_avail, h, l, c)
+        if self._compact_surface:
+            for update in self._execution_plan.update_1s_callbacks:
+                update(ts_avail, h, l, c)
+        else:
+            self.structural_geometry_tracker.on_1s(ts_avail, h, l, c)
+            self.rolling_productivity_tracker.on_completed_1s(ts_avail, h, l, c)
 
         if self.active_regime_dir != 0:
             self.highest_high_since_flip = max(self.highest_high_since_flip, h)
@@ -871,6 +953,66 @@ class FlipPredictionCollector(Strategy):
             for col in (self._study_feature_aliases or self.cfg.feature_list or all_computed_60.keys()):
                 cand_record[col] = all_computed_60.get(col, None)
 
+            self._append_candidate(cand_record)
+            self._track_pending(cand_record, T)
+            return
+
+        if self._compact_surface:
+            # Exact compact V2 surface.  All stateful providers have already
+            # consumed the completed input stream; only now, after the cheap
+            # population gates pass, calculate the declared snapshot.
+            if not self.structural_geometry_tracker.can_snapshot(
+                T, self.structural_geometry_tracker._five_close_ts,
+            ):
+                return
+            if self._benchmark_mode in {"checkpoint_only", "baseline"}:
+                structural_feats, rolling_feats, velocity_feats = {}, {}, {}
+            else:
+                structural_feats = self.structural_geometry_tracker.snapshot(
+                checkpoint_ns=T,
+                current_price=price_at_T,
+                checkpoint_atr=atr,
+                five_provenance_close_ts=self.structural_geometry_tracker._five_close_ts,
+                )
+                regime_exp_speed = structural_feats.get("regime_expansion_atr_per_min")
+                rolling_feats = self.rolling_productivity_tracker.snapshot(
+                checkpoint_ns=T,
+                direction=direction,
+                current_regime_start_atr=atr,
+                regime_expansion_atr_per_min=regime_exp_speed,
+                )
+                velocity_feats = (
+                self.velocity_tracker.calculate(atr=atr)
+                if self._execution_plan.calculate_velocity_at_checkpoint and self.velocity_tracker
+                else {}
+                )
+            compact_feats = {
+                **structural_feats,
+                **rolling_feats,
+                **velocity_feats,
+                # Preserve the historical physical alias contract exactly.  The
+                # old fallback exposed ``ema_slope_short`` but did not expose
+                # the canonical ``ema_slope`` alias, so this selected column is
+                # intentionally unavailable until its provider binding changes.
+                "ema_slope": None,
+            }
+            cand_record = {
+                "observation_ts": T,
+                "regime_start_ns": self.regime_start_ns,
+                "regime_direction": direction,
+                "checkpoint_index": self.next_checkpoint_index,
+                "regime_age_seconds": regime_age_s,
+                "close": price_at_T,
+                "atr": atr,
+                "running_mfe_atr": current_mfe,
+                "running_mae_atr": current_mae,
+                "current_pnl_atr": current_pnl,
+                "new_progress_windows": self.mfe_progress_count,
+                "retained_mfe_ratio": retained,
+                "triggering_1s_ts_init": triggering_1s_ts_init if triggering_1s_ts_init is not None else T,
+            }
+            for alias in self._study_feature_aliases:
+                cand_record[alias] = compact_feats.get(alias)
             self._append_candidate(cand_record)
             self._track_pending(cand_record, T)
             return

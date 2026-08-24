@@ -432,6 +432,9 @@ class OutputManager:
             "regime_age_seconds", "close", "atr", "running_mfe_atr", "running_mae_atr",
             "current_pnl_atr", "new_progress_windows", "retained_mfe_ratio", "triggering_1s_ts_init",
         ]
+        # Causality provenance is an optional runtime metadata column for legacy
+        # fixtures, but is allowed and persisted whenever the collector emits it.
+        metadata_contract = set(declared_metadata) | {"triggering_1s_ts_init"}
 
         # D2: collection candidate universe != frozen model feature list. A study may
         # declare features.source (e.g. "verified_registry_numeric_universe") to collect
@@ -443,7 +446,7 @@ class OutputManager:
             self.study_data.spec.features, authority=self.feature_authority,
         )
 
-        allowed_columns = set(expected_feats) | set(declared_metadata) | set(collection_universe)
+        allowed_columns = set(expected_feats) | metadata_contract | set(collection_universe)
 
         # Check for duplicate column names. D1: this already ran unconditionally regardless
         # of row count -- a duplicate column name is a schema defect, not a data defect --

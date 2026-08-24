@@ -1,0 +1,87 @@
+{
+  "run_id": "20260824_153221_clean_maturity_flip_model_rolling_productivity_day",
+  "study_id": "clean_maturity_flip_model_rolling_productivity",
+  "status": "FAILED_VALIDATION",
+  "feature_surface_validation": {
+    "passed": false,
+    "rows": 1704,
+    "declared_features": [],
+    "emitted_features": [],
+    "metadata_columns": [
+      "checkpoint_index",
+      "new_progress_windows",
+      "observation_ts",
+      "regime_age_seconds",
+      "regime_start_ns",
+      "retained_mfe_ratio",
+      "running_mfe_atr"
+    ],
+    "collection_universe_columns": [
+      "arrival_acceleration",
+      "arrival_velocity",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_giveback_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_retention_ratio"
+    ],
+    "undeclared_columns": [
+      "triggering_1s_ts_init"
+    ],
+    "per_feature": {},
+    "findings": [
+      {
+        "code": "UNDECLARED_FEATURE_COLUMN",
+        "feature": null,
+        "message": "columns ['triggering_1s_ts_init'] are neither declared features nor declared metadata. An undeclared feature satisfies every contract check because no contract check looks at it."
+      }
+    ]
+  },
+  "candidate_disposition_reconciliation": {
+    "candidates": 1704,
+    "observations": 1704,
+    "passed": true,
+    "findings": [],
+    "undisposed_candidates": 0,
+    "orphaned_observations": 0,
+    "duplicate_observations": 0,
+    "disposition_counts": {
+      "LABELED_NEGATIVE": 1343,
+      "LABELED_POSITIVE": 361
+    }
+  },
+  "population_funnel": null,
+  "stage": "day",
+  "wall_time_seconds": 127.069,
+  "total_bars_processed": 0,
+  "candidates_count": 1704,
+  "observations_count": 1704,
+  "throughput_bars_per_sec": 0.0,
+  "memory": {
+    "baseline_process_rss_mb": 194.76,
+    "peak_process_rss_mb": 311.52,
+    "rss_delta_mb": 116.76,
+    "python_tracemalloc_peak_mb": 58.6
+  },
+  "bars_breakdown": {
+    "loaded": {
+      "1s": 207911,
+      "1m": 5520
+    },
+    "callbacks": {},
+    "ts_event_ranges": {},
+    "ts_init_ranges": {}
+  },
+  "output_artifacts": {
+    "candidates_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260824_153221_clean_maturity_flip_model_rolling_productivity_day\\collection\\candidates.parquet",
+    "observations_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260824_153221_clean_maturity_flip_model_rolling_productivity_day\\collection\\observations.parquet",
+    "collection_manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\20260824_153221_clean_maturity_flip_model_rolling_productivity_day\\collection\\collection_manifest.json"
+  },
+  "end_time_utc": "2026-08-24T15:34:29.065559+00:00"
+}

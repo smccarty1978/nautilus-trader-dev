@@ -1,20 +1,32 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "blocked_clean_maturity_flip_model_rolling_productivity",
-  "generated_at_utc": "2026-08-24T14:50:36.250083+00:00",
-  "code_hash": "",
+  "preflight_run_id": "20260824T152721Z_d09c6012dd4e",
+  "generated_at_utc": "2026-08-24T15:27:21.835030+00:00",
+  "code_hash": "d09c6012dd4e598ccfd26d8e996af13f658ac5e57af2ddf8f9641923f100ecc8",
   "superseded": true,
-  "failed_gate": "EXECUTION_MANIFEST",
+  "failed_gate": "CAUSAL_INVARIANTS",
   "failure_ids": [
-    "POST_FREEZE_MUTATION"
+    "INVARIANT_TEST_FAILURE"
   ],
   "failure_details": [
     {
-      "message": "POST_FREEZE_MUTATION: Execution composite mutated after FREEZE. Current composite 0dd652ba1c73... != Frozen composite 9b4fc71ebe91...\nModified/Mutated files: ['study:tests/test_study_contracts.py']"
+      "message": "FAILED scripts/tests/test_population_funnel.py::test_population_funnel_zero_candidate_run_persists_and_reconciles"
+    },
+    {
+      "message": "FAILED scripts/tests/test_population_funnel.py::test_population_funnel_mismatch_hard_fails_persist_collection"
+    },
+    {
+      "message": "FAILED scripts/tests/test_population_funnel.py::test_population_funnel_out_of_window_candidate_still_reconciles"
+    },
+    {
+      "message": "FAILED scripts/tests/test_readiness.py::test_r10_parity_reports_real_surface_counts_and_catches_injected_bad_alias"
+    },
+    {
+      "message": "13 failed, 184 passed in 58.75s"
     }
   ],
-  "recommended_smallest_investigation_scope": "Inspect and revert post-freeze mutations.",
-  "superseded_by_preflight_run_id": "20260824T150354Z_f562d183c475",
-  "superseded_at_utc": "2026-08-24T15:03:54.631057+00:00",
+  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit.",
+  "superseded_by_preflight_run_id": "20260824T165829Z_e1310d03a83c",
+  "superseded_at_utc": "2026-08-24T16:58:29.636603+00:00",
   "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
 }

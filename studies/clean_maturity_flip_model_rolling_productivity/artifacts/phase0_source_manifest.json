@@ -2,16 +2,14 @@
   "study_id": "clean_maturity_flip_model_rolling_productivity",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "fb58531b57181691eae59fcf50ff439ea40f2c27",
+  "git_commit_hash": "b939b471897bef07709284684c54058655bcf28d",
   "source_state_binding": {
-    "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "fb58531b57181691eae59fcf50ff439ea40f2c27",
-    "git_commit_is_sufficient_provenance": false,
+    "provenance_strength": "COMMITTED",
+    "git_commit_hash": "b939b471897bef07709284684c54058655bcf28d",
+    "git_commit_is_sufficient_provenance": true,
     "working_tree_dirty": true,
     "source_state_sha256": "d758eceb4cb74d5d9c678f046818d649f144d39c44f5351f98bdb0abc4137fbe",
-    "dependencies_diverging_from_commit": [
-      "studies/clean_maturity_flip_model_rolling_productivity/study.yaml"
-    ],
+    "dependencies_diverging_from_commit": [],
     "source_files": {
       "features/registry.py": {
         "sha256": "569ddadb246c68f39209ed36fe519f37e2c2fb617586302d4a3cbb57e3131478",
@@ -39,7 +37,7 @@
       },
       "studies/clean_maturity_flip_model_rolling_productivity/study.yaml": {
         "sha256": "76571c8e10ab7eebf90ac2dfceae9cb531633fcc3c31a77a58c283f227b480a1",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       }
     }
   },
@@ -351,5 +349,5 @@
       2026
     ]
   },
-  "manifest_sha256": "76241d490fb1c36f1d925ed01071d24ad1560157b311a847fc4c5307aa812e1d"
+  "manifest_sha256": "c811628f9100439384babcc43ef8b3162d9c83d304f5dd709e05413447a16bd2"
 }
