@@ -1,0 +1,1789 @@
+schema_version: 2
+generated_from: active canonical feature authority
+features:
+  - canonical_name: abs_delta_cum
+    family: ohlcv_est_delta
+    description: Canonical abs_delta_cum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: session_boundary
+    example_instances: [rth_abs_delta_cum]
+  - canonical_name: abs_delta_per_atr_moved
+    family: ohlcv_est_delta
+    description: Canonical abs_delta_per_atr_moved building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, none
+    example_instances: [abs_delta_per_atr_moved_120s, abs_delta_per_atr_moved_15s, abs_delta_per_atr_moved_1800s]
+  - canonical_name: abs_delta_per_point_moved
+    family: ohlcv_est_delta
+    description: Canonical abs_delta_per_point_moved building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [abs_delta_per_point_moved_120s, abs_delta_per_point_moved_15s, abs_delta_per_point_moved_1800s]
+  - canonical_name: accel
+    family: arrival_volume
+    description: Canonical accel building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVolumeProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [vol_accel]
+  - canonical_name: activity_duration_median
+    family: regime_median_center_slope_alignment
+    description: Canonical activity_duration_median building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [activity_duration_median_120m, activity_duration_median_15m, activity_duration_median_30m]
+  - canonical_name: activity_flip_count
+    family: regime_median_center_slope_alignment
+    description: Canonical activity_flip_count building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [activity_flip_count_30m]
+  - canonical_name: activity_regime_count
+    family: regime_median_center_slope_alignment
+    description: Canonical activity_regime_count building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [activity_regime_count_120m, activity_regime_count_15m, activity_regime_count_30m]
+  - canonical_name: activity_regime_count_std
+    family: regime_median_center_slope_alignment
+    description: Canonical activity_regime_count_std building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [activity_regime_count_std]
+  - canonical_name: aligned_price_minus_center
+    family: regime_median_center_slope_alignment
+    description: Canonical aligned_price_minus_center building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [aligned_price_minus_center_15m, aligned_price_minus_center_30m, aligned_price_minus_center_5m]
+  - canonical_name: arrival_acceleration
+    family: arrival_velocity
+    description: Canonical arrival_acceleration building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVelocityProvider
+    parameters:
+      - bar_state
+      - input_timeframe
+      - short_lookback
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [arrival_accel_10s, arrival_accel_5s]
+  - canonical_name: arrival_deceleration
+    family: arrival_velocity
+    description: Canonical arrival_deceleration building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVelocityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [is_decelerating]
+  - canonical_name: arrival_jerk
+    family: arrival_velocity
+    description: Canonical arrival_jerk building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVelocityProvider
+    parameters:
+      - derivative_order
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [arrival_jerk]
+  - canonical_name: arrival_velocity
+    family: arrival_velocity
+    description: Canonical arrival_velocity building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVelocityProvider
+    parameters:
+      - bar_state
+      - input_timeframe
+      - lookback
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [arrival_vel_10s, arrival_vel_20s, arrival_vel_30s]
+  - canonical_name: arrival_velocity_max
+    family: arrival_velocity
+    description: Canonical arrival_velocity_max building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVelocityProvider
+    parameters:
+      - bar_state
+      - input_timeframe
+      - lookback
+      - velocity_lookback
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [max_vel_30s]
+  - canonical_name: arrival_velocity_ratio
+    family: arrival_velocity
+    description: Canonical arrival_velocity_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVelocityProvider
+    parameters:
+      - bar_state
+      - input_timeframe
+      - long_lookback
+      - short_lookback
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [vel_ratio_5_20]
+  - canonical_name: available
+    family: ohlcv_est_delta
+    description: Canonical available building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, session_boundary
+    example_instances: [regime_available, rth_available]
+  - canonical_name: bar_est_bear_volume
+    family: ohlcv_est_delta
+    description: Canonical bar_est_bear_volume building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [bar_est_bear_volume]
+  - canonical_name: bar_est_bull_volume
+    family: ohlcv_est_delta
+    description: Canonical bar_est_bull_volume building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [bar_est_bull_volume]
+  - canonical_name: bar_est_delta
+    family: ohlcv_est_delta
+    description: Canonical bar_est_delta building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [bar_est_delta]
+  - canonical_name: bar_est_delta_ratio
+    family: ohlcv_est_delta
+    description: Canonical bar_est_delta_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [bar_est_delta_ratio]
+  - canonical_name: bar_volume
+    family: ohlcv_est_delta
+    description: Canonical bar_volume building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [bar_volume]
+  - canonical_name: bar_zero_range
+    family: ohlcv_est_delta
+    description: Canonical bar_zero_range building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [bar_zero_range]
+  - canonical_name: center_slope_acceleration
+    family: regime_median_center_slope_alignment
+    description: Canonical center_slope_acceleration building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [center_slope_acceleration_15m, center_slope_acceleration_30m, center_slope_acceleration_5m]
+  - canonical_name: center_slope_change
+    family: regime_median_center_slope_alignment
+    description: Canonical center_slope_change building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [center_slope_change_15m, center_slope_change_30m, center_slope_change_5m]
+  - canonical_name: center_spread
+    family: regime_median_center_slope_alignment
+    description: Canonical center_spread building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+      - timeframe_2
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [center_spread_15m_30m, center_spread_5m_15m, center_spread_5m_30m]
+  - canonical_name: clean_score
+    family: pullback_1m
+    description: Canonical clean_score building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [clean_pullback_score_1m]
+  - canonical_name: climax
+    family: arrival_volume
+    description: Canonical climax building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVolumeProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [vol_climax]
+  - canonical_name: close_vs_range
+    family: pullback_1s
+    description: Canonical close_vs_range building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [close_vs_range_30s]
+  - canonical_name: consecutive_down
+    family: pullback_1s
+    description: Canonical consecutive_down building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [consecutive_down_1s]
+  - canonical_name: consecutive_up
+    family: pullback_1s
+    description: Canonical consecutive_up building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [consecutive_up_1s]
+  - canonical_name: cross_family_slope_vs_reg_count
+    family: regime_median_center_slope_alignment
+    description: Canonical cross_family_slope_vs_reg_count building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [cross_family_slope_vs_reg_count]
+  - canonical_name: cross_family_spread_vs_reg_count
+    family: regime_median_center_slope_alignment
+    description: Canonical cross_family_spread_vs_reg_count building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [cross_family_spread_vs_reg_count]
+  - canonical_name: crosses_per_minute
+    family: regime_median_center_slope_alignment
+    description: Canonical crosses_per_minute building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [crosses_per_minute]
+  - canonical_name: directional_volume_ratio
+    family: arrival_volume
+    description: Canonical directional_volume_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVolumeProvider
+    parameters:
+      - direction
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [down_vol_ratio_10s, up_vol_ratio_10s]
+  - canonical_name: distance_to_completed_range_high_atr
+    family: structural_regime_geometry
+    description: Canonical distance_to_completed_range_high_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - reference_timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [distance_to_completed_5m_high_atr]
+  - canonical_name: distance_to_completed_range_low_atr
+    family: structural_regime_geometry
+    description: Canonical distance_to_completed_range_low_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - reference_timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [distance_to_completed_5m_low_atr]
+  - canonical_name: distance_to_level
+    family: price_level_context
+    description: Canonical distance_to_level building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_price_levels.GenericPriceLevelProvider
+    parameters:
+      - level
+      - level_context
+      - normalization
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: none, session_boundary
+    example_instances: [opening_range_30m_high_developing_signed_distance_atr, opening_range_30m_high_developing_signed_distance_points, opening_range_30m_high_developing_signed_distance_ticks]
+  - canonical_name: downbar_vol_sum
+    family: ohlcv_est_delta
+    description: Canonical downbar_vol_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [downbar_vol_sum_120s, downbar_vol_sum_15s, downbar_vol_sum_1800s]
+  - canonical_name: duration_median
+    family: regime_median_center_slope_alignment
+    description: Canonical duration_median building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - lookback
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [duration_median_last_10, duration_median_last_3, duration_median_last_5]
+  - canonical_name: duration_ratio
+    family: regime_median_center_slope_alignment
+    description: Canonical duration_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - denominator_lookback
+      - numerator_lookback
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [duration_ratio_3_vs_10, duration_ratio_5_vs_10]
+  - canonical_name: elapsed_seconds
+    family: ohlcv_est_delta
+    description: Canonical elapsed_seconds building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, session_boundary
+    example_instances: [regime_elapsed_seconds, rth_elapsed_seconds]
+  - canonical_name: ema_slope
+    family: context
+    description: Canonical ema_slope building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_context.GenericContextProvider
+    parameters:
+      - ema_role
+      - lookback
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [ema_slope_long, ema_slope_short]
+  - canonical_name: est_abs_delta_sum
+    family: ohlcv_est_delta
+    description: Canonical est_abs_delta_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, none
+    example_instances: [est_abs_delta_sum_120s, est_abs_delta_sum_15s, est_abs_delta_sum_1800s]
+  - canonical_name: est_bear_vol_sum
+    family: ohlcv_est_delta
+    description: Canonical est_bear_vol_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [est_bear_vol_sum_120s, est_bear_vol_sum_15s, est_bear_vol_sum_1800s]
+  - canonical_name: est_bull_vol_sum
+    family: ohlcv_est_delta
+    description: Canonical est_bull_vol_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [est_bull_vol_sum_120s, est_bull_vol_sum_15s, est_bull_vol_sum_1800s]
+  - canonical_name: est_delta_cum
+    family: ohlcv_est_delta
+    description: Canonical est_delta_cum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: session_boundary
+    example_instances: [rth_est_delta_cum]
+  - canonical_name: est_delta_neg_sum
+    family: ohlcv_est_delta
+    description: Canonical est_delta_neg_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [est_delta_neg_sum_120s, est_delta_neg_sum_15s, est_delta_neg_sum_1800s]
+  - canonical_name: est_delta_pos_sum
+    family: ohlcv_est_delta
+    description: Canonical est_delta_pos_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [est_delta_pos_sum_120s, est_delta_pos_sum_15s, est_delta_pos_sum_1800s]
+  - canonical_name: est_delta_ratio
+    family: ohlcv_est_delta
+    description: Canonical est_delta_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, none
+    example_instances: [est_delta_ratio_120s, est_delta_ratio_15s, est_delta_ratio_1800s]
+  - canonical_name: est_delta_ratio_cum
+    family: ohlcv_est_delta
+    description: Canonical est_delta_ratio_cum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: session_boundary
+    example_instances: [rth_est_delta_ratio_cum]
+  - canonical_name: est_delta_ratio_minus
+    family: ohlcv_est_delta
+    description: Canonical est_delta_ratio_minus building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+      - timeframe_2
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [est_delta_ratio_15s_minus_60s, est_delta_ratio_30s_minus_120s, est_delta_ratio_60s_minus_300s]
+  - canonical_name: est_delta_sum
+    family: ohlcv_est_delta
+    description: Canonical est_delta_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, none
+    example_instances: [est_delta_sum_120s, est_delta_sum_15s, est_delta_sum_1800s]
+  - canonical_name: est_delta_sum_minus_scaled
+    family: ohlcv_est_delta
+    description: Canonical est_delta_sum_minus_scaled building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+      - timeframe_2
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [est_delta_sum_15s_minus_60s_scaled, est_delta_sum_30s_minus_120s_scaled, est_delta_sum_60s_minus_300s_scaled]
+  - canonical_name: first_half_est_delta_ratio
+    family: ohlcv_est_delta
+    description: Canonical first_half_est_delta_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [regime_first_half_est_delta_ratio]
+  - canonical_name: first_half_vol
+    family: ohlcv_est_delta
+    description: Canonical first_half_vol building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [regime_first_half_vol]
+  - canonical_name: fraction_of_time_on_adverse_side
+    family: regime_median_center_slope_alignment
+    description: Canonical fraction_of_time_on_adverse_side building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [fraction_of_time_on_adverse_side]
+  - canonical_name: fraction_of_time_on_favorable_side
+    family: regime_median_center_slope_alignment
+    description: Canonical fraction_of_time_on_favorable_side building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [fraction_of_time_on_favorable_side]
+  - canonical_name: higher_lows_count
+    family: pullback_1m, pullback_1s
+    description: Canonical higher_lows_count building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [higher_lows_count_1m, higher_lows_count_1s]
+  - canonical_name: late_minus_early_delta_ratio
+    family: ohlcv_est_delta
+    description: Canonical late_minus_early_delta_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [regime_late_minus_early_delta_ratio]
+  - canonical_name: late_vs_early_vol_ratio
+    family: ohlcv_est_delta
+    description: Canonical late_vs_early_vol_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [regime_late_vs_early_vol_ratio]
+  - canonical_name: lower_highs_count
+    family: pullback_1m, pullback_1s
+    description: Canonical lower_highs_count building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [lower_highs_count_1m, lower_highs_count_1s]
+  - canonical_name: move_outside_completed_range
+    family: structural_regime_geometry
+    description: Canonical move_outside_completed_range building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - context
+      - reference_bar_state
+      - reference_timeframe
+      - source_bar_state
+      - source_timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [current_1m_move_outside_completed_5m_range]
+  - canonical_name: nearest_level_geometry
+    family: price_level_context
+    description: Canonical nearest_level_geometry building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_price_levels.GenericPriceLevelProvider
+    parameters:
+      - level_context
+      - metric
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [nearest_level_above_distance_atr, nearest_level_above_distance_points, nearest_level_above_distance_ticks]
+  - canonical_name: ordering_changes
+    family: regime_median_center_slope_alignment
+    description: Canonical ordering_changes building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [ordering_changes_15m, ordering_changes_30m, ordering_changes_60m]
+  - canonical_name: ordering_state
+    family: regime_median_center_slope_alignment
+    description: Canonical ordering_state building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [ordering_state]
+  - canonical_name: price_change_atr
+    family: ohlcv_est_delta
+    description: Canonical price_change_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, none
+    example_instances: [price_change_atr_120s, price_change_atr_15s, price_change_atr_1800s]
+  - canonical_name: price_change_points
+    family: ohlcv_est_delta
+    description: Canonical price_change_points building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [price_change_points_120s, price_change_points_15s, price_change_points_1800s]
+  - canonical_name: price_cross_count
+    family: regime_median_center_slope_alignment
+    description: Canonical price_cross_count building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [price_cross_count_15m, price_cross_count_30m, price_cross_count_5m]
+  - canonical_name: price_level_aggregate
+    family: price_level_context
+    description: Canonical price_level_aggregate building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_price_levels.GenericPriceLevelProvider
+    parameters:
+      - level_context
+      - metric
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: none, session_boundary
+    example_instances: [directional_space_balance_atr, distance_above_full_envelope_atr, distance_below_full_envelope_atr]
+  - canonical_name: price_level_available
+    family: price_level_context
+    description: Canonical price_level_available building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_price_levels.GenericPriceLevelProvider
+    parameters:
+      - level
+      - level_context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: none, session_boundary
+    example_instances: [n_level_clusters_available, n_levels_available, opening_range_30m_high_developing_available]
+  - canonical_name: price_level_position
+    family: price_level_context
+    description: Canonical price_level_position building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_price_levels.GenericPriceLevelProvider
+    parameters:
+      - level
+      - level_context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: none, session_boundary
+    example_instances: [opening_range_30m_high_developing_position, opening_range_30m_high_final_position, opening_range_30m_low_developing_position]
+  - canonical_name: price_level_value
+    family: price_level_context
+    description: Canonical price_level_value building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_price_levels.GenericPriceLevelProvider
+    parameters:
+      - level
+      - level_context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: none, session_boundary
+    example_instances: [nearest_cluster_above_price, nearest_cluster_below_price, nearest_level_above_price]
+  - canonical_name: pullback_bars
+    family: pullback_1m
+    description: Canonical pullback_bars building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [pullback_bars_1m]
+  - canonical_name: pullback_depth_atr
+    family: pullback_1m
+    description: Canonical pullback_depth_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [pullback_depth_atr]
+  - canonical_name: pullback_efficiency
+    family: pullback_1m
+    description: Canonical pullback_efficiency building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [pullback_efficiency_1m]
+  - canonical_name: pullback_linearity
+    family: pullback_1s
+    description: Canonical pullback_linearity building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [pullback_linearity_1s]
+  - canonical_name: range_atr
+    family: ohlcv_est_delta, pullback_1s
+    description: Canonical range_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_bar_geometry.GenericRangeATRProvider
+    parameters:
+      - context
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow, disallow
+    reset_policy: event_start, none
+    example_instances: [range_30s_atr, range_atr_120s, range_atr_15s]
+  - canonical_name: range_points
+    family: ohlcv_est_delta
+    description: Canonical range_points building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [range_points_120s, range_points_15s, range_points_1800s]
+  - canonical_name: range_position
+    family: range_position
+    description: Canonical range_position building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_bar_geometry.GenericRangePositionProvider
+    parameters:
+      - bar_state
+      - lookback
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [latest_1m_close_position_prev5_range]
+  - canonical_name: regime_age
+    family: context
+    description: Canonical regime_age building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_context.GenericContextProvider
+    parameters:
+      - unit
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [regime_age_bars]
+  - canonical_name: regime_age_min
+    family: structural_regime_geometry
+    description: Canonical regime_age_min building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [current_5m_regime_age_min]
+  - canonical_name: regime_directional_displacement_atr
+    family: structural_regime_geometry
+    description: Canonical regime_directional_displacement_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [current_5m_directional_displacement_atr]
+  - canonical_name: regime_duration_min
+    family: structural_regime_geometry
+    description: Canonical regime_duration_min building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [prior_1m_regime_duration_min, prior_5m_regime_duration_min]
+  - canonical_name: regime_efficiency
+    family: structural_regime_geometry
+    description: Canonical regime_efficiency building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [prior_1m_regime_efficiency, prior_5m_regime_efficiency]
+  - canonical_name: regime_expansion_atr_per_min
+    family: structural_regime_geometry
+    description: Canonical regime_expansion_atr_per_min building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [regime_expansion_atr_per_min]
+  - canonical_name: regime_mfe_atr
+    family: structural_regime_geometry
+    description: Canonical regime_mfe_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [prior_1m_regime_mfe_atr, prior_5m_regime_mfe_atr]
+  - canonical_name: regime_net_directional_move_atr
+    family: structural_regime_geometry
+    description: Canonical regime_net_directional_move_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [prior_1m_regime_net_directional_move_atr, prior_5m_regime_net_directional_move_atr]
+  - canonical_name: regime_net_move_atr_per_min
+    family: structural_regime_geometry
+    description: Canonical regime_net_move_atr_per_min building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [prior_1m_regime_net_move_atr_per_min, prior_5m_regime_net_move_atr_per_min]
+  - canonical_name: regime_range_atr
+    family: structural_regime_geometry
+    description: Canonical regime_range_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [current_5m_regime_range_atr, prior_1m_regime_range_atr, prior_5m_regime_range_atr]
+  - canonical_name: regime_range_atr_per_min
+    family: structural_regime_geometry
+    description: Canonical regime_range_atr_per_min building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - bar_state
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [current_5m_regime_range_atr_per_min, prior_1m_regime_range_atr_per_min, prior_5m_regime_range_atr_per_min]
+  - canonical_name: regime_sequence_metric
+    family: regime_median_center_slope_alignment
+    description: Canonical regime_sequence_metric building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - lookback
+      - metric
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [seq_12r_alternation_rate, seq_12r_asym_duration, seq_12r_asym_efficiency]
+  - canonical_name: relative_volume
+    family: arrival_volume
+    description: Canonical relative_volume building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVolumeProvider
+    parameters:
+      - aggregation_lookback
+      - bar_state
+      - baseline_lookback
+      - input_timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [rvol_10s, rvol_1s, rvol_5s]
+  - canonical_name: retracement_pct
+    family: pullback_1m
+    description: Canonical retracement_pct building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [retracement_pct]
+  - canonical_name: rolling_current_progress_atr
+    family: rolling_5m_productivity
+    description: Canonical rolling_current_progress_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider
+    parameters:
+      - update_every
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [rolling_5m_current_progress_atr]
+  - canonical_name: rolling_current_speed_atr_per_min
+    family: rolling_5m_productivity
+    description: Canonical rolling_current_speed_atr_per_min building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider
+    parameters:
+      - update_every
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [rolling_5m_current_speed_atr_per_min]
+  - canonical_name: rolling_current_speed_vs_lifetime
+    family: rolling_5m_productivity
+    description: Canonical rolling_current_speed_vs_lifetime building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider
+    parameters:
+      - update_every
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [rolling_5m_current_speed_vs_lifetime]
+  - canonical_name: rolling_giveback_atr
+    family: rolling_5m_productivity
+    description: Canonical rolling_giveback_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider
+    parameters:
+      - update_every
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [rolling_5m_giveback_atr]
+  - canonical_name: rolling_max_progress_atr
+    family: rolling_5m_productivity
+    description: Canonical rolling_max_progress_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider
+    parameters:
+      - update_every
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [rolling_5m_max_progress_atr]
+  - canonical_name: rolling_max_speed_atr_per_min
+    family: rolling_5m_productivity
+    description: Canonical rolling_max_speed_atr_per_min building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider
+    parameters:
+      - update_every
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [rolling_5m_max_speed_atr_per_min]
+  - canonical_name: rolling_max_speed_vs_lifetime
+    family: rolling_5m_productivity
+    description: Canonical rolling_max_speed_vs_lifetime building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider
+    parameters:
+      - update_every
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [rolling_5m_max_speed_vs_lifetime]
+  - canonical_name: rolling_retention_ratio
+    family: rolling_5m_productivity
+    description: Canonical rolling_retention_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider
+    parameters:
+      - update_every
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [rolling_5m_retention_ratio]
+  - canonical_name: second_half_est_delta_ratio
+    family: ohlcv_est_delta
+    description: Canonical second_half_est_delta_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [regime_second_half_est_delta_ratio]
+  - canonical_name: second_half_vol
+    family: ohlcv_est_delta
+    description: Canonical second_half_vol building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [regime_second_half_vol]
+  - canonical_name: seconds_in_current_ordering
+    family: regime_median_center_slope_alignment
+    description: Canonical seconds_in_current_ordering building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [seconds_in_current_ordering]
+  - canonical_name: session_elapsed
+    family: context
+    description: Canonical session_elapsed building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_context.GenericContextProvider
+    parameters:
+      - session
+      - unit
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [minutes_since_rth_open]
+  - canonical_name: session_membership
+    family: context
+    description: Canonical session_membership building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_context.GenericContextProvider
+    parameters:
+      - session
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [is_rth]
+  - canonical_name: slope__aligned_atr
+    family: regime_median_center_slope_alignment
+    description: Canonical slope__aligned_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+      - timeframe_2
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [slope_15m_10m_aligned_atr, slope_15m_3m_aligned_atr, slope_15m_5m_aligned_atr]
+  - canonical_name: spike
+    family: arrival_volume
+    description: Canonical spike building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVolumeProvider
+    parameters:
+      []
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [vol_spike]
+  - canonical_name: spread_change
+    family: regime_median_center_slope_alignment
+    description: Canonical spread_change building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider
+    parameters:
+      - timeframe
+      - timeframe_2
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [spread_change_15m_30m, spread_change_5m_15m, spread_change_5m_30m]
+  - canonical_name: structural_current_expansion_atr
+    family: structural_regime_geometry
+    description: Canonical structural_current_expansion_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [structural_current_expansion_atr]
+  - canonical_name: structural_expansion_atr_per_min
+    family: structural_regime_geometry
+    description: Canonical structural_expansion_atr_per_min building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [structural_expansion_atr_per_min]
+  - canonical_name: structural_giveback_atr
+    family: structural_regime_geometry
+    description: Canonical structural_giveback_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [structural_giveback_atr]
+  - canonical_name: structural_max_expansion_atr
+    family: structural_regime_geometry
+    description: Canonical structural_max_expansion_atr building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [structural_max_expansion_atr]
+  - canonical_name: structural_retention_ratio
+    family: structural_regime_geometry
+    description: Canonical structural_retention_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s+1m+5m]
+    null_policy: allow
+    reset_policy: event_start
+    example_instances: [structural_retention_ratio]
+  - canonical_name: swing_count
+    family: pullback_1m, pullback_1s
+    description: Canonical swing_count building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_pullback.GenericPullbackProvider
+    parameters:
+      - scope
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [swing_count_1m, swing_count_1s]
+  - canonical_name: up_down_vol_ratio
+    family: ohlcv_est_delta
+    description: Canonical up_down_vol_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [up_down_vol_ratio_120s, up_down_vol_ratio_15s, up_down_vol_ratio_1800s]
+  - canonical_name: upbar_vol_sum
+    family: ohlcv_est_delta
+    description: Canonical upbar_vol_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [upbar_vol_sum_120s, upbar_vol_sum_15s, upbar_vol_sum_1800s]
+  - canonical_name: vol_cum
+    family: ohlcv_est_delta
+    description: Canonical vol_cum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: session_boundary
+    example_instances: [rth_vol_cum]
+  - canonical_name: vol_max
+    family: ohlcv_est_delta
+    description: Canonical vol_max building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+      - timeframe_2
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [vol_max_1s_120s, vol_max_1s_15s, vol_max_1s_1800s]
+  - canonical_name: vol_mean
+    family: ohlcv_est_delta
+    description: Canonical vol_mean building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+      - timeframe_2
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [vol_mean_1s_120s, vol_mean_1s_15s, vol_mean_1s_1800s]
+  - canonical_name: vol_sum
+    family: ohlcv_est_delta
+    description: Canonical vol_sum building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, none
+    example_instances: [regime_vol_sum, vol_sum_120s, vol_sum_15s]
+  - canonical_name: vol_sum_vs_ratio
+    family: ohlcv_est_delta
+    description: Canonical vol_sum_vs_ratio building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+      - timeframe_2
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [vol_sum_30s_vs_300s_ratio, vol_sum_60s_vs_900s_ratio]
+  - canonical_name: volume_per_atr_moved
+    family: ohlcv_est_delta
+    description: Canonical volume_per_atr_moved building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, none
+    example_instances: [regime_volume_per_atr_moved, volume_per_atr_moved_120s, volume_per_atr_moved_15s]
+  - canonical_name: volume_per_point_moved
+    family: ohlcv_est_delta
+    description: Canonical volume_per_point_moved building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [volume_per_point_moved_120s, volume_per_point_moved_15s, volume_per_point_moved_1800s]
+  - canonical_name: volume_per_second
+    family: ohlcv_est_delta
+    description: Canonical volume_per_second building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+    temporal_semantics:
+      input_requirements: [1m, 1s]
+    null_policy: allow
+    reset_policy: event_start, session_boundary
+    example_instances: [regime_volume_per_second, rth_volume_per_second]
+  - canonical_name: volume_price_correlation
+    family: arrival_volume
+    description: Canonical volume_price_correlation building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVolumeProvider
+    parameters:
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [vol_price_corr_10s]
+  - canonical_name: volume_trend
+    family: arrival_volume
+    description: Canonical volume_trend building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_arrival.GenericArrivalVolumeProvider
+    parameters:
+      - window
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [vol_trend_10s]
+  - canonical_name: wick_imbalance
+    family: wick_imbalance
+    description: Canonical wick_imbalance building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_bar_geometry.GenericWickImbalanceProvider
+    parameters:
+      - bar_state
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1m]
+    null_policy: allow
+    reset_policy: none
+    example_instances: [latest_1m_wick_imbalance]
+  - canonical_name: window_available
+    family: ohlcv_est_delta
+    description: Canonical window_available building block.
+    dtype: float64
+    status: verified
+    provider: features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider
+    parameters:
+      - context
+      - timeframe
+    temporal_semantics:
+      input_requirements: [1s]
+    null_policy: disallow
+    reset_policy: none
+    example_instances: [window_available_120s, window_available_15s, window_available_1800s]

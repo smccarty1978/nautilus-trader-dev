@@ -29,9 +29,9 @@ class StrategyBinding:
 
 STRATEGY_REGISTRY: Dict[str, Dict[str, Any]] = {
     "flip_prediction_collector": {
-        "module_path": "strategies.flip_prediction_collector",
-        "class_name": "FlipPredictionCollector",
-        "config_class_name": "FlipPredictionCollectorConfig",
+        "module_path": "research_workflow.generic_collector",
+        "class_name": "GenericStudyCollector",
+        "config_class_name": "GenericStudyCollectorConfig",
         "supported_modes": ["collect"],
     },
     "score_fanning_strategy": {

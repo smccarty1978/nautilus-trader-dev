@@ -1,6 +1,6 @@
 import pytest
 
-from features.registry import FEATURE_REGISTRY
+from features.registry import resolve_feature_request
 from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation import phase0
 from studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.execution import authorize_stage
 
@@ -13,13 +13,18 @@ def test_phase0_authenticates_actual_config_and_clean_registry_inventory():
     assert manifest["candidate_count"] >= 25
     assert manifest["study_yaml_sha256"]
     assert manifest["collection_input_allowlist"]["years"] == [2021, 2022, 2023, 2024]
-    assert all(FEATURE_REGISTRY[name].status == "verified" for name in manifest["candidate_features"])
+    assert all(resolve_feature_request(name)["status"] == "verified" for name in manifest["candidate_features"])
 
 
 def test_phase0_rejects_noncentral_implementation(monkeypatch):
     candidate = phase0.verified_numeric_candidates()[0]
-    definition = FEATURE_REGISTRY[candidate]
-    monkeypatch.setattr(definition, "implementation", "studies.fake.module")
+    original = phase0.resolve_feature_request
+    def fake(name, **kwargs):
+        resolved = dict(original(name, **kwargs))
+        if name == candidate:
+            resolved["provider"] = "studies.fake.module.Provider"
+        return resolved
+    monkeypatch.setattr(phase0, "resolve_feature_request", fake)
     with pytest.raises(RuntimeError, match="not importable|escapes central features tree"):
         phase0._implementation_path(candidate)
 

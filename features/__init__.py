@@ -6,7 +6,11 @@ from features.engine import FeatureEngine
 from features.trackers.velocity import ArrivalVelocityTracker
 from features.trackers.volume import ArrivalVolumeTracker
 from features.trackers.pullback import PullbackTracker
-from features.registry import FEATURE_REGISTRY, resolve_feature_name, FeatureDefinition
+from features.registry import (
+    FeatureDefinition, resolve_feature_request,
+    resolve_runtime_feature_aliases,
+)
+
 
 __all__ = [
     "FeatureLibrary",
@@ -16,7 +20,7 @@ __all__ = [
     "ArrivalVelocityTracker",
     "ArrivalVolumeTracker",
     "PullbackTracker",
-    "FEATURE_REGISTRY",
-    "resolve_feature_name",
+    "resolve_feature_request",
+    "resolve_runtime_feature_aliases",
     "FeatureDefinition",
 ]

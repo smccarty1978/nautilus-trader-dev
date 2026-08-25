@@ -1,0 +1,316 @@
+{
+  "lineage_version": 1,
+  "study_id": "clean_maturity_flip_model_rolling_productivity",
+  "bootstrapped_from_local_ledger": false,
+  "issuance_counter": 30,
+  "prev_chain_sha256": "61128fbd1436beca449e92d04d17c63e4e70a17fe852353c99533bcec657f2be",
+  "chain_sha256": "4e13109c762c07f498c6d95500cd7eed5961918fdd72f52b626d2706c3459263",
+  "high_water": {
+    "causal": 15,
+    "contract": 15
+  },
+  "entries": [
+    {
+      "audit_type": "causal",
+      "pass": 1,
+      "audited_execution_composite_sha256": "e3a28fc5c9bb29a3186dbae5f6c8fcbcda319219afbed813895322028ac02b0a",
+      "audit_report_sha256": "7610494930e5522e4095941ba2a82a1baa025bb3c7354756c629a14f71b72a52",
+      "audit_report_path": "audit/pass_01.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:17:11.993344+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 1,
+      "audited_execution_composite_sha256": "e3a28fc5c9bb29a3186dbae5f6c8fcbcda319219afbed813895322028ac02b0a",
+      "audit_report_sha256": "58ef5dcac5e451ff234f93dfe2f5df8800205c4f3c06d35c7fb09b4ac79e8f0b",
+      "audit_report_path": "audit/contract_pass_01.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:17:14.780779+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 2,
+      "audited_execution_composite_sha256": "60794d7b552be5c2674a6279a0a12712f3daa79fa4326c59e73412edf2c0c576",
+      "audit_report_sha256": "51f3f147ed0b4f07a0705bd4c3e996250d1bd272b544db7081bee540730d1c11",
+      "audit_report_path": "audit/pass_02.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:32:01.226667+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 2,
+      "audited_execution_composite_sha256": "60794d7b552be5c2674a6279a0a12712f3daa79fa4326c59e73412edf2c0c576",
+      "audit_report_sha256": "85c5e712f5c3e5610020c8f9b197b1f90f0a4ec143f194af50c1edf5eae98289",
+      "audit_report_path": "audit/contract_pass_02.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:32:04.004387+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 3,
+      "audited_execution_composite_sha256": "4af77fa71a2485246f7a9acda4a86c6317d0eb15010f5d6b59c7b215677da933",
+      "audit_report_sha256": "e55bd08cff154bb92926c9a54e72d0de704f40de6f4d3863d2509331fc15fd03",
+      "audit_report_path": "audit/pass_03.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:37:16.285702+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 3,
+      "audited_execution_composite_sha256": "4af77fa71a2485246f7a9acda4a86c6317d0eb15010f5d6b59c7b215677da933",
+      "audit_report_sha256": "9a65417058dd14587ae0561c511bffecc35705a4518f0ef0f0e39a97081b99a0",
+      "audit_report_path": "audit/contract_pass_03.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:37:19.196621+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 4,
+      "audited_execution_composite_sha256": "a2141101dd4532348fa2f15f4965f1b6fdceccdfac79e476fa3d8f82f1175611",
+      "audit_report_sha256": "f05c2ad01e9da5d83a9197442c0a72e82c00c775d6dad91636222d46b1d72495",
+      "audit_report_path": "audit/pass_04.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:41:58.581089+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 4,
+      "audited_execution_composite_sha256": "a2141101dd4532348fa2f15f4965f1b6fdceccdfac79e476fa3d8f82f1175611",
+      "audit_report_sha256": "7e2ec82e5c7161681094d87d0ab698a41c2662f46d5f08b6fe0aadf156796c42",
+      "audit_report_path": "audit/contract_pass_04.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:42:01.327170+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 5,
+      "audited_execution_composite_sha256": "a2141101dd4532348fa2f15f4965f1b6fdceccdfac79e476fa3d8f82f1175611",
+      "audit_report_sha256": "f05c2ad01e9da5d83a9197442c0a72e82c00c775d6dad91636222d46b1d72495",
+      "audit_report_path": "audit/pass_05.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:53:27.697224+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 5,
+      "audited_execution_composite_sha256": "a2141101dd4532348fa2f15f4965f1b6fdceccdfac79e476fa3d8f82f1175611",
+      "audit_report_sha256": "7e2ec82e5c7161681094d87d0ab698a41c2662f46d5f08b6fe0aadf156796c42",
+      "audit_report_path": "audit/contract_pass_05.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T15:53:30.584165+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 6,
+      "audited_execution_composite_sha256": "88c8941e835ec2be57692ae9df326abda2d6bae2bc3799f6b8bb4249d065beeb",
+      "audit_report_sha256": "6035d4524787ce93b5f4420f65ae063e6d3ee12a43c44cfd2a3aac6ebdd64e7b",
+      "audit_report_path": "audit/pass_06.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T16:41:54.669017+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 6,
+      "audited_execution_composite_sha256": "88c8941e835ec2be57692ae9df326abda2d6bae2bc3799f6b8bb4249d065beeb",
+      "audit_report_sha256": "352ade662b056a91751a1e2cf7e8561634e3ab69f0fd0e0f1354d47df2dcde55",
+      "audit_report_path": "audit/contract_pass_06.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T16:41:57.707111+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 7,
+      "audited_execution_composite_sha256": "1c14c748bac806fe0eaf763765a9a97ba3451d3d78039d523c27467d058b9644",
+      "audit_report_sha256": "e87bd83f12bad61e816b9a0a53d089d4a9ed83bffc001b6be41f1ef102d1f5fe",
+      "audit_report_path": "audit/pass_07.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T16:52:24.998284+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 7,
+      "audited_execution_composite_sha256": "1c14c748bac806fe0eaf763765a9a97ba3451d3d78039d523c27467d058b9644",
+      "audit_report_sha256": "13529b6dc2f4f3f4c20318bdf1dd2518c1cd8dac3e31682b57a9e2d1d66eed2b",
+      "audit_report_path": "audit/contract_pass_07.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T16:52:28.199208+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 8,
+      "audited_execution_composite_sha256": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
+      "audit_report_sha256": "793480413401d7c640aa2757bfc0f773c4e26dd04decb6339d171239ac5ea555",
+      "audit_report_path": "audit/pass_08.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T16:58:32.913135+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 8,
+      "audited_execution_composite_sha256": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
+      "audit_report_sha256": "b639d5e83f0badeffe496633c26b4cecdd5540b77124ab1ab7e7a1a72eaf389d",
+      "audit_report_path": "audit/contract_pass_08.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T16:58:35.886686+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 9,
+      "audited_execution_composite_sha256": "58c8570b93b88a02696bb156e2942531721abb1a2451a63169acdfe04ce58e99",
+      "audit_report_sha256": "ac5939c4eb6641bb3e6ad828227a05b442892f3a757e705cd5f70c16d43c5768",
+      "audit_report_path": "audit/pass_09.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T21:43:03.751076+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 9,
+      "audited_execution_composite_sha256": "58c8570b93b88a02696bb156e2942531721abb1a2451a63169acdfe04ce58e99",
+      "audit_report_sha256": "511e5ec402836fbb159e94f79f31b6b795564fa409145b04224506b72d9229ee",
+      "audit_report_path": "audit/contract_pass_09.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T21:43:06.736155+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 10,
+      "audited_execution_composite_sha256": "21a9eb43f9480c42e0f14cfb90a54255d43cf56dacaf938ddcedf8bfa11c9231",
+      "audit_report_sha256": "459aad681be00e585e0c6c80f85a5e8659e58b0de927d653d7a4d7fd2a1f0433",
+      "audit_report_path": "audit/pass_10.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T21:46:19.296060+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 10,
+      "audited_execution_composite_sha256": "21a9eb43f9480c42e0f14cfb90a54255d43cf56dacaf938ddcedf8bfa11c9231",
+      "audit_report_sha256": "d6e566d21fe95dc3da8a855a3d417ec557acd9a34f018739c535b618e7c0ab23",
+      "audit_report_path": "audit/contract_pass_10.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T21:46:22.311795+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 11,
+      "audited_execution_composite_sha256": "50b2c0c7d2cdbe790d3ed4bbf20c628e39ca9d9f38e27490141ec86c63a00994",
+      "audit_report_sha256": "1f2f36465d4b04e6a3cd071f04b4c5468527151c80df6e185efef4045a79ac8d",
+      "audit_report_path": "audit/pass_11.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T21:56:23.284031+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 11,
+      "audited_execution_composite_sha256": "50b2c0c7d2cdbe790d3ed4bbf20c628e39ca9d9f38e27490141ec86c63a00994",
+      "audit_report_sha256": "cb6f29f29f9f5a19b76a1449281ff71058262e05d43cccaad030f214b355e3a2",
+      "audit_report_path": "audit/contract_pass_11.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T21:56:26.192416+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 12,
+      "audited_execution_composite_sha256": "50b2c0c7d2cdbe790d3ed4bbf20c628e39ca9d9f38e27490141ec86c63a00994",
+      "audit_report_sha256": "1f2f36465d4b04e6a3cd071f04b4c5468527151c80df6e185efef4045a79ac8d",
+      "audit_report_path": "audit/pass_12.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T22:00:00.051133+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 12,
+      "audited_execution_composite_sha256": "50b2c0c7d2cdbe790d3ed4bbf20c628e39ca9d9f38e27490141ec86c63a00994",
+      "audit_report_sha256": "cb6f29f29f9f5a19b76a1449281ff71058262e05d43cccaad030f214b355e3a2",
+      "audit_report_path": "audit/contract_pass_12.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T22:00:02.994990+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 13,
+      "audited_execution_composite_sha256": "e5a8eb7b4a8d1d5b7f0629cf35b5bae25990141ec3f56a60e77efaa194ae3c32",
+      "audit_report_sha256": "3ad1b985d55afa0e321c166f4d9c8b6f4265c658d7c75ef7d7efe542278b3876",
+      "audit_report_path": "audit/pass_13.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T22:04:52.288523+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 13,
+      "audited_execution_composite_sha256": "e5a8eb7b4a8d1d5b7f0629cf35b5bae25990141ec3f56a60e77efaa194ae3c32",
+      "audit_report_sha256": "93d96bf090ecb9a32da2581a5b66eed4ac8130cce6b3d73b87c33ba4843b9e21",
+      "audit_report_path": "audit/contract_pass_13.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T22:04:55.224676+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 14,
+      "audited_execution_composite_sha256": "75f74078d71e6eb949e541688425bd615f6605b7fa840eae92d47d361eec46d9",
+      "audit_report_sha256": "a491a1c5bb75a64c0c6090e36f88b6084bdace9b110c597046f4c8cab1448681",
+      "audit_report_path": "audit/pass_14.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-25T03:19:17.843062+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 14,
+      "audited_execution_composite_sha256": "75f74078d71e6eb949e541688425bd615f6605b7fa840eae92d47d361eec46d9",
+      "audit_report_sha256": "ceafd259ea3d9ee91c89e90bdda8dddbfcf1eeaf73b65cab8db2186f3cbb2667",
+      "audit_report_path": "audit/contract_pass_14.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-25T03:19:21.093765+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 15,
+      "audited_execution_composite_sha256": "67052e7d8f95abbc93163942916156b3b2cfaf78b79e6a0eca8cd8978c7791d8",
+      "audit_report_sha256": "bccb86842ca7ec65f55b890dcfdd02a85525e034f1729582c8a07e610617a80b",
+      "audit_report_path": "audit/pass_15.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-25T03:29:22.995386+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 15,
+      "audited_execution_composite_sha256": "67052e7d8f95abbc93163942916156b3b2cfaf78b79e6a0eca8cd8978c7791d8",
+      "audit_report_sha256": "03f63ac206d9c04fbb69d57e0214ddced8cccbdc0207fc659a2746062afa3110",
+      "audit_report_path": "audit/contract_pass_15.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-25T03:29:26.220110+00:00"
+    }
+  ],
+  "integrity_sha256": "bf61baa3106ca251653eed9e494a8ed7d997aa3a5d2acc7571c0c9f640ecde60",
+  "note": "Durable audit lineage anchor. Lives outside the study directory so that deleting or rebuilding studies/<id>/audit/ cannot reset the audit high-water mark, and INSIDE the repository so that committing it makes it durable. COMMIT THIS FILE with the audit artifacts it anchors -- an uncommitted anchor is only as durable as the working tree. Authoritative over the study-local pass_ledger.json."
+}

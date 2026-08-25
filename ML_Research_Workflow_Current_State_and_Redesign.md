@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **docs/RESEARCH_WORKFLOW.md**.
+>
+> A pre-migration state assessment and redesign proposal. The redesign was implemented; this describes the system before it.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 ---
 title: "ML Trend Analysis Research Workflow"
 subtitle: "Current State, Failure Analysis, and Proposed Modular Redesign"

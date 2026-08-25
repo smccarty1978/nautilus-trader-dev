@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **AGENTS.md, CLAUDE.md, CODEX.md**.
+>
+> A second agent operating manual. The agent rules now live in the three operating manuals and `docs/RESEARCH_WORKFLOW.md`.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # ML Trend Analysis — Research Agent Workflow Playbook
 
 **Purpose:** Give a research/orchestration agent enough context to route each task through the repo's governed workflow with minimal unnecessary Opus usage, minimal repeated discovery, and clear stop conditions.

@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 from typing import Sequence
 
-from features.registry import FEATURE_REGISTRY
+from features.registry import resolve_feature_request
 from studies.nt_reduced_f3_top25_population_parity_smoke.implementation.reduced_feature_engine import (
     ReducedFeatureEngine,
 )
@@ -41,16 +41,18 @@ def load_ordered_features(repo_root: Path) -> list[str]:
     if raw["sha256"] != EXPECTED_HASH or raw["actual_n_features"] != 25:
         raise RuntimeError("frozen F3 feature-set identity mismatch")
     names = list(raw["features"])
-    if any(name not in FEATURE_REGISTRY for name in names):
-        raise RuntimeError("frozen feature missing from central registry")
     for name in names:
-        meta = FEATURE_REGISTRY[name]
+        try:
+            meta = resolve_feature_request(name)
+        except Exception as exc:
+            raise RuntimeError("frozen feature missing from canonical resolver") from exc
         expected_tf = "1m" if name in PRICE_FEATURES else "1s"
-        if meta.version != "1.0" or meta.status != "verified":
+        if meta["status"] != "verified":
             raise RuntimeError(f"unfrozen registry identity for {name}")
-        if meta.source_timeframe != expected_tf:
+        streams = set(meta["input_requirements"].get("required_streams", []))
+        if f"completed_{expected_tf}" not in streams:
             raise RuntimeError(
-                f"source timeframe mismatch for {name}: {meta.source_timeframe} != {expected_tf}"
+                f"source timeframe mismatch for {name}: {sorted(streams)} does not include {expected_tf}"
             )
     return names
 

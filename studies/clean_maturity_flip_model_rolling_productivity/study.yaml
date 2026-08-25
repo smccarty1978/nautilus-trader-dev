@@ -1,0 +1,147 @@
+study:
+  id: clean_maturity_flip_model_rolling_productivity
+  type: flip_prediction
+  risk_tier: 2
+  description: V2-native maturity-conditioned flip model with explicit canonical feature
+    instances.
+operation:
+  kind: train_evaluate
+  target_metric: roc_auc
+instrument:
+  symbol: NQ
+  venue: XCME
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+  qualification:
+    age_gate_seconds: 120
+    running_mfe_atr_gte: 1.0
+    new_progress_windows_gte: 2
+    retained_mfe_ratio_gte: 0.5
+    cadence_seconds: 5
+    established: true
+target:
+  type: flip
+  event: prevailing_1m_regime_transition
+  direction: both
+  horizon_seconds: 300
+  confirmation:
+    mode: completed_1m_bar
+    confirmation_bars: 1
+features:
+  source: canonical_verified_definition_universe
+  selection:
+    mode: none
+    source: canonical_verified_definition_universe
+    feature_count: 13
+    direction_specific: false
+    ranking_method: frozen_train_only_temporal_rank
+  instances:
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: rolling_retention_ratio
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_current_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_max_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_giveback_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: arrival_velocity
+    parameters:
+      input_timeframe: 1s
+      lookback: 20
+      bar_state: completed
+  - feature: arrival_acceleration
+    parameters:
+      input_timeframe: 1s
+      short_lookback: 20
+      bar_state: completed
+  - feature: ema_slope
+    parameters:
+      ema_role: short
+      lookback: 20
+  timing_contract: verified
+  metadata_columns:
+  - observation_ts
+  - regime_start_ns
+  - checkpoint_index
+  - regime_age_seconds
+  - running_mfe_atr
+  - new_progress_windows
+  - retained_mfe_ratio
+model:
+  mode: training
+  family: HistGradientBoostingClassifier
+  arms:
+  - BASELINE
+  - BASELINE_PLUS_STRUCTURAL
+  - BASELINE_PLUS_STRUCTURAL_PLUS_ROLLING_5M
+  params:
+    learning_rate: 0.05
+    max_depth: 3
+    max_iter: 200
+    random_state: 42
+chronology:
+  train:
+  - 2021
+  - 2022
+  - 2023
+  dev:
+  - 2024
+  prohibited:
+  - 2025
+  - 2026
+stratification: {}
+baseline: {}
+lineage: {}
+execution:
+  runtime: nautilustrader
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
+  data_requirements:
+    dataset_id: NQ_v0_2020_2026
+    authorized_dates:
+    - '2023-10-02'
+  progress_seconds: 60
+  bounded: true
+acceptance:
+  criteria:
+    minimum_structural_block_coverage: 0.9
+bespoke: {}

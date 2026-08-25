@@ -1,0 +1,442 @@
+{
+  "feature_sets": {
+    "A": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "B": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr"
+    ],
+    "C": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr"
+    ]
+  },
+  "ordered_hashes": {
+    "A": "3df6e09faf7ea97875ff1dcbe0322cb22cacee1019a33af564bf8f56c086e45c",
+    "B": "ad53a1fd02857327bb763147feed736c74cc4ec69d5ce8b64763378bb1e17bba",
+    "C": "ca1da0ac788d4a83e92c42ce2f52ca9b31b995cbb3436f768c9421f1f13d8bbc"
+  },
+  "rolling_stats": {
+    "TRAIN": {
+      "rolling_300s_retention_ratio": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "min": null,
+        "max": null,
+        "std": null
+      },
+      "rolling_300s_current_progress_atr": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "min": null,
+        "max": null,
+        "std": null
+      },
+      "rolling_300s_max_progress_atr": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "min": null,
+        "max": null,
+        "std": null
+      },
+      "rolling_300s_giveback_atr": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "min": null,
+        "max": null,
+        "std": null
+      }
+    },
+    "OOS": {
+      "rolling_300s_retention_ratio": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "min": null,
+        "max": null,
+        "std": null
+      },
+      "rolling_300s_current_progress_atr": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "min": null,
+        "max": null,
+        "std": null
+      },
+      "rolling_300s_max_progress_atr": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "min": null,
+        "max": null,
+        "std": null
+      },
+      "rolling_300s_giveback_atr": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "min": null,
+        "max": null,
+        "std": null
+      }
+    }
+  },
+  "baseline_stats": {
+    "TRAIN": {
+      "arrival_velocity": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "std": null
+      },
+      "arrival_acceleration": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "std": null
+      },
+      "ema_slope": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "std": null
+      }
+    },
+    "OOS": {
+      "arrival_velocity": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "std": null
+      },
+      "arrival_acceleration": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "std": null
+      },
+      "ema_slope": {
+        "dtype": "object",
+        "non_null": 0,
+        "null_pct": 1.0,
+        "unique": 0,
+        "std": null
+      }
+    }
+  },
+  "estimator": {
+    "LONG_A": {
+      "n_features_in": 3,
+      "feature_names_in": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "fit_identity": "84ee9447ce104d3a588e93082cb84dea0d65c02f1c8623717ea4040c11df8228",
+      "artifact_hash": "36a494793ab4bdc1d59042b7b10df5a278baebe709c7ff6a7e4fef22be9d271c"
+    },
+    "LONG_B": {
+      "n_features_in": 9,
+      "feature_names_in": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr"
+      ],
+      "fit_identity": "07482c62dd585319806f854c09ebd336d0930aa21fbcc5f3abb9ec10bfa53b36",
+      "artifact_hash": "7b1d8558106206d1b816d8688f434e292b1c0a047153a573ec8df66d6281dd58"
+    },
+    "LONG_C": {
+      "n_features_in": 13,
+      "feature_names_in": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr"
+      ],
+      "fit_identity": "d8dc7a484983ea2b5959abc779006470dc8bf4e957a67b288adc208168142c0e",
+      "artifact_hash": "9140ecef5de0f7532ce0a6a027c201c90f257f9044a6dba85319881f8ab62faa"
+    },
+    "SHORT_A": {
+      "n_features_in": 3,
+      "feature_names_in": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "fit_identity": "3c9d1c327d128442a9dca4ec18d0990b940377efd5a860c7c6b1fd23fce3027f",
+      "artifact_hash": "3b6148532b40de388e86e2ddbcc684b80ac049ff4b3d112abbf79ac8889aa102"
+    },
+    "SHORT_B": {
+      "n_features_in": 9,
+      "feature_names_in": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr"
+      ],
+      "fit_identity": "25dac8d215411d7e1e2f25504abdde823796441ab33a18828553369a30e8e749",
+      "artifact_hash": "92da923d4332fffe4eb90e71bc8b8b48ddff00fa26910936a3a78ef1d53c77b0"
+    },
+    "SHORT_C": {
+      "n_features_in": 13,
+      "feature_names_in": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr"
+      ],
+      "fit_identity": "35963a774b273697db5fffae0d9e4ba89eb4ae39ca428753ce4bacf5911ae14f",
+      "artifact_hash": "daea9cd040210beb10a98b5082c30654bf7d6c07acd3a6d28d77ccaf8143ecdf"
+    }
+  },
+  "scores": {
+    "TRAIN": {
+      "LONG_A": {
+        "unique": 1,
+        "std": 0.0,
+        "min": 0.2942747112484827,
+        "max": 0.2942747112484827,
+        "sha256": "2f2dbfa1de33679b822cb69090946b57c4562923191dec59635defe8c247d5b0"
+      },
+      "LONG_B": {
+        "unique": 10501,
+        "std": 0.041279341684661935,
+        "min": 0.07511396895630862,
+        "max": 0.8794869623497765,
+        "sha256": "9795e641177072bc87bf1a742a2b88caa01a6dc19ce1c444c415af25f8c60ec6"
+      },
+      "LONG_C": {
+        "unique": 10501,
+        "std": 0.041279341684661935,
+        "min": 0.07511396895630862,
+        "max": 0.8794869623497765,
+        "sha256": "9795e641177072bc87bf1a742a2b88caa01a6dc19ce1c444c415af25f8c60ec6"
+      },
+      "SHORT_A": {
+        "unique": 1,
+        "std": 5.551115123125783e-17,
+        "min": 0.279316765025953,
+        "max": 0.279316765025953,
+        "sha256": "f44dd902788df11ab9bc5d4e8861426425cfd674d903490edca2dd90778c2c15"
+      },
+      "SHORT_B": {
+        "unique": 11052,
+        "std": 0.03766390174212229,
+        "min": 0.09794196057013436,
+        "max": 0.7292833010080766,
+        "sha256": "56d7ed2b8befc20db6a92ca45dcbe679f56487d4f8be59d4450bfa89f5fa8706"
+      },
+      "SHORT_C": {
+        "unique": 11052,
+        "std": 0.03766390174212229,
+        "min": 0.09794196057013436,
+        "max": 0.7292833010080766,
+        "sha256": "56d7ed2b8befc20db6a92ca45dcbe679f56487d4f8be59d4450bfa89f5fa8706"
+      }
+    },
+    "OOS": {
+      "LONG_A": {
+        "unique": 1,
+        "std": 1.1102230246251565e-16,
+        "min": 0.2942747112484827,
+        "max": 0.2942747112484827,
+        "sha256": "089b9e35579ac6c636e19bfe5ec1c5add7255bf51d01af4e5a1b43848332c218"
+      },
+      "LONG_B": {
+        "unique": 3716,
+        "std": 0.04060871095424448,
+        "min": 0.15142708131938187,
+        "max": 0.8094725998827605,
+        "sha256": "fc665fa9fc42ee548d6c051e8be34f3c94f659802025cc4a3a8dee386a61acbe"
+      },
+      "LONG_C": {
+        "unique": 3716,
+        "std": 0.04060871095424448,
+        "min": 0.15142708131938187,
+        "max": 0.8094725998827605,
+        "sha256": "fc665fa9fc42ee548d6c051e8be34f3c94f659802025cc4a3a8dee386a61acbe"
+      },
+      "SHORT_A": {
+        "unique": 1,
+        "std": 5.551115123125783e-17,
+        "min": 0.279316765025953,
+        "max": 0.279316765025953,
+        "sha256": "5d4bcfe3bd190e270dbf4e7c27db27434092a72bd60167aca980cb8cac5fb4e2"
+      },
+      "SHORT_B": {
+        "unique": 3813,
+        "std": 0.03696615819083977,
+        "min": 0.16177850067065647,
+        "max": 0.6041653089759055,
+        "sha256": "89e4a3217a1769f966d9ea79d6755e6e671f45f7aa4e661e4ccba04fef26c413"
+      },
+      "SHORT_C": {
+        "unique": 3813,
+        "std": 0.03696615819083977,
+        "min": 0.16177850067065647,
+        "max": 0.6041653089759055,
+        "sha256": "89e4a3217a1769f966d9ea79d6755e6e671f45f7aa4e661e4ccba04fef26c413"
+      }
+    }
+  },
+  "thresholds": {
+    "LONG_A": {
+      "p90": 0.2942747112484827,
+      "p95": 0.2942747112484827,
+      "p97_5": 0.2942747112484827
+    },
+    "LONG_B": {
+      "p90": 0.33515761309431824,
+      "p95": 0.35331457190054316,
+      "p97_5": 0.3742469245716071
+    },
+    "LONG_C": {
+      "p90": 0.33515761309431824,
+      "p95": 0.35331457190054316,
+      "p97_5": 0.3742469245716071
+    },
+    "SHORT_A": {
+      "p90": 0.279316765025953,
+      "p95": 0.279316765025953,
+      "p97_5": 0.279316765025953
+    },
+    "SHORT_B": {
+      "p90": 0.3178818499342198,
+      "p95": 0.3330165098131677,
+      "p97_5": 0.3543762033524304
+    },
+    "SHORT_C": {
+      "p90": 0.3178818499342198,
+      "p95": 0.3330165098131677,
+      "p97_5": 0.3543762033524304
+    }
+  },
+  "decile_distinct_boundaries": {
+    "LONG_A": 1,
+    "LONG_B": 9,
+    "LONG_C": 9,
+    "SHORT_A": 1,
+    "SHORT_B": 9,
+    "SHORT_C": 9
+  },
+  "bc_diff": {
+    "TRAIN": {
+      "LONG": {
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "different_count": 0
+      },
+      "SHORT": {
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "different_count": 0
+      }
+    },
+    "OOS": {
+      "LONG": {
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "different_count": 0
+      },
+      "SHORT": {
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "different_count": 0
+      }
+    }
+  },
+  "ab_diff": {
+    "TRAIN": {
+      "LONG": {
+        "max_abs": 0.5852122511012938,
+        "mean_abs": 0.026744026179690066,
+        "different_count": 1387411
+      },
+      "SHORT": {
+        "max_abs": 0.4499665359821236,
+        "mean_abs": 0.025121597337065284,
+        "different_count": 1387411
+      }
+    },
+    "OOS": {
+      "LONG": {
+        "max_abs": 0.5151978886342778,
+        "mean_abs": 0.02659186751579389,
+        "different_count": 450973
+      },
+      "SHORT": {
+        "max_abs": 0.3248485439499525,
+        "mean_abs": 0.025193050058321488,
+        "different_count": 450973
+      }
+    }
+  }
+}

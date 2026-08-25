@@ -1,3 +1,11 @@
+<!-- DOC-STATUS-BANNER -->
+> **[HISTORICAL]**
+>
+> A point-in-time record of backtest harness remediation. It is not a description of the current system
+> and not a source of instructions.
+>
+> Current authority: **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
 # Backtest Harness — Red Team Remediation Report
 
 **Date:** 2026-08-16 · **Source:** `exports/FINAL_REDTEAM_BACKTEST_HARNESS_2026-08-16.md` (verdict `FLOW_BLOCKED`)

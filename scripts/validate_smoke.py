@@ -318,8 +318,18 @@ def validate_smoke_run(
     from scripts.check_feature_surface import validate_feature_surface
 
     declared_metadata = (study_cfg.get("features", {}) or {}).get("metadata_columns")
+    collection_universe = None
+    if not expected_feature_list:
+        # V2 studies declare canonical FeatureInstances; resolve their physical
+        # output surface through the same authority used by OutputManager.
+        from research_workflow.output_manager import resolve_collection_allowed_feature_aliases
+        from backtests.nt_runtime.compiled_study_loader import load_compiled_study
+        collection_universe = resolve_collection_allowed_feature_aliases(
+            load_compiled_study(study_dir).spec.features
+        )
     surface_report = validate_feature_surface(
-        cand_df, expected_feature_list, metadata_columns=declared_metadata
+        cand_df, expected_feature_list, metadata_columns=declared_metadata,
+        collection_universe=collection_universe,
     )
     if not surface_report.passed:
         detail = "; ".join(f"[{f['code']}] {f['message']}" for f in surface_report.findings)

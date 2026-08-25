@@ -40,6 +40,7 @@ added); adding a name is refused, so the baseline cannot be used to launder a ne
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import sys
@@ -75,6 +76,7 @@ def _name_set_hash(names) -> str:
 
 
 PROMOTIONS_PATH = REPO_ROOT / "features" / "feature_lifecycle_promotions.json"
+CANONICAL_PROMOTIONS_PATH = REPO_ROOT / "features" / "feature_definition_promotions.json"
 
 VALID_STATUSES = ("archived", "provisional", "verified", "deprecated")
 
@@ -247,6 +249,84 @@ def evidence_for_feature(name: str, fdef: Any, repo_root: Path) -> Dict[str, Any
     }
 
 
+def structural_coverage_for_definition(name: str, fdef: Any, repo_root: Path) -> List[str]:
+    """Return declared tests that explicitly cover this definition or its family.
+
+    This is intentionally AST-based rather than a physical-alias text grep: a generic
+    test can cover the canonical implementation across representative parameters.
+    """
+    family = getattr(fdef, "coverage_family", "") or getattr(fdef, "family", "")
+    covered: List[str] = []
+    for test_rel in getattr(fdef, "tests", ()) or ():
+        path = repo_root / test_rel
+        if not path.is_file():
+            continue
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        except (OSError, SyntaxError):
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            for decorator in node.decorator_list:
+                if not isinstance(decorator, ast.Call) or not isinstance(decorator.func, ast.Name):
+                    continue
+                if decorator.func.id not in {"covers_feature", "covers_feature_family"} or not decorator.args:
+                    continue
+                arg = decorator.args[0]
+                if not isinstance(arg, ast.Constant) or not isinstance(arg.value, str):
+                    continue
+                if decorator.func.id == "covers_feature" and arg.value == name:
+                    covered.append(test_rel)
+                if decorator.func.id == "covers_feature_family" and arg.value == family:
+                    covered.append(test_rel)
+    return sorted(set(covered))
+
+
+def canonical_definition_evidence(name: str, fdef: Any, repo_root: Path) -> Dict[str, Any]:
+    impl = getattr(fdef, "implementation", "") or ""
+    return {
+        "implementation": impl,
+        "implementation_resolves": _implementation_module_exists(impl, repo_root),
+        "declared_tests": list(getattr(fdef, "tests", ()) or ()),
+        "structural_coverage": structural_coverage_for_definition(name, fdef, repo_root),
+        "implementation_sha256": feature_implementation_sha256(name, fdef, repo_root),
+    }
+
+
+def check_canonical_feature_promotions(
+    *, repo_root: Optional[Path] = None, require_promoted: bool = False,
+) -> Dict[str, Any]:
+    """Validate V2 canonical definitions and their generated promotion evidence."""
+    if repo_root is None:
+        repo_root = REPO_ROOT
+    from features.registry import CANONICAL_FEATURE_DEFINITIONS, canonical_definition_status
+    records = load_promotions(CANONICAL_PROMOTIONS_PATH)
+    violations: List[Dict[str, Any]] = []
+    evidence: Dict[str, Any] = {}
+    for name, definition in sorted(CANONICAL_FEATURE_DEFINITIONS.items()):
+        ev = canonical_definition_evidence(name, definition, repo_root)
+        evidence[name] = ev
+        if not ev["implementation_resolves"]:
+            violations.append({"feature": name, "code": "PROMOTION_IMPLEMENTATION_UNRESOLVED", "message": "canonical provider does not resolve"})
+        if not ev["structural_coverage"]:
+            violations.append({"feature": name, "code": "PROMOTION_EVIDENCE_UNBOUND", "message": "no @covers_feature or @covers_feature_family declaration"})
+        if require_promoted or canonical_definition_status(name) == "verified":
+            rec = records.get(name)
+            if rec is None:
+                violations.append({"feature": name, "code": "PROMOTION_RECORD_ABSENT", "message": "canonical definition has no generated promotion record"})
+            else:
+                reason = _promotion_record_is_complete(rec, repo_root, ev["implementation_sha256"])
+                if reason:
+                    violations.append({"feature": name, "code": "PROMOTION_RECORD_INCOMPLETE", "message": reason})
+                if not rec.get("supported_parameter_schema"):
+                    violations.append({"feature": name, "code": "PROMOTION_PARAMETER_DOMAIN_ABSENT", "message": "promotion record omits supported_parameter_schema"})
+                elif list(rec["supported_parameter_schema"]) != list(getattr(definition, "parameter_schema", ())):
+                    violations.append({"feature": name, "code": "PROMOTION_PARAMETER_DOMAIN_DRIFT", "message": "promotion record parameter domain does not match the canonical definition"})
+    return {"passed": not violations, "features": sorted(CANONICAL_FEATURE_DEFINITIONS),
+            "promotion_records": sorted(records), "violations": violations, "evidence": evidence}
+
+
 def check_feature_promotions(
     registry: Optional[Dict[str, Any]] = None,
     baseline: Optional[Set[str]] = None,
@@ -257,7 +337,14 @@ def check_feature_promotions(
     if repo_root is None:
         repo_root = REPO_ROOT
     if registry is None:
-        from features.registry import FEATURE_REGISTRY as registry  # noqa: N806
+        from features.registry import resolve_runtime_feature_aliases, resolve_runtime_feature_definition
+        # Active pipeline promotion checks resolve compatibility aliases through
+        # canonical authority.  The old physical registry remains reachable
+        # only when a unit test explicitly supplies a synthetic registry.
+        registry = {
+            name: resolve_runtime_feature_definition(name)
+            for name in resolve_runtime_feature_aliases()
+        }
     if baseline is None:
         baseline = load_baseline()
     if promotions is None:
@@ -342,7 +429,38 @@ def check_feature_promotions(
 
 def assert_feature_promotions(**kwargs) -> Dict[str, Any]:
     """Fail-closed wrapper used by the preflight gate."""
+    # After V2 cutover lifecycle authority is the activated canonical bundle.
+    # The historical per-physical-alias validator remains for explicit legacy
+    # or synthetic-registry tests, but must not reintroduce a second active
+    # promotion authority into phase-zero/build paths.
+    if not kwargs:
+        try:
+            from features.candidate_authority import ACTIVE_POINTER, load_authority
+            if ACTIVE_POINTER.is_file():
+                bundle = load_authority("active")
+                definitions = {item["canonical_name"] for item in bundle["registry"]["definitions"]}
+                facts = {item["canonical_name"]: item for item in bundle["promotion_facts"]["definitions"]}
+                missing = sorted(definitions - set(facts))
+                unverified = sorted(name for name, item in facts.items()
+                                    if name in definitions and item.get("lifecycle_status") != "verified")
+                if missing or unverified:
+                    raise FeaturePromotionError(
+                        f"CANONICAL_PROMOTION_FACTS_INCOMPLETE: missing={missing}, unverified={unverified}"
+                    )
+                return {"passed": True, "authority": "canonical_active",
+                        "canonical_definition_count": len(definitions), "violations": []}
+        except ImportError:
+            pass
     report = check_feature_promotions(**kwargs)
+    # The normal preflight path uses the authoritative registry.  Unit tests that pass
+    # a synthetic registry exercise the legacy lifecycle in isolation and must not be
+    # coupled to repository-wide V2 state.
+    if not kwargs:
+        canonical = check_canonical_feature_promotions(require_promoted=True)
+        report["canonical_definitions"] = canonical
+        if not canonical["passed"]:
+            report["passed"] = False
+            report["violations"].extend(canonical["violations"])
     if not report["passed"]:
         detail = "; ".join(f"[{v['code']}] {v['message']}" for v in report["violations"])
         raise FeaturePromotionError(f"FEATURE_PROMOTION_UNSUPPORTED: {detail}")
@@ -383,13 +501,10 @@ def main() -> int:
     ap.add_argument("--json", help="Write the promotion report to this path")
     args = ap.parse_args()
 
-    report = check_feature_promotions()
     try:
-        assert_baseline_not_extended()
+        report = assert_feature_promotions()
     except FeaturePromotionError as err:
-        report["passed"] = False
-        report["violations"].append({"feature": None, "code": "PROMOTION_BASELINE_EXTENDED",
-                                     "message": str(err)})
+        report = {"passed": False, "violations": [{"feature": None, "code": "PROMOTION_UNSUPPORTED", "message": str(err)}]}
 
     if args.json:
         Path(args.json).parent.mkdir(parents=True, exist_ok=True)
@@ -397,8 +512,8 @@ def main() -> int:
 
     print("=" * 60)
     print(f"FEATURE PROMOTION VALIDATION: {'PASS' if report['passed'] else 'BLOCKED'}")
-    print(f"Grandfathered baseline:      {report['baseline_size']}")
-    print(f"Requiring fresh evidence:    {len(report['features_requiring_evidence'])}")
+    print(f"Grandfathered baseline:      {report.get('baseline_size', 0)}")
+    print(f"Requiring fresh evidence:    {len(report.get('features_requiring_evidence', []))}")
     for v in report["violations"]:
         print(f"  [{v['code']}] {v['message']}")
     print("=" * 60)

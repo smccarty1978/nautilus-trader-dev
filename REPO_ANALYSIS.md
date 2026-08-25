@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **docs/RESEARCH_WORKFLOW.md §1**.
+>
+> Point-in-time repository analysis, taken before the `research_workflow/` consolidation.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # Repo-Wide Script Consolidation Analysis
 
 **Repo:** `smccarty1978/nautilus-trader-dev` · **Analyzed:** 1,631 Python files, 374,184 lines **Method:** read-only AST/import fingerprinting + structural clustering. No files modified except this report.

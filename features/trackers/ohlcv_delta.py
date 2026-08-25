@@ -19,7 +19,7 @@ enough completed history exists to cover it fully.
 from __future__ import annotations
 
 from collections import deque
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 
@@ -56,8 +56,23 @@ def bar_estimates(open_px: float, high: float, low: float, close: float,
 class OHLCVDeltaTracker:
     """Stateful tracker over completed 1s bars. See module docstring."""
 
-    def __init__(self, maxlen: int = 1900):
+    def __init__(self, maxlen: int = 1900, windows_seconds: Optional[Iterable[int]] = None):
+        """Create a completed-bar delta provider.
+
+        ``windows_seconds`` is deliberately an input contract, not a feature
+        identity.  The default reproduces the historical aliases exactly;
+        callers may request any positive duration no greater than the retained
+        completed-bar history.  A custom duration shares the identical
+        trailing-window calculation and availability rule -- it is not a
+        second provider or a new registry definition.
+        """
+        requested = WINDOWS_S if windows_seconds is None else tuple(int(value) for value in windows_seconds)
+        if not requested or any(value <= 0 for value in requested):
+            raise ValueError("windows_seconds must contain positive completed-bar durations")
+        if max(requested) > maxlen:
+            raise ValueError("maxlen must retain every requested completed-bar window")
         self.maxlen = maxlen
+        self.windows_seconds = tuple(sorted(set(requested)))
         self.ts: deque = deque(maxlen=maxlen)
         self.opens: deque = deque(maxlen=maxlen)
         self.highs: deque = deque(maxlen=maxlen)
@@ -193,7 +208,7 @@ class OHLCVDeltaTracker:
         atr_safe = atr if atr and atr > 0 else None
 
         window_vals: Dict[int, Dict[str, float]] = {}
-        for W in WINDOWS_S:
+        for W in self.windows_seconds:
             cutoff = obs_ts - W * NS
             mask = ts > cutoff
             cnt = int(mask.sum())

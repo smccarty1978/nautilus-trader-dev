@@ -1,437 +1,338 @@
-# NautilusTrader Development Framework - AGENTS.md
+# AGENTS.md — Shared Agent Operating Core
 
-## PURPOSE
+This is the **common core** every agent in this repository inherits, regardless of harness.
 
-This repository follows strict methodology to ensure all backtests, studies, and models produce trustworthy, reproducible results. Any NT user should be able to clone this repo and replicate results exactly.
+- **Claude** also reads `CLAUDE.md`.
+- **Codex** also reads `CODEX.md`.
+- **The authoritative description of the system is `docs/RESEARCH_WORKFLOW.md`.**
+  This file does not restate it. When you need a path, a stage, a script, an error code, or
+  a contract, go there.
 
 ---
 
-## CORE PRINCIPLES
+## 1. Mission
 
-### 1. NautilusTrader is the ONLY execution environment
-- ALL signal detection happens in NT event loop
-- ALL feature computation happens in NT event loop
-- ALL backtesting uses NT BacktestEngine
-- NO pandas for signal detection, validation, or "quick checks"
-- Pandas is ONLY for:
-  - Loading raw data into NT catalog
-  - Post-backtest analysis of NT-generated results (use NT reports first)
-  - Visualization of NT-generated results (use NT tearsheets first)
+Produce quantitative research results that are **causally sound, reproducible, and honestly
+reported**. Every rule below exists because a specific defect once produced a plausible
+wrong number that nobody caught.
 
-### 2. No look-ahead bias
-- Indicators compute on COMPLETED bars only
-- Decisions at bar N cannot use data from bar N+1
-- All features must be computable in real-time
+The two failure modes to fear, in order:
 
-### 3. Reproducibility
-- All parameters in config files (YAML)
-- All random seeds fixed and documented
-- All data sources versioned
-- Results include exact config used
+1. A result that is wrong in a way that looks right.
+2. A result nobody can reproduce through the contracts.
 
-### 4. Separation of concerns
-- Indicators: Reusable, strategy-agnostic
-- Strategies: Config-driven, indicator-agnostic
-- Backtests: Strategy-agnostic runners
-- Analysis: Works on any backtest output
+Slowness is not in the top two.
 
-### 5. Factory-first study creation
-- Every new study MUST be configured via `study.yaml`, scaffolded via `python scripts/create_study.py --config <study.yaml>`, and validated via `python scripts/compile_study.py`.
-- Coding agents MUST NOT create study-specific implementations for behavior already representable by a canonical study type (e.g. `flip_prediction`).
-- A coding agent proposing bespoke code must provide `BESPOKE_JUSTIFICATION` before implementation.
-
-### 6. Research Decision Contract Authority & Fidelity
-- Precedence: `research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code`.
-- BEFORE drafting or modifying `SPEC.md`: Create or verify `research_decision.yaml`.
-- `SPEC.md` must be derived from `research_decision.yaml`. No study may compile or pass preflight unless decision-contract fidelity passes (`python scripts/check_research_decision_fidelity.py --study studies/<name>`).
-- Behavioral Rule: Never improve, broaden, clean up, or make a study more statistically pure by changing a fixed baseline or adding feature discovery unless the Research Decision Contract explicitly permits it. If a design concern exists, surface it as a caveat; do not silently alter the experiment.
 ---
 
-## DOCUMENTATION INDEX
+## 2. Repository architecture (one screen)
 
-Implementation detail lives in `docs/`. Do not guess — read the relevant spec
-before writing code. These files are canonical; this document intentionally does
-not restate them.
-
-| Topic | Spec |
+| Directory | Owns |
 |---|---|
-| End-to-end research workflow, stage gates, CLI reference, escalation rules | `docs/RESEARCH_WORKFLOW.md` |
-| Wrangling, catalog build, validation, timestamp convention | `docs/DATA_CATALOG.md` |
-| Runner setup, StrategyConfig, parameter sweeps, logging | `docs/BACKTEST_EXECUTION.md` |
-| NT built-in reports, tearsheets, key metrics | `docs/ANALYSIS_REPORTING.md` |
-| Feature collection, MFE/MAE replay, ML requirements, pitfalls | `docs/STUDY_METHODOLOGY.md` |
-| Indicator and Strategy `SPEC.md` templates | `docs/TEMPLATES.md` |
-| Profiling, Cython/Rust thresholds, ONNX inference | `docs/PERFORMANCE.md` |
-| Feature registry contract | `features/FEATURE_REGISTRY_CONTRACT.md` |
+| `features/` | Canonical feature definitions, providers, resolver, authority bundle |
+| `research_workflow/` | The reusable governed research lifecycle, the generic collector, modeling, analysis, forward outcomes |
+| `research/` | Analysis harness, schemas, engines, study types |
+| `studies/<id>/` | One study's hypothesis, contracts, decisions, audits, results. Small hooks only |
+| `strategies/` | Executable trading strategies only |
+| `backtests/` | NT runtime (`nt_runtime/`) and the two supported entrypoints |
+| `scripts/` | Operational, audit, lifecycle and diagnostic CLIs |
+| `archive/`, `scratch/`, `runs/`, `features/archive/` | Historical or generated. Never an active implementation |
 
+```
+NEW STUDY != NEW INFRASTRUCTURE
+```
+
+Full map: `docs/RESEARCH_WORKFLOW.md` §1.
 
 ---
 
-## AGENT GOVERNANCE
+## 3. Mandatory lifecycle
 
-### Audit gates (mandatory: pre-execution and completion)
+```
+PREPARE+FREEZE -> READINESS -> PREFLIGHT -> CAUSAL REVIEW -> CONTRACT REVIEW -> SEAL
+   -> NT SMOKE -> RECONCILE -> AUTHORIZE -> TRAIN COLLECT (partitioned) -> MERGE
+   -> FIT -> TRAIN FREEZE -> OOS OPEN -> OOS -> ANALYSIS -> DECISION
+```
 
-For any of the following, the split audit is required **before the first study
-collector, label builder, model-training script, backtest, or staged runner is
-executed**. Unit tests and deterministic lint may run first so the audit has a
-testable code surface. After execution, `contract-checker` verifies the
-materialized deliverables; a completion causal re-audit is required only if the
-audited code/configuration surface changed.
+Detail, entry points and outputs: `docs/RESEARCH_WORKFLOW.md` §3.
 
-- A new strategy file or material edit to an existing one
-- A new study/research script that produces results you'll act on
-- Any change to data loading, feature engineering, or label construction
+Non-negotiable properties of that order:
 
-**The gate is split.** Two agents with disjoint scope, defined in
-`docs/CAUSAL_CHECKLIST.md` § SCOPE SPLIT:
+- **No execution before the seal.** No collection, label build, training, backtest or staged
+  run happens before preflight is `CLEAR` and both reviews have issued a status.
+- **The freeze goes stale on any execution-affecting change.** Re-run PREPARE, then redo
+  preflight → reviews → seal. `research_workflow/__init__.py` is inside the execution
+  closure; even a cosmetic `__all__` edit stales a sealed study.
+- **Gates read JSON.** `audit/status.json`, `audit/contract_status.json`,
+  `audit/preflight.json`. Never prose. A gate that greps a long report for "critical" and
+  "0" passes on a failing audit that happens to contain an earlier clean summary — that has
+  actually happened here.
+- **The two reviews have disjoint scope** and neither may report the other's category
+  (`docs/CAUSAL_CHECKLIST.md`). That boundary is what stopped 18-pass audit loops.
+- **Re-audits are bounded.** Pass 2+ adjudicates every prior finding before raising new
+  ones; at most 3 new CRITICALs per pass; a **new** `audit/pass_NN.md` file, never an append.
 
-| Agent | Owns | Must not report |
-|---|---|---|
-| `lookahead-auditor` | A, B, C1–C3, F, G, H — causality and timestamps | deliverables, manifests, seal design, test quality |
-| `contract-checker` | C4, D, E + the SPEC's Deliverables Manifest | novel causal theories |
+---
 
-Splitting them is deliberate. Across ~100 historical audits, ~60% of blocking
-findings were completeness issues raised by the causal auditor, which has no
-natural stopping point for them —
-`studies/codex_5.6_short_rth_enriched_volume_level_retrain/` ran **18 passes**
-and produced a 1,240-line append-only `audit.md`.
+## 4. Causality and TRAIN/OOS
 
-Pre-execution workflow:
+**Contract authority:** `research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code`.
 
-1. Freeze the SPEC/config and implement the smallest testable code surface. Do
-   not run collection, label construction, model fitting, backtesting, or a
-   staged runner yet.
-2. **Run deterministic preflight first.** `python scripts/research_preflight.py --study studies/<name>`.
-   It orchestrates AST causal linting (`causal_lint.py`), artifact schema checks (`check_artifact_schema.py`),
-   model/feature binding (`check_model_binding.py`), and fast causal canaries (`select_required_tests.py` -> pytest)
-   deterministically and for free.
-   - If preflight is `BLOCKED`, inspect `audit/failure_packet.json` and resolve all issues locally.
-   - Coding agents may NOT bypass a `BLOCKED` preflight or request an audit while preflight is failing.
-3. Once preflight is `CLEAR`, invoke `lookahead-auditor` on the causal contract; invoke `contract-checker`
-   on the Deliverables Manifest. They are independent and may run in parallel.
-4. Each writes a **new** `audit/pass_<NN>.md` plus a machine-readable
-   `audit/status.json` (`contract_status.json` for the contract-checker).
-   **Never append to a previous pass's report** — append-only files make the
-   verdict unparseable, and a gate that greps for "critical" and "0" will pass
-   on a failing report that merely contains an earlier clean summary.
-5. Address every CRITICAL finding by editing the code (do not dismiss without
-   explicit user approval). Address WARNINGs unless out of scope or waived.
-6. Re-invoke on the same scope, **passing the previous pass's findings**. The
-   auditor must adjudicate every prior finding (`FIXED` / `NOT FIXED` /
-   `WITHDRAWN`) *before* raising anything new, and may raise **at most 3 new
-   CRITICAL findings per pass.**
-7. Repeat 5–6 until `status.json` shows `critical: 0` and either zero WARNING or
-   user-acknowledged WARNING.
-8. Only after both statuses are clean may the study/model execution begin. If
-   code or configuration changes afterward, re-run lint and the affected audit
-   before executing the changed pipeline. Before acceptance, run
-   `contract-checker` against the materialized deliverables and re-run the causal
-   audit if the audited code/configuration surface changed.
+- NautilusTrader is the **only** execution environment for signal detection, validation and
+  backtesting. Pandas loads raw data and post-analyses NT outputs. Nothing else.
+- Indicators compute on **completed bars only**.
+- Bar timestamps: catalog `ts_event` is OPEN-stamped; `ts_init = ts_event + bar_duration_ns`.
+  1s bars arrive **before** their parent 1m bar — buffer and replay them retroactively from
+  fill time or you will miss the first minute of price action.
+- **OOS may not influence** feature selection, preprocessing, model class, hyperparameters,
+  calibration, thresholds, or deciles. Those are frozen into
+  `artifacts/train_experiment_freeze.json` *before* OOS opens.
+- `research_workflow.experiment.assert_oos_open` is the only door. Do not route around it.
+- **Forward outcomes are labels, never inputs.** `research_workflow/forward_outcomes/guard.py` fails closed at
+  fit time and at freeze time. Never loosen it — its patterns are anchored precisely so that
+  `rolling_300s_giveback_atr` (causal) passes while `max_mfe_atr` (post-event) is caught.
+- **Never improve a study.** Do not broaden a baseline, clean up a population, or add feature
+  discovery to make a study more statistically pure unless the decision contract explicitly
+  permits it. Surface the concern as a caveat; do not silently alter the experiment.
+- **A baseline must include the losers the entry rule pays for.** Excluding them is a sign
+  flip, not a smaller sample.
 
-Gates read `audit/status.json`. Do not parse prose for a verdict.
+---
 
-Do not skip the audit because the change "looks small". Look-ahead bugs are most often introduced by small edits to previously-clean code.
+## 5. Feature System V2
 
-### Commit protocol (mandatory)
+**The runtime is canonical-only.** Read `docs/RESEARCH_WORKFLOW.md` §2 before touching a
+feature.
 
-Every phase gate ends with a commit. A study that runs for days without commits
-cannot be bisected when a defect is found late, and audit reports lose their
-anchor to the code they audited.
+A canonical feature names a formula, a provider, and causal/reset/null semantics.
+**Timeframe, window, lookback, period, context, bar_state and cadence are PARAMETERS.**
 
-**Commit at these points, and only these:**
+```yaml
+- feature: regime_efficiency
+  parameters: {timeframe: 5m, context: prior, bar_state: completed}
+```
 
-| Trigger | Message prefix | Must include |
-|---|---|---|
-| SPEC frozen (before implementation) | `spec(<study>):` | `SPEC.md`, `config/*.yaml` |
-| Phase gate passed (`status.json` clean) | `phase(<study>): <phase> <verdict>` | code + `audit/pass_NN.md` + `audit/status.json` + `audit/pass_ledger.json` + `audit_lineage/<study>.json` |
-| Study accepted | `study(<study>): ACCEPTED` | `BUILD_REPORT.md` / `STUDY_REPORT.md` + manifests |
-| Tooling / governance change | `chore:` or `docs:` | — |
+- "1m EMA" is not a separately named feature.
+- `timeframe: 1m, bar_state: completed` / `bar_state: forming, update_every: 5s` /
+  `window: 300s, update_every: 1s` are three different things and must stay different.
+- Ambiguous temporal semantics **fail closed**. Fix the declaration; do not add a default.
+- Physical aliases are output column names, generated from the instance. Never a study input.
+- Legacy alias resolution requires an explicit `legacy_mode=True` historical replay. There is
+  no active fallback and none may be added.
+- Do not add a provider to support another timeframe/window/period. That is a parameter.
 
-Rules:
+---
 
-1. **Never commit on `main`.** Branch first: `study/<study_name>` or
-   `chore/<topic>`. Open a PR when the study is accepted.
-2. **The audit artifact commits with the code it audited.** A `pass_NN.md`
-   committed separately from its code is unanchored — the scope hash it records
-   must correspond to the tree in that same commit.
-3. **The durable audit anchor commits with the pass it anchors.**
-   `audit_lineage/<study>.json` is the half of the audit-immutability control that
-   survives deleting `studies/<id>/audit/`, and git is what makes it durable — an
-   uncommitted anchor is only as durable as the working tree. `git clean -xdf` on an
-   uncommitted anchor is a silent audit-history reset. It is **not** generated data and
-   is exempt from rule 4; see `audit_lineage/README.md`.
-4. **Never commit generated data.** `canonical_*/`, `_work/`, `results/*.parquet`,
-   `artifacts/**/model.joblib` stay untracked. Commit the *manifests* and hashes
-   that identify them, not the bytes.
-5. Run `python scripts/causal_lint.py` and `python scripts/sync_agents.py --check`
-   before committing. Both must exit 0.
-6. Do not use `--no-verify` or skip hooks.
+## 6. Autonomy policy
 
-### Agent definition parity (all three harnesses)
+**A gate failure means: do not advance past the gate. It does not mean: stop and report
+`BLOCKED`.**
 
-`.claude/agents/*.md` is the **canonical** source. `.agents/agents_staging/*.md`
-(Antigravity) and `.codex/agents/*.toml` (Codex) are **generated** — do not edit
-them by hand.
+Autonomously, without asking: diagnose the deterministic defect, fix it at the owning layer,
+add or update a targeted test, re-run the affected bounded check, regenerate stale
+deterministic artifacts, and resume from the correct lifecycle stage.
+
+**Terminal stop only for:** genuine semantic ambiguity · data safety risk · authorization
+ambiguity · inability to preserve causality or TRAIN/OOS correctness · a real capability gap
+· prohibited data access risk. Say which one.
+
+Full policy and failure routing: `docs/RESEARCH_WORKFLOW.md` §12.
+
+---
+
+## 7. Data safety — DESTRUCTIVE FILESYSTEM SAFETY (mandatory)
+
+Before any recursive deletion: inspect every descendant for symlinks, **junctions**, mount
+points and Windows reparse points; resolve paths (`Path.resolve()`, not string prefixes);
+confirm the target is inside repository-owned storage; **fail closed** if anything escapes —
+do not delete "the safe part". Use `scripts/safe_cleanup.py::assert_safe_to_delete`.
+
+`os.path.islink()` returns `False` for a Windows directory junction. A cleanup of a
+"throwaway" worktree once followed a junction out of it and destroyed 179 GB of live data.
+
+**Never junction live `data/` into a disposable worktree.**
+**Never silently substitute a dataset.** If the authorized source is unavailable, fail closed.
+
+---
+
+## 8. Testing policy
+
+- **Targeted over global.** `python scripts/select_required_tests.py` picks the tests a change
+  actually requires. Running the whole suite repeatedly is latency, not diligence.
+- **Bounded before expensive.** Synthetic fixture → 1 day → 1 week → 1 month → full. Verify
+  metrics before expanding. Never auto-expand a stage.
+- A repair needs a test that **fails before it and passes after it**. A fix with no test is a
+  fix that will come back.
+- Deterministic checks before LLM reasoning. `research_workflow.preflight` costs zero tokens.
+- **Parity failures:** run `scripts/find_first_parity_divergence.py` **first**. No broad
+  investigation before first-divergence localization has pinpointed the earliest failing
+  timestamp, stage and field.
+
+---
+
+## 9. Documentation and artifacts
+
+- Detailed evidence goes to **artifacts** (`audit/*.json`, `audit/pass_NN.md`,
+  `validation_report.json`). Chat responses stay short.
+- Report exact paths, exact SHAs, exact row counts. "It worked" is not a report.
+- Scratch pandas output is **NON-AUTHORITATIVE** and must be labelled so. It may not be
+  quoted as a result or used to close a research question.
+- Report outcomes faithfully. If tests fail, say so with the output. If a step was skipped,
+  say that.
+- If a study reports a delta between model arms, it must state which integrity checks it
+  verified (`docs/RESEARCH_WORKFLOW.md` §6.2). An unverified arm delta is a hypothesis.
+- **Never commit generated data** — `runs/`, `canonical_*/`, `_work/`, `*.parquet`,
+  `*.joblib`, `*.onnx`. Commit the manifests.
+
+---
+
+## 10. Commit protocol
+
+- Branch: `study/<name>` or `chore/<topic>`. **Never commit on `main`.**
+- Commit code together with the `audit/pass_NN.md` + `status.json` that audited it, so the
+  scope hash matches the tree.
+- Commit at every phase gate.
+- Never skip hooks (`--no-verify`) or bypass signing unless explicitly asked.
+- Commit or push only when asked.
+
+---
+
+## 11. Subagents
+
+`.claude/agents/*.md` is **canonical**. `.agents/agents_staging/*.md` and
+`.codex/agents/*.toml` are **generated**:
 
 ```bash
-python scripts/sync_agents.py           # regenerate from canonical
+python scripts/sync_agents.py           # regenerate
 python scripts/sync_agents.py --check   # verify in sync
 ```
 
-This exists because the harnesses silently drifted: the Codex auditor was
-missing 14 checklist rules including `C4` and `D4`, the #2 and #4 most frequent
-finding categories in the repository. An audit that passed under Codex would
-fail under Claude, causing rework on every harness switch. Agent definitions
-must **reference** `docs/CAUSAL_CHECKLIST.md`, never restate rules inline;
-`sync_agents.py` warns when a definition inlines rule text.
+Do not hand-edit the generated files. The harnesses previously drifted far enough that the
+Codex auditor was silently missing 14 checklist rules including C4 and D4 — the #2 and #4
+most frequent finding categories in this repository.
 
-### Standing Authorization for Named Mandatory Agent Gates
+### Roster — six roles
 
-Named mandatory gates in this repository constitute standing user authorization for the main orchestrator to invoke the specifically named agent when that gate condition is reached.
+| Agent | Codex `agent_type` | Owns | Tier | Cap |
+|---|---|---|---|---|
+| `repo-scout` | `repo_scout` | Inventory; locating the authoritative implementation; stale/duplicate paths; execution-closure and dependency reasoning; where a change belongs | Haiku / low | 700w — paths, symbols, line ranges |
+| `lookahead-auditor` | `lookahead_auditor` | Causality: look-ahead, timestamp legality, event order. Checklist **A, B, C1–C3, F, G, H** | Sonnet / high | 1,500w report |
+| `contract-checker` | `contract_checker` | Governance: TRAIN/OOS separation, authorization, freeze/seal freshness, provenance, deliverables, model-integrity declarations. Checklist **C4, D, E** | Sonnet / medium | 1,000w compliance table |
+| `implementer` | `implementer` | Deterministic fixes, wiring, targeted tests, bounded fixtures, integration, first-broken-stage tracing | Sonnet / medium | — |
+| `research-executor` | `research_executor` | Governed collection, partitioned TRAIN, reconciliation, fitting, TRAIN freeze, OOS opening and scoring, artifact production | Sonnet / medium | — |
+| `analysis-decider` | `analysis_decider` | Reading generated artifacts, model comparison, forward-outcome interpretation, the research conclusion | Sonnet / high | — |
 
-This authorization applies only to:
+`Explore` (`.claude/agents/Explore.md`, Claude-only) is **a model pin, not a role** — it stops
+the built-in fan-out search agent inheriting the orchestrator's model. Prefer `repo-scout`.
 
-- `repo-scout` / Codex `repo_scout` where the selected risk tier requires it
-- `contract-checker` / Codex `contract_checker` where the selected risk tier requires it
-- `results-triager` / Codex `results_triager` for exact approved test commands
-- `lookahead-auditor` / Codex `lookahead_auditor` at mandatory causal or look-ahead audit gates
+**Ownership is exclusive.** Causality belongs to `lookahead-auditor` and governance to
+`contract-checker`; neither may report the other's category. Code changes belong to
+`implementer`, lifecycle execution to `research-executor`, and conclusions to
+`analysis-decider` — an agent that finds work outside its own column refers it in one line
+and moves on.
 
-The invocation must remain limited to the scope of the named gate.
+Why this set, and why there is deliberately no separate performance agent:
+`docs/SUBAGENT_ROSTER.md`.
 
-This standing authorization does not permit:
+### Shared audit protocol
 
-- discretionary agent use
-- unnamed or general-purpose agents
-- broad parallel fan-out
-- nested delegation
-- workers spawning subagents
-- expanding the audit into implementation work
-- code modifications by an audit-only agent
+Both audit gates obey this. It is stated **here only**; the agent cards do not restate it.
 
-Session-level instructions prohibiting discretionary agent spawning remain in force. They do not prevent execution of a specifically named mandatory repository gate covered by this standing authorization.
+- **Distinct declared identities.** The causal and contract reviews are independent roles and
+  must be authored by different declared reviewers. `scripts/run_preexec_audits.py` enforces
+  this (`AUDITOR_ROLE_REUSE`) — one reviewer authoring both reports is a one-reviewer workflow
+  wearing a two-reviewer seal. The agent name is the **role**, not the identity; do not
+  substitute it unless it is genuinely the externally declared identity for the invocation.
+- **The reviewer declares the audited composite**; tooling verifies it against
+  `scripts/resolve_execution_manifest.py` and never self-generates or stamps it. If the
+  composite has moved, the freeze is stale — report `INCOMPLETE` and stop rather than auditing
+  a moving target.
+- **One new file per pass.** `audit/pass_NN.md` (causal) / `audit/contract_pass_NN.md`
+  (contract). Never append — append-only reports reached 1,240 lines and became unparseable.
+- **Bounded re-audit.** Pass 2+ adjudicates every prior finding (`FIXED` / `NOT FIXED` /
+  `WITHDRAWN`, one line of evidence) *before* raising anything new, then at most **3 new
+  blocking findings per pass**. Never re-raise an addressed finding under new framing — mark
+  the original `NOT FIXED`.
+- **Every report carries exactly one machine-parsed summary block**, which is what
+  `run_preexec_audits.py` reads to issue the official status:
 
-If a mandatory gate and a session-level restriction appear to conflict, the orchestrator should:
+  ```
+  <!-- AUDIT_SUMMARY_V2_START -->
+  {"verdict": "CLEAR", "audit_type": "causal|contract", "auditor": "<declared reviewer>", "critical": 0, "warning": 0, "note": 0, "study": "<study_id>", "audited_execution_composite_sha256": "<declared composite>"}
+  <!-- AUDIT_SUMMARY_V2_END -->
+  ```
 
-1. invoke only the specifically named mandatory gate;
-2. keep the scope limited to the gate’s defined responsibilities;
-3. avoid all additional agent delegation; and
-4. record the invocation and resulting verdict in the study artifacts.
+  `verdict` is strictly `CLEAR`, `BLOCKED` or `INCOMPLETE`. A line counts as a finding only
+  when it is a heading or bullet of the form `SEVERITY: <title>`. Gates read this block, never
+  prose.
+- **Filing path** when the agent cannot write its own report:
 
-Passing criteria remain governed by the applicable frozen contract or SPEC. Standing authorization to invoke an auditor does not relax the audit acceptance standard. Do not mark the work finalized unless the audit satisfies the acceptance gate defined by the applicable frozen SPEC. At minimum, any CRITICAL finding blocks finalization. Any WARNING must either be remediated or explicitly adjudicated according to the SPEC; do not silently treat an unresolved WARNING as cleared.
+  ```
+  python scripts/run_preexec_audits.py --study <study_dir> --pass-num <NN>       --type causal|contract --ingest <report.md> --author "<who you are>"
+  ```
 
-**Immediate component audit for high-risk logic.** The universal pre-execution
-gate above applies to every study and model-training pipeline. For the following
-components, invoke the harness-specific lookahead auditor immediately after that
-component is implemented, before any dependent code is added or any execution
-occurs:
-- state-smoothing / hysteresis state machines
-- matched-donor or nearest-neighbor selection logic (placebos, controls)
-- any shuffle/permutation/circular-shift control
-- stop/exit fill-timing mechanics (new or reused from another study)
+  It validates and re-derives the status itself, so filing never requires anyone to author a
+  verdict on another reviewer's behalf.
 
-If the component reuses another study's execution stack "verbatim," audit it anyway — a bug inherited from upstream is still a bug in your results. (See `studies/rl_regime_feasibility/contextual_runner_exit_v3/`: a completion-gate-only audit found 4 CRITICAL issues — a phantom stop-fill price inherited from a reused sim stack, a matched-placebo geometry mismatch, and two matched-donor/shuffle controls that leaked outcome-correlated or future information — only after the entire pipeline had already been run once and was partway through a second run.)
+### Shared subagent principles
 
----
+Every subagent inherits these:
 
-## DIRECTORY STRUCTURE
-
-```
-{repo_root}/
-│
-├── AGENTS.md                    # Framework rules & governance
-├── CLAUDE.md                    # Core invariants & quick reference
-│
-├── docs/                        # Operational specs & workflow manuals
-│   ├── RESEARCH_WORKFLOW.md     # Primary end-to-end research workflow manual
-│   ├── CAUSAL_CHECKLIST.md      # Disjoint ruleset for causal & contract auditors
-│   └── DATA_CATALOG.md          # Catalog wrangling & timestamp conventions
-│
-├── backtests/                   # Standalone & generic study backtest execution
-│   ├── nt_runtime/              # Canonical NT engine builder & modes
-│   ├── run_backtest.py          # Supported standalone CLI entrypoint
-│   ├── run_nt_study.py          # Supported declarative study collection CLI
-│   └── configs/                 # Config YAMLs for standalone runs
-│
-├── features/                    # Central feature registry & stateful trackers
-│   ├── registry.py              # Canonical feature definitions & metadata
-│   ├── FEATURE_REGISTRY_CONTRACT.md
-│   └── trackers/                # Real-time stateful feature tracker implementations
-│
-├── indicators/                  # Reusable indicator definitions & registry
-│   └── registry.py
-│
-├── strategies/                  # Reusable NT strategy implementations & registry
-│   └── registry.py
-│
-├── research/                    # Analysis schemas, contract compilers, engines & harness
-│   ├── analysis/                # Canonical validated analysis package (on analysis-harness branch if unmerged)
-│   ├── schemas/study_spec.py    # Authoritative StudySpec pydantic model
-│   └── engines/                 # Low-level feature binding, target & lineage engines
-│
-├── studies/                     # Declarative research studies
-│   └── {study_name}/
-│       ├── research_decision.yaml # Authoritative decision contract
-│       ├── study.yaml           # Machine-readable spec
-│       ├── SPEC.md              # Rendered specification
-│       ├── compiled_study.json  # Compiled sha256-bound contract
-│       ├── audit/               # Audit pass reports & status.json
-│       ├── artifacts/           # Sealed execution manifests & frozen weights
-│       └── results/             # Study reports & analysis artifacts
-│
-├── models/                      # Trained models & frozen artifacts
-│   └── artifacts/               # Joblib / ONNX weights
-│
-└── scripts/                     # Preflight, audit, sync, and orchestration scripts
-    ├── create_study.py          # Scaffold new study from study.yaml
-    ├── compile_study.py         # Compile & validate study contracts
-    ├── research_preflight.py    # Deterministic AST lint, schema & test preflight
-    ├── run_preexec_audits.py    # Deterministic audit provenance & status parser
-    ├── preexec_audit_seal.py    # Cryptographic pre-execution seal manager
-    └── sync_agents.py           # Cross-harness agent definition generator
-```
----
-
-## TIMEZONE & TIMESTAMP CONVENTION
-
-All timestamps in Central Time (America/Chicago) for display/analysis.
-Internal NT uses UTC. Convert for human-readable output.
-
-```python
-import pytz
-CT = pytz.timezone('America/Chicago')
-
-def to_ct(utc_timestamp):
-    return utc_timestamp.astimezone(CT)
-```
-
-RTH (Regular Trading Hours): 08:30 CT - 15:15 CT
-
-### Canonical Bar-Availability & Timestamp Contract
-- **Raw Databento OHLCV:** OPEN-stamped (`ts_event`). Complete OHLCV becomes usable only at interval close.
-- **Offline Research:** Normalize derived bars to CLOSE-stamped indices (`label='right', closed='left'`).
-- **NautilusTrader Catalog:** Preserve open-stamped `ts_event` and set `ts_init = ts_event + bar_duration_ns` (1s: +1s, 1m: +60s, 3m: +180s, 5m: +300s) so the NT event loop dispatches completed bars at interval close.
-
----
-
-## VERSION CONTROL
-
-### What to commit
-- All code (strategies, indicators, scripts)
-- All configs (YAML)
-- All SPEC.md files
-- requirements.txt / pyproject.toml
-- This AGENTS.md
-
-### What to .gitignore
-```
-data/raw/           # Large data files
-data/catalog/       # Generated
-backtests/results/  # Generated (archive important ones)
-models/artifacts/   # Large model files
-logs/               # Generated
-__pycache__/
-*.pyc
-.env
-```
-
-### Results archiving
-For significant results, create a tagged release with:
-- Config used
-- Summary metrics
-- Link to full results (external storage if large)
----
-
-## LESSONS LEARNED
-
-1. **Pandas validation is invalid** - Breakdown strategy showed 63% WR in pandas, 11% in NT due to look-ahead
-2. **Timestamp handling is critical** - Databento OPEN timestamps require ts_init = ts_event + bar_duration_ns in NT catalog to prevent look-ahead bias
-3. **MFE/MAE from pandas may be inflated** - Only trust NT backtest results
-4. **CTB checked at touch time, not breach time** - Order of operations matters
-5. **Regime change bar can be breach bar** - Don't return early on regime change
-6. **Touch counting resets only on regime change** - Not on new breaches
-7. **Collector MFE/MAE blind spot** - 1s bars process before parent 1m bar in NT. Swing breakout collector showed +$70/trade but NT backtest showed -$3/trade. Root cause: 44% of trades hit SL in the first 60s that were invisible to the collector. Trades surviving 60s matched collector exactly (62% WR, +$63/trade). Fix: buffer 1s bars and replay from fill time.
-8. **Recursive deletion escaped a disposable workspace and destroyed real data** - a cleanup of what was believed to be a throwaway worktree followed a link out of it. On Windows this is easy to miss: junctions and other reparse points are not symlinks and do not look like them.
-
----
-
-## DESTRUCTIVE FILESYSTEM SAFETY (mandatory)
-
-**Never recursively delete, clean up, or remove a worktree/path without first checking
-every descendant for symlinks, junctions, mount points, or Windows reparse points that
-escape the disposable workspace.**
-
-Recursive deletion must **fail closed**: if any descendant resolves outside the intended
-disposable root, abort the whole operation rather than deleting "the safe part". A partial
-delete of a tree you did not fully understand is how the incident above happened.
-
-Concretely:
-
-- **Do not use `rm -rf` against repo or worktree trees containing external data
-  junctions.** `data/catalog/` in particular may be a link to storage that lives outside
-  the repository.
-- Resolve before you delete. A path that *looks* inside the root is not necessarily
-  inside it — `Path.resolve()` is what decides, not the string.
-- On Windows, check for reparse points, not just symlinks. `os.path.islink()` returns
-  False for a directory junction.
-- `scripts/safe_cleanup.py::assert_safe_to_delete` implements this check. Use it, or
-  replicate it, before any recursive removal of a directory you did not create in this
-  session.
-
-This is a safety rule, not a framework. It is deliberately one function and one
-prohibition.
-
-<!-- BEGIN SUBAGENT ROUTING -->
-## Subagent Routing & Lean Workflow
-
-Keep architecture, causal interpretation, integration, and final approval in the main session. Claude agent names are hyphenated. Codex `name` / `agent_type` values use underscores; filenames may remain hyphenated for easy cross-harness comparison. Use the exact harness-specific identifier below when invoking an agent.
-
-### Roster
-
-| Agent | Codex `agent_type` | Role | Model tier | Output cap | Available in |
-|---|---|---|---|---|---|
-| `repo-scout` | `repo_scout` | Locate files, trace execution paths | Haiku / low | 700w — paths, symbols, line ranges only | Claude, Codex |
-| `contract-checker` | `contract_checker` | Compare code/tests against explicit specs | Sonnet / medium | 1,000w — compliance table + findings only | Claude, Codex |
-| `results-triager` | `results_triager` | Run exact approved pytest commands | Haiku / low | 500w — failures, root-cause tracebacks, commands | Claude, Codex |
-| `lookahead-auditor` | `lookahead_auditor` | Internal causal / look-ahead review (self-attested) | Sonnet / high | 1,500w — complete Markdown report, parent persists | Claude, Codex |
-| `Explore` | — | Broad fan-out location sweep; prefer `repo-scout` | Haiku / low | 700w — paths and symbols only | **Claude only** |
-| `implementation-worker` | `implementation_worker` | Implement one frozen, bounded task packet | Sonnet-class / medium | — | **Codex only** |
-
-Tier rationale and the no-escalate-for-length rule: `CLAUDE.md` § LEAN WORKFLOW
-(*Model tiering*). Exact model ids live in the `.claude/agents/*.md` frontmatter
-(canonical) and in `CODEX_META` in `scripts/sync_agents.py` (per-harness). The
-`Explore` definition exists only to pin the model — the built-in agent inherits
-the orchestrator's model, which is Opus.
-
-### Risk tiers
-
-Not every task needs the full ceremony.
-
-* **Tier 1 — small diagnostic / local fix:** main session → deterministic tests → local smoke. No planning agent or auditor unless the change touches core causal or timing logic.
-* **Tier 2 — normal research study:** planning → freeze SPEC → main-session implementation + tests → split pre-execution audit → staged runner → completion contract check; causal re-audit only if the audited surface changes.
-* **Tier 3 — model freeze / deployment:** `repo-scout` → freeze SPEC → main-session implementation + tests → split pre-execution audit → staged runner → completion contract check; causal re-audit only if the audited surface changes.
+1. **Authoritative implementation first.** Find what exists before proposing anything.
+2. **No duplicate infrastructure.** No second collector, auditor, analysis loader, or runner.
+3. **Feature V2 canonical semantics.** Never rewrite feature identity around timeframes.
+4. **Causal and TRAIN/OOS correctness above all.**
+5. **Deterministic defects are fixable** — diagnose and repair rather than reporting `BLOCKED`.
+6. **Targeted tests.**
+7. **Bounded before expensive.**
+8. **No silent dataset substitution.**
+9. **No unsafe recursive cleanup.**
+10. **Exact artifact and provenance reporting.**
 
 ### Coordination rules
 
-* Spawn `repo-scout` and `contract-checker` (Codex: `repo_scout`, `contract_checker`) in parallel only when their assignments are independent; wait for both before freezing the task packet.
-* Never run multiple writing agents in the same worktree concurrently.
-* Do not duplicate searches or tests a subagent already completed.
-* Subagent prompts must be self-contained — child agents do not inherit the parent conversation.
+- Worker and coding agents **cannot spawn subagents**. Only the main orchestrator invokes the
+  named gates.
+- Spawn `repo-scout` and `contract-checker` in parallel only when their assignments are
+  independent.
+- Never run two writing agents in the same worktree concurrently.
+- **Never use an agent for process monitoring.** Use `scripts/run_bounded_study.py` and read
+  its JSON status card.
+- Subagent prompts must be self-contained — children do not inherit the parent conversation.
+- **Model tiering: the cheapest model that can be trusted with the decision.** Never put a
+  research-blessing gate on Haiku; never route discovery through a parent-model agent. Do not
+  escalate a model because a task is long — a 5,000-line test log does not need Opus; a
+  three-line timestamp question might. Changing a gate's model is a framework change and
+  needs the escalation justification in `docs/RESEARCH_WORKFLOW.md` §1.
 
-### Diff-first auditing
+### Standing authorization
 
-* Auditors use the contextual diff (`git diff -U20`) as the primary review surface.
-* Open full files only to resolve state flow, causality, base-class dependencies, or import behavior.
-* Do not reopen unchanged files to repeat discovery — only when full context is needed to resolve a live causal, structural, or audit question.
+The named gates above may be invoked without asking, scoped strictly to the gate. No
+discretionary, general-purpose, nested, or fan-out agent use beyond that.
 
-### Deterministic process control
+### Required delegation packet
 
-* Never use an LLM or agent for process monitoring or status reporting.
-* Use `scripts/run_bounded_study.py` to enforce time limits, log capture, CPU/memory limits, and stale-progress detection, and to emit a status JSON card.
-* The main session reviews the compact JSON status card, not raw output logs.
-<!-- END SUBAGENT ROUTING -->
+Exact objective · exact paths/subsystem · relevant symbols · applicable spec sections ·
+required output format and word cap · explicit prohibitions · known facts vs. open questions.
 
-## Central Feature System
+---
 
-See `CLAUDE.md` § Central Feature System (canonical). In short: check
-`features/FEATURE_REGISTRY_CONTRACT.md` and `features/registry.py` before
-creating, modifying, or locally reimplementing any feature.
+## 12. Documentation index
+
+| Topic | Document |
+|---|---|
+| **The workflow (authoritative)** | `docs/RESEARCH_WORKFLOW.md` |
+| Causal/contract audit ruleset A1–H4 | `docs/CAUSAL_CHECKLIST.md` |
+| Which docs are current, which are stale | `docs/DOCUMENT_MAP.md` |
+| Feature lifecycle and promotion | `features/FEATURE_REGISTRY_CONTRACT.md` |
+| Canonical feature vocabulary | `features/CANONICAL_FEATURE_REFERENCE.yaml` |
+| Catalog and data | `docs/DATA_CATALOG.md` |
+| Backtest execution and configs | `docs/BACKTEST_EXECUTION.md` |
+| Study methodology, MFE/MAE replay | `docs/STUDY_METHODOLOGY.md` |
+| SPEC templates, Deliverables Manifest | `docs/TEMPLATES.md` |
+| Reporting and tearsheets | `docs/ANALYSIS_REPORTING.md` |
+| Profiling and ONNX | `docs/PERFORMANCE.md` |
+| Error registry | `docs/ERROR_REGISTRY.md` |
+| Subagent roster rationale | `docs/SUBAGENT_ROSTER.md` |
+
+Do not guess implementation details. Read the spec before writing code.

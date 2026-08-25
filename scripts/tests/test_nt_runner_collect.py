@@ -82,9 +82,9 @@ def mock_study_dir():
             },
             "features": {
                 "source_key": "F3_top25_gbt_v1",
-                "feature_list_sha256": "5e8b5cfd125b7b6dd030dba26126b57d51616014095e70cb8a357ebbf06e2cea",
-                "feature_list": ["rth_vol_cum", "rth_elapsed_seconds", "pct_levels_behind_trade"],
-                "metadata_columns": ["observation_ts", "close", "atr"],
+                "feature_list_sha256": "369e44a4991571075ff32b2736336278a635ad71dd7284dc89020f1074867cc7",
+                "feature_list": ["vol_cum", "elapsed_seconds", "price_level_aggregate"],
+                "metadata_columns": ["observation_ts", "regime_start_ns", "checkpoint_index", "close", "atr"],
             },
             "chronology": {
                 "train": [2021, 2022, 2023, 2024],
@@ -191,7 +191,7 @@ def test_resolve_data_plan_rejects_unauthorized_years(mock_study_dir):
 def test_resolve_strategy_binding_success():
     binding = resolve_strategy_binding("flip_prediction_collector", mode="collect")
     assert binding.binding_id == "flip_prediction_collector"
-    assert binding.class_name == "FlipPredictionCollector"
+    assert binding.class_name == "GenericStudyCollector"
     assert "collect" in binding.supported_modes
 
 
@@ -240,19 +240,30 @@ def test_output_manager_persists_artifacts(mock_study_dir):
         mgr = OutputManager(study_data, data_plan, run_plan, output_base_dir=Path(tmp_out))
         assert (mgr.run_dir / "run_manifest.json").exists()
 
-        # Create dummy dataframes
+        # Create dummy dataframes. regime_start_ns/checkpoint_index are part of the
+        # authoritative candidate key (backtests.nt_runtime.output_manager.CANDIDATE_KEY_COLUMNS,
+        # Phase 1 D1.2) and must be present on both sides regardless of what a study's own
+        # declared metadata_columns happens to list.
         cands_df = pd.DataFrame([
             {
                 "observation_ts": 1740993000000000000,
+                "regime_start_ns": 1740992000000000000,
+                "checkpoint_index": 0,
                 "close": 21000.0,
                 "atr": 10.0,
-                "rth_vol_cum": 100.0,
-                "rth_elapsed_seconds": 60.0,
-                "pct_levels_behind_trade": 0.5,
+                    "vol_cum": 100.0,
+                    "elapsed_seconds": 60.0,
+                    "price_level_aggregate": 0.5,
             }
         ])
         obs_df = pd.DataFrame([
-            {"observation_ts": 1740993000000000000, "flip_ts": 1740993120000000000, "target_flip_within_horizon": 1}
+            {
+                "observation_ts": 1740993000000000000,
+                "regime_start_ns": 1740992000000000000,
+                "checkpoint_index": 0,
+                "flip_ts": 1740993120000000000,
+                "target_flip_within_horizon": 1,
+            }
         ])
 
         telemetry = CausalTelemetry()
@@ -518,7 +529,9 @@ def test_execute_collect_leaves_non_phase0_config_unaffected(mock_study_dir):
     run_plan, data_plan = _plans_for(study_data)
 
     binding = resolve_strategy_binding("flip_prediction_collector", mode="collect")
-    assert not hasattr(binding.config_cls, "phase0_manifest_path")
+    # The generic collector declares the phase-zero field so the public runtime
+    # can bind every study through the same path.
+    assert hasattr(binding.config_cls, "phase0_manifest_path")
     fake_strategy_instance = MagicMock(spec=[])
     strategy_binding = dataclasses.replace(
         binding, strategy_cls=MagicMock(return_value=fake_strategy_instance),
@@ -535,7 +548,7 @@ def test_execute_collect_leaves_non_phase0_config_unaffected(mock_study_dir):
         )
 
     constructed_config = strategy_binding.strategy_cls.call_args.args[0]
-    assert not hasattr(constructed_config, "phase0_manifest_path")
+    assert hasattr(constructed_config, "phase0_manifest_path")
     assert type(constructed_config).__name__ == "FlipPredictionCollectorConfig"
 
 

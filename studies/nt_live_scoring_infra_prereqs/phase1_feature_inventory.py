@@ -28,7 +28,7 @@ RESULTS = HERE / "results"
 RESULTS.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(ROOT))
 
-from features.registry import FEATURE_REGISTRY  # noqa: E402
+from features.registry import resolve_feature_request  # noqa: E402
 
 ENRICHED_RETRAIN = ROOT / "studies" / "short_rth_enriched_volume_level_retrain"
 DUMMY_SUFFIX_RE = re.compile(r"(.+)__(ABOVE|BELOW|TOUCH|UNAVAILABLE)$")
@@ -64,8 +64,11 @@ _TIMING_UNVERIFIED_NAMES = {
 def classify(name: str, f0_set: set) -> dict:
     row = {"name": name, "in_f0": name in f0_set,
            "timing_status": "TIMING_UNVERIFIED" if name in _TIMING_UNVERIFIED_NAMES else "verified"}
-    if name in FEATURE_REGISTRY:
-        d = FEATURE_REGISTRY[name]
+    try:
+        d = resolve_feature_request(name)
+    except Exception:
+        d = None
+    if d is not None:
         # `live_tracker_exists` must not be conflated with `in_registry`: a
         # registered feature with status="verified" but no `implementation`
         # set (e.g. the 5 hand-written `context`-family entries) is
@@ -74,33 +77,37 @@ def classify(name: str, f0_set: set) -> dict:
         # a distinguishing reason (completion-gate audit Note).
         row.update({
             "in_registry": True, "registry_match_kind": "exact",
-            "status": d.status, "family": d.family,
-            "source_timeframe": d.source_timeframe, "update_anchor": d.update_anchor,
-            "snapshot_anchor": d.snapshot_anchor, "warmup": d.warmup,
-            "null_policy": d.null_policy, "implementation": d.implementation,
-            "live_tracker_exists": bool(d.implementation),
-            "registered_without_implementation": d.status == "verified" and not d.implementation,
-            "source_script": d.implementation or "UNRESOLVED",
+            "status": d["status"], "family": d["family"],
+            "source_timeframe": d["input_requirements"].get("required_streams", []), "update_anchor": "canonical_instance_contract",
+            "snapshot_anchor": "canonical_instance_contract", "warmup": None,
+            "null_policy": "allow", "implementation": d["provider"],
+            "live_tracker_exists": bool(d["provider"]),
+            "registered_without_implementation": d["status"] == "verified" and not d["provider"],
+            "source_script": d["provider"] or "UNRESOLVED",
             "source_function": "n/a (class-based tracker)",
         })
         return row
 
     m = DUMMY_SUFFIX_RE.match(name)
-    if m and m.group(1) in FEATURE_REGISTRY:
+    if m:
         base = m.group(1)
-        d = FEATURE_REGISTRY[base]
-        row.update({
-            "in_registry": True, "registry_match_kind": f"one_hot_dummy_of:{base}",
-            "status": d.status, "family": d.family,
-            "source_timeframe": d.source_timeframe, "update_anchor": d.update_anchor,
-            "snapshot_anchor": d.snapshot_anchor, "warmup": d.warmup,
-            "null_policy": d.null_policy, "implementation": d.implementation,
-            "live_tracker_exists": bool(d.implementation),
-            "registered_without_implementation": d.status == "verified" and not d.implementation,
-            "source_script": d.implementation or "UNRESOLVED",
-            "source_function": "n/a (one-hot expansion of registered categorical base)",
-        })
-        return row
+        try:
+            d = resolve_feature_request(base)
+        except Exception:
+            d = None
+        if d is not None:
+            row.update({
+                "in_registry": True, "registry_match_kind": f"one_hot_dummy_of:{base}",
+                "status": d["status"], "family": d["family"],
+                "source_timeframe": d["input_requirements"].get("required_streams", []), "update_anchor": "canonical_instance_contract",
+                "snapshot_anchor": "canonical_instance_contract", "warmup": None,
+                "null_policy": "allow", "implementation": d["provider"],
+                "live_tracker_exists": bool(d["provider"]),
+                "registered_without_implementation": d["status"] == "verified" and not d["provider"],
+                "source_script": d["provider"] or "UNRESOLVED",
+                "source_function": "n/a (one-hot expansion of registered categorical base)",
+            })
+            return row
 
     if name in f0_set:
         row.update({

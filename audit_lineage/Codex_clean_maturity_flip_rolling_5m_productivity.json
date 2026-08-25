@@ -2,12 +2,12 @@
   "lineage_version": 1,
   "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
   "bootstrapped_from_local_ledger": false,
-  "issuance_counter": 14,
-  "prev_chain_sha256": "596c6ebdd151eb624763033776dec40c401901d46db1039ce98fcf1faf42c7c9",
-  "chain_sha256": "252267205aadcde88b5935af87e96995d189fd40a03da87cd3511c2ff69c4c61",
+  "issuance_counter": 22,
+  "prev_chain_sha256": "abc5c39c66e74270f7c5caf3cb2ec80f93fe548fd48d67cf5826cb5fca2ec567",
+  "chain_sha256": "4b810d4bdd6cc6018a3cff31069dcaad625180e1b82fb7514bdc20566b3d9e00",
   "high_water": {
-    "causal": 22,
-    "contract": 24
+    "causal": 30,
+    "contract": 27
   },
   "entries": [
     {
@@ -149,8 +149,88 @@
       "auditor": "contract-checker-pass24-smccarty",
       "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
       "issued_at": "2026-08-21T04:14:01.990954+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 24,
+      "audited_execution_composite_sha256": "ab0e65d5f02ac689b8e9b0fd901b0b05a38cb5846250ee5e5e373f077046252b",
+      "audit_report_sha256": "bf130822a2018670e625d536eb2b37094b754ce58bcdfb182366b7405621a623",
+      "audit_report_path": "audit/pass_24.md",
+      "auditor": "lookahead-auditor-pass24-smccarty",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-21T21:59:44.389079+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 25,
+      "audited_execution_composite_sha256": "ab0e65d5f02ac689b8e9b0fd901b0b05a38cb5846250ee5e5e373f077046252b",
+      "audit_report_sha256": "0d920bb73e37d65e4b1990924e39dd145124339f29c6df0e1e3d4b592c124bc0",
+      "audit_report_path": "audit/contract_pass_25.md",
+      "auditor": "contract-checker-pass25-smccarty",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-21T22:04:46.400444+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 25,
+      "audited_execution_composite_sha256": "1f9e7d8da68f7c5f9c0c8614e82435a07812c28c39d48f3064288ff5227644c7",
+      "audit_report_sha256": "d661b6f068c504403fe5e70d676af1c8489fdf019d8453bdcba042397bed0bc2",
+      "audit_report_path": "audit/pass_25.md",
+      "auditor": "lookahead-auditor-pass25-smccarty",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-22T02:06:59.111205+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 26,
+      "audited_execution_composite_sha256": "1f9e7d8da68f7c5f9c0c8614e82435a07812c28c39d48f3064288ff5227644c7",
+      "audit_report_sha256": "fe786d0696fe67e00e9b7a6a24ac7ab8ca75a1024ab43df7c5c0ac2e2a76b4dd",
+      "audit_report_path": "audit/contract_pass_26.md",
+      "auditor": "contract-checker-pass26-smccarty",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-22T02:08:55.854939+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 26,
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "audit_report_sha256": "2e6f7ed27512877654259cf4e6689d5ce8459ed3ef309eace61b9dc91b48a171",
+      "audit_report_path": "audit/pass_26.md",
+      "auditor": "lookahead-auditor-pass26-smccarty",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-22T05:19:16.306715+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 27,
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "audit_report_sha256": "46fb9a0021436aae88d3ef908196a523b00f491e64ced6c98bc0452da8108923",
+      "audit_report_path": "audit/contract_pass_27.md",
+      "auditor": "contract-checker-pass27-smccarty",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-22T05:21:29.324105+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 27,
+      "audited_execution_composite_sha256": "cda6a8e680f742815ddb8a0be4a0c83c927366841a524b5685f9019e5fab5b32",
+      "audit_report_sha256": "a241077662786afe9bd6d820dbc66a631524c2f58baa67cff29136837990065b",
+      "audit_report_path": "audit/pass_27.md",
+      "auditor": "codex-lookahead-fsv2-pass27",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-22T15:26:53.158848+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 30,
+      "audited_execution_composite_sha256": "ee064017c7f275aae5b470115982a440eb2dca608165e854dacb66f4e6623fc7",
+      "audit_report_sha256": "d1c47cdb399733137635a2e4b3d6117b8e317a1f8e2a3fd7752a78d4bb726179",
+      "audit_report_path": "audit/pass_30.md",
+      "auditor": "codex-lookahead-cleanflip-pass30",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-24T03:09:13.617535+00:00"
     }
   ],
-  "integrity_sha256": "fec217aa97500ccbdf637cb04f894afa6ca0d080890b175ed69dcdf9f795e67b",
+  "integrity_sha256": "e4591cd90de845e657abca5d9a104e58b2d276ac499829d7bc0236652401e503",
   "note": "Durable audit lineage anchor. Lives outside the study directory so that deleting or rebuilding studies/<id>/audit/ cannot reset the audit high-water mark, and INSIDE the repository so that committing it makes it durable. COMMIT THIS FILE with the audit artifacts it anchors -- an uncommitted anchor is only as durable as the working tree. Authoritative over the study-local pass_ledger.json."
 }

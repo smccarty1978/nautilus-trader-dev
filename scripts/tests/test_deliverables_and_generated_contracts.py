@@ -139,7 +139,7 @@ target:
 features:
   source: verified_registry_numeric_universe
   feature_list:
-  - latest_1m_wick_imbalance
+  - wick_imbalance
   timing_contract: verified
 model:
   mode: scoring
@@ -267,3 +267,19 @@ def test_generated_study_spec_md_matches_the_deliverables_contract(generated_stu
         assert unproducible not in spec_md, (
             f"SPEC still declares {unproducible}, which collect mode cannot produce"
         )
+
+
+def test_compile_study_materializes_standalone_deliverables_contract(tmp_path: Path):
+    """The canonical compile stage, not a hand edit, creates contract authority."""
+    import shutil
+    from scripts.compile_study import compile_study
+
+    source = REPO_ROOT / "studies" / "Codex_clean_maturity_flip_rolling_5m_productivity"
+    study = tmp_path / source.name
+    shutil.copytree(source, study)
+    contract_path = study / "config" / "deliverables_contract.json"
+    contract_path.unlink(missing_ok=True)
+
+    assert compile_study(study) == 0
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    assert contract == compile_deliverables_contract(["collect"])

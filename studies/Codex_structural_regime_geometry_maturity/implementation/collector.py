@@ -11,7 +11,7 @@ from nautilus_trader.trading.strategy import Strategy
 from collectors.collector_v2.aggregator import TimeframeAggregator
 from collectors.collector_v2.regime_engine import RegimeStateEngine
 from collectors.collector_v2.registry import CompletedBarRegistry
-from features.registry import FEATURE_REGISTRY, bind_snapshot_anchor
+from features.registry import bind_snapshot_anchor, resolve_runtime_family_aliases
 from features.trackers.structural_regime_geometry import StructuralRegimeGeometryTracker
 from studies.fable5_pre_flip_d10_reversal_entry.strategy import RegimeEngine
 
@@ -45,9 +45,8 @@ class StructuralOnlyCollector(Strategy):
         self._registry = CompletedBarRegistry(supported_timeframes=("5m",))
         self._engine_5m = RegimeStateEngine("5m", self._registry)
         self._aggregator = TimeframeAggregator(self._on_bucket_closed, timeframes=("5m",))
-        for name, definition in FEATURE_REGISTRY.items():
-            if definition.family == "structural_regime_geometry":
-                bind_snapshot_anchor(name, "Codex_structural_regime_geometry_maturity", "at_5s_decision_ts")
+        for name in resolve_runtime_family_aliases({"structural_regime_geometry"}):
+            bind_snapshot_anchor(name, "Codex_structural_regime_geometry_maturity", "at_5s_decision_ts")
 
     def on_start(self) -> None:
         self.subscribe_bars(self._bar_1s); self.subscribe_bars(self._bar_1m)

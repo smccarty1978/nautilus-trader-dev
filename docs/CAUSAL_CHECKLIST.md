@@ -9,8 +9,9 @@ drift; in July 2026 the Codex auditor was silently missing 14 rules, including
 `C4` and `D4`, which were the #2 and #4 most frequent finding categories in the
 repository. An audit that passed under one harness would fail under another.
 
-`scripts/check_agent_parity.py` enforces that no agent definition restates the
-ruleset. Change rules **here only**.
+`python scripts/sync_agents.py --check` enforces that the three harnesses carry byte-identical
+agent instructions. Change rules **here only** — an agent definition that restates a rule
+drifts from this file.
 
 ---
 
@@ -20,8 +21,8 @@ Two different agents consume this file. They do **not** share scope.
 
 | Agent | Owns | Must NOT report |
 |---|---|---|
-| `lookahead-auditor` | Sections **A, B, C1–C3, F, G, H** — causality, timestamps, look-ahead, train/serve skew | Missing deliverables, incomplete manifests, seal/tamper design, test quality, report wording |
-| `contract-checker` | Sections **C4, D, E, plus the SPEC's Deliverables Manifest** — contract compliance, output completeness, seal integrity, reachability of terminal labels | Novel causal theories not already in the SPEC |
+| `lookahead-auditor` | Sections **A, B, C1–C3, F, G, H** — causality, timestamps, look-ahead, feature/label separation, session handling, data integrity, bracket price resolution | Missing deliverables, incomplete manifests, seal/tamper design, lifecycle state, model-integrity declarations, test quality, report wording |
+| `contract-checker` | Sections **C4, D, E**, plus the SPEC's Deliverables Manifest, lifecycle-state verification, and model-integrity declarations — contract compliance, train/serve skew, output completeness, seal integrity, reachability of terminal labels | Novel causal theories not already in the SPEC |
 
 **Why the split exists.** Across ~100 historical audit reports, ~60% of blocking
 findings were contract/deliverable-completeness (`D1` 22, `C4` 22, `C3` 12,

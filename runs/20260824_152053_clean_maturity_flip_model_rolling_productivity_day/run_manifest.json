@@ -1,0 +1,52 @@
+{
+  "run_id": "20260824_152053_clean_maturity_flip_model_rolling_productivity_day",
+  "study_id": "clean_maturity_flip_model_rolling_productivity",
+  "study_type": "flip_prediction",
+  "spec_sha256": "4f3b003e95ed208a51a7d33e95355cad81b2d416cae031fe1d8946c3d16acf7d",
+  "composite_seal_hash": "e3a28fc5c9bb29a3186dbae5f6c8fcbcda319219afbed813895322028ac02b0a",
+  "execution_manifest_sha256": "e3a28fc5c9bb29a3186dbae5f6c8fcbcda319219afbed813895322028ac02b0a",
+  "feature_authority": "active",
+  "stage": "day",
+  "dates": {
+    "start": "2023-10-02",
+    "end": "2023-10-02",
+    "warmup_start": "2023-09-27T00:00:00+00:00"
+  },
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME",
+    "instrument_id": "NQ.XCME"
+  },
+  "timestamp_contract": {
+    "raw_timestamp_semantic": "OPEN_STAMPED",
+    "ts_init_delta_1s_ns": 1000000000,
+    "ts_init_delta_1m_ns": 60000000000
+  },
+  "start_time_utc": "2026-08-24T15:20:53.026754+00:00",
+  "status": "COMPLETED",
+  "pid": 130412,
+  "feature_surface_passed": true,
+  "candidate_reconciliation_passed": true,
+  "population_funnel_reconciliation_passed": null,
+  "telemetry": {
+    "wall_time_seconds": 130.03419809998013,
+    "total_bars_processed": 0,
+    "throughput_bars_per_sec": 0.0,
+    "baseline_process_rss_mb": 194.7,
+    "peak_process_rss_mb": 310.53,
+    "rss_delta_mb": 115.82,
+    "python_tracemalloc_peak_mb": 58.25,
+    "bars_loaded": {
+      "1s": 207911,
+      "1m": 5520
+    },
+    "callbacks": {}
+  },
+  "outputs": {
+    "candidates_count": 1704,
+    "candidates_sha256": "c3b01419c19eb3a3e6cd160f33c4f140f501e0e41f6812c0df8128196596b989",
+    "observations_count": 1704,
+    "observations_sha256": "517797b826aea681f9b38dfd3d656eee963e19239497ceeb9ddfc8b38c24a3aa"
+  },
+  "end_time_utc": "2026-08-24T15:23:03.165570+00:00"
+}

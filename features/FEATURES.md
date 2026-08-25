@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **features/CANONICAL_FEATURE_REFERENCE.yaml**.
+>
+> This is a Feature System V1 catalogue of *physical* feature names (`ema_21_slope`, `arrival_vel_30s`). Under Feature System V2 those are instance aliases, not canonical feature identities: timeframe, window, period and lookback are **parameters**. See `docs/RESEARCH_WORKFLOW.md` §2.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # Feature Library Documentation
 
 Comprehensive feature extraction for ML training using NautilusTrader indicators.

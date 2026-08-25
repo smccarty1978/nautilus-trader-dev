@@ -1,3 +1,11 @@
+<!-- DOC-STATUS-BANNER -->
+> **[HISTORICAL]**
+>
+> A point-in-time record of red-team findings against the hardened workflow. It is not a description of the current system
+> and not a source of instructions.
+>
+> Current authority: **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
 # Workflow Hardening — Final Independent Red Team
 
 **Commit audited:** `33f5ad1` (`chore/workflow-hardening-remediation`)

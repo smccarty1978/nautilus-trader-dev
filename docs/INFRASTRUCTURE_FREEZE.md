@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **docs/RESEARCH_WORKFLOW.md §1 and §11**.
+>
+> Several frozen paths listed here have moved (`scripts/study_spec.py` no longer exists; `backtests/nt_runtime/output_manager.py` is now a shim for `research_workflow.output_manager`).
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # Infrastructure Freeze & Regression Evidence Card
 
 ## Status: FROZEN

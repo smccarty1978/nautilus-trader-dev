@@ -170,22 +170,31 @@ Preconditions that abort the study rather than producing a weak result.
 
 ## Source-of-truth hierarchy
 
-1. Current Study Brief
-2. Study-specific SPEC and feature contract
-3. `features/FEATURE_REGISTRY_CONTRACT.md`
-4. `features/registry.py`
-5. Project-wide research standards
-6. Historical implementations only when the above are silent
+1. `research_decision.yaml` (the study's decision contract)
+2. Study `SPEC.md` and feature contract
+3. `docs/RESEARCH_WORKFLOW.md` (the workflow authority)
+4. `features/FEATURE_REGISTRY_CONTRACT.md`
+5. `features/CANONICAL_FEATURE_REFERENCE.yaml` and `features/registry.py`
+6. Project-wide research standards
+7. Historical implementations only when all of the above are silent
 
 ---
 
 ## Central Feature System Rules
 
+Feature System V2 is active and the runtime is canonical-only
+(`docs/RESEARCH_WORKFLOW.md` §2).
+
 Before implementing a new feature:
-* Search the central registry.
-* Reuse verified canonical implementations.
-* Bind the feature to an explicit study-specific update and snapshot anchor.
-* Do not use deprecated aliases in new outputs.
-* Do not promote provisional features without tests and provenance review.
+* Resolve the request first — `python scripts/feature_ctl.py`. Check
+  `features/CANONICAL_FEATURE_REFERENCE.yaml`.
+* Declare a canonical `FeatureInstance` (`feature:` + `parameters:`), **not** a physical
+  name. Timeframe, window, lookback and period are parameters, never identities.
+* Reuse a verified provider. Do not add one to support another timeframe or window.
+* Bind the feature to an explicit study-specific update and snapshot anchor. The central
+  implementation defines *how* it is calculated; the study contract defines *when*.
+* Never declare a legacy alias in a new study.
+* Do not promote provisional features without tests that name the feature and an explicit
+  promotion record.
 
 ```

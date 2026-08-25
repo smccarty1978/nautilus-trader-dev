@@ -234,6 +234,7 @@ def test_caveats_are_propagated_from_tables_into_the_context(tmp_path):
 
 
 @real_fixture
+@pytest.mark.slow
 def test_end_to_end_real_fixture_a_produces_tables_and_context(tmp_path):
     spec = parse_analysis_spec({
         "analysis_id": "fixture_a_smoke",

@@ -25,7 +25,7 @@ def compile_population_contract(
         # the triggering stream and would mislead any reviewer checking observation
         # timing against the contract. Sourced from the collector's own constant so the
         # two cannot drift.
-        from strategies.flip_prediction_collector import CANDIDATE_STEP_NS
+        from research_workflow.generic_collector import CANDIDATE_STEP_NS
 
         cadence = int(CANDIDATE_STEP_NS // 1_000_000_000)
         chk_freq = f"{cadence}s"

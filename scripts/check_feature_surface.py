@@ -70,6 +70,7 @@ class SurfaceReport:
     declared_features: List[str] = field(default_factory=list)
     emitted_features: List[str] = field(default_factory=list)
     metadata_columns: List[str] = field(default_factory=list)
+    collection_universe_columns: List[str] = field(default_factory=list)
     undeclared_columns: List[str] = field(default_factory=list)
     rows: int = 0
 
@@ -80,6 +81,7 @@ class SurfaceReport:
             "declared_features": self.declared_features,
             "emitted_features": self.emitted_features,
             "metadata_columns": self.metadata_columns,
+            "collection_universe_columns": self.collection_universe_columns,
             "undeclared_columns": self.undeclared_columns,
             "per_feature": self.per_feature,
             "findings": self.findings,
@@ -113,6 +115,7 @@ def validate_feature_surface(
     *,
     strict_order: bool = True,
     metadata_columns: Optional[List[str]] = None,
+    collection_universe: Optional[List[str]] = None,
 ) -> SurfaceReport:
     """Validates a produced candidate surface against its declared feature contract.
 
@@ -124,9 +127,18 @@ def validate_feature_surface(
     ``metadata_columns`` names the legitimate non-feature columns (identity, timing,
     target, bookkeeping). They are explicitly distinguished rather than guessed, so a
     real metadata column is never rejected as a stowaway feature.
+
+    ``collection_universe`` (Phase 1 Packet D2) names features that ARE features -- not
+    metadata -- but are not yet part of the frozen, ordered ``declared_features`` list. A
+    study collecting from a registry-defined candidate universe before TRAIN-stage
+    selection freezes its Top-N model list legitimately emits any subset of that universe;
+    columns in it are excluded from the "undeclared" check the same way metadata is, but
+    -- unlike ``declared_features`` -- membership here never participates in the strict
+    ordered-identity/hash check below. That check remains exclusively about the later
+    frozen model feature list, so a wide collection-time universe can never be mistaken
+    for a frozen, ordered model input list.
     """
-    if registry is None:
-        from features.registry import FEATURE_REGISTRY as registry  # noqa: N806
+    resolver_mode = registry is None
 
     declared_features = list(declared_features or [])
     report = SurfaceReport(
@@ -140,13 +152,20 @@ def validate_feature_surface(
         report.findings.append({"code": code, "feature": feature, "message": message})
 
     meta = set(metadata_columns if metadata_columns is not None else DEFAULT_METADATA_COLUMNS)
+    # Collector causality provenance is metadata even when an older study's
+    # explicit metadata list predates this required runtime column.
+    meta.add("triggering_1s_ts_init")
     report.metadata_columns = sorted(meta)
 
+    collection_universe_set = set(collection_universe or ())
+    report.collection_universe_columns = sorted(collection_universe_set)
+
     # W2 (reverse direction): no undeclared feature column may enter the surface.
-    # Runs whether or not features are declared -- a study declaring none must emit none.
+    # Runs whether or not features are declared -- a study declaring none must emit none,
+    # unless collection_universe explicitly widens what's allowed at collection time.
     undeclared = [
         c for c in candidates_df.columns
-        if c not in set(declared_features) and c not in meta
+        if c not in set(declared_features) and c not in meta and c not in collection_universe_set
     ]
     if undeclared:
         report.undeclared_columns = sorted(undeclared)
@@ -174,7 +193,14 @@ def validate_feature_surface(
         entry: Dict[str, Any] = {}
 
         # 2. Registry binding must resolve.
-        fdef = registry.get(name)
+        try:
+            if resolver_mode:
+                from features.registry import resolve_runtime_feature_definition
+                fdef = resolve_runtime_feature_definition(name)
+            else:
+                fdef = registry.get(name)
+        except Exception:
+            fdef = None
         if fdef is None:
             fail("FEATURE_NOT_REGISTERED", name,
                  f"'{name}' is declared by the study but absent from the feature registry")

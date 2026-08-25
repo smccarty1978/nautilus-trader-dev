@@ -44,7 +44,7 @@ for p in (ROOT / "studies" / "regime_sequence_chop_context", ROOT):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 from train_weakness_model import CENTER_FEATS, SEQUENCE_FEATS  # noqa: E402
-from features.registry import FEATURE_REGISTRY  # noqa: E402
+from features.registry import resolve_feature_request  # noqa: E402
 
 F0_FEATS = CENTER_FEATS + SEQUENCE_FEATS
 KEY = ["regime_start_ns", "observation_time"]
@@ -57,6 +57,13 @@ PROVENANCE_COLS = [
 ]
 NAME_COLS = ["nearest_level_above_name", "nearest_level_below_name"]
 POSITION_CATEGORIES = ["ABOVE", "BELOW", "TOUCH", "UNAVAILABLE"]
+
+
+def _feature_family(name: str) -> str | None:
+    try:
+        return str(resolve_feature_request(name)["family"])
+    except Exception:
+        return None
 
 
 def sha256_file(path: Path, block: int = 1 << 20) -> str:
@@ -196,10 +203,9 @@ def main() -> None:
     # Everything from the 461-feature registry that is NOT F0 and NOT a
     # position/name/provenance column is either ohlcv_est_delta or
     # price_level_context (numeric, no further encoding needed).
-    ohlcv_feats = [c for c in frames[2021].columns
-                   if c in FEATURE_REGISTRY and FEATURE_REGISTRY[c].family == "ohlcv_est_delta"]
+    ohlcv_feats = [c for c in frames[2021].columns if _feature_family(c) == "ohlcv_est_delta"]
     level_feats_numeric = [c for c in frames[2021].columns
-                            if c in FEATURE_REGISTRY and FEATURE_REGISTRY[c].family == "price_level_context"
+                            if _feature_family(c) == "price_level_context"
                             and c not in excluded]
     level_feats = level_feats_numeric + sorted(ref_dummy)
 

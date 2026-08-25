@@ -1,0 +1,5548 @@
+{
+  "canonical_instance_count": 532,
+  "historical_feature_count": 532,
+  "instances": [
+    {
+      "canonical_name": "arrival_velocity",
+      "historical_alias": "arrival_vel_5s",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 5
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "arrival_vel_5s"
+    },
+    {
+      "canonical_name": "arrival_velocity",
+      "historical_alias": "arrival_vel_10s",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 10
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "arrival_vel_10s"
+    },
+    {
+      "canonical_name": "arrival_velocity",
+      "historical_alias": "arrival_vel_20s",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 20
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "arrival_vel_20s"
+    },
+    {
+      "canonical_name": "arrival_velocity",
+      "historical_alias": "arrival_vel_30s",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 30
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "arrival_vel_30s"
+    },
+    {
+      "canonical_name": "arrival_acceleration",
+      "historical_alias": "arrival_accel_5s",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "short_lookback": 5
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "arrival_accel_5s"
+    },
+    {
+      "canonical_name": "arrival_acceleration",
+      "historical_alias": "arrival_accel_10s",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "short_lookback": 10
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "arrival_accel_10s"
+    },
+    {
+      "canonical_name": "arrival_jerk",
+      "historical_alias": "arrival_jerk",
+      "parameters": {
+        "derivative_order": 3
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "arrival_jerk"
+    },
+    {
+      "canonical_name": "arrival_velocity_max",
+      "historical_alias": "max_vel_30s",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 30,
+        "velocity_lookback": 5
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "max_vel_30s"
+    },
+    {
+      "canonical_name": "arrival_velocity_ratio",
+      "historical_alias": "vel_ratio_5_20",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "long_lookback": 20,
+        "short_lookback": 5
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vel_ratio_5_20"
+    },
+    {
+      "canonical_name": "arrival_deceleration",
+      "historical_alias": "is_decelerating",
+      "parameters": {},
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "is_decelerating"
+    },
+    {
+      "canonical_name": "relative_volume",
+      "historical_alias": "rvol_1s",
+      "parameters": {
+        "aggregation_lookback": 1,
+        "bar_state": "completed",
+        "baseline_lookback": 10,
+        "input_timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rvol_1s"
+    },
+    {
+      "canonical_name": "relative_volume",
+      "historical_alias": "rvol_5s",
+      "parameters": {
+        "aggregation_lookback": 5,
+        "bar_state": "completed",
+        "baseline_lookback": 5,
+        "input_timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rvol_5s"
+    },
+    {
+      "canonical_name": "relative_volume",
+      "historical_alias": "rvol_10s",
+      "parameters": {
+        "aggregation_lookback": 10,
+        "bar_state": "completed",
+        "baseline_lookback": 10,
+        "input_timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rvol_10s"
+    },
+    {
+      "canonical_name": "volume_trend",
+      "historical_alias": "vol_trend_10s",
+      "parameters": {
+        "window": "10s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_trend_10s"
+    },
+    {
+      "canonical_name": "spike",
+      "historical_alias": "vol_spike",
+      "parameters": {},
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_spike"
+    },
+    {
+      "canonical_name": "climax",
+      "historical_alias": "vol_climax",
+      "parameters": {},
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_climax"
+    },
+    {
+      "canonical_name": "accel",
+      "historical_alias": "vol_accel",
+      "parameters": {},
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_accel"
+    },
+    {
+      "canonical_name": "directional_volume_ratio",
+      "historical_alias": "up_vol_ratio_10s",
+      "parameters": {
+        "direction": "up",
+        "window": "10s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_vol_ratio_10s"
+    },
+    {
+      "canonical_name": "directional_volume_ratio",
+      "historical_alias": "down_vol_ratio_10s",
+      "parameters": {
+        "direction": "down",
+        "window": "10s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "down_vol_ratio_10s"
+    },
+    {
+      "canonical_name": "volume_price_correlation",
+      "historical_alias": "vol_price_corr_10s",
+      "parameters": {
+        "window": "10s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_price_corr_10s"
+    },
+    {
+      "canonical_name": "higher_lows_count",
+      "historical_alias": "higher_lows_count_1s",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "higher_lows_count_1s"
+    },
+    {
+      "canonical_name": "lower_highs_count",
+      "historical_alias": "lower_highs_count_1s",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "lower_highs_count_1s"
+    },
+    {
+      "canonical_name": "swing_count",
+      "historical_alias": "swing_count_1s",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "swing_count_1s"
+    },
+    {
+      "canonical_name": "pullback_linearity",
+      "historical_alias": "pullback_linearity_1s",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pullback_linearity_1s"
+    },
+    {
+      "canonical_name": "consecutive_down",
+      "historical_alias": "consecutive_down_1s",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "consecutive_down_1s"
+    },
+    {
+      "canonical_name": "consecutive_up",
+      "historical_alias": "consecutive_up_1s",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "consecutive_up_1s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_30s_atr",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_30s_atr"
+    },
+    {
+      "canonical_name": "close_vs_range",
+      "historical_alias": "close_vs_range_30s",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "close_vs_range_30s"
+    },
+    {
+      "canonical_name": "higher_lows_count",
+      "historical_alias": "higher_lows_count_1m",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "higher_lows_count_1m"
+    },
+    {
+      "canonical_name": "lower_highs_count",
+      "historical_alias": "lower_highs_count_1m",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "lower_highs_count_1m"
+    },
+    {
+      "canonical_name": "swing_count",
+      "historical_alias": "swing_count_1m",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "swing_count_1m"
+    },
+    {
+      "canonical_name": "pullback_depth_atr",
+      "historical_alias": "pullback_depth_atr",
+      "parameters": {
+        "scope": "since_breach"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pullback_depth_atr"
+    },
+    {
+      "canonical_name": "pullback_bars",
+      "historical_alias": "pullback_bars_1m",
+      "parameters": {
+        "scope": "since_breach",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pullback_bars_1m"
+    },
+    {
+      "canonical_name": "pullback_efficiency",
+      "historical_alias": "pullback_efficiency_1m",
+      "parameters": {
+        "scope": "since_breach",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pullback_efficiency_1m"
+    },
+    {
+      "canonical_name": "retracement_pct",
+      "historical_alias": "retracement_pct",
+      "parameters": {
+        "scope": "since_breach"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "retracement_pct"
+    },
+    {
+      "canonical_name": "clean_score",
+      "historical_alias": "clean_pullback_score_1m",
+      "parameters": {
+        "scope": "since_breach",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "clean_pullback_score_1m"
+    },
+    {
+      "canonical_name": "bar_volume",
+      "historical_alias": "bar_volume",
+      "parameters": {
+        "context": "bar"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "bar_volume"
+    },
+    {
+      "canonical_name": "bar_est_bull_volume",
+      "historical_alias": "bar_est_bull_volume",
+      "parameters": {
+        "context": "bar"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "bar_est_bull_volume"
+    },
+    {
+      "canonical_name": "bar_est_bear_volume",
+      "historical_alias": "bar_est_bear_volume",
+      "parameters": {
+        "context": "bar"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "bar_est_bear_volume"
+    },
+    {
+      "canonical_name": "bar_est_delta",
+      "historical_alias": "bar_est_delta",
+      "parameters": {
+        "context": "bar"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "bar_est_delta"
+    },
+    {
+      "canonical_name": "bar_est_delta_ratio",
+      "historical_alias": "bar_est_delta_ratio",
+      "parameters": {
+        "context": "bar"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "bar_est_delta_ratio"
+    },
+    {
+      "canonical_name": "bar_zero_range",
+      "historical_alias": "bar_zero_range",
+      "parameters": {
+        "context": "bar"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "bar_zero_range"
+    },
+    {
+      "canonical_name": "window_available",
+      "historical_alias": "window_available_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "window_available_5s"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "vol_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_5s"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "historical_alias": "vol_mean_1s_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_mean_1s_5s"
+    },
+    {
+      "canonical_name": "vol_max",
+      "historical_alias": "vol_max_1s_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_max_1s_5s"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "historical_alias": "est_bull_vol_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bull_vol_sum_5s"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "historical_alias": "est_bear_vol_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bear_vol_sum_5s"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "est_delta_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_5s"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "est_abs_delta_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_abs_delta_sum_5s"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "est_delta_ratio_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_5s"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "historical_alias": "est_delta_pos_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_pos_sum_5s"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "historical_alias": "est_delta_neg_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_neg_sum_5s"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "historical_alias": "upbar_vol_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "upbar_vol_sum_5s"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "historical_alias": "downbar_vol_sum_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "downbar_vol_sum_5s"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "historical_alias": "up_down_vol_ratio_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_down_vol_ratio_5s"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "historical_alias": "price_change_points_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_points_5s"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "price_change_atr_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_atr_5s"
+    },
+    {
+      "canonical_name": "range_points",
+      "historical_alias": "range_points_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_points_5s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_atr_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_atr_5s"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "historical_alias": "volume_per_point_moved_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_point_moved_5s"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "volume_per_atr_moved_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_atr_moved_5s"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "historical_alias": "abs_delta_per_point_moved_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_point_moved_5s"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "abs_delta_per_atr_moved_5s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_atr_moved_5s"
+    },
+    {
+      "canonical_name": "window_available",
+      "historical_alias": "window_available_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "window_available_15s"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "vol_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_15s"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "historical_alias": "vol_mean_1s_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_mean_1s_15s"
+    },
+    {
+      "canonical_name": "vol_max",
+      "historical_alias": "vol_max_1s_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_max_1s_15s"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "historical_alias": "est_bull_vol_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bull_vol_sum_15s"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "historical_alias": "est_bear_vol_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bear_vol_sum_15s"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "est_delta_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_15s"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "est_abs_delta_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_abs_delta_sum_15s"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "est_delta_ratio_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_15s"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "historical_alias": "est_delta_pos_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_pos_sum_15s"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "historical_alias": "est_delta_neg_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_neg_sum_15s"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "historical_alias": "upbar_vol_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "upbar_vol_sum_15s"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "historical_alias": "downbar_vol_sum_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "downbar_vol_sum_15s"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "historical_alias": "up_down_vol_ratio_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_down_vol_ratio_15s"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "historical_alias": "price_change_points_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_points_15s"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "price_change_atr_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_atr_15s"
+    },
+    {
+      "canonical_name": "range_points",
+      "historical_alias": "range_points_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_points_15s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_atr_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_atr_15s"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "historical_alias": "volume_per_point_moved_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_point_moved_15s"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "volume_per_atr_moved_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_atr_moved_15s"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "historical_alias": "abs_delta_per_point_moved_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_point_moved_15s"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "abs_delta_per_atr_moved_15s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_atr_moved_15s"
+    },
+    {
+      "canonical_name": "window_available",
+      "historical_alias": "window_available_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "window_available_30s"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "vol_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_30s"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "historical_alias": "vol_mean_1s_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_mean_1s_30s"
+    },
+    {
+      "canonical_name": "vol_max",
+      "historical_alias": "vol_max_1s_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_max_1s_30s"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "historical_alias": "est_bull_vol_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bull_vol_sum_30s"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "historical_alias": "est_bear_vol_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bear_vol_sum_30s"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "est_delta_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_30s"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "est_abs_delta_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_abs_delta_sum_30s"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "est_delta_ratio_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_30s"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "historical_alias": "est_delta_pos_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_pos_sum_30s"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "historical_alias": "est_delta_neg_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_neg_sum_30s"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "historical_alias": "upbar_vol_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "upbar_vol_sum_30s"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "historical_alias": "downbar_vol_sum_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "downbar_vol_sum_30s"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "historical_alias": "up_down_vol_ratio_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_down_vol_ratio_30s"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "historical_alias": "price_change_points_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_points_30s"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "price_change_atr_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_atr_30s"
+    },
+    {
+      "canonical_name": "range_points",
+      "historical_alias": "range_points_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_points_30s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_atr_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_atr_30s"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "historical_alias": "volume_per_point_moved_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_point_moved_30s"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "volume_per_atr_moved_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_atr_moved_30s"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "historical_alias": "abs_delta_per_point_moved_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_point_moved_30s"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "abs_delta_per_atr_moved_30s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_atr_moved_30s"
+    },
+    {
+      "canonical_name": "window_available",
+      "historical_alias": "window_available_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "window_available_60s"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "vol_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_60s"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "historical_alias": "vol_mean_1s_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_mean_1s_60s"
+    },
+    {
+      "canonical_name": "vol_max",
+      "historical_alias": "vol_max_1s_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_max_1s_60s"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "historical_alias": "est_bull_vol_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bull_vol_sum_60s"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "historical_alias": "est_bear_vol_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bear_vol_sum_60s"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "est_delta_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_60s"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "est_abs_delta_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_abs_delta_sum_60s"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "est_delta_ratio_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_60s"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "historical_alias": "est_delta_pos_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_pos_sum_60s"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "historical_alias": "est_delta_neg_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_neg_sum_60s"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "historical_alias": "upbar_vol_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "upbar_vol_sum_60s"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "historical_alias": "downbar_vol_sum_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "downbar_vol_sum_60s"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "historical_alias": "up_down_vol_ratio_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_down_vol_ratio_60s"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "historical_alias": "price_change_points_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_points_60s"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "price_change_atr_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_atr_60s"
+    },
+    {
+      "canonical_name": "range_points",
+      "historical_alias": "range_points_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_points_60s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_atr_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_atr_60s"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "historical_alias": "volume_per_point_moved_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_point_moved_60s"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "volume_per_atr_moved_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_atr_moved_60s"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "historical_alias": "abs_delta_per_point_moved_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_point_moved_60s"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "abs_delta_per_atr_moved_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_atr_moved_60s"
+    },
+    {
+      "canonical_name": "window_available",
+      "historical_alias": "window_available_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "window_available_120s"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "vol_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_120s"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "historical_alias": "vol_mean_1s_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_mean_1s_120s"
+    },
+    {
+      "canonical_name": "vol_max",
+      "historical_alias": "vol_max_1s_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_max_1s_120s"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "historical_alias": "est_bull_vol_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bull_vol_sum_120s"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "historical_alias": "est_bear_vol_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bear_vol_sum_120s"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "est_delta_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_120s"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "est_abs_delta_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_abs_delta_sum_120s"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "est_delta_ratio_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_120s"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "historical_alias": "est_delta_pos_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_pos_sum_120s"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "historical_alias": "est_delta_neg_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_neg_sum_120s"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "historical_alias": "upbar_vol_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "upbar_vol_sum_120s"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "historical_alias": "downbar_vol_sum_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "downbar_vol_sum_120s"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "historical_alias": "up_down_vol_ratio_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_down_vol_ratio_120s"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "historical_alias": "price_change_points_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_points_120s"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "price_change_atr_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_atr_120s"
+    },
+    {
+      "canonical_name": "range_points",
+      "historical_alias": "range_points_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_points_120s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_atr_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_atr_120s"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "historical_alias": "volume_per_point_moved_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_point_moved_120s"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "volume_per_atr_moved_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_atr_moved_120s"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "historical_alias": "abs_delta_per_point_moved_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_point_moved_120s"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "abs_delta_per_atr_moved_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_atr_moved_120s"
+    },
+    {
+      "canonical_name": "window_available",
+      "historical_alias": "window_available_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "window_available_300s"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "vol_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_300s"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "historical_alias": "vol_mean_1s_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_mean_1s_300s"
+    },
+    {
+      "canonical_name": "vol_max",
+      "historical_alias": "vol_max_1s_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_max_1s_300s"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "historical_alias": "est_bull_vol_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bull_vol_sum_300s"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "historical_alias": "est_bear_vol_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bear_vol_sum_300s"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "est_delta_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_300s"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "est_abs_delta_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_abs_delta_sum_300s"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "est_delta_ratio_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_300s"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "historical_alias": "est_delta_pos_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_pos_sum_300s"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "historical_alias": "est_delta_neg_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_neg_sum_300s"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "historical_alias": "upbar_vol_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "upbar_vol_sum_300s"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "historical_alias": "downbar_vol_sum_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "downbar_vol_sum_300s"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "historical_alias": "up_down_vol_ratio_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_down_vol_ratio_300s"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "historical_alias": "price_change_points_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_points_300s"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "price_change_atr_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_atr_300s"
+    },
+    {
+      "canonical_name": "range_points",
+      "historical_alias": "range_points_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_points_300s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_atr_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_atr_300s"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "historical_alias": "volume_per_point_moved_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_point_moved_300s"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "volume_per_atr_moved_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_atr_moved_300s"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "historical_alias": "abs_delta_per_point_moved_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_point_moved_300s"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "abs_delta_per_atr_moved_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_atr_moved_300s"
+    },
+    {
+      "canonical_name": "window_available",
+      "historical_alias": "window_available_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "window_available_900s"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "vol_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_900s"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "historical_alias": "vol_mean_1s_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_mean_1s_900s"
+    },
+    {
+      "canonical_name": "vol_max",
+      "historical_alias": "vol_max_1s_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_max_1s_900s"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "historical_alias": "est_bull_vol_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bull_vol_sum_900s"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "historical_alias": "est_bear_vol_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bear_vol_sum_900s"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "est_delta_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_900s"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "est_abs_delta_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_abs_delta_sum_900s"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "est_delta_ratio_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_900s"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "historical_alias": "est_delta_pos_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_pos_sum_900s"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "historical_alias": "est_delta_neg_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_neg_sum_900s"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "historical_alias": "upbar_vol_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "upbar_vol_sum_900s"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "historical_alias": "downbar_vol_sum_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "downbar_vol_sum_900s"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "historical_alias": "up_down_vol_ratio_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_down_vol_ratio_900s"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "historical_alias": "price_change_points_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_points_900s"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "price_change_atr_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_atr_900s"
+    },
+    {
+      "canonical_name": "range_points",
+      "historical_alias": "range_points_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_points_900s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_atr_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_atr_900s"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "historical_alias": "volume_per_point_moved_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_point_moved_900s"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "volume_per_atr_moved_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_atr_moved_900s"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "historical_alias": "abs_delta_per_point_moved_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_point_moved_900s"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "abs_delta_per_atr_moved_900s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_atr_moved_900s"
+    },
+    {
+      "canonical_name": "window_available",
+      "historical_alias": "window_available_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "window_available_1800s"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "vol_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_1800s"
+    },
+    {
+      "canonical_name": "vol_mean",
+      "historical_alias": "vol_mean_1s_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_mean_1s_1800s"
+    },
+    {
+      "canonical_name": "vol_max",
+      "historical_alias": "vol_max_1s_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_max_1s_1800s"
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "historical_alias": "est_bull_vol_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bull_vol_sum_1800s"
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "historical_alias": "est_bear_vol_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_bear_vol_sum_1800s"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "est_delta_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_1800s"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "est_abs_delta_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_abs_delta_sum_1800s"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "est_delta_ratio_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_1800s"
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "historical_alias": "est_delta_pos_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_pos_sum_1800s"
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "historical_alias": "est_delta_neg_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_neg_sum_1800s"
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "historical_alias": "upbar_vol_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "upbar_vol_sum_1800s"
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "historical_alias": "downbar_vol_sum_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "downbar_vol_sum_1800s"
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "historical_alias": "up_down_vol_ratio_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "up_down_vol_ratio_1800s"
+    },
+    {
+      "canonical_name": "price_change_points",
+      "historical_alias": "price_change_points_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_points_1800s"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "price_change_atr_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_change_atr_1800s"
+    },
+    {
+      "canonical_name": "range_points",
+      "historical_alias": "range_points_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_points_1800s"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "range_atr_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "range_atr_1800s"
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "historical_alias": "volume_per_point_moved_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_point_moved_1800s"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "volume_per_atr_moved_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "volume_per_atr_moved_1800s"
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "historical_alias": "abs_delta_per_point_moved_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_point_moved_1800s"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "abs_delta_per_atr_moved_1800s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "abs_delta_per_atr_moved_1800s"
+    },
+    {
+      "canonical_name": "est_delta_sum_minus_scaled",
+      "historical_alias": "est_delta_sum_15s_minus_60s_scaled",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s",
+        "timeframe_2": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_15s_minus_60s_scaled"
+    },
+    {
+      "canonical_name": "est_delta_sum_minus_scaled",
+      "historical_alias": "est_delta_sum_30s_minus_120s_scaled",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s",
+        "timeframe_2": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_30s_minus_120s_scaled"
+    },
+    {
+      "canonical_name": "est_delta_sum_minus_scaled",
+      "historical_alias": "est_delta_sum_60s_minus_300s_scaled",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s",
+        "timeframe_2": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_sum_60s_minus_300s_scaled"
+    },
+    {
+      "canonical_name": "est_delta_ratio_minus",
+      "historical_alias": "est_delta_ratio_15s_minus_60s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s",
+        "timeframe_2": "60s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_15s_minus_60s"
+    },
+    {
+      "canonical_name": "est_delta_ratio_minus",
+      "historical_alias": "est_delta_ratio_30s_minus_120s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s",
+        "timeframe_2": "120s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_30s_minus_120s"
+    },
+    {
+      "canonical_name": "est_delta_ratio_minus",
+      "historical_alias": "est_delta_ratio_60s_minus_300s",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s",
+        "timeframe_2": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "est_delta_ratio_60s_minus_300s"
+    },
+    {
+      "canonical_name": "vol_sum_vs_ratio",
+      "historical_alias": "vol_sum_30s_vs_300s_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s",
+        "timeframe_2": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_30s_vs_300s_ratio"
+    },
+    {
+      "canonical_name": "vol_sum_vs_ratio",
+      "historical_alias": "vol_sum_60s_vs_900s_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s",
+        "timeframe_2": "900s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "vol_sum_60s_vs_900s_ratio"
+    },
+    {
+      "canonical_name": "available",
+      "historical_alias": "regime_available",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_available"
+    },
+    {
+      "canonical_name": "vol_sum",
+      "historical_alias": "regime_vol_sum",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_vol_sum"
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "historical_alias": "regime_est_delta_sum",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_est_delta_sum"
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "historical_alias": "regime_est_delta_ratio",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_est_delta_ratio"
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "historical_alias": "regime_est_abs_delta_sum",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_est_abs_delta_sum"
+    },
+    {
+      "canonical_name": "elapsed_seconds",
+      "historical_alias": "regime_elapsed_seconds",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_elapsed_seconds"
+    },
+    {
+      "canonical_name": "volume_per_second",
+      "historical_alias": "regime_volume_per_second",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_volume_per_second"
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "historical_alias": "regime_price_change_atr",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_price_change_atr"
+    },
+    {
+      "canonical_name": "range_atr",
+      "historical_alias": "regime_range_atr",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_range_atr"
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "historical_alias": "regime_volume_per_atr_moved",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_volume_per_atr_moved"
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "historical_alias": "regime_abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_abs_delta_per_atr_moved"
+    },
+    {
+      "canonical_name": "first_half_est_delta_ratio",
+      "historical_alias": "regime_first_half_est_delta_ratio",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_first_half_est_delta_ratio"
+    },
+    {
+      "canonical_name": "second_half_est_delta_ratio",
+      "historical_alias": "regime_second_half_est_delta_ratio",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_second_half_est_delta_ratio"
+    },
+    {
+      "canonical_name": "late_minus_early_delta_ratio",
+      "historical_alias": "regime_late_minus_early_delta_ratio",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_late_minus_early_delta_ratio"
+    },
+    {
+      "canonical_name": "first_half_vol",
+      "historical_alias": "regime_first_half_vol",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_first_half_vol"
+    },
+    {
+      "canonical_name": "second_half_vol",
+      "historical_alias": "regime_second_half_vol",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_second_half_vol"
+    },
+    {
+      "canonical_name": "late_vs_early_vol_ratio",
+      "historical_alias": "regime_late_vs_early_vol_ratio",
+      "parameters": {
+        "context": "regime"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_late_vs_early_vol_ratio"
+    },
+    {
+      "canonical_name": "available",
+      "historical_alias": "rth_available",
+      "parameters": {
+        "context": "RTH"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_available"
+    },
+    {
+      "canonical_name": "elapsed_seconds",
+      "historical_alias": "rth_elapsed_seconds",
+      "parameters": {
+        "context": "RTH"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_elapsed_seconds"
+    },
+    {
+      "canonical_name": "vol_cum",
+      "historical_alias": "rth_vol_cum",
+      "parameters": {
+        "context": "RTH"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_vol_cum"
+    },
+    {
+      "canonical_name": "est_delta_cum",
+      "historical_alias": "rth_est_delta_cum",
+      "parameters": {
+        "context": "RTH"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_est_delta_cum"
+    },
+    {
+      "canonical_name": "est_delta_ratio_cum",
+      "historical_alias": "rth_est_delta_ratio_cum",
+      "parameters": {
+        "context": "RTH"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_est_delta_ratio_cum"
+    },
+    {
+      "canonical_name": "abs_delta_cum",
+      "historical_alias": "rth_abs_delta_cum",
+      "parameters": {
+        "context": "RTH"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_abs_delta_cum"
+    },
+    {
+      "canonical_name": "volume_per_second",
+      "historical_alias": "rth_volume_per_second",
+      "parameters": {
+        "context": "RTH"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_volume_per_second"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "prior_day_open_price",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_open_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "prior_day_open_available",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_open_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_open_signed_distance_points",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_open_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_open_signed_distance_ticks",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_open_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_open_signed_distance_atr",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_open_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "prior_day_open_position",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_open_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "prior_day_high_price",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_high_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "prior_day_high_available",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_high_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_high_signed_distance_points",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_high_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_high_signed_distance_ticks",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_high_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_high_signed_distance_atr",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_high_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "prior_day_high_position",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_high_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "prior_day_low_price",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_low_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "prior_day_low_available",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_low_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_low_signed_distance_points",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_low_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_low_signed_distance_ticks",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_low_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_low_signed_distance_atr",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_low_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "prior_day_low_position",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_low_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "prior_day_close_price",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_close_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "prior_day_close_available",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_close_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_close_signed_distance_points",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_close_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_close_signed_distance_ticks",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_close_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "prior_day_close_signed_distance_atr",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_close_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "prior_day_close_position",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_day_close_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "overnight_high_developing_price",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_developing_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "overnight_high_developing_available",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_developing_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_high_developing_signed_distance_points",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_developing_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_high_developing_signed_distance_ticks",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_developing_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_high_developing_signed_distance_atr",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_developing_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "overnight_high_developing_position",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_developing_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "overnight_low_developing_price",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_developing_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "overnight_low_developing_available",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_developing_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_low_developing_signed_distance_points",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_developing_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_low_developing_signed_distance_ticks",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_developing_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_low_developing_signed_distance_atr",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_developing_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "overnight_low_developing_position",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_developing_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "overnight_high_final_price",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_final_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "overnight_high_final_available",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_final_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_high_final_signed_distance_points",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_final_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_high_final_signed_distance_ticks",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_final_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_high_final_signed_distance_atr",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_final_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "overnight_high_final_position",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_high_final_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "overnight_low_final_price",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_final_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "overnight_low_final_available",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_final_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_low_final_signed_distance_points",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_final_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_low_final_signed_distance_ticks",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_final_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "overnight_low_final_signed_distance_atr",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_final_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "overnight_low_final_position",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "overnight_low_final_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rth_open_price",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_open_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rth_open_available",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_open_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rth_open_signed_distance_points",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session",
+        "normalization": "points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_open_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rth_open_signed_distance_ticks",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session",
+        "normalization": "ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_open_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rth_open_signed_distance_atr",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session",
+        "normalization": "atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_open_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rth_open_position",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_open_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "opening_range_30m_high_developing_price",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_developing_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "opening_range_30m_high_developing_available",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_developing_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_high_developing_signed_distance_points",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "normalization": "points",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_developing_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_high_developing_signed_distance_ticks",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_developing_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_high_developing_signed_distance_atr",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "normalization": "atr",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_developing_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "opening_range_30m_high_developing_position",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_developing_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "opening_range_30m_low_developing_price",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_developing_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "opening_range_30m_low_developing_available",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_developing_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_low_developing_signed_distance_points",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "normalization": "points",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_developing_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_low_developing_signed_distance_ticks",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_developing_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_low_developing_signed_distance_atr",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "normalization": "atr",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_developing_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "opening_range_30m_low_developing_position",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_developing_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "opening_range_30m_high_final_price",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_final_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "opening_range_30m_high_final_available",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_final_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_high_final_signed_distance_points",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "normalization": "points",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_final_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_high_final_signed_distance_ticks",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_final_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_high_final_signed_distance_atr",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "normalization": "atr",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_final_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "opening_range_30m_high_final_position",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_high_final_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "opening_range_30m_low_final_price",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_final_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "opening_range_30m_low_final_available",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_final_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_low_final_signed_distance_points",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "normalization": "points",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_final_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_low_final_signed_distance_ticks",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_final_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "opening_range_30m_low_final_signed_distance_atr",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "normalization": "atr",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_final_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "opening_range_30m_low_final_position",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_low_final_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_5m_open_price",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_open_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_5m_open_available",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_open_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_open_signed_distance_points",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_open_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_open_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_open_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_open_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_open_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_5m_open_position",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_open_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_5m_high_price",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_high_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_5m_high_available",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_high_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_high_signed_distance_points",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_high_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_high_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_high_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_high_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_high_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_5m_high_position",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_high_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_5m_low_price",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_low_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_5m_low_available",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_low_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_low_signed_distance_points",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_low_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_low_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_low_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_low_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_low_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_5m_low_position",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_low_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_5m_close_price",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_close_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_5m_close_available",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_close_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_close_signed_distance_points",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_close_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_close_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_close_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_5m_close_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_close_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_5m_close_position",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_close_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_15m_open_price",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_open_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_15m_open_available",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_open_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_open_signed_distance_points",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_open_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_open_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_open_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_open_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_open_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_15m_open_position",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_open_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_15m_high_price",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_high_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_15m_high_available",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_high_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_high_signed_distance_points",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_high_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_high_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_high_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_high_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_high_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_15m_high_position",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_high_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_15m_low_price",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_low_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_15m_low_available",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_low_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_low_signed_distance_points",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_low_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_low_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_low_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_low_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_low_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_15m_low_position",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_low_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_15m_close_price",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_close_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_15m_close_available",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_close_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_close_signed_distance_points",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_close_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_close_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_close_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_15m_close_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_close_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_15m_close_position",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_15m_close_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_30m_open_price",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_open_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_30m_open_available",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_open_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_open_signed_distance_points",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_open_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_open_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_open_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_open_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_open_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_30m_open_position",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_open_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_30m_high_price",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_high_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_30m_high_available",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_high_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_high_signed_distance_points",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_high_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_high_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_high_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_high_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_high_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_30m_high_position",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_high_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_30m_low_price",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_low_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_30m_low_available",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_low_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_low_signed_distance_points",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_low_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_low_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_low_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_low_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_low_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_30m_low_position",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_low_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_30m_close_price",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_close_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_30m_close_available",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_close_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_close_signed_distance_points",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_close_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_close_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_close_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_30m_close_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_close_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_30m_close_position",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_30m_close_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_60m_open_price",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_open_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_60m_open_available",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_open_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_open_signed_distance_points",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_open_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_open_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_open_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_open_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_open_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_60m_open_position",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_open_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_60m_high_price",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_high_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_60m_high_available",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_high_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_high_signed_distance_points",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_high_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_high_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_high_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_high_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_high_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_60m_high_position",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_high_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_60m_low_price",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_low_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_60m_low_available",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_low_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_low_signed_distance_points",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_low_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_low_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_low_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_low_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_low_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_60m_low_position",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_low_position"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "rolling_60m_close_price",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_close_price"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "rolling_60m_close_available",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_close_available"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_close_signed_distance_points",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_close_signed_distance_points"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_close_signed_distance_ticks",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_close_signed_distance_ticks"
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "historical_alias": "rolling_60m_close_signed_distance_atr",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_close_signed_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_position",
+      "historical_alias": "rolling_60m_close_position",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_60m_close_position"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "opening_range_30m_is_developing",
+      "parameters": {
+        "level_context": "session",
+        "metric": "opening_range_is_developing",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_is_developing"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "opening_range_30m_is_final",
+      "parameters": {
+        "level_context": "session",
+        "metric": "opening_range_is_final",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_is_final"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "opening_range_30m_elapsed_seconds",
+      "parameters": {
+        "level_context": "session",
+        "metric": "opening_range_elapsed_seconds",
+        "timeframe": "30m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "opening_range_30m_elapsed_seconds"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "rth_open_elapsed_seconds",
+      "parameters": {
+        "level_context": "session",
+        "metric": "rth_open_elapsed_seconds"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rth_open_elapsed_seconds"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "n_levels_available",
+      "parameters": {
+        "level": "n_levels",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_levels_available"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_levels_above",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_levels_above"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_levels_above"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_levels_below",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_levels_below"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_levels_below"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_levels_touched",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_levels_touched"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_levels_touched"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "pct_levels_above",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_above"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pct_levels_above"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "pct_levels_below",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_below"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pct_levels_below"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "pct_levels_touched",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_touched"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pct_levels_touched"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "level_balance",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_balance"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "level_balance"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_prior_day_levels_above",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_prior_day_levels_above"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_prior_day_levels_above"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_prior_day_levels_below",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_prior_day_levels_below"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_prior_day_levels_below"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_session_levels_above",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_session_levels_above"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_session_levels_above"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_session_levels_below",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_session_levels_below"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_session_levels_below"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_rolling_levels_above",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_rolling_levels_above"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_rolling_levels_above"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_rolling_levels_below",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_rolling_levels_below"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_rolling_levels_below"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_above_name",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_above_name"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_above_name"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "nearest_level_above_price",
+      "parameters": {
+        "level": "nearest_level_above",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_above_price"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_above_distance_points",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_above_distance_points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_above_distance_points"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_above_distance_ticks",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_above_distance_ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_above_distance_ticks"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_above_distance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_above_distance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_above_distance_atr"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_below_name",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_below_name"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_below_name"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "nearest_level_below_price",
+      "parameters": {
+        "level": "nearest_level_below",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_below_price"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_below_distance_points",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_below_distance_points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_below_distance_points"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_below_distance_ticks",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_below_distance_ticks"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_below_distance_ticks"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_below_distance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_below_distance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_below_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_space_balance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_space_balance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_space_balance_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_space_total_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_space_total_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_space_total_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_upside_downside_ratio",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_upside_downside_ratio"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_upside_downside_ratio"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "level_density_025a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_density_025a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "level_density_025a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_above_within_025a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_above_within_025a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_above_within_025a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_below_within_025a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_below_within_025a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_below_within_025a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "level_density_050a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_density_050a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "level_density_050a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_above_within_050a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_above_within_050a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_above_within_050a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_below_within_050a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_below_within_050a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_below_within_050a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "level_density_100a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_density_100a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "level_density_100a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_above_within_100a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_above_within_100a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_above_within_100a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_below_within_100a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_below_within_100a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_below_within_100a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "level_density_200a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_density_200a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "level_density_200a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_above_within_200a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_above_within_200a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_above_within_200a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_below_within_200a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_below_within_200a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_below_within_200a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "inverse_distance_density",
+      "parameters": {
+        "level_context": "session",
+        "metric": "inverse_distance_density"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "inverse_distance_density"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "lowest_available_level",
+      "parameters": {
+        "level_context": "session",
+        "metric": "lowest_available_level"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "lowest_available_level"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "highest_available_level",
+      "parameters": {
+        "level_context": "session",
+        "metric": "highest_available_level"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "highest_available_level"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "full_level_envelope_width_points",
+      "parameters": {
+        "level_context": "session",
+        "metric": "full_level_envelope_width_points"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "full_level_envelope_width_points"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "full_level_envelope_width_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "full_level_envelope_width_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "full_level_envelope_width_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "price_position_in_full_envelope",
+      "parameters": {
+        "level_context": "session",
+        "metric": "price_position_in_full_envelope"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "price_position_in_full_envelope"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "distance_above_full_envelope_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "distance_above_full_envelope_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "distance_above_full_envelope_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "distance_below_full_envelope_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "distance_below_full_envelope_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "distance_below_full_envelope_atr"
+    },
+    {
+      "canonical_name": "price_level_available",
+      "historical_alias": "n_level_clusters_available",
+      "parameters": {
+        "level": "n_level_clusters",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_level_clusters_available"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_level_clusters_above",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_level_clusters_above"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_level_clusters_above"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_level_clusters_below",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_level_clusters_below"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_level_clusters_below"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "n_level_clusters_touched",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_level_clusters_touched"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "n_level_clusters_touched"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "nearest_cluster_above_price",
+      "parameters": {
+        "level": "nearest_cluster_above",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_cluster_above_price"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_cluster_above_distance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_above_distance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_cluster_above_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_cluster_above_strength",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_above_strength"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_cluster_above_strength"
+    },
+    {
+      "canonical_name": "price_level_value",
+      "historical_alias": "nearest_cluster_below_price",
+      "parameters": {
+        "level": "nearest_cluster_below",
+        "level_context": "session"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_cluster_below_price"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_cluster_below_distance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_below_distance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_cluster_below_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_cluster_below_strength",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_below_strength"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_cluster_below_strength"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "max_cluster_strength",
+      "parameters": {
+        "level_context": "session",
+        "metric": "max_cluster_strength"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "max_cluster_strength"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "max_nearby_cluster_strength_050a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "max_nearby_cluster_strength_050a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "max_nearby_cluster_strength_050a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "max_nearby_cluster_strength_100a",
+      "parameters": {
+        "level_context": "session",
+        "metric": "max_nearby_cluster_strength_100a"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "max_nearby_cluster_strength_100a"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_ahead_of_trade",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_ahead_of_trade"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_ahead_of_trade"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "levels_behind_trade",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_behind_trade"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "levels_behind_trade"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "pct_levels_ahead_of_trade",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_ahead_of_trade"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pct_levels_ahead_of_trade"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "pct_levels_behind_trade",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_behind_trade"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "pct_levels_behind_trade"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_ahead_distance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_ahead_distance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_ahead_distance_atr"
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "historical_alias": "nearest_level_behind_distance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_behind_distance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_level_behind_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_cluster_ahead_distance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_ahead_distance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_cluster_ahead_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "nearest_cluster_behind_distance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_behind_distance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "nearest_cluster_behind_distance_atr"
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "historical_alias": "directional_space_balance_atr",
+      "parameters": {
+        "level_context": "session",
+        "metric": "directional_space_balance_atr"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "directional_space_balance_atr"
+    },
+    {
+      "canonical_name": "rolling_max_progress_atr",
+      "historical_alias": "rolling_5m_max_progress_atr",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_max_progress_atr"
+    },
+    {
+      "canonical_name": "rolling_current_progress_atr",
+      "historical_alias": "rolling_5m_current_progress_atr",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_current_progress_atr"
+    },
+    {
+      "canonical_name": "rolling_giveback_atr",
+      "historical_alias": "rolling_5m_giveback_atr",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_giveback_atr"
+    },
+    {
+      "canonical_name": "rolling_retention_ratio",
+      "historical_alias": "rolling_5m_retention_ratio",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_retention_ratio"
+    },
+    {
+      "canonical_name": "rolling_max_speed_atr_per_min",
+      "historical_alias": "rolling_5m_max_speed_atr_per_min",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_max_speed_atr_per_min"
+    },
+    {
+      "canonical_name": "rolling_current_speed_atr_per_min",
+      "historical_alias": "rolling_5m_current_speed_atr_per_min",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_current_speed_atr_per_min"
+    },
+    {
+      "canonical_name": "rolling_max_speed_vs_lifetime",
+      "historical_alias": "rolling_5m_max_speed_vs_lifetime",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_max_speed_vs_lifetime"
+    },
+    {
+      "canonical_name": "rolling_current_speed_vs_lifetime",
+      "historical_alias": "rolling_5m_current_speed_vs_lifetime",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "rolling_5m_current_speed_vs_lifetime"
+    },
+    {
+      "canonical_name": "structural_max_expansion_atr",
+      "historical_alias": "structural_max_expansion_atr",
+      "parameters": {
+        "context": "current"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "structural_max_expansion_atr"
+    },
+    {
+      "canonical_name": "structural_current_expansion_atr",
+      "historical_alias": "structural_current_expansion_atr",
+      "parameters": {
+        "context": "current"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "structural_current_expansion_atr"
+    },
+    {
+      "canonical_name": "structural_giveback_atr",
+      "historical_alias": "structural_giveback_atr",
+      "parameters": {
+        "context": "current"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "structural_giveback_atr"
+    },
+    {
+      "canonical_name": "structural_retention_ratio",
+      "historical_alias": "structural_retention_ratio",
+      "parameters": {
+        "context": "current"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "structural_retention_ratio"
+    },
+    {
+      "canonical_name": "structural_expansion_atr_per_min",
+      "historical_alias": "structural_expansion_atr_per_min",
+      "parameters": {
+        "context": "current"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "structural_expansion_atr_per_min"
+    },
+    {
+      "canonical_name": "regime_expansion_atr_per_min",
+      "historical_alias": "regime_expansion_atr_per_min",
+      "parameters": {
+        "context": "current"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "regime_expansion_atr_per_min"
+    },
+    {
+      "canonical_name": "regime_duration_min",
+      "historical_alias": "prior_1m_regime_duration_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_1m_regime_duration_min"
+    },
+    {
+      "canonical_name": "regime_range_atr",
+      "historical_alias": "prior_1m_regime_range_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_1m_regime_range_atr"
+    },
+    {
+      "canonical_name": "regime_net_directional_move_atr",
+      "historical_alias": "prior_1m_regime_net_directional_move_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_1m_regime_net_directional_move_atr"
+    },
+    {
+      "canonical_name": "regime_mfe_atr",
+      "historical_alias": "prior_1m_regime_mfe_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_1m_regime_mfe_atr"
+    },
+    {
+      "canonical_name": "regime_range_atr_per_min",
+      "historical_alias": "prior_1m_regime_range_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_1m_regime_range_atr_per_min"
+    },
+    {
+      "canonical_name": "regime_net_move_atr_per_min",
+      "historical_alias": "prior_1m_regime_net_move_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_1m_regime_net_move_atr_per_min"
+    },
+    {
+      "canonical_name": "regime_efficiency",
+      "historical_alias": "prior_1m_regime_efficiency",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_1m_regime_efficiency"
+    },
+    {
+      "canonical_name": "regime_age_min",
+      "historical_alias": "current_5m_regime_age_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "current",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "current_5m_regime_age_min"
+    },
+    {
+      "canonical_name": "regime_range_atr",
+      "historical_alias": "current_5m_regime_range_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "current",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "current_5m_regime_range_atr"
+    },
+    {
+      "canonical_name": "regime_directional_displacement_atr",
+      "historical_alias": "current_5m_directional_displacement_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "current",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "current_5m_directional_displacement_atr"
+    },
+    {
+      "canonical_name": "regime_range_atr_per_min",
+      "historical_alias": "current_5m_regime_range_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "current",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "current_5m_regime_range_atr_per_min"
+    },
+    {
+      "canonical_name": "distance_to_completed_range_high_atr",
+      "historical_alias": "distance_to_completed_5m_high_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "reference_timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "distance_to_completed_5m_high_atr"
+    },
+    {
+      "canonical_name": "distance_to_completed_range_low_atr",
+      "historical_alias": "distance_to_completed_5m_low_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "reference_timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "distance_to_completed_5m_low_atr"
+    },
+    {
+      "canonical_name": "move_outside_completed_range",
+      "historical_alias": "current_1m_move_outside_completed_5m_range",
+      "parameters": {
+        "context": "current",
+        "reference_bar_state": "completed",
+        "reference_timeframe": "5m",
+        "source_bar_state": "completed",
+        "source_timeframe": "1m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "current_1m_move_outside_completed_5m_range"
+    },
+    {
+      "canonical_name": "regime_duration_min",
+      "historical_alias": "prior_5m_regime_duration_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_5m_regime_duration_min"
+    },
+    {
+      "canonical_name": "regime_range_atr",
+      "historical_alias": "prior_5m_regime_range_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_5m_regime_range_atr"
+    },
+    {
+      "canonical_name": "regime_net_directional_move_atr",
+      "historical_alias": "prior_5m_regime_net_directional_move_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_5m_regime_net_directional_move_atr"
+    },
+    {
+      "canonical_name": "regime_mfe_atr",
+      "historical_alias": "prior_5m_regime_mfe_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_5m_regime_mfe_atr"
+    },
+    {
+      "canonical_name": "regime_range_atr_per_min",
+      "historical_alias": "prior_5m_regime_range_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_5m_regime_range_atr_per_min"
+    },
+    {
+      "canonical_name": "regime_net_move_atr_per_min",
+      "historical_alias": "prior_5m_regime_net_move_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_5m_regime_net_move_atr_per_min"
+    },
+    {
+      "canonical_name": "regime_efficiency",
+      "historical_alias": "prior_5m_regime_efficiency",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      },
+      "parity_evidence": "693/693 legacy parity matrix PASS",
+      "physical_alias": "prior_5m_regime_efficiency"
+    }
+  ],
+  "schema_version": 1,
+  "source": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/_work/coverage_smoke_2021_02_v1/features.parquet",
+  "study": "Codex_clean_maturity_flip_rolling_5m_productivity",
+  "unmapped": []
+}

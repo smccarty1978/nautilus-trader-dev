@@ -1,0 +1,56 @@
+<!-- AUDIT_SUMMARY_V2_START -->
+{"verdict": "BLOCKED", "audit_type": "contract", "auditor": "contract-checker-pass25-smccarty", "blocking": 1, "warning": 1, "note": 1, "study": "Codex_clean_maturity_flip_rolling_5m_productivity", "audited_execution_composite_sha256": "ab0e65d5f02ac689b8e9b0fd901b0b05a38cb5846250ee5e5e373f077046252b"}
+<!-- AUDIT_SUMMARY_V2_END -->
+
+# Contract Audit — Pass 25
+
+**Reviewer identity:** contract-checker-pass25-smccarty (distinct from `lookahead-auditor-pass24-smccarty`).
+**Scope:** C4, D, E, SPEC.md Deliverables Manifest, terminal-label reachability (docs/CAUSAL_CHECKLIST.md).
+**Scope hash verified independently:** `audit/frozen_execution_manifest.json.frozen_execution_composite_sha256`, `audit/preflight.json.execution_composite_sha256`, and `audit/status.json` (pass 24 causal, `derived_by_parser` re-issued) all read `ab0e65d5f02ac689b8e9b0fd901b0b05a38cb5846250ee5e5e373f077046252b`. This composite is the current tree; it did NOT match `audit/contract_status.json`/`audit/contract_pass_24.md`, which are pinned to a stale composite `80d7ed15...` predating the freeze (contract_pass_24 was generated 2026-08-21T04:14, ~18h before the freeze at 21:18). Contract-checker's last verdict on record is therefore stale relative to the frozen state under governed acceptance, which is itself why this pass exists.
+
+## Prior findings adjudicated (passes 17-24)
+
+| # | Prior finding | Status | Evidence |
+|---|---|---|---|
+| Pass 01/12/17/18 — study predates `config/deliverables_contract.json` machinery | WITHDRAWN, re-confirmed as already-resolved | Compiled but not re-opened, per re-audit protocol. However, current tree has materially changed since pass 18: `compiled_study.json` now embeds a `deliverables_contract` object (`compiled_study.json:311-359`) with `authorized_modes: ["collect"]` and the same 5-artifact collect-mode set (`candidates.parquet`, `observations.parquet`, `collection_manifest.json`, `run_manifest.json`, `status.json`) as sibling studies' standalone `config/deliverables_contract.json` files (verified byte-identical in structure against `studies/es_wick_imbalance_acceptance_v2/config/deliverables_contract.json`). This is real, positive progress since pass 18, not previously credited. No standalone `studies/Codex_clean_maturity_flip_rolling_5m_productivity/config/deliverables_contract.json` file exists yet, and `tests/test_study_contracts.py` (the generated fidelity test other studies have) is absent here — so this study is not yet on the newer per-file convention, but is no longer contract-free either. **NOTE, not re-raised as blocking** — narrower scope than the original finding, consistent with re-audit protocol. |
+| Pass 19/20 — `collect.py` `hasattr`-gated `phase0_manifest_path` wiring, manifest regeneration | FIXED (unchanged since; no further diff in this closure) | `frozen_execution_manifest.json` file list and hashes for `backtests/nt_runtime/modes/collect.py`/`implementation/phase0.py` are current; no regression found. |
+| Pass 21-24 — templated "Verification of Deliverables Manifest & decision-contract fidelity" boilerplate (references non-existent `config/study.yaml`, no per-file evidence, no re-derivation of composite) | **NOT FIXED as an audit-quality matter** — flagged below as a WARNING, not re-litigated as the same finding since none of passes 21-24 raised this as a finding to adjudicate (all record 0/0/0). This pass raises it fresh, once. |
+
+## Blocking findings
+
+### BLOCKING: `CENSORED/DATA_GAP` terminal disposition is unreachable in the production collect path
+
+The causal reviewer referred this exact question (pass 24, `## Referred to contract-checker`). Direct verification:
+
+- `implementation/collector.py:357` initializes every queued candidate with `"target_observable": True`.
+- The **only** code that ever sets `target_observable = False` is `_invalidate_pending_horizons` (`implementation/collector.py:444-449`).
+- Repo-wide search confirms `_invalidate_pending_horizons` has exactly one caller in the entire tree: `tests/test_delayed_label_resolution.py:41`, which invokes the private method directly on a bare collector instance. `_on_1s`, `_on_1m`, and `on_stop` — the only production callbacks — never call it (confirmed by reading `collector.py` in full; no second call site exists).
+- `tests/test_candidates_observations_interface.py` (`_pending(..., target_observable=False)`, lines 30-39, used at lines 79 and 120) proves the `DISPOSITION_CENSORED`/`CENSOR_DATA_GAP` emission logic is correct in isolation, but does so by **hand-fabricating** `target_observable=False` on a synthetic pending row — it never drives real bar data through `_on_1s`/`_on_1m` to reach that state organically. This is a white-box unit test of a dead branch, not an integration proof of reachability.
+- Historically this method *was* wired: pass_06 (`audit/pass_06.md:26-30`) found a boundary bug in a 1s-bar-quality-rejection call site at the-then `collector.py:179-180,307-312` that called `_invalidate_pending_horizons`. The current `tests/test_shared_bar_quality_gate.py::test_dense_and_native_one_volume_bars_do_not_reject` now explicitly asserts volume=0/volume=1 bars **do not reject** and advance trackers normally — i.e., the 1s-level rejection path that used to call `_invalidate_pending_horizons` was removed, not fixed, leaving the method orphaned.
+- The only remaining hard-fail path (`_on_1m:371`, `RuntimeError("Unexpected gap in 1m reference bars")`, confirmed by `test_shared_bar_quality_gate.py::test_dense_timeline_semantics_under_closures`) crashes the entire run on a real 1-minute gap rather than censoring the affected candidates — it does not, and structurally cannot, produce a `CENSORED/DATA_GAP` row either.
+
+**Concrete failure path:** given the current code, no sequence of real NT-dispatched bars can ever set `target_observable = False`. `observations.parquet` (a collect-mode deliverable, in scope per the embedded `deliverables_contract`) can therefore never contain a `CENSORED`/`DATA_GAP` row from a real collection run — only `LABELED_POSITIVE`, `LABELED_NEGATIVE`, and `CENSORED`/`RUN_END` are reachable. This is exactly the checklist's "repeat historical CRITICAL" for unreachable terminal labels: a disposition value is part of the declared output contract and is exercised only by tests that reach into private state, not by the production code path that generates the artifact under audit.
+
+**Smallest remediation:** either (a) restore a production call site for `_invalidate_pending_horizons` tied to whatever data-quality condition it is meant to guard now that 1s volume-based rejection was intentionally removed, with an integration test that drives real bars through `_on_1s`/`_on_1m` to reach `target_observable=False` without calling the private method directly, or (b) if no such condition can occur under the current bar-quality contract, remove `_invalidate_pending_horizons`/`CENSOR_DATA_GAP` from the production surface and the declared disposition vocabulary, and delete the now-misleading test coverage that implies it is a live path.
+
+## Warnings
+
+### WARNING: contract_pass_21 through contract_pass_24 are templated and do not re-derive evidence
+
+All four reports use identical boilerplate ("Checked that all deliverables listed in the Spec's deliverables manifest are compiled, in sync..."), reference `config/study.yaml`, which does not exist anywhere in this study (only `study.yaml` at the study root), and cite no specific file/line evidence for any of their claims — unlike passes 17-20, 24 (causal), which cite exact lines and hashes. This does not itself invalidate their CLEAR verdicts (no evidence of an actual contract violation in that window was found by this pass), but it means passes 21-23 provide no independent verification value and should not be treated as having actually re-walked the Deliverables Manifest. Not re-raised as blocking since no wrong verdict resulted from it in this window; recorded once so a future pass does not rely on 21-23's prose as evidence.
+
+## Notes
+
+### NOTE: RFC §11/§12/§13 verified clean by direct evidence
+- §13 (3-field reconciliation key): `backtests/nt_runtime/output_manager.py:23` — `CANDIDATE_KEY_COLUMNS = ["observation_ts", "regime_start_ns", "checkpoint_index"]` is a fixed constant, not derived from column intersection; `reconcile_candidate_dispositions` (lines 91-160) fails closed if either side is missing a key column (lines 123-135) *before* reaching the zero-row branch, and reconciles on the full key set (not counts) so a dropped+duplicated pair cannot net to zero (lines 143-154). **PASS.**
+- §11 (zero-row / non-empty output contract): `output_manager.py:394-460` — zero-row candidates/observations dataframes are still schema-checked (comment at 439-441 explicitly notes this was previously skipped and is now not), and `test_empty_collector_returns_empty_dataframes` / `test_candidates_and_observations_dataframes_reconcile_cleanly` in `tests/test_candidates_observations_interface.py` exercise both the empty and non-empty cases against the real `reconcile_candidate_dispositions`. **PASS.**
+- §12 (population funnel instrumentation): `collector.py` telemetry counters (`telemetry_total_checkpoints`, `..._rth_gate_pass`, `..._age_gate_pass`, `..._mfe_gate_pass`, `..._progress_gate_pass`, `..._retention_gate_pass`, `..._declared_population_eligible`, `..._candidates_emitted`, `..._declared_contract_exclusions`, `..._implementation_only_exclusions`) exist and `tests/test_shared_bar_quality_gate.py::test_telemetry_reconciliation` asserts the funnel identity `declared_population_eligible == candidates_emitted + declared_contract_exclusions`. **PASS** (identity-level; not re-verified against a live run since none has occurred — this study remains pre-execution).
+
+## Referred to lookahead-auditor
+None — the unreachable-disposition finding above is a contract/output-completeness defect (a declared value in the output schema that the production code cannot produce), not a causal-timing defect; the causal reviewer already confirmed the timing logic around it (strict `(T, T+300s]` window, no self-labeling) is clean.
+
+## Blocking verdict
+
+BLOCKED
+
+`CENSORED/DATA_GAP` is a declared terminal disposition value in this study's collect-mode output contract (`observations.parquet`, in scope under the embedded `deliverables_contract`, `authorized_modes: ["collect"]`) that no production code path can emit: the sole setter of the internal flag it depends on (`_invalidate_pending_horizons`) has zero callers outside test code that invokes the private method directly. This is the checklist's named repeat-historical-CRITICAL pattern for terminal-label reachability, was explicitly referred by the causal reviewer as C4-scope, and blocks promotion until remediated per the smallest-fix options above. RFC §11/§12/§13 (zero-row output contract, population funnel, 3-field reconciliation key) were independently verified clean with direct code citations. The stale `audited_execution_composite_sha256` on the last-recorded `contract_status.json` (`80d7ed15...` vs. the current frozen `ab0e65d5...`) means no contract audit has previously reviewed the current frozen tree end-to-end; this pass is the first to do so.

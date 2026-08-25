@@ -21,10 +21,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(HERE))
 
-from features.registry import FEATURE_REGISTRY  # noqa: E402
+from features.registry import resolve_feature_request, resolve_runtime_feature_aliases  # noqa: E402
 
 NEW_FAMILIES = ("ohlcv_est_delta", "price_level_context")
-NEW_FEATURE_COLS = [n for n, d in FEATURE_REGISTRY.items() if d.family in NEW_FAMILIES]
+_RESOLVED_FEATURES = {n: resolve_feature_request(n) for n in resolve_runtime_feature_aliases()}
+NEW_FEATURE_COLS = [n for n, d in _RESOLVED_FEATURES.items() if set(d["family"] if isinstance(d["family"], list) else (d["family"],)) & set(NEW_FAMILIES)]
 
 YEARS = (2021, 2022, 2023, 2024, 2025, 2026)
 KNOWN_CROSSING_CONTROLS = {2025: 650, 2026: 222}
@@ -87,7 +88,7 @@ def main() -> None:
     manifest = {
         "years": list(YEARS),
         "total_new_features_expected": len(NEW_FEATURE_COLS),
-        "families": {fam: sum(1 for n in NEW_FEATURE_COLS if FEATURE_REGISTRY[n].family == fam)
+        "families": {fam: sum(1 for n in NEW_FEATURE_COLS if fam in (_RESOLVED_FEATURES[n]["family"] if isinstance(_RESOLVED_FEATURES[n]["family"], list) else (_RESOLVED_FEATURES[n]["family"],)))
                     for fam in NEW_FAMILIES},
         "all_row_counts_unchanged": all_row_counts_unchanged,
         "all_labels_unchanged": all_labels_unchanged,

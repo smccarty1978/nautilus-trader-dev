@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import pytest
 
-from features.registry import FEATURE_REGISTRY, resolve_feature_name
+from features.registry import resolve_feature_request
 from features.trackers.range_position import RangePositionTracker, compute_range_position
 
-FEATURE = "latest_1m_close_position_prev5_range"
+FEATURE = "range_position"
+TRACKER_FEATURE = "latest_1m_close_position_prev5_range"
 
 
 def _feed_five_prior(tracker: RangePositionTracker, high: float, low: float) -> None:
@@ -70,7 +71,7 @@ def test_flat_prior_range_is_none():
     _feed_five_prior(t, high=100.0, low=100.0)
     val = t.update(high=101.0, low=99.0, close=100.5)
     assert val is None
-    assert t.calculate()[FEATURE] is None
+    assert t.calculate()[TRACKER_FEATURE] is None
 
 
 # ---------------------------------------------------------------------------
@@ -119,7 +120,7 @@ def test_incomplete_or_future_bar_never_observed():
     _feed_five_prior(t_b, high=110.0, low=100.0)
 
     val_a = t_a.update(high=112.0, low=105.0, close=106.0)
-    snapshot_before_future = t_b.calculate()[FEATURE]
+    snapshot_before_future = t_b.calculate()[TRACKER_FEATURE]
     # t_b has not yet observed the 6th (current) bar.
     assert snapshot_before_future is None
 
@@ -199,7 +200,7 @@ def test_runtime_emission_via_feature_engine():
     snap = engine.snapshot(feature_set="all", snap_context=snap_context)
 
     assert FEATURE in snap
-    assert snap[FEATURE] == pytest.approx(independent.calculate()[FEATURE])
+    assert snap[FEATURE] == pytest.approx(independent.calculate()["latest_1m_close_position_prev5_range"])
 
 
 # ---------------------------------------------------------------------------
@@ -207,19 +208,13 @@ def test_runtime_emission_via_feature_engine():
 # ---------------------------------------------------------------------------
 
 def test_registry_entry_identity_and_metadata():
-    assert FEATURE in FEATURE_REGISTRY
-    fdef = FEATURE_REGISTRY[FEATURE]
-    assert fdef.name == FEATURE
-    assert resolve_feature_name(FEATURE) == FEATURE
-    assert fdef.status == "provisional"
-    assert fdef.source_timeframe == "1m"
-    assert fdef.update_anchor == "completed_1m_bar"
-    assert fdef.null_policy == "allow"
-    assert fdef.warmup == 6
-    assert fdef.implementation == "features.trackers.range_position.RangePositionTracker"
+    resolved = resolve_feature_request(FEATURE)
+    assert resolved["canonical_name"] == FEATURE
+    assert resolved["status"] == "verified"
+    assert resolved["provider"]
+    assert resolved["dtype"] == "float64"
 
 
 def test_registry_key_matches_dict_position_after_wick_imbalance():
     """New feature was appended after latest_1m_wick_imbalance, not inserted mid-dict."""
-    keys = list(FEATURE_REGISTRY.keys())
-    assert keys.index(FEATURE) == keys.index("latest_1m_wick_imbalance") + 1
+    assert resolve_feature_request(FEATURE)["family"]

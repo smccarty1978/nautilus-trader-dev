@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **docs/RESEARCH_WORKFLOW.md §3**.
+>
+> A proposal that was implemented differently.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # Proposed Canonical Workflow — Collection to Analysis
 
 **Project:** NautilusTrader ML Research Framework  

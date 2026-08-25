@@ -1,0 +1,384 @@
+{
+  "promotions": [
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "distance_to_completed_range_high_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "reference_timeframe",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "distance_to_completed_range_low_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "reference_timeframe",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "move_outside_completed_range",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "source_timeframe",
+        "reference_timeframe",
+        "context",
+        "source_bar_state",
+        "reference_bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_age_min",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_directional_displacement_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_duration_min",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_efficiency",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_expansion_atr_per_min",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "context"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_mfe_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_net_directional_move_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_net_move_atr_per_min",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_range_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "regime_range_atr_per_min",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "timeframe",
+        "context",
+        "regime",
+        "bar_state"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "rolling_current_progress_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "supported_parameter_schema": [
+        "window",
+        "update_every"
+      ],
+      "test_evidence": [
+        "studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "rolling_current_speed_atr_per_min",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "supported_parameter_schema": [
+        "window",
+        "update_every"
+      ],
+      "test_evidence": [
+        "studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "rolling_current_speed_vs_lifetime",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "supported_parameter_schema": [
+        "window",
+        "update_every"
+      ],
+      "test_evidence": [
+        "studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "rolling_giveback_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "supported_parameter_schema": [
+        "window",
+        "update_every"
+      ],
+      "test_evidence": [
+        "studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "rolling_max_progress_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "supported_parameter_schema": [
+        "window",
+        "update_every"
+      ],
+      "test_evidence": [
+        "studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "rolling_max_speed_atr_per_min",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "supported_parameter_schema": [
+        "window",
+        "update_every"
+      ],
+      "test_evidence": [
+        "studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "rolling_max_speed_vs_lifetime",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "supported_parameter_schema": [
+        "window",
+        "update_every"
+      ],
+      "test_evidence": [
+        "studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "rolling_retention_ratio",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
+      "supported_parameter_schema": [
+        "window",
+        "update_every"
+      ],
+      "test_evidence": [
+        "studies/Codex_clean_maturity_flip_rolling_5m_productivity/tests/test_rolling_5m_productivity.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "structural_current_expansion_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "context"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "structural_expansion_atr_per_min",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "context"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "structural_giveback_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "context"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "structural_max_expansion_atr",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "context"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    },
+    {
+      "audited_execution_composite_sha256": "3be6c8711aad4639263ca26241347d5f9adf17b64dc693b9a89d8ad57788a090",
+      "causal_audit_artifact": "studies/Codex_clean_maturity_flip_rolling_5m_productivity/audit/pass_26.md",
+      "feature": "structural_retention_ratio",
+      "promoted_by": "feature_ctl promote",
+      "reviewed_implementation_sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "supported_parameter_schema": [
+        "context"
+      ],
+      "test_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ]
+    }
+  ],
+  "schema_version": 2
+}

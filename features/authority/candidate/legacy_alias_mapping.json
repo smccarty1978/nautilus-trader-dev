@@ -1,0 +1,5020 @@
+{
+  "aliases": {
+    "abs_delta_per_atr_moved_120s": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "abs_delta_per_atr_moved_15s": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "abs_delta_per_atr_moved_1800s": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "abs_delta_per_atr_moved_300s": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "abs_delta_per_atr_moved_30s": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "abs_delta_per_atr_moved_5s": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "abs_delta_per_atr_moved_60s": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "abs_delta_per_atr_moved_900s": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "abs_delta_per_point_moved_120s": {
+      "canonical_feature": "abs_delta_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "abs_delta_per_point_moved_15s": {
+      "canonical_feature": "abs_delta_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "abs_delta_per_point_moved_1800s": {
+      "canonical_feature": "abs_delta_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "abs_delta_per_point_moved_300s": {
+      "canonical_feature": "abs_delta_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "abs_delta_per_point_moved_30s": {
+      "canonical_feature": "abs_delta_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "abs_delta_per_point_moved_5s": {
+      "canonical_feature": "abs_delta_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "abs_delta_per_point_moved_60s": {
+      "canonical_feature": "abs_delta_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "abs_delta_per_point_moved_900s": {
+      "canonical_feature": "abs_delta_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "activity_duration_median_120m": {
+      "canonical_feature": "activity_duration_median",
+      "parameters": {
+        "timeframe": "120m"
+      }
+    },
+    "activity_duration_median_15m": {
+      "canonical_feature": "activity_duration_median",
+      "parameters": {
+        "timeframe": "15m"
+      }
+    },
+    "activity_duration_median_30m": {
+      "canonical_feature": "activity_duration_median",
+      "parameters": {
+        "timeframe": "30m"
+      }
+    },
+    "activity_duration_median_5m": {
+      "canonical_feature": "activity_duration_median",
+      "parameters": {
+        "timeframe": "5m"
+      }
+    },
+    "activity_duration_median_60m": {
+      "canonical_feature": "activity_duration_median",
+      "parameters": {
+        "timeframe": "60m"
+      }
+    },
+    "activity_flip_count_30m": {
+      "canonical_feature": "activity_flip_count",
+      "parameters": {
+        "timeframe": "30m"
+      }
+    },
+    "activity_regime_count_120m": {
+      "canonical_feature": "activity_regime_count",
+      "parameters": {
+        "timeframe": "120m"
+      }
+    },
+    "activity_regime_count_15m": {
+      "canonical_feature": "activity_regime_count",
+      "parameters": {
+        "timeframe": "15m"
+      }
+    },
+    "activity_regime_count_30m": {
+      "canonical_feature": "activity_regime_count",
+      "parameters": {
+        "timeframe": "30m"
+      }
+    },
+    "activity_regime_count_5m": {
+      "canonical_feature": "activity_regime_count",
+      "parameters": {
+        "timeframe": "5m"
+      }
+    },
+    "activity_regime_count_60m": {
+      "canonical_feature": "activity_regime_count",
+      "parameters": {
+        "timeframe": "60m"
+      }
+    },
+    "activity_regime_count_std": {
+      "canonical_feature": "activity_regime_count_std",
+      "parameters": {}
+    },
+    "aligned_price_minus_center_15m": {
+      "canonical_feature": "aligned_price_minus_center",
+      "parameters": {
+        "timeframe": "15m"
+      }
+    },
+    "aligned_price_minus_center_30m": {
+      "canonical_feature": "aligned_price_minus_center",
+      "parameters": {
+        "timeframe": "30m"
+      }
+    },
+    "aligned_price_minus_center_5m": {
+      "canonical_feature": "aligned_price_minus_center",
+      "parameters": {
+        "timeframe": "5m"
+      }
+    },
+    "arrival_accel_10s": {
+      "canonical_feature": "arrival_acceleration",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "short_lookback": 10
+      }
+    },
+    "arrival_accel_5s": {
+      "canonical_feature": "arrival_acceleration",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "short_lookback": 5
+      }
+    },
+    "arrival_jerk": {
+      "canonical_feature": "arrival_jerk",
+      "parameters": {
+        "derivative_order": 3
+      }
+    },
+    "arrival_vel_10s": {
+      "canonical_feature": "arrival_velocity",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 10
+      }
+    },
+    "arrival_vel_20s": {
+      "canonical_feature": "arrival_velocity",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 20
+      }
+    },
+    "arrival_vel_30s": {
+      "canonical_feature": "arrival_velocity",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 30
+      }
+    },
+    "arrival_vel_5s": {
+      "canonical_feature": "arrival_velocity",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 5
+      }
+    },
+    "bar_est_bear_volume": {
+      "canonical_feature": "bar_est_bear_volume",
+      "parameters": {
+        "context": "bar"
+      }
+    },
+    "bar_est_bull_volume": {
+      "canonical_feature": "bar_est_bull_volume",
+      "parameters": {
+        "context": "bar"
+      }
+    },
+    "bar_est_delta": {
+      "canonical_feature": "bar_est_delta",
+      "parameters": {
+        "context": "bar"
+      }
+    },
+    "bar_est_delta_ratio": {
+      "canonical_feature": "bar_est_delta_ratio",
+      "parameters": {
+        "context": "bar"
+      }
+    },
+    "bar_volume": {
+      "canonical_feature": "bar_volume",
+      "parameters": {
+        "context": "bar"
+      }
+    },
+    "bar_zero_range": {
+      "canonical_feature": "bar_zero_range",
+      "parameters": {
+        "context": "bar"
+      }
+    },
+    "center_slope_acceleration_15m": {
+      "canonical_feature": "center_slope_acceleration",
+      "parameters": {
+        "timeframe": "15m"
+      }
+    },
+    "center_slope_acceleration_30m": {
+      "canonical_feature": "center_slope_acceleration",
+      "parameters": {
+        "timeframe": "30m"
+      }
+    },
+    "center_slope_acceleration_5m": {
+      "canonical_feature": "center_slope_acceleration",
+      "parameters": {
+        "timeframe": "5m"
+      }
+    },
+    "center_slope_change_15m": {
+      "canonical_feature": "center_slope_change",
+      "parameters": {
+        "timeframe": "15m"
+      }
+    },
+    "center_slope_change_30m": {
+      "canonical_feature": "center_slope_change",
+      "parameters": {
+        "timeframe": "30m"
+      }
+    },
+    "center_slope_change_5m": {
+      "canonical_feature": "center_slope_change",
+      "parameters": {
+        "timeframe": "5m"
+      }
+    },
+    "center_spread_15m_30m": {
+      "canonical_feature": "center_spread",
+      "parameters": {
+        "timeframe": "15m",
+        "timeframe_2": "30m"
+      }
+    },
+    "center_spread_5m_15m": {
+      "canonical_feature": "center_spread",
+      "parameters": {
+        "timeframe": "5m",
+        "timeframe_2": "15m"
+      }
+    },
+    "center_spread_5m_30m": {
+      "canonical_feature": "center_spread",
+      "parameters": {
+        "timeframe": "5m",
+        "timeframe_2": "30m"
+      }
+    },
+    "clean_pullback_score_1m": {
+      "canonical_feature": "clean_score",
+      "parameters": {
+        "scope": "since_breach",
+        "timeframe": "1m"
+      }
+    },
+    "close_vs_range_30s": {
+      "canonical_feature": "close_vs_range",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "30s"
+      }
+    },
+    "consecutive_down_1s": {
+      "canonical_feature": "consecutive_down",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      }
+    },
+    "consecutive_up_1s": {
+      "canonical_feature": "consecutive_up",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      }
+    },
+    "cross_family_slope_vs_reg_count": {
+      "canonical_feature": "cross_family_slope_vs_reg_count",
+      "parameters": {}
+    },
+    "cross_family_spread_vs_reg_count": {
+      "canonical_feature": "cross_family_spread_vs_reg_count",
+      "parameters": {}
+    },
+    "crosses_per_minute": {
+      "canonical_feature": "crosses_per_minute",
+      "parameters": {}
+    },
+    "current_1m_move_outside_completed_5m_range": {
+      "canonical_feature": "move_outside_completed_range",
+      "parameters": {
+        "context": "current",
+        "reference_bar_state": "completed",
+        "reference_timeframe": "5m",
+        "source_bar_state": "completed",
+        "source_timeframe": "1m"
+      }
+    },
+    "current_5m_directional_displacement_atr": {
+      "canonical_feature": "regime_directional_displacement_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "current",
+        "timeframe": "5m"
+      }
+    },
+    "current_5m_regime_age_min": {
+      "canonical_feature": "regime_age_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "current",
+        "timeframe": "5m"
+      }
+    },
+    "current_5m_regime_range_atr": {
+      "canonical_feature": "regime_range_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "current",
+        "timeframe": "5m"
+      }
+    },
+    "current_5m_regime_range_atr_per_min": {
+      "canonical_feature": "regime_range_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "current",
+        "timeframe": "5m"
+      }
+    },
+    "directional_space_balance_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "directional_space_balance_atr"
+      }
+    },
+    "distance_above_full_envelope_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "distance_above_full_envelope_atr"
+      }
+    },
+    "distance_below_full_envelope_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "distance_below_full_envelope_atr"
+      }
+    },
+    "distance_to_completed_5m_high_atr": {
+      "canonical_feature": "distance_to_completed_range_high_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "reference_timeframe": "5m"
+      }
+    },
+    "distance_to_completed_5m_low_atr": {
+      "canonical_feature": "distance_to_completed_range_low_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "reference_timeframe": "5m"
+      }
+    },
+    "down_vol_ratio_10s": {
+      "canonical_feature": "directional_volume_ratio",
+      "parameters": {
+        "direction": "down",
+        "window": "10s"
+      }
+    },
+    "downbar_vol_sum_120s": {
+      "canonical_feature": "downbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "downbar_vol_sum_15s": {
+      "canonical_feature": "downbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "downbar_vol_sum_1800s": {
+      "canonical_feature": "downbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "downbar_vol_sum_300s": {
+      "canonical_feature": "downbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "downbar_vol_sum_30s": {
+      "canonical_feature": "downbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "downbar_vol_sum_5s": {
+      "canonical_feature": "downbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "downbar_vol_sum_60s": {
+      "canonical_feature": "downbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "downbar_vol_sum_900s": {
+      "canonical_feature": "downbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "duration_median_last_10": {
+      "canonical_feature": "duration_median",
+      "parameters": {
+        "lookback": 10
+      }
+    },
+    "duration_median_last_3": {
+      "canonical_feature": "duration_median",
+      "parameters": {
+        "lookback": 3
+      }
+    },
+    "duration_median_last_5": {
+      "canonical_feature": "duration_median",
+      "parameters": {
+        "lookback": 5
+      }
+    },
+    "duration_ratio_3_vs_10": {
+      "canonical_feature": "duration_ratio",
+      "parameters": {
+        "denominator_lookback": 10,
+        "numerator_lookback": 3
+      }
+    },
+    "duration_ratio_5_vs_10": {
+      "canonical_feature": "duration_ratio",
+      "parameters": {
+        "denominator_lookback": 10,
+        "numerator_lookback": 5
+      }
+    },
+    "ema_slope_long": {
+      "canonical_feature": "ema_slope",
+      "parameters": {
+        "ema_role": "long",
+        "lookback": 5
+      }
+    },
+    "ema_slope_short": {
+      "canonical_feature": "ema_slope",
+      "parameters": {
+        "ema_role": "short",
+        "lookback": 5
+      }
+    },
+    "est_abs_delta_sum_120s": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "est_abs_delta_sum_15s": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "est_abs_delta_sum_1800s": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "est_abs_delta_sum_300s": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "est_abs_delta_sum_30s": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "est_abs_delta_sum_5s": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "est_abs_delta_sum_60s": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "est_abs_delta_sum_900s": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "est_bear_vol_sum_120s": {
+      "canonical_feature": "est_bear_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "est_bear_vol_sum_15s": {
+      "canonical_feature": "est_bear_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "est_bear_vol_sum_1800s": {
+      "canonical_feature": "est_bear_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "est_bear_vol_sum_300s": {
+      "canonical_feature": "est_bear_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "est_bear_vol_sum_30s": {
+      "canonical_feature": "est_bear_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "est_bear_vol_sum_5s": {
+      "canonical_feature": "est_bear_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "est_bear_vol_sum_60s": {
+      "canonical_feature": "est_bear_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "est_bear_vol_sum_900s": {
+      "canonical_feature": "est_bear_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "est_bull_vol_sum_120s": {
+      "canonical_feature": "est_bull_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "est_bull_vol_sum_15s": {
+      "canonical_feature": "est_bull_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "est_bull_vol_sum_1800s": {
+      "canonical_feature": "est_bull_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "est_bull_vol_sum_300s": {
+      "canonical_feature": "est_bull_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "est_bull_vol_sum_30s": {
+      "canonical_feature": "est_bull_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "est_bull_vol_sum_5s": {
+      "canonical_feature": "est_bull_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "est_bull_vol_sum_60s": {
+      "canonical_feature": "est_bull_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "est_bull_vol_sum_900s": {
+      "canonical_feature": "est_bull_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "est_delta_neg_sum_120s": {
+      "canonical_feature": "est_delta_neg_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "est_delta_neg_sum_15s": {
+      "canonical_feature": "est_delta_neg_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "est_delta_neg_sum_1800s": {
+      "canonical_feature": "est_delta_neg_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "est_delta_neg_sum_300s": {
+      "canonical_feature": "est_delta_neg_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "est_delta_neg_sum_30s": {
+      "canonical_feature": "est_delta_neg_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "est_delta_neg_sum_5s": {
+      "canonical_feature": "est_delta_neg_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "est_delta_neg_sum_60s": {
+      "canonical_feature": "est_delta_neg_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "est_delta_neg_sum_900s": {
+      "canonical_feature": "est_delta_neg_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "est_delta_pos_sum_120s": {
+      "canonical_feature": "est_delta_pos_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "est_delta_pos_sum_15s": {
+      "canonical_feature": "est_delta_pos_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "est_delta_pos_sum_1800s": {
+      "canonical_feature": "est_delta_pos_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "est_delta_pos_sum_300s": {
+      "canonical_feature": "est_delta_pos_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "est_delta_pos_sum_30s": {
+      "canonical_feature": "est_delta_pos_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "est_delta_pos_sum_5s": {
+      "canonical_feature": "est_delta_pos_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "est_delta_pos_sum_60s": {
+      "canonical_feature": "est_delta_pos_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "est_delta_pos_sum_900s": {
+      "canonical_feature": "est_delta_pos_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "est_delta_ratio_120s": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "est_delta_ratio_15s": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "est_delta_ratio_15s_minus_60s": {
+      "canonical_feature": "est_delta_ratio_minus",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s",
+        "timeframe_2": "60s"
+      }
+    },
+    "est_delta_ratio_1800s": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "est_delta_ratio_300s": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "est_delta_ratio_30s": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "est_delta_ratio_30s_minus_120s": {
+      "canonical_feature": "est_delta_ratio_minus",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s",
+        "timeframe_2": "120s"
+      }
+    },
+    "est_delta_ratio_5s": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "est_delta_ratio_60s": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "est_delta_ratio_60s_minus_300s": {
+      "canonical_feature": "est_delta_ratio_minus",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s",
+        "timeframe_2": "300s"
+      }
+    },
+    "est_delta_ratio_900s": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "est_delta_sum_120s": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "est_delta_sum_15s": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "est_delta_sum_15s_minus_60s_scaled": {
+      "canonical_feature": "est_delta_sum_minus_scaled",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s",
+        "timeframe_2": "60s"
+      }
+    },
+    "est_delta_sum_1800s": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "est_delta_sum_300s": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "est_delta_sum_30s": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "est_delta_sum_30s_minus_120s_scaled": {
+      "canonical_feature": "est_delta_sum_minus_scaled",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s",
+        "timeframe_2": "120s"
+      }
+    },
+    "est_delta_sum_5s": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "est_delta_sum_60s": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "est_delta_sum_60s_minus_300s_scaled": {
+      "canonical_feature": "est_delta_sum_minus_scaled",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s",
+        "timeframe_2": "300s"
+      }
+    },
+    "est_delta_sum_900s": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "fraction_of_time_on_adverse_side": {
+      "canonical_feature": "fraction_of_time_on_adverse_side",
+      "parameters": {}
+    },
+    "fraction_of_time_on_favorable_side": {
+      "canonical_feature": "fraction_of_time_on_favorable_side",
+      "parameters": {}
+    },
+    "full_level_envelope_width_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "full_level_envelope_width_atr"
+      }
+    },
+    "full_level_envelope_width_points": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "full_level_envelope_width_points"
+      }
+    },
+    "higher_lows_count_1m": {
+      "canonical_feature": "higher_lows_count",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1m"
+      }
+    },
+    "higher_lows_count_1s": {
+      "canonical_feature": "higher_lows_count",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      }
+    },
+    "highest_available_level": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "highest_available_level"
+      }
+    },
+    "inverse_distance_density": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "inverse_distance_density"
+      }
+    },
+    "is_decelerating": {
+      "canonical_feature": "arrival_deceleration",
+      "parameters": {}
+    },
+    "is_rth": {
+      "canonical_feature": "session_membership",
+      "parameters": {
+        "session": "RTH"
+      }
+    },
+    "latest_1m_close_position_prev5_range": {
+      "canonical_feature": "range_position",
+      "parameters": {
+        "bar_state": "completed",
+        "lookback": 5,
+        "timeframe": "1m"
+      }
+    },
+    "latest_1m_wick_imbalance": {
+      "canonical_feature": "wick_imbalance",
+      "parameters": {
+        "bar_state": "completed",
+        "timeframe": "1m"
+      }
+    },
+    "level_balance": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_balance"
+      }
+    },
+    "level_density_025a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_density_025a"
+      }
+    },
+    "level_density_050a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_density_050a"
+      }
+    },
+    "level_density_100a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_density_100a"
+      }
+    },
+    "level_density_200a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "level_density_200a"
+      }
+    },
+    "levels_above_within_025a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_above_within_025a"
+      }
+    },
+    "levels_above_within_050a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_above_within_050a"
+      }
+    },
+    "levels_above_within_100a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_above_within_100a"
+      }
+    },
+    "levels_above_within_200a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_above_within_200a"
+      }
+    },
+    "levels_ahead_of_trade": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_ahead_of_trade"
+      }
+    },
+    "levels_behind_trade": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_behind_trade"
+      }
+    },
+    "levels_below_within_025a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_below_within_025a"
+      }
+    },
+    "levels_below_within_050a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_below_within_050a"
+      }
+    },
+    "levels_below_within_100a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_below_within_100a"
+      }
+    },
+    "levels_below_within_200a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "levels_below_within_200a"
+      }
+    },
+    "lower_highs_count_1m": {
+      "canonical_feature": "lower_highs_count",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1m"
+      }
+    },
+    "lower_highs_count_1s": {
+      "canonical_feature": "lower_highs_count",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      }
+    },
+    "lowest_available_level": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "lowest_available_level"
+      }
+    },
+    "max_cluster_strength": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "max_cluster_strength"
+      }
+    },
+    "max_nearby_cluster_strength_050a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "max_nearby_cluster_strength_050a"
+      }
+    },
+    "max_nearby_cluster_strength_100a": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "max_nearby_cluster_strength_100a"
+      }
+    },
+    "max_vel_30s": {
+      "canonical_feature": "arrival_velocity_max",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "lookback": 30,
+        "velocity_lookback": 5
+      }
+    },
+    "minutes_since_rth_open": {
+      "canonical_feature": "session_elapsed",
+      "parameters": {
+        "session": "RTH",
+        "unit": "minutes"
+      }
+    },
+    "n_level_clusters_above": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_level_clusters_above"
+      }
+    },
+    "n_level_clusters_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "n_level_clusters",
+        "level_context": "session"
+      }
+    },
+    "n_level_clusters_below": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_level_clusters_below"
+      }
+    },
+    "n_level_clusters_touched": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_level_clusters_touched"
+      }
+    },
+    "n_levels_above": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_levels_above"
+      }
+    },
+    "n_levels_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "n_levels",
+        "level_context": "session"
+      }
+    },
+    "n_levels_below": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_levels_below"
+      }
+    },
+    "n_levels_touched": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_levels_touched"
+      }
+    },
+    "n_prior_day_levels_above": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_prior_day_levels_above"
+      }
+    },
+    "n_prior_day_levels_below": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_prior_day_levels_below"
+      }
+    },
+    "n_rolling_levels_above": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_rolling_levels_above"
+      }
+    },
+    "n_rolling_levels_below": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_rolling_levels_below"
+      }
+    },
+    "n_session_levels_above": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_session_levels_above"
+      }
+    },
+    "n_session_levels_below": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "n_session_levels_below"
+      }
+    },
+    "nearest_cluster_above_distance_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_above_distance_atr"
+      }
+    },
+    "nearest_cluster_above_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "nearest_cluster_above",
+        "level_context": "session"
+      }
+    },
+    "nearest_cluster_above_strength": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_above_strength"
+      }
+    },
+    "nearest_cluster_ahead_distance_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_ahead_distance_atr"
+      }
+    },
+    "nearest_cluster_behind_distance_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_behind_distance_atr"
+      }
+    },
+    "nearest_cluster_below_distance_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_below_distance_atr"
+      }
+    },
+    "nearest_cluster_below_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "nearest_cluster_below",
+        "level_context": "session"
+      }
+    },
+    "nearest_cluster_below_strength": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_cluster_below_strength"
+      }
+    },
+    "nearest_level_above_distance_atr": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_above_distance_atr"
+      }
+    },
+    "nearest_level_above_distance_points": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_above_distance_points"
+      }
+    },
+    "nearest_level_above_distance_ticks": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_above_distance_ticks"
+      }
+    },
+    "nearest_level_above_name": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_above_name"
+      }
+    },
+    "nearest_level_above_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "nearest_level_above",
+        "level_context": "session"
+      }
+    },
+    "nearest_level_ahead_distance_atr": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_ahead_distance_atr"
+      }
+    },
+    "nearest_level_behind_distance_atr": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_behind_distance_atr"
+      }
+    },
+    "nearest_level_below_distance_atr": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_below_distance_atr"
+      }
+    },
+    "nearest_level_below_distance_points": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_below_distance_points"
+      }
+    },
+    "nearest_level_below_distance_ticks": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_below_distance_ticks"
+      }
+    },
+    "nearest_level_below_name": {
+      "canonical_feature": "nearest_level_geometry",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_level_below_name"
+      }
+    },
+    "nearest_level_below_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "nearest_level_below",
+        "level_context": "session"
+      }
+    },
+    "nearest_space_balance_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_space_balance_atr"
+      }
+    },
+    "nearest_space_total_atr": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_space_total_atr"
+      }
+    },
+    "nearest_upside_downside_ratio": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "nearest_upside_downside_ratio"
+      }
+    },
+    "opening_range_30m_elapsed_seconds": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "opening_range_elapsed_seconds",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_developing_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_developing_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_developing_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_developing_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "normalization": "atr",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_developing_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "normalization": "points",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_developing_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_high_developing",
+        "level_context": "session",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_final_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_final_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_final_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_final_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "normalization": "atr",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_final_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "normalization": "points",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_high_final_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_high_final",
+        "level_context": "session",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_is_developing": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "opening_range_is_developing",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_is_final": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "opening_range_is_final",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_developing_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_developing_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_developing_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_developing_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "normalization": "atr",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_developing_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "normalization": "points",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_developing_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_low_developing",
+        "level_context": "session",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_final_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_final_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_final_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_final_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "normalization": "atr",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_final_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "normalization": "points",
+        "timeframe": "30m"
+      }
+    },
+    "opening_range_30m_low_final_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "opening_range_low_final",
+        "level_context": "session",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      }
+    },
+    "ordering_changes_15m": {
+      "canonical_feature": "ordering_changes",
+      "parameters": {
+        "timeframe": "15m"
+      }
+    },
+    "ordering_changes_30m": {
+      "canonical_feature": "ordering_changes",
+      "parameters": {
+        "timeframe": "30m"
+      }
+    },
+    "ordering_changes_60m": {
+      "canonical_feature": "ordering_changes",
+      "parameters": {
+        "timeframe": "60m"
+      }
+    },
+    "ordering_state": {
+      "canonical_feature": "ordering_state",
+      "parameters": {}
+    },
+    "overnight_high_developing_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session"
+      }
+    },
+    "overnight_high_developing_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session"
+      }
+    },
+    "overnight_high_developing_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session"
+      }
+    },
+    "overnight_high_developing_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session",
+        "normalization": "atr"
+      }
+    },
+    "overnight_high_developing_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session",
+        "normalization": "points"
+      }
+    },
+    "overnight_high_developing_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_high_developing",
+        "level_context": "session",
+        "normalization": "ticks"
+      }
+    },
+    "overnight_high_final_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session"
+      }
+    },
+    "overnight_high_final_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session"
+      }
+    },
+    "overnight_high_final_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session"
+      }
+    },
+    "overnight_high_final_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session",
+        "normalization": "atr"
+      }
+    },
+    "overnight_high_final_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session",
+        "normalization": "points"
+      }
+    },
+    "overnight_high_final_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_high_final",
+        "level_context": "session",
+        "normalization": "ticks"
+      }
+    },
+    "overnight_low_developing_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session"
+      }
+    },
+    "overnight_low_developing_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session"
+      }
+    },
+    "overnight_low_developing_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session"
+      }
+    },
+    "overnight_low_developing_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session",
+        "normalization": "atr"
+      }
+    },
+    "overnight_low_developing_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session",
+        "normalization": "points"
+      }
+    },
+    "overnight_low_developing_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_low_developing",
+        "level_context": "session",
+        "normalization": "ticks"
+      }
+    },
+    "overnight_low_final_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session"
+      }
+    },
+    "overnight_low_final_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session"
+      }
+    },
+    "overnight_low_final_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session"
+      }
+    },
+    "overnight_low_final_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session",
+        "normalization": "atr"
+      }
+    },
+    "overnight_low_final_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session",
+        "normalization": "points"
+      }
+    },
+    "overnight_low_final_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "overnight_low_final",
+        "level_context": "session",
+        "normalization": "ticks"
+      }
+    },
+    "pct_levels_above": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_above"
+      }
+    },
+    "pct_levels_ahead_of_trade": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_ahead_of_trade"
+      }
+    },
+    "pct_levels_behind_trade": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_behind_trade"
+      }
+    },
+    "pct_levels_below": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_below"
+      }
+    },
+    "pct_levels_touched": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "pct_levels_touched"
+      }
+    },
+    "price_change_atr_120s": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "price_change_atr_15s": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "price_change_atr_1800s": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "price_change_atr_300s": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "price_change_atr_30s": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "price_change_atr_5s": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "price_change_atr_60s": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "price_change_atr_900s": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "price_change_points_120s": {
+      "canonical_feature": "price_change_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "price_change_points_15s": {
+      "canonical_feature": "price_change_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "price_change_points_1800s": {
+      "canonical_feature": "price_change_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "price_change_points_300s": {
+      "canonical_feature": "price_change_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "price_change_points_30s": {
+      "canonical_feature": "price_change_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "price_change_points_5s": {
+      "canonical_feature": "price_change_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "price_change_points_60s": {
+      "canonical_feature": "price_change_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "price_change_points_900s": {
+      "canonical_feature": "price_change_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "price_cross_count_15m": {
+      "canonical_feature": "price_cross_count",
+      "parameters": {
+        "timeframe": "15m"
+      }
+    },
+    "price_cross_count_30m": {
+      "canonical_feature": "price_cross_count",
+      "parameters": {
+        "timeframe": "30m"
+      }
+    },
+    "price_cross_count_5m": {
+      "canonical_feature": "price_cross_count",
+      "parameters": {
+        "timeframe": "5m"
+      }
+    },
+    "price_position_in_full_envelope": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "price_position_in_full_envelope"
+      }
+    },
+    "prior_1m_regime_duration_min": {
+      "canonical_feature": "regime_duration_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      }
+    },
+    "prior_1m_regime_efficiency": {
+      "canonical_feature": "regime_efficiency",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      }
+    },
+    "prior_1m_regime_mfe_atr": {
+      "canonical_feature": "regime_mfe_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      }
+    },
+    "prior_1m_regime_net_directional_move_atr": {
+      "canonical_feature": "regime_net_directional_move_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      }
+    },
+    "prior_1m_regime_net_move_atr_per_min": {
+      "canonical_feature": "regime_net_move_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      }
+    },
+    "prior_1m_regime_range_atr": {
+      "canonical_feature": "regime_range_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      }
+    },
+    "prior_1m_regime_range_atr_per_min": {
+      "canonical_feature": "regime_range_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "1m"
+      }
+    },
+    "prior_5m_regime_duration_min": {
+      "canonical_feature": "regime_duration_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      }
+    },
+    "prior_5m_regime_efficiency": {
+      "canonical_feature": "regime_efficiency",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      }
+    },
+    "prior_5m_regime_mfe_atr": {
+      "canonical_feature": "regime_mfe_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      }
+    },
+    "prior_5m_regime_net_directional_move_atr": {
+      "canonical_feature": "regime_net_directional_move_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      }
+    },
+    "prior_5m_regime_net_move_atr_per_min": {
+      "canonical_feature": "regime_net_move_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      }
+    },
+    "prior_5m_regime_range_atr": {
+      "canonical_feature": "regime_range_atr",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      }
+    },
+    "prior_5m_regime_range_atr_per_min": {
+      "canonical_feature": "regime_range_atr_per_min",
+      "parameters": {
+        "bar_state": "completed",
+        "context": "prior",
+        "timeframe": "5m"
+      }
+    },
+    "prior_day_close_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_close_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_close_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_close_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day",
+        "normalization": "atr"
+      }
+    },
+    "prior_day_close_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day",
+        "normalization": "points"
+      }
+    },
+    "prior_day_close_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_close",
+        "level_context": "prior_day",
+        "normalization": "ticks"
+      }
+    },
+    "prior_day_high_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_high_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_high_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_high_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day",
+        "normalization": "atr"
+      }
+    },
+    "prior_day_high_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day",
+        "normalization": "points"
+      }
+    },
+    "prior_day_high_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_high",
+        "level_context": "prior_day",
+        "normalization": "ticks"
+      }
+    },
+    "prior_day_low_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_low_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_low_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_low_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day",
+        "normalization": "atr"
+      }
+    },
+    "prior_day_low_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day",
+        "normalization": "points"
+      }
+    },
+    "prior_day_low_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_low",
+        "level_context": "prior_day",
+        "normalization": "ticks"
+      }
+    },
+    "prior_day_open_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_open_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_open_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day"
+      }
+    },
+    "prior_day_open_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day",
+        "normalization": "atr"
+      }
+    },
+    "prior_day_open_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day",
+        "normalization": "points"
+      }
+    },
+    "prior_day_open_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "prior_day_open",
+        "level_context": "prior_day",
+        "normalization": "ticks"
+      }
+    },
+    "pullback_bars_1m": {
+      "canonical_feature": "pullback_bars",
+      "parameters": {
+        "scope": "since_breach",
+        "timeframe": "1m"
+      }
+    },
+    "pullback_depth_atr": {
+      "canonical_feature": "pullback_depth_atr",
+      "parameters": {
+        "scope": "since_breach"
+      }
+    },
+    "pullback_efficiency_1m": {
+      "canonical_feature": "pullback_efficiency",
+      "parameters": {
+        "scope": "since_breach",
+        "timeframe": "1m"
+      }
+    },
+    "pullback_linearity_1s": {
+      "canonical_feature": "pullback_linearity",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      }
+    },
+    "range_30s_atr": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "30s"
+      }
+    },
+    "range_atr_120s": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "range_atr_15s": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "range_atr_1800s": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "range_atr_300s": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "range_atr_30s": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "range_atr_5s": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "range_atr_60s": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "range_atr_900s": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "range_points_120s": {
+      "canonical_feature": "range_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "range_points_15s": {
+      "canonical_feature": "range_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "range_points_1800s": {
+      "canonical_feature": "range_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "range_points_300s": {
+      "canonical_feature": "range_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "range_points_30s": {
+      "canonical_feature": "range_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "range_points_5s": {
+      "canonical_feature": "range_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "range_points_60s": {
+      "canonical_feature": "range_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "range_points_900s": {
+      "canonical_feature": "range_points",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "regime_abs_delta_per_atr_moved": {
+      "canonical_feature": "abs_delta_per_atr_moved",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_age_bars": {
+      "canonical_feature": "regime_age",
+      "parameters": {
+        "unit": "bars"
+      }
+    },
+    "regime_available": {
+      "canonical_feature": "available",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_elapsed_seconds": {
+      "canonical_feature": "elapsed_seconds",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_est_abs_delta_sum": {
+      "canonical_feature": "est_abs_delta_sum",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_est_delta_ratio": {
+      "canonical_feature": "est_delta_ratio",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_est_delta_sum": {
+      "canonical_feature": "est_delta_sum",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_expansion_atr_per_min": {
+      "canonical_feature": "regime_expansion_atr_per_min",
+      "parameters": {
+        "context": "current"
+      }
+    },
+    "regime_first_half_est_delta_ratio": {
+      "canonical_feature": "first_half_est_delta_ratio",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_first_half_vol": {
+      "canonical_feature": "first_half_vol",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_late_minus_early_delta_ratio": {
+      "canonical_feature": "late_minus_early_delta_ratio",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_late_vs_early_vol_ratio": {
+      "canonical_feature": "late_vs_early_vol_ratio",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_price_change_atr": {
+      "canonical_feature": "price_change_atr",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_range_atr": {
+      "canonical_feature": "range_atr",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_second_half_est_delta_ratio": {
+      "canonical_feature": "second_half_est_delta_ratio",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_second_half_vol": {
+      "canonical_feature": "second_half_vol",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_vol_sum": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_volume_per_atr_moved": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "regime_volume_per_second": {
+      "canonical_feature": "volume_per_second",
+      "parameters": {
+        "context": "regime"
+      }
+    },
+    "retracement_pct": {
+      "canonical_feature": "retracement_pct",
+      "parameters": {
+        "scope": "since_breach"
+      }
+    },
+    "rolling_15m_close_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_close_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_close_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_close_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_close_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_close_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_high_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_high_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_high_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_high_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_high_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_high_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_low_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_low_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_low_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_low_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_low_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_low_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_open_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_open_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_open_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_open_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_open_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_15m_open_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "15m"
+      }
+    },
+    "rolling_30m_close_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_close_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_close_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_close_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_close_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_close_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_high_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_high_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_high_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_high_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_high_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_high_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_low_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_low_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_low_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_low_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_low_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_low_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_open_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_open_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_open_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_open_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_open_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_30m_open_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "30m"
+      }
+    },
+    "rolling_5m_close_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_close_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_close_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_close_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_close_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_close_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_current_progress_atr": {
+      "canonical_feature": "rolling_current_progress_atr",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      }
+    },
+    "rolling_5m_current_speed_atr_per_min": {
+      "canonical_feature": "rolling_current_speed_atr_per_min",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      }
+    },
+    "rolling_5m_current_speed_vs_lifetime": {
+      "canonical_feature": "rolling_current_speed_vs_lifetime",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      }
+    },
+    "rolling_5m_giveback_atr": {
+      "canonical_feature": "rolling_giveback_atr",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      }
+    },
+    "rolling_5m_high_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_high_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_high_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_high_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_high_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_high_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_low_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_low_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_low_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_low_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_low_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_low_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_max_progress_atr": {
+      "canonical_feature": "rolling_max_progress_atr",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      }
+    },
+    "rolling_5m_max_speed_atr_per_min": {
+      "canonical_feature": "rolling_max_speed_atr_per_min",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      }
+    },
+    "rolling_5m_max_speed_vs_lifetime": {
+      "canonical_feature": "rolling_max_speed_vs_lifetime",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      }
+    },
+    "rolling_5m_open_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_open_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_open_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_open_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_open_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_open_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "5m"
+      }
+    },
+    "rolling_5m_retention_ratio": {
+      "canonical_feature": "rolling_retention_ratio",
+      "parameters": {
+        "update_every": "1s",
+        "window": "300s"
+      }
+    },
+    "rolling_60m_close_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_close_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_close_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_close_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_close_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_close_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_close",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_high_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_high_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_high_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_high_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_high_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_high_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_high",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_low_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_low_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_low_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_low_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_low_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_low_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_low",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_open_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_open_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_open_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_open_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "atr",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_open_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "points",
+        "timeframe": "60m"
+      }
+    },
+    "rolling_60m_open_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rolling_open",
+        "level_context": "rolling",
+        "normalization": "ticks",
+        "timeframe": "60m"
+      }
+    },
+    "rth_abs_delta_cum": {
+      "canonical_feature": "abs_delta_cum",
+      "parameters": {
+        "context": "RTH"
+      }
+    },
+    "rth_available": {
+      "canonical_feature": "available",
+      "parameters": {
+        "context": "RTH"
+      }
+    },
+    "rth_elapsed_seconds": {
+      "canonical_feature": "elapsed_seconds",
+      "parameters": {
+        "context": "RTH"
+      }
+    },
+    "rth_est_delta_cum": {
+      "canonical_feature": "est_delta_cum",
+      "parameters": {
+        "context": "RTH"
+      }
+    },
+    "rth_est_delta_ratio_cum": {
+      "canonical_feature": "est_delta_ratio_cum",
+      "parameters": {
+        "context": "RTH"
+      }
+    },
+    "rth_open_available": {
+      "canonical_feature": "price_level_available",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session"
+      }
+    },
+    "rth_open_elapsed_seconds": {
+      "canonical_feature": "price_level_aggregate",
+      "parameters": {
+        "level_context": "session",
+        "metric": "rth_open_elapsed_seconds"
+      }
+    },
+    "rth_open_position": {
+      "canonical_feature": "price_level_position",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session"
+      }
+    },
+    "rth_open_price": {
+      "canonical_feature": "price_level_value",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session"
+      }
+    },
+    "rth_open_signed_distance_atr": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session",
+        "normalization": "atr"
+      }
+    },
+    "rth_open_signed_distance_points": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session",
+        "normalization": "points"
+      }
+    },
+    "rth_open_signed_distance_ticks": {
+      "canonical_feature": "distance_to_level",
+      "parameters": {
+        "level": "rth_open",
+        "level_context": "session",
+        "normalization": "ticks"
+      }
+    },
+    "rth_vol_cum": {
+      "canonical_feature": "vol_cum",
+      "parameters": {
+        "context": "RTH"
+      }
+    },
+    "rth_volume_per_second": {
+      "canonical_feature": "volume_per_second",
+      "parameters": {
+        "context": "RTH"
+      }
+    },
+    "rvol_10s": {
+      "canonical_feature": "relative_volume",
+      "parameters": {
+        "aggregation_lookback": 10,
+        "bar_state": "completed",
+        "baseline_lookback": 10,
+        "input_timeframe": "1s"
+      }
+    },
+    "rvol_1s": {
+      "canonical_feature": "relative_volume",
+      "parameters": {
+        "aggregation_lookback": 1,
+        "bar_state": "completed",
+        "baseline_lookback": 10,
+        "input_timeframe": "1s"
+      }
+    },
+    "rvol_5s": {
+      "canonical_feature": "relative_volume",
+      "parameters": {
+        "aggregation_lookback": 5,
+        "bar_state": "completed",
+        "baseline_lookback": 5,
+        "input_timeframe": "1s"
+      }
+    },
+    "seconds_in_current_ordering": {
+      "canonical_feature": "seconds_in_current_ordering",
+      "parameters": {}
+    },
+    "seq_12r_alternation_rate": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "alternation_rate"
+      }
+    },
+    "seq_12r_asym_duration": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "asym_duration"
+      }
+    },
+    "seq_12r_asym_efficiency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "asym_efficiency"
+      }
+    },
+    "seq_12r_asym_mfe": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "asym_mfe"
+      }
+    },
+    "seq_12r_asym_net_move": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "asym_net_move"
+      }
+    },
+    "seq_12r_asym_volume": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "asym_volume"
+      }
+    },
+    "seq_12r_center_dir_consistency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "center_dir_consistency"
+      }
+    },
+    "seq_12r_center_migration_r2": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "center_migration_r2"
+      }
+    },
+    "seq_12r_center_migration_slope_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "center_migration_slope_atr"
+      }
+    },
+    "seq_12r_center_reversal_count": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "center_reversal_count"
+      }
+    },
+    "seq_12r_disp_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "disp_atr"
+      }
+    },
+    "seq_12r_dist_to_high_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "dist_to_high_atr"
+      }
+    },
+    "seq_12r_dist_to_low_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "dist_to_low_atr"
+      }
+    },
+    "seq_12r_efficiency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "efficiency"
+      }
+    },
+    "seq_12r_max_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "max_overlap"
+      }
+    },
+    "seq_12r_mean_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "mean_overlap"
+      }
+    },
+    "seq_12r_mean_retracement": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "mean_retracement"
+      }
+    },
+    "seq_12r_mean_retracement_mfe": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "mean_retracement_mfe"
+      }
+    },
+    "seq_12r_median_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "median_overlap"
+      }
+    },
+    "seq_12r_overlap_above_50": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "overlap_above_50"
+      }
+    },
+    "seq_12r_overlap_above_75": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "overlap_above_75"
+      }
+    },
+    "seq_12r_perfect_alternation": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "perfect_alternation"
+      }
+    },
+    "seq_12r_position_pct": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "position_pct"
+      }
+    },
+    "seq_12r_range_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "range_atr"
+      }
+    },
+    "seq_12r_reclaim_rate": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 12,
+        "metric": "reclaim_rate"
+      }
+    },
+    "seq_3r_alternation_rate": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "alternation_rate"
+      }
+    },
+    "seq_3r_asym_duration": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "asym_duration"
+      }
+    },
+    "seq_3r_asym_efficiency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "asym_efficiency"
+      }
+    },
+    "seq_3r_asym_mfe": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "asym_mfe"
+      }
+    },
+    "seq_3r_asym_net_move": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "asym_net_move"
+      }
+    },
+    "seq_3r_asym_volume": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "asym_volume"
+      }
+    },
+    "seq_3r_center_dir_consistency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "center_dir_consistency"
+      }
+    },
+    "seq_3r_center_migration_r2": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "center_migration_r2"
+      }
+    },
+    "seq_3r_center_migration_slope_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "center_migration_slope_atr"
+      }
+    },
+    "seq_3r_center_reversal_count": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "center_reversal_count"
+      }
+    },
+    "seq_3r_disp_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "disp_atr"
+      }
+    },
+    "seq_3r_dist_to_high_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "dist_to_high_atr"
+      }
+    },
+    "seq_3r_dist_to_low_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "dist_to_low_atr"
+      }
+    },
+    "seq_3r_efficiency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "efficiency"
+      }
+    },
+    "seq_3r_max_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "max_overlap"
+      }
+    },
+    "seq_3r_mean_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "mean_overlap"
+      }
+    },
+    "seq_3r_mean_retracement": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "mean_retracement"
+      }
+    },
+    "seq_3r_mean_retracement_mfe": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "mean_retracement_mfe"
+      }
+    },
+    "seq_3r_median_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "median_overlap"
+      }
+    },
+    "seq_3r_overlap_above_50": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "overlap_above_50"
+      }
+    },
+    "seq_3r_overlap_above_75": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "overlap_above_75"
+      }
+    },
+    "seq_3r_perfect_alternation": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "perfect_alternation"
+      }
+    },
+    "seq_3r_position_pct": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "position_pct"
+      }
+    },
+    "seq_3r_range_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "range_atr"
+      }
+    },
+    "seq_3r_reclaim_rate": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 3,
+        "metric": "reclaim_rate"
+      }
+    },
+    "seq_5r_alternation_rate": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "alternation_rate"
+      }
+    },
+    "seq_5r_asym_duration": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "asym_duration"
+      }
+    },
+    "seq_5r_asym_efficiency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "asym_efficiency"
+      }
+    },
+    "seq_5r_asym_mfe": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "asym_mfe"
+      }
+    },
+    "seq_5r_asym_net_move": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "asym_net_move"
+      }
+    },
+    "seq_5r_asym_volume": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "asym_volume"
+      }
+    },
+    "seq_5r_center_dir_consistency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "center_dir_consistency"
+      }
+    },
+    "seq_5r_center_migration_r2": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "center_migration_r2"
+      }
+    },
+    "seq_5r_center_migration_slope_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "center_migration_slope_atr"
+      }
+    },
+    "seq_5r_center_reversal_count": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "center_reversal_count"
+      }
+    },
+    "seq_5r_disp_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "disp_atr"
+      }
+    },
+    "seq_5r_dist_to_high_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "dist_to_high_atr"
+      }
+    },
+    "seq_5r_dist_to_low_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "dist_to_low_atr"
+      }
+    },
+    "seq_5r_efficiency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "efficiency"
+      }
+    },
+    "seq_5r_max_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "max_overlap"
+      }
+    },
+    "seq_5r_mean_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "mean_overlap"
+      }
+    },
+    "seq_5r_mean_retracement": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "mean_retracement"
+      }
+    },
+    "seq_5r_mean_retracement_mfe": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "mean_retracement_mfe"
+      }
+    },
+    "seq_5r_median_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "median_overlap"
+      }
+    },
+    "seq_5r_overlap_above_50": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "overlap_above_50"
+      }
+    },
+    "seq_5r_overlap_above_75": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "overlap_above_75"
+      }
+    },
+    "seq_5r_perfect_alternation": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "perfect_alternation"
+      }
+    },
+    "seq_5r_position_pct": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "position_pct"
+      }
+    },
+    "seq_5r_range_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "range_atr"
+      }
+    },
+    "seq_5r_reclaim_rate": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 5,
+        "metric": "reclaim_rate"
+      }
+    },
+    "seq_8r_alternation_rate": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "alternation_rate"
+      }
+    },
+    "seq_8r_asym_duration": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "asym_duration"
+      }
+    },
+    "seq_8r_asym_efficiency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "asym_efficiency"
+      }
+    },
+    "seq_8r_asym_mfe": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "asym_mfe"
+      }
+    },
+    "seq_8r_asym_net_move": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "asym_net_move"
+      }
+    },
+    "seq_8r_asym_volume": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "asym_volume"
+      }
+    },
+    "seq_8r_center_dir_consistency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "center_dir_consistency"
+      }
+    },
+    "seq_8r_center_migration_r2": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "center_migration_r2"
+      }
+    },
+    "seq_8r_center_migration_slope_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "center_migration_slope_atr"
+      }
+    },
+    "seq_8r_center_reversal_count": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "center_reversal_count"
+      }
+    },
+    "seq_8r_disp_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "disp_atr"
+      }
+    },
+    "seq_8r_dist_to_high_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "dist_to_high_atr"
+      }
+    },
+    "seq_8r_dist_to_low_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "dist_to_low_atr"
+      }
+    },
+    "seq_8r_efficiency": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "efficiency"
+      }
+    },
+    "seq_8r_max_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "max_overlap"
+      }
+    },
+    "seq_8r_mean_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "mean_overlap"
+      }
+    },
+    "seq_8r_mean_retracement": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "mean_retracement"
+      }
+    },
+    "seq_8r_mean_retracement_mfe": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "mean_retracement_mfe"
+      }
+    },
+    "seq_8r_median_overlap": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "median_overlap"
+      }
+    },
+    "seq_8r_overlap_above_50": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "overlap_above_50"
+      }
+    },
+    "seq_8r_overlap_above_75": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "overlap_above_75"
+      }
+    },
+    "seq_8r_perfect_alternation": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "perfect_alternation"
+      }
+    },
+    "seq_8r_position_pct": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "position_pct"
+      }
+    },
+    "seq_8r_range_atr": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "range_atr"
+      }
+    },
+    "seq_8r_reclaim_rate": {
+      "canonical_feature": "regime_sequence_metric",
+      "parameters": {
+        "lookback": 8,
+        "metric": "reclaim_rate"
+      }
+    },
+    "slope_15m_10m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "15m",
+        "timeframe_2": "10m"
+      }
+    },
+    "slope_15m_3m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "15m",
+        "timeframe_2": "3m"
+      }
+    },
+    "slope_15m_5m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "15m",
+        "timeframe_2": "5m"
+      }
+    },
+    "slope_30m_10m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "30m",
+        "timeframe_2": "10m"
+      }
+    },
+    "slope_30m_15m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "30m",
+        "timeframe_2": "15m"
+      }
+    },
+    "slope_30m_5m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "30m",
+        "timeframe_2": "5m"
+      }
+    },
+    "slope_5m_1m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "5m",
+        "timeframe_2": "1m"
+      }
+    },
+    "slope_5m_3m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "5m",
+        "timeframe_2": "3m"
+      }
+    },
+    "slope_5m_5m_aligned_atr": {
+      "canonical_feature": "slope__aligned_atr",
+      "parameters": {
+        "timeframe": "5m",
+        "timeframe_2": "5m"
+      }
+    },
+    "spread_change_15m_30m": {
+      "canonical_feature": "spread_change",
+      "parameters": {
+        "timeframe": "15m",
+        "timeframe_2": "30m"
+      }
+    },
+    "spread_change_5m_15m": {
+      "canonical_feature": "spread_change",
+      "parameters": {
+        "timeframe": "5m",
+        "timeframe_2": "15m"
+      }
+    },
+    "spread_change_5m_30m": {
+      "canonical_feature": "spread_change",
+      "parameters": {
+        "timeframe": "5m",
+        "timeframe_2": "30m"
+      }
+    },
+    "structural_current_expansion_atr": {
+      "canonical_feature": "structural_current_expansion_atr",
+      "parameters": {
+        "context": "current"
+      }
+    },
+    "structural_expansion_atr_per_min": {
+      "canonical_feature": "structural_expansion_atr_per_min",
+      "parameters": {
+        "context": "current"
+      }
+    },
+    "structural_giveback_atr": {
+      "canonical_feature": "structural_giveback_atr",
+      "parameters": {
+        "context": "current"
+      }
+    },
+    "structural_max_expansion_atr": {
+      "canonical_feature": "structural_max_expansion_atr",
+      "parameters": {
+        "context": "current"
+      }
+    },
+    "structural_retention_ratio": {
+      "canonical_feature": "structural_retention_ratio",
+      "parameters": {
+        "context": "current"
+      }
+    },
+    "swing_count_1m": {
+      "canonical_feature": "swing_count",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1m"
+      }
+    },
+    "swing_count_1s": {
+      "canonical_feature": "swing_count",
+      "parameters": {
+        "scope": "trailing",
+        "timeframe": "1s"
+      }
+    },
+    "up_down_vol_ratio_120s": {
+      "canonical_feature": "up_down_vol_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "up_down_vol_ratio_15s": {
+      "canonical_feature": "up_down_vol_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "up_down_vol_ratio_1800s": {
+      "canonical_feature": "up_down_vol_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "up_down_vol_ratio_300s": {
+      "canonical_feature": "up_down_vol_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "up_down_vol_ratio_30s": {
+      "canonical_feature": "up_down_vol_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "up_down_vol_ratio_5s": {
+      "canonical_feature": "up_down_vol_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "up_down_vol_ratio_60s": {
+      "canonical_feature": "up_down_vol_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "up_down_vol_ratio_900s": {
+      "canonical_feature": "up_down_vol_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "up_vol_ratio_10s": {
+      "canonical_feature": "directional_volume_ratio",
+      "parameters": {
+        "direction": "up",
+        "window": "10s"
+      }
+    },
+    "upbar_vol_sum_120s": {
+      "canonical_feature": "upbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "upbar_vol_sum_15s": {
+      "canonical_feature": "upbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "upbar_vol_sum_1800s": {
+      "canonical_feature": "upbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "upbar_vol_sum_300s": {
+      "canonical_feature": "upbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "upbar_vol_sum_30s": {
+      "canonical_feature": "upbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "upbar_vol_sum_5s": {
+      "canonical_feature": "upbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "upbar_vol_sum_60s": {
+      "canonical_feature": "upbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "upbar_vol_sum_900s": {
+      "canonical_feature": "upbar_vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "vel_ratio_5_20": {
+      "canonical_feature": "arrival_velocity_ratio",
+      "parameters": {
+        "bar_state": "completed",
+        "input_timeframe": "1s",
+        "long_lookback": 20,
+        "short_lookback": 5
+      }
+    },
+    "vol_accel": {
+      "canonical_feature": "accel",
+      "parameters": {}
+    },
+    "vol_climax": {
+      "canonical_feature": "climax",
+      "parameters": {}
+    },
+    "vol_max_1s_120s": {
+      "canonical_feature": "vol_max",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "120s"
+      }
+    },
+    "vol_max_1s_15s": {
+      "canonical_feature": "vol_max",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "15s"
+      }
+    },
+    "vol_max_1s_1800s": {
+      "canonical_feature": "vol_max",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "1800s"
+      }
+    },
+    "vol_max_1s_300s": {
+      "canonical_feature": "vol_max",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "300s"
+      }
+    },
+    "vol_max_1s_30s": {
+      "canonical_feature": "vol_max",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "30s"
+      }
+    },
+    "vol_max_1s_5s": {
+      "canonical_feature": "vol_max",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "5s"
+      }
+    },
+    "vol_max_1s_60s": {
+      "canonical_feature": "vol_max",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "60s"
+      }
+    },
+    "vol_max_1s_900s": {
+      "canonical_feature": "vol_max",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "900s"
+      }
+    },
+    "vol_mean_1s_120s": {
+      "canonical_feature": "vol_mean",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "120s"
+      }
+    },
+    "vol_mean_1s_15s": {
+      "canonical_feature": "vol_mean",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "15s"
+      }
+    },
+    "vol_mean_1s_1800s": {
+      "canonical_feature": "vol_mean",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "1800s"
+      }
+    },
+    "vol_mean_1s_300s": {
+      "canonical_feature": "vol_mean",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "300s"
+      }
+    },
+    "vol_mean_1s_30s": {
+      "canonical_feature": "vol_mean",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "30s"
+      }
+    },
+    "vol_mean_1s_5s": {
+      "canonical_feature": "vol_mean",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "5s"
+      }
+    },
+    "vol_mean_1s_60s": {
+      "canonical_feature": "vol_mean",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "60s"
+      }
+    },
+    "vol_mean_1s_900s": {
+      "canonical_feature": "vol_mean",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1s",
+        "timeframe_2": "900s"
+      }
+    },
+    "vol_price_corr_10s": {
+      "canonical_feature": "volume_price_correlation",
+      "parameters": {
+        "window": "10s"
+      }
+    },
+    "vol_spike": {
+      "canonical_feature": "spike",
+      "parameters": {}
+    },
+    "vol_sum_120s": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "vol_sum_15s": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "vol_sum_1800s": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "vol_sum_300s": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "vol_sum_30s": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "vol_sum_30s_vs_300s_ratio": {
+      "canonical_feature": "vol_sum_vs_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s",
+        "timeframe_2": "300s"
+      }
+    },
+    "vol_sum_5s": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "vol_sum_60s": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "vol_sum_60s_vs_900s_ratio": {
+      "canonical_feature": "vol_sum_vs_ratio",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s",
+        "timeframe_2": "900s"
+      }
+    },
+    "vol_sum_900s": {
+      "canonical_feature": "vol_sum",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "vol_trend_10s": {
+      "canonical_feature": "volume_trend",
+      "parameters": {
+        "window": "10s"
+      }
+    },
+    "volume_per_atr_moved_120s": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "volume_per_atr_moved_15s": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "volume_per_atr_moved_1800s": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "volume_per_atr_moved_300s": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "volume_per_atr_moved_30s": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "volume_per_atr_moved_5s": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "volume_per_atr_moved_60s": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "volume_per_atr_moved_900s": {
+      "canonical_feature": "volume_per_atr_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "volume_per_point_moved_120s": {
+      "canonical_feature": "volume_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "volume_per_point_moved_15s": {
+      "canonical_feature": "volume_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "volume_per_point_moved_1800s": {
+      "canonical_feature": "volume_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "volume_per_point_moved_300s": {
+      "canonical_feature": "volume_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "volume_per_point_moved_30s": {
+      "canonical_feature": "volume_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "volume_per_point_moved_5s": {
+      "canonical_feature": "volume_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "volume_per_point_moved_60s": {
+      "canonical_feature": "volume_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "volume_per_point_moved_900s": {
+      "canonical_feature": "volume_per_point_moved",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    },
+    "window_available_120s": {
+      "canonical_feature": "window_available",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "120s"
+      }
+    },
+    "window_available_15s": {
+      "canonical_feature": "window_available",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "15s"
+      }
+    },
+    "window_available_1800s": {
+      "canonical_feature": "window_available",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "1800s"
+      }
+    },
+    "window_available_300s": {
+      "canonical_feature": "window_available",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "300s"
+      }
+    },
+    "window_available_30s": {
+      "canonical_feature": "window_available",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "30s"
+      }
+    },
+    "window_available_5s": {
+      "canonical_feature": "window_available",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "5s"
+      }
+    },
+    "window_available_60s": {
+      "canonical_feature": "window_available",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "60s"
+      }
+    },
+    "window_available_900s": {
+      "canonical_feature": "window_available",
+      "parameters": {
+        "context": "rolling",
+        "timeframe": "900s"
+      }
+    }
+  },
+  "schema_version": 1
+}

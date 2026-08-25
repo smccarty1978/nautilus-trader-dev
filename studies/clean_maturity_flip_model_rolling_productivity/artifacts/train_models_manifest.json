@@ -1,0 +1,307 @@
+{
+  "modeling_version": "1.0.0",
+  "arms": {
+    "LONG_A": {
+      "arm": "LONG_A",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "n_features": 3,
+      "n_rows": 639304,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_repaired_merge",
+      "analysis_spec_sha256": "repaired_feature_emission_v1",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "e5e73950193f6bd7fdc1f98b7e5c2672356d093c5a77c4b6a669c9b9b26fb981",
+      "x_content_sha256": "ae76d1c9d17db734132a8dfa4819d552660dbf347750557cbccb167ce471638a",
+      "y_content_sha256": "bc64879a4a126bea36cecd93442f501f60178c3a721ef17702be200376dd9256",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": "8085802f8c841ceceb9ec8bb066b650990cb9594bcfe0b030b64e9333dd26a79",
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T03:50:36.979933+00:00",
+      "fit_identity_sha256": "98fce5213c2545cb143c11b6f0970f016dcaefde8540a115708faf3f8cb30b60"
+    },
+    "LONG_B": {
+      "arm": "LONG_B",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr"
+      ],
+      "n_features": 9,
+      "n_rows": 639304,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_repaired_merge",
+      "analysis_spec_sha256": "repaired_feature_emission_v1",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "be3b4e165b7ccfb84bd045164354aef4dcf9632eb62e831838740c6961568627",
+      "x_content_sha256": "a9ae9e4c639c8187e4de80d6015cd4f99af6126e2a381d9b6b62f0f7ea47d26c",
+      "y_content_sha256": "bc64879a4a126bea36cecd93442f501f60178c3a721ef17702be200376dd9256",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": "e955e398018793c146b47d33f334221cd70bee204ccfb9569fb51de101e6590a",
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T03:50:39.093654+00:00",
+      "fit_identity_sha256": "cea6c9aba124ec09a304812434448d2aa9b6be765a5d70e8f1d369bc998a662f"
+    },
+    "LONG_C": {
+      "arm": "LONG_C",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr"
+      ],
+      "n_features": 13,
+      "n_rows": 639304,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_repaired_merge",
+      "analysis_spec_sha256": "repaired_feature_emission_v1",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "0aef879f7dfe94c78968a21b3f0401e8b8380136a83ae92784f3020acede3497",
+      "x_content_sha256": "456156016eab911c542eee98032f8e9e131212285288b503c86991aa538de5cc",
+      "y_content_sha256": "bc64879a4a126bea36cecd93442f501f60178c3a721ef17702be200376dd9256",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": "fe09d3d1e0e72120cc16d7ddb0e03234e08a3ce66179a1fd79581651906bd4ec",
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T03:50:41.513367+00:00",
+      "fit_identity_sha256": "a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38"
+    },
+    "SHORT_A": {
+      "arm": "SHORT_A",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "n_features": 3,
+      "n_rows": 734213,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_repaired_merge",
+      "analysis_spec_sha256": "repaired_feature_emission_v1",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "18b39e5b387ba3d1b5cbbe28cef4cb9b428a36a367bca080801b38ed90027ed8",
+      "x_content_sha256": "2b6665895f2c37a0f1b1b031cc928ea142a94bf30316961dd62b83259319c203",
+      "y_content_sha256": "fda373f5e95a35f4fc427191d42e6135b9535a3a5b4650e161897efe9d7f8fa7",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": "7e9c61c08f62b431732109631f1b4566fbaa9820a4f754ec8ca4f4fccb91d714",
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T03:50:43.496132+00:00",
+      "fit_identity_sha256": "1fa4ae5db1bacd4d4454ceaea345941a7186cab7c37b8ce200e6066024c6741f"
+    },
+    "SHORT_B": {
+      "arm": "SHORT_B",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr"
+      ],
+      "n_features": 9,
+      "n_rows": 734213,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_repaired_merge",
+      "analysis_spec_sha256": "repaired_feature_emission_v1",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "adfb41bb47dfe767ee848529f823c52732807ce3fc3710032bf42984ad067643",
+      "x_content_sha256": "e9ada34c85ac4ea7288f33b55b7d0b9d4cd4a29c4ebeb06987b82eaf212702bb",
+      "y_content_sha256": "fda373f5e95a35f4fc427191d42e6135b9535a3a5b4650e161897efe9d7f8fa7",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": "9555f301a2e0212ab942f29e6ee7ea6f932d107f5e5e219eb8bf91ab742eafae",
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T03:50:45.989891+00:00",
+      "fit_identity_sha256": "c3b7dab93c0fd856fceac70033692bc2a461757b7206e1aecaabb719321476a3"
+    },
+    "SHORT_C": {
+      "arm": "SHORT_C",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr"
+      ],
+      "n_features": 13,
+      "n_rows": 734213,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_repaired_merge",
+      "analysis_spec_sha256": "repaired_feature_emission_v1",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "4fe13527cef4d77bf3ffdf5d6f7c3b8d103d7f28ae39ea962cc222003a153e11",
+      "x_content_sha256": "0c3f197b9dfd143256fdbdd9795ff75ac25aac4e49b3d93024b7c632456f9fd8",
+      "y_content_sha256": "fda373f5e95a35f4fc427191d42e6135b9535a3a5b4650e161897efe9d7f8fa7",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": "396bfdfa3b9e9c95faf45f9c0eb8565724d5447159753b58ea710c35906df021",
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T03:50:48.794732+00:00",
+      "fit_identity_sha256": "5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf"
+    }
+  }
+}

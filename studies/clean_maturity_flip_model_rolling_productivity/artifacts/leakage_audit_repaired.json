@@ -1,0 +1,247 @@
+{
+  "rows": 1387411,
+  "future_timestamp_violations": 0,
+  "triggering_timestamp_mismatch": 0,
+  "feature_stats": {
+    "arrival_velocity": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 479673,
+      "min": -0.4548806102650278,
+      "max": 0.8134474809212972,
+      "std": 0.021379908777783296
+    },
+    "arrival_acceleration": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 752668,
+      "min": -0.7550461233166912,
+      "max": 0.5081541208374816,
+      "std": 0.021724631947622225
+    },
+    "ema_slope": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 135045,
+      "min": -3.814325575603274,
+      "max": 2.892341918104463,
+      "std": 0.2892959487157249
+    },
+    "prior_1m_regime_efficiency": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 5871,
+      "min": 0.0,
+      "max": 2.271105826397146,
+      "std": 0.23436369729633055
+    },
+    "prior_1m_regime_mfe_atr": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 11693,
+      "min": 0.11274567593362604,
+      "max": 55.37990921798037,
+      "std": 2.923382678640843
+    },
+    "prior_1m_regime_range_atr": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 11693,
+      "min": 0.9554477094020734,
+      "max": 58.41244661974722,
+      "std": 2.732629389217817
+    },
+    "prior_5m_regime_efficiency": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 6816,
+      "min": 0.0,
+      "max": 1.0,
+      "std": 0.25445978996071644
+    },
+    "prior_5m_regime_mfe_atr": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 11900,
+      "min": 0.0,
+      "max": 65.6998485367391,
+      "std": 3.2181718239060864
+    },
+    "prior_5m_regime_range_atr": {
+      "non_null": 1387411,
+      "null_pct": 0.0,
+      "unique": 11904,
+      "min": 0.8908296109447794,
+      "max": 67.14956706746221,
+      "std": 3.222172281304023
+    },
+    "rolling_300s_retention_ratio": {
+      "non_null": 378683,
+      "null_pct": 0.7270578076719876,
+      "unique": 54724,
+      "min": -166.00000000000003,
+      "max": 1.0,
+      "std": 1.6418825759722513
+    },
+    "rolling_300s_current_progress_atr": {
+      "non_null": 378683,
+      "null_pct": 0.7270578076719876,
+      "unique": 265912,
+      "min": -10.589996743629442,
+      "max": 25.559958100606327,
+      "std": 1.7138045017120398
+    },
+    "rolling_300s_max_progress_atr": {
+      "non_null": 378683,
+      "null_pct": 0.7270578076719876,
+      "unique": 244495,
+      "min": 0.008973839471342773,
+      "max": 26.426397358253997,
+      "std": 1.6830320742161113
+    },
+    "rolling_300s_giveback_atr": {
+      "non_null": 378683,
+      "null_pct": 0.7270578076719876,
+      "unique": 265588,
+      "min": 0.0,
+      "max": 11.671770604537826,
+      "std": 0.842500980161576
+    }
+  },
+  "single_feature_auc": {
+    "LONG": {
+      "arrival_velocity": 0.5804591808957356,
+      "arrival_acceleration": 0.5031937586493227,
+      "ema_slope": 0.6015505223847414,
+      "prior_1m_regime_efficiency": 0.50441927098207,
+      "prior_1m_regime_mfe_atr": 0.49743859117333555,
+      "prior_1m_regime_range_atr": 0.4925122467664046,
+      "prior_5m_regime_efficiency": 0.5122134601498953,
+      "prior_5m_regime_mfe_atr": 0.5011991712534852,
+      "prior_5m_regime_range_atr": 0.49981717601823594,
+      "rolling_300s_retention_ratio": 0.4257955940145393,
+      "rolling_300s_current_progress_atr": 0.43053751435021764,
+      "rolling_300s_max_progress_atr": 0.4549633302683964,
+      "rolling_300s_giveback_atr": 0.5581007678848448
+    },
+    "SHORT": {
+      "arrival_velocity": 0.41900930813921156,
+      "arrival_acceleration": 0.49708093003516973,
+      "ema_slope": 0.39856853364442335,
+      "prior_1m_regime_efficiency": 0.5117705974492069,
+      "prior_1m_regime_mfe_atr": 0.5129184586950212,
+      "prior_1m_regime_range_atr": 0.507628916133303,
+      "prior_5m_regime_efficiency": 0.5155678640622023,
+      "prior_5m_regime_mfe_atr": 0.5131628384830911,
+      "prior_5m_regime_range_atr": 0.5119793613179597,
+      "rolling_300s_retention_ratio": 0.4323046520174826,
+      "rolling_300s_current_progress_atr": 0.43998994899066135,
+      "rolling_300s_max_progress_atr": 0.46210503277596504,
+      "rolling_300s_giveback_atr": 0.5553431186837959
+    }
+  },
+  "single_feature_mi": {
+    "LONG": {
+      "arrival_velocity": 0.02332911188341158,
+      "arrival_acceleration": 0.019686995632566262,
+      "ema_slope": 0.14677869660775889,
+      "prior_1m_regime_efficiency": 0.10965540336347113,
+      "prior_1m_regime_mfe_atr": 0.1680278570337348,
+      "prior_1m_regime_range_atr": 0.168880723348237,
+      "prior_5m_regime_efficiency": 0.11719815774626907,
+      "prior_5m_regime_mfe_atr": 0.1610703822526025,
+      "prior_5m_regime_range_atr": 0.16202763773777806,
+      "rolling_300s_retention_ratio": 0.018131668713735172,
+      "rolling_300s_current_progress_atr": 0.021372166149591587,
+      "rolling_300s_max_progress_atr": 0.011661110336692593,
+      "rolling_300s_giveback_atr": 0.017766889461528823
+    },
+    "SHORT": {
+      "arrival_velocity": 0.02511624271008661,
+      "arrival_acceleration": 0.017738702492146485,
+      "ema_slope": 0.10744331869172985,
+      "prior_1m_regime_efficiency": 0.10456082170196002,
+      "prior_1m_regime_mfe_atr": 0.17477745848713977,
+      "prior_1m_regime_range_atr": 0.1738001369574138,
+      "prior_5m_regime_efficiency": 0.1167188167837514,
+      "prior_5m_regime_mfe_atr": 0.16641051313362132,
+      "prior_5m_regime_range_atr": 0.16647630994674145,
+      "rolling_300s_retention_ratio": 0.02000262362961136,
+      "rolling_300s_current_progress_atr": 0.02035669989533906,
+      "rolling_300s_max_progress_atr": 0.01139141633484253,
+      "rolling_300s_giveback_atr": 0.018542544236547664
+    }
+  },
+  "shifted_single_feature_auc": {
+    "LONG": {
+      "arrival_velocity": 0.5771945698920182,
+      "arrival_acceleration": 0.5032387086355405,
+      "ema_slope": 0.5983523605499206,
+      "prior_1m_regime_efficiency": 0.5044059612622653,
+      "prior_1m_regime_mfe_atr": 0.49748228639903536,
+      "prior_1m_regime_range_atr": 0.4926111904904758,
+      "prior_5m_regime_efficiency": 0.5122792992875049,
+      "prior_5m_regime_mfe_atr": 0.5012178240855926,
+      "prior_5m_regime_range_atr": 0.49982129180830864,
+      "rolling_300s_retention_ratio": 0.3165116095976169,
+      "rolling_300s_current_progress_atr": 0.32212244944865787,
+      "rolling_300s_max_progress_atr": 0.3873923864264034,
+      "rolling_300s_giveback_atr": 0.6450900800962369
+    },
+    "SHORT": {
+      "arrival_velocity": 0.42239473421151646,
+      "arrival_acceleration": 0.4973850241329415,
+      "ema_slope": 0.40157158252453684,
+      "prior_1m_regime_efficiency": 0.5118201360149323,
+      "prior_1m_regime_mfe_atr": 0.5129815644828235,
+      "prior_1m_regime_range_atr": 0.5077189012445155,
+      "prior_5m_regime_efficiency": 0.5156320545962064,
+      "prior_5m_regime_mfe_atr": 0.513161475187928,
+      "prior_5m_regime_range_atr": 0.5119506605520091,
+      "rolling_300s_retention_ratio": 0.3012285760456548,
+      "rolling_300s_current_progress_atr": 0.31820424459157326,
+      "rolling_300s_max_progress_atr": 0.3901164841119188,
+      "rolling_300s_giveback_atr": 0.6638070325641724
+    }
+  },
+  "temporal_validation_auc": {
+    "LONG": {
+      "A": 0.6344799848992777,
+      "B": 0.630444644879425,
+      "C": 0.6494514246196526
+    },
+    "SHORT": {
+      "A": 0.6306184565597543,
+      "B": 0.6253548827653485,
+      "C": 0.6498708427189649
+    }
+  },
+  "shuffled_label_auc": {
+    "LONG": {
+      "A": 0.5161606721234857,
+      "B": 0.5248511378998876,
+      "C": 0.5286066578834971
+    },
+    "SHORT": {
+      "A": 0.4843080144945358,
+      "B": 0.48928863874321815,
+      "C": 0.4787591315831029
+    }
+  },
+  "temporal_rows": {
+    "LONG": {
+      "fit": 201530,
+      "validation": 230455
+    },
+    "SHORT": {
+      "fit": 247890,
+      "validation": 239971
+    }
+  },
+  "event_order_evidence": {
+    "checkpoint_triggering_ts_equals_observation_ts": true,
+    "sweep_after_checkpoint_in_source": true,
+    "target_registered_after_snapshot_in_source": true,
+    "completed_1m_and_5m_state_before_snapshot_in_source": true
+  }
+}

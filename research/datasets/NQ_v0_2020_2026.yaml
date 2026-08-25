@@ -1,0 +1,44 @@
+# DatasetSpec authority for the NQ_v0_2020_2026 physical catalog.
+#
+# This YAML is the binding layer over the existing governed resolver
+# (backtests/nt_runtime/data_plan.py:PRODUCT_CATALOGS["NQ"] / resolve_catalog_plan).
+# It does not introduce a parallel data-plan system. A study binds to this dataset via
+# execution.data_requirements.dataset_id: NQ_v0_2020_2026 in its study.yaml.
+#
+# 5m is intentionally declared "derived", not "external": the runtime never opens a 5m
+# stream from this catalog for this study, it aggregates completed 1m bars via
+# CompletedMinuteFiveMinuteAggregator (collectors/collector_v2/aggregator.py). This
+# mirrors an existing catalog-level 5m parquet stream that this dataset binding does not
+# use -- do not repoint any study at it without a separate research decision (RFC D7).
+
+dataset_id: NQ_v0_2020_2026
+instrument_id: NQ.XCME
+catalog_rel_path: data/catalog/NQ_v0_2020_2026
+
+provenance:
+  source: databento
+  manifest_path: null
+  expected_hash: null
+
+streams:
+  1s:
+    source: external
+    bar_type: NQ.XCME-1-SECOND-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 1000000000
+  1m:
+    source: external
+    bar_type: NQ.XCME-1-MINUTE-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 60000000000
+  5m:
+    source: derived
+    external_catalog_stream: false
+    derived_from: 1m
+    aggregator: CompletedMinuteFiveMinuteAggregator
+
+coverage:
+  start: '2020-01-01T23:01:00Z'
+  end: '2026-04-30T00:00:00Z'

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "partition": "train",
+  "feature_sets": {
+    "A": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "B": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr"
+    ],
+    "C": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr"
+    ]
+  },
+  "feature_contract_sha256": "99f2af86aefc8ef904eed65c23be7220522d3b99d525a978cea34c104536f72a",
+  "feature_emission_repaired": true
+}

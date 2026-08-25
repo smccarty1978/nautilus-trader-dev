@@ -44,7 +44,7 @@ ROOT = HERE.parents[1]
 WORK, RESULTS = HERE / "_work", HERE / "results"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from features.registry import FEATURE_REGISTRY  # noqa: E402
+from features.registry import resolve_feature_request  # noqa: E402
 
 FEATURE_SETS = ["F0_existing_only", "F1_volume_delta_only",
                 "F2_price_levels_only", "F3_volume_delta_plus_price_levels"]
@@ -62,9 +62,12 @@ def feature_family(feat: str, f0_feats: set[str]) -> str:
     if feat in f0_feats:
         return "existing"
     base = feat.split("__")[0] if "__" in feat else feat
-    d = FEATURE_REGISTRY.get(feat) or FEATURE_REGISTRY.get(base)
+    try:
+        d = resolve_feature_request(feat if feat != base else base)
+    except Exception:
+        d = None
     if d is not None:
-        return "volume_delta" if d.family == "ohlcv_est_delta" else "price_level"
+        return "volume_delta" if "ohlcv_est_delta" in str(d["family"]) else "price_level"
     raise RuntimeError(f"could not classify feature family for {feat!r}")
 
 

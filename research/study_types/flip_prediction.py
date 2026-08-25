@@ -20,7 +20,7 @@ from research.engines.deliverables_engine import compile_deliverables_contract, 
 class FlipPredictionCompiler(BaseStudyCompiler):
     """Compiler for canonical flip_prediction studies."""
 
-    DEFAULT_STRATEGY = "strategies.flip_prediction_collector.FlipPredictionCollector"
+    DEFAULT_STRATEGY = "research_workflow.generic_collector.GenericStudyCollector"
 
     def evaluate_fit(self, spec: StudySpec) -> FitDecision:
         if spec.study.type != "flip_prediction":

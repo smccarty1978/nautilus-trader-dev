@@ -1,0 +1,3861 @@
+{
+  "definitions": [
+    {
+      "canonical_name": "abs_delta_cum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "abs_delta_per_atr_moved",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 9,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 9,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "abs_delta_per_point_moved",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "accel",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "activity_duration_median",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 5,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 5,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "activity_flip_count",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "activity_regime_count",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 5,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 5,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "activity_regime_count_std",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "aligned_price_minus_center",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "arrival_acceleration",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "input_timeframe",
+        "short_lookback"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "arrival_deceleration",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "arrival_jerk",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "derivative_order"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "arrival_velocity",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "input_timeframe",
+        "lookback"
+      ],
+      "parity_evidence": {
+        "alias_count": 4,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 4,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "arrival_velocity_max",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "input_timeframe",
+        "lookback",
+        "velocity_lookback"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "arrival_velocity_ratio",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "input_timeframe",
+        "long_lookback",
+        "short_lookback"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "available",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "bar_est_bear_volume",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "bar_est_bull_volume",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "bar_est_delta",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "bar_est_delta_ratio",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "bar_volume",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "bar_zero_range",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "center_slope_acceleration",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "center_slope_change",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "center_spread",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe",
+        "timeframe_2"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "clean_score",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "climax",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "close_vs_range",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "consecutive_down",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "consecutive_up",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "cross_family_slope_vs_reg_count",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "cross_family_spread_vs_reg_count",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "crosses_per_minute",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "directional_volume_ratio",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "direction",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "distance_to_completed_range_high_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "reference_timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "distance_to_completed_range_low_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "reference_timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "distance_to_level",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level",
+        "level_context",
+        "normalization",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 87,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 87,
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "downbar_vol_sum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "duration_median",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "lookback"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "duration_ratio",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "denominator_lookback",
+        "numerator_lookback"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "elapsed_seconds",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "ema_slope",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "ema_role",
+        "lookback"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_context.GenericContextProvider",
+      "provider_sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_abs_delta_sum",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 9,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 9,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_bear_vol_sum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_bull_vol_sum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_delta_cum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_delta_neg_sum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_delta_pos_sum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_delta_ratio",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 9,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 9,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_delta_ratio_cum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_delta_ratio_minus",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_delta_sum",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 9,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 9,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "est_delta_sum_minus_scaled",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "first_half_est_delta_ratio",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "first_half_vol",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "fraction_of_time_on_adverse_side",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "fraction_of_time_on_favorable_side",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "higher_lows_count",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "late_minus_early_delta_ratio",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "late_vs_early_vol_ratio",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "lower_highs_count",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "move_outside_completed_range",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "reference_bar_state",
+        "reference_timeframe",
+        "source_bar_state",
+        "source_timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "nearest_level_geometry",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level_context",
+        "metric"
+      ],
+      "parity_evidence": {
+        "alias_count": 10,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 10,
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "ordering_changes",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "ordering_state",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "price_change_atr",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 9,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 9,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "price_change_points",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "price_cross_count",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "price_level_aggregate",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level_context",
+        "metric",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 57,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 57,
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "price_level_available",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level",
+        "level_context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 31,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 31,
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "price_level_position",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level",
+        "level_context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 29,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 29,
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "price_level_value",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "level",
+        "level_context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 33,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 33,
+      "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+      "provider_sha256": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
+      "reset_policies": [
+        "none",
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "pullback_bars",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "pullback_depth_atr",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "pullback_efficiency",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "pullback_linearity",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "range_atr",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow",
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context",
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 10,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 10,
+      "provider": "features.trackers.generic_bar_geometry.GenericRangeATRProvider",
+      "provider_sha256": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "range_points",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "range_position",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "lookback",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_bar_geometry.GenericRangePositionProvider",
+      "provider_sha256": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_age",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "unit"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_context.GenericContextProvider",
+      "provider_sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_age_min",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_directional_displacement_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_duration_min",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_efficiency",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_expansion_atr_per_min",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_mfe_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_net_directional_move_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_net_move_atr_per_min",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_range_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_range_atr_per_min",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "regime_sequence_metric",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "lookback",
+        "metric"
+      ],
+      "parity_evidence": {
+        "alias_count": 100,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 100,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "relative_volume",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "aggregation_lookback",
+        "bar_state",
+        "baseline_lookback",
+        "input_timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "retracement_pct",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "rolling_current_progress_atr",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "rolling_current_speed_atr_per_min",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "rolling_current_speed_vs_lifetime",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "rolling_giveback_atr",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "rolling_max_progress_atr",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "rolling_max_speed_atr_per_min",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "rolling_max_speed_vs_lifetime",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "rolling_retention_ratio",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "update_every",
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "provider_sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "second_half_est_delta_ratio",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "second_half_vol",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "seconds_in_current_ordering",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "session_elapsed",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "session",
+        "unit"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_context.GenericContextProvider",
+      "provider_sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "session_membership",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "session"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_context.GenericContextProvider",
+      "provider_sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "slope__aligned_atr",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe",
+        "timeframe_2"
+      ],
+      "parity_evidence": {
+        "alias_count": 9,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 9,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "spike",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "spread_change",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "timeframe",
+        "timeframe_2"
+      ],
+      "parity_evidence": {
+        "alias_count": 3,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 3,
+      "provider": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+      "provider_sha256": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "structural_current_expansion_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "structural_expansion_atr_per_min",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "structural_giveback_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "structural_max_expansion_atr",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "structural_retention_ratio",
+      "input_availability_contracts": [
+        "1s+1m+5m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+      "reset_policies": [
+        "event_start"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "swing_count",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "scope",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_pullback.GenericPullbackProvider",
+      "provider_sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "up_down_vol_ratio",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "upbar_vol_sum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "vol_cum",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "vol_max",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "vol_mean",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "vol_sum",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 9,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 9,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "vol_sum_vs_ratio",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe",
+        "timeframe_2"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "volume_per_atr_moved",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 9,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 9,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "volume_per_point_moved",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "volume_per_second",
+      "input_availability_contracts": [
+        "1m",
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "context"
+      ],
+      "parity_evidence": {
+        "alias_count": 2,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 2,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "event_start",
+        "session_boundary"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "volume_price_correlation",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "volume_trend",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "window"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+      "provider_sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "wick_imbalance",
+      "input_availability_contracts": [
+        "1m"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "bar_state",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 1,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 1,
+      "provider": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+      "provider_sha256": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    },
+    {
+      "canonical_name": "window_available",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "disallow"
+      ],
+      "parameter_schema": [
+        "context",
+        "timeframe"
+      ],
+      "parity_evidence": {
+        "alias_count": 8,
+        "artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+        "passed": true
+      },
+      "parity_passed_alias_count": 8,
+      "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+      "provider_sha256": "b97c60cad971bd1facf7db855e9d8051a622970bf7295d452c453b4951b38838",
+      "reset_policies": [
+        "none"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_feature_system_v2.py",
+        "features/tests/test_generic_provider_parameterization.py"
+      ]
+    }
+  ],
+  "kind": "immutable_promotion_facts",
+  "parity_artifact": "scratch/feature_system_v2_full_legacy_parity_matrix.json",
+  "schema_version": 1
+}

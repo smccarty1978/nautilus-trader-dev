@@ -1,0 +1,20 @@
+study_id: frozen_flip_score_forward_path_2024
+title: Frozen Flip Score Forward Path 2024
+status: descriptive_oos_follow_up
+question: >-
+  When a frozen C-arm flip predictor identifies a high-confidence proposed entry,
+  what subsequent causal price path follows?
+source_study: clean_maturity_flip_model_rolling_productivity
+source_period: 2024
+train_artifacts: frozen_from_source_study
+model_fit: prohibited
+threshold_derivation: TRAIN_ONLY
+decile_derivation: TRAIN_ONLY
+outcome_horizons_seconds: [30, 60, 120, 300, 600, 900]
+entry_families:
+  - first_crossing_p90_p95_p97_5
+  - first_top_decile_crossing
+confirmation_entry: completed_1m_flip_close
+economic_use: observational_only
+strategy_optimization: prohibited
+prohibited_years: [2025, 2026]

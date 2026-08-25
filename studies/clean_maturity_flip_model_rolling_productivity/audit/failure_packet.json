@@ -1,0 +1,32 @@
+{
+  "status": "BLOCKED",
+  "preflight_run_id": "20260824T214021Z_ac10ef8a1168",
+  "generated_at_utc": "2026-08-24T21:40:21.131910+00:00",
+  "code_hash": "ac10ef8a1168e719225283e474178c9bf69b2d71ec85a36491d2a70cca101cbc",
+  "superseded": true,
+  "failed_gate": "CAUSAL_INVARIANTS",
+  "failure_ids": [
+    "INVARIANT_TEST_FAILURE"
+  ],
+  "failure_details": [
+    {
+      "message": "FAILED scripts/tests/test_target_censoring.py::test_6_candidate_emitted_near_session_end_is_censored_even_if_a_flip_lands"
+    },
+    {
+      "message": "FAILED scripts/tests/test_target_censoring.py::test_7_pending_candidates_at_strategy_stop_all_reach_a_disposition"
+    },
+    {
+      "message": "FAILED scripts/tests/test_target_censoring.py::test_candidates_reconcile_to_labeled_plus_censored"
+    },
+    {
+      "message": "FAILED scripts/tests/test_target_censoring.py::test_disabling_censoring_labels_the_late_candidates_instead_of_dropping_them"
+    },
+    {
+      "message": "14 failed, 183 passed in 66.69s (0:01:06)"
+    }
+  ],
+  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit.",
+  "superseded_by_preflight_run_id": "20260825T032919Z_899f1bec3446",
+  "superseded_at_utc": "2026-08-25T03:29:19.504625+00:00",
+  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+}

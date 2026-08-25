@@ -1,0 +1,481 @@
+{
+  "schema_version": 1,
+  "status": "SCORED",
+  "period": "oos_2024",
+  "train_freeze_sha256": "126c9b668a7f8cdc56d3f9b7d8df17a1d7e399d8b441447de3641dca8d6c48a7",
+  "oos_candidates": 450973,
+  "oos_observations": 450973,
+  "duplicates": 0,
+  "disposition_counts": {
+    "LABELED_NEGATIVE": 328356,
+    "LABELED_POSITIVE": 118316,
+    "CENSORED": 4301
+  },
+  "classification": [
+    {
+      "direction": "LONG",
+      "maturity": "<300s",
+      "model": "A",
+      "n": 10795,
+      "auc": 0.5669217182069817,
+      "pr_auc": 0.24000826958785057,
+      "brier": 0.16668059392137008,
+      "score_unique": 6734
+    },
+    {
+      "direction": "LONG",
+      "maturity": "<300s",
+      "model": "B",
+      "n": 10795,
+      "auc": 0.576692136892367,
+      "pr_auc": 0.25076844243315793,
+      "brier": 0.16745130118631718,
+      "score_unique": 8138
+    },
+    {
+      "direction": "LONG",
+      "maturity": "<300s",
+      "model": "C",
+      "n": 10795,
+      "auc": 0.560672335969258,
+      "pr_auc": 0.2440101431735091,
+      "brier": 0.1674555997630513,
+      "score_unique": 8363
+    },
+    {
+      "direction": "LONG",
+      "maturity": "300-600s",
+      "model": "A",
+      "n": 48191,
+      "auc": 0.5909306385938198,
+      "pr_auc": 0.30972545532162277,
+      "brier": 0.18579752117505619,
+      "score_unique": 19413
+    },
+    {
+      "direction": "LONG",
+      "maturity": "300-600s",
+      "model": "B",
+      "n": 48191,
+      "auc": 0.589074477549701,
+      "pr_auc": 0.3050244218541758,
+      "brier": 0.18677151711212353,
+      "score_unique": 32833
+    },
+    {
+      "direction": "LONG",
+      "maturity": "300-600s",
+      "model": "C",
+      "n": 48191,
+      "auc": 0.6086998397084602,
+      "pr_auc": 0.32330048176940307,
+      "brier": 0.1843736274892901,
+      "score_unique": 33963
+    },
+    {
+      "direction": "LONG",
+      "maturity": "600-900s",
+      "model": "A",
+      "n": 51218,
+      "auc": 0.6124832052085492,
+      "pr_auc": 0.35516721094384707,
+      "brier": 0.1933782306855491,
+      "score_unique": 21476
+    },
+    {
+      "direction": "LONG",
+      "maturity": "600-900s",
+      "model": "B",
+      "n": 51218,
+      "auc": 0.6119234975565271,
+      "pr_auc": 0.35919423089540714,
+      "brier": 0.19351910107951514,
+      "score_unique": 34382
+    },
+    {
+      "direction": "LONG",
+      "maturity": "600-900s",
+      "model": "C",
+      "n": 51218,
+      "auc": 0.625470642900424,
+      "pr_auc": 0.369641353375427,
+      "brier": 0.19200837553359104,
+      "score_unique": 36406
+    },
+    {
+      "direction": "LONG",
+      "maturity": "900-1800s",
+      "model": "A",
+      "n": 90724,
+      "auc": 0.6402970790926964,
+      "pr_auc": 0.4478949858001038,
+      "brier": 0.20930390093814036,
+      "score_unique": 30605
+    },
+    {
+      "direction": "LONG",
+      "maturity": "900-1800s",
+      "model": "B",
+      "n": 90724,
+      "auc": 0.6369333035076555,
+      "pr_auc": 0.4440385550511592,
+      "brier": 0.2097144407894138,
+      "score_unique": 54083
+    },
+    {
+      "direction": "LONG",
+      "maturity": "900-1800s",
+      "model": "C",
+      "n": 90724,
+      "auc": 0.6508302986880835,
+      "pr_auc": 0.4525534998353557,
+      "brier": 0.20760278266806087,
+      "score_unique": 59582
+    },
+    {
+      "direction": "LONG",
+      "maturity": ">=1800s",
+      "model": "A",
+      "n": 272,
+      "auc": 0.6393970189701896,
+      "pr_auc": 0.5678174715980935,
+      "brier": 0.2305290262380828,
+      "score_unique": 267
+    },
+    {
+      "direction": "LONG",
+      "maturity": ">=1800s",
+      "model": "B",
+      "n": 272,
+      "auc": 0.6395099367660344,
+      "pr_auc": 0.5785466327337648,
+      "brier": 0.22819905870834406,
+      "score_unique": 272
+    },
+    {
+      "direction": "LONG",
+      "maturity": ">=1800s",
+      "model": "C",
+      "n": 272,
+      "auc": 0.671239837398374,
+      "pr_auc": 0.618485747801827,
+      "brier": 0.21973203970869756,
+      "score_unique": 271
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "<300s",
+      "model": "A",
+      "n": 10178,
+      "auc": 0.5652176932312327,
+      "pr_auc": 0.2228355283449335,
+      "brier": 0.1536367890674386,
+      "score_unique": 6688
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "<300s",
+      "model": "B",
+      "n": 10178,
+      "auc": 0.5697202873163937,
+      "pr_auc": 0.22883407205144407,
+      "brier": 0.1535261138909549,
+      "score_unique": 8234
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "<300s",
+      "model": "C",
+      "n": 10178,
+      "auc": 0.5605168675262968,
+      "pr_auc": 0.22030128594099505,
+      "brier": 0.15345209034155813,
+      "score_unique": 7873
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "300-600s",
+      "model": "A",
+      "n": 54068,
+      "auc": 0.5986534991814381,
+      "pr_auc": 0.283197295612827,
+      "brier": 0.17283049209598209,
+      "score_unique": 22017
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "300-600s",
+      "model": "B",
+      "n": 54068,
+      "auc": 0.5952183323557813,
+      "pr_auc": 0.2849263095942984,
+      "brier": 0.17323002157283462,
+      "score_unique": 41652
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "300-600s",
+      "model": "C",
+      "n": 54068,
+      "auc": 0.610631443357029,
+      "pr_auc": 0.29603735932711334,
+      "brier": 0.17145702779002023,
+      "score_unique": 40607
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "600-900s",
+      "model": "A",
+      "n": 59460,
+      "auc": 0.6045132539829002,
+      "pr_auc": 0.3196077160827797,
+      "brier": 0.18028062773119372,
+      "score_unique": 24692
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "600-900s",
+      "model": "B",
+      "n": 59460,
+      "auc": 0.6040197536780656,
+      "pr_auc": 0.31721875902315444,
+      "brier": 0.18068286377289314,
+      "score_unique": 45158
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "600-900s",
+      "model": "C",
+      "n": 59460,
+      "auc": 0.6175501087453272,
+      "pr_auc": 0.33516556387600493,
+      "brier": 0.17901219420404627,
+      "score_unique": 44327
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "900-1800s",
+      "model": "A",
+      "n": 121333,
+      "auc": 0.6291469172180965,
+      "pr_auc": 0.35514975298815393,
+      "brier": 0.18635262501533875,
+      "score_unique": 37577
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "900-1800s",
+      "model": "B",
+      "n": 121333,
+      "auc": 0.6235908652593347,
+      "pr_auc": 0.353367310147959,
+      "brier": 0.1872144888459544,
+      "score_unique": 85882
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "900-1800s",
+      "model": "C",
+      "n": 121333,
+      "auc": 0.6374093863777717,
+      "pr_auc": 0.36228582749551264,
+      "brier": 0.18570519646827863,
+      "score_unique": 84974
+    },
+    {
+      "direction": "SHORT",
+      "maturity": ">=1800s",
+      "model": "A",
+      "n": 433,
+      "auc": 0.596398885641213,
+      "pr_auc": 0.4331232771523822,
+      "brier": 0.23205454050077962,
+      "score_unique": 416
+    },
+    {
+      "direction": "SHORT",
+      "maturity": ">=1800s",
+      "model": "B",
+      "n": 433,
+      "auc": 0.5933047131896236,
+      "pr_auc": 0.4393824720795925,
+      "brier": 0.23221620173390994,
+      "score_unique": 433
+    },
+    {
+      "direction": "SHORT",
+      "maturity": ">=1800s",
+      "model": "C",
+      "n": 433,
+      "auc": 0.5992647058823529,
+      "pr_auc": 0.4552905308874938,
+      "brier": 0.23086083537089336,
+      "score_unique": 433
+    }
+  ],
+  "incremental": [
+    {
+      "direction": "LONG",
+      "maturity": "300-600s",
+      "comparison": "B-A",
+      "auc_delta": -0.001856161044118787,
+      "pr_auc_delta": -0.004701033467446991,
+      "brier_delta": 0.0009739959370673457
+    },
+    {
+      "direction": "LONG",
+      "maturity": "300-600s",
+      "comparison": "C-B",
+      "auc_delta": 0.019625362158759208,
+      "pr_auc_delta": 0.018276059915227294,
+      "brier_delta": -0.002397889622833438
+    },
+    {
+      "direction": "LONG",
+      "maturity": "300-600s",
+      "comparison": "C-A",
+      "auc_delta": 0.01776920111464042,
+      "pr_auc_delta": 0.013575026447780303,
+      "brier_delta": -0.0014238936857660922
+    },
+    {
+      "direction": "LONG",
+      "maturity": "600-900s",
+      "comparison": "B-A",
+      "auc_delta": -0.0005597076520220678,
+      "pr_auc_delta": 0.0040270199515600735,
+      "brier_delta": 0.00014087039396604162
+    },
+    {
+      "direction": "LONG",
+      "maturity": "600-900s",
+      "comparison": "C-B",
+      "auc_delta": 0.013547145343896894,
+      "pr_auc_delta": 0.010447122480019833,
+      "brier_delta": -0.001510725545924102
+    },
+    {
+      "direction": "LONG",
+      "maturity": "600-900s",
+      "comparison": "C-A",
+      "auc_delta": 0.012987437691874826,
+      "pr_auc_delta": 0.014474142431579906,
+      "brier_delta": -0.0013698551519580604
+    },
+    {
+      "direction": "LONG",
+      "maturity": "900-1800s",
+      "comparison": "B-A",
+      "auc_delta": -0.0033637755850408624,
+      "pr_auc_delta": -0.003856430748944595,
+      "brier_delta": 0.0004105398512734282
+    },
+    {
+      "direction": "LONG",
+      "maturity": "900-1800s",
+      "comparison": "C-B",
+      "auc_delta": 0.013896995180427973,
+      "pr_auc_delta": 0.00851494478419651,
+      "brier_delta": -0.002111658121352916
+    },
+    {
+      "direction": "LONG",
+      "maturity": "900-1800s",
+      "comparison": "C-A",
+      "auc_delta": 0.010533219595387111,
+      "pr_auc_delta": 0.004658514035251915,
+      "brier_delta": -0.001701118270079488
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "300-600s",
+      "comparison": "B-A",
+      "auc_delta": -0.00343516682565681,
+      "pr_auc_delta": 0.00172901398147135,
+      "brier_delta": 0.00039952947685253926
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "300-600s",
+      "comparison": "C-B",
+      "auc_delta": 0.015413111001247759,
+      "pr_auc_delta": 0.01111104973281496,
+      "brier_delta": -0.0017729937828143971
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "300-600s",
+      "comparison": "C-A",
+      "auc_delta": 0.011977944175590949,
+      "pr_auc_delta": 0.01284006371428631,
+      "brier_delta": -0.0013734643059618579
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "600-900s",
+      "comparison": "B-A",
+      "auc_delta": -0.0004935003048346376,
+      "pr_auc_delta": -0.002388957059625274,
+      "brier_delta": 0.00040223604169942195
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "600-900s",
+      "comparison": "C-B",
+      "auc_delta": 0.013530355067261635,
+      "pr_auc_delta": 0.017946804852850495,
+      "brier_delta": -0.001670669568846872
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "600-900s",
+      "comparison": "C-A",
+      "auc_delta": 0.013036854762426997,
+      "pr_auc_delta": 0.015557847793225221,
+      "brier_delta": -0.00126843352714745
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "900-1800s",
+      "comparison": "B-A",
+      "auc_delta": -0.005556051958761743,
+      "pr_auc_delta": -0.0017824428401949088,
+      "brier_delta": 0.0008618638306156501
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "900-1800s",
+      "comparison": "C-B",
+      "auc_delta": 0.013818521118436955,
+      "pr_auc_delta": 0.008918517347553612,
+      "brier_delta": -0.001509292377675775
+    },
+    {
+      "direction": "SHORT",
+      "maturity": "900-1800s",
+      "comparison": "C-A",
+      "auc_delta": 0.008262469159675212,
+      "pr_auc_delta": 0.007136074507358703,
+      "brier_delta": -0.0006474285470601249
+    }
+  ],
+  "score_identity": {
+    "LONG": {
+      "B_C_max_abs": 0.5049603321670465,
+      "B_C_different": 446672,
+      "A_unique": 52346,
+      "B_unique": 187479,
+      "C_unique": 223341
+    },
+    "SHORT": {
+      "B_C_max_abs": 0.5303279634845832,
+      "B_C_different": 446672,
+      "A_unique": 63553,
+      "B_unique": 265286,
+      "C_unique": 275448
+    }
+  },
+  "train_only_artifacts_applied": true,
+  "oos_fit_performed": false,
+  "economic_diagnostics": "NOT_AVAILABLE_IN_COLLECTION_CONTRACT"
+}

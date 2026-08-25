@@ -1,3 +1,11 @@
+<!-- DOC-STATUS-BANNER -->
+> **[HISTORICAL]**
+>
+> A point-in-time record of an independent audit brief. It is not a description of the current system
+> and not a source of instructions.
+>
+> Current authority: **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
 # NautilusTrader ML Research Framework — Independent Audit Brief
 
 **Purpose:** Give an independent agent enough context to audit the research workflow, scripts, execution gates, and agent/subagent responsibilities without relying on the implementer's interpretation.

@@ -1,32 +1,29 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "20260821T033459Z_0e41d4fa6216",
-  "generated_at_utc": "2026-08-21T03:34:59.472336+00:00",
-  "code_hash": "0e41d4fa621618d93239eb9fbfb9cc991418fbe762680b02b5a843b8b7b9beda",
-  "superseded": true,
+  "preflight_run_id": "20260824T041606Z_83c64b1b1985",
+  "generated_at_utc": "2026-08-24T04:16:06.463950+00:00",
+  "code_hash": "83c64b1b19856048b0945e3a4acdd724cd1580375ef576586f68e2d7d8fa3e7e",
+  "superseded": false,
   "failed_gate": "CAUSAL_INVARIANTS",
   "failure_ids": [
     "INVARIANT_TEST_FAILURE"
   ],
   "failure_details": [
     {
-      "message": "SKIPPED [1] scripts\\tests\\test_safe_cleanup.py:76: symlink creation not permitted in this environment"
+      "message": "=========================== short test summary info ==========================="
     },
     {
-      "message": "SKIPPED [1] scripts\\tests\\test_safe_cleanup.py:88: symlink creation not permitted in this environment"
+      "message": "FAILED scripts/tests/test_readiness.py::test_r7_synthetic_valid_output_schema_passes"
     },
     {
-      "message": "SKIPPED [1] scripts\\tests\\test_safe_cleanup.py:107: symlink creation not permitted in this environment"
+      "message": "FAILED scripts/tests/test_readiness.py::test_r10_parity_reports_real_surface_counts_and_catches_injected_bad_alias"
     },
     {
-      "message": "FAILED scripts/tests/test_run_lifecycle_and_dates.py::test_blocked_preflight_packet_is_bound_to_its_own_run"
+      "message": "FAILED scripts/tests/test_readiness.py::test_r10_candidate_authority_uses_the_same_outputmanager_resolver_path"
     },
     {
-      "message": "1 failed, 926 passed, 7 skipped, 2 deselected, 3 warnings in 550.72s (0:09:10)"
+      "message": "3 failed, 499 passed, 2 deselected in 544.85s (0:09:04)"
     }
   ],
-  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit.",
-  "superseded_by_preflight_run_id": "20260821T041351Z_1e69d74068bf",
-  "superseded_at_utc": "2026-08-21T04:13:51.037413+00:00",
-  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit."
 }

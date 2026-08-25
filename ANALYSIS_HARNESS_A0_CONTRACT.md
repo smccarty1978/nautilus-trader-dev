@@ -1,3 +1,12 @@
+<!-- DOC-STATUS-BANNER -->
+> **[DESIGN CONTRACT — CITED BY LIVE CODE]**
+>
+> `research/analysis/__init__.py`, `research/analysis/errors.py` (§7) and `scripts/tests/test_analysis_reproducibility.py` (§6) cite this document.
+>
+> Section numbers here are load-bearing. Do not renumber, delete, or casually edit.
+> This is a frozen contract, not a workflow manual — the current workflow is
+> **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
 # Analysis Harness — Phase A0 Contract & Fixtures
 
 **Status:** A0 complete — contract defined, fixtures selected, blockers identified. **A1 not started.**

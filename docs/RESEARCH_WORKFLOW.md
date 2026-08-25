@@ -1,512 +1,834 @@
-# Research Workflow
+# Research Workflow — Authoritative Manual
 
-## 1. Purpose
+**This describes the system as implemented.** It is the single authoritative statement of
+where code belongs, how features are identified, what the lifecycle is, and which scripts to
+run. `CLAUDE.md`, `CODEX.md` and `AGENTS.md` are short agent manuals that link here.
 
-This repository operates under strict methodology to ensure that all quantitative studies, machine learning models, feature collection, and backtests produce trustworthy, reproducible, look-ahead-free results.
+If another document contradicts this one, this one wins. Classification of every doc:
+`docs/DOCUMENT_MAP.md`. Current-state numbers deliberately kept out of this file:
+`docs/WORKFLOW_REFERENCE_FACTS.md`.
 
-The purpose of this workflow specification is to:
+## 0. Index
 
-- Preserve **causal integrity** (bar completion, timestamp dispatch, zero look-ahead bias).
-- Preserve **research-decision fidelity** (`research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code`).
-- Prevent **DEV / OOS leakage** (strict temporal partitioning, locked evaluation gates).
-- Mandate **reusability of canonical infrastructure** (`backtests/nt_runtime/`, `utils/runner/`, `features/registry.py`).
-- Minimize **agent and token waste** (deterministic preflights, compact handoffs, diff-first auditing).
-- Separate **deterministic computation** (AST linting, schema validation, backtest execution) from **AI reasoning** (spec drafting, audit adjudication, result interpretation).
-- Prevent **one-off runner proliferation**.
+| Question | § |
+|---|---|
+| Where does shared research code go? | 1 |
+| How do I declare a 5m completed regime-efficiency feature? | 2 |
+| Can I copy an old collector? | 7 |
+| What happens after READINESS fails? | 4, 12 |
+| When can OOS open? | 3 |
+| What does the lookahead auditor prove? | 6.1 |
+| What does model integrity prove? | 6.2 |
+| Where do forward outcomes live? | 9 |
+| Can forward outcomes enter model X? | 10 |
+| Which script should I run for a new study? | 3, 11 |
+| What should I do before recursive deletion? | 13 |
+| Is this a governed study or an ordinary backtest? | 8 |
 
-### Core Invariant
+---
+
+## 1. Repository architecture
+
+```
+features/                 CANONICAL FEATURE IDENTITY
+  authority/                active.json pointer + candidate/ bundle (registry, aliases, promotion facts)
+  registry.py               FeatureInstance, validate_feature_instance, resolvers
+  candidate_authority.py    bundle load / freeze / atomic activation
+  trackers/generic_*.py     parameterized providers
+  CANONICAL_FEATURE_REFERENCE.yaml   generated canonical vocabulary
+  archive/                  Feature System V1. Non-runtime, rollback only.
+
+research_workflow/        REUSABLE GOVERNED RESEARCH LIFECYCLE
+  study_factory  compiler        scaffold + compile a declarative study
+  prepare  phase0               PREPARE + FREEZE, phase-zero authorization
+  readiness  preflight          R1-R10 gate, deterministic preflight
+  causal_audit  contract_audit  executable structured reviews
+  seal  smoke                   pre-execution seal, bounded NT smoke
+  generic_collector             THE collector strategy (NT event loop)
+  execution_plan                compiled callback groups for one study
+  output_manager                persistence, schema + surface enforcement
+  experiment                    TRAIN/OOS authorization, freeze, OOS gate
+  collection  partitioning      period + year-partitioned collection, merge, parity
+  modeling  analysis            governed fit, TRAIN freeze, bound analysis
+  forward_outcomes/             proposed entry -> future path (§9)
+  hooks/                        tiny study hook Protocols
+  lifecycle                     one small facade over all of the above
+
+research/                 ANALYSIS + SCHEMA LAYER (consumed by research_workflow)
+  analysis/                 loader, spec, slices, metrics, modeling, reporting, identity
+  schemas/                  StudySpec, DatasetSpec
+  engines/                  feature binding, target, lineage, population, timestamp
+  study_types/              flip_prediction, bespoke, base
+
+studies/<id>/             STUDY-SPECIFIC ONLY — contracts, audits, artifacts (§16)
+
+strategies/               EXECUTABLE TRADING STRATEGIES ONLY
+                          (STRATEGY_REGISTRY lives in backtests/nt_runtime/strategy_binding.py)
+
+backtests/                NT RUNTIME
+  nt_runtime/               engine_builder, data_plan, run_plan, strategy_binding,
+                            compiled_study_loader, telemetry, modes/
+  run_nt_study.py           collect entrypoint
+  run_backtest.py           standalone backtest entrypoint (§8)
+  run_*.py (other)          FROZEN references. Not templates.
+
+scripts/                  OPERATIONAL / GOVERNANCE / DIAGNOSTIC CLIs (§11)
+
+archive/  scratch/  runs/  features/archive/    Historical or generated. Never active.
+```
+
+### Core invariant
 
 ```
 NEW STUDY != NEW INFRASTRUCTURE
 ```
 
-A new study should normally add or configure only:
+A new study adds: `research_decision.yaml`, `SPEC.md`, `study.yaml`, compiled contracts,
+study tests, and rarely a small declarative hook. If you are writing a collector, an engine
+bootstrap, a catalog loader, an analysis loader, or a `run_*.py`, stop — it exists.
 
-- Research decision contract (`research_decision.yaml`)
-- Study configuration (`study.yaml`) and compiled contract (`compiled_study.json`)
-- Strategy-specific logic (`strategies/<strategy_name>/`) if genuinely new
-- Feature tracker(s) (`features/trackers/`) if genuinely new
-- Study-specific unit and contract tests (`studies/<name>/tests/`)
-- Study execution specifications and reports (`SPEC.md`, `STUDY_REPORT.md`)
-
-A new study MUST NOT create:
-
-- Another NautilusTrader engine bootstrap script
-- Another instrument or catalog data loader
-- Another generic analysis/result loader
-- Another `run_*.py` execution script for a standard backtest or collection
-- Sibling-study imports (`sys.path.insert` into another study directory) to reuse execution code
+**Escalation rule.** You may modify `research_workflow/`, `research/`, `backtests/nt_runtime/`,
+`utils/runner/`, `features/` or `scripts/` only if all three hold: (1) a concrete study cannot
+be expressed by the existing capability; (2) the failure is *not* a missing feature instance,
+a missing strategy registration, YAML/CLI misuse, a stale audit or seal, or caller misuse;
+(3) you document the missing capability (`BESPOKE_JUSTIFICATION`, or the study `SPEC.md`).
 
 ---
 
-## 2. Canonical End-to-End Flow
+## 2. Feature System V2 — canonical, timeframe-agnostic identity
 
-Every research study moves through 16 distinct operational stages in sequence:
+**The runtime is canonical-only.**
+
+A canonical feature definition names exactly five things: the **formula**, the **provider**,
+its **causal semantics**, its **reset semantics**, its **null semantics**.
+
+Everything else is a **parameter of a `FeatureInstance`**:
 
 ```
-RESEARCH QUESTION
-    ↓
-RESEARCH_DECISION / CONTRACT
-    ↓
-STUDY SPEC
-    ↓
-FEATURE SURFACE / STRATEGY CONFIGURATION
-    ↓
-DETERMINISTIC PREFLIGHT
-    ↓
-CAUSAL AUDIT
-    ↓
-CONTRACT AUDIT
-    ↓
-PREEXEC AUDIT SEAL
-    ↓
-BOUNDED SMOKE
-    ↓
-SMOKE VALIDATION
-    ↓
-AUTHORIZED COLLECTION / BACKTEST
-    ↓
-COLLECTION / RUN VALIDATION
-    ↓
-ANALYSIS CONTRACT
-    ↓
-TRAIN ANALYSIS
-    ↓
-MODEL / THRESHOLD FREEZE
-    ↓
-AUTHORIZED OOS ANALYSIS
-    ↓
-RESULT VALIDATION
-    ↓
-STUDY REPORT / NEXT DECISION
+timeframe  window  lookback  period  context  bar_state  update_every
+source_timeframe  reference_timeframe  input_timeframe  ema_role
 ```
 
-### Stage Details
+> **"1m EMA" is NOT a separately named feature.** Timeframe belongs in the parameters.
 
-| Stage | Purpose | Primary Input | Canonical Tool / Script | Output Artifact | Fail Condition | Next Permitted Stage |
-|---|---|---|---|---|---|---|
-| **1. Research Question** | Define target anomaly or hypothesis | Natural language prompt | Orchestrator / User | `research_decision.yaml` draft | Underspecified goal | Research Decision |
-| **2. Research Decision Contract** | Freeze baseline, arms, chronology, feature selection mode | Research question | `research_decision.yaml` | `studies/<name>/research_decision.yaml` | Missing baseline or unconstrained scope | Study Spec |
-| **3. Study Spec & Compilation** | Scaffold study tree and compile machine contract | `research_decision.yaml` | `python scripts/create_study.py --config study.yaml` & `python scripts/compile_study.py --study studies/<name>` | `SPEC.md`, `compiled_study.json`, `config/*.json`, `tests/` | Schema validation error or contract mismatch | Feature Surface / Strategy Config |
-| **4. Feature & Strategy Implementation** | Implement feature trackers and strategy logic | `compiled_study.json` | `features/registry.py`, `strategies/<name>/` | Strategy code, feature trackers, registry entries | Unregistered feature or syntax error | Deterministic Preflight |
-| **5. Deterministic Preflight** | Execute AST lint, schema check, fidelity check, invariant tests | `studies/<name>` | `python scripts/research_preflight.py --study studies/<name>` | `audit/preflight.json` | Exit code != 0 (`status: BLOCKED`) | Causal Audit / Contract Audit |
-| **6. Causal Audit** | Audit look-ahead, timestamp, bar dispatch causality | Code diff, `audit/preflight.json` | `lookahead-auditor` agent | `audit/pass_<NN>.md`, `audit/status.json` | Critical findings > 0 | Contract Audit / Preexec Seal |
-| **7. Contract Audit** | Verify deliverable manifest, label reachability, contract fidelity | `SPEC.md`, `research_decision.yaml` | `contract-checker` agent | `audit/contract_pass_<NN>.md`, `audit/contract_status.json` | Deliverable missing or label unreachable | Preexec Audit Seal |
-| **8. Preexec Audit Seal** | Authenticate freshness of execution code & audit reports | Audit reports & execution manifest | `python scripts/run_preexec_audits.py --study studies/<name>` & `preexec_audit_seal.py` | `artifacts/preexec_audit_seal.json` | Code drift or stale audit (`PREEXEC_AUDIT_STALE`) | Bounded Smoke |
-| **9. Bounded Smoke** | Run 1-day execution to verify runtime stability | `artifacts/preexec_audit_seal.json` | `python backtests/run_nt_study.py --study studies/<name> --mode collect --stage day` | `runs/<timestamp>_collect_day/` | Runtime exception or zero events | Smoke Validation |
-| **10. Smoke Validation** | Verify candidate parquet schema, row counts, event order | Smoke run output | `python scripts/validate_smoke.py --run-dir runs/...` | `validation_report.json` | Schema mismatch or NaN targets | Authorized Collection / Backtest |
-| **11. Authorized Collection / Backtest** | Run full authorized train/dev dataset | Validated smoke run | `python backtests/run_nt_study.py --study studies/<name> --mode collect --stage full` or `python backtests/run_backtest.py` | `runs/<timestamp>_collect_full/` | Engine error or memory overflow | Collection / Run Validation |
-| **12. Collection / Run Validation** | Verify full dataset integrity and equivalence against reference | Collection run outputs | `python scripts/check_collect_equivalence.py` | `equivalence_report.json` | Divergence from reference or missing data | Analysis Contract |
-| **13. Analysis Contract & Specs** | Bind collection artifacts to analysis schema | Collection data | `research/schemas/study_spec.py` | `analysis_spec.json` | Missing join keys or partition leak | Train Analysis |
-| **14. Train Analysis & Model Fitting** | Fit model / compute feature ranks on TRAIN split only | `analysis_spec.json` | `research/engines/` | Model artifacts, feature ranks, threshold freeze | fitting on OOS data | Model / Threshold Freeze |
-| **15. Model / Threshold Freeze** | Lock hyper-parameters, thresholds, and feature lists | Fitted model | `models/artifacts/` | Frozen model joblib / ONNX | Modifying model post-freeze | Authorized OOS Analysis |
-| **16. Authorized OOS Analysis** | Evaluate frozen model on authorized DEV / OOS partitions | Frozen model & OOS data | `python scripts/generate_oos_unlock.py` + analysis runner | `OOS_EVALUATION_REPORT.md` | Evaluating OOS without authorization | Study Report / Next Decision |
+Declare instances in `study.yaml`:
+
+```yaml
+features:
+  source: canonical_verified_definition_universe
+  instances:
+    - feature: regime_efficiency                     # a 5m completed regime efficiency
+      parameters: {timeframe: 5m, context: prior, bar_state: completed}
+    - feature: rolling_giveback_atr
+      parameters: {window: 300s, update_every: 1s}
+    - feature: arrival_velocity
+      parameters: {input_timeframe: 1s, lookback: 20, bar_state: completed}
+```
+
+`prior_5m_regime_efficiency` and `rolling_300s_giveback_atr` are **output column aliases**,
+generated by `generate_physical_alias()`. Never write one into a study contract. Verification
+status lives on the canonical definition, never on the alias.
+
+### Bar-state semantics
+
+Three different things that must never collapse into one another:
+
+| Meaning | Parameters |
+|---|---|
+| Completed calendar bar | `timeframe: 1m, bar_state: completed` |
+| Forming calendar bar | `timeframe: 1m, bar_state: forming, update_every: 5s` |
+| True rolling window | `window: 300s, update_every: 1s` |
+
+`validate_feature_instance()` raises rather than guessing. **Ambiguous timeframe semantics
+fail closed — never resolve one of these by adding a default.**
+
+| Code | Meaning |
+|---|---|
+| `AMBIGUOUS_TEMPORAL_SEMANTICS` | `timeframe` + `update_every` without `bar_state`; or `timeframe` + `window` together |
+| `FORMING_BAR_UPDATE_REQUIRED` / `_INVALID` | forming without `update_every`; `update_every` exceeds `timeframe` |
+| `COMPLETED_BAR_UPDATE_FREQUENCY_INVALID` | `update_every` on a completed calendar bar |
+| `ROLLING_WINDOW_UPDATE_REQUIRED` | `window` without `update_every` |
+| `FORMING_BAR_UNSUPPORTED` | provider supports completed bars only |
+| `UNSUPPORTED_TIMEFRAME_PARAMETER` / `UNSUPPORTED_UPDATE_CADENCE` | outside declared support |
+| `UNKNOWN_CANONICAL_FEATURE` / `UNKNOWN_FEATURE_PARAMETER` | not in the active bundle / not in the parameter schema |
+| `MISSING_REQUIRED_FEATURE_PARAMETER` | required parameter omitted |
+| `UNVERIFIED_CANONICAL_FEATURE` | definition exists but is not `verified` |
+| `LEGACY_FEATURE_ALIAS_NOT_ALLOWED` | you used a physical alias — declare a canonical instance |
+
+### Authority and legacy policy
+
+The active bundle is selected by an atomic pointer, `features/authority/active.json`.
+`features.candidate_authority.load_authority()` is the only loader — a candidate is never
+selected by environment variable, ambient state, or fallback.
+
+| | |
+|---|---|
+| Active runtime | canonical only |
+| `source: canonical_verified_definition_universe` | the active path |
+| `source: verified_registry_numeric_universe` | legacy; raises unless `legacy_mode=True` |
+| Active fallback to legacy aliases | **prohibited** — there is none, and none may be added |
+| New studies using physical alias names | **prohibited** |
+| Historical replay | explicit, isolated `legacy_mode=True` only |
+| `features/archive/legacy_registry_*/` | V1 rollback archive, non-runtime |
+
+Legacy alias behaviour reproduces historical datasets. It is never a development option.
+
+### Adding a feature
+
+1. Resolve the request first: `python scripts/feature_ctl.py`, or read
+   `features/CANONICAL_FEATURE_REFERENCE.yaml`. If it resolves, declare an instance — done.
+2. **Do not add a provider to support another timeframe, window, or period.** That is a
+   parameter. Extend or add a parameterized provider in `features/trackers/generic_*.py`
+   only when the formula or state-transition semantics genuinely differ.
+3. Declare the canonical definition with `parameter_schema`, `supported_bar_states`,
+   `supported_timeframes`, null and reset policies — those fields are what let validation
+   fail closed.
+4. Add tests in `features/tests/` that **name the feature**.
+5. Promote via `scripts/check_feature_promotion.py`: the implementation must resolve, a test
+   must name the feature, and an explicit promotion record must name the causal-audit
+   artifact and audited execution composite. Contract: `features/FEATURE_REGISTRY_CONTRACT.md`.
+6. Declare the instance, recompile, re-run preflight.
+
+Never bypass an unresolved feature with a hand-built script or inline pandas.
 
 ---
 
-## 3. New Feature Workflow
+## 3. The lifecycle
 
-When a study requires a feature that is not currently available in the repository, follow this exact workflow:
+One sequence. `research_workflow/lifecycle.py` is the facade over it.
 
-1. **Check Existing Registry**: Inspect `features/registry.py` and `features/FEATURE_REGISTRY_CONTRACT.md` to confirm the feature or an alias does not already exist.
-2. **Identify Family**: Determine the correct feature family (e.g., `arrival_velocity`, `relative_volume`, `orderbook_imbalance`).
-3. **Implement Minimal Tracker**: Add or extend a stateful feature tracker in `features/trackers/`. The tracker must compute strictly on COMPLETED 1s or bar updates without future information.
-4. **Register Feature**: Add the `FeatureDefinition` entry to `FEATURE_REGISTRY` in `features/registry.py` specifying:
-   - `name`: Canonical feature identifier (e.g., `rvol_5s`)
-   - `status`: `'verified'` or `'provisional'`
-   - `family`: Feature family string
-   - `implementation`: Full module import path to the tracker class
-   - `window`, `window_unit`, `reset_policy`, `update_anchor`
-5. **Update Study Feature Contract**: Declare the new feature in `study.yaml` under `features.feature_list`.
-6. **Add Unit Tests**: Write targeted unit tests in `tests/test_feature_library.py` verifying state updates, reset behavior, and deterministic values.
-7. **Compile & Preflight**: Run `python scripts/compile_study.py --study studies/<name>` and `python scripts/research_preflight.py --study studies/<name>`.
-8. **Fail-Closed Rule**: If the runner or preflight reports:
-   - `FEATURE_NOT_REGISTERED`
-   - `FEATURE_LIST_MISMATCH`
-   - `SCHEMA_MISSING`
-   - `UNKNOWN_PARAMETER`
-   - `MISSING_TRACKER_SOURCE`
-
-   **DO NOT** bypass the error by creating a custom hand-built collection script or inline pandas calculation.
-   Fix the registration, tracker implementation, or study contract declaration at the canonical layer in `features/registry.py` and `study.yaml`.
-
----
-
-## 4. Collector Workflow
-
-Feature collection extracts dataset matrices directly from the NautilusTrader event loop during market replay.
-
-### Execution Sequence
-
-1. **Define & Compile Study**:
-   ```bash
-   python scripts/create_study.py --config study.yaml
-   python scripts/compile_study.py --study studies/<id>
-   ```
-2. **Run Deterministic Preflight**:
-   ```bash
-   python scripts/research_preflight.py --study studies/<id>
-   ```
-   Must yield `RESEARCH PREFLIGHT VERDICT: CLEAR` (`audit/preflight.json`).
-
-3. **Split Pre-Execution Audit**:
-   - **Causal Audit**: Invoke `lookahead-auditor`. Report filed via:
-     ```bash
-     python scripts/run_preexec_audits.py --study studies/<id> --pass-num 1 --type causal --ingest audit/pass_01.md --author <declared_causal_reviewer_id>
-     ```
-   - **Contract Audit**: Invoke `contract-checker`. Report filed via:
-     ```bash
-     python scripts/run_preexec_audits.py --study studies/<id> --pass-num 1 --type contract --ingest audit/contract_pass_01.md --author <declared_contract_reviewer_id>
-     ```
-   *Requirement*: Causal and contract reviews MUST be conducted by distinct declared auditor identities. Each report MUST declare:
-   - `audit_type`: (`causal` | `contract`)
-   - `auditor`: `<actual declared reviewer identity>`
-   - `study`: `<study id>`
-   - `audited_execution_composite_sha256`: `<declared composite>`
-
-   > [!IMPORTANT]
-   > - `lookahead-auditor` and `contract-checker` are audit **ROLES**, not mandatory reviewer identity strings.
-   > - Do not substitute the role name for reviewer identity unless that role name is genuinely the externally declared identity for the invocation.
-   > - Causal and contract reviews MUST use **DISTINCT** declared reviewer identities.
-   > - One reviewer/session must NOT author both audit roles.
-   > - The reviewer declares the composite; tooling verifies it against `resolve_execution_manifest.py` and must never self-generate or stamp it.
-
-4. **Generate Preexec Cryptographic Seal**:
-   `run_preexec_audits.py` verifies report hashes and code composite hashes, issuing `artifacts/preexec_audit_seal.json`.
-
-5. **Bounded Smoke Run & Validation**:
-   ```bash
-   python backtests/run_nt_study.py --study studies/<id> --mode collect --stage day
-   python scripts/validate_smoke.py --run-dir runs/<latest_smoke_dir>
-   ```
-
-6. **Authorized Full Collection**:
-   ```bash
-   python backtests/run_nt_study.py --study studies/<id> --mode collect --stage full
-   ```
-
----
-
-## 5. Backtest Workflow
-
-The standalone backtest harness executes strategies against historical catalog data.
-
-### Canonical CLI Syntax
-
-Standard execution using a config YAML:
-```bash
-python backtests/run_backtest.py --config backtests/configs/w4_exit_b1_2023.yaml
-```
-
-Standard execution using CLI flags:
-```bash
-python backtests/run_backtest.py \
-    --strategy w4_exit_strategy \
-    --symbol NQ \
-    --start-date 2023-01-01 \
-    --end-date 2023-12-31 \
-    --order-handling simulated_orders \
-    --run-window from_start \
-    --param policy=B1 \
-    --param theta=0.62 \
-    --param N=10
-```
-
-Dry-run resolution (prints execution plan without running backtest):
-```bash
-python backtests/run_backtest.py --config backtests/configs/w4_exit_b1_2023.yaml --dry-run
-```
-
-### Infrastructure Responsibilities
-
-- **Shared Harness (`backtests/nt_runtime/` & `utils/runner/`) owns**:
-  - NautilusTrader engine bootstrap (`engine_builder.py`)
-  - Instrument creation (`xcme_futures_instrument`)
-  - Catalog bar loading & timestamp conversion (`utils/runner/data.py` -> `CausalDataLoader`)
-  - 1s-before-1m bar dispatch ordering (`utils/causal_registration.py`)
-  - Execution mode validation (`virtual` vs `simulated_orders`)
-  - Parameter parsing and strategy instantiation (`strategy_binding.py`)
-  - Standard run artifacts (`run_manifest.json`, `trades.parquet`, `metrics.json`)
-
-- **Strategy (`strategies/<strategy_name>/`) owns**:
-  - Signal detection and state machine transitions
-  - Order submission (`submit_order`, `cancel_order`)
-  - Indicator and feature updates on bar close
-  - Strategy-specific parameters (`StrategyConfig`)
-
-*Rule*: **DO NOT** create a new `run_*.py` script for an ordinary parameter, date range, or strategy variation. Create new runner code only when the canonical runner provably cannot represent the required execution semantics.
-
----
-
-## 6. Analysis Workflow
-
-Post-backtest and post-collection analysis processes candidate parquet matrices, fits ML models, and evaluates out-of-sample performance under strict partition guards.
-
-### Pandas/Polars are libraries, not an alternate governed workflow
-
-Pandas and Polars are computation libraries. They are **not** a second, parallel route to
-an authoritative research result. The governed path is the only one that produces one:
-
-```
-validated collection
-    ↓
-research/analysis/
-    ↓
-AnalysisSpec / validation contracts
-    ↓
-authoritative result
-```
-
-Scratch pandas/Polars work is legitimate and encouraged for **debugging, forensic
-inspection and diagnostics**. Its outputs are **NON-AUTHORITATIVE** and must be labelled
-as such — they may not be quoted as a study result, entered into a report as a finding, or
-used to close a research question.
-
-If `research/analysis/` cannot express the analysis a study requires, that is a gap in the
-harness, not a licence to route around it. Stop and report:
-
-    ANALYSIS_HARNESS_GAP
-
-naming the specific capability that is missing. Do not silently substitute scratch
-analysis for the governed path — a result nobody can reproduce through the contracts is
-not a result.
-
-### Do not wrap or duplicate canonical runners
-
-- **No scratch wrappers around canonical runners** merely to retry, monitor, or babysit a
-  run. Use `scripts/run_bounded_study.py` and read its status card. A wrapper becomes a
-  second runner with none of the governance the first one carries.
-- **Do not launch another identical run while one is `RUNNING`** unless the previous
-  process is confirmed terminal. Confirm with `python scripts/reconcile_runs.py`, which
-  classifies a run as `RUNNING` only when its recorded PID is genuinely alive; anything
-  else is `ABANDONED`, `FAILED`, `ABORTED` or `SUCCESS`. Concurrent identical runs produce
-  two run directories competing for the same identity and make the resulting evidence
-  ambiguous.
-
-```
-VALIDATED COLLECTION / TRADES PARQUET
-    ↓
-ANALYSIS SPEC (`research/schemas/study_spec.py`)
-    ↓
-SPEC & PROVENANCE VALIDATION
-    ↓
-FEATURE / TARGET EXTRACTION (`research/engines/`)
-    ↓
-TRAIN-ONLY ANALYSIS & FEATURE RANKING
-    ↓
-MODEL FITTING & HYPERPARAMETER TUNING
-    ↓
-THRESHOLD & MODEL FREEZE (`models/artifacts/`)
-    ↓
-AUTHORIZED OOS UNLOCK (`scripts/generate_oos_unlock.py`)
-    ↓
-OOS EVALUATION & METRIC CALCULATION
-    ↓
-STUDY REPORT (`STUDY_REPORT.md`)
-```
-
-### Canonical Analysis Package Location
-
-```
-Canonical validated analysis package:
-    research/analysis/
-
-If it is not present in the current checkout, it is maintained on the
-analysis-harness branch/worktree pending integration.
-
-Do NOT recreate equivalent analysis loading/modeling/reporting plumbing
-locally. Use/integrate the validated harness rather than building a
-parallel implementation.
-```
-
-> [!NOTE]
-> Low-level engines in `research/engines/` (`feature_binding_engine.py`, `target_engine.py`, `lineage_engine.py`) provide specific data transformation utilities consumed by the analysis harness, but are not a standalone replacement for the complete `research/analysis/` package.
-
-### Analysis Harness Controls
-
-- **Harness owns**: Collection identity, schema validation, partition provenance, OOS lock enforcement, join-key validation, target alignment, standard slicing, row reconciliation, metrics computation, and model freeze verification.
-- **Study owns**: Research question, experimental arms, requested feature list, custom slices, model class selection, and success criteria.
-
----
-
-## 7. Failure Handling
-
-When a command or script fails, locate the specific error code and resolve the issue at the owning architectural layer:
-
-```
-                  ┌───────────────────────────────┐
-                  │      COMMAND / RUN FAILURE    │
-                  └───────────────┬───────────────┘
-                                  │
-               Read explicit error code / traceback
-                                  │
-    ┌─────────────────────────────┼─────────────────────────────┐
-    │                             │                             │
-┌───▼──────────────────────┐ ┌────▼──────────────────────┐ ┌────▼──────────────────────┐
-│  FEATURE_NOT_REGISTERED  │ │   UNREGISTERED_STRATEGY   │ │    INVALID_PARAM     │
-│  FEATURE_LIST_MISMATCH   │ │   STRATEGY_NOT_BOUND      │ │  CONFIG_UNKNOWN_KEYS    │
-└───────────┬──────────────┘ └───────────┬──────────────┘ └───────────┬──────────────┘
-            │                            │                            │
-   Fix in features/              Fix in strategies/           Fix in study.yaml or
-   registry.py or                registry.py or               StrategyConfig schema
-   study.yaml                    strategy.py
-            │                            │                            │
-    ┌───────▼────────────────────┴────────────▼───────────────────────▼──────────────┐
-    │  Re-run preflight: `python scripts/research_preflight.py --study studies/<id>`  │
-    └────────────────────────────────────────────────────────────────────────────────┘
-```
-
-| Failure Error Code | Root Cause | Owning Layer / Required Fix |
-|---|---|---|
-| `FEATURE_NOT_REGISTERED` | Feature string missing from `FEATURE_REGISTRY` | Add `FeatureDefinition` to `features/registry.py` |
-| `FEATURE_LIST_MISMATCH` | `study.yaml` feature list SHA-256 != compiled SHA-256 | Re-compile study via `python scripts/compile_study.py` |
-| `UNREGISTERED_STRATEGY` | Strategy ID not in `STRATEGY_REGISTRY` | Register strategy class in `strategies/registry.py` |
-| `CONFIG_UNKNOWN_KEYS` | YAML config contains undeclared key | Align YAML key with `CONFIG_KEYS` or `StrategyConfig` |
-| `PREEXEC_AUDIT_STALE` | Code or config modified after audit seal | Re-run deterministic preflight and split pre-execution audit |
-| `OOS_LOCKED` | Attempted analysis on DEV/OOS partition without authorization | STOP. Obtain OOS unlock token via `generate_oos_unlock.py` |
-| `SCHEMA_MISMATCH` | Parquet columns do not match `compiled_study.json` schema | Re-verify study contracts and collector output fields |
-| `MANIFEST_RESOLUTION_FAILED` | Execution manifest hash mismatch | Re-resolve manifest via `scripts/resolve_execution_manifest.py` |
-
----
-
-## 8. Escalation Rule
-
-An AI agent or developer **MAY** modify shared framework code (`backtests/nt_runtime/`, `utils/runner/`, `research/engines/`, `scripts/`) ONLY IF ALL of the following conditions are met:
-
-1. A concrete study cannot be expressed by the existing harness capabilities.
-2. The failure is **NOT** caused by:
-   - Missing feature registration or tracker declaration
-   - Missing strategy registration or config binding
-   - Incorrect YAML syntax or unsupported CLI arguments
-   - Stale audit status or missing audit seal
-   - Caller misuse or improper path syntax
-3. The agent explicitly documents the missing capability in `BESPOKE_JUSTIFICATION` or the study `SPEC.md`.
-
-Otherwise, the agent **MUST** resolve the issue strictly by configuring or extending the canonical user-space layers (`study.yaml`, `features/registry.py`, `strategies/`, `tests/`).
-
----
-
-## 9. Token-Efficient Agent Workflow
-
-To maximize reasoning quality and minimize context/token consumption, agents must execute within structured, bounded sessions:
-
-```
-SESSION START
-    ↓
-1. Read `docs/RESEARCH_WORKFLOW.md` (or relevant section)
-    ↓
-2. Read study `SPEC.md` / task packet
-    ↓
-3. Read ONLY named canonical files (avoid broad scans)
-    ↓
-4. Perform ONE bounded task (e.g., implement tracker, run preflight)
-    ↓
-5. Write compact status JSON / Markdown artifacts
-    ↓
-6. Update session handoff
-    ↓
-END SESSION
-```
-
-### Rules of Token Discipline
-
-- **No Repo-Wide Archaeology**: Do not run broad grep/glob searches across historical folders (`archive/`, `scratch/`, `runs/`, old result trees) unless explicitly instructed.
-- **Targeted File Reads**: Use line-bounded reads (`view_file` with `StartLine`/`EndLine`) for specific symbols rather than dumping 1000-line files into chat.
-- **Compact Chat Responses**: Keep responses concise. Detailed logs, failure packets, and tracebacks belong in artifact files (`audit/failure_packet.json`, `audit/pass_NN.md`), not chat text.
-- **Deterministic Scripts Over Reasoning**: Use `scripts/research_preflight.py` and `scripts/sync_agents.py` to evaluate code mechanically rather than manually inspecting ASTs in LLM prompts.
-
----
-
-## 10. Canonical Script & Module Reference
-
-| Stage / Purpose | Canonical Path | Primary Class / Function | Typical Invocation Syntax | Primary Output Artifact |
+| # | Stage | Entry point | Artifact | Fails when |
 |---|---|---|---|---|
-| **Study Scaffolding** | `scripts/create_study.py` | `create_study()` | `python scripts/create_study.py --config study.yaml` | `studies/<id>/` tree & `SPEC.md` |
-| **Study Compilation** | `scripts/compile_study.py` | `compile_study()` | `python scripts/compile_study.py --study studies/<id>` | `compiled_study.json` |
-| **Fidelity Check** | `scripts/check_research_decision_fidelity.py` | `check_decision_fidelity()` | `python scripts/check_research_decision_fidelity.py --study studies/<id>` | Fidelity stdout / exit code |
-| **Research Preflight** | `scripts/research_preflight.py` | `run_preflight()` | `python scripts/research_preflight.py --study studies/<id>` | `audit/preflight.json` |
-| **Audit Report Filing** | `scripts/run_preexec_audits.py` | `_extract_v2_summary()` | `python scripts/run_preexec_audits.py --study studies/<id> --type causal --ingest audit/pass_01.md --author <declared_reviewer_id>` | `audit/status.json` |
-| **Preexec Audit Seal** | `scripts/preexec_audit_seal.py` | `generate_preexec_audit_seal()` | `python scripts/preexec_audit_seal.py` (called via preexec parser) | `artifacts/preexec_audit_seal.json` |
-| **Collector Runner** | `backtests/run_nt_study.py` | `run_collect_mode()` | `python backtests/run_nt_study.py --study studies/<id> --mode collect --stage day` | `runs/<timestamp>_collect_day/` |
-| **Smoke Validation** | `scripts/validate_smoke.py` | `validate_smoke_run()` | `python scripts/validate_smoke.py --run-dir runs/...` | `validation_report.json` |
-| **Standalone Backtest** | `backtests/run_backtest.py` | `run_backtest_mode()` | `python backtests/run_backtest.py --config backtests/configs/<name>.yaml` | `runs/<timestamp>_<strategy>/` |
-| **Analysis Harness** | `research/analysis/` | Analysis package API | Python import (`research.analysis`) | Fit models, thresholds, reports |
-| **Agent Parity Sync** | `scripts/sync_agents.py` | `main()` | `python scripts/sync_agents.py` (`--check` to verify) | `.agents/` and `.codex/` agent files |
-| **Feature Registry** | `features/registry.py` | `FEATURE_REGISTRY` | Python import `from features.registry import FEATURE_REGISTRY` | Feature metadata dictionary |
-| **Engine Construction** | `backtests/nt_runtime/engine_builder.py` | `build_engine()` | Python import in runtime harness | `BacktestEngine` instance |
-| **Catalog Data Loading** | `utils/runner/data.py` | `CausalDataLoader.load_bars()` | Python import in runtime harness | List of NT Bar objects |
+| 0 | **AUTHOR** the contract | write `research_decision.yaml`, derive `SPEC.md`, then `study.yaml` (§16) | those three files | decision contract missing or SPEC not derived from it |
+| 0b | **SCAFFOLD** | `python -m research_workflow.study_factory --config study.yaml` | `studies/<id>/` tree | schema validation error |
+| 1 | **PREPARE + FREEZE** (compiles) | `python -m research_workflow.prepare --study studies/<id>` | `compiled_study.json`, `audit/frozen_execution_manifest.json` | compile or phase0 regeneration error |
+| 2 | **READINESS** (R1–R10, §4) | `python -m research_workflow.readiness --study studies/<id>` | `audit/readiness.json` | any check fails |
+| 3 | **PREFLIGHT** (§5) | `python -m research_workflow.preflight --study studies/<id>` | `audit/preflight.json`, `audit/failure_packet.json` | any required check missing **or** failing |
+| 4 | **CAUSAL REVIEW** (§6.1) | `lookahead-auditor` agent, or `research_workflow.causal_audit.run_causal_review` | `audit/pass_NN.md` + `audit/status.json` | CRITICAL > 0, or stale freeze |
+| 5 | **CONTRACT REVIEW** (§6.1) | `contract-checker` agent, or `research_workflow.contract_audit.run_contract_review` | `audit/contract_pass_NN.md` + `audit/contract_status.json` | missing deliverable, unreachable terminal label |
+| 6 | **SEAL** | `research_workflow.seal.generate_preexec_audit_seal` | `artifacts/preexec_audit_seal.json` | `PREEXEC_AUDIT_STALE` |
+| 7 | **NT SMOKE** (1 day) | `python backtests/run_nt_study.py --study studies/<id> --mode collect --stage day` | `runs/<ts>_collect_day/` | runtime error, zero events, schema/surface violation |
+| 8 | **RECONCILE** | `python scripts/reconcile_runs.py` | `lifecycle.json` sidecar | — (classification only) |
+| 9 | **AUTHORIZE** | `experiment.authorize_experiment` | `artifacts/experiment_authorization.json` | chronology missing or overlapping |
+| 10 | **TRAIN COLLECT** (partitioned, §7) | `collection.collect_period_partitioned(..., execute=True)` | one run dir per year | authorization mismatch, prohibited year |
+| 11 | **MERGE** | `partitioning.reconcile_partitions` → `merge_partition_outputs` | merged frame | overlap, schema/dtype drift |
+| 12 | **FIT** | `modeling.fit_models` | `artifacts/experiment_models.json` | non-TRAIN partition, outcome column in X |
+| 13 | **TRAIN FREEZE** | `modeling.freeze_train_artifacts` | `artifacts/train_experiment_freeze.json` | non-TRAIN meta, outcome column in a frozen feature set |
+| 14 | **OOS OPEN** | `experiment.assert_oos_open` | (returns the freeze) | `TrainFreezeRequired` |
+| 15 | **OOS** | `collection.collect_period(..., "oos")` | run dirs | freeze absent or stale |
+| 16 | **ANALYSIS** | `analysis.analyze_results` | `artifacts/experiment_analysis.json` | missing columns, OOS not open |
+| 17 | **DECISION** | — | `results/STUDY_REPORT.md`, next `research_decision.yaml` | — |
+
+**Nothing executes before stage 6.** No collection, label build, training, backtest or staged
+run happens before preflight is `CLEAR` and both reviews have issued a status.
+
+### Three properties of this order
+
+1. **Expensive work happens late.** READINESS sits before PREFLIGHT, the audits and the seal
+   because it proves the real NT runtime path is safe on bounded real samples. Failing R1
+   costs seconds; failing after an audit round costs a re-audit.
+2. **FREEZE goes stale on any execution-affecting change.** The composite is resolved from the
+   study's whole execution closure (`scripts/resolve_execution_manifest.py`). Both reviews
+   re-resolve it and refuse with `STALE_FREEZE` if it moved. After fixing anything inside the
+   closure, re-run stage 1 and redo 3–6.
+3. **Targeted tests beat global CI.** `research_workflow/test_selection.py` picks the tests a
+   change requires. Running the whole suite repeatedly is latency, not diligence.
+
+### TRAIN / OOS discipline
+
+`research_workflow/experiment.py` is the whole authority.
+
+- `chronology.train` / `.dev` / `.prohibited` in `study.yaml` must be non-empty (train, dev)
+  and pairwise disjoint. The authorization is content-hashed; a stale artifact is refused.
+- `runtime_authorization(study, "oos")` calls `assert_oos_open` *before* producing dates and
+  stamps `train_freeze_sha256` into the plan. `verify_runtime_authorization` re-checks that
+  binding at the NT boundary and rejects prohibited years.
+- **OOS opens only at stage 14**, and only when `artifacts/train_experiment_freeze.json`
+  exists and binds to the current authorization.
+- **OOS may not influence** feature selection, preprocessing, model class, hyperparameters,
+  calibration, thresholds, or deciles — all are fields of the TRAIN freeze, frozen at stage 13.
+  Thresholds and deciles carry `derivation_population: "train"`.
+- **Smoke acceptance must use the authoritative population.** `scripts/validate_smoke.py` and
+  `OutputManager` re-derive the feature surface independently for that reason.
 
 ---
 
-## 11. Study Directory & Artifact Convention
+## 4. READINESS gate (R1–R10)
 
-Every research study follows a standardized directory structure:
+`research_workflow/readiness.py`. Every check fails closed with a specific exception. A failed
+R1 short-circuits R2–R7 as `R1_PREREQUISITE_FAILED` (all depend on `DataPlan`); R8 and R9 are
+independent and always run.
+
+| Check | Proves |
+|---|---|
+| R1 | exact physical dataset identity — declared == `DatasetSpec` == resolved == opened, with warmup-through-run coverage |
+| R2 | 1s / 1m `ts_init - ts_event` contracts on real bounded samples; derived 5m via `CompletedMinuteFiveMinuteAggregator`, no external 5m stream |
+| R3 | loaded bars are precision-compatible with the governed instrument |
+| R4 | callback causal order, via a probe strategy and the existing verifier |
+| R5 | the real collector constructs under real phase0 authorization (construction only, no `engine.run()`) |
+| R6 | the `STRATEGY_OUTPUT_INTERFACE_MISSING` contract |
+| R7 | a synthetic candidate/observation fixture validates through the real `OutputManager` |
+| R8 | the execution identity resolves twice with exact equality and no mutation |
+| R9 | zero alternate (ungoverned) catalog openers under `studies/<id>/**/*.py` |
+| R10 | bounded real first-nonempty collector output parity against the collection-time feature contract |
+
+**When READINESS fails:** it is a defect to fix, not a stop (§12). Read the named exception in
+`audit/readiness.json`, fix at the owning layer, re-run stage 2 only. If the fix touched the
+execution closure, re-run stage 1 first.
+
+`audit/readiness.json` is additive evidence. It never rewrites `frozen_execution_manifest.json`,
+`status.json` or any other stage artifact, and is not a second execution-identity authority.
+
+---
+
+## 5. Deterministic PREFLIGHT
+
+`research_workflow/preflight.py`. Required checks:
+
+```
+EXECUTION_MANIFEST  CAUSAL_LINT  ARTIFACT_SCHEMA
+FEATURE_PROMOTION   RESEARCH_DECISION_FIDELITY   CAUSAL_INVARIANTS
+```
+
+Readiness is a **two-part claim**: every required check *executed*, **and** every one passed.
+`--skip-tests` stays available for diagnostics but cannot report `READY_FOR_AUDIT` — a check
+that never ran cannot fail, and skipping one used to *increase* the reported readiness.
+
+On failure read `audit/failure_packet.json`. Do not re-derive the failure by hand.
+
+---
+
+## 6. Causal audit vs. model integrity
+
+Two different questions. Never merged, never duplicated.
+
+```
+LOOKAHEAD / CAUSAL AUDIT   "Could this information legally be known at T?"
+MODEL INTEGRITY            "Is the feature/model surface scientifically sane and nondegenerate?"
+```
+
+### 6.1 The causal system — it exists, do not build another
+
+| Layer | Implementation |
+|---|---|
+| AST lint | `scripts/causal_lint.py` (inside preflight) |
+| Ruleset A1–H4 | `docs/CAUSAL_CHECKLIST.md` — single source of truth for all three harnesses |
+| Causal reviewer | `lookahead-auditor` — owns **A, B, C1–C3, F, G, H** |
+| Contract reviewer | `contract-checker` — owns **C4, D, E**, deliverables, seals, lifecycle state, model-integrity declarations |
+| Executable review | `research_workflow/causal_audit.py`, `contract_audit.py` |
+| Provenance | `scripts/run_preexec_audits.py`, `research_workflow/seal.py` — binds report bytes to the audited composite |
+
+The two reviewers have **disjoint scope** and neither may report the other's category. That
+boundary is what stopped multi-pass audit loops. Re-audits: pass 2+ adjudicates every prior
+finding before raising new ones, at most 3 new CRITICALs per pass, always a **new**
+`audit/pass_NN.md` — never an append. Gates read the status JSON, never prose.
+
+Causal and contract reviews must be authored by **distinct declared reviewer identities**.
+
+### 6.2 Model integrity — gate, diagnostic, or recommendation
+
+Be precise about which of the three a control actually is.
+
+**Implemented hard gates** (fail closed, inside the lifecycle):
+
+| Control | Where |
+|---|---|
+| Declared feature contract == produced surface; an **all-null column is refused under either null policy** | `scripts/check_feature_surface.py`, in `OutputManager.persist_collection` and re-derived in `scripts/validate_smoke.py` |
+| Forward-outcome columns may not enter a fit matrix or a frozen feature set | `forward_outcomes/guard.py` via `modeling.fit_models` and `freeze_train_artifacts` (§10) |
+| Outcome columns in `X` rejected at fit time | `research/analysis/modeling.fit_model` (`SchemaSurplus`) |
+| TRAIN and DEV may not appear in one fit | `fit_model` (`PartitionMixing`) |
+| Refuses to fit without partition provenance | `fit_model` (`PartitionProvenanceMissing`) — a missing `_partition` column is not evidence of a single partition |
+| Threshold freeze requires TRAIN-only scores, records `derivation_population` | `research/analysis/modeling.freeze_threshold` |
+| Declared arms must request features the collection provides | `resolve_arms` (`SchemaMissing`) |
+| Model/feature-order binding, binary classes, `predict_proba` | `scripts/check_model_binding.py` |
+| `train_test_split(shuffle=True)` on temporal data | `causal_lint.py` rule C3, CRITICAL |
+| Degenerate slice surfaces a caveat, not a silent single group | `research/analysis/slices.py`, `reporting.py` |
+
+**Available diagnostics** (real, but not unconditional gates): see §11 diagnostics table.
+
+**Recommended integrity checks** — the study performs and reports these; they are **not**
+mechanically enforced, and must not be described as gates:
+
+- every declared feature is populated where its semantics require a value
+- every required feature has variance on the fitted population
+- each arm has the feature surface it claims — two arms with identical
+  `fit_identity_sha256` / `prediction_identity` mean the added block is dead
+- score surfaces are nondegenerate; frozen thresholds and deciles are nondegenerate
+- a shuffled-label run behaves near chance when performed
+- temporal validation is chronological
+- suspiciously strong single-feature power triggers inspection before it is reported
+
+A study reporting an arm delta must state which of these it verified. An unverified delta is a
+hypothesis, not a result.
+
+---
+
+## 7. The generic collector
+
+**The authoritative collection path is `research_workflow/generic_collector.py`, executed
+through `backtests/run_nt_study.py --mode collect`.**
+
+**No, you may not copy an old collector.** Not copy, not subclass, not wrap, not
+`sys.path.insert` into a sibling study. Anything under `collectors/`,
+`strategies/*_collector.py` or `studies/*/implementation/collector.py` is historical.
+
+How a study drives it:
+
+1. `study.yaml` declares canonical `FeatureInstance`s.
+2. `research_workflow/compiler.py` compiles them; the **provider dependency closure** is
+   derived from the declared instances, not discovered at runtime.
+3. `research_workflow/phase0.py` builds the phase-zero authorization manifest from the
+   compiled instances — no study module imported, no historical alias catalog consulted.
+4. `research_workflow/execution_plan.py` binds resolved provider methods and the output
+   surface **once**, at strategy construction, into fixed callback groups. A declared instance
+   whose provider has no output binding is kept as a null column without paying for an unused
+   calculation at every checkpoint.
+5. `research_workflow/output_manager.py` persists and enforces schema and feature surface.
+
+Compact snapshot paths and callback grouping are **implementation details**. Canonical output
+parity is **mandatory**.
+
+**ETH state may remain causally necessary even when candidate emission is RTH.** Session
+filtering governs which candidates are *emitted*, not which bars providers may *see*. Do not
+cut ETH history out of the replay as an optimization.
+
+### Partitioned TRAIN collection
+
+`research_workflow/partitioning.py` + `collection.collect_period_partitioned`. A
+`PartitionSpec` carries three intervals:
+
+```
+warmup prefix      [warmup_start, primary_end]    causal context only
+primary emission   [primary_start, primary_end]   the ONLY rows retained
+forward lookahead  [primary_end, lookahead_end]   target / outcome resolution
+```
+
+- `lookahead_seconds` defaults to `target.horizon_seconds`. At a chronology boundary the
+  lookahead replays only if it stays inside an authorized year; otherwise the lower-level
+  authorization stays fail-closed and the target contract's censoring handles the tail.
+- Each year runs in its **own process** (one worker created and torn down per partition).
+  NautilusTrader's Rust logger is process-global and cannot initialize twice in one
+  interpreter, so a reused worker panics on the second year — and per-process isolation is
+  what makes partitioning genuinely memory-bounded.
+- `retain_primary_rows()` drops warmup/lookahead rows **after** replay, so filtering cannot
+  change causal state.
+- `reconcile_partitions()` rejects duplicate ids, overlapping primary intervals, and
+  incompatible authority hashes.
+- `merge_partition_outputs()` is deterministic: identical column order, lossless numeric dtype
+  promotion only, duplicate primary keys rejected, stable `mergesort` ordering.
+- **Partitioned vs. monolithic parity is mandatory.** A divergence is a defect, not a variant.
+
+### Telemetry must not change what it measures
+
+`tracemalloc` is **opt-in** (`NT_TELEMETRY_TRACEMALLOC=1`) because it instruments every
+allocation; left on it dominates replay wall time. Process RSS telemetry is always collected
+and is cheap. Benchmark harnesses must separate replay cost from instrumentation cost, and
+comparisons run through `scripts/benchmark_historical_same_harness.py` under the same harness.
+Measured figures: `docs/WORKFLOW_REFERENCE_FACTS.md`.
+
+---
+
+## 8. Standalone backtests vs. governed studies
+
+Two different activities. Do not mix their rules.
+
+| | Governed ML study | Standalone strategy backtest |
+|---|---|---|
+| Question | does a signal exist, and does it survive OOS? | how does this strategy perform? |
+| Entry point | `backtests/run_nt_study.py --mode collect` | `backtests/run_backtest.py` |
+| Contract | `research_decision.yaml` → `study.yaml` → `compiled_study.json` | a config YAML or `--param` flags |
+| Lifecycle | all 17 stages (§3) mandatory | not applicable |
+| Data plan | `resolve_data_plan(...)` — adds collector chronology and OOS gates | `resolve_catalog_plan(...)` — generic catalog/instrument/warmup |
+| Manual | this document | `docs/BACKTEST_EXECUTION.md` |
+
+A standard backtest is `python backtests/run_backtest.py --strategy <id> --param k=v`. **Never
+a new `run_*.py`** for an ordinary parameter, date range, or strategy variation. Do not call
+`resolve_data_plan` for a non-collector backtest. `--strategy` must never override a sealed
+study's declared `strategy_class`.
+
+---
+
+## 9. Forward outcomes / economic path
+
+`research_workflow/forward_outcomes/` — study-agnostic. It imports no regime engine, no flip
+definition, no instrument, no classifier.
+
+### The separation this package exists to enforce
+
+```
+causal features   what was knowable at decision time    -> model INPUTS
+proposed entry    immutable decision/entry anchor       -> the boundary
+forward outcome   what happened afterwards              -> LABELS, never inputs
+```
+
+| Module | Role |
+|---|---|
+| `contracts.py` | `ProposedEntry` (frozen, `entry_sha256`), `ForwardOutcomeSpec` (frozen, `spec_sha256`); `build_outcome_columns()` **derives** the output schema from the spec |
+| `tracker.py` | streaming observation of active entries |
+| `selection.py` | build entries from frozen scores — threshold crossings, deciles, local maxima |
+| `partition.py` | `required_lookahead_seconds`, partition build/merge, `assert_partition_parity` |
+| `guard.py` | the causal guard (§10) |
+| `governance.py` | artifact writing, reconciliation, provenance |
+| `analysis.py` | descriptive summaries only |
+| `smoke.py` | streaming-vs-bruteforce infrastructure smoke |
+
+**Architectural guarantees:**
+
+- **Immutable proposed entry.** Every field is knowable at `decision_ts`/`entry_ts`; the frozen
+  `entry_sha256` covers all of it, so an entry set cannot be re-anchored after its outcomes are
+  measured. ATR is taken at the entry anchor, never recomputed from the future path.
+- **Separate post-event artifact.** Candidate features, model scores, `proposed_entries.parquet`
+  and `forward_outcomes.parquet` are four distinct files. Every outcome artifact carries
+  `forward_outcome_manifest.json` declaring `data_class: OUTCOME_LABEL_POST_EVENT`,
+  `causal_relative_to_entry: false`, `usable_as_model_input: false`.
+- **Streaming tracker.** One small observation per live entry; work per bar is O(active
+  observations). **Full future paths are never retained**, and nothing scans the historical
+  entry set.
+- **Partition-safe lookahead.** The spec sizes the lookahead; `assert_partition_parity` proves
+  the partitioned result equals the monolithic one.
+- **Explicit censoring, no silent shortening.** A record's status is the **worst** any part
+  reached, so one unobservable horizon can never report as `RESOLVED`. A horizon exceeding the
+  tracking budget raises at spec construction rather than being quietly truncated.
+- **Signal-entry vs. confirmation-entry** are separate entry families in separate artifact
+  directories, compared explicitly — never pooled.
+- **Production causal guard** — §10.
+
+Metric definitions and censoring codes are generated from the spec; read
+`build_outcome_columns()` and `OutcomeStatus`, not a list in this manual.
+
+---
+
+## 10. Production causal outcome guard
+
+`research_workflow/forward_outcomes/guard.py`. **Fail-closed** — it raises `OutcomeLeakError`;
+there is no warning mode.
+
+**Can a forward outcome enter model X? No.** Two production surfaces enforce it:
+
+1. **Fit time** — `modeling.fit_models` calls `guard_training_frame(X, list(X.columns))`. It
+   checks the declared feature list **and** any outcome columns riding along in the frame,
+   because the common accident is a frame joined with outcomes and a fitter that re-derives
+   its column list from the frame.
+2. **TRAIN freeze** — `modeling.freeze_train_artifacts` calls `assert_causal_feature_surface`
+   on **every arm's frozen feature set**. A set can be frozen without passing through a
+   fitter, and a leak frozen into the contract outlives the run.
+
+Three barriers, none of them naive substring matching:
+
+- **Exact** — `outcome_column_namespace(spec)` regenerates the schema from the spec.
+- **Structural** — `OUTCOME_COLUMN_PATTERNS`, anchored regexes matching the *generated naming
+  grammar*.
+- **Registry** — `assert_outcome_columns_not_registrable(spec)` asserts no outcome column
+  resolves through `features.registry`. If one did, a study contract could legally declare it.
+
+### The constraint that must not be broken
+
+`prior_1m_regime_mfe_atr`, `rolling_300s_giveback_atr`, `rolling_300s_max_progress_atr`,
+`running_mfe_atr` and `current_progress_atr` are **legitimate causal features** — they describe
+the past as of the decision. `mfe_300s`, `max_mfe_atr` and `time_to_max_mfe` describe the
+future after the entry. The patterns are anchored to the generated grammar precisely so the
+first group passes and the second is caught.
+
+**Do not "tighten" the guard with an unanchored substring match** — it would reject the study's
+own inputs. Identity columns shared with the entry table are exempt by name, so joining
+outcomes back to entries does not trip it.
+
+---
+
+## 11. Scripts
+
+55 scripts, classified. **Authoritative** = run this. **Shim** = redirects to a module; prefer
+the module. **Diagnostic** = never a gate. **Historical** = a completed migration or a
+superseded path; do not use for new work.
+
+`sealed-safe` = cannot change the execution composite or a stage artifact, so it is safe while
+a study is sealed and in flight.
+
+### Authoritative — lifecycle and governance
+
+| Script | Purpose | Mutates | Sealed-safe |
+|---|---|---|---|
+| `resolve_execution_manifest.py` | resolve the execution closure + composite | no | yes |
+| `run_preexec_audits.py` | ingest an audit report, verify provenance, issue status | `audit/status.json` | yes |
+| `run_bounded_study.py` | run a stage under time/memory/stale-progress limits, emit a JSON status card | `runs/` | yes |
+| `reconcile_runs.py` | classify run lifecycle; `ABANDONED` by PID liveness. Never rewrites `run_manifest.json` | `lifecycle.json` sidecar | yes |
+| `validate_smoke.py` | canonical smoke acceptance; re-derives the feature surface | `validation_report.json` | yes |
+| `causal_lint.py` | AST lint for recurring causal defects | no | yes |
+| `check_artifact_schema.py` | artifact + seal manifest schema and DAG validation | no | yes |
+| `check_model_binding.py` | model sha, feature count/order, binary classes, `predict_proba` | no | yes |
+| `check_feature_surface.py` | declared contract == produced surface; all-null refusal | no | yes |
+| `check_feature_promotion.py` | feature lifecycle promotion evidence | no | yes |
+| `check_candidate_promotion.py` | promotion facts for an inactive canonical authority | no | yes |
+| `check_research_decision_fidelity.py` | decision contract → SPEC/study fidelity | no | yes |
+| `check_spec_fidelity.py` | SPEC → `StudySpec` fidelity | no | yes |
+| `check_collect_equivalence.py` | full-collection equivalence against a reference | no | yes |
+| `scan_alternate_catalog_openers.py` | static guard: ungoverned catalog opens under a study | no | yes |
+| `validate_data.py` | raw file and catalog integrity | no | yes |
+| `build_audit_packet.py` | assemble the contextual diff packet for an auditor | yes | yes |
+| `describe_study_diff.py` | describe what changed between study states | no | yes |
+| `bootstrap_audit_lineage.py` | record a study's durable audit lineage anchor | yes | **no** |
+| `safe_cleanup.py` | fail-closed guard for recursive deletion (§13) | deletes | — |
+| `sync_agents.py` | regenerate Codex + Antigravity agent defs | yes | yes |
+
+### Authoritative — feature system
+
+| Script | Purpose | Sealed-safe |
+|---|---|---|
+| `feature_ctl.py` | V2 canonical feature governance CLI: check and promote | yes (check) |
+| `generate_canonical_feature_reference.py` | regenerate `CANONICAL_FEATURE_REFERENCE.yaml` | yes |
+| `prepare_feature_candidate.py` | prepare + freeze an inactive candidate authority | yes |
+| `materialize_feature_candidate.py` | materialize the final candidate bundle | yes |
+| `authorize_feature_candidate_activation.py` | bind review evidence to candidate bytes | yes |
+| `activate_feature_pipeline_v2.py` | verify parity, then atomically flip the active pointer | **no** |
+
+### Authoritative — data and catalog
+
+| Script | Purpose |
+|---|---|
+| `build_v0_catalog.py` | generic raw-parquet → NT catalog materializer |
+| `build_es_v0_2020_2026_catalog.py` | ES.v.0 2020–2026 catalog |
+| `build_dense_1s.py` | calendar-aligned dense 1s parquet from immutable raw bars |
+| `preflight_dense_1s.py` | preflight for the dense-1s utility |
+| `check_mbp1_cost.py` | Databento MBP-1 download cost preflight |
+
+### Compatibility shims — not primary entry points
+
+| Shim | Use instead |
+|---|---|
+| `scripts/research_preflight.py` | `research_workflow.preflight` |
+| `scripts/compile_study.py` | `research_workflow.compiler` |
+| `scripts/create_study.py` | `research_workflow.study_factory` |
+| `scripts/prepare_and_freeze.py` | `research_workflow.prepare` |
+| `scripts/preexec_audit_seal.py` | `research_workflow.seal` |
+| `scripts/build_phase0_manifest.py` | `research_workflow.phase0` |
+| `scripts/select_required_tests.py` | `research_workflow.test_selection` |
+| `backtests/nt_runtime/output_manager.py` | `research_workflow.output_manager` |
+| `backtests/nt_runtime/readiness.py` | `research_workflow.readiness` |
+
+### Diagnostics — never a gate
+
+| Script | Purpose |
+|---|---|
+| `find_first_parity_divergence.py` | first-divergence localization — **mandatory first step for any parity failure** |
+| `verify_collector_parity.py` | full collector run vs. every persisted field |
+| `diagnose_collector_gap.py` | locate the replay-time gap between collectors |
+| `run_collector_ablation_matrix.py` | benchmark-only ablation matrix on one replay day |
+| `benchmark_historical_same_harness.py` | historical controls through the canonical harness |
+| `run_vertical_slice.py` | 10-stage end-to-end composition gate on a synthetic partition |
+| `run_isolated_sweeps.py` | isolated parameter sweeps |
+| `capture_baseline_fixtures.py` | capture baseline fixtures |
+| `export_notebook_knowledge_base.py` | export a knowledge-base bundle |
+
+### Historical — completed migrations and superseded paths
+
+| Script | Status |
+|---|---|
+| `generate_oos_unlock.py` | superseded by `experiment.assert_oos_open` + the TRAIN freeze; kept for studies built against it |
+| `archive_legacy_feature_registry.py` | V1 archive creation — done |
+| `restore_legacy_feature_file.py` | V1 rollback operator tool |
+| `migrate_cleanflip_feature_instances.py` | one-off V1→V2 study migration |
+| `audit_full_feature_system_v2_inventory.py` | V1→V2 normalization — done |
+| `build_canonical_promotion_inventory.py` | V2 promotion evidence build — done |
+| `run_full_legacy_feature_parity.py` | legacy→canonical parity matrix — evidence produced |
+
+---
+
+## 12. Autonomy policy
+
+**A gate failure means: do not advance past the gate. It does not mean: stop and report
+`BLOCKED`.**
+
+Autonomously, without asking: diagnose the deterministic defect (read
+`audit/failure_packet.json`, the exception, the diff), fix it at the owning layer, add or
+update a **targeted** test, re-run the affected **bounded** check, regenerate stale
+deterministic artifacts, and resume from the correct stage — not from the beginning.
+
+### Terminal stop conditions
+
+Stop only for these, and say which one:
+
+1. **Genuine semantic ambiguity** — two defensible readings producing materially different
+   experiments.
+2. **Data safety risk** (§13).
+3. **Authorization ambiguity** — unclear whether a period, dataset or action is authorized.
+4. **Cannot preserve causality or TRAIN/OOS correctness** — the only fix would require
+   look-ahead, OOS tuning, or breaking a freeze.
+5. **Capability gap** — name it (`ANALYSIS_HARNESS_GAP`, `BESPOKE_JUSTIFICATION`), do not say
+   "it didn't work".
+6. **Prohibited data access risk** — the next step would touch a prohibited year or source.
+
+### Failure routing
+
+| Error | Fix at |
+|---|---|
+| any feature-instance code (§2) | `study.yaml` instance parameters, or the canonical bundle |
+| `FEATURE_LIST_MISMATCH` | recompile the study |
+| `UNREGISTERED_STRATEGY`, `STRATEGY_NOT_BOUND` | `STRATEGY_REGISTRY` in `backtests/nt_runtime/strategy_binding.py` |
+| `CONFIG_UNKNOWN_KEYS` | align the YAML key with the config schema |
+| `STALE_FREEZE`, `PREEXEC_AUDIT_STALE` | re-run stage 1, then redo 3–6 |
+| `MANIFEST_RESOLUTION_FAILED` | `scripts/resolve_execution_manifest.py` |
+| `OUTCOME_COLUMN_IN_CAUSAL_SURFACE` / `_IN_TRAINING_FRAME` | drop the columns; never loosen the guard |
+| `PartitionProvenanceMissing` | pass `meta` with `_partition`, or an explicit recorded `SplitPolicy` opt-out |
+| `PartitionMixing` | you are fitting across TRAIN and DEV |
+| `TrainFreezeRequired` | OOS is locked; freeze TRAIN artifacts first |
+| any parity failure | run `scripts/find_first_parity_divergence.py` **before** any investigation |
+
+---
+
+## 13. Data safety
+
+**Before any recursive deletion or cleanup:**
+
+1. Inspect every descendant for **symlinks, junctions, mount points and Windows reparse
+   points** that escape the intended root. `os.path.islink()` returns `False` for a Windows
+   directory junction — check reparse points, not just symlinks.
+2. Resolve before you delete. `Path.resolve()` decides, not the string prefix.
+3. Confirm the target is inside repository-owned storage. `data/catalog/` in particular may
+   link to storage outside the repository.
+4. **Fail closed.** If any descendant resolves outside the intended disposable root, abort the
+   whole operation. Do not delete "the safe part".
+
+`scripts/safe_cleanup.py::assert_safe_to_delete` implements this. Use it, or replicate it,
+before any recursive removal of a directory you did not create in this session.
+
+**Never junction live `data/` into a disposable worktree.**
+
+**Never silently substitute a dataset.** If the authorized source is unavailable, fail closed
+and report it. A substituted source produces a result nothing downstream will flag.
+
+---
+
+## 14. Research pattern
+
+Prediction of a **structural** event and prediction of a **tradable** event are distinct
+research questions. Do not mix them.
+
+| Study | Does | Prohibited |
+|---|---|---|
+| **1 — Prediction** | collect causal features, train and freeze a predictor, validate clean OOS signal | — |
+| **2 — Economics (observational)** | use the *frozen* scores/thresholds/deciles to create immutable proposed-entry anchors; observe the forward path with `forward_outcomes`; ask only whether confidence **ranks** economic quality | `model_fit`, `strategy_optimization` |
+| **3 — Economic-quality model** | only if 2 warrants it: train against a declared economic target (P(clean reversal), E[MFE], E[MAE], target-before-stop) | — |
+| **4 — Strategy optimization** | last | — |
+
+`studies/frozen_flip_score_forward_path_2024/` is the reference Study 2: it consumes the frozen
+artifacts of another study, declares `model_fit: prohibited` and
+`economic_use: observational_only`, and produces separate signal-entry and confirmation-entry
+artifact sets.
+
+Observation is not optimization. A Study 2 is never licensed to tune anything on OOS.
+
+---
+
+## 15. Analysis discipline
+
+Pandas and Polars are computation libraries, **not** a second governed workflow.
+
+```
+validated collection -> research/analysis/ -> AnalysisSpec + validation contracts -> authoritative result
+```
+
+Scratch pandas work is encouraged for **debugging and forensic inspection**. Its outputs are
+**NON-AUTHORITATIVE** and must be labelled so: they may not be quoted as a study result,
+entered into a report as a finding, or used to close a research question.
+
+If `research/analysis/` cannot express what a study requires, that is a harness gap. Stop and
+report `ANALYSIS_HARNESS_GAP` naming the missing capability.
+
+**Do not wrap a canonical runner** to retry, monitor or babysit it — a wrapper becomes a second
+runner with none of the governance. Use `scripts/run_bounded_study.py` and read its JSON status
+card. Do not launch a second identical run while one is `RUNNING`; confirm terminal state with
+`scripts/reconcile_runs.py`.
+
+---
+
+## 16. Study directory and contract authority
 
 ```
 studies/<study_id>/
-├── research_decision.yaml   # Canonical Research Decision Contract (AUTHORITATIVE)
-├── study.yaml               # Machine-readable study specification
-├── SPEC.md                  # Human-readable study specification (derived from research_decision.yaml)
-├── compiled_study.json      # Compiled study contract (sha256 bound)
-├── config/                  # Sub-component contract JSONs (feature, population, target)
-│   ├── feature_contract.json
-│   ├── population_contract.json
-│   └── target_contract.json
-├── implementation/          # Study-specific strategy or custom collectors (if bespoke)
-├── tests/                   # Auto-generated & study-specific contract tests
-│   └── test_study_contracts.py
-├── audit/                   # Machine-parsed audit artifacts & status files
-│   ├── preflight.json
-│   ├── pass_01.md
-│   ├── status.json          # Causal audit status
-│   ├── contract_pass_01.md
-│   └── contract_status.json # Contract audit status
-├── artifacts/               # Sealed execution artifacts & frozen model weights
-│   └── preexec_audit_seal.json
-└── results/                 # Post-analysis summary reports and metrics JSONs
-    └── STUDY_REPORT.md
+├── research_decision.yaml    AUTHORITATIVE decision contract      [git]
+├── SPEC.md                   derived from research_decision.yaml  [git]
+├── study.yaml                machine contract, FeatureInstances   [git]
+├── compiled_study.json       compiled, sha256-bound               [git]
+├── config/                   feature/population/target/deliverables contracts [git]
+├── implementation/           small declarative hooks only, often absent       [git]
+├── tests/                    study contract tests                 [git]
+├── audit/                    frozen_execution_manifest, readiness, preflight,
+│                             failure_packet, pass_NN + status, contract_pass_NN
+│                             + contract_status                    [git]
+├── artifacts/                phase0_source_manifest, preexec_audit_seal,
+│                             experiment_authorization, experiment_models,
+│                             train_experiment_freeze, experiment_analysis  [git]
+└── results/STUDY_REPORT.md                                        [git]
 ```
 
-### Artifact Categorization
+**Contract authority:** `research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code`.
 
-- **Source / Config (Tracked in Git)**: `research_decision.yaml`, `study.yaml`, `SPEC.md`, `strategies/`, `features/`, `tests/`.
-- **Generated Contracts (Tracked in Git)**: `compiled_study.json`, `config/*.json`.
-- **Audit Evidence (Tracked in Git)**: `audit/pass_NN.md`, `audit/status.json`, `audit/contract_pass_NN.md`, `audit/contract_status.json`.
-- **Run Evidence (Untracked / Gitignored)**: `runs/`, `canonical_*/`, `_work/`, `*.parquet`.
-- **Model Artifacts (Untracked / Gitignored)**: `models/artifacts/*.joblib`, `models/artifacts/*.onnx`.
+Create or verify `research_decision.yaml` **before** drafting or modifying `SPEC.md`. Nothing
+compiles or passes preflight unless
+`python scripts/check_research_decision_fidelity.py --study studies/<id>` passes.
 
----
+**Behavioural rule:** never improve, broaden, clean up, or make a study more statistically pure
+by changing a fixed baseline or adding feature discovery unless the decision contract
+explicitly permits it. Surface a design concern as a caveat; do not silently alter the
+experiment.
 
-## 12. Stopping Rules
-
-To prevent scope creep and unnecessary refactoring, strictly enforce these stopping rules:
-
-1. **Collector Framework**: Frozen. No modifications permitted unless a demonstrated defect is identified or a new study contract requires a feature that cannot be represented.
-2. **Backtest Harness**: Frozen. No modifications permitted unless an explicit execution mode or order handling semantics cannot be represented.
-3. **Analysis Harness**: Frozen. Partition provenance, OOS lock enforcement, and metric computation logic are immutable.
-4. **Shared Feature Infrastructure**: Add new feature definitions and stateful trackers normally in `features/registry.py` and `features/trackers/`. Do not rewrite the registry schema or lookup engine.
-5. **Research Agents**: Once the assigned research question is answered and validated, produce the final study report (`STUDY_REPORT.md`) or next decision contract (`research_decision.yaml`). Do not alter an accepted study's parameters post-hoc.
+**Never commit generated data** — `runs/`, `canonical_*/`, `_work/`, `*.parquet`, `*.joblib`,
+`*.onnx`. Commit the manifests.
 
 ---
 
-## 13. Workflow Acceptance Test
+## 17. Timestamps
 
-The canonical workflow validation test verifies that an agent handles a missing feature correctly under fail-closed governance:
+- Raw Databento OHLCV bars are **OPEN-stamped** (`ts_event`). Complete OHLCV is usable only at
+  interval close.
+- Offline research normalizes derived bars to **CLOSE-stamped** indices
+  (`label='right', closed='left'`).
+- NT catalogs preserve open-stamped `ts_event` and set `ts_init = ts_event + bar_duration_ns`
+  (1s +1s, 1m +60s, 3m +180s, 5m +300s), so the event loop dispatches completed bars at
+  interval close.
+- **1s bars therefore arrive before their parent 1m bar** (`add_bars_causal_order`,
+  `verify_callback_causal_order`; proven per-study by R4). Buffer recent 1s bars and replay
+  them retroactively from fill time, or you will miss the first minute of price action.
+- Derived timeframes are aggregated from **completed** lower-timeframe bars, never loaded as an
+  independent stream.
+- Per-event callback ordering beyond these guarantees is a property of a study family and
+  belongs in that study's `SPEC.md`, not here.
+- Display and analysis in Central Time (`America/Chicago`); NT internals are UTC.
+  RTH 08:30–15:15 CT.
 
-### Test Protocol
+---
 
-1. **Scenario Setup**: Introduce a study configuration (`study.yaml`) referencing a new feature `arrival_vel_45s` that is intentionally absent from `features/registry.py`.
-2. **Deterministic Preflight Failure**: `python scripts/research_preflight.py --study studies/<test_study>` fails with `FEATURE_NOT_REGISTERED`.
-3. **Agent Remediation Action**:
-   - The agent MUST diagnose `FEATURE_NOT_REGISTERED` from `audit/failure_packet.json`.
-   - The agent MUST add the canonical `FeatureDefinition` for `arrival_vel_45s` to `FEATURE_REGISTRY` in `features/registry.py`.
-   - The agent MUST update or verify the tracker implementation in `features/trackers/velocity.py`.
-   - The agent MUST add unit tests for `arrival_vel_45s` in `tests/test_feature_library.py`.
-   - The agent MUST re-compile the study via `python scripts/compile_study.py` and re-run preflight.
-4. **Success Criteria**:
-   The workflow test succeeds if and only if the agent fixes the feature definition at the canonical layer (`features/registry.py`) and passes preflight WITHOUT:
-   - Creating a replacement collector script
-   - Creating a replacement backtest runner
-   - Copying engine/catalog setup inline
-   - Bypassing preflight or audit validation
-   - Manually constructing custom analysis code
+## 18. Deprecated — use instead
+
+| Deprecated | Use instead |
+|---|---|
+| Feature System V1 physical names; `features/FEATURES.md` | canonical instances (§2); `features/CANONICAL_FEATURE_REFERENCE.yaml` |
+| Legacy alias resolution as an active path | `canonical_verified_definition_universe` |
+| Bespoke per-study collectors | `research_workflow/generic_collector.py` (§7) |
+| Legacy `backtests/run_*.py` scripts | `run_backtest.py` / `run_nt_study.py` (§8) |
+| `scripts/generate_oos_unlock.py` as the OOS authority | `experiment.assert_oos_open` (§3) |
+| The seven `scripts/` shims | the `research_workflow` modules (§11) |
+| Root-level `*_HARDENING_*`, `*_HARNESS_*_REPORT`, `*RFC*`, `*PLAYBOOK*`, `PROPOSED_*` docs | this document; see `docs/DOCUMENT_MAP.md` |
+
+---
+
+## 19. Deeper references
+
+| Topic | Document |
+|---|---|
+| Causal/contract audit ruleset A1–H4 | `docs/CAUSAL_CHECKLIST.md` |
+| Current-state numbers, closure membership, troubleshooting facts | `docs/WORKFLOW_REFERENCE_FACTS.md` |
+| Which docs are current vs. stale | `docs/DOCUMENT_MAP.md` |
+| Subagent roster and rationale | `docs/SUBAGENT_ROSTER.md` |
+| Feature lifecycle and promotion | `features/FEATURE_REGISTRY_CONTRACT.md` |
+| Canonical feature vocabulary | `features/CANONICAL_FEATURE_REFERENCE.yaml` |
+| Catalog and data | `docs/DATA_CATALOG.md` |
+| Standalone backtest execution | `docs/BACKTEST_EXECUTION.md` |
+| Study methodology, MFE/MAE replay | `docs/STUDY_METHODOLOGY.md` |
+| SPEC templates, Deliverables Manifest | `docs/TEMPLATES.md` |
+| Reporting and tearsheets | `docs/ANALYSIS_REPORTING.md` |
+| Profiling and ONNX | `docs/PERFORMANCE.md` |
+| Error registry | `docs/ERROR_REGISTRY.md` |
+| Analysis harness contract | `ANALYSIS_HARNESS_A0_CONTRACT.md` |
+| Backtest harness boundary | `BACKTEST_HARNESS_B0_BOUNDARY.md` |
+| READINESS R1–R10 design | `ML_Trend_Analysis_Workflow_V2_Phase1_FINAL.md` §8 |

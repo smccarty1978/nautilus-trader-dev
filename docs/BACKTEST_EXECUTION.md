@@ -88,7 +88,7 @@ The building blocks, if you need them individually:
 | Execution semantics (fill model, OMS, run window) | `backtests.nt_runtime.engine_builder.ExecutionMode` |
 | Catalog bars | `utils.runner.data.CausalDataLoader` |
 | 1s-before-1m ordering | `utils.causal_registration.add_bars_causal_order` |
-| Run artifacts / manifest | `backtests.nt_runtime.output_manager.OutputManager` |
+| Run artifacts / manifest | `research_workflow.output_manager.OutputManager` |
 
 ### Multiple Backtests (Parameter Sweep)
 
