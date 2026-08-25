@@ -1,8 +1,8 @@
 {
-  "seal_id": "preexec_seal_clean_maturity_flip_model_rolling_productivity_e5a8eb7b4a8d1d5b",
+  "seal_id": "preexec_seal_clean_maturity_flip_model_rolling_productivity_67052e7d8f95abbc",
   "study_name": "clean_maturity_flip_model_rolling_productivity",
   "seal_status": "LOCKED",
-  "composite_seal_hash": "e5a8eb7b4a8d1d5b7f0629cf35b5bae25990141ec3f56a60e77efaa194ae3c32",
+  "composite_seal_hash": "67052e7d8f95abbc93163942916156b3b2cfaf78b79e6a0eca8cd8978c7791d8",
   "reviewer_provenance": {
     "causal": {
       "declared_auditor": "research_workflow.causal_audit",
@@ -20,15 +20,15 @@
   "causal_audit_verdict": {
     "audit_type": "causal",
     "auditor": "research_workflow.causal_audit",
-    "pass": 13,
+    "pass": 15,
     "verdict": "CLEAR",
     "critical": 0,
     "warning": 0,
     "note": 0,
     "causal_contract": "ts_avail <= T (latest_source_ts_init <= observation_ts)",
-    "audited_execution_composite_sha256": "e5a8eb7b4a8d1d5b7f0629cf35b5bae25990141ec3f56a60e77efaa194ae3c32",
-    "audit_report_sha256": "3ad1b985d55afa0e321c166f4d9c8b6f4265c658d7c75ef7d7efe542278b3876",
-    "audit_report_path": "audit/pass_13.md",
+    "audited_execution_composite_sha256": "67052e7d8f95abbc93163942916156b3b2cfaf78b79e6a0eca8cd8978c7791d8",
+    "audit_report_sha256": "bccb86842ca7ec65f55b890dcfdd02a85525e034f1729582c8a07e610617a80b",
+    "audit_report_path": "audit/pass_15.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "research_workflow.causal_audit",
@@ -112,11 +112,11 @@
       "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
       "repo:research/study_types/flip_prediction.py": "e662823800d2b4a5514f1eaca52d894eac413d649c0473f35fb43dccf99b1ca6",
       "repo:research_workflow/__init__.py": "2db30381d989228f3493988d477bfada5565ac2d1c2d358e6c48f43c689cae2c",
-      "repo:research_workflow/collection.py": "46b553b476bb0d243c7b1e3c2216bb3732525fc83f26b87a26115ca4d51aa98b",
+      "repo:research_workflow/collection.py": "ccdc77e3f1f9b214b817c90def0be051af8a9bcdcd1acceea22ada39551860b7",
       "repo:research_workflow/compiler.py": "1977e34cff480e3224b6dce07b90f5d16e573fbed6617af4981832e38a75149c",
-      "repo:research_workflow/execution_plan.py": "995c5a8419380d9a1459da430b58cc064948f286ea0d7b98eda35a0499286582",
+      "repo:research_workflow/execution_plan.py": "14b61994fc826fb719f4f29997f8e952952d01239e8628cb1d0b3ce4ebb8e588",
       "repo:research_workflow/experiment.py": "f3a61f87ade0deb4069d16b9911e8b9c79d5dc958bd621001b553b10c7028d90",
-      "repo:research_workflow/generic_collector.py": "6c8e3b52bf220e67507b2d7619e2dc542efa7148756422b38deced2299a56807",
+      "repo:research_workflow/generic_collector.py": "0192354b0bfb24532ebd0023b469b170710fe0ad6055035c6fb6d98599e746e9",
       "repo:research_workflow/output_manager.py": "22b0865604ee2f2166ac9a283ffe3625166dd72533ab7c339bbe872dd47e2bb6",
       "repo:research_workflow/partitioning.py": "8c0c8e3c83de45b919a382dd4e1ee990dfd5ba455851e452b3b352979bf0af8c",
       "repo:research_workflow/preflight.py": "fc548aea2037cf970fa15fd1686858d37dcec625122ca19e3fba37d296630562",
@@ -143,7 +143,7 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
       "study:SPEC.md": "734ac3300291c48483f854a35d4355408b1aa9ea316be55bba7b16e2b4bfd0d1",
-      "study:artifacts/phase0_source_manifest.json": "bfb45cf2848239ec20748e234400344319fb7056144c89615dfa16de77859cc2",
+      "study:artifacts/phase0_source_manifest.json": "eb13b288ea5f8d9e181fb4fb2a1d5c0bd411a0d2ee8778b5f982409fe7062f21",
       "study:compiled_study.json": "64b7e1e079da12564a0864ccc0ea2844db137a59788684c58ce371d5a1944f93",
       "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
       "study:config/deliverables_contract.json": "75f653be74ec501f2df4be8c139ded3259507d5b6379eeed0a7e4a38bb170a0e",
@@ -158,20 +158,20 @@
       "study:study.yaml": "fd2aab80927037c62db97861e2c9922dbd084d80030177599b3613f4f854613d",
       "study:tests/test_study_contracts.py": "840f2cce707dc96359c85141b33e6cfd1632632f052becd06ed0dd6beef837bd"
     },
-    "timestamp": "2026-08-24T22:04:52.243133+00:00"
+    "timestamp": "2026-08-25T03:29:22.945591+00:00"
   },
   "contract_audit_verdict": {
     "audit_type": "contract",
     "auditor": "research_workflow.contract_audit",
-    "pass": 13,
+    "pass": 15,
     "verdict": "CLEAR",
     "critical": 0,
     "blocking": 0,
     "warning": 0,
     "not_verified": 0,
-    "audited_execution_composite_sha256": "e5a8eb7b4a8d1d5b7f0629cf35b5bae25990141ec3f56a60e77efaa194ae3c32",
-    "audit_report_sha256": "93d96bf090ecb9a32da2581a5b66eed4ac8130cce6b3d73b87c33ba4843b9e21",
-    "audit_report_path": "audit/contract_pass_13.md",
+    "audited_execution_composite_sha256": "67052e7d8f95abbc93163942916156b3b2cfaf78b79e6a0eca8cd8978c7791d8",
+    "audit_report_sha256": "03f63ac206d9c04fbb69d57e0214ddced8cccbdc0207fc659a2746062afa3110",
+    "audit_report_path": "audit/contract_pass_15.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "research_workflow.contract_audit",
@@ -255,11 +255,11 @@
       "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
       "repo:research/study_types/flip_prediction.py": "e662823800d2b4a5514f1eaca52d894eac413d649c0473f35fb43dccf99b1ca6",
       "repo:research_workflow/__init__.py": "2db30381d989228f3493988d477bfada5565ac2d1c2d358e6c48f43c689cae2c",
-      "repo:research_workflow/collection.py": "46b553b476bb0d243c7b1e3c2216bb3732525fc83f26b87a26115ca4d51aa98b",
+      "repo:research_workflow/collection.py": "ccdc77e3f1f9b214b817c90def0be051af8a9bcdcd1acceea22ada39551860b7",
       "repo:research_workflow/compiler.py": "1977e34cff480e3224b6dce07b90f5d16e573fbed6617af4981832e38a75149c",
-      "repo:research_workflow/execution_plan.py": "995c5a8419380d9a1459da430b58cc064948f286ea0d7b98eda35a0499286582",
+      "repo:research_workflow/execution_plan.py": "14b61994fc826fb719f4f29997f8e952952d01239e8628cb1d0b3ce4ebb8e588",
       "repo:research_workflow/experiment.py": "f3a61f87ade0deb4069d16b9911e8b9c79d5dc958bd621001b553b10c7028d90",
-      "repo:research_workflow/generic_collector.py": "6c8e3b52bf220e67507b2d7619e2dc542efa7148756422b38deced2299a56807",
+      "repo:research_workflow/generic_collector.py": "0192354b0bfb24532ebd0023b469b170710fe0ad6055035c6fb6d98599e746e9",
       "repo:research_workflow/output_manager.py": "22b0865604ee2f2166ac9a283ffe3625166dd72533ab7c339bbe872dd47e2bb6",
       "repo:research_workflow/partitioning.py": "8c0c8e3c83de45b919a382dd4e1ee990dfd5ba455851e452b3b352979bf0af8c",
       "repo:research_workflow/preflight.py": "fc548aea2037cf970fa15fd1686858d37dcec625122ca19e3fba37d296630562",
@@ -286,7 +286,7 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
       "study:SPEC.md": "734ac3300291c48483f854a35d4355408b1aa9ea316be55bba7b16e2b4bfd0d1",
-      "study:artifacts/phase0_source_manifest.json": "bfb45cf2848239ec20748e234400344319fb7056144c89615dfa16de77859cc2",
+      "study:artifacts/phase0_source_manifest.json": "eb13b288ea5f8d9e181fb4fb2a1d5c0bd411a0d2ee8778b5f982409fe7062f21",
       "study:compiled_study.json": "64b7e1e079da12564a0864ccc0ea2844db137a59788684c58ce371d5a1944f93",
       "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
       "study:config/deliverables_contract.json": "75f653be74ec501f2df4be8c139ded3259507d5b6379eeed0a7e4a38bb170a0e",
@@ -301,7 +301,7 @@
       "study:study.yaml": "fd2aab80927037c62db97861e2c9922dbd084d80030177599b3613f4f854613d",
       "study:tests/test_study_contracts.py": "840f2cce707dc96359c85141b33e6cfd1632632f052becd06ed0dd6beef837bd"
     },
-    "timestamp": "2026-08-24T22:04:55.173910+00:00"
+    "timestamp": "2026-08-25T03:29:26.171970+00:00"
   },
   "file_hashes": {
     "repo:backtests/nt_runtime/__init__.py": "10323c7cf54ad135db68b1ac8452d7a5b0d9e9e0d5e535933aa12d087314923d",
@@ -368,11 +368,11 @@
     "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
     "repo:research/study_types/flip_prediction.py": "e662823800d2b4a5514f1eaca52d894eac413d649c0473f35fb43dccf99b1ca6",
     "repo:research_workflow/__init__.py": "2db30381d989228f3493988d477bfada5565ac2d1c2d358e6c48f43c689cae2c",
-    "repo:research_workflow/collection.py": "46b553b476bb0d243c7b1e3c2216bb3732525fc83f26b87a26115ca4d51aa98b",
+    "repo:research_workflow/collection.py": "ccdc77e3f1f9b214b817c90def0be051af8a9bcdcd1acceea22ada39551860b7",
     "repo:research_workflow/compiler.py": "1977e34cff480e3224b6dce07b90f5d16e573fbed6617af4981832e38a75149c",
-    "repo:research_workflow/execution_plan.py": "995c5a8419380d9a1459da430b58cc064948f286ea0d7b98eda35a0499286582",
+    "repo:research_workflow/execution_plan.py": "14b61994fc826fb719f4f29997f8e952952d01239e8628cb1d0b3ce4ebb8e588",
     "repo:research_workflow/experiment.py": "f3a61f87ade0deb4069d16b9911e8b9c79d5dc958bd621001b553b10c7028d90",
-    "repo:research_workflow/generic_collector.py": "6c8e3b52bf220e67507b2d7619e2dc542efa7148756422b38deced2299a56807",
+    "repo:research_workflow/generic_collector.py": "0192354b0bfb24532ebd0023b469b170710fe0ad6055035c6fb6d98599e746e9",
     "repo:research_workflow/output_manager.py": "22b0865604ee2f2166ac9a283ffe3625166dd72533ab7c339bbe872dd47e2bb6",
     "repo:research_workflow/partitioning.py": "8c0c8e3c83de45b919a382dd4e1ee990dfd5ba455851e452b3b352979bf0af8c",
     "repo:research_workflow/preflight.py": "fc548aea2037cf970fa15fd1686858d37dcec625122ca19e3fba37d296630562",
@@ -399,7 +399,7 @@
     "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
     "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
     "study:SPEC.md": "734ac3300291c48483f854a35d4355408b1aa9ea316be55bba7b16e2b4bfd0d1",
-    "study:artifacts/phase0_source_manifest.json": "bfb45cf2848239ec20748e234400344319fb7056144c89615dfa16de77859cc2",
+    "study:artifacts/phase0_source_manifest.json": "eb13b288ea5f8d9e181fb4fb2a1d5c0bd411a0d2ee8778b5f982409fe7062f21",
     "study:compiled_study.json": "64b7e1e079da12564a0864ccc0ea2844db137a59788684c58ce371d5a1944f93",
     "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
     "study:config/deliverables_contract.json": "75f653be74ec501f2df4be8c139ded3259507d5b6379eeed0a7e4a38bb170a0e",
@@ -413,8 +413,8 @@
     "study:research_decision.yaml": "500b3849e1222d5e9397ee9247f0a7043251780734d4592a14ef5997e0960c39",
     "study:study.yaml": "fd2aab80927037c62db97861e2c9922dbd084d80030177599b3613f4f854613d",
     "study:tests/test_study_contracts.py": "840f2cce707dc96359c85141b33e6cfd1632632f052becd06ed0dd6beef837bd",
-    "study:audit/status.json": "5771b93c6e15bb59d159a458446cbcc36b19f175bf1359ec9027e3b21a1cb0fb",
-    "study:audit/contract_status.json": "f0f09203a9abcd8e9681bf16fbd6e801c13a75a70cd2f80f2c9b0c4dd5a3f282",
+    "study:audit/status.json": "2eddaa8ee57e08d1d5762857b407718efde5dc2632a985098e1ce13e8ecb9b46",
+    "study:audit/contract_status.json": "c021ae06af9be4f855fded5df2fc0f26bab78037b8aabb1306c1a21313dcd683",
     "study:audit/contract_pass_01.md": "58ef5dcac5e451ff234f93dfe2f5df8800205c4f3c06d35c7fb09b4ac79e8f0b",
     "study:audit/contract_pass_02.md": "85c5e712f5c3e5610020c8f9b197b1f90f0a4ec143f194af50c1edf5eae98289",
     "study:audit/contract_pass_03.md": "9a65417058dd14587ae0561c511bffecc35705a4518f0ef0f0e39a97081b99a0",
@@ -428,6 +428,8 @@
     "study:audit/contract_pass_11.md": "cb6f29f29f9f5a19b76a1449281ff71058262e05d43cccaad030f214b355e3a2",
     "study:audit/contract_pass_12.md": "cb6f29f29f9f5a19b76a1449281ff71058262e05d43cccaad030f214b355e3a2",
     "study:audit/contract_pass_13.md": "93d96bf090ecb9a32da2581a5b66eed4ac8130cce6b3d73b87c33ba4843b9e21",
+    "study:audit/contract_pass_14.md": "ceafd259ea3d9ee91c89e90bdda8dddbfcf1eeaf73b65cab8db2186f3cbb2667",
+    "study:audit/contract_pass_15.md": "03f63ac206d9c04fbb69d57e0214ddced8cccbdc0207fc659a2746062afa3110",
     "study:audit/pass_01.md": "7610494930e5522e4095941ba2a82a1baa025bb3c7354756c629a14f71b72a52",
     "study:audit/pass_02.md": "51f3f147ed0b4f07a0705bd4c3e996250d1bd272b544db7081bee540730d1c11",
     "study:audit/pass_03.md": "e55bd08cff154bb92926c9a54e72d0de704f40de6f4d3863d2509331fc15fd03",
@@ -440,7 +442,9 @@
     "study:audit/pass_10.md": "459aad681be00e585e0c6c80f85a5e8659e58b0de927d653d7a4d7fd2a1f0433",
     "study:audit/pass_11.md": "1f2f36465d4b04e6a3cd071f04b4c5468527151c80df6e185efef4045a79ac8d",
     "study:audit/pass_12.md": "1f2f36465d4b04e6a3cd071f04b4c5468527151c80df6e185efef4045a79ac8d",
-    "study:audit/pass_13.md": "3ad1b985d55afa0e321c166f4d9c8b6f4265c658d7c75ef7d7efe542278b3876"
+    "study:audit/pass_13.md": "3ad1b985d55afa0e321c166f4d9c8b6f4265c658d7c75ef7d7efe542278b3876",
+    "study:audit/pass_14.md": "a491a1c5bb75a64c0c6090e36f88b6084bdace9b110c597046f4c8cab1448681",
+    "study:audit/pass_15.md": "bccb86842ca7ec65f55b890dcfdd02a85525e034f1729582c8a07e610617a80b"
   },
   "evidence": {
     "repo_backtests_nt_runtime___init___py": {
@@ -701,7 +705,7 @@
     },
     "repo_research_workflow_collection_py": {
       "path": "repo:research_workflow/collection.py",
-      "sha256": "46b553b476bb0d243c7b1e3c2216bb3732525fc83f26b87a26115ca4d51aa98b"
+      "sha256": "ccdc77e3f1f9b214b817c90def0be051af8a9bcdcd1acceea22ada39551860b7"
     },
     "repo_research_workflow_compiler_py": {
       "path": "repo:research_workflow/compiler.py",
@@ -709,7 +713,7 @@
     },
     "repo_research_workflow_execution_plan_py": {
       "path": "repo:research_workflow/execution_plan.py",
-      "sha256": "995c5a8419380d9a1459da430b58cc064948f286ea0d7b98eda35a0499286582"
+      "sha256": "14b61994fc826fb719f4f29997f8e952952d01239e8628cb1d0b3ce4ebb8e588"
     },
     "repo_research_workflow_experiment_py": {
       "path": "repo:research_workflow/experiment.py",
@@ -717,7 +721,7 @@
     },
     "repo_research_workflow_generic_collector_py": {
       "path": "repo:research_workflow/generic_collector.py",
-      "sha256": "6c8e3b52bf220e67507b2d7619e2dc542efa7148756422b38deced2299a56807"
+      "sha256": "0192354b0bfb24532ebd0023b469b170710fe0ad6055035c6fb6d98599e746e9"
     },
     "repo_research_workflow_output_manager_py": {
       "path": "repo:research_workflow/output_manager.py",
@@ -825,7 +829,7 @@
     },
     "study_artifacts_phase0_source_manifest_json": {
       "path": "study:artifacts/phase0_source_manifest.json",
-      "sha256": "bfb45cf2848239ec20748e234400344319fb7056144c89615dfa16de77859cc2"
+      "sha256": "eb13b288ea5f8d9e181fb4fb2a1d5c0bd411a0d2ee8778b5f982409fe7062f21"
     },
     "study_compiled_study_json": {
       "path": "study:compiled_study.json",
@@ -881,11 +885,11 @@
     },
     "study_audit_status_json": {
       "path": "study:audit/status.json",
-      "sha256": "5771b93c6e15bb59d159a458446cbcc36b19f175bf1359ec9027e3b21a1cb0fb"
+      "sha256": "2eddaa8ee57e08d1d5762857b407718efde5dc2632a985098e1ce13e8ecb9b46"
     },
     "study_audit_contract_status_json": {
       "path": "study:audit/contract_status.json",
-      "sha256": "f0f09203a9abcd8e9681bf16fbd6e801c13a75a70cd2f80f2c9b0c4dd5a3f282"
+      "sha256": "c021ae06af9be4f855fded5df2fc0f26bab78037b8aabb1306c1a21313dcd683"
     },
     "study_audit_contract_pass_01_md": {
       "path": "study:audit/contract_pass_01.md",
@@ -939,6 +943,14 @@
       "path": "study:audit/contract_pass_13.md",
       "sha256": "93d96bf090ecb9a32da2581a5b66eed4ac8130cce6b3d73b87c33ba4843b9e21"
     },
+    "study_audit_contract_pass_14_md": {
+      "path": "study:audit/contract_pass_14.md",
+      "sha256": "ceafd259ea3d9ee91c89e90bdda8dddbfcf1eeaf73b65cab8db2186f3cbb2667"
+    },
+    "study_audit_contract_pass_15_md": {
+      "path": "study:audit/contract_pass_15.md",
+      "sha256": "03f63ac206d9c04fbb69d57e0214ddced8cccbdc0207fc659a2746062afa3110"
+    },
     "study_audit_pass_01_md": {
       "path": "study:audit/pass_01.md",
       "sha256": "7610494930e5522e4095941ba2a82a1baa025bb3c7354756c629a14f71b72a52"
@@ -990,6 +1002,14 @@
     "study_audit_pass_13_md": {
       "path": "study:audit/pass_13.md",
       "sha256": "3ad1b985d55afa0e321c166f4d9c8b6f4265c658d7c75ef7d7efe542278b3876"
+    },
+    "study_audit_pass_14_md": {
+      "path": "study:audit/pass_14.md",
+      "sha256": "a491a1c5bb75a64c0c6090e36f88b6084bdace9b110c597046f4c8cab1448681"
+    },
+    "study_audit_pass_15_md": {
+      "path": "study:audit/pass_15.md",
+      "sha256": "bccb86842ca7ec65f55b890dcfdd02a85525e034f1729582c8a07e610617a80b"
     }
   }
 }

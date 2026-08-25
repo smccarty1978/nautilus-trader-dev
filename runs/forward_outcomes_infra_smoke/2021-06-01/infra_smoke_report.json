@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "date": "2021-06-01",
+  "output_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\runs\\forward_outcomes_infra_smoke\\2021-06-01",
+  "bars": 42947,
+  "entries": 81,
+  "outcome_rows": 81,
+  "outcome_status_counts": {
+    "RESOLVED": 79,
+    "CENSORED_SESSION": 2
+  },
+  "cross_checked_entries": 25,
+  "partition_parity": {
+    "passed": true,
+    "partitions": [
+      "p1",
+      "p2"
+    ]
+  },
+  "reconciliation": {
+    "passed": true,
+    "findings": [],
+    "entry_count": 81,
+    "outcome_count": 81,
+    "manifest_sha256": "44947d87fb799a31ab3b92cbbd16013988e163150dc70200fdd4001d0c2a6b5d",
+    "spec_sha256": "65a72cd2bfe63f8dd1b35815c67c4c210e988732dd7b07046413cca3c20f24ec"
+  },
+  "spec_sha256": "65a72cd2bfe63f8dd1b35815c67c4c210e988732dd7b07046413cca3c20f24ec",
+  "manifest_sha256": "44947d87fb799a31ab3b92cbbd16013988e163150dc70200fdd4001d0c2a6b5d",
+  "findings": []
+}

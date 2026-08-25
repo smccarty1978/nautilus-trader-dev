@@ -1,0 +1,176 @@
+{
+  "partition": "train",
+  "feature_sets": {
+    "A": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "B": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr"
+    ],
+    "C": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr"
+    ]
+  },
+  "preprocessing_hash": "0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4",
+  "model_hashes": {
+    "LONG_A": "98fce5213c2545cb143c11b6f0970f016dcaefde8540a115708faf3f8cb30b60",
+    "LONG_B": "cea6c9aba124ec09a304812434448d2aa9b6be765a5d70e8f1d369bc998a662f",
+    "LONG_C": "a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38",
+    "SHORT_A": "1fa4ae5db1bacd4d4454ceaea345941a7186cab7c37b8ce200e6066024c6741f",
+    "SHORT_B": "c3b7dab93c0fd856fceac70033692bc2a461757b7206e1aecaabb719321476a3",
+    "SHORT_C": "5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf"
+  },
+  "thresholds": {
+    "LONG_A": {
+      "p90": 0.4290593155438407,
+      "p95": 0.47446264078390715,
+      "p97_5": 0.5069819214838768
+    },
+    "LONG_B": {
+      "p90": 0.4288479283622137,
+      "p95": 0.47041333938599883,
+      "p97_5": 0.5027515005775817
+    },
+    "LONG_C": {
+      "p90": 0.43654834666810594,
+      "p95": 0.48026545737579335,
+      "p97_5": 0.5225306063299479
+    },
+    "SHORT_A": {
+      "p90": 0.4142322967063708,
+      "p95": 0.4573746762367127,
+      "p97_5": 0.49255291672412577
+    },
+    "SHORT_B": {
+      "p90": 0.4119212508414384,
+      "p95": 0.45385394072463,
+      "p97_5": 0.48751147948969586
+    },
+    "SHORT_C": {
+      "p90": 0.4214933537606981,
+      "p95": 0.4675432275035304,
+      "p97_5": 0.5124956610728943
+    }
+  },
+  "deciles": {
+    "LONG_A": {
+      "boundaries": [
+        0.1699817666451073,
+        0.20595696182922266,
+        0.23438218898964033,
+        0.26147447475492086,
+        0.28497742491196804,
+        0.3130956980427329,
+        0.3413989996154927,
+        0.3753024456513685,
+        0.4290593155438407
+      ],
+      "derivation": "TRAIN_ONLY"
+    },
+    "LONG_B": {
+      "boundaries": [
+        0.1727668509539769,
+        0.20815848980364599,
+        0.23530615935053847,
+        0.2602349323822135,
+        0.2852911853728987,
+        0.31212261439953665,
+        0.340887597137605,
+        0.37584849055231967,
+        0.4288479283622137
+      ],
+      "derivation": "TRAIN_ONLY"
+    },
+    "LONG_C": {
+      "boundaries": [
+        0.1579985910078199,
+        0.2011064204305651,
+        0.23222882024298877,
+        0.2603554311439116,
+        0.2865540916287268,
+        0.3144563200219175,
+        0.3456441091651209,
+        0.3825056420177639,
+        0.43654834666810594
+      ],
+      "derivation": "TRAIN_ONLY"
+    },
+    "SHORT_A": {
+      "boundaries": [
+        0.16305272389231545,
+        0.1923024626198518,
+        0.21820725040883673,
+        0.24331149621768475,
+        0.2676568251646387,
+        0.29457214563050094,
+        0.32372844243145693,
+        0.3599244948032804,
+        0.4142322967063708
+      ],
+      "derivation": "TRAIN_ONLY"
+    },
+    "SHORT_B": {
+      "boundaries": [
+        0.16380252120202665,
+        0.1939554252883014,
+        0.21882699348386214,
+        0.24276360290595395,
+        0.26790202008147307,
+        0.2945163448898891,
+        0.323792104942849,
+        0.35966755002651346,
+        0.4119212508414384
+      ],
+      "derivation": "TRAIN_ONLY"
+    },
+    "SHORT_C": {
+      "boundaries": [
+        0.14960616480116584,
+        0.18797213239689609,
+        0.217205028880706,
+        0.2422433080677638,
+        0.2674223070160301,
+        0.2955886701121324,
+        0.3283127756807321,
+        0.3668514965031125,
+        0.4214933537606981
+      ],
+      "derivation": "TRAIN_ONLY"
+    }
+  },
+  "schema_version": 1,
+  "study_id": "clean_maturity_flip_model_rolling_productivity",
+  "authorization_sha256": "7321ebc950ef1719c09b9b504f79a48af15225b4de27d73ca5b1fcdb00aee2fe",
+  "train_merge_sha256": "b455d9893fd0e553f2a3a16945b310720cb86ad89a4cb79e5e666e374cb45d01",
+  "merged_dataset_identity_sha256": "6f33869c49b09a4b30ab3e788d09d4dc8de9139777d7a7c5afd5a652c6fd265c",
+  "population_contract_sha256": "repaired_contract",
+  "target_contract_sha256": "repaired_contract",
+  "feature_contract_sha256": "99f2af86aefc8ef904eed65c23be7220522d3b99d525a978cea34c104536f72a",
+  "merged_candidate_rows": 1387411,
+  "merged_observation_rows": 1387411,
+  "calibration": "none",
+  "provenance": "TRAIN_ONLY",
+  "model_artifact": "train_fitted_models.joblib"
+}

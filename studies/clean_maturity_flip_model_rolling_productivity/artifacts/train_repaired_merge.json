@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "period": "train",
+  "study_id": "clean_maturity_flip_model_rolling_productivity",
+  "partition_ids": [
+    "train-2021",
+    "train-2022",
+    "train-2023"
+  ],
+  "candidate_rows": 1387411,
+  "observation_rows": 1387411,
+  "duplicate_keys": 0,
+  "candidate_sha256": "b455d9893fd0e553f2a3a16945b310720cb86ad89a4cb79e5e666e374cb45d01",
+  "observation_sha256": "a0e7272337b31d6d7492a934ca4b176528bee4dc26ce5cf21652a6df47b871ab",
+  "dispositions": {
+    "LABELED_NEGATIVE": 980308,
+    "LABELED_POSITIVE": 393209,
+    "CENSORED": 13894
+  },
+  "feature_nonnull": {
+    "arrival_velocity": 1387411,
+    "arrival_acceleration": 1387411,
+    "ema_slope": 1387411,
+    "rolling_300s_retention_ratio": 378683,
+    "rolling_300s_current_progress_atr": 378683,
+    "rolling_300s_max_progress_atr": 378683,
+    "rolling_300s_giveback_atr": 378683
+  }
+}

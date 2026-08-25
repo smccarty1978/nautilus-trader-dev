@@ -111,8 +111,14 @@ def collect_period_partitioned(study_path, period="train", *, years=None, execut
         # memory-bounded and a completed engine cannot poison the next partition.
         from concurrent.futures import ProcessPoolExecutor
         jobs = [(str(study_path), partition, output_dir, kwargs) for partition in partitions]
-        with ProcessPoolExecutor(max_workers=1) as pool:
-            results = list(pool.map(_collect_partition_worker, jobs))
+        # NautilusTrader's Rust logger is process-global and cannot be initialized
+        # twice in one interpreter.  A single pool with max_workers=1 still reuses
+        # that worker across years, so the second partition panics while installing
+        # the logger.  Create and tear down one worker process per partition.
+        results = []
+        for job in jobs:
+            with ProcessPoolExecutor(max_workers=1) as pool:
+                results.append(pool.submit(_collect_partition_worker, job).result())
     return {"period": period, "partition_count": len(partitions), "partitions": results,
             "status": "COLLECTED" if execute else "PLANNED"}
 

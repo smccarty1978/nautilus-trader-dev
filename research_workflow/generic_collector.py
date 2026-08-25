@@ -1000,15 +1000,20 @@ class FlipPredictionCollector(Strategy):
                 if self._execution_plan.calculate_velocity_at_checkpoint and self.velocity_tracker
                 else {}
                 )
+            # Providers retain their small internal output vocabularies.  Bind
+            # those outputs to the canonical FeatureInstance keys here, once per
+            # eligible checkpoint.  Previously the compact path copied only exact
+            # key matches, so canonical arrival/rolling/EMA instances silently
+            # became all-null columns even though their state was being updated.
             compact_feats = {
                 **structural_feats,
-                **rolling_feats,
-                **velocity_feats,
-                # Preserve the historical physical alias contract exactly.  The
-                # old fallback exposed ``ema_slope_short`` but did not expose
-                # the canonical ``ema_slope`` alias, so this selected column is
-                # intentionally unavailable until its provider binding changes.
-                "ema_slope": None,
+                "rolling_300s_retention_ratio": rolling_feats.get("rolling_5m_retention_ratio"),
+                "rolling_300s_current_progress_atr": rolling_feats.get("rolling_5m_current_progress_atr"),
+                "rolling_300s_max_progress_atr": rolling_feats.get("rolling_5m_max_progress_atr"),
+                "rolling_300s_giveback_atr": rolling_feats.get("rolling_5m_giveback_atr"),
+                "arrival_velocity": velocity_feats.get("arrival_vel_20s"),
+                "arrival_acceleration": velocity_feats.get("arrival_accel_10s"),
+                "ema_slope": self._get_context_features(T, atr).get("ema_slope_short"),
             }
             cand_record = {
                 "observation_ts": T,

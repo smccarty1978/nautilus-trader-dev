@@ -46,11 +46,14 @@ class CompiledExecutionPlan:
         # callback; it is initialized once and does not perform feature discovery.
         update_1m: Tuple[Callable[..., None], ...] = ()
 
-        # The legacy velocity tracker exposes arrival_vel_* / arrival_accel_* names,
-        # while this study's canonical aliases are arrival_velocity/arrival_acceleration.
-        # Preserve the proven null compatibility surface and avoid an unused snapshot.
+        # The tracker retains compact legacy output keys internally, but canonical
+        # FeatureInstances must explicitly request the calculation.  The collector
+        # maps those keys to the declared parameterized surface at the snapshot
+        # boundary.
         velocity_outputs = {"arrival_vel_5s", "arrival_vel_10s", "arrival_vel_20s",
                             "arrival_vel_30s", "arrival_accel_5s", "arrival_accel_10s"}
-        calculate_velocity = bool(set(aliases) & velocity_outputs)
-        calculate_ema = "ema_slope_short" in aliases or "ema_slope_long" in aliases
+        calculate_velocity = bool(set(aliases) & velocity_outputs) or bool(
+            set(aliases) & {"arrival_velocity", "arrival_acceleration"}
+        )
+        calculate_ema = "ema_slope" in aliases or "ema_slope_short" in aliases or "ema_slope_long" in aliases
         return cls(aliases, True, update_1s, update_1m, (), calculate_velocity, calculate_ema)

@@ -8,6 +8,10 @@ import pandas as pd
 
 from research.analysis.modeling import SplitPolicy, fit_arms, freeze_threshold, write_model_manifest
 from research_workflow.experiment import write_train_freeze
+from research_workflow.forward_outcomes.guard import (
+    assert_causal_feature_surface,
+    guard_training_frame,
+)
 
 
 def fit_models(
@@ -24,6 +28,11 @@ def fit_models(
     """Fit declared arms on one TRAIN partition and persist model provenance."""
     if "_partition" not in meta or set(meta["_partition"].dropna()) != {"train"}:
         raise ValueError("fit_models requires a single TRAIN partition")
+    # A forward outcome resolves after the entry it describes, so it is a label. The
+    # accident this guards is mundane: an outcome table joined onto candidates for
+    # analysis, then a feature matrix built from the joined frame's columns. X is the
+    # authoritative feature surface here, so it is the surface that gets checked.
+    guard_training_frame(X, list(X.columns), context="fit_models feature matrix")
     models = fit_arms(
         X, y, spec, estimator=estimator, hyperparameters=hyperparameters,
         dataset_identity_sha256=dataset_identity_sha256,
@@ -48,6 +57,13 @@ def freeze_train_artifacts(
     """Freeze all TRAIN-derived objects before any OOS frame is accepted."""
     if "_partition" not in meta or set(meta["_partition"].dropna()) != {"train"}:
         raise ValueError("freeze_train_artifacts requires TRAIN-only metadata")
+    # The frozen feature sets are what OOS scoring replays. Guarding them here as well
+    # as in fit_models is deliberate: a set can be assembled and frozen without ever
+    # passing through a fitter, and a leak frozen into the contract outlives the run.
+    for arm, columns in feature_sets.items():
+        assert_causal_feature_surface(
+            columns, context=f"TRAIN freeze feature set for arm {arm!r}"
+        )
     threshold_payload = dict(thresholds or {})
     if not threshold_payload:
         # Thresholds are caller-supplied only after they have been derived from

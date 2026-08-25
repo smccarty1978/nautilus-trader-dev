@@ -1,0 +1,156 @@
+{
+  "modeling_version": "1.0.0",
+  "arms": {
+    "A": {
+      "arm": "A",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "n_features": 3,
+      "n_rows": 734213,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_partition_merge",
+      "analysis_spec_sha256": "a673a55141d5b0f78b92f44619a145c1fd4236e88e75f8b3b741df471b095988",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "7958ab1d7432b5e000331c85e246d7b231e7ec7881117be1422dc989a53b12f8",
+      "x_content_sha256": "01fd811fd693bee041ecfb4d145240316ab94a4729ba5c268973a7e0e664bca6",
+      "y_content_sha256": "fda373f5e95a35f4fc427191d42e6135b9535a3a5b4650e161897efe9d7f8fa7",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": null,
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T02:27:26.560506+00:00",
+      "fit_identity_sha256": "3c9d1c327d128442a9dca4ec18d0990b940377efd5a860c7c6b1fd23fce3027f"
+    },
+    "B": {
+      "arm": "B",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr"
+      ],
+      "n_features": 9,
+      "n_rows": 734213,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_partition_merge",
+      "analysis_spec_sha256": "a673a55141d5b0f78b92f44619a145c1fd4236e88e75f8b3b741df471b095988",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "f8413cbf1b92582075365e88e974d965c8cd82dc18dc0c12df275d395ef92088",
+      "x_content_sha256": "4337098871789b44aa19e1fae8ff471616fe1b7c4ed9563f77de1a789dae7682",
+      "y_content_sha256": "fda373f5e95a35f4fc427191d42e6135b9535a3a5b4650e161897efe9d7f8fa7",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": null,
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T02:27:27.726100+00:00",
+      "fit_identity_sha256": "25dac8d215411d7e1e2f25504abdde823796441ab33a18828553369a30e8e749"
+    },
+    "C": {
+      "arm": "C",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr"
+      ],
+      "n_features": 13,
+      "n_rows": 734213,
+      "seed": 42,
+      "hyperparameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "train_partition_merge",
+      "analysis_spec_sha256": "a673a55141d5b0f78b92f44619a145c1fd4236e88e75f8b3b741df471b095988",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "5a92bd97eacd81606387fc5838e0f6a0eebc7375dee52cc50eb8f63cd157a160",
+      "x_content_sha256": "b2e8ee9e3988a9955138c5594d3cab7003e49b6cdd5eeacf12a0d1a455fd8e26",
+      "y_content_sha256": "fda373f5e95a35f4fc427191d42e6135b9535a3a5b4650e161897efe9d7f8fa7",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": null,
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-25T02:27:29.053029+00:00",
+      "fit_identity_sha256": "35963a774b273697db5fffae0d9e4ba89eb4ae39ca428753ce4bacf5911ae14f"
+    }
+  }
+}
