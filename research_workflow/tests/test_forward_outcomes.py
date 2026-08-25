@@ -205,6 +205,20 @@ def test_unconfirmed_entry_reports_confirmed_false_after_the_wait_window():
     assert rec["post_confirmation_mfe"] is None
 
 
+def test_confirmation_at_exact_wait_deadline_is_accepted():
+    conf = ConfirmationSpec(
+        confirmation_id="flip_confirm", max_wait_seconds=2, post_max_tracking_seconds=2
+    )
+    sp = spec(horizons_seconds=(2,), max_tracking_seconds=4, confirmation=conf)
+    entry = make_entry("LONG")
+    rec = compute_forward_outcomes(
+        [entry], make_bars(PATH), sp,
+        confirmations={entry.entry_id: (T0 + 2 * NS, 102.0)},
+    )[0]
+    assert rec["confirmed"] is True
+    assert rec["seconds_to_confirmation"] == pytest.approx(2.0)
+
+
 def test_confirmation_before_its_entry_is_rejected():
     conf = ConfirmationSpec(
         confirmation_id="c", max_wait_seconds=3, post_max_tracking_seconds=2

@@ -1,3 +1,12 @@
+<!-- DOC-STATUS-BANNER -->
+> **[DESIGN CONTRACT — CITED BY LIVE CODE]**
+>
+> `backtests/nt_runtime/engine_builder.py` cites §6.3 of this document.
+>
+> Section numbers here are load-bearing. Do not renumber, delete, or casually edit.
+> This is a frozen contract, not a workflow manual — the current workflow is
+> **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
 # Backtest Harness B0 Boundary & Inventory Decision (Revised)
 
 **Status:** Phase B0 Complete (Revised per Red Team Review R1–R7)  

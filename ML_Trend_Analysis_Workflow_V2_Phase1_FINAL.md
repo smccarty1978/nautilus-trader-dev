@@ -1,3 +1,12 @@
+<!-- DOC-STATUS-BANNER -->
+> **[DESIGN CONTRACT — CITED BY LIVE CODE]**
+>
+> `research_workflow/readiness.py` and `scripts/tests/test_readiness.py` cite §8 of this document for the R1-R10 readiness contract.
+>
+> Section numbers here are load-bearing. Do not renumber, delete, or casually edit.
+> This is a frozen contract, not a workflow manual — the current workflow is
+> **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
 # ML Trend Analysis Workflow V2 — Phase 1 Corrected RFC v2
 
 **Status:** FINAL — IMPLEMENTATION AUTHORITY  

@@ -1,0 +1,119 @@
+# Document Map
+
+Every Markdown document in this repository, classified. Written 2026-08-25.
+
+**Read order for a new agent:** `CLAUDE.md` or `CODEX.md` → `docs/RESEARCH_WORKFLOW.md` →
+the specific deeper doc you need.
+
+## Classes
+
+| Class | Meaning |
+|---|---|
+| **AUTHORITATIVE** | Describes the current system. If something contradicts it, the other thing is wrong. |
+| **CURRENT** | Accurate supporting reference for a narrower area. |
+| **DESIGN CONTRACT** | A frozen contract that live code cites by section number. Do not edit casually; do not delete. |
+| **HISTORICAL** | A record of what was done or proposed at a point in time. Not an instruction. May contradict the current system. |
+| **STALE** | Materially conflicts with the current system and is superseded. Marked with a banner. |
+
+Historical and stale documents carry a `> **[HISTORICAL]**` / `> **[STALE]**` banner at the
+top. They are kept because they hold reasoning that is still worth reading, and because
+some are cited from git history and audit trails. **They are never a source of instructions.**
+
+---
+
+## AUTHORITATIVE
+
+| Document | Scope |
+|---|---|
+| `docs/RESEARCH_WORKFLOW.md` | The end-to-end research system: architecture, Feature V2, lifecycle, collector, forward outcomes, scripts, autonomy, data safety |
+| `AGENTS.md` | Shared cross-harness agent operating core |
+| `CLAUDE.md` | Claude-specific operating manual |
+| `CODEX.md` | Codex-specific operating manual |
+| `docs/CAUSAL_CHECKLIST.md` | Causal + contract audit ruleset A1–H4; single source of truth for all three harnesses |
+| `features/FEATURE_REGISTRY_CONTRACT.md` | Feature lifecycle, canonical identity, promotion evidence |
+| `features/CANONICAL_FEATURE_REFERENCE.yaml` | Generated canonical feature vocabulary (the active V2 bundle) |
+| `.claude/agents/*.md` | Canonical subagent definitions (Codex/Antigravity are generated from these) |
+| `docs/SUBAGENT_ROSTER.md` | The subagent roster and why it is this set — including why certain roles deliberately do not exist |
+| `.codex/agents/implementation-worker.toml` | Codex-only agent; not generated, edit directly |
+
+## CURRENT
+
+| Document | Scope |
+|---|---|
+| `docs/DATA_CATALOG.md` | Catalog wrangling, building, validation |
+| `docs/BACKTEST_EXECUTION.md` | Backtest runner, sweeps, YAML configs |
+| `docs/STUDY_METHODOLOGY.md` | Feature collection, MFE/MAE replay pattern |
+| `docs/TEMPLATES.md` | SPEC templates, Deliverables Manifest |
+| `docs/ANALYSIS_REPORTING.md` | NT reports, tearsheets |
+| `docs/PERFORMANCE.md` | Profiling, ONNX inference |
+| `docs/ERROR_REGISTRY.md` | Error code registry |
+| `docs/DOCUMENT_MAP.md` | This file |
+| `BACKTEST_DATA_LOGGING.md` | Logging conventions that make outputs visualizable |
+| `VISUALIZER_EXTENSIONS.md` | How to add an overlay to the TradingView visualizer |
+
+## DESIGN CONTRACT (cited by live code — keep)
+
+| Document | Cited by |
+|---|---|
+| `ANALYSIS_HARNESS_A0_CONTRACT.md` | `research/analysis/__init__.py`, `research/analysis/errors.py` §7, `scripts/tests/test_analysis_reproducibility.py` §6 |
+| `BACKTEST_HARNESS_B0_BOUNDARY.md` | `backtests/nt_runtime/engine_builder.py` §6.3 |
+| `ML_Trend_Analysis_Workflow_V2_Phase1_FINAL.md` | `research_workflow/readiness.py` §8, `scripts/tests/test_readiness.py` — the R1–R10 design |
+
+## STALE — superseded, banner applied
+
+| Document | Superseded by | Why |
+|---|---|---|
+| `features/FEATURES.md` | `features/CANONICAL_FEATURE_REFERENCE.yaml` | A Feature System V1 catalogue of physical names (`ema_21_slope`, `arrival_vel_30s`). Those are instance aliases, not canonical identities |
+| `docs/INFRASTRUCTURE_FREEZE.md` | `docs/RESEARCH_WORKFLOW.md` §1, §11 | Freezes paths that have moved (`scripts/study_spec.py`, `backtests/nt_runtime/output_manager.py` is now a shim) |
+| `ML_Research_Workflow_Current_State_and_Redesign.md` | `docs/RESEARCH_WORKFLOW.md` | Pre-migration state assessment and redesign proposal |
+| `ML_Trend_Analysis_Workflow_V2_Phase1_Corrected_RFC.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
+| `ML_Trend_Analysis_Workflow_V2_Phase1_Corrected_RFC_v2.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
+| `ml_trend_analysis_workflow_v2_spec.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
+| `NautilusTrader_AI_Workflow_Reference.md` | `docs/RESEARCH_WORKFLOW.md` | A parallel workflow reference; describes the pre-V2 feature system and pre-`research_workflow` layout |
+| `PROPOSED_COLLECTION_TO_ANALYSIS_WORKFLOW.md` | `docs/RESEARCH_WORKFLOW.md` §3 | A proposal that was implemented differently |
+| `RESEARCH_AGENT_WORKFLOW_PLAYBOOK.md` | `AGENTS.md`, `CLAUDE.md`, `CODEX.md` | A second agent operating manual |
+| `RESEARCH_PARQUET_PLATFORM_BLUEPRINT.md` | `docs/RESEARCH_WORKFLOW.md` §15 | Blueprint for a storage platform superseded by `research/analysis/` |
+| `RESEARCH_PARQUET_WORKFLOW_README.md` | `docs/RESEARCH_WORKFLOW.md` §15 | As above |
+| `REPO_ANALYSIS.md` | `docs/RESEARCH_WORKFLOW.md` §1 | Point-in-time repository analysis, pre-consolidation |
+| `PROJECT_CONTINUATION_BACKTEST_ANALYSIS_ROADMAP.md` | `docs/RESEARCH_WORKFLOW.md` §14 | Superseded roadmap |
+| `STUDIES.md` | `studies/` | A one-entry study register that was never maintained |
+
+## HISTORICAL — records, not instructions
+
+| Document | What it records |
+|---|---|
+| `WORKFLOW_HARDENING_REMEDIATION_REPORT.md` | Workflow hardening remediation |
+| `WORKFLOW_HARDENING_FINAL_REMEDIATION.md` | " |
+| `WORKFLOW_HARDENING_FINAL_RED_TEAM.md` | Red-team findings against the hardened workflow |
+| `WORKFLOW_HARDENING_LAST_FIX_REPORT.md` | " |
+| `ANALYSIS_HARNESS_IMPLEMENTATION_REPORT.md` | Build report for `research/analysis/` |
+| `BACKTEST_HARNESS_IMPLEMENTATION_REPORT.md` | Build report for the backtest harness |
+| `BACKTEST_HARNESS_REMEDIATION_REPORT.md` | " |
+| `NT_RESEARCH_FLOW_INDEPENDENT_AUDIT_BRIEF.md` | An independent audit brief |
+| `BASELINE_CAPTURE_RERUN_PLAN.md` | A one-off rerun plan |
+| `FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC.md` | Superseded spec draft |
+| `FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC_REVISED.md` | Superseded spec draft |
+| `FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC_FINAL.md` | Spec for `studies/full_trade_path_builder` |
+| `audit.md`, `audit_5s_scalps.md`, `audit_keltner.md`, `audit_stall_parity.md` | Individual historical audits |
+| `.claude/scratch/*.md` | Session scratch |
+
+## Duplicated agent workflow docs
+
+`.claude/AGENT_WORKFLOW.md`, `.agents/AGENT_WORKFLOW.md` and `.codex/AGENT_WORKFLOW.md`
+were three hand-maintained near-copies of the same content. They are now thin harness-launch
+notes pointing at `AGENTS.md` and `docs/RESEARCH_WORKFLOW.md`. Do not re-expand them.
+
+## Per-study documents
+
+`studies/<id>/SPEC.md`, `research_decision.yaml`, `audit/*.md`, `results/*.md` are
+**authoritative for that study** and historical for everything else. A finding in one
+study's report is not a repository rule. Repository rules live in
+`docs/RESEARCH_WORKFLOW.md`.
+
+## Rules for adding a document
+
+1. If it describes how the repository works, it belongs **in** `docs/RESEARCH_WORKFLOW.md`,
+   not beside it.
+2. If it is a point-in-time report, name it as one and expect it to become HISTORICAL.
+3. Do not create a second workflow manual. That is what produced this table.
+4. Add new documents to this map in the same change.

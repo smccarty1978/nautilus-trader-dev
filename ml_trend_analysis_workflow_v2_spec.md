@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **ML_Trend_Analysis_Workflow_V2_Phase1_FINAL.md**.
+>
+> Superseded RFC draft.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # ML Trend Analysis Workflow V2: Implementation Specification
 
 This specification maps the current repository state to the target modular design, enforcing NautilusTrader's strict causal event model.

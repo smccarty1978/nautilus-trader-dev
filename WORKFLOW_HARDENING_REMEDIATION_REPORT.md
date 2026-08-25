@@ -1,3 +1,11 @@
+<!-- DOC-STATUS-BANNER -->
+> **[HISTORICAL]**
+>
+> A point-in-time record of workflow hardening remediation. It is not a description of the current system
+> and not a source of instructions.
+>
+> Current authority: **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
  p# Workflow Hardening Remediation Report
 
 **Trigger:** independent Red Team failure of the first workflow acceptance test of

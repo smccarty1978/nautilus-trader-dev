@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **docs/RESEARCH_WORKFLOW.md §14**.
+>
+> Superseded roadmap.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # Project Continuation: Collector Hardening, Backtests, and Analysis
 
 ## Purpose

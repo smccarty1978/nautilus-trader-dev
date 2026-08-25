@@ -1,3 +1,11 @@
+<!-- DOC-STATUS-BANNER -->
+> **[HISTORICAL]**
+>
+> A point-in-time record of the build of `research/analysis/`. It is not a description of the current system
+> and not a source of instructions.
+>
+> Current authority: **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
 # Analysis Harness — A1–A4 Implementation Report
 
 **Branch:** `worktree-analysis-harness-a1-a4` · **Worktree:** `.claude/worktrees/analysis-harness-a1-a4`

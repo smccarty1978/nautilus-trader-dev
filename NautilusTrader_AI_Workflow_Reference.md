@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **docs/RESEARCH_WORKFLOW.md**.
+>
+> A parallel workflow reference describing the pre-V2 feature system and the layout before `research_workflow/` consolidation.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # NautilusTrader AI Workflow Reference
 
 **Purpose:** A compact, AI-friendly reference for designing research collectors, backtests, data pipelines, validation flows, and live-compatible strategy workflows with NautilusTrader (NT).

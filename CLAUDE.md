@@ -1,94 +1,169 @@
-# NautilusTrader Development Framework
+# CLAUDE.md — Claude Operating Manual
 
-## CORE INVARIANTS (NEVER VIOLATE)
-1. **NT is the ONLY execution environment.** NO pandas for signal detection, validation, or backtesting. Pandas is strictly for loading raw data and post-analysis of NT outputs.
-2. **No Look-Ahead Bias.** Indicators compute on COMPLETED bars only.
-3. **Timestamp Convention.** Raw Databento OHLCV bars are OPEN-stamped. Offline research normalizes derived bars to CLOSE-stamped indices (`label='right', closed='left'`). NautilusTrader catalogs preserve open-stamped `ts_event` and set `ts_init = ts_event + bar_duration_ns` (1s: +1s, 1m: +60s, 3m: +180s, 5m: +300s) so the NT event loop dispatches completed bars at interval close.
-4. **MFE/MAE Blind Spot.** 1s bars process before their parent 1m bar in NT. To avoid missing the first minute of price action, you MUST buffer recent 1s bars and replay them retroactively from fill time when a signal triggers.
-5. **Mandatory Preflight & Pre-Execution Audit Gate.** After a study/model pipeline is implemented and unit-tested, but before its first collection, label-build, training, backtest, or staged-runner execution:
-   - Run `python scripts/research_preflight.py --study studies/<name>`. Preflight must be `CLEAR` (0 CRITICAL, exit code 0). Coding agents may NOT bypass a `BLOCKED` preflight.
-   - If preflight is `BLOCKED`, inspect `audit/failure_packet.json` and fix locally before requesting an audit.
-   - Only after preflight is `CLEAR`, invoke `lookahead-auditor` (causality) and `contract-checker` (deliverables). Clear all CRITICAL findings before execution. Before acceptance, re-run `contract-checker` on materialized outputs and re-run causality only when the audited surface changes; gates read `audit/status.json`, never prose.
-6. **Factory-First Study Creation.** Every new study MUST be configured via `study.yaml`, scaffolded via `python scripts/create_study.py --config <study.yaml>`, and validated via `python scripts/compile_study.py`. Coding agents MUST NOT create study-specific implementations for behavior already representable by a canonical study type (e.g. `flip_prediction`). A coding agent proposing bespoke code must provide `BESPOKE_JUSTIFICATION` before implementation.
-7. **Research Decision Contract Authority & Fidelity.**
-   - Hierarchy: `research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code`.
-   - BEFORE drafting or modifying `SPEC.md`: Create or verify `research_decision.yaml`. `SPEC.md` must be derived from `research_decision.yaml`. No study may compile or pass preflight unless decision-contract fidelity passes (`python scripts/check_research_decision_fidelity.py --study studies/<name>`).
-   - Behavioral Rule: Never improve, broaden, clean up, or make a study more statistically pure by changing a fixed baseline or adding feature discovery unless the Research Decision Contract explicitly permits it. If a design concern exists, surface it as a caveat; do not silently alter the experiment.
+**Read in this order:**
 
-## LEAN WORKFLOW (token discipline)
-- **Deterministic Preflight First.** `python scripts/research_preflight.py --study studies/<name>` before any agent turn. It orchestrates AST causal linting, schema validation, model binding, and fast causal canaries for zero LLM tokens.
-- **Worker Subagent Boundary.** Worker and coding agents cannot spawn additional subagents. Only the main orchestrator may invoke named mandatory repository gates.
-- **Split audit gate.** `lookahead-auditor` = causality only (A, B, C1–C3, F, G, H). `contract-checker` = deliverables, seals, C4/D/E. Scope defined in `docs/CAUSAL_CHECKLIST.md`. Neither may report the other's category — that boundary is what stops multi-pass loops.
-- **Bounded re-audits.** Pass 2+ must adjudicate all prior findings before raising new ones, max 3 new CRITICALs per pass. New file per pass (`audit/pass_NN.md`), never append.
-- **Freeze deliverables up front.** Every study SPEC needs the Deliverables Manifest and Domain/Completeness sections from `docs/TEMPLATES.md`. An auditor cannot verify a deliverable set that was never written down — it invents one finding at a time instead.
-- **Agent defs are generated.** Edit `.claude/agents/*.md` only; run `python scripts/sync_agents.py` to propagate to Codex and Antigravity.
-- **Model tiering — cheapest model that can be trusted with the decision.** Haiku for deterministic search / test execution / extraction (`repo-scout`, `results-triager`, `Explore`). Sonnet for the two audit gates (`lookahead-auditor`, `contract-checker`) — they must notice defects the checklist does not encode, which is why Red Team kept finding things after hundreds of deterministic tests. Opus only for the main orchestrator: study design, architecture, unresolved ambiguity. Never put a research-blessing gate on Haiku, and never route discovery through a parent-model agent — `Explore` is pinned to Haiku here for exactly that reason; prefer `repo-scout`.
-- **Do not escalate a model because a task is long.** Escalate only when the task needs materially more reasoning than its tier can reliably provide. A 5,000-line test log does not need Opus; a three-line timestamp question might. A model change to a mandatory gate is a framework change and needs the `AGENTS.md` § Escalation Rule justification.
-- **Commit at every phase gate.** Branch (`study/<name>` or `chore/<topic>`) — never commit on `main`. Commit code together with the `audit/pass_NN.md` + `status.json` that audited it, so the scope hash matches the tree. Never commit generated data (`canonical_*/`, `_work/`, `*.parquet`, `model.joblib`) — commit the manifests instead. Full protocol: `AGENTS.md` § Commit protocol.
-- **Risk tiers.** Tier 1 (small fix / diagnostic): main session + deterministic tests, no agents. Tier 2 (research study): plan → implement/tests → deterministic preflight CLEAR → split pre-execution audit → staged runner. Tier 3 (model freeze / deploy): add `repo-scout`, then implement/tests → deterministic preflight CLEAR → split pre-execution audit → staged runner.
-- **Parity Failure First-Divergence Rule.** For any parity failure, no broad repository investigation is allowed until first-divergence localization (`python scripts/find_first_parity_divergence.py --reference ledger_a.jsonl --runtime ledger_b.jsonl`) has pinpointed the exact earliest failing timestamp, stage, and field difference.
-- **Diff-first.** Review `git diff -U20` as the primary surface. Open full files only to resolve causality, state flow, base classes, or imports — never to repeat discovery already done.
-- **No agents for process monitoring.** Use `scripts/run_bounded_study.py` and read its JSON status card, not raw logs.
-- **Subagent output caps.** `repo-scout` 700w (paths/symbols only) · `contract-checker` 1,000w (compliance table) · `results-triager` 500w (failures + root cause) · `lookahead-auditor` 1,500w (findings by severity).
-- **Standing authorization.** The named mandatory gates above may be invoked without asking, scoped strictly to the gate. No discretionary, general-purpose, nested, or fan-out agent use. Full text: `AGENTS.md` § Standing Authorization.
+1. `AGENTS.md` — the shared agent core. Every rule there applies to you.
+2. `docs/RESEARCH_WORKFLOW.md` — the authoritative description of the system.
+3. This file — what Claude specifically is here to do, and what Claude specifically gets
+   wrong.
 
-## BACKTEST / COLLECT — IMPORT, DON'T REGENERATE
-Engine setup, instrument construction, catalog loading and the `sys.path`/`os.chdir` preamble
-are already implemented. Import them; never re-type them into a new script.
+This file adds Claude-specific guidance. It does not repeat the workflow.
+
+---
+
+## 1. Mission
+
+Claude is used here for the work that needs breadth: architecture, repository-wide
+reasoning, refactoring, documentation, debugging complex cross-file interactions, and
+multi-file implementation. You are usually the orchestrator.
+
+That means your characteristic failure is not writing bad code. It is **building a second
+version of something that already exists** because you started editing before you finished
+looking.
+
+---
+
+## 2. Inspect broadly before editing
+
+Before writing a line:
+
+- Locate the **authoritative** implementation, not the first plausible one. `grep` finds
+  four collectors in this repository; exactly one of them is current
+  (`research_workflow/generic_collector.py`).
+- Check whether the thing you are about to build exists under a different name. Consult
+  `docs/RESEARCH_WORKFLOW.md` §1 and §11 first, then `repo-scout`.
+- Read `docs/DOCUMENT_MAP.md` before trusting any Markdown file that is not
+  `docs/RESEARCH_WORKFLOW.md`. Roughly thirty root-level documents describe systems that no
+  longer exist; they carry a `[STALE]` or `[HISTORICAL]` banner.
+- Prefer `git diff -U20` as the primary review surface. Open full files only to resolve
+  causality, state flow, base classes, or imports.
+- Do not reopen unchanged files to repeat discovery you already did.
+
+**Discovery belongs on Haiku.** Use `repo-scout` for evidence gathering. `Explore` exists in
+`.claude/agents/` only to pin the built-in agent's model — it is not a distinct role.
+
+---
+
+## 3. Understand the execution closure before touching a shared file
+
+A study's execution closure is resolved by `scripts/resolve_execution_manifest.py` and
+hashed into `audit/frozen_execution_manifest.json`. Editing anything inside it stales the
+freeze and invalidates the seal of every study sealed against it.
+
+`research_workflow/__init__.py` is inside that closure. A cosmetic `__all__` edit is enough.
+
+Before editing anything under `research_workflow/`, `research/`, `features/`,
+`backtests/nt_runtime/` or `utils/`:
+
+```bash
+python scripts/resolve_execution_manifest.py --study studies/<in-flight-study>
+```
+
+If a sealed study is in flight and your change is not required by it, do the change on a
+separate branch or after that study completes. If it *is* required, expect to re-run PREPARE
+and stages 3–6 and say so up front.
+
+Sealed studies also fix their strategy: `--strategy` must never override a sealed study's
+declared `strategy_class`.
+
+---
+
+## 4. Trace defects to the first broken stage
+
+When something is wrong, find the **earliest** point at which it became wrong. Do not patch
+the symptom at the surface where you noticed it.
+
+- Parity failure → `scripts/find_first_parity_divergence.py` **before** any investigation.
+  This is a hard rule, not a suggestion.
+- Wrong numbers in a report → check the population and the join before the metric. Three of
+  the worst defects found here were scope losses at a join, not arithmetic errors.
+- A model arm that behaves like another arm → check whether the added feature block is
+  actually populated and has variance, before theorising about the model.
+- A gate that passes when it should not → check whether it covers the deliverable it is
+  vouching for. A check that derives its own scope cannot detect scope loss.
+
+---
+
+## 5. Explicit prohibitions
+
+These are the specific things Claude has done here that cost real time.
+
+- **Don't stop at the first deterministic defect.** A `BLOCKED` preflight is an instruction
+  to fix, not to report. Fix it, add a targeted test, re-run the bounded check, continue.
+  See `AGENTS.md` §6 for the six terminal stop conditions.
+- **Don't build a bespoke collector.** Generic extension points exist: declared
+  `FeatureInstance`s, `research_workflow/hooks/` protocols, and small declarative hooks in
+  `studies/<id>/implementation/`. Copying, subclassing or wrapping a historical study
+  collector is prohibited. So is `sys.path.insert` into a sibling study directory.
+- **Don't create a duplicate auditor.** The lookahead/causal system already exists
+  (`scripts/causal_lint.py`, `docs/CAUSAL_CHECKLIST.md`, `lookahead-auditor`,
+  `contract-checker`, `research_workflow/causal_audit.py`). If it misses something, extend
+  the checklist and the lint — do not write a second "leakage scanner".
+- **Don't rewrite canonical feature identity around timeframes.** `prior_5m_regime_efficiency`
+  is an output alias. The identity is `regime_efficiency` with `timeframe: 5m`. Adding a
+  provider "for the 5m case" is the same mistake in code.
+- **Don't loosen the outcome guard.** If `forward_outcomes/guard.py` rejects something,
+  either it is a genuine leak or the column is misnamed. An unanchored substring match would
+  reject `rolling_300s_giveback_atr`, which is a legitimate causal input.
+- **Don't wrap a canonical runner** to retry, monitor or babysit it. Use
+  `scripts/run_bounded_study.py` and read its JSON status card. A wrapper becomes a second
+  runner with none of the governance.
+- **Don't launch a second identical run** while one is `RUNNING`. Confirm terminal state with
+  `scripts/reconcile_runs.py` — it classifies `RUNNING` only when the recorded PID is alive.
+- **Don't route around the analysis harness.** If `research/analysis/` cannot express the
+  analysis, report `ANALYSIS_HARNESS_GAP` naming the missing capability.
+- **Don't add a new `run_*.py`.** A standard backtest is
+  `python backtests/run_backtest.py --strategy <id> --param k=v`. Legacy `backtests/run_*.py`
+  scripts are frozen references, not templates.
+
+---
+
+## 6. Import, don't regenerate
 
 | Concern | Canonical import |
-| --- | --- |
+|---|---|
 | Engine + venue + instrument | `backtests/nt_runtime/engine_builder.py` → `build_engine`, `create_futures_instrument` |
 | Catalog bar loading | `utils/runner/data.py` → `CausalDataLoader.load_bars` (never open `ParquetDataCatalog` inline) |
 | 1s-before-1m dispatch order | `utils/causal_registration.py` → `add_bars_causal_order` |
-| Study / stage / output / telemetry | `backtests/nt_runtime/{compiled_study_loader,data_plan,run_plan,output_manager,telemetry}.py` |
+| Study / stage / run plan / telemetry | `backtests/nt_runtime/{compiled_study_loader,data_plan,run_plan,telemetry}.py` |
+| Output persistence + surface enforcement | `research_workflow/output_manager.py` |
 | Collect entrypoint | `backtests/run_nt_study.py --mode collect` |
-| Standalone backtest entrypoint | `backtests/run_backtest.py` (non-collector strategies) |
+| Standalone backtest entrypoint | `backtests/run_backtest.py` |
+| Strategy registration | `STRATEGY_REGISTRY` in `backtests/nt_runtime/strategy_binding.py` |
 
-- A standard backtest is `python backtests/run_backtest.py --strategy <id> --param k=v`, **not** a new `run_*.py`.
-  Legacy `backtests/run_*.py` scripts are frozen references, not templates to copy.
-- `resolve_catalog_plan(...)` is the generic catalog/instrument/warmup resolver.
-  `resolve_data_plan(...)` is the study-bound wrapper that additionally applies collector chronology
-  and OOS gates — do not call it for a non-collector backtest.
-- `--strategy` must NEVER override a sealed study's declared `strategy_class`. If a study is sealed,
-  the strategy it seals is the only strategy permitted to run under that study identity.
-- Shared helpers go in `backtests/nt_runtime/`, `utils/runner/`, or `features/`. NEVER `sys.path.insert`
-  into a sibling study directory.
+`resolve_catalog_plan(...)` is the generic catalog/instrument/warmup resolver.
+`resolve_data_plan(...)` is the study-bound wrapper that additionally applies collector
+chronology and OOS gates — do not call it for a non-collector backtest.
 
-## DOCUMENTATION INDEX
-Do not guess implementation details. Use your `Read` tool to read the relevant spec before writing code:
+Shared helpers go in `research_workflow/`, `backtests/nt_runtime/`, `utils/runner/` or
+`features/`.
 
-- **Workflow Manual:** `docs/RESEARCH_WORKFLOW.md` (End-to-end execution, audit, feature & analysis flow)
-- **Catalog & Data:** `docs/DATA_CATALOG.md` (Wrangling, building, validation)
-- **Backtest & Config:** `docs/BACKTEST_EXECUTION.md` (Runner setup, parameter sweeps, yaml configs)
-- **Reporting & Tearsheets:** `docs/ANALYSIS_REPORTING.md` (NT built-in reports, TearsheetConfigs)
-- **Studies & ML Data:** `docs/STUDY_METHODOLOGY.md` (Feature collection, MFE/MAE replay pattern)
-- **Templates:** `docs/TEMPLATES.md` (Indicator and Strategy SPEC.md templates)
-- **Optimization:** `docs/PERFORMANCE.md` (Profiling, ONNX ML inference)
+---
 
-## CANONICAL RESEARCH WORKFLOW
-- Read `docs/RESEARCH_WORKFLOW.md` before starting any new study, collector, backtest, feature, or analysis task.
-- Use canonical collector (`backtests/run_nt_study.py`), backtest (`backtests/run_backtest.py`), and analysis harnesses. Do not regenerate engine, instrument, catalog, loading, validation, or reporting infrastructure.
-- A new feature must be implemented/registered through `features/registry.py` and declared in the study feature list; never bypass missing-feature errors with a one-off runner.
-- No new sibling-study imports. Promote genuinely shared helpers to shared code (`backtests/nt_runtime/`, `utils/runner/`, `features/`).
-- No new `run_*.py` for ordinary backtest variations.
-- Shared framework code changes require a demonstrated missing capability or defect (`AGENTS.md` § Escalation Rule).
-- Do not search `archive/`, `scratch/`, `runs/`, or historical result directories unless explicitly needed.
-- Prefer bounded sessions and compact handoffs; do not reread unchanged files.
-- Detailed evidence goes to artifacts; chat responses stay concise.
+## 7. Risk tiers
 
-<!-- BEGIN CENTRAL FEATURE SYSTEM -->
-## Central Feature System
+| Tier | Work | Process |
+|---|---|---|
+| **1** | Small fix, diagnostic, docs | Main session → targeted tests → local smoke. No agents, no auditor unless causal or timing logic changed |
+| **2** | Normal research study | `research_decision.yaml` → `SPEC.md` → `study.yaml` → compile → PREPARE+FREEZE → READINESS → preflight `CLEAR` → split pre-execution audit → seal → staged runner → completion contract check |
+| **3** | Model freeze / deployment / cross-timeframe strategy | Tier 2, preceded by `repo-scout` for execution-closure and dependency evidence |
 
-Before creating, modifying, or locally reimplementing a feature:
+Re-audit causality only when the audited surface actually changes. Re-run `contract-checker`
+on materialized outputs before acceptance.
 
-1. Read `features/FEATURE_REGISTRY_CONTRACT.md`.
-2. Inspect `features/registry.py` for the canonical name, implementation,
-   lifecycle, aliases, and verification status.
-3. Reuse a verified registered feature when available.
-4. Do not add a study-local duplicate without a documented exemption.
-5. A central implementation defines how a feature is calculated; the
-   study contract must still define when it is updated and snapped.
-6. New or changed features require registry metadata, focused tests,
-   provenance review, and parity evidence where applicable.
-<!-- END CENTRAL FEATURE SYSTEM -->
+---
+
+## 8. When you write documentation
+
+- Update the authoritative doc. Do not create a parallel one.
+- Link instead of duplicating.
+- If you mark something stale, add it to `docs/DOCUMENT_MAP.md` in the same change.
+- Describe what the code does today, not what it was designed to do.
+
+---
+
+## 9. Delivering
+
+Concise chat, detailed artifacts. Exact paths, exact SHAs, exact counts. State what you
+verified and what you did not. If you left part of a task undone, say which part and why —
+scaling the work down is the user's call.

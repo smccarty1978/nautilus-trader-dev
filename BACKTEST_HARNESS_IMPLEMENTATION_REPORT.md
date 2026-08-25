@@ -1,3 +1,11 @@
+<!-- DOC-STATUS-BANNER -->
+> **[HISTORICAL]**
+>
+> A point-in-time record of the build of the backtest harness. It is not a description of the current system
+> and not a source of instructions.
+>
+> Current authority: **`docs/RESEARCH_WORKFLOW.md`**. Classification: `docs/DOCUMENT_MAP.md`.
+
 # Backtest Harness — Implementation Report
 
 **Date:** 2026-08-16 · **Base commit:** `97b97db` · **Branch:** `study/Codex_clean_maturity_flip_rolling_5m_productivity`

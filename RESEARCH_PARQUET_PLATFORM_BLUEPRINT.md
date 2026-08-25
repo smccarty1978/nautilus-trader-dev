@@ -1,3 +1,13 @@
+<!-- DOC-STATUS-BANNER -->
+> **[STALE — SUPERSEDED]**
+>
+> Superseded by **docs/RESEARCH_WORKFLOW.md §15**.
+>
+> Blueprint for a storage platform superseded by `research/analysis/`.
+>
+> Kept for its reasoning and for the audit trail. **Not a source of instructions.**
+> Classification: `docs/DOCUMENT_MAP.md`.
+
 # NautilusTrader Research Parquet Platform Blueprint
 
 **Status:** Proposed architecture  

@@ -155,7 +155,7 @@ class ForwardObservation:
 
         if self.spec.confirmation is not None and self.confirmed is None:
             wait_deadline = self.entry.entry_ts + self.spec.confirmation.max_wait_seconds * NS
-            if ts_close >= wait_deadline:
+            if ts_close > wait_deadline:
                 self.confirmed = False
 
     def _accumulate(self, ts_close: int, high: float, low: float, close: float) -> None:
@@ -289,7 +289,11 @@ class ForwardObservation:
             raise ForwardOutcomeError(
                 f"entry {self.entry.entry_id} already confirmed at {self.confirmation_ts}"
             )
-        if self.confirmed is False:
+        # A confirmation at the exact wait deadline is still observable on that
+        # completed bar. The streaming adapter may visit the deadline before the
+        # coincident confirmation event is supplied, so only a strictly later
+        # event is too late.
+        if self.confirmed is False and self.last_bar_ts is not None and self.last_bar_ts > self.entry.entry_ts + spec.max_wait_seconds * NS:
             raise ForwardOutcomeError(
                 f"entry {self.entry.entry_id} exceeded its confirmation wait window"
             )
@@ -716,9 +720,19 @@ def compute_forward_outcomes(
     pending_conf = dict(confirmations or {})
     for bar in bars:
         ts_open, ts_close, high, low, close = bar
+        # A confirmation whose timestamp falls between two sampled bars must be
+        # applied before the later bar; otherwise the later bar can incorrectly
+        # mark the wait window as expired. A coincident confirmation is applied
+        # after that bar, preserving the NT short-bar-before-parent-bar order.
+        if pending_conf:
+            due_before = [eid for eid, (cts, _) in pending_conf.items() if int(cts) < int(ts_close)]
+            for eid in due_before:
+                cts, cprice = pending_conf.pop(eid)
+                if tracker.is_active(eid):
+                    tracker.record_confirmation(eid, cts, cprice)
         tracker.on_bar(ts_open, ts_close, high, low, close)
         if pending_conf:
-            due = [eid for eid, (cts, _) in pending_conf.items() if int(cts) <= int(ts_close)]
+            due = [eid for eid, (cts, _) in pending_conf.items() if int(cts) == int(ts_close)]
             for eid in due:
                 cts, cprice = pending_conf.pop(eid)
                 if tracker.is_active(eid):
