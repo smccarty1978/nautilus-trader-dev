@@ -5,6 +5,65 @@ from pathlib import Path
 from typing import Any
 
 
+def _expected_feature_surface(study: Path, features: dict[str, Any]) -> dict[str, Any]:
+    """Derive the expected feature surface from the study's own contracts.
+
+    There is no correct constant here. A study declares its cardinality in
+    ``features.selection.feature_count`` and its identities in ``features.instances``;
+    phase zero records the *authorized* surface those instances resolved to. This
+    compares the three against each other and never against a literal — a hardcoded
+    count made this audit pass only for the one study it was written against.
+    """
+    instances = features.get("instances") or []
+    declared_count = (features.get("selection") or {}).get("feature_count")
+
+    if declared_count is None:
+        count_matches, count_detail = True, "no selection.feature_count declared; cardinality not asserted"
+    else:
+        count_matches = len(instances) == int(declared_count)
+        count_detail = f"declared selection.feature_count={declared_count}, instances={len(instances)}"
+
+    # Resolve the declared instances through the canonical resolver -- the same one
+    # phase zero records as the source of the authorized candidate universe.
+    try:
+        from features.registry import FeatureInstance, resolve_feature_instances
+        resolved = resolve_feature_instances(
+            features.get("source"),
+            tuple(FeatureInstance(str(i["feature"]), dict(i.get("parameters", {})), i.get("physical_alias"))
+                  for i in instances),
+            legacy_mode=False,
+        ) if instances else []
+        declared_aliases = {item["physical_alias"] for item in resolved}
+    except Exception as exc:  # a non-resolving instance is itself the finding
+        return {"count_matches": count_matches, "count_detail": count_detail,
+                "surface_matches": False, "surface_detail": f"instances do not resolve: {exc}"}
+
+    if len(declared_aliases) != len(instances):
+        return {"count_matches": count_matches, "count_detail": count_detail,
+                "surface_matches": False,
+                "surface_detail": f"{len(instances)} instances collapsed to {len(declared_aliases)} aliases"}
+
+    manifest = study / "artifacts" / "phase0_source_manifest.json"
+    if not manifest.is_file():
+        return {"count_matches": count_matches, "count_detail": count_detail,
+                "surface_matches": True,
+                "surface_detail": f"{len(declared_aliases)} aliases resolved; no phase0 manifest to compare"}
+
+    authorized = set(
+        (json.loads(manifest.read_text(encoding="utf-8")).get("candidate_feature_universe") or {})
+        .get("candidates") or {}
+    )
+    missing = sorted(authorized - declared_aliases)
+    unexpected = sorted(declared_aliases - authorized)
+    return {
+        "count_matches": count_matches, "count_detail": count_detail,
+        "surface_matches": not missing and not unexpected,
+        "surface_detail": (f"declared {len(declared_aliases)} == authorized {len(authorized)}"
+                           if not missing and not unexpected
+                           else f"missing={missing[:5]} unexpected={unexpected[:5]}"),
+    }
+
+
 def run_contract_review(study_path: str | Path, **_: Any) -> dict[str, Any]:
     study = Path(study_path).resolve()
     try:
@@ -18,9 +77,15 @@ def run_contract_review(study_path: str | Path, **_: Any) -> dict[str, Any]:
         spec = compiled.get("spec", {})
         features = spec.get("features", {})
         instances = features.get("instances", [])
+        surface = _expected_feature_surface(study, features)
         checks = [
             {"name": "compiled_spec_present", "passed": bool(spec)},
-            {"name": "explicit_feature_instances", "passed": len(instances) == 13 and all("feature" in i and "parameters" in i for i in instances)},
+            {"name": "explicit_feature_instances",
+             "passed": bool(instances) and all("feature" in i and "parameters" in i for i in instances)},
+            {"name": "declared_instance_count_matches_contract", "passed": surface["count_matches"],
+             "detail": surface["count_detail"]},
+            {"name": "declared_surface_matches_authorized", "passed": surface["surface_matches"],
+             "detail": surface["surface_detail"]},
             {"name": "generic_collector_binding", "passed": "research_workflow.generic_collector" in str(spec.get("execution", {}))},
             {"name": "deliverables_contract", "passed": (study / "config" / "deliverables_contract.json").is_file()},
             {"name": "phase0_manifest", "passed": (study / "artifacts" / "phase0_source_manifest.json").is_file()},

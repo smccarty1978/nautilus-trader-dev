@@ -14,7 +14,6 @@ Proves the core underlying invariants of the NautilusTrader research framework:
 """
 
 import ast
-import hashlib
 import json
 import shutil
 import sys
@@ -28,6 +27,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from backtests.nt_runtime.compiled_study_loader import CompiledStudyData, load_compiled_study
+from scripts.resolve_execution_manifest import canonical_file_sha256
 from backtests.nt_runtime.data_plan import UnauthorizedExecutionDomainError, resolve_data_plan
 from backtests.nt_runtime.modes.collect import run_collect_mode
 from backtests.nt_runtime.run_plan import RunPlan, RunStage
@@ -249,7 +249,10 @@ def test_full_stage_accepts_valid_smoke_acceptance(tmp_path, monkeypatch):
 
     # 2. Get current validator script hash
     val_script = REPO_ROOT / "scripts" / "validate_smoke.py"
-    val_sha = hashlib.sha256(val_script.read_bytes()).hexdigest()
+    # Must use the SAME canonical hash the gate uses (W7 line-ending normalisation).
+    # A raw read_bytes() hash disagrees with it on any CRLF checkout, so the fixture
+    # would look stale on Windows and the test would assert the wrong failure.
+    val_sha = canonical_file_sha256(val_script)
 
     # 3. Write fully valid smoke_acceptance.json satisfying all 11 smoke-gate requirements
     sacc_file = tmp_study / "artifacts" / "smoke_acceptance.json"
@@ -314,7 +317,10 @@ def test_gate_rejects_contradictory_acceptance(tmp_path):
     )
 
     val_script = REPO_ROOT / "scripts" / "validate_smoke.py"
-    val_sha = hashlib.sha256(val_script.read_bytes()).hexdigest()
+    # Must use the SAME canonical hash the gate uses (W7 line-ending normalisation).
+    # A raw read_bytes() hash disagrees with it on any CRLF checkout, so the fixture
+    # would look stale on Windows and the test would assert the wrong failure.
+    val_sha = canonical_file_sha256(val_script)
 
     # Contradictory: violations=0 but exact_timestamp_equality_verified=False
     sacc_file = tmp_study / "artifacts" / "smoke_acceptance.json"
