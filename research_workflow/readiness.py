@@ -795,6 +795,13 @@ def run_readiness(
     except Exception as exc:
         r9 = _result(False, type(exc).__name__, str(exc))
 
+    try:
+        from research_workflow.gates import assert_gates_satisfied
+        gate_evidence = assert_gates_satisfied(study_path, study_data.spec, stage="readiness")
+        r_gates = _result(True, "REQUIRED_GATES_SATISFIED", f"{len(gate_evidence)} gate(s) evaluated", gates=gate_evidence)
+    except Exception as exc:
+        r_gates = _result(False, type(exc).__name__, str(exc))
+
     checks = {
         "r1_dataset_identity": r1,
         "r2_1s_timestamp": r2_1s,
@@ -808,6 +815,7 @@ def run_readiness(
         "r8_double_identity": r8,
         "r9_alternate_opener": r9,
         "r10_real_nonempty_output_parity": r10,
+        "required_gates": r_gates,
     }
     overall_status = "PASS" if all(c["passed"] for c in checks.values()) else "BLOCKED"
 
@@ -847,7 +855,7 @@ def main() -> int:
             "r1_dataset_identity", "r2_1s_timestamp", "r2_1m_timestamp", "r2_derived_5m",
             "r3_instrument_precision", "r4_callback_order", "r5_real_collector",
             "r6_output_interface", "r7_synthetic_schema", "r8_double_identity", "r9_alternate_opener",
-            "r10_real_nonempty_output_parity",
+            "r10_real_nonempty_output_parity", "required_gates",
         ):
             check = result[name]
             print(f"  {name}: {'PASS' if check['passed'] else 'FAIL'} - {check['detail']}")

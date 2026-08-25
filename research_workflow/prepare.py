@@ -34,6 +34,22 @@ def run_prepare_and_freeze(study_dir: Path):
     if compile_rc != 0:
         raise RuntimeError("Study compilation failed.")
 
+    # 1b. Derived causal inputs and pre-freeze gates staged "prepare" must be satisfied
+    # before PREPARE completes -- checked here as well as in build_phase0_manifest so
+    # the check fires on this documented CLI entry point (`python -m
+    # research_workflow.prepare`) even when a caller does not route through
+    # lifecycle.prepare()'s compile+build_phase0_manifest+run_prepare_and_freeze order.
+    import yaml as _yaml
+    from research.schemas.study_spec import StudySpec
+    from research_workflow.derived_inputs import verify_derived_causal_inputs
+    from research_workflow.gates import assert_gates_satisfied
+
+    _study_spec = StudySpec.model_validate(
+        _yaml.safe_load((study_dir / "study.yaml").read_text(encoding="utf-8"))
+    )
+    verify_derived_causal_inputs(_study_spec, repo_root=project_root)
+    assert_gates_satisfied(study_dir, _study_spec, stage="prepare")
+
     # 2. Write phase0 manifest (PREPARE stage)
     phase0_py = study_dir / "implementation" / "phase0.py"
     if phase0_py.exists():

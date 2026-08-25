@@ -64,6 +64,53 @@ def _expected_feature_surface(study: Path, features: dict[str, Any]) -> dict[str
     }
 
 
+def _check_derived_causal_inputs_bound(study: Path, spec: dict[str, Any]) -> dict[str, Any]:
+    """Re-runs the provenance verification the compiler recorded; a compiled contract
+    that no longer resolves against on-disk parent artifacts is not audit-clean."""
+    derived = ((spec.get("features") or {}).get("derived_inputs")) or []
+    if not derived:
+        return {"name": "derived_causal_inputs_bound", "passed": True, "checked": 0}
+    try:
+        from research.schemas.study_spec import StudySpec
+        from research_workflow.derived_inputs import verify_derived_causal_inputs
+
+        full_spec = StudySpec.model_validate(spec)
+        verify_derived_causal_inputs(full_spec, repo_root=study.parents[1])
+        return {"name": "derived_causal_inputs_bound", "passed": True, "checked": len(derived)}
+    except Exception as exc:
+        return {"name": "derived_causal_inputs_bound", "passed": False, "detail": str(exc)}
+
+
+def _check_required_gates_declared_and_bound(spec: dict[str, Any]) -> dict[str, Any]:
+    """Structural check: every declared gate names a schema version and a non-empty,
+    typed scope -- a bare-string or unversioned gate can never be verified as fresh."""
+    gates = spec.get("required_gates") or []
+    bad = [
+        g.get("id") for g in gates
+        if not g.get("artifact_schema_version") or not g.get("scope_fields") or not g.get("artifact_path")
+    ]
+    return {"name": "required_gates_declared_and_bound", "passed": not bad,
+            "checked": len(gates), "malformed": bad}
+
+
+def _check_model_selection_binding_present(study: Path, spec: dict[str, Any]) -> dict[str, Any]:
+    """When a study declares a hyperparameter search, a selection manifest must exist
+    once TRAIN freeze has happened -- checked leniently here (pre-freeze, the manifest
+    legitimately does not exist yet); the hard refusal lives in
+    modeling.freeze_train_artifacts, which this only cross-references."""
+    selection = ((spec.get("model") or {}).get("selection")) or {}
+    if selection.get("search_method", "none") == "none":
+        return {"name": "model_selection_binding_present", "passed": True, "search_method": "none"}
+    freeze_path = study / "artifacts" / "train_experiment_freeze.json"
+    if not freeze_path.is_file():
+        return {"name": "model_selection_binding_present", "passed": True,
+                "detail": "TRAIN not yet frozen; nothing to bind yet"}
+    manifest_path = study / "artifacts" / "model_selection_manifest.json"
+    present = manifest_path.is_file()
+    return {"name": "model_selection_binding_present", "passed": present,
+            "detail": None if present else "TRAIN frozen but no model_selection_manifest.json found"}
+
+
 def run_contract_review(study_path: str | Path, **_: Any) -> dict[str, Any]:
     study = Path(study_path).resolve()
     try:
@@ -91,6 +138,9 @@ def run_contract_review(study_path: str | Path, **_: Any) -> dict[str, Any]:
             {"name": "phase0_manifest", "passed": (study / "artifacts" / "phase0_source_manifest.json").is_file()},
             {"name": "legacy_aliases_excluded", "passed": all("legacy" not in str(i).lower() for i in instances)},
             {"name": "population_target_contracts", "passed": all((study / "config" / n).is_file() for n in ("population_contract.json", "target_contract.json"))},
+            _check_derived_causal_inputs_bound(study, spec),
+            _check_required_gates_declared_and_bound(spec),
+            _check_model_selection_binding_present(study, spec),
         ]
         passed = all(c["passed"] for c in checks)
         audit = study / "audit"; audit.mkdir(exist_ok=True)

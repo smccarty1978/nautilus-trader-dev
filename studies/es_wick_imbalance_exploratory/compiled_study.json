@@ -1,7 +1,7 @@
 {
   "study_id": "es_wick_imbalance_exploratory",
   "study_type": "flip_prediction",
-  "spec_sha256": "7151bc7640ebb98526b28d07b673317aa6009975b142e277b0851d572e3eeb08",
+  "spec_sha256": "7b9ec51e240288fecf34c2b11d107d48ada479b45b46fc39a1f84d0de3ba4313",
   "spec": {
     "study": {
       "id": "es_wick_imbalance_exploratory",
@@ -29,7 +29,11 @@
       "event": "prevailing_1m_regime_transition",
       "direction": "both",
       "horizon_seconds": 300,
-      "confirmation": null
+      "confirmation": null,
+      "conditions": null,
+      "condition_logic": null,
+      "required_forward_outcomes": null,
+      "decision_reference": "decision_ts"
     },
     "features": {
       "source_manifest": null,
@@ -40,10 +44,12 @@
       "feature_list": [
         "latest_1m_wick_imbalance"
       ],
+      "instances": null,
       "feature_list_sha256": null,
       "directional_mapping": null,
       "timing_contract": "verified",
-      "metadata_columns": null
+      "metadata_columns": null,
+      "derived_inputs": null
     },
     "model": {
       "mode": "scoring",
@@ -51,7 +57,8 @@
       "arms": null,
       "artifact_path": null,
       "artifact_sha256": null,
-      "params": null
+      "params": null,
+      "selection": null
     },
     "chronology": {
       "train": [
@@ -101,7 +108,8 @@
       "canonical_type_considered": null,
       "reusable_extension_considered": null,
       "custom_scope": null
-    }
+    },
+    "required_gates": null
   },
   "contracts": {
     "population_contract": {
@@ -114,7 +122,9 @@
       "session": "RTH",
       "qualification": {},
       "causal_checkpoint": {
-        "checkpoint_frequency": "1m_bar_close",
+        "checkpoint_frequency": "5s",
+        "checkpoint_grid_origin": "regime_start_ns",
+        "triggering_stream": "completed_1s_bar",
         "observation_timing": "interval_close"
       }
     },
@@ -130,7 +140,8 @@
       "censoring_policy": {
         "session_end_censoring": true,
         "max_horizon_seconds": 300
-      }
+      },
+      "decision_reference": "decision_ts"
     },
     "feature_contract": {
       "source_key": null,
@@ -138,22 +149,74 @@
       "feature_list": [
         "latest_1m_wick_imbalance"
       ],
+      "resolved_feature_instances": [
+        {
+          "requested": "latest_1m_wick_imbalance",
+          "canonical_name": "wick_imbalance",
+          "parameters": {
+            "bar_state": "completed",
+            "timeframe": "1m"
+          },
+          "physical_alias": "latest_1m_wick_imbalance"
+        }
+      ],
       "feature_list_sha256": "f5cddfd93e1bda3b8ff3db0524413c3d8f1fd3fca62490806c3aeb640cf8aa20",
       "bound_trackers": [
-        "features.trackers.wick.WickTracker"
+        "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider"
       ],
       "families": [
-        "wick_imbalance"
+        "['wick_imbalance']"
       ],
       "source_timeframes": [
-        "1m"
+        "completed_1m"
       ],
+      "feature_statuses": {
+        "latest_1m_wick_imbalance": "verified"
+      },
+      "feature_null_policies": {
+        "latest_1m_wick_imbalance": "allow"
+      },
+      "contains_provisional_features": [],
       "directional_mapping": "direction_normalized",
-      "timing_contract": "verified"
+      "timing_contract": "verified",
+      "runtime_data_requirements": {
+        "resolved_instances": [
+          {
+            "requested": "latest_1m_wick_imbalance",
+            "canonical_name": "wick_imbalance",
+            "parameters": {
+              "bar_state": "completed",
+              "timeframe": "1m"
+            },
+            "physical_alias": "latest_1m_wick_imbalance",
+            "provider": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+            "family": [
+              "wick_imbalance"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "wick_imbalance",
+              "provider": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          }
+        ],
+        "required_streams": [
+          "completed_1m"
+        ],
+        "rolling_windows": [],
+        "aliases": [
+          "latest_1m_wick_imbalance"
+        ]
+      },
+      "derived_causal_inputs": []
     },
     "execution_contract": {
       "runtime": "nautilustrader",
-      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
       "bounded_execution": true,
       "progress_seconds": 60,
       "checkpoint": null,
@@ -171,6 +234,8 @@
     },
     "timestamp_contract": {
       "source": "databento_glbx_mdp3",
+      "instrument_symbol": "ES",
+      "measured_catalog_rel_path": "data/catalog/ES_v0_2020_2026",
       "raw_timestamp_semantic": "OPEN_STAMPED",
       "raw_index_field": "ts_event",
       "timezone": "UTC",
@@ -191,9 +256,9 @@
         },
         "empirical_measurement": {
           "status": "MEASURED",
-          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\ES_v0_2020_2026",
           "measurements": {
-            "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+            "ES.XCME-1-MINUTE-LAST-EXTERNAL": {
               "sample_count": 1000,
               "expected_delta_ns": 60000000000,
               "observed_deltas_ns": [
@@ -201,7 +266,7 @@
               ],
               "pass": true
             },
-            "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+            "ES.XCME-1-SECOND-LAST-EXTERNAL": {
               "sample_count": 1000,
               "expected_delta_ns": 1000000000,
               "observed_deltas_ns": [
@@ -209,7 +274,7 @@
               ],
               "pass": true
             },
-            "NQ.XCME-5-MINUTE-LAST-EXTERNAL": {
+            "ES.XCME-5-MINUTE-LAST-EXTERNAL": {
               "sample_count": 1000,
               "expected_delta_ns": 300000000000,
               "observed_deltas_ns": [
@@ -222,6 +287,55 @@
       },
       "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
     },
+    "deliverables_contract": {
+      "contract_version": 1,
+      "authorized_modes": [
+        "collect"
+      ],
+      "deliverables_by_mode": {
+        "collect": [
+          "candidates.parquet",
+          "observations.parquet",
+          "collection_manifest.json",
+          "run_manifest.json",
+          "status.json"
+        ]
+      },
+      "artifact_metadata": {
+        "candidates.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "observations.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "collection_manifest.json": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "run_manifest.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::OutputManager",
+          "relative_to": "run_dir"
+        },
+        "status.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir"
+        }
+      },
+      "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
+    },
     "lineage": {
       "has_parent": false
     },
@@ -229,5 +343,5 @@
       "has_baseline": false
     }
   },
-  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector"
+  "strategy_class": "research_workflow.generic_collector.GenericStudyCollector"
 }

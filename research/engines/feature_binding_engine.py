@@ -54,6 +54,7 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
             "feature_list_sha256": None,
             "bound_trackers": [],
             "timing_contract": "verified",
+            "derived_causal_inputs": _compile_derived_causal_inputs(features_spec),
         }
 
     # Handle unselected candidate universe mode (e.g. verified_registry_numeric_universe)
@@ -82,6 +83,7 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
             "candidate_universe_count": len(verified_feats),
             "candidate_universe_hash": hashlib.sha256(json.dumps(verified_feats).encode("utf-8")).hexdigest(),
             "timing_contract": "verified",
+            "derived_causal_inputs": _compile_derived_causal_inputs(features_spec),
         }
 
     # Resolve every requested output name through the single canonical feature
@@ -202,4 +204,34 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
         ).hexdigest()
     from features.registry import derive_study_feature_requirements
     contract["runtime_data_requirements"] = derive_study_feature_requirements(features_spec)
+    contract["derived_causal_inputs"] = _compile_derived_causal_inputs(features_spec)
     return contract
+
+
+def _compile_derived_causal_inputs(features_spec: Optional[FeaturesSpec]) -> List[Dict[str, Any]]:
+    """Structurally separate from ``resolved_feature_instances``/``feature_list``.
+
+    Never resolvable through ``features.registry`` -- a derived causal input is not a
+    canonical market ``FeatureInstance`` and must not be absorbed by the feature
+    promotion path. Provenance verification against the declared upstream freeze
+    (``research_workflow.derived_inputs.verify_derived_causal_inputs``) happens at
+    PREPARE time, not here -- the compiler records the declaration; phase0 authenticates it.
+    """
+    derived = (features_spec.derived_inputs if features_spec else None) or []
+    return [
+        {
+            "name": d.name,
+            "kind": d.kind,
+            "parent_study_id": d.parent_study_id,
+            "parent_train_freeze_artifact": d.parent_train_freeze_artifact,
+            "parent_train_freeze_artifact_sha256": d.parent_train_freeze_artifact_sha256,
+            "parent_frozen_execution_composite_sha256": d.parent_frozen_execution_composite_sha256,
+            "model_hashes": dict(d.model_hashes),
+            "preprocessing_hash": d.preprocessing_hash,
+            "score_artifact_path": d.score_artifact_path,
+            "score_artifact_sha256": d.score_artifact_sha256,
+            "availability_reference": d.availability_reference,
+            "retrain_prohibited": d.retrain_prohibited,
+        }
+        for d in derived
+    ]

@@ -1,119 +1,297 @@
-"""Strict Machine-Readable StudySpec Schema.
-=========================================
-Authoritative schema for study.yaml files in the NautilusTrader framework.
-"""
-
-from __future__ import annotations
-
-import hashlib
-import json
-from typing import Any, Dict, List, Literal, Optional, Union
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-
-
-class StudyMetadata(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    id: str = Field(..., description="Unique study directory and experiment identifier")
-    type: Literal["flip_prediction", "bespoke"] = Field(
-        ..., description="Supported canonical study type or bespoke escape hatch"
-    )
-    risk_tier: Literal[1, 2, 3, "Tier 1", "Tier 2", "Tier 3"] = Field(
-        2, description="Governance risk tier (1=diagnostic, 2=study, 3=model freeze)"
-    )
-    description: str = Field(..., description="High-level description of research intent")
-
-    @field_validator("id")
-    @classmethod
-    def validate_id(cls, v: str) -> str:
-        v_clean = v.strip()
-        if not v_clean:
-            raise ValueError("Study ID cannot be empty")
-        if any(c in v_clean for c in r'/\:*?"<>| '):
-            raise ValueError(f"Invalid study ID '{v_clean}': must not contain spaces or path separators")
-        return v_clean
-
-
-class InstrumentSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    symbol: str = Field(..., description="Underlying symbol, e.g. NQ, ES, YM")
-    venue: str = Field("XCME", description="Execution/Exchange venue, e.g. XCME")
-
-
-class PopulationSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    type: str = Field("regime_state", description="Population type, e.g. regime_state, breakout")
-    prevailing_regime: Optional[str] = Field(
-        None, description="Prevailing regime direction, e.g. bearish, bullish"
-    )
-    session: str = Field("RTH", description="Session filter, e.g. RTH, ETH, ALL")
-    qualification: Optional[Dict[str, Any]] = Field(
-        default=None, description="Qualification rules, e.g. age_gate_seconds, established"
-    )
-
-
-class TargetSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    type: str = Field("flip", description="Target type, e.g. flip, excursion, return")
-    event: Optional[str] = Field(None, description="Target event name, e.g. regime_flip")
-    direction: Optional[str] = Field(
-        None, description="Target direction, e.g. bullish (for bearish prevailing), bearish"
-    )
-    horizon_seconds: Optional[int] = Field(
-        None, description="Prediction horizon in seconds, e.g. 300"
-    )
-    confirmation: Optional[Dict[str, Any]] = Field(
-        default=None, description="Confirmation parameters, e.g. bars_required, ticks_required"
-    )
-
-
-class FeatureSelectionSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    mode: Literal["train_only", "pre_frozen", "none"] = Field(
-        "train_only", description="Feature selection regime mode"
-    )
-    source: str = Field(
-        "verified_registry_numeric_universe",
-        description="Candidate feature pool source (e.g. verified_registry_numeric_universe)",
-    )
-    years: Optional[List[int]] = Field(
-        default=None, description="Authorized selection years (must be subset of train years)"
-    )
-    feature_count: Optional[int] = Field(
-        25, description="Target feature count per directional model"
-    )
-    direction_specific: bool = Field(
-        True, description="Whether selection is performed separately for SHORT and LONG models"
-    )
-    ranking_method: Optional[str] = Field(
-        "frozen_train_only_temporal_rank", description="Ranking methodology"
-    )
-
-
+"""Strict Machine-Readable StudySpec Schema.
+=========================================
+Authoritative schema for study.yaml files in the NautilusTrader framework.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+from enum import Enum
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+
+# Shared causal ordering for the three named decision-path timestamps a study may
+# reference (`TargetSpec.decision_reference`, `DerivedCausalInputSpec.availability_reference`).
+# Mirrors the ordering already implicit in `research_workflow.forward_outcomes.contracts`
+# (`ProposedEntry` requires `entry_ts >= decision_ts`; a `ConfirmationSpec` is documented as
+# strictly after entry). Defined here, not imported from `research_workflow`, because
+# `research/schemas` is lower in the layering than `research_workflow` -- research_workflow
+# imports this module, never the reverse.
+TIMESTAMP_CAUSAL_ORDER: Dict[str, int] = {
+    "decision_ts": 0,
+    "entry_ts": 1,
+    "confirmation_ts": 2,
+}
+
+
+class StudyMetadata(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(..., description="Unique study directory and experiment identifier")
+    type: Literal["flip_prediction", "bespoke"] = Field(
+        ..., description="Supported canonical study type or bespoke escape hatch"
+    )
+    risk_tier: Literal[1, 2, 3, "Tier 1", "Tier 2", "Tier 3"] = Field(
+        2, description="Governance risk tier (1=diagnostic, 2=study, 3=model freeze)"
+    )
+    description: str = Field(..., description="High-level description of research intent")
+
+    @field_validator("id")
+    @classmethod
+    def validate_id(cls, v: str) -> str:
+        v_clean = v.strip()
+        if not v_clean:
+            raise ValueError("Study ID cannot be empty")
+        if any(c in v_clean for c in r'/\:*?"<>| '):
+            raise ValueError(f"Invalid study ID '{v_clean}': must not contain spaces or path separators")
+        return v_clean
+
+
+class InstrumentSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    symbol: str = Field(..., description="Underlying symbol, e.g. NQ, ES, YM")
+    venue: str = Field("XCME", description="Execution/Exchange venue, e.g. XCME")
+
+
+class PopulationSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    type: str = Field("regime_state", description="Population type, e.g. regime_state, breakout")
+    prevailing_regime: Optional[str] = Field(
+        None, description="Prevailing regime direction, e.g. bearish, bullish"
+    )
+    session: str = Field("RTH", description="Session filter, e.g. RTH, ETH, ALL")
+    qualification: Optional[Dict[str, Any]] = Field(
+        default=None, description="Qualification rules, e.g. age_gate_seconds, established"
+    )
+
+
+class FlipConditionSpec(BaseModel):
+    """One condition of a composite target: a regime-flip event."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(..., description="Unique condition id within this target")
+    kind: Literal["flip"] = "flip"
+    event: Optional[str] = Field(None, description="Target event name, e.g. regime_flip")
+    direction: Optional[str] = Field(None, description="Target direction, e.g. bullish, bearish")
+    horizon_seconds: Optional[int] = Field(None, description="Prediction horizon in seconds")
+    confirmation: Optional[Dict[str, Any]] = Field(
+        default=None, description="Confirmation parameters, e.g. bars_required, ticks_required"
+    )
+
+
+class ExcursionConditionSpec(BaseModel):
+    """One condition of a composite target: a threshold on a forward-outcome excursion metric.
+
+    ``metric`` is a free string (e.g. ``mfe_atr``, ``mae_atr``) -- it is never enum-locked to a
+    specific pair of metrics, so this stays a generic mechanism rather than an
+    MFE/MAE special case. The metric is *generated*, not computed here: see
+    ``forward_outcome_id`` and ``TargetSpec.required_forward_outcomes``.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(..., description="Unique condition id within this target")
+    kind: Literal["excursion"] = "excursion"
+    metric: str = Field(..., description="Forward-outcome metric name, e.g. mfe_atr, mae_atr")
+    comparator: Literal[">=", "<=", ">", "<", "=="] = Field(...)
+    threshold: float = Field(...)
+    forward_outcome_id: str = Field(
+        ..., description="id of the TargetSpec.required_forward_outcomes entry that generates this metric"
+    )
+
+
+class ReturnConditionSpec(BaseModel):
+    """One condition of a composite target: a threshold on a forward-outcome return metric."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(..., description="Unique condition id within this target")
+    kind: Literal["return"] = "return"
+    comparator: Literal[">=", "<=", ">", "<", "=="] = Field(...)
+    threshold: float = Field(...)
+    forward_outcome_id: str = Field(
+        ..., description="id of the TargetSpec.required_forward_outcomes entry that generates this metric"
+    )
+
+
+TargetConditionSpec = Annotated[
+    Union[FlipConditionSpec, ExcursionConditionSpec, ReturnConditionSpec],
+    Field(discriminator="kind"),
+]
+
+
+class RequiredForwardOutcomeSpec(BaseModel):
+    """Declares how a forward-outcome measurement referenced by a composite condition is generated.
+
+    Kept distinct from the conditions themselves (review correction): a threshold condition
+    *consumes* a value; this spec declares *how that value is produced* -- entry reference,
+    horizon, ATR/units, bar inclusion, censoring. ``target_engine.compile_target_contract``
+    constructs a real ``research_workflow.forward_outcomes.contracts.ForwardOutcomeSpec`` from
+    this (not an approximation of its shape), so the same causal guard that already protects
+    forward-outcome columns applies to composite-target excursion conditions for free.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(..., description="Unique id referenced by condition forward_outcome_id values")
+    entry_reference: Literal["decision_close", "next_bar_open", "confirmation_close", "explicit"] = "next_bar_open"
+    horizon_seconds: int = Field(..., description="Measurement horizon in seconds")
+    max_tracking_seconds: Optional[int] = Field(
+        None, description="Tracking budget; defaults to horizon_seconds when unset"
+    )
+    excursion_units: List[Literal["points", "atr", "ticks"]] = Field(default_factory=lambda: ["atr"])
+    bar_inclusion: Literal["fully_forward", "close_after_entry"] = "fully_forward"
+    session_end_censoring: bool = False
+
+
+class TargetSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    type: str = Field("flip", description="Target type, e.g. flip, excursion, return, composite")
+    event: Optional[str] = Field(None, description="Target event name, e.g. regime_flip")
+    direction: Optional[str] = Field(
+        None, description="Target direction, e.g. bullish (for bearish prevailing), bearish"
+    )
+    horizon_seconds: Optional[int] = Field(
+        None, description="Prediction horizon in seconds, e.g. 300"
+    )
+    confirmation: Optional[Dict[str, Any]] = Field(
+        default=None, description="Confirmation parameters, e.g. bars_required, ticks_required"
+    )
+    # -- composite target support -------------------------------------------------
+    # A study with no `conditions` declared compiles exactly as it always has -- these
+    # fields are additive and never required.
+    conditions: Optional[List[TargetConditionSpec]] = Field(
+        default=None, description="Composite target: typed, discriminated conditions"
+    )
+    condition_logic: Optional[Literal["AND", "OR"]] = Field(
+        default=None, description="Boolean composition of `conditions`; required when len(conditions) > 1"
+    )
+    required_forward_outcomes: Optional[List[RequiredForwardOutcomeSpec]] = Field(
+        default=None, description="Forward-outcome generation specs referenced by excursion/return conditions"
+    )
+    decision_reference: Literal["decision_ts", "entry_ts", "confirmation_ts"] = Field(
+        "decision_ts",
+        description="When this study model actually makes its decision, on the shared "
+                    "TIMESTAMP_CAUSAL_ORDER scale. Not assumed to always be decision_ts.",
+    )
+
+    @model_validator(mode="after")
+    def validate_composite_target(self) -> TargetSpec:
+        conditions = self.conditions or []
+        if len(conditions) > 1 and not self.condition_logic:
+            raise ValueError(
+                "TARGET_CONDITION_LOGIC_REQUIRED: a composite target with more than one "
+                "condition must declare condition_logic (AND/OR)"
+            )
+        ids = [c.id for c in conditions]
+        if len(ids) != len(set(ids)):
+            raise ValueError(f"DUPLICATE_TARGET_CONDITION_ID: {ids}")
+        declared_fo_ids = {fo.id for fo in (self.required_forward_outcomes or [])}
+        for c in conditions:
+            if c.kind in ("excursion", "return") and c.forward_outcome_id not in declared_fo_ids:
+                raise ValueError(
+                    f"TARGET_CONDITION_FORWARD_OUTCOME_UNDECLARED: condition {c.id!r} "
+                    f"references undeclared forward_outcome_id {c.forward_outcome_id!r}"
+                )
+        return self
+
+
+class FeatureSelectionSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["train_only", "pre_frozen", "none"] = Field(
+        "train_only", description="Feature selection regime mode"
+    )
+    source: str = Field(
+        "verified_registry_numeric_universe",
+        description="Candidate feature pool source (e.g. verified_registry_numeric_universe)",
+    )
+    years: Optional[List[int]] = Field(
+        default=None, description="Authorized selection years (must be subset of train years)"
+    )
+    feature_count: Optional[int] = Field(
+        25, description="Target feature count per directional model"
+    )
+    direction_specific: bool = Field(
+        True, description="Whether selection is performed separately for SHORT and LONG models"
+    )
+    ranking_method: Optional[str] = Field(
+        "frozen_train_only_temporal_rank", description="Ranking methodology"
+    )
+
+
+class DerivedCausalInputSpec(BaseModel):
+    """A causal input that is NOT a canonical market FeatureInstance.
+
+    Distinguished by construction from `features.instances`: this is never resolvable
+    through `features.registry`, and the compiled feature contract keeps it in a separate
+    `derived_causal_inputs` key. Initial supported kind is a frozen external model score --
+    the output of another study's TRAIN freeze, consumed as a first-class input with
+    provenance, never re-derived or retrained by the child study.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(..., description="Column name this input is bound to")
+    kind: Literal["frozen_external_model_score"] = "frozen_external_model_score"
+    parent_study_id: str = Field(..., description="Upstream study directory id")
+    parent_train_freeze_artifact: str = Field(
+        ..., description="Relative path within the parent study to its authoritative TRAIN freeze"
+    )
+    parent_train_freeze_artifact_sha256: str = Field(
+        ..., description="sha256 of the exact file bytes at parent_train_freeze_artifact"
+    )
+    parent_frozen_execution_composite_sha256: str = Field(
+        ..., description="Parent's audited execution composite, from its audit/status.json"
+    )
+    model_hashes: Dict[str, str] = Field(..., description="Per-arm fit_identity_sha256 values, must match the parent freeze")
+    preprocessing_hash: str = Field(...)
+    score_artifact_path: Optional[str] = Field(
+        None, description="A materialized score table, if consumed instead of the raw model artifact"
+    )
+    score_artifact_sha256: Optional[str] = Field(None)
+    availability_reference: Literal["decision_ts", "entry_ts", "confirmation_ts"] = "decision_ts"
+    retrain_prohibited: bool = Field(
+        True, description="Must be True for this kind -- the child study may never retrain the upstream model"
+    )
+
+    @field_validator("retrain_prohibited")
+    @classmethod
+    def validate_retrain_prohibited(cls, v: bool) -> bool:
+        if not v:
+            raise ValueError(
+                "DERIVED_INPUT_RETRAIN_PROHIBITED_REQUIRED: frozen_external_model_score inputs "
+                "may never permit upstream retraining"
+            )
+        return v
+
+
 class FeaturesSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    source_manifest: Optional[str] = Field(
-        None, description="Path or identifier of feature manifest"
-    )
-    source: Optional[str] = Field(
-        None, description="Feature source universe, e.g. verified_registry_numeric_universe"
-    )
-    source_key: Optional[str] = Field(
-        None, description="Key identifier for feature set, e.g. F3_top25_gbt_v1"
-    )
-    selection: Optional[FeatureSelectionSpec] = Field(
-        default=None, description="Feature selection specification"
-    )
-    forbidden_lineage: Optional[List[str]] = Field(
-        default=None, description="Forbidden prior feature keys or lineage sources"
-    )
+    model_config = ConfigDict(extra="forbid")
+
+    source_manifest: Optional[str] = Field(
+        None, description="Path or identifier of feature manifest"
+    )
+    source: Optional[str] = Field(
+        None, description="Feature source universe, e.g. verified_registry_numeric_universe"
+    )
+    source_key: Optional[str] = Field(
+        None, description="Key identifier for feature set, e.g. F3_top25_gbt_v1"
+    )
+    selection: Optional[FeatureSelectionSpec] = Field(
+        default=None, description="Feature selection specification"
+    )
+    forbidden_lineage: Optional[List[str]] = Field(
+        default=None, description="Forbidden prior feature keys or lineage sources"
+    )
     feature_list: Optional[List[str]] = Field(
-        default=None, description="Exact ordered feature names"
+        default=None, description="Exact ordered feature names"
     )
 
     # V2 study-local instance declarations.  They are intentionally a list in
@@ -123,234 +301,446 @@ class FeaturesSpec(BaseModel):
         default=None,
         description="Canonical FeatureInstance declarations: feature, parameters, optional physical_alias",
     )
-    feature_list_sha256: Optional[str] = Field(
-        None, description="SHA-256 hash of ordered feature list"
-    )
-    directional_mapping: Optional[str] = Field(
-        None, description="Directional polarity mapping policy"
-    )
-    timing_contract: Optional[str] = Field(
-        "verified", description="Feature timing audit status, e.g. verified"
-    )
-    metadata_columns: Optional[List[str]] = Field(
-        default=None, description="Declared non-feature metadata columns for output contract validation"
-    )
-
-
-class ModelSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    mode: Optional[str] = Field("scoring", description="Model mode: scoring, training, evaluation")
-    family: Optional[str] = Field(
-        None, description="Model family, e.g. HistGradientBoostingClassifier, LogisticRegression"
-    )
-    arms: Optional[List[str]] = Field(
-        default=None, description="Model arms, e.g. [BASELINE_A, STRUCTURAL_B, ROLLING_PRODUCTIVITY_C]"
-    )
-    artifact_path: Optional[str] = Field(
-        None, description="Path to trained model artifact (.joblib, .onnx)"
-    )
-    artifact_sha256: Optional[str] = Field(
-        None, description="Pinned SHA-256 of model artifact"
-    )
-    params: Optional[Dict[str, Any]] = Field(
-        default=None, description="Model hyperparameters"
-    )
-
-
-class WarmupSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    days_before_partition: int = Field(5, description="Warmup lookback in days prior to partition start")
-    allowed: bool = Field(True, description="Whether warmup data loading is authorized")
-    candidate_emission: bool = Field(False, description="Whether candidate emission is permitted during warmup")
-    target_generation: bool = Field(False, description="Whether target generation is permitted during warmup")
-    permitted_partition_relationship: Literal["pre_train_only", "pre_partition", "explicit_whitelist"] = Field(
-        "pre_train_only", description="Permitted chronological relationship for warmup"
-    )
-
-
-class ChronologySpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    train: Optional[List[int]] = Field(
-        default=None, description="Authorized training years, e.g. [2021, 2022, 2023, 2024]"
-    )
-    dev: Optional[List[int]] = Field(
-        default=None, description="Authorized validation/development years, e.g. [2025]"
-    )
-    diagnostic: Optional[List[int]] = Field(
-        default=None, description="Authorized diagnostic evaluation years"
-    )
-    prohibited: Optional[List[int]] = Field(
-        default=None, description="Prohibited OOS/test years, e.g. [2026]"
-    )
-    warmup: Optional[WarmupSpec] = Field(
-        default=None, description="Explicit warmup authorization specification"
-    )
-
-    @model_validator(mode="after")
-    def check_chronology_disjoint(self) -> ChronologySpec:
-        train_set = set(self.train or [])
-        dev_set = set(self.dev or [])
-        prohib_set = set(self.prohibited or [])
-
-        overlap_train_dev = train_set & dev_set
-        if overlap_train_dev:
-            raise ValueError(f"Chronology error: train and dev overlap on years {sorted(overlap_train_dev)}")
-
-        overlap_prohib = (train_set | dev_set) & prohib_set
-        if overlap_prohib:
-            raise ValueError(
-                f"Chronology error: prohibited years {sorted(overlap_prohib)} appear in train/dev partition"
-            )
-        return self
-
-
-class StratificationSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    column: Optional[str] = Field(None, description="Stratification feature column")
-    buckets: Optional[List[List[Any]]] = Field(
-        default=None, description="Bucket intervals [lower, upper]"
-    )
-    extrapolation_bucket: Optional[str] = Field(
-        None, description="Descriptive extrapolation bucket label, e.g. '>=1800s'"
-    )
-
-
-class BaselineSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    study: Optional[str] = Field(None, description="Reference baseline study name")
-    manifest_sha256: Optional[str] = Field(None, description="Pinned SHA256 of baseline manifest")
-    results_sha256: Optional[str] = Field(None, description="Pinned SHA256 of baseline results")
-
-
-class LineageSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    parent_study: Optional[str] = Field(None, description="Parent study identifier")
-    parent_manifest_sha256: Optional[str] = Field(None, description="Pinned parent manifest SHA256")
-    clean_lineage_start: Optional[str] = Field(
-        None, description="Timestamp marking the clean lineage reset boundary"
-    )
-    invalidated_prior_runs: Optional[List[Dict[str, Any]]] = Field(
-        default=None, description="Record of quarantined historical runs"
-    )
-    intended_changes: Optional[List[str]] = Field(
-        default=None, description="List of dimensions intended to change"
-    )
-    frozen: Optional[List[str]] = Field(
-        default=None, description="List of dimensions strictly frozen against parent"
-    )
-
-
-class ExecutionSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    runtime: Literal["nautilustrader"] = Field(
-        "nautilustrader",
-        description="Execution runtime environment. MUST strictly be 'nautilustrader'",
-    )
-    strategy_class: Optional[str] = Field(
-        None, description="Fully qualified Python class of NautilusTrader strategy"
-    )
-    data_requirements: Optional[Dict[str, Any]] = Field(
-        default=None, description="Data timeframe and catalog requirements"
-    )
-    checkpoint: Optional[str] = Field(None, description="Checkpoint storage identifier")
-    progress_seconds: Optional[int] = Field(60, description="Bounded runner progress interval")
-    bounded: Optional[bool] = Field(True, description="Enforce bounded study process control")
-    observation_policy: Optional[Dict[str, Any]] = Field(
-        default=None, description="Observation timing policy (exact_grid, parent_bar_close, event_driven)"
-    )
-    # NOTE: authorized modes are deliberately NOT a StudySpec field.
-    # `compute_sha256` hashes `model_dump(exclude_none=False)`, so any additional field --
-    # even an unset optional one -- changes every study's spec hash and marks every
-    # existing compiled_study.json stale. The mode-partitioned deliverables contract
-    # therefore derives its modes from `operation.kind` in the compiler instead
-    # (research/engines/deliverables_engine.py). Adding a declarative override here needs
-    # a deliberate spec-version bump and a recompile of every study.
-
-
-class AcceptanceSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    criteria: Optional[Dict[str, Any]] = Field(
-        default=None, description="Structured quantitative acceptance gates"
-    )
-
-
-class BespokeSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    reason: Optional[str] = Field(None, description="Justification why canonical study types cannot fit")
-    unsupported_contract_element: Optional[str] = Field(
-        None, description="Specific element unsupported by canonical types"
-    )
-    canonical_type_considered: Optional[str] = Field(
-        None, description="Canonical type evaluated prior to choosing bespoke"
-    )
-    reusable_extension_considered: Optional[str] = Field(
-        None, description="Assessment of whether a reusable extension was feasible"
-    )
-    custom_scope: Optional[List[str]] = Field(
-        default=None, description="List of bespoke custom implementation files"
-    )
-
-
-class OperationSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    kind: Literal[
-        "train_evaluate",
-        "artifact_reconstruction",
-        "runtime_population_parity",
-        "score_parity",
-        "execution_economics",
-        "bespoke_operation",
-    ] = Field("train_evaluate", description="Specific research operation type")
-    target_metric: Optional[str] = Field(None, description="Primary quantitative evaluation metric")
-    reconciliation_target: Optional[str] = Field(None, description="Target for parity/reconciliation studies")
-
-
-class StudySpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    study: StudyMetadata
-    operation: OperationSpec = Field(default_factory=OperationSpec)
-    instrument: InstrumentSpec
-    population: PopulationSpec
-    target: TargetSpec
-    features: Optional[FeaturesSpec] = Field(default_factory=FeaturesSpec)
-    model: Optional[ModelSpec] = Field(default_factory=ModelSpec)
-    chronology: Optional[ChronologySpec] = Field(default_factory=ChronologySpec)
-    stratification: Optional[StratificationSpec] = Field(default_factory=StratificationSpec)
-    baseline: Optional[BaselineSpec] = Field(default_factory=BaselineSpec)
-    lineage: Optional[LineageSpec] = Field(default_factory=LineageSpec)
-    execution: ExecutionSpec = Field(default_factory=ExecutionSpec)
-    acceptance: Optional[AcceptanceSpec] = Field(default_factory=AcceptanceSpec)
-    bespoke: Optional[BespokeSpec] = Field(default_factory=BespokeSpec)
-
-    @model_validator(mode="after")
-    def validate_study_type_and_bespoke(self) -> StudySpec:
-        # Enforce Bespoke justification rules
-        if self.study.type == "bespoke":
-            if not self.bespoke or not self.bespoke.reason or not self.bespoke.reason.strip():
-                raise ValueError(
-                    "BESPOKE_JUSTIFICATION_MISSING: study.type='bespoke' requires a non-empty 'bespoke.reason'"
-                )
-            if not self.bespoke.unsupported_contract_element or not self.bespoke.unsupported_contract_element.strip():
-                raise ValueError(
-                    "BESPOKE_JUSTIFICATION_INCOMPLETE: 'bespoke.unsupported_contract_element' is required"
-                )
-        return self
-
-    def compute_sha256(self) -> str:
-        """Computes deterministic canonical SHA-256 hash of the StudySpec."""
-        data_dict = self.model_dump(exclude_none=False)
-        canonical_json = json.dumps(data_dict, sort_keys=True, indent=None)
-        return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
+    feature_list_sha256: Optional[str] = Field(
+        None, description="SHA-256 hash of ordered feature list"
+    )
+    directional_mapping: Optional[str] = Field(
+        None, description="Directional polarity mapping policy"
+    )
+    timing_contract: Optional[str] = Field(
+        "verified", description="Feature timing audit status, e.g. verified"
+    )
+    metadata_columns: Optional[List[str]] = Field(
+        default=None, description="Declared non-feature metadata columns for output contract validation"
+    )
+    derived_inputs: Optional[List[DerivedCausalInputSpec]] = Field(
+        default=None, description="Non-FeatureInstance causal inputs, e.g. a frozen external model score"
+    )
+
+
+class HyperparameterDomainSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    kind: Literal["choice", "int_range", "float_range"]
+    values: Optional[List[Any]] = None
+    low: Optional[float] = None
+    high: Optional[float] = None
+    log_scale: bool = False
+
+    @model_validator(mode="after")
+    def validate_domain(self) -> HyperparameterDomainSpec:
+        if self.kind == "choice" and not self.values:
+            raise ValueError("HYPERPARAMETER_CHOICE_REQUIRES_VALUES")
+        if self.kind in ("int_range", "float_range"):
+            if self.low is None or self.high is None or self.low >= self.high:
+                raise ValueError("HYPERPARAMETER_RANGE_REQUIRES_LOW_LT_HIGH")
+            if self.log_scale and self.low <= 0:
+                raise ValueError("LOG_SCALE_REQUIRES_POSITIVE_LOW")
+        return self
+
+
+class ModelFamilySpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    family: str
+    fixed_hyperparameters: Optional[Dict[str, Any]] = None
+    tunable_hyperparameters: Optional[List[HyperparameterDomainSpec]] = None
+
+
+class MetricBoundSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    metric: str
+    minimum: Optional[float] = None
+    maximum: Optional[float] = None
+
+    @model_validator(mode="after")
+    def at_least_one_bound(self) -> MetricBoundSpec:
+        if self.minimum is None and self.maximum is None:
+            raise ValueError("METRIC_BOUND_REQUIRES_MIN_OR_MAX")
+        return self
+
+
+class FinalValidationRequirementsSpec(BaseModel):
+    """Typed acceptance bounds for the final TRAIN-side validation period.
+
+    The final-validation period may only ACCEPT or REJECT the winner an inner
+    chronological search already selected -- it never triggers another search. See
+    `ModelSelectionSpec.final_validation_policy`.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    primary_metric_bound: Optional[MetricBoundSpec] = None
+    max_degradation_vs_inner_validation: Optional[float] = Field(
+        None, description="Direction-aware fraction: how much worse the final metric may be than inner"
+    )
+    calibration_max_brier: Optional[float] = None
+    secondary_metric_bounds: Optional[List[MetricBoundSpec]] = None
+
+
+class ModelSelectionSpec(BaseModel):
+    """Bounded, TRAIN-only hyperparameter search protocol -- never an unbounded AutoML system."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    allowed_families: List[ModelFamilySpec] = Field(default_factory=list)
+    search_method: Literal["grid", "random", "none"] = "none"
+    max_trials: Optional[int] = None
+    random_seed: Optional[int] = None
+    tuning_years: Optional[List[int]] = Field(
+        default=None, description="Inner-TRAIN chronological search years -- distinct from chronology.dev (OOS)"
+    )
+    final_train_validation_years: Optional[List[int]] = Field(
+        default=None, description="Inner-TRAIN confirmatory years -- accept/reject only, never re-selects"
+    )
+    primary_selection_metric: Optional[str] = None
+    primary_selection_metric_direction: Literal["maximize", "minimize"] = "maximize"
+    secondary_metrics: Optional[List[str]] = None
+    calibration_required: bool = False
+    simpler_model_tie_preference: bool = True
+    final_validation_policy: Literal["gated", "report_only"] = "gated"
+    final_validation_requirements: Optional[FinalValidationRequirementsSpec] = None
+
+    @model_validator(mode="after")
+    def validate_bounded_search(self) -> ModelSelectionSpec:
+        if self.search_method != "none":
+            if not self.max_trials:
+                raise ValueError("MODEL_SELECTION_MAX_TRIALS_REQUIRED")
+            if not any(f.tunable_hyperparameters for f in self.allowed_families):
+                raise ValueError("MODEL_SELECTION_NO_TUNABLE_DOMAIN")
+            if not self.tuning_years or len(self.tuning_years) < 2:
+                raise ValueError("INSUFFICIENT_TUNING_YEARS_FOR_INNER_VALIDATION")
+            if self.search_method == "grid":
+                bad = [
+                    h.name for f in self.allowed_families
+                    for h in (f.tunable_hyperparameters or [])
+                    if h.kind != "choice"
+                ]
+                if bad:
+                    raise ValueError(f"GRID_REQUIRES_CHOICE_DOMAINS: {bad}")
+            # Explicit, not implicit: a study that wants no numerical gate must say so.
+            if self.final_validation_policy == "gated" and not self.final_validation_requirements:
+                raise ValueError("FINAL_VALIDATION_REQUIREMENTS_REQUIRED_FOR_GATED_POLICY")
+        return self
+
+
+class ModelSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Optional[str] = Field("scoring", description="Model mode: scoring, training, evaluation")
+    family: Optional[str] = Field(
+        None, description="Model family, e.g. HistGradientBoostingClassifier, LogisticRegression"
+    )
+    arms: Optional[List[str]] = Field(
+        default=None, description="Model arms, e.g. [BASELINE_A, STRUCTURAL_B, ROLLING_PRODUCTIVITY_C]"
+    )
+    artifact_path: Optional[str] = Field(
+        None, description="Path to trained model artifact (.joblib, .onnx)"
+    )
+    artifact_sha256: Optional[str] = Field(
+        None, description="Pinned SHA-256 of model artifact"
+    )
+    params: Optional[Dict[str, Any]] = Field(
+        default=None, description="Model hyperparameters"
+    )
+    selection: Optional[ModelSelectionSpec] = Field(
+        default=None, description="Bounded TRAIN-only model-selection / hyperparameter search protocol"
+    )
+
+
+class WarmupSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    days_before_partition: int = Field(5, description="Warmup lookback in days prior to partition start")
+    allowed: bool = Field(True, description="Whether warmup data loading is authorized")
+    candidate_emission: bool = Field(False, description="Whether candidate emission is permitted during warmup")
+    target_generation: bool = Field(False, description="Whether target generation is permitted during warmup")
+    permitted_partition_relationship: Literal["pre_train_only", "pre_partition", "explicit_whitelist"] = Field(
+        "pre_train_only", description="Permitted chronological relationship for warmup"
+    )
+
+
+class ChronologySpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    train: Optional[List[int]] = Field(
+        default=None, description="Authorized training years, e.g. [2021, 2022, 2023, 2024]"
+    )
+    dev: Optional[List[int]] = Field(
+        default=None, description="Authorized validation/development years, e.g. [2025]"
+    )
+    diagnostic: Optional[List[int]] = Field(
+        default=None, description="Authorized diagnostic evaluation years"
+    )
+    prohibited: Optional[List[int]] = Field(
+        default=None, description="Prohibited OOS/test years, e.g. [2026]"
+    )
+    warmup: Optional[WarmupSpec] = Field(
+        default=None, description="Explicit warmup authorization specification"
+    )
+
+    @model_validator(mode="after")
+    def check_chronology_disjoint(self) -> ChronologySpec:
+        train_set = set(self.train or [])
+        dev_set = set(self.dev or [])
+        prohib_set = set(self.prohibited or [])
+
+        overlap_train_dev = train_set & dev_set
+        if overlap_train_dev:
+            raise ValueError(f"Chronology error: train and dev overlap on years {sorted(overlap_train_dev)}")
+
+        overlap_prohib = (train_set | dev_set) & prohib_set
+        if overlap_prohib:
+            raise ValueError(
+                f"Chronology error: prohibited years {sorted(overlap_prohib)} appear in train/dev partition"
+            )
+        return self
+
+
+class StratificationSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    column: Optional[str] = Field(None, description="Stratification feature column")
+    buckets: Optional[List[List[Any]]] = Field(
+        default=None, description="Bucket intervals [lower, upper]"
+    )
+    extrapolation_bucket: Optional[str] = Field(
+        None, description="Descriptive extrapolation bucket label, e.g. '>=1800s'"
+    )
+
+
+class BaselineSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    study: Optional[str] = Field(None, description="Reference baseline study name")
+    manifest_sha256: Optional[str] = Field(None, description="Pinned SHA256 of baseline manifest")
+    results_sha256: Optional[str] = Field(None, description="Pinned SHA256 of baseline results")
+
+
+class LineageSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    parent_study: Optional[str] = Field(None, description="Parent study identifier")
+    parent_manifest_sha256: Optional[str] = Field(None, description="Pinned parent manifest SHA256")
+    clean_lineage_start: Optional[str] = Field(
+        None, description="Timestamp marking the clean lineage reset boundary"
+    )
+    invalidated_prior_runs: Optional[List[Dict[str, Any]]] = Field(
+        default=None, description="Record of quarantined historical runs"
+    )
+    intended_changes: Optional[List[str]] = Field(
+        default=None, description="List of dimensions intended to change"
+    )
+    frozen: Optional[List[str]] = Field(
+        default=None, description="List of dimensions strictly frozen against parent"
+    )
+
+
+class GateScopeField(str, Enum):
+    """Typed StudySpec sections the required-gate artifact staleness hash may bind to.
+
+    An Enum rejects an unknown/typo'd scope name at Pydantic validation time -- no custom
+    validator needed for that half of the review's requirement.
+    """
+
+    POPULATION = "population"
+    TARGET = "target"
+    CHRONOLOGY = "chronology"
+    FEATURES = "features"
+    INSTRUMENT = "instrument"
+
+
+class RequiredGateSpec(BaseModel):
+    """A study-declared pre-freeze gate PREPARE/READINESS/PREFLIGHT/SEAL/TRAIN FREEZE must
+    fail closed on if the artifact it names is missing, stale, or not PASS. Never an
+    arbitrary shell command -- always a structured artifact (see research_workflow.gates).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    stage: Literal["prepare", "readiness", "preflight", "seal", "train_freeze"]
+    artifact_path: str = Field(..., description="Relative path within the study directory")
+    artifact_schema_version: int
+    scope_fields: List[GateScopeField] = Field(
+        default_factory=lambda: [GateScopeField.POPULATION, GateScopeField.CHRONOLOGY, GateScopeField.TARGET]
+    )
+
+
+class ExecutionSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    runtime: Literal["nautilustrader"] = Field(
+        "nautilustrader",
+        description="Execution runtime environment. MUST strictly be 'nautilustrader'",
+    )
+    strategy_class: Optional[str] = Field(
+        None, description="Fully qualified Python class of NautilusTrader strategy"
+    )
+    data_requirements: Optional[Dict[str, Any]] = Field(
+        default=None, description="Data timeframe and catalog requirements"
+    )
+    checkpoint: Optional[str] = Field(None, description="Checkpoint storage identifier")
+    progress_seconds: Optional[int] = Field(60, description="Bounded runner progress interval")
+    bounded: Optional[bool] = Field(True, description="Enforce bounded study process control")
+    observation_policy: Optional[Dict[str, Any]] = Field(
+        default=None, description="Observation timing policy (exact_grid, parent_bar_close, event_driven)"
+    )
+    # NOTE: authorized modes are deliberately NOT a StudySpec field.
+    # `compute_sha256` hashes `model_dump(exclude_none=False)`, so any additional field --
+    # even an unset optional one -- changes every study's spec hash and marks every
+    # existing compiled_study.json stale. The mode-partitioned deliverables contract
+    # therefore derives its modes from `operation.kind` in the compiler instead
+    # (research/engines/deliverables_engine.py). Adding a declarative override here needs
+    # a deliberate spec-version bump and a recompile of every study.
+
+
+class AcceptanceSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    criteria: Optional[Dict[str, Any]] = Field(
+        default=None, description="Structured quantitative acceptance gates"
+    )
+
+
+class BespokeSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reason: Optional[str] = Field(None, description="Justification why canonical study types cannot fit")
+    unsupported_contract_element: Optional[str] = Field(
+        None, description="Specific element unsupported by canonical types"
+    )
+    canonical_type_considered: Optional[str] = Field(
+        None, description="Canonical type evaluated prior to choosing bespoke"
+    )
+    reusable_extension_considered: Optional[str] = Field(
+        None, description="Assessment of whether a reusable extension was feasible"
+    )
+    custom_scope: Optional[List[str]] = Field(
+        default=None, description="List of bespoke custom implementation files"
+    )
+
+
+class OperationSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal[
+        "train_evaluate",
+        "artifact_reconstruction",
+        "runtime_population_parity",
+        "score_parity",
+        "execution_economics",
+        "bespoke_operation",
+    ] = Field("train_evaluate", description="Specific research operation type")
+    target_metric: Optional[str] = Field(None, description="Primary quantitative evaluation metric")
+    reconciliation_target: Optional[str] = Field(None, description="Target for parity/reconciliation studies")
+
+
+class StudySpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    study: StudyMetadata
+    operation: OperationSpec = Field(default_factory=OperationSpec)
+    instrument: InstrumentSpec
+    population: PopulationSpec
+    target: TargetSpec
+    features: Optional[FeaturesSpec] = Field(default_factory=FeaturesSpec)
+    model: Optional[ModelSpec] = Field(default_factory=ModelSpec)
+    chronology: Optional[ChronologySpec] = Field(default_factory=ChronologySpec)
+    stratification: Optional[StratificationSpec] = Field(default_factory=StratificationSpec)
+    baseline: Optional[BaselineSpec] = Field(default_factory=BaselineSpec)
+    lineage: Optional[LineageSpec] = Field(default_factory=LineageSpec)
+    execution: ExecutionSpec = Field(default_factory=ExecutionSpec)
+    acceptance: Optional[AcceptanceSpec] = Field(default_factory=AcceptanceSpec)
+    bespoke: Optional[BespokeSpec] = Field(default_factory=BespokeSpec)
+    required_gates: Optional[List[RequiredGateSpec]] = Field(
+        default=None, description="Machine-enforced pre-freeze gates this study declares"
+    )
+
+    @model_validator(mode="after")
+    def validate_study_type_and_bespoke(self) -> StudySpec:
+        # Enforce Bespoke justification rules
+        if self.study.type == "bespoke":
+            if not self.bespoke or not self.bespoke.reason or not self.bespoke.reason.strip():
+                raise ValueError(
+                    "BESPOKE_JUSTIFICATION_MISSING: study.type='bespoke' requires a non-empty 'bespoke.reason'"
+                )
+            if not self.bespoke.unsupported_contract_element or not self.bespoke.unsupported_contract_element.strip():
+                raise ValueError(
+                    "BESPOKE_JUSTIFICATION_INCOMPLETE: 'bespoke.unsupported_contract_element' is required"
+                )
+        return self
+
+    @model_validator(mode="after")
+    def validate_derived_input_causal_ordering(self) -> StudySpec:
+        """Availability must be provably at-or-before the decision point of the CHILD study --
+
+        not merely membership in the {decision_ts, entry_ts, confirmation_ts} enum. A derived
+        input available only at confirmation_ts is illegal for a study whose own model decides
+        at decision_ts (confirmation happens strictly after); a later-deciding study may
+        legitimately consume it. The comparison is a real ordering check on
+        TIMESTAMP_CAUSAL_ORDER, not a decision_ts-only special case.
+        """
+        decision_idx = TIMESTAMP_CAUSAL_ORDER[self.target.decision_reference]
+        for di in ((self.features.derived_inputs if self.features else None) or []):
+            avail_idx = TIMESTAMP_CAUSAL_ORDER[di.availability_reference]
+            if avail_idx > decision_idx:
+                raise ValueError(
+                    f"DERIVED_INPUT_NOT_AVAILABLE_AT_DECISION: input {di.name!r} available at "
+                    f"{di.availability_reference!r} but this study's decision point is "
+                    f"{self.target.decision_reference!r}"
+                )
+        return self
+
+    @model_validator(mode="after")
+    def validate_model_selection_chronology(self) -> StudySpec:
+        """chronology.dev already means OOS in this codebase (experiment.py binds it to
+        oos_years); tuning_years/final_train_validation_years are a distinct inner-TRAIN
+        concept and must never overlap it, chronology.prohibited, or fall outside
+        chronology.train. This is the compile-time half of "OOS years can never enter tuning".
+        """
+        selection = self.model.selection if self.model else None
+        if not selection or not (selection.tuning_years or selection.final_train_validation_years):
+            return self
+        train_years = set(self.chronology.train or []) if self.chronology else set()
+        oos_years = set(self.chronology.dev or []) if self.chronology else set()
+        prohibited_years = set(self.chronology.prohibited or []) if self.chronology else set()
+        tuning = set(selection.tuning_years or [])
+        final_val = set(selection.final_train_validation_years or [])
+        if not tuning or not final_val:
+            raise ValueError(
+                "MODEL_SELECTION_YEARS_INCOMPLETE: both tuning_years and "
+                "final_train_validation_years are required when either is declared"
+            )
+        if tuning & final_val:
+            raise ValueError(
+                f"MODEL_SELECTION_YEARS_OVERLAP: tuning_years and "
+                f"final_train_validation_years share {sorted(tuning & final_val)}"
+            )
+        for label, years in (('tuning_years', tuning), ('final_train_validation_years', final_val)):
+            if not years <= train_years:
+                raise ValueError(
+                    f"MODEL_SELECTION_YEARS_NOT_SUBSET_OF_TRAIN: {label} {sorted(years)} "
+                    f"is not a subset of chronology.train {sorted(train_years)}"
+                )
+            if years & oos_years:
+                raise ValueError(
+                    f"MODEL_SELECTION_YEARS_INCLUDE_OOS: {label} {sorted(years)} overlaps "
+                    f"chronology.dev (OOS) {sorted(oos_years)}"
+                )
+            if years & prohibited_years:
+                raise ValueError(
+                    f"MODEL_SELECTION_YEARS_INCLUDE_PROHIBITED: {label} {sorted(years)} "
+                    f"overlaps chronology.prohibited {sorted(prohibited_years)}"
+                )
+        return self
+
+    def compute_sha256(self) -> str:
+        """Computes deterministic canonical SHA-256 hash of the StudySpec."""
+        data_dict = self.model_dump(exclude_none=False)
+        canonical_json = json.dumps(data_dict, sort_keys=True, indent=None)
+        return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
 
 # tamper_authority_canary

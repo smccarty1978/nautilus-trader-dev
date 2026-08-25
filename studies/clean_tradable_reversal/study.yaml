@@ -1,0 +1,164 @@
+study:
+  id: clean_tradable_reversal
+  type: flip_prediction
+  risk_tier: 2
+  description: >
+    Among high-confidence Stage-1 flip predictions (frozen Model C, TRAIN P90), does
+    information available at the decision timestamp T distinguish economically clean
+    reversals (CLEAN_TRADABLE_REVERSAL, target T1) from ugly, weak, or failed ones.
+    Schema/contract expressibility proof for the composite-target, derived-causal-input,
+    and required-gate closures documented in RESEARCH_WORKFLOW.md §20 -- see
+    research_decision.yaml for the full decision contract. NOT prepared: the declared
+    TRAIN_TARGET_BALANCE_PASS gate below is intentionally unsatisfied.
+
+operation:
+  kind: train_evaluate
+  target_metric: roc_auc
+
+instrument:
+  symbol: NQ
+  venue: XCME
+
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+  qualification:
+    selection: one_first_crossing_per_regime
+    stage1_score_threshold_source: stage1_dependency.thresholds_p90
+    stage1_score_threshold_derivation: TRAIN_ONLY
+    primary_maturity_buckets: ["300-600s", "600-900s", "900-1800s"]
+    diagnostic_maturity_buckets: ["<300s", ">=1800s"]
+    maturity_role: population_slice_only_never_a_model_input
+
+target:
+  type: composite
+  direction: opposite
+  decision_reference: decision_ts
+  conditions:
+    - id: flip_within_300s
+      kind: flip
+      event: opposite_regime_flip
+      direction: opposite
+      horizon_seconds: 300
+    - id: mfe_ge_1p0_atr
+      kind: excursion
+      metric: mfe_atr
+      comparator: ">="
+      threshold: 1.0
+      forward_outcome_id: fo_300s
+    - id: mae_le_0p5_atr
+      kind: excursion
+      metric: mae_atr
+      comparator: "<="
+      threshold: 0.5
+      forward_outcome_id: fo_300s
+  condition_logic: AND
+  required_forward_outcomes:
+    - id: fo_300s
+      entry_reference: next_bar_open
+      horizon_seconds: 300
+      excursion_units: [atr]
+      bar_inclusion: fully_forward
+      session_end_censoring: true
+
+features:
+  source: canonical_verified_definition_universe
+  derived_inputs:
+    - name: stage1_model_c_score
+      kind: frozen_external_model_score
+      parent_study_id: clean_maturity_flip_model_rolling_productivity
+      parent_train_freeze_artifact: artifacts/train_experiment_freeze_repaired.json
+      parent_train_freeze_artifact_sha256: c5bd68ca503a2395b7ca695354fae5a5968b44c95aef74290bb59d952e4f49a9
+      parent_frozen_execution_composite_sha256: 7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8
+      model_hashes:
+        LONG_C: a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38
+        SHORT_C: 5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf
+      preprocessing_hash: 0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4
+      availability_reference: decision_ts
+      retrain_prohibited: true
+  # Arm C superset (21 canonical instances). Arm A is stage1_model_c_score alone; Arm B
+  # is the original Stage-1 13; Arm C adds the final 7 -- per-arm feature subsets are an
+  # AnalysisSpec.model_arms concern (research/analysis/spec.py), not a StudySpec field.
+  instances:
+    # original Stage-1 13 (Arm B)
+    - feature: regime_efficiency
+      parameters: {timeframe: 1m, context: prior, bar_state: completed}
+    - feature: regime_mfe_atr
+      parameters: {timeframe: 1m, context: prior, bar_state: completed}
+    - feature: regime_range_atr
+      parameters: {timeframe: 1m, context: prior, bar_state: completed}
+    - feature: regime_efficiency
+      parameters: {timeframe: 5m, context: prior, bar_state: completed}
+      physical_alias: prior_5m_regime_efficiency
+    - feature: regime_mfe_atr
+      parameters: {timeframe: 5m, context: prior, bar_state: completed}
+      physical_alias: prior_5m_regime_mfe_atr
+    - feature: regime_range_atr
+      parameters: {timeframe: 5m, context: prior, bar_state: completed}
+      physical_alias: prior_5m_regime_range_atr
+    - feature: rolling_retention_ratio
+      parameters: {window: 300s, update_every: 1s}
+    - feature: rolling_current_progress_atr
+      parameters: {window: 300s, update_every: 1s}
+    - feature: rolling_max_progress_atr
+      parameters: {window: 300s, update_every: 1s}
+    - feature: rolling_giveback_atr
+      parameters: {window: 300s, update_every: 1s}
+    - feature: arrival_velocity
+      parameters: {input_timeframe: 1s, lookback: 20, bar_state: completed}
+    - feature: arrival_acceleration
+      parameters: {input_timeframe: 1s, short_lookback: 20, bar_state: completed}
+    - feature: ema_slope
+      parameters: {ema_role: short, lookback: 20}
+    # final 7 additions (Arm C)
+    - feature: regime_range_atr_per_min
+      parameters: {timeframe: 5m, context: current, bar_state: completed}
+    - feature: distance_to_completed_range_high_atr
+      parameters: {reference_timeframe: 5m, bar_state: completed}
+    - feature: distance_to_completed_range_low_atr
+      parameters: {reference_timeframe: 5m, bar_state: completed}
+    - feature: relative_volume
+      parameters: {input_timeframe: 1s, aggregation_lookback: 5, baseline_lookback: 5, bar_state: completed}
+    - feature: est_delta_ratio
+      parameters: {context: rolling, timeframe: 30s}
+    - feature: range_position
+      parameters: {timeframe: 1m, lookback: 5, bar_state: completed}
+    - feature: wick_imbalance
+      parameters: {timeframe: 1m, bar_state: completed}
+
+model:
+  mode: training
+  family: HistGradientBoostingClassifier
+  arms: [A_SCORE_ONLY, B_PLUS_ORIGINAL_13, C_PLUS_CONTEXT_7]
+  # model.selection intentionally undeclared: the decision contract's exact
+  # tuning/hyperparameter-search policy is a later design step (research_decision.yaml
+  # selection_rule / acceptance_logic), not part of this expressibility proof.
+
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+
+execution:
+  runtime: nautilustrader
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
+  data_requirements:
+    dataset_id: NQ_v0_2020_2026
+  progress_seconds: 60
+  bounded: true
+
+acceptance:
+  criteria:
+    R1: "Stage-1 score alone substantially ranks clean-path probability"
+    R2: "B > A robustly"
+    R3: "C > B robustly"
+    R4: "classification signal exists but forward economic enrichment is weak"
+    R5: "no arm adds useful discrimination"
+
+required_gates:
+  - id: TRAIN_TARGET_BALANCE_PASS
+    stage: prepare
+    artifact_path: artifacts/train_target_balance_pass.json
+    artifact_schema_version: 1
+    scope_fields: [population, target, chronology]

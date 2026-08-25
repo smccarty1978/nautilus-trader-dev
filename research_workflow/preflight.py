@@ -51,6 +51,7 @@ REQUIRED_STUDY_CHECKS = (
     "ARTIFACT_SCHEMA",
     "FEATURE_PROMOTION",
     "RESEARCH_DECISION_FIDELITY",
+    "REQUIRED_GATES",
     "CAUSAL_INVARIANTS",
 )
 
@@ -520,6 +521,26 @@ def run_preflight(
                 _mark("RESEARCH_DECISION_FIDELITY", "FAILED")
                 failure_ids = ["RESEARCH_DECISION_FIDELITY_MISMATCH"]
                 failure_details = [{"message": line} for line in dec_res.stdout.splitlines() if "[CRITICAL]" in line or "FAIL" in line]
+
+    # 2a-gates. Study-declared pre-freeze gates staged "preflight" or earlier must be
+    # satisfied. Always runs (even without research_decision.yaml) -- an undeclared-gates
+    # study passes trivially, since assert_gates_satisfied has nothing to check.
+    if not failed_gate and study_dir and (study_dir / "study.yaml").exists():
+        _begin("REQUIRED_GATES")
+        try:
+            import yaml as _yaml
+            from research.schemas.study_spec import StudySpec as _StudySpec
+            from research_workflow.gates import assert_gates_satisfied
+
+            _spec = _StudySpec.model_validate(
+                _yaml.safe_load((study_dir / "study.yaml").read_text(encoding="utf-8"))
+            )
+            assert_gates_satisfied(study_dir, _spec, stage="preflight")
+        except Exception as e:
+            failed_gate = "REQUIRED_GATES"
+            _mark("REQUIRED_GATES", "FAILED")
+            failure_ids = [type(e).__name__]
+            failure_details = [{"message": str(e)}]
 
     # 2b. Stage 2b: SPEC to StudySpec Fidelity Validation
     if not failed_gate and study_dir and (study_dir / "study_clauses.yaml").exists():

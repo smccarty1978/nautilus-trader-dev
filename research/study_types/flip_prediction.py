@@ -29,7 +29,17 @@ class FlipPredictionCompiler(BaseStudyCompiler):
         # Population and target checks
         if spec.population.type != "regime_state":
             return FitDecision.BESPOKE_REQUIRED
-        if spec.target.type != "flip":
+        if spec.target.type == "flip":
+            pass
+        elif spec.target.type == "composite":
+            # A composite target is still canonically a flip prediction when a flip
+            # event is one of its conditions -- the excursion/return conditions refine
+            # what counts as a "clean" flip, they do not change what is being predicted.
+            # A composite target with NO flip condition (e.g. pure excursion/return) is
+            # not a flip prediction and genuinely needs bespoke.
+            if not any(c.kind == "flip" for c in (spec.target.conditions or [])):
+                return FitDecision.BESPOKE_REQUIRED
+        else:
             return FitDecision.BESPOKE_REQUIRED
 
         # Research operation check: only train_evaluate and artifact_reconstruction are canonical flip_prediction
@@ -88,6 +98,13 @@ class FlipPredictionCompiler(BaseStudyCompiler):
             "deliverables_contract": deliverables_contract,
             "lineage": lineage_info,
             "baseline": baseline_info,
+            # Additive, generic capabilities -- absent/empty when a study declares none
+            # of them, so an unmodified study's compiled contract keys are unchanged
+            # in kind (feat_contract already always carries "derived_causal_inputs";
+            # these two are new top-level keys since they have no natural home in an
+            # existing per-section contract).
+            "required_gates": [g.model_dump() for g in (spec.required_gates or [])],
+            "model_selection": spec.model.selection.model_dump() if (spec.model and spec.model.selection) else None,
         }
 
         # 3. Render SPEC.md
@@ -133,6 +150,27 @@ class FlipPredictionCompiler(BaseStudyCompiler):
                 lines.append(f"- `{a}` -- written to `{meta['relative_to']}` by `{meta['producer']}`")
             lines.append("")
         deliverables_section = "\n".join(lines).rstrip()
+
+        derived_inputs = contracts["feature_contract"].get("derived_causal_inputs") or []
+        if derived_inputs:
+            di_lines = "\n".join(
+                f"- `{d['name']}` <- `{d['parent_study_id']}` "
+                f"(`{d['parent_train_freeze_artifact']}`, availability=`{d['availability_reference']}`)"
+                for d in derived_inputs
+            )
+            derived_inputs_section = f"\n## Derived Causal Inputs\n\n{di_lines}\n"
+        else:
+            derived_inputs_section = ""
+
+        required_gates = contracts.get("required_gates") or []
+        if required_gates:
+            gate_lines = "\n".join(
+                f"- `{g['id']}` (stage=`{g['stage']}`, artifact=`{g['artifact_path']}`)"
+                for g in required_gates
+            )
+            gates_section = f"\n## Required Pre-Freeze Gates\n\n{gate_lines}\n"
+        else:
+            gates_section = ""
 
         return f"""# SPEC: {spec.study.id}
 
@@ -185,7 +223,7 @@ is out of scope rather than missing.
 **Authorized modes:** {authorized_modes}
 
 {deliverables_section}
-"""
+{derived_inputs_section}{gates_section}"""
 
     def _render_task_packet(self, spec: StudySpec, spec_hash: str, contracts: Dict[str, Any]) -> Dict[str, Any]:
         return {

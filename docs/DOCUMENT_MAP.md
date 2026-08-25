@@ -48,6 +48,8 @@ some are cited from git history and audit trails. **They are never a source of i
 | `docs/PERFORMANCE.md` | Profiling, ONNX inference |
 | `docs/ERROR_REGISTRY.md` | Error code registry |
 | `docs/DOCUMENT_MAP.md` | This file |
+| `docs/RESEARCH_STUDY_BLUEPRINT.md` | Researcher-facing implementation map of the lifecycle in §1 of `docs/RESEARCH_WORKFLOW.md` — exact paths/functions, a worked study example, agent-role and CLI entry-point maps, StudySpec schema-gap inventory, and the novelty routing matrix. Defers to `docs/RESEARCH_WORKFLOW.md` on any conflict |
+| `docs/templates/RESEARCH_STUDY_REQUEST_TEMPLATE.md` | Fill-in research request form + agent intake result block, used at STEP 0-2 of `docs/RESEARCH_STUDY_BLUEPRINT.md` §6 |
 | `BACKTEST_DATA_LOGGING.md` | Logging conventions that make outputs visualizable |
 | `VISUALIZER_EXTENSIONS.md` | How to add an overlay to the TradingView visualizer |
 

@@ -1,7 +1,7 @@
 {
   "study_id": "ym_prev5_range_position",
   "study_type": "flip_prediction",
-  "spec_sha256": "7ab2a506ed27ab8d68572e7492fdae2b06dc6b7f39fb33c967807b58f4864ccb",
+  "spec_sha256": "df2a3bb97f3e5664941bc1623814d7b42c5a1cb9e830cead1ef5d1a01a808bc5",
   "spec": {
     "study": {
       "id": "ym_prev5_range_position",
@@ -29,7 +29,11 @@
       "event": "prevailing_1m_regime_transition",
       "direction": "both",
       "horizon_seconds": 300,
-      "confirmation": null
+      "confirmation": null,
+      "conditions": null,
+      "condition_logic": null,
+      "required_forward_outcomes": null,
+      "decision_reference": "decision_ts"
     },
     "features": {
       "source_manifest": null,
@@ -40,10 +44,12 @@
       "feature_list": [
         "latest_1m_close_position_prev5_range"
       ],
+      "instances": null,
       "feature_list_sha256": null,
       "directional_mapping": null,
       "timing_contract": "verified",
-      "metadata_columns": null
+      "metadata_columns": null,
+      "derived_inputs": null
     },
     "model": {
       "mode": "scoring",
@@ -51,7 +57,8 @@
       "arms": null,
       "artifact_path": null,
       "artifact_sha256": null,
-      "params": null
+      "params": null,
+      "selection": null
     },
     "chronology": {
       "train": [
@@ -105,7 +112,8 @@
       "canonical_type_considered": null,
       "reusable_extension_considered": null,
       "custom_scope": null
-    }
+    },
+    "required_gates": null
   },
   "contracts": {
     "population_contract": {
@@ -136,7 +144,8 @@
       "censoring_policy": {
         "session_end_censoring": true,
         "max_horizon_seconds": 300
-      }
+      },
+      "decision_reference": "decision_ts"
     },
     "feature_contract": {
       "source_key": null,
@@ -144,31 +153,76 @@
       "feature_list": [
         "latest_1m_close_position_prev5_range"
       ],
+      "resolved_feature_instances": [
+        {
+          "requested": "latest_1m_close_position_prev5_range",
+          "canonical_name": "range_position",
+          "parameters": {
+            "bar_state": "completed",
+            "lookback": 5,
+            "timeframe": "1m"
+          },
+          "physical_alias": "latest_1m_close_position_prev5_range"
+        }
+      ],
       "feature_list_sha256": "0a4200c7db88216fa0a5a5b9761052b51d26e70fb169ea4ae19cd0d646cfb300",
       "bound_trackers": [
-        "features.trackers.range_position.RangePositionTracker"
+        "features.trackers.generic_bar_geometry.GenericRangePositionProvider"
       ],
       "families": [
-        "range_position"
+        "['range_position']"
       ],
       "source_timeframes": [
-        "1m"
+        "completed_1m"
       ],
       "feature_statuses": {
-        "latest_1m_close_position_prev5_range": "provisional"
+        "latest_1m_close_position_prev5_range": "verified"
       },
       "feature_null_policies": {
         "latest_1m_close_position_prev5_range": "allow"
       },
-      "contains_provisional_features": [
-        "latest_1m_close_position_prev5_range"
-      ],
+      "contains_provisional_features": [],
       "directional_mapping": "direction_normalized",
-      "timing_contract": "verified"
+      "timing_contract": "verified",
+      "runtime_data_requirements": {
+        "resolved_instances": [
+          {
+            "requested": "latest_1m_close_position_prev5_range",
+            "canonical_name": "range_position",
+            "parameters": {
+              "bar_state": "completed",
+              "lookback": 5,
+              "timeframe": "1m"
+            },
+            "physical_alias": "latest_1m_close_position_prev5_range",
+            "provider": "features.trackers.generic_bar_geometry.GenericRangePositionProvider",
+            "family": [
+              "range_position"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "range_position",
+              "provider": "features.trackers.generic_bar_geometry.GenericRangePositionProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          }
+        ],
+        "required_streams": [
+          "completed_1m"
+        ],
+        "rolling_windows": [],
+        "aliases": [
+          "latest_1m_close_position_prev5_range"
+        ]
+      },
+      "derived_causal_inputs": []
     },
     "execution_contract": {
       "runtime": "nautilustrader",
-      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
       "bounded_execution": true,
       "progress_seconds": 60,
       "checkpoint": null,
@@ -287,5 +341,5 @@
       "has_baseline": false
     }
   },
-  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector"
+  "strategy_class": "research_workflow.generic_collector.GenericStudyCollector"
 }

@@ -1,7 +1,7 @@
 {
   "study_id": "es_wick_imbalance_acceptance_v2",
   "study_type": "flip_prediction",
-  "spec_sha256": "c83abf0b50c3658e7102924761e2b0601ed28601c1eaa73bc917ea07736c116e",
+  "spec_sha256": "55da006a3423d683d64f6e520949ac36da4c6396566e36dccd6a27762baea125",
   "spec": {
     "study": {
       "id": "es_wick_imbalance_acceptance_v2",
@@ -29,7 +29,11 @@
       "event": "prevailing_1m_regime_transition",
       "direction": "both",
       "horizon_seconds": 300,
-      "confirmation": null
+      "confirmation": null,
+      "conditions": null,
+      "condition_logic": null,
+      "required_forward_outcomes": null,
+      "decision_reference": "decision_ts"
     },
     "features": {
       "source_manifest": null,
@@ -40,10 +44,12 @@
       "feature_list": [
         "latest_1m_wick_imbalance"
       ],
+      "instances": null,
       "feature_list_sha256": null,
       "directional_mapping": null,
       "timing_contract": "verified",
-      "metadata_columns": null
+      "metadata_columns": null,
+      "derived_inputs": null
     },
     "model": {
       "mode": "scoring",
@@ -51,7 +57,8 @@
       "arms": null,
       "artifact_path": null,
       "artifact_sha256": null,
-      "params": null
+      "params": null,
+      "selection": null
     },
     "chronology": {
       "train": [
@@ -107,7 +114,8 @@
       "canonical_type_considered": null,
       "reusable_extension_considered": null,
       "custom_scope": null
-    }
+    },
+    "required_gates": null
   },
   "contracts": {
     "population_contract": {
@@ -138,7 +146,8 @@
       "censoring_policy": {
         "session_end_censoring": true,
         "max_horizon_seconds": 300
-      }
+      },
+      "decision_reference": "decision_ts"
     },
     "feature_contract": {
       "source_key": null,
@@ -146,31 +155,74 @@
       "feature_list": [
         "latest_1m_wick_imbalance"
       ],
+      "resolved_feature_instances": [
+        {
+          "requested": "latest_1m_wick_imbalance",
+          "canonical_name": "wick_imbalance",
+          "parameters": {
+            "bar_state": "completed",
+            "timeframe": "1m"
+          },
+          "physical_alias": "latest_1m_wick_imbalance"
+        }
+      ],
       "feature_list_sha256": "f5cddfd93e1bda3b8ff3db0524413c3d8f1fd3fca62490806c3aeb640cf8aa20",
       "bound_trackers": [
-        "features.trackers.wick.WickTracker"
+        "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider"
       ],
       "families": [
-        "wick_imbalance"
+        "['wick_imbalance']"
       ],
       "source_timeframes": [
-        "1m"
+        "completed_1m"
       ],
       "feature_statuses": {
-        "latest_1m_wick_imbalance": "provisional"
+        "latest_1m_wick_imbalance": "verified"
       },
       "feature_null_policies": {
         "latest_1m_wick_imbalance": "allow"
       },
-      "contains_provisional_features": [
-        "latest_1m_wick_imbalance"
-      ],
+      "contains_provisional_features": [],
       "directional_mapping": "direction_normalized",
-      "timing_contract": "verified"
+      "timing_contract": "verified",
+      "runtime_data_requirements": {
+        "resolved_instances": [
+          {
+            "requested": "latest_1m_wick_imbalance",
+            "canonical_name": "wick_imbalance",
+            "parameters": {
+              "bar_state": "completed",
+              "timeframe": "1m"
+            },
+            "physical_alias": "latest_1m_wick_imbalance",
+            "provider": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+            "family": [
+              "wick_imbalance"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "wick_imbalance",
+              "provider": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          }
+        ],
+        "required_streams": [
+          "completed_1m"
+        ],
+        "rolling_windows": [],
+        "aliases": [
+          "latest_1m_wick_imbalance"
+        ]
+      },
+      "derived_causal_inputs": []
     },
     "execution_contract": {
       "runtime": "nautilustrader",
-      "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector",
+      "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
       "bounded_execution": true,
       "progress_seconds": 60,
       "checkpoint": null,
@@ -297,5 +349,5 @@
       "has_baseline": false
     }
   },
-  "strategy_class": "strategies.flip_prediction_collector.FlipPredictionCollector"
+  "strategy_class": "research_workflow.generic_collector.GenericStudyCollector"
 }

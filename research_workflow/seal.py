@@ -83,6 +83,23 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
     except PreflightEvidenceError as err:
         raise PreexecAuditStaleError(str(err))
 
+    # Any study-declared gate staged "seal" must be satisfied before the seal is issued.
+    try:
+        import yaml as _yaml
+        from research.schemas.study_spec import StudySpec
+        from research_workflow.gates import assert_gates_satisfied
+
+        _study_spec = StudySpec.model_validate(
+            _yaml.safe_load((study_dir / "study.yaml").read_text(encoding="utf-8"))
+        )
+        assert_gates_satisfied(study_dir, _study_spec, stage="seal")
+    except (FileNotFoundError, OSError):
+        raise
+    except PreexecAuditStaleError:
+        raise
+    except Exception as err:
+        raise PreexecAuditStaleError(f"REQUIRED_GATE_NOT_SATISFIED: {err}")
+
     # 1. Compute current execution code manifest & composite hash
     current_composite_sha, exec_file_hashes = compute_execution_files_manifest(study_dir, repo_root)
 

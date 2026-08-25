@@ -298,6 +298,17 @@ def build_phase0_manifest(study_dir: Path) -> dict:
     dependency_paths.add(spec_md_path)
     source_binding = build_source_state_binding(sorted(dependency_paths))
 
+    # 2b. Derived causal inputs and pre-freeze gates are authenticated at phase-zero,
+    # the same lifecycle point that already authenticates the feature-instance universe
+    # above -- both are part of what "this study is authorized to run" means. Fail
+    # closed: DerivedInputBindingError / RequiredGateNotSatisfied / RequiredGateStale
+    # propagate and PREPARE does not complete.
+    from research_workflow.derived_inputs import verify_derived_causal_inputs
+    from research_workflow.gates import assert_gates_satisfied
+
+    derived_causal_inputs = verify_derived_causal_inputs(spec, repo_root=project_root)
+    required_gates_evidence = assert_gates_satisfied(study_dir, spec, stage="prepare")
+
     manifest = {
         "study_id": spec.study.id,
         "authenticated": True,
@@ -337,6 +348,8 @@ def build_phase0_manifest(study_dir: Path) -> dict:
             "dev": spec.chronology.dev,
             "prohibited": spec.chronology.prohibited,
         },
+        "derived_causal_inputs": derived_causal_inputs,
+        "required_gates_evidence": required_gates_evidence,
     }
 
     manifest_hash = hashlib.sha256(json.dumps(manifest, indent=2).encode("utf-8")).hexdigest()

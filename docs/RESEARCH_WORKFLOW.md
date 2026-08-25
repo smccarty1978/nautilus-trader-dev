@@ -24,6 +24,10 @@ If another document contradicts this one, this one wins. Classification of every
 | Which script should I run for a new study? | 3, 11 |
 | What should I do before recursive deletion? | 13 |
 | Is this a governed study or an ordinary backtest? | 8 |
+| Can a target combine several conditions? | 20.1 |
+| Can a study consume another study's frozen model score? | 20.2 |
+| Can a study declare a machine-enforced pre-freeze gate? | 20.3 |
+| Is hyperparameter search governed the same way as everything else? | 20.4 |
 
 ---
 
@@ -832,3 +836,102 @@ experiment.
 | Analysis harness contract | `ANALYSIS_HARNESS_A0_CONTRACT.md` |
 | Backtest harness boundary | `BACKTEST_HARNESS_B0_BOUNDARY.md` |
 | READINESS R1–R10 design | `ML_Trend_Analysis_Workflow_V2_Phase1_FINAL.md` §8 |
+| Composite targets, derived inputs, gates, model selection | §20, below |
+| Researcher-facing implementation map, novelty routing | `docs/RESEARCH_STUDY_BLUEPRINT.md` |
+
+---
+
+## 20. Composite targets, derived causal inputs, pre-freeze gates, and model selection
+
+Four generic extensions to `StudySpec` (`research/schemas/study_spec.py`), added to close
+gaps documented in `docs/RESEARCH_STUDY_BLUEPRINT.md` §5. All four are additive —
+`Optional` fields, absent by default — and none force `study.type: bespoke` on their own.
+
+### 20.1 Composite targets
+
+`TargetSpec.conditions` is a discriminated union (`kind`: `flip` | `excursion` | `return`)
+composed by `condition_logic` (`AND`/`OR`). An `excursion`/`return` condition never embeds
+its own generation parameters — it references a `TargetSpec.required_forward_outcomes`
+entry by id, and `research/engines/target_engine.py::compile_target_contract` constructs
+a **real** `research_workflow.forward_outcomes.contracts.ForwardOutcomeSpec` from that
+entry, not an approximation of its shape. This is why a composite target's excursion
+conditions are causally label-only "for free": the generated column names come from the
+same `build_outcome_columns()` the forward-outcome guard already protects, so
+`causal_audit`'s `composite_target_label_only` check verifies them against
+`forward_outcomes.guard.OUTCOME_COLUMN_PATTERNS` directly, rather than a second scanner.
+A target declaring no `conditions` compiles exactly as it always has.
+
+### 20.2 Derived causal inputs
+
+`FeaturesSpec.derived_inputs` (`DerivedCausalInputSpec`, initial `kind:
+frozen_external_model_score`) declares a non-`FeatureInstance` causal input — another
+study's frozen TRAIN score. It is never resolvable through `features.registry` and never
+enters `resolved_feature_instances`/`feature_list`; the compiled feature contract carries
+it under a separate `derived_causal_inputs` key.
+
+Provenance is pinned exactly, not by convention: `parent_train_freeze_artifact_sha256` is
+the sha256 of the parent artifact's file bytes (not an internal field — some legacy
+freezes predate `experiment.write_train_freeze`'s auto-hash), plus per-arm `model_hashes`,
+`preprocessing_hash`, and the parent's `audit/status.json.audited_execution_composite_sha256`.
+`research_workflow/derived_inputs.py::verify_derived_causal_inputs` re-derives all of this
+against on-disk state at PREPARE time (`research_workflow/phase0.py` and
+`research_workflow/prepare.py`, both — the wiring is defense-in-depth across the two
+documented ways PREPARE can be invoked) and fails closed
+(`DerivedInputBindingError`) on a missing, invalidated, or mismatched upstream artifact.
+"Invalidated" is detected generically by scanning the parent study's existing
+`artifacts/*_INVALIDATION.md` convention (already used by real studies) — not a new
+mechanism invented for one study.
+
+**Availability must be causally ordered against the child's own decision point, not just
+enum membership.** `TargetSpec.decision_reference` and
+`DerivedCausalInputSpec.availability_reference` share one ordering,
+`TIMESTAMP_CAUSAL_ORDER = {decision_ts: 0, entry_ts: 1, confirmation_ts: 2}`. A `StudySpec`
+validator rejects an input whose availability index exceeds the child's decision index at
+compile time; `causal_audit`'s `derived_input_availability_causal` check re-derives the
+same comparison from the compiled contract as a second, independent layer. A later-deciding
+study (`decision_reference: confirmation_ts`) may legitimately consume a
+`confirmation_ts`-available input — this is a real ordering check, not a `decision_ts`-only
+special case.
+
+### 20.3 Machine-enforced pre-freeze gates
+
+`StudySpec.required_gates` (`RequiredGateSpec`) declares a gate — e.g.
+`TRAIN_TARGET_BALANCE_PASS` — bound to a specific, schema-versioned artifact and a typed
+`scope_fields` list (`GateScopeField`: `population` | `target` | `chronology` | `features`
+| `instrument`). Never an arbitrary shell command: `research_workflow/gates.py`'s
+`assert_gates_satisfied` loads the declared artifact, validates it carries at minimum
+`gate_id`, `schema_version`, `status`, `scope_sha256`, `producer`, `created_at_utc`, and
+compares `scope_sha256` against a fresh hash of the study's *current* declared
+scope — that recomputation **is** the staleness check, not a separate mechanism. Wired
+fail-closed at every stage a gate may declare (`prepare`, `readiness`, `preflight`, `seal`,
+`train_freeze`): `research_workflow/phase0.py`, `research_workflow/prepare.py`,
+`research_workflow/readiness.py`, `research_workflow/preflight.py` (new required check
+`REQUIRED_GATES`), `research_workflow/seal.py`, `research_workflow/modeling.py::freeze_train_artifacts`.
+
+### 20.4 Model selection
+
+`ModelSpec.selection` (`ModelSelectionSpec`) declares a bounded TRAIN-only hyperparameter
+search — never an unbounded AutoML system. `search_method: grid` enumerates only `choice`
+domains and refuses (`SearchSpaceExceedsMaxTrials`) rather than silently truncating a grid
+exceeding `max_trials`. `search_method: random` treats `max_trials` as a count of **unique**
+configurations: `research_workflow/model_selection.py` de-duplicates deterministically from
+`random_seed` and stops cleanly (`search_space_exhausted: true`, not an error) if a small
+declared finite space is exhausted first; `log_scale` sampling requires a positive `low`.
+
+`tuning_years`/`final_train_validation_years` are a **new, distinct, inner-TRAIN** concept
+— `chronology.dev` already means OOS in this codebase (`experiment.py` binds it to
+`oos_years`). A `StudySpec` cross-field validator rejects any overlap with
+`chronology.dev`/`prohibited`, and the runner independently re-checks every row's
+`_selection_role`/`_year` against the declared sets (`SelectionPartitionMismatch`) — OOS
+data cannot enter tuning by declaration, and cannot enter it through the data either.
+
+**Final TRAIN validation may only ACCEPT or REJECT the already-selected configuration —
+it never triggers a second search.** The function that evaluates
+`final_train_validation_years` rows takes the winner as its only argument and has no code
+path back into the candidate loop. `final_validation_policy` defaults to `gated` (a study
+opting out must say `report_only` explicitly — never implicit); a gated `FAIL` status makes
+`modeling.freeze_train_artifacts` refuse outright (`ModelSelectionFinalValidationFailed`),
+with no re-derivation attempted. Every frozen arm's hyperparameters and seed are
+cross-checked against the selection manifest's winner
+(`ModelSelectionBindingMismatch` on any drift) — the freeze refuses a model whose
+family/hyperparameters cannot be traced to the declared selection protocol.

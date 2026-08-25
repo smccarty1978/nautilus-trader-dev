@@ -1,7 +1,7 @@
 {
   "study_id": "Codex_clean_maturity_flip_rolling_5m_productivity",
   "study_type": "flip_prediction",
-  "spec_sha256": "5cf6b4d08d66f1ff7649cdcb4891a38da8d1f79246174a376c63f945c04e5212",
+  "spec_sha256": "560873bc4c7169bd7557edac5400771afcf225fd20cda07561f542de087b0f11",
   "spec": {
     "study": {
       "id": "Codex_clean_maturity_flip_rolling_5m_productivity",
@@ -39,7 +39,11 @@
       "confirmation": {
         "mode": "completed_1m_bar",
         "confirmation_bars": 1
-      }
+      },
+      "conditions": null,
+      "condition_logic": null,
+      "required_forward_outcomes": null,
+      "decision_reference": "decision_ts"
     },
     "features": {
       "source_manifest": null,
@@ -4550,7 +4554,8 @@
         "running_mfe_atr",
         "new_progress_windows",
         "retained_mfe_ratio"
-      ]
+      ],
+      "derived_inputs": null
     },
     "model": {
       "mode": "training",
@@ -4567,7 +4572,8 @@
         "max_depth": 3,
         "max_iter": 200,
         "random_state": 42
-      }
+      },
+      "selection": null
     },
     "chronology": {
       "train": [
@@ -4652,7 +4658,8 @@
       "canonical_type_considered": null,
       "reusable_extension_considered": null,
       "custom_scope": null
-    }
+    },
+    "required_gates": null
   },
   "contracts": {
     "population_contract": {
@@ -4690,7 +4697,8 @@
       "censoring_policy": {
         "session_end_censoring": true,
         "max_horizon_seconds": 300
-      }
+      },
+      "decision_reference": "decision_ts"
     },
     "feature_contract": {
       "source_key": null,
@@ -24444,7 +24452,8 @@
           "prior_5m_regime_net_move_atr_per_min",
           "prior_5m_regime_efficiency"
         ]
-      }
+      },
+      "derived_causal_inputs": []
     },
     "execution_contract": {
       "runtime": "nautilustrader",

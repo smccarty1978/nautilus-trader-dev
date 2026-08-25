@@ -294,6 +294,34 @@ def canonical_definition_evidence(name: str, fdef: Any, repo_root: Path) -> Dict
     }
 
 
+def _declared_values_for_parameter(definition: Any, param_name: str) -> List[Any]:
+    if param_name == "timeframe":
+        return list(getattr(definition, "supported_timeframes", ()) or ())
+    supported_values = getattr(definition, "supported_parameter_values", None) or {}
+    return list(supported_values.get(param_name, []) or [])
+
+
+def _unverified_parameter_values(rec: Dict[str, Any], definition: Any) -> List[Dict[str, Any]]:
+    """Blueprint §7.A/§7.C correction: a value merely being IN a definition's declared
+    `supported_*` set proves it is syntactically valid, not that it has independent
+    causal/parity evidence. A promotion record that opts in to `verified_parameter_values`
+    (per parameter name, the values that DO have such evidence) is cross-checked here;
+    a definition that never opts in is unaffected -- mirrors the existing
+    `feature_lifecycle_baseline.json` grandfather pattern (baseline cannot grow, only
+    shrink), applied going forward rather than retroactively.
+    """
+    verified = rec.get("verified_parameter_values")
+    if not verified:
+        return []
+    findings: List[Dict[str, Any]] = []
+    for param_name, verified_values in verified.items():
+        declared = _declared_values_for_parameter(definition, param_name)
+        unverified = [v for v in declared if v not in (verified_values or [])]
+        if unverified:
+            findings.append({"parameter": param_name, "unverified_values": unverified})
+    return findings
+
+
 def check_canonical_feature_promotions(
     *, repo_root: Optional[Path] = None, require_promoted: bool = False,
 ) -> Dict[str, Any]:
@@ -323,6 +351,15 @@ def check_canonical_feature_promotions(
                     violations.append({"feature": name, "code": "PROMOTION_PARAMETER_DOMAIN_ABSENT", "message": "promotion record omits supported_parameter_schema"})
                 elif list(rec["supported_parameter_schema"]) != list(getattr(definition, "parameter_schema", ())):
                     violations.append({"feature": name, "code": "PROMOTION_PARAMETER_DOMAIN_DRIFT", "message": "promotion record parameter domain does not match the canonical definition"})
+                for finding in _unverified_parameter_values(rec, definition):
+                    violations.append({
+                        "feature": name, "code": "UNVERIFIED_PARAMETER_VALUE",
+                        "message": (
+                            f"parameter {finding['parameter']!r} declares values "
+                            f"{finding['unverified_values']} with no independent causal/parity "
+                            f"evidence in the promotion record's verified_parameter_values"
+                        ),
+                    })
     return {"passed": not violations, "features": sorted(CANONICAL_FEATURE_DEFINITIONS),
             "promotion_records": sorted(records), "violations": violations, "evidence": evidence}
 

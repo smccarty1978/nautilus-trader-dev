@@ -1,7 +1,7 @@
 {
   "study_id": "reconstructed_long_rth_strict_retrain",
   "study_type": "flip_prediction",
-  "spec_sha256": "bd51e8c29eb7d0fa300c6bb638034541851e1c4db0c0552603714aa2bf4ecaa2",
+  "spec_sha256": "72d9d2e3c01282980e79b57c0a35f7451271ada4882d2c6dd03108e3f8d3338f",
   "spec": {
     "study": {
       "id": "reconstructed_long_rth_strict_retrain",
@@ -35,11 +35,18 @@
       "confirmation": {
         "mode": "bar_close",
         "confirmation_bars": 1
-      }
+      },
+      "conditions": null,
+      "condition_logic": null,
+      "required_forward_outcomes": null,
+      "decision_reference": "decision_ts"
     },
     "features": {
       "source_manifest": null,
+      "source": null,
       "source_key": "F3_top25_gbt_v1",
+      "selection": null,
+      "forbidden_lineage": null,
       "feature_list": [
         "rolling_5m_low_signed_distance_atr",
         "rth_elapsed_seconds",
@@ -67,13 +74,17 @@
         "rth_abs_delta_cum",
         "n_levels_below"
       ],
+      "instances": null,
       "feature_list_sha256": "8bcfeb74ab3b5453635ad9895fa9d15fd65866044f23fa0415bfc796e5fd6299",
       "directional_mapping": "direction_normalized",
-      "timing_contract": "verified"
+      "timing_contract": "verified",
+      "metadata_columns": null,
+      "derived_inputs": null
     },
     "model": {
       "mode": "training",
       "family": "HistGradientBoostingClassifier",
+      "arms": null,
       "artifact_path": null,
       "artifact_sha256": null,
       "params": {
@@ -81,7 +92,8 @@
         "max_depth": 3,
         "max_iter": 200,
         "random_state": 42
-      }
+      },
+      "selection": null
     },
     "chronology": {
       "train": [
@@ -96,11 +108,13 @@
       "diagnostic": null,
       "prohibited": [
         2026
-      ]
+      ],
+      "warmup": null
     },
     "stratification": {
       "column": null,
-      "buckets": null
+      "buckets": null,
+      "extrapolation_bucket": null
     },
     "baseline": {
       "study": null,
@@ -110,6 +124,8 @@
     "lineage": {
       "parent_study": null,
       "parent_manifest_sha256": null,
+      "clean_lineage_start": null,
+      "invalidated_prior_runs": null,
       "intended_changes": null,
       "frozen": null
     },
@@ -119,7 +135,8 @@
       "data_requirements": null,
       "checkpoint": null,
       "progress_seconds": 60,
-      "bounded": true
+      "bounded": true,
+      "observation_policy": null
     },
     "acceptance": {
       "criteria": null
@@ -130,7 +147,8 @@
       "canonical_type_considered": null,
       "reusable_extension_considered": null,
       "custom_scope": null
-    }
+    },
+    "required_gates": null
   },
   "contracts": {
     "population_contract": {
@@ -146,7 +164,9 @@
         "established": true
       },
       "causal_checkpoint": {
-        "checkpoint_frequency": "1m_bar_close",
+        "checkpoint_frequency": "5s",
+        "checkpoint_grid_origin": "regime_start_ns",
+        "triggering_stream": "completed_1s_bar",
         "observation_timing": "interval_close"
       }
     },
@@ -162,7 +182,8 @@
       "censoring_policy": {
         "session_end_censoring": true,
         "max_horizon_seconds": 300
-      }
+      },
+      "decision_reference": "decision_ts"
     },
     "feature_contract": {
       "source_key": "F3_top25_gbt_v1",
@@ -194,21 +215,961 @@
         "rth_abs_delta_cum",
         "n_levels_below"
       ],
+      "resolved_feature_instances": [
+        {
+          "requested": "rolling_5m_low_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_low",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "5m"
+          },
+          "physical_alias": "rolling_5m_low_signed_distance_atr"
+        },
+        {
+          "requested": "rth_elapsed_seconds",
+          "canonical_name": "elapsed_seconds",
+          "parameters": {
+            "context": "RTH"
+          },
+          "physical_alias": "rth_elapsed_seconds"
+        },
+        {
+          "requested": "rolling_15m_high_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_high",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "15m"
+          },
+          "physical_alias": "rolling_15m_high_signed_distance_atr"
+        },
+        {
+          "requested": "rolling_60m_high_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_high",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "60m"
+          },
+          "physical_alias": "rolling_60m_high_signed_distance_atr"
+        },
+        {
+          "requested": "rolling_15m_low_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_low",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "15m"
+          },
+          "physical_alias": "rolling_15m_low_signed_distance_atr"
+        },
+        {
+          "requested": "rolling_30m_low_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_low",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "30m"
+          },
+          "physical_alias": "rolling_30m_low_signed_distance_atr"
+        },
+        {
+          "requested": "price_change_points_60s",
+          "canonical_name": "price_change_points",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "60s"
+          },
+          "physical_alias": "price_change_points_60s"
+        },
+        {
+          "requested": "rolling_30m_high_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "rolling_high",
+            "level_context": "rolling",
+            "normalization": "atr",
+            "timeframe": "30m"
+          },
+          "physical_alias": "rolling_30m_high_signed_distance_atr"
+        },
+        {
+          "requested": "range_points_1800s",
+          "canonical_name": "range_points",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "1800s"
+          },
+          "physical_alias": "range_points_1800s"
+        },
+        {
+          "requested": "opening_range_30m_low_developing_signed_distance_points",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "opening_range_low_developing",
+            "level_context": "session",
+            "normalization": "points",
+            "timeframe": "30m"
+          },
+          "physical_alias": "opening_range_30m_low_developing_signed_distance_points"
+        },
+        {
+          "requested": "est_bear_vol_sum_300s",
+          "canonical_name": "est_bear_vol_sum",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "300s"
+          },
+          "physical_alias": "est_bear_vol_sum_300s"
+        },
+        {
+          "requested": "full_level_envelope_width_atr",
+          "canonical_name": "price_level_aggregate",
+          "parameters": {
+            "level_context": "session",
+            "metric": "full_level_envelope_width_atr"
+          },
+          "physical_alias": "full_level_envelope_width_atr"
+        },
+        {
+          "requested": "rth_vol_cum",
+          "canonical_name": "vol_cum",
+          "parameters": {
+            "context": "RTH"
+          },
+          "physical_alias": "rth_vol_cum"
+        },
+        {
+          "requested": "est_delta_sum_1800s",
+          "canonical_name": "est_delta_sum",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "1800s"
+          },
+          "physical_alias": "est_delta_sum_1800s"
+        },
+        {
+          "requested": "price_change_atr_60s",
+          "canonical_name": "price_change_atr",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "60s"
+          },
+          "physical_alias": "price_change_atr_60s"
+        },
+        {
+          "requested": "prior_day_close_signed_distance_atr",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "prior_day_close",
+            "level_context": "prior_day",
+            "normalization": "atr"
+          },
+          "physical_alias": "prior_day_close_signed_distance_atr"
+        },
+        {
+          "requested": "up_down_vol_ratio_1800s",
+          "canonical_name": "up_down_vol_ratio",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "1800s"
+          },
+          "physical_alias": "up_down_vol_ratio_1800s"
+        },
+        {
+          "requested": "price_change_atr_30s",
+          "canonical_name": "price_change_atr",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "30s"
+          },
+          "physical_alias": "price_change_atr_30s"
+        },
+        {
+          "requested": "pct_levels_behind_trade",
+          "canonical_name": "price_level_aggregate",
+          "parameters": {
+            "level_context": "session",
+            "metric": "pct_levels_behind_trade"
+          },
+          "physical_alias": "pct_levels_behind_trade"
+        },
+        {
+          "requested": "prior_day_low_signed_distance_points",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "prior_day_low",
+            "level_context": "prior_day",
+            "normalization": "points"
+          },
+          "physical_alias": "prior_day_low_signed_distance_points"
+        },
+        {
+          "requested": "opening_range_30m_low_final_signed_distance_points",
+          "canonical_name": "distance_to_level",
+          "parameters": {
+            "level": "opening_range_low_final",
+            "level_context": "session",
+            "normalization": "points",
+            "timeframe": "30m"
+          },
+          "physical_alias": "opening_range_30m_low_final_signed_distance_points"
+        },
+        {
+          "requested": "vol_max_1s_1800s",
+          "canonical_name": "vol_max",
+          "parameters": {
+            "context": "rolling",
+            "timeframe": "1s",
+            "timeframe_2": "1800s"
+          },
+          "physical_alias": "vol_max_1s_1800s"
+        },
+        {
+          "requested": "price_position_in_full_envelope",
+          "canonical_name": "price_level_aggregate",
+          "parameters": {
+            "level_context": "session",
+            "metric": "price_position_in_full_envelope"
+          },
+          "physical_alias": "price_position_in_full_envelope"
+        },
+        {
+          "requested": "rth_abs_delta_cum",
+          "canonical_name": "abs_delta_cum",
+          "parameters": {
+            "context": "RTH"
+          },
+          "physical_alias": "rth_abs_delta_cum"
+        },
+        {
+          "requested": "n_levels_below",
+          "canonical_name": "price_level_aggregate",
+          "parameters": {
+            "level_context": "session",
+            "metric": "n_levels_below"
+          },
+          "physical_alias": "n_levels_below"
+        }
+      ],
       "feature_list_sha256": "8bcfeb74ab3b5453635ad9895fa9d15fd65866044f23fa0415bfc796e5fd6299",
       "bound_trackers": [
-        "features.trackers.ohlcv_delta.OHLCVDeltaTracker",
-        "features.trackers.price_levels.PriceLevelTracker"
+        "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "features.trackers.generic_price_levels.GenericPriceLevelProvider"
       ],
       "families": [
-        "ohlcv_est_delta",
-        "price_level_context"
+        "['ohlcv_est_delta']",
+        "['price_level_context']"
       ],
       "source_timeframes": [
-        "1m",
-        "1s"
+        "completed_15m",
+        "completed_1m",
+        "completed_1s",
+        "completed_30m",
+        "completed_5m",
+        "completed_60m"
       ],
+      "feature_statuses": {
+        "rolling_5m_low_signed_distance_atr": "verified",
+        "rth_elapsed_seconds": "verified",
+        "rolling_15m_high_signed_distance_atr": "verified",
+        "rolling_60m_high_signed_distance_atr": "verified",
+        "rolling_15m_low_signed_distance_atr": "verified",
+        "rolling_30m_low_signed_distance_atr": "verified",
+        "price_change_points_60s": "verified",
+        "rolling_30m_high_signed_distance_atr": "verified",
+        "range_points_1800s": "verified",
+        "opening_range_30m_low_developing_signed_distance_points": "verified",
+        "est_bear_vol_sum_300s": "verified",
+        "full_level_envelope_width_atr": "verified",
+        "rth_vol_cum": "verified",
+        "est_delta_sum_1800s": "verified",
+        "price_change_atr_60s": "verified",
+        "prior_day_close_signed_distance_atr": "verified",
+        "up_down_vol_ratio_1800s": "verified",
+        "price_change_atr_30s": "verified",
+        "pct_levels_behind_trade": "verified",
+        "prior_day_low_signed_distance_points": "verified",
+        "opening_range_30m_low_final_signed_distance_points": "verified",
+        "vol_max_1s_1800s": "verified",
+        "price_position_in_full_envelope": "verified",
+        "rth_abs_delta_cum": "verified",
+        "n_levels_below": "verified"
+      },
+      "feature_null_policies": {
+        "rolling_5m_low_signed_distance_atr": "allow",
+        "rth_elapsed_seconds": "allow",
+        "rolling_15m_high_signed_distance_atr": "allow",
+        "rolling_60m_high_signed_distance_atr": "allow",
+        "rolling_15m_low_signed_distance_atr": "allow",
+        "rolling_30m_low_signed_distance_atr": "allow",
+        "price_change_points_60s": "allow",
+        "rolling_30m_high_signed_distance_atr": "allow",
+        "range_points_1800s": "allow",
+        "opening_range_30m_low_developing_signed_distance_points": "allow",
+        "est_bear_vol_sum_300s": "allow",
+        "full_level_envelope_width_atr": "allow",
+        "rth_vol_cum": "allow",
+        "est_delta_sum_1800s": "allow",
+        "price_change_atr_60s": "allow",
+        "prior_day_close_signed_distance_atr": "allow",
+        "up_down_vol_ratio_1800s": "allow",
+        "price_change_atr_30s": "allow",
+        "pct_levels_behind_trade": "allow",
+        "prior_day_low_signed_distance_points": "allow",
+        "opening_range_30m_low_final_signed_distance_points": "allow",
+        "vol_max_1s_1800s": "allow",
+        "price_position_in_full_envelope": "allow",
+        "rth_abs_delta_cum": "allow",
+        "n_levels_below": "allow"
+      },
+      "contains_provisional_features": [],
       "directional_mapping": "direction_normalized",
-      "timing_contract": "verified"
+      "timing_contract": "verified",
+      "runtime_data_requirements": {
+        "resolved_instances": [
+          {
+            "requested": "rolling_5m_low_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_low",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "5m"
+            },
+            "physical_alias": "rolling_5m_low_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            }
+          },
+          {
+            "requested": "rth_elapsed_seconds",
+            "canonical_name": "elapsed_seconds",
+            "parameters": {
+              "context": "RTH"
+            },
+            "physical_alias": "rth_elapsed_seconds",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "elapsed_seconds",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1m",
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_15m_high_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_high",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "15m"
+            },
+            "physical_alias": "rolling_15m_high_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_15m"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_60m_high_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_high",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "60m"
+            },
+            "physical_alias": "rolling_60m_high_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_60m"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_15m_low_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_low",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "15m"
+            },
+            "physical_alias": "rolling_15m_low_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_15m"
+              ]
+            }
+          },
+          {
+            "requested": "rolling_30m_low_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_low",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "30m"
+            },
+            "physical_alias": "rolling_30m_low_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_30m"
+              ]
+            }
+          },
+          {
+            "requested": "price_change_points_60s",
+            "canonical_name": "price_change_points",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "60s"
+            },
+            "physical_alias": "price_change_points_60s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_change_points",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "60s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "rolling_30m_high_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "rolling_high",
+              "level_context": "rolling",
+              "normalization": "atr",
+              "timeframe": "30m"
+            },
+            "physical_alias": "rolling_30m_high_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_30m"
+              ]
+            }
+          },
+          {
+            "requested": "range_points_1800s",
+            "canonical_name": "range_points",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "1800s"
+            },
+            "physical_alias": "range_points_1800s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "range_points",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "1800s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "opening_range_30m_low_developing_signed_distance_points",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "opening_range_low_developing",
+              "level_context": "session",
+              "normalization": "points",
+              "timeframe": "30m"
+            },
+            "physical_alias": "opening_range_30m_low_developing_signed_distance_points",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_30m"
+              ]
+            }
+          },
+          {
+            "requested": "est_bear_vol_sum_300s",
+            "canonical_name": "est_bear_vol_sum",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "300s"
+            },
+            "physical_alias": "est_bear_vol_sum_300s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "est_bear_vol_sum",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "300s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "full_level_envelope_width_atr",
+            "canonical_name": "price_level_aggregate",
+            "parameters": {
+              "level_context": "session",
+              "metric": "full_level_envelope_width_atr"
+            },
+            "physical_alias": "full_level_envelope_width_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_level_aggregate",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "rth_vol_cum",
+            "canonical_name": "vol_cum",
+            "parameters": {
+              "context": "RTH"
+            },
+            "physical_alias": "rth_vol_cum",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "vol_cum",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "est_delta_sum_1800s",
+            "canonical_name": "est_delta_sum",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "1800s"
+            },
+            "physical_alias": "est_delta_sum_1800s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "est_delta_sum",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "1800s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "price_change_atr_60s",
+            "canonical_name": "price_change_atr",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "60s"
+            },
+            "physical_alias": "price_change_atr_60s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_change_atr",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "60s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "prior_day_close_signed_distance_atr",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "prior_day_close",
+              "level_context": "prior_day",
+              "normalization": "atr"
+            },
+            "physical_alias": "prior_day_close_signed_distance_atr",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "up_down_vol_ratio_1800s",
+            "canonical_name": "up_down_vol_ratio",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "1800s"
+            },
+            "physical_alias": "up_down_vol_ratio_1800s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "up_down_vol_ratio",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "1800s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "price_change_atr_30s",
+            "canonical_name": "price_change_atr",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "30s"
+            },
+            "physical_alias": "price_change_atr_30s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_change_atr",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "30s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "pct_levels_behind_trade",
+            "canonical_name": "price_level_aggregate",
+            "parameters": {
+              "level_context": "session",
+              "metric": "pct_levels_behind_trade"
+            },
+            "physical_alias": "pct_levels_behind_trade",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_level_aggregate",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "prior_day_low_signed_distance_points",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "prior_day_low",
+              "level_context": "prior_day",
+              "normalization": "points"
+            },
+            "physical_alias": "prior_day_low_signed_distance_points",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "opening_range_30m_low_final_signed_distance_points",
+            "canonical_name": "distance_to_level",
+            "parameters": {
+              "level": "opening_range_low_final",
+              "level_context": "session",
+              "normalization": "points",
+              "timeframe": "30m"
+            },
+            "physical_alias": "opening_range_30m_low_final_signed_distance_points",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "distance_to_level",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_30m"
+              ]
+            }
+          },
+          {
+            "requested": "vol_max_1s_1800s",
+            "canonical_name": "vol_max",
+            "parameters": {
+              "context": "rolling",
+              "timeframe": "1s",
+              "timeframe_2": "1800s"
+            },
+            "physical_alias": "vol_max_1s_1800s",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "vol_max",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ],
+              "window_type": "rolling",
+              "window": "1s",
+              "update_every": "1s"
+            }
+          },
+          {
+            "requested": "price_position_in_full_envelope",
+            "canonical_name": "price_level_aggregate",
+            "parameters": {
+              "level_context": "session",
+              "metric": "price_position_in_full_envelope"
+            },
+            "physical_alias": "price_position_in_full_envelope",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_level_aggregate",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "rth_abs_delta_cum",
+            "canonical_name": "abs_delta_cum",
+            "parameters": {
+              "context": "RTH"
+            },
+            "physical_alias": "rth_abs_delta_cum",
+            "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+            "family": [
+              "ohlcv_est_delta"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "abs_delta_cum",
+              "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "n_levels_below",
+            "canonical_name": "price_level_aggregate",
+            "parameters": {
+              "level_context": "session",
+              "metric": "n_levels_below"
+            },
+            "physical_alias": "n_levels_below",
+            "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+            "family": [
+              "price_level_context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "price_level_aggregate",
+              "provider": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          }
+        ],
+        "required_streams": [
+          "completed_15m",
+          "completed_1m",
+          "completed_1s",
+          "completed_30m",
+          "completed_5m",
+          "completed_60m"
+        ],
+        "rolling_windows": [
+          "1800s",
+          "1s",
+          "300s",
+          "30s",
+          "60s"
+        ],
+        "aliases": [
+          "rolling_5m_low_signed_distance_atr",
+          "rth_elapsed_seconds",
+          "rolling_15m_high_signed_distance_atr",
+          "rolling_60m_high_signed_distance_atr",
+          "rolling_15m_low_signed_distance_atr",
+          "rolling_30m_low_signed_distance_atr",
+          "price_change_points_60s",
+          "rolling_30m_high_signed_distance_atr",
+          "range_points_1800s",
+          "opening_range_30m_low_developing_signed_distance_points",
+          "est_bear_vol_sum_300s",
+          "full_level_envelope_width_atr",
+          "rth_vol_cum",
+          "est_delta_sum_1800s",
+          "price_change_atr_60s",
+          "prior_day_close_signed_distance_atr",
+          "up_down_vol_ratio_1800s",
+          "price_change_atr_30s",
+          "pct_levels_behind_trade",
+          "prior_day_low_signed_distance_points",
+          "opening_range_30m_low_final_signed_distance_points",
+          "vol_max_1s_1800s",
+          "price_position_in_full_envelope",
+          "rth_abs_delta_cum",
+          "n_levels_below"
+        ]
+      },
+      "derived_causal_inputs": []
     },
     "execution_contract": {
       "runtime": "nautilustrader",
@@ -234,6 +1195,8 @@
     },
     "timestamp_contract": {
       "source": "databento_glbx_mdp3",
+      "instrument_symbol": "NQ",
+      "measured_catalog_rel_path": "data/catalog/NQ_v0_2020_2026",
       "raw_timestamp_semantic": "OPEN_STAMPED",
       "raw_index_field": "ts_event",
       "timezone": "UTC",
@@ -247,13 +1210,92 @@
         "causal_dispatch_field": "ts_init",
         "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
         "timeframe_deltas_ns": {
-          "1s": 1000000000,
-          "1m": 60000000000,
-          "3m": 180000000000,
-          "5m": 300000000000
+          "1-SECOND": 1000000000,
+          "1-MINUTE": 60000000000,
+          "3-MINUTE": 180000000000,
+          "5-MINUTE": 300000000000
+        },
+        "empirical_measurement": {
+          "status": "MEASURED",
+          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+          "measurements": {
+            "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 60000000000,
+              "observed_deltas_ns": [
+                60000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 1000000000,
+              "observed_deltas_ns": [
+                1000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-5-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 300000000000,
+              "observed_deltas_ns": [
+                300000000000
+              ],
+              "pass": true
+            }
+          }
         }
       },
       "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "deliverables_contract": {
+      "contract_version": 1,
+      "authorized_modes": [
+        "collect"
+      ],
+      "deliverables_by_mode": {
+        "collect": [
+          "candidates.parquet",
+          "observations.parquet",
+          "collection_manifest.json",
+          "run_manifest.json",
+          "status.json"
+        ]
+      },
+      "artifact_metadata": {
+        "candidates.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "observations.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "collection_manifest.json": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "run_manifest.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::OutputManager",
+          "relative_to": "run_dir"
+        },
+        "status.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir"
+        }
+      },
+      "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
     },
     "lineage": {
       "has_parent": false
