@@ -139,14 +139,10 @@ def test_duplicate_instances_collapse_is_detected(tmp_path):
 # study assumption. `utils/visualizer*.py` compare string-split lengths.
 GENERIC_ROOT = "research_workflow"
 
-# Known offenders of the same class, found 2026-08-25 and tracked separately. Listing them
-# keeps the invariant honest: the test still fails if a NEW one appears. Do not add to this
-# list to make a failure go away -- fix the code.
-KNOWN_STUDY_SPECIFIC_OFFENDERS = {
-    # `self._is_targeted_60 = bool(config.feature_list and len(config.feature_list) == 60)`
-    # A 60-feature surface flag baked into the generic collector. Same defect as `== 13`.
-    "research_workflow/generic_collector.py:232",
-}
+# Empty, and it must stay that way. `generic_collector.py`'s `len(feature_list) == 60`
+# was the last entry; it is now a capability check against the fused ring surface.
+# Do not add to this list to make a failure go away -- fix the code.
+KNOWN_STUDY_SPECIFIC_OFFENDERS: set[str] = set()
 
 
 def _generic_modules() -> list[Path]:

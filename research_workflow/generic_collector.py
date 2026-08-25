@@ -46,6 +46,55 @@ DISPOSITION_CENSORED = "CENSORED"
 # Why a candidate was censored rather than labeled.
 CENSOR_SESSION_END = "SESSION_END"
 CENSOR_DATA_END = "DATA_END"
+# The fused ring-buffer snapshot assembles two things in one pass: a base block of
+# OHLCV/delta/price-level/RTH keys built inline by ``all_computed_60``, and the
+# structural-geometry + rolling-productivity provider snapshots spread into it.
+#
+# A study needs that fused assembly only when its declared surface spans the provider
+# block. A surface drawn purely from the base block has always been served by the
+# per-tracker path and must keep being served by it -- those are different computations
+# of the same column names, and silently swapping them would change values nobody asked
+# to change.
+#
+# The old gate was ``len(feature_list) == 60``: the cardinality of base+provider. It
+# therefore accepted any unrelated 60-name surface and rejected every valid subset.
+# Drift-checked by scripts/tests/test_generic_collector_surface.py.
+_FUSED_BASE_BLOCK: frozenset[str] = frozenset({
+    "est_bear_vol_sum_300s", "est_delta_sum_1800s", "full_level_envelope_width_atr",
+    "n_levels_below", "opening_range_30m_low_developing_signed_distance_points",
+    "opening_range_30m_low_final_signed_distance_points", "pct_levels_behind_trade",
+    "price_change_atr_30s", "price_change_atr_60s", "price_change_points_60s",
+    "price_position_in_full_envelope", "prior_day_close_signed_distance_atr",
+    "prior_day_low_signed_distance_points", "range_points_1800s",
+    "rolling_15m_high_signed_distance_atr", "rolling_15m_low_signed_distance_atr",
+    "rolling_30m_high_signed_distance_atr", "rolling_30m_low_signed_distance_atr",
+    "rolling_5m_low_signed_distance_atr", "rolling_60m_high_signed_distance_atr",
+    "rth_abs_delta_cum", "rth_elapsed_seconds", "rth_vol_cum", "up_down_vol_ratio_1800s",
+    "vol_max_1s_1800s",
+})
+
+_FUSED_PROVIDER_BLOCK: frozenset[str] = frozenset({
+    "current_1m_move_outside_completed_5m_range", "current_5m_directional_displacement_atr",
+    "current_5m_regime_age_min", "current_5m_regime_range_atr",
+    "current_5m_regime_range_atr_per_min", "distance_to_completed_5m_high_atr",
+    "distance_to_completed_5m_low_atr", "prior_1m_regime_duration_min",
+    "prior_1m_regime_efficiency", "prior_1m_regime_mfe_atr",
+    "prior_1m_regime_net_directional_move_atr", "prior_1m_regime_net_move_atr_per_min",
+    "prior_1m_regime_range_atr", "prior_1m_regime_range_atr_per_min",
+    "prior_5m_regime_duration_min", "prior_5m_regime_efficiency", "prior_5m_regime_mfe_atr",
+    "prior_5m_regime_net_directional_move_atr", "prior_5m_regime_net_move_atr_per_min",
+    "prior_5m_regime_range_atr", "prior_5m_regime_range_atr_per_min",
+    "regime_expansion_atr_per_min", "rolling_5m_current_progress_atr",
+    "rolling_5m_current_speed_atr_per_min", "rolling_5m_current_speed_vs_lifetime",
+    "rolling_5m_giveback_atr", "rolling_5m_max_progress_atr",
+    "rolling_5m_max_speed_atr_per_min", "rolling_5m_max_speed_vs_lifetime",
+    "rolling_5m_retention_ratio", "structural_current_expansion_atr",
+    "structural_expansion_atr_per_min", "structural_giveback_atr",
+    "structural_max_expansion_atr", "structural_retention_ratio",
+})
+
+_FUSED_RING_SURFACE: frozenset[str] = _FUSED_BASE_BLOCK | _FUSED_PROVIDER_BLOCK
+
 PROGRESS_GAP_NS = 120 * NS
 CANDIDATE_STEP_NS = 5 * NS
 CANDIDATE_TIMEOUT_NS = 1800 * NS
@@ -229,7 +278,13 @@ class FlipPredictionCollector(Strategy):
         self.target_dir = 0 if self.is_both_directions else (1 if config.target_direction == "bullish" else -1)
         self.trade_dir = -self.prevailing_dir
 
-        self._is_targeted_60 = bool(config.feature_list and len(config.feature_list) == 60)
+        # Capability, not cardinality. The fused ring snapshot is required when the
+        # declared surface is servable by it AND actually spans the provider block --
+        # a base-block-only surface stays on the per-tracker path it has always used.
+        _declared = set(config.feature_list or ())
+        self._requires_fused_ring_snapshot = bool(_declared) and _declared.issubset(
+            _FUSED_RING_SURFACE
+        ) and bool(_declared & _FUSED_PROVIDER_BLOCK)
 
         self.regime_engine = RegimeEngine()
         self.ohlcv_tracker = OHLCVDeltaTracker()
@@ -239,7 +294,7 @@ class FlipPredictionCollector(Strategy):
         self.wick_tracker = WickTracker()
         self.range_position_tracker = RangePositionTracker()
 
-        if self._is_targeted_60:
+        if self._requires_fused_ring_snapshot:
             self.ring = FastOHLCVRingBuffer(capacity=3600)
             self.velocity_tracker = None
             self.volume_tracker = None
@@ -612,7 +667,7 @@ class FlipPredictionCollector(Strategy):
         c = float(bar.close)
         v = float(bar.volume)
 
-        if not self._is_targeted_60:
+        if not self._requires_fused_ring_snapshot:
             if self.velocity_tracker and getattr(self, "_benchmark_mode", "") not in {"checkpoint_only", "baseline"}:
                 self.velocity_tracker.update(c)
             if self.volume_tracker and not self._compact_surface:
@@ -632,7 +687,7 @@ class FlipPredictionCollector(Strategy):
             b_est = None
         else:
             b_est = self.ohlcv_tracker.update(ts_avail, o, h, l, c, v)
-        if self._is_targeted_60 and self.ring:
+        if self._requires_fused_ring_snapshot and self.ring:
             self.ring.append(ts_avail, o, h, l, c, v, b_est["bar_est_delta"])
 
         if not self._compact_surface:
@@ -772,7 +827,7 @@ class FlipPredictionCollector(Strategy):
 
         trade_dir = -direction
 
-        if self._is_targeted_60 and self.ring:
+        if self._requires_fused_ring_snapshot and self.ring:
             # 1. Structural features (27)
             structural_feats = self.structural_geometry_tracker.snapshot(
                 checkpoint_ns=T,
