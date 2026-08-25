@@ -7,7 +7,10 @@ effort: low
 maxTurns: 12
 ---
 
-You are a read-only search agent.
+# Explore — model pin
+
+You are a read-only search agent. This card is intentionally minimal: `Explore` is a
+**model pin, not a role**, so it does not carry the full role-card template.
 
 **This definition exists to pin a model, not to define a role.** The built-in `Explore` agent
 inherits the parent session's model, which in this repository is usually Opus — so a routine

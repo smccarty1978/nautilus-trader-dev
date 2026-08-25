@@ -88,7 +88,7 @@ Non-negotiable properties of that order:
   calibration, thresholds, or deciles. Those are frozen into
   `artifacts/train_experiment_freeze.json` *before* OOS opens.
 - `research_workflow.experiment.assert_oos_open` is the only door. Do not route around it.
-- **Forward outcomes are labels, never inputs.** `forward_outcomes/guard.py` fails closed at
+- **Forward outcomes are labels, never inputs.** `research_workflow/forward_outcomes/guard.py` fails closed at
   fit time and at freeze time. Never loosen it — its patterns are anchored precisely so that
   `rolling_300s_giveback_atr` (causal) passes while `max_mfe_atr` (post-event) is caught.
 - **Never improve a study.** Do not broaden a baseline, clean up a population, or add feature
@@ -180,7 +180,7 @@ do not delete "the safe part". Use `scripts/safe_cleanup.py::assert_safe_to_dele
 - Report outcomes faithfully. If tests fail, say so with the output. If a step was skipped,
   say that.
 - If a study reports a delta between model arms, it must state which integrity checks it
-  verified (`docs/RESEARCH_WORKFLOW.md` §6.3). An unverified arm delta is a hypothesis.
+  verified (`docs/RESEARCH_WORKFLOW.md` §6.2). An unverified arm delta is a hypothesis.
 - **Never commit generated data** — `runs/`, `canonical_*/`, `_work/`, `*.parquet`,
   `*.joblib`, `*.onnx`. Commit the manifests.
 
@@ -211,19 +211,68 @@ Do not hand-edit the generated files. The harnesses previously drifted far enoug
 Codex auditor was silently missing 14 checklist rules including C4 and D4 — the #2 and #4
 most frequent finding categories in this repository.
 
-### Roster
+### Roster — six roles
 
-| Agent | Codex `agent_type` | Role | Tier | Cap | Available in |
-|---|---|---|---|---|---|
-| `repo-scout` | `repo_scout` | Locate implementations, trace call paths and execution closure, identify stale/duplicate paths | Haiku / low | 700w — paths, symbols, line ranges | Claude, Codex |
-| `lookahead-auditor` | `lookahead_auditor` | Causal/look-ahead review: A, B, C1–C3, F, G, H | Sonnet / high | 1,500w report | Claude, Codex |
-| `contract-checker` | `contract_checker` | Contract/governance review: C4, D, E, deliverables, seals, TRAIN/OOS lifecycle state | Sonnet / medium | 1,000w compliance table | Claude, Codex |
-| `results-triager` | `results_triager` | Run exact approved pytest commands, reduce output to failures + root cause | Haiku / low | 500w | Claude, Codex |
-| `implementation-worker` | `implementation_worker` | Implement one frozen bounded task packet, repairing deterministic failures | Sonnet-class / medium | — | **Codex only** |
-| `Explore` | — | Model pin for the built-in fan-out search agent. **Not a distinct role** — prefer `repo-scout` | Haiku / low | 700w | **Claude only** |
+| Agent | Codex `agent_type` | Owns | Tier | Cap |
+|---|---|---|---|---|
+| `repo-scout` | `repo_scout` | Inventory; locating the authoritative implementation; stale/duplicate paths; execution-closure and dependency reasoning; where a change belongs | Haiku / low | 700w — paths, symbols, line ranges |
+| `lookahead-auditor` | `lookahead_auditor` | Causality: look-ahead, timestamp legality, event order. Checklist **A, B, C1–C3, F, G, H** | Sonnet / high | 1,500w report |
+| `contract-checker` | `contract_checker` | Governance: TRAIN/OOS separation, authorization, freeze/seal freshness, provenance, deliverables, model-integrity declarations. Checklist **C4, D, E** | Sonnet / medium | 1,000w compliance table |
+| `implementer` | `implementer` | Deterministic fixes, wiring, targeted tests, bounded fixtures, integration, first-broken-stage tracing | Sonnet / medium | — |
+| `research-executor` | `research_executor` | Governed collection, partitioned TRAIN, reconciliation, fitting, TRAIN freeze, OOS opening and scoring, artifact production | Sonnet / medium | — |
+| `analysis-decider` | `analysis_decider` | Reading generated artifacts, model comparison, forward-outcome interpretation, the research conclusion | Sonnet / high | — |
 
-Rationale for the set — including why there is deliberately no separate research-execution,
-analysis-decision or performance agent — is in `docs/SUBAGENT_ROSTER.md`.
+`Explore` (`.claude/agents/Explore.md`, Claude-only) is **a model pin, not a role** — it stops
+the built-in fan-out search agent inheriting the orchestrator's model. Prefer `repo-scout`.
+
+**Ownership is exclusive.** Causality belongs to `lookahead-auditor` and governance to
+`contract-checker`; neither may report the other's category. Code changes belong to
+`implementer`, lifecycle execution to `research-executor`, and conclusions to
+`analysis-decider` — an agent that finds work outside its own column refers it in one line
+and moves on.
+
+Why this set, and why there is deliberately no separate performance agent:
+`docs/SUBAGENT_ROSTER.md`.
+
+### Shared audit protocol
+
+Both audit gates obey this. It is stated **here only**; the agent cards do not restate it.
+
+- **Distinct declared identities.** The causal and contract reviews are independent roles and
+  must be authored by different declared reviewers. `scripts/run_preexec_audits.py` enforces
+  this (`AUDITOR_ROLE_REUSE`) — one reviewer authoring both reports is a one-reviewer workflow
+  wearing a two-reviewer seal. The agent name is the **role**, not the identity; do not
+  substitute it unless it is genuinely the externally declared identity for the invocation.
+- **The reviewer declares the audited composite**; tooling verifies it against
+  `scripts/resolve_execution_manifest.py` and never self-generates or stamps it. If the
+  composite has moved, the freeze is stale — report `INCOMPLETE` and stop rather than auditing
+  a moving target.
+- **One new file per pass.** `audit/pass_NN.md` (causal) / `audit/contract_pass_NN.md`
+  (contract). Never append — append-only reports reached 1,240 lines and became unparseable.
+- **Bounded re-audit.** Pass 2+ adjudicates every prior finding (`FIXED` / `NOT FIXED` /
+  `WITHDRAWN`, one line of evidence) *before* raising anything new, then at most **3 new
+  blocking findings per pass**. Never re-raise an addressed finding under new framing — mark
+  the original `NOT FIXED`.
+- **Every report carries exactly one machine-parsed summary block**, which is what
+  `run_preexec_audits.py` reads to issue the official status:
+
+  ```
+  <!-- AUDIT_SUMMARY_V2_START -->
+  {"verdict": "CLEAR", "audit_type": "causal|contract", "auditor": "<declared reviewer>", "critical": 0, "warning": 0, "note": 0, "study": "<study_id>", "audited_execution_composite_sha256": "<declared composite>"}
+  <!-- AUDIT_SUMMARY_V2_END -->
+  ```
+
+  `verdict` is strictly `CLEAR`, `BLOCKED` or `INCOMPLETE`. A line counts as a finding only
+  when it is a heading or bullet of the form `SEVERITY: <title>`. Gates read this block, never
+  prose.
+- **Filing path** when the agent cannot write its own report:
+
+  ```
+  python scripts/run_preexec_audits.py --study <study_dir> --pass-num <NN>       --type causal|contract --ingest <report.md> --author "<who you are>"
+  ```
+
+  It validates and re-derives the status itself, so filing never requires anyone to author a
+  verdict on another reviewer's behalf.
 
 ### Shared subagent principles
 
@@ -254,7 +303,7 @@ Every subagent inherits these:
   research-blessing gate on Haiku; never route discovery through a parent-model agent. Do not
   escalate a model because a task is long — a 5,000-line test log does not need Opus; a
   three-line timestamp question might. Changing a gate's model is a framework change and
-  needs the §6 escalation justification.
+  needs the escalation justification in `docs/RESEARCH_WORKFLOW.md` §1.
 
 ### Standing authorization
 

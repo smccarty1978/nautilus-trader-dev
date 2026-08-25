@@ -65,16 +65,30 @@ CODEX_META: dict[str, dict[str, str]] = {
         "model_reasoning_effort": "low",
         "approval_policy": "never",
     },
-    "results-triager": {
-        "name": "results_triager",
-        "model": "gemini-3.6-flash",
-        "model_reasoning_effort": "low",
+    "implementer": {
+        "name": "implementer",
+        "model": "gemini-3.5-pro",
+        "model_reasoning_effort": "medium",
+        "approval_policy": "on-request",
+    },
+    "research-executor": {
+        "name": "research_executor",
+        "model": "gpt-5.6-sol",
+        "model_reasoning_effort": "medium",
+        "approval_policy": "on-request",
+    },
+    "analysis-decider": {
+        "name": "analysis_decider",
+        "model": "gpt-5.6-sol",
+        "model_reasoning_effort": "high",
         "approval_policy": "never",
     },
 }
 
 # Codex agents with no Claude counterpart -- left untouched by this script.
-CODEX_ONLY = {"implementation-worker"}
+# `implementation-worker` was retired in the 2026-08 agent redesign; the
+# `implementer` role is now generated from the Claude definition like every other.
+CODEX_ONLY: set[str] = set()
 
 FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 
@@ -99,8 +113,8 @@ def render_antigravity(stem: str, body: str) -> str:
 
 
 # Tools that make an agent capable of changing the workspace. `Bash` counts: an
-# agent that can run arbitrary commands is not read-only in any meaningful sense,
-# and `results-triager` runs pytest, which writes caches and artifacts.
+# agent that can run arbitrary commands is not read-only in any meaningful sense --
+# even running pytest writes caches and artifacts.
 WRITE_TOOLS = ("Write", "Edit", "NotebookEdit", "MultiEdit", "Bash")
 
 

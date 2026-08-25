@@ -22,9 +22,11 @@ Antigravity runs these subagents natively on Gemini models.
 | Agent | Claude tier | Gemini equivalent | Flag |
 |---|---|---|---|
 | `repo-scout` | Haiku / low | Gemini 3.6 Flash / Flash Lite | `flash` / `flash_lite` |
-| `contract-checker` | Sonnet / medium | Gemini Pro / 3.6 Flash | `pro` / `flash` |
-| `results-triager` | Haiku / low | Gemini 3.6 Flash / Flash Lite | `flash` / `flash_lite` |
 | `lookahead-auditor` | Sonnet / high | Gemini Pro | `pro` |
+| `contract-checker` | Sonnet / medium | Gemini Pro / 3.6 Flash | `pro` / `flash` |
+| `implementer` | Sonnet / medium | Gemini Pro | `pro` |
+| `research-executor` | Sonnet / medium | Gemini Pro | `pro` |
+| `analysis-decider` | Sonnet / high | Gemini Pro | `pro` |
 
 Tiering rule: the cheapest model that can be trusted with the decision. **Never put a
 research-blessing gate on a Flash-tier model.** Do not escalate a model because a task is
@@ -46,8 +48,8 @@ Do not hand-edit the staged Markdown. The harnesses previously drifted far enoug
 auditor was silently missing 14 checklist rules, including C4 and D4 — the #2 and #4 most
 frequent finding categories in this repository.
 
-`Explore` (Claude-only, a model pin) and `implementation-worker` (Codex-only) have no
-Antigravity counterpart.
+`Explore` is a Claude-only model pin and has no Antigravity counterpart. Every other agent is
+generated for all three harnesses.
 
 ---
 

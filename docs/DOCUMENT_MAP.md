@@ -34,7 +34,7 @@ some are cited from git history and audit trails. **They are never a source of i
 | `features/CANONICAL_FEATURE_REFERENCE.yaml` | Generated canonical feature vocabulary (the active V2 bundle) |
 | `.claude/agents/*.md` | Canonical subagent definitions (Codex/Antigravity are generated from these) |
 | `docs/SUBAGENT_ROSTER.md` | The subagent roster and why it is this set — including why certain roles deliberately do not exist |
-| `.codex/agents/implementation-worker.toml` | Codex-only agent; not generated, edit directly |
+| `docs/WORKFLOW_REFERENCE_FACTS.md` | Current-state numbers, closure membership, hashing convention, measured benchmarks. Goes stale by design — each entry names the command that re-derives it |
 
 ## CURRENT
 

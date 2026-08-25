@@ -31,9 +31,10 @@ Before writing anything:
 - Check `docs/DOCUMENT_MAP.md` before trusting any other Markdown file. Roughly thirty
   root-level docs describe systems that no longer exist and carry a `[STALE]` or
   `[HISTORICAL]` banner.
-- Several `scripts/*.py` are **compatibility shims** that redirect into `research_workflow`
-  (`research_preflight`, `compile_study`, `create_study`, `prepare_and_freeze`,
-  `preexec_audit_seal`, `build_phase0_manifest`, `select_required_tests`). Prefer the module.
+- **Prefer the authoritative entry point over a compatibility shim.** Several `scripts/*.py`
+  and `backtests/nt_runtime/*.py` files are one-line redirects into `research_workflow`; §11
+  classifies every script as authoritative / shim / diagnostic / historical. A shim's docstring
+  names its target — edit and invoke the target, never the shim.
 - Read the failure artifact before re-deriving the failure. `audit/failure_packet.json`,
   `audit/preflight.json`, `validation_report.json`, the run's `lifecycle.json`.
 
@@ -102,19 +103,18 @@ investigation before first-divergence localization.
 
 ## 6. Preserve TRAIN/OOS and freeze semantics
 
-- **Do not open OOS early.** `research_workflow.experiment.assert_oos_open` is the only door,
-  and it opens only when `artifacts/train_experiment_freeze.json` exists and binds to the
-  current authorization.
-- **Do not tune on OOS.** Feature sets, preprocessing, model class, hyperparameters,
-  calibration, thresholds and deciles are frozen before OOS opens. If a fix would require
-  changing one of them after OOS was seen, that is a terminal stop.
-- **Do not touch prohibited years.** `chronology.prohibited` is enforced at the runtime
-  authorization boundary; do not route around it.
-- **Do not break a seal casually.** Any edit inside a study's execution closure stales the
-  freeze. If your change is inside it, say so, re-run PREPARE, and redo preflight → reviews →
-  seal. `research_workflow/__init__.py` is inside the closure.
-- **Never let a forward-outcome column into a feature surface.** If
-  `forward_outcomes/guard.py` raises, drop the column — do not loosen the guard.
+The policy itself is `docs/RESEARCH_WORKFLOW.md` §3 (TRAIN/OOS discipline) — what is frozen,
+when OOS opens, and what a stale freeze means. Do not restate it; read it.
+
+Codex-specific behaviour around that policy:
+
+- **Do not open OOS early.** `experiment.assert_oos_open` is the only door. If a stage appears
+  to need OOS data before stage 14, you have the wrong stage.
+- **Do not tune on OOS.** If a fix would require changing anything frozen at stage 13 *after*
+  OOS was seen, stop — that is a terminal stop, not a defect to repair.
+- **Declare closure impact.** If your edit lands inside a study's execution closure, say so
+  up front: the freeze is stale and stages 3–6 must be redone before execution resumes.
+- **Report exact artifacts** — paths and hashes, per §8.
 
 ---
 
@@ -164,11 +164,11 @@ If a test failed, say so and include the failing output. If you skipped a step, 
 
 ## 9. Agent roster
 
-Codex agent identifiers use underscores: `repo_scout`, `contract_checker`,
-`results_triager`, `lookahead_auditor`, `implementation_worker`. Roster, models and caps are
-in `AGENTS.md` §11; rationale is in `docs/SUBAGENT_ROSTER.md`.
+Codex agent identifiers use underscores: `repo_scout`, `lookahead_auditor`,
+`contract_checker`, `implementer`, `research_executor`, `analysis_decider`. Roster, models and
+caps are in `AGENTS.md` §11; rationale is in `docs/SUBAGENT_ROSTER.md`.
 
-`implementation_worker` is Codex-only and is the agent this file's §3–§8 describe most
-directly. It requires a frozen task packet: exact objective, root cause or approved
-interpretation, exact files allowed to change, required behaviour, forbidden semantic
-changes, acceptance tests, and stop-and-escalate conditions.
+`implementer` is the agent this file's §3–§8 describe most directly. It requires a frozen task
+packet: exact objective, root cause or approved interpretation, exact files allowed to change,
+required behaviour, forbidden semantic changes, acceptance tests, and stop-and-escalate
+conditions.

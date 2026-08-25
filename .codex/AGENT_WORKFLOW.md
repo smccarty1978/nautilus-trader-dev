@@ -25,10 +25,11 @@ hyphenated for easy cross-harness comparison.
 |---|---|---|---|---|
 | — (main session) | — | session model | session effort | user-selected permission mode |
 | `repo-scout` | `repo_scout` | `gemini-3.6-flash` | low | read-only |
-| `contract-checker` | `contract_checker` | `gpt-5.6-sol` | medium | read-only + own audit artifacts |
 | `lookahead-auditor` | `lookahead_auditor` | `gpt-5.6-sol` | high | read-only + own audit artifacts |
-| `results-triager` | `results_triager` | `gemini-3.6-flash` | low | guarded pytest only |
-| — | `implementation_worker` | `gemini-3.5-pro` | medium | workspace-write |
+| `contract-checker` | `contract_checker` | `gpt-5.6-sol` | medium | read-only + own audit artifacts |
+| `implementer` | `implementer` | `gemini-3.5-pro` | medium | workspace-write |
+| `research-executor` | `research_executor` | `gpt-5.6-sol` | medium | workspace-write |
+| `analysis-decider` | `analysis_decider` | `gpt-5.6-sol` | high | workspace-write (reports only) |
 
 Model ids are declared in `CODEX_META` in `scripts/sync_agents.py`. `sandbox_mode` is
 **derived** from the Claude definition's declared tools, not set here — it used to live in
@@ -49,8 +50,8 @@ Do not hand-edit the generated TOML. The harnesses previously drifted far enough
 Codex auditor was silently missing 14 checklist rules, including C4 and D4 — the #2 and #4
 most frequent finding categories in this repository.
 
-**`.codex/agents/implementation-worker.toml` is Codex-only and is NOT generated.** It has no
-Claude counterpart; `sync_agents.py` leaves it alone. Edit it directly.
+**Every agent is generated.** There are no Codex-only agents; `implementation-worker` was
+retired in the 2026-08 redesign and replaced by the generated `implementer`.
 
 ---
 
@@ -59,8 +60,6 @@ Claude counterpart; `sync_agents.py` leaves it alone. Edit it directly.
 - `.codex/config.toml` — agents enabled, `max_concurrent_threads_per_session = 4`.
 - `.codex/hooks/deny-subagent-tool.py` — enforces the boundary that worker and coding agents
   cannot spawn subagents. Only the main orchestrator invokes the named gates.
-- `.codex/hooks/validate-results-triager-command.py` — restricts `results_triager` Bash to
-  pytest with no chaining, pipes, redirection, or command substitution.
 
 ---
 
@@ -72,6 +71,6 @@ conversation:
 exact objective · exact subsystem or paths · relevant symbols · applicable spec sections ·
 required output format and word cap · explicit prohibitions · known facts vs. open questions.
 
-`implementation_worker` additionally requires a **frozen task packet**: exact objective, root
-cause or approved interpretation, exact files allowed to change, required behaviour,
-forbidden semantic changes, acceptance tests, and stop-and-escalate conditions.
+`implementer` additionally requires a **frozen task packet**: exact objective, root cause or
+approved interpretation, exact files allowed to change, required behaviour, forbidden semantic
+changes, acceptance tests, and stop-and-escalate conditions.

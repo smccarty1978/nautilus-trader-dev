@@ -1,0 +1,111 @@
+# Workflow Reference Facts
+
+Facts that were moved out of `docs/RESEARCH_WORKFLOW.md` because they describe **the state
+of the system right now** rather than a rule. They go stale; the rules do not.
+
+Each entry names the command that regenerates or re-verifies it. **Re-derive before relying
+on a number here** — do not quote these figures into a study report.
+
+---
+
+## Feature authority bundle
+
+| Fact | Value as of 2026-08-25 | Re-derive with |
+|---|---|---|
+| Active bundle | `candidate`, `activation_kind: feature_pipeline_v2` | `cat features/authority/active.json` |
+| Canonical definitions | 129 | `python -c "import json;print(len(json.load(open('features/authority/candidate/canonical_registry.json'))['definitions']))"` |
+| Legacy aliases mapped | 693 | `python -c "import json;print(len(json.load(open('features/authority/candidate/legacy_alias_mapping.json'))['aliases']))"` |
+| Bundle composite | `133250b8…` | `cat features/authority/candidate/manifest.json` |
+
+`scripts/activate_feature_pipeline_v2.py` asserts these counts before flipping the pointer,
+so a mismatch here means the bundle changed and this table was not updated.
+
+---
+
+## Execution closure membership
+
+The closure is **resolved, never enumerated by hand**:
+
+```bash
+python scripts/resolve_execution_manifest.py --study studies/<id>
+```
+
+Sampled from `studies/clean_maturity_flip_model_rolling_productivity` on 2026-08-25:
+
+| Fact | Value |
+|---|---|
+| Files in closure | 109 |
+| Markdown in closure | `study:SPEC.md` only |
+| Root docs in closure (`AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `docs/*`) | none |
+
+**Consequences worth knowing:**
+
+- Editing repository documentation does **not** stale a study seal.
+- `research_workflow/__init__.py` **is** in the closure. A cosmetic `__all__` edit stales a
+  sealed study. This has actually happened.
+- `GOVERNANCE_AUTHORITY_DATA_FILES` in `scripts/resolve_execution_manifest.py` pulls
+  `features/feature_lifecycle_baseline.json` and `features/feature_lifecycle_promotions.json`
+  into the closure. The second file is **absent**, which is a legitimate deny-state: a missing
+  promotions file grants nothing.
+
+---
+
+## Hashing convention
+
+`canonical_file_sha256()` in `scripts/resolve_execution_manifest.py` normalizes CRLF→LF for
+`.py .json .yaml .yml .md .txt .toml .cfg .ini` before hashing (finding **W7**), so a seal
+binds content rather than checkout policy. Everything else is hashed byte-exact.
+
+This repository is checked out with `core.autocrlf=true` and carries no `.gitattributes`, so
+**raw-bytes and normalized hashes of the same file differ on Windows**:
+
+| `scripts/validate_smoke.py` | Hash |
+|---|---|
+| raw bytes | `56f8409a…` |
+| normalized (what the gates use) | `27963595…` |
+
+**Known defect:** `scripts/tests/test_round2_invariants.py:317` hashes with `read_bytes()`
+instead of `canonical_file_sha256`, so four smoke-acceptance tests fail on any Windows
+checkout with `SMOKE_VALIDATOR_STALE`. `stability_source_snapshot.json` (root, orphaned — no
+code reads it) also holds raw-bytes hashes.
+
+---
+
+## Telemetry cost measurement
+
+Measured 2026-08-24 on a 213,431-event smoke day, generic collector, full surface:
+
+| Configuration | Replay wall time |
+|---|---|
+| `tracemalloc` off (default) | 5.73 s |
+| `tracemalloc` on | 35.24 s |
+
+≈6× — which is why it is opt-in (`NT_TELEMETRY_TRACEMALLOC=1`). Re-measure with
+`scripts/benchmark_historical_same_harness.py` rather than quoting these numbers.
+
+---
+
+## Study-specific event ordering
+
+Per-event callback ordering is a property of a **study family**, not of the infrastructure.
+It belongs in that study's `SPEC.md` and audit passes.
+
+For the regime-flip family the verified ordering is: completed 1s state update → checkpoint
+snapshot → candidate registration → horizon handling → coincident completed-timeframe regime
+update. Authority: `studies/clean_maturity_flip_model_rolling_productivity/` SPEC and audit
+passes, not this file.
+
+The **generic** guarantees (1s dispatched before its parent 1m, `ts_init` = close, derived
+timeframes aggregated from completed lower-timeframe bars) are rules and live in
+`docs/RESEARCH_WORKFLOW.md` §17.
+
+---
+
+## Audit history that justifies current limits
+
+| Fact | Source |
+|---|---|
+| ~60% of blocking audit findings were completeness, not look-ahead (`D1` 22, `C4` 22, `C3` 12, `D4` 9) across ~100 reports | why the audit gate is split |
+| One study ran **18 audit passes** and produced a 1,240-line append-only report | `studies/codex_5.6_short_rth_enriched_volume_level_retrain/` |
+| The Codex auditor silently missed 14 checklist rules including C4 and D4 | why `scripts/sync_agents.py` exists |
+| A cleanup followed a Windows junction out of a disposable worktree and destroyed 179 GB | why `scripts/safe_cleanup.py` fails closed |

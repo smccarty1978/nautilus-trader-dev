@@ -102,7 +102,7 @@ These are the specific things Claude has done here that cost real time.
 - **Don't rewrite canonical feature identity around timeframes.** `prior_5m_regime_efficiency`
   is an output alias. The identity is `regime_efficiency` with `timeframe: 5m`. Adding a
   provider "for the 5m case" is the same mistake in code.
-- **Don't loosen the outcome guard.** If `forward_outcomes/guard.py` rejects something,
+- **Don't loosen the outcome guard.** If `research_workflow/forward_outcomes/guard.py` rejects something,
   either it is a genuine leak or the column is misnamed. An unanchored substring match would
   reject `rolling_300s_giveback_atr`, which is a legitimate causal input.
 - **Don't wrap a canonical runner** to retry, monitor or babysit it. Use
@@ -118,22 +118,17 @@ These are the specific things Claude has done here that cost real time.
 
 ---
 
-## 6. Import, don't regenerate
+## 6. Three imports Claude keeps re-typing
 
-| Concern | Canonical import |
-|---|---|
-| Engine + venue + instrument | `backtests/nt_runtime/engine_builder.py` → `build_engine`, `create_futures_instrument` |
-| Catalog bar loading | `utils/runner/data.py` → `CausalDataLoader.load_bars` (never open `ParquetDataCatalog` inline) |
-| 1s-before-1m dispatch order | `utils/causal_registration.py` → `add_bars_causal_order` |
-| Study / stage / run plan / telemetry | `backtests/nt_runtime/{compiled_study_loader,data_plan,run_plan,telemetry}.py` |
-| Output persistence + surface enforcement | `research_workflow/output_manager.py` |
-| Collect entrypoint | `backtests/run_nt_study.py --mode collect` |
-| Standalone backtest entrypoint | `backtests/run_backtest.py` |
-| Strategy registration | `STRATEGY_REGISTRY` in `backtests/nt_runtime/strategy_binding.py` |
+The full canonical-import map is `docs/RESEARCH_WORKFLOW.md` §1 and §8. These three are here
+because they are the ones that have actually been re-implemented inline in this repository:
 
-`resolve_catalog_plan(...)` is the generic catalog/instrument/warmup resolver.
-`resolve_data_plan(...)` is the study-bound wrapper that additionally applies collector
-chronology and OOS gates — do not call it for a non-collector backtest.
+- **Catalog loading** — `utils/runner/data.py` → `CausalDataLoader.load_bars`. Never open a
+  `ParquetDataCatalog` inline; readiness R9 fails the study if you do.
+- **`resolve_data_plan` vs. `resolve_catalog_plan`** — the first is study-bound and applies
+  collector chronology plus OOS gates. Do not call it for a non-collector backtest.
+- **Strategy registration** — `STRATEGY_REGISTRY` lives in
+  `backtests/nt_runtime/strategy_binding.py`, not in `strategies/`.
 
 Shared helpers go in `research_workflow/`, `backtests/nt_runtime/`, `utils/runner/` or
 `features/`.
@@ -142,14 +137,17 @@ Shared helpers go in `research_workflow/`, `backtests/nt_runtime/`, `utils/runne
 
 ## 7. Risk tiers
 
-| Tier | Work | Process |
+The lifecycle itself is `docs/RESEARCH_WORKFLOW.md` §3 — do not restate it. Tiers only decide
+**how much ceremony** wraps it.
+
+| Tier | Work | Ceremony |
 |---|---|---|
-| **1** | Small fix, diagnostic, docs | Main session → targeted tests → local smoke. No agents, no auditor unless causal or timing logic changed |
-| **2** | Normal research study | `research_decision.yaml` → `SPEC.md` → `study.yaml` → compile → PREPARE+FREEZE → READINESS → preflight `CLEAR` → split pre-execution audit → seal → staged runner → completion contract check |
+| **1** | Small fix, diagnostic, docs | Main session → targeted tests → local smoke. No agents, and no auditor unless causal or timing logic changed |
+| **2** | Normal research study | The full lifecycle (§3), every stage |
 | **3** | Model freeze / deployment / cross-timeframe strategy | Tier 2, preceded by `repo-scout` for execution-closure and dependency evidence |
 
-Re-audit causality only when the audited surface actually changes. Re-run `contract-checker`
-on materialized outputs before acceptance.
+Claude-specific: re-audit causality only when the audited surface actually changes, and
+re-run `contract-checker` on materialized outputs before acceptance.
 
 ---
 

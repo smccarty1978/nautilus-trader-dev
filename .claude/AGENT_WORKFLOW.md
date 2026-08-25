@@ -76,16 +76,8 @@ Do not hand-edit `.agents/agents_staging/*.md` or `.codex/agents/*.toml`. The ha
 previously drifted far enough that the Codex auditor was silently missing 14 checklist rules,
 including C4 and D4 — the #2 and #4 most frequent finding categories in this repository.
 
-`.codex/agents/implementation-worker.toml` is Codex-only and is not generated; edit it
-directly.
-
----
-
-## Hooks
-
-`.claude/hooks/validate-results-triager-command.py` — a `PreToolUse` hook scoped to
-`results-triager`, restricting its Bash to pytest with no chaining, pipes, redirection, or
-command substitution.
+Every agent is generated for every harness. `implementation-worker` was retired in the
+2026-08 redesign; the `implementer` role replaces it.
 
 ---
 
