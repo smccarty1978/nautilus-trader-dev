@@ -172,6 +172,10 @@ class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
     feature_authority: str = "active"
     session: str = "RTH"                     # resolved via utils.session_boundaries
     session_end_censoring: bool = True       # from target_contract.censoring_policy
+    # Partitioned collection may replay causal lookahead bars while retaining only
+    # primary-interval candidates.  None preserves the ordinary study-wide surface.
+    primary_start_ts: Optional[int] = None
+    primary_end_ts: Optional[int] = None
 
 
 class FlipPredictionCollector(Strategy):
@@ -290,7 +294,7 @@ class FlipPredictionCollector(Strategy):
 
     def _append_candidate(self, record: Dict[str, Any]) -> None:
         """Emit only the study-declared surface plus canonical key/metadata fields."""
-        if self._benchmark_mode in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
+        if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
             return
         aliases = set(self._study_feature_aliases or self.cfg.feature_list or ())
         # Causality evidence is a runtime metadata field, not a feature.  It is
@@ -312,9 +316,9 @@ class FlipPredictionCollector(Strategy):
         elif bar.bar_type == self._bar_type_1m:
             self._benchmark_bars_1m += 1
             self.bars_1m_count = self._benchmark_bars_1m
-        if self._benchmark_mode == "empty_generic":
+        if getattr(self, "_benchmark_mode", "") == "empty_generic":
             return
-        if self._benchmark_mode == "regime_state" and bar.bar_type == self._bar_type_1s:
+        if getattr(self, "_benchmark_mode", "") == "regime_state" and bar.bar_type == self._bar_type_1s:
             return
         if bar.bar_type == self._bar_type_1s:
             self._handle_1s_bar(bar)
@@ -422,7 +426,7 @@ class FlipPredictionCollector(Strategy):
         contract in ``OutputManager.persist_collection`` rejects columns the study never
         declared. They belong to the observation surface, not the feature surface.
         """
-        if self._benchmark_mode in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
+        if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
             return
         self.pending_candidates.append({
             "observation_ts": cand_record["observation_ts"],
@@ -436,7 +440,8 @@ class FlipPredictionCollector(Strategy):
             ),
         })
         horizon_end = T + int(self.cfg.horizon_seconds) * NS
-        if self._next_pending_horizon_ns is None or horizon_end < self._next_pending_horizon_ns:
+        next_horizon = getattr(self, "_next_pending_horizon_ns", None)
+        if next_horizon is None or horizon_end < next_horizon:
             self._next_pending_horizon_ns = horizon_end
 
     def _emit_observation(
@@ -498,12 +503,13 @@ class FlipPredictionCollector(Strategy):
         giving the same-timestamp 1m flip its chance. ``final=True`` (run end) resolves
         those, because by then no further bar can arrive to change the answer.
         """
-        if self._benchmark_mode in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
+        if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
             return
         if not self.pending_candidates:
             self._next_pending_horizon_ns = None
             return
-        if not final and self._next_pending_horizon_ns is not None and now_ts < self._next_pending_horizon_ns:
+        next_horizon = getattr(self, "_next_pending_horizon_ns", None)
+        if not final and next_horizon is not None and now_ts < next_horizon:
             return
         still_pending: List[Dict[str, Any]] = []
         for cand in self.pending_candidates:
@@ -607,7 +613,7 @@ class FlipPredictionCollector(Strategy):
         v = float(bar.volume)
 
         if not self._is_targeted_60:
-            if self.velocity_tracker and self._benchmark_mode not in {"checkpoint_only", "baseline"}:
+            if self.velocity_tracker and getattr(self, "_benchmark_mode", "") not in {"checkpoint_only", "baseline"}:
                 self.velocity_tracker.update(c)
             if self.volume_tracker and not self._compact_surface:
                 self.volume_tracker.update(v, o, c)
@@ -616,7 +622,7 @@ class FlipPredictionCollector(Strategy):
                 self.lows_1s.append(l)
                 self.closes_1s.append(c)
 
-        if self._compact_surface and self._benchmark_mode not in {"checkpoint_only", "baseline"}:
+        if self._compact_surface and getattr(self, "_benchmark_mode", "") not in {"checkpoint_only", "baseline"}:
             # The selected V2 surface does not consume OHLCV-delta, price-level,
             # wick, range-position, pullback, or volume snapshots.  Structural,
             # rolling, and arrival providers maintain their own causal state.
@@ -754,6 +760,14 @@ class FlipPredictionCollector(Strategy):
         # This previously read `510 <= minute_of_day < 900` (08:30-15:00), silently
         # disagreeing with the 08:30-15:15 window used elsewhere in this same file.
         if not is_in_session(T, self.cfg.session):
+            return
+
+        # Warmup/lookahead bars are allowed to update state and dispose pending
+        # targets, but they must never create primary output rows.  The bounds are
+        # injected by the generic partition runner and are absent for normal runs.
+        if self.cfg.primary_start_ts is not None and T < self.cfg.primary_start_ts:
+            return
+        if self.cfg.primary_end_ts is not None and T > self.cfg.primary_end_ts:
             return
 
         trade_dir = -direction
@@ -965,7 +979,7 @@ class FlipPredictionCollector(Strategy):
                 T, self.structural_geometry_tracker._five_close_ts,
             ):
                 return
-            if self._benchmark_mode in {"checkpoint_only", "baseline"}:
+            if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline"}:
                 structural_feats, rolling_feats, velocity_feats = {}, {}, {}
             else:
                 structural_feats = self.structural_geometry_tracker.snapshot(

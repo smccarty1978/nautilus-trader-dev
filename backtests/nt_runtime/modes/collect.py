@@ -30,6 +30,8 @@ def run_collect_mode(
     log_level: str = "ERROR",
     feature_authority: str = "active",
     experiment_authorization: Optional[Dict[str, Any]] = None,
+    date_range: Optional[Tuple[str, str]] = None,
+    primary_interval: Optional[Tuple[int, int]] = None,
 ) -> Dict[str, Any]:
     """Runs a study in 'collect' mode through the NautilusTrader BacktestEngine."""
     # 1. Load and validate compiled study
@@ -57,15 +59,23 @@ def run_collect_mode(
         # lower-level planner to construct its bounded plan.
         period = str(experiment_authorization.get("period"))
         years = sorted(study_data.spec.chronology.train if period == "train" else study_data.spec.chronology.dev or [])
-        if not years:
+        if not years and date_range is None:
             raise RuntimeError(f"EXPERIMENT_AUTHORIZATION_EMPTY: {period}")
-        requested_start, requested_end = f"{years[0]}-01-01", f"{years[-1]}-12-31"
+        requested_start, requested_end = date_range or (f"{years[0]}-01-01", f"{years[-1]}-12-31")
         verified = verify_runtime_authorization(study_data.study_dir, experiment_authorization, requested_start, requested_end)
         authorized_dates_override = verified["dates"]
     run_plan = resolve_run_plan(
         study_data, stage=stage, reference_date=date_override,
         authorized_dates=authorized_dates_override,
     )
+    if date_range is not None:
+        run_plan = RunPlan(
+            stage=run_plan.stage,
+            start_date=date_range[0],
+            end_date=date_range[1],
+            is_bounded=True,
+            auto_expand=False,
+        )
 
     # Enforce strict smoke gate before stage=FULL (R3-1)
     if run_plan.stage == RunStage.FULL:
@@ -214,6 +224,7 @@ def run_collect_mode(
         return _execute_collect(
             study_data, spec, data_plan, run_plan, strategy_binding,
             output_mgr, telemetry, log_level, feature_authority,
+            primary_interval,
         )
     except KeyboardInterrupt as exc:
         output_mgr.finalize_failed(exc, status="ABORTED")
@@ -229,6 +240,7 @@ def build_collector_config_kwargs(
     study_data: Any,
     data_plan: DataPlan,
     *, feature_authority: str = "active",
+    primary_interval: Optional[Tuple[int, int]] = None,
 ) -> Dict[str, Any]:
     """Resolves the StrategyConfig kwargs a governed collector is constructed with.
 
@@ -291,6 +303,11 @@ def build_collector_config_kwargs(
         cfg_kwargs["phase0_manifest_path"] = str(study_data.study_dir / "artifacts" / "phase0_source_manifest.json")
     if hasattr(strategy_binding.config_cls, "feature_authority"):
         cfg_kwargs["feature_authority"] = feature_authority
+    if primary_interval is not None:
+        if hasattr(strategy_binding.config_cls, "primary_start_ts"):
+            cfg_kwargs["primary_start_ts"] = int(primary_interval[0])
+        if hasattr(strategy_binding.config_cls, "primary_end_ts"):
+            cfg_kwargs["primary_end_ts"] = int(primary_interval[1])
     return cfg_kwargs
 
 
@@ -304,22 +321,26 @@ def _execute_collect(
     telemetry,
     log_level: str,
     feature_authority: str = "active",
+    primary_interval: Optional[Tuple[int, int]] = None,
 ) -> Dict[str, Any]:
     """Runs the engine and persists results. Split out so the caller owns failure status."""
     # 5. Construct BacktestEngine and load bars in causal order
-    engine, instrument = build_engine(data_plan, log_level=log_level, telemetry=telemetry)
+    engine = None
+    try:
+        engine, instrument = build_engine(data_plan, log_level=log_level, telemetry=telemetry)
 
-    # 6. Build StrategyConfig
-    cfg_kwargs = build_collector_config_kwargs(
+        # 6. Build StrategyConfig
+        cfg_kwargs = build_collector_config_kwargs(
         strategy_binding, spec, study_data, data_plan, feature_authority=feature_authority,
-    )
+        primary_interval=primary_interval,
+        )
 
-    strategy_config = strategy_binding.config_cls(**cfg_kwargs)
-    strategy = strategy_binding.strategy_cls(strategy_config)
-    engine.add_strategy(strategy)
+        strategy_config = strategy_binding.config_cls(**cfg_kwargs)
+        strategy = strategy_binding.strategy_cls(strategy_config)
+        engine.add_strategy(strategy)
 
-    # 7. Execute in NautilusTrader event loop
-    engine.run()
+        # 7. Execute in NautilusTrader event loop
+        engine.run()
 
     # Extract collected surfaces from Strategy generically, failing closed rather than
     # silently reporting zero activity if bars genuinely loaded but the strategy exposes
@@ -328,39 +349,39 @@ def _execute_collect(
     # observations silently extracted as empty because the strategy predated this
     # interface convention). Shared with READINESS R6 via output_manager.py so this
     # contract has exactly one implementation.
-    bars_loaded_total = sum(telemetry.bars_loaded_by_tf.values())
-    candidates_df, observations_df = verify_strategy_output_interface(strategy, bars_loaded_total)
+        bars_loaded_total = sum(telemetry.bars_loaded_by_tf.values())
+        candidates_df, observations_df = verify_strategy_output_interface(strategy, bars_loaded_total)
 
     # Record bar callback breakdown
-    b1s = getattr(strategy, "bars_1s_count", 0)
-    b1m = getattr(strategy, "bars_1m_count", 0)
-    if b1s > 0:
-        telemetry.callbacks_by_tf["1s"] = b1s
-    if b1m > 0:
-        telemetry.callbacks_by_tf["1m"] = b1m
-    telemetry.update_candidates(len(candidates_df))
+        b1s = getattr(strategy, "bars_1s_count", 0)
+        b1m = getattr(strategy, "bars_1m_count", 0)
+        if b1s > 0:
+            telemetry.callbacks_by_tf["1s"] = b1s
+        if b1m > 0:
+            telemetry.callbacks_by_tf["1m"] = b1m
+        telemetry.update_candidates(len(candidates_df))
 
     # Population funnel (Packet E). Only strategies that implement
     # get_population_funnel() (currently the representative collector) contribute a
     # funnel; anything else leaves telemetry's population_* fields at None, which
     # OutputManager.persist_collection treats as "nothing to reconcile".
-    get_funnel = getattr(strategy, "get_population_funnel", None)
-    if callable(get_funnel):
-        funnel = get_funnel()
-        telemetry.record_population_funnel(
-            total_checkpoints=funnel["total_population_checkpoints"],
-            declared_contract_exclusions=funnel["declared_contract_exclusions"],
-            implementation_only_exclusions=funnel["implementation_only_exclusions"],
-            candidates_emitted_raw=funnel["candidates_emitted"],
-        )
+        get_funnel = getattr(strategy, "get_population_funnel", None)
+        if callable(get_funnel):
+            funnel = get_funnel()
+            telemetry.record_population_funnel(
+                total_checkpoints=funnel["total_population_checkpoints"],
+                declared_contract_exclusions=funnel["declared_contract_exclusions"],
+                implementation_only_exclusions=funnel["implementation_only_exclusions"],
+                candidates_emitted_raw=funnel["candidates_emitted"],
+            )
 
-    snapshot = telemetry.stop()
+        snapshot = telemetry.stop()
 
     # 8. Persist artifacts & update run manifests
-    status_data = output_mgr.persist_collection(candidates_df, observations_df, snapshot)
+        status_data = output_mgr.persist_collection(candidates_df, observations_df, snapshot)
 
     # 9. Print deterministic summary card
-    print(f"""======================================================================
+        print(f"""======================================================================
 NT RUN COMPLETED: {study_data.study_id} ({output_mgr.run_id})
 ======================================================================
 Mode: collect
@@ -378,4 +399,9 @@ Next stage:
   NOT AUTOMATICALLY STARTED
 =====================================================================""")
 
-    return status_data
+        return status_data
+    finally:
+        if engine is not None:
+            dispose = getattr(engine, "dispose", None)
+            if callable(dispose):
+                dispose()

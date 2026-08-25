@@ -13,6 +13,9 @@ from research_workflow.experiment import (
     runtime_authorization,
 )
 
+# Partitioned collection is imported lazily below to keep the public collection
+# module lightweight and to avoid initializing NT during planning/tests.
+
 
 def _year_window(years: tuple[int, ...]) -> tuple[str, str]:
     return f"{years[0]}-01-01", f"{years[-1]}-12-31"
@@ -74,3 +77,47 @@ def collect_period(
         "authorization_sha256": auth.authorization_sha256,
         "run": result,
     }
+
+
+def build_year_partitions(study_path, period="train", **kwargs):
+    from research_workflow.partitioning import build_year_partitions as _build
+    return _build(study_path, period, **kwargs)
+
+
+def collect_partition(study_path, partition, **kwargs):
+    from research_workflow.partitioning import collect_partition as _collect
+    return _collect(study_path, partition, **kwargs)
+
+
+def reconcile_partitions(partitions):
+    from research_workflow.partitioning import reconcile_partitions as _reconcile
+    return _reconcile(partitions)
+
+
+def merge_partition_outputs(frames, partitions, **kwargs):
+    from research_workflow.partitioning import merge_partition_outputs as _merge
+    return _merge(frames, partitions, **kwargs)
+
+
+def collect_period_partitioned(study_path, period="train", *, years=None, execute=False, output_dir=None, **kwargs):
+    """Collect an authorized period one bounded year partition at a time."""
+    from research_workflow.partitioning import build_year_partitions, collect_partition as _collect
+    partitions = build_year_partitions(study_path, period, years=years)
+    if not execute:
+        results = [_collect(study_path, partition, execute=False, output_dir=output_dir, **kwargs) for partition in partitions]
+    else:
+        # NautilusTrader's Rust logger is process-global and cannot be initialized
+        # twice in one interpreter.  Isolate each year so partitioning is genuinely
+        # memory-bounded and a completed engine cannot poison the next partition.
+        from concurrent.futures import ProcessPoolExecutor
+        jobs = [(str(study_path), partition, output_dir, kwargs) for partition in partitions]
+        with ProcessPoolExecutor(max_workers=1) as pool:
+            results = list(pool.map(_collect_partition_worker, jobs))
+    return {"period": period, "partition_count": len(partitions), "partitions": results,
+            "status": "COLLECTED" if execute else "PLANNED"}
+
+
+def _collect_partition_worker(args):
+    study_path, partition, output_dir, kwargs = args
+    from research_workflow.partitioning import collect_partition as _collect
+    return _collect(study_path, partition, execute=True, output_dir=output_dir, **kwargs)

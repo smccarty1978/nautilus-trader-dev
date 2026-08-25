@@ -1,8 +1,8 @@
 {
-  "seal_id": "preexec_seal_clean_maturity_flip_model_rolling_productivity_fd84e156682bdb11",
+  "seal_id": "preexec_seal_clean_maturity_flip_model_rolling_productivity_e5a8eb7b4a8d1d5b",
   "study_name": "clean_maturity_flip_model_rolling_productivity",
   "seal_status": "LOCKED",
-  "composite_seal_hash": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
+  "composite_seal_hash": "e5a8eb7b4a8d1d5b7f0629cf35b5bae25990141ec3f56a60e77efaa194ae3c32",
   "reviewer_provenance": {
     "causal": {
       "declared_auditor": "research_workflow.causal_audit",
@@ -20,15 +20,15 @@
   "causal_audit_verdict": {
     "audit_type": "causal",
     "auditor": "research_workflow.causal_audit",
-    "pass": 8,
+    "pass": 13,
     "verdict": "CLEAR",
     "critical": 0,
     "warning": 0,
     "note": 0,
     "causal_contract": "ts_avail <= T (latest_source_ts_init <= observation_ts)",
-    "audited_execution_composite_sha256": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
-    "audit_report_sha256": "793480413401d7c640aa2757bfc0f773c4e26dd04decb6339d171239ac5ea555",
-    "audit_report_path": "audit/pass_08.md",
+    "audited_execution_composite_sha256": "e5a8eb7b4a8d1d5b7f0629cf35b5bae25990141ec3f56a60e77efaa194ae3c32",
+    "audit_report_sha256": "3ad1b985d55afa0e321c166f4d9c8b6f4265c658d7c75ef7d7efe542278b3876",
+    "audit_report_path": "audit/pass_13.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "research_workflow.causal_audit",
@@ -53,12 +53,12 @@
       "repo:backtests/nt_runtime/data_plan.py": "a2b99760eebed4e3fd69f6752b5778035860fb4605a3a7f919afb798569835ef",
       "repo:backtests/nt_runtime/engine_builder.py": "8df12bfcd570830e3e1d259f35ba0339d5ce11a5deb919e64c218c1c9e882f50",
       "repo:backtests/nt_runtime/modes/__init__.py": "7699281dd37cdfbb152a55cefc325119d0502fb25b7d2414e5cf3f5467340ce4",
-      "repo:backtests/nt_runtime/modes/collect.py": "3783bc8ba4977acfe61412523a275d30c4258c47c36f3b44024278c2bba6f9ba",
+      "repo:backtests/nt_runtime/modes/collect.py": "1343df71140f705fd1f464ce8eb565409f993cbeff0a14a734757f9ef23f7217",
       "repo:backtests/nt_runtime/output_manager.py": "0395ba8607ac3a4c98233e3ab369f54dcb4f0712da5ecf7f37e0a8f2aae93bbf",
       "repo:backtests/nt_runtime/phase0.py": "da10baf623c09a7dfe3c9d5cb2aaa03ab70041be86747266ed4d2b83e1333446",
       "repo:backtests/nt_runtime/run_plan.py": "05975c9ff2de28aa1fe90af36ceb8a5a3f9df60203773a4d382233fb154bda7b",
       "repo:backtests/nt_runtime/strategy_binding.py": "74f8dcd4529e819b406c1f9c6ec08e1787453bc8f412f3a714ce54564619528f",
-      "repo:backtests/nt_runtime/telemetry.py": "dddf320b89aac84b3e62df8104b315e47ff150d8d7a80ce2cc8cc1e728dfa7ef",
+      "repo:backtests/nt_runtime/telemetry.py": "957b46643de5909f2a71e6b4f13cc9bc4f1c4fed19aac0a14f42e20196566e9e",
       "repo:backtests/run_nt_study.py": "30097869c9b55087500f659a905a0ce24fb323e4ad4264cb7c757f6f05ff8bff",
       "repo:features/__init__.py": "abfe0599ce47ef23bd78e69c59bfc5ec0f04c19aaa17de2c891b65ea1b1d5b74",
       "repo:features/authority/active.json": "7eca580b435b2bcc04ff6367345a2d51458d378b225f46072905d3f0187f5449",
@@ -86,7 +86,7 @@
       "repo:features/trackers/pullback.py": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00",
       "repo:features/trackers/range_position.py": "192d3eb4d2fa47894438de8d043c5aa4570e8cb1ce3e5e5f0764386f4cf1cbbe",
       "repo:features/trackers/rolling_5m_productivity.py": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
-      "repo:features/trackers/structural_regime_geometry.py": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "repo:features/trackers/structural_regime_geometry.py": "2a7c25d6f7f926e30e6301d8f26bc1a999d8defccba457315b678eeb7fd46a0e",
       "repo:features/trackers/velocity.py": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d",
       "repo:features/trackers/volume.py": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b",
       "repo:features/trackers/wick.py": "5252e26577986d8531fbf71007eb65e77cbd9982d4d8551b71b21b167e7b3134",
@@ -112,11 +112,13 @@
       "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
       "repo:research/study_types/flip_prediction.py": "e662823800d2b4a5514f1eaca52d894eac413d649c0473f35fb43dccf99b1ca6",
       "repo:research_workflow/__init__.py": "2db30381d989228f3493988d477bfada5565ac2d1c2d358e6c48f43c689cae2c",
-      "repo:research_workflow/collection.py": "66353b9ce1627a6bad42169ca38941b667aa1412735c9981b29b185b0f10bcf9",
+      "repo:research_workflow/collection.py": "46b553b476bb0d243c7b1e3c2216bb3732525fc83f26b87a26115ca4d51aa98b",
       "repo:research_workflow/compiler.py": "1977e34cff480e3224b6dce07b90f5d16e573fbed6617af4981832e38a75149c",
+      "repo:research_workflow/execution_plan.py": "995c5a8419380d9a1459da430b58cc064948f286ea0d7b98eda35a0499286582",
       "repo:research_workflow/experiment.py": "f3a61f87ade0deb4069d16b9911e8b9c79d5dc958bd621001b553b10c7028d90",
-      "repo:research_workflow/generic_collector.py": "a0141e6a326453da4fc0d06d95665175db1fdbeff18d6db40223ba82b0918707",
+      "repo:research_workflow/generic_collector.py": "6c8e3b52bf220e67507b2d7619e2dc542efa7148756422b38deced2299a56807",
       "repo:research_workflow/output_manager.py": "22b0865604ee2f2166ac9a283ffe3625166dd72533ab7c339bbe872dd47e2bb6",
+      "repo:research_workflow/partitioning.py": "8c0c8e3c83de45b919a382dd4e1ee990dfd5ba455851e452b3b352979bf0af8c",
       "repo:research_workflow/preflight.py": "fc548aea2037cf970fa15fd1686858d37dcec625122ca19e3fba37d296630562",
       "repo:research_workflow/seal.py": "07e7c27820d170f8c62f544c363d274b6511b2e9960d089cd00057cf7860f670",
       "repo:research_workflow/study_factory.py": "79bd5dca8c94db8c60284a97bcdbeff12d361eb3081571e54602278059100baa",
@@ -141,7 +143,7 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
       "study:SPEC.md": "734ac3300291c48483f854a35d4355408b1aa9ea316be55bba7b16e2b4bfd0d1",
-      "study:artifacts/phase0_source_manifest.json": "6391532e0202860308afe7b90f45473e1b5ef8c63e09ecbaa25e84fa9a220e6a",
+      "study:artifacts/phase0_source_manifest.json": "bfb45cf2848239ec20748e234400344319fb7056144c89615dfa16de77859cc2",
       "study:compiled_study.json": "64b7e1e079da12564a0864ccc0ea2844db137a59788684c58ce371d5a1944f93",
       "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
       "study:config/deliverables_contract.json": "75f653be74ec501f2df4be8c139ded3259507d5b6379eeed0a7e4a38bb170a0e",
@@ -156,20 +158,20 @@
       "study:study.yaml": "fd2aab80927037c62db97861e2c9922dbd084d80030177599b3613f4f854613d",
       "study:tests/test_study_contracts.py": "840f2cce707dc96359c85141b33e6cfd1632632f052becd06ed0dd6beef837bd"
     },
-    "timestamp": "2026-08-24T16:58:32.866065+00:00"
+    "timestamp": "2026-08-24T22:04:52.243133+00:00"
   },
   "contract_audit_verdict": {
     "audit_type": "contract",
     "auditor": "research_workflow.contract_audit",
-    "pass": 8,
+    "pass": 13,
     "verdict": "CLEAR",
     "critical": 0,
     "blocking": 0,
     "warning": 0,
     "not_verified": 0,
-    "audited_execution_composite_sha256": "fd84e156682bdb11e2f634d34d645e609f01aac220ab09c1f93c5fbc0d1050f4",
-    "audit_report_sha256": "b639d5e83f0badeffe496633c26b4cecdd5540b77124ab1ab7e7a1a72eaf389d",
-    "audit_report_path": "audit/contract_pass_08.md",
+    "audited_execution_composite_sha256": "e5a8eb7b4a8d1d5b7f0629cf35b5bae25990141ec3f56a60e77efaa194ae3c32",
+    "audit_report_sha256": "93d96bf090ecb9a32da2581a5b66eed4ac8130cce6b3d73b87c33ba4843b9e21",
+    "audit_report_path": "audit/contract_pass_13.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "research_workflow.contract_audit",
@@ -194,12 +196,12 @@
       "repo:backtests/nt_runtime/data_plan.py": "a2b99760eebed4e3fd69f6752b5778035860fb4605a3a7f919afb798569835ef",
       "repo:backtests/nt_runtime/engine_builder.py": "8df12bfcd570830e3e1d259f35ba0339d5ce11a5deb919e64c218c1c9e882f50",
       "repo:backtests/nt_runtime/modes/__init__.py": "7699281dd37cdfbb152a55cefc325119d0502fb25b7d2414e5cf3f5467340ce4",
-      "repo:backtests/nt_runtime/modes/collect.py": "3783bc8ba4977acfe61412523a275d30c4258c47c36f3b44024278c2bba6f9ba",
+      "repo:backtests/nt_runtime/modes/collect.py": "1343df71140f705fd1f464ce8eb565409f993cbeff0a14a734757f9ef23f7217",
       "repo:backtests/nt_runtime/output_manager.py": "0395ba8607ac3a4c98233e3ab369f54dcb4f0712da5ecf7f37e0a8f2aae93bbf",
       "repo:backtests/nt_runtime/phase0.py": "da10baf623c09a7dfe3c9d5cb2aaa03ab70041be86747266ed4d2b83e1333446",
       "repo:backtests/nt_runtime/run_plan.py": "05975c9ff2de28aa1fe90af36ceb8a5a3f9df60203773a4d382233fb154bda7b",
       "repo:backtests/nt_runtime/strategy_binding.py": "74f8dcd4529e819b406c1f9c6ec08e1787453bc8f412f3a714ce54564619528f",
-      "repo:backtests/nt_runtime/telemetry.py": "dddf320b89aac84b3e62df8104b315e47ff150d8d7a80ce2cc8cc1e728dfa7ef",
+      "repo:backtests/nt_runtime/telemetry.py": "957b46643de5909f2a71e6b4f13cc9bc4f1c4fed19aac0a14f42e20196566e9e",
       "repo:backtests/run_nt_study.py": "30097869c9b55087500f659a905a0ce24fb323e4ad4264cb7c757f6f05ff8bff",
       "repo:features/__init__.py": "abfe0599ce47ef23bd78e69c59bfc5ec0f04c19aaa17de2c891b65ea1b1d5b74",
       "repo:features/authority/active.json": "7eca580b435b2bcc04ff6367345a2d51458d378b225f46072905d3f0187f5449",
@@ -227,7 +229,7 @@
       "repo:features/trackers/pullback.py": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00",
       "repo:features/trackers/range_position.py": "192d3eb4d2fa47894438de8d043c5aa4570e8cb1ce3e5e5f0764386f4cf1cbbe",
       "repo:features/trackers/rolling_5m_productivity.py": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
-      "repo:features/trackers/structural_regime_geometry.py": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+      "repo:features/trackers/structural_regime_geometry.py": "2a7c25d6f7f926e30e6301d8f26bc1a999d8defccba457315b678eeb7fd46a0e",
       "repo:features/trackers/velocity.py": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d",
       "repo:features/trackers/volume.py": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b",
       "repo:features/trackers/wick.py": "5252e26577986d8531fbf71007eb65e77cbd9982d4d8551b71b21b167e7b3134",
@@ -253,11 +255,13 @@
       "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
       "repo:research/study_types/flip_prediction.py": "e662823800d2b4a5514f1eaca52d894eac413d649c0473f35fb43dccf99b1ca6",
       "repo:research_workflow/__init__.py": "2db30381d989228f3493988d477bfada5565ac2d1c2d358e6c48f43c689cae2c",
-      "repo:research_workflow/collection.py": "66353b9ce1627a6bad42169ca38941b667aa1412735c9981b29b185b0f10bcf9",
+      "repo:research_workflow/collection.py": "46b553b476bb0d243c7b1e3c2216bb3732525fc83f26b87a26115ca4d51aa98b",
       "repo:research_workflow/compiler.py": "1977e34cff480e3224b6dce07b90f5d16e573fbed6617af4981832e38a75149c",
+      "repo:research_workflow/execution_plan.py": "995c5a8419380d9a1459da430b58cc064948f286ea0d7b98eda35a0499286582",
       "repo:research_workflow/experiment.py": "f3a61f87ade0deb4069d16b9911e8b9c79d5dc958bd621001b553b10c7028d90",
-      "repo:research_workflow/generic_collector.py": "a0141e6a326453da4fc0d06d95665175db1fdbeff18d6db40223ba82b0918707",
+      "repo:research_workflow/generic_collector.py": "6c8e3b52bf220e67507b2d7619e2dc542efa7148756422b38deced2299a56807",
       "repo:research_workflow/output_manager.py": "22b0865604ee2f2166ac9a283ffe3625166dd72533ab7c339bbe872dd47e2bb6",
+      "repo:research_workflow/partitioning.py": "8c0c8e3c83de45b919a382dd4e1ee990dfd5ba455851e452b3b352979bf0af8c",
       "repo:research_workflow/preflight.py": "fc548aea2037cf970fa15fd1686858d37dcec625122ca19e3fba37d296630562",
       "repo:research_workflow/seal.py": "07e7c27820d170f8c62f544c363d274b6511b2e9960d089cd00057cf7860f670",
       "repo:research_workflow/study_factory.py": "79bd5dca8c94db8c60284a97bcdbeff12d361eb3081571e54602278059100baa",
@@ -282,7 +286,7 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
       "study:SPEC.md": "734ac3300291c48483f854a35d4355408b1aa9ea316be55bba7b16e2b4bfd0d1",
-      "study:artifacts/phase0_source_manifest.json": "6391532e0202860308afe7b90f45473e1b5ef8c63e09ecbaa25e84fa9a220e6a",
+      "study:artifacts/phase0_source_manifest.json": "bfb45cf2848239ec20748e234400344319fb7056144c89615dfa16de77859cc2",
       "study:compiled_study.json": "64b7e1e079da12564a0864ccc0ea2844db137a59788684c58ce371d5a1944f93",
       "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
       "study:config/deliverables_contract.json": "75f653be74ec501f2df4be8c139ded3259507d5b6379eeed0a7e4a38bb170a0e",
@@ -297,7 +301,7 @@
       "study:study.yaml": "fd2aab80927037c62db97861e2c9922dbd084d80030177599b3613f4f854613d",
       "study:tests/test_study_contracts.py": "840f2cce707dc96359c85141b33e6cfd1632632f052becd06ed0dd6beef837bd"
     },
-    "timestamp": "2026-08-24T16:58:35.841381+00:00"
+    "timestamp": "2026-08-24T22:04:55.173910+00:00"
   },
   "file_hashes": {
     "repo:backtests/nt_runtime/__init__.py": "10323c7cf54ad135db68b1ac8452d7a5b0d9e9e0d5e535933aa12d087314923d",
@@ -305,12 +309,12 @@
     "repo:backtests/nt_runtime/data_plan.py": "a2b99760eebed4e3fd69f6752b5778035860fb4605a3a7f919afb798569835ef",
     "repo:backtests/nt_runtime/engine_builder.py": "8df12bfcd570830e3e1d259f35ba0339d5ce11a5deb919e64c218c1c9e882f50",
     "repo:backtests/nt_runtime/modes/__init__.py": "7699281dd37cdfbb152a55cefc325119d0502fb25b7d2414e5cf3f5467340ce4",
-    "repo:backtests/nt_runtime/modes/collect.py": "3783bc8ba4977acfe61412523a275d30c4258c47c36f3b44024278c2bba6f9ba",
+    "repo:backtests/nt_runtime/modes/collect.py": "1343df71140f705fd1f464ce8eb565409f993cbeff0a14a734757f9ef23f7217",
     "repo:backtests/nt_runtime/output_manager.py": "0395ba8607ac3a4c98233e3ab369f54dcb4f0712da5ecf7f37e0a8f2aae93bbf",
     "repo:backtests/nt_runtime/phase0.py": "da10baf623c09a7dfe3c9d5cb2aaa03ab70041be86747266ed4d2b83e1333446",
     "repo:backtests/nt_runtime/run_plan.py": "05975c9ff2de28aa1fe90af36ceb8a5a3f9df60203773a4d382233fb154bda7b",
     "repo:backtests/nt_runtime/strategy_binding.py": "74f8dcd4529e819b406c1f9c6ec08e1787453bc8f412f3a714ce54564619528f",
-    "repo:backtests/nt_runtime/telemetry.py": "dddf320b89aac84b3e62df8104b315e47ff150d8d7a80ce2cc8cc1e728dfa7ef",
+    "repo:backtests/nt_runtime/telemetry.py": "957b46643de5909f2a71e6b4f13cc9bc4f1c4fed19aac0a14f42e20196566e9e",
     "repo:backtests/run_nt_study.py": "30097869c9b55087500f659a905a0ce24fb323e4ad4264cb7c757f6f05ff8bff",
     "repo:features/__init__.py": "abfe0599ce47ef23bd78e69c59bfc5ec0f04c19aaa17de2c891b65ea1b1d5b74",
     "repo:features/authority/active.json": "7eca580b435b2bcc04ff6367345a2d51458d378b225f46072905d3f0187f5449",
@@ -338,7 +342,7 @@
     "repo:features/trackers/pullback.py": "7729ec97d420ccd93e98e0f53a7ffc9f69ecd2f3329a6fa41e0930013579ed00",
     "repo:features/trackers/range_position.py": "192d3eb4d2fa47894438de8d043c5aa4570e8cb1ce3e5e5f0764386f4cf1cbbe",
     "repo:features/trackers/rolling_5m_productivity.py": "965f02c7813c7e40a58278ca65e3e140eaf1eb7e4596a3ffd0235092f4b9848b",
-    "repo:features/trackers/structural_regime_geometry.py": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4",
+    "repo:features/trackers/structural_regime_geometry.py": "2a7c25d6f7f926e30e6301d8f26bc1a999d8defccba457315b678eeb7fd46a0e",
     "repo:features/trackers/velocity.py": "0427f575e1037c1ee4e596e66c9ae0c73144ec51f3293676b9bd03f2ee48f23d",
     "repo:features/trackers/volume.py": "dca8a2467e01b82a405c33e04faa9c059fc02dc1bba53f69d3da14d99eaa1a5b",
     "repo:features/trackers/wick.py": "5252e26577986d8531fbf71007eb65e77cbd9982d4d8551b71b21b167e7b3134",
@@ -364,11 +368,13 @@
     "repo:research/study_types/bespoke.py": "8439ee453773d7b01062c210bd833a7ed759db7231358a15ce527bc19a231ed0",
     "repo:research/study_types/flip_prediction.py": "e662823800d2b4a5514f1eaca52d894eac413d649c0473f35fb43dccf99b1ca6",
     "repo:research_workflow/__init__.py": "2db30381d989228f3493988d477bfada5565ac2d1c2d358e6c48f43c689cae2c",
-    "repo:research_workflow/collection.py": "66353b9ce1627a6bad42169ca38941b667aa1412735c9981b29b185b0f10bcf9",
+    "repo:research_workflow/collection.py": "46b553b476bb0d243c7b1e3c2216bb3732525fc83f26b87a26115ca4d51aa98b",
     "repo:research_workflow/compiler.py": "1977e34cff480e3224b6dce07b90f5d16e573fbed6617af4981832e38a75149c",
+    "repo:research_workflow/execution_plan.py": "995c5a8419380d9a1459da430b58cc064948f286ea0d7b98eda35a0499286582",
     "repo:research_workflow/experiment.py": "f3a61f87ade0deb4069d16b9911e8b9c79d5dc958bd621001b553b10c7028d90",
-    "repo:research_workflow/generic_collector.py": "a0141e6a326453da4fc0d06d95665175db1fdbeff18d6db40223ba82b0918707",
+    "repo:research_workflow/generic_collector.py": "6c8e3b52bf220e67507b2d7619e2dc542efa7148756422b38deced2299a56807",
     "repo:research_workflow/output_manager.py": "22b0865604ee2f2166ac9a283ffe3625166dd72533ab7c339bbe872dd47e2bb6",
+    "repo:research_workflow/partitioning.py": "8c0c8e3c83de45b919a382dd4e1ee990dfd5ba455851e452b3b352979bf0af8c",
     "repo:research_workflow/preflight.py": "fc548aea2037cf970fa15fd1686858d37dcec625122ca19e3fba37d296630562",
     "repo:research_workflow/seal.py": "07e7c27820d170f8c62f544c363d274b6511b2e9960d089cd00057cf7860f670",
     "repo:research_workflow/study_factory.py": "79bd5dca8c94db8c60284a97bcdbeff12d361eb3081571e54602278059100baa",
@@ -393,7 +399,7 @@
     "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
     "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
     "study:SPEC.md": "734ac3300291c48483f854a35d4355408b1aa9ea316be55bba7b16e2b4bfd0d1",
-    "study:artifacts/phase0_source_manifest.json": "6391532e0202860308afe7b90f45473e1b5ef8c63e09ecbaa25e84fa9a220e6a",
+    "study:artifacts/phase0_source_manifest.json": "bfb45cf2848239ec20748e234400344319fb7056144c89615dfa16de77859cc2",
     "study:compiled_study.json": "64b7e1e079da12564a0864ccc0ea2844db137a59788684c58ce371d5a1944f93",
     "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
     "study:config/deliverables_contract.json": "75f653be74ec501f2df4be8c139ded3259507d5b6379eeed0a7e4a38bb170a0e",
@@ -407,8 +413,8 @@
     "study:research_decision.yaml": "500b3849e1222d5e9397ee9247f0a7043251780734d4592a14ef5997e0960c39",
     "study:study.yaml": "fd2aab80927037c62db97861e2c9922dbd084d80030177599b3613f4f854613d",
     "study:tests/test_study_contracts.py": "840f2cce707dc96359c85141b33e6cfd1632632f052becd06ed0dd6beef837bd",
-    "study:audit/status.json": "6460725bd6e79d5e0dd4cc3a50368aeb974d159690a33e5e4f62d9311e727f0b",
-    "study:audit/contract_status.json": "943c5ff6cdc1b4d509ec60e28e436b31ba6cabfb97352b1fcf1592468412df59",
+    "study:audit/status.json": "5771b93c6e15bb59d159a458446cbcc36b19f175bf1359ec9027e3b21a1cb0fb",
+    "study:audit/contract_status.json": "f0f09203a9abcd8e9681bf16fbd6e801c13a75a70cd2f80f2c9b0c4dd5a3f282",
     "study:audit/contract_pass_01.md": "58ef5dcac5e451ff234f93dfe2f5df8800205c4f3c06d35c7fb09b4ac79e8f0b",
     "study:audit/contract_pass_02.md": "85c5e712f5c3e5610020c8f9b197b1f90f0a4ec143f194af50c1edf5eae98289",
     "study:audit/contract_pass_03.md": "9a65417058dd14587ae0561c511bffecc35705a4518f0ef0f0e39a97081b99a0",
@@ -417,6 +423,11 @@
     "study:audit/contract_pass_06.md": "352ade662b056a91751a1e2cf7e8561634e3ab69f0fd0e0f1354d47df2dcde55",
     "study:audit/contract_pass_07.md": "13529b6dc2f4f3f4c20318bdf1dd2518c1cd8dac3e31682b57a9e2d1d66eed2b",
     "study:audit/contract_pass_08.md": "b639d5e83f0badeffe496633c26b4cecdd5540b77124ab1ab7e7a1a72eaf389d",
+    "study:audit/contract_pass_09.md": "511e5ec402836fbb159e94f79f31b6b795564fa409145b04224506b72d9229ee",
+    "study:audit/contract_pass_10.md": "d6e566d21fe95dc3da8a855a3d417ec557acd9a34f018739c535b618e7c0ab23",
+    "study:audit/contract_pass_11.md": "cb6f29f29f9f5a19b76a1449281ff71058262e05d43cccaad030f214b355e3a2",
+    "study:audit/contract_pass_12.md": "cb6f29f29f9f5a19b76a1449281ff71058262e05d43cccaad030f214b355e3a2",
+    "study:audit/contract_pass_13.md": "93d96bf090ecb9a32da2581a5b66eed4ac8130cce6b3d73b87c33ba4843b9e21",
     "study:audit/pass_01.md": "7610494930e5522e4095941ba2a82a1baa025bb3c7354756c629a14f71b72a52",
     "study:audit/pass_02.md": "51f3f147ed0b4f07a0705bd4c3e996250d1bd272b544db7081bee540730d1c11",
     "study:audit/pass_03.md": "e55bd08cff154bb92926c9a54e72d0de704f40de6f4d3863d2509331fc15fd03",
@@ -424,7 +435,12 @@
     "study:audit/pass_05.md": "f05c2ad01e9da5d83a9197442c0a72e82c00c775d6dad91636222d46b1d72495",
     "study:audit/pass_06.md": "6035d4524787ce93b5f4420f65ae063e6d3ee12a43c44cfd2a3aac6ebdd64e7b",
     "study:audit/pass_07.md": "e87bd83f12bad61e816b9a0a53d089d4a9ed83bffc001b6be41f1ef102d1f5fe",
-    "study:audit/pass_08.md": "793480413401d7c640aa2757bfc0f773c4e26dd04decb6339d171239ac5ea555"
+    "study:audit/pass_08.md": "793480413401d7c640aa2757bfc0f773c4e26dd04decb6339d171239ac5ea555",
+    "study:audit/pass_09.md": "ac5939c4eb6641bb3e6ad828227a05b442892f3a757e705cd5f70c16d43c5768",
+    "study:audit/pass_10.md": "459aad681be00e585e0c6c80f85a5e8659e58b0de927d653d7a4d7fd2a1f0433",
+    "study:audit/pass_11.md": "1f2f36465d4b04e6a3cd071f04b4c5468527151c80df6e185efef4045a79ac8d",
+    "study:audit/pass_12.md": "1f2f36465d4b04e6a3cd071f04b4c5468527151c80df6e185efef4045a79ac8d",
+    "study:audit/pass_13.md": "3ad1b985d55afa0e321c166f4d9c8b6f4265c658d7c75ef7d7efe542278b3876"
   },
   "evidence": {
     "repo_backtests_nt_runtime___init___py": {
@@ -449,7 +465,7 @@
     },
     "repo_backtests_nt_runtime_modes_collect_py": {
       "path": "repo:backtests/nt_runtime/modes/collect.py",
-      "sha256": "3783bc8ba4977acfe61412523a275d30c4258c47c36f3b44024278c2bba6f9ba"
+      "sha256": "1343df71140f705fd1f464ce8eb565409f993cbeff0a14a734757f9ef23f7217"
     },
     "repo_backtests_nt_runtime_output_manager_py": {
       "path": "repo:backtests/nt_runtime/output_manager.py",
@@ -469,7 +485,7 @@
     },
     "repo_backtests_nt_runtime_telemetry_py": {
       "path": "repo:backtests/nt_runtime/telemetry.py",
-      "sha256": "dddf320b89aac84b3e62df8104b315e47ff150d8d7a80ce2cc8cc1e728dfa7ef"
+      "sha256": "957b46643de5909f2a71e6b4f13cc9bc4f1c4fed19aac0a14f42e20196566e9e"
     },
     "repo_backtests_run_nt_study_py": {
       "path": "repo:backtests/run_nt_study.py",
@@ -581,7 +597,7 @@
     },
     "repo_features_trackers_structural_regime_geometry_py": {
       "path": "repo:features/trackers/structural_regime_geometry.py",
-      "sha256": "36e97edd6c73cab94464d567d12a57005c50649accf81a2a8066120fb3ea85d4"
+      "sha256": "2a7c25d6f7f926e30e6301d8f26bc1a999d8defccba457315b678eeb7fd46a0e"
     },
     "repo_features_trackers_velocity_py": {
       "path": "repo:features/trackers/velocity.py",
@@ -685,11 +701,15 @@
     },
     "repo_research_workflow_collection_py": {
       "path": "repo:research_workflow/collection.py",
-      "sha256": "66353b9ce1627a6bad42169ca38941b667aa1412735c9981b29b185b0f10bcf9"
+      "sha256": "46b553b476bb0d243c7b1e3c2216bb3732525fc83f26b87a26115ca4d51aa98b"
     },
     "repo_research_workflow_compiler_py": {
       "path": "repo:research_workflow/compiler.py",
       "sha256": "1977e34cff480e3224b6dce07b90f5d16e573fbed6617af4981832e38a75149c"
+    },
+    "repo_research_workflow_execution_plan_py": {
+      "path": "repo:research_workflow/execution_plan.py",
+      "sha256": "995c5a8419380d9a1459da430b58cc064948f286ea0d7b98eda35a0499286582"
     },
     "repo_research_workflow_experiment_py": {
       "path": "repo:research_workflow/experiment.py",
@@ -697,11 +717,15 @@
     },
     "repo_research_workflow_generic_collector_py": {
       "path": "repo:research_workflow/generic_collector.py",
-      "sha256": "a0141e6a326453da4fc0d06d95665175db1fdbeff18d6db40223ba82b0918707"
+      "sha256": "6c8e3b52bf220e67507b2d7619e2dc542efa7148756422b38deced2299a56807"
     },
     "repo_research_workflow_output_manager_py": {
       "path": "repo:research_workflow/output_manager.py",
       "sha256": "22b0865604ee2f2166ac9a283ffe3625166dd72533ab7c339bbe872dd47e2bb6"
+    },
+    "repo_research_workflow_partitioning_py": {
+      "path": "repo:research_workflow/partitioning.py",
+      "sha256": "8c0c8e3c83de45b919a382dd4e1ee990dfd5ba455851e452b3b352979bf0af8c"
     },
     "repo_research_workflow_preflight_py": {
       "path": "repo:research_workflow/preflight.py",
@@ -801,7 +825,7 @@
     },
     "study_artifacts_phase0_source_manifest_json": {
       "path": "study:artifacts/phase0_source_manifest.json",
-      "sha256": "6391532e0202860308afe7b90f45473e1b5ef8c63e09ecbaa25e84fa9a220e6a"
+      "sha256": "bfb45cf2848239ec20748e234400344319fb7056144c89615dfa16de77859cc2"
     },
     "study_compiled_study_json": {
       "path": "study:compiled_study.json",
@@ -857,11 +881,11 @@
     },
     "study_audit_status_json": {
       "path": "study:audit/status.json",
-      "sha256": "6460725bd6e79d5e0dd4cc3a50368aeb974d159690a33e5e4f62d9311e727f0b"
+      "sha256": "5771b93c6e15bb59d159a458446cbcc36b19f175bf1359ec9027e3b21a1cb0fb"
     },
     "study_audit_contract_status_json": {
       "path": "study:audit/contract_status.json",
-      "sha256": "943c5ff6cdc1b4d509ec60e28e436b31ba6cabfb97352b1fcf1592468412df59"
+      "sha256": "f0f09203a9abcd8e9681bf16fbd6e801c13a75a70cd2f80f2c9b0c4dd5a3f282"
     },
     "study_audit_contract_pass_01_md": {
       "path": "study:audit/contract_pass_01.md",
@@ -895,6 +919,26 @@
       "path": "study:audit/contract_pass_08.md",
       "sha256": "b639d5e83f0badeffe496633c26b4cecdd5540b77124ab1ab7e7a1a72eaf389d"
     },
+    "study_audit_contract_pass_09_md": {
+      "path": "study:audit/contract_pass_09.md",
+      "sha256": "511e5ec402836fbb159e94f79f31b6b795564fa409145b04224506b72d9229ee"
+    },
+    "study_audit_contract_pass_10_md": {
+      "path": "study:audit/contract_pass_10.md",
+      "sha256": "d6e566d21fe95dc3da8a855a3d417ec557acd9a34f018739c535b618e7c0ab23"
+    },
+    "study_audit_contract_pass_11_md": {
+      "path": "study:audit/contract_pass_11.md",
+      "sha256": "cb6f29f29f9f5a19b76a1449281ff71058262e05d43cccaad030f214b355e3a2"
+    },
+    "study_audit_contract_pass_12_md": {
+      "path": "study:audit/contract_pass_12.md",
+      "sha256": "cb6f29f29f9f5a19b76a1449281ff71058262e05d43cccaad030f214b355e3a2"
+    },
+    "study_audit_contract_pass_13_md": {
+      "path": "study:audit/contract_pass_13.md",
+      "sha256": "93d96bf090ecb9a32da2581a5b66eed4ac8130cce6b3d73b87c33ba4843b9e21"
+    },
     "study_audit_pass_01_md": {
       "path": "study:audit/pass_01.md",
       "sha256": "7610494930e5522e4095941ba2a82a1baa025bb3c7354756c629a14f71b72a52"
@@ -926,6 +970,26 @@
     "study_audit_pass_08_md": {
       "path": "study:audit/pass_08.md",
       "sha256": "793480413401d7c640aa2757bfc0f773c4e26dd04decb6339d171239ac5ea555"
+    },
+    "study_audit_pass_09_md": {
+      "path": "study:audit/pass_09.md",
+      "sha256": "ac5939c4eb6641bb3e6ad828227a05b442892f3a757e705cd5f70c16d43c5768"
+    },
+    "study_audit_pass_10_md": {
+      "path": "study:audit/pass_10.md",
+      "sha256": "459aad681be00e585e0c6c80f85a5e8659e58b0de927d653d7a4d7fd2a1f0433"
+    },
+    "study_audit_pass_11_md": {
+      "path": "study:audit/pass_11.md",
+      "sha256": "1f2f36465d4b04e6a3cd071f04b4c5468527151c80df6e185efef4045a79ac8d"
+    },
+    "study_audit_pass_12_md": {
+      "path": "study:audit/pass_12.md",
+      "sha256": "1f2f36465d4b04e6a3cd071f04b4c5468527151c80df6e185efef4045a79ac8d"
+    },
+    "study_audit_pass_13_md": {
+      "path": "study:audit/pass_13.md",
+      "sha256": "3ad1b985d55afa0e321c166f4d9c8b6f4265c658d7c75ef7d7efe542278b3876"
     }
   }
 }
