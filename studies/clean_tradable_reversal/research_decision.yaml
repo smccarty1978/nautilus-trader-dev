@@ -1,0 +1,230 @@
+research_question: >
+  Among high-confidence Stage-1 flip predictions (frozen Model C, TRAIN P90), can
+  information available at the decision timestamp T distinguish economically clean
+  reversals from ugly, weak, or failed reversals?
+
+status: FORMALIZED_NOT_SCAFFOLDED
+
+stage1_dependency:
+  parent_study: clean_maturity_flip_model_rolling_productivity
+  frozen: true
+  retrain_prohibited: true
+  frozen_execution_composite_sha256: 7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8
+  train_experiment_freeze_artifact: artifacts/train_experiment_freeze_repaired.json
+  model_artifact: artifacts/train_fitted_models.joblib
+  model_hashes:
+    LONG_C: a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38
+    SHORT_C: 5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf
+  preprocessing_hash: 0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4
+  threshold_source: train_experiment_freeze_repaired.json (derivation=TRAIN_ONLY)
+  thresholds_p90:
+    LONG: 0.43654834666810594
+    SHORT: 0.4214933537606981
+  note: >
+    Stage-1's own internal arms A/B/C (baseline / +structural / +rolling productivity)
+    are an unrelated prior comparison. "Model C" here means the frozen 13-feature
+    Stage-1 classifier whose score is consumed as a single derived input
+    (stage1_model_c_score) below -- it is not retrained or re-selected by this study.
+
+derived_causal_inputs:
+  - name: stage1_model_c_score
+    kind: frozen_external_model_score
+    not_a_feature_instance: true
+    binds_to: [stage1_dependency.model_hashes, stage1_dependency.preprocessing_hash,
+               stage1_dependency.train_experiment_freeze_artifact]
+
+primary_population:
+  selection: one_first_crossing_per_regime
+  threshold: stage1_dependency.thresholds_p90 (TRAIN-only, frozen)
+  direction: [LONG, SHORT]
+  maturity_definition: prevailing eligible 1m regime age at T (causal, backward-looking)
+  primary_maturity_buckets: ["300-600s", "600-900s", "900-1800s"]
+  diagnostic_maturity_buckets: ["<300s", ">=1800s"]
+  train_counts_2021_2023:
+    LONG: {300-600s: 538, 600-900s: 428, 900-1800s: 301, total_primary: 1267, "<300s": 87, ">=1800s": 0}
+    SHORT: {300-600s: 538, 600-900s: 494, 900-1800s: 403, total_primary: 1435, "<300s": 54, ">=1800s": 1}
+  train_counts_source: repaired_first_crossing_analysis.json (model=C, threshold=p90; TRAIN-only, no 2024/2025/2026 content)
+  flip_resolution_censored_at_p90: 0
+  maturity_role: population_slice_only, never a model input
+
+target:
+  status: PROVISIONAL_PENDING_TRAIN_BALANCE
+  status_meaning: >
+    T1 is the predeclared primary target candidate. It is NOT finally frozen for
+    modeling. The only artifact currently missing to finalize it is TRAIN-only
+    MFE_300s_atr / MAE_300s_atr class balance for the primary population above --
+    no such artifact exists anywhere in the repository as of this decision (verified
+    by direct inspection of train_observations_repaired_merged.parquet, which carries
+    only the Stage-1 flip-classification label, and by a repo-wide search that found
+    no MFE_300s_atr/MAE_300s_atr/clean_tradable_reversal artifact for this population).
+  primary_candidate:
+    id: T1
+    definition: >
+      CLEAN_TRADABLE_REVERSAL = 1 iff accepted opposite regime flip occurs within
+      (T, T+300s] AND MFE_300s_atr >= 1.0 AND MAE_300s_atr <= 0.5; else 0, subject
+      to censoring.
+    entry_reference: NEXT_BAR_OPEN
+    atr_reference: entry_atr frozen at entry_ts
+    horizon_seconds: 300
+    bar_inclusion: FULLY_FORWARD
+    censoring_states: [RESOLVED, CENSORED_SESSION, CENSORED_HORIZON, CENSORED_DATA_END]
+    censoring_source: research_workflow.forward_outcomes.contracts.OutcomeStatus
+    censored_rows_never_coerced_to_negative: true
+    shared_upper_bound_train_only:
+      note: flip-within-300s rate at P90 (necessary but not sufficient for T1=1)
+      LONG: {300-600s: 0.3420074349442379, 600-900s: 0.37616822429906543, 900-1800s: 0.3920265780730897}
+      SHORT: {300-600s: 0.3252788104089219, 600-900s: 0.38461538461538464, 900-1800s: 0.3548387096774194}
+      source: repaired_first_crossing_analysis.json
+  diagnostic_alternatives_train_only_evaluation_pending:
+    - id: T2
+      definition: flip within 300s AND MFE_300s_atr >= 1.0 AND return_300s_atr > 0
+    - id: T3
+      definition: flip within 300s AND MFE_300s_atr >= 1.0
+  selection_rule: >
+    Prefer T1 unless the TRAIN_TARGET_BALANCE_PASS below shows an operational
+    rejection reason: vanishing positive class, severe LONG/SHORT collapse, severe
+    maturity-bucket collapse, or pathological censoring. T2/T3 having a higher
+    positive rate is explicitly NOT a rejection reason for T1. OOS/predictive
+    performance may never be used to choose or revise the target.
+
+required_pre_freeze_gates:
+  - id: TRAIN_TARGET_BALANCE_PASS
+    status: NOT_EXECUTED
+    must_run_before: [target freeze, TRAIN collection authorization, PREPARE]
+    scope:
+      population: primary_population above (2702 primary regimes: 1267 LONG + 1435 SHORT)
+      period: [2021, 2022, 2023]
+      outcome_module: research_workflow.forward_outcomes
+      entry_reference: NEXT_BAR_OPEN
+      atr_reference: frozen_at_entry_ts
+      horizon_seconds: 300
+      bar_inclusion: FULLY_FORWARD
+    required_outputs:
+      - T1 balance (overall, LONG, SHORT, by maturity bucket)
+      - T2 diagnostic balance
+      - T3 diagnostic balance
+      - T1 negative subtype counts (flip_failed, flip_correct_low_mfe, flip_correct_high_mae, multiple_failures)
+      - censoring counts by reason
+    enforcement_note: >
+      This gate is NOT machine-enforced by any existing StudySpec/compiler check --
+      see schema_constraints_found below. It is binding by decision-contract authority
+      only until study.yaml exists; whoever authors study.yaml must not compile/PREPARE
+      this study until this gate's required_outputs are recorded here.
+
+feature_surface:
+  arm_a:
+    inputs: [stage1_model_c_score]
+    count: 1
+  arm_b:
+    inputs: [stage1_model_c_score, "+ original Stage-1 13 FeatureInstances (see below)"]
+    count: 14
+    original_13:
+      - {feature: regime_efficiency, parameters: {timeframe: 1m, context: prior, bar_state: completed}}
+      - {feature: regime_mfe_atr,    parameters: {timeframe: 1m, context: prior, bar_state: completed}}
+      - {feature: regime_range_atr,  parameters: {timeframe: 1m, context: prior, bar_state: completed}}
+      - {feature: regime_efficiency, parameters: {timeframe: 5m, context: prior, bar_state: completed}}
+      - {feature: regime_mfe_atr,    parameters: {timeframe: 5m, context: prior, bar_state: completed}}
+      - {feature: regime_range_atr,  parameters: {timeframe: 5m, context: prior, bar_state: completed}}
+      - {feature: rolling_retention_ratio,      parameters: {window: 300s, update_every: 1s}}
+      - {feature: rolling_current_progress_atr, parameters: {window: 300s, update_every: 1s}}
+      - {feature: rolling_max_progress_atr,     parameters: {window: 300s, update_every: 1s}}
+      - {feature: rolling_giveback_atr,         parameters: {window: 300s, update_every: 1s}}
+      - {feature: arrival_velocity,     parameters: {input_timeframe: 1s, lookback: 20, bar_state: completed}}
+      - {feature: arrival_acceleration, parameters: {input_timeframe: 1s, short_lookback: 20, bar_state: completed}}
+      - {feature: ema_slope,            parameters: {ema_role: short, lookback: 20}}
+  arm_c:
+    inputs: [stage1_model_c_score, "+ original 13", "+ final 7 additions below"]
+    count: 21
+    additions:
+      - {feature: regime_range_atr_per_min, parameters: {timeframe: 5m, context: current, bar_state: completed}}
+      - {feature: distance_to_completed_range_high_atr, parameters: {reference_timeframe: 5m, bar_state: completed}}
+      - {feature: distance_to_completed_range_low_atr,  parameters: {reference_timeframe: 5m, bar_state: completed}}
+      - {feature: relative_volume, parameters: {input_timeframe: 1s, aggregation_lookback: 5, baseline_lookback: 5, bar_state: completed}}
+      - {feature: est_delta_ratio, parameters: {context: rolling, timeframe: 30s}}
+      - {feature: range_position,  parameters: {timeframe: 1m, lookback: 5, bar_state: completed}}
+      - {feature: wick_imbalance,  parameters: {timeframe: 1m, bar_state: completed}}
+  feature_promotions_required: none
+  deferred_not_included:
+    - {feature: regime_age_min, parameters: {timeframe: 5m, context: current}, reason: "overlaps the maturity population-slice age axis; kept out for first-pass interpretability"}
+    - {feature: arrival_velocity_ratio, reason: "near-duplicate of arrival_velocity + arrival_acceleration already in the 13"}
+    - {family: regime_median_center_slope_alignment, reason: "22 verified features; deferred to avoid muddling the compact clean-vs-ugly hypothesis"}
+    - {concept: raw_volatility_atr_level, reason: "no canonical FeatureInstance exists for this in the active bundle; not essential for first pass"}
+
+model_arms:
+  A: stage1_model_c_score only
+  B: A plus original Stage-1 13 causal features
+  C: B plus final 7 canonical context FeatureInstances
+variable_being_tested:
+  - contemporaneous_current_regime_pace
+  - room_to_range_boundary
+  - participation_and_signed_order_flow
+  - signal_bar_shape_and_rejection
+
+primary_comparison: >
+  Does B improve over A, and does C improve over B, on predicting
+  CLEAN_TRADABLE_REVERSAL -- separately for LONG and SHORT, reported by maturity
+  bucket (maturity is a reporting slice, never a model input).
+
+acceptance_logic:
+  R1: "Stage-1 score alone substantially ranks clean-path probability -> flip confidence already contains economic-quality information"
+  R2: "B > A robustly -> original causal feature surface contains economic information beyond score"
+  R3: "C > B robustly -> contemporaneous geometry/participation/bar-shape adds economic-quality signal"
+  R4: "classification signal exists but forward economic enrichment is weak -> reconsider target formulation later"
+  R5: "no arm adds useful discrimination -> clean-vs-ugly is not predictable from this signal-time surface"
+  no_hard_auc_threshold_set: true
+
+prohibited_changes:
+  - use_2024_2025_2026_for_target_selection
+  - use_2024_2025_2026_for_feature_selection
+  - use_2024_2025_2026_for_population_definition
+  - change_target_after_seeing_predictive_performance
+  - change_feature_surface_after_seeing_predictive_performance
+  - retrain_or_reselect_stage1
+  - broaden_arm_c_into_a_feature_mining_pass
+  - coerce_censored_target_rows_to_negative
+
+allowed_changes:
+  - execute_TRAIN_TARGET_BALANCE_PASS_and_record_results_here
+  - reject_T1_for_the_explicit_operational_reasons_listed_above_only
+  - evaluate_model_arms_a_b_c
+  - stratify_by_maturity_buckets
+
+chronology:
+  train: [2021, 2022, 2023]
+  temporal_validation: {fit: [2021, 2022], validation: [2023]}
+  dev_oos: [2024]
+  prohibited: [2025, 2026]
+
+schema_constraints_found:
+  note: >
+    study.yaml (research.schemas.study_spec.StudySpec, extra="forbid") is NOT
+    scaffolded this session. Three genuine gaps were found, each of which would
+    force either an omission or a semantically-wrong field reuse if study.yaml were
+    written now -- both are misleading contracts, so authoring stopped here per
+    instruction rather than inventing a workaround:
+      1. TargetSpec (type/event/direction/horizon_seconds/confirmation) has no field
+         for a composite flip+MFE+MAE excursion-conditioned target; T1 cannot be
+         expressed without misusing `confirmation` (documented as bars/ticks params)
+         or silently dropping the excursion conditions.
+      2. ModelSpec/FeaturesSpec has no field for a frozen EXTERNAL model's score as a
+         derived causal input bound to another study's model hash -- only this
+         study's own artifact_path/artifact_sha256 is representable.
+      3. No StudySpec field anywhere (StudyMetadata, TargetSpec, AcceptanceSpec,
+         ExecutionSpec) can declare a required pre-freeze pipeline gate
+         (TRAIN_TARGET_BALANCE_PASS) that PREPARE/READINESS/PREFLIGHT would actually
+         enforce. Storing it in AcceptanceSpec.criteria (a free dict) would look like
+         a governed, checked field without any code path reading or enforcing it --
+         a document that looks authoritative but is inert is worse than no document.
+  next_step_for_whoever_authors_study.yaml: >
+    Either extend TargetSpec with an excursion-conditions sub-schema and add a
+    documented pre-freeze-gate field to StudyMetadata/AcceptanceSpec (an
+    infrastructure change, out of scope for this decision contract), or accept a
+    `bespoke` study.type with `bespoke.reason`/`bespoke.unsupported_contract_element`
+    citing this section verbatim, and manually verify (not merely declare) that
+    TRAIN_TARGET_BALANCE_PASS's required_outputs are filled in here before running
+    `research_workflow.prepare`.
+
+terminal_question: >
+  Does contemporaneous signal-time context (current-regime pace, room-to-boundary,
+  participation, order-flow sign, bar shape) add economic-path discrimination beyond
+  frozen Stage-1 flip confidence and its own causal feature surface?
