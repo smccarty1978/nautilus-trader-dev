@@ -2,33 +2,33 @@
   "study_id": "clean_maturity_flip_model_rolling_productivity",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "336b430d427548598ab17de2c288804fb04185b3",
+  "git_commit_hash": "fec1ec200950fcb4d25dea73b884726eb142ce67",
   "source_state_binding": {
     "provenance_strength": "COMMITTED",
-    "git_commit_hash": "336b430d427548598ab17de2c288804fb04185b3",
+    "git_commit_hash": "fec1ec200950fcb4d25dea73b884726eb142ce67",
     "git_commit_is_sufficient_provenance": true,
     "working_tree_dirty": true,
-    "source_state_sha256": "d758eceb4cb74d5d9c678f046818d649f144d39c44f5351f98bdb0abc4137fbe",
+    "source_state_sha256": "8c921e1a6575f44e2f1e5809fd81461fc2e7e9225beedf680ae6094aad8b0010",
     "dependencies_diverging_from_commit": [],
     "source_files": {
       "features/registry.py": {
-        "sha256": "569ddadb246c68f39209ed36fe519f37e2c2fb617586302d4a3cbb57e3131478",
+        "sha256": "7afb75ad9e70cc6c2f7f935a79178799cd40398a7ef4fa080a755f418ec68ed1",
         "state": "COMMITTED"
       },
       "features/trackers/generic_arrival.py": {
-        "sha256": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
+        "sha256": "db34d3bd72cd490fb17a44e0d21f34041e20c504fc1626c89efd0bdbcab2c495",
         "state": "COMMITTED"
       },
       "features/trackers/generic_context.py": {
-        "sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+        "sha256": "917ccdcf18de729b93c27a1277cf1580080e772f09d52fbfe4eba5c274476e88",
         "state": "COMMITTED"
       },
       "features/trackers/generic_rolling_productivity.py": {
-        "sha256": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
+        "sha256": "eb5f07231547978421a6b65fdfb809a4c8af6dc9350a7731a3fe8a5026dd5bbd",
         "state": "COMMITTED"
       },
       "features/trackers/generic_structural_geometry.py": {
-        "sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+        "sha256": "e15b7b81a68edac36490d211113cca693fc62402beccf48ca3aa5a3cc38a0c94",
         "state": "COMMITTED"
       },
       "studies/clean_maturity_flip_model_rolling_productivity/SPEC.md": {
@@ -36,12 +36,12 @@
         "state": "COMMITTED"
       },
       "studies/clean_maturity_flip_model_rolling_productivity/study.yaml": {
-        "sha256": "76571c8e10ab7eebf90ac2dfceae9cb531633fcc3c31a77a58c283f227b480a1",
+        "sha256": "e635896401026c3584f3812474ba3fd9cfa9ab109e6e9823ad5744a637c4102a",
         "state": "COMMITTED"
       }
     }
   },
-  "study_yaml_sha256": "76571c8e10ab7eebf90ac2dfceae9cb531633fcc3c31a77a58c283f227b480a1",
+  "study_yaml_sha256": "e635896401026c3584f3812474ba3fd9cfa9ab109e6e9823ad5744a637c4102a",
   "spec_md_sha256": "c150bee7109a526324b8240bb580139a70a5502dabdcbb40aeca4b6f6a41843c",
   "clean_lineage_start": null,
   "invalidated_prior_runs_count": 0,
@@ -349,5 +349,5 @@
       2026
     ]
   },
-  "manifest_sha256": "ff999158671da4d78c77d040d91d063e4a86e39050c88182c68daae0a00c36c9"
+  "manifest_sha256": "d3cff633143d26e56249e3ec272eb16149b166f68d0908836aa5810ad650ae78"
 }

@@ -300,6 +300,26 @@
       "auditor": "research_workflow.contract_audit",
       "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
       "issued_at": "2026-08-25T03:29:26.220110+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 16,
+      "audited_execution_composite_sha256": "7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8",
+      "audit_report_sha256": "a5290d8998441e78b0f14a4471b5d72633ad293b332173fb303fcbd102a9acc7",
+      "audit_report_path": "audit/pass_16.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-25T17:54:32.641156+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 16,
+      "audited_execution_composite_sha256": "7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8",
+      "audit_report_sha256": "2c0434b53cd510d0d33bd2ce05c0adc28aec434e0d90c1dfe053b32c7aee7ff8",
+      "audit_report_path": "audit/contract_pass_16.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-25T17:54:43.118161+00:00"
     }
   ]
 }
