@@ -31,7 +31,18 @@ intake applies (§7 Novelty Routing Matrix, §8 Severity Levels, §9 stop/no-sto
 
 ## Candidate Population
 
-<!-- What defines a candidate event? Point to an existing population definition if you know one. -->
+<!-- What defines a candidate event? Point to an existing population definition if you know one.
+
+     A population defined by a derived score crossing a frozen threshold (e.g. "the first
+     upcross of another study's frozen model score above its TRAIN P90") is an EXISTING,
+     SUPPORTED capability -- describe its semantics here (threshold source, crossing rule,
+     censoring treatment), not as a schema gap. It is implemented generically via
+     `population.qualification.required_checkpoint_identities_path` (the collector's
+     identity-allowlist qualification mode, docs/RESEARCH_WORKFLOW.md §7) and built with
+     `scripts/build_derived_score_upcross_population.py` -- see
+     docs/RESEARCH_STUDY_BLUEPRINT.md for how this fits the wider routing model. Membership
+     coming from an external, governed identity artifact rather than a live threshold filter
+     is not itself novel. -->
 
 ## Event / Decision Timestamp T
 
@@ -139,9 +150,13 @@ AUTO_FIXABLE_ITEMS:
 SCHEMA_GAPS:
   <anything StudySpec cannot represent today (BLUEPRINT §5.1). Composite targets, derived
    external-model inputs, machine-enforced pre-freeze gates, and bounded model-selection
-   search are now expressible (BLUEPRINT §5.1 CLOSED items, RESEARCH_WORKFLOW.md §20) — this
-   field is for whatever the NEXT gap turns out to be. Report it; do not invent a workaround
-   that produces a misleading contract.>
+   search are now expressible (BLUEPRINT §5.1 CLOSED items, RESEARCH_WORKFLOW.md §20). A
+   population sourced from an external frozen identity table (derived-score threshold-upcross
+   or similar) is also already supported — RESEARCH_WORKFLOW.md §7's identity-allowlist
+   qualification mode plus `scripts/build_derived_score_upcross_population.py` — this is a
+   Candidate Population description, never a schema gap on its own. Reserve this field for a
+   concept the current StudySpec/framework genuinely cannot represent yet; do not invent a
+   workaround that produces a misleading contract.>
 
 PROPOSED_EXECUTION_PLAN:
   <ordered steps through docs/RESEARCH_STUDY_BLUEPRINT.md §6, STEP 3 onward>
