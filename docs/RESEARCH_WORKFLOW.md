@@ -15,6 +15,7 @@ If another document contradicts this one, this one wins. Classification of every
 | Where does shared research code go? | 1 |
 | How do I declare a 5m completed regime-efficiency feature? | 2 |
 | Can I copy an old collector? | 7 |
+| Can a population be defined by an externally frozen identity list instead of a live filter? | 7 |
 | What happens after READINESS fails? | 4, 12 |
 | When can OOS open? | 3 |
 | What does the lookahead auditor prove? | 6.1 |
@@ -396,6 +397,47 @@ parity is **mandatory**.
 filtering governs which candidates are *emitted*, not which bars providers may *see*. Do not
 cut ETH history out of the replay as an optimization.
 
+### Population qualification: established filter vs. identity allowlist
+
+Candidate declaration in `_evaluate_checkpoint` is gated by exactly one of two mutually
+exclusive tests — they express different population definitions and are never combined:
+
+- **Established filter** (`established_required: true`, the default): a live threshold/
+  persistence rule over `age_gate_seconds`, `running_mfe_atr_gte`, `new_progress_windows_gte`,
+  `retained_mfe_ratio_gte`. This is what most existing studies use.
+- **Identity allowlist** (`required_checkpoint_identities_path`, a `population.qualification`
+  key in `study.yaml`): when set, it is the *only* qualification test applied, and the
+  established filter is not evaluated at all. Membership comes from an externally frozen
+  `(regime_start_ns, checkpoint_index)` table loaded once at strategy construction
+  (`FlipPredictionCollectorConfig.required_checkpoint_identities_path`, resolved relative to
+  the study directory by `build_collector_config_kwargs` in
+  `backtests/nt_runtime/modes/collect.py`) — fails closed on a missing identity/checkpoint
+  column or a duplicate identity.
+
+Use the identity allowlist when a population's selection logic was itself computed once,
+offline, against an already-collected checkpoint stream (e.g. a derived-score threshold-
+upcross rule scored against a frozen upstream model — see `clean_tradable_reversal`'s
+`STAGE2_P90_UPCROSS_V1`) — the live collector's job then is to reproduce that exact
+checkpoint's feature surface, not to rediscover membership. `checkpoint_index` numbering is
+driven purely by wall-clock grid alignment relative to `regime_start_ns` (unconditional in
+`_handle_1s_bar`, independent of which qualification path is active), so it reproduces
+identically across studies sharing this collector and the same market data. This is a
+generic, declarative mechanism — any study can plug into it by declaring
+`population.qualification.required_checkpoint_identities_path` in `study.yaml`; it is not
+specific to any one study.
+
+**Build that identity table with `scripts/build_derived_score_upcross_population.py`**, not a
+bespoke per-study script — it was extracted after being independently reimplemented twice with
+subtly different results. The pitfall it exists to prevent: `left_censored_above_threshold`
+(a regime whose first eligible checkpoint is already at/above threshold) is a **diagnostic
+label only**. It does not remove the regime from later selection. That regime's own first
+checkpoint can never be selected as an upcross regardless (its `prev_above` is undefined, not
+`False`), but a genuine later dip-then-recross within the *same* regime is a real, fully
+observed, non-censored crossing and stays eligible. Filtering the whole regime out once it is
+flagged left-censored silently drops real population members (~0.4% of `clean_tradable_reversal`'s
+TRAIN population when this was gotten wrong) — verify any new use against a population with a
+known frozen count before trusting it.
+
 ### Partitioned TRAIN collection
 
 `research_workflow/partitioning.py` + `collection.collect_period_partitioned`. A
@@ -573,6 +615,7 @@ a study is sealed and in flight.
 | `bootstrap_audit_lineage.py` | record a study's durable audit lineage anchor | yes | **no** |
 | `safe_cleanup.py` | fail-closed guard for recursive deletion (§13) | deletes | — |
 | `sync_agents.py` | regenerate Codex + Antigravity agent defs | yes | yes |
+| `build_derived_score_upcross_population.py` | build a frozen identity+score population from a checkpoint stream, a frozen model, and per-direction thresholds (feeds the generic collector's identity-allowlist mode, §7) | no | yes |
 
 ### Authoritative — feature system
 

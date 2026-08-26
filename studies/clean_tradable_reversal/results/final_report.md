@@ -88,21 +88,21 @@ results land within the expected range of this decomposition.
 
 ## 8. OOS 2024 (one-shot, frozen models, no refitting/recalibration/reselection)
 
-Population: 2,853 total (LONG 1,376, SHORT 1,512); 2,715 in primary maturity buckets. Resolved
-T1: 2,688 (LONG 1,261 pos=236, SHORT 1,427 pos=254). Feature/null-rate parity to TRAIN confirmed
-(`rolling_300s_*` 75.73% OOS vs 73.75% TRAIN, within sampling noise; all else 0% null).
+Population: 2,864 total (LONG 1,362, SHORT 1,502); 2,725 in primary maturity buckets. Resolved
+T1: 2,698 (LONG 1,265 pos=238, SHORT 1,433 pos=254). Feature/null-rate parity to TRAIN confirmed
+(all causal features 0% null except `rolling_300s_*`).
 
 | Direction | Arm | OOS ROC | PR | Brier | TRAIN final-validation ROC | Verdict |
 |---|---|---|---|---|---|---|
-| LONG | A | 0.4975 | 0.1857 | 0.1542 | 0.5027 | flat/weak both periods |
-| LONG | **B (primary)** | **0.4913** | 0.1817 | 0.1558 | 0.5610 | **COLLAPSES** |
-| LONG | C (secondary) | 0.5244 | 0.1988 | 0.1555 | 0.5634 | weakens modestly, best of 3 |
-| SHORT | **A (primary)** | **0.5161** | 0.1776 | 0.1481 | 0.5400 | weakens modestly |
-| SHORT | B | 0.5141 | 0.1941 | 0.1565 | 0.5217 | roughly stable-weak |
-| SHORT | C (secondary) | 0.5365 | 0.1981 | 0.1551 | 0.5144 | improves unexpectedly |
+| LONG | A | 0.5008 | 0.1889 | 0.1546 | 0.5027 | flat/weak both periods |
+| LONG | **B (primary)** | **0.4912** | 0.1822 | 0.1565 | 0.5610 | **COLLAPSES** |
+| LONG | C (secondary) | 0.5230 | 0.1986 | 0.1562 | 0.5634 | weakens modestly, best of 3 |
+| SHORT | **A (primary)** | **0.5157** | 0.1765 | 0.1477 | 0.5400 | weakens modestly |
+| SHORT | B | 0.5150 | 0.1938 | 0.1559 | 0.5217 | roughly stable-weak |
+| SHORT | C (secondary) | 0.5362 | 0.1973 | 0.1546 | 0.5144 | improves unexpectedly |
 
-**Calibration.** LONG: score-quintile actual T1 rate is non-monotonic (0.174/0.183/0.246/0.155/0.179)
-— ranking does not hold. SHORT: weak/partial (0.158/0.172/0.203/0.181/0.175) — mostly monotonic
+**Calibration.** LONG: score-quintile actual T1 rate is non-monotonic (0.174/0.186/0.245/0.158/0.178)
+— ranking does not hold. SHORT: weak/partial (0.156/0.172/0.203/0.185/0.168) — mostly monotonic
 through the middle, breaks at the top quintile.
 
 **Negative-subtype diagnostic.** The TRAIN finding that different negative failure modes
@@ -115,18 +115,32 @@ positives score above all negatives **does not replicate**: LONG T1_POSITIVE mea
 
 OOS opened exactly once via `research_workflow.experiment.assert_oos_open`, with the current
 execution composite, TRAIN freeze hash, and model-selection manifest hash all verified live
-against their pinned values before any 2024 access. Two mechanical issues were found and fixed
-*during* OOS collection, both classified **EXTERNAL_RUNNER_ONLY** (confirmed: the execution
-composite is byte-identical, `b010f3c7d4599887279c1e988ecb463e23db9b9077047f288cc36244094d7fe9`,
-before and after both fixes — neither touched `generic_collector.py`, the compiled study, the
-execution manifest, the seal, or the OOS authorization):
+against their pinned values before any 2024 access. Three mechanical issues were found and fixed
+*during and after* OOS collection, all classified **EXTERNAL_RUNNER_ONLY** (confirmed: the
+execution composite is byte-identical, `b010f3c7d4599887279c1e988ecb463e23db9b9077047f288cc36244094d7fe9`,
+across all three fixes — none touched `generic_collector.py`, the compiled study, the execution
+manifest, the seal, or the OOS authorization):
 
 1. The initial direct 2024 collection window included a 5-day warmup tail (31 checkpoints,
    2023-12-27–29) before strict-2024 filtering was applied to every downstream artifact.
 2. A direct-construction collection script omitted `feature_requirements`, leaving
    `relative_volume` 100%-null until corrected and the OOS feature collection re-run.
+3. **Found after study closure**, while extracting the population-derivation logic into a
+   reusable script (`scripts/build_derived_score_upcross_population.py`): the one-off 2024
+   population script incorrectly excluded an *entire* regime once its first checkpoint was
+   flagged `LEFT_CENSORED_ABOVE_THRESHOLD`. In the authoritative TRAIN definition,
+   left-censoring is diagnostic-only — a regime's ambiguous first state can never itself be
+   selected, but a genuine later dip-then-recross in that same regime remains a valid,
+   observed crossing. Re-verifying the extracted script against the frozen TRAIN population
+   (8,533/8,533, exact identity-set match) confirmed TRAIN was unaffected — only the
+   independently-written 2024 script had this bug. It dropped 11 of 2,864 real 2024
+   identities (~0.4%). The OOS population, features, forward outcomes, targets, and model
+   scoring were fully rebuilt against the corrected population; the numbers in this report
+   reflect that correction. Effect on conclusions: **none** — every metric moved by ≤0.003
+   ROC, all verdicts (COLLAPSES / weak / etc.) are unchanged.
 
-The metrics in this report come only from the corrected, feature-complete, strictly-2024 dataset.
+The metrics in this report come only from the corrected, feature-complete, strictly-2024,
+correctly-population-derived dataset.
 
 ## 10. What this study establishes
 
@@ -162,6 +176,6 @@ feature order) verified live before scoring.
 ## 13. Allowed next research directions
 
 A **new**, separately predeclared study — not a continuation of this one — motivated by the
-Arm-C secondary OOS observation (LONG 0.5244, SHORT 0.5365) or a different Stage-2 feature
+Arm-C secondary OOS observation (LONG 0.5230, SHORT 0.5362) or a different Stage-2 feature
 hypothesis (e.g. the deferred `regime_median_center_slope_alignment` family), using genuinely
 unseen confirmation data. 2024 cannot be reused as untouched OOS for that follow-on hypothesis.

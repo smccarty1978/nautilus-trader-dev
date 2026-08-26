@@ -11,9 +11,19 @@ final_result:
   primary_long_arm: B_PLUS_ORIGINAL_13
   primary_short_arm: A_SCORE_ONLY
   arm_c_status: HYPOTHESIS_GENERATION_ONLY
-  long_primary: {train_final_validation_roc: 0.5610, oos_roc: 0.4913, verdict: COLLAPSES}
-  short_primary: {train_final_validation_roc: 0.5400, oos_roc: 0.5161, verdict: WEAK_INSUFFICIENT_SUPPORT}
-  arm_c_oos_secondary_only: {long_roc: 0.5244, short_roc: 0.5365}
+  long_primary: {train_final_validation_roc: 0.5610, oos_roc: 0.4912, verdict: COLLAPSES}
+  short_primary: {train_final_validation_roc: 0.5400, oos_roc: 0.5157, verdict: WEAK_INSUFFICIENT_SUPPORT}
+  arm_c_oos_secondary_only: {long_roc: 0.5230, short_roc: 0.5362}
+  post_closure_correction:
+    found_via: scripts/build_derived_score_upcross_population.py extraction/verification
+    bug: >
+      One-off 2024 population script wrongly excluded a whole regime once its first
+      checkpoint was flagged LEFT_CENSORED_ABOVE_THRESHOLD; the authoritative TRAIN
+      definition treats that as diagnostic-only. TRAIN population re-verified unaffected
+      (exact 8533/8533 identity match). 2024 OOS population corrected 2853 -> 2864
+      identities (~0.4%); every OOS metric changed by <=0.003 ROC; no conclusion changed.
+    classification: EXTERNAL_RUNNER_ONLY
+    execution_composite_unchanged: b010f3c7d4599887279c1e988ecb463e23db9b9077047f288cc36244094d7fe9
   oos_reselection_occurred: false
   oos_recalibration_occurred: false
   target_changed: false
