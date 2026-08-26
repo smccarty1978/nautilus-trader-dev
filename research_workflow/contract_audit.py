@@ -137,7 +137,16 @@ def run_contract_review(study_path: str | Path, **_: Any) -> dict[str, Any]:
             {"name": "deliverables_contract", "passed": (study / "config" / "deliverables_contract.json").is_file()},
             {"name": "phase0_manifest", "passed": (study / "artifacts" / "phase0_source_manifest.json").is_file()},
             {"name": "legacy_aliases_excluded", "passed": all("legacy" not in str(i).lower() for i in instances)},
-            {"name": "population_target_contracts", "passed": all((study / "config" / n).is_file() for n in ("population_contract.json", "target_contract.json"))},
+            # Historically checked for standalone config/population_contract.json +
+            # config/target_contract.json files; research_workflow.compiler.compile_study
+            # no longer writes those (only compiled_study.json + config/
+            # deliverables_contract.json) -- both segments are authoritatively present as
+            # nested keys inside compiled_study.json's own "contracts" dict, which this
+            # audit already loads. A study compiled with the current compiler was failing
+            # this check unconditionally, on a convention no current code path produces.
+            {"name": "population_target_contracts",
+             "passed": bool((compiled.get("contracts") or {}).get("population_contract"))
+                       and bool((compiled.get("contracts") or {}).get("target_contract"))},
             _check_derived_causal_inputs_bound(study, spec),
             _check_required_gates_declared_and_bound(spec),
             _check_model_selection_binding_present(study, spec),

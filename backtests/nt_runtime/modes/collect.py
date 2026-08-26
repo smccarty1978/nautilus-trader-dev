@@ -272,6 +272,11 @@ def build_collector_config_kwargs(
         cfg_kwargs["new_progress_windows_gte"] = int(qualification.get("new_progress_windows_gte", 2))
     if hasattr(strategy_binding.config_cls, "retained_mfe_ratio_gte"):
         cfg_kwargs["retained_mfe_ratio_gte"] = float(qualification.get("retained_mfe_ratio_gte", 0.5))
+    if hasattr(strategy_binding.config_cls, "required_checkpoint_identities_path"):
+        rel = qualification.get("required_checkpoint_identities_path")
+        cfg_kwargs["required_checkpoint_identities_path"] = (
+            str(study_data.study_dir / rel) if rel else ""
+        )
     if hasattr(strategy_binding.config_cls, "feature_list"):
         cfg_kwargs["feature_list"] = spec.features.feature_list
     if hasattr(strategy_binding.config_cls, "feature_requirements"):

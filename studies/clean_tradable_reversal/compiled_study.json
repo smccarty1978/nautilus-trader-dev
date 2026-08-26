@@ -1,7 +1,7 @@
 {
   "study_id": "clean_tradable_reversal",
   "study_type": "flip_prediction",
-  "spec_sha256": "24847e2b21a462f12b53e14e8a887c06a3211a8c96fc68db6df41a75933bd034",
+  "spec_sha256": "df8e91ddab93923c0e2bb9532dea0caedc159d0e7d4f8c4d3d54d22f3413b37c",
   "spec": {
     "study": {
       "id": "clean_tradable_reversal",
@@ -24,8 +24,11 @@
       "session": "RTH",
       "qualification": {
         "selection": "one_first_crossing_per_regime",
+        "population_version": "STAGE2_P90_UPCROSS_V1",
         "stage1_score_threshold_source": "stage1_dependency.thresholds_p90",
         "stage1_score_threshold_derivation": "TRAIN_ONLY",
+        "required_checkpoint_identities_path": "artifacts/stage2_train_frozen_population.parquet",
+        "required_checkpoint_identities_sha256": "78b16f23cfe13c7393541c690ed4316e4d2addd5a461f7c6adc767b3b2cda57b",
         "primary_maturity_buckets": [
           "300-600s",
           "600-900s",
@@ -253,7 +256,11 @@
       "feature_list_sha256": null,
       "directional_mapping": null,
       "timing_contract": "verified",
-      "metadata_columns": null,
+      "metadata_columns": [
+        "observation_ts",
+        "regime_start_ns",
+        "checkpoint_index"
+      ],
       "derived_inputs": [
         {
           "name": "stage1_model_c_score",
@@ -276,7 +283,7 @@
     },
     "model": {
       "mode": "training",
-      "family": "HistGradientBoostingClassifier",
+      "family": "lightgbm",
       "arms": [
         "A_SCORE_ONLY",
         "B_PLUS_ORIGINAL_13",
@@ -285,7 +292,71 @@
       "artifact_path": null,
       "artifact_sha256": null,
       "params": null,
-      "selection": null
+      "selection": {
+        "allowed_families": [
+          {
+            "family": "lightgbm",
+            "fixed_hyperparameters": {
+              "learning_rate": 0.1
+            },
+            "tunable_hyperparameters": [
+              {
+                "name": "n_estimators",
+                "kind": "choice",
+                "values": [
+                  50,
+                  100,
+                  200
+                ],
+                "low": null,
+                "high": null,
+                "log_scale": false
+              },
+              {
+                "name": "max_depth",
+                "kind": "choice",
+                "values": [
+                  3,
+                  5,
+                  -1
+                ],
+                "low": null,
+                "high": null,
+                "log_scale": false
+              }
+            ]
+          }
+        ],
+        "search_method": "grid",
+        "max_trials": 9,
+        "random_seed": 42,
+        "tuning_years": [
+          2021,
+          2022
+        ],
+        "final_train_validation_years": [
+          2023
+        ],
+        "primary_selection_metric": "roc_auc",
+        "primary_selection_metric_direction": "maximize",
+        "secondary_metrics": [
+          "pr_auc",
+          "brier"
+        ],
+        "calibration_required": true,
+        "simpler_model_tie_preference": true,
+        "final_validation_policy": "gated",
+        "final_validation_requirements": {
+          "primary_metric_bound": {
+            "metric": "roc_auc",
+            "minimum": 0.5,
+            "maximum": null
+          },
+          "max_degradation_vs_inner_validation": 0.35,
+          "calibration_max_brier": 0.26,
+          "secondary_metric_bounds": null
+        }
+      }
     },
     "chronology": {
       "train": [
@@ -373,8 +444,11 @@
       "session": "RTH",
       "qualification": {
         "selection": "one_first_crossing_per_regime",
+        "population_version": "STAGE2_P90_UPCROSS_V1",
         "stage1_score_threshold_source": "stage1_dependency.thresholds_p90",
         "stage1_score_threshold_derivation": "TRAIN_ONLY",
+        "required_checkpoint_identities_path": "artifacts/stage2_train_frozen_population.parquet",
+        "required_checkpoint_identities_sha256": "78b16f23cfe13c7393541c690ed4316e4d2addd5a461f7c6adc767b3b2cda57b",
         "primary_maturity_buckets": [
           "300-600s",
           "600-900s",
@@ -1463,7 +1537,71 @@
         ]
       }
     ],
-    "model_selection": null
+    "model_selection": {
+      "allowed_families": [
+        {
+          "family": "lightgbm",
+          "fixed_hyperparameters": {
+            "learning_rate": 0.1
+          },
+          "tunable_hyperparameters": [
+            {
+              "name": "n_estimators",
+              "kind": "choice",
+              "values": [
+                50,
+                100,
+                200
+              ],
+              "low": null,
+              "high": null,
+              "log_scale": false
+            },
+            {
+              "name": "max_depth",
+              "kind": "choice",
+              "values": [
+                3,
+                5,
+                -1
+              ],
+              "low": null,
+              "high": null,
+              "log_scale": false
+            }
+          ]
+        }
+      ],
+      "search_method": "grid",
+      "max_trials": 9,
+      "random_seed": 42,
+      "tuning_years": [
+        2021,
+        2022
+      ],
+      "final_train_validation_years": [
+        2023
+      ],
+      "primary_selection_metric": "roc_auc",
+      "primary_selection_metric_direction": "maximize",
+      "secondary_metrics": [
+        "pr_auc",
+        "brier"
+      ],
+      "calibration_required": true,
+      "simpler_model_tie_preference": true,
+      "final_validation_policy": "gated",
+      "final_validation_requirements": {
+        "primary_metric_bound": {
+          "metric": "roc_auc",
+          "minimum": 0.5,
+          "maximum": null
+        },
+        "max_degradation_vs_inner_validation": 0.35,
+        "calibration_max_brier": 0.26,
+        "secondary_metric_bounds": null
+      }
+    }
   },
   "strategy_class": "research_workflow.generic_collector.GenericStudyCollector"
 }

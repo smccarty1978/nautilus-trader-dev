@@ -25,8 +25,19 @@ population:
   session: RTH
   qualification:
     selection: one_first_crossing_per_regime
+    population_version: STAGE2_P90_UPCROSS_V1
     stage1_score_threshold_source: stage1_dependency.thresholds_p90
     stage1_score_threshold_derivation: TRAIN_ONLY
+    # Population membership was computed once, offline, against Stage-1's own already-
+    # collected TRAIN checkpoint stream (per-checkpoint upcross detection against the
+    # frozen Model C score and its TRAIN P90 threshold) -- not something the live NT
+    # collector rediscovers. This identity table is that frozen result: it is both the
+    # allowlist the collector's generic identity-qualification mode reads
+    # (research_workflow.generic_collector's required_checkpoint_identities_path) and the
+    # source of the reused (never re-scored) stage1_model_c_score derived input and T1/T2/T3
+    # targets, joined by (regime_start_ns, checkpoint_index) after collection.
+    required_checkpoint_identities_path: artifacts/stage2_train_frozen_population.parquet
+    required_checkpoint_identities_sha256: 78b16f23cfe13c7393541c690ed4316e4d2addd5a461f7c6adc767b3b2cda57b
     primary_maturity_buckets: ["300-600s", "600-900s", "900-1800s"]
     diagnostic_maturity_buckets: ["<300s", ">=1800s"]
     maturity_role: population_slice_only_never_a_model_input
@@ -64,6 +75,13 @@ target:
 
 features:
   source: canonical_verified_definition_universe
+  # Explicit, study-accurate metadata contract. OutputManager falls back to a hardcoded
+  # default metadata list (written for a different study's regime-qualification
+  # convention: regime_direction/atr/close/running_mfe_atr/etc.) whenever a study omits
+  # this field -- that default does not match this study's actual candidate-key-only
+  # collector surface (verified via READINESS R7/R10 against the real bounded collector
+  # run) and must not be inherited silently.
+  metadata_columns: [observation_ts, regime_start_ns, checkpoint_index]
   derived_inputs:
     - name: stage1_model_c_score
       kind: frozen_external_model_score
@@ -129,11 +147,50 @@ features:
 
 model:
   mode: training
-  family: HistGradientBoostingClassifier
+  # lightgbm (research.analysis.modeling's SUPPORTED_ESTIMATORS name for this family) --
+  # not HistGradientBoostingClassifier, which the fitting/selection runner does not
+  # support. Chosen specifically because it handles missing values (the documented
+  # ~73.75% rolling_300s_* null rate) natively -- no imputation step is declared or
+  # required, matching the "preserve observed missingness" requirement directly.
+  family: lightgbm
   arms: [A_SCORE_ONLY, B_PLUS_ORIGINAL_13, C_PLUS_CONTEXT_7]
-  # model.selection intentionally undeclared: the decision contract's exact
-  # tuning/hyperparameter-search policy is a later design step (research_decision.yaml
-  # selection_rule / acceptance_logic), not part of this expressibility proof.
+  selection:
+    allowed_families:
+      - family: lightgbm
+        fixed_hyperparameters:
+          learning_rate: 0.1
+        tunable_hyperparameters:
+          - name: n_estimators
+            kind: choice
+            values: [50, 100, 200]
+          - name: max_depth
+            kind: choice
+            values: [3, 5, -1]
+    search_method: grid
+    max_trials: 9
+    random_seed: 42
+    # Inner chronological search: fit 2021 / validate 2022 (one walk-forward fold).
+    tuning_years: [2021, 2022]
+    # Confirmatory only -- accepts or rejects the already-selected winner, refit on
+    # 2021+2022 combined; never triggers a second search (research_workflow.model_selection
+    # ._evaluate_final_validation takes the winner as its only input).
+    final_train_validation_years: [2023]
+    primary_selection_metric: roc_auc
+    primary_selection_metric_direction: maximize
+    secondary_metrics: [pr_auc, brier]
+    calibration_required: true
+    simpler_model_tie_preference: true
+    final_validation_policy: gated
+    final_validation_requirements:
+      # Deliberately weak/generous bounds: this is a TRAIN-only research/diagnostic
+      # pass (per research_decision.yaml's acceptance criteria R1-R5), not a deployment
+      # gate, and the inner-validation fold is a single year-over-year split. The bound
+      # exists to catch a genuinely broken fit, not to enforce a deployment bar.
+      primary_metric_bound:
+        metric: roc_auc
+        minimum: 0.5
+      max_degradation_vs_inner_validation: 0.35
+      calibration_max_brier: 0.26
 
 chronology:
   train: [2021, 2022, 2023]

@@ -1,0 +1,40 @@
+{
+  "study_status": "CLOSED_NOT_SUPPORTED",
+  "final_stage2_result": "NOT_SUPPORTED",
+  "primary_long_arm": "B_PLUS_ORIGINAL_13",
+  "primary_short_arm": "A_SCORE_ONLY",
+  "arm_c_status": "HYPOTHESIS_GENERATION_ONLY",
+  "long_primary_train_final_validation_roc": 0.5610,
+  "long_primary_oos_roc": 0.4913,
+  "long_verdict": "COLLAPSES",
+  "short_primary_train_final_validation_roc": 0.5400,
+  "short_primary_oos_roc": 0.5161,
+  "short_verdict": "WEAK_INSUFFICIENT_SUPPORT",
+  "long_c_oos_roc_secondary_only": 0.5244,
+  "short_c_oos_roc_secondary_only": 0.5365,
+  "calibration_ordering_long": "FAIL_NOT_MONOTONIC",
+  "calibration_ordering_short": "WEAK_PARTIAL",
+  "negative_subtype_replication": "PARTIAL -- negatives-not-separated-from-each-other replicates; positives-score-higher-than-negatives does NOT replicate OOS",
+  "oos_reselection_occurred": false,
+  "oos_recalibration_occurred": false,
+  "target_changed": false,
+  "population_changed": false,
+  "feature_surface_changed": false,
+  "prohibited_years_untouched": [2025, 2026],
+  "oos_fix_1_classification": "EXTERNAL_RUNNER_ONLY",
+  "oos_fix_2_classification": "EXTERNAL_RUNNER_ONLY",
+  "execution_composite_unchanged_across_oos": "b010f3c7d4599887279c1e988ecb463e23db9b9077047f288cc36244094d7fe9",
+  "what_this_study_establishes": [
+    "Stage-1 broad flip prediction remains valid and reproducible (frozen Model C in-sample: LONG ROC=0.6754, SHORT ROC=0.6768; deterministic refit parity confirmed, corr>=0.997 all arms).",
+    "P90-upcross conditioning compresses Stage-1 score variance ~4x (std 0.11->0.026 LONG, 0.107->0.027 SHORT).",
+    "Most of the Stage-1 ~0.67 -> Stage-2 ~0.5 AUC reduction is explained by range restriction from high-score conditioning (population effect: LONG -0.152, SHORT -0.138 ROC), not a modeling defect.",
+    "Changing the label from flip-only to T1 (flip AND MFE>=1atr AND MAE<=0.5atr) adds a smaller secondary reduction (LONG -0.006, SHORT -0.028 ROC).",
+    "The tested Stage-2 causal feature sets (Arms A/B/C, 21 predeclared inputs) do not robustly identify clean/tradable reversals among high-confidence Stage-1 upcrosses -- TRAIN's LONG B signal collapses OOS; SHORT A is weak and not cleanly calibrated.",
+    "This study does NOT establish that no feature in the full 129-feature canonical registry could ever help -- it only rejects the predeclared 21-input A/B/C universe actually tested."
+  ],
+  "historical_non_authoritative_items": {
+    "old_2702_first_crossing_population": "aggregate counts valid; row-level selection methodology unrecoverable (driver script absent from git history)",
+    "historical_train_temporal_validation_roc_0.6495_0.6499": "provenance unrecoverable; not located in any surviving repaired Stage-1 artifact; not used as acceptance evidence"
+  },
+  "next_action": "None inside this study. Optional future research: a NEW predeclared study motivated by the Arm-C secondary OOS observation or a different Stage-2 feature hypothesis, using genuinely unseen confirmation data -- 2024 cannot be reused as untouched OOS for that future hypothesis."
+}

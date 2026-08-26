@@ -1,0 +1,810 @@
+{
+  "schema_version": 1,
+  "search_method": "grid",
+  "max_trials": 9,
+  "random_seed": 42,
+  "tuning_years": [
+    2021,
+    2022
+  ],
+  "final_train_validation_years": [
+    2023
+  ],
+  "primary_selection_metric": "roc_auc",
+  "primary_selection_metric_direction": "maximize",
+  "secondary_metrics": [
+    "pr_auc",
+    "brier"
+  ],
+  "attempts": {
+    "LONG__A_SCORE_ONLY": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.4906367938436136
+        ],
+        "average_score": 0.4906367938436136
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.504052290954122
+        ],
+        "average_score": 0.504052290954122
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.4928389255808468
+        ],
+        "average_score": 0.4928389255808468
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.49934581023705626
+        ],
+        "average_score": 0.49934581023705626
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.4975619913904942
+        ],
+        "average_score": 0.4975619913904942
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.4907289332468451
+        ],
+        "average_score": 0.4907289332468451
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.502900548413728
+        ],
+        "average_score": 0.502900548413728
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.4897946396980775
+        ],
+        "average_score": 0.4897946396980775
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.4870802128788772
+        ],
+        "average_score": 0.4870802128788772
+      }
+    ],
+    "LONG__B_PLUS_ORIGINAL_13": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.4851065868616582
+        ],
+        "average_score": 0.4851065868616582
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.4757452234933365
+        ],
+        "average_score": 0.4757452234933365
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.48505867437197775
+        ],
+        "average_score": 0.48505867437197775
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.4676001002476707
+        ],
+        "average_score": 0.4676001002476707
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.4678765184573653
+        ],
+        "average_score": 0.4678765184573653
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.4753914081849275
+        ],
+        "average_score": 0.4753914081849275
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.47569362542752686
+        ],
+        "average_score": 0.47569362542752686
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.45199905649251093
+        ],
+        "average_score": 0.45199905649251093
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.4656872862365845
+        ],
+        "average_score": 0.4656872862365845
+      }
+    ],
+    "LONG__C_PLUS_CONTEXT_7": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.48365446986672955
+        ],
+        "average_score": 0.48365446986672955
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.4709208043401344
+        ],
+        "average_score": 0.4709208043401344
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.4815831760820851
+        ],
+        "average_score": 0.4815831760820851
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.4844910956480717
+        ],
+        "average_score": 0.4844910956480717
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.4779897393560561
+        ],
+        "average_score": 0.4779897393560561
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.46882739709871446
+        ],
+        "average_score": 0.46882739709871446
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.4764012560443448
+        ],
+        "average_score": 0.4764012560443448
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.4766592463733931
+        ],
+        "average_score": 0.4766592463733931
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.46366759051774975
+        ],
+        "average_score": 0.46366759051774975
+      }
+    ],
+    "SHORT__A_SCORE_ONLY": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.5047481597083154
+        ],
+        "average_score": 0.5047481597083154
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.4954962917949922
+        ],
+        "average_score": 0.4954962917949922
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.502183490546494
+        ],
+        "average_score": 0.502183490546494
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.5019583741903407
+        ],
+        "average_score": 0.5019583741903407
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.4966370654770948
+        ],
+        "average_score": 0.4966370654770948
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.5005911030701451
+        ],
+        "average_score": 0.5005911030701451
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.4945723479774055
+        ],
+        "average_score": 0.4945723479774055
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.49959396190976
+        ],
+        "average_score": 0.49959396190976
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.5031267695112351
+        ],
+        "average_score": 0.5031267695112351
+      }
+    ],
+    "SHORT__B_PLUS_ORIGINAL_13": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.5066595771127101
+        ],
+        "average_score": 0.5066595771127101
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.5196016959686218
+        ],
+        "average_score": 0.5196016959686218
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.5032662587871338
+        ],
+        "average_score": 0.5032662587871338
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.5038021185796954
+        ],
+        "average_score": 0.5038021185796954
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.5190050685707183
+        ],
+        "average_score": 0.5190050685707183
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.5132763406852929
+        ],
+        "average_score": 0.5132763406852929
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.5026005772922507
+        ],
+        "average_score": 0.5026005772922507
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.5201126962862708
+        ],
+        "average_score": 0.5201126962862708
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.5092684408965984
+        ],
+        "average_score": 0.5092684408965984
+      }
+    ],
+    "SHORT__C_PLUS_CONTEXT_7": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.5239410554228182
+        ],
+        "average_score": 0.5239410554228182
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.5187122791995249
+        ],
+        "average_score": 0.5187122791995249
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 50
+        },
+        "fold_scores": [
+          0.5243719529879708
+        ],
+        "average_score": 0.5243719529879708
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.509188338144102
+        ],
+        "average_score": 0.509188338144102
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.5200187827143784
+        ],
+        "average_score": 0.5200187827143784
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 100
+        },
+        "fold_scores": [
+          0.5256038780780863
+        ],
+        "average_score": 0.5256038780780863
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.5217423729749886
+        ],
+        "average_score": 0.5217423729749886
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": 5,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.5262032676398691
+        ],
+        "average_score": 0.5262032676398691
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.1,
+          "max_depth": -1,
+          "n_estimators": 200
+        },
+        "fold_scores": [
+          0.52099382656373
+        ],
+        "average_score": 0.52099382656373
+      }
+    ]
+  },
+  "winner": {
+    "LONG__A_SCORE_ONLY": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "n_estimators": 50
+      },
+      "inner_validation_score": 0.504052290954122,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    },
+    "LONG__B_PLUS_ORIGINAL_13": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "n_estimators": 50
+      },
+      "inner_validation_score": 0.4851065868616582,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    },
+    "LONG__C_PLUS_CONTEXT_7": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "n_estimators": 100
+      },
+      "inner_validation_score": 0.4844910956480717,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    },
+    "SHORT__A_SCORE_ONLY": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "n_estimators": 50
+      },
+      "inner_validation_score": 0.5047481597083154,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    },
+    "SHORT__B_PLUS_ORIGINAL_13": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "n_estimators": 200
+      },
+      "inner_validation_score": 0.5201126962862708,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    },
+    "SHORT__C_PLUS_CONTEXT_7": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "n_estimators": 200
+      },
+      "inner_validation_score": 0.5262032676398691,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    }
+  },
+  "final_validation_metric": {
+    "LONG__A_SCORE_ONLY": {
+      "roc_auc": 0.5027236882446471,
+      "pr_auc": 0.21679070811831763,
+      "brier": 0.17202716694794498
+    },
+    "LONG__B_PLUS_ORIGINAL_13": {
+      "roc_auc": 0.560960349658826,
+      "pr_auc": 0.2611833390733914,
+      "brier": 0.16815229887013888
+    },
+    "LONG__C_PLUS_CONTEXT_7": {
+      "roc_auc": 0.5634291377601586,
+      "pr_auc": 0.256671855435868,
+      "brier": 0.1692631450165815
+    },
+    "SHORT__A_SCORE_ONLY": {
+      "roc_auc": 0.5399879283947709,
+      "pr_auc": 0.22042903662229343,
+      "brier": 0.15185930205068818
+    },
+    "SHORT__B_PLUS_ORIGINAL_13": {
+      "roc_auc": 0.5217141679425273,
+      "pr_auc": 0.2058246548091509,
+      "brier": 0.167421796074974
+    },
+    "SHORT__C_PLUS_CONTEXT_7": {
+      "roc_auc": 0.5144064303380049,
+      "pr_auc": 0.19683831062401838,
+      "brier": 0.16894132240544302
+    }
+  },
+  "final_validation_reasons": {
+    "LONG__A_SCORE_ONLY": [],
+    "LONG__B_PLUS_ORIGINAL_13": [],
+    "LONG__C_PLUS_CONTEXT_7": [],
+    "SHORT__A_SCORE_ONLY": [],
+    "SHORT__B_PLUS_ORIGINAL_13": [],
+    "SHORT__C_PLUS_CONTEXT_7": []
+  },
+  "final_validation_policy": "gated",
+  "final_validation_status": "PASS",
+  "no_retuning_after_final_validation_assertion": true,
+  "generated_at_utc": "2026-08-26T12:27:12.430897+00:00",
+  "per_direction_status": {
+    "LONG": "PASS",
+    "SHORT": "PASS"
+  },
+  "manifest_sha256": "1d05933d8f1f80b48e25679d24e3695c8ed4e0b33d144acaadb7fd5f6ba9e7a3"
+}

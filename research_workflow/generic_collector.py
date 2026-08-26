@@ -211,6 +211,17 @@ class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
     age_gate_seconds: int = 120              # minimum regime age before candidate declaration
     established_required: bool = True
     checkpoint_interval_seconds: int = 5
+    # Generic allowlist-membership qualification, orthogonal to the established-filter
+    # path above: when set, this is the ONLY population-qualification test applied, and
+    # the established filter is not evaluated at all. Population membership then comes
+    # from an externally frozen (regime_start_ns, checkpoint_index) identity table
+    # instead of a live threshold/persistence rule -- for a population whose selection
+    # was itself computed once, offline, against an already-collected checkpoint stream
+    # (e.g. a derived-score upcross rule scored against a frozen upstream model), so the
+    # collector's job is to reproduce that exact checkpoint's feature surface, not to
+    # rediscover membership. Path is resolved relative to the study directory by the
+    # generic config-kwargs builder; empty string disables this path entirely.
+    required_checkpoint_identities_path: str = ""
     running_mfe_atr_gte: float = 1.0
     new_progress_windows_gte: int = 2
     retained_mfe_ratio_gte: float = 0.5
@@ -257,7 +268,52 @@ class FlipPredictionCollector(Strategy):
             str(item.get("physical_alias")) for item in resolved_instances
             if item.get("physical_alias")
         )) or tuple(dict.fromkeys(requirements.get("aliases", ())))
+        self._resolved_instance_parameters: Dict[str, Dict[str, Any]] = {
+            str(item.get("physical_alias")): dict(item.get("parameters") or {})
+            for item in resolved_instances if item.get("physical_alias")
+        }
         self._metadata_columns = tuple(config.metadata_columns)
+        # Generic V2 provider: GenericArrivalVolumeProvider (features/trackers/generic_arrival.py)
+        # is the canonical registry-declared implementation of `relative_volume`. The
+        # legacy ArrivalVolumeTracker already on this collector computes a related
+        # `rvol_*` family but with different cold-start fallback behavior (returns
+        # 1.0 instead of None below the full window) -- not the same contract, so it
+        # is not reused for this alias. Constructed only when the study declares the
+        # alias (capability, not cardinality), with lookbacks read from the study's
+        # own declared parameters rather than hardcoded.
+        self._relative_volume_provider: Optional["GenericArrivalVolumeProvider"] = None
+        if "relative_volume" in self._study_feature_aliases:
+            rv_params = self._resolved_instance_parameters.get("relative_volume", {})
+            agg_lb = int(rv_params.get("aggregation_lookback", 5))
+            base_lb = int(rv_params.get("baseline_lookback", 5))
+            self._relative_volume_agg_lookback = agg_lb
+            self._relative_volume_baseline_lookback = base_lb
+            from features.trackers.generic_arrival import GenericArrivalVolumeProvider
+            self._relative_volume_provider = GenericArrivalVolumeProvider(
+                max_lookback_bars=max(agg_lb + base_lb, 60)
+            )
+        # Generic identity-allowlist qualification (see config field docstring above).
+        # Loaded once at construction; membership tested per-checkpoint in
+        # _evaluate_checkpoint. A missing/malformed file fails closed -- an allowlist
+        # path that silently resolved to "no restriction" would collect an unbounded
+        # population under a name that promises a specific, frozen one.
+        self._required_identities: Optional[frozenset] = None
+        if config.required_checkpoint_identities_path:
+            ident_df = pd.read_parquet(config.required_checkpoint_identities_path)
+            missing_cols = {"regime_start_ns", "checkpoint_index"} - set(ident_df.columns)
+            if missing_cols:
+                raise RuntimeError(
+                    f"REQUIRED_CHECKPOINT_IDENTITIES_MALFORMED: missing columns {sorted(missing_cols)} "
+                    f"in {config.required_checkpoint_identities_path}"
+                )
+            self._required_identities = frozenset(
+                zip(ident_df["regime_start_ns"].astype("int64"), ident_df["checkpoint_index"].astype("int64"))
+            )
+            if len(self._required_identities) != len(ident_df):
+                raise RuntimeError(
+                    f"REQUIRED_CHECKPOINT_IDENTITIES_DUPLICATE: {len(ident_df)} rows collapsed to "
+                    f"{len(self._required_identities)} unique (regime_start_ns, checkpoint_index) identities"
+                )
         # V2-native studies declare a small explicit surface.  Keep this fast
         # path deliberately narrow: it is only enabled when every requested
         # alias is produced by the structural/rolling/arrival/context providers
@@ -672,6 +728,8 @@ class FlipPredictionCollector(Strategy):
                 self.velocity_tracker.update(c)
             if self.volume_tracker and not self._compact_surface:
                 self.volume_tracker.update(v, o, c)
+            if self._relative_volume_provider is not None:
+                self._relative_volume_provider.update_completed_bar(volume=v, open_px=o, close_px=c)
             if not self._compact_surface:
                 self.highs_1s.append(h)
                 self.lows_1s.append(l)
@@ -801,8 +859,15 @@ class FlipPredictionCollector(Strategy):
         current_pnl = (direction * (price_at_T - self.regime_start_close)) / atr
         retained = (current_pnl / current_mfe) if current_mfe > 0 else 0.0
 
-        # Established filter
-        if self.cfg.established_required:
+        # Population qualification: an explicit frozen identity allowlist, when declared,
+        # is the ONLY test applied -- it supersedes the established filter rather than
+        # combining with it, since the two express mutually exclusive population
+        # definitions (a live threshold/persistence rule vs. an externally frozen
+        # membership set).
+        if self._required_identities is not None:
+            if (self.regime_start_ns, self.next_checkpoint_index) not in self._required_identities:
+                return
+        elif self.cfg.established_required:
             if not (
                 regime_age_s >= self.cfg.age_gate_seconds
                 and current_mfe >= self.cfg.running_mfe_atr_gte
@@ -1135,6 +1200,42 @@ class FlipPredictionCollector(Strategy):
             **context_feats,
             **wick_feats,
             **range_position_feats,
+            # Canonical FeatureInstance alias bridge. These trackers retain their
+            # legacy internal output keys (rolling_5m_*, arrival_vel_*/arrival_accel_*,
+            # ema_slope_short) rather than the canonical alias names -- the compact
+            # V2 surface bridges this explicitly (see its own comment above); this
+            # general fallback path previously looked the canonical alias names up
+            # directly against merged_raw and silently returned None for every one
+            # of them, even though the underlying state was being updated.
+            "rolling_300s_retention_ratio": rolling_feats.get("rolling_5m_retention_ratio"),
+            "rolling_300s_current_progress_atr": rolling_feats.get("rolling_5m_current_progress_atr"),
+            "rolling_300s_max_progress_atr": rolling_feats.get("rolling_5m_max_progress_atr"),
+            "rolling_300s_giveback_atr": rolling_feats.get("rolling_5m_giveback_atr"),
+            "arrival_velocity": velocity_feats.get("arrival_vel_20s"),
+            "arrival_acceleration": velocity_feats.get("arrival_accel_10s"),
+            "ema_slope": context_feats.get("ema_slope_short"),
+            # est_delta_ratio (30s window): OHLCVDeltaTracker already computes this
+            # exact windowed value under its legacy per-window key; GenericOHLCVDeltaProvider
+            # (the registry-declared implementation) is itself a thin delegator to the
+            # same tracker class, so reading the already-updated self.ohlcv_tracker here
+            # is not an approximation -- it is the identical computation.
+            "est_delta_ratio": ohlcv_feats.get("est_delta_ratio_30s"),
+            # range_position / wick_imbalance: RangePositionTracker/WickTracker compute
+            # byte-for-byte the same formulas as GenericRangePositionProvider/
+            # GenericWickImbalanceProvider (verified against both implementations) --
+            # same lookback default (5), same None-on-unavailable/flat-range semantics.
+            "range_position": range_position_feats.get("latest_1m_close_position_prev5_range"),
+            "wick_imbalance": wick_feats.get("latest_1m_wick_imbalance"),
+            # relative_volume: genuinely wired to the canonical GenericArrivalVolumeProvider
+            # (constructed in __init__), NOT the legacy ArrivalVolumeTracker -- the legacy
+            # tracker's rvol_5s uses a different cold-start fallback (1.0 instead of None
+            # below the full window), which is not the declared contract for this alias.
+            "relative_volume": (
+                self._relative_volume_provider.relative_volume(
+                    aggregation_lookback=self._relative_volume_agg_lookback,
+                    baseline_lookback=self._relative_volume_baseline_lookback,
+                ) if self._relative_volume_provider is not None else None
+            ),
         }
 
         study_universe = self._study_feature_aliases or self.cfg.feature_list or resolve_runtime_feature_aliases()

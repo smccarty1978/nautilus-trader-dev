@@ -1,0 +1,49 @@
+{
+  "evidence_schema_version": 2,
+  "study_id": "clean_tradable_reversal",
+  "status": "CLEAR",
+  "audit_ready": true,
+  "execution_composite_sha256": "b010f3c7d4599887279c1e988ecb463e23db9b9077047f288cc36244094d7fe9",
+  "preflight_run_id": "20260826T122443Z_cf96df572bf6",
+  "generated_at_utc": "2026-08-26T12:24:43.707614+00:00",
+  "elapsed_seconds": 71.38,
+  "code_hash": "cf96df572bf66834c414b63acae2bbf1dae0098879cf07f3efb0fd56ac30240b",
+  "spec_hash": "ad5f7dfa6a2dd38ca407306829b8612a27dd235a5ae84e9cf6b1d53ce58b5ca6",
+  "checks_run": [
+    "EXECUTION_MANIFEST",
+    "CAUSAL_LINT",
+    "ARTIFACT_SCHEMA",
+    "FEATURE_PROMOTION",
+    "RESEARCH_DECISION_FIDELITY",
+    "REQUIRED_GATES",
+    "CAUSAL_INVARIANTS"
+  ],
+  "check_outcomes": {
+    "EXECUTION_MANIFEST": "PASSED",
+    "CAUSAL_LINT": "PASSED",
+    "ARTIFACT_SCHEMA": "PASSED",
+    "FEATURE_PROMOTION": "PASSED",
+    "RESEARCH_DECISION_FIDELITY": "PASSED",
+    "REQUIRED_GATES": "PASSED",
+    "CAUSAL_INVARIANTS": "PASSED"
+  },
+  "is_compiled_study": true,
+  "required_checks": [
+    "EXECUTION_MANIFEST",
+    "CAUSAL_LINT",
+    "ARTIFACT_SCHEMA",
+    "FEATURE_PROMOTION",
+    "RESEARCH_DECISION_FIDELITY",
+    "REQUIRED_GATES",
+    "CAUSAL_INVARIANTS"
+  ],
+  "required_checks_missing": [],
+  "checks_complete": true,
+  "diagnostic_mode": false,
+  "failed_gate": null,
+  "failure_ids": [],
+  "failure_packet": null,
+  "required_next_action": "READY_FOR_AUDIT",
+  "evidence_sha256": "ac1c5d37fb62906592447c4b1572793d9ba8fb9a5661a70ad6b9ea59d650d82f",
+  "superseded_failure_packet": "audit/failure_packet.json"
+}

@@ -1,0 +1,788 @@
+{
+  "study_id": "clean_tradable_reversal",
+  "authenticated": true,
+  "feature_authority": "active",
+  "git_commit_hash": "f356b90a4589e1c49a3d2f05c592e9a5024506a1",
+  "source_state_binding": {
+    "provenance_strength": "WORKING_TREE",
+    "git_commit_hash": "f356b90a4589e1c49a3d2f05c592e9a5024506a1",
+    "git_commit_is_sufficient_provenance": false,
+    "working_tree_dirty": true,
+    "source_state_sha256": "7c6acfed770aa409028996edb882f82638751a846da0cfba14578a2159315d1b",
+    "dependencies_diverging_from_commit": [
+      "studies/clean_tradable_reversal/SPEC.md",
+      "studies/clean_tradable_reversal/study.yaml"
+    ],
+    "source_files": {
+      "features/registry.py": {
+        "sha256": "7afb75ad9e70cc6c2f7f935a79178799cd40398a7ef4fa080a755f418ec68ed1",
+        "state": "COMMITTED"
+      },
+      "features/trackers/generic_arrival.py": {
+        "sha256": "db34d3bd72cd490fb17a44e0d21f34041e20c504fc1626c89efd0bdbcab2c495",
+        "state": "COMMITTED"
+      },
+      "features/trackers/generic_bar_geometry.py": {
+        "sha256": "0201a8e16fc2abcaabdcf1f2563eedab0b29280b2ebd115604500ac9c82490c0",
+        "state": "COMMITTED"
+      },
+      "features/trackers/generic_context.py": {
+        "sha256": "917ccdcf18de729b93c27a1277cf1580080e772f09d52fbfe4eba5c274476e88",
+        "state": "COMMITTED"
+      },
+      "features/trackers/generic_ohlcv_delta.py": {
+        "sha256": "d0fff6d1834ec718724654987be14b3595d2d408c40577f2097bad7a03fd8661",
+        "state": "COMMITTED"
+      },
+      "features/trackers/generic_rolling_productivity.py": {
+        "sha256": "eb5f07231547978421a6b65fdfb809a4c8af6dc9350a7731a3fe8a5026dd5bbd",
+        "state": "COMMITTED"
+      },
+      "features/trackers/generic_structural_geometry.py": {
+        "sha256": "e15b7b81a68edac36490d211113cca693fc62402beccf48ca3aa5a3cc38a0c94",
+        "state": "COMMITTED"
+      },
+      "studies/clean_tradable_reversal/SPEC.md": {
+        "sha256": "ad5f7dfa6a2dd38ca407306829b8612a27dd235a5ae84e9cf6b1d53ce58b5ca6",
+        "state": "MODIFIED"
+      },
+      "studies/clean_tradable_reversal/study.yaml": {
+        "sha256": "81b20fac921c445ccdfba63d90454abc941b091ef430c14cbc40d6f882903bbc",
+        "state": "MODIFIED"
+      }
+    }
+  },
+  "study_yaml_sha256": "81b20fac921c445ccdfba63d90454abc941b091ef430c14cbc40d6f882903bbc",
+  "spec_md_sha256": "ad5f7dfa6a2dd38ca407306829b8612a27dd235a5ae84e9cf6b1d53ce58b5ca6",
+  "clean_lineage_start": null,
+  "invalidated_prior_runs_count": 0,
+  "invalidated_prior_runs": [],
+  "forbidden_lineage": [],
+  "provenance_certifications": {
+    "f3_scored_tables_read": false,
+    "2024_read_since_clean_lineage_reset": false,
+    "2025_read_in_selection_or_training": false,
+    "2026_read_in_selection_or_training": false
+  },
+  "candidate_feature_universe": {
+    "source": "features.registry.resolve_feature_instances",
+    "status_filter": "verified",
+    "total_candidates_count": 20,
+    "candidate_names_sha256": "dcc09ac1b9290aecb8bc8007b0bffb4cefee53062a2345dd362d1882141676a0",
+    "candidates": {
+      "arrival_acceleration": {
+        "canonical_name": "arrival_acceleration",
+        "family": [
+          "arrival_velocity"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "parameters": {
+          "input_timeframe": "1s",
+          "short_lookback": 20,
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "arrival_acceleration",
+          "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        }
+      },
+      "arrival_velocity": {
+        "canonical_name": "arrival_velocity",
+        "family": [
+          "arrival_velocity"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "parameters": {
+          "input_timeframe": "1s",
+          "lookback": 20,
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "arrival_velocity",
+          "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        }
+      },
+      "current_5m_regime_range_atr_per_min": {
+        "canonical_name": "regime_range_atr_per_min",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "timeframe": "5m",
+          "context": "current",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "regime_range_atr_per_min",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        }
+      },
+      "distance_to_completed_5m_high_atr": {
+        "canonical_name": "distance_to_completed_range_high_atr",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "reference_timeframe": "5m",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "distance_to_completed_range_high_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        }
+      },
+      "distance_to_completed_5m_low_atr": {
+        "canonical_name": "distance_to_completed_range_low_atr",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "reference_timeframe": "5m",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "distance_to_completed_range_low_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        }
+      },
+      "ema_slope": {
+        "canonical_name": "ema_slope",
+        "family": [
+          "context"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_context.GenericContextProvider",
+        "parameters": {
+          "ema_role": "short",
+          "lookback": 20
+        },
+        "input_requirements": {
+          "canonical_name": "ema_slope",
+          "provider": "features.trackers.generic_context.GenericContextProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        }
+      },
+      "est_delta_ratio": {
+        "canonical_name": "est_delta_ratio",
+        "family": [
+          "ohlcv_est_delta"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "parameters": {
+          "context": "rolling",
+          "timeframe": "30s"
+        },
+        "input_requirements": {
+          "canonical_name": "est_delta_ratio",
+          "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+          "required_streams": [
+            "completed_1s"
+          ],
+          "window_type": "rolling",
+          "window": "30s",
+          "update_every": "1s"
+        }
+      },
+      "prior_1m_regime_efficiency": {
+        "canonical_name": "regime_efficiency",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "timeframe": "1m",
+          "context": "prior",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "regime_efficiency",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        }
+      },
+      "prior_1m_regime_mfe_atr": {
+        "canonical_name": "regime_mfe_atr",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "timeframe": "1m",
+          "context": "prior",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "regime_mfe_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        }
+      },
+      "prior_1m_regime_range_atr": {
+        "canonical_name": "regime_range_atr",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "timeframe": "1m",
+          "context": "prior",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "regime_range_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        }
+      },
+      "prior_5m_regime_efficiency": {
+        "canonical_name": "regime_efficiency",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "timeframe": "5m",
+          "context": "prior",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "regime_efficiency",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        }
+      },
+      "prior_5m_regime_mfe_atr": {
+        "canonical_name": "regime_mfe_atr",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "timeframe": "5m",
+          "context": "prior",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "regime_mfe_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        }
+      },
+      "prior_5m_regime_range_atr": {
+        "canonical_name": "regime_range_atr",
+        "family": [
+          "structural_regime_geometry"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "parameters": {
+          "timeframe": "5m",
+          "context": "prior",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "regime_range_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        }
+      },
+      "range_position": {
+        "canonical_name": "range_position",
+        "family": [
+          "range_position"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_bar_geometry.GenericRangePositionProvider",
+        "parameters": {
+          "timeframe": "1m",
+          "lookback": 5,
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "range_position",
+          "provider": "features.trackers.generic_bar_geometry.GenericRangePositionProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        }
+      },
+      "relative_volume": {
+        "canonical_name": "relative_volume",
+        "family": [
+          "arrival_volume"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+        "parameters": {
+          "input_timeframe": "1s",
+          "aggregation_lookback": 5,
+          "baseline_lookback": 5,
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "relative_volume",
+          "provider": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        }
+      },
+      "rolling_300s_current_progress_atr": {
+        "canonical_name": "rolling_current_progress_atr",
+        "family": [
+          "rolling_5m_productivity"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "parameters": {
+          "window": "300s",
+          "update_every": "1s"
+        },
+        "input_requirements": {
+          "canonical_name": "rolling_current_progress_atr",
+          "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+          "required_streams": [
+            "completed_1s"
+          ],
+          "window_type": "rolling",
+          "window": "300s",
+          "update_every": "1s"
+        }
+      },
+      "rolling_300s_giveback_atr": {
+        "canonical_name": "rolling_giveback_atr",
+        "family": [
+          "rolling_5m_productivity"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "parameters": {
+          "window": "300s",
+          "update_every": "1s"
+        },
+        "input_requirements": {
+          "canonical_name": "rolling_giveback_atr",
+          "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+          "required_streams": [
+            "completed_1s"
+          ],
+          "window_type": "rolling",
+          "window": "300s",
+          "update_every": "1s"
+        }
+      },
+      "rolling_300s_max_progress_atr": {
+        "canonical_name": "rolling_max_progress_atr",
+        "family": [
+          "rolling_5m_productivity"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "parameters": {
+          "window": "300s",
+          "update_every": "1s"
+        },
+        "input_requirements": {
+          "canonical_name": "rolling_max_progress_atr",
+          "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+          "required_streams": [
+            "completed_1s"
+          ],
+          "window_type": "rolling",
+          "window": "300s",
+          "update_every": "1s"
+        }
+      },
+      "rolling_300s_retention_ratio": {
+        "canonical_name": "rolling_retention_ratio",
+        "family": [
+          "rolling_5m_productivity"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "parameters": {
+          "window": "300s",
+          "update_every": "1s"
+        },
+        "input_requirements": {
+          "canonical_name": "rolling_retention_ratio",
+          "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+          "required_streams": [
+            "completed_1s"
+          ],
+          "window_type": "rolling",
+          "window": "300s",
+          "update_every": "1s"
+        }
+      },
+      "wick_imbalance": {
+        "canonical_name": "wick_imbalance",
+        "family": [
+          "wick_imbalance"
+        ],
+        "dtype": "float64",
+        "implementation": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+        "parameters": {
+          "timeframe": "1m",
+          "bar_state": "completed"
+        },
+        "input_requirements": {
+          "canonical_name": "wick_imbalance",
+          "provider": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        }
+      }
+    }
+  },
+  "selection_contract": {
+    "mode": "train_only",
+    "years": [
+      2021,
+      2022,
+      2023
+    ],
+    "direction_specific": true,
+    "feature_count_per_direction": 25,
+    "ranking_method": "frozen_train_only_temporal_rank"
+  },
+  "chronology": {
+    "train": [
+      2021,
+      2022,
+      2023
+    ],
+    "dev": [
+      2024
+    ],
+    "prohibited": [
+      2025,
+      2026
+    ]
+  },
+  "derived_causal_inputs": [
+    {
+      "name": "stage1_model_c_score",
+      "parent_study_id": "clean_maturity_flip_model_rolling_productivity",
+      "parent_train_freeze_artifact": "artifacts/train_experiment_freeze_repaired.json",
+      "parent_train_freeze_artifact_sha256": "c5bd68ca503a2395b7ca695354fae5a5968b44c95aef74290bb59d952e4f49a9",
+      "parent_frozen_execution_composite_sha256": "7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8",
+      "model_hashes": {
+        "LONG_C": "a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38",
+        "SHORT_C": "5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf"
+      },
+      "preprocessing_hash": "0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4",
+      "availability_reference": "decision_ts",
+      "verified": true
+    }
+  ],
+  "required_gates_evidence": [
+    {
+      "gate_id": "TRAIN_TARGET_BALANCE_PASS",
+      "stage": "prepare",
+      "artifact_path": "artifacts/train_target_balance_pass.json",
+      "schema_version": 1,
+      "status": "PASS",
+      "scope_sha256": "907838108655d90758f69c1bd1af53cd0e62954a42a49a43bc7e4ab46c7e9967",
+      "producer": "clean_tradable_reversal.train_target_balance_pass_diagnostic_v1",
+      "created_at_utc": "2026-08-26T05:06:26.041948+00:00",
+      "evidence_sha256": "6935f891f1b16d6060fb162d4cb2d6c78540ffd48ade0eed366c09d9b16c4319",
+      "evidence": {
+        "population_version": "STAGE2_P90_UPCROSS_V1",
+        "population_count": {
+          "total": 8533,
+          "LONG": 3984,
+          "SHORT": 4549
+        },
+        "maturity_counts": {
+          "LONG": {
+            "300-600s": 1585,
+            "600-900s": 1372,
+            "900-1800s": 1027
+          },
+          "SHORT": {
+            "300-600s": 1765,
+            "600-900s": 1551,
+            "900-1800s": 1233
+          }
+        },
+        "left_censored_above_threshold": 58,
+        "multiple_crossing_regimes": 7161,
+        "forward_outcome_spec_sha256": "842dc6f8389bea21ea49830bed294a5af190e4e457367c9c44a209f07f54052b",
+        "stage1_dependency": {
+          "parent_study_id": "clean_maturity_flip_model_rolling_productivity",
+          "parent_train_freeze_artifact": "artifacts/train_experiment_freeze_repaired.json",
+          "parent_train_freeze_artifact_sha256": "c5bd68ca503a2395b7ca695354fae5a5968b44c95aef74290bb59d952e4f49a9",
+          "parent_frozen_execution_composite_sha256": "7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8",
+          "model_hashes": {
+            "LONG_C": "a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38",
+            "SHORT_C": "5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf"
+          },
+          "preprocessing_hash": "0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4"
+        },
+        "T1_balance": {
+          "overall": {
+            "eligible": 8533,
+            "resolved": 8442,
+            "positive": 1687,
+            "negative": 6755,
+            "censored": 91,
+            "positive_rate_among_resolved": 0.1998341625207297
+          },
+          "LONG": {
+            "eligible": 3984,
+            "resolved": 3945,
+            "positive": 813,
+            "negative": 3132,
+            "censored": 39,
+            "positive_rate_among_resolved": 0.20608365019011407
+          },
+          "SHORT": {
+            "eligible": 4549,
+            "resolved": 4497,
+            "positive": 874,
+            "negative": 3623,
+            "censored": 52,
+            "positive_rate_among_resolved": 0.19435179008227707
+          },
+          "300-600s": {
+            "eligible": 3350,
+            "resolved": 3334,
+            "positive": 653,
+            "negative": 2681,
+            "censored": 16,
+            "positive_rate_among_resolved": 0.19586082783443312
+          },
+          "600-900s": {
+            "eligible": 2923,
+            "resolved": 2899,
+            "positive": 616,
+            "negative": 2283,
+            "censored": 24,
+            "positive_rate_among_resolved": 0.21248706450500174
+          },
+          "900-1800s": {
+            "eligible": 2260,
+            "resolved": 2209,
+            "positive": 418,
+            "negative": 1791,
+            "censored": 51,
+            "positive_rate_among_resolved": 0.1892258940697148
+          }
+        },
+        "T2_balance": {
+          "overall": {
+            "eligible": 8533,
+            "resolved": 8442,
+            "positive": 2518,
+            "negative": 5924,
+            "censored": 91,
+            "positive_rate_among_resolved": 0.2982705520018953
+          },
+          "LONG": {
+            "eligible": 3984,
+            "resolved": 3945,
+            "positive": 1179,
+            "negative": 2766,
+            "censored": 39,
+            "positive_rate_among_resolved": 0.29885931558935364
+          },
+          "SHORT": {
+            "eligible": 4549,
+            "resolved": 4497,
+            "positive": 1339,
+            "negative": 3158,
+            "censored": 52,
+            "positive_rate_among_resolved": 0.29775405826106294
+          },
+          "300-600s": {
+            "eligible": 3350,
+            "resolved": 3334,
+            "positive": 977,
+            "negative": 2357,
+            "censored": 16,
+            "positive_rate_among_resolved": 0.29304139172165566
+          },
+          "600-900s": {
+            "eligible": 2923,
+            "resolved": 2899,
+            "positive": 878,
+            "negative": 2021,
+            "censored": 24,
+            "positive_rate_among_resolved": 0.3028630562262849
+          },
+          "900-1800s": {
+            "eligible": 2260,
+            "resolved": 2209,
+            "positive": 663,
+            "negative": 1546,
+            "censored": 51,
+            "positive_rate_among_resolved": 0.30013580805794476
+          }
+        },
+        "T3_balance": {
+          "overall": {
+            "eligible": 8533,
+            "resolved": 8442,
+            "positive": 2861,
+            "negative": 5581,
+            "censored": 91,
+            "positive_rate_among_resolved": 0.33890073442312246
+          },
+          "LONG": {
+            "eligible": 3984,
+            "resolved": 3945,
+            "positive": 1348,
+            "negative": 2597,
+            "censored": 39,
+            "positive_rate_among_resolved": 0.34169835234474016
+          },
+          "SHORT": {
+            "eligible": 4549,
+            "resolved": 4497,
+            "positive": 1513,
+            "negative": 2984,
+            "censored": 52,
+            "positive_rate_among_resolved": 0.336446519902157
+          },
+          "300-600s": {
+            "eligible": 3350,
+            "resolved": 3334,
+            "positive": 1106,
+            "negative": 2228,
+            "censored": 16,
+            "positive_rate_among_resolved": 0.3317336532693461
+          },
+          "600-900s": {
+            "eligible": 2923,
+            "resolved": 2899,
+            "positive": 996,
+            "negative": 1903,
+            "censored": 24,
+            "positive_rate_among_resolved": 0.3435667471541911
+          },
+          "900-1800s": {
+            "eligible": 2260,
+            "resolved": 2209,
+            "positive": 759,
+            "negative": 1450,
+            "censored": 51,
+            "positive_rate_among_resolved": 0.34359438660027164
+          }
+        },
+        "T1_negative_subtypes": {
+          "overall": {
+            "FLIP_FAILED": 5108,
+            "HIGH_MAE_ONLY": 1174,
+            "LOW_MFE_AND_HIGH_MAE": 388,
+            "LOW_MFE_ONLY": 85
+          },
+          "LONG": {
+            "FLIP_FAILED": 2370,
+            "HIGH_MAE_ONLY": 535,
+            "LOW_MFE_AND_HIGH_MAE": 192,
+            "LOW_MFE_ONLY": 35
+          },
+          "SHORT": {
+            "FLIP_FAILED": 2738,
+            "HIGH_MAE_ONLY": 639,
+            "LOW_MFE_AND_HIGH_MAE": 196,
+            "LOW_MFE_ONLY": 50
+          },
+          "300-600s": {
+            "FLIP_FAILED": 2124,
+            "HIGH_MAE_ONLY": 453,
+            "LOW_MFE_AND_HIGH_MAE": 88,
+            "LOW_MFE_ONLY": 16
+          },
+          "600-900s": {
+            "FLIP_FAILED": 1736,
+            "HIGH_MAE_ONLY": 380,
+            "LOW_MFE_AND_HIGH_MAE": 136,
+            "LOW_MFE_ONLY": 31
+          },
+          "900-1800s": {
+            "FLIP_FAILED": 1248,
+            "HIGH_MAE_ONLY": 341,
+            "LOW_MFE_AND_HIGH_MAE": 164,
+            "LOW_MFE_ONLY": 38
+          }
+        },
+        "censoring": {
+          "stage1_flip_side": {
+            "SESSION_END": 91
+          },
+          "forward_outcome_side": {
+            "RESOLVED": 8441,
+            "CENSORED_SESSION": 90,
+            "MISSING_DATA": 1,
+            "CENSORED_DATA_END": 1
+          }
+        },
+        "train_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "no_2024_2025_2026_access": true,
+        "operational_gate": {
+          "status": "PASS",
+          "reasons_failed": [],
+          "criteria": [
+            "vanishing_positive_class",
+            "severe_long_short_collapse",
+            "severe_maturity_bucket_collapse",
+            "pathological_censoring"
+          ],
+          "primary_target": "T1"
+        },
+        "inherited_stage1_fact": "The four rolling_300s_* features are null on ~72.7% of frozen Stage-1 TRAIN checkpoint rows, independent of regime age -- an inherited property of the already-repaired, hash-verified parent TRAIN candidates that frozen Model C was itself fit on. Not a new Stage-2 defect; not investigated or altered here."
+      }
+    }
+  ],
+  "manifest_sha256": "0d2e24facdd9807a7f6a1d7fa9d65f10f0803d393237b870300f640ab0a4262e"
+}

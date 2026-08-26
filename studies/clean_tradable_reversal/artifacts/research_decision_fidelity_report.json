@@ -1,0 +1,53 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_tradable_reversal",
+  "decision_contract": {
+    "research_question": "Among high-confidence Stage-1 flip predictions (frozen Model C, TRAIN P90), can information available at the decision timestamp T distinguish economically clean reversals from ugly, weak, or failed reversals?\n",
+    "baseline": null,
+    "baseline_feature_selection": null,
+    "model_arms": {
+      "A": "stage1_model_c_score only",
+      "B": "A plus original Stage-1 13 causal features",
+      "C": "B plus final 7 canonical context FeatureInstances"
+    },
+    "variable_being_tested": [
+      "contemporaneous_current_regime_pace",
+      "room_to_range_boundary",
+      "participation_and_signed_order_flow",
+      "signal_bar_shape_and_rejection"
+    ],
+    "prohibited_changes": [
+      "use_2024_2025_2026_for_target_selection",
+      "use_2024_2025_2026_for_feature_selection",
+      "use_2024_2025_2026_for_population_definition",
+      "change_target_after_seeing_predictive_performance",
+      "change_feature_surface_after_seeing_predictive_performance",
+      "retrain_or_reselect_stage1",
+      "broaden_arm_c_into_a_feature_mining_pass",
+      "coerce_censored_target_rows_to_negative"
+    ],
+    "allowed_changes": [
+      "execute_TRAIN_TARGET_BALANCE_PASS_and_record_results_here",
+      "reject_T1_for_the_explicit_operational_reasons_listed_above_only",
+      "evaluate_model_arms_a_b_c",
+      "stratify_by_maturity_buckets"
+    ],
+    "chronology": {
+      "train": [
+        2021,
+        2022,
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": "Does B improve over A, and does C improve over B, on predicting CLEAN_TRADABLE_REVERSAL -- separately for LONG and SHORT, reported by maturity bucket (maturity is a reporting slice, never a model input).\n",
+    "terminal_question": "Does contemporaneous signal-time context (current-regime pace, room-to-boundary, participation, order-flow sign, bar shape) add economic-path discrimination beyond frozen Stage-1 flip confidence and its own causal feature surface?\n"
+  },
+  "findings": []
+}

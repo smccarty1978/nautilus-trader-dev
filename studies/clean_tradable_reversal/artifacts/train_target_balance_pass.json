@@ -1,0 +1,260 @@
+{
+  "gate_id": "TRAIN_TARGET_BALANCE_PASS",
+  "schema_version": 1,
+  "status": "PASS",
+  "scope_sha256": "907838108655d90758f69c1bd1af53cd0e62954a42a49a43bc7e4ab46c7e9967",
+  "producer": "clean_tradable_reversal.train_target_balance_pass_diagnostic_v1",
+  "created_at_utc": "2026-08-26T05:06:26.041948+00:00",
+  "evidence_sha256": "6935f891f1b16d6060fb162d4cb2d6c78540ffd48ade0eed366c09d9b16c4319",
+  "evidence": {
+    "population_version": "STAGE2_P90_UPCROSS_V1",
+    "population_count": {
+      "total": 8533,
+      "LONG": 3984,
+      "SHORT": 4549
+    },
+    "maturity_counts": {
+      "LONG": {
+        "300-600s": 1585,
+        "600-900s": 1372,
+        "900-1800s": 1027
+      },
+      "SHORT": {
+        "300-600s": 1765,
+        "600-900s": 1551,
+        "900-1800s": 1233
+      }
+    },
+    "left_censored_above_threshold": 58,
+    "multiple_crossing_regimes": 7161,
+    "forward_outcome_spec_sha256": "842dc6f8389bea21ea49830bed294a5af190e4e457367c9c44a209f07f54052b",
+    "stage1_dependency": {
+      "parent_study_id": "clean_maturity_flip_model_rolling_productivity",
+      "parent_train_freeze_artifact": "artifacts/train_experiment_freeze_repaired.json",
+      "parent_train_freeze_artifact_sha256": "c5bd68ca503a2395b7ca695354fae5a5968b44c95aef74290bb59d952e4f49a9",
+      "parent_frozen_execution_composite_sha256": "7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8",
+      "model_hashes": {
+        "LONG_C": "a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38",
+        "SHORT_C": "5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf"
+      },
+      "preprocessing_hash": "0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4"
+    },
+    "T1_balance": {
+      "overall": {
+        "eligible": 8533,
+        "resolved": 8442,
+        "positive": 1687,
+        "negative": 6755,
+        "censored": 91,
+        "positive_rate_among_resolved": 0.1998341625207297
+      },
+      "LONG": {
+        "eligible": 3984,
+        "resolved": 3945,
+        "positive": 813,
+        "negative": 3132,
+        "censored": 39,
+        "positive_rate_among_resolved": 0.20608365019011407
+      },
+      "SHORT": {
+        "eligible": 4549,
+        "resolved": 4497,
+        "positive": 874,
+        "negative": 3623,
+        "censored": 52,
+        "positive_rate_among_resolved": 0.19435179008227707
+      },
+      "300-600s": {
+        "eligible": 3350,
+        "resolved": 3334,
+        "positive": 653,
+        "negative": 2681,
+        "censored": 16,
+        "positive_rate_among_resolved": 0.19586082783443312
+      },
+      "600-900s": {
+        "eligible": 2923,
+        "resolved": 2899,
+        "positive": 616,
+        "negative": 2283,
+        "censored": 24,
+        "positive_rate_among_resolved": 0.21248706450500174
+      },
+      "900-1800s": {
+        "eligible": 2260,
+        "resolved": 2209,
+        "positive": 418,
+        "negative": 1791,
+        "censored": 51,
+        "positive_rate_among_resolved": 0.1892258940697148
+      }
+    },
+    "T2_balance": {
+      "overall": {
+        "eligible": 8533,
+        "resolved": 8442,
+        "positive": 2518,
+        "negative": 5924,
+        "censored": 91,
+        "positive_rate_among_resolved": 0.2982705520018953
+      },
+      "LONG": {
+        "eligible": 3984,
+        "resolved": 3945,
+        "positive": 1179,
+        "negative": 2766,
+        "censored": 39,
+        "positive_rate_among_resolved": 0.29885931558935364
+      },
+      "SHORT": {
+        "eligible": 4549,
+        "resolved": 4497,
+        "positive": 1339,
+        "negative": 3158,
+        "censored": 52,
+        "positive_rate_among_resolved": 0.29775405826106294
+      },
+      "300-600s": {
+        "eligible": 3350,
+        "resolved": 3334,
+        "positive": 977,
+        "negative": 2357,
+        "censored": 16,
+        "positive_rate_among_resolved": 0.29304139172165566
+      },
+      "600-900s": {
+        "eligible": 2923,
+        "resolved": 2899,
+        "positive": 878,
+        "negative": 2021,
+        "censored": 24,
+        "positive_rate_among_resolved": 0.3028630562262849
+      },
+      "900-1800s": {
+        "eligible": 2260,
+        "resolved": 2209,
+        "positive": 663,
+        "negative": 1546,
+        "censored": 51,
+        "positive_rate_among_resolved": 0.30013580805794476
+      }
+    },
+    "T3_balance": {
+      "overall": {
+        "eligible": 8533,
+        "resolved": 8442,
+        "positive": 2861,
+        "negative": 5581,
+        "censored": 91,
+        "positive_rate_among_resolved": 0.33890073442312246
+      },
+      "LONG": {
+        "eligible": 3984,
+        "resolved": 3945,
+        "positive": 1348,
+        "negative": 2597,
+        "censored": 39,
+        "positive_rate_among_resolved": 0.34169835234474016
+      },
+      "SHORT": {
+        "eligible": 4549,
+        "resolved": 4497,
+        "positive": 1513,
+        "negative": 2984,
+        "censored": 52,
+        "positive_rate_among_resolved": 0.336446519902157
+      },
+      "300-600s": {
+        "eligible": 3350,
+        "resolved": 3334,
+        "positive": 1106,
+        "negative": 2228,
+        "censored": 16,
+        "positive_rate_among_resolved": 0.3317336532693461
+      },
+      "600-900s": {
+        "eligible": 2923,
+        "resolved": 2899,
+        "positive": 996,
+        "negative": 1903,
+        "censored": 24,
+        "positive_rate_among_resolved": 0.3435667471541911
+      },
+      "900-1800s": {
+        "eligible": 2260,
+        "resolved": 2209,
+        "positive": 759,
+        "negative": 1450,
+        "censored": 51,
+        "positive_rate_among_resolved": 0.34359438660027164
+      }
+    },
+    "T1_negative_subtypes": {
+      "overall": {
+        "FLIP_FAILED": 5108,
+        "HIGH_MAE_ONLY": 1174,
+        "LOW_MFE_AND_HIGH_MAE": 388,
+        "LOW_MFE_ONLY": 85
+      },
+      "LONG": {
+        "FLIP_FAILED": 2370,
+        "HIGH_MAE_ONLY": 535,
+        "LOW_MFE_AND_HIGH_MAE": 192,
+        "LOW_MFE_ONLY": 35
+      },
+      "SHORT": {
+        "FLIP_FAILED": 2738,
+        "HIGH_MAE_ONLY": 639,
+        "LOW_MFE_AND_HIGH_MAE": 196,
+        "LOW_MFE_ONLY": 50
+      },
+      "300-600s": {
+        "FLIP_FAILED": 2124,
+        "HIGH_MAE_ONLY": 453,
+        "LOW_MFE_AND_HIGH_MAE": 88,
+        "LOW_MFE_ONLY": 16
+      },
+      "600-900s": {
+        "FLIP_FAILED": 1736,
+        "HIGH_MAE_ONLY": 380,
+        "LOW_MFE_AND_HIGH_MAE": 136,
+        "LOW_MFE_ONLY": 31
+      },
+      "900-1800s": {
+        "FLIP_FAILED": 1248,
+        "HIGH_MAE_ONLY": 341,
+        "LOW_MFE_AND_HIGH_MAE": 164,
+        "LOW_MFE_ONLY": 38
+      }
+    },
+    "censoring": {
+      "stage1_flip_side": {
+        "SESSION_END": 91
+      },
+      "forward_outcome_side": {
+        "RESOLVED": 8441,
+        "CENSORED_SESSION": 90,
+        "MISSING_DATA": 1,
+        "CENSORED_DATA_END": 1
+      }
+    },
+    "train_years": [
+      2021,
+      2022,
+      2023
+    ],
+    "no_2024_2025_2026_access": true,
+    "operational_gate": {
+      "status": "PASS",
+      "reasons_failed": [],
+      "criteria": [
+        "vanishing_positive_class",
+        "severe_long_short_collapse",
+        "severe_maturity_bucket_collapse",
+        "pathological_censoring"
+      ],
+      "primary_target": "T1"
+    },
+    "inherited_stage1_fact": "The four rolling_300s_* features are null on ~72.7% of frozen Stage-1 TRAIN checkpoint rows, independent of regime age -- an inherited property of the already-repaired, hash-verified parent TRAIN candidates that frozen Model C was itself fit on. Not a new Stage-2 defect; not investigated or altered here."
+  }
+}

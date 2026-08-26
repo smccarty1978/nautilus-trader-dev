@@ -3,7 +3,30 @@ research_question: >
   information available at the decision timestamp T distinguish economically clean
   reversals from ugly, weak, or failed reversals?
 
-status: FORMALIZED_NOT_SCAFFOLDED
+status: CLOSED_NOT_SUPPORTED
+
+final_result:
+  status: CLOSED_NOT_SUPPORTED
+  final_stage2_result: NOT_SUPPORTED
+  primary_long_arm: B_PLUS_ORIGINAL_13
+  primary_short_arm: A_SCORE_ONLY
+  arm_c_status: HYPOTHESIS_GENERATION_ONLY
+  long_primary: {train_final_validation_roc: 0.5610, oos_roc: 0.4913, verdict: COLLAPSES}
+  short_primary: {train_final_validation_roc: 0.5400, oos_roc: 0.5161, verdict: WEAK_INSUFFICIENT_SUPPORT}
+  arm_c_oos_secondary_only: {long_roc: 0.5244, short_roc: 0.5365}
+  oos_reselection_occurred: false
+  oos_recalibration_occurred: false
+  target_changed: false
+  population_changed: false
+  feature_surface_changed: false
+  prohibited_years_untouched: [2025, 2026]
+  report: results/final_report.md
+  decision_artifact: [artifacts/final_research_decision.json, artifacts/final_research_decision.md]
+  next_action: >
+    None inside this study. Optional future research: a NEW predeclared study motivated
+    by the Arm-C secondary OOS observation or a different Stage-2 feature hypothesis,
+    using genuinely unseen confirmation data. 2024 cannot be reused as untouched OOS for
+    that future hypothesis.
 
 stage1_dependency:
   parent_study: clean_maturity_flip_model_rolling_productivity
@@ -34,29 +57,100 @@ derived_causal_inputs:
                stage1_dependency.train_experiment_freeze_artifact]
 
 primary_population:
+  primary_population_version: STAGE2_P90_UPCROSS_V1
   selection: one_first_crossing_per_regime
+  crossing_definition: >
+    STAGE2_P90_UPCROSS_V1. Eligible checkpoints = rows present in
+    train_candidates_repaired_merged.parquet / train_observations_repaired_merged.parquet
+    for the given regime (the parent Stage-1 collector's own qualification gate is already
+    baked into this stream -- empirically verified as a no-op: 100% of rows already pass
+    age_gate_seconds>=120, running_mfe_atr>=1.0, new_progress_windows>=2,
+    retained_mfe_ratio>=0.5). Order eligible checkpoints strictly by observation_ts, with
+    checkpoint_index as a deterministic tie-break. score_t = frozen repaired Model C score
+    (LONG_C / SHORT_C, unchanged -- fit_identity_sha256 re-verified byte-for-byte against
+    stage1_dependency.model_hashes in this session). threshold = frozen TRAIN P90 for that
+    direction (stage1_dependency.thresholds_p90, unchanged). A crossing event: score_t >=
+    threshold AND the immediately previous eligible checkpoint in the same regime exists
+    with score_prev < threshold. Selected: the FIRST such upward crossing per regime. A
+    regime whose first eligible checkpoint is already >= threshold is
+    LEFT_CENSORED_ABOVE_THRESHOLD and is excluded (58 such regimes in TRAIN 2021-2023; not
+    counted as crossings pending an explicit initial-above-threshold policy decision). No
+    persistence requirement, no cadence resampling, no forward outcomes, and never tuned to
+    reproduce any prior count.
   threshold: stage1_dependency.thresholds_p90 (TRAIN-only, frozen)
   direction: [LONG, SHORT]
   maturity_definition: prevailing eligible 1m regime age at T (causal, backward-looking)
   primary_maturity_buckets: ["300-600s", "600-900s", "900-1800s"]
   diagnostic_maturity_buckets: ["<300s", ">=1800s"]
   train_counts_2021_2023:
-    LONG: {300-600s: 538, 600-900s: 428, 900-1800s: 301, total_primary: 1267, "<300s": 87, ">=1800s": 0}
-    SHORT: {300-600s: 538, 600-900s: 494, 900-1800s: 403, total_primary: 1435, "<300s": 54, ">=1800s": 1}
-  train_counts_source: repaired_first_crossing_analysis.json (model=C, threshold=p90; TRAIN-only, no 2024/2025/2026 content)
+    LONG: {300-600s: 1585, 600-900s: 1372, 900-1800s: 1027, total_primary: 3984, "<300s": 253, ">=1800s": 2}
+    SHORT: {300-600s: 1765, 600-900s: 1551, 900-1800s: 1233, total_primary: 4549, "<300s": 194, ">=1800s": 1}
+    total_primary_all_directions: 8533
+  train_counts_source: >
+    Computed directly in this session against train_candidates_repaired_merged.parquet +
+    train_observations_repaired_merged.parquet + train_fitted_models.joblib under the
+    STAGE2_P90_UPCROSS_V1 algorithm above. Diagnostics: 11,693 total TRAIN regimes; 9,005
+    ever reach >=P90; 8,983 have a true below->above upcross; 58 are left-censored above
+    threshold; 7,161 of the 8,983 upcrossing regimes cross more than once (only the first
+    crossing is selected).
+  checkpoint_continuity_proven: >
+    YES for this algorithm's requirements. Verified: zero duplicate (regime, observation_ts)
+    rows; checkpoint_index strictly non-decreasing with observation_ts within every regime
+    (0 violations); score evaluation is fully deterministic given the frozen model + frame.
+    One inherited (not newly introduced) data characteristic is noted for transparency: the
+    four rolling_300s_* features are null on ~72.7% of rows regardless of regime age (does
+    not correlate cleanly with the 300s warmup boundary) -- this is a property of the
+    already-repaired, hash-verified, frozen Stage-1 TRAIN candidates the frozen Model C was
+    itself fit on (LightGBM handles it natively via learned missing-value splits), and
+    re-investigating Stage-1 feature emission is out of scope here per explicit instruction
+    (Stage-1 recollection/retraining prohibited).
   flip_resolution_censored_at_p90: 0
   maturity_role: population_slice_only, never a model input
+  historical_reference:
+    status: HISTORICAL_ANALYSIS_POPULATION
+    aggregate_counts_valid: true
+    row_level_selection_method: UNRECOVERABLE
+    authoritative_for_this_study: false
+    note: >
+      repaired_first_crossing_analysis.json (LONG total_primary=1267, SHORT
+      total_primary=1435, total=2702) remains a valid, internally-consistent AGGREGATE
+      record of a prior first-crossing analysis run against this same repaired Stage-1
+      data. Its row-level checkpoint-selection methodology (exact cadence/persistence/
+      threshold-calibration rule) could not be recovered: the driver script that produced
+      it is absent from the repository and its full git history (verified via
+      `git log --all --diff-filter=A` across the whole history plus a repo-wide content
+      search), and reconstructing "one first crossing per regime" via the most literal
+      reading (first row where score >= frozen P90, per regime) reproduces the aggregate
+      counts' relative shape but not their absolute magnitude (roughly 3x over-count in
+      every maturity bucket, uniformly -- ruled out as caused by merge duplication, the
+      qualification filter, threshold value, or model identity, all independently
+      re-verified in this session). The 2,702 figure is retained here for historical
+      context only and is NOT an authoritative reconciliation target for
+      STAGE2_P90_UPCROSS_V1 or any future population version.
 
 target:
-  status: PROVISIONAL_PENDING_TRAIN_BALANCE
+  status: CONFIRMED_TRAIN_ONLY
   status_meaning: >
-    T1 is the predeclared primary target candidate. It is NOT finally frozen for
-    modeling. The only artifact currently missing to finalize it is TRAIN-only
-    MFE_300s_atr / MAE_300s_atr class balance for the primary population above --
-    no such artifact exists anywhere in the repository as of this decision (verified
-    by direct inspection of train_observations_repaired_merged.parquet, which carries
-    only the Stage-1 flip-classification label, and by a repo-wide search that found
-    no MFE_300s_atr/MAE_300s_atr/clean_tradable_reversal artifact for this population).
+    T1 is CONFIRMED as the primary target on the TRAIN-only STAGE2_P90_UPCROSS_V1
+    population (8,533 primary regimes: 3,984 LONG + 4,549 SHORT), per
+    TRAIN_TARGET_BALANCE_PASS (artifacts/train_target_balance_pass.json,
+    evidence_sha256=6935f891f1b16d6060fb162d4cb2d6c78540ffd48ade0eed366c09d9b16c4319).
+    Confirmation used only the four predeclared operational criteria below -- no
+    predictive-performance, AUC, or model-based selection was involved, and 2024/2025/
+    2026 were never opened. T1 overall: 1,687 positive / 6,755 negative / 91 censored
+    among 8,442 resolved (20.0% positive rate), balanced across LONG (20.6%) and SHORT
+    (19.4%), and across all three primary maturity buckets (19.6% / 21.2% / 18.9%);
+    overall censoring 1.07%. None of vanishing-positive-class, severe LONG/SHORT
+    collapse, severe maturity-bucket collapse, or pathological censoring triggered.
+    T2 (29.8% positive) and T3 (33.9% positive) were computed strictly as
+    DIAGNOSTIC_ONLY per selection_rule below -- their higher positive rates were never
+    used as, and explicitly are not, a reason to prefer them over T1.
+  train_balance_result:
+    gate_artifact: artifacts/train_target_balance_pass.json
+    gate_evidence_sha256: 6935f891f1b16d6060fb162d4cb2d6c78540ffd48ade0eed366c09d9b16c4319
+    population_version: STAGE2_P90_UPCROSS_V1
+    T1_negative_subtypes_overall: {FLIP_FAILED: 5108, HIGH_MAE_ONLY: 1174, LOW_MFE_AND_HIGH_MAE: 388, LOW_MFE_ONLY: 85}
+    oos_involvement: none
   primary_candidate:
     id: T1
     definition: >
@@ -75,11 +169,15 @@ target:
       LONG: {300-600s: 0.3420074349442379, 600-900s: 0.37616822429906543, 900-1800s: 0.3920265780730897}
       SHORT: {300-600s: 0.3252788104089219, 600-900s: 0.38461538461538464, 900-1800s: 0.3548387096774194}
       source: repaired_first_crossing_analysis.json
-  diagnostic_alternatives_train_only_evaluation_pending:
+  diagnostic_alternatives_train_only_evaluated:
     - id: T2
       definition: flip within 300s AND MFE_300s_atr >= 1.0 AND return_300s_atr > 0
+      status: DIAGNOSTIC_ONLY
+      overall_positive_rate: 0.298271
     - id: T3
       definition: flip within 300s AND MFE_300s_atr >= 1.0
+      status: DIAGNOSTIC_ONLY
+      overall_positive_rate: 0.338901
   selection_rule: >
     Prefer T1 unless the TRAIN_TARGET_BALANCE_PASS below shows an operational
     rejection reason: vanishing positive class, severe LONG/SHORT collapse, severe
@@ -89,27 +187,33 @@ target:
 
 required_pre_freeze_gates:
   - id: TRAIN_TARGET_BALANCE_PASS
-    status: NOT_EXECUTED
+    status: PASS
+    artifact: artifacts/train_target_balance_pass.json
+    artifact_evidence_sha256: 6935f891f1b16d6060fb162d4cb2d6c78540ffd48ade0eed366c09d9b16c4319
     must_run_before: [target freeze, TRAIN collection authorization, PREPARE]
     scope:
-      population: primary_population above (2702 primary regimes: 1267 LONG + 1435 SHORT)
+      population: >
+        primary_population above, STAGE2_P90_UPCROSS_V1 (3,984 LONG + 4,549 SHORT = 8,533
+        primary regimes). Executed against exactly this population -- the gate artifact's
+        scope_sha256 is bound to the study's current population/target/chronology and is
+        verified live via research_workflow.gates.assert_gates_satisfied(stage="prepare").
+      population_version: STAGE2_P90_UPCROSS_V1
       period: [2021, 2022, 2023]
       outcome_module: research_workflow.forward_outcomes
       entry_reference: NEXT_BAR_OPEN
-      atr_reference: frozen_at_entry_ts
+      atr_reference: frozen_at_entry_ts (NT AverageTrueRange(14) on 1m bars)
       horizon_seconds: 300
       bar_inclusion: FULLY_FORWARD
     required_outputs:
-      - T1 balance (overall, LONG, SHORT, by maturity bucket)
-      - T2 diagnostic balance
-      - T3 diagnostic balance
-      - T1 negative subtype counts (flip_failed, flip_correct_low_mfe, flip_correct_high_mae, multiple_failures)
-      - censoring counts by reason
+      - T1 balance (overall, LONG, SHORT, by maturity bucket) -- RECORDED, see artifact
+      - T2 diagnostic balance -- RECORDED, see artifact
+      - T3 diagnostic balance -- RECORDED, see artifact
+      - T1 negative subtype counts (FLIP_FAILED, LOW_MFE_ONLY, HIGH_MAE_ONLY, LOW_MFE_AND_HIGH_MAE) -- RECORDED, see artifact
+      - censoring counts by reason -- RECORDED, see artifact
     enforcement_note: >
-      This gate is NOT machine-enforced by any existing StudySpec/compiler check --
-      see schema_constraints_found below. It is binding by decision-contract authority
-      only until study.yaml exists; whoever authors study.yaml must not compile/PREPARE
-      this study until this gate's required_outputs are recorded here.
+      This gate IS now machine-enforced: StudySpec.required_gates + research_workflow.gates
+      close the schema_constraints_found gap below. assert_gates_satisfied(stage="prepare")
+      returns PASS against the current study state as of this update.
 
 feature_surface:
   arm_a:
@@ -192,7 +296,7 @@ allowed_changes:
 chronology:
   train: [2021, 2022, 2023]
   temporal_validation: {fit: [2021, 2022], validation: [2023]}
-  dev_oos: [2024]
+  dev: [2024]  # this repo's convention: chronology.dev == the OOS year (see study.yaml, experiment.py)
   prohibited: [2025, 2026]
 
 schema_constraints_found:

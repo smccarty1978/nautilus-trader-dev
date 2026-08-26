@@ -1,0 +1,227 @@
+{
+  "partition": "train",
+  "feature_sets": {
+    "LONG__A_SCORE_ONLY": [
+      "stage1_model_c_score"
+    ],
+    "LONG__B_PLUS_ORIGINAL_13": [
+      "stage1_model_c_score",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "LONG__C_PLUS_CONTEXT_7": [
+      "stage1_model_c_score",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "current_5m_regime_range_atr_per_min",
+      "distance_to_completed_5m_high_atr",
+      "distance_to_completed_5m_low_atr",
+      "relative_volume",
+      "est_delta_ratio",
+      "range_position",
+      "wick_imbalance"
+    ],
+    "SHORT__A_SCORE_ONLY": [
+      "stage1_model_c_score"
+    ],
+    "SHORT__B_PLUS_ORIGINAL_13": [
+      "stage1_model_c_score",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "SHORT__C_PLUS_CONTEXT_7": [
+      "stage1_model_c_score",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "current_5m_regime_range_atr_per_min",
+      "distance_to_completed_5m_high_atr",
+      "distance_to_completed_5m_low_atr",
+      "relative_volume",
+      "est_delta_ratio",
+      "range_position",
+      "wick_imbalance"
+    ]
+  },
+  "model_hashes": {
+    "LONG__A_SCORE_ONLY": "f0dc3efad193f32913ff7690d0aa7d8564bc8ac851b49d4c3235ad28935026d7",
+    "LONG__B_PLUS_ORIGINAL_13": "5f16b9cfb37d7d572e3ddafc96e686a331f4a8f61cb5dc9841cc05905b2e8c28",
+    "LONG__C_PLUS_CONTEXT_7": "88ae6db2af538295074615f32758e794bf604e5c4d7086fc9466c21d7f79c09f",
+    "SHORT__A_SCORE_ONLY": "c8245c98e0d175a1b23cff11594e8f3b9e3753eb33ea61a33c833c73e45c2e29",
+    "SHORT__B_PLUS_ORIGINAL_13": "efee0ba0f38102b90d23513a56022d6b6131bf83036787de91f88c45314cd462",
+    "SHORT__C_PLUS_CONTEXT_7": "b67aae5fcb6a2474c43ef4ef30b53388acce8905c2a5c0547dfb8c9663b99ea3"
+  },
+  "preprocessing_hash": "591b8d8ecd34639295a730b4c9e21895cd117a6ab825905fa62c279bd16a09a2",
+  "thresholds": {
+    "LONG__A_SCORE_ONLY": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.2544918078401225,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.27436639687365066,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.2868699790911445,
+        "derivation_population": "train"
+      }
+    },
+    "LONG__B_PLUS_ORIGINAL_13": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.25997305910830254,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.3002984916774269,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.34627807594751264,
+        "derivation_population": "train"
+      }
+    },
+    "LONG__C_PLUS_CONTEXT_7": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.29761723536159473,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.3504194192466254,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.40032483839643823,
+        "derivation_population": "train"
+      }
+    },
+    "SHORT__A_SCORE_ONLY": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.23607497660163,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.26368126257855046,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.2835015296400111,
+        "derivation_population": "train"
+      }
+    },
+    "SHORT__B_PLUS_ORIGINAL_13": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.4572809969276459,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.6265861946288476,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.7122463347150776,
+        "derivation_population": "train"
+      }
+    },
+    "SHORT__C_PLUS_CONTEXT_7": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.5437998940746668,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.6509868107963945,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.7339589619463439,
+        "derivation_population": "train"
+      }
+    }
+  },
+  "deciles": {},
+  "model_selection_manifest_sha256": "1d05933d8f1f80b48e25679d24e3695c8ed4e0b33d144acaadb7fd5f6ba9e7a3",
+  "schema_version": 1,
+  "study_id": "clean_tradable_reversal",
+  "authorization_sha256": "eef2925a063cd3c890c29bf0b91359070903c962e1590295b142fda95a7ae0d0",
+  "generated_at_utc": "2026-08-26T12:27:15.191761+00:00",
+  "freeze_sha256": "19e1c1e58790c3bcc16fc681efa9d06ebc1fdae8b2793b60d0bf8b6b06a06cde"
+}

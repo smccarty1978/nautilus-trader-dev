@@ -43,8 +43,15 @@ class ChronologySpec(BaseModel):
 
 class ResearchDecisionContract(BaseModel):
     research_question: str
-    baseline: BaselineSpec
-    baseline_feature_selection: FeatureSelectionSpec
+    # Optional: this pair models one specific study family (an A/B/C comparison against a
+    # frozen/rerankable baseline feature set). A decision for a genuinely different shape
+    # -- e.g. consuming a frozen upstream model score as a derived input, with no baseline
+    # feature-selection concept at all -- must not be forced to fabricate these fields just
+    # to parse; a document that looks authoritative but declares irrelevant fields is worse
+    # than one that omits what does not apply. Every check below that depends on either
+    # field is itself guarded on presence.
+    baseline: Optional[BaselineSpec] = None
+    baseline_feature_selection: Optional[FeatureSelectionSpec] = None
     model_arms: Dict[str, str]
     variable_being_tested: List[str]
     prohibited_changes: List[str] = Field(default_factory=list)
@@ -116,38 +123,39 @@ def check_research_decision_fidelity(study_dir: Path) -> Dict[str, Any]:
         # Previously only `mode == "none"` was compared, so a decision declaring
         # 'train_only' or 'pre_frozen' cross-checked nothing at all -- the gate silently
         # passed for two of its three modes (contract audit pass 01, WARNING).
-        _SELECTION_FREEDOM = {None: 0, "none": 0, "pre_frozen": 0, "train_only": 1}
-        decision_mode = decision.baseline_feature_selection.mode
-        decision_rank = _SELECTION_FREEDOM.get(decision_mode)
-        study_rank = _SELECTION_FREEDOM.get(study_sel_mode)
+        if decision.baseline_feature_selection is not None:
+            _SELECTION_FREEDOM = {None: 0, "none": 0, "pre_frozen": 0, "train_only": 1}
+            decision_mode = decision.baseline_feature_selection.mode
+            decision_rank = _SELECTION_FREEDOM.get(decision_mode)
+            study_rank = _SELECTION_FREEDOM.get(study_sel_mode)
 
-        if decision_rank is None or study_rank is None:
-            findings.append({
-                "severity": "CRITICAL",
-                "code": "UNKNOWN_SELECTION_MODE",
-                "message": (
-                    f"Unrecognized feature selection mode (decision: {decision_mode!r}, "
-                    f"study: {study_sel_mode!r}); known: {sorted(k for k in _SELECTION_FREEDOM if k)}"
-                ),
-            })
-        elif study_rank > decision_rank:
-            findings.append({
-                "severity": "CRITICAL",
-                "code": "UNAUTHORIZED_FEATURE_DISCOVERY",
-                "message": (
-                    f"study.yaml selection.mode '{study_sel_mode}' grants more feature-selection "
-                    f"freedom than research_decision.yaml authorizes "
-                    f"(baseline_feature_selection.mode: '{decision_mode}')"
-                ),
-            })
-
-        if decision.baseline_feature_selection.mode == "none":
-            if study_features.get("source") == "verified_registry_numeric_universe":
+            if decision_rank is None or study_rank is None:
                 findings.append({
                     "severity": "CRITICAL",
-                    "code": "UNAUTHORIZED_UNIVERSE_EXPANSION",
-                    "message": "research_decision.yaml prohibits full feature registry expansion, but study.yaml sources verified_registry_numeric_universe",
+                    "code": "UNKNOWN_SELECTION_MODE",
+                    "message": (
+                        f"Unrecognized feature selection mode (decision: {decision_mode!r}, "
+                        f"study: {study_sel_mode!r}); known: {sorted(k for k in _SELECTION_FREEDOM if k)}"
+                    ),
                 })
+            elif study_rank > decision_rank:
+                findings.append({
+                    "severity": "CRITICAL",
+                    "code": "UNAUTHORIZED_FEATURE_DISCOVERY",
+                    "message": (
+                        f"study.yaml selection.mode '{study_sel_mode}' grants more feature-selection "
+                        f"freedom than research_decision.yaml authorizes "
+                        f"(baseline_feature_selection.mode: '{decision_mode}')"
+                    ),
+                })
+
+            if decision.baseline_feature_selection.mode == "none":
+                if study_features.get("source") == "verified_registry_numeric_universe":
+                    findings.append({
+                        "severity": "CRITICAL",
+                        "code": "UNAUTHORIZED_UNIVERSE_EXPANSION",
+                        "message": "research_decision.yaml prohibits full feature registry expansion, but study.yaml sources verified_registry_numeric_universe",
+                    })
 
         # Check prohibited changes against known schema
         KNOWN_PROHIBITIONS = {
@@ -165,6 +173,18 @@ def check_research_decision_fidelity(study_dir: Path) -> Dict[str, Any]:
             # without this token the decision contract could not express the constraint
             # the runtime enforces.
             "expansion_beyond_authorized_dates",
+            # Vocabulary for a derived-causal-input study (frozen upstream model score
+            # consumed as an input, no baseline-feature-selection concept at all -- see
+            # clean_tradable_reversal). Extending the known vocabulary, not special-casing
+            # one study: any future study may declare these same tokens.
+            "use_2024_2025_2026_for_target_selection",
+            "use_2024_2025_2026_for_feature_selection",
+            "use_2024_2025_2026_for_population_definition",
+            "change_target_after_seeing_predictive_performance",
+            "change_feature_surface_after_seeing_predictive_performance",
+            "retrain_or_reselect_stage1",
+            "broaden_arm_c_into_a_feature_mining_pass",
+            "coerce_censored_target_rows_to_negative",
         }
         for prohibited in decision.prohibited_changes:
             if prohibited not in KNOWN_PROHIBITIONS:
@@ -187,7 +207,8 @@ def check_research_decision_fidelity(study_dir: Path) -> Dict[str, Any]:
                 })
 
         # Check baseline feature list binding if baseline is frozen to top25
-        if decision.baseline_feature_selection.mode == "none":
+        if (decision.baseline_feature_selection is not None and decision.baseline is not None
+                and decision.baseline_feature_selection.mode == "none"):
             expected_base_sha = getattr(decision.baseline, "expected_baseline_sha", None)
             if not expected_base_sha and (
                 "replace_frozen_top25" in (decision.prohibited_changes or [])
@@ -232,7 +253,7 @@ def check_research_decision_fidelity(study_dir: Path) -> Dict[str, Any]:
     # 2. Check SPEC.md fidelity if present
     if spec_md_path.exists():
         spec_text = spec_md_path.read_text(encoding="utf-8")
-        if decision.baseline_feature_selection.mode == "none":
+        if decision.baseline_feature_selection is not None and decision.baseline_feature_selection.mode == "none":
             if "fresh Top-25" in spec_text or "selected from 2021" in spec_text:
                 findings.append({
                     "severity": "CRITICAL",
