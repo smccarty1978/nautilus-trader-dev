@@ -50,8 +50,8 @@ some are cited from git history and audit trails. **They are never a source of i
 | `docs/DOCUMENT_MAP.md` | This file |
 | `docs/RESEARCH_STUDY_BLUEPRINT.md` | Researcher-facing implementation map of the lifecycle in §1 of `docs/RESEARCH_WORKFLOW.md` — exact paths/functions, a worked study example, agent-role and CLI entry-point maps, StudySpec schema-gap inventory, and the novelty routing matrix. Defers to `docs/RESEARCH_WORKFLOW.md` on any conflict |
 | `docs/templates/RESEARCH_STUDY_REQUEST_TEMPLATE.md` | Fill-in research request form + agent intake result block, used at STEP 0-2 of `docs/RESEARCH_STUDY_BLUEPRINT.md` §6 |
-| `BACKTEST_DATA_LOGGING.md` | Logging conventions that make outputs visualizable |
-| `VISUALIZER_EXTENSIONS.md` | How to add an overlay to the TradingView visualizer |
+| `docs/BACKTEST_DATA_LOGGING.md` | Logging conventions that make outputs visualizable |
+| `docs/VISUALIZER_EXTENSIONS.md` | How to add an overlay to the TradingView visualizer |
 
 ## DESIGN CONTRACT (cited by live code — keep)
 
@@ -67,36 +67,36 @@ some are cited from git history and audit trails. **They are never a source of i
 |---|---|---|
 | `features/FEATURES.md` | `features/CANONICAL_FEATURE_REFERENCE.yaml` | A Feature System V1 catalogue of physical names (`ema_21_slope`, `arrival_vel_30s`). Those are instance aliases, not canonical identities |
 | `docs/INFRASTRUCTURE_FREEZE.md` | `docs/RESEARCH_WORKFLOW.md` §1, §11 | Freezes paths that have moved (`scripts/study_spec.py`, `backtests/nt_runtime/output_manager.py` is now a shim) |
-| `ML_Research_Workflow_Current_State_and_Redesign.md` | `docs/RESEARCH_WORKFLOW.md` | Pre-migration state assessment and redesign proposal |
-| `ML_Trend_Analysis_Workflow_V2_Phase1_Corrected_RFC.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
-| `ML_Trend_Analysis_Workflow_V2_Phase1_Corrected_RFC_v2.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
-| `ml_trend_analysis_workflow_v2_spec.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
-| `NautilusTrader_AI_Workflow_Reference.md` | `docs/RESEARCH_WORKFLOW.md` | A parallel workflow reference; describes the pre-V2 feature system and pre-`research_workflow` layout |
-| `PROPOSED_COLLECTION_TO_ANALYSIS_WORKFLOW.md` | `docs/RESEARCH_WORKFLOW.md` §3 | A proposal that was implemented differently |
-| `RESEARCH_AGENT_WORKFLOW_PLAYBOOK.md` | `AGENTS.md`, `CLAUDE.md`, `CODEX.md` | A second agent operating manual |
-| `RESEARCH_PARQUET_PLATFORM_BLUEPRINT.md` | `docs/RESEARCH_WORKFLOW.md` §15 | Blueprint for a storage platform superseded by `research/analysis/` |
-| `RESEARCH_PARQUET_WORKFLOW_README.md` | `docs/RESEARCH_WORKFLOW.md` §15 | As above |
-| `REPO_ANALYSIS.md` | `docs/RESEARCH_WORKFLOW.md` §1 | Point-in-time repository analysis, pre-consolidation |
-| `PROJECT_CONTINUATION_BACKTEST_ANALYSIS_ROADMAP.md` | `docs/RESEARCH_WORKFLOW.md` §14 | Superseded roadmap |
-| `STUDIES.md` | `studies/` | A one-entry study register that was never maintained |
+| `archive/docs/ML_Research_Workflow_Current_State_and_Redesign.md` | `docs/RESEARCH_WORKFLOW.md` | Pre-migration state assessment and redesign proposal |
+| `archive/docs/ML_Trend_Analysis_Workflow_V2_Phase1_Corrected_RFC.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
+| `archive/docs/ML_Trend_Analysis_Workflow_V2_Phase1_Corrected_RFC_v2.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
+| `archive/docs/ml_trend_analysis_workflow_v2_spec.md` | `..._Phase1_FINAL.md` | Superseded RFC draft |
+| `archive/docs/NautilusTrader_AI_Workflow_Reference.md` | `docs/RESEARCH_WORKFLOW.md` | A parallel workflow reference; describes the pre-V2 feature system and pre-`research_workflow` layout |
+| `archive/docs/PROPOSED_COLLECTION_TO_ANALYSIS_WORKFLOW.md` | `docs/RESEARCH_WORKFLOW.md` §3 | A proposal that was implemented differently |
+| `archive/docs/RESEARCH_AGENT_WORKFLOW_PLAYBOOK.md` | `AGENTS.md`, `CLAUDE.md`, `CODEX.md` | A second agent operating manual |
+| `archive/docs/RESEARCH_PARQUET_PLATFORM_BLUEPRINT.md` | `docs/RESEARCH_WORKFLOW.md` §15 | Blueprint for a storage platform superseded by `research/analysis/` |
+| `archive/docs/RESEARCH_PARQUET_WORKFLOW_README.md` | `docs/RESEARCH_WORKFLOW.md` §15 | As above |
+| `archive/docs/REPO_ANALYSIS.md` | `docs/RESEARCH_WORKFLOW.md` §1 | Point-in-time repository analysis, pre-consolidation |
+| `archive/docs/PROJECT_CONTINUATION_BACKTEST_ANALYSIS_ROADMAP.md` | `docs/RESEARCH_WORKFLOW.md` §14 | Superseded roadmap |
+| `archive/docs/STUDIES.md` | `studies/` | A one-entry study register that was never maintained |
 
 ## HISTORICAL — records, not instructions
 
 | Document | What it records |
 |---|---|
-| `WORKFLOW_HARDENING_REMEDIATION_REPORT.md` | Workflow hardening remediation |
-| `WORKFLOW_HARDENING_FINAL_REMEDIATION.md` | " |
-| `WORKFLOW_HARDENING_FINAL_RED_TEAM.md` | Red-team findings against the hardened workflow |
-| `WORKFLOW_HARDENING_LAST_FIX_REPORT.md` | " |
-| `ANALYSIS_HARNESS_IMPLEMENTATION_REPORT.md` | Build report for `research/analysis/` |
-| `BACKTEST_HARNESS_IMPLEMENTATION_REPORT.md` | Build report for the backtest harness |
-| `BACKTEST_HARNESS_REMEDIATION_REPORT.md` | " |
-| `NT_RESEARCH_FLOW_INDEPENDENT_AUDIT_BRIEF.md` | An independent audit brief |
-| `BASELINE_CAPTURE_RERUN_PLAN.md` | A one-off rerun plan |
-| `FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC.md` | Superseded spec draft |
-| `FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC_REVISED.md` | Superseded spec draft |
-| `FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC_FINAL.md` | Spec for `studies/full_trade_path_builder` |
-| `audit.md`, `audit_5s_scalps.md`, `audit_keltner.md`, `audit_stall_parity.md` | Individual historical audits |
+| `archive/docs/WORKFLOW_HARDENING_REMEDIATION_REPORT.md` | Workflow hardening remediation |
+| `archive/docs/WORKFLOW_HARDENING_FINAL_REMEDIATION.md` | " |
+| `archive/docs/WORKFLOW_HARDENING_FINAL_RED_TEAM.md` | Red-team findings against the hardened workflow |
+| `archive/docs/WORKFLOW_HARDENING_LAST_FIX_REPORT.md` | " |
+| `archive/docs/ANALYSIS_HARNESS_IMPLEMENTATION_REPORT.md` | Build report for `research/analysis/` |
+| `archive/docs/BACKTEST_HARNESS_IMPLEMENTATION_REPORT.md` | Build report for the backtest harness |
+| `archive/docs/BACKTEST_HARNESS_REMEDIATION_REPORT.md` | " |
+| `archive/docs/NT_RESEARCH_FLOW_INDEPENDENT_AUDIT_BRIEF.md` | An independent audit brief |
+| `archive/docs/BASELINE_CAPTURE_RERUN_PLAN.md` | A one-off rerun plan |
+| `archive/docs/FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC.md` | Superseded spec draft |
+| `archive/docs/FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC_REVISED.md` | Superseded spec draft |
+| `studies/full_trade_path_builder/FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC_FINAL.md` | Spec for `studies/full_trade_path_builder` |
+| `archive/docs/audit.md`, `archive/docs/audit_5s_scalps.md`, `archive/docs/audit_keltner.md`, `archive/docs/audit_stall_parity.md` | Individual historical audits |
 | `.claude/scratch/*.md` | Session scratch |
 
 ## Duplicated agent workflow docs

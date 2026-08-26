@@ -12,7 +12,7 @@ def run_smoke(study_path: str | Path, authorized_dates: Iterable[str], **kwargs:
     if not date:
         raise ValueError("authorized_dates must contain at least one date")
     repo_root = study.parents[1]
-    kwargs.setdefault("output_dir", repo_root / "runs")
+    kwargs.setdefault("output_dir", study / "runs")
     run_result = run_collect_mode(study, stage="day", date_override=date, **kwargs)
     run_dir = None
     if isinstance(run_result, dict):

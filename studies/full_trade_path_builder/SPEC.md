@@ -2,7 +2,7 @@
 
 The canonical design contract is:
 
-`../../FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC_FINAL.md`
+`./FULL_TRADE_PATH_DUAL_MODEL_BUILDER_SPEC_FINAL.md`
 
 Implementation is phased and acceptance is blocked until every gate in that
 document passes.

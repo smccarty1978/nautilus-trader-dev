@@ -49,6 +49,8 @@ def compile_study(study_path: Path) -> int:
     try:
         result = compiler.compile(spec)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"[ERROR] Study compilation failed: {e}", file=sys.stderr)
         return 1
 

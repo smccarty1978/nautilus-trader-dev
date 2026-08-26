@@ -312,8 +312,7 @@ class OutputManager:
         self.feature_authority = feature_authority
 
         if output_base_dir is None:
-            repo_root = Path(__file__).resolve().parents[2]
-            output_base_dir = repo_root / "runs"
+            output_base_dir = study_data.study_dir / "runs"
 
         self.run_id = f"{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{study_data.study_id}_{run_plan.stage.value}"
         self.run_dir = output_base_dir / self.run_id

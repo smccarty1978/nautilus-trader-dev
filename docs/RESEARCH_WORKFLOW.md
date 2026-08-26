@@ -82,6 +82,15 @@ scripts/                  OPERATIONAL / GOVERNANCE / DIAGNOSTIC CLIs (§11)
 archive/  scratch/  runs/  features/archive/    Historical or generated. Never active.
 ```
 
+### Repository layout policy
+
+To prevent clutter and folder creep, the repository layout obeys strict containment rules:
+*   **root**: Contains only operational entry points, environment setups, and active configuration files. No research logs, data, or point-in-time forensic CSVs belong at the root.
+*   **studies/<id>**: Contains all files, logic, tests, and artifacts owned by a specific study, including local execution run outputs (placed under `studies/<id>/runs/`).
+*   **scripts**: Houses reusable operational, governance, and diagnostic tooling.
+*   **archive**: Retains historical, stale, or non-authoritative documents and forensic data (under `archive/docs/` and `archive/forensics/`).
+*   **scratch**: Reserved for disposable developer work and local non-committed playground code.
+
 ### Core invariant
 
 ```
