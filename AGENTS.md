@@ -32,11 +32,12 @@ Slowness is not in the top two.
 | `features/` | Canonical feature definitions, providers, resolver, authority bundle |
 | `research_workflow/` | The reusable governed research lifecycle, the generic collector, modeling, analysis, forward outcomes |
 | `research/` | Analysis harness, schemas, engines, study types |
-| `studies/<id>/` | One study's hypothesis, contracts, decisions, audits, results. Small hooks only |
+| `studies/<id>/` | One study's hypothesis, contracts, decisions, audits, results, and all execution run outputs (`runs/`, `_work/`). Small hooks only |
 | `strategies/` | Executable trading strategies only |
 | `backtests/` | NT runtime (`nt_runtime/`) and the two supported entrypoints |
-| `scripts/` | Operational, audit, lifecycle and diagnostic CLIs |
-| `archive/`, `scratch/`, `runs/`, `features/archive/` | Historical or generated. Never an active implementation |
+| `scripts/` | Operational, audit, lifecycle and diagnostic CLIs. Reusable tooling only — no study-specific scripts |
+| `archive/`, `scratch/`, `features/archive/` | Historical or generated. Never an active implementation |
+| `runs/` (root) | Legacy run outputs from pre-migration studies only. New studies write to `studies/<id>/runs/` |
 
 ```
 NEW STUDY != NEW INFRASTRUCTURE
@@ -183,6 +184,9 @@ do not delete "the safe part". Use `scripts/safe_cleanup.py::assert_safe_to_dele
   verified (`docs/RESEARCH_WORKFLOW.md` §6.2). An unverified arm delta is a hypothesis.
 - **Never commit generated data** — `runs/`, `canonical_*/`, `_work/`, `*.parquet`,
   `*.joblib`, `*.onnx`. Commit the manifests.
+- **Output placement** — study-owned run outputs belong under `studies/<id>/runs/` and
+  `studies/<id>/_work/`. Reusable tooling belongs in `scripts/`. Historical material belongs
+  in `archive/`. Scratch output must not land in the repository root.
 
 ---
 

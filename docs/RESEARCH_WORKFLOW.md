@@ -221,7 +221,7 @@ One sequence. `research_workflow/lifecycle.py` is the facade over it.
 | 4 | **CAUSAL REVIEW** (§6.1) | `lookahead-auditor` agent, or `research_workflow.causal_audit.run_causal_review` | `audit/pass_NN.md` + `audit/status.json` | CRITICAL > 0, or stale freeze |
 | 5 | **CONTRACT REVIEW** (§6.1) | `contract-checker` agent, or `research_workflow.contract_audit.run_contract_review` | `audit/contract_pass_NN.md` + `audit/contract_status.json` | missing deliverable, unreachable terminal label |
 | 6 | **SEAL** | `research_workflow.seal.generate_preexec_audit_seal` | `artifacts/preexec_audit_seal.json` | `PREEXEC_AUDIT_STALE` |
-| 7 | **NT SMOKE** (1 day) | `python backtests/run_nt_study.py --study studies/<id> --mode collect --stage day` | `runs/<ts>_collect_day/` | runtime error, zero events, schema/surface violation |
+| 7 | **NT SMOKE** (1 day) | `python backtests/run_nt_study.py --study studies/<id> --mode collect --stage day` | `studies/<id>/runs/` | `PREEXEC_AUDIT_STALE` or schema/surface failure |
 | 8 | **RECONCILE** | `python scripts/reconcile_runs.py` | `lifecycle.json` sidecar | — (classification only) |
 | 9 | **AUTHORIZE** | `experiment.authorize_experiment` | `artifacts/experiment_authorization.json` | chronology missing or overlapping |
 | 10 | **TRAIN COLLECT** (partitioned, §7) | `collection.collect_period_partitioned(..., execute=True)` | one run dir per year | authorization mismatch, prohibited year |
@@ -605,7 +605,7 @@ a study is sealed and in flight.
 |---|---|---|---|
 | `resolve_execution_manifest.py` | resolve the execution closure + composite | no | yes |
 | `run_preexec_audits.py` | ingest an audit report, verify provenance, issue status | `audit/status.json` | yes |
-| `run_bounded_study.py` | run a stage under time/memory/stale-progress limits, emit a JSON status card | `runs/` | yes |
+| `run_bounded_study.py` | run a stage under time/memory/stale-progress limits, emit a JSON status card | `studies/<id>/runs/` | yes |
 | `reconcile_runs.py` | classify run lifecycle; `ABANDONED` by PID liveness. Never rewrites `run_manifest.json` | `lifecycle.json` sidecar | yes |
 | `validate_smoke.py` | canonical smoke acceptance; re-derives the feature surface | `validation_report.json` | yes |
 | `causal_lint.py` | AST lint for recurring causal defects | no | yes |

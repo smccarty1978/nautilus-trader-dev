@@ -34,31 +34,32 @@ def inspect_run_lineage_for_oos_leakage(study_dir: Path, oos_year: int = 2024, r
     if repo_root is None:
         repo_root = REPO_ROOT
 
-    runs_dir = repo_root / "runs"
+    runs_dirs = [repo_root / "runs", study_dir / "runs"]
     inspected_runs: List[str] = []
     oos_leaks_found: List[Dict[str, Any]] = []
 
-    if runs_dir.exists():
-        for run_p in sorted(runs_dir.glob(f"*_{study_dir.name}_*")):
-            if not run_p.is_dir():
-                continue
-            inspected_runs.append(run_p.name)
-            manifest_p = run_p / "run_manifest.json"
-            if manifest_p.exists():
-                try:
-                    with open(manifest_p, "r", encoding="utf-8") as f:
-                        mdata = json.load(f)
-                    start_d = mdata.get("start_date", "")
-                    end_d = mdata.get("end_date", "")
-                    if str(oos_year) in start_d or str(oos_year) in end_d:
-                        oos_leaks_found.append({
-                            "run_name": run_p.name,
-                            "start_date": start_d,
-                            "end_date": end_d,
-                            "reason": "Date range contains OOS year before authorized unlock",
-                        })
-                except Exception:
-                    pass
+    for r_dir in runs_dirs:
+        if r_dir.exists():
+            for run_p in sorted(r_dir.glob(f"*_{study_dir.name}_*")):
+                if not run_p.is_dir():
+                    continue
+                inspected_runs.append(run_p.name)
+                manifest_p = run_p / "run_manifest.json"
+                if manifest_p.exists():
+                    try:
+                        with open(manifest_p, "r", encoding="utf-8") as f:
+                            mdata = json.load(f)
+                        start_d = mdata.get("start_date", "")
+                        end_d = mdata.get("end_date", "")
+                        if str(oos_year) in start_d or str(oos_year) in end_d:
+                            oos_leaks_found.append({
+                                "run_name": run_p.name,
+                                "start_date": start_d,
+                                "end_date": end_d,
+                                "reason": "Date range contains OOS year before authorized unlock",
+                            })
+                    except Exception:
+                        pass
 
     return {
         "runs_inspected_count": len(inspected_runs),

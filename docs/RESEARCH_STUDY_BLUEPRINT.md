@@ -172,7 +172,7 @@ research idea
   -> contract audit              [git]   audit/contract_pass_01.md .. contract_pass_16.md,
                                          audit/contract_status.json
   -> seal                        [git]   artifacts/preexec_audit_seal.json
-  -> collector execution          --     runs/ (not committed)
+   -> collector execution          --     studies/<id>/runs/ (not committed)
   -> TRAIN artifacts             [git]   artifacts/train_collection_manifest.json,
                                          artifacts/train_candidates_merged.parquet (not committed —
                                          parquet is generated data; manifest is)
@@ -256,7 +256,7 @@ identities** — `scripts/run_preexec_audits.py` enforces `AUDITOR_ROLE_REUSE`.
 | `lookahead-auditor` agent, or `research_workflow.causal_audit.run_causal_review` | 4 | preflight CLEAR | `audit/pass_NN.md` + `audit/status.json` | CRITICAL > 0, stale freeze | ? if genuine ambiguity, else ✓ |
 | `contract-checker` agent, or `research_workflow.contract_audit.run_contract_review` | 5 | causal review issued | `audit/contract_pass_NN.md` + `audit/contract_status.json` | missing deliverable, unreachable terminal label | ✓ |
 | `research_workflow.seal.generate_preexec_audit_seal` | 6 | both reviews CLEAR and fresh | `artifacts/preexec_audit_seal.json` | `PREEXEC_AUDIT_STALE` | ✓ (re-run stage 1, then 3–6) |
-| `python backtests/run_nt_study.py --study studies/<id> --mode collect --stage day` | 7 | seal exists | `runs/<ts>_collect_day/` | runtime error, zero events, schema/surface violation | ✓ or ⛔ if data-safety |
+| `python backtests/run_nt_study.py --study studies/<id> --mode collect --stage day` | 7 | seal exists | `studies/<id>/runs/` | runtime error, zero events, schema/surface violation | ✓ or ⛔ if data-safety |
 | `python scripts/reconcile_runs.py [--runs-dir] [--study] [--dry-run] [--json]` | 8 | a run exists | `lifecycle.json` sidecar | — (classification only) | — |
 | `research_workflow.experiment.authorize_experiment` | 9 | seal + reconciled run | `artifacts/experiment_authorization.json` | chronology missing/overlapping | ⛔ if ambiguous authorization |
 | `--mode collect --stage full` (partitioned) via `collection.collect_period_partitioned` | 10 | authorization | one run dir per TRAIN year | authorization mismatch, prohibited year | ⛔ if prohibited year |

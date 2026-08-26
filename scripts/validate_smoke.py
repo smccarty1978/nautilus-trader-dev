@@ -56,10 +56,13 @@ def validate_smoke_run(
 
     # 1. Locate latest day run if run_dir not explicitly passed
     if run_dir is None:
-        runs_dir = repo_root / "runs"
-        day_runs = sorted(runs_dir.glob(f"*_{study_dir.name}_day"))
+        runs_dir = study_dir / "runs"
+        day_runs = sorted(runs_dir.glob(f"*_{study_dir.name}_day")) if runs_dir.is_dir() else []
         if not day_runs:
-            raise SmokeValidationError(f"No completed day runs found in {runs_dir} for study {study_dir.name}")
+            runs_dir = repo_root / "runs"
+            day_runs = sorted(runs_dir.glob(f"*_{study_dir.name}_day")) if runs_dir.is_dir() else []
+        if not day_runs:
+            raise SmokeValidationError(f"No completed day runs found for study {study_dir.name}")
         run_dir = day_runs[-1]
     else:
         run_dir = run_dir.resolve()

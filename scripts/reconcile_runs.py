@@ -132,7 +132,14 @@ def reconcile_runs(
     write: bool = True,
 ) -> Dict[str, Any]:
     """Classifies every run directory and records the verdict in a sidecar."""
-    runs_dir = runs_dir or (REPO_ROOT / "runs")
+    if runs_dir is None:
+        if study_id:
+            study_runs_dir = REPO_ROOT / "studies" / study_id / "runs"
+            if study_runs_dir.is_dir():
+                runs_dir = study_runs_dir
+        if runs_dir is None:
+            runs_dir = REPO_ROOT / "runs"
+
     if not runs_dir.is_dir():
         return {"runs_dir": str(runs_dir), "runs": [], "counts": {}}
 
