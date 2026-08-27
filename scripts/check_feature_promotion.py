@@ -77,6 +77,66 @@ def _name_set_hash(names) -> str:
 
 PROMOTIONS_PATH = REPO_ROOT / "features" / "feature_lifecycle_promotions.json"
 CANONICAL_PROMOTIONS_PATH = REPO_ROOT / "features" / "feature_definition_promotions.json"
+SCOPED_PROMOTIONS_PATH = REPO_ROOT / "features" / "feature_scoped_promotions.json"
+
+
+def check_scoped_promotions(*, repo_root: Optional[Path] = None) -> Dict[str, Any]:
+    """Validate additive feature-candidate scoped promotion evidence.
+
+    Legacy whole-bundle validation remains unchanged; this checker only validates
+    explicit FEATURE_DEFINITION and FEATURE_PARAMETER_VALUE records.
+    """
+    root = repo_root or REPO_ROOT
+    if not SCOPED_PROMOTIONS_PATH.is_file():
+        return {"passed": True, "records": [], "violations": []}
+    payload = json.loads(SCOPED_PROMOTIONS_PATH.read_text(encoding="utf-8"))
+    records = payload.get("records", [])
+    violations = []
+    from features.registry import CANONICAL_FEATURE_DEFINITIONS
+    for rec in records:
+        scope = rec.get("scope_type")
+        name = rec.get("canonical_feature")
+        if scope not in {"FEATURE_DEFINITION", "FEATURE_PARAMETER_VALUE"}:
+            violations.append({"code":"SCOPED_SCOPE_INVALID", "record":rec}); continue
+        if name not in CANONICAL_FEATURE_DEFINITIONS:
+            violations.append({"code":"SCOPED_FEATURE_UNKNOWN", "feature":name}); continue
+        required = ("authority_id", "authority_type", "feature_candidate_composite",
+                    "seal_identity", "causal_audit", "contract_audit",
+                    "runtime_evidence", "reviewed_implementation_sha256",
+                    "registry_declaration_sha256", "promotion_decision")
+        missing = [k for k in required if not rec.get(k)]
+        if missing: violations.append({"code":"SCOPED_EVIDENCE_MISSING", "feature":name, "missing":missing}); continue
+        if rec.get("authority_type") != "feature_candidate" or rec.get("promotion_decision") != "PROMOTE":
+            violations.append({"code":"SCOPED_AUTHORITY_INVALID", "feature":name})
+        if scope == "FEATURE_PARAMETER_VALUE" and (not rec.get("parameter_name") or "parameter_value" not in rec):
+            violations.append({"code":"SCOPED_PARAMETER_MISSING", "feature":name})
+        impl = feature_implementation_sha256(name, CANONICAL_FEATURE_DEFINITIONS[name], root)
+        if impl != rec.get("reviewed_implementation_sha256"):
+            violations.append({"code":"SCOPED_IMPLEMENTATION_MISMATCH", "feature":name})
+    return {"passed": not violations, "records": records, "violations": violations}
+
+
+def promote_scoped_records(records: List[Dict[str, Any]], *, repo_root: Optional[Path] = None) -> Dict[str, Any]:
+    """Validate independently promotable feature-candidate scopes.
+
+    This is deliberately additive: legacy bundle validation is untouched and a
+    failed record is isolated from sibling records.
+    """
+    root = repo_root or REPO_ROOT
+    from features.registry import CANONICAL_FEATURE_DEFINITIONS
+    accepted, rejected = [], []
+    for rec in records:
+        name = rec.get("canonical_name") or rec.get("canonical_feature")
+        reason = None
+        if rec.get("scope_type") not in {"FEATURE_DEFINITION", "FEATURE_PARAMETER_VALUE"}: reason = "SCOPED_SCOPE_INVALID"
+        elif name not in CANONICAL_FEATURE_DEFINITIONS: reason = "SCOPED_FEATURE_UNKNOWN"
+        elif rec.get("authority_type") != "feature_candidate" or not rec.get("authority_id"): reason = "SCOPED_AUTHORITY_INVALID"
+        elif rec.get("promotion_decision") != "PROMOTE": reason = "SCOPED_DECISION_NOT_PROMOTE"
+        elif not all(rec.get(k) for k in ("feature_candidate_composite", "seal_identity", "causal_audit", "contract_audit", "runtime_evidence", "registry_declaration_sha256")): reason = "SCOPED_EVIDENCE_MISSING"
+        elif feature_implementation_sha256(name, CANONICAL_FEATURE_DEFINITIONS[name], root) != rec.get("reviewed_implementation_sha256"): reason = "SCOPED_IMPLEMENTATION_MISMATCH"
+        if rec.get("scope_type") == "FEATURE_PARAMETER_VALUE" and (not rec.get("parameter_name") or "parameter_value" not in rec): reason = "SCOPED_PARAMETER_SCOPE_MISSING"
+        (rejected if reason else accepted).append({"record": rec, **({"reason": reason} if reason else {})})
+    return {"accepted": accepted, "rejected": rejected, "passed": bool(accepted) and not rejected}
 
 VALID_STATUSES = ("archived", "provisional", "verified", "deprecated")
 

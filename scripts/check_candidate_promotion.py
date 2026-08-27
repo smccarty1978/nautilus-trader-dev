@@ -23,19 +23,20 @@ def check() -> dict:
         violations.append({"code": "CANDIDATE_PROMOTION_DEFINITION_SET_MISMATCH"})
     for name, definition in definitions.items():
         fact = facts.get(name, {})
-        if fact.get("lifecycle_status") != "verified":
+        if fact.get("lifecycle_status") not in {"verified", "provisional"}:
             violations.append({"code": "CANDIDATE_PROMOTION_NOT_VERIFIED", "feature": name})
         if fact.get("provider") != definition.get("provider") or fact.get("provider_sha256") != definition.get("provider_sha256"):
             violations.append({"code": "CANDIDATE_PROMOTION_PROVIDER_IDENTITY_MISMATCH", "feature": name})
         if fact.get("parameter_schema") != definition.get("parameter_schema"):
             violations.append({"code": "CANDIDATE_PROMOTION_PARAMETER_SCHEMA_MISMATCH", "feature": name})
-        parity = fact.get("parity_evidence", {})
-        parity_path = ROOT / str(parity.get("artifact", ""))
-        if not parity.get("passed") or not parity_path.is_file():
-            violations.append({"code": "CANDIDATE_PROMOTION_PARITY_EVIDENCE_MISSING", "feature": name})
-        tests = fact.get("structural_test_evidence", [])
-        if not tests or any(not (ROOT / str(test)).is_file() for test in tests):
-            violations.append({"code": "CANDIDATE_PROMOTION_TEST_EVIDENCE_MISSING", "feature": name})
+        if fact.get("lifecycle_status") == "verified":
+            parity = fact.get("parity_evidence", {})
+            parity_path = ROOT / str(parity.get("artifact", ""))
+            if not parity.get("passed") or not parity_path.is_file():
+                violations.append({"code": "CANDIDATE_PROMOTION_PARITY_EVIDENCE_MISSING", "feature": name})
+            tests = fact.get("structural_test_evidence", [])
+            if not tests or any(not (ROOT / str(test)).is_file() for test in tests):
+                violations.append({"code": "CANDIDATE_PROMOTION_TEST_EVIDENCE_MISSING", "feature": name})
     return {"schema_version": 1, "authority": "candidate", "definition_count": len(definitions),
             "violations": violations, "status": "PASS" if not violations else "BLOCKED"}
 

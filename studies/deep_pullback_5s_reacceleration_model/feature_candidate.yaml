@@ -2,16 +2,33 @@ authority_id: deep_pullback_5s_reacceleration_capabilities_v1
 authority_type: feature_candidate
 candidate_features:
   - canonical_name: pullback_max_depth_atr
+    parameters: {scope: current_deep_pullback_episode, extreme_source: prevailing_directional_extreme}
   - canonical_name: pullback_recovery_from_extreme_atr
+    parameters: {scope: current_deep_pullback_episode}
   - canonical_name: pullback_post_arm_seconds
+    parameters: {scope: current_deep_pullback_episode}
   - canonical_name: pullback_elapsed_seconds
+    parameters: {scope: current_deep_pullback_episode}
   - canonical_name: pullback_fraction_of_structural_move
+    parameters: {scope: current_deep_pullback_episode}
   - canonical_name: seconds_since_prevailing_directional_extreme
+    parameters: {timeframe: 1m, context: current, bar_state: completed, threshold_atr: 1.0}
   - canonical_name: prior_deep_pullback_count
+    parameters: {timeframe: 1m, context: current, bar_state: completed, threshold_atr: 1.0}
   - canonical_name: recovery_from_counter_regime_extreme_atr
+    parameters: {timeframe: 5s}
   - canonical_name: fraction_of_counter_regime_move_recovered
+    parameters: {timeframe: 5s}
   - canonical_name: trend_normalized_est_delta_sum
+    parameters: {window: 5s, update_every: 1s, direction_reference: prevailing_1m}
+  - canonical_name: trend_normalized_est_delta_sum
+    parameters: {window: 60s, update_every: 1s, direction_reference: prevailing_1m}
+  - canonical_name: trend_normalized_est_delta_sum
+    parameters: {window: 300s, update_every: 1s, direction_reference: prevailing_1m}
   - canonical_name: trend_normalized_est_delta_sum_ratio
+    parameters: {numerator_window: 5s, denominator_window: 300s, update_every: 1s, direction_reference: prevailing_1m}
+  - canonical_name: trend_normalized_est_delta_sum_ratio
+    parameters: {numerator_window: 60s, denominator_window: 300s, update_every: 1s, direction_reference: prevailing_1m}
   - canonical_name: regime_direction
   - canonical_name: regime_alignment
   - canonical_name: generic_completed_5s_regime_state

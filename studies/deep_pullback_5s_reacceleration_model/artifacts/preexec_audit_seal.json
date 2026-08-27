@@ -1,8 +1,8 @@
 {
-  "seal_id": "preexec_seal_deep_pullback_5s_reacceleration_model_87e13d4288fbbb34",
+  "seal_id": "preexec_seal_deep_pullback_5s_reacceleration_model_a8f0d6e8756c298f",
   "study_name": "deep_pullback_5s_reacceleration_model",
   "seal_status": "LOCKED",
-  "composite_seal_hash": "87e13d4288fbbb34fdf6f074975153a08947731132e33ea32ba4521ca36889e9",
+  "composite_seal_hash": "a8f0d6e8756c298f3bb6e72bd00b319b3c8348ede1c2814a6cc6c6736343b256",
   "reviewer_provenance": {
     "causal": {
       "declared_auditor": "research_workflow.causal_audit",
@@ -20,15 +20,15 @@
   "causal_audit_verdict": {
     "audit_type": "causal",
     "auditor": "research_workflow.causal_audit",
-    "pass": 13,
+    "pass": 18,
     "verdict": "CLEAR",
     "critical": 0,
     "warning": 0,
     "note": 0,
     "causal_contract": "ts_avail <= T (latest_source_ts_init <= observation_ts)",
-    "audited_execution_composite_sha256": "87e13d4288fbbb34fdf6f074975153a08947731132e33ea32ba4521ca36889e9",
-    "audit_report_sha256": "acf2223d6a434ef822137732adc62d1f26459311af7855456fb722d559eb5236",
-    "audit_report_path": "audit/pass_13.md",
+    "audited_execution_composite_sha256": "a8f0d6e8756c298f3bb6e72bd00b319b3c8348ede1c2814a6cc6c6736343b256",
+    "audit_report_sha256": "e90efa4ba074e555a4de0f57bfba704b3c9e09454e0d524af1c058a9cfd4ed80",
+    "audit_report_path": "audit/pass_18.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "research_workflow.causal_audit",
@@ -48,7 +48,7 @@
     "derived_by_parser": "scripts/run_preexec_audits.py",
     "audit_provenance_version": 2,
     "audited_files": {
-      "feature_candidate:authority": "264325a4cde36d40f3d381c2f055b260ae6e1d7eecc23cdd0f58f9f22c5b5592",
+      "feature_candidate:authority": "9098c88864f60deea6221f840d8112ce553470a9686778a20845e7c7a06fafc9",
       "repo:backtests/nt_runtime/__init__.py": "10323c7cf54ad135db68b1ac8452d7a5b0d9e9e0d5e535933aa12d087314923d",
       "repo:backtests/nt_runtime/compiled_study_loader.py": "409c32ad7e7f3bf48947f4d8e6d2894503e87131b0b32c8af468e128dd00944d",
       "repo:backtests/nt_runtime/data_plan.py": "a2b99760eebed4e3fd69f6752b5778035860fb4605a3a7f919afb798569835ef",
@@ -59,22 +59,24 @@
       "repo:backtests/nt_runtime/strategy_binding.py": "74f8dcd4529e819b406c1f9c6ec08e1787453bc8f412f3a714ce54564619528f",
       "repo:backtests/nt_runtime/telemetry.py": "957b46643de5909f2a71e6b4f13cc9bc4f1c4fed19aac0a14f42e20196566e9e",
       "repo:features/__init__.py": "abfe0599ce47ef23bd78e69c59bfc5ec0f04c19aaa17de2c891b65ea1b1d5b74",
-      "repo:features/authority/candidate/canonical_registry.json": "df523e3af37c022ae11c83955af01ae105642be67c0f0faeb279fb71eef80344",
+      "repo:features/authority/candidate/canonical_registry.json": "c1705b23f3cd25de741ab5624dafaa0db9cb0a3bf3f056ebb10e50e4001a662f",
       "repo:features/authority/candidate/legacy_alias_mapping.json": "3e2ab3a42e2a74771b2162c49a9d085d237aab20942a4746759341f52ee67e7f",
-      "repo:features/authority/candidate/promotion_facts.json": "9ae61fc5adeff87192ea5322d96e904117b8977085f5202b2710c1fda22259b1",
+      "repo:features/authority/candidate/promotion_facts.json": "fed7f18f01a56c40e6053b237c4e750e66c50cae28e7f8009a1a93fc37f1dfb6",
       "repo:features/candidate_authority.py": "657d83f6fdd37c2dc8b288383df18843c0d90e6387f469531707af58816d108e",
       "repo:features/collector.py": "a71360e6a1e8a423d383100d6cc7e40ee35ecb338fcdbceeb7e66024191508fa",
       "repo:features/engine.py": "ced40b73944decc4e7c68567175cc4d586b10d96b9d4b97c7d0a9db113d5ae03",
       "repo:features/feature_lifecycle_baseline.json": "36750ebdba6057539f038f8eea549d68191eec7900e2873b4ffe2cd03e822364",
       "repo:features/library.py": "e638f784bd6da02141cb8f242af33178c8ee9443a1b31366aaac43cc4a99311a",
-      "repo:features/registry.py": "29e1b92339f58e0c13382ec83bb17a59994bc2bd95f407f1f8290215eae08e4c",
+      "repo:features/registry.py": "aa2f6da6a8ed24f3cc53bfaac10e99dd831fbc25ce77831bb7714289d0c2d07f",
       "repo:features/trackers/generic_arrival.py": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
       "repo:features/trackers/generic_bar_geometry.py": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
       "repo:features/trackers/generic_context.py": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "repo:features/trackers/generic_episode_geometry.py": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
       "repo:features/trackers/generic_median_center.py": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
       "repo:features/trackers/generic_ohlcv_delta.py": "cd2adf446c44c24bcfcff6cd3ad4c13d302023703268e62671b85dc38d5bfab9",
       "repo:features/trackers/generic_price_levels.py": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
       "repo:features/trackers/generic_pullback.py": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "repo:features/trackers/generic_regime_geometry.py": "e156900048d06bfaa8ed6b789ffa1053e95a8498756627b567d2627a4a7ea8cb",
       "repo:features/trackers/generic_rolling_productivity.py": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
       "repo:features/trackers/generic_structural_geometry.py": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
       "repo:features/trackers/median_center.py": "b800317b95f7d744d311eb93a590ee745a7ec17b9e1475cf84726366eacee3d0",
@@ -129,7 +131,7 @@
       "repo:research_workflow/test_selection.py": "6941f6013f9431d7eb82394a2bd910759449b9c73969e9b545e015d3d527b6b3",
       "repo:scripts/causal_lint.py": "9f27fe82aca1010ff9aa800428de4b6309813a12b0ab68d1821f920f395f646b",
       "repo:scripts/check_artifact_schema.py": "8b97ee2653158d4fdb6b7b003dfd58fa0f5d456225da916935ea19552ef4e1bc",
-      "repo:scripts/check_candidate_promotion.py": "d6b22dc9931b641736d86c3b5036c372795263eccf65b99a25a35166dae537ae",
+      "repo:scripts/check_candidate_promotion.py": "c31dad68380f547a910d92374d9b38e8d460b2b3168509304d95349a310a7d8c",
       "repo:scripts/check_feature_surface.py": "1d20f798b1ec0622d1014c5cdb5e3a51b138a19ae383d7a36d1175bfa5a559ca",
       "repo:scripts/check_model_binding.py": "2e3fe29b623d1435e6d6fff7a53137d50351a6b47605e834ea43c49150ca3ad4",
       "repo:scripts/check_research_decision_fidelity.py": "c2a0b9d201f56148dc6131469d0ac7aea275d13b8ddede86e1d0e32109ffb944",
@@ -147,20 +149,20 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59"
     },
-    "timestamp": "2026-08-27T14:16:52.785189+00:00"
+    "timestamp": "2026-08-27T15:30:44.103657+00:00"
   },
   "contract_audit_verdict": {
     "audit_type": "contract",
     "auditor": "research_workflow.contract_audit",
-    "pass": 6,
+    "pass": 11,
     "verdict": "CLEAR",
     "critical": 0,
     "blocking": 0,
     "warning": 0,
     "not_verified": 0,
-    "audited_execution_composite_sha256": "87e13d4288fbbb34fdf6f074975153a08947731132e33ea32ba4521ca36889e9",
-    "audit_report_sha256": "89c84eabf132b9508b4e4d28166d8ef50d7352fb796b2f0c656bf53a7fd04ee7",
-    "audit_report_path": "audit/contract_pass_06.md",
+    "audited_execution_composite_sha256": "a8f0d6e8756c298f3bb6e72bd00b319b3c8348ede1c2814a6cc6c6736343b256",
+    "audit_report_sha256": "852779039f6d05ffef883db02b446ccc72cca775d36fcdb6b5e9cb3cec58432e",
+    "audit_report_path": "audit/contract_pass_11.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "research_workflow.contract_audit",
@@ -180,7 +182,7 @@
     "derived_by_parser": "scripts/run_preexec_audits.py",
     "audit_provenance_version": 2,
     "audited_files": {
-      "feature_candidate:authority": "264325a4cde36d40f3d381c2f055b260ae6e1d7eecc23cdd0f58f9f22c5b5592",
+      "feature_candidate:authority": "9098c88864f60deea6221f840d8112ce553470a9686778a20845e7c7a06fafc9",
       "repo:backtests/nt_runtime/__init__.py": "10323c7cf54ad135db68b1ac8452d7a5b0d9e9e0d5e535933aa12d087314923d",
       "repo:backtests/nt_runtime/compiled_study_loader.py": "409c32ad7e7f3bf48947f4d8e6d2894503e87131b0b32c8af468e128dd00944d",
       "repo:backtests/nt_runtime/data_plan.py": "a2b99760eebed4e3fd69f6752b5778035860fb4605a3a7f919afb798569835ef",
@@ -191,22 +193,24 @@
       "repo:backtests/nt_runtime/strategy_binding.py": "74f8dcd4529e819b406c1f9c6ec08e1787453bc8f412f3a714ce54564619528f",
       "repo:backtests/nt_runtime/telemetry.py": "957b46643de5909f2a71e6b4f13cc9bc4f1c4fed19aac0a14f42e20196566e9e",
       "repo:features/__init__.py": "abfe0599ce47ef23bd78e69c59bfc5ec0f04c19aaa17de2c891b65ea1b1d5b74",
-      "repo:features/authority/candidate/canonical_registry.json": "df523e3af37c022ae11c83955af01ae105642be67c0f0faeb279fb71eef80344",
+      "repo:features/authority/candidate/canonical_registry.json": "c1705b23f3cd25de741ab5624dafaa0db9cb0a3bf3f056ebb10e50e4001a662f",
       "repo:features/authority/candidate/legacy_alias_mapping.json": "3e2ab3a42e2a74771b2162c49a9d085d237aab20942a4746759341f52ee67e7f",
-      "repo:features/authority/candidate/promotion_facts.json": "9ae61fc5adeff87192ea5322d96e904117b8977085f5202b2710c1fda22259b1",
+      "repo:features/authority/candidate/promotion_facts.json": "fed7f18f01a56c40e6053b237c4e750e66c50cae28e7f8009a1a93fc37f1dfb6",
       "repo:features/candidate_authority.py": "657d83f6fdd37c2dc8b288383df18843c0d90e6387f469531707af58816d108e",
       "repo:features/collector.py": "a71360e6a1e8a423d383100d6cc7e40ee35ecb338fcdbceeb7e66024191508fa",
       "repo:features/engine.py": "ced40b73944decc4e7c68567175cc4d586b10d96b9d4b97c7d0a9db113d5ae03",
       "repo:features/feature_lifecycle_baseline.json": "36750ebdba6057539f038f8eea549d68191eec7900e2873b4ffe2cd03e822364",
       "repo:features/library.py": "e638f784bd6da02141cb8f242af33178c8ee9443a1b31366aaac43cc4a99311a",
-      "repo:features/registry.py": "29e1b92339f58e0c13382ec83bb17a59994bc2bd95f407f1f8290215eae08e4c",
+      "repo:features/registry.py": "aa2f6da6a8ed24f3cc53bfaac10e99dd831fbc25ce77831bb7714289d0c2d07f",
       "repo:features/trackers/generic_arrival.py": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
       "repo:features/trackers/generic_bar_geometry.py": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
       "repo:features/trackers/generic_context.py": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+      "repo:features/trackers/generic_episode_geometry.py": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
       "repo:features/trackers/generic_median_center.py": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
       "repo:features/trackers/generic_ohlcv_delta.py": "cd2adf446c44c24bcfcff6cd3ad4c13d302023703268e62671b85dc38d5bfab9",
       "repo:features/trackers/generic_price_levels.py": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
       "repo:features/trackers/generic_pullback.py": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+      "repo:features/trackers/generic_regime_geometry.py": "e156900048d06bfaa8ed6b789ffa1053e95a8498756627b567d2627a4a7ea8cb",
       "repo:features/trackers/generic_rolling_productivity.py": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
       "repo:features/trackers/generic_structural_geometry.py": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
       "repo:features/trackers/median_center.py": "b800317b95f7d744d311eb93a590ee745a7ec17b9e1475cf84726366eacee3d0",
@@ -261,7 +265,7 @@
       "repo:research_workflow/test_selection.py": "6941f6013f9431d7eb82394a2bd910759449b9c73969e9b545e015d3d527b6b3",
       "repo:scripts/causal_lint.py": "9f27fe82aca1010ff9aa800428de4b6309813a12b0ab68d1821f920f395f646b",
       "repo:scripts/check_artifact_schema.py": "8b97ee2653158d4fdb6b7b003dfd58fa0f5d456225da916935ea19552ef4e1bc",
-      "repo:scripts/check_candidate_promotion.py": "d6b22dc9931b641736d86c3b5036c372795263eccf65b99a25a35166dae537ae",
+      "repo:scripts/check_candidate_promotion.py": "c31dad68380f547a910d92374d9b38e8d460b2b3168509304d95349a310a7d8c",
       "repo:scripts/check_feature_surface.py": "1d20f798b1ec0622d1014c5cdb5e3a51b138a19ae383d7a36d1175bfa5a559ca",
       "repo:scripts/check_model_binding.py": "2e3fe29b623d1435e6d6fff7a53137d50351a6b47605e834ea43c49150ca3ad4",
       "repo:scripts/check_research_decision_fidelity.py": "c2a0b9d201f56148dc6131469d0ac7aea275d13b8ddede86e1d0e32109ffb944",
@@ -279,10 +283,10 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59"
     },
-    "timestamp": "2026-08-27T14:16:57.036486+00:00"
+    "timestamp": "2026-08-27T15:30:48.355858+00:00"
   },
   "file_hashes": {
-    "feature_candidate:authority": "264325a4cde36d40f3d381c2f055b260ae6e1d7eecc23cdd0f58f9f22c5b5592",
+    "feature_candidate:authority": "9098c88864f60deea6221f840d8112ce553470a9686778a20845e7c7a06fafc9",
     "repo:backtests/nt_runtime/__init__.py": "10323c7cf54ad135db68b1ac8452d7a5b0d9e9e0d5e535933aa12d087314923d",
     "repo:backtests/nt_runtime/compiled_study_loader.py": "409c32ad7e7f3bf48947f4d8e6d2894503e87131b0b32c8af468e128dd00944d",
     "repo:backtests/nt_runtime/data_plan.py": "a2b99760eebed4e3fd69f6752b5778035860fb4605a3a7f919afb798569835ef",
@@ -293,22 +297,24 @@
     "repo:backtests/nt_runtime/strategy_binding.py": "74f8dcd4529e819b406c1f9c6ec08e1787453bc8f412f3a714ce54564619528f",
     "repo:backtests/nt_runtime/telemetry.py": "957b46643de5909f2a71e6b4f13cc9bc4f1c4fed19aac0a14f42e20196566e9e",
     "repo:features/__init__.py": "abfe0599ce47ef23bd78e69c59bfc5ec0f04c19aaa17de2c891b65ea1b1d5b74",
-    "repo:features/authority/candidate/canonical_registry.json": "df523e3af37c022ae11c83955af01ae105642be67c0f0faeb279fb71eef80344",
+    "repo:features/authority/candidate/canonical_registry.json": "c1705b23f3cd25de741ab5624dafaa0db9cb0a3bf3f056ebb10e50e4001a662f",
     "repo:features/authority/candidate/legacy_alias_mapping.json": "3e2ab3a42e2a74771b2162c49a9d085d237aab20942a4746759341f52ee67e7f",
-    "repo:features/authority/candidate/promotion_facts.json": "9ae61fc5adeff87192ea5322d96e904117b8977085f5202b2710c1fda22259b1",
+    "repo:features/authority/candidate/promotion_facts.json": "fed7f18f01a56c40e6053b237c4e750e66c50cae28e7f8009a1a93fc37f1dfb6",
     "repo:features/candidate_authority.py": "657d83f6fdd37c2dc8b288383df18843c0d90e6387f469531707af58816d108e",
     "repo:features/collector.py": "a71360e6a1e8a423d383100d6cc7e40ee35ecb338fcdbceeb7e66024191508fa",
     "repo:features/engine.py": "ced40b73944decc4e7c68567175cc4d586b10d96b9d4b97c7d0a9db113d5ae03",
     "repo:features/feature_lifecycle_baseline.json": "36750ebdba6057539f038f8eea549d68191eec7900e2873b4ffe2cd03e822364",
     "repo:features/library.py": "e638f784bd6da02141cb8f242af33178c8ee9443a1b31366aaac43cc4a99311a",
-    "repo:features/registry.py": "29e1b92339f58e0c13382ec83bb17a59994bc2bd95f407f1f8290215eae08e4c",
+    "repo:features/registry.py": "aa2f6da6a8ed24f3cc53bfaac10e99dd831fbc25ce77831bb7714289d0c2d07f",
     "repo:features/trackers/generic_arrival.py": "31bd4f8f014acaad6cb2d48c2ff5a5d9dcd52ec222904d356577b5cc00e16471",
     "repo:features/trackers/generic_bar_geometry.py": "de584069c53df866d1e6cbebd183f2b67f9b758b8080128af84e8d06e63a4c45",
     "repo:features/trackers/generic_context.py": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a",
+    "repo:features/trackers/generic_episode_geometry.py": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
     "repo:features/trackers/generic_median_center.py": "13f4389769dd9d9cad46c4442cfba6592cea7b04e93dfcf3894f73556a6588b3",
     "repo:features/trackers/generic_ohlcv_delta.py": "cd2adf446c44c24bcfcff6cd3ad4c13d302023703268e62671b85dc38d5bfab9",
     "repo:features/trackers/generic_price_levels.py": "8c293e312fd07f968a3c8bcd32b0540017aa6014fc3c80cab286c24b75c7dadc",
     "repo:features/trackers/generic_pullback.py": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4",
+    "repo:features/trackers/generic_regime_geometry.py": "e156900048d06bfaa8ed6b789ffa1053e95a8498756627b567d2627a4a7ea8cb",
     "repo:features/trackers/generic_rolling_productivity.py": "45635ea0308e8e6221809dc6e33b8bfacb286d96a6f6380c607bc242883d4699",
     "repo:features/trackers/generic_structural_geometry.py": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
     "repo:features/trackers/median_center.py": "b800317b95f7d744d311eb93a590ee745a7ec17b9e1475cf84726366eacee3d0",
@@ -363,7 +369,7 @@
     "repo:research_workflow/test_selection.py": "6941f6013f9431d7eb82394a2bd910759449b9c73969e9b545e015d3d527b6b3",
     "repo:scripts/causal_lint.py": "9f27fe82aca1010ff9aa800428de4b6309813a12b0ab68d1821f920f395f646b",
     "repo:scripts/check_artifact_schema.py": "8b97ee2653158d4fdb6b7b003dfd58fa0f5d456225da916935ea19552ef4e1bc",
-    "repo:scripts/check_candidate_promotion.py": "d6b22dc9931b641736d86c3b5036c372795263eccf65b99a25a35166dae537ae",
+    "repo:scripts/check_candidate_promotion.py": "c31dad68380f547a910d92374d9b38e8d460b2b3168509304d95349a310a7d8c",
     "repo:scripts/check_feature_surface.py": "1d20f798b1ec0622d1014c5cdb5e3a51b138a19ae383d7a36d1175bfa5a559ca",
     "repo:scripts/check_model_binding.py": "2e3fe29b623d1435e6d6fff7a53137d50351a6b47605e834ea43c49150ca3ad4",
     "repo:scripts/check_research_decision_fidelity.py": "c2a0b9d201f56148dc6131469d0ac7aea275d13b8ddede86e1d0e32109ffb944",
@@ -380,14 +386,19 @@
     "repo:utils/causal_registration.py": "d01d3f8440cef4d15716d1195ff3c01b4b8697edabc30ac8783bbee968a205c8",
     "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
     "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
-    "study:audit/status.json": "522b383d49e9804a703d141c9f3bbd471cfaf739802e51249079aace4317b655",
-    "study:audit/contract_status.json": "b0c345741455f82f55209b5b9e7512e5f117f3154dda3de14649ea148ffd36b3",
+    "study:audit/status.json": "d9d0af46cee70523c73a1217bb521e5e95ed0bd31094f4caabc57bb39dfdcb8e",
+    "study:audit/contract_status.json": "497cd391b13679d36c177fef084aff7f028401c98ee2004cfba4c49c50b4a32f",
     "study:audit/contract_pass_01.md": "1f1c01370ee2ae24cdf8c7f04780d328a42076137b2d1ab2173810e6ca3a15d9",
     "study:audit/contract_pass_02.md": "b5a398c961e3a721f70754f103b1c3f8bef20a5b2ca4f8994cbc5fb8e862e3ea",
     "study:audit/contract_pass_03.md": "aefe34d4278dd68bfc828007e6bd6d2d77cb2efeaa81005a6c429b6f4e732075",
     "study:audit/contract_pass_04.md": "3b2b9436e2276cf9fdb6dac7cce2be7e1ec9677fae99b83ba6f872438880f2b5",
     "study:audit/contract_pass_05.md": "ebbe6aebc2cc6da0f5538440503df427012d0a6840333b9b9e471f01531d17da",
     "study:audit/contract_pass_06.md": "89c84eabf132b9508b4e4d28166d8ef50d7352fb796b2f0c656bf53a7fd04ee7",
+    "study:audit/contract_pass_07.md": "6fa43c2ccdc2002e1d01afc0ff76b682f7e723bc85cf52328d702150db00c344",
+    "study:audit/contract_pass_08.md": "2c23a6abfd0683bddca43b597dd0d3771c7f7136ad901724e6e62c3ebdc18f4b",
+    "study:audit/contract_pass_09.md": "2c23a6abfd0683bddca43b597dd0d3771c7f7136ad901724e6e62c3ebdc18f4b",
+    "study:audit/contract_pass_10.md": "89ef71aff3cf236b76ee114aeb08c87ea38758528d72f57fba8595c9598fb4f9",
+    "study:audit/contract_pass_11.md": "852779039f6d05ffef883db02b446ccc72cca775d36fcdb6b5e9cb3cec58432e",
     "study:audit/pass_01.md": "838495cb59c186599fc9c7d6349e542fad839486b66eb55db70347872250c2f9",
     "study:audit/pass_02.md": "838495cb59c186599fc9c7d6349e542fad839486b66eb55db70347872250c2f9",
     "study:audit/pass_03.md": "838495cb59c186599fc9c7d6349e542fad839486b66eb55db70347872250c2f9",
@@ -400,12 +411,17 @@
     "study:audit/pass_10.md": "8b370fd7442182bab276cad32952e4d8355d7d0a84fe777f200275140fc2e915",
     "study:audit/pass_11.md": "9f419b8c840e5eac88777dc049260147bf04e4776a8668b0d088b6373dca7d0e",
     "study:audit/pass_12.md": "e5c7d368b6434c605e7697bec328405cbb987fe79076e39d1a99c2c9287736c7",
-    "study:audit/pass_13.md": "acf2223d6a434ef822137732adc62d1f26459311af7855456fb722d559eb5236"
+    "study:audit/pass_13.md": "acf2223d6a434ef822137732adc62d1f26459311af7855456fb722d559eb5236",
+    "study:audit/pass_14.md": "430e33f12650c23dd6e04fb9bfe7f22e103e1af97309778ca08927fe2b802c26",
+    "study:audit/pass_15.md": "673e167a9d400d1edb0df7d2971412325091eb798d9f901a7d89d19b889ededa",
+    "study:audit/pass_16.md": "673e167a9d400d1edb0df7d2971412325091eb798d9f901a7d89d19b889ededa",
+    "study:audit/pass_17.md": "c531eb60930267a6f266c6a415f23fb4b141f143b33ee6884f1a0e18744edc16",
+    "study:audit/pass_18.md": "e90efa4ba074e555a4de0f57bfba704b3c9e09454e0d524af1c058a9cfd4ed80"
   },
   "evidence": {
     "feature_candidate_authority": {
       "path": "feature_candidate:authority",
-      "sha256": "264325a4cde36d40f3d381c2f055b260ae6e1d7eecc23cdd0f58f9f22c5b5592"
+      "sha256": "9098c88864f60deea6221f840d8112ce553470a9686778a20845e7c7a06fafc9"
     },
     "repo_backtests_nt_runtime___init___py": {
       "path": "repo:backtests/nt_runtime/__init__.py",
@@ -449,7 +465,7 @@
     },
     "repo_features_authority_candidate_canonical_registry_json": {
       "path": "repo:features/authority/candidate/canonical_registry.json",
-      "sha256": "df523e3af37c022ae11c83955af01ae105642be67c0f0faeb279fb71eef80344"
+      "sha256": "c1705b23f3cd25de741ab5624dafaa0db9cb0a3bf3f056ebb10e50e4001a662f"
     },
     "repo_features_authority_candidate_legacy_alias_mapping_json": {
       "path": "repo:features/authority/candidate/legacy_alias_mapping.json",
@@ -457,7 +473,7 @@
     },
     "repo_features_authority_candidate_promotion_facts_json": {
       "path": "repo:features/authority/candidate/promotion_facts.json",
-      "sha256": "9ae61fc5adeff87192ea5322d96e904117b8977085f5202b2710c1fda22259b1"
+      "sha256": "fed7f18f01a56c40e6053b237c4e750e66c50cae28e7f8009a1a93fc37f1dfb6"
     },
     "repo_features_candidate_authority_py": {
       "path": "repo:features/candidate_authority.py",
@@ -481,7 +497,7 @@
     },
     "repo_features_registry_py": {
       "path": "repo:features/registry.py",
-      "sha256": "29e1b92339f58e0c13382ec83bb17a59994bc2bd95f407f1f8290215eae08e4c"
+      "sha256": "aa2f6da6a8ed24f3cc53bfaac10e99dd831fbc25ce77831bb7714289d0c2d07f"
     },
     "repo_features_trackers_generic_arrival_py": {
       "path": "repo:features/trackers/generic_arrival.py",
@@ -494,6 +510,10 @@
     "repo_features_trackers_generic_context_py": {
       "path": "repo:features/trackers/generic_context.py",
       "sha256": "568524bba4b38589844f19c216a5524452a8e2d725a996d2d4961d5fd91bd92a"
+    },
+    "repo_features_trackers_generic_episode_geometry_py": {
+      "path": "repo:features/trackers/generic_episode_geometry.py",
+      "sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f"
     },
     "repo_features_trackers_generic_median_center_py": {
       "path": "repo:features/trackers/generic_median_center.py",
@@ -510,6 +530,10 @@
     "repo_features_trackers_generic_pullback_py": {
       "path": "repo:features/trackers/generic_pullback.py",
       "sha256": "6f7d338404b359845827d10b5300d2f65306e712ae834f29ff85f4e9260738d4"
+    },
+    "repo_features_trackers_generic_regime_geometry_py": {
+      "path": "repo:features/trackers/generic_regime_geometry.py",
+      "sha256": "e156900048d06bfaa8ed6b789ffa1053e95a8498756627b567d2627a4a7ea8cb"
     },
     "repo_features_trackers_generic_rolling_productivity_py": {
       "path": "repo:features/trackers/generic_rolling_productivity.py",
@@ -729,7 +753,7 @@
     },
     "repo_scripts_check_candidate_promotion_py": {
       "path": "repo:scripts/check_candidate_promotion.py",
-      "sha256": "d6b22dc9931b641736d86c3b5036c372795263eccf65b99a25a35166dae537ae"
+      "sha256": "c31dad68380f547a910d92374d9b38e8d460b2b3168509304d95349a310a7d8c"
     },
     "repo_scripts_check_feature_surface_py": {
       "path": "repo:scripts/check_feature_surface.py",
@@ -797,11 +821,11 @@
     },
     "study_audit_status_json": {
       "path": "study:audit/status.json",
-      "sha256": "522b383d49e9804a703d141c9f3bbd471cfaf739802e51249079aace4317b655"
+      "sha256": "d9d0af46cee70523c73a1217bb521e5e95ed0bd31094f4caabc57bb39dfdcb8e"
     },
     "study_audit_contract_status_json": {
       "path": "study:audit/contract_status.json",
-      "sha256": "b0c345741455f82f55209b5b9e7512e5f117f3154dda3de14649ea148ffd36b3"
+      "sha256": "497cd391b13679d36c177fef084aff7f028401c98ee2004cfba4c49c50b4a32f"
     },
     "study_audit_contract_pass_01_md": {
       "path": "study:audit/contract_pass_01.md",
@@ -826,6 +850,26 @@
     "study_audit_contract_pass_06_md": {
       "path": "study:audit/contract_pass_06.md",
       "sha256": "89c84eabf132b9508b4e4d28166d8ef50d7352fb796b2f0c656bf53a7fd04ee7"
+    },
+    "study_audit_contract_pass_07_md": {
+      "path": "study:audit/contract_pass_07.md",
+      "sha256": "6fa43c2ccdc2002e1d01afc0ff76b682f7e723bc85cf52328d702150db00c344"
+    },
+    "study_audit_contract_pass_08_md": {
+      "path": "study:audit/contract_pass_08.md",
+      "sha256": "2c23a6abfd0683bddca43b597dd0d3771c7f7136ad901724e6e62c3ebdc18f4b"
+    },
+    "study_audit_contract_pass_09_md": {
+      "path": "study:audit/contract_pass_09.md",
+      "sha256": "2c23a6abfd0683bddca43b597dd0d3771c7f7136ad901724e6e62c3ebdc18f4b"
+    },
+    "study_audit_contract_pass_10_md": {
+      "path": "study:audit/contract_pass_10.md",
+      "sha256": "89ef71aff3cf236b76ee114aeb08c87ea38758528d72f57fba8595c9598fb4f9"
+    },
+    "study_audit_contract_pass_11_md": {
+      "path": "study:audit/contract_pass_11.md",
+      "sha256": "852779039f6d05ffef883db02b446ccc72cca775d36fcdb6b5e9cb3cec58432e"
     },
     "study_audit_pass_01_md": {
       "path": "study:audit/pass_01.md",
@@ -878,6 +922,26 @@
     "study_audit_pass_13_md": {
       "path": "study:audit/pass_13.md",
       "sha256": "acf2223d6a434ef822137732adc62d1f26459311af7855456fb722d559eb5236"
+    },
+    "study_audit_pass_14_md": {
+      "path": "study:audit/pass_14.md",
+      "sha256": "430e33f12650c23dd6e04fb9bfe7f22e103e1af97309778ca08927fe2b802c26"
+    },
+    "study_audit_pass_15_md": {
+      "path": "study:audit/pass_15.md",
+      "sha256": "673e167a9d400d1edb0df7d2971412325091eb798d9f901a7d89d19b889ededa"
+    },
+    "study_audit_pass_16_md": {
+      "path": "study:audit/pass_16.md",
+      "sha256": "673e167a9d400d1edb0df7d2971412325091eb798d9f901a7d89d19b889ededa"
+    },
+    "study_audit_pass_17_md": {
+      "path": "study:audit/pass_17.md",
+      "sha256": "c531eb60930267a6f266c6a415f23fb4b141f143b33ee6884f1a0e18744edc16"
+    },
+    "study_audit_pass_18_md": {
+      "path": "study:audit/pass_18.md",
+      "sha256": "e90efa4ba074e555a4de0f57bfba704b3c9e09454e0d524af1c058a9cfd4ed80"
     }
   }
 }

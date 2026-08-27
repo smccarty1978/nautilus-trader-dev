@@ -1,20 +1,37 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "20260827T134952Z_c00cec645843",
-  "generated_at_utc": "2026-08-27T13:49:52.145670+00:00",
-  "code_hash": "c00cec645843ada2532a73a6fe44056d6c5c50c750fddaab0b3569cfeb96d270",
+  "preflight_run_id": "20260827T150131Z_c54cc47f1707",
+  "generated_at_utc": "2026-08-27T15:01:31.281951+00:00",
+  "code_hash": "c54cc47f1707f0c665c142dcc007b6680e32053ab69d0dff144b6c1a78294220",
   "superseded": true,
-  "failed_gate": "CAUSAL_LINT",
+  "failed_gate": "ARTIFACT_SCHEMA",
   "failure_ids": [
-    "no eligible Python files found under requested roots or execution manifest"
+    "SEAL_SCHEMA",
+    "INCOMPLETE_TERMINAL_EVIDENCE",
+    "SEAL_NO_EVIDENCE"
   ],
   "failure_details": [
     {
-      "message": "no eligible Python files found under requested roots or execution manifest"
+      "severity": "CRITICAL",
+      "code": "SEAL_SCHEMA",
+      "artifact": "studies\\deep_pullback_5s_reacceleration_model\\audit\\candidate_promotion_check.json",
+      "message": "Missing 'seal_id'"
+    },
+    {
+      "severity": "CRITICAL",
+      "code": "INCOMPLETE_TERMINAL_EVIDENCE",
+      "artifact": "studies\\deep_pullback_5s_reacceleration_model\\audit\\candidate_promotion_check.json",
+      "message": "Terminal promotion manifest missing required fields: ['model_sha256', 'feature_list_sha256', 'code_sha256', 'spec_sha256', 'validation_report_sha256', 'audit_status_sha256', 'preflight_sha256', 'test_evidence_sha256', 'promotion_timestamp']"
+    },
+    {
+      "severity": "CRITICAL",
+      "code": "SEAL_NO_EVIDENCE",
+      "artifact": "studies\\deep_pullback_5s_reacceleration_model\\audit\\candidate_promotion_check.json",
+      "message": "Seal manifest has no persisted evidence dictionary"
     }
   ],
-  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_LINT and fix locally before requesting audit.",
-  "superseded_by_preflight_run_id": "20260827T141648Z_d559f3dfce44",
-  "superseded_at_utc": "2026-08-27T14:16:48.759063+00:00",
+  "recommended_smallest_investigation_scope": "Inspect findings in ARTIFACT_SCHEMA and fix locally before requesting audit.",
+  "superseded_by_preflight_run_id": "20260827T153034Z_9f21cc9bec42",
+  "superseded_at_utc": "2026-08-27T15:30:34.560937+00:00",
   "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
 }

@@ -682,7 +682,7 @@ for _K in (3, 5, 8, 12):
 # Structural-regime geometry is provisional until the owning study's parity,
 # prefix-invariance, and causal audits clear. Its study-specific snapshot binding is
 # declared by the collector; the registry records update ownership and formulas.
-_STRUCTURAL_IMPL = 'features.trackers.structural_regime_geometry.StructuralRegimeGeometryTracker'
+_STRUCTURAL_IMPL = 'features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider'
 _STRUCTURAL_TESTS = ('studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py',)
 # Declared here as well as consumed by the legacy physical-alias loop below so V2
 # canonical definitions can be constructed before that loop.  They intentionally name
@@ -812,11 +812,11 @@ for _name in (
 _EPISODE_IMPL = 'features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider'
 _EPISODE_TESTS = ('features/tests/test_generic_episode_geometry.py',)
 for _name, _params, _required, _values in (
-    ('pullback_max_depth_atr', ('scope', 'extreme_source'), ('scope', 'extreme_source'), {}),
-    ('pullback_recovery_from_extreme_atr', ('scope',), ('scope',), {}),
-    ('pullback_post_arm_seconds', ('scope',), ('scope',), {}),
-    ('pullback_elapsed_seconds', ('scope',), ('scope',), {}),
-    ('pullback_fraction_of_structural_move', ('scope',), ('scope',), {}),
+    ('pullback_max_depth_atr', ('scope', 'extreme_source'), ('scope', 'extreme_source'), {'scope': ('current_deep_pullback_episode',), 'extreme_source': ('prevailing_directional_extreme',)}),
+    ('pullback_recovery_from_extreme_atr', ('scope',), ('scope',), {'scope': ('current_deep_pullback_episode',)}),
+    ('pullback_post_arm_seconds', ('scope',), ('scope',), {'scope': ('current_deep_pullback_episode',)}),
+    ('pullback_elapsed_seconds', ('scope',), ('scope',), {'scope': ('current_deep_pullback_episode',)}),
+    ('pullback_fraction_of_structural_move', ('scope',), ('scope',), {'scope': ('current_deep_pullback_episode',)}),
 ):
     CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
         _name, family='pullback_episode_geometry', implementation=_EPISODE_IMPL,
@@ -871,6 +871,7 @@ for _name, _params, _required in (
         update_anchor='completed_1s_at_checkpoint', normalizer='study_contract',
         window_unit='seconds', reset_policy='none', null_policy='allow',
         supported_update_every=('1s',), supported_parameter_values={
+            'window': ('5s','60s','300s'), 'numerator_window': ('5s','60s'), 'denominator_window': ('300s',),
             'update_every': ('1s',), 'direction_reference': ('prevailing_1m',),
         }, required_parameters=_required,
     )
