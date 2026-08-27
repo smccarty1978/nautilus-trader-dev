@@ -788,18 +788,114 @@ for _name in (
         # ``regime`` remains in the historical schema for promotion-record
         # compatibility, but no active completed-bar provider consumes it;
         # an empty domain makes every supplied value fail closed.
-        _value_domain = {"timeframe": ("1m", "5m"), "bar_state": ("completed",), "regime": ()}
+        _value_domain = {"timeframe": ("1m", "5m", "5s"), "bar_state": ("completed",), "regime": ()}
+        _combinations = (*_combinations, {"timeframe": "5s", "context": "prior", "bar_state": "completed"})
         if _name in {"regime_age_min", "regime_range_atr", "regime_directional_displacement_atr", "regime_range_atr_per_min"}:
+            _combinations = (*_combinations, {"timeframe": "5m", "context": "current", "bar_state": "completed"})
+        if _name == "regime_age_min":
+            _combinations = (*_combinations, {"timeframe": "1m", "context": "current", "bar_state": "completed"})
+        if _name == "regime_efficiency":
             _combinations = (*_combinations, {"timeframe": "5m", "context": "current", "bar_state": "completed"})
     CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
         _name, family="structural_regime_geometry", implementation=_STRUCTURAL_IMPL,
         tests=_STRUCTURAL_TESTS, parameters=_params, source_timeframe="1s+1m+5m",
         update_anchor="completed_1s_completed_5m_then_1m_flip",
         normalizer="study_contract", window_unit="since_regime_flip", reset_policy="event_start",
-        supported_timeframes=("1m", "5m"),
+        supported_timeframes=("1m", "5m", "5s"),
         supported_parameter_values=_value_domain,
         required_parameters=_required, supported_parameter_combinations=_combinations,
     )
+
+# Deep-pullback episode geometry is supplied by the reusable episode tracker.  These
+# definitions remain provisional until causal/runtime evidence is promoted through the
+# canonical authority workflow; registry presence must never self-grant verification.
+_EPISODE_IMPL = 'features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider'
+_EPISODE_TESTS = ('features/tests/test_generic_episode_geometry.py',)
+for _name, _params, _required, _values in (
+    ('pullback_max_depth_atr', ('scope', 'extreme_source'), ('scope', 'extreme_source'), {}),
+    ('pullback_recovery_from_extreme_atr', ('scope',), ('scope',), {}),
+    ('pullback_post_arm_seconds', ('scope',), ('scope',), {}),
+    ('pullback_elapsed_seconds', ('scope',), ('scope',), {}),
+    ('pullback_fraction_of_structural_move', ('scope',), ('scope',), {}),
+):
+    CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
+        _name, family='pullback_episode_geometry', implementation=_EPISODE_IMPL,
+        tests=_EPISODE_TESTS, parameters=_params, source_timeframe='1s',
+        update_anchor='completed_1s_at_candidate', normalizer='study_contract',
+        window_unit='events', reset_policy='episode', null_policy='allow',
+        required_parameters=_required, supported_parameter_values=_values,
+    )
+
+for _name, _params in (
+    ('seconds_since_prevailing_directional_extreme', ('timeframe', 'context', 'bar_state')),
+    ('prior_deep_pullback_count', ('timeframe', 'context', 'bar_state', 'threshold_atr')),
+):
+    CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
+        _name, family='pullback_sequence_maturity', implementation=_EPISODE_IMPL,
+        tests=_EPISODE_TESTS, parameters=_params, source_timeframe='1s+1m',
+        update_anchor='completed_1s_at_candidate', normalizer='study_contract',
+        window_unit='since_regime_flip', reset_policy='event_start', null_policy='allow',
+        supported_timeframes=('1m',),
+        supported_parameter_values={
+            'timeframe': ('1m',), 'context': ('current',), 'bar_state': ('completed',),
+            'threshold_atr': (1.0,),
+        }, required_parameters=_params,
+        supported_parameter_combinations=(
+            {'timeframe': '1m', 'context': 'current', 'bar_state': 'completed',
+             **({'threshold_atr': 1.0} if _name == 'prior_deep_pullback_count' else {})},
+        ),
+    )
+
+_REGIME_GEOMETRY_IMPL = 'features.trackers.generic_regime_geometry.GenericCompletedRegimeGeometryProvider'
+for _name in ('recovery_from_counter_regime_extreme_atr', 'fraction_of_counter_regime_move_recovered'):
+    CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
+        _name, family='counter_regime_geometry', implementation=_REGIME_GEOMETRY_IMPL,
+        tests=_EPISODE_TESTS, parameters=('timeframe',), source_timeframe='5s',
+        update_anchor='completed_5s_regime_flip', normalizer='study_contract',
+        window_unit='since_regime_flip', reset_policy='event_start', null_policy='allow',
+        supported_timeframes=('5s',), supported_parameter_values={'timeframe': ('5s',)},
+        required_parameters=('timeframe',),
+    )
+
+_DELTA_IMPL = 'features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider'
+for _name, _params, _required in (
+    ('trend_normalized_est_delta_sum', ('window', 'update_every', 'direction_reference'),
+     ('window', 'update_every', 'direction_reference')),
+    ('trend_normalized_est_delta_sum_ratio',
+     ('numerator_window', 'denominator_window', 'update_every', 'direction_reference'),
+     ('numerator_window', 'denominator_window', 'update_every', 'direction_reference')),
+):
+    CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
+        _name, family='direction_normalized_ohlcv_est_delta', implementation=_DELTA_IMPL,
+        tests=_EPISODE_TESTS, parameters=_params, source_timeframe='1s',
+        update_anchor='completed_1s_at_checkpoint', normalizer='study_contract',
+        window_unit='seconds', reset_policy='none', null_policy='allow',
+        supported_update_every=('1s',), supported_parameter_values={
+            'update_every': ('1s',), 'direction_reference': ('prevailing_1m',),
+        }, required_parameters=_required,
+    )
+
+CANONICAL_FEATURE_DEFINITIONS['regime_direction'] = _canonical_definition(
+    'regime_direction', family='completed_regime_context', implementation=_REGIME_GEOMETRY_IMPL,
+    tests=_EPISODE_TESTS, parameters=('timeframe', 'context', 'bar_state'), source_timeframe='5m',
+    update_anchor='completed_5m_bar', normalizer='none', window_unit='since_regime_flip',
+    reset_policy='event_start', null_policy='allow', supported_timeframes=('5m',),
+    supported_parameter_values={'timeframe': ('5m',), 'context': ('current',), 'bar_state': ('completed',)},
+    required_parameters=('timeframe', 'context', 'bar_state'),
+    supported_parameter_combinations=({'timeframe': '5m', 'context': 'current', 'bar_state': 'completed'},),
+)
+CANONICAL_FEATURE_DEFINITIONS['regime_alignment'] = _canonical_definition(
+    'regime_alignment', family='completed_regime_context', implementation=_REGIME_GEOMETRY_IMPL,
+    tests=_EPISODE_TESTS, parameters=('source_timeframe', 'reference_timeframe', 'context', 'bar_state'),
+    source_timeframe='1m+5m', update_anchor='completed_5m_bar', normalizer='none',
+    window_unit='since_regime_flip', reset_policy='event_start', null_policy='allow',
+    supported_timeframes=('1m', '5m'), supported_parameter_values={
+        'source_timeframe': ('1m',), 'reference_timeframe': ('5m',),
+        'context': ('current',), 'bar_state': ('completed',),
+    }, required_parameters=('source_timeframe', 'reference_timeframe', 'context', 'bar_state'),
+    supported_parameter_combinations=({'source_timeframe': '1m', 'reference_timeframe': '5m',
+                                       'context': 'current', 'bar_state': 'completed'},),
+)
 
 for _name in (
     "rolling_max_progress_atr", "rolling_current_progress_atr", "rolling_giveback_atr",
@@ -988,6 +1084,9 @@ def validate_feature_instance(instance: FeatureInstance) -> Dict[str, Any]:
                 f"UNSUPPORTED_UPDATE_CADENCE: {instance.canonical_name} supports "
                 f"{list(definition.supported_update_every)}, not {params['update_every']!r}"
             )
+    for key in ("numerator_window", "denominator_window"):
+        if key in params:
+            _duration_seconds(str(params[key]))
     for key in ("source_timeframe", "reference_timeframe"):
         if key in params:
             _duration_seconds(str(params[key]))
@@ -1016,6 +1115,13 @@ def generate_physical_alias(instance: FeatureInstance) -> str:
         return f"{prefix}{name}"
     if name.startswith("rolling_") and "window" in params:
         return f"rolling_{params['window']}_{name[len('rolling_'):]}"
+    if name == "trend_normalized_est_delta_sum" and "window" in params:
+        return f"trend_normalized_est_delta_sum_{params['window']}"
+    if name == "trend_normalized_est_delta_sum_ratio" and "numerator_window" in params:
+        return (
+            f"trend_normalized_est_delta_sum_ratio_{params['numerator_window']}"
+            f"_vs_{params['denominator_window']}"
+        )
     if name.startswith("distance_to_completed_range_"):
         return f"distance_to_completed_{params['reference_timeframe']}_{name[len('distance_to_completed_range_'):]}"
     if name == "move_outside_completed_range":

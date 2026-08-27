@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "search_method": "random",
+  "max_trials": 24,
+  "random_seed": 42,
+  "tuning_years": [
+    2021,
+    2022
+  ],
+  "final_train_validation_years": [
+    2023
+  ],
+  "primary_selection_metric": "pr_auc",
+  "primary_selection_metric_direction": "maximize",
+  "secondary_metrics": [
+    "brier"
+  ],
+  "declared_search_space_size": null,
+  "attempted_draw_count": 24,
+  "unique_evaluated_count": 24,
+  "search_space_exhausted": false,
+  "attempts": {
+    "C": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.06597076978316395,
+          "max_depth": 3,
+          "n_estimators": 100,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30887334955243934
+        ],
+        "average_score": 0.30887334955243934
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.06543367060584497,
+          "max_depth": 3,
+          "n_estimators": 300,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.28503901941853826
+        ],
+        "average_score": 0.28503901941853826
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.039440343780424526,
+          "max_depth": 5,
+          "n_estimators": 100,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30962585339970716
+        ],
+        "average_score": 0.30962585339970716
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.029083922675345254,
+          "max_depth": 3,
+          "n_estimators": 300,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.306031578424526
+        ],
+        "average_score": 0.306031578424526
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.02754301947728003,
+          "max_depth": 5,
+          "n_estimators": 300,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30676166622574336
+        ],
+        "average_score": 0.30676166622574336
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.04121104666078603,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 31,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.29636331855172743
+        ],
+        "average_score": 0.29636331855172743
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.06151889011627744,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30331583577611065
+        ],
+        "average_score": 0.30331583577611065
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.02828315521526488,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.29893044304741223
+        ],
+        "average_score": 0.29893044304741223
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.036862754389988345,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30811552888173993
+        ],
+        "average_score": 0.30811552888173993
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.030614145882839516,
+          "max_depth": 5,
+          "n_estimators": 100,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3015973894306522
+        ],
+        "average_score": 0.3015973894306522
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.02445004930574217,
+          "max_depth": 5,
+          "n_estimators": 200,
+          "num_leaves": 31,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.28980545280240655
+        ],
+        "average_score": 0.28980545280240655
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.03205921029406638,
+          "max_depth": 5,
+          "n_estimators": 300,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30567138334746413
+        ],
+        "average_score": 0.30567138334746413
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.027254232246330383,
+          "max_depth": 5,
+          "n_estimators": 100,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30324725975642003
+        ],
+        "average_score": 0.30324725975642003
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.028861842631876633,
+          "max_depth": 5,
+          "n_estimators": 200,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30910294541484323
+        ],
+        "average_score": 0.30910294541484323
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.08066331905706195,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3010284078420419
+        ],
+        "average_score": 0.3010284078420419
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.055635802200620345,
+          "max_depth": 4,
+          "n_estimators": 200,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.28754706420474013
+        ],
+        "average_score": 0.28754706420474013
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.035428564717249415,
+          "max_depth": 4,
+          "n_estimators": 300,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.2940491711489817
+        ],
+        "average_score": 0.2940491711489817
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.09030742454102285,
+          "max_depth": 5,
+          "n_estimators": 300,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.26996125860840736
+        ],
+        "average_score": 0.26996125860840736
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.05557260723101661,
+          "max_depth": 5,
+          "n_estimators": 300,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.2997496298367762
+        ],
+        "average_score": 0.2997496298367762
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.042085841761169834,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.29541863083145836
+        ],
+        "average_score": 0.29541863083145836
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.03370496650952895,
+          "max_depth": 5,
+          "n_estimators": 100,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30532370927235986
+        ],
+        "average_score": 0.30532370927235986
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.07306894931633574,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.2924737586647637
+        ],
+        "average_score": 0.2924737586647637
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.02808669736575327,
+          "max_depth": 3,
+          "n_estimators": 300,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.2958611384912256
+        ],
+        "average_score": 0.2958611384912256
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.057433060863871295,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.29399045180007577
+        ],
+        "average_score": 0.29399045180007577
+      }
+    ]
+  },
+  "winner": {
+    "C": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.039440343780424526,
+        "max_depth": 5,
+        "n_estimators": 100,
+        "num_leaves": 4,
+        "verbosity": -1
+      },
+      "inner_validation_score": 0.30962585339970716,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    }
+  },
+  "final_validation_metric": {
+    "C": {
+      "pr_auc": 0.3234728767048036,
+      "brier": 0.12911170166038222
+    }
+  },
+  "final_validation_reasons": {
+    "C": []
+  },
+  "final_validation_policy": "gated",
+  "final_validation_status": "PASS",
+  "no_retuning_after_final_validation_assertion": true,
+  "generated_at_utc": "2026-08-27T05:34:26.969565+00:00",
+  "manifest_sha256": "c005787af311ec13708df4d4be68797b6d492eef3d8acf1f87ef85379f9704f1"
+}

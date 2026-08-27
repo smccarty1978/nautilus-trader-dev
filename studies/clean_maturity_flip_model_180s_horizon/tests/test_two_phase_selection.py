@@ -13,6 +13,12 @@ prove the required assertions hold BEFORE any real data is ever passed through i
     direction.
   - LONG and SHORT are fully independent: one direction's failure does not alter or block
     the other's result, and both are reported explicitly, never pooled.
+  - study.yaml's OWN declared secondary_metrics are all registry-supported -- a
+    `secondary_metrics: [brier_score, precision_at_p90, ...]` mismatch against
+    research_workflow.model_selection's actual metric registry raised
+    UnsupportedSelectionMetric the first time a real Phase 2/3 dispatch ran, uncaught by
+    any test until this one was added (per AGENTS.md's "prove a multi-call protocol
+    before it's authoritative" -- this regression is what that principle is for).
 """
 from __future__ import annotations
 
@@ -23,6 +29,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+import yaml
 
 STUDY_DIR = Path(__file__).resolve().parents[1]
 
@@ -166,6 +173,31 @@ def test_phase1_uses_parent_fixed_hyperparameters_not_defaults():
     assert not spec.tunable_hyperparameters
 
 
+def test_phase1_manifests_do_not_clobber_across_directions_or_metrics():
+    """Independent contract review (pass 09) found all four Phase-1 calls (LONG/SHORT x
+    pr_auc/brier) wrote to the same hardcoded run_model_selection default path, so only
+    the last call's manifest survived on disk. Prove each call now leaves its own file."""
+    tmp = tempfile.mkdtemp()
+    for direction, seed in (("LONG", 10), ("SHORT", 11)):
+        X_by_arm, y, meta = _synthetic_direction_dataset(seed, years=(2021, 2022))
+        run_phase1_architecture_selection(
+            tmp, X_by_arm, y, meta,
+            feature_counts={a: X_by_arm[a].shape[1] for a in X_by_arm},
+            direction=direction,
+        )
+    artifacts_dir = Path(tmp) / "artifacts"
+    expected = {
+        "model_selection_manifest_phase1_long_prauc.json",
+        "model_selection_manifest_phase1_long_brier.json",
+        "model_selection_manifest_phase1_short_prauc.json",
+        "model_selection_manifest_phase1_short_brier.json",
+    }
+    present = {p.name for p in artifacts_dir.glob("model_selection_manifest_phase1_*.json")}
+    assert expected <= present, f"missing: {expected - present}"
+    # The shared default path must not be left behind either -- every call renamed it.
+    assert not (artifacts_dir / "model_selection_manifest.json").exists()
+
+
 # ---------------------------------------------------------------------------
 # Phase 2 / 3
 # ---------------------------------------------------------------------------
@@ -261,3 +293,30 @@ def test_run_study_reports_both_directions_independently_never_pooled():
     assert report["LONG_status"] == "FAIL_DIRECTION"
     assert report["SHORT_status"] == results["SHORT"].status
     assert "LONG_winning_arm" in report and "SHORT_winning_arm" in report
+
+
+# ---------------------------------------------------------------------------
+# study.yaml fidelity: declared secondary_metrics must be registry-supported
+# ---------------------------------------------------------------------------
+
+def test_study_yaml_secondary_metrics_are_registry_supported():
+    """A metric name in study.yaml that the fitting layer cannot score is a defect that
+    only surfaces the first time a REAL Phase 2/3 run reaches _evaluate_final_validation
+    -- by then a gate has already been consumed. Assert it here instead."""
+    from research_workflow.model_selection import _METRIC_FNS
+
+    data = yaml.safe_load((STUDY_DIR / "study.yaml").read_text(encoding="utf-8"))
+    declared = (data.get("model", {}).get("selection", {}) or {}).get("secondary_metrics") or []
+    unsupported = [m for m in declared if m not in _METRIC_FNS]
+    assert not unsupported, (
+        f"study.yaml declares secondary_metrics {unsupported!r} not in "
+        f"research_workflow.model_selection._METRIC_FNS ({sorted(_METRIC_FNS)}) -- these "
+        f"would raise UnsupportedSelectionMetric the first time final validation actually "
+        f"runs, not at compile/preflight time."
+    )
+    primary = (data.get("model", {}).get("selection", {}) or {}).get("primary_selection_metric")
+    if primary:
+        assert primary in _METRIC_FNS, (
+            f"study.yaml's primary_selection_metric {primary!r} is not in _METRIC_FNS "
+            f"({sorted(_METRIC_FNS)})"
+        )

@@ -1,7 +1,7 @@
 {
   "study_id": "clean_maturity_flip_model_180s_horizon",
   "study_type": "flip_prediction",
-  "spec_sha256": "f17e54590d244c3f01416f73a2498a883fe80b32af21528b78f3f1293d1d54c8",
+  "spec_sha256": "e363badf226991c99ebef50892f468d79d04be59f5abd7ffb5cac5a702fad1e0",
   "spec": {
     "study": {
       "id": "clean_maturity_flip_model_180s_horizon",
@@ -261,11 +261,7 @@
         "primary_selection_metric": "pr_auc",
         "primary_selection_metric_direction": "maximize",
         "secondary_metrics": [
-          "brier_score",
-          "precision_at_p90",
-          "precision_at_p95",
-          "precision_at_p97_5",
-          "resolved_count"
+          "brier"
         ],
         "calibration_required": true,
         "simpler_model_tie_preference": true,
@@ -1128,11 +1124,7 @@
       "primary_selection_metric": "pr_auc",
       "primary_selection_metric_direction": "maximize",
       "secondary_metrics": [
-        "brier_score",
-        "precision_at_p90",
-        "precision_at_p95",
-        "precision_at_p97_5",
-        "resolved_count"
+        "brier"
       ],
       "calibration_required": true,
       "simpler_model_tie_preference": true,

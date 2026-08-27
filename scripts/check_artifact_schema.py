@@ -197,7 +197,12 @@ def scan_artifacts(root: Path, *, candidate_authority: bool = False) -> Tuple[Li
             continue
 
         name = json_file.name.lower()
-        if name in {"status.json", "contract_status.json"}:
+        # Scoped to audit/ deliberately: a collection run's own run-tracking file is
+        # ALSO named `status.json` (runs/<run_id>/status.json, a distinct schema
+        # describing an NT collection run's outcome, not an audit verdict) and would
+        # otherwise be misvalidated against the audit-status schema the first time
+        # this check runs after TRAIN collection has already produced run directories.
+        if name in {"status.json", "contract_status.json"} and json_file.parent == root / "audit":
             scanned["status_json"] += 1
             issues.extend(validate_status_json(data, json_file))
         elif name == "run_status.json":

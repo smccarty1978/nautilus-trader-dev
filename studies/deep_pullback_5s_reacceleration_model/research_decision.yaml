@@ -66,6 +66,18 @@ target_atr:
   frozen_for_full_path: true
   structural_feature_atr_anchors_unchanged: true
 
+arm_atr:
+  source: latest_causally_completed_1m_wilder_atr_14_available_at_arm_observation
+  frozen_at: threshold_crossing_completed_1s_availability
+  qualification_formula: raw_direction_normalized_adverse_intrabar_excursion_at_arm / arm_atr
+  threshold: 1.0
+  retrospective_recomputation_using_ATR_T: prohibited
+
+pullback_start:
+  source: first_completed_1s_observation_after_active_favorable_extreme_with_positive_direction_normalized_adverse_excursion
+  availability: completed_1s_bar_only
+  arbitrary_close_change_proxy: prohibited
+
 candidate_population:
   directions: both
   candidates_per_episode: 1
@@ -73,8 +85,9 @@ candidate_population:
   state_machine:
     arm: >-
       Arm only after a completed 1s bar proves that direction-normalized adverse intrabar
-      excursion from the current causal favorable extreme of the active prevailing 1m regime
-      first reaches at least 1.00 target ATR. Bullish depth is running_high minus completed_1s_low;
+      excursion from the current causal favorable extreme of the active prevailing 1m regime,
+      divided by the latest completed 1m Wilder ATR(14) available at that arm observation,
+      first reaches at least 1.00. Bullish depth is running_high minus completed_1s_low;
       bearish depth is completed_1s_high minus running_low. The completed 1s close need not remain
       beyond the threshold and forming 1s information is prohibited.
     required_intermediate_state: >-
@@ -99,6 +112,9 @@ candidate_population:
   population_score_gate: none
   p90_gate_prohibited: true
   pullback_depth_price_field: completed_1s_intrabar_high_low
+  pullback_duration_fields:
+    pullback_elapsed_seconds: causal_pullback_start_to_candidate_T
+    pullback_post_arm_seconds: arm_timestamp_to_candidate_T
   counter_5s_already_active_at_arm_counts: true
 
 primary_target:
@@ -165,6 +181,8 @@ feature_policy:
     - pullback_recovery_from_deepest_extreme
     - pullback_fraction_of_structural_move
     - pullback_age_and_maturity
+    - pullback_elapsed_seconds
+    - pullback_post_arm_seconds
     - counter_5s_regime_geometry
     - direction_normalized_pressure_and_selected_ratios
     - completed_5m_alignment

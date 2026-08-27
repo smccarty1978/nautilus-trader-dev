@@ -1,0 +1,68 @@
+{
+  "partition": "train",
+  "feature_sets": {
+    "C": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr"
+    ]
+  },
+  "model_hashes": {
+    "C": "160def95de40280428d10ecbe3b3a723bb0acffcce02a8a660cc3c8c5a0ba231"
+  },
+  "preprocessing_hash": "b911cf21faca1a389ea16dc6e3395a8630d0e40974ac8cad1cf14506db2c367c",
+  "thresholds": {
+    "C": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.2852887899663343,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.32770330252959395,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.3639796684339806,
+        "derivation_population": "train"
+      }
+    }
+  },
+  "deciles": {
+    "C": {
+      "boundaries": [
+        0.06716255061987056,
+        0.0959974733851858,
+        0.11533470936210777,
+        0.13324590970726913,
+        0.14980039904362538,
+        0.17164852705760078,
+        0.20171761499125726,
+        0.23767264775091101,
+        0.2852887899663343
+      ],
+      "derivation": "TRAIN_ONLY"
+    }
+  },
+  "model_selection_manifest_sha256": "c005787af311ec13708df4d4be68797b6d492eef3d8acf1f87ef85379f9704f1",
+  "schema_version": 1,
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+  "generated_at_utc": "2026-08-27T08:02:26.592319+00:00",
+  "freeze_sha256": "6303cca8cbf13bbaddaee44b3118ce6d0505fbc98245a799aa71c7ee125ae9b7"
+}

@@ -2,15 +2,14 @@
   "study_id": "clean_maturity_flip_model_180s_horizon",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "74cd5a9d1482a049fd20e38729c8b65a81965e6b",
+  "git_commit_hash": "cc23a48c77548e5097d5c51f298f2975ee95f02b",
   "source_state_binding": {
     "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "74cd5a9d1482a049fd20e38729c8b65a81965e6b",
+    "git_commit_hash": "cc23a48c77548e5097d5c51f298f2975ee95f02b",
     "git_commit_is_sufficient_provenance": false,
     "working_tree_dirty": true,
-    "source_state_sha256": "4e9667e78ea700e868a57de477eb74dbc1f1fcb25d7a7a981255b90515d906fd",
+    "source_state_sha256": "8502c4940d318b43d7c8988c92c156b8705a0c79ccf6a2b3dc752c7336b337e2",
     "dependencies_diverging_from_commit": [
-      "studies/clean_maturity_flip_model_180s_horizon/SPEC.md",
       "studies/clean_maturity_flip_model_180s_horizon/study.yaml"
     ],
     "source_files": {
@@ -36,15 +35,15 @@
       },
       "studies/clean_maturity_flip_model_180s_horizon/SPEC.md": {
         "sha256": "b6a228703605bb67afe5d708da19b31e1cd2ef5a4ae0483d19bd9ec68cdbf15a",
-        "state": "UNTRACKED_OR_NEW"
+        "state": "COMMITTED"
       },
       "studies/clean_maturity_flip_model_180s_horizon/study.yaml": {
-        "sha256": "40d81ecc4a46d2ddc6193d3e5d6d6ab00b91b5b5d1d0e28873eb0b48900eb225",
-        "state": "UNTRACKED_OR_NEW"
+        "sha256": "f924191c294afa33c0caade45b9ed1f96ce406252f002b59f8891cb3b88ca580",
+        "state": "MODIFIED"
       }
     }
   },
-  "study_yaml_sha256": "40d81ecc4a46d2ddc6193d3e5d6d6ab00b91b5b5d1d0e28873eb0b48900eb225",
+  "study_yaml_sha256": "f924191c294afa33c0caade45b9ed1f96ce406252f002b59f8891cb3b88ca580",
   "spec_md_sha256": "b6a228703605bb67afe5d708da19b31e1cd2ef5a4ae0483d19bd9ec68cdbf15a",
   "clean_lineage_start": null,
   "invalidated_prior_runs_count": 0,
@@ -354,5 +353,5 @@
   },
   "derived_causal_inputs": [],
   "required_gates_evidence": [],
-  "manifest_sha256": "ca8850a1e94d8332ca3b09072b48acdd5fcc402fa95131f1b5ff8a8043982a1a"
+  "manifest_sha256": "3ceab368b4eec240f16ace93bb6f8109959f902554787a0346609278cfb3ca43"
 }

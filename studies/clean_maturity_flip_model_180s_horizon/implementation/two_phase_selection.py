@@ -124,6 +124,26 @@ class Phase1Result:
     brier_manifest: Dict[str, Any] = field(default_factory=dict)
 
 
+def _run_model_selection_to_named_manifest(
+    study_path: str | Path, X_by_arm, y, meta, spec: ModelSelectionSpec, output_manifest_name: str,
+) -> Dict[str, Any]:
+    """Calls `run_model_selection` and immediately renames its output off the shared
+    default path (`artifacts/model_selection_manifest.json`) to `output_manifest_name`.
+
+    `run_model_selection` always writes to that one hardcoded path regardless of caller
+    -- with no rename, two calls in the same study directory silently overwrite each
+    other's artifact (caught by independent contract review, pass 09: Phase 1's four
+    calls -- LONG/SHORT x pr_auc/brier -- left only the last call's manifest on disk).
+    """
+    manifest = run_model_selection(study_path, X_by_arm, y, meta, spec)
+    study_dir = Path(study_path).resolve()
+    default_path = study_dir / "artifacts" / "model_selection_manifest.json"
+    out_path = study_dir / "artifacts" / output_manifest_name
+    if default_path.resolve() != out_path.resolve():
+        default_path.replace(out_path)
+    return manifest
+
+
 def run_phase1_architecture_selection(
     study_path: str | Path,
     X_by_arm: Mapping[str, pd.DataFrame],
@@ -131,6 +151,7 @@ def run_phase1_architecture_selection(
     meta: pd.DataFrame,
     *,
     feature_counts: Mapping[str, int],
+    direction: str = "unspecified",
 ) -> Phase1Result:
     """PHASE 1: untuned A/B/C comparison, fit=2021 -> val=2022 ONLY.
 
@@ -139,16 +160,21 @@ def run_phase1_architecture_selection(
     governed calls are made (one scored on pr_auc, one on brier) because
     `run_model_selection`'s internal `_fit_and_score` evaluates exactly one metric per
     call; this is two invocations of the same existing function, never new fitting code.
+    Each call's manifest is immediately renamed to a direction- and metric-specific path
+    (see `_run_model_selection_to_named_manifest`) so parallel/sequential calls across
+    directions never clobber each other's artifact.
     """
     _assert_no_years_outside(meta, TUNING_YEARS, phase="PHASE1")
 
-    pr_auc_manifest = run_model_selection(
+    pr_auc_manifest = _run_model_selection_to_named_manifest(
         study_path, X_by_arm, y, meta,
         phase1_selection_spec(primary_metric="pr_auc", direction="maximize"),
+        f"model_selection_manifest_phase1_{direction.lower()}_prauc.json",
     )
-    brier_manifest = run_model_selection(
+    brier_manifest = _run_model_selection_to_named_manifest(
         study_path, X_by_arm, y, meta,
         phase1_selection_spec(primary_metric="brier", direction="minimize"),
+        f"model_selection_manifest_phase1_{direction.lower()}_brier.json",
     )
 
     per_arm_pr_auc = {a: w["inner_validation_score"] for a, w in pr_auc_manifest["winner"].items()}
@@ -290,6 +316,7 @@ def run_direction_two_phase_selection(
     """
     phase1 = run_phase1_architecture_selection(
         study_path, X_by_arm_tuning, y_tuning, meta_tuning, feature_counts=feature_counts,
+        direction=direction,
     )
     winning_arm = phase1.winning_arm
 

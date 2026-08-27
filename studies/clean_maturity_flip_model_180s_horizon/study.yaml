@@ -175,12 +175,22 @@ model:
     - 2023
     primary_selection_metric: pr_auc
     primary_selection_metric_direction: maximize
+    # secondary_metrics is restricted to what research_workflow/model_selection.py's
+    # _METRIC_FNS registry actually supports ({roc_auc, pr_auc, brier} -- confirmed by
+    # direct code read, not assumption). "brier_score" (wrong name) and
+    # precision_at_p90/p95/p97_5/resolved_count (not (y_true, y_score)-scoreable --
+    # precision-at-threshold needs a threshold this search doesn't have yet, and
+    # resolved_count is a row count, not a fold metric) were declared here originally
+    # but are computed by NO code path and would raise UnsupportedSelectionMetric the
+    # first time final validation actually ran (caught by research-executor's real
+    # Phase 2/3 dispatch, not by this study's own bounded-fixture tests, which never
+    # set secondary_metrics and so never exercised this). Those four remain valid
+    # POST-HOC diagnostics -- see research_decision.yaml's
+    # architecture_selection_protocol.required_diagnostics_not_selection_criteria --
+    # computed later from the frozen model's real score distribution, not as
+    # search-time metrics here.
     secondary_metrics:
-    - brier_score
-    - precision_at_p90
-    - precision_at_p95
-    - precision_at_p97_5
-    - resolved_count
+    - brier
     calibration_required: true
     simpler_model_tie_preference: true
     final_validation_policy: gated

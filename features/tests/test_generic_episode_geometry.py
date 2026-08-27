@@ -6,9 +6,44 @@ import pytest
 from features.trackers.generic_episode_geometry import GenericEpisodeGeometryProvider
 from features.trackers.generic_ohlcv_delta import GenericOHLCVDeltaProvider
 from features.trackers.generic_regime_geometry import GenericCompletedRegimeGeometryProvider
+from features.registry import FeatureInstance, generate_physical_alias, validate_feature_instance
 
 
 NS = 1_000_000_000
+
+
+def test_deep_pullback_surface_names_are_registered_and_parameterized():
+    names = {
+        "pullback_max_depth_atr", "pullback_recovery_from_extreme_atr",
+        "pullback_post_arm_seconds", "pullback_elapsed_seconds",
+        "pullback_fraction_of_structural_move",
+        "seconds_since_prevailing_directional_extreme", "prior_deep_pullback_count",
+        "recovery_from_counter_regime_extreme_atr", "fraction_of_counter_regime_move_recovered",
+        "trend_normalized_est_delta_sum", "trend_normalized_est_delta_sum_ratio",
+        "regime_direction", "regime_alignment",
+    }
+    from features.registry import CANONICAL_FEATURE_DEFINITIONS
+    assert names <= set(CANONICAL_FEATURE_DEFINITIONS)
+    assert validate_feature_instance(FeatureInstance(
+        "regime_age_min", {"timeframe": "1m", "context": "current", "bar_state": "completed"}
+    ))["timeframe"] == "1m"
+    assert validate_feature_instance(FeatureInstance(
+        "regime_duration_min", {"timeframe": "5s", "context": "prior", "bar_state": "completed"}
+    ))["timeframe"] == "5s"
+    assert validate_feature_instance(FeatureInstance(
+        "regime_efficiency", {"timeframe": "5m", "context": "current", "bar_state": "completed"}
+    ))["context"] == "current"
+    assert generate_physical_alias(FeatureInstance(
+        "trend_normalized_est_delta_sum", {
+            "window": "5s", "update_every": "1s", "direction_reference": "prevailing_1m",
+        }
+    )) == "trend_normalized_est_delta_sum_5s"
+    assert generate_physical_alias(FeatureInstance(
+        "trend_normalized_est_delta_sum_ratio", {
+            "numerator_window": "60s", "denominator_window": "300s",
+            "update_every": "1s", "direction_reference": "prevailing_1m",
+        }
+    )) == "trend_normalized_est_delta_sum_ratio_60s_vs_300s"
 
 
 def test_pullback_max_depth_uses_completed_1s_wick_and_keeps_arm_atr_separate_from_candidate_atr():

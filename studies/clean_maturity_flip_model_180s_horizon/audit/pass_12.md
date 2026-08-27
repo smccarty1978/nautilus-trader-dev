@@ -1,0 +1,53 @@
+# Look-Ahead & Timestamp Audit — Pass 12
+
+**Date** 2026-08-27 · **Scope** NEW `implementation/final_train_freeze.py` and `tests/test_final_train_freeze.py` (full read, traced against `research_workflow/modeling.py::fit_models/freeze_train_artifacts` and `research_workflow/experiment.py::write_train_freeze/_load_study/load_authorization`) · **Scope hash (frozen execution composite)** `85efdcc4be7043072f8937e6eb112eee8ace6b7811b16b5493c73eb900c4e6ea` · **Lint** 0 critical / 0 warning (`audit/lint.json`, 102/102 files, 100% coverage) · **Verdict** `CLEAR`
+
+## Summary
+Critical: 0 · Warning: 0 · Note: 1
+
+## Prior findings adjudicated
+| # | Finding | Status | Evidence |
+|---|---|---|---|
+| 1 | pass 11 referrals (parent SPEC.md drift, `model_family_resolution` joblib claim, `model.params` random_state landmine, optional `pre_fit` gate adoption) | WITHDRAWN (not re-raised; untouched this pass) | unchanged |
+
+## (1) Composite freshness
+`85efdcc4be7043072f8937e6eb112eee8ace6b7811b16b5493c73eb900c4e6ea` matches exactly across `audit/frozen_execution_manifest.json`, `audit/preflight.json` (`status: CLEAR`), and `audit/readiness.json` (`prepared_execution_identity`, `overall_status: PASS`). `audit/lint.json` moved 100→102 files — grepped the manifest directly and confirmed both `study:implementation/final_train_freeze.py` and `study:tests/test_final_train_freeze.py` are present with hashes in both `resolved_execution_file_list` and `file_sha256_map` — the pass-08 fix (adding the `implementation/*.py` glob to the shared resolver) is correctly picking up new study-local implementation files without any repeat of the pass-07 gap.
+
+## (2) Rename-after-write traced for BOTH governed calls — no LONG/SHORT collision possible
+- **`fit_models`** (`research_workflow/modeling.py:34-70`) always writes to the hardcoded `out = Path(study_path).resolve() / "artifacts" / "experiment_models.json"` (line 68). `final_train_freeze.py`'s `_rename_off_default(study_path, "artifacts/experiment_models.json", f"artifacts/experiment_models_{direction.lower()}.json")` (line 109-112) is called **immediately** after `fit_models` returns, moving that exact path to a direction-specific name before any second call in the same process could reach it.
+- **`freeze_train_artifacts` → `write_train_freeze`** (`modeling.py:73-187`, `research_workflow/experiment.py:183-203`): `write_train_freeze` always writes to the hardcoded `out = path / "artifacts" / "train_experiment_freeze.json"` (`experiment.py:201`) and returns that `Path`; `freeze_train_artifacts` returns it unchanged. `final_train_freeze.py` line 136-139 renames it to `artifacts/train_experiment_freeze_{direction.lower()}.json` immediately after the call returns — the same verified pattern as `fit_models`, and the same pattern already proven correct for `two_phase_selection.py`'s Phase 1/2/3 manifests in passes 07/08/11.
+- **`_rename_off_default`** (lines 38-46) is slightly stricter than the `two_phase_selection.py` helper it mirrors: it raises `FinalFreezeError` if the expected default-path file is missing rather than silently no-op'ing, which is the correct behavior here (a missing `experiment_models.json`/`train_experiment_freeze.json` after a governed call returned successfully would itself be a symptom of something wrong).
+- **No collision path exists**: within one call to `run_final_train_fit_and_freeze`, the `fit_models` rename happens (line 109-112) strictly before `freeze_train_artifacts` is even invoked (line 125) — they target different filenames anyway (`experiment_models_*` vs `train_experiment_freeze_*`), so they can't collide with each other. Across two calls (LONG then SHORT, as the coordinator's own test drives — see below), each call's own rename completes before the next call's `fit_models`/`freeze_train_artifacts` can write to the shared default paths again, because Python executes the caller's two `run_final_train_fit_and_freeze(...)` invocations sequentially, not concurrently (same ordering argument verified for Phase 1's four calls in pass 11).
+- **The new test proves it against real execution, into a shared temp directory** (`tests/test_final_train_freeze.py:123-142`, `test_final_freeze_no_clobber_across_directions`): runs `run_final_train_fit_and_freeze` for LONG then SHORT into the **same** `tmp`, then asserts all four direction-specific files exist **and** that neither shared default path (`experiment_models.json`, `train_experiment_freeze.json`) is left behind — proving every rename fired, not merely that four names happen to exist.
+
+## (3) No custom fitting/threshold logic — traced what actually happens locally vs. inside the governed functions
+- **Fitting**: `fit_models(..., estimator="lightgbm", hyperparameters=dict(tuned_hyperparameters))` (line 105-108) — the only fitting call; `tuned_hyperparameters` is the caller-supplied Phase-2/3 winner, never re-derived here.
+- **Thresholds (P90/P95/P97.5)**: confirmed these are computed **inside** `freeze_train_artifacts` (`modeling.py:159-172`), not in `final_train_freeze.py` — `threshold_payload` is built only `if not threshold_payload` (i.e., only when the caller supplies none, which `final_train_freeze.py` does — it never passes a `thresholds=` argument), from `score_arrays` via `pd.Series(values).quantile(...)`. `final_train_freeze.py` reads the result back out of the written freeze file (`frozen_payload.get("thresholds", {})`, line 141-147) rather than computing them itself.
+- **Deciles**: computed locally at lines 118-123 via `score_series.quantile(q)` for a fixed, predeclared `DECILE_QUANTILES` tuple — this is the one piece of arithmetic that lives in the study-local file rather than the governed function. It is the same generic `pandas.Series.quantile` operation `freeze_train_artifacts` itself uses for thresholds one function away, applied to the same already-fitted model's own score distribution, then handed to `freeze_train_artifacts` as data (`deciles=deciles`) for it to record — not a policy decision, a search, or a threshold *selection* (no comparison, no picking-the-best-of-anything). This matches the "no custom threshold-*selection*" claim: nothing here chooses among candidate thresholds or influences which arm/hyperparameters were already fixed by Phase 2/3.
+- **Binding / freeze-refusal logic** (`ModelSelectionBindingMismatch`, `ModelSelectionFinalValidationFailed`) lives entirely inside `freeze_train_artifacts` (`modeling.py:114-148`) — `final_train_freeze.py` only supplies `model_selection_manifest_path` and lets the governed function enforce the match/gate itself; it adds no parallel or duplicate check of its own.
+- Confirmed via the new test suite that the binding check is real, not decorative: `test_final_freeze_binds_to_selection_manifest_and_rejects_mismatch` fits once with hyperparameters matching the declared winner (succeeds) and once with a deliberately mismatched `n_estimators` against the *same* declared winner (raises `ModelSelectionBindingMismatch`) — exercising the actual governed code path, not a mock.
+
+## (4) No new 2024/2025/2026 touchpoint
+`run_final_train_fit_and_freeze` never references `_year`, `chronology.dev`, or `chronology.prohibited`, and never calls `assert_oos_open` (a separate, later-stage function this module does not import). It operates exclusively on caller-supplied `X_train_full`/`y_train_full`/`meta_train_full`, gated by a single check — `meta_train_full["_partition"].nunique() != 1 or meta_train_full["_partition"].iloc[0] != "train"` (line 91) — which is **independently re-checked inside both governed functions it calls** (`fit_models` line 47-48, `freeze_train_artifacts` line 104-105: `set(meta["_partition"].dropna()) != {"train"}`), so a non-TRAIN row rejects at three layers, not one. `test_final_freeze_rejects_non_train_partition` exercises this against a real `"dev"`-tagged row and confirms the raise. This module cannot reach 2024+ data on its own; the only way it could see such data is if the caller (research-executor, assembling frames from the already-collected 2021-2023 merged TRAIN dataset) mislabeled a non-2021-2023 row's `_partition` as `"train"` — a data-assembly-layer trust boundary, not a gap this module introduces (see Note).
+
+**Positive finding, not merely absence of a problem**: `freeze_train_artifacts` → `write_train_freeze` → `load_authorization` → `_load_study` (`research_workflow/experiment.py:60-66, 183-186`) re-reads `study_path / "study.yaml"` **from disk** to compute `authorization_sha256`, rather than trusting the in-memory `study_spec` object `final_train_freeze.py` passes in — confirmed by reading the actual call chain, not taking the coordinator's description at face value. This is a real defense: a caller cannot spoof TRAIN/OOS authorization by constructing a StudySpec object with different chronology than what's actually sealed on disk.
+
+## Critical findings
+None.
+
+## Warnings
+None.
+
+## Notes
+### [NOTE] `_partition` is the sole boundary check at this stage; no redundant `_year` cross-check — consistent with, not a deviation from, existing convention
+Unlike `two_phase_selection.py`'s Phase 1/2/3 (which needed row-level `_year` checks because a single call's frame legitimately mixes `tuning` (2021/2022) and `final_validation` (2023) roles within one TRAIN partition), this stage fits on the **whole** TRAIN partition at once — there is no finer split to enforce here, so the relevant boundary is simply TRAIN vs. not-TRAIN, and `_partition` is the same designated ground-truth column `run_model_selection`'s own `_assert_partition_and_years` checks first before doing its finer year-level work. I confirmed this is checked three times independently (`final_train_freeze.py`, `fit_models`, `freeze_train_artifacts`) at this stage, which is proportionate. Residual dependency: correctness still assumes upstream partition-labeling is accurate — the same trust boundary this whole codebase already relies on elsewhere, not a new one.
+
+## Referred to contract-checker
+- (carried forward, unresolved) `discovered_parent_spec_md_drift`, `model_family_resolution` joblib-claim verification, `model.params` dormant `random_state` landmine, optional `pre_fit` gate adoption.
+
+## Clean checks
+A1–A5, B1–B7/B9/B10, C1–C3 (TRAIN/OOS boundary re-verified at this new stage), F1–F4, G1–G4, H1–H4 clean.
+
+<!-- AUDIT_SUMMARY_V2_START -->
+{"audit_type": "causal", "auditor": "lookahead-auditor", "study": "clean_maturity_flip_model_180s_horizon", "verdict": "CLEAR", "critical": 0, "warning": 0, "note": 1, "audited_execution_composite_sha256": "85efdcc4be7043072f8937e6eb112eee8ace6b7811b16b5493c73eb900c4e6ea"}
+<!-- AUDIT_SUMMARY_V2_END -->

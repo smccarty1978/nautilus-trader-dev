@@ -1,0 +1,72 @@
+{
+  "LONG": {
+    "models_manifest_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\experiment_models_long.json",
+    "train_freeze_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\train_experiment_freeze_long.json",
+    "thresholds": {
+      "C": {
+        "p90": {
+          "method": "quantile",
+          "parameter": 0.9,
+          "threshold": 0.28485631865861344,
+          "derivation_population": "train"
+        },
+        "p95": {
+          "method": "quantile",
+          "parameter": 0.95,
+          "threshold": 0.33222113070660036,
+          "derivation_population": "train"
+        },
+        "p97_5": {
+          "method": "quantile",
+          "parameter": 0.975,
+          "threshold": 0.37673375655439945,
+          "derivation_population": "train"
+        }
+      }
+    },
+    "n_rows": 737005,
+    "tuned_hyperparameters": {
+      "learning_rate": 0.028861842631876633,
+      "max_depth": 5,
+      "n_estimators": 200,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "random_seed": 42
+  },
+  "SHORT": {
+    "models_manifest_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\experiment_models_short.json",
+    "train_freeze_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\train_experiment_freeze_short.json",
+    "thresholds": {
+      "C": {
+        "p90": {
+          "method": "quantile",
+          "parameter": 0.9,
+          "threshold": 0.2852887899663343,
+          "derivation_population": "train"
+        },
+        "p95": {
+          "method": "quantile",
+          "parameter": 0.95,
+          "threshold": 0.32770330252959395,
+          "derivation_population": "train"
+        },
+        "p97_5": {
+          "method": "quantile",
+          "parameter": 0.975,
+          "threshold": 0.3639796684339806,
+          "derivation_population": "train"
+        }
+      }
+    },
+    "n_rows": 642087,
+    "tuned_hyperparameters": {
+      "learning_rate": 0.039440343780424526,
+      "max_depth": 5,
+      "n_estimators": 100,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "random_seed": 42
+  }
+}

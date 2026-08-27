@@ -257,6 +257,19 @@ Both audit gates obey this. It is stated **here only**; the agent cards do not r
   `WITHDRAWN`, one line of evidence) *before* raising anything new, then at most **3 new
   blocking findings per pass**. Never re-raise an addressed finding under new framing — mark
   the original `NOT FIXED`.
+- **Same-category findings, one pass.** When a finding is one instance of a class (a stale
+  pin, a stale generated mirror, an undisclosed fact), check the rest of that artifact family
+  before filing — a stale `baseline.manifest_sha256`, a stale `config/baseline.json` mirror of
+  it, and a missing lineage disclosure of the same fact were once raised as three separate
+  findings across three separate re-freeze cycles on the same study, when one sweep of the
+  category would have caught all three.
+- **Verify a declared chronological protocol by tracing calls, not prose.** When a study
+  composes several governed calls across a year split (TRAIN-internal tuning vs. a
+  reject-only final-validation year, etc.), trace call-by-call which years each invocation
+  actually touches before accepting the description as correct. A protocol description can
+  double-use a year (e.g., the same year serving as both an architecture-selection evaluation
+  year and the declared reject-only gate) while reading as correct prose — only a call-by-call
+  trace catches it.
 - **Every report carries exactly one machine-parsed summary block**, which is what
   `run_preexec_audits.py` reads to issue the official status:
 
@@ -292,6 +305,14 @@ Every subagent inherits these:
 8. **No silent dataset substitution.**
 9. **No unsafe recursive cleanup.**
 10. **Exact artifact and provenance reporting.**
+11. **Prove a multi-call protocol before it's authoritative.** If a task composes existing
+    governed APIs across a declared split (a chronological role, a single-arm restriction, a
+    gate that must not re-enter selection), write and run a bounded synthetic-fixture test
+    against the composition *before* it is written into `research_decision.yaml`/`study.yaml`
+    or run against real data. A `random_state` duplicate-kwarg crash and a silent
+    hyperparameter-default fallback both sat in an already-sealed contract because the
+    protocol was described and frozen before any code exercised it; both were only caught
+    once a test was finally written, one freeze cycle later than necessary.
 
 ### Coordination rules
 
