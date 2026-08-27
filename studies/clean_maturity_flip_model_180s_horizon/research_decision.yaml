@@ -1,0 +1,272 @@
+research_question: "Does shortening the Stage-1 imminent-flip prediction horizon from 300s to 180s improve flip prediction precision/discrimination and the economic quality of high-confidence predictions, while preserving a significant amount of favorable excursion opportunity?"
+
+parent_dependency:
+  parent_study: clean_maturity_flip_model_rolling_productivity
+  frozen: true
+  retrain_prohibited_on_parent: true
+  frozen_execution_composite_sha256: "7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8"
+  train_experiment_freeze_artifact: "artifacts/train_experiment_freeze_repaired.json"
+  authoritative_over: "train_experiment_freeze.json (superseded per repair convention)"
+  model_artifact: "artifacts/train_fitted_models.joblib"
+  model_artifact_sha256: "03f602c5b38915c2a80ef474aba0ca95c6d3fbcb634243c24b8fa0a63a1aaa89"
+  discovered_parent_spec_md_drift:
+    finding: >
+      The parent's own sealed artifacts/frozen_execution_manifest.json (composite
+      7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8, matching its
+      audit/status.json audited_execution_composite_sha256) records SPEC.md sha256 =
+      734ac3300291c48483f854a35d4355408b1aa9ea316be55bba7b16e2b4bfd0d1. The parent's CURRENT
+      on-disk SPEC.md instead hashes to c150bee7109a526324b8240bb580139a70a5502dabdcbb40aeca4
+      b6f6a41843c. These differ, meaning the parent's SPEC.md changed after the parent's own
+      seal was issued, without an accompanying re-seal. This is a pre-existing anomaly in the
+      PARENT study's history, discovered during this study's independent contract review
+      (pass 01) -- not something this child study caused, and not something this child study
+      is authorized to fix (would require modifying an already-sealed study).
+    resolution_for_this_study: >
+      study.yaml's baseline.manifest_sha256 pin was dropped rather than pinned to either
+      inconsistent value (see study.yaml:baseline comment). This study's lineage binding to
+      the parent relies solely on the parent's execution composite hash
+      (lineage.parent_manifest_sha256, frozen_execution_composite_sha256 above), which is
+      verified consistent across compiled_study.json, this document, and the parent's own
+      sealed audit trail.
+    flagged_to_researcher: true
+  note: >
+    This is a comparison/lineage dependency (baseline binding), not a derived_causal_input:
+    this study retrains fresh models on a new target, it does not consume the parent's score
+    as a feature.
+
+model_family_resolution:
+  question: "Was the parent's frozen Stage-1 model LightGBM or HistGradientBoostingClassifier?"
+  finding: >
+    compiled_study.json / study.yaml declare model.family="HistGradientBoostingClassifier"
+    with sklearn-style params (max_iter, random_state) -- but this is stale relative to what
+    was actually fit. Deserializing artifacts/train_fitted_models.joblib directly shows every
+    one of the six persisted estimators (LONG_A/B/C, SHORT_A/B/C) is a
+    lightgbm.sklearn.LGBMClassifier (lightgbm==4.6.0), get_params() = {n_estimators: 200,
+    learning_rate: 0.05, max_depth: 3, num_leaves: 8, random_state: 42, verbosity: -1},
+    matching models_long.json/models_short.json's "estimator": "lightgbm" declaration exactly.
+    compiled_study.json is not part of the frozen execution closure (regenerates on recompile)
+    and reflects a pre-repair compiled intent that was superseded.
+  resolution: "LightGBM preserved as this study's model family, per direct artifact inspection."
+
+baseline:
+  short: "parent's exact canonical feature instances (A/B/C), target horizon shortened only"
+  long: "parent's exact canonical feature instances (A/B/C), target horizon shortened only"
+baseline_feature_selection:
+  mode: "none"
+
+model_arms:
+  A: "explicit canonical baseline (arrival_velocity, arrival_acceleration, ema_slope) -- identical to parent"
+  B: "A plus completed-bar prior 1m/5m structural regime geometry -- identical to parent"
+  C: "B plus completed-1s rolling 300s productivity -- identical to parent"
+
+variable_being_tested:
+  - flip_target_horizon_seconds  # 300 -> 180, the ONLY intended semantic change
+prohibited_changes:
+  - change_feature_surface_after_seeing_predictive_performance
+  - change_target_after_seeing_predictive_performance
+  - use_2024_to_change_model_design
+  - use_2024_2025_2026_for_target_selection
+  - use_2024_2025_2026_for_feature_selection
+  - use_2024_2025_2026_for_population_definition
+  - introduce_unconstrained_search
+  - unauthorized_feature_discovery
+  - expand_to_full_feature_registry
+  - expansion_beyond_authorized_dates
+additional_protocol_notes:
+  # These constrain the research protocol but have no dedicated token in the
+  # deterministic RESEARCH_DECISION_FIDELITY vocabulary (scripts/check_research_decision_fidelity.py);
+  # they are enforced procedurally (by the frozen study.yaml contract and by researcher
+  # instruction) rather than by that specific gate.
+  - "population/session/confirmation semantics are structurally unchanged from the parent
+     study.yaml -- not merely 'prohibited from changing', but literally identical fields."
+  - "2023 (final_train_validation_years) may NEVER be used to re-select a model that failed
+     the gate -- on gate failure, STOP and report; do not pick a different model using 2023."
+allowed_changes:
+  - evaluate_180s_flip_target_instead_of_300s
+  - evaluate_model_arms_a_b_c_untuned_at_parent_hyperparameters
+  - bounded_hyperparameter_search_on_the_untuned_winner_only
+  - stratify_by_maturity_buckets_and_direction
+  - compute_descriptive_multi_horizon_forward_outcomes_180s_and_300s_post_hoc
+
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]              # protected OOS, opened only after explicit authorization post-freeze
+  prohibited: [2025, 2026]
+
+inner_train_selection_protocol:
+  approved_by: "researcher, 2026-08-26; corrected 2026-08-26 to remove a chronology
+                contradiction (2023 was previously double-used: as the architecture-
+                comparison evaluation year AND as the reject-only final gate). Corrected
+                version below makes 2023 genuinely single-use."
+  development_selection_years: [2021, 2022]   # ALL adaptive selection (architecture AND
+                                                # hyperparameters) happens strictly inside
+                                                # this window. 2023 never participates in
+                                                # any selection decision.
+  internal_walk_forward_mechanism: >
+    research_workflow/model_selection.py::_walk_forward_folds(tuning_years=[2021,2022])
+    deterministically produces exactly one causal chronological fold: fit_years=[2021],
+    val_year=2022. This is the SAME mechanism ModelSpec.selection already declares in
+    study.yaml (tuning_years=[2021,2022]) -- no study.yaml/model.selection schema change
+    is required to fix the earlier contradiction; only the EXECUTION PROTOCOL below
+    (which invocation touches which years, in what order) needed correcting.
+  final_train_validation_years: [2023]        # reject-only gate, touched exactly once,
+                                                # after architecture AND hyperparameters
+                                                # are both already frozen.
+  final_train_validation_rules:
+    - "2023 may ACCEPT or REJECT the already-selected, already-tuned model. Nothing else."
+    - "2023 may NEVER be used to choose among A/B/C."
+    - "2023 may NEVER be used to choose hyperparameters."
+    - "2023 may NEVER be used to choose thresholds after seeing 2023 performance."
+    - "2023 may NEVER be used to re-select a model that failed the gate."
+    - "2023 may NEVER be used to modify the feature surface."
+    - "On gate failure: STOP and report the failure for that direction (LONG/SHORT
+       independently). Do not switch arm, do not pick another hyperparameter trial, do
+       not alter features, do not alter thresholds, do not relax the gate bounds. This
+       branch of the study terminates at D (no robust improvement) for that direction
+       unless the researcher explicitly authorizes a new, separately-frozen attempt."
+
+architecture_selection_protocol:
+  stage: "PHASE 1 of 2. Untuned A/B/C comparison, LONG and SHORT separately, at parent's
+          exact frozen hyperparameters (n_estimators=200, learning_rate=0.05, max_depth=3,
+          num_leaves=8, verbosity=-1, seed=42). 2023 is NOT loaded/scored/referenced
+          anywhere in this phase."
+  implementation: "studies/clean_maturity_flip_model_180s_horizon/implementation/
+                    two_phase_selection.py, proven against synthetic fixtures in
+                    tests/test_two_phase_selection.py (9 tests, all passing) -- this is no
+                    longer merely a documented protocol commitment; both auditors' pass-05/
+                    pass-06/pass-07 referral (write and verify the orchestration code once
+                    it exists) is satisfied by this module."
+  mechanism: "research_workflow.model_selection.run_model_selection invoked with
+              X_by_arm={'A': X_A, 'B': X_B, 'C': X_C}, search_method='none', tuning_years=
+              [2021,2022], and final_train_validation_years=None on THIS call (a spec copy,
+              NOT the full study.yaml model.selection object, which declares [2023] and a
+              bounded tunable search for phase 2 below). This guarantees 2023 cannot be
+              touched even incidentally by this invocation.
+              HYPERPARAMETER FIDELITY (corrected -- caught by independent causal review
+              pass 05): this Phase-1 spec copy's allowed_families entry is NOT study.yaml's
+              declared ModelFamilySpec (whose fixed_hyperparameters only pins verbosity,
+              leaving num_leaves/max_depth/learning_rate/n_estimators as *tunable* domains
+              for phase 2). Reusing that object with search_method='none' would silently
+              fall back to LightGBM library defaults for those four parameters via
+              _enumerate_candidates's 'none' branch, which reads only
+              fixed_hyperparameters -- violating the requirement that the untuned
+              comparison isolate the target-horizon change as the sole experimental
+              variable. Phase 1 therefore constructs its OWN ModelFamilySpec
+              (two_phase_selection.phase1_family_spec()) with all five NON-SEED parent
+              hyperparameters as fixed_hyperparameters (n_estimators: 200,
+              learning_rate: 0.05, max_depth: 3, num_leaves: 8, verbosity: -1) and
+              tunable_hyperparameters=None -- distinct from, and never substituted for,
+              the bounded-search ModelFamilySpec study.yaml declares for phase 2.
+              SEED FIDELITY (a second real bug, caught by this module's own bounded-fixture
+              test suite before any real data was involved): `random_state` must NEVER
+              appear inside a hyperparameters dict passed to the fitting layer --
+              research.analysis.modeling._build_estimator always constructs
+              `LGBMClassifier(random_state=seed, **hyperparameters)`, so a hyperparameters
+              dict that also carries `random_state` raises `TypeError: got multiple values
+              for keyword argument 'random_state'`. This affected BOTH the Phase-1 spec
+              construction AND study.yaml's own model.selection.allowed_families[0]
+              .fixed_hyperparameters (which originally, incorrectly, declared
+              random_state: 42 alongside verbosity: -1) -- study.yaml has been corrected to
+              drop it; the seed is supplied exclusively via ModelSelectionSpec.random_seed
+              (42, already declared, unchanged) for both phases."
+  fit_year: 2021
+  evaluation_year: 2022
+  per_arm_score: "inner_validation_score = pr_auc on the fit=2021/val=2022 fold, one value
+                  per arm (A, B, C), per direction (LONG, SHORT)"
+  architecture_winner_selection: "downstream comparison (this study's own code, not
+                                   run_model_selection itself, which scores arms
+                                   independently and does not cross-compare them) of the
+                                   three per-arm inner_validation_score values"
+  primary_selection_metric: "pr_auc, maximize"
+  deterministic_tie_break_order:
+    1: "pr_auc (higher wins)"
+    2: "brier_score (lower wins)"
+    3: "fewer features (n_features, lower wins)"
+    4: "lexical arm name (A < B < C)"
+  tie_tolerance_pr_auc: 0.005   # |delta PR-AUC| below this counts as a tie; predeclared, not
+                                 # chosen after seeing results
+  required_diagnostics_not_selection_criteria:
+    - precision_and_flip_rate_at_train_frozen_p90_p95_p97_5
+    - calibration_curve_and_brier_score
+    - resolved_candidate_count_and_retention
+    - mfe_mae_at_180s_and_300s_in_atr
+    - maturity_slice_breakdown_300_600_600_900_900_1800_plus_unsliced
+
+bounded_tuning_protocol:
+  stage: "PHASE 2 of 2. Runs ONLY after Phase 1's architecture winner is fixed. Applies to
+          the winning architecture only (both LONG and SHORT arms of that architecture --
+          the winning arm may differ by direction, per Phase 1's independent per-direction
+          comparison)."
+  mechanism: "research_workflow.model_selection.run_model_selection invoked with
+              X_by_arm={<winning_arm>: X_winner} ONLY -- a single arm, never the other two
+              -- using the FULL study.yaml model.selection object, including
+              final_train_validation_years=[2023] this time. Because only one arm/candidate
+              set is passed in, _evaluate_final_validation (which 'takes the already-
+              selected winner as its only input and has no code path back into the
+              candidate loop') can only ever score the one architecture+hyperparameter
+              combination Phase 1 already fixed -- 2023 is structurally incapable of
+              influencing which architecture or which trial was chosen."
+  search_method: random
+  max_trials: 24
+  random_seed: 42
+  tuning_years: [2021, 2022]              # same walk-forward fold as Phase 1: fit=2021,
+                                            # val=2022, now scoring each hyperparameter
+                                            # trial instead of each arm
+  final_train_validation_years: [2023]    # touched exactly once, on the already-selected
+                                            # winning trial only
+  search_space:
+    num_leaves: {kind: choice, values: [4, 8, 16, 31]}
+    max_depth: {kind: choice, values: [3, 4, 5]}
+    learning_rate: {kind: float_range, low: 0.02, high: 0.10, log_scale: true}
+    n_estimators: {kind: choice, values: [100, 200, 300]}
+  fixed_hyperparameters:
+    verbosity: -1
+    random_state: 42
+  hyperparameter_winner_selection: "best average walk-forward pr_auc across the declared
+                                     random-search trials (max_trials=24, seed=42),
+                                     identical tie-break order to Phase 1"
+  final_validation_policy: gated
+  final_validation_requirements:
+    max_degradation_vs_inner_validation: 0.15   # Phase-2 winner's fold-1 (2021->2022)
+                                                  # pr_auc may not degrade more than 15%
+                                                  # relative when scored on 2023
+    calibration_max_brier: 0.30
+
+train_only_threshold_derivation:
+  rule: >
+    P90/P95/P97.5 score thresholds intended for eventual 2024 OOS use are computed AFTER
+    the winning, tuned model has already passed the 2023 reject-only gate, from that one
+    fixed model's own score distribution over the FULL TRAIN partition (2021-2023) --
+    identical convention to the parent study's train_experiment_freeze_repaired.json
+    (derivation: "TRAIN_ONLY"). This is a descriptive readout of one already-frozen model,
+    not a choice among candidate thresholds, and 2023's presence in that distribution is
+    not a preference signal -- no alternative threshold definition is ever compared against
+    2023 performance.
+
+target_change:
+  from: "flip_within_300s (parent, unchanged elsewhere)"
+  to: "flip_within_180s (this study)"
+  mechanism: "TargetSpec.horizon_seconds: 300 -> 180, scalar parameter variation (BLUEPRINT
+              Section 7.F Level 1). event/direction/confirmation/decision_reference/population/
+              session/maturity-slice semantics unchanged."
+
+forward_outcomes_post_hoc:
+  role: "descriptive/analysis only, computed at frozen first-crossing populations
+        (TRAIN-derived P90/P95/P97.5), never a model feature"
+  horizons_seconds: [180, 300]
+  metrics: [mfe_atr, mae_atr, return_atr, flip_within_180s, flip_within_300s,
+            confirmation_rate, seconds_to_flip, seconds_to_confirmation,
+            p_mfe_ge_1_atr, p_mfe_ge_2_atr, p_mfe_ge_3_atr]
+
+agreement_diagnostic:
+  role: "descriptive only -- never optimizes a combined trading rule on 2024"
+  compares: "300s-high/180s-high vs 300s-high/180s-low vs 300s-low/180s-high vs 300s-low/180s-low"
+  thresholds: "each model's own TRAIN-frozen P90/P95/P97.5 (never a shared numeric cutoff)"
+
+terminal_decision_classes: [A, B, C, D, MIXED]
+primary_comparison: >
+  Frozen 300s Model C (parent baseline) vs. frozen untuned 180s architecture winner vs. frozen
+  tuned 180s winner, on 2024 OOS, opened only after explicit post-freeze authorization.
+terminal_question: >
+  Does tightening the flip-prediction horizon to 180s remove bad predictions faster than it
+  removes valuable reversal opportunity?

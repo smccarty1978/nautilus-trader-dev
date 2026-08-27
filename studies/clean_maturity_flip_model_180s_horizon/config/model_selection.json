@@ -1,0 +1,86 @@
+{
+  "allowed_families": [
+    {
+      "family": "lightgbm",
+      "fixed_hyperparameters": {
+        "verbosity": -1,
+        "random_state": 42
+      },
+      "tunable_hyperparameters": [
+        {
+          "name": "num_leaves",
+          "kind": "choice",
+          "values": [
+            4,
+            8,
+            16,
+            31
+          ],
+          "low": null,
+          "high": null,
+          "log_scale": false
+        },
+        {
+          "name": "max_depth",
+          "kind": "choice",
+          "values": [
+            3,
+            4,
+            5
+          ],
+          "low": null,
+          "high": null,
+          "log_scale": false
+        },
+        {
+          "name": "learning_rate",
+          "kind": "float_range",
+          "values": null,
+          "low": 0.02,
+          "high": 0.1,
+          "log_scale": true
+        },
+        {
+          "name": "n_estimators",
+          "kind": "choice",
+          "values": [
+            100,
+            200,
+            300
+          ],
+          "low": null,
+          "high": null,
+          "log_scale": false
+        }
+      ]
+    }
+  ],
+  "search_method": "random",
+  "max_trials": 24,
+  "random_seed": 42,
+  "tuning_years": [
+    2021,
+    2022
+  ],
+  "final_train_validation_years": [
+    2023
+  ],
+  "primary_selection_metric": "pr_auc",
+  "primary_selection_metric_direction": "maximize",
+  "secondary_metrics": [
+    "brier_score",
+    "precision_at_p90",
+    "precision_at_p95",
+    "precision_at_p97_5",
+    "resolved_count"
+  ],
+  "calibration_required": true,
+  "simpler_model_tie_preference": true,
+  "final_validation_policy": "gated",
+  "final_validation_requirements": {
+    "primary_metric_bound": null,
+    "max_degradation_vs_inner_validation": 0.15,
+    "calibration_max_brier": 0.3,
+    "secondary_metric_bounds": null
+  }
+}

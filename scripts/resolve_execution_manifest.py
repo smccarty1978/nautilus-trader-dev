@@ -522,6 +522,17 @@ def resolve_study_files(study_dir: Path, repo_root: Optional[Path] = None) -> Di
             rel = tf.relative_to(study_dir).as_posix()
             files[f"study:{rel}"] = tf.resolve()
 
+    # Include any study-local implementation files. Without this, a study's own
+    # orchestration/glue code (e.g. a bounded model-selection wrapper composing
+    # existing governed APIs) sits entirely outside the frozen composite: it could be
+    # edited after seal with no staleness detection at all, defeating the point of
+    # freezing a study that relies on such code to enforce a declared invariant.
+    implementation_dir = study_dir / "implementation"
+    if implementation_dir.exists():
+        for pf in sorted(implementation_dir.glob("*.py")):
+            rel = pf.relative_to(study_dir).as_posix()
+            files[f"study:{rel}"] = pf.resolve()
+
     return files
 
 

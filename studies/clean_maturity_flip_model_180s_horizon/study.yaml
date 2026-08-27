@@ -1,0 +1,244 @@
+study:
+  id: clean_maturity_flip_model_180s_horizon
+  type: flip_prediction
+  risk_tier: 2
+  description: 180-second flip-target comparison against the frozen 300s Stage-1 parent
+    (clean_maturity_flip_model_rolling_productivity), same population and A/B/C feature
+    architectures, target horizon shortened only.
+operation:
+  kind: train_evaluate
+  target_metric: pr_auc
+instrument:
+  symbol: NQ
+  venue: XCME
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+  qualification:
+    age_gate_seconds: 120
+    running_mfe_atr_gte: 1.0
+    new_progress_windows_gte: 2
+    retained_mfe_ratio_gte: 0.5
+    cadence_seconds: 5
+    established: true
+target:
+  type: flip
+  event: prevailing_1m_regime_transition
+  direction: both
+  horizon_seconds: 180
+  confirmation:
+    mode: completed_1m_bar
+    confirmation_bars: 1
+  decision_reference: decision_ts
+features:
+  source: canonical_verified_definition_universe
+  selection:
+    mode: none
+    source: canonical_verified_definition_universe
+    feature_count: 13
+    direction_specific: false
+    ranking_method: frozen_train_only_temporal_rank
+  instances:
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: rolling_retention_ratio
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_current_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_max_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_giveback_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: arrival_velocity
+    parameters:
+      input_timeframe: 1s
+      lookback: 20
+      bar_state: completed
+  - feature: arrival_acceleration
+    parameters:
+      input_timeframe: 1s
+      short_lookback: 20
+      bar_state: completed
+  - feature: ema_slope
+    parameters:
+      ema_role: short
+      lookback: 20
+  timing_contract: verified
+  metadata_columns:
+  - observation_ts
+  - regime_start_ns
+  - checkpoint_index
+  - regime_age_seconds
+  - running_mfe_atr
+  - new_progress_windows
+  - retained_mfe_ratio
+model:
+  mode: training
+  family: lightgbm
+  arms:
+  - BASELINE
+  - BASELINE_PLUS_STRUCTURAL
+  - BASELINE_PLUS_STRUCTURAL_PLUS_ROLLING_5M
+  params:
+    n_estimators: 200
+    learning_rate: 0.05
+    max_depth: 3
+    num_leaves: 8
+    verbosity: -1
+    random_state: 42
+  selection:
+    allowed_families:
+    - family: lightgbm
+      # random_state is deliberately NOT declared here: research.analysis.modeling
+      # ._build_estimator always constructs the estimator as
+      # LGBMClassifier(random_state=seed, **hyperparameters) -- a hyperparameters dict
+      # that also carries random_state raises "got multiple values for keyword
+      # argument 'random_state'" (caught by this study's own bounded-fixture test
+      # suite, implementation/two_phase_selection.py, before this was ever run
+      # against real data). The seed (42) is supplied below via
+      # model.selection.random_seed, which run_model_selection passes through as the
+      # fitting layer's `seed=` argument.
+      fixed_hyperparameters:
+        verbosity: -1
+      tunable_hyperparameters:
+      - name: num_leaves
+        kind: choice
+        values:
+        - 4
+        - 8
+        - 16
+        - 31
+        log_scale: false
+      - name: max_depth
+        kind: choice
+        values:
+        - 3
+        - 4
+        - 5
+        log_scale: false
+      - name: learning_rate
+        kind: float_range
+        low: 0.02
+        high: 0.1
+        log_scale: true
+      - name: n_estimators
+        kind: choice
+        values:
+        - 100
+        - 200
+        - 300
+        log_scale: false
+    search_method: random
+    max_trials: 24
+    random_seed: 42
+    tuning_years:
+    - 2021
+    - 2022
+    final_train_validation_years:
+    - 2023
+    primary_selection_metric: pr_auc
+    primary_selection_metric_direction: maximize
+    secondary_metrics:
+    - brier_score
+    - precision_at_p90
+    - precision_at_p95
+    - precision_at_p97_5
+    - resolved_count
+    calibration_required: true
+    simpler_model_tie_preference: true
+    final_validation_policy: gated
+    final_validation_requirements:
+      max_degradation_vs_inner_validation: 0.15
+      calibration_max_brier: 0.3
+chronology:
+  train:
+  - 2021
+  - 2022
+  - 2023
+  dev:
+  - 2024
+  prohibited:
+  - 2025
+  - 2026
+stratification: {}
+baseline:
+  study: clean_maturity_flip_model_rolling_productivity
+  # No manifest_sha256 pin: the parent's own sealed frozen_execution_manifest.json records
+  # SPEC.md sha256=734ac3300291c48483f854a35d4355408b1aa9ea316be55bba7b16e2b4bfd0d1, but the
+  # parent's CURRENT on-disk SPEC.md hashes to c150bee7109a526324b8240bb580139a70a5502dabdcbb
+  # 40aeca4b6f6a41843c -- the parent's SPEC.md drifted after its own seal, for reasons outside
+  # this study's control (discovered by independent contract review, pass 01). Pinning to
+  # either value would be misleading: the sealed value no longer matches disk, and the disk
+  # value doesn't match what was actually audited. The authoritative, internally-consistent
+  # lineage binding is lineage.parent_manifest_sha256 (the execution composite) below, which
+  # is verified consistent across compiled_study.json, research_decision.yaml, and the
+  # parent's own sealed audit trail.
+lineage:
+  parent_study: clean_maturity_flip_model_rolling_productivity
+  parent_manifest_sha256: 7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8
+  intended_changes:
+  - "model.family declared as lightgbm here. The parent's own study.yaml/compiled_study.json
+     declare model.family=HistGradientBoostingClassifier with sklearn-style params, but that
+     declaration is stale relative to what the parent actually fit: deserializing the parent's
+     artifacts/train_fitted_models.joblib directly shows all six persisted estimators are
+     lightgbm.sklearn.LGBMClassifier (matching models_long.json/models_short.json's
+     'estimator':'lightgbm' declaration and get_params()). This study's model.family=lightgbm
+     preserves the parent's ACTUAL frozen implementation, not its stale compiled declaration.
+     See research_decision.yaml:model_family_resolution for the full evidence trail."
+  - target.horizon_seconds (300 -> 180)
+  frozen:
+  - population
+  - features
+  - session
+  - confirmation
+  - chronology
+execution:
+  runtime: nautilustrader
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
+  data_requirements:
+    dataset_id: NQ_v0_2020_2026
+    authorized_dates:
+    - '2023-10-02'
+  progress_seconds: 60
+  bounded: true
+acceptance:
+  criteria:
+    minimum_structural_block_coverage: 0.9
+bespoke: {}
