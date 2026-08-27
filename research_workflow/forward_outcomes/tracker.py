@@ -31,6 +31,7 @@ from research_workflow.forward_outcomes.contracts import (
     Direction,
     ForwardOutcomeError,
     ForwardOutcomeSpec,
+    OrderedBarrierDisposition,
     OutcomeStatus,
     ProposedEntry,
     horizon_label,
@@ -55,6 +56,7 @@ class ForwardObservation:
         "post_mfe", "post_mae", "post_time_to_mfe_ns", "post_time_to_mae_ns",
         "_post_horizons", "_post_cursor", "_post_results", "post_bars_observed",
         "_level_fav_ts", "_level_adv_ts", "_level_ambiguous",
+        "_ordered_results",
         "close_deadline_ns", "closed", "resolved_at_ts", "final_status",
         "censor_reason", "session_truncated",
     )
@@ -109,6 +111,14 @@ class ForwardObservation:
         self._level_fav_ts: Dict[float, Optional[int]] = {l: None for l in spec.diagnostic_levels_atr}
         self._level_adv_ts: Dict[float, Optional[int]] = {l: None for l in spec.diagnostic_levels_atr}
         self._level_ambiguous: Dict[float, bool] = {l: False for l in spec.diagnostic_levels_atr}
+        self._ordered_results: Dict[str, Dict[str, Any]] = {
+            b.barrier_id: {
+                "spec": b, "disposition": None, "binary_label": None,
+                "favorable_ts": None, "adverse_ts": None, "resolved_at_ts": None,
+                "censor_reason": None,
+            }
+            for b in spec.ordered_barriers
+        }
 
         self.close_deadline_ns = entry.entry_ts + spec.max_tracking_ns
         self.closed = False
@@ -145,6 +155,7 @@ class ForwardObservation:
         # horizon is never shortened; the status records what was observable.
         self._emit_due_horizons(ts_close, inclusive=False)
         self._emit_due_post_horizons(ts_close, inclusive=False)
+        self._finalize_due_ordered(ts_close, inclusive=False)
 
         if self._includes(ts_open, ts_close):
             self._accumulate(ts_close, high, low, close)
@@ -152,6 +163,7 @@ class ForwardObservation:
         # A horizon landing exactly on this bar's close includes this bar.
         self._emit_due_horizons(ts_close, inclusive=True)
         self._emit_due_post_horizons(ts_close, inclusive=True)
+        self._finalize_due_ordered(ts_close, inclusive=True)
 
         if self.spec.confirmation is not None and self.confirmed is None:
             wait_deadline = self.entry.entry_ts + self.spec.confirmation.max_wait_seconds * NS
@@ -191,6 +203,7 @@ class ForwardObservation:
         self.bars_observed += 1
 
         self._update_levels(ts_close, favorable, adverse)
+        self._update_ordered_barriers(ts_close, favorable, adverse)
         if self.confirmation_ts is not None and ts_close > self.confirmation_ts:
             self._accumulate_post(ts_close, high, low)
 
@@ -230,6 +243,55 @@ class ForwardObservation:
                 self._level_fav_ts[level] = ts_close
             if hit_adv:
                 self._level_adv_ts[level] = ts_close
+
+    def _update_ordered_barriers(
+        self, ts_close: int, favorable: float, adverse: float
+    ) -> None:
+        if not self._ordered_results or self.atr is None:
+            return
+        for result in self._ordered_results.values():
+            if result["disposition"] is not None:
+                continue
+            barrier = result["spec"]
+            deadline = self.entry.entry_ts + barrier.horizon_seconds * NS
+            if ts_close > deadline:
+                continue
+            hit_favorable = favorable >= barrier.favorable_atr * self.atr
+            hit_adverse = adverse >= barrier.adverse_atr * self.atr
+            if not hit_favorable and not hit_adverse:
+                continue
+            if hit_favorable:
+                result["favorable_ts"] = ts_close
+            if hit_adverse:
+                result["adverse_ts"] = ts_close
+            if hit_favorable and hit_adverse:
+                result["disposition"] = OrderedBarrierDisposition.AMBIGUOUS_FIRST_TOUCH
+                result["binary_label"] = None
+            elif hit_favorable:
+                result["disposition"] = OrderedBarrierDisposition.SUCCESS
+                result["binary_label"] = 1
+            else:
+                result["disposition"] = OrderedBarrierDisposition.FAILURE
+                result["binary_label"] = 0
+            result["resolved_at_ts"] = ts_close
+
+    def _finalize_due_ordered(self, now_ts: int, *, inclusive: bool) -> None:
+        for result in self._ordered_results.values():
+            if result["disposition"] is not None:
+                continue
+            barrier = result["spec"]
+            deadline = self.entry.entry_ts + barrier.horizon_seconds * NS
+            due = deadline <= now_ts if inclusive else deadline < now_ts
+            if not due:
+                continue
+            if self._horizon_status(deadline) is OutcomeStatus.RESOLVED:
+                result["disposition"] = OrderedBarrierDisposition.TIMEOUT
+                result["binary_label"] = 0
+            else:
+                result["disposition"] = OrderedBarrierDisposition.CENSORED
+                result["binary_label"] = None
+                result["censor_reason"] = self._horizon_status(deadline).value
+            result["resolved_at_ts"] = deadline
 
     # -- horizons ---------------------------------------------------------------
     def _horizon_status(self, deadline_ns: int) -> OutcomeStatus:
@@ -357,6 +419,14 @@ class ForwardObservation:
         self.final_status = worst_status(statuses)
         self.censor_reason = reason if self.final_status is not OutcomeStatus.RESOLVED else None
         self.resolved_at_ts = int(now_ts)
+        for result in self._ordered_results.values():
+            if result["disposition"] is None:
+                result["disposition"] = OrderedBarrierDisposition.CENSORED
+                result["binary_label"] = None
+                result["resolved_at_ts"] = int(now_ts)
+                result["censor_reason"] = reason or (
+                    self.final_status.value if self.final_status else "INCOMPLETE_PATH"
+                )
         self.closed = True
 
     # -- record -----------------------------------------------------------------
@@ -485,6 +555,28 @@ class ForwardObservation:
                 before = False if ambiguous else fav_ts < adv_ts
             row[f"favorable_before_adverse_{lab}"] = before
             row[f"first_touch_ambiguous_{lab}"] = bool(ambiguous)
+
+        for barrier in spec.ordered_barriers:
+            prefix = f"ordered_{barrier.barrier_id}"
+            result = self._ordered_results[barrier.barrier_id]
+            disposition = result["disposition"]
+            fav_ts = result["favorable_ts"]
+            adv_ts = result["adverse_ts"]
+            row[f"{prefix}_disposition"] = disposition.value if disposition else None
+            row[f"{prefix}_binary_label"] = result["binary_label"]
+            row[f"{prefix}_favorable_touch_ts"] = fav_ts
+            row[f"{prefix}_adverse_touch_ts"] = adv_ts
+            row[f"{prefix}_time_to_favorable"] = (
+                (fav_ts - entry.entry_ts) / NS if fav_ts is not None else None
+            )
+            row[f"{prefix}_time_to_adverse"] = (
+                (adv_ts - entry.entry_ts) / NS if adv_ts is not None else None
+            )
+            row[f"{prefix}_first_touch_ambiguous"] = (
+                disposition is OrderedBarrierDisposition.AMBIGUOUS_FIRST_TOUCH
+            )
+            row[f"{prefix}_censor_reason"] = result["censor_reason"]
+            row[f"{prefix}_resolved_at_ts"] = result["resolved_at_ts"]
 
         if spec.confirmation is not None:
             self._units(row, "pre_confirmation_mfe", self.pre_mfe)

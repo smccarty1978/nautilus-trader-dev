@@ -56,6 +56,54 @@ class InstrumentSpec(BaseModel):
     venue: str = Field("XCME", description="Execution/Exchange venue, e.g. XCME")
 
 
+class EpisodeArmConditionSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["directional_adverse_excursion"] = "directional_adverse_excursion"
+    threshold_atr: float = Field(..., gt=0)
+    price_source: Literal["completed_1s_intrabar"]
+
+
+class EpisodeStateRequirementSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["direction_relation"] = "direction_relation"
+    source: str
+    relation: Literal["opposite_prevailing", "aligned_prevailing"]
+    active_at_arm_counts: bool = True
+
+
+class EpisodeEmitConditionSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["direction_transition"] = "direction_transition"
+    source: str
+    from_relation: Literal["opposite_prevailing", "aligned_prevailing"]
+    to_relation: Literal["opposite_prevailing", "aligned_prevailing"]
+    strictly_after_arm: bool = True
+
+
+class EpisodeLifecycleSpec(BaseModel):
+    """Bounded declarative arm/intermediate/emit/reset population protocol."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    arm_condition: EpisodeArmConditionSpec
+    required_event: EpisodeStateRequirementSpec
+    emit_condition: EpisodeEmitConditionSpec
+    rearm_on: List[Literal["new_favorable_extreme"]]
+    terminate_on: List[Literal["prevailing_regime_flip"]]
+    max_candidates_per_episode: int = Field(1, ge=1)
+
+    @model_validator(mode="after")
+    def validate_sources_and_ordering(self) -> EpisodeLifecycleSpec:
+        if self.required_event.source != self.emit_condition.source:
+            raise ValueError("EPISODE_STATE_SOURCE_MISMATCH")
+        if not self.emit_condition.strictly_after_arm:
+            raise ValueError("EPISODE_RETROACTIVE_EMISSION_FORBIDDEN")
+        return self
+
+
 class PopulationSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -66,6 +114,9 @@ class PopulationSpec(BaseModel):
     session: str = Field("RTH", description="Session filter, e.g. RTH, ETH, ALL")
     qualification: Optional[Dict[str, Any]] = Field(
         default=None, description="Qualification rules, e.g. age_gate_seconds, established"
+    )
+    episode_lifecycle: Optional[EpisodeLifecycleSpec] = Field(
+        None, exclude_if=lambda value: value is None
     )
 
 
@@ -119,10 +170,37 @@ class ReturnConditionSpec(BaseModel):
     )
 
 
+class OrderedBarrierConditionSpec(BaseModel):
+    """Binary label produced by a declared asymmetric ordered-barrier race."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(..., description="Unique condition id within this target")
+    kind: Literal["ordered_barrier"] = "ordered_barrier"
+    forward_outcome_id: str = Field(...)
+    barrier_id: str = Field(...)
+
+
 TargetConditionSpec = Annotated[
-    Union[FlipConditionSpec, ExcursionConditionSpec, ReturnConditionSpec],
+    Union[
+        FlipConditionSpec,
+        ExcursionConditionSpec,
+        ReturnConditionSpec,
+        OrderedBarrierConditionSpec,
+    ],
     Field(discriminator="kind"),
 ]
+
+
+class OrderedBarrierRequirementSpec(BaseModel):
+    """Schema-layer declaration compiled to the runtime OrderedBarrierSpec."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    favorable_atr: float = Field(..., gt=0)
+    adverse_atr: float = Field(..., gt=0)
+    horizon_seconds: int = Field(..., gt=0)
 
 
 class RequiredForwardOutcomeSpec(BaseModel):
@@ -147,6 +225,23 @@ class RequiredForwardOutcomeSpec(BaseModel):
     excursion_units: List[Literal["points", "atr", "ticks"]] = Field(default_factory=lambda: ["atr"])
     bar_inclusion: Literal["fully_forward", "close_after_entry"] = "fully_forward"
     session_end_censoring: bool = False
+    max_gap_seconds: Optional[int] = Field(
+        None, gt=0, exclude_if=lambda value: value is None
+    )
+    ordered_barriers: Optional[List[OrderedBarrierRequirementSpec]] = Field(
+        None, exclude_if=lambda value: value is None
+    )
+
+    @model_validator(mode="after")
+    def validate_ordered_barriers(self) -> RequiredForwardOutcomeSpec:
+        barriers = self.ordered_barriers or []
+        ids = [b.id for b in barriers]
+        if len(ids) != len(set(ids)):
+            raise ValueError(f"DUPLICATE_ORDERED_BARRIER_ID: {ids}")
+        budget = self.max_tracking_seconds or self.horizon_seconds
+        if any(b.horizon_seconds > budget for b in barriers):
+            raise ValueError("ORDERED_BARRIER_HORIZON_EXCEEDS_TRACKING_BUDGET")
+        return self
 
 
 class TargetSpec(BaseModel):
@@ -193,12 +288,22 @@ class TargetSpec(BaseModel):
         if len(ids) != len(set(ids)):
             raise ValueError(f"DUPLICATE_TARGET_CONDITION_ID: {ids}")
         declared_fo_ids = {fo.id for fo in (self.required_forward_outcomes or [])}
+        declared_fo = {fo.id: fo for fo in (self.required_forward_outcomes or [])}
         for c in conditions:
-            if c.kind in ("excursion", "return") and c.forward_outcome_id not in declared_fo_ids:
+            if c.kind in ("excursion", "return", "ordered_barrier") and c.forward_outcome_id not in declared_fo_ids:
                 raise ValueError(
                     f"TARGET_CONDITION_FORWARD_OUTCOME_UNDECLARED: condition {c.id!r} "
                     f"references undeclared forward_outcome_id {c.forward_outcome_id!r}"
                 )
+            if c.kind == "ordered_barrier" and c.forward_outcome_id in declared_fo:
+                barrier_ids = {
+                    b.id for b in (declared_fo[c.forward_outcome_id].ordered_barriers or [])
+                }
+                if c.barrier_id not in barrier_ids:
+                    raise ValueError(
+                        f"TARGET_CONDITION_ORDERED_BARRIER_UNDECLARED: condition {c.id!r} "
+                        f"references barrier {c.barrier_id!r}"
+                    )
         return self
 
 
@@ -256,6 +361,20 @@ class DerivedCausalInputSpec(BaseModel):
         None, description="A materialized score table, if consumed instead of the raw model artifact"
     )
     score_artifact_sha256: Optional[str] = Field(None)
+    model_artifact_path: Optional[str] = Field(None, exclude_if=lambda value: value is None)
+    model_artifact_sha256: Optional[str] = Field(None, exclude_if=lambda value: value is None)
+    preprocessing_artifact_path: Optional[str] = Field(None, exclude_if=lambda value: value is None)
+    preprocessing_artifact_sha256: Optional[str] = Field(None, exclude_if=lambda value: value is None)
+    ordered_feature_surfaces: Optional[Dict[str, List[str]]] = Field(
+        None, exclude_if=lambda value: value is None
+    )
+    direction_arm_mapping: Optional[Dict[Literal["LONG", "SHORT"], str]] = Field(
+        None, exclude_if=lambda value: value is None
+    )
+    score_output: Literal["predict_proba_positive"] = Field(
+        "predict_proba_positive",
+        exclude_if=lambda value: value == "predict_proba_positive",
+    )
     availability_reference: Literal["decision_ts", "entry_ts", "confirmation_ts"] = "decision_ts"
     retrain_prohibited: bool = Field(
         True, description="Must be True for this kind -- the child study may never retrain the upstream model"
@@ -561,7 +680,7 @@ class RequiredGateSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: str
-    stage: Literal["prepare", "readiness", "preflight", "seal", "train_freeze"]
+    stage: Literal["prepare", "readiness", "preflight", "seal", "pre_fit", "train_freeze"]
     artifact_path: str = Field(..., description="Relative path within the study directory")
     artifact_schema_version: int
     scope_fields: List[GateScopeField] = Field(

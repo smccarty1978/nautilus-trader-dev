@@ -226,7 +226,8 @@ One sequence. `research_workflow/lifecycle.py` is the facade over it.
 | 9 | **AUTHORIZE** | `experiment.authorize_experiment` | `artifacts/experiment_authorization.json` | chronology missing or overlapping |
 | 10 | **TRAIN COLLECT** (partitioned, §7) | `collection.collect_period_partitioned(..., execute=True)` | one run dir per year | authorization mismatch, prohibited year |
 | 11 | **MERGE** | `partitioning.reconcile_partitions` → `merge_partition_outputs` | merged frame | overlap, schema/dtype drift |
-| 12 | **FIT** | `modeling.fit_models` | `artifacts/experiment_models.json` | non-TRAIN partition, outcome column in X |
+| 11b | **REQUIRED PRE-FIT GATES** | `gates.assert_gates_satisfied(..., stage="pre_fit")` | gate evidence bound to merged TRAIN identity | missing/failed/stale gate or changed merge identity |
+| 12 | **FIT** | `modeling.fit_models` | `artifacts/experiment_models.json` | non-TRAIN partition, outcome column in X, unsatisfied pre-fit gate |
 | 13 | **TRAIN FREEZE** | `modeling.freeze_train_artifacts` | `artifacts/train_experiment_freeze.json` | non-TRAIN meta, outcome column in a frozen feature set |
 | 14 | **OOS OPEN** | `experiment.assert_oos_open` | (returns the freeze) | `TrainFreezeRequired` |
 | 15 | **OOS** | `collection.collect_period(..., "oos")` | run dirs | freeze absent or stale |
@@ -956,9 +957,12 @@ special case.
 compares `scope_sha256` against a fresh hash of the study's *current* declared
 scope — that recomputation **is** the staleness check, not a separate mechanism. Wired
 fail-closed at every stage a gate may declare (`prepare`, `readiness`, `preflight`, `seal`,
-`train_freeze`): `research_workflow/phase0.py`, `research_workflow/prepare.py`,
+`pre_fit`, `train_freeze`). A `pre_fit` artifact must additionally carry the exact merged
+TRAIN `dataset_identity_sha256`; `modeling.fit_models` checks it before estimator construction,
+so a re-merge makes the gate stale. Wiring lives in `research_workflow/phase0.py`,
+`research_workflow/prepare.py`,
 `research_workflow/readiness.py`, `research_workflow/preflight.py` (new required check
-`REQUIRED_GATES`), `research_workflow/seal.py`, `research_workflow/modeling.py::freeze_train_artifacts`.
+`REQUIRED_GATES`), `research_workflow/seal.py`, and `research_workflow/modeling.py`.
 
 ### 20.4 Model selection
 

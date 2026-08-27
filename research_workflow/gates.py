@@ -2,7 +2,7 @@
 
 A study may declare a required gate -- e.g. ``TRAIN_TARGET_BALANCE_PASS`` -- that must be
 satisfied by a specific, schema-versioned, scope-bound artifact before PREPARE,
-READINESS, PREFLIGHT, SEAL, or TRAIN FREEZE may proceed. Never an arbitrary shell
+READINESS, PREFLIGHT, SEAL, PRE FIT, or TRAIN FREEZE may proceed. Never an arbitrary shell
 command: always a structured JSON artifact this module validates and hashes against the
 study's own current population/target/chronology declaration, so a gate that ran against
 an earlier version of the study is caught as stale, not silently accepted.
@@ -16,7 +16,7 @@ from typing import Any, Dict, List
 from research.analysis.identity import canonical_sha256
 from research.schemas.study_spec import GateScopeField, RequiredGateSpec, StudySpec
 
-_STAGE_ORDER = ["prepare", "readiness", "preflight", "seal", "train_freeze"]
+_STAGE_ORDER = ["prepare", "readiness", "preflight", "seal", "pre_fit", "train_freeze"]
 
 _REQUIRED_ARTIFACT_KEYS = (
     "gate_id",
@@ -66,7 +66,13 @@ def validate_gate_artifact_schema(payload: Dict[str, Any], expected_schema_versi
         )
 
 
-def assert_gates_satisfied(study_dir: str | Path, spec: StudySpec, stage: str) -> List[Dict[str, Any]]:
+def assert_gates_satisfied(
+    study_dir: str | Path,
+    spec: StudySpec,
+    stage: str,
+    *,
+    dataset_identity_sha256: str | None = None,
+) -> List[Dict[str, Any]]:
     """Fails closed for every declared gate whose stage is at or before ``stage``.
 
     Returns evidence records for every satisfied gate. Raises on the first violation:
@@ -91,6 +97,25 @@ def assert_gates_satisfied(study_dir: str | Path, spec: StudySpec, stage: str) -
             )
         payload = json.loads(artifact_path.read_text(encoding="utf-8"))
         validate_gate_artifact_schema(payload, gate.artifact_schema_version)
+
+        if gate.stage == "pre_fit":
+            if not dataset_identity_sha256:
+                raise RequiredGateNotSatisfied(
+                    f"REQUIRED_GATE_DATASET_BINDING_REQUIRED: pre_fit gate {gate.id!r} "
+                    "requires the merged TRAIN dataset_identity_sha256"
+                )
+            artifact_dataset_identity = payload.get("dataset_identity_sha256")
+            if not artifact_dataset_identity:
+                raise RequiredGateArtifactMalformed(
+                    f"pre_fit gate {gate.id!r} artifact is missing "
+                    "dataset_identity_sha256"
+                )
+            if artifact_dataset_identity != dataset_identity_sha256:
+                raise RequiredGateStale(
+                    f"REQUIRED_GATE_STALE: pre_fit gate {gate.id!r} binds merged TRAIN "
+                    f"dataset {artifact_dataset_identity!r}, not current dataset "
+                    f"{dataset_identity_sha256!r}"
+                )
 
         expected_scope_sha256 = compute_population_scope_sha256(spec, gate.scope_fields)
         if payload["scope_sha256"] != expected_scope_sha256:

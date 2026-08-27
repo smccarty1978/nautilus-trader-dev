@@ -22,6 +22,7 @@ def _compile_forward_outcome_spec(spec: RequiredForwardOutcomeSpec) -> Dict[str,
     from research_workflow.forward_outcomes.contracts import (
         BarInclusion,
         ForwardOutcomeSpec,
+        OrderedBarrierSpec,
         ReferencePrice,
         build_outcome_columns,
     )
@@ -44,6 +45,16 @@ def _compile_forward_outcome_spec(spec: RequiredForwardOutcomeSpec) -> Dict[str,
         reference_price=entry_reference_map[spec.entry_reference],
         bar_inclusion=bar_inclusion_map[spec.bar_inclusion],
         session_end_censoring=spec.session_end_censoring,
+        max_gap_seconds=spec.max_gap_seconds,
+        ordered_barriers=tuple(
+            OrderedBarrierSpec(
+                barrier_id=b.id,
+                favorable_atr=b.favorable_atr,
+                adverse_atr=b.adverse_atr,
+                horizon_seconds=b.horizon_seconds,
+            )
+            for b in (spec.ordered_barriers or [])
+        ),
     )
     return {
         "id": spec.id,
@@ -54,6 +65,8 @@ def _compile_forward_outcome_spec(spec: RequiredForwardOutcomeSpec) -> Dict[str,
         "excursion_units": list(fo.excursion_units),
         "bar_inclusion": spec.bar_inclusion,
         "session_end_censoring": spec.session_end_censoring,
+        "max_gap_seconds": spec.max_gap_seconds,
+        "ordered_barriers": [b.model_dump() for b in (spec.ordered_barriers or [])],
         "generated_outcome_columns": list(build_outcome_columns(fo)),
     }
 

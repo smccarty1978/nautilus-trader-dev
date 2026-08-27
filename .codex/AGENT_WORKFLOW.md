@@ -24,16 +24,16 @@ hyphenated for easy cross-harness comparison.
 | Claude | Codex `agent_type` | Model | Reasoning | Access |
 |---|---|---|---|---|
 | — (main session) | — | session model | session effort | user-selected permission mode |
-| `repo-scout` | `repo_scout` | `gemini-3.6-flash` | low | read-only |
+| `repo-scout` | `repo_scout` | `gpt-5.6-luna` | low | read-only |
 | `lookahead-auditor` | `lookahead_auditor` | `gpt-5.6-sol` | high | read-only + own audit artifacts |
 | `contract-checker` | `contract_checker` | `gpt-5.6-sol` | medium | read-only + own audit artifacts |
-| `implementer` | `implementer` | `gemini-3.5-pro` | medium | workspace-write |
-| `research-executor` | `research_executor` | `gpt-5.6-sol` | medium | workspace-write |
+| `implementer` | `implementer` | `gpt-5.6-terra` | medium | workspace-write |
+| `research-executor` | `research_executor` | `gpt-5.6-terra` | medium | workspace-write |
 | `analysis-decider` | `analysis_decider` | `gpt-5.6-sol` | high | workspace-write (reports only) |
 
-Model ids are declared in `CODEX_META` in `scripts/sync_agents.py`. `sandbox_mode` is
-**derived** from the Claude definition's declared tools, not set here — it used to live in
-`CODEX_META` and drifted out of sync when `contract-checker` gained `Write`.
+Model ids are resolved from portable capability tiers in
+`config/agent_model_profiles.json` by `scripts/sync_agents.py`. `sandbox_mode` is **derived**
+from the Claude definition's declared tools, not set in the model profile.
 
 ---
 

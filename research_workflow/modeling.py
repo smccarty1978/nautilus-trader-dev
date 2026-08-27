@@ -38,6 +38,7 @@ def fit_models(
     *,
     meta: pd.DataFrame,
     spec,
+    study_spec: Optional[Any] = None,
     dataset_identity_sha256: Optional[str] = None,
     estimator: str = "gradient_boosting",
     hyperparameters: Optional[Dict[str, Any]] = None,
@@ -50,6 +51,15 @@ def fit_models(
     # analysis, then a feature matrix built from the joined frame's columns. X is the
     # authoritative feature surface here, so it is the surface that gets checked.
     guard_training_frame(X, list(X.columns), context="fit_models feature matrix")
+    if study_spec is not None and getattr(study_spec, "required_gates", None):
+        from research_workflow.gates import assert_gates_satisfied
+
+        assert_gates_satisfied(
+            study_path,
+            study_spec,
+            stage="pre_fit",
+            dataset_identity_sha256=dataset_identity_sha256,
+        )
     models = fit_arms(
         X, y, spec, estimator=estimator, hyperparameters=hyperparameters,
         dataset_identity_sha256=dataset_identity_sha256,
@@ -72,6 +82,7 @@ def freeze_train_artifacts(
     deciles: Optional[Mapping[str, Any]] = None,
     study_spec: Optional[Any] = None,
     model_selection_manifest_path: Optional[str | Path] = None,
+    dataset_identity_sha256: Optional[str] = None,
 ) -> Path:
     """Freeze all TRAIN-derived objects before any OOS frame is accepted.
 
@@ -138,7 +149,12 @@ def freeze_train_artifacts(
 
     if study_spec is not None and getattr(study_spec, "required_gates", None):
         from research_workflow.gates import assert_gates_satisfied
-        assert_gates_satisfied(study_path, study_spec, stage="train_freeze")
+        assert_gates_satisfied(
+            study_path,
+            study_spec,
+            stage="train_freeze",
+            dataset_identity_sha256=dataset_identity_sha256,
+        )
 
     threshold_payload = dict(thresholds or {})
     if not threshold_payload:

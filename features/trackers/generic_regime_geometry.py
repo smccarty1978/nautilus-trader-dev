@@ -85,7 +85,10 @@ class GenericCompletedRegimeGeometryProvider:
             )
         self.on_geometry_bar(timeframe=timeframe, close_ts=close_ts, high=high, low=low, close=close)
 
-    def prior_snapshot(self, *, timeframe: str, checkpoint_ns: int) -> dict:
+    def prior_snapshot(
+        self, *, timeframe: str, checkpoint_ns: int,
+        candidate_price: float | None = None, candidate_atr: float | None = None,
+    ) -> dict:
         prior = self._prior.get(timeframe)
         close_ts = self._close_ts.get(timeframe)
         if prior is None:
@@ -98,7 +101,7 @@ class GenericCompletedRegimeGeometryProvider:
         fav = prior["high"] - prior["start_price"] if prior["direction"] == 1 else prior["start_price"] - prior["low"]
         rng_atr, net_atr = _ratio(rng, prior["atr_start"]), _ratio(net, prior["atr_start"])
         prefix = f"prior_{timeframe}_regime"
-        return {"available": True, "completed_close_ts": close_ts,
+        result = {"available": True, "completed_close_ts": close_ts,
                 f"{prefix}_duration_min": duration,
                 f"{prefix}_range_atr": rng_atr,
                 f"{prefix}_net_directional_move_atr": net_atr,
@@ -106,3 +109,23 @@ class GenericCompletedRegimeGeometryProvider:
                 f"{prefix}_range_atr_per_min": _ratio(rng_atr, duration) if rng_atr is not None else None,
                 f"{prefix}_net_move_atr_per_min": _ratio(abs(net_atr), duration) if net_atr is not None else None,
                 f"{prefix}_efficiency": _ratio(abs(net), rng)}
+        if (candidate_price is None) != (candidate_atr is None):
+            raise ValueError("candidate_price and candidate_atr must be supplied together")
+        if candidate_price is not None:
+            if not math.isfinite(candidate_atr) or candidate_atr <= 0.0:
+                raise ValueError("candidate_atr must be finite and positive")
+            extreme = prior["high"] if prior["direction"] == 1 else prior["low"]
+            counter_move = (
+                prior["high"] - prior["start_price"]
+                if prior["direction"] == 1 else prior["start_price"] - prior["low"]
+            )
+            recovered = (
+                extreme - float(candidate_price)
+                if prior["direction"] == 1 else float(candidate_price) - extreme
+            )
+            recovered = max(0.0, recovered)
+            result.update({
+                f"{prefix}_recovery_from_extreme_atr": recovered / candidate_atr,
+                f"{prefix}_fraction_move_recovered": _ratio(recovered, counter_move),
+            })
+        return result

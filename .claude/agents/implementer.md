@@ -4,6 +4,7 @@ description: Deterministic implementer and repair agent. Executes one bounded ta
 tools: [Read, Grep, Glob, Edit, Write, Bash]
 model: claude-sonnet-5
 effort: medium
+capability_tier: balanced_coding
 maxTurns: 40
 ---
 

@@ -115,6 +115,26 @@ These are the specific things Claude has done here that cost real time.
 - **Don't add a new `run_*.py`.** A standard backtest is
   `python backtests/run_backtest.py --strategy <id> --param k=v`. Legacy `backtests/run_*.py`
   scripts are frozen references, not templates.
+- **Don't write a multi-call protocol into `research_decision.yaml` before it has been run.**
+  When a described protocol composes existing governed APIs across a chronological split
+  (e.g., "phase 1 uses years X, phase 2 uses years Y"), write and run a bounded
+  synthetic-fixture test proving it *first*, then write the description. A `random_state`
+  duplicate-kwarg crash and a silent hyperparameter-default fallback both sat in an
+  already-sealed `study.yaml` because the prose was written, reviewed, and frozen before any
+  code exercised it — both were only caught once a test suite was finally written, one freeze
+  cycle later than it should have been.
+- **Don't describe a chronological split in prose only.** Before presenting any protocol that
+  touches more than one year-role (TRAIN/tuning/final-validation/OOS), write out — literally,
+  as a table, one row per governed call — which years and which role each call touches. A
+  2023 double-use (used simultaneously as the architecture-comparison evaluation year and the
+  declared reject-only final-validation year) passed self-review and was only caught by the
+  researcher; a call-by-call year table would have surfaced it before it was ever presented.
+- **Don't resolve findings from the same category one at a time across separate freeze
+  cycles.** A stale baseline-manifest pin, a stale `config/baseline.json` mirror, and a
+  missing lineage disclosure were all "provenance" findings surfaced across three separate
+  re-freeze/re-audit cycles on the same study. Sweep the whole category — grep for every other
+  place the same stale value or the same undisclosed fact could be hiding — before
+  re-freezing, not after the next review pass finds the next instance of it.
 
 ---
 

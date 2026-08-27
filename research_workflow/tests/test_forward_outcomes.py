@@ -23,6 +23,8 @@ from research_workflow.forward_outcomes import (
     OutcomeAnalysisConfig,
     OutcomeLeakError,
     OutcomeStatus,
+    OrderedBarrierDisposition,
+    OrderedBarrierSpec,
     ProposedEntry,
     ReferencePrice,
     SelectionError,
@@ -111,6 +113,92 @@ def test_short_path_mirrors_the_long_definition():
     assert rec["max_mae"] == pytest.approx(3.0)
     assert rec["time_to_max_mfe"] == pytest.approx(3.0)   # low set on bar 3
     assert rec["time_to_max_mae"] == pytest.approx(2.0)   # high set on bar 2
+
+
+def ordered_spec(*, horizon=3, max_tracking=None, max_gap_seconds=1):
+    return ForwardOutcomeSpec(
+        spec_id="ordered_test",
+        horizons_seconds=(horizon,),
+        max_tracking_seconds=max_tracking or horizon,
+        max_gap_seconds=max_gap_seconds,
+        ordered_barriers=(
+            OrderedBarrierSpec(
+                barrier_id="primary",
+                favorable_atr=1.0,
+                adverse_atr=0.75,
+                horizon_seconds=horizon,
+            ),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("direction", "rows", "expected"),
+    [
+        ("LONG", [(102.0, 99.5, 101.0)], OrderedBarrierDisposition.SUCCESS),
+        ("LONG", [(101.0, 98.5, 99.0)], OrderedBarrierDisposition.FAILURE),
+        ("SHORT", [(100.5, 98.0, 99.0)], OrderedBarrierDisposition.SUCCESS),
+        ("SHORT", [(101.5, 99.0, 101.0)], OrderedBarrierDisposition.FAILURE),
+    ],
+)
+def test_asymmetric_ordered_barrier_is_direction_normalized(direction, rows, expected):
+    rec = compute_forward_outcomes(
+        [make_entry(direction)], make_bars(rows), ordered_spec(horizon=1)
+    )[0]
+    assert rec["ordered_primary_disposition"] == expected.value
+    assert rec["ordered_primary_binary_label"] == (
+        1 if expected is OrderedBarrierDisposition.SUCCESS else 0
+    )
+
+
+def test_same_completed_bar_collision_is_ambiguous_and_unlabelled():
+    rec = compute_forward_outcomes(
+        [make_entry("LONG")], make_bars([(102.0, 98.5, 100.0)]), ordered_spec(horizon=1)
+    )[0]
+    assert rec["ordered_primary_disposition"] == "AMBIGUOUS_FIRST_TOUCH"
+    assert rec["ordered_primary_binary_label"] is None
+    assert rec["ordered_primary_time_to_favorable"] == pytest.approx(1.0)
+    assert rec["ordered_primary_time_to_adverse"] == pytest.approx(1.0)
+    assert rec["ordered_primary_first_touch_ambiguous"] is True
+
+
+def test_fully_observed_ordered_barrier_timeout_is_negative():
+    quiet = [(100.5, 99.5, 100.0)] * 3
+    rec = compute_forward_outcomes(
+        [make_entry("LONG")], make_bars(quiet), ordered_spec(horizon=3)
+    )[0]
+    assert rec["ordered_primary_disposition"] == "TIMEOUT"
+    assert rec["ordered_primary_binary_label"] == 0
+
+
+def test_incomplete_ordered_barrier_path_is_censored_and_unlabelled():
+    rec = compute_forward_outcomes(
+        [make_entry("LONG")],
+        make_bars([(100.5, 99.5, 100.0)]),
+        ordered_spec(horizon=3),
+    )[0]
+    assert rec["ordered_primary_disposition"] == "CENSORED"
+    assert rec["ordered_primary_binary_label"] is None
+
+
+def test_ordered_barrier_outputs_are_structurally_blocked_from_training():
+    for name in (
+        "ordered_primary_binary_label",
+        "ordered_primary_disposition",
+        "ordered_primary_time_to_favorable",
+        "ordered_primary_time_to_adverse",
+        "ordered_primary_favorable_touch_ts",
+        "ordered_primary_adverse_touch_ts",
+        "ordered_primary_first_touch_ambiguous",
+        "ordered_primary_censor_reason",
+        "ordered_primary_resolved_at_ts",
+    ):
+        assert is_outcome_column(name)
+    with pytest.raises(OutcomeLeakError):
+        guard_training_frame(
+            pd.DataFrame({"x": [1.0], "ordered_primary_binary_label": [1]}),
+            ["x"],
+        )
 
 
 # --------------------------------------------------------------------------

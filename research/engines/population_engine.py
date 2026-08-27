@@ -46,4 +46,6 @@ def compile_population_contract(
             "observation_timing": "interval_close",
         },
     }
+    if pop_spec.episode_lifecycle is not None:
+        contract["episode_lifecycle"] = pop_spec.episode_lifecycle.model_dump(mode="json")
     return contract

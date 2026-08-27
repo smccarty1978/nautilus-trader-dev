@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import json
 import re
 import sys
 from pathlib import Path
@@ -32,6 +33,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CLAUDE_DIR = REPO_ROOT / ".claude" / "agents"
 ANTIGRAVITY_DIR = REPO_ROOT / ".agents" / "agents_staging"
 CODEX_DIR = REPO_ROOT / ".codex" / "agents"
+MODEL_PROFILES_PATH = REPO_ROOT / "config" / "agent_model_profiles.json"
 
 BANNER = (
     "GENERATED FILE -- DO NOT EDIT.\n"
@@ -40,47 +42,34 @@ BANNER = (
 )
 
 # Per-harness metadata that is NOT derived from the Claude definition.
-# Codex/Antigravity run different models, so only the instructions are shared.
+# Codex/Antigravity run different models, so only the instructions and
+# capability tier are shared. Concrete model IDs live in the profile map.
 # NOTE: `sandbox_mode` is deliberately absent -- it is DERIVED from the Claude
 # definition's declared tools by `derive_sandbox_mode`. It used to live here and
 # drifted out of sync when contract-checker gained Write (Red Team W5).
 CODEX_META: dict[str, dict[str, str]] = {
     "lookahead-auditor": {
         "name": "lookahead_auditor",
-        # GPT-5.6 Sol is Codex's frontier model for complex professional work;
-        # it replaces the unavailable Gemini 3.5 Pro target for causal audits.
-        "model": "gpt-5.6-sol",
-        "model_reasoning_effort": "high",
         "approval_policy": "never",
     },
     "contract-checker": {
         "name": "contract_checker",
-        "model": "gpt-5.6-sol",
-        "model_reasoning_effort": "medium",
         "approval_policy": "never",
     },
     "repo-scout": {
         "name": "repo_scout",
-        "model": "gemini-3.6-flash",
-        "model_reasoning_effort": "low",
         "approval_policy": "never",
     },
     "implementer": {
         "name": "implementer",
-        "model": "gemini-3.5-pro",
-        "model_reasoning_effort": "medium",
         "approval_policy": "on-request",
     },
     "research-executor": {
         "name": "research_executor",
-        "model": "gpt-5.6-sol",
-        "model_reasoning_effort": "medium",
         "approval_policy": "on-request",
     },
     "analysis-decider": {
         "name": "analysis_decider",
-        "model": "gpt-5.6-sol",
-        "model_reasoning_effort": "high",
         "approval_policy": "never",
     },
 }
@@ -91,6 +80,32 @@ CODEX_META: dict[str, dict[str, str]] = {
 CODEX_ONLY: set[str] = set()
 
 FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
+
+
+def load_model_profiles() -> dict[str, dict[str, object]]:
+    """Load the harness-neutral capability-to-model map."""
+    try:
+        payload = json.loads(MODEL_PROFILES_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot load model profiles: {MODEL_PROFILES_PATH}") from exc
+    profiles = payload.get("profiles")
+    if not isinstance(profiles, dict) or not profiles:
+        raise ValueError("model profile map must contain non-empty profiles")
+    return profiles
+
+
+def resolve_model(*, harness: str, capability_tier: str, profiles: dict[str, dict[str, object]] | None = None) -> tuple[str, str]:
+    """Resolve one provider model from a role's portable capability tier."""
+    profiles = profiles if profiles is not None else load_model_profiles()
+    profile = profiles.get(capability_tier)
+    if not isinstance(profile, dict):
+        raise ValueError(f"unknown capability tier: {capability_tier!r}")
+    models = profile.get("models")
+    model = models.get(harness) if isinstance(models, dict) else None
+    reasoning = profile.get("reasoning")
+    if not isinstance(model, str) or not model or not isinstance(reasoning, str) or not reasoning:
+        raise ValueError(f"incomplete {harness} model profile: {capability_tier!r}")
+    return model, reasoning
 
 
 def parse_claude_agent(path: Path) -> tuple[dict[str, str], str]:
@@ -135,6 +150,11 @@ def derive_sandbox_mode(stem: str, fm: dict[str, str]) -> str:
 
 def render_codex(stem: str, fm: dict[str, str], body: str) -> str:
     meta = CODEX_META[stem]
+    capability_tier = fm.get("capability_tier", "").strip()
+    if not capability_tier:
+        raise ValueError(f"{stem}: missing capability_tier in canonical frontmatter")
+    model, profile_effort = resolve_model(harness="codex", capability_tier=capability_tier)
+    effort = fm.get("effort", profile_effort).strip() or profile_effort
     desc = fm.get("description", "").replace('"', r"\"")
     comment = "\n".join(f"# {ln}" for ln in BANNER.format(stem=stem).splitlines())
     sandbox_mode = derive_sandbox_mode(stem, fm)
@@ -148,8 +168,8 @@ def render_codex(stem: str, fm: dict[str, str], body: str) -> str:
         f"{comment}\n\n"
         f'name = "{meta["name"]}"\n'
         f'description = "{desc}"\n'
-        f'model = "{meta["model"]}"\n'
-        f'model_reasoning_effort = "{meta["model_reasoning_effort"]}"\n'
+        f'model = "{model}"\n'
+        f'model_reasoning_effort = "{effort}"\n'
         f'sandbox_mode = "{sandbox_mode}"\n'
         f'approval_policy = "{meta["approval_policy"]}"\n'
         f"\n"

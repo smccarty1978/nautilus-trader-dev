@@ -102,6 +102,29 @@ def summarize_group(frame: pd.DataFrame, config: OutcomeAnalysisConfig) -> dict[
         row["censored_fraction"] = 0.0
         resolved = frame
 
+    for disposition_col in sorted(
+        c for c in frame.columns
+        if c.startswith("ordered_") and c.endswith("_disposition")
+    ):
+        prefix = disposition_col.removesuffix("_disposition")
+        values = frame[disposition_col].dropna().astype(str)
+        row[f"{prefix}_n_terminal"] = int(len(values))
+        for disposition in (
+            "SUCCESS", "FAILURE", "TIMEOUT", "AMBIGUOUS_FIRST_TOUCH", "CENSORED"
+        ):
+            count = int((values == disposition).sum())
+            row[f"{prefix}_n_{disposition.lower()}"] = count
+            row[f"{prefix}_fraction_{disposition.lower()}"] = (
+                float(count / len(values)) if len(values) else None
+            )
+        label_col = f"{prefix}_binary_label"
+        if label_col in frame.columns:
+            labels = frame[label_col].dropna().astype(int)
+            row[f"{prefix}_n_binary"] = int(len(labels))
+            row[f"{prefix}_positive_rate"] = (
+                float(labels.mean()) if len(labels) else None
+            )
+
     if "confirmed" in frame.columns:
         confirmed = frame["confirmed"].dropna()
         row["confirmation_rate"] = float(confirmed.astype(bool).mean()) if len(confirmed) else None

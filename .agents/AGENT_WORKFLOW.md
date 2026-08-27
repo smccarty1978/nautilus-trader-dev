@@ -17,16 +17,17 @@ hand-maintained near-copies of the same content, and they drifted. Do not re-exp
 
 ## Model mapping
 
-Antigravity runs these subagents natively on Gemini models.
+Antigravity runs these subagents natively on Gemini models. The portable capability tiers and
+all harness mappings are defined in `config/agent_model_profiles.json`.
 
 | Agent | Claude tier | Gemini equivalent | Flag |
 |---|---|---|---|
-| `repo-scout` | Haiku / low | Gemini 3.6 Flash / Flash Lite | `flash` / `flash_lite` |
-| `lookahead-auditor` | Sonnet / high | Gemini Pro | `pro` |
-| `contract-checker` | Sonnet / medium | Gemini Pro / 3.6 Flash | `pro` / `flash` |
-| `implementer` | Sonnet / medium | Gemini Pro | `pro` |
-| `research-executor` | Sonnet / medium | Gemini Pro | `pro` |
-| `analysis-decider` | Sonnet / high | Gemini Pro | `pro` |
+| `repo-scout` | fast discovery / low | Gemini 3.6 Flash / Flash Lite | `flash` / `flash_lite` |
+| `lookahead-auditor` | high assurance / high | Gemini Pro | `pro` |
+| `contract-checker` | governance review / medium | Gemini Pro / 3.6 Flash | `pro` / `flash` |
+| `implementer` | balanced coding / medium | Gemini Pro | `pro` |
+| `research-executor` | balanced coding / medium | Gemini Pro | `pro` |
+| `analysis-decider` | high assurance / high | Gemini Pro | `pro` |
 
 Tiering rule: the cheapest model that can be trusted with the decision. **Never put a
 research-blessing gate on a Flash-tier model.** Do not escalate a model because a task is

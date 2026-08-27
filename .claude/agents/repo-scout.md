@@ -4,6 +4,7 @@ description: Read-only repository and architecture mapper. Use proactively to lo
 tools: [Read, Grep, Glob]
 model: claude-haiku-4-5-20251001
 effort: low
+capability_tier: fast_discovery
 maxTurns: 12
 ---
 

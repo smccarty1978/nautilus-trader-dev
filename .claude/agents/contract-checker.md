@@ -4,6 +4,7 @@ description: Compliance and governance reviewer. Owns deliverable completeness, 
 tools: [Read, Grep, Glob, Write]
 model: claude-sonnet-5
 effort: medium
+capability_tier: governance_review
 maxTurns: 15
 ---
 

@@ -31,6 +31,8 @@ from research_workflow.forward_outcomes.contracts import (
     Direction,
     ForwardOutcomeError,
     ForwardOutcomeSpec,
+    OrderedBarrierDisposition,
+    OrderedBarrierSpec,
     OutcomeStatus,
     ProposedEntry,
     ReferencePrice,
@@ -87,7 +89,7 @@ from research_workflow.forward_outcomes.tracker import (
 __all__ = [
     # contracts
     "BarInclusion", "ConfirmationSpec", "Direction", "ForwardOutcomeError",
-    "ForwardOutcomeSpec", "OutcomeStatus", "ProposedEntry", "ReferencePrice",
+    "ForwardOutcomeSpec", "OrderedBarrierDisposition", "OrderedBarrierSpec", "OutcomeStatus", "ProposedEntry", "ReferencePrice",
     "build_outcome_columns", "horizon_label", "level_label", "worst_status",
     # observation
     "ForwardObservation", "ForwardOutcomeTracker", "compute_forward_outcomes",

@@ -23,9 +23,16 @@ class CompiledExecutionPlan:
     checkpoint_callbacks: Tuple[Callable[..., dict], ...]
     calculate_velocity_at_checkpoint: bool
     calculate_ema_at_checkpoint: bool
+    required_regime_state_timeframes: Tuple[str, ...] = ()
 
     @classmethod
-    def for_collector(cls, collector, aliases: Tuple[str, ...]) -> "CompiledExecutionPlan":
+    def for_collector(
+        cls,
+        collector,
+        aliases: Tuple[str, ...],
+        *,
+        required_regime_state_timeframes: Tuple[str, ...] = (),
+    ) -> "CompiledExecutionPlan":
         """Compile the declared surface into fixed callback groups.
 
         Provider output names are inspected once here.  In particular, a declared
@@ -35,7 +42,10 @@ class CompiledExecutionPlan:
         """
         compact = bool(aliases) and set(aliases).issubset(collector._compact_supported)
         if not compact:
-            return cls(aliases, False, (), (), (), False, False)
+            return cls(
+                aliases, False, (), (), (), False, False,
+                tuple(required_regime_state_timeframes),
+            )
 
         # These are the only providers needed by the current compact V2 surface.
         update_1s = (
@@ -56,4 +66,7 @@ class CompiledExecutionPlan:
             set(aliases) & {"arrival_velocity", "arrival_acceleration"}
         )
         calculate_ema = "ema_slope" in aliases or "ema_slope_short" in aliases or "ema_slope_long" in aliases
-        return cls(aliases, True, update_1s, update_1m, (), calculate_velocity, calculate_ema)
+        return cls(
+            aliases, True, update_1s, update_1m, (), calculate_velocity,
+            calculate_ema, tuple(required_regime_state_timeframes),
+        )

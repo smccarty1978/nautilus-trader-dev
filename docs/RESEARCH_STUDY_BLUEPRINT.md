@@ -261,7 +261,8 @@ identities** — `scripts/run_preexec_audits.py` enforces `AUDITOR_ROLE_REUSE`.
 | `research_workflow.experiment.authorize_experiment` | 9 | seal + reconciled run | `artifacts/experiment_authorization.json` | chronology missing/overlapping | ⛔ if ambiguous authorization |
 | `--mode collect --stage full` (partitioned) via `collection.collect_period_partitioned` | 10 | authorization | one run dir per TRAIN year | authorization mismatch, prohibited year | ⛔ if prohibited year |
 | `partitioning.reconcile_partitions` → `merge_partition_outputs` (**library-only, no CLI**) | 11 | all TRAIN years collected | merged frame | overlap, schema/dtype drift | ✓ |
-| `modeling.fit_models` (**library-only**) | 12 | merged TRAIN frame | `artifacts/experiment_models.json` | non-TRAIN partition, outcome column in X | ⛔ if outcome leak (never loosen the guard) |
+| `gates.assert_gates_satisfied(..., stage="pre_fit")` (**library-only**) | 11b | merged TRAIN identity + declared gate artifacts | verified gate evidence | missing/failed/stale gate or changed merge identity | ⛔ |
+| `modeling.fit_models` (**library-only**) | 12 | merged TRAIN frame + satisfied declared pre-fit gates | `artifacts/experiment_models.json` | non-TRAIN partition, outcome column in X, gate failure | ⛔ if outcome leak (never loosen the guard) |
 | `modeling.freeze_train_artifacts` (**library-only**) | 13 | fit complete | `artifacts/train_experiment_freeze.json` | non-TRAIN meta, outcome column in a frozen set | ⛔ |
 | `experiment.assert_oos_open` (**library-only**) | 14 | TRAIN freeze exists | returns the freeze | `TrainFreezeRequired` | ✓ (freeze first) |
 | `collection.collect_period(..., "oos")` (**library-only**) | 15 | OOS open | run dirs | freeze absent/stale | ⛔ |
@@ -342,12 +343,14 @@ against real repo artifacts (`scripts/tests/test_study_spec_extensions.py`).
    `target.decision_reference` (`TIMESTAMP_CAUSAL_ORDER`), not merely enum membership.
 3. **Machine-enforced pre-freeze gates.** `StudySpec.required_gates`
    (`RequiredGateSpec`) binds a gate id to a stage (`prepare`\|`readiness`\|`preflight`\|`seal`\|
-   `train_freeze`), a schema-versioned artifact path, and a typed `scope_fields` list
+   `pre_fit`\|`train_freeze`), a schema-versioned artifact path, and a typed `scope_fields` list
    (`GateScopeField` enum — a typo fails Pydantic validation, not silently). `research_workflow/
    gates.py::assert_gates_satisfied` fails closed if the artifact is missing
    (`RequiredGateNotSatisfied`), stale relative to the study's current declared scope
    (`RequiredGateStale`, detected by recomputing the scope hash), or malformed
-   (`RequiredGateArtifactMalformed`). Wired into every stage that can declare one.
+   (`RequiredGateArtifactMalformed`). A `pre_fit` artifact is additionally bound to the exact
+   merged TRAIN `dataset_identity_sha256` and is checked before estimator construction.
+   Wired into every stage that can declare one.
 4. **Model selection.** `ModelSpec.selection` (`ModelSelectionSpec`) plus
    `research_workflow/model_selection.py` — a real, bounded, executable TRAIN-only search
    (never unbounded AutoML): grid over `choice` domains only (refuses rather than truncates a

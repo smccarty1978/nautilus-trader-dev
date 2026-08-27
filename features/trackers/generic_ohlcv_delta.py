@@ -65,3 +65,32 @@ class GenericOHLCVDeltaProvider:
         """
         key = name if window is None else f"{name}_{window}"
         return self.snapshot(atr=atr).get(key)
+
+    def trend_normalized_est_delta_sum(
+        self, *, window: str, prevailing_direction: int, atr: float,
+    ) -> float | None:
+        """Return estimated delta with positive meaning prevailing-trend pressure."""
+        if prevailing_direction not in (-1, 1):
+            raise ValueError("prevailing_direction must be -1 or +1")
+        value = self.metric(name="est_delta_sum", window=window, atr=atr)
+        return None if value is None else prevailing_direction * float(value)
+
+    def trend_normalized_est_delta_scale_ratio(
+        self, *, numerator_window: str, denominator_window: str,
+        prevailing_direction: int, atr: float,
+    ) -> float | None:
+        """Compare directional pressure against a non-signed long-window scale.
+
+        Unlike the historical volume ratios (which use EPS because zero volume
+        is an observed neutral value), a zero estimated-delta scale has no
+        directional interpretation.  It therefore follows this feature's
+        declared null contract and returns ``None`` rather than manufacturing
+        an infinite or arbitrary neutral ratio.
+        """
+        numerator = self.trend_normalized_est_delta_sum(
+            window=numerator_window, prevailing_direction=prevailing_direction, atr=atr,
+        )
+        denominator = self.metric(name="est_delta_sum", window=denominator_window, atr=atr)
+        if numerator is None or denominator is None or float(denominator) == 0.0:
+            return None
+        return numerator / abs(float(denominator))

@@ -1,0 +1,333 @@
+contract_version: 1
+contract_status: PRE_SCAFFOLD_FROZEN_FOR_APPROVED_GENERIC_CAPABILITY_IMPLEMENTATION
+study_id: deep_pullback_5s_reacceleration_model
+
+research_question: >-
+  Within an established prevailing 1m regime, after a direction-normalized pullback of at
+  least 1.00 ATR and a completed causal 5s regime flip back into alignment with that
+  prevailing regime, can causal market state, pullback geometry, volume/delta,
+  structural-regime context, and the frozen upstream Model C context identify entries that
+  reach +1.00 ATR favorable before -0.75 ATR adverse within 300 seconds?
+
+hypothesis:
+  alternative: >-
+    A completed 5s re-alignment is insufficient alone, but the geometry, maturity, pressure,
+    structural location, and upstream Model C state of the pullback contain learnable
+    continuation information.
+  null: >-
+    The motivated causal feature surface cannot materially distinguish ordered-barrier
+    continuation successes from failures and timeouts beyond the unconditional base rate.
+
+study_type:
+  primary: classification
+  target_shape: asymmetric_ordered_forward_barrier
+  secondary: descriptive_forward_path
+  strategy_policy_optimization: false
+
+instrument:
+  symbol: NQ
+  venue: XCME
+  contract: current_governed_continuous_v0
+  dataset_id: NQ_v0_2020_2026
+  new_data_source_authorized: false
+
+session_contract:
+  candidate_emission: canonical_NQ_RTH
+  provider_visibility: canonical_existing_state_retention
+  retain_causally_required_ETH_state: true
+  inline_session_redefinition_prohibited: true
+
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+
+prevailing_regime_contract:
+  timeframe: 1m
+  definition: existing_accepted_confirmed_regime
+  redesign_authorized: false
+  direction_normalization:
+    bullish_prevailing: LONG
+    bearish_prevailing: SHORT
+
+decision_and_entry:
+  decision_ts: completed_5s_flip_back_close
+  decision_rule: >-
+    T is the close/availability timestamp of the first completed 5s regime transition after
+    episode arming which returns the 5s regime to the direction of the still-active confirmed
+    prevailing 1m regime.
+  executable_reference: first_1s_bar_open_strictly_after_T
+  forward_bar_inclusion: fully_forward
+  five_second_close_is_not_a_fill: true
+
+target_atr:
+  source: latest_causally_completed_1m_wilder_atr_14_available_at_T
+  frozen_at: decision_ts
+  frozen_for_full_path: true
+  structural_feature_atr_anchors_unchanged: true
+
+candidate_population:
+  directions: both
+  candidates_per_episode: 1
+  pullback_gate_atr: 1.0
+  state_machine:
+    arm: >-
+      Arm only after a completed 1s bar proves that direction-normalized adverse intrabar
+      excursion from the current causal favorable extreme of the active prevailing 1m regime
+      first reaches at least 1.00 target ATR. Bullish depth is running_high minus completed_1s_low;
+      bearish depth is completed_1s_high minus running_low. The completed 1s close need not remain
+      beyond the threshold and forming 1s information is prohibited.
+    required_intermediate_state: >-
+      A causal counter-trend completed 5s regime satisfies the requirement when it is active at
+      episode arming, even if it began before the 1 ATR threshold, or when it becomes active after
+      arming.
+    emit: >-
+      Emit only the first completed 5s flip back to the prevailing direction whose availability
+      timestamp is strictly after episode arming. Never convert a pre-arm flip-back retroactively.
+    after_emit: episode_terminal_no_more_candidates
+    rearm:
+      - prevailing_1m_regime_establishes_new_directional_favorable_extreme
+      - prevailing_1m_regime_flips
+    chatter_policy: no_repeated_candidates_inside_episode
+    machine_invariants:
+      - depth_arms_from_fully_completed_1s_intrabar_extreme
+      - counter_state_active_at_arm_counts_as_seen
+      - counter_state_may_first_appear_after_arm
+      - candidate_flip_back_timestamp_strictly_after_arm_timestamp
+      - no_retroactive_candidate
+      - one_candidate_per_episode
+  population_score_gate: none
+  p90_gate_prohibited: true
+  pullback_depth_price_field: completed_1s_intrabar_high_low
+  counter_5s_already_active_at_arm_counts: true
+
+primary_target:
+  id: ordered_continuation_1p00_vs_0p75_300s
+  direction_normalized: true
+  favorable_barrier_atr: 1.0
+  adverse_barrier_atr: 0.75
+  horizon_seconds: 300
+  reference: first_1s_bar_open_strictly_after_T
+  dispositions:
+    SUCCESS:
+      definition: favorable_barrier_first
+      binary_label: 1
+    FAILURE:
+      definition: adverse_barrier_first
+      binary_label: 0
+    TIMEOUT:
+      definition: full_300s_observed_neither_barrier
+      binary_label: 0
+    AMBIGUOUS_FIRST_TOUCH:
+      definition: both_barriers_touched_inside_same_1s_OHLC_bar
+      binary_label: null
+      training_policy: exclude_and_report
+    CENSORED:
+      definition: session_end_data_end_missing_or_gapped_path_or_other_incomplete_observation
+      binary_label: null
+      training_policy: exclude_and_report
+  adverse_first_assumption_for_same_bar_collision: prohibited
+
+secondary_forward_outcomes:
+  diagnostic_barrier_pairs:
+    - {favorable_atr: 0.5, adverse_atr: 0.75, horizon_seconds: 300}
+    - {favorable_atr: 1.0, adverse_atr: 0.75, horizon_seconds: 300}
+    - {favorable_atr: 1.5, adverse_atr: 0.75, horizon_seconds: 300}
+  horizons_seconds: [60, 120, 180, 300]
+  measurements: [mfe_atr, mae_atr, return_atr]
+  additional_labels:
+    - prevailing_1m_regime_eventual_continuation_or_failure
+    - prevailing_1m_regime_eventual_flip
+    - time_to_next_prevailing_1m_flip
+  feature_use: prohibited_label_only
+
+feature_policy:
+  surface_role: broad_motivated_first_pass_discovery
+  target_count_min: 55
+  target_count_max: 65
+  data_driven_feature_selection_before_first_fit: false
+  arbitrary_transformation_generation: prohibited
+  arbitrary_window_grid: prohibited
+  semantic_duplicate_search_required: true
+  families:
+    A: frozen_Model_C_market_feature_context
+    B: pullback_geometry
+    C: counter_5s_regime_geometry
+    D: structural_1m_location
+    E: multi_horizon_volume_delta_5s_60s_300s
+    F: rolling_productivity
+    G: completed_5m_context_and_alignment
+    H: frozen_Model_C_score_at_candidate
+  requested_new_concepts:
+    - pullback_max_depth_atr_from_completed_1s_intrabar_extremes
+    - pullback_current_depth_atr_from_candidate_time_price
+    - pullback_recovery_from_max_depth_to_candidate
+    - pullback_recovery_from_deepest_extreme
+    - pullback_fraction_of_structural_move
+    - pullback_age_and_maturity
+    - counter_5s_regime_geometry
+    - direction_normalized_pressure_and_selected_ratios
+    - completed_5m_alignment
+  new_feature_contract: canonical_identity_generic_provider_targeted_tests_causal_evidence_promotion
+  inline_study_feature_calculation: prohibited
+
+stage1_dependency:
+  parent_study_id: clean_maturity_flip_model_rolling_productivity
+  parent_train_freeze_artifact: artifacts/train_experiment_freeze_repaired.json
+  parent_train_freeze_artifact_sha256: c5bd68ca503a2395b7ca695354fae5a5968b44c95aef74290bb59d952e4f49a9
+  parent_frozen_execution_composite_sha256: 7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8
+  preprocessing_sha256: 0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4
+  feature_contract_sha256: 99f2af86aefc8ef904eed65c23be7220522d3b99d525a978cea34c104536f72a
+  model_hashes:
+    LONG_C: a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38
+    SHORT_C: 5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf
+  ordered_model_c_feature_surface:
+    - arrival_velocity
+    - arrival_acceleration
+    - ema_slope
+    - prior_1m_regime_efficiency
+    - prior_1m_regime_mfe_atr
+    - prior_1m_regime_range_atr
+    - prior_5m_regime_efficiency
+    - prior_5m_regime_mfe_atr
+    - prior_5m_regime_range_atr
+    - rolling_300s_retention_ratio
+    - rolling_300s_current_progress_atr
+    - rolling_300s_max_progress_atr
+    - rolling_300s_giveback_atr
+  candidate_score:
+    desired: true
+    availability_reference: decision_ts
+    population_gate: false
+    kind: frozen_external_model_score
+    not_a_feature_instance: true
+  historical_score_snapshots:
+    required: false
+    absence_blocks_first_study: false
+  parent_artifact_reconciliation_required_before_scoring: true
+
+model:
+  allowed_family: lightgbm
+  new_model_family_authorized: false
+  broad_hyperparameter_search: false
+  initial_protocol: conservative_fixed_or_small_bounded_train_only
+  proposed_inner_train_chronology:
+    selection_fit_years: [2021]
+    selection_validation_years: [2022]
+    final_train_validation_years: [2023]
+  oos_may_influence_design: false
+
+pre_fit_population_target_gate:
+  required: true
+  lifecycle_point: post_train_merge_pre_fit
+  slices: [direction, year]
+  required_counts:
+    - eligible_pullbacks
+    - counter_5s_regime_observed
+    - valid_flip_back_candidates
+    - duplicate_or_overlap_dispositions
+    - target_resolved
+    - success
+    - failure
+    - timeout
+    - ambiguous_first_touch
+    - censored_session
+    - censored_data_or_gap
+  descriptive_slices: [prevailing_1m_regime_age, pullback_depth]
+  optimization_use: prohibited
+  stop_on_pathological_population_or_balance: true
+
+analysis_requirements:
+  required_metrics: [candidate_count, positive_rate, roc_auc, pr_auc, brier]
+  score_analysis: [deciles, train_derived_high_score_groups]
+  stability: [direction, year, prevailing_regime_age, pullback_depth]
+  path_diagnostics: [mfe, mae, time_to_favorable, time_to_adverse, timeout_share]
+  family_ablation_if_signal_exists: true
+  permutation_importance_required: false
+  calibration_curve_required: false
+  pooled_metrics_may_lead: false
+
+terminal_decisions:
+  P1: STRONG_LEARNABLE_PULLBACK_CONTINUATION_SIGNAL
+  P2: SIGNAL_EXISTS_BUT_IS_DIRECTION_SPECIFIC
+  P3: SIGNAL_CONCENTRATED_IN_A_FEATURE_FAMILY
+  P4: CLASSIFICATION_SIGNAL_BUT_POOR_ECONOMIC_PATH
+  P5: NO_MEANINGFUL_SIGNAL
+  ABORT: CAUSAL_POPULATION_CHRONOLOGY_DATA_FEATURE_GOVERNANCE_OR_TARGET_CONTRACT_FAILURE
+
+approved_generic_capability_work:
+  - generic_completed_5s_regime_state
+  - generic_stateful_episode_population_lifecycle
+  - generic_asymmetric_ordered_barrier_outcome
+  - generic_post_train_merge_pre_fit_required_gate
+  - generic_frozen_external_model_scoring_if_materialized_surface_is_incomplete
+  - canonical_generic_missing_market_state_features_after_duplicate_search
+
+model_arms:
+  BROAD: approximately_55_to_65_motivated_features
+  FAMILY_ABLATIONS: conditional_only_if_clean_signal_exists
+
+variable_being_tested:
+  - causal_pullback_geometry_and_pressure_state_at_first_5s_reacceleration
+  - incremental_information_beyond_unconditional_candidate_base_rate
+
+baseline_feature_selection:
+  mode: none
+
+primary_comparison: >-
+  Direction-first discrimination and economic path quality of the frozen broad motivated
+  feature model versus the unconditional eligible-candidate base rate, with governed family
+  ablations only after clean signal exists.
+
+terminal_question: >-
+  Is there stable, economically coherent learnable continuation signal at the first completed
+  5s re-alignment after a deep pullback, or should this research branch close?
+
+prohibited_changes:
+  - expand_to_full_feature_registry
+  - use_2024_to_change_model_design
+  - introduce_unconstrained_search
+  - unauthorized_feature_discovery
+  - change_target_after_seeing_predictive_performance
+  - change_feature_surface_after_seeing_predictive_performance
+  - retrain_or_reselect_stage1
+  - broaden_arm_c_into_a_feature_mining_pass
+  - coerce_censored_target_rows_to_negative
+
+frozen_prohibitions:
+  - change_1m_regime_definition
+  - change_5s_regime_definition
+  - change_candidate_timestamp_or_next_1s_open_reference
+  - optimize_1_atr_pullback_gate
+  - gate_population_on_Model_C_P90
+  - use_forming_5m_state
+  - change_session_instrument_catalog_roll_or_data_source
+  - access_2025_or_2026
+  - open_2024_before_train_freeze
+  - create_bespoke_collector_model_trainer_target_engine_or_forward_tracker
+  - add_permutation_importance_or_advanced_calibration_infrastructure_for_this_study
+
+allowed_changes:
+  - implement_approved_reusable_level3_capabilities
+  - add_and_promote_genuinely_new_canonical_features_after_duplicate_search
+  - run_targeted_synthetic_and_bounded_governed_validation
+  - run_governed_family_ablations_only_if_signal_exists
+
+authorization:
+  now:
+    - pre_scaffold_contract_authoring
+    - generic_capability_implementation_plan
+  not_yet:
+    - study_scaffold
+    - capability_implementation
+    - collection
+    - model_fit
+    - OOS_open
+  never:
+    - access_2025
+    - access_2026
+
+remaining_clarifications: []
+
+expensive_run_started: false
+study_yaml_created: false

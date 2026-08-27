@@ -37,6 +37,7 @@ from research_workflow.modeling import (
     ModelSelectionBindingRequired,
     ModelSelectionFinalValidationFailed,
     freeze_train_artifacts,
+    fit_models,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -88,6 +89,52 @@ def test_b_composite_target_compiles_and_serializes_exact_conditions():
     fo = contract["required_forward_outcomes"][0]
     assert fo["id"] == "fo1"
     assert "generated_outcome_columns" in fo and len(fo["generated_outcome_columns"]) > 0
+
+
+def test_asymmetric_ordered_barrier_target_compiles_to_runtime_contract():
+    target = {
+        "type": "classification",
+        "conditions": [{
+            "id": "primary_label", "kind": "ordered_barrier",
+            "forward_outcome_id": "path", "barrier_id": "primary",
+        }],
+        "required_forward_outcomes": [{
+            "id": "path", "entry_reference": "next_bar_open",
+            "horizon_seconds": 300, "max_tracking_seconds": 300,
+            "max_gap_seconds": 1,
+            "ordered_barriers": [{
+                "id": "primary", "favorable_atr": 1.0,
+                "adverse_atr": 0.75, "horizon_seconds": 300,
+            }],
+        }],
+    }
+    spec = StudySpec.model_validate(dict(BASE_SPEC, target=target))
+    contract = compile_target_contract(spec.target)
+    fo = contract["required_forward_outcomes"][0]
+    assert fo["ordered_barriers"][0] == {
+        "id": "primary", "favorable_atr": 1.0,
+        "adverse_atr": 0.75, "horizon_seconds": 300,
+    }
+    assert "ordered_primary_binary_label" in fo["generated_outcome_columns"]
+
+
+def test_ordered_barrier_condition_must_reference_declared_barrier():
+    target = {
+        "type": "classification",
+        "conditions": [{
+            "id": "primary_label", "kind": "ordered_barrier",
+            "forward_outcome_id": "path", "barrier_id": "missing",
+        }],
+        "required_forward_outcomes": [{
+            "id": "path", "horizon_seconds": 300,
+            "ordered_barriers": [{
+                "id": "primary", "favorable_atr": 1.0,
+                "adverse_atr": 0.75, "horizon_seconds": 300,
+            }],
+        }],
+    }
+    with pytest.raises(ValidationError, match="TARGET_CONDITION_ORDERED_BARRIER_UNDECLARED"):
+        StudySpec.model_validate(dict(BASE_SPEC, target=target))
 
 
 # ---------------------------------------------------------------------------
@@ -256,6 +303,52 @@ def test_gate_artifact_missing_required_key_fails_closed(tmp_path):
     }))
     with pytest.raises(RequiredGateArtifactMalformed):
         assert_gates_satisfied(tmp_path, spec, "prepare")
+
+
+def _pre_fit_gated_spec():
+    return StudySpec.model_validate(dict(
+        BASE_SPEC,
+        required_gates=[{
+            "id": "population_balance", "stage": "pre_fit",
+            "artifact_path": "artifacts/population_balance.json",
+            "artifact_schema_version": 1,
+        }],
+    ))
+
+
+def test_pre_fit_gate_is_bound_to_merged_train_dataset_identity(tmp_path):
+    spec = _pre_fit_gated_spec()
+    (tmp_path / "artifacts").mkdir()
+    scope = compute_population_scope_sha256(spec, spec.required_gates[0].scope_fields)
+    (tmp_path / "artifacts" / "population_balance.json").write_text(json.dumps({
+        "gate_id": "population_balance", "schema_version": 1, "status": "PASS",
+        "scope_sha256": scope, "dataset_identity_sha256": "old-merge",
+        "producer": "diagnostic", "created_at_utc": "now",
+    }))
+    with pytest.raises(RequiredGateStale, match="old-merge"):
+        assert_gates_satisfied(
+            tmp_path, spec, "pre_fit", dataset_identity_sha256="current-merge"
+        )
+
+
+def test_fit_refuses_missing_pre_fit_gate_before_estimator_construction(tmp_path, monkeypatch):
+    called = False
+
+    def forbidden_fit(*args, **kwargs):
+        nonlocal called
+        called = True
+        raise AssertionError("estimator construction was reached")
+
+    monkeypatch.setattr("research_workflow.modeling.fit_arms", forbidden_fit)
+    X = pd.DataFrame({"x": [0.0, 1.0]})
+    y = pd.Series([0, 1])
+    meta = pd.DataFrame({"_partition": ["train", "train"]})
+    with pytest.raises(RequiredGateNotSatisfied):
+        fit_models(
+            tmp_path, X, y, meta=meta, spec=object(),
+            study_spec=_pre_fit_gated_spec(), dataset_identity_sha256="merge-sha",
+        )
+    assert called is False
 
 
 # ---------------------------------------------------------------------------

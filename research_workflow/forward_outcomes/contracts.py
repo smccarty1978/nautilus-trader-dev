@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from enum import Enum
+import re
 from typing import Any, Iterable, Mapping, Optional, Tuple
 
 from research.analysis.identity import canonical_sha256
@@ -95,6 +96,42 @@ class BarInclusion(str, Enum):
     CLOSE_AFTER_ENTRY = "CLOSE_AFTER_ENTRY"
 
 
+class OrderedBarrierDisposition(str, Enum):
+    """Terminal result of an asymmetric, direction-normalized barrier race."""
+
+    SUCCESS = "SUCCESS"
+    FAILURE = "FAILURE"
+    TIMEOUT = "TIMEOUT"
+    AMBIGUOUS_FIRST_TOUCH = "AMBIGUOUS_FIRST_TOUCH"
+    CENSORED = "CENSORED"
+
+
+@dataclass(frozen=True)
+class OrderedBarrierSpec:
+    """One generic favourable-X/adverse-Y race over a fixed forward horizon."""
+
+    barrier_id: str
+    favorable_atr: float
+    adverse_atr: float
+    horizon_seconds: int
+
+    def __post_init__(self) -> None:
+        if not re.fullmatch(r"[a-z][a-z0-9_]*", self.barrier_id):
+            raise ForwardOutcomeError(
+                "ordered barrier_id must match [a-z][a-z0-9_]*"
+            )
+        if float(self.favorable_atr) <= 0 or float(self.adverse_atr) <= 0:
+            raise ForwardOutcomeError("ordered barrier distances must be positive")
+        if int(self.horizon_seconds) <= 0:
+            raise ForwardOutcomeError("ordered barrier horizon_seconds must be positive")
+        object.__setattr__(self, "favorable_atr", float(self.favorable_atr))
+        object.__setattr__(self, "adverse_atr", float(self.adverse_atr))
+        object.__setattr__(self, "horizon_seconds", int(self.horizon_seconds))
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
 @dataclass(frozen=True)
 class ConfirmationSpec:
     """Optional second event on the path between prediction and economic exposure.
@@ -153,6 +190,7 @@ class ForwardOutcomeSpec:
     path_quality: bool = True
     epsilon: float = 1e-9
     diagnostic_levels_atr: Tuple[float, ...] = ()
+    ordered_barriers: Tuple[OrderedBarrierSpec, ...] = ()
     confirmation: Optional[ConfirmationSpec] = None
     direction_convention: str = "SIGNED_BY_DIRECTION"
 
@@ -188,10 +226,24 @@ class ForwardOutcomeSpec:
             raise ForwardOutcomeError("diagnostic_levels_atr must be positive")
         if levels and "atr" not in units:
             raise ForwardOutcomeError("diagnostic_levels_atr require the 'atr' excursion unit")
+        barriers = tuple(
+            b if isinstance(b, OrderedBarrierSpec) else OrderedBarrierSpec(**b)
+            for b in self.ordered_barriers
+        )
+        barrier_ids = [b.barrier_id for b in barriers]
+        if len(barrier_ids) != len(set(barrier_ids)):
+            raise ForwardOutcomeError(f"duplicate ordered barrier ids: {barrier_ids}")
+        if any(b.horizon_seconds > int(self.max_tracking_seconds) for b in barriers):
+            raise ForwardOutcomeError(
+                "ordered barrier horizon_seconds exceed max_tracking_seconds"
+            )
+        if barriers and "atr" not in units:
+            raise ForwardOutcomeError("ordered barriers require the 'atr' excursion unit")
         object.__setattr__(self, "horizons_seconds", horizons)
         object.__setattr__(self, "max_tracking_seconds", int(self.max_tracking_seconds))
         object.__setattr__(self, "excursion_units", units)
         object.__setattr__(self, "diagnostic_levels_atr", levels)
+        object.__setattr__(self, "ordered_barriers", barriers)
         object.__setattr__(self, "reference_price", ReferencePrice(self.reference_price))
         object.__setattr__(self, "bar_inclusion", BarInclusion(self.bar_inclusion))
         if self.confirmation is not None:
@@ -220,6 +272,7 @@ class ForwardOutcomeSpec:
             "path_quality": bool(self.path_quality),
             "epsilon": self.epsilon,
             "diagnostic_levels_atr": list(self.diagnostic_levels_atr),
+            "ordered_barriers": [b.to_dict() for b in self.ordered_barriers],
             "confirmation": self.confirmation.to_dict() if self.confirmation else None,
             "direction_convention": self.direction_convention,
         }
@@ -407,6 +460,16 @@ def build_outcome_columns(spec: ForwardOutcomeSpec) -> Tuple[str, ...]:
         cols += [
             f"time_to_favorable_{lab}", f"time_to_adverse_{lab}",
             f"favorable_before_adverse_{lab}", f"first_touch_ambiguous_{lab}",
+        ]
+
+    for barrier in spec.ordered_barriers:
+        prefix = f"ordered_{barrier.barrier_id}"
+        cols += [
+            f"{prefix}_disposition", f"{prefix}_binary_label",
+            f"{prefix}_favorable_touch_ts", f"{prefix}_adverse_touch_ts",
+            f"{prefix}_time_to_favorable", f"{prefix}_time_to_adverse",
+            f"{prefix}_first_touch_ambiguous", f"{prefix}_censor_reason",
+            f"{prefix}_resolved_at_ts",
         ]
 
     if spec.confirmation is not None:

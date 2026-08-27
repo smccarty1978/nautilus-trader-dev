@@ -4,6 +4,7 @@ description: Reads already-generated artifacts and decides what they mean. Owns 
 tools: [Read, Grep, Glob, Write]
 model: claude-sonnet-5
 effort: high
+capability_tier: high_assurance
 maxTurns: 30
 ---
 

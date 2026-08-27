@@ -22,7 +22,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.sync_agents import (  # noqa: E402
-    CODEX_DIR, CODEX_META, CLAUDE_DIR, WRITE_TOOLS, derive_sandbox_mode, parse_claude_agent,
+    CODEX_DIR, CODEX_META, CLAUDE_DIR, WRITE_TOOLS, derive_sandbox_mode, load_model_profiles,
+    parse_claude_agent, resolve_model,
 )
 
 GENERATED = sorted(CODEX_META)
@@ -104,3 +105,19 @@ def test_generator_reports_in_sync():
         cwd=str(REPO_ROOT), capture_output=True, text=True,
     )
     assert proc.returncode == 0, f"agent artifacts are out of sync:\n{proc.stdout}\n{proc.stderr}"
+
+
+def test_codex_models_resolve_from_portable_capability_tiers():
+    profiles = load_model_profiles()
+    assert resolve_model(harness="codex", capability_tier="balanced_coding", profiles=profiles) == (
+        "gpt-5.6-terra", "medium"
+    )
+    assert resolve_model(harness="codex", capability_tier="fast_discovery", profiles=profiles) == (
+        "gpt-5.6-luna", "low"
+    )
+
+
+def test_generated_codex_agents_do_not_use_foreign_provider_models():
+    for path in CODEX_DIR.glob("*.toml"):
+        text = path.read_text(encoding="utf-8")
+        assert 'model = "gemini-' not in text

@@ -18,8 +18,10 @@ hand-maintained near-copies of the same content, and they drifted. Do not re-exp
 
 ## Model routing
 
-Agent model ids live in the frontmatter of `.claude/agents/*.md` (canonical) and in
-`CODEX_META` in `scripts/sync_agents.py` (per-harness).
+Claude model ids remain in `.claude/agents/*.md` for Claude launch compatibility. Portable
+capability tiers and per-harness model mappings live in
+`config/agent_model_profiles.json`; Codex and Gemini/Antigravity adapters resolve models from
+that map.
 
 > **Do NOT set `CLAUDE_CODE_SUBAGENT_MODEL` to a fixed model.** Leave it unset or set it to
 > `inherit`, so each agent file's `model:` frontmatter controls routing. Pinning it globally

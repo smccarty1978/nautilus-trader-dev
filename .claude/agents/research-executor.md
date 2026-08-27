@@ -4,6 +4,7 @@ description: Governed research execution. Drives a sealed study through collecti
 tools: [Read, Grep, Glob, Bash, Write]
 model: claude-sonnet-5
 effort: medium
+capability_tier: balanced_coding
 maxTurns: 40
 ---
 

@@ -4,6 +4,7 @@ description: Use proactively before any backtest, study, or strategy review to a
 tools: [Read, Grep, Glob, Write]
 model: claude-sonnet-5
 effort: high
+capability_tier: high_assurance
 ---
 
 # Look-Ahead & Timestamp Auditor

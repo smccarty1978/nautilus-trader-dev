@@ -55,6 +55,7 @@ OUTCOME_COLUMN_PATTERNS: tuple[re.Pattern, ...] = tuple(
         r"^(retained_mfe_fraction_final|giveback_from_max_mfe)$",
         r"^time_to_(favorable|adverse)_[0-9p]+atr$",
         r"^(favorable_before_adverse|first_touch_ambiguous)_[0-9p]+atr$",
+        r"^ordered_[a-z][a-z0-9_]*_(disposition|binary_label|favorable_touch_ts|adverse_touch_ts|time_to_favorable|time_to_adverse|first_touch_ambiguous|censor_reason|resolved_at_ts)$",
         r"^(pre|post)_confirmation_.+$",
         r"^confirmed$",
         r"^confirmation_(ts|price)$",
