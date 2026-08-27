@@ -1,0 +1,20 @@
+{
+  "status": "BLOCKED",
+  "preflight_run_id": "20260827T134952Z_c00cec645843",
+  "generated_at_utc": "2026-08-27T13:49:52.145670+00:00",
+  "code_hash": "c00cec645843ada2532a73a6fe44056d6c5c50c750fddaab0b3569cfeb96d270",
+  "superseded": true,
+  "failed_gate": "CAUSAL_LINT",
+  "failure_ids": [
+    "no eligible Python files found under requested roots or execution manifest"
+  ],
+  "failure_details": [
+    {
+      "message": "no eligible Python files found under requested roots or execution manifest"
+    }
+  ],
+  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_LINT and fix locally before requesting audit.",
+  "superseded_by_preflight_run_id": "20260827T141648Z_d559f3dfce44",
+  "superseded_at_utc": "2026-08-27T14:16:48.759063+00:00",
+  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+}

@@ -72,6 +72,10 @@ CODEX_META: dict[str, dict[str, str]] = {
         "name": "analysis_decider",
         "approval_policy": "never",
     },
+    "capability-router": {
+        "name": "capability_router",
+        "approval_policy": "never",
+    },
 }
 
 # Codex agents with no Claude counterpart -- left untouched by this script.

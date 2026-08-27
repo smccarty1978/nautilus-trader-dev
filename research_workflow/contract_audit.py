@@ -113,6 +113,36 @@ def _check_model_selection_binding_present(study: Path, spec: dict[str, Any]) ->
 
 def run_contract_review(study_path: str | Path, **_: Any) -> dict[str, Any]:
     study = Path(study_path).resolve()
+    if (study / "feature_candidate.yaml").is_file() and not (study / "study.yaml").is_file():
+        try:
+            from research_workflow.feature_candidate_authority import validate
+            from scripts.resolve_execution_manifest import resolve_execution_manifest
+            authority = validate(study / "feature_candidate.yaml")
+            frozen = json.loads((study / "audit" / "frozen_execution_manifest.json").read_text(encoding="utf-8"))
+            composite = frozen.get("frozen_execution_composite_sha256")
+            current, _, _ = resolve_execution_manifest(study, feature_authority="candidate", authority_type="feature_candidate")
+            if not composite or current != composite:
+                raise RuntimeError(f"STALE_FREEZE: current={current} frozen={composite}")
+            candidates = authority.get("candidate_features") or []
+            checks = [{"name":"authority_identity", "passed": authority.get("authority_type") == "feature_candidate" and bool(authority.get("authority_id"))},
+                      {"name":"candidate_identities", "passed": bool(candidates) and all((x.get("canonical_name") or x.get("feature")) for x in candidates)},
+                      {"name":"implementation_declared", "passed": bool(authority.get("implementation"))},
+                      {"name":"evidence_requirements_declared", "passed": bool(authority.get("evidence_requirements"))},
+                      {"name":"prohibited_scope_declared", "passed": bool(authority.get("prohibited_scope_expansion"))}]
+            passed = all(c["passed"] for c in checks)
+            audit = study / "audit"; audit.mkdir(exist_ok=True)
+            n = max([int(p.stem.split("_")[-1]) for p in audit.glob("contract_pass_*.md") if p.stem.split("_")[-1].isdigit()] or [0]) + 1
+            payload = {"audit_type":"contract", "auditor":"research_workflow.contract_audit", "study":study.name,
+                       "feature_authority":"candidate", "authority_type":"feature_candidate", "authority_id":authority["authority_id"],
+                       "verdict":"CLEAR" if passed else "BLOCKED", "blocking":0 if passed else 1, "critical":0 if passed else 1, "warning":0,
+                       "audited_execution_composite_sha256":composite}
+            report = "# Feature Candidate Contract Review\n\n" + json.dumps({"checks":checks}, indent=2) + "\n\n<!-- AUDIT_SUMMARY_V2_START -->\n" + json.dumps(payload) + "\n<!-- AUDIT_SUMMARY_V2_END -->\n"
+            (audit / f"contract_pass_{n:02d}.md").write_text(report, encoding="utf-8")
+            from scripts.run_preexec_audits import issue_contract_audit_status_from_report
+            evidence = issue_contract_audit_status_from_report(study, n, auditor="research_workflow.contract_audit") if passed else None
+            return {"status":"CLEAR" if passed else "BLOCKED", "checks":checks, "frozen_composite":composite, "evidence":evidence}
+        except Exception as exc:
+            return {"status":"BLOCKED", "study":str(study), "findings":[str(exc)], "artifact_path":None}
     try:
         frozen = json.loads((study / "audit" / "frozen_execution_manifest.json").read_text(encoding="utf-8"))
         composite = frozen.get("frozen_execution_composite_sha256")

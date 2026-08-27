@@ -553,6 +553,7 @@ def resolve_execution_file_paths(
     study_dir: Path,
     repo_root: Optional[Path] = None,
     strict: bool = True,
+    authority_type: Optional[str] = None,
 ) -> Tuple[Dict[str, Path], Dict[str, Any]]:
     """Resolves every execution-closure composite key to its authoritative physical Path.
 
@@ -598,18 +599,23 @@ def resolve_execution_file_paths(
     try:
         all_unresolved: List[Dict[str, str]] = []
 
-        # 1. Study Contract Files
-        study_files_map = resolve_study_files(study_dir, repo_root)
+        candidate_authority = authority_type == "feature_candidate" or (study_dir / "feature_candidate.yaml").is_file() or (study_dir / "feature_candidate.json").is_file()
+        if candidate_authority:
+            authority_path = study_dir / "feature_candidate.yaml"
+            if not authority_path.is_file():
+                authority_path = study_dir / "feature_candidate.json"
+            from research_workflow.feature_candidate_authority import validate
+            validate(authority_path)
+            study_files_map = {"feature_candidate:authority": authority_path.resolve()}
+        else:
+            study_files_map = resolve_study_files(study_dir, repo_root)
 
         # 2. Dynamic Strategy File Resolution
-        strategy_file = resolve_dynamic_strategy_file(study_dir, repo_root)
+        strategy_file = None if candidate_authority else resolve_dynamic_strategy_file(study_dir, repo_root)
 
         # 3. Runtime Execution Graph Seeds
-        runtime_seeds = [
-            repo_root / "backtests/run_nt_study.py",
-            repo_root / "backtests/nt_runtime/modes/collect.py",
-            strategy_file,
-        ]
+        runtime_seeds = ([repo_root / "features/registry.py", repo_root / "features/candidate_authority.py"]
+                         if candidate_authority else [repo_root / "backtests/run_nt_study.py", repo_root / "backtests/nt_runtime/modes/collect.py", strategy_file])
         runtime_closure_set, runtime_unres = compute_ast_closure(runtime_seeds, repo_root)
         all_unresolved.extend(runtime_unres)
 
@@ -708,6 +714,7 @@ def resolve_execution_manifest(
     repo_root: Optional[Path] = None,
     strict: bool = True,
     feature_authority: str = "active",
+    authority_type: Optional[str] = None,
 ) -> Tuple[str, Dict[str, str], Dict[str, Any]]:
     """Dynamically resolves the full transitive closure across Runtime, Contract Authority, and Governance graphs.
 
@@ -755,7 +762,7 @@ def resolve_execution_manifest(
     try:
         if feature_authority not in {"active", "candidate"}:
             raise ValueError(f"UNKNOWN_FEATURE_AUTHORITY: {feature_authority!r}")
-        combined_paths, closure_data = resolve_execution_file_paths(study_dir, repo_root, strict=strict)
+        combined_paths, closure_data = resolve_execution_file_paths(study_dir, repo_root, strict=strict, authority_type=authority_type)
         if feature_authority in {"active", "candidate"}:
             from features.candidate_authority import (
                 ACTIVE_POINTER, AUTHORITY_ROOT, CANDIDATE_DIR,
@@ -768,6 +775,11 @@ def resolve_execution_manifest(
                 combined_paths["repo:features/authority/active.json"] = ACTIVE_POINTER
                 pointer = json.loads(ACTIVE_POINTER.read_text(encoding="utf-8"))
                 authority_dir = AUTHORITY_ROOT / str(pointer.get("bundle", ""))
+            else:
+                # Candidate authority must be independent of the currently
+                # activated bundle; changing active.json cannot stale an
+                # otherwise frozen feature-candidate review.
+                authority_dir = CANDIDATE_DIR
             assert authority_dir is not None
             bundle_hashes(authority_dir)
             for name in REQUIRED_BUNDLE_FILES:
@@ -916,8 +928,15 @@ def verify_frozen_execution_identity(study_path: Path, repo_root: Optional[Path]
     frozen_composite = frozen_data.get("frozen_execution_composite_sha256")
     frozen_hashes = frozen_data.get("file_sha256_map", {})
 
-    # Re-resolve the execution manifest from current tree
-    current_composite, current_hashes, _ = resolve_execution_manifest(study_path, repo_root)
+    # Re-resolve through the same typed authority mode used at prepare.  A
+    # feature-candidate freeze must never fall back to the active study closure.
+    authority_type = frozen_data.get("authority_type")
+    if authority_type == "feature_candidate":
+        current_composite, current_hashes, _ = resolve_execution_manifest(
+            study_path, repo_root, feature_authority="candidate", authority_type=authority_type
+        )
+    else:
+        current_composite, current_hashes, _ = resolve_execution_manifest(study_path, repo_root)
 
     # Compare
     added = [k for k in current_hashes if k not in frozen_hashes]

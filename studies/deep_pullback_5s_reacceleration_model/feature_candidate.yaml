@@ -1,0 +1,54 @@
+authority_id: deep_pullback_5s_reacceleration_capabilities_v1
+authority_type: feature_candidate
+candidate_features:
+  - canonical_name: pullback_max_depth_atr
+  - canonical_name: pullback_recovery_from_extreme_atr
+  - canonical_name: pullback_post_arm_seconds
+  - canonical_name: pullback_elapsed_seconds
+  - canonical_name: pullback_fraction_of_structural_move
+  - canonical_name: seconds_since_prevailing_directional_extreme
+  - canonical_name: prior_deep_pullback_count
+  - canonical_name: recovery_from_counter_regime_extreme_atr
+  - canonical_name: fraction_of_counter_regime_move_recovered
+  - canonical_name: trend_normalized_est_delta_sum
+  - canonical_name: trend_normalized_est_delta_sum_ratio
+  - canonical_name: regime_direction
+  - canonical_name: regime_alignment
+  - canonical_name: generic_completed_5s_regime_state
+  - canonical_name: episode_population_lifecycle
+  - canonical_name: asymmetric_ordered_barrier_outcome
+  - canonical_name: frozen_external_model_score
+  - canonical_name: completed_5m_context
+  - canonical_name: arm_time_atr_anchor
+  - canonical_name: candidate_time_atr_anchor
+  - canonical_name: pullback_current_depth_atr
+semantics:
+  source_timeframe: 1s
+  availability_timestamp: completed_source_bar_ts_init
+  bar_state: completed
+  warmup: causal_provider_declared
+  reset_policy: prevailing_extreme_or_regime_flip
+  null_policy: provider_declared
+  normalization: direction_normalized
+implementation:
+  registry_definitions: features/registry.py
+  providers:
+    - features.trackers.generic_episode_geometry
+    - features.trackers.generic_regime_geometry
+    - features.trackers.generic_ohlcv_delta
+  lifecycle: research_workflow/episode_population.py
+evidence_requirements:
+  - deterministic_unit_tests
+  - synthetic_causal_event_loop_replay
+  - independent_causal_audit
+  - independent_contract_audit
+promotion_scope:
+  exact_feature_definitions: true
+  exact_parameter_instances_only: true
+prohibited_scope_expansion:
+  - study_population
+  - target_behavior
+  - model_behavior
+  - train_oos_data
+  - undeclared_registry_mutation
+terminal_decision: DEFER

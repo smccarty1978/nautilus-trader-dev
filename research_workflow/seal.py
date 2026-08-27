@@ -83,16 +83,17 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
     except PreflightEvidenceError as err:
         raise PreexecAuditStaleError(str(err))
 
+    is_candidate = (study_dir / "feature_candidate.yaml").is_file() and not (study_dir / "study.yaml").is_file()
     # Any study-declared gate staged "seal" must be satisfied before the seal is issued.
     try:
-        import yaml as _yaml
-        from research.schemas.study_spec import StudySpec
-        from research_workflow.gates import assert_gates_satisfied
-
-        _study_spec = StudySpec.model_validate(
-            _yaml.safe_load((study_dir / "study.yaml").read_text(encoding="utf-8"))
-        )
-        assert_gates_satisfied(study_dir, _study_spec, stage="seal")
+        if is_candidate:
+            _study_spec = None
+        else:
+            import yaml as _yaml
+            from research.schemas.study_spec import StudySpec
+            from research_workflow.gates import assert_gates_satisfied
+            _study_spec = StudySpec.model_validate(_yaml.safe_load((study_dir / "study.yaml").read_text(encoding="utf-8")))
+            assert_gates_satisfied(study_dir, _study_spec, stage="seal")
     except (FileNotFoundError, OSError):
         raise
     except PreexecAuditStaleError:
@@ -101,7 +102,12 @@ def generate_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = Non
         raise PreexecAuditStaleError(f"REQUIRED_GATE_NOT_SATISFIED: {err}")
 
     # 1. Compute current execution code manifest & composite hash
-    current_composite_sha, exec_file_hashes = compute_execution_files_manifest(study_dir, repo_root)
+    from scripts.resolve_execution_manifest import resolve_execution_manifest
+    current_composite_sha, exec_file_hashes, _ = resolve_execution_manifest(
+        study_dir, repo_root,
+        feature_authority="candidate" if is_candidate else "active",
+        authority_type="feature_candidate" if is_candidate else None,
+    )
 
     # 2. Verify audits exist, are CLEAR, and have authentic provenance
     status_file = study_dir / "audit" / "status.json"
@@ -321,8 +327,12 @@ def verify_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = None)
     # reconstructing a path by splitting the key string -- that reconstruction is exactly
     # what broke on the dataset-authority pseudo-scope.
     from scripts.resolve_execution_manifest import resolve_execution_file_paths
+    typed_candidate = (study_dir / "feature_candidate.yaml").is_file() and not (study_dir / "study.yaml").is_file()
     try:
-        exec_paths, _ = resolve_execution_file_paths(study_dir, repo_root)
+        exec_paths, _ = resolve_execution_file_paths(
+            study_dir, repo_root,
+            authority_type="feature_candidate" if typed_candidate else None,
+        )
     except Exception as err:
         raise PreexecAuditStaleError(f"PREEXEC_AUDIT_STALE: {err}")
 
@@ -359,7 +369,12 @@ def verify_preexec_audit_seal(study_dir: Path, repo_root: Optional[Path] = None)
             )
 
     # Verify current execution composite hash against seal composite hash
-    current_composite_sha, _ = compute_execution_files_manifest(study_dir, repo_root)
+    from scripts.resolve_execution_manifest import resolve_execution_manifest
+    current_composite_sha, _, _ = resolve_execution_manifest(
+        study_dir, repo_root,
+        feature_authority="candidate" if typed_candidate else "active",
+        authority_type="feature_candidate" if typed_candidate else None,
+    )
     if current_composite_sha != seal_data.get("composite_seal_hash"):
         raise PreexecAuditStaleError(
             f"PREEXEC_AUDIT_STALE: Current execution composite hash mismatch!\n"

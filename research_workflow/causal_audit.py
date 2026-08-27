@@ -122,6 +122,34 @@ def _write_and_issue(study: Path, composite: str, checks: list[dict[str, Any]]) 
 
 def run_causal_review(study_path: str | Path, **_: Any) -> dict[str, Any]:
     study = Path(study_path).resolve()
+    if (study / "feature_candidate.yaml").is_file() and not (study / "study.yaml").is_file():
+        try:
+            from research_workflow.feature_candidate_authority import validate
+            from scripts.resolve_execution_manifest import resolve_execution_manifest
+            authority = validate(study / "feature_candidate.yaml")
+            frozen = json.loads((study / "audit" / "frozen_execution_manifest.json").read_text(encoding="utf-8"))
+            composite = frozen.get("frozen_execution_composite_sha256")
+            current, _, _ = resolve_execution_manifest(study, feature_authority="candidate", authority_type="feature_candidate")
+            if not composite or current != composite:
+                raise RuntimeError(f"STALE_FREEZE: current={current} frozen={composite}")
+            checks = [{"name": "authority_schema", "passed": True},
+                      {"name": "completed_availability_declared", "passed": authority["semantics"].get("bar_state") == "completed"},
+                      {"name": "promotion_scope_declared", "passed": bool(authority.get("promotion_scope"))},
+                      {"name": "future_scope_excluded", "passed": "train_oos_data" in authority.get("prohibited_scope_expansion", [])}]
+            passed = all(c["passed"] for c in checks)
+            audit_dir = study / "audit"; audit_dir.mkdir(exist_ok=True)
+            n = max([int(p.stem.split("_")[-1]) for p in audit_dir.glob("pass_*.md") if p.stem.split("_")[-1].isdigit()] or [0]) + 1
+            payload = {"audit_type":"causal", "auditor":"research_workflow.causal_audit", "study":study.name,
+                       "feature_authority":"candidate", "authority_type":"feature_candidate", "authority_id":authority["authority_id"],
+                       "verdict":"CLEAR" if passed else "BLOCKED", "critical":0 if passed else 1, "warning":0,
+                       "audited_execution_composite_sha256":composite}
+            report = "# Feature Candidate Causal Review\n\n" + json.dumps({"checks":checks}, indent=2) + "\n\n<!-- AUDIT_SUMMARY_V2_START -->\n" + json.dumps(payload) + "\n<!-- AUDIT_SUMMARY_V2_END -->\n"
+            (audit_dir / f"pass_{n:02d}.md").write_text(report, encoding="utf-8")
+            from scripts.run_preexec_audits import issue_causal_audit_status_from_report
+            evidence = issue_causal_audit_status_from_report(study, n, auditor="research_workflow.causal_audit") if passed else None
+            return {"status":"CLEAR" if passed else "BLOCKED", "checks":checks, "frozen_composite":composite, "evidence":evidence}
+        except Exception as exc:
+            return {"status":"BLOCKED", "study":str(study), "findings":[str(exc)], "artifact_path":None}
     try:
         study, composite = _context(study)
         result = _write_and_issue(study, composite, _run_checks(study, composite))

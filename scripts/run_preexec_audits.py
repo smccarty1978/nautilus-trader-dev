@@ -1161,7 +1161,16 @@ def issue_causal_audit_status_from_report(
         checked["verdict"], checked["primary"], checked["warning"], checked["tertiary"]
     )
     report_sha256 = checked["report_sha256"]
-    _, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+    typed_candidate = False
+    try:
+        typed_candidate = json.loads((study_dir / "audit" / "frozen_execution_manifest.json").read_text(encoding="utf-8")).get("authority_type") == "feature_candidate"
+    except Exception:
+        pass
+    _, file_hashes, _ = resolve_execution_manifest(
+        study_dir, repo_root=repo_root,
+        feature_authority="candidate" if typed_candidate else "active",
+        authority_type="feature_candidate" if typed_candidate else None,
+    )
 
     reviewer_provenance = build_reviewer_provenance(
         resolved_auditor, checked["identity_source"], transcript_path
@@ -1223,7 +1232,16 @@ def issue_contract_audit_status_from_report(
         checked["verdict"], checked["primary"], checked["warning"], checked["tertiary"]
     )
     report_sha256 = checked["report_sha256"]
-    _, file_hashes, _ = resolve_execution_manifest(study_dir, repo_root=repo_root)
+    typed_candidate = False
+    try:
+        typed_candidate = json.loads((study_dir / "audit" / "frozen_execution_manifest.json").read_text(encoding="utf-8")).get("authority_type") == "feature_candidate"
+    except Exception:
+        pass
+    _, file_hashes, _ = resolve_execution_manifest(
+        study_dir, repo_root=repo_root,
+        feature_authority="candidate" if typed_candidate else "active",
+        authority_type="feature_candidate" if typed_candidate else None,
+    )
 
     reviewer_provenance = build_reviewer_provenance(
         resolved_auditor, checked["identity_source"], transcript_path

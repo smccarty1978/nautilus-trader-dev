@@ -1,5 +1,19 @@
 # Research Study Request
 
+## CAPABILITY_ROUTING
+
+```yaml
+CAPABILITY_ROUTING:
+  EXISTING_VERIFIED: []
+  FEATURE_CANDIDATE_REQUIRED: []
+  GENERIC_PROVIDER_EXTENSION_REQUIRED: []
+  GENERIC_COLLECTOR_EXTENSION_REQUIRED: []
+  STUDY_LOCAL_BESPOKE_REQUIRED: []
+  SEMANTIC_REVIEW_REQUIRED: []
+  CAPABILITY_PROMOTION_BLOCKERS: []
+  TRUE_CAPABILITY_GAPS: []
+```
+
 A researcher fills in everything above the `AGENT INTAKE RESULT` line and hands this to a
 coding/research agent. The agent fills in everything below it and hands it back **before**
 scaffolding `study.yaml`. See `docs/RESEARCH_STUDY_BLUEPRINT.md` for the routing rules this

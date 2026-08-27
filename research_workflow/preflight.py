@@ -188,7 +188,13 @@ def _current_execution_composite(study_dir: Path, repo_root: Optional[Path] = No
     """Recomputes the study's execution composite from the tree as it stands NOW."""
     from scripts.resolve_execution_manifest import resolve_execution_manifest
 
-    comp_sha, _, _ = resolve_execution_manifest(Path(study_dir), repo_root or REPO_ROOT)
+    candidate = Path(study_dir) / "feature_candidate.yaml"
+    if candidate.is_file() or (Path(study_dir) / "feature_candidate.json").is_file():
+        comp_sha, _, _ = resolve_execution_manifest(Path(study_dir), repo_root or REPO_ROOT,
+                                                    feature_authority="candidate",
+                                                    authority_type="feature_candidate")
+    else:
+        comp_sha, _, _ = resolve_execution_manifest(Path(study_dir), repo_root or REPO_ROOT)
     return comp_sha
 
 
@@ -242,7 +248,8 @@ def assert_preflight_audit_ready(
         )
 
     # 4/5. Completeness and outcomes, against this module's constant -- not the file's.
-    if not data.get("is_compiled_study"):
+    is_candidate = data.get("authority_type") == "feature_candidate"
+    if not data.get("is_compiled_study") and not is_candidate:
         raise PreflightEvidenceError(
             "PREFLIGHT_NOT_A_STUDY: the artifact records is_compiled_study=false. A "
             "bare-directory preflight has no compiled contracts to check and cannot "
@@ -254,8 +261,9 @@ def assert_preflight_audit_ready(
             "PREFLIGHT_EVIDENCE_MALFORMED: check_outcomes must be an object mapping "
             "each check to its outcome."
         )
+    required_checks = list(data.get("required_checks") or REQUIRED_STUDY_CHECKS) if is_candidate else list(REQUIRED_STUDY_CHECKS)
     deficient = [
-        name for name in REQUIRED_STUDY_CHECKS
+        name for name in required_checks
         if outcomes.get(name, "NOT_EXECUTED") not in PASSING_OUTCOMES
     ]
     if deficient:
@@ -356,6 +364,10 @@ def run_preflight(
         check_outcomes[name] = outcome
 
     study_dir = study_path if study_path and study_path.exists() else None
+    is_candidate_request = bool(study_dir and feature_authority == "candidate" and
+                                ((study_dir / "feature_candidate.yaml").exists() or (study_dir / "feature_candidate.json").exists()))
+    if is_candidate_request and not extra_paths:
+        extra_paths = [REPO_ROOT / "features", REPO_ROOT / "research_workflow"]
     audit_dir = ((study_dir / "audit" / "candidate") if feature_authority == "candidate"
                  else ((study_dir / "audit") if study_dir else (REPO_ROOT / "audit")))
     audit_dir.mkdir(parents=True, exist_ok=True)
@@ -416,7 +428,7 @@ def run_preflight(
     execution_composite: Optional[str] = None
 
     # 0. Stage 0: Canonical Execution Manifest Resolution
-    if study_dir and (study_dir / "study.yaml").exists():
+    if study_dir and ((study_dir / "study.yaml").exists() or is_candidate_request):
         _begin("EXECUTION_MANIFEST")
         try:
             from scripts.resolve_execution_manifest import resolve_execution_manifest
@@ -611,9 +623,12 @@ def run_preflight(
     # or a scratch folder) has no compiled contracts for most of these gates to read, so
     # demanding them there would be a false alarm -- and it could never be audit-ready
     # anyway, because there is no study to audit.
+    is_feature_candidate = bool(study_dir and feature_authority == "candidate" and
+                                ((study_dir / "feature_candidate.yaml").exists() or (study_dir / "feature_candidate.json").exists()))
     is_compiled_study = bool(study_dir and (study_dir / "study.yaml").exists())
 
-    required = list(REQUIRED_STUDY_CHECKS) if is_compiled_study else []
+    required = (list(REQUIRED_STUDY_CHECKS) if is_compiled_study else
+                (list(checks_run) if is_feature_candidate else []))
     incomplete = [
         name for name in required
         if check_outcomes.get(name, "NOT_EXECUTED") not in PASSING_OUTCOMES
@@ -633,7 +648,7 @@ def run_preflight(
     # Readiness needs all three: nothing failed, every required check ran and passed, and
     # there is actually a compiled study to be ready for.
     audit_ready = (
-        status == STATUS_CLEAR and checks_complete and not failed_gate and is_compiled_study
+        status == STATUS_CLEAR and checks_complete and not failed_gate and (is_compiled_study or is_feature_candidate)
     )
 
     code_hash = calculate_dir_hash(study_dir) if study_dir else ""
@@ -669,6 +684,7 @@ def run_preflight(
         "checks_run": checks_run,
         "check_outcomes": check_outcomes,
         "is_compiled_study": is_compiled_study,
+        "authority_type": "feature_candidate" if is_feature_candidate else "study",
         "required_checks": required,
         "required_checks_missing": incomplete,
         "checks_complete": checks_complete,
@@ -726,6 +742,13 @@ def run_preflight(
     target_preflight.parent.mkdir(parents=True, exist_ok=True)
     with open(target_preflight, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2)
+    if is_feature_candidate:
+        # Existing audit-status parsers read the canonical study audit path;
+        # retain the same artifact location while preserving candidate mode.
+        root_preflight = study_dir / "audit" / "preflight.json"
+        if root_preflight != target_preflight:
+            with open(root_preflight, "w", encoding="utf-8") as f:
+                json.dump(result, f, indent=2)
 
     # Print summary card
     print("=" * 60)

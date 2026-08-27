@@ -1,0 +1,53 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\deep_pullback_5s_reacceleration_model",
+  "decision_contract": {
+    "research_question": "Within an established prevailing 1m regime, after a direction-normalized pullback of at least 1.00 ATR and a completed causal 5s regime flip back into alignment with that prevailing regime, can causal market state, pullback geometry, volume/delta, structural-regime context, and the frozen upstream Model C context identify entries that reach +1.00 ATR favorable before -0.75 ATR adverse within 300 seconds?",
+    "baseline": null,
+    "baseline_feature_selection": {
+      "mode": "none"
+    },
+    "model_arms": {
+      "BROAD": "approximately_55_to_65_motivated_features",
+      "FAMILY_ABLATIONS": "conditional_only_if_clean_signal_exists"
+    },
+    "variable_being_tested": [
+      "causal_pullback_geometry_and_pressure_state_at_first_5s_reacceleration",
+      "incremental_information_beyond_unconditional_candidate_base_rate"
+    ],
+    "prohibited_changes": [
+      "expand_to_full_feature_registry",
+      "use_2024_to_change_model_design",
+      "introduce_unconstrained_search",
+      "unauthorized_feature_discovery",
+      "change_target_after_seeing_predictive_performance",
+      "change_feature_surface_after_seeing_predictive_performance",
+      "retrain_or_reselect_stage1",
+      "broaden_arm_c_into_a_feature_mining_pass",
+      "coerce_censored_target_rows_to_negative"
+    ],
+    "allowed_changes": [
+      "implement_approved_reusable_level3_capabilities",
+      "add_and_promote_genuinely_new_canonical_features_after_duplicate_search",
+      "run_targeted_synthetic_and_bounded_governed_validation",
+      "run_governed_family_ablations_only_if_signal_exists"
+    ],
+    "chronology": {
+      "train": [
+        2021,
+        2022,
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": "Direction-first discrimination and economic path quality of the frozen broad motivated feature model versus the unconditional eligible-candidate base rate, with governed family ablations only after clean signal exists.",
+    "terminal_question": "Is there stable, economically coherent learnable continuation signal at the first completed 5s re-alignment after a deep pullback, or should this research branch close?"
+  },
+  "findings": []
+}

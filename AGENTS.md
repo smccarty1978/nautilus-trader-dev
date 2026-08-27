@@ -226,6 +226,8 @@ most frequent finding categories in this repository.
 | `research-executor` | `research_executor` | Governed collection, partitioned TRAIN, reconciliation, fitting, TRAIN freeze, OOS opening and scoring, artifact production | Sonnet / medium | — |
 | `analysis-decider` | `analysis_decider` | Reading generated artifacts, model comparison, forward-outcome interpretation, the research conclusion | Sonnet / high | — |
 
+| `capability-router` | `capability_router` | Read-only semantic routing of pre-study capability requests; no implementation, audit, promotion, or scaffolding | high assurance | — |
+
 `Explore` (`.claude/agents/Explore.md`, Claude-only) is **a model pin, not a role** — it stops
 the built-in fan-out search agent inheriting the orchestrator's model. Prefer `repo-scout`.
 
