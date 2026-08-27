@@ -45,12 +45,25 @@ def route(request: dict[str, Any], *, repo_root: Path = ROOT) -> dict[str, list[
             out["GENERIC_PROVIDER_EXTENSION" if kind == "generic_provider" else
                 "GENERIC_COLLECTOR_EXTENSION" if kind == "generic_collector" else
                 "STUDY_LOCAL_BESPOKE" if kind == "study_local_bespoke" else
+                "TRUE_CAPABILITY_GAP" if (kind == "true_capability_gap" or item.get("capability_gap")) else
                 "SEMANTIC_REVIEW_REQUIRED"].append(fact)
             continue
         try:
             from features.registry import FeatureInstance
             validate_feature_instance(FeatureInstance(str(name), params))
-            status = str(getattr(definition, "status", "provisional"))
+            from features.candidate_authority import load_authority, ACTIVE_POINTER
+            is_active_verified = False
+            if ACTIVE_POINTER.is_file():
+                try:
+                    active_bundle = load_authority("active")
+                    active_verified = {
+                        d.get("canonical_name") for d in active_bundle["registry"].get("definitions", [])
+                        if d.get("status") == "verified"
+                    }
+                    is_active_verified = str(name) in active_verified
+                except Exception:
+                    pass
+            status = "verified" if (is_active_verified or getattr(definition, "status", "provisional") == "verified") else "provisional"
             if status == "verified":
                 out["EXISTING_VERIFIED"].append(fact)
             else:

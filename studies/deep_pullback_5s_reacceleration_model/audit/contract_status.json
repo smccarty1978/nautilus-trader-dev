@@ -1,15 +1,15 @@
 {
   "audit_type": "contract",
   "auditor": "research_workflow.contract_audit",
-  "pass": 11,
+  "pass": 17,
   "verdict": "CLEAR",
   "critical": 0,
   "blocking": 0,
   "warning": 0,
   "not_verified": 0,
-  "audited_execution_composite_sha256": "a8f0d6e8756c298f3bb6e72bd00b319b3c8348ede1c2814a6cc6c6736343b256",
-  "audit_report_sha256": "852779039f6d05ffef883db02b446ccc72cca775d36fcdb6b5e9cb3cec58432e",
-  "audit_report_path": "audit/contract_pass_11.md",
+  "audited_execution_composite_sha256": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+  "audit_report_sha256": "b75423e692088fd51ef1f758d7e43c1df6aaa840bc733c9ede5903c3d2d67d9e",
+  "audit_report_path": "audit/contract_pass_17.md",
   "transcript_sha256": null,
   "reviewer_provenance": {
     "declared_auditor": "research_workflow.contract_audit",
@@ -43,7 +43,7 @@
     "repo:features/authority/candidate/canonical_registry.json": "c1705b23f3cd25de741ab5624dafaa0db9cb0a3bf3f056ebb10e50e4001a662f",
     "repo:features/authority/candidate/legacy_alias_mapping.json": "3e2ab3a42e2a74771b2162c49a9d085d237aab20942a4746759341f52ee67e7f",
     "repo:features/authority/candidate/promotion_facts.json": "fed7f18f01a56c40e6053b237c4e750e66c50cae28e7f8009a1a93fc37f1dfb6",
-    "repo:features/candidate_authority.py": "657d83f6fdd37c2dc8b288383df18843c0d90e6387f469531707af58816d108e",
+    "repo:features/candidate_authority.py": "7e65925140308c7cb583a3682a1476c7bbd5af2207bb49a2a86b8ce4e98c6440",
     "repo:features/collector.py": "a71360e6a1e8a423d383100d6cc7e40ee35ecb338fcdbceeb7e66024191508fa",
     "repo:features/engine.py": "ced40b73944decc4e7c68567175cc4d586b10d96b9d4b97c7d0a9db113d5ae03",
     "repo:features/feature_lifecycle_baseline.json": "36750ebdba6057539f038f8eea549d68191eec7900e2873b4ffe2cd03e822364",
@@ -130,5 +130,5 @@
     "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
     "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59"
   },
-  "timestamp": "2026-08-27T15:30:48.355858+00:00"
+  "timestamp": "2026-08-27T17:12:48.257317+00:00"
 }

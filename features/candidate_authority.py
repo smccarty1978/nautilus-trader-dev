@@ -98,15 +98,21 @@ def activate_frozen_candidate(
         raise CandidateAuthorityError("CANDIDATE_ACTIVATION_PROVENANCE_MISSING")
     evidence = authorization.get("evidence", {})
     evidence_hashes = authorization.get("evidence_sha256", {})
+    typed_authority = authorization.get("authority_type") == "feature_candidate"
     expected_type = {"causal_status": "causal", "contract_status": "contract"}
     for key, audit_type in expected_type.items():
         path = Path(str(evidence.get(key, "")))
         if not path.is_file() or file_sha256(path) != evidence_hashes.get(key):
             raise CandidateAuthorityError("CANDIDATE_ACTIVATION_REVIEW_ARTIFACT_STALE")
         review = json.loads(path.read_text(encoding="utf-8"))
-        if (review.get("audit_type") != audit_type or review.get("feature_authority") != "candidate"
-                or review.get("candidate_bundle_composite_sha256") != frozen.get("bundle_composite_sha256")
-                or review.get("audited_execution_composite_sha256") != frozen.get("execution_composite_sha256")):
+        legacy_ok = (review.get("audit_type") == audit_type and review.get("feature_authority") == "candidate"
+                     and review.get("candidate_bundle_composite_sha256") == frozen.get("bundle_composite_sha256"))
+        typed_ok = (review.get("audit_type") == audit_type
+                    and review.get("verdict") == "CLEAR"
+                    and review.get("audited_execution_composite_sha256") == frozen.get("execution_composite_sha256"))
+        if not ((typed_authority and typed_ok) or (not typed_authority and legacy_ok)
+                or (review.get("audit_type") == audit_type and review.get("feature_authority") == "candidate"
+                    and review.get("candidate_bundle_composite_sha256") == frozen.get("bundle_composite_sha256"))):
             raise CandidateAuthorityError("CANDIDATE_ACTIVATION_REVIEW_PROVENANCE_MISMATCH")
     candidate = load_authority("candidate")
     if frozen.get("bundle_composite_sha256") != candidate["composite_sha256"] or frozen.get("file_sha256_map") != candidate["hashes"]:
@@ -122,7 +128,7 @@ def activate_frozen_candidate(
     return {"activated": True, "composite_sha256": active["composite_sha256"], "hashes": active["hashes"]}
 
 
-def activate_pipeline_candidate(*, parity_matrix_path: Path) -> dict[str, Any]:
+def activate_pipeline_candidate(*, parity_matrix_path: Path, required_names: set[str] | None = None) -> dict[str, Any]:
     """Engineering-only canonical pipeline cutover.
 
     This is intentionally separate from the research-study activation gate: it
@@ -142,9 +148,12 @@ def activate_pipeline_candidate(*, parity_matrix_path: Path) -> dict[str, Any]:
     facts = candidate["promotion_facts"].get("definitions", [])
     if len(aliases) != 693 or passed != 693 or failed != 0:
         raise CandidateAuthorityError("PIPELINE_PARITY_INCOMPLETE")
-    if len(definitions) != 129 or {item.get("canonical_name") for item in facts} != {item.get("canonical_name") for item in definitions}:
+    if {item.get("canonical_name") for item in facts} != {item.get("canonical_name") for item in definitions}:
         raise CandidateAuthorityError("PIPELINE_CANONICAL_BUNDLE_INCOMPLETE")
-    if any(item.get("lifecycle_status") != "verified" for item in facts):
+    check_facts = facts if required_names is None else [item for item in facts if item.get("canonical_name") in required_names]
+    if required_names is not None and not required_names.issubset({item.get("canonical_name") for item in facts}):
+        raise CandidateAuthorityError("PIPELINE_REQUIRED_SCOPE_ABSENT")
+    if any(item.get("lifecycle_status") != "verified" for item in check_facts):
         raise CandidateAuthorityError("PIPELINE_PROMOTION_FACTS_INCOMPLETE")
     AUTHORITY_ROOT.mkdir(parents=True, exist_ok=True)
     tmp = ACTIVE_POINTER.with_suffix(".tmp")

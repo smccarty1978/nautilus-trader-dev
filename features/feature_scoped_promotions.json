@@ -1,0 +1,559 @@
+{
+  "records": [
+    {
+      "authority_id": "test_idempotency_96978f9e_auth_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "regime_efficiency",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "9874cac8713a8c4e52ec0e11af7a55aa2785c748a5cd3f31cb9becfe9bf1ef24",
+      "parameter_name": "bar_state",
+      "parameter_value": "completed",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "9a5c871b783612921aec4d1e45108e059bd8a680ea84be48a279859b0cde6356",
+      "reviewed_implementation_sha256": "e15b7b81a68edac36490d211113cca693fc62402beccf48ca3aa5a3cc38a0c94",
+      "runtime_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_test_idempotency_96978f9e_9874cac8713a8c4e"
+    },
+    {
+      "authority_id": "test_idempotency_96978f9e_auth_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "regime_efficiency",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "9874cac8713a8c4e52ec0e11af7a55aa2785c748a5cd3f31cb9becfe9bf1ef24",
+      "parameter_name": "context",
+      "parameter_value": "prior",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "9a5c871b783612921aec4d1e45108e059bd8a680ea84be48a279859b0cde6356",
+      "reviewed_implementation_sha256": "e15b7b81a68edac36490d211113cca693fc62402beccf48ca3aa5a3cc38a0c94",
+      "runtime_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_test_idempotency_96978f9e_9874cac8713a8c4e"
+    },
+    {
+      "authority_id": "test_idempotency_96978f9e_auth_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "regime_efficiency",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "9874cac8713a8c4e52ec0e11af7a55aa2785c748a5cd3f31cb9becfe9bf1ef24",
+      "parameter_name": "timeframe",
+      "parameter_value": "5m",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "9a5c871b783612921aec4d1e45108e059bd8a680ea84be48a279859b0cde6356",
+      "reviewed_implementation_sha256": "e15b7b81a68edac36490d211113cca693fc62402beccf48ca3aa5a3cc38a0c94",
+      "runtime_evidence": [
+        "studies/Codex_structural_regime_geometry_maturity/tests/test_geometry_tracker.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_test_idempotency_96978f9e_9874cac8713a8c4e"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "pullback_max_depth_atr",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "scope",
+      "parameter_value": "current_deep_pullback_episode",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "be774480f29bf909895e44f176fa908cad02cb3b457cf551474402188ebd5b48",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "pullback_max_depth_atr",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "extreme_source",
+      "parameter_value": "prevailing_directional_extreme",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "be774480f29bf909895e44f176fa908cad02cb3b457cf551474402188ebd5b48",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "pullback_recovery_from_extreme_atr",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "scope",
+      "parameter_value": "current_deep_pullback_episode",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "e9f52f3956f7314c071bda7d2cbc001849bb44f3a192a1f3f2f9255a94d8d7f2",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "pullback_post_arm_seconds",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "scope",
+      "parameter_value": "current_deep_pullback_episode",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "6ea2637da1e2dd2604aa21077207870181cc86a4fb16f49b8fe187c33aae27c3",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "pullback_elapsed_seconds",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "scope",
+      "parameter_value": "current_deep_pullback_episode",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "d3913c7790b09c0affa9fbad0ad5826a213d75a7e7d1fb1ace7e25fbd834fe16",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "pullback_fraction_of_structural_move",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "scope",
+      "parameter_value": "current_deep_pullback_episode",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "d4dd5b73993e514795fa83ea953ed9e7bb3a0f9deb7b9f69bc55eaadb890c2d6",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "seconds_since_prevailing_directional_extreme",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "timeframe",
+      "parameter_value": "1m",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "718b1ddeb0ab723cac6489b6bd5b254ba9c0bf554f75f922e31353ad8ad3ebf1",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "seconds_since_prevailing_directional_extreme",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "context",
+      "parameter_value": "current",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "718b1ddeb0ab723cac6489b6bd5b254ba9c0bf554f75f922e31353ad8ad3ebf1",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "seconds_since_prevailing_directional_extreme",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "bar_state",
+      "parameter_value": "completed",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "718b1ddeb0ab723cac6489b6bd5b254ba9c0bf554f75f922e31353ad8ad3ebf1",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "seconds_since_prevailing_directional_extreme",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "threshold_atr",
+      "parameter_value": 1.0,
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "718b1ddeb0ab723cac6489b6bd5b254ba9c0bf554f75f922e31353ad8ad3ebf1",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "prior_deep_pullback_count",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "timeframe",
+      "parameter_value": "1m",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "fa5cf0055812ec349688da7cc2a621c2efdb2ba5bcaaba655c770358c0bb616e",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "prior_deep_pullback_count",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "context",
+      "parameter_value": "current",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "fa5cf0055812ec349688da7cc2a621c2efdb2ba5bcaaba655c770358c0bb616e",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "prior_deep_pullback_count",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "bar_state",
+      "parameter_value": "completed",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "fa5cf0055812ec349688da7cc2a621c2efdb2ba5bcaaba655c770358c0bb616e",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "prior_deep_pullback_count",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "threshold_atr",
+      "parameter_value": 1.0,
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "fa5cf0055812ec349688da7cc2a621c2efdb2ba5bcaaba655c770358c0bb616e",
+      "reviewed_implementation_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "recovery_from_counter_regime_extreme_atr",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "timeframe",
+      "parameter_value": "5s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "d4efa70338070746373b4981ac1e73e57211485ece5fc0aa2d3037da07f9f733",
+      "reviewed_implementation_sha256": "be6e08df629cd7a2a32147e9099e38372b9e4a4c061f54808223c1637b01a1bb",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "fraction_of_counter_regime_move_recovered",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "timeframe",
+      "parameter_value": "5s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "31940d7707981900cd1a16746508595419bafe143c56e684d9107c1ee8083b54",
+      "reviewed_implementation_sha256": "be6e08df629cd7a2a32147e9099e38372b9e4a4c061f54808223c1637b01a1bb",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "window",
+      "parameter_value": "5s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "30e71da67f5cae33dadd7589457229d9492ee77b88f6a746d4282567029d5d57",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "update_every",
+      "parameter_value": "1s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "30e71da67f5cae33dadd7589457229d9492ee77b88f6a746d4282567029d5d57",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "direction_reference",
+      "parameter_value": "prevailing_1m",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "30e71da67f5cae33dadd7589457229d9492ee77b88f6a746d4282567029d5d57",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "window",
+      "parameter_value": "60s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "30e71da67f5cae33dadd7589457229d9492ee77b88f6a746d4282567029d5d57",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "window",
+      "parameter_value": "300s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "30e71da67f5cae33dadd7589457229d9492ee77b88f6a746d4282567029d5d57",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum_ratio",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "numerator_window",
+      "parameter_value": "5s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "73b523101b962da6d71ee56470fa7d3f9e6650e4cfbb0923b4170f90d07829d6",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum_ratio",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "denominator_window",
+      "parameter_value": "300s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "73b523101b962da6d71ee56470fa7d3f9e6650e4cfbb0923b4170f90d07829d6",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum_ratio",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "update_every",
+      "parameter_value": "1s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "73b523101b962da6d71ee56470fa7d3f9e6650e4cfbb0923b4170f90d07829d6",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum_ratio",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "direction_reference",
+      "parameter_value": "prevailing_1m",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "73b523101b962da6d71ee56470fa7d3f9e6650e4cfbb0923b4170f90d07829d6",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "trend_normalized_est_delta_sum_ratio",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "parameter_name": "numerator_window",
+      "parameter_value": "60s",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "73b523101b962da6d71ee56470fa7d3f9e6650e4cfbb0923b4170f90d07829d6",
+      "reviewed_implementation_sha256": "ec202100b11e8de71dac466be4e5ce74ccefa8c5153276a28423af31d282af50",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_PARAMETER_VALUE",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "regime_direction",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "eda200e0e52ed243da9812808b99de7abb8639c69813952a9cb38b318e85679a",
+      "reviewed_implementation_sha256": "be6e08df629cd7a2a32147e9099e38372b9e4a4c061f54808223c1637b01a1bb",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_DEFINITION",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    },
+    {
+      "authority_id": "deep_pullback_5s_reacceleration_capabilities_v1",
+      "authority_type": "feature_candidate",
+      "canonical_name": "regime_alignment",
+      "causal_audit": "audit/status.json",
+      "contract_audit": "audit/contract_status.json",
+      "feature_candidate_composite": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
+      "promotion_decision": "PROMOTE",
+      "registry_declaration_sha256": "65009f77655b8aa23759ea00bde204176b7e266faaa70506ae96fd48c1c6dc84",
+      "reviewed_implementation_sha256": "be6e08df629cd7a2a32147e9099e38372b9e4a4c061f54808223c1637b01a1bb",
+      "runtime_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ],
+      "scope_type": "FEATURE_DEFINITION",
+      "seal_identity": "preexec_seal_deep_pullback_5s_reacceleration_model_07ad15b53aef1877"
+    }
+  ],
+  "schema_version": 1
+}

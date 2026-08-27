@@ -95,7 +95,7 @@ def check_scoped_promotions(*, repo_root: Optional[Path] = None) -> Dict[str, An
     from features.registry import CANONICAL_FEATURE_DEFINITIONS
     for rec in records:
         scope = rec.get("scope_type")
-        name = rec.get("canonical_feature")
+        name = rec.get("canonical_feature") or rec.get("canonical_name")
         if scope not in {"FEATURE_DEFINITION", "FEATURE_PARAMETER_VALUE"}:
             violations.append({"code":"SCOPED_SCOPE_INVALID", "record":rec}); continue
         if name not in CANONICAL_FEATURE_DEFINITIONS:

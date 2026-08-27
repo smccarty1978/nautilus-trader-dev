@@ -1,0 +1,36 @@
+{
+  "lineage_version": 1,
+  "study_id": "existing_caps_study",
+  "bootstrapped_from_local_ledger": false,
+  "issuance_counter": 2,
+  "prev_chain_sha256": "0138e4c86e12d189c491acc7a9feebcc0bcec684c22a31570328e51b30508490",
+  "chain_sha256": "861e39c5b0a972d5ab8b0fd501090c3f41a356beaf31914fef3ed9513bdc6be7",
+  "high_water": {
+    "causal": 1,
+    "contract": 1
+  },
+  "entries": [
+    {
+      "audit_type": "causal",
+      "pass": 1,
+      "audited_execution_composite_sha256": "e7e18a296a29225b9b4757eff2476eadc891fbf6d5a60a76b437bce5a99975d4",
+      "audit_report_sha256": "6a3f8f5382ff74075231095d6f246f99dff04e62cadd6d3387fb46eb8e3fd357",
+      "audit_report_path": "audit/pass_01.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-27T17:29:46.202526+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 1,
+      "audited_execution_composite_sha256": "e7e18a296a29225b9b4757eff2476eadc891fbf6d5a60a76b437bce5a99975d4",
+      "audit_report_sha256": "e4511ffa1819e41b74d325826f0f4cd4e4bc2c480e539c4a47b6e55f44ac331a",
+      "audit_report_path": "audit/contract_pass_01.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-27T17:29:49.039897+00:00"
+    }
+  ],
+  "integrity_sha256": "a24baad161dc2577104729af8b116dcfc5d8d3fe8dc96ab1dd6482de8e259fca",
+  "note": "Durable audit lineage anchor. Lives outside the study directory so that deleting or rebuilding studies/<id>/audit/ cannot reset the audit high-water mark, and INSIDE the repository so that committing it makes it durable. COMMIT THIS FILE with the audit artifacts it anchors -- an uncommitted anchor is only as durable as the working tree. Authoritative over the study-local pass_ledger.json."
+}

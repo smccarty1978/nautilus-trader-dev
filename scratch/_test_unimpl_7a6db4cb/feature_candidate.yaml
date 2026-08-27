@@ -1,0 +1,18 @@
+authority_id: unimpl_fixture_7a6db4cb_auth_v1
+authority_type: feature_candidate
+candidate_features:
+- canonical_name: test_unimplemented_7a6db4cb
+  parameters:
+    timeframe: 5m
+evidence_requirements:
+- features/tests/test_generic_provider_parameterization.py
+implementation: features.trackers.nonexistent_tracker.NonexistentTracker
+prohibited_scope_expansion:
+- train_oos_data
+- unscoped_sibling_features
+promotion_scope:
+- FEATURE_DEFINITION
+- FEATURE_PARAMETER_VALUE
+semantics:
+  bar_state: completed
+terminal_decision: PROMOTE

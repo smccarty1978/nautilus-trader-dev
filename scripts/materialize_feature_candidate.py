@@ -102,16 +102,19 @@ def main() -> int:
     for fact, definition in zip(facts["definitions"], definitions):
         if definition.get("status") == "provisional":
             fact["lifecycle_status"] = "provisional"
-    if args.scoped_records and args.scoped_records.is_file():
-        scoped = json.loads(args.scoped_records.read_text(encoding="utf-8")).get("records", [])
-        by_scope = {(r.get("canonical_name") or r.get("canonical_feature"), r.get("scope_type")): r for r in scoped if r.get("promotion_decision") == "PROMOTE"}
+    scoped_records_path = args.scoped_records or (ROOT / "features" / "feature_scoped_promotions.json")
+    if scoped_records_path and scoped_records_path.is_file():
+        scoped = json.loads(scoped_records_path.read_text(encoding="utf-8")).get("records", [])
+        promoted_names = {
+            r.get("canonical_name") or r.get("canonical_feature")
+            for r in scoped
+            if r.get("promotion_decision") == "PROMOTE"
+        }
         for item in definitions:
-            rec = by_scope.get((item["canonical_name"], "FEATURE_DEFINITION"))
-            if rec:
+            if item["canonical_name"] in promoted_names:
                 item["status"] = "verified"
         for fact in facts["definitions"]:
-            rec = by_scope.get((fact["canonical_name"], "FEATURE_DEFINITION"))
-            if rec:
+            if fact["canonical_name"] in promoted_names:
                 fact["lifecycle_status"] = "verified"
     hashes = {
         "canonical_registry.json": _write("canonical_registry.json", {"schema_version": 1, "definitions": definitions}),

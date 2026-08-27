@@ -1,0 +1,20 @@
+authority_id: novel_fixture_6a1ecafa_auth_v1
+authority_type: feature_candidate
+candidate_features:
+- canonical_name: test_generic_provisional_6a1ecafa
+  parameters:
+    bar_state: completed
+    context: prior
+    timeframe: 5m
+evidence_requirements:
+- features/tests/test_generic_provider_parameterization.py
+implementation: features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider
+prohibited_scope_expansion:
+- train_oos_data
+- unscoped_sibling_features
+promotion_scope:
+- FEATURE_DEFINITION
+- FEATURE_PARAMETER_VALUE
+semantics:
+  bar_state: completed
+terminal_decision: PROMOTE

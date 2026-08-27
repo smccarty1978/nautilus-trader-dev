@@ -1,0 +1,25 @@
+{
+  "ledger_version": 1,
+  "entries": [
+    {
+      "audit_type": "causal",
+      "pass": 1,
+      "audited_execution_composite_sha256": "e17c884d4bb6d25e7058a30a57dccbe291c36b26947db1b429d5d3da61dd0a45",
+      "audit_report_sha256": "7e46ce61317764e22a8216b59a5f2f62cd138ca74e9732193193ef621fffc372",
+      "audit_report_path": "audit/pass_01.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-27T17:34:56.540314+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 1,
+      "audited_execution_composite_sha256": "e17c884d4bb6d25e7058a30a57dccbe291c36b26947db1b429d5d3da61dd0a45",
+      "audit_report_sha256": "cfb401fbe31d5e12a007e5ca7a56a33a7a550ac3e724c2e61bcd63c58c080cd3",
+      "audit_report_path": "audit/contract_pass_01.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-27T17:34:59.486824+00:00"
+    }
+  ]
+}

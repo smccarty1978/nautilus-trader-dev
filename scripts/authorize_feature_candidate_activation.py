@@ -38,6 +38,38 @@ def _review_is_candidate(status: dict, path: Path, *, audit_type: str, study: Pa
         and report.is_file()
     )
 
+def _report_summary(path: Path) -> dict:
+    """Read the canonical machine summary from a typed audit report."""
+    if not path.is_file():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    start, end = "<!-- AUDIT_SUMMARY_V2_START -->", "<!-- AUDIT_SUMMARY_V2_END -->"
+    if start not in text or end not in text:
+        return {}
+    try:
+        return json.loads(text.split(start, 1)[1].split(end, 1)[0].strip())
+    except (ValueError, json.JSONDecodeError):
+        return {}
+
+def _typed_review_ok(status: dict, path: Path, *, audit_type: str, study: Path,
+                     authority_id: str, execution: str) -> bool:
+    report_name = status.get("audit_report_path") or status.get("report")
+    if report_name and Path(report_name).is_absolute():
+        report = Path(report_name)
+    elif str(report_name).startswith("audit/"):
+        report = study / str(report_name)
+    else:
+        report = study / "audit" / str(report_name or "")
+    summary = _report_summary(report)
+    return (status.get("audit_type") == audit_type
+            and status.get("verdict") == "CLEAR"
+            and status.get("audited_execution_composite_sha256") == execution
+            and report.is_file()
+            and summary.get("audit_type") == audit_type
+            and summary.get("authority_type") == "feature_candidate"
+            and summary.get("authority_id") == authority_id
+            and summary.get("audited_execution_composite_sha256") == execution)
+
 
 def authorize(study: Path, causal_status: Path, contract_status: Path) -> dict:
     audit = study / "audit" / "candidate"
@@ -47,10 +79,22 @@ def authorize(study: Path, causal_status: Path, contract_status: Path) -> dict:
     contract = _load(contract_status)
     expected = frozen.get("execution_composite_sha256")
     bundle = frozen.get("bundle_composite_sha256")
+    typed = frozen.get("authority_type") == "feature_candidate" or (study / "feature_candidate.yaml").is_file()
+    authority_id = ""
+    if typed:
+        try:
+            import yaml
+            authority_id = str(yaml.safe_load((study / "feature_candidate.yaml").read_text(encoding="utf-8")).get("authority_id", ""))
+        except (OSError, ValueError, AttributeError, ImportError):
+            authority_id = ""
+        manifest = study / "audit" / "frozen_execution_manifest.json"
+        if manifest.is_file():
+            current = _load(manifest)
+            expected = current.get("frozen_execution_composite_sha256", expected)
     checks = {
         "preflight": preflight.get("status") == "CLEAR" and preflight.get("execution_composite_sha256") == expected,
-        "causal": _clear_causal(causal) and _review_is_candidate(causal, causal_status, audit_type="causal", study=study, bundle=bundle, execution=expected),
-        "contract": _clear_contract(contract) and _review_is_candidate(contract, contract_status, audit_type="contract", study=study, bundle=bundle, execution=expected),
+        "causal": (_clear_causal(causal) and (_typed_review_ok(causal, causal_status, audit_type="causal", study=study, authority_id=authority_id, execution=expected) if typed else _review_is_candidate(causal, causal_status, audit_type="causal", study=study, bundle=bundle, execution=expected))),
+        "contract": (_clear_contract(contract) and (_typed_review_ok(contract, contract_status, audit_type="contract", study=study, authority_id=authority_id, execution=expected) if typed else _review_is_candidate(contract, contract_status, audit_type="contract", study=study, bundle=bundle, execution=expected))),
     }
     result = {
         "schema_version": 1,
@@ -59,6 +103,8 @@ def authorize(study: Path, causal_status: Path, contract_status: Path) -> dict:
         "candidate_execution_composite_sha256": expected,
         "candidate_freeze_path": str((audit / "candidate_authority_freeze.json").resolve()),
         "candidate_identifier": "features/authority/candidate",
+        "authority_type": "feature_candidate" if typed else "study",
+        "authority_id": authority_id or None,
         "checks": checks,
         "evidence": {
             "preflight": str((audit / "preflight.json").resolve()),
