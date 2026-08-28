@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "study_id": "deep_pullback_5s_reacceleration_model",
+  "status": "CLOSED",
+  "outcome": "DIAGNOSTIC_NEGATIVE",
+  "terminal_decision": "P5_NO_MEANINGFUL_SIGNAL",
+  "decided_utc": "2026-08-28",
+  "decided_by": "researcher",
+  "sealed_execution_composite_sha256": "1a2e54fad3b4c6e0ce4e51b083728573293af5d9977b48037c7d5073555cf5bc",
+  "seal_sha256": "db288e642155a901330662ea45f48be78368b5f7d781cab9f6dd45b1e0172e1f",
+  "reason": "No learnable ordered-barrier continuation-ranking signal in the causal 35-input surface at the first 5s re-acceleration after a deep pullback. Correct-label (1s-replay ordered barrier) TRAIN-only feasibility fit: POOLED ROC-AUC 0.514 / LONG 0.509 / SHORT 0.506, flat score deciles, tail lift ~1.0.",
+  "collector_target_defect": {
+    "summary": "generic_collector.py ignores the compiled ordered-barrier target_contract and labels via legacy opposing-1m-regime-flip-within-horizon",
+    "binary_label_mismatch_vs_frozen_target": "28668/55457 (51.7%)",
+    "recorded_as": "framework backlog - docs/WORKFLOW_REFERENCE_FACTS.md Known defects",
+    "fix_required_for_this_branch": false
+  },
+  "rolling_300s_missingness_verdict": "LINEAGE_MATCH_EXPECTED",
+  "session_semantics": "RTH candidate emission; session_end_censoring=true; ETH not used to resolve an RTH candidate economic target",
+  "oos_accessed": false,
+  "prohibited_years_accessed": false,
+  "accepted_model_lineage": null,
+  "diagnostic_artifacts": [
+    "artifacts/target_replay_diagnostic.json",
+    "artifacts/target_replay_audit_sample.csv",
+    "artifacts/pre_oos_directional_diagnostic.json",
+    "artifacts/correct_label_feasibility.json",
+    "artifacts/rolling_300s_parent_parity_audit.json",
+    "artifacts/train_freeze_lineage.json"
+  ],
+  "wrong_target_artifacts_not_a_lineage": [
+    "artifacts/train_experiment_freeze.json",
+    "artifacts/experiment_models.json",
+    "artifacts/experiment_authorization.json",
+    "artifacts/model_selection_manifest.json",
+    "artifacts/population_target_gate.json"
+  ]
+}

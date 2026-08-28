@@ -107,10 +107,12 @@ notes pointing at `AGENTS.md` and `docs/RESEARCH_WORKFLOW.md`. Do not re-expand 
 
 ## Per-study documents
 
-`studies/<id>/SPEC.md`, `research_decision.yaml`, `audit/*.md`, `results/*.md` are
+`studies/<id>/SPEC.md`, `research_decision.yaml`, `audit/*.md`, `results/*.md`, and
+`CLOSURE.md` (present only on a closed study — its terminal record) are
 **authoritative for that study** and historical for everything else. A finding in one
 study's report is not a repository rule. Repository rules live in
-`docs/RESEARCH_WORKFLOW.md`.
+`docs/RESEARCH_WORKFLOW.md`. Cross-study framework defects a study surfaces are lifted
+into `docs/WORKFLOW_REFERENCE_FACTS.md` → "Known defects".
 
 ## Rules for adding a document
 

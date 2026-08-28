@@ -101,6 +101,41 @@ timeframes aggregated from completed lower-timeframe bars) are rules and live in
 
 ---
 
+## Known defects (framework backlog)
+
+**`generic_collector.py` ignores a compiled ordered-barrier `target_contract`.**
+The target engine compiles `required_forward_outcomes` (ordered ±ATR barrier specs) into
+`compiled_study.json`, and `docs/RESEARCH_WORKFLOW.md` §9 describes a streaming
+`forward_outcomes` tracker — but `research_workflow/generic_collector.py` never instantiates
+`research_workflow/forward_outcomes/tracker.py`. For every candidate (checkpoint **and**
+episode paths) it resolves `disposition` / `target_flip_within_horizon` through its legacy
+path (`_track_pending` / `_emit_observation` / `_sweep_elapsed_horizons` / `_on_regime_flip`):
+`LABELED_POSITIVE` iff the opposing 1m regime flip lands within the horizon, `LABELED_NEGATIVE`
+iff the horizon elapses with no opposing flip, `CENSORED` iff the horizon crosses the RTH
+session close. `atr_t` is stored on the row but never used for labeling; no
+`favorable ≥ favorable_atr·ATR_T` / `adverse ≥ adverse_atr·ATR_T`, no ambiguous-first-touch.
+Any `flip_prediction` study whose `target_contract.target_type` is `composite` with
+`ordered_barrier` conditions is therefore collecting the wrong target.
+Discovered 2026-08-28 (`studies/deep_pullback_5s_reacceleration_model/`, exhaustive 1s-bar
+replay: 51.7% binary-label disagreement, `artifacts/target_replay_diagnostic.json`). Repair
+is a collector-runtime change → new runtime closure → re-seal → re-collect. Backlog item;
+not yet scheduled (the study that surfaced it closed diagnostic-negative under the correct
+target, so there is no live consumer forcing the fix).
+
+**`GenericRollingProductivityProvider` (`Rolling5mProductivityTracker`) requires an exact
+contiguous window of printed 1s bars** (301/301 for `window=300s`). NQ 1s bars print only on
+traded seconds, so `rolling_300s_*` (and any frozen external score consuming them) is
+~73–79% null on this instrument. This is `LINEAGE_MATCH_EXPECTED`, not a defect: the parent
+`clean_maturity_flip_model_rolling_productivity` TRAIN surface is itself 72.7% null on these
+features and Model-C was fit expecting it (LightGBM native NaN, no complete-case filter).
+Recorded here only so a future study does not mistake the null rate for a wiring bug
+(`studies/deep_pullback_5s_reacceleration_model/artifacts/rolling_300s_parent_parity_audit.json`).
+
+`scripts/tests/test_round2_invariants.py:317` hashes with `read_bytes()` instead of
+`canonical_file_sha256` — see the Hashing convention section above.
+
+---
+
 ## Audit history that justifies current limits
 
 | Fact | Source |
