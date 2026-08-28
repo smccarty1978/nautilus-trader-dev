@@ -52,6 +52,7 @@ REQUIRED_STUDY_CHECKS = (
     "FEATURE_PROMOTION",
     "RESEARCH_DECISION_FIDELITY",
     "REQUIRED_GATES",
+    "RUNTIME_CONTRACT_BINDING",
     "CAUSAL_INVARIANTS",
 )
 
@@ -565,6 +566,31 @@ def run_preflight(
         except Exception as e:
             failed_gate = "REQUIRED_GATES"
             _mark("REQUIRED_GATES", "FAILED")
+            failure_ids = [type(e).__name__]
+            failure_details = [{"message": str(e)}]
+
+    # 2a-runtime. Every compiled semantic primitive must have an executable runtime
+    # binding. A collector class existing (checked structurally elsewhere) is not proof
+    # that it runs the declared population_contract.episode_lifecycle or computes every
+    # declared FeatureInstance -- a study could otherwise SEAL with null feature columns
+    # and a checkpoint-grid population standing in for a sealed episode lifecycle.
+    if not failed_gate and study_dir and (study_dir / "compiled_study.json").exists():
+        _begin("RUNTIME_CONTRACT_BINDING")
+        try:
+            from research_workflow.runtime_bindings import verify_runtime_contract
+            _rt = verify_runtime_contract(study_dir)
+            if not _rt["passed"]:
+                failed_gate = "RUNTIME_CONTRACT_BINDING"
+                _mark("RUNTIME_CONTRACT_BINDING", "FAILED")
+                failure_ids = ["RUNTIME_CONTRACT_BINDING_MISSING"]
+                failure_details = [
+                    {"message": f"{m['primitive']}: declared [{m['declared']}] has no runtime "
+                                f"binding -> required {m['required_binding']} ({m.get('reason','')})"}
+                    for m in _rt["missing"]
+                ]
+        except Exception as e:
+            failed_gate = "RUNTIME_CONTRACT_BINDING"
+            _mark("RUNTIME_CONTRACT_BINDING", "FAILED")
             failure_ids = [type(e).__name__]
             failure_details = [{"message": str(e)}]
 

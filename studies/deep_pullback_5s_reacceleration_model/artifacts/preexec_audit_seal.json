@@ -20,7 +20,7 @@
   "causal_audit_verdict": {
     "audit_type": "causal",
     "auditor": "research_workflow.causal_audit",
-    "pass": 30,
+    "pass": 31,
     "verdict": "CLEAR",
     "critical": 0,
     "warning": 0,
@@ -28,7 +28,7 @@
     "causal_contract": "ts_avail <= T (latest_source_ts_init <= observation_ts)",
     "audited_execution_composite_sha256": "675baa3de792f8392383189abdd509f9abf00922744d49cc4b0ddf40a9a22ebf",
     "audit_report_sha256": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3",
-    "audit_report_path": "audit/pass_30.md",
+    "audit_report_path": "audit/pass_31.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "research_workflow.causal_audit",
@@ -149,12 +149,12 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59"
     },
-    "timestamp": "2026-08-27T23:05:47.674764+00:00"
+    "timestamp": "2026-08-28T02:07:02.221833+00:00"
   },
   "contract_audit_verdict": {
     "audit_type": "contract",
     "auditor": "research_workflow.contract_audit",
-    "pass": 22,
+    "pass": 23,
     "verdict": "CLEAR",
     "critical": 0,
     "blocking": 0,
@@ -162,7 +162,7 @@
     "not_verified": 0,
     "audited_execution_composite_sha256": "675baa3de792f8392383189abdd509f9abf00922744d49cc4b0ddf40a9a22ebf",
     "audit_report_sha256": "dea3884bb13d0b777a76df0bc9f3ec66ef6929126b6c4388be566bff64b8f9ec",
-    "audit_report_path": "audit/contract_pass_22.md",
+    "audit_report_path": "audit/contract_pass_23.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "research_workflow.contract_audit",
@@ -283,7 +283,7 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59"
     },
-    "timestamp": "2026-08-27T23:05:52.202688+00:00"
+    "timestamp": "2026-08-28T02:07:06.603991+00:00"
   },
   "file_hashes": {
     "feature_candidate:authority": "156949002ff26cce005a3e5451323a2dcaa18e6eee7ebb838ea66d72a8f841d3",
@@ -386,8 +386,8 @@
     "repo:utils/causal_registration.py": "d01d3f8440cef4d15716d1195ff3c01b4b8697edabc30ac8783bbee968a205c8",
     "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
     "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
-    "study:audit/status.json": "e4854e76413b859cc2a546aaccde0ddbfafcb6fd21cf81020bf8aac95845415f",
-    "study:audit/contract_status.json": "f0a42d09ca44e94be257dd715b0f88ef3560beb12f88337c080406eaab232977",
+    "study:audit/status.json": "64c47b33fd889588127912b09af90861e9d89062900467adc6542e1f6970ae11",
+    "study:audit/contract_status.json": "05729850fb138231e731a5304627b816bc64484738968f5270ca183e4a8d269a",
     "study:audit/contract_pass_01.md": "1f1c01370ee2ae24cdf8c7f04780d328a42076137b2d1ab2173810e6ca3a15d9",
     "study:audit/contract_pass_02.md": "b5a398c961e3a721f70754f103b1c3f8bef20a5b2ca4f8994cbc5fb8e862e3ea",
     "study:audit/contract_pass_03.md": "aefe34d4278dd68bfc828007e6bd6d2d77cb2efeaa81005a6c429b6f4e732075",
@@ -410,6 +410,7 @@
     "study:audit/contract_pass_20.md": "84dfbb3b0ddeacbe720ba72447a360a8dd04edf8236fe75e2c892b9642e9e2ac",
     "study:audit/contract_pass_21.md": "fcd3220b9b2289e6dd23461863635d831c006d6c5f2b4a669265ec65a96cf6bb",
     "study:audit/contract_pass_22.md": "dea3884bb13d0b777a76df0bc9f3ec66ef6929126b6c4388be566bff64b8f9ec",
+    "study:audit/contract_pass_23.md": "dea3884bb13d0b777a76df0bc9f3ec66ef6929126b6c4388be566bff64b8f9ec",
     "study:audit/pass_01.md": "838495cb59c186599fc9c7d6349e542fad839486b66eb55db70347872250c2f9",
     "study:audit/pass_02.md": "838495cb59c186599fc9c7d6349e542fad839486b66eb55db70347872250c2f9",
     "study:audit/pass_03.md": "838495cb59c186599fc9c7d6349e542fad839486b66eb55db70347872250c2f9",
@@ -439,7 +440,8 @@
     "study:audit/pass_27.md": "f8f33001c0a78f8cae7f7992eea1cc51906a2f56ec8567f86c03ad522c213814",
     "study:audit/pass_28.md": "45f1a4896a2432b71e53584b6140beb80a5f3ca4345efb6c64698055174d919e",
     "study:audit/pass_29.md": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3",
-    "study:audit/pass_30.md": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3"
+    "study:audit/pass_30.md": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3",
+    "study:audit/pass_31.md": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3"
   },
   "evidence": {
     "feature_candidate_authority": {
@@ -844,11 +846,11 @@
     },
     "study_audit_status_json": {
       "path": "study:audit/status.json",
-      "sha256": "e4854e76413b859cc2a546aaccde0ddbfafcb6fd21cf81020bf8aac95845415f"
+      "sha256": "64c47b33fd889588127912b09af90861e9d89062900467adc6542e1f6970ae11"
     },
     "study_audit_contract_status_json": {
       "path": "study:audit/contract_status.json",
-      "sha256": "f0a42d09ca44e94be257dd715b0f88ef3560beb12f88337c080406eaab232977"
+      "sha256": "05729850fb138231e731a5304627b816bc64484738968f5270ca183e4a8d269a"
     },
     "study_audit_contract_pass_01_md": {
       "path": "study:audit/contract_pass_01.md",
@@ -936,6 +938,10 @@
     },
     "study_audit_contract_pass_22_md": {
       "path": "study:audit/contract_pass_22.md",
+      "sha256": "dea3884bb13d0b777a76df0bc9f3ec66ef6929126b6c4388be566bff64b8f9ec"
+    },
+    "study_audit_contract_pass_23_md": {
+      "path": "study:audit/contract_pass_23.md",
       "sha256": "dea3884bb13d0b777a76df0bc9f3ec66ef6929126b6c4388be566bff64b8f9ec"
     },
     "study_audit_pass_01_md": {
@@ -1056,6 +1062,10 @@
     },
     "study_audit_pass_30_md": {
       "path": "study:audit/pass_30.md",
+      "sha256": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3"
+    },
+    "study_audit_pass_31_md": {
+      "path": "study:audit/pass_31.md",
       "sha256": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3"
     }
   }

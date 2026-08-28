@@ -1,7 +1,7 @@
 {
   "audit_type": "causal",
   "auditor": "research_workflow.causal_audit",
-  "pass": 30,
+  "pass": 31,
   "verdict": "CLEAR",
   "critical": 0,
   "warning": 0,
@@ -9,7 +9,7 @@
   "causal_contract": "ts_avail <= T (latest_source_ts_init <= observation_ts)",
   "audited_execution_composite_sha256": "675baa3de792f8392383189abdd509f9abf00922744d49cc4b0ddf40a9a22ebf",
   "audit_report_sha256": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3",
-  "audit_report_path": "audit/pass_30.md",
+  "audit_report_path": "audit/pass_31.md",
   "transcript_sha256": null,
   "reviewer_provenance": {
     "declared_auditor": "research_workflow.causal_audit",
@@ -130,5 +130,5 @@
     "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
     "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59"
   },
-  "timestamp": "2026-08-27T23:05:47.674764+00:00"
+  "timestamp": "2026-08-28T02:07:02.221833+00:00"
 }

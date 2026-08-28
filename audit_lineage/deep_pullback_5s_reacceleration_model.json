@@ -2,12 +2,12 @@
   "lineage_version": 1,
   "study_id": "deep_pullback_5s_reacceleration_model",
   "bootstrapped_from_local_ledger": false,
-  "issuance_counter": 35,
-  "prev_chain_sha256": "663b8143fe2889991e681e8d1e34691331017e00db5c19c47cce7d994b543d09",
-  "chain_sha256": "1bd9807bffe68003b4eaa2bb710b324475b4c86f63991c420cb42c56a9796c95",
+  "issuance_counter": 37,
+  "prev_chain_sha256": "759401ca11d26083b58c37abb4800ecc12d10aaf326ed0787cf6f4737fce676d",
+  "chain_sha256": "587987f6235d76af1a21bd5ef2902b8e5a0cadbaf98c656018d2cb8dcf67649f",
   "high_water": {
-    "causal": 30,
-    "contract": 22
+    "causal": 31,
+    "contract": 23
   },
   "entries": [
     {
@@ -359,8 +359,28 @@
       "auditor": "research_workflow.contract_audit",
       "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
       "issued_at": "2026-08-27T23:05:52.236319+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 31,
+      "audited_execution_composite_sha256": "675baa3de792f8392383189abdd509f9abf00922744d49cc4b0ddf40a9a22ebf",
+      "audit_report_sha256": "e1034007da4d640b5040ee353d23035e108aad8fe42cd0d1d81b4fd8b349fdc3",
+      "audit_report_path": "audit/pass_31.md",
+      "auditor": "research_workflow.causal_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-28T02:07:02.253522+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 23,
+      "audited_execution_composite_sha256": "675baa3de792f8392383189abdd509f9abf00922744d49cc4b0ddf40a9a22ebf",
+      "audit_report_sha256": "dea3884bb13d0b777a76df0bc9f3ec66ef6929126b6c4388be566bff64b8f9ec",
+      "audit_report_path": "audit/contract_pass_23.md",
+      "auditor": "research_workflow.contract_audit",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-28T02:07:06.634957+00:00"
     }
   ],
-  "integrity_sha256": "366e9bac97ed368090f769a372f9d6fcbad8ad866ff40147ebbf929a0c8539a7",
+  "integrity_sha256": "9344b718443d2858b678854ddb47e46d8f3c345380edae1901c5e3ce8d813d5a",
   "note": "Durable audit lineage anchor. Lives outside the study directory so that deleting or rebuilding studies/<id>/audit/ cannot reset the audit high-water mark, and INSIDE the repository so that committing it makes it durable. COMMIT THIS FILE with the audit artifacts it anchors -- an uncommitted anchor is only as durable as the working tree. Authoritative over the study-local pass_ledger.json."
 }

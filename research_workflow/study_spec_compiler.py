@@ -121,7 +121,12 @@ def _deep_pullback_projection(request: dict[str, Any], study: Path) -> dict[str,
                    "required_forward_outcomes": [{"id": target_id, "entry_reference": "next_bar_open", "horizon_seconds": target["horizon_seconds"], "max_tracking_seconds": target["horizon_seconds"], "excursion_units": ["atr"], "bar_inclusion": "fully_forward", "session_end_censoring": True, "max_gap_seconds": 1, "atr_source": request["target_atr"]["source"], "atr_frozen_at": request["target_atr"]["frozen_at"], "ordered_barriers": [{"id": target_id, "favorable_atr": target["favorable_barrier_atr"], "adverse_atr": target["adverse_barrier_atr"], "horizon_seconds": target["horizon_seconds"]}]}]},
         # mode "none" == no selection: the ordered `instances` list IS the final surface,
         # so feature_count is exactly its length (not the schema's 25-feature default).
+        # metadata_columns = the candidate key only: this episode-population study persists
+        # no extra runtime observables on the candidates frame (episode/barrier bookkeeping
+        # lives on the observations frame). Matches clean_tradable_reversal's contract and
+        # keeps the collector's emitted set == OutputManager's declared set.
         "features": {"source": "canonical_verified_definition_universe", "instances": instances, "derived_inputs": [derived],
+                     "metadata_columns": ["observation_ts", "regime_start_ns", "checkpoint_index"],
                      "selection": {"mode": "none", "source": "canonical_verified_definition_universe",
                                    "feature_count": len(instances), "direction_specific": False}},
         "model": {"family": request["model"]["allowed_family"], "arms": ["BROAD"], "selection": {"search_method": "none", "allowed_families": [{"family": request["model"]["allowed_family"]}], "tuning_years": proto.get("selection_fit_years", []) + proto.get("selection_validation_years", []), "final_train_validation_years": proto.get("final_train_validation_years", [])}},

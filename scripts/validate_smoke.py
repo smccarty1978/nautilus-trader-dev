@@ -338,6 +338,48 @@ def validate_smoke_run(
         detail = "; ".join(f"[{f['code']}] {f['message']}" for f in surface_report.findings)
         raise SmokeValidationError(f"FEATURE_SURFACE_INVALID: {detail}")
 
+    # 9c. RUNTIME FEATURE BINDING (empirical). The ordered physical output surface is
+    # config/feature_contract.json. Every declared column must be present in the real
+    # candidates frame AND not 100% null -- a declared FeatureInstance whose provider is
+    # not wired into the collector is emitted as an all-null column and would otherwise
+    # SEAL silently. Alias-agnostic: checks the emitted values directly.
+    _fc_path = study_dir / "config" / "feature_contract.json"
+    if _fc_path.is_file():
+        declared_surface = list(json.loads(_fc_path.read_text(encoding="utf-8")).get("feature_list") or [])
+        if declared_surface:
+            absent = [c for c in declared_surface if c not in cand_df.columns]
+            all_null = [c for c in declared_surface if c in cand_df.columns and cand_df[c].notna().sum() == 0]
+            if absent or all_null:
+                raise SmokeValidationError(
+                    "RUNTIME_FEATURE_BINDING_MISSING: the collector does not compute every declared "
+                    f"FeatureInstance. absent_columns={sorted(absent)} "
+                    f"all_null_columns={sorted(all_null)} "
+                    f"(declared {len(declared_surface)}, populated "
+                    f"{len([c for c in declared_surface if c in cand_df.columns and cand_df[c].notna().sum() > 0])})"
+                )
+
+    # 9d. EPISODE POPULATION GATING (empirical). If the sealed population contract
+    # declares an episode_lifecycle, the collector must emit at most
+    # max_candidates_per_episode candidates per episode -- not one per checkpoint. With
+    # no episode-identity column the prevailing regime (regime_start_ns) is the coarsest
+    # possible episode bound; a ratio well above the per-episode cap proves the
+    # checkpoint grid is still the population generator.
+    _cs_path = study_dir / "compiled_study.json"
+    if _cs_path.is_file():
+        _pc = (json.loads(_cs_path.read_text(encoding="utf-8")).get("contracts") or {}).get("population_contract") or {}
+        _epi = _pc.get("episode_lifecycle")
+        if _epi and "regime_start_ns" in cand_df.columns and len(cand_df):
+            cap = int(_epi.get("max_candidates_per_episode") or 1)
+            regimes = int(cand_df["regime_start_ns"].nunique())
+            per_regime_max = int(cand_df.groupby("regime_start_ns").size().max()) if regimes else 0
+            if per_regime_max > cap:
+                raise SmokeValidationError(
+                    "EPISODE_POPULATION_NOT_GATED: population_contract.episode_lifecycle declares "
+                    f"max_candidates_per_episode={cap}, but the collector emitted up to {per_regime_max} "
+                    f"candidates within a single prevailing regime ({len(cand_df)} candidates / {regimes} "
+                    f"regimes). EpisodePopulationEngine is not bound; emission is still checkpoint-grid."
+                )
+
     # The run itself must not have been filed as valid on a failing surface.
     if run_status.get("feature_surface_validation", {}).get("passed") is False:
         raise SmokeValidationError(

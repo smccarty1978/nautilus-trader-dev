@@ -241,6 +241,13 @@ class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
 class FlipPredictionCollector(Strategy):
     """Canonical event-driven collector strategy for flip prediction research."""
 
+    # --- Honest runtime capability declaration (research_workflow.runtime_bindings) ---
+    # This collector emits on the causal-checkpoint grid. It does NOT run
+    # EpisodePopulationEngine for a population_contract.episode_lifecycle population,
+    # so preflight's RUNTIME_CONTRACT_BINDING gate fails closed for any study that
+    # declares one until a collector that genuinely executes it sets this True.
+    SUPPORTS_EPISODE_LIFECYCLE = False
+
     def __init__(self, config: FlipPredictionCollectorConfig) -> None:
         super().__init__(config)
         self.cfg = config

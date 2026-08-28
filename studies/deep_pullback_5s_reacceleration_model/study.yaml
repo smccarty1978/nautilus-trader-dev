@@ -230,6 +230,10 @@ features:
       context: current
       bar_state: completed
   timing_contract: verified
+  metadata_columns:
+  - observation_ts
+  - regime_start_ns
+  - checkpoint_index
   derived_inputs:
   - name: frozen_model_c_score
     kind: frozen_external_model_score
