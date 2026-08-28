@@ -15,6 +15,17 @@ def test_completed_calendar_instance_defaults_to_completed_semantics():
     assert validate_feature_instance(completed)["bar_state"] == "completed"
 
 
+def test_event_anchored_timeframe_feature_without_bar_state_schema_is_idempotent():
+    # "since 5s regime flip" geometry labels a timeframe but declares no bar_state
+    # parameter; validation must not inject one, so re-validating its own normalized
+    # output (as the phase-0 double resolve does) stays clean.
+    for name in ("fraction_of_counter_regime_move_recovered", "recovery_from_counter_regime_extreme_atr"):
+        first = validate_feature_instance(FeatureInstance(name, {"timeframe": "5s"}))
+        assert "bar_state" not in first
+        again = validate_feature_instance(FeatureInstance(name, dict(first)))
+        assert again == first
+
+
 def test_instances_require_declared_legacy_compatible_parameter_combinations_before_cutover():
     with pytest.raises(FeatureInstanceError, match="MISSING_REQUIRED_FEATURE_PARAMETER"):
         validate_feature_instance(FeatureInstance("regime_efficiency", {}))

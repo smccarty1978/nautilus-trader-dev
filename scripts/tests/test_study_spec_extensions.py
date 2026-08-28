@@ -118,6 +118,42 @@ def test_asymmetric_ordered_barrier_target_compiles_to_runtime_contract():
     assert "ordered_primary_binary_label" in fo["generated_outcome_columns"]
 
 
+def test_composite_target_without_top_level_horizon_surfaces_forward_outcome_horizon():
+    """A composite ordered-barrier target carries the horizon on its forward outcome;
+    the compiled contract must surface that exact value and keep censoring consistent."""
+    target = {
+        "type": "composite", "decision_reference": "decision_ts",
+        "conditions": [{"id": "cont", "kind": "ordered_barrier", "forward_outcome_id": "path", "barrier_id": "primary"}],
+        "required_forward_outcomes": [{
+            "id": "path", "entry_reference": "next_bar_open",
+            "horizon_seconds": 300, "max_tracking_seconds": 300, "max_gap_seconds": 1,
+            "ordered_barriers": [{"id": "primary", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 300}],
+        }],
+    }
+    spec = StudySpec.model_validate(dict(BASE_SPEC, target=target))
+    assert spec.target.horizon_seconds is None
+    contract = compile_target_contract(spec.target)
+    assert contract["horizon_seconds"] == 300
+    assert contract["censoring_policy"]["max_horizon_seconds"] == contract["horizon_seconds"]
+
+
+def test_composite_target_with_conflicting_forward_outcome_horizons_fails_closed():
+    target = {
+        "type": "composite", "decision_reference": "decision_ts", "condition_logic": "AND",
+        "conditions": [
+            {"id": "a", "kind": "ordered_barrier", "forward_outcome_id": "p1", "barrier_id": "b1"},
+            {"id": "b", "kind": "ordered_barrier", "forward_outcome_id": "p2", "barrier_id": "b2"},
+        ],
+        "required_forward_outcomes": [
+            {"id": "p1", "horizon_seconds": 300, "ordered_barriers": [{"id": "b1", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 300}]},
+            {"id": "p2", "horizon_seconds": 120, "ordered_barriers": [{"id": "b2", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 120}]},
+        ],
+    }
+    spec = StudySpec.model_validate(dict(BASE_SPEC, target=target))
+    with pytest.raises(ValueError, match="TARGET_HORIZON_AMBIGUOUS"):
+        compile_target_contract(spec.target)
+
+
 def test_ordered_barrier_condition_must_reference_declared_barrier():
     target = {
         "type": "classification",

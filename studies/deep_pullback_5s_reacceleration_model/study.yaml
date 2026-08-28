@@ -1,0 +1,309 @@
+study:
+  id: deep_pullback_5s_reacceleration_model
+  type: flip_prediction
+  risk_tier: 2
+  description: Within an established prevailing 1m regime, after a direction-normalized
+    pullback of at least 1.00 ATR and a completed causal 5s regime flip back into
+    alignment with that prevailing regime, can causal market state, pullback geometry,
+    volume/delta, structural-regime context, and the frozen upstream Model C context
+    identify entries that reach +1.00 ATR favorable before -0.75 ATR adverse within
+    300 seconds?
+operation:
+  kind: train_evaluate
+instrument:
+  symbol: NQ
+  venue: XCME
+population:
+  type: regime_state
+  session: RTH
+  episode_lifecycle:
+    arm_condition:
+      kind: directional_adverse_excursion
+      threshold_atr: 1.0
+      price_source: completed_1s_intrabar
+    required_event:
+      kind: direction_relation
+      source: generic_completed_5s_regime_state
+      bar_state: completed
+      availability_timestamp: completed_source_bar_ts_init
+      relation: opposite_prevailing
+      active_at_arm_counts: true
+    emit_condition:
+      kind: direction_transition
+      source: generic_completed_5s_regime_state
+      bar_state: completed
+      availability_timestamp: completed_source_bar_ts_init
+      from_relation: opposite_prevailing
+      to_relation: aligned_prevailing
+      strictly_after_arm: true
+    rearm_on:
+    - new_favorable_extreme
+    terminate_on:
+    - prevailing_regime_flip
+    max_candidates_per_episode: 1
+target:
+  type: composite
+  conditions:
+  - id: ordered_continuation
+    kind: ordered_barrier
+    forward_outcome_id: ordered_continuation_1p00_vs_0p75_300s
+    barrier_id: ordered_continuation_1p00_vs_0p75_300s
+  required_forward_outcomes:
+  - id: ordered_continuation_1p00_vs_0p75_300s
+    entry_reference: next_bar_open
+    horizon_seconds: 300
+    max_tracking_seconds: 300
+    excursion_units:
+    - atr
+    bar_inclusion: fully_forward
+    session_end_censoring: true
+    max_gap_seconds: 1
+    atr_source: latest_causally_completed_1m_wilder_atr_14_available_at_T
+    atr_frozen_at: decision_ts
+    ordered_barriers:
+    - id: ordered_continuation_1p00_vs_0p75_300s
+      favorable_atr: 1.0
+      adverse_atr: 0.75
+      horizon_seconds: 300
+  decision_reference: decision_ts
+features:
+  source: canonical_verified_definition_universe
+  selection:
+    mode: none
+    source: canonical_verified_definition_universe
+    feature_count: 34
+    direction_specific: false
+    ranking_method: frozen_train_only_temporal_rank
+  instances:
+  - feature: arrival_velocity
+    parameters:
+      input_timeframe: 1s
+      lookback: 20
+      bar_state: completed
+  - feature: arrival_acceleration
+    parameters:
+      input_timeframe: 1s
+      short_lookback: 20
+      bar_state: completed
+  - feature: ema_slope
+    parameters:
+      ema_role: short
+      lookback: 20
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: rolling_retention_ratio
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_current_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_max_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_giveback_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: pullback_max_depth_atr
+    parameters:
+      scope: current_deep_pullback_episode
+      extreme_source: prevailing_directional_extreme
+  - feature: pullback_current_depth_atr
+    parameters:
+      scope: current_deep_pullback_episode
+  - feature: pullback_recovery_from_extreme_atr
+    parameters:
+      scope: current_deep_pullback_episode
+  - feature: pullback_fraction_of_structural_move
+    parameters:
+      scope: current_deep_pullback_episode
+  - feature: seconds_since_prevailing_directional_extreme
+    parameters:
+      timeframe: 1m
+      context: current
+      bar_state: completed
+  - feature: prior_deep_pullback_count
+    parameters:
+      timeframe: 1m
+      context: current
+      bar_state: completed
+      threshold_atr: 1.0
+  - feature: pullback_elapsed_seconds
+    parameters:
+      scope: current_deep_pullback_episode
+  - feature: pullback_post_arm_seconds
+    parameters:
+      scope: current_deep_pullback_episode
+  - feature: recovery_from_counter_regime_extreme_atr
+    parameters:
+      timeframe: 5s
+  - feature: fraction_of_counter_regime_move_recovered
+    parameters:
+      timeframe: 5s
+  - feature: trend_normalized_est_delta_sum
+    parameters:
+      window: 5s
+      update_every: 1s
+      direction_reference: prevailing_1m
+  - feature: trend_normalized_est_delta_sum
+    parameters:
+      window: 60s
+      update_every: 1s
+      direction_reference: prevailing_1m
+  - feature: trend_normalized_est_delta_sum
+    parameters:
+      window: 300s
+      update_every: 1s
+      direction_reference: prevailing_1m
+  - feature: trend_normalized_est_delta_sum_ratio
+    parameters:
+      numerator_window: 5s
+      denominator_window: 300s
+      update_every: 1s
+      direction_reference: prevailing_1m
+  - feature: trend_normalized_est_delta_sum_ratio
+    parameters:
+      numerator_window: 60s
+      denominator_window: 300s
+      update_every: 1s
+      direction_reference: prevailing_1m
+  - feature: regime_direction
+    parameters:
+      timeframe: 5m
+      context: current
+      bar_state: completed
+  - feature: regime_age_min
+    parameters:
+      timeframe: 5m
+      context: current
+      bar_state: completed
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 5m
+      context: current
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 5m
+      context: current
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 5m
+      context: current
+      bar_state: completed
+  - feature: regime_alignment
+    parameters:
+      source_timeframe: 1m
+      reference_timeframe: 5m
+      context: current
+      bar_state: completed
+  timing_contract: verified
+  derived_inputs:
+  - name: frozen_model_c_score
+    kind: frozen_external_model_score
+    parent_study_id: clean_maturity_flip_model_rolling_productivity
+    parent_train_freeze_artifact: artifacts/train_experiment_freeze_repaired.json
+    parent_train_freeze_artifact_sha256: c5bd68ca503a2395b7ca695354fae5a5968b44c95aef74290bb59d952e4f49a9
+    parent_frozen_execution_composite_sha256: 7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8
+    model_hashes:
+      LONG_C: a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38
+      SHORT_C: 5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf
+    preprocessing_hash: 0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4
+    ordered_feature_surfaces:
+      MODEL_C:
+      - arrival_velocity
+      - arrival_acceleration
+      - ema_slope
+      - prior_1m_regime_efficiency
+      - prior_1m_regime_mfe_atr
+      - prior_1m_regime_range_atr
+      - prior_5m_regime_efficiency
+      - prior_5m_regime_mfe_atr
+      - prior_5m_regime_range_atr
+      - rolling_300s_retention_ratio
+      - rolling_300s_current_progress_atr
+      - rolling_300s_max_progress_atr
+      - rolling_300s_giveback_atr
+    availability_reference: decision_ts
+    retrain_prohibited: true
+model:
+  mode: scoring
+  family: lightgbm
+  arms:
+  - BROAD
+  selection:
+    allowed_families:
+    - family: lightgbm
+    search_method: none
+    tuning_years:
+    - 2021
+    - 2022
+    final_train_validation_years:
+    - 2023
+    primary_selection_metric_direction: maximize
+    calibration_required: false
+    simpler_model_tie_preference: true
+    final_validation_policy: gated
+chronology:
+  train:
+  - 2021
+  - 2022
+  - 2023
+  dev:
+  - 2024
+  prohibited:
+  - 2025
+  - 2026
+stratification: {}
+baseline: {}
+lineage: {}
+execution:
+  runtime: nautilustrader
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
+  data_requirements:
+    dataset_id: NQ_v0_2020_2026
+  progress_seconds: 60
+  bounded: true
+acceptance: {}
+bespoke: {}
+required_gates:
+- id: population_target_gate
+  stage: pre_fit
+  artifact_path: artifacts/population_target_gate.json
+  artifact_schema_version: 1
+  scope_fields:
+  - population
+  - target
+  - chronology

@@ -794,7 +794,10 @@ for _name in (
             _combinations = (*_combinations, {"timeframe": "5m", "context": "current", "bar_state": "completed"})
         if _name == "regime_age_min":
             _combinations = (*_combinations, {"timeframe": "1m", "context": "current", "bar_state": "completed"})
-        if _name == "regime_efficiency":
+        if _name in {"regime_efficiency", "regime_mfe_atr"}:
+            # regime_mfe_atr current-context = maximum favorable excursion SO FAR of the
+            # in-progress 5m regime, from completed-5m running extreme up to T. Distinct
+            # from the completed-regime (context=prior) statistic; no forming-5m state.
             _combinations = (*_combinations, {"timeframe": "5m", "context": "current", "bar_state": "completed"})
     CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
         _name, family="structural_regime_geometry", implementation=_STRUCTURAL_IMPL,
@@ -813,6 +816,11 @@ _EPISODE_IMPL = 'features.trackers.generic_episode_geometry.GenericEpisodeGeomet
 _EPISODE_TESTS = ('features/tests/test_generic_episode_geometry.py',)
 for _name, _params, _required, _values in (
     ('pullback_max_depth_atr', ('scope', 'extreme_source'), ('scope', 'extreme_source'), {'scope': ('current_deep_pullback_episode',), 'extreme_source': ('prevailing_directional_extreme',)}),
+    # Remaining adverse depth from the prevailing-1m running favorable extreme at
+    # candidate T, normalized by the candidate-time ATR contract. Emitted by the same
+    # GenericEpisodeGeometryProvider.candidate_snapshot as pullback_max_depth_atr /
+    # pullback_recovery_from_extreme_atr; it is a model feature, not an ATR anchor.
+    ('pullback_current_depth_atr', ('scope',), ('scope',), {'scope': ('current_deep_pullback_episode',)}),
     ('pullback_recovery_from_extreme_atr', ('scope',), ('scope',), {'scope': ('current_deep_pullback_episode',)}),
     ('pullback_post_arm_seconds', ('scope',), ('scope',), {'scope': ('current_deep_pullback_episode',)}),
     ('pullback_elapsed_seconds', ('scope',), ('scope',), {'scope': ('current_deep_pullback_episode',)}),
@@ -931,6 +939,7 @@ for _metric in (
 LEGACY_FEATURE_INSTANCE_OVERRIDES.update({
     "current_5m_regime_age_min": FeatureInstance("regime_age_min", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
     "current_5m_regime_range_atr": FeatureInstance("regime_range_atr", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
+    "current_5m_regime_mfe_atr": FeatureInstance("regime_mfe_atr", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
     "current_5m_directional_displacement_atr": FeatureInstance("regime_directional_displacement_atr", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
     "current_5m_regime_range_atr_per_min": FeatureInstance("regime_range_atr_per_min", {"timeframe": "5m", "context": "current", "bar_state": "completed"}),
     "distance_to_completed_5m_high_atr": FeatureInstance("distance_to_completed_range_high_atr", {"reference_timeframe": "5m", "bar_state": "completed"}),
@@ -1065,8 +1074,14 @@ def validate_feature_instance(instance: FeatureInstance) -> Dict[str, Any]:
                 f"UNSUPPORTED_TIMEFRAME_PARAMETER: {instance.canonical_name} supports "
                 f"{list(definition.supported_timeframes)}, not {params['timeframe']!r}"
             )
-        params.setdefault("bar_state", "completed")
-        if params["bar_state"] == "forming":
+        # Bar-state only defaults for features whose identity actually carries the
+        # completed/forming choice.  Event-anchored geometry (e.g. "since 5s regime
+        # flip") labels a timeframe but declares no ``bar_state`` parameter; injecting
+        # one here made ``validate_feature_instance`` non-idempotent — re-validating its
+        # own output tripped UNKNOWN_FEATURE_PARAMETER in the phase-0 double resolve.
+        if "bar_state" in definition.parameter_schema:
+            params.setdefault("bar_state", "completed")
+        if params.get("bar_state") == "forming":
             if "update_every" not in params:
                 raise FeatureInstanceError("FORMING_BAR_UPDATE_REQUIRED: forming calendar bars require update_every")
             if _duration_seconds(str(params["update_every"])) > _duration_seconds(str(params["timeframe"])):

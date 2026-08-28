@@ -52,7 +52,8 @@ from backtests.nt_runtime.data_plan import DataPlan, resolve_data_plan
 from backtests.nt_runtime.engine_builder import ExecutionMode, build_engine, create_futures_instrument
 from backtests.nt_runtime.modes.collect import build_collector_config_kwargs
 from research_workflow.output_manager import (
-    OutputManager, resolve_collection_allowed_feature_aliases, verify_strategy_output_interface,
+    CANDIDATE_KEY_COLUMNS, DEFAULT_METADATA_COLUMNS, OutputManager,
+    resolve_collection_allowed_feature_aliases, verify_strategy_output_interface,
 )
 from backtests.nt_runtime.run_plan import RunPlan, resolve_run_plan
 from backtests.nt_runtime.strategy_binding import resolve_strategy_binding
@@ -428,11 +429,13 @@ def build_synthetic_schema_fixture(
     schema/feature-source/metadata/candidate-key/observation-key validity; does not
     establish a productive real population.
     """
-    from research_workflow.output_manager import CANDIDATE_KEY_COLUMNS
+    from research_workflow.output_manager import CANDIDATE_KEY_COLUMNS, DEFAULT_METADATA_COLUMNS
     from research_workflow.output_manager import resolve_collection_allowed_feature_aliases
 
     spec = study_data.spec
-    declared_metadata = list(spec.features.metadata_columns or [])
+    # Mirror OutputManager's own fallback: R7 verifies the runtime output contract and
+    # must not validate against a narrower metadata set than persist_collection enforces.
+    declared_metadata = list(spec.features.metadata_columns or DEFAULT_METADATA_COLUMNS)
     collection_universe = resolve_collection_allowed_feature_aliases(spec.features, authority=feature_authority)
     if not collection_universe:
         raise OutputSchemaContractFailed(
@@ -497,7 +500,11 @@ def build_synthetic_schema_fixture(
 
 def evaluate_real_output_parity(candidates_df: pd.DataFrame, features_spec: Any, *, authority: str = "active") -> Dict[str, Any]:
     """Compare a real emitted surface using OutputManager's exact allowed-alias rule."""
-    metadata = set(getattr(features_spec, "metadata_columns", None) or [])
+    # Mirror OutputManager's allowed contract exactly: declared metadata (or the
+    # documented default when the study declares none) plus the always-present
+    # candidate key, so the key columns are never mistaken for emitted features.
+    metadata = set(getattr(features_spec, "metadata_columns", None) or DEFAULT_METADATA_COLUMNS)
+    metadata |= set(CANDIDATE_KEY_COLUMNS)
     # Causality provenance is runtime metadata, never a feature alias. Treat it
     # as metadata when the collector emits it; legacy fixtures may omit it.
     if "triggering_1s_ts_init" in candidates_df.columns:

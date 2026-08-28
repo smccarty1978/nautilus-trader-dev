@@ -22,6 +22,16 @@ from backtests.nt_runtime.telemetry import TelemetrySnapshot
 
 CANDIDATE_KEY_COLUMNS = ["observation_ts", "regime_start_ns", "checkpoint_index"]
 
+# Canonical output metadata contract used when a study declares no explicit
+# ``features.metadata_columns``. Mirrored (deliberately, to avoid importing the sealed
+# runtime) by research/analysis/identity.DEFAULT_METADATA_COLUMNS; READINESS R7 must
+# validate its synthetic fixture against THIS list, not an empty fallback of its own.
+DEFAULT_METADATA_COLUMNS: Tuple[str, ...] = (
+    "observation_ts", "regime_start_ns", "regime_direction", "checkpoint_index",
+    "regime_age_seconds", "close", "atr", "running_mfe_atr", "running_mae_atr",
+    "current_pnl_atr", "new_progress_windows", "retained_mfe_ratio", "triggering_1s_ts_init",
+)
+
 # Single canonical output-interface contract (STRATEGY_OUTPUT_INTERFACE_MISSING). Named
 # here -- not in backtests/nt_runtime/modes/collect.py -- so a second consumer (READINESS
 # R6) can verify the same contract against a strategy instance without either reimplementing
@@ -426,11 +436,7 @@ class OutputManager:
         # Strict contract-driven schema validation (features + metadata)
         expected_feats = self.study_data.spec.features.feature_list or []
         expected_sha = self.study_data.spec.features.feature_list_sha256
-        declared_metadata = self.study_data.spec.features.metadata_columns or [
-            "observation_ts", "regime_start_ns", "regime_direction", "checkpoint_index",
-            "regime_age_seconds", "close", "atr", "running_mfe_atr", "running_mae_atr",
-            "current_pnl_atr", "new_progress_windows", "retained_mfe_ratio", "triggering_1s_ts_init",
-        ]
+        declared_metadata = self.study_data.spec.features.metadata_columns or list(DEFAULT_METADATA_COLUMNS)
         # Causality provenance is an optional runtime metadata column for legacy
         # fixtures, but is allowed and persisted whenever the collector emits it.
         metadata_contract = set(declared_metadata) | {"triggering_1s_ts_init"}

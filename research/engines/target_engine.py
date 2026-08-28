@@ -46,6 +46,8 @@ def _compile_forward_outcome_spec(spec: RequiredForwardOutcomeSpec) -> Dict[str,
         bar_inclusion=bar_inclusion_map[spec.bar_inclusion],
         session_end_censoring=spec.session_end_censoring,
         max_gap_seconds=spec.max_gap_seconds,
+        atr_source=spec.atr_source,
+        atr_frozen_at=spec.atr_frozen_at,
         ordered_barriers=tuple(
             OrderedBarrierSpec(
                 barrier_id=b.id,
@@ -66,6 +68,8 @@ def _compile_forward_outcome_spec(spec: RequiredForwardOutcomeSpec) -> Dict[str,
         "bar_inclusion": spec.bar_inclusion,
         "session_end_censoring": spec.session_end_censoring,
         "max_gap_seconds": spec.max_gap_seconds,
+        "atr_source": spec.atr_source,
+        "atr_frozen_at": spec.atr_frozen_at,
         "ordered_barriers": [b.model_dump() for b in (spec.ordered_barriers or [])],
         "generated_outcome_columns": list(build_outcome_columns(fo)),
     }
@@ -76,24 +80,47 @@ def _compile_condition(condition: Any) -> Dict[str, Any]:
     return body
 
 
+def resolve_effective_horizon(target_spec: TargetSpec) -> int | None:
+    """The single authoritative horizon for the target.
+
+    A ``flip`` target authors ``horizon_seconds`` directly.  A composite
+    ordered-barrier target instead carries the horizon on its forward-outcome
+    contract(s); surface that exact value here.  Fail closed when multiple
+    forward outcomes imply conflicting horizons rather than pick one.
+    """
+    if target_spec.horizon_seconds is not None:
+        return target_spec.horizon_seconds
+    outcomes = target_spec.required_forward_outcomes or []
+    horizons = {fo.horizon_seconds for fo in outcomes if fo.horizon_seconds is not None}
+    if not horizons:
+        return None
+    if len(horizons) > 1:
+        raise ValueError(
+            f"TARGET_HORIZON_AMBIGUOUS: required forward outcomes imply conflicting "
+            f"horizons {sorted(horizons)}; a composite target needs one authoritative horizon"
+        )
+    return next(iter(horizons))
+
+
 def compile_target_contract(target_spec: TargetSpec) -> Dict[str, Any]:
     """Compiles the authoritative target contract dictionary.
 
     A target with no declared ``conditions`` compiles exactly as it always has --
     composite-target fields are additive, never required.
     """
+    effective_horizon = resolve_effective_horizon(target_spec)
     contract = {
         "target_type": target_spec.type,
         "event": target_spec.event or "regime_flip",
         "direction": target_spec.direction,
-        "horizon_seconds": target_spec.horizon_seconds,
+        "horizon_seconds": effective_horizon,
         "confirmation": target_spec.confirmation or {
             "mode": "bar_close",
             "confirmation_bars": 1,
         },
         "censoring_policy": {
             "session_end_censoring": True,
-            "max_horizon_seconds": target_spec.horizon_seconds or 300,
+            "max_horizon_seconds": effective_horizon or 300,
         },
         "decision_reference": target_spec.decision_reference,
     }

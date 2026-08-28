@@ -1,0 +1,21 @@
+{
+  "audit_type": "causal_static_non_gate_reaudit_2",
+  "study": "deep_pullback_5s_reacceleration_model",
+  "verdict": "CLEAR",
+  "critical": 0,
+  "warning": 0,
+  "note": 0,
+  "new_findings": 0,
+  "scope_sha256": "b89da2b87b9e6cc49714d274bef611b0b153f5b20bb391b305572d03b468d448",
+  "report": "scratch/workflow_engine_audit/lookahead.md",
+  "workflow_executed": false,
+  "tests_executed": false,
+  "backtest_or_collection_executed": false,
+  "protected_oos_accessed": false,
+  "created_at_utc": "2026-08-27T19:06:45.1743467Z",
+  "prior_findings": [
+    {"id": "B3_C2_ATR_AT_T_PROVENANCE", "status": "FIXED"},
+    {"id": "B9_COMPLETED_STATE_SOURCE", "status": "FIXED"}
+  ],
+  "blocking_rule_ids": []
+}

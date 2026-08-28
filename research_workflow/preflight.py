@@ -184,12 +184,26 @@ def load_preflight_evidence(study_dir: Path) -> Dict[str, Any]:
     return data
 
 
-def _current_execution_composite(study_dir: Path, repo_root: Optional[Path] = None) -> str:
-    """Recomputes the study's execution composite from the tree as it stands NOW."""
+def _current_execution_composite(study_dir: Path, repo_root: Optional[Path] = None,
+                                 authority_type: Optional[str] = None) -> str:
+    """Recomputes the execution composite from the tree as it stands NOW.
+
+    ``authority_type`` pins which closure to resolve so a freshness check compares
+    like with like. A scaffolded study whose pre-scaffold ``feature_candidate.yaml``
+    still lingers on disk must be re-resolved against its own (study) closure, not the
+    candidate-authority closure -- otherwise the two legitimately-different composites
+    read as PREFLIGHT_EVIDENCE_STALE. Only a bare pre-scaffold candidate authority
+    (``feature_candidate.yaml`` present, no ``study.yaml``) resolves the candidate closure.
+    """
     from scripts.resolve_execution_manifest import resolve_execution_manifest
 
-    candidate = Path(study_dir) / "feature_candidate.yaml"
-    if candidate.is_file() or (Path(study_dir) / "feature_candidate.json").is_file():
+    has_candidate = ((Path(study_dir) / "feature_candidate.yaml").is_file()
+                     or (Path(study_dir) / "feature_candidate.json").is_file())
+    scaffolded = (Path(study_dir) / "study.yaml").is_file()
+    use_candidate = (authority_type == "feature_candidate"
+                     if authority_type is not None
+                     else (has_candidate and not scaffolded))
+    if use_candidate:
         comp_sha, _, _ = resolve_execution_manifest(Path(study_dir), repo_root or REPO_ROOT,
                                                     feature_authority="candidate",
                                                     authority_type="feature_candidate")
@@ -294,7 +308,7 @@ def assert_preflight_audit_ready(
             "execution_composite_sha256, so there is nothing tying it to the code it "
             "supposedly validated."
         )
-    current_composite = _current_execution_composite(study_dir, repo_root)
+    current_composite = _current_execution_composite(study_dir, repo_root, data.get("authority_type"))
     if evidence_composite != current_composite:
         raise PreflightEvidenceError(
             f"PREFLIGHT_EVIDENCE_STALE: preflight validated execution composite "

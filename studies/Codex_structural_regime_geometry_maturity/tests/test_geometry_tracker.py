@@ -46,6 +46,28 @@ def test_forming_5m_state_is_refused():
     assert snap['structural_unavailable_reason'] == 'FORMING_OR_MISSING_5M_STATE'
 
 
+@covers_feature_family("structural_regime_geometry")
+def test_current_5m_regime_mfe_so_far_is_causal_and_distinct_from_prior():
+    """current_5m_regime_mfe_atr = running favorable extreme of the in-progress 5m
+    regime (completed-5m bars only), never the eventual completed-regime MFE."""
+    t = StructuralRegimeGeometryTracker(); _seed(t)
+    snap = t.snapshot(900 * NS, 105.0, 11.0, 900 * NS)
+    # Current bearish 5m regime: start_price 106, running low 96, atr_start 10.
+    assert snap['current_5m_regime_mfe_atr'] == 1.0
+    # Distinct from the frozen completed prior 5m regime (bullish: 92 -> high 112).
+    assert snap['prior_5m_regime_mfe_atr'] == 2.0
+    # And distinct from net displacement to the last completed close (97).
+    assert snap['current_5m_directional_displacement_atr'] == 0.9
+    # No future / no forming: a later 1s tick cannot revise a completed-5m quantity.
+    t.on_1s(910 * NS, 200.0, 50.0, 60.0)
+    later = t.snapshot(910 * NS, 60.0, 11.0, 900 * NS)
+    assert later['current_5m_regime_mfe_atr'] == snap['current_5m_regime_mfe_atr']
+    # A new completed 5m regime resets the running extreme.
+    t.on_5m_bar(close_ts=1200 * NS, direction=1, open_=97.0, high=101.0, low=95.0, close=100.0, atr=10.0)
+    after = t.snapshot(1200 * NS, 100.0, 11.0, 1200 * NS)
+    assert after['current_5m_regime_mfe_atr'] == 0.4  # (101 - 97) / 10, bullish
+
+
 def test_prior_regime_formula_is_prefix_and_timeframe_invariant():
     """The same completed-regime algorithm powers the legacy 1m and 5m aliases."""
     t = StructuralRegimeGeometryTracker()

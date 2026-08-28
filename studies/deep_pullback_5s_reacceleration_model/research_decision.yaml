@@ -158,9 +158,14 @@ secondary_forward_outcomes:
   feature_use: prohibited_label_only
 
 feature_policy:
-  surface_role: broad_motivated_first_pass_discovery
-  target_count_min: 55
-  target_count_max: 65
+  surface_role: exact_motivated_surface_after_semantic_deduplication
+  # Revised 2026-08-27 (researcher): the historical 55-65 range was an EXPECTED broad
+  # discovery estimate, never an acceptance quota. There is no minimum feature-count
+  # requirement; no artificial expansion; exact semantic deduplication is required; the
+  # smallest surface covering every approved information family is preferred. The
+  # authored surface below is authoritative.
+  feature_count_policy: no_quota_smallest_covering_surface
+  historical_expected_range_non_binding: {min: 55, max: 65}
   data_driven_feature_selection_before_first_fit: false
   arbitrary_transformation_generation: prohibited
   arbitrary_window_grid: prohibited
@@ -188,6 +193,81 @@ feature_policy:
     - completed_5m_alignment
   new_feature_contract: canonical_identity_generic_provider_targeted_tests_causal_evidence_promotion
   inline_study_feature_calculation: prohibited
+
+  # --- Authored, resolved feature surface (2026-08-27) ---------------------------
+  # Every entry is a canonical FeatureInstance that resolves `verified` against the
+  # active feature authority. Family A order = frozen Model C parent surface
+  # (clean_maturity_flip_model_rolling_productivity, train_experiment_freeze_repaired.json
+  # feature_sets.C). Family H is a frozen derived input, not a canonical column.
+  family_column_mapping:
+    A: "columns 1-13"
+    B: "columns 14-21"
+    C: "columns 22-23"
+    D: "0 columns -- subsumed by families A and B"
+    E: "columns 24-28"
+    F: "0 columns -- duplicates of A columns 10-13"
+    G: "columns 29-34"
+    H: "derived input model_c_score_at_candidate (not a canonical column)"
+  semantic_duplicates_removed:
+    - concept: "pullback_recovery_from_max_depth_to_candidate"
+      kept: "pullback_recovery_from_extreme_atr {scope: current_deep_pullback_episode}"
+      reason: "identical under the episode-geometry contract: recovery = max(0, max_depth_points - current_depth); max depth is the episode extreme."
+    - concept: "pullback_recovery_from_deepest_extreme"
+      kept: "pullback_recovery_from_extreme_atr {scope: current_deep_pullback_episode}"
+      reason: "same concept, one column."
+    - concept: "Family F rolling_productivity, window 300s"
+      kept: "rolling_retention_ratio / rolling_current_progress_atr / rolling_max_progress_atr / rolling_giveback_atr -- already present as Family A columns 10-13 (Model C context inputs)"
+      reason: "identical canonical FeatureInstances; semantic_duplicate_search_required."
+    - concept: "Family D structural_1m_location additional columns"
+      kept: "0 additional columns"
+      reason: "concept coverage is satisfied by Family A prior-1m Model C context and Family B deep-pullback structural geometry / depth / recovery / fraction-of-structural-move / seconds-since-extreme / prior-deep-pullback-count / pullback_current_depth_atr."
+  capability_promotions_this_surface:
+    - canonical: "pullback_current_depth_atr {scope: current_deep_pullback_episode}"
+      note: "remaining adverse depth from the prevailing-1m running extreme at candidate T, normalized by candidate-time ATR. Emitted by GenericEpisodeGeometryProvider; registered + scoped-promoted via the generic capability workflow."
+    - canonical: "regime_mfe_atr {timeframe: 5m, context: current, bar_state: completed}"
+      note: "maximum favorable excursion SO FAR of the current prevailing 5m regime, from the completed-5m running extreme available at T. NOT the eventual completed-regime MFE, NOT regime_directional_displacement_atr, NOT forming-5m state. Generic provider extension in features/trackers/structural_regime_geometry.py + canonical param combo + causal test + scoped promotion."
+  feature_surface:
+    # Family A -- frozen Model C parent surface (exact feature_sets.C order)
+    - {feature: arrival_velocity,     parameters: {input_timeframe: 1s, lookback: 20, bar_state: completed}}
+    - {feature: arrival_acceleration, parameters: {input_timeframe: 1s, short_lookback: 20, bar_state: completed}}
+    - {feature: ema_slope,            parameters: {ema_role: short, lookback: 20}}
+    - {feature: regime_efficiency,    parameters: {timeframe: 1m, context: prior, bar_state: completed}}
+    - {feature: regime_mfe_atr,       parameters: {timeframe: 1m, context: prior, bar_state: completed}}
+    - {feature: regime_range_atr,     parameters: {timeframe: 1m, context: prior, bar_state: completed}}
+    - {feature: regime_efficiency,    parameters: {timeframe: 5m, context: prior, bar_state: completed}}
+    - {feature: regime_mfe_atr,       parameters: {timeframe: 5m, context: prior, bar_state: completed}}
+    - {feature: regime_range_atr,     parameters: {timeframe: 5m, context: prior, bar_state: completed}}
+    - {feature: rolling_retention_ratio,      parameters: {window: 300s, update_every: 1s}}
+    - {feature: rolling_current_progress_atr, parameters: {window: 300s, update_every: 1s}}
+    - {feature: rolling_max_progress_atr,     parameters: {window: 300s, update_every: 1s}}
+    - {feature: rolling_giveback_atr,         parameters: {window: 300s, update_every: 1s}}
+    # Family B -- deep-pullback geometry + maturity
+    - {feature: pullback_max_depth_atr,   parameters: {scope: current_deep_pullback_episode, extreme_source: prevailing_directional_extreme}}
+    - {feature: pullback_current_depth_atr, parameters: {scope: current_deep_pullback_episode}}
+    - {feature: pullback_recovery_from_extreme_atr,   parameters: {scope: current_deep_pullback_episode}}
+    - {feature: pullback_fraction_of_structural_move, parameters: {scope: current_deep_pullback_episode}}
+    - {feature: seconds_since_prevailing_directional_extreme, parameters: {timeframe: 1m, context: current, bar_state: completed}}
+    - {feature: prior_deep_pullback_count, parameters: {timeframe: 1m, context: current, bar_state: completed, threshold_atr: 1.0}}
+    - {feature: pullback_elapsed_seconds,  parameters: {scope: current_deep_pullback_episode}}
+    - {feature: pullback_post_arm_seconds, parameters: {scope: current_deep_pullback_episode}}
+    # Family C -- countertrend 5s regime geometry
+    - {feature: recovery_from_counter_regime_extreme_atr,  parameters: {timeframe: 5s}}
+    - {feature: fraction_of_counter_regime_move_recovered, parameters: {timeframe: 5s}}
+    # Family E -- multi-horizon direction-normalized volume/delta
+    - {feature: trend_normalized_est_delta_sum,       parameters: {window: 5s,   update_every: 1s, direction_reference: prevailing_1m}}
+    - {feature: trend_normalized_est_delta_sum,       parameters: {window: 60s,  update_every: 1s, direction_reference: prevailing_1m}}
+    - {feature: trend_normalized_est_delta_sum,       parameters: {window: 300s, update_every: 1s, direction_reference: prevailing_1m}}
+    - {feature: trend_normalized_est_delta_sum_ratio, parameters: {numerator_window: 5s,  denominator_window: 300s, update_every: 1s, direction_reference: prevailing_1m}}
+    - {feature: trend_normalized_est_delta_sum_ratio, parameters: {numerator_window: 60s, denominator_window: 300s, update_every: 1s, direction_reference: prevailing_1m}}
+    # Family G -- compact current completed-5m context + alignment
+    - {feature: regime_direction,  parameters: {timeframe: 5m, context: current, bar_state: completed}}
+    - {feature: regime_age_min,    parameters: {timeframe: 5m, context: current, bar_state: completed}}
+    - {feature: regime_efficiency, parameters: {timeframe: 5m, context: current, bar_state: completed}}
+    - {feature: regime_mfe_atr,    parameters: {timeframe: 5m, context: current, bar_state: completed}}
+    - {feature: regime_range_atr,  parameters: {timeframe: 5m, context: current, bar_state: completed}}
+    - {feature: regime_alignment,  parameters: {source_timeframe: 1m, reference_timeframe: 5m, context: current, bar_state: completed}}
+  feature_surface_count: 34
+  derived_input_count: 1
 
 stage1_dependency:
   parent_study_id: clean_maturity_flip_model_rolling_productivity

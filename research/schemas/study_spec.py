@@ -69,6 +69,8 @@ class EpisodeStateRequirementSpec(BaseModel):
 
     kind: Literal["direction_relation"] = "direction_relation"
     source: str
+    bar_state: Literal["completed"]
+    availability_timestamp: Literal["completed_source_bar_ts_init"]
     relation: Literal["opposite_prevailing", "aligned_prevailing"]
     active_at_arm_counts: bool = True
 
@@ -78,6 +80,8 @@ class EpisodeEmitConditionSpec(BaseModel):
 
     kind: Literal["direction_transition"] = "direction_transition"
     source: str
+    bar_state: Literal["completed"]
+    availability_timestamp: Literal["completed_source_bar_ts_init"]
     from_relation: Literal["opposite_prevailing", "aligned_prevailing"]
     to_relation: Literal["opposite_prevailing", "aligned_prevailing"]
     strictly_after_arm: bool = True
@@ -228,6 +232,10 @@ class RequiredForwardOutcomeSpec(BaseModel):
     max_gap_seconds: Optional[int] = Field(
         None, gt=0, exclude_if=lambda value: value is None
     )
+    # Provenance of the numeric ``ProposedEntry.entry_atr`` used by ATR barriers.
+    # It is declarative identity, not another calculated ATR stream.
+    atr_source: Optional[str] = Field(None)
+    atr_frozen_at: Optional[Literal["decision_ts", "entry_ts", "confirmation_ts"]] = Field(None)
     ordered_barriers: Optional[List[OrderedBarrierRequirementSpec]] = Field(
         None, exclude_if=lambda value: value is None
     )
@@ -241,6 +249,10 @@ class RequiredForwardOutcomeSpec(BaseModel):
         budget = self.max_tracking_seconds or self.horizon_seconds
         if any(b.horizon_seconds > budget for b in barriers):
             raise ValueError("ORDERED_BARRIER_HORIZON_EXCEEDS_TRACKING_BUDGET")
+        if (self.atr_source is None) != (self.atr_frozen_at is None):
+            raise ValueError("ATR_PROVENANCE_REQUIRES_SOURCE_AND_FREEZE_REFERENCE")
+        if barriers and self.atr_frozen_at is not None and self.atr_frozen_at != "decision_ts":
+            raise ValueError("ORDERED_BARRIER_ATR_MUST_FREEZE_AT_DECISION")
         return self
 
 

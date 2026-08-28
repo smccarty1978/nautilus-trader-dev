@@ -59,6 +59,8 @@ class EntryColumns:
     direction_value: Optional[str] = None
     score: Optional[str] = None
     atr: Optional[str] = None
+    atr_source: Optional[str] = None
+    atr_availability_ts: Optional[str] = None
     regime_id: Optional[str] = None
     maturity_bucket: Optional[str] = None
     maturity_seconds: Optional[str] = None
@@ -67,7 +69,7 @@ class EntryColumns:
     def required(self) -> list[str]:
         names = [self.candidate_key, self.decision_ts, self.price]
         for optional in (
-            self.entry_ts, self.direction, self.score, self.atr, self.regime_id,
+            self.entry_ts, self.direction, self.score, self.atr, self.atr_source, self.atr_availability_ts, self.regime_id,
             self.maturity_bucket, self.maturity_seconds, self.session_close_ts,
         ):
             if optional:
@@ -124,6 +126,8 @@ def _row_entry(
         source_freeze_sha256=context.source_freeze_sha256,
         regime_id=str(row[columns.regime_id]) if columns.regime_id else None,
         entry_atr=float(row[columns.atr]) if columns.atr else None,
+        entry_atr_source=str(row[columns.atr_source]) if columns.atr_source else None,
+        entry_atr_availability_ts=int(row[columns.atr_availability_ts]) if columns.atr_availability_ts else None,
         model_id=context.model_id,
         model_hash=context.model_hash,
         score=float(row[columns.score]) if columns.score else None,

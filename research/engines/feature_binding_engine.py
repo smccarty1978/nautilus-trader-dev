@@ -90,18 +90,35 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
     # authority.  A physical alias is compatibility/output vocabulary, never a
     # registry identity owned by this compiler.
     try:
-        from features.registry import resolve_feature_request
+        from features.registry import (
+            FeatureInstance,
+            generate_physical_alias,
+            resolve_feature_request,
+        )
     except ImportError as e:
         raise FeatureBindingError(f"Unable to import features.registry: {e}")
+
+    def _render_alias(item: Dict[str, Any]) -> str:
+        """One shared physical-identity renderer.
+
+        ``generate_physical_alias`` is the same function ``resolve_feature_instances``
+        (phase-0 / runtime / output) uses, so the compiled contract's output columns
+        match what the collector actually emits.  ``resolve_feature_request`` returns
+        the bare canonical name when no alias is supplied, which silently collapses two
+        instances of one canonical feature that differ only by a parameter (rolling
+        ``window`` 5s/60s/300s, ``timeframe`` 1m/5m, ...).
+        """
+        if item.get("physical_alias"):
+            return str(item["physical_alias"])
+        return generate_physical_alias(
+            FeatureInstance(str(item["feature"]), dict(item.get("parameters", {})))
+        )
 
     instance_requests = list(features_spec.instances or [])
     if features_spec.feature_list and instance_requests:
         raise FeatureBindingError("FEATURE_LIST_AND_INSTANCES_CONFLICT: choose aliases or canonical instances")
     try:
-        instance_aliases = [resolve_feature_request(
-            str(item["feature"]), item.get("parameters", {}),
-            physical_alias=item.get("physical_alias"),
-        )["physical_alias"] for item in instance_requests]
+        instance_aliases = [_render_alias(item) for item in instance_requests]
     except KeyError as exc:
         raise FeatureBindingError(f"INVALID_FEATURE_INSTANCE: missing {exc.args[0]!r}") from exc
     except Exception as exc:
@@ -130,21 +147,16 @@ def compile_feature_contract(features_spec: Optional[FeaturesSpec]) -> Dict[str,
     null_policies: Dict[str, str] = {}
 
     resolved_instances: List[Dict[str, Any]] = []
-    instance_by_alias = {
-        resolve_feature_request(str(item["feature"]), item.get("parameters", {}),
-                                physical_alias=item.get("physical_alias"))["physical_alias"]: item
-        for item in instance_requests
-    }
+    instance_by_alias = {_render_alias(item): item for item in instance_requests}
     for name in feature_list:
         try:
-            # Preserve an explicitly declared compatibility/output alias only
-            # as the instance's physical output name; canonical identity and
-            # validation remain parameter-driven.
+            # Canonical identity and validation are parameter-driven; `name` is the
+            # rendered physical output column, echoed back as the instance's alias.
             item_for_name = instance_by_alias.get(name)
             resolved = resolve_feature_request(
                 (item_for_name or {}).get("feature", name),
                 (item_for_name or {}).get("parameters", {}) if item_for_name else {},
-                physical_alias=(item_for_name or {}).get("physical_alias") if item_for_name else None,
+                physical_alias=(item_for_name or {}).get("physical_alias") or name,
             )
         except Exception:
             unregistered.append(name)

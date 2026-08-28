@@ -30,7 +30,17 @@ candidate_features:
   - canonical_name: trend_normalized_est_delta_sum_ratio
     parameters: {numerator_window: 60s, denominator_window: 300s, update_every: 1s, direction_reference: prevailing_1m}
   - canonical_name: regime_direction
+    parameters: {timeframe: 5m, context: current, bar_state: completed}
   - canonical_name: regime_alignment
+    parameters: {source_timeframe: 1m, reference_timeframe: 5m, context: current, bar_state: completed}
+  - canonical_name: regime_age_min
+    parameters: {timeframe: 5m, context: current, bar_state: completed}
+  - canonical_name: regime_efficiency
+    parameters: {timeframe: 5m, context: current, bar_state: completed}
+  - canonical_name: regime_mfe_atr
+    parameters: {timeframe: 5m, context: current, bar_state: completed}
+  - canonical_name: regime_range_atr
+    parameters: {timeframe: 5m, context: current, bar_state: completed}
   - canonical_name: generic_completed_5s_regime_state
   - canonical_name: episode_population_lifecycle
   - canonical_name: asymmetric_ordered_barrier_outcome
@@ -39,6 +49,7 @@ candidate_features:
   - canonical_name: arm_time_atr_anchor
   - canonical_name: candidate_time_atr_anchor
   - canonical_name: pullback_current_depth_atr
+    parameters: {scope: current_deep_pullback_episode}
 semantics:
   source_timeframe: 1s
   availability_timestamp: completed_source_bar_ts_init

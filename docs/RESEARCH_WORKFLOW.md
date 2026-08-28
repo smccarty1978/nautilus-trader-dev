@@ -829,6 +829,16 @@ by changing a fixed baseline or adding feature discovery unless the decision con
 explicitly permits it. Surface a design concern as a caveat; do not silently alter the
 experiment.
 
+**Scaffolding rule — capability authority ≠ feature-selection authority.** `study_spec_compiler`
+may consult a capability authority (`feature_candidate.yaml`, the active feature bundle,
+promotion facts) only to *resolve* a FeatureInstance the intake requested by exact identity. It
+must never infer the study's scientific feature surface from the set of available or candidate
+capabilities. The intake authors the ordered surface explicitly (`feature_surface:` — a list of
+`{feature, parameters}` — or a supplied `study_spec.features.instances`). An intake that names
+families/concepts but no exact instances halts at `SEMANTIC_DECISION_REQUIRED`
+(`FEATURE_SURFACE_NOT_AUTHORED`); the compiler does not guess a list from a size range like
+"approximately 55–65 features".
+
 **Never commit generated data** — `runs/`, `canonical_*/`, `_work/`, `*.parquet`, `*.joblib`,
 `*.onnx`. Commit the manifests.
 

@@ -19,10 +19,14 @@ def spec():
         },
         "required_event": {
             "kind": "direction_relation", "source": "completed_5s_regime",
+            "bar_state": "completed",
+            "availability_timestamp": "completed_source_bar_ts_init",
             "relation": "opposite_prevailing", "active_at_arm_counts": True,
         },
         "emit_condition": {
             "kind": "direction_transition", "source": "completed_5s_regime",
+            "bar_state": "completed",
+            "availability_timestamp": "completed_source_bar_ts_init",
             "from_relation": "opposite_prevailing",
             "to_relation": "aligned_prevailing", "strictly_after_arm": True,
         },

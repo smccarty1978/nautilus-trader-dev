@@ -1,0 +1,26 @@
+{
+  "allowed_families": [
+    {
+      "family": "lightgbm",
+      "fixed_hyperparameters": null,
+      "tunable_hyperparameters": null
+    }
+  ],
+  "search_method": "none",
+  "max_trials": null,
+  "random_seed": null,
+  "tuning_years": [
+    2021,
+    2022
+  ],
+  "final_train_validation_years": [
+    2023
+  ],
+  "primary_selection_metric": null,
+  "primary_selection_metric_direction": "maximize",
+  "secondary_metrics": null,
+  "calibration_required": false,
+  "simpler_model_tie_preference": true,
+  "final_validation_policy": "gated",
+  "final_validation_requirements": null
+}

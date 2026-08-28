@@ -42,6 +42,26 @@ def get_compiler_for_spec(spec: StudySpec):
         raise ValueError(f"UNSUPPORTED_STUDY_TYPE: {spec.study.type}")
 
 
+def materialize_compiled_study(spec: StudySpec, study_dir: Path, *, write_study_yaml: bool = False) -> dict:
+    """Write only derived StudySpec artifacts using the canonical compiler rendering."""
+    result = get_compiler_for_spec(spec).compile(spec)
+    study_dir.mkdir(parents=True, exist_ok=True)
+    if write_study_yaml:
+        with open(study_dir / "study.yaml", "w", encoding="utf-8") as f:
+            yaml.safe_dump(spec.model_dump(exclude_none=True, mode="json"), f, sort_keys=False)
+    (study_dir / "SPEC.md").write_text(result.rendered_spec_md, encoding="utf-8")
+    (study_dir / "TASK_PACKET.json").write_text(json.dumps(result.rendered_task_packet, indent=2), encoding="utf-8")
+    compiled = {"study_id": spec.study.id, "study_type": spec.study.type, "spec_sha256": result.spec_sha256,
+                "spec": spec.model_dump(mode="json"), "contracts": result.contracts, "strategy_class": result.nt_strategy_class}
+    (study_dir / "compiled_study.json").write_text(json.dumps(compiled, indent=2), encoding="utf-8")
+    config = study_dir / "config"; config.mkdir(exist_ok=True)
+    for name, contract in result.contracts.items():
+        (config / f"{name}.json").write_text(json.dumps(contract, indent=2), encoding="utf-8")
+    tests = study_dir / "tests"; tests.mkdir(exist_ok=True)
+    (tests / "test_study_contracts.py").write_text(generate_test_file_content(spec, result), encoding="utf-8")
+    return {"spec_sha256": result.spec_sha256, "contracts": result.contracts}
+
+
 def generate_test_file_content(spec: StudySpec, result) -> str:
     """Renders study contract tests that load real artifacts and can actually fail.
 
@@ -128,8 +148,12 @@ def test_feature_hash_equals_hash_recomputed_from_the_ordered_list():
     recomputed = hashlib.sha256(json.dumps(declared).encode("utf-8")).hexdigest()
     assert fc["feature_list_sha256"] == recomputed
     assert fc["feature_count"] == len(declared)
-    # And the compiled spec must carry the same ordered list.
-    assert _compiled()["spec"]["features"]["feature_list"] == declared
+    # When study.yaml declares features via `instances`, the compiler echoes the
+    # resolved ordered list onto StudySpec.features.feature_list. A train-only
+    # candidate-universe study legitimately leaves it None. Compare only when set.
+    spec_feature_list = _compiled()["spec"]["features"].get("feature_list")
+    if spec_feature_list is not None:
+        assert spec_feature_list == declared
 
 
 def test_declared_features_resolve_in_the_central_registry():
@@ -139,15 +163,23 @@ def test_declared_features_resolve_in_the_central_registry():
         sys.path.insert(0, str(REPO_ROOT))
     from features.registry import resolve_feature_request
 
-    for name in (_config("feature_contract")["feature_list"] or []):
-        resolved = resolve_feature_request(name)
+    fc = _config("feature_contract")
+    # `feature_list` entries are rendered physical output columns; the canonical
+    # identity to resolve is (canonical_name, parameters) from resolved_feature_instances.
+    resolved_instances = fc.get("resolved_feature_instances")
+    if resolved_instances:
+        items = [(r["canonical_name"], r.get("parameters") or {{}}) for r in resolved_instances]
+    else:
+        items = [(n, {{}}) for n in (fc.get("feature_list") or [])]
+    import importlib
+    for canonical, params in items:
+        resolved = resolve_feature_request(canonical, params)
         impl = resolved["provider"]
-        assert impl, f"{{name!r}} has no implementation binding"
-        import importlib
+        assert impl, f"{{canonical!r}} has no implementation binding"
         module_name = impl.rsplit(".", 1)[0]
         mod = importlib.import_module(module_name)
         assert Path(mod.__file__).exists(), (
-            f"{{name!r}} implementation module {{module_name}} does not resolve to a file"
+            f"{{canonical!r}} implementation module {{module_name}} does not resolve to a file"
         )
 
 
@@ -177,10 +209,23 @@ def test_target_contract_fields_equal_the_compiled_target():
     """Target fields agree across study.yaml, the compiled spec and the config contract."""
     y = _study_yaml()["target"]
     tc = _config("target_contract")
-    assert tc["horizon_seconds"] == y.get("horizon_seconds")
+    # A `flip` target authors horizon_seconds directly. A composite ordered-barrier
+    # target carries it on its single forward outcome; the compiler surfaces that one
+    # value onto target_contract.horizon_seconds. Either way the contract must equal it.
+    fo_horizons = {{fo.get("horizon_seconds") for fo in (tc.get("required_forward_outcomes") or [])}}
+    fo_horizons.discard(None)
+    if y.get("horizon_seconds") is not None:
+        expected_h = y["horizon_seconds"]
+    elif len(fo_horizons) == 1:
+        expected_h = next(iter(fo_horizons))
+    else:
+        expected_h = None
+    assert tc["horizon_seconds"] == expected_h
     assert tc["direction"] == y.get("direction")
     assert tc["event"] == (y.get("event") or "regime_flip")
-    assert _compiled()["spec"]["target"]["horizon_seconds"] == tc["horizon_seconds"]
+    compiled_h = _compiled()["spec"]["target"].get("horizon_seconds")
+    if compiled_h is not None:
+        assert compiled_h == tc["horizon_seconds"]
 
 
 def test_censoring_policy_is_declared_and_bounded_by_the_horizon():
@@ -188,7 +233,9 @@ def test_censoring_policy_is_declared_and_bounded_by_the_horizon():
     tc = _config("target_contract")
     policy = tc.get("censoring_policy")
     assert policy is not None, "target contract declares no censoring policy"
-    assert policy["max_horizon_seconds"] == tc["horizon_seconds"]
+    # The censoring bound is the effective horizon (legacy default 300 when a target
+    # declares none anywhere).
+    assert policy["max_horizon_seconds"] == (tc["horizon_seconds"] or 300)
 
 
 def test_execution_chronology_equals_the_source_decision():

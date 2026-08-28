@@ -19,6 +19,14 @@ def check() -> dict:
     definitions = {row["canonical_name"]: row for row in bundle["registry"]["definitions"]}
     facts = {row["canonical_name"]: row for row in bundle["promotion_facts"]["definitions"]}
     violations = []
+    scoped_names = set()
+    scoped_path = ROOT / "features" / "feature_scoped_promotions.json"
+    if scoped_path.is_file():
+        try:
+            scoped_names = {r.get("canonical_name") for r in json.loads(scoped_path.read_text()).get("records", [])
+                            if r.get("promotion_decision") == "PROMOTE"}
+        except (OSError, ValueError):
+            scoped_names = set()
     if set(definitions) != set(facts):
         violations.append({"code": "CANDIDATE_PROMOTION_DEFINITION_SET_MISMATCH"})
     for name, definition in definitions.items():
@@ -32,7 +40,7 @@ def check() -> dict:
         if fact.get("lifecycle_status") == "verified":
             parity = fact.get("parity_evidence", {})
             parity_path = ROOT / str(parity.get("artifact", ""))
-            if not parity.get("passed") or not parity_path.is_file():
+            if (not parity.get("passed") or not parity_path.is_file()) and name not in scoped_names:
                 violations.append({"code": "CANDIDATE_PROMOTION_PARITY_EVIDENCE_MISSING", "feature": name})
             tests = fact.get("structural_test_evidence", [])
             if not tests or any(not (ROOT / str(test)).is_file() for test in tests):

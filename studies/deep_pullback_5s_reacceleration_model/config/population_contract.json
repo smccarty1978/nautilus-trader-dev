@@ -1,0 +1,47 @@
+{
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME"
+  },
+  "population_type": "regime_state",
+  "prevailing_regime": null,
+  "session": "RTH",
+  "qualification": {},
+  "causal_checkpoint": {
+    "checkpoint_frequency": "5s",
+    "checkpoint_grid_origin": "regime_start_ns",
+    "triggering_stream": "completed_1s_bar",
+    "observation_timing": "interval_close"
+  },
+  "episode_lifecycle": {
+    "arm_condition": {
+      "kind": "directional_adverse_excursion",
+      "threshold_atr": 1.0,
+      "price_source": "completed_1s_intrabar"
+    },
+    "required_event": {
+      "kind": "direction_relation",
+      "source": "generic_completed_5s_regime_state",
+      "bar_state": "completed",
+      "availability_timestamp": "completed_source_bar_ts_init",
+      "relation": "opposite_prevailing",
+      "active_at_arm_counts": true
+    },
+    "emit_condition": {
+      "kind": "direction_transition",
+      "source": "generic_completed_5s_regime_state",
+      "bar_state": "completed",
+      "availability_timestamp": "completed_source_bar_ts_init",
+      "from_relation": "opposite_prevailing",
+      "to_relation": "aligned_prevailing",
+      "strictly_after_arm": true
+    },
+    "rearm_on": [
+      "new_favorable_extreme"
+    ],
+    "terminate_on": [
+      "prevailing_regime_flip"
+    ],
+    "max_candidates_per_episode": 1
+  }
+}

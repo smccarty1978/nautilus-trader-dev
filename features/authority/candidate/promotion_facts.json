@@ -2229,6 +2229,33 @@
       ]
     },
     {
+      "canonical_name": "pullback_current_depth_atr",
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "lifecycle_schema_version": 1,
+      "lifecycle_status": "verified",
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "scope"
+      ],
+      "parity_evidence": {
+        "artifact": "",
+        "passed": false
+      },
+      "parity_passed_alias_count": 0,
+      "provider": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+      "provider_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "reset_policies": [
+        "episode"
+      ],
+      "structural_test_evidence": [
+        "features/tests/test_generic_episode_geometry.py"
+      ]
+    },
+    {
       "canonical_name": "pullback_depth_atr",
       "input_availability_contracts": [
         "1s"

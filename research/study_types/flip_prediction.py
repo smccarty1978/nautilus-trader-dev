@@ -37,7 +37,24 @@ class FlipPredictionCompiler(BaseStudyCompiler):
             # what counts as a "clean" flip, they do not change what is being predicted.
             # A composite target with NO flip condition (e.g. pure excursion/return) is
             # not a flip prediction and genuinely needs bespoke.
-            if not any(c.kind == "flip" for c in (spec.target.conditions or [])):
+            conditions = spec.target.conditions or []
+            has_flip = any(c.kind == "flip" for c in conditions)
+            # An emitted regime-state episode is itself the completed flip-back decision.
+            # Its declared *future* ordered barrier is therefore a canonical flip outcome,
+            # not an arbitrary non-flip composite. Keep this exception intentionally narrow.
+            episode_barrier = (
+                bool(spec.population.episode_lifecycle)
+                and spec.population.episode_lifecycle.required_event.source == "generic_completed_5s_regime_state"
+                and spec.population.episode_lifecycle.emit_condition.source == "generic_completed_5s_regime_state"
+                and spec.population.episode_lifecycle.required_event.bar_state == "completed"
+                and spec.population.episode_lifecycle.emit_condition.bar_state == "completed"
+                and spec.population.episode_lifecycle.required_event.availability_timestamp == "completed_source_bar_ts_init"
+                and spec.population.episode_lifecycle.emit_condition.availability_timestamp == "completed_source_bar_ts_init"
+                and bool(conditions)
+                and all(c.kind == "ordered_barrier" for c in conditions)
+                and all(getattr(c, "forward_outcome_id", None) for c in conditions)
+            )
+            if not has_flip and not episode_barrier:
                 return FitDecision.BESPOKE_REQUIRED
         else:
             return FitDecision.BESPOKE_REQUIRED

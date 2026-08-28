@@ -3,18 +3,20 @@
   "study_id": "deep_pullback_5s_reacceleration_model",
   "status": "CLEAR",
   "audit_ready": true,
-  "execution_composite_sha256": "07ad15b53aef1877de3be5e6687231a494358a1f039837fbfa852b72f3d97d2d",
-  "preflight_run_id": "20260827T171241Z_19b2e1d3768e",
-  "generated_at_utc": "2026-08-27T17:12:41.935234+00:00",
-  "elapsed_seconds": 4.87,
-  "code_hash": "19b2e1d3768eddbfe15d0e8e45adfe97f6ff594ea50fe4aaefae38400b3c1ff3",
-  "spec_hash": "",
+  "execution_composite_sha256": "675baa3de792f8392383189abdd509f9abf00922744d49cc4b0ddf40a9a22ebf",
+  "preflight_run_id": "20260827T230543Z_832e3d44f4ab",
+  "generated_at_utc": "2026-08-27T23:05:43.592344+00:00",
+  "elapsed_seconds": 73.63,
+  "code_hash": "832e3d44f4abc572c0f782fba165b0099197532d352d645c4fdec1c52ac130d7",
+  "spec_hash": "6b2a7762b1ecfce8377917f4efb0f9bb21c0bb694679991661a50330625280a5",
   "checks_run": [
     "EXECUTION_MANIFEST",
     "CAUSAL_LINT",
     "ARTIFACT_SCHEMA",
     "FEATURE_PROMOTION",
-    "RESEARCH_DECISION_FIDELITY"
+    "RESEARCH_DECISION_FIDELITY",
+    "REQUIRED_GATES",
+    "CAUSAL_INVARIANTS"
   ],
   "check_outcomes": {
     "EXECUTION_MANIFEST": "PASSED",
@@ -22,24 +24,26 @@
     "ARTIFACT_SCHEMA": "PASSED",
     "FEATURE_PROMOTION": "PASSED",
     "RESEARCH_DECISION_FIDELITY": "PASSED",
-    "CAUSAL_INVARIANTS": "SKIPPED"
+    "REQUIRED_GATES": "PASSED",
+    "CAUSAL_INVARIANTS": "PASSED"
   },
-  "is_compiled_study": false,
-  "authority_type": "feature_candidate",
+  "is_compiled_study": true,
+  "authority_type": "study",
   "required_checks": [
     "EXECUTION_MANIFEST",
     "CAUSAL_LINT",
     "ARTIFACT_SCHEMA",
     "FEATURE_PROMOTION",
-    "RESEARCH_DECISION_FIDELITY"
+    "RESEARCH_DECISION_FIDELITY",
+    "REQUIRED_GATES",
+    "CAUSAL_INVARIANTS"
   ],
   "required_checks_missing": [],
   "checks_complete": true,
-  "diagnostic_mode": true,
+  "diagnostic_mode": false,
   "failed_gate": null,
   "failure_ids": [],
   "failure_packet": null,
   "required_next_action": "READY_FOR_AUDIT",
-  "evidence_sha256": "5b3015b588813c16721e0384dad6ac170dfc387aaa54bb9922d4996948e33825",
-  "superseded_failure_packet": "audit/failure_packet.json"
+  "evidence_sha256": "11d7d7a50594375a1eb78821a8fd60ea8da5ef10822369d7ebe646eeea3f5b40"
 }

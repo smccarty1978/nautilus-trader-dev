@@ -673,6 +673,8 @@ class ForwardOutcomeTracker:
                 f"entry {entry.entry_id} has no frozen entry_atr but the spec declares "
                 f"ATR-normalized excursions"
             )
+        if self.spec.atr_source is not None and (entry.entry_atr_source != self.spec.atr_source or entry.entry_atr_availability_ts is None):
+            raise ForwardOutcomeError("entry ATR provenance does not match forward outcome spec")
         if self.primary_interval is not None:
             start, end = self.primary_interval
             if not (start <= entry.entry_ts <= end):

@@ -1,0 +1,113 @@
+{
+  "target_type": "composite",
+  "event": "regime_flip",
+  "direction": null,
+  "horizon_seconds": 300,
+  "confirmation": {
+    "mode": "bar_close",
+    "confirmation_bars": 1
+  },
+  "censoring_policy": {
+    "session_end_censoring": true,
+    "max_horizon_seconds": 300
+  },
+  "decision_reference": "decision_ts",
+  "conditions": [
+    {
+      "id": "ordered_continuation",
+      "kind": "ordered_barrier",
+      "forward_outcome_id": "ordered_continuation_1p00_vs_0p75_300s",
+      "barrier_id": "ordered_continuation_1p00_vs_0p75_300s"
+    }
+  ],
+  "condition_logic": null,
+  "required_forward_outcomes": [
+    {
+      "id": "ordered_continuation_1p00_vs_0p75_300s",
+      "spec_sha256": "8ea2f6f83044eaf44be3f7831d9f22285cb0797377e762c92cb5596bbf71fc0c",
+      "entry_reference": "next_bar_open",
+      "horizon_seconds": 300,
+      "max_tracking_seconds": 300,
+      "excursion_units": [
+        "atr"
+      ],
+      "bar_inclusion": "fully_forward",
+      "session_end_censoring": true,
+      "max_gap_seconds": 1,
+      "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
+      "atr_frozen_at": "decision_ts",
+      "ordered_barriers": [
+        {
+          "id": "ordered_continuation_1p00_vs_0p75_300s",
+          "favorable_atr": 1.0,
+          "adverse_atr": 0.75,
+          "horizon_seconds": 300
+        }
+      ],
+      "generated_outcome_columns": [
+        "entry_id",
+        "candidate_key",
+        "study_id",
+        "source_period",
+        "regime_id",
+        "decision_ts",
+        "entry_ts",
+        "direction",
+        "entry_price",
+        "entry_atr",
+        "model_id",
+        "model_hash",
+        "score",
+        "score_decile",
+        "threshold_id",
+        "maturity_bucket",
+        "maturity_seconds",
+        "selector_id",
+        "mfe_300s_atr",
+        "mae_300s_atr",
+        "return_300s_atr",
+        "time_to_mfe_300s",
+        "time_to_mae_300s",
+        "price_300s",
+        "status_300s",
+        "mfe_mae_ratio_300s",
+        "return_over_mae_300s",
+        "mfe_minus_mae_300s",
+        "retained_mfe_fraction_300s",
+        "giveback_from_mfe_300s",
+        "max_mfe_atr",
+        "max_mae_atr",
+        "final_return_atr",
+        "time_to_max_mfe",
+        "time_to_max_mae",
+        "final_price",
+        "max_mfe_mae_ratio",
+        "final_return_over_mae",
+        "max_mfe_minus_max_mae",
+        "retained_mfe_fraction_final",
+        "giveback_from_max_mfe",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_disposition",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_binary_label",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_favorable_touch_ts",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_adverse_touch_ts",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_time_to_favorable",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_time_to_adverse",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_first_touch_ambiguous",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_censor_reason",
+        "ordered_ordered_continuation_1p00_vs_0p75_300s_resolved_at_ts",
+        "outcome_status",
+        "censor_reason",
+        "resolved_at_ts",
+        "tracked_seconds",
+        "bars_observed",
+        "first_bar_ts",
+        "last_bar_ts",
+        "max_gap_seconds_observed",
+        "spec_sha256",
+        "entry_sha256",
+        "authorization_sha256",
+        "source_freeze_sha256"
+      ]
+    }
+  ]
+}

@@ -1785,6 +1785,29 @@
       "status": "verified"
     },
     {
+      "canonical_name": "pullback_current_depth_atr",
+      "dtype": "float64",
+      "family": [
+        "pullback_episode_geometry"
+      ],
+      "input_availability_contracts": [
+        "1s"
+      ],
+      "legacy_alias_count": 0,
+      "null_policies": [
+        "allow"
+      ],
+      "parameter_schema": [
+        "scope"
+      ],
+      "provider": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+      "provider_sha256": "571d5479fe41d15e6a25494e7974d1bbf3d6fa95700180aee31635bdeccb2f5f",
+      "reset_policies": [
+        "episode"
+      ],
+      "status": "verified"
+    },
+    {
       "canonical_name": "pullback_depth_atr",
       "dtype": "float64",
       "family": [

@@ -187,6 +187,8 @@ class ForwardOutcomeSpec:
     session: str = "ALL"
     session_end_censoring: bool = False
     max_gap_seconds: Optional[int] = None
+    atr_source: Optional[str] = None
+    atr_frozen_at: Optional[str] = None
     path_quality: bool = True
     epsilon: float = 1e-9
     diagnostic_levels_atr: Tuple[float, ...] = ()
@@ -239,6 +241,10 @@ class ForwardOutcomeSpec:
             )
         if barriers and "atr" not in units:
             raise ForwardOutcomeError("ordered barriers require the 'atr' excursion unit")
+        if (self.atr_source is None) != (self.atr_frozen_at is None):
+            raise ForwardOutcomeError("atr provenance requires source and freeze reference")
+        if barriers and self.atr_frozen_at is not None and self.atr_frozen_at not in {"decision_ts"}:
+            raise ForwardOutcomeError("ordered barrier ATR must freeze at decision_ts")
         object.__setattr__(self, "horizons_seconds", horizons)
         object.__setattr__(self, "max_tracking_seconds", int(self.max_tracking_seconds))
         object.__setattr__(self, "excursion_units", units)
@@ -269,6 +275,8 @@ class ForwardOutcomeSpec:
             "session": self.session,
             "session_end_censoring": bool(self.session_end_censoring),
             "max_gap_seconds": self.max_gap_seconds,
+            "atr_source": self.atr_source,
+            "atr_frozen_at": self.atr_frozen_at,
             "path_quality": bool(self.path_quality),
             "epsilon": self.epsilon,
             "diagnostic_levels_atr": list(self.diagnostic_levels_atr),
@@ -316,6 +324,8 @@ class ProposedEntry:
     entry_id: str = ""
     regime_id: Optional[str] = None
     entry_atr: Optional[float] = None
+    entry_atr_source: Optional[str] = None
+    entry_atr_availability_ts: Optional[int] = None
     model_id: Optional[str] = None
     model_hash: Optional[str] = None
     score: Optional[float] = None
@@ -345,6 +355,13 @@ class ProposedEntry:
             raise ForwardOutcomeError("entry_price must be a positive finite price")
         if self.entry_atr is not None and not (float(self.entry_atr) > 0):
             raise ForwardOutcomeError("entry_atr must be positive when supplied")
+        provenance = (self.entry_atr_source, self.entry_atr_availability_ts)
+        if any(x is not None for x in provenance) and (self.entry_atr is None or any(x is None for x in provenance)):
+            raise ForwardOutcomeError("ATR provenance requires entry_atr")
+        if self.entry_atr_availability_ts is not None:
+            object.__setattr__(self, "entry_atr_availability_ts", int(self.entry_atr_availability_ts))
+            if self.entry_atr_availability_ts > self.decision_ts:
+                raise ForwardOutcomeError("entry ATR availability is after decision_ts")
         if not self.entry_id:
             object.__setattr__(self, "entry_id", self._derive_entry_id())
 

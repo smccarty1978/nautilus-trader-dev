@@ -147,8 +147,16 @@ class StructuralRegimeGeometryTracker:
         out.update(self._completed("prior_1m_regime", self._prior_one))
         f, f_age, f_range = self._five, (checkpoint_ns-self._five.start_ns)/(60*NS), self._five.high-self._five.low
         f_range_atr = _ratio(f_range, f.atr_start)
+        # Maximum favorable excursion SO FAR of the current 5m regime: the running
+        # favorable extreme (from completed 5m bars only, up to T) versus the regime
+        # start price. Distinct from prior_5m_regime_mfe_atr (a frozen completed-regime
+        # statistic) and from current_5m_directional_displacement_atr (net move to the
+        # last completed close, not the peak). No forming-5m information is consulted.
+        f_favorable_extreme = f.high if f.direction == 1 else f.low
+        f_mfe = f.direction * (f_favorable_extreme - f.start_price)
         out.update({"current_5m_regime_age_min": f_age,
                     "current_5m_regime_range_atr": f_range_atr,
+                    "current_5m_regime_mfe_atr": _ratio(f_mfe, f.atr_start),
                     "current_5m_directional_displacement_atr": _ratio(f.direction*(f.last_close-f.start_price), f.atr_start),
                     "current_5m_regime_range_atr_per_min": _ratio(f_range_atr, f_age) if f_range_atr is not None else None,
                     "distance_to_completed_5m_high_atr": _ratio(f.high-current_price, f.atr_start),
