@@ -1,0 +1,39 @@
+{
+  "summary": {
+    "rows_replayed": 59724,
+    "LONG_rows": 29267,
+    "SHORT_rows": 30457,
+    "collected_resolved_binary_rows": 56001,
+    "replay_resolved_binary_rows": 58778,
+    "rows_binary_in_both": 55457,
+    "LONG_label_mismatches": 16979,
+    "SHORT_label_mismatches": 11689,
+    "total_label_mismatches": 28668,
+    "disposition_mismatches": 32535,
+    "collected_disposition_counts": {
+      "LABELED_NEGATIVE": 47258,
+      "LABELED_POSITIVE": 8743,
+      "CENSORED": 3723
+    },
+    "replay_disposition_counts": {
+      "FAILURE": 32080,
+      "SUCCESS": 23138,
+      "TIMEOUT": 3560,
+      "CENSORED": 937,
+      "AMBIGUOUS_FIRST_TOUCH": 9
+    },
+    "collected_positive_rate": 0.1561222121033553,
+    "replay_positive_rate": 0.3936506856306781,
+    "collected_pos_rate_LONG": 0.2952201075112596,
+    "collected_pos_rate_SHORT": 0.021602444764480665,
+    "replay_pos_rate_LONG": 0.39058798941061723,
+    "replay_pos_rate_SHORT": 0.3965746591286997,
+    "censoring_only_collected": 3321,
+    "censoring_only_replay": 544
+  },
+  "verdict": "BLOCK_OOS",
+  "artifacts": [
+    "artifacts/target_replay_full.parquet",
+    "artifacts/target_replay_audit_sample.csv"
+  ]
+}

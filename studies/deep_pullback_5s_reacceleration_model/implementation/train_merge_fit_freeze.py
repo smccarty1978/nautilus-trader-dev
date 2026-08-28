@@ -431,9 +431,20 @@ def final_fit_and_freeze(
     )
     artifact_bytes_parity = repro_fitted.provenance.model_sha256 == fitted.provenance.model_sha256
 
+    from research_workflow.modeling_closure import resolve_modeling_closure
+
+    modeling_closure = resolve_modeling_closure(
+        study_dir, driver_relpaths=["implementation/train_merge_fit_freeze.py"],
+    )
+    (study_dir / "artifacts" / "modeling_execution_manifest.json").write_text(
+        json.dumps(modeling_closure, indent=2, default=str) + "\n", encoding="utf-8")
+
     lineage = {
         "schema_version": 1,
         "study_id": "deep_pullback_5s_reacceleration_model",
+        "collection_producer_composite_sha256": SEALED_COMPOSITE,
+        "modeling_execution_composite_sha256": modeling_closure["modeling_execution_composite_sha256"],
+        "modeling_execution_file_count": modeling_closure["file_count"],
         "sealed_execution_composite_sha256": SEALED_COMPOSITE,
         "train_experiment_freeze_sha256": frozen["freeze_sha256"],
         "authorization_sha256": frozen["authorization_sha256"],
