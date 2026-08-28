@@ -2,16 +2,15 @@
   "study_id": "deep_pullback_5s_reacceleration_model",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "95635d55696fa8683a8ba8a043104d5f8b3984d8",
+  "git_commit_hash": "00f66966e02e4fc585848b0304df9c54823cad5b",
   "source_state_binding": {
     "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "95635d55696fa8683a8ba8a043104d5f8b3984d8",
+    "git_commit_hash": "00f66966e02e4fc585848b0304df9c54823cad5b",
     "git_commit_is_sufficient_provenance": false,
     "working_tree_dirty": true,
-    "source_state_sha256": "54758fd5def4b8152b03ec81d1f3d0d321410acfce0a06acdbe7b69fe645b508",
+    "source_state_sha256": "4d04e1404bc32a7717ed8461d6d9a01be64ff4d318760e7f8075aef268f5405b",
     "dependencies_diverging_from_commit": [
-      "studies/deep_pullback_5s_reacceleration_model/SPEC.md",
-      "studies/deep_pullback_5s_reacceleration_model/study.yaml"
+      "features/trackers/generic_regime_geometry.py"
     ],
     "source_files": {
       "features/registry.py": {
@@ -35,8 +34,8 @@
         "state": "COMMITTED"
       },
       "features/trackers/generic_regime_geometry.py": {
-        "sha256": "be6e08df629cd7a2a32147e9099e38372b9e4a4c061f54808223c1637b01a1bb",
-        "state": "COMMITTED"
+        "sha256": "fd409f9a4278d12935a505d7f78b088dd189b275f756b19675c5a1b397384683",
+        "state": "MODIFIED"
       },
       "features/trackers/generic_rolling_productivity.py": {
         "sha256": "eb5f07231547978421a6b65fdfb809a4c8af6dc9350a7731a3fe8a5026dd5bbd",
@@ -48,11 +47,11 @@
       },
       "studies/deep_pullback_5s_reacceleration_model/SPEC.md": {
         "sha256": "1fae810354961f79f639f21fb3c06f5ba4d44ce4be049b4186e59a6b33b6d67a",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       },
       "studies/deep_pullback_5s_reacceleration_model/study.yaml": {
         "sha256": "73f270d8d30ab6b73e7e1f24780de7b116afaca2f297df1c2469ac9959c0e4a7",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       }
     }
   },
@@ -800,5 +799,5 @@
     }
   ],
   "required_gates_evidence": [],
-  "manifest_sha256": "ba33094f8819b36189c723bbd8639af194a4408398927bc42c274b41ba90cdc3"
+  "manifest_sha256": "470c86891d2cfaee22dfdd97016ac6830ca2bceb6474a59a8c77ebc6851f2961"
 }

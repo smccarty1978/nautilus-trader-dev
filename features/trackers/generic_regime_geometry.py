@@ -85,6 +85,51 @@ class GenericCompletedRegimeGeometryProvider:
             )
         self.on_geometry_bar(timeframe=timeframe, close_ts=close_ts, high=high, low=low, close=close)
 
+    def current_snapshot(
+        self, *, timeframe: str, checkpoint_ns: int,
+        candidate_price: float | None = None, candidate_atr: float | None = None,
+    ) -> dict:
+        """Read-only geometry of the *active* (not yet completed) regime.
+
+        Additive accessor: it exposes the state ``on_completed_bar`` / ``on_geometry_bar``
+        already maintain in ``self._current`` without changing how that state is built.
+        It applies the identical causal guard as :meth:`prior_snapshot` -- the last
+        completed geometry observation must be available by ``checkpoint_ns`` -- so it
+        never reads a forming bar. Net move is measured to the last completed close.
+        """
+        current = self._current.get(timeframe)
+        close_ts = self._close_ts.get(timeframe)
+        if current is None:
+            return {"available": False, "unavailable_reason": "NO_CURRENT_REGIME"}
+        if close_ts is None or close_ts > checkpoint_ns:
+            return {"available": False, "unavailable_reason": "FORMING_OR_MISSING_COMPLETED_STATE"}
+        end_close = current.last_close if current.last_close is not None else current.start_price
+        rng = current.high - current.low
+        net = current.direction * (end_close - current.start_price)
+        fav = (
+            current.high - current.start_price
+            if current.direction == 1 else current.start_price - current.low
+        )
+        prefix = f"current_{timeframe}_regime"
+        result = {
+            "available": True, "completed_close_ts": close_ts,
+            f"{prefix}_direction": current.direction,
+            f"{prefix}_efficiency": _ratio(abs(net), rng),
+            f"{prefix}_mfe_atr": _ratio(fav, current.atr_start),
+            f"{prefix}_range_atr": _ratio(rng, current.atr_start),
+            f"{prefix}_net_directional_move_atr": _ratio(net, current.atr_start),
+        }
+        if (candidate_price is None) != (candidate_atr is None):
+            raise ValueError("candidate_price and candidate_atr must be supplied together")
+        if candidate_price is not None:
+            if not math.isfinite(candidate_atr) or candidate_atr <= 0.0:
+                raise ValueError("candidate_atr must be finite and positive")
+            result[f"{prefix}_distance_to_extreme_atr"] = _ratio(
+                abs((current.high if current.direction == 1 else current.low) - float(candidate_price)),
+                float(candidate_atr),
+            )
+        return result
+
     def prior_snapshot(
         self, *, timeframe: str, checkpoint_ns: int,
         candidate_price: float | None = None, candidate_atr: float | None = None,

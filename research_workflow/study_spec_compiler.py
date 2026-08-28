@@ -131,6 +131,13 @@ def _deep_pullback_projection(request: dict[str, Any], study: Path) -> dict[str,
                                    "feature_count": len(instances), "direction_specific": False}},
         "model": {"family": request["model"]["allowed_family"], "arms": ["BROAD"], "selection": {"search_method": "none", "allowed_families": [{"family": request["model"]["allowed_family"]}], "tuning_years": proto.get("selection_fit_years", []) + proto.get("selection_validation_years", []), "final_train_validation_years": proto.get("final_train_validation_years", [])}},
         "chronology": request["chronology"],
+        # Runtime feature path is NOT a StudySpec field: ExecutionSpec is `extra="forbid"`
+        # and its hash feeds every study's spec_sha256 (see the NOTE in research/schemas/
+        # study_spec.py), so a new field there would stale every compiled study. Instead
+        # runtime_bindings derives provider_host mode from the compiled
+        # population_contract.episode_lifecycle primitive -- an episode-lifecycle study
+        # cannot run the legacy checkpoint collector, so it is a provider_host study by
+        # construction. Legacy studies keep their compact / fused-ring / exploratory paths.
         "execution": {"runtime": "nautilustrader", "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
                       "data_requirements": {"dataset_id": request["instrument"]["dataset_id"]}},
         "required_gates": [{"id": "population_target_gate", "stage": "pre_fit", "artifact_path": "artifacts/population_target_gate.json", "artifact_schema_version": 1, "scope_fields": ["population", "target", "chronology"]}]}

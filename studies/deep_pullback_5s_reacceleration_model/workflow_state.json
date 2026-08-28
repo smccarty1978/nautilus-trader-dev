@@ -8,7 +8,7 @@
   "blockers": [
     {
       "detail": {
-        "code_hash": "f9a85646e95e598fb7de153f5898e4c5f92a10f15b50c85fd5bd4aaf6f350ec1",
+        "code_hash": "83a1835749cc883b33aefd935cd1855fd642fd6e0394a38633a6388cfc1a14c0",
         "failed_gate": "RUNTIME_CONTRACT_BINDING",
         "failure_details": [
           {
@@ -18,8 +18,8 @@
         "failure_ids": [
           "RUNTIME_CONTRACT_BINDING_MISSING"
         ],
-        "generated_at_utc": "2026-08-28T02:55:19.487738+00:00",
-        "preflight_run_id": "20260828T025519Z_f9a85646e95e",
+        "generated_at_utc": "2026-08-28T03:26:38.633273+00:00",
+        "preflight_run_id": "20260828T032638Z_83a1835749cc",
         "recommended_smallest_investigation_scope": "Inspect findings in RUNTIME_CONTRACT_BINDING and fix locally before requesting audit.",
         "status": "BLOCKED",
         "superseded": false
@@ -39,12 +39,12 @@
     "compiled_study": "1261bd16cd41d89f6538c3314b205a4ccc5e3dd91dddc8830e50db23ee070b2c",
     "contract_reports": "494bd2a9b46f93bd23a7ee4cd9c1ebc002d20fc79a1b9359469590c33e77a61c",
     "contract_status": "4f7081ee64e13fcf15c138a6d9f5c370b0a41122244795f4a5bc092b115ea33a",
-    "current_execution_composite": "8326963ebc41dde6f3601f34993b7a151f4fed697c8d8a32ca0c22dbe919a4e2",
-    "execution_composite": "8326963ebc41dde6f3601f34993b7a151f4fed697c8d8a32ca0c22dbe919a4e2",
-    "execution_freeze": "822b9e3c6409f02a13ea2446dfbddc85c5900ab11ad2795e8c4859e766ddd073",
+    "current_execution_composite": "a52f1924710cea19310151fdc71bcab0b4e2e23706462d492c1332acfa2814ea",
+    "execution_composite": "a52f1924710cea19310151fdc71bcab0b4e2e23706462d492c1332acfa2814ea",
+    "execution_freeze": "230ba0c7162fe40c85af6a8f22a5788950c65a3bc5112aca483f38ac07174942",
     "feature_candidate_semantics": "d3cb9764249179fa4906dad68b517c6227342213c3c3756ecb13becae1b84337",
     "frozen_lineage": "7cd1ee894a3b472084c5d40903f2375e1afd08d87b71a8c10196b92c3c98fbe1",
-    "preflight": "fe6596d2678e2546feb9c96f8d809fdbc03e85a4cffee295ea377ed15b1f0155",
+    "preflight": "bea5623df9493fdfbb9ee7631f363eec7456fad9806f09c80327386eac8ef810",
     "seal": "b4c26967c70e256f7ebc85b91f7905c54faf937645673eed8f31de67a8af1574",
     "smoke": null,
     "study_spec": "73f270d8d30ab6b73e7e1f24780de7b116afaca2f297df1c2469ac9959c0e4a7",
@@ -61,12 +61,12 @@
     "compiled_study": "1261bd16cd41d89f6538c3314b205a4ccc5e3dd91dddc8830e50db23ee070b2c",
     "contract_reports": "494bd2a9b46f93bd23a7ee4cd9c1ebc002d20fc79a1b9359469590c33e77a61c",
     "contract_status": "4f7081ee64e13fcf15c138a6d9f5c370b0a41122244795f4a5bc092b115ea33a",
-    "current_execution_composite": "8326963ebc41dde6f3601f34993b7a151f4fed697c8d8a32ca0c22dbe919a4e2",
-    "execution_composite": "8326963ebc41dde6f3601f34993b7a151f4fed697c8d8a32ca0c22dbe919a4e2",
-    "execution_freeze": "822b9e3c6409f02a13ea2446dfbddc85c5900ab11ad2795e8c4859e766ddd073",
+    "current_execution_composite": "a52f1924710cea19310151fdc71bcab0b4e2e23706462d492c1332acfa2814ea",
+    "execution_composite": "a52f1924710cea19310151fdc71bcab0b4e2e23706462d492c1332acfa2814ea",
+    "execution_freeze": "230ba0c7162fe40c85af6a8f22a5788950c65a3bc5112aca483f38ac07174942",
     "feature_candidate_semantics": "d3cb9764249179fa4906dad68b517c6227342213c3c3756ecb13becae1b84337",
     "frozen_lineage": "7cd1ee894a3b472084c5d40903f2375e1afd08d87b71a8c10196b92c3c98fbe1",
-    "preflight": "fe6596d2678e2546feb9c96f8d809fdbc03e85a4cffee295ea377ed15b1f0155",
+    "preflight": "bea5623df9493fdfbb9ee7631f363eec7456fad9806f09c80327386eac8ef810",
     "seal": "b4c26967c70e256f7ebc85b91f7905c54faf937645673eed8f31de67a8af1574",
     "smoke": null,
     "study_spec": "73f270d8d30ab6b73e7e1f24780de7b116afaca2f297df1c2469ac9959c0e4a7",
@@ -79,7 +79,7 @@
   ],
   "study_id": "deep_pullback_5s_reacceleration_model",
   "terminal_reason": {
-    "code_hash": "f9a85646e95e598fb7de153f5898e4c5f92a10f15b50c85fd5bd4aaf6f350ec1",
+    "code_hash": "83a1835749cc883b33aefd935cd1855fd642fd6e0394a38633a6388cfc1a14c0",
     "failed_gate": "RUNTIME_CONTRACT_BINDING",
     "failure_details": [
       {
@@ -89,20 +89,20 @@
     "failure_ids": [
       "RUNTIME_CONTRACT_BINDING_MISSING"
     ],
-    "generated_at_utc": "2026-08-28T02:55:19.487738+00:00",
-    "preflight_run_id": "20260828T025519Z_f9a85646e95e",
+    "generated_at_utc": "2026-08-28T03:26:38.633273+00:00",
+    "preflight_run_id": "20260828T032638Z_83a1835749cc",
     "recommended_smallest_investigation_scope": "Inspect findings in RUNTIME_CONTRACT_BINDING and fix locally before requesting audit.",
     "status": "BLOCKED",
     "superseded": false
   },
   "terminal_state": "SAFETY_OR_AUTHORIZATION_BLOCK",
-  "timestamp": "2026-08-28T02:55:20.164057+00:00",
+  "timestamp": "2026-08-28T03:26:39.396400+00:00",
   "timestamps": {
     "causal": 1787882822.2223842,
     "contract": 1787882826.604225,
-    "preflight": 1787885719.487153,
-    "prepared": 1787885702.9254553,
-    "readiness": 1787885712.5402305,
+    "preflight": 1787887598.6333122,
+    "prepared": 1787887582.4396415,
+    "readiness": 1787887591.3527083,
     "seal": 1787882832.1374812,
     "smoke": null
   }

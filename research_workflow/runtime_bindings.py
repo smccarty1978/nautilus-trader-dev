@@ -17,19 +17,20 @@ It is NOT a second resolver. It reads:
     (``SUPPORTS_EPISODE_LIFECYCLE``)
 and reports every primitive with no executable binding.
 
-Scope note. This module statically verifies the one primitive whose runtime
-component is canonically singular and unambiguous: ``episode_lifecycle`` ->
-``EpisodePopulationEngine``. Per-*feature* realizability (a declared FeatureInstance
-emitted as an all-null column because its provider is not wired into the collector)
-is NOT statically verifiable against the current collector -- it serves three
-different feature-surface paths (compact / fused-ring / exploratory) and bridges
-legacy-tracker outputs to canonical aliases, so there is no hand-maintainable
-"emittable alias" set that is both complete and regression-free. That check is
-instead empirical: ``scripts.validate_smoke`` runs the real collector and fails on
-``RUNTIME_FEATURE_BINDING_MISSING`` for any declared column that is absent or
-entirely null in real output. A generic feature-provider host (one bound provider
-per FeatureInstance, realizability = "is a provider bound") would make the static
-check tractable; that host does not exist yet.
+Scope note. Two checks:
+
+  * ``episode_lifecycle`` -> ``EpisodePopulationEngine`` -- always verified; the
+    primitive's runtime component is canonically singular.
+
+  * per-*feature* realizability -- verified statically ONLY for studies whose compiled
+    ``execution.runtime_feature_mode == "provider_host"``, via
+    ``research_workflow.provider_host.ProviderHost``'s own machine-readable binding
+    metadata (one registered ``RuntimeProviderAdapter`` per canonical provider,
+    ``bound`` per FeatureInstance). Legacy studies omit the field and keep their
+    compact / fused-ring / exploratory collector paths; for them per-column coverage
+    stays empirical -- ``scripts.validate_smoke`` runs the real collector and fails on
+    ``RUNTIME_FEATURE_BINDING_MISSING`` for any declared column absent or entirely null
+    in real output.
 """
 from __future__ import annotations
 
@@ -124,6 +125,45 @@ def verify_runtime_contract(study_dir: str | Path) -> Dict[str, Any]:
                       "the checkpoint grid instead of one candidate per deep-pullback episode",
         })
 
+    # --- feature-provider realizability (provider_host runtime mode only) ---------
+    # A study is provider_host mode iff it declares an episode_lifecycle population --
+    # such a study cannot run the legacy checkpoint collector, so every FeatureInstance
+    # must resolve to a registered RuntimeProviderAdapter and be bound. Proven from
+    # ProviderHost's own machine-readable binding metadata, not a module-name or
+    # alias-list heuristic. An explicit spec.execution.runtime_feature_mode (future
+    # schema bump) takes precedence if present. Legacy studies keep their compact /
+    # fused-ring / exploratory collector feature paths untouched.
+    runtime_feature_mode = (
+        (spec.get("execution") or {}).get("runtime_feature_mode")
+        or ("provider_host" if episode else None)
+    )
+    provider_host_meta: List[Dict[str, Any]] | None = None
+    if runtime_feature_mode == "provider_host":
+        try:
+            from research_workflow.provider_host import ProviderHost
+
+            host = ProviderHost.from_feature_contract(compiled)
+            verdict = host.verify_bindings()
+            provider_host_meta = verdict["metadata"]
+            for alias in verdict["unbound"]:
+                rec = next((m for m in verdict["metadata"] if m["physical_alias"] == alias), {})
+                missing.append({
+                    "primitive": f"feature_instance:{alias}",
+                    "declared": rec.get("canonical_name", alias),
+                    "required_binding": rec.get("canonical_provider", "features.registry-resolved provider"),
+                    "collector": caps["strategy_class"],
+                    "reason": "runtime_feature_mode=provider_host but no RuntimeProviderAdapter "
+                              "binds this FeatureInstance's canonical provider",
+                })
+        except Exception as e:  # RuntimeProviderBindingMissing, duplicate alias, resolve failure
+            missing.append({
+                "primitive": "runtime_feature_mode.provider_host",
+                "declared": runtime_feature_mode,
+                "required_binding": "research_workflow.provider_host.ProviderHost",
+                "collector": caps["strategy_class"],
+                "reason": f"{type(e).__name__}: {e}",
+            })
+
     return {
         "passed": not missing,
         "missing": missing,
@@ -131,5 +171,11 @@ def verify_runtime_contract(study_dir: str | Path) -> Dict[str, Any]:
             "strategy_class": caps["strategy_class"],
             "supports_episode_lifecycle": caps["supports_episode_lifecycle"],
             "episode_lifecycle_declared": bool(episode),
+            "runtime_feature_mode": runtime_feature_mode or "legacy_runtime",
+            "provider_host_bindings": (
+                {"required": len(provider_host_meta),
+                 "bound": sum(1 for m in provider_host_meta if m["bound"])}
+                if provider_host_meta is not None else None
+            ),
         },
     }

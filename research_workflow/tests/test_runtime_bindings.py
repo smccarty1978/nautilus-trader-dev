@@ -78,3 +78,28 @@ def test_existing_non_episode_studies_are_not_regressed():
 def test_preflight_required_checks_include_runtime_binding():
     from research_workflow.preflight import REQUIRED_STUDY_CHECKS
     assert "RUNTIME_CONTRACT_BINDING" in REQUIRED_STUDY_CHECKS
+
+
+def test_episode_study_is_provider_host_mode_and_all_features_bind():
+    study = Path(__file__).resolve().parents[2] / "studies" / "deep_pullback_5s_reacceleration_model"
+    if not (study / "compiled_study.json").is_file():
+        pytest.skip("deep_pullback study is not scaffolded in this tree")
+    result = verify_runtime_contract(study)
+    assert result["checked"]["runtime_feature_mode"] == "provider_host"
+    phb = result["checked"]["provider_host_bindings"]
+    assert phb == {"required": 34, "bound": 34}
+    # every remaining miss is the episode primitive, never a feature instance
+    assert all(m["primitive"] == "population_contract.episode_lifecycle" for m in result["missing"])
+
+
+def test_non_episode_studies_never_run_the_provider_host_check():
+    import glob
+    root = Path(__file__).resolve().parents[2]
+    for cs in glob.glob(str(root / "studies" / "*" / "compiled_study.json")):
+        data = json.loads(Path(cs).read_text())
+        pc = (data.get("contracts") or {}).get("population_contract") or {}
+        if pc.get("episode_lifecycle"):
+            continue
+        checked = verify_runtime_contract(Path(cs).parent)["checked"]
+        assert checked["runtime_feature_mode"] == "legacy_runtime"
+        assert checked["provider_host_bindings"] is None
