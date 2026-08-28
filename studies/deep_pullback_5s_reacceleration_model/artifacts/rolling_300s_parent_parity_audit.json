@@ -1,0 +1,40 @@
+{
+  "stamp": [
+    "DIAGNOSTIC_ONLY",
+    "NON_ACCEPTANCE_EVIDENCE"
+  ],
+  "question": "rolling_300s / Model-C missingness: child-provider defect or shared lineage property?",
+  "parent_study": "clean_maturity_flip_model_rolling_productivity",
+  "parent_semantics": {
+    "collector": "research_workflow.generic_collector.GenericStudyCollector (SAME as child)",
+    "rolling_instances": "rolling_{retention_ratio,current_progress_atr,max_progress_atr,giveback_atr} window=300s update_every=1s (SAME as child)",
+    "tracker": "Rolling5mProductivityTracker(window_seconds=300) via GenericRollingProductivityProvider (SAME code path)",
+    "requires_301_of_301_printed_1s_bars": true,
+    "operates_on_densified_1s_grid": false,
+    "missing_seconds_tolerated": false,
+    "unavailable_reasons": "MISSING_COMPLETED_CHECKPOINT_1S / MISSING_EXACT_300S_BOUNDARY / INCOMPLETE_1S_WINDOW / NONPOSITIVE_PROGRESS_DENOMINATOR"
+  },
+  "child_semantics": "identical - same collector, same instances, same tracker, same exact-contiguity requirement",
+  "parent_coverage": {
+    "non_rolling_model_c_inputs_nonnull": 1.0,
+    "rolling_300s_nonnull_fraction": 0.2729,
+    "model_c_scoreable_rows_all_13_nonnull": 0.2729,
+    "rows": 1387411,
+    "complete_case_filtered": false,
+    "fit_missing_policy": "lightgbm native NaN (calibration none)"
+  },
+  "child_coverage": {
+    "rolling_300s_nonnull_fraction": 0.203,
+    "model_c_score_nonnull_fraction": 0.21,
+    "contiguity_nonnull_rows_bars_per_301": 301.0,
+    "contiguity_null_rows_bars_per_301": 259.6
+  },
+  "verdict": "LINEAGE_MATCH_EXPECTED",
+  "rationale": [
+    "Identical collector + rolling instances + tracker + exact-301-contiguous-1s-bar requirement in both studies.",
+    "Parent TRAIN surface itself is 72.7% missing on the four rolling_300s inputs; Model C was fit expecting it (no complete-case filter, LightGBM native missing).",
+    "Child ~79% missing vs parent ~73% missing is the same mechanism (NQ 1s bars print only on traded seconds); the ~6pp gap is plausibly lower liquidity mid-deep-pullback, not a semantic change.",
+    "NOT a child-provider defect and NOT a parent defect - it is an inherent property of the exact-contiguity rolling provider on this instrument/timeframe."
+  ],
+  "separate_open_question": "Whether Model-C's learned relation transfers from its native population (established regimes, running_mfe_atr>=1.0) to deep-pullback re-acceleration checkpoints is an applicability question, not a provider-semantics mismatch."
+}

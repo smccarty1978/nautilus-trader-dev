@@ -1,0 +1,440 @@
+{
+  "stamp": [
+    "DIAGNOSTIC_ONLY",
+    "NON_ACCEPTANCE_EVIDENCE",
+    "POST_COLLECTION_RELABELED_TARGET"
+  ],
+  "target": "ordered_barrier +1.00/-0.75 ATR within 300s, entry next 1s open, ATR_T frozen",
+  "label_source": "independent 1s-bar replay (target_replay_diagnostic.py)",
+  "binary_population": {
+    "replay_resolved_rows": 58778,
+    "excluded_ambiguous_or_censored": 946,
+    "replay_disposition_counts": {
+      "FAILURE": 32080,
+      "SUCCESS": 23138,
+      "TIMEOUT": 3560,
+      "CENSORED": 937,
+      "AMBIGUOUS_FIRST_TOUCH": 9
+    }
+  },
+  "config": {
+    "model_family": "lightgbm",
+    "hyperparameters": {},
+    "seed": 0,
+    "feature_surface": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "pullback_max_depth_atr",
+      "pullback_current_depth_atr",
+      "pullback_recovery_from_extreme_atr",
+      "pullback_fraction_of_structural_move",
+      "seconds_since_prevailing_directional_extreme",
+      "prior_deep_pullback_count",
+      "pullback_elapsed_seconds",
+      "pullback_post_arm_seconds",
+      "recovery_from_counter_regime_extreme_atr",
+      "fraction_of_counter_regime_move_recovered",
+      "trend_normalized_est_delta_sum_5s",
+      "trend_normalized_est_delta_sum_60s",
+      "trend_normalized_est_delta_sum_300s",
+      "trend_normalized_est_delta_sum_ratio_5s_vs_300s",
+      "trend_normalized_est_delta_sum_ratio_60s_vs_300s",
+      "current_5m_regime_direction",
+      "current_5m_regime_age_min",
+      "current_5m_regime_efficiency",
+      "current_5m_regime_mfe_atr",
+      "current_5m_regime_range_atr",
+      "regime_alignment",
+      "model_c_score_at_candidate"
+    ],
+    "n_features": 35
+  },
+  "arms": {
+    "POOLED_BROAD": {
+      "arm": "POOLED_BROAD",
+      "train_rows": 40018,
+      "validation_rows": 18760,
+      "n": 18760,
+      "base_rate": 0.383955223880597,
+      "mean_prediction": 0.3973963878935408,
+      "ROC_AUC": 0.5136250169094096,
+      "PR_AUC": 0.3932039969626646,
+      "Brier": 0.23839602999675424,
+      "log_loss": 0.6698046734374952,
+      "score_deciles_dev": [
+        0.3339950945004921,
+        0.3576420496269655,
+        0.37174827362054763,
+        0.3819793089389299,
+        0.39149142767455697,
+        0.4013881216764706,
+        0.4135444551570345,
+        0.4320023226930978,
+        0.47061382154117753
+      ],
+      "success_rate_2023_by_score_decile": [
+        {
+          "decile": 1,
+          "n": 1876,
+          "score_min": 0.1744909424001578,
+          "score_max": 0.3387747526157621,
+          "mean_pred": 0.31098928763103223,
+          "success_rate_2023": 0.34914712153518124
+        },
+        {
+          "decile": 2,
+          "n": 1876,
+          "score_min": 0.3387790452044032,
+          "score_max": 0.3597468510426232,
+          "mean_pred": 0.35031664624563486,
+          "success_rate_2023": 0.3763326226012793
+        },
+        {
+          "decile": 3,
+          "n": 1876,
+          "score_min": 0.35975809692096394,
+          "score_max": 0.37269145180798835,
+          "mean_pred": 0.3666319990557378,
+          "success_rate_2023": 0.38326226012793174
+        },
+        {
+          "decile": 4,
+          "n": 1876,
+          "score_min": 0.37269585421618423,
+          "score_max": 0.38273997603202653,
+          "mean_pred": 0.3777240178191368,
+          "success_rate_2023": 0.3875266524520256
+        },
+        {
+          "decile": 5,
+          "n": 1876,
+          "score_min": 0.3827404491141694,
+          "score_max": 0.3921705930257656,
+          "mean_pred": 0.38738120659998565,
+          "success_rate_2023": 0.3704690831556503
+        },
+        {
+          "decile": 6,
+          "n": 1876,
+          "score_min": 0.3921762605913622,
+          "score_max": 0.4024193690401048,
+          "mean_pred": 0.39720305687253354,
+          "success_rate_2023": 0.39658848614072495
+        },
+        {
+          "decile": 7,
+          "n": 1876,
+          "score_min": 0.4024300864601482,
+          "score_max": 0.4142835086634755,
+          "mean_pred": 0.4078990878330504,
+          "success_rate_2023": 0.3917910447761194
+        },
+        {
+          "decile": 8,
+          "n": 1876,
+          "score_min": 0.41430806479184634,
+          "score_max": 0.43163762530991207,
+          "mean_pred": 0.42238130195380647,
+          "success_rate_2023": 0.40191897654584224
+        },
+        {
+          "decile": 9,
+          "n": 1876,
+          "score_min": 0.43164217379391395,
+          "score_max": 0.46181633061941096,
+          "mean_pred": 0.44514695493539447,
+          "success_rate_2023": 0.3853944562899787
+        },
+        {
+          "decile": 10,
+          "n": 1876,
+          "score_min": 0.46186493270304496,
+          "score_max": 0.7971810438900601,
+          "mean_pred": 0.5082903199890961,
+          "success_rate_2023": 0.39712153518123666
+        }
+      ],
+      "diagnostic_score_tails_2021_2022_applied_to_2023": {
+        "P90": {
+          "threshold": 0.47061382154117753,
+          "n": 1559,
+          "success_rate": 0.4021808851828095,
+          "lift_vs_arm_base_rate": 1.0474681946452182
+        },
+        "P95": {
+          "threshold": 0.5127375174327755,
+          "n": 627,
+          "success_rate": 0.4098883572567783,
+          "lift_vs_arm_base_rate": 1.067542077209102
+        },
+        "P97_5": {
+          "threshold": 0.5538102520920066,
+          "n": 277,
+          "success_rate": 0.4151624548736462,
+          "lift_vs_arm_base_rate": 1.0812783081257258
+        }
+      }
+    },
+    "LONG_BROAD": {
+      "arm": "LONG_BROAD",
+      "train_rows": 19299,
+      "validation_rows": 9409,
+      "n": 9409,
+      "base_rate": 0.3846317355723244,
+      "mean_prediction": 0.38958638427706577,
+      "ROC_AUC": 0.5085982587581088,
+      "PR_AUC": 0.390891356498514,
+      "Brier": 0.24062475556448598,
+      "log_loss": 0.6746780753085578,
+      "score_deciles_dev": [
+        0.28845997808984486,
+        0.3241506827966321,
+        0.3493011735654306,
+        0.36833809366668335,
+        0.38433576124907953,
+        0.3996369570360893,
+        0.42126194961130475,
+        0.4549947984181127,
+        0.5155085885176346
+      ],
+      "success_rate_2023_by_score_decile": [
+        {
+          "decile": 1,
+          "n": 941,
+          "score_min": 0.11752839539170039,
+          "score_max": 0.30712679925258524,
+          "mean_pred": 0.27251635009218644,
+          "success_rate_2023": 0.3645058448459086
+        },
+        {
+          "decile": 2,
+          "n": 941,
+          "score_min": 0.30722267254747937,
+          "score_max": 0.3361359017459187,
+          "mean_pred": 0.3230984763527498,
+          "success_rate_2023": 0.39107332624867164
+        },
+        {
+          "decile": 3,
+          "n": 941,
+          "score_min": 0.3361392361007256,
+          "score_max": 0.35616557300446405,
+          "mean_pred": 0.3465496552765398,
+          "success_rate_2023": 0.3602550478214665
+        },
+        {
+          "decile": 4,
+          "n": 941,
+          "score_min": 0.35617572983638335,
+          "score_max": 0.37171517838833185,
+          "mean_pred": 0.364445569860451,
+          "success_rate_2023": 0.410201912858661
+        },
+        {
+          "decile": 5,
+          "n": 941,
+          "score_min": 0.3717174976432742,
+          "score_max": 0.3848328852928363,
+          "mean_pred": 0.3785020503735719,
+          "success_rate_2023": 0.35069075451647186
+        },
+        {
+          "decile": 6,
+          "n": 940,
+          "score_min": 0.3848362282065253,
+          "score_max": 0.397679614713889,
+          "mean_pred": 0.3913869128459672,
+          "success_rate_2023": 0.4053191489361702
+        },
+        {
+          "decile": 7,
+          "n": 941,
+          "score_min": 0.3976867946834394,
+          "score_max": 0.4150202670883171,
+          "mean_pred": 0.40579669957340236,
+          "success_rate_2023": 0.39107332624867164
+        },
+        {
+          "decile": 8,
+          "n": 941,
+          "score_min": 0.41505663428373996,
+          "score_max": 0.4388700312034574,
+          "mean_pred": 0.42657111948631415,
+          "success_rate_2023": 0.3942614240170032
+        },
+        {
+          "decile": 9,
+          "n": 941,
+          "score_min": 0.43891167942570797,
+          "score_max": 0.47755051844651836,
+          "mean_pred": 0.456164989503385,
+          "success_rate_2023": 0.3783209351753454
+        },
+        {
+          "decile": 10,
+          "n": 941,
+          "score_min": 0.47757786169662364,
+          "score_max": 0.7980771515445201,
+          "mean_pred": 0.5308339328264605,
+          "success_rate_2023": 0.40063761955366634
+        }
+      ],
+      "diagnostic_score_tails_2021_2022_applied_to_2023": {
+        "P90": {
+          "threshold": 0.5155085885176346,
+          "n": 476,
+          "success_rate": 0.39285714285714285,
+          "lift_vs_arm_base_rate": 1.0213851498046027
+        },
+        "P95": {
+          "threshold": 0.5683130324642498,
+          "n": 175,
+          "success_rate": 0.4,
+          "lift_vs_arm_base_rate": 1.039955788891959
+        },
+        "P97_5": {
+          "threshold": 0.6119775412523084,
+          "n": 78,
+          "success_rate": 0.3717948717948718,
+          "lift_vs_arm_base_rate": 0.9666255730085517
+        }
+      }
+    },
+    "SHORT_BROAD": {
+      "arm": "SHORT_BROAD",
+      "train_rows": 20719,
+      "validation_rows": 9351,
+      "n": 9351,
+      "base_rate": 0.38327451609453533,
+      "mean_prediction": 0.40003862872828266,
+      "ROC_AUC": 0.5063121077203423,
+      "PR_AUC": 0.38968164031309,
+      "Brier": 0.24065900032677184,
+      "log_loss": 0.6746676346146749,
+      "score_deciles_dev": [
+        0.30657840065323533,
+        0.33815825409636824,
+        0.3586508708461954,
+        0.3753186005668576,
+        0.39085790470789167,
+        0.4081831113175531,
+        0.42983592828177797,
+        0.46181520364380946,
+        0.5202496266229961
+      ],
+      "success_rate_2023_by_score_decile": [
+        {
+          "decile": 1,
+          "n": 936,
+          "score_min": 0.12489782466789674,
+          "score_max": 0.3218772092522616,
+          "mean_pred": 0.2883923555525868,
+          "success_rate_2023": 0.36004273504273504
+        },
+        {
+          "decile": 2,
+          "n": 935,
+          "score_min": 0.32190544971524837,
+          "score_max": 0.3486449642710639,
+          "mean_pred": 0.3364893423471868,
+          "success_rate_2023": 0.38074866310160427
+        },
+        {
+          "decile": 3,
+          "n": 935,
+          "score_min": 0.3486734064526928,
+          "score_max": 0.36604796972151205,
+          "mean_pred": 0.3575330686057191,
+          "success_rate_2023": 0.39037433155080214
+        },
+        {
+          "decile": 4,
+          "n": 935,
+          "score_min": 0.3660483701712453,
+          "score_max": 0.3797918298994764,
+          "mean_pred": 0.3730136177416395,
+          "success_rate_2023": 0.39037433155080214
+        },
+        {
+          "decile": 5,
+          "n": 935,
+          "score_min": 0.3797924517683257,
+          "score_max": 0.3935455748736052,
+          "mean_pred": 0.3866250749439921,
+          "success_rate_2023": 0.3625668449197861
+        },
+        {
+          "decile": 6,
+          "n": 935,
+          "score_min": 0.3935467371363325,
+          "score_max": 0.4079783504596114,
+          "mean_pred": 0.40043409813486625,
+          "success_rate_2023": 0.39358288770053473
+        },
+        {
+          "decile": 7,
+          "n": 935,
+          "score_min": 0.40798052147511754,
+          "score_max": 0.42625283279199794,
+          "mean_pred": 0.41679900615920273,
+          "success_rate_2023": 0.386096256684492
+        },
+        {
+          "decile": 8,
+          "n": 935,
+          "score_min": 0.42628270772721505,
+          "score_max": 0.4487651648273528,
+          "mean_pred": 0.43721933111737066,
+          "success_rate_2023": 0.37219251336898396
+        },
+        {
+          "decile": 9,
+          "n": 935,
+          "score_min": 0.4487675303501657,
+          "score_max": 0.4870605322697994,
+          "mean_pred": 0.4655265191823711,
+          "success_rate_2023": 0.4213903743315508
+        },
+        {
+          "decile": 10,
+          "n": 935,
+          "score_min": 0.48706568448021115,
+          "score_max": 0.7834328473081518,
+          "mean_pred": 0.5384732812766895,
+          "success_rate_2023": 0.3754010695187166
+        }
+      ],
+      "diagnostic_score_tails_2021_2022_applied_to_2023": {
+        "P90": {
+          "threshold": 0.5202496266229961,
+          "n": 510,
+          "success_rate": 0.3803921568627451,
+          "lift_vs_arm_base_rate": 0.9924796481092437
+        },
+        "P95": {
+          "threshold": 0.570762153158437,
+          "n": 186,
+          "success_rate": 0.42473118279569894,
+          "lift_vs_arm_base_rate": 1.1081644225230416
+        },
+        "P97_5": {
+          "threshold": 0.6146092062945404,
+          "n": 78,
+          "success_rate": 0.44871794871794873,
+          "lift_vs_arm_base_rate": 1.1707481971153846
+        }
+      }
+    }
+  }
+}
