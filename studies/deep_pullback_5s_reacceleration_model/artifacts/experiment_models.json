@@ -1,0 +1,76 @@
+{
+  "modeling_version": "1.0.0",
+  "arms": {
+    "BROAD": {
+      "arm": "BROAD",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "pullback_max_depth_atr",
+        "pullback_current_depth_atr",
+        "pullback_recovery_from_extreme_atr",
+        "pullback_fraction_of_structural_move",
+        "seconds_since_prevailing_directional_extreme",
+        "prior_deep_pullback_count",
+        "pullback_elapsed_seconds",
+        "pullback_post_arm_seconds",
+        "recovery_from_counter_regime_extreme_atr",
+        "fraction_of_counter_regime_move_recovered",
+        "trend_normalized_est_delta_sum_5s",
+        "trend_normalized_est_delta_sum_60s",
+        "trend_normalized_est_delta_sum_300s",
+        "trend_normalized_est_delta_sum_ratio_5s_vs_300s",
+        "trend_normalized_est_delta_sum_ratio_60s_vs_300s",
+        "current_5m_regime_direction",
+        "current_5m_regime_age_min",
+        "current_5m_regime_efficiency",
+        "current_5m_regime_mfe_atr",
+        "current_5m_regime_range_atr",
+        "regime_alignment",
+        "model_c_score_at_candidate"
+      ],
+      "n_features": 35,
+      "n_rows": 56001,
+      "seed": 0,
+      "hyperparameters": {},
+      "split_policy": {
+        "kind": "single_partition",
+        "fit_partitions": [
+          "train"
+        ],
+        "eval_partitions": [],
+        "description": "derived from the metadata partition column"
+      },
+      "dataset_identity_sha256": "5b3beff6f804de7d1c5cf4b4fb995adb3a1c90782862d5bc9b0142a2a2310bc7",
+      "analysis_spec_sha256": "7d9f74d9853cbc8e7f26c0c00c3b808fa2bc5c687c1d40fbf84f66086070bbcf",
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "88290776eb1b976c8296591e1c63775f5b04ceb8f7fd1a315b83d00d2b9f514b",
+      "x_content_sha256": "e744d16b04455defea7b0a9dbef1c5675d9e45e2e352e0d8b93ac14238e6aa42",
+      "y_content_sha256": "c06dc42ddff6dbf83f9aa53a593dd7c47b18732c87285fa6824f56d9e381874f",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": null,
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-08-28T15:55:05.714129+00:00",
+      "fit_identity_sha256": "38569822043ef85a584e2846c321637fe369014d3448f2f32a966a1170a2c5a2"
+    }
+  }
+}

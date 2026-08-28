@@ -1,0 +1,55 @@
+{
+  "gate_id": "population_target_gate",
+  "schema_version": 1,
+  "status": "PASS",
+  "scope_sha256": "2c3574041f4a4184196b5b2000190ce5cf56b54ee3dd5fa4ff050bf8f1dfd431",
+  "dataset_identity_sha256": "5b3beff6f804de7d1c5cf4b4fb995adb3a1c90782862d5bc9b0142a2a2310bc7",
+  "producer": "studies/deep_pullback_5s_reacceleration_model/implementation/train_merge_fit_freeze.py",
+  "created_at_utc": "2026-08-28T15:55:01.495199+00:00",
+  "lifecycle_point": "post_train_merge_pre_fit",
+  "optimization_use": "prohibited",
+  "totals": {
+    "merged_candidates": 59724,
+    "target_resolved": 56001,
+    "success": 8743,
+    "failure": 47258,
+    "censored_session": 3723,
+    "duplicate_or_overlap_dispositions": 0,
+    "base_rate": 0.1561222121033553
+  },
+  "by_year": {
+    "2021": {
+      "target_resolved": 17558,
+      "success": 2730,
+      "failure": 14828,
+      "positive_rate": 0.15548467934844515
+    },
+    "2022": {
+      "target_resolved": 20276,
+      "success": 3123,
+      "failure": 17153,
+      "positive_rate": 0.154024462418623
+    },
+    "2023": {
+      "target_resolved": 18167,
+      "success": 2890,
+      "failure": 15277,
+      "positive_rate": 0.15907964991468046
+    }
+  },
+  "by_direction": {
+    "SHORT": {
+      "target_resolved": 28469,
+      "success": 615,
+      "failure": 27854,
+      "positive_rate": 0.021602444764480665
+    },
+    "LONG": {
+      "target_resolved": 27532,
+      "success": 8128,
+      "failure": 19404,
+      "positive_rate": 0.2952201075112596
+    }
+  },
+  "pathological_findings": []
+}

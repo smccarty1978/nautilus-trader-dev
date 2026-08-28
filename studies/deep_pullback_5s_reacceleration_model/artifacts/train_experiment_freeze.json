@@ -1,0 +1,90 @@
+{
+  "partition": "train",
+  "feature_sets": {
+    "BROAD": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "pullback_max_depth_atr",
+      "pullback_current_depth_atr",
+      "pullback_recovery_from_extreme_atr",
+      "pullback_fraction_of_structural_move",
+      "seconds_since_prevailing_directional_extreme",
+      "prior_deep_pullback_count",
+      "pullback_elapsed_seconds",
+      "pullback_post_arm_seconds",
+      "recovery_from_counter_regime_extreme_atr",
+      "fraction_of_counter_regime_move_recovered",
+      "trend_normalized_est_delta_sum_5s",
+      "trend_normalized_est_delta_sum_60s",
+      "trend_normalized_est_delta_sum_300s",
+      "trend_normalized_est_delta_sum_ratio_5s_vs_300s",
+      "trend_normalized_est_delta_sum_ratio_60s_vs_300s",
+      "current_5m_regime_direction",
+      "current_5m_regime_age_min",
+      "current_5m_regime_efficiency",
+      "current_5m_regime_mfe_atr",
+      "current_5m_regime_range_atr",
+      "regime_alignment",
+      "model_c_score_at_candidate"
+    ]
+  },
+  "model_hashes": {
+    "BROAD": "38569822043ef85a584e2846c321637fe369014d3448f2f32a966a1170a2c5a2"
+  },
+  "preprocessing_hash": "ae415866d2bf1ae453ec78523e1091a592d4f8c76d730e38497d1c03bfe70b17",
+  "thresholds": {
+    "BROAD": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.37517980467770246,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.4252503572912127,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.4719189185188967,
+        "derivation_population": "train"
+      }
+    }
+  },
+  "deciles": {
+    "BROAD": {
+      "boundaries": [
+        0.007459655930305422,
+        0.014171919823811125,
+        0.0228318127529841,
+        0.03458517089637379,
+        0.08483068836385667,
+        0.19755159074953535,
+        0.2578076240680281,
+        0.31190604257191745,
+        0.37517980467770246
+      ],
+      "derivation": "TRAIN_ONLY"
+    }
+  },
+  "model_selection_manifest_sha256": null,
+  "schema_version": 1,
+  "study_id": "deep_pullback_5s_reacceleration_model",
+  "authorization_sha256": "081d74b0832727003052e0d657359ae07a4b4d2a04c49ff0224966e7b717943c",
+  "generated_at_utc": "2026-08-28T15:55:05.304046+00:00",
+  "freeze_sha256": "726b190e5f22cb5b3dc9f5a520000349d58aed78d7ce28e1682a06898d1244bc"
+}

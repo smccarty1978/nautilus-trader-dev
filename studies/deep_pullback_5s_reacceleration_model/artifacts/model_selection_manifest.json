@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "search_method": "none",
+  "max_trials": null,
+  "random_seed": null,
+  "tuning_years": [
+    2021,
+    2022
+  ],
+  "final_train_validation_years": [
+    2023
+  ],
+  "primary_selection_metric": null,
+  "primary_selection_metric_direction": "maximize",
+  "secondary_metrics": null,
+  "declared_search_space_size": 1,
+  "attempted_draw_count": 0,
+  "unique_evaluated_count": 1,
+  "search_space_exhausted": false,
+  "attempts": {
+    "BROAD": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {},
+        "fold_scores": [
+          0.8005011086766727
+        ],
+        "average_score": 0.8005011086766727
+      }
+    ]
+  },
+  "winner": {
+    "BROAD": {
+      "family": "lightgbm",
+      "hyperparameters": {},
+      "inner_validation_score": 0.8005011086766727,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    }
+  },
+  "final_validation_metric": {
+    "BROAD": {}
+  },
+  "final_validation_reasons": {
+    "BROAD": []
+  },
+  "final_validation_policy": "gated",
+  "final_validation_status": "PASS",
+  "no_retuning_after_final_validation_assertion": true,
+  "generated_at_utc": "2026-08-28T15:55:04.156122+00:00",
+  "manifest_sha256": "f2852b5e782781ddfaee67b5a616ef7a6a36ad26c3f8c4cba8b725ef70f70b57"
+}
