@@ -509,6 +509,12 @@ def evaluate_real_output_parity(candidates_df: pd.DataFrame, features_spec: Any,
     # as metadata when the collector emits it; legacy fixtures may omit it.
     if "triggering_1s_ts_init" in candidates_df.columns:
         metadata.add("triggering_1s_ts_init")
+    # Declared derived causal inputs (e.g. a frozen external model score) bind to their
+    # own column -- neither a market FeatureInstance nor metadata. Mirror OutputManager.
+    metadata |= {
+        di.name for di in (getattr(features_spec, "derived_inputs", None) or [])
+        if getattr(di, "name", None)
+    }
     emitted = sorted(set(candidates_df.columns) - metadata)
     allowed = resolve_collection_allowed_feature_aliases(features_spec, authority=authority)
     # The resolved count is the same bounded explicit-instance contract consumed

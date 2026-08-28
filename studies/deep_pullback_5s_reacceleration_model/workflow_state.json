@@ -1,292 +1,72 @@
 {
-  "actions_executed_this_run": [
-    "READY"
-  ],
-  "authorization_state": "TRAIN_AUTHORIZED",
-  "blockers": [
-    {
-      "detail": {
-        "artifact_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\deep_pullback_5s_reacceleration_model\\audit\\readiness.json",
-        "dataset_id": "NQ_v0_2020_2026",
-        "feature_authority": "active",
-        "generated_at_utc": "2026-08-28T04:53:14.866317+00:00",
-        "overall_status": "BLOCKED",
-        "prepared_execution_identity": "356d53b41b4dd1ca636e4a79ac3104e56782802db198ba762460abc8e19c0b6c",
-        "r10_real_nonempty_output_parity": {
-          "code": "RealNonemptyOutputParityFailed",
-          "detail": "REAL_NONEMPTY_OUTPUT_PARITY: no in-window candidate was observed before the bounded engine window ended",
-          "passed": false
-        },
-        "r1_dataset_identity": {
-          "code": "DATASET_IDENTITY_OK",
-          "dataset_spec_dataset_id": "NQ_v0_2020_2026",
-          "declared_dataset_id": "NQ_v0_2020_2026",
-          "detail": "declared dataset_id == DatasetSpec authority == resolved catalog == CausalDataLoader.catalog_path == actual catalog on disk",
-          "passed": true,
-          "resolved_catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
-          "run_end": "2023-03-03T23:59:59.999999999+00:00",
-          "warmup_start": "2023-02-26T00:00:00+00:00"
-        },
-        "r2_1m_timestamp": {
-          "code": "TIMESTAMP_CONTRACT_OK",
-          "detail": "1m: ts_init - ts_event == 60000000000 for all 200 sampled bars",
-          "expected_delta_ns": 60000000000,
-          "passed": true,
-          "sampled": 200,
-          "stream": "1m"
-        },
-        "r2_1s_timestamp": {
-          "code": "TIMESTAMP_CONTRACT_OK",
-          "detail": "1s: ts_init - ts_event == 1000000000 for all 200 sampled bars",
-          "expected_delta_ns": 1000000000,
-          "passed": true,
-          "sampled": 200,
-          "stream": "1s"
-        },
-        "r2_derived_5m": {
-          "code": "DERIVED_5M_PATH_OK",
-          "completed_5m_count": 264,
-          "detail": "CompletedMinuteFiveMinuteAggregator produced 264 completed 5m bar(s) from 1321 completed 1m parents; no external 5m catalog stream opened",
-          "passed": true,
-          "source_1m_count": 1321
-        },
-        "r3_instrument_precision": {
-          "code": "INSTRUMENT_PRECISION_OK",
-          "detail": "loaded bars are precision-compatible with the governed instrument definition",
-          "instrument_id": "NQ.XCME",
-          "passed": true,
-          "price_increment": "0.25",
-          "price_precision": 2
-        },
-        "r4_callback_order": {
-          "code": "CALLBACK_ORDER_OK",
-          "detail": "no causal inversions across 259559 recorded (ts_init, timeframe) callbacks",
-          "events": 259559,
-          "passed": true,
-          "probe_1m_events": 6899,
-          "probe_1s_events": 252660
-        },
-        "r5_real_collector": {
-          "code": "REAL_COLLECTOR_INSTANTIATED",
-          "collector_class": "FlipPredictionCollector",
-          "detail": "constructor + phase0 authorization succeeded",
-          "passed": true
-        },
-        "r6_output_interface": {
-          "code": "OUTPUT_INTERFACE_OK",
-          "collector_class": "FlipPredictionCollector",
-          "detail": "real collector implements the candidates/observations extraction interface",
-          "passed": true
-        },
-        "r7_synthetic_schema": {
-          "code": "SYNTHETIC_SCHEMA_OK",
-          "detail": "synthetic candidate/observation fixture validated through the real OutputManager path (schema, feature source, metadata, candidate key, observation key)",
-          "feature_checked": "arrival_acceleration",
-          "passed": true,
-          "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\deep_pullback_5s_reacceleration_model\\_work\\readiness_schema_fixture\\20260828_045311_deep_pullback_5s_reacceleration_model_day",
-          "run_id": "20260828_045311_deep_pullback_5s_reacceleration_model_day"
-        },
-        "r8_double_identity": {
-          "code": "IDENTITY_STABLE",
-          "composite_sha256": "356d53b41b4dd1ca636e4a79ac3104e56782802db198ba762460abc8e19c0b6c",
-          "coverage_pct": 100.0,
-          "detail": "execution identity resolved twice with exact equality",
-          "files_resolved": 110,
-          "passed": true,
-          "unresolved_dependencies": []
-        },
-        "r9_alternate_opener": {
-          "code": "NO_ALTERNATE_CATALOG_OPENERS",
-          "detail": "zero alternate catalog openers under studies/<study>/**/*.py",
-          "passed": true,
-          "violations": 0
-        },
-        "required_gates": {
-          "code": "REQUIRED_GATES_SATISFIED",
-          "detail": "0 gate(s) evaluated",
-          "gates": [],
-          "passed": true
-        },
-        "resolved_catalog": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
-        "run_window": {
-          "end_date": "2023-03-03",
-          "stage": "day",
-          "start_date": "2023-03-03"
-        },
-        "schema_version": 1,
-        "study": "deep_pullback_5s_reacceleration_model"
-      }
-    }
-  ],
+  "actions_executed_this_run": [],
+  "authorization_state": "TRAIN_NOT_AUTHORIZED",
+  "blockers": [],
   "completed_gates": [
-    "PREPARED"
+    "PREPARED",
+    "READY",
+    "PREFLIGHT",
+    "CAUSAL_AUDIT",
+    "CONTRACT_AUDIT"
   ],
   "current_authority_hashes": {
     "active_authority_bundle": "91a2742a161f31166f78191918afc15b8d1ee2b4f7273e4012007123641766ec",
     "active_feature_authority": "01fc2ddae798ff0e87686a2220cc0d356550ded99c2fea06ffbb6f09e3b9f1f4",
     "approved_request": "87e213b140cf7a94920433991c49c52fcd473ee43d734204bd07400f22840522",
-    "causal_reports": "ff3b28385a8ffee4d2dcda66a655ddd406ba24e083d78d9aa429383b715c9777",
-    "causal_status": "d4b2f90d20fa9bd6e933bbcf1d22415ff3b27f4da1ae555853bcae22254a41fd",
-    "compiled_study": "1261bd16cd41d89f6538c3314b205a4ccc5e3dd91dddc8830e50db23ee070b2c",
-    "contract_reports": "494bd2a9b46f93bd23a7ee4cd9c1ebc002d20fc79a1b9359469590c33e77a61c",
-    "contract_status": "4f7081ee64e13fcf15c138a6d9f5c370b0a41122244795f4a5bc092b115ea33a",
-    "current_execution_composite": "356d53b41b4dd1ca636e4a79ac3104e56782802db198ba762460abc8e19c0b6c",
-    "execution_composite": "356d53b41b4dd1ca636e4a79ac3104e56782802db198ba762460abc8e19c0b6c",
-    "execution_freeze": "f09a0ce2eabf7f6666e636a24c511c298c80153b32465a6849e81d27e2071fdf",
+    "causal_reports": "eebfc597f5f5b3f302d4f1353c82c88b931d1444462682c0a42f886def03927d",
+    "causal_status": "e110b1e1f0189cef14691942a854c58926c7f33c305380a28f69a3024301c3b7",
+    "compiled_study": "1e049c297cee0304ee64c75e83cc187919118e14b8ee8217c9f678b6bb297a28",
+    "contract_reports": "b5d4ea6b015ea8a3a381e7c456b1ddeeaec33f6e6d5ddefb2c79e7e13511d2f5",
+    "contract_status": "fefa467682db14691cea72577defbd13c41cb749eb9ac2a4fb68403861c37cdf",
+    "current_execution_composite": "1a2e54fad3b4c6e0ce4e51b083728573293af5d9977b48037c7d5073555cf5bc",
+    "execution_composite": "1a2e54fad3b4c6e0ce4e51b083728573293af5d9977b48037c7d5073555cf5bc",
+    "execution_freeze": "307fe7ed798c3568d00a41a6e824e08a0abb3d45248a81ddb50da254f7e7f79e",
     "feature_candidate_semantics": "d3cb9764249179fa4906dad68b517c6227342213c3c3756ecb13becae1b84337",
-    "frozen_lineage": "7cd1ee894a3b472084c5d40903f2375e1afd08d87b71a8c10196b92c3c98fbe1",
-    "preflight": "1d6e9f63f4255e0cb36221dbb36814996aab5bea08811bc7bcbc141373f30df3",
-    "seal": "b4c26967c70e256f7ebc85b91f7905c54faf937645673eed8f31de67a8af1574",
-    "smoke": null,
-    "study_spec": "73f270d8d30ab6b73e7e1f24780de7b116afaca2f297df1c2469ac9959c0e4a7",
-    "train_authorization": "4b1781089dfab64f98089668540e78a387fc3c0c35e9b1a9f8e8b45a70e9c0f4",
+    "frozen_lineage": "9c1e5277ef34d8fca28bda49bbff223136bab78301409e1339ccf4b401f7f510",
+    "preflight": "1492e7de6a87b7450cca3ebfb3895869aa5968ac6ff7ba5b9f9de26145164a32",
+    "seal": "db288e642155a901330662ea45f48be78368b5f7d781cab9f6dd45b1e0172e1f",
+    "smoke": "dbe07299a4b5ce1de4e40a6fca9f964bc44c582a8052da2485d7968cd3ae862a",
+    "study_spec": "0cb778c5f1ee9c5a39f148cb6afe256191b221c3243e7d1ad39a2dd06320abb1",
+    "train_authorization": null,
     "train_freeze": null
   },
-  "current_stage": "SAFETY_OR_AUTHORIZATION_BLOCK",
+  "current_stage": "READY_FOR_TRAIN_AUTHORIZATION",
   "fingerprints": {
     "active_authority_bundle": "91a2742a161f31166f78191918afc15b8d1ee2b4f7273e4012007123641766ec",
     "active_feature_authority": "01fc2ddae798ff0e87686a2220cc0d356550ded99c2fea06ffbb6f09e3b9f1f4",
     "approved_request": "87e213b140cf7a94920433991c49c52fcd473ee43d734204bd07400f22840522",
-    "causal_reports": "ff3b28385a8ffee4d2dcda66a655ddd406ba24e083d78d9aa429383b715c9777",
-    "causal_status": "d4b2f90d20fa9bd6e933bbcf1d22415ff3b27f4da1ae555853bcae22254a41fd",
-    "compiled_study": "1261bd16cd41d89f6538c3314b205a4ccc5e3dd91dddc8830e50db23ee070b2c",
-    "contract_reports": "494bd2a9b46f93bd23a7ee4cd9c1ebc002d20fc79a1b9359469590c33e77a61c",
-    "contract_status": "4f7081ee64e13fcf15c138a6d9f5c370b0a41122244795f4a5bc092b115ea33a",
-    "current_execution_composite": "356d53b41b4dd1ca636e4a79ac3104e56782802db198ba762460abc8e19c0b6c",
-    "execution_composite": "356d53b41b4dd1ca636e4a79ac3104e56782802db198ba762460abc8e19c0b6c",
-    "execution_freeze": "f09a0ce2eabf7f6666e636a24c511c298c80153b32465a6849e81d27e2071fdf",
+    "causal_reports": "eebfc597f5f5b3f302d4f1353c82c88b931d1444462682c0a42f886def03927d",
+    "causal_status": "e110b1e1f0189cef14691942a854c58926c7f33c305380a28f69a3024301c3b7",
+    "compiled_study": "1e049c297cee0304ee64c75e83cc187919118e14b8ee8217c9f678b6bb297a28",
+    "contract_reports": "b5d4ea6b015ea8a3a381e7c456b1ddeeaec33f6e6d5ddefb2c79e7e13511d2f5",
+    "contract_status": "fefa467682db14691cea72577defbd13c41cb749eb9ac2a4fb68403861c37cdf",
+    "current_execution_composite": "1a2e54fad3b4c6e0ce4e51b083728573293af5d9977b48037c7d5073555cf5bc",
+    "execution_composite": "1a2e54fad3b4c6e0ce4e51b083728573293af5d9977b48037c7d5073555cf5bc",
+    "execution_freeze": "307fe7ed798c3568d00a41a6e824e08a0abb3d45248a81ddb50da254f7e7f79e",
     "feature_candidate_semantics": "d3cb9764249179fa4906dad68b517c6227342213c3c3756ecb13becae1b84337",
-    "frozen_lineage": "7cd1ee894a3b472084c5d40903f2375e1afd08d87b71a8c10196b92c3c98fbe1",
-    "preflight": "1d6e9f63f4255e0cb36221dbb36814996aab5bea08811bc7bcbc141373f30df3",
-    "seal": "b4c26967c70e256f7ebc85b91f7905c54faf937645673eed8f31de67a8af1574",
-    "smoke": null,
-    "study_spec": "73f270d8d30ab6b73e7e1f24780de7b116afaca2f297df1c2469ac9959c0e4a7",
-    "train_authorization": "4b1781089dfab64f98089668540e78a387fc3c0c35e9b1a9f8e8b45a70e9c0f4",
+    "frozen_lineage": "9c1e5277ef34d8fca28bda49bbff223136bab78301409e1339ccf4b401f7f510",
+    "preflight": "1492e7de6a87b7450cca3ebfb3895869aa5968ac6ff7ba5b9f9de26145164a32",
+    "seal": "db288e642155a901330662ea45f48be78368b5f7d781cab9f6dd45b1e0172e1f",
+    "smoke": "dbe07299a4b5ce1de4e40a6fca9f964bc44c582a8052da2485d7968cd3ae862a",
+    "study_spec": "0cb778c5f1ee9c5a39f148cb6afe256191b221c3243e7d1ad39a2dd06320abb1",
+    "train_authorization": null,
     "train_freeze": null
   },
-  "next_deterministic_action": null,
-  "stale_gates": [],
+  "next_deterministic_action": "authorize_experiment",
+  "stale_gates": [
+    "train_authorization"
+  ],
   "study_id": "deep_pullback_5s_reacceleration_model",
-  "terminal_reason": {
-    "artifact_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\deep_pullback_5s_reacceleration_model\\audit\\readiness.json",
-    "dataset_id": "NQ_v0_2020_2026",
-    "feature_authority": "active",
-    "generated_at_utc": "2026-08-28T04:53:14.866317+00:00",
-    "overall_status": "BLOCKED",
-    "prepared_execution_identity": "356d53b41b4dd1ca636e4a79ac3104e56782802db198ba762460abc8e19c0b6c",
-    "r10_real_nonempty_output_parity": {
-      "code": "RealNonemptyOutputParityFailed",
-      "detail": "REAL_NONEMPTY_OUTPUT_PARITY: no in-window candidate was observed before the bounded engine window ended",
-      "passed": false
-    },
-    "r1_dataset_identity": {
-      "code": "DATASET_IDENTITY_OK",
-      "dataset_spec_dataset_id": "NQ_v0_2020_2026",
-      "declared_dataset_id": "NQ_v0_2020_2026",
-      "detail": "declared dataset_id == DatasetSpec authority == resolved catalog == CausalDataLoader.catalog_path == actual catalog on disk",
-      "passed": true,
-      "resolved_catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
-      "run_end": "2023-03-03T23:59:59.999999999+00:00",
-      "warmup_start": "2023-02-26T00:00:00+00:00"
-    },
-    "r2_1m_timestamp": {
-      "code": "TIMESTAMP_CONTRACT_OK",
-      "detail": "1m: ts_init - ts_event == 60000000000 for all 200 sampled bars",
-      "expected_delta_ns": 60000000000,
-      "passed": true,
-      "sampled": 200,
-      "stream": "1m"
-    },
-    "r2_1s_timestamp": {
-      "code": "TIMESTAMP_CONTRACT_OK",
-      "detail": "1s: ts_init - ts_event == 1000000000 for all 200 sampled bars",
-      "expected_delta_ns": 1000000000,
-      "passed": true,
-      "sampled": 200,
-      "stream": "1s"
-    },
-    "r2_derived_5m": {
-      "code": "DERIVED_5M_PATH_OK",
-      "completed_5m_count": 264,
-      "detail": "CompletedMinuteFiveMinuteAggregator produced 264 completed 5m bar(s) from 1321 completed 1m parents; no external 5m catalog stream opened",
-      "passed": true,
-      "source_1m_count": 1321
-    },
-    "r3_instrument_precision": {
-      "code": "INSTRUMENT_PRECISION_OK",
-      "detail": "loaded bars are precision-compatible with the governed instrument definition",
-      "instrument_id": "NQ.XCME",
-      "passed": true,
-      "price_increment": "0.25",
-      "price_precision": 2
-    },
-    "r4_callback_order": {
-      "code": "CALLBACK_ORDER_OK",
-      "detail": "no causal inversions across 259559 recorded (ts_init, timeframe) callbacks",
-      "events": 259559,
-      "passed": true,
-      "probe_1m_events": 6899,
-      "probe_1s_events": 252660
-    },
-    "r5_real_collector": {
-      "code": "REAL_COLLECTOR_INSTANTIATED",
-      "collector_class": "FlipPredictionCollector",
-      "detail": "constructor + phase0 authorization succeeded",
-      "passed": true
-    },
-    "r6_output_interface": {
-      "code": "OUTPUT_INTERFACE_OK",
-      "collector_class": "FlipPredictionCollector",
-      "detail": "real collector implements the candidates/observations extraction interface",
-      "passed": true
-    },
-    "r7_synthetic_schema": {
-      "code": "SYNTHETIC_SCHEMA_OK",
-      "detail": "synthetic candidate/observation fixture validated through the real OutputManager path (schema, feature source, metadata, candidate key, observation key)",
-      "feature_checked": "arrival_acceleration",
-      "passed": true,
-      "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\deep_pullback_5s_reacceleration_model\\_work\\readiness_schema_fixture\\20260828_045311_deep_pullback_5s_reacceleration_model_day",
-      "run_id": "20260828_045311_deep_pullback_5s_reacceleration_model_day"
-    },
-    "r8_double_identity": {
-      "code": "IDENTITY_STABLE",
-      "composite_sha256": "356d53b41b4dd1ca636e4a79ac3104e56782802db198ba762460abc8e19c0b6c",
-      "coverage_pct": 100.0,
-      "detail": "execution identity resolved twice with exact equality",
-      "files_resolved": 110,
-      "passed": true,
-      "unresolved_dependencies": []
-    },
-    "r9_alternate_opener": {
-      "code": "NO_ALTERNATE_CATALOG_OPENERS",
-      "detail": "zero alternate catalog openers under studies/<study>/**/*.py",
-      "passed": true,
-      "violations": 0
-    },
-    "required_gates": {
-      "code": "REQUIRED_GATES_SATISFIED",
-      "detail": "0 gate(s) evaluated",
-      "gates": [],
-      "passed": true
-    },
-    "resolved_catalog": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
-    "run_window": {
-      "end_date": "2023-03-03",
-      "stage": "day",
-      "start_date": "2023-03-03"
-    },
-    "schema_version": 1,
-    "study": "deep_pullback_5s_reacceleration_model"
-  },
-  "terminal_state": "SAFETY_OR_AUTHORIZATION_BLOCK",
-  "timestamp": "2026-08-28T04:53:15.596872+00:00",
+  "terminal_reason": null,
+  "terminal_state": "READY_FOR_TRAIN_AUTHORIZATION",
+  "timestamp": "2026-08-28T14:34:57.286080+00:00",
   "timestamps": {
-    "causal": 1787882822.2223842,
-    "contract": 1787882826.604225,
-    "preflight": 1787892699.165524,
-    "prepared": 1787892769.2641912,
-    "readiness": 1787892794.8664792,
-    "seal": 1787882832.1374812,
-    "smoke": null
+    "causal": 1787927437.2035143,
+    "contract": 1787927442.1900208,
+    "preflight": 1787927432.519704,
+    "prepared": 1787927343.6861458,
+    "readiness": 1787927353.809972,
+    "seal": 1787927448.7422106,
+    "smoke": 1787927482.8448029
   }
 }

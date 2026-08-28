@@ -251,13 +251,18 @@ class EpisodePopulationRuntime:
         ):
             self._pullback_start_ts = self._pending_pullback_start
 
-        # --- canonical episode geometry -------------------------------------- #
-        # start on the first adverse bar (measured FROM the extreme, so start_ns is the
-        # extreme's ts); observe every completed 1s thereafter; the provider arms itself
-        # on the SAME bar as the engine (same favorable extreme, same ATR, same threshold).
-        if raw_adverse > 0.0 and not self._geom_active and self._prevailing_extreme_ts is not None:
+        # --- canonical episode geometry (FLAG A: arm parity) ------------------ #
+        # The geometry provider's episode starts at the SAME bar the population runtime
+        # records _pending_pullback_start (the first completed-1s adverse excursion from
+        # the current favorable extreme) and observes that same bar. It arms itself on
+        # exactly the bar the engine arms -- same favorable extreme, same completed-1m
+        # ATR, same threshold -- so arm_ts / pullback_start_ts / frozen ATR_arm are
+        # identical, with no one-bar offset. A new favorable extreme terminates the
+        # geometry episode AND resets _pending_pullback_start together, so a rearm cycle
+        # restarts both from the same new first-adverse bar.
+        if raw_adverse > 0.0 and not self._geom_active and self._pending_pullback_start is not None:
             self._geom.start_episode(
-                start_ns=int(self._prevailing_extreme_ts), direction=d,
+                start_ns=int(self._pending_pullback_start), direction=d,
                 favorable_extreme_price=float(self._fav_extreme_price),
             )
             self._geom_active = True
@@ -340,6 +345,20 @@ class EpisodePopulationRuntime:
         *, transition, emitted: List[EpisodeCandidateEvent], triggering_5s_ts: Optional[int],
         prev_state=None,
     ) -> None:
+        # Recheck-and-commit the pullback start immediately before every snapshot
+        # (base and each completed-5s transition in the same bar). Real data can
+        # deliver several completed-5s transitions inside one 1s bar; if an earlier
+        # transition snapshot drives a REARM/TERMINATE that clears the committed
+        # start, a later transition snapshot in the same bar would otherwise reach
+        # the engine's arm check with arm_depth_atr >= threshold and no start
+        # (PULLBACK_START_REQUIRED_AT_ARM). The pending start is authoritative here.
+        if (
+            self._arm_ts is None and self._pullback_start_ts is None
+            and self._pending_pullback_start is not None
+            and float(arm_depth_atr) >= self._threshold
+        ):
+            self._pullback_start_ts = self._pending_pullback_start
+
         snap = EpisodeSnapshot(
             timestamp_ns=int(ts_init),
             prevailing_regime_id=str(self._prevailing_start_ns),
@@ -361,8 +380,13 @@ class EpisodePopulationRuntime:
             self._frozen_atr_arm = None
             self._arm_ts = None
             self._armed_from_extreme = None
-            self._pending_pullback_start = None
             self._pullback_start_ts = None  # mirrors the engine's own _reset
+            # New leg: if this same bar still carries an adverse excursion from the
+            # (new) favorable extreme, its pending pullback-start is this bar --
+            # do not lose it just because the rearm happened mid-bar.
+            self._pending_pullback_start = (
+                int(ts_init) if float(arm_depth_atr) > 0.0 else None
+            )
         elif decision.action is EpisodeAction.EMIT:
             d = self._prevailing_direction
             # the counter regime is the opposite-prevailing 5s regime that just ended --

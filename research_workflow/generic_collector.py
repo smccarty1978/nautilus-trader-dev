@@ -991,9 +991,14 @@ class FlipPredictionCollector(Strategy):
         }
         feats: Dict[str, Any] = {}
         if self._provider_host is not None:
+            # ATR_T for pullback / counter-regime / direction-normalized-delta geometry;
+            # the prevailing 1m regime's FROZEN ATR for Family A (frozen Model-C parent
+            # parity -- FLAG B).
+            regime_frozen_atr = float(self.regime_frozen_atr or 0.0)
             feats = dict(self._provider_host.snapshot(
                 decision_ts=int(ev.candidate_ts), price=float(price_at_T),
                 atr=atr_t if atr_t > 0 else 1e-9, episode_state=episode_state,
+                family_a_atr=regime_frozen_atr if regime_frozen_atr > 0 else (atr_t if atr_t > 0 else 1e-9),
             ))
         row: Dict[str, Any] = {
             "observation_ts": int(ev.candidate_ts),
@@ -1013,15 +1018,21 @@ class FlipPredictionCollector(Strategy):
             "triggering_1s_ts_init": int(ts_avail),
             **feats,
         }
+        score_col = getattr(self, "_model_c_derived_name", "model_c_score_at_candidate")
+        row[score_col] = None
         if self._model_c_scorer is not None and self._model_c_surface:
-            avail = {name: int(ev.candidate_ts) for name in self._model_c_surface}
-            obs = self._model_c_scorer.score(
-                {name: feats.get(name) for name in self._model_c_surface},
-                checkpoint_ts=int(ev.candidate_ts),
-                direction="LONG" if ev.prevailing_direction == 1 else "SHORT",
-                availability_ts=avail,
-            )
-            row[getattr(self, "_model_c_derived_name", "model_c_score_at_candidate")] = float(obs.score)
+            # The frozen Model-C score is a derived causal input: it obeys availability
+            # like any feature. If any of the 13 parent-surface inputs is null at candidate
+            # T (e.g. no completed prior 1m/5m regime yet early in a session), the score is
+            # null -- the candidate ROW still persists. It is NEVER fabricated.
+            inputs = {name: feats.get(name) for name in self._model_c_surface}
+            if all(v is not None for v in inputs.values()):
+                obs = self._model_c_scorer.score(
+                    inputs, checkpoint_ts=int(ev.candidate_ts),
+                    direction="LONG" if ev.prevailing_direction == 1 else "SHORT",
+                    availability_ts={name: int(ev.candidate_ts) for name in self._model_c_surface},
+                )
+                row[score_col] = float(obs.score)
         return row
 
     def _compute_running_mfe(self, direction: int) -> float:

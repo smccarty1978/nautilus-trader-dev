@@ -198,6 +198,7 @@ class ArrivalVelocityAdapter(_BaseAdapter):
         return self._provider.velocity(lookback=lookback, atr=atr)
 
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
+        atr = float(episode_state.get("family_a_atr", atr))  # FLAG B: frozen-parent ATR
         out: Dict[str, Any] = {}
         for inst in self.instances:
             p = inst.parameters
@@ -276,6 +277,7 @@ class ContextAdapter(_BaseAdapter):
         return spec.canonical_name == "ema_slope" and spec.parameters.get("ema_role") == "short"
 
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
+        atr = float(episode_state.get("family_a_atr", atr))  # FLAG B: frozen-parent ATR
         out: Dict[str, Any] = {}
         for inst in self.instances:
             if inst.canonical_name == "ema_slope":
@@ -358,15 +360,17 @@ class StructuralGeometryAdapter(_BaseAdapter):
             self._five_close_ts = int(event["close_ts"])
 
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
+        # FLAG B: the sealed Model-C parent passes checkpoint_atr = the prevailing 1m
+        # regime frozen ATR (regime_frozen_atr) to the structural tracker. The prior_1m /
+        # prior_5m regime features it feeds Model C normalise by each regime's own
+        # atr_start, but structural checkpoint-ATR outputs must match the parent.
+        atr = float(episode_state.get("family_a_atr", atr))
         snap = self._provider.snapshot(
             checkpoint_ns=int(decision_ts), current_price=float(price),
             checkpoint_atr=float(atr), completed_reference_close_ts=self._five_close_ts,
         )
         # Host-internal (underscore-prefixed): consumed by ProviderHost cross-adapter
         # derivation for pullback_fraction_of_structural_move; never a feature column.
-        # structural_max_expansion_checkpoint_atr is normalized by the SAME checkpoint
-        # ATR the host passes as `atr`, so `value * atr` recovers the raw point distance
-        # the episode provider's max_depth_points is also measured in.
         out: Dict[str, Any] = {
             "_structural_max_expansion_checkpoint_atr": snap.get("structural_max_expansion_checkpoint_atr"),
         }
@@ -424,6 +428,7 @@ class RollingProductivityAdapter(_BaseAdapter):
 
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
         direction = int(episode_state.get("prevailing_direction", 0) or 0)
+        atr = float(episode_state.get("family_a_atr", atr))  # FLAG B: frozen-parent (regime-start) ATR
         snap = self._provider.snapshot(
             int(decision_ts), direction, float(atr),
             episode_state.get("regime_expansion_atr_per_min"),
@@ -913,8 +918,16 @@ class ProviderHost:
     def snapshot(
         self, *, decision_ts: int, price: float, atr: float,
         episode_state: Optional[Mapping[str, Any]] = None,
+        family_a_atr: Optional[float] = None,
     ) -> Dict[str, Any]:
         """Produce the full candidate-time feature row (exactly the declared aliases).
+
+        ``atr`` is the candidate-time ATR (ATR_T) used by the pullback / counter-regime /
+        direction-normalized-delta geometry. ``family_a_atr`` (FLAG B) is the ATR the
+        frozen Model-C parent normalized its Family-A inputs by -- the prevailing 1m
+        regime's frozen ATR. When omitted it falls back to ``atr`` (Stage-1 synthetic).
+        ArrivalVelocity / Context / RollingProductivity / StructuralGeometry read
+        ``episode_state["family_a_atr"]``.
 
         Raises ``FeatureOutputBindingMissing`` if any declared alias is absent from the
         merged adapter output -- a present key with a ``None`` value is a permitted null
@@ -930,6 +943,7 @@ class ProviderHost:
                 f"dispatched event ts {self._latest_event_ts}"
             )
         state = dict(episode_state or {})
+        state["family_a_atr"] = float(family_a_atr) if family_a_atr is not None else float(atr)
         merged: Dict[str, Any] = {}
         # Deterministic order: structural first so cross-adapter derivations can read it.
         ordered = sorted(
@@ -939,9 +953,10 @@ class ProviderHost:
         for adapter in ordered:
             if isinstance(adapter, EpisodeGeometryAdapter) and "structural_expansion_points" not in state:
                 sx = merged.get("_structural_max_expansion_checkpoint_atr")
-                # checkpoint-ATR-normalized -> raw points via the same checkpoint ATR.
+                # _structural_max_expansion_checkpoint_atr was normalized by the structural
+                # adapter's ATR (family_a_atr) -> multiply by the same to recover raw points.
                 state["structural_expansion_points"] = (
-                    sx * float(atr) if sx is not None else None
+                    sx * state["family_a_atr"] if sx is not None else None
                 )
             part = adapter.snapshot(
                 decision_ts=int(decision_ts), price=float(price), atr=float(atr),

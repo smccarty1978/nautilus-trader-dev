@@ -301,6 +301,46 @@ def test_collector_wiring_episode_vs_legacy():
     assert 'while self.regime_start_ns > 0 and not getattr(self, "_episode_mode", False):' in src
 
 
+def test_multiple_completed_5s_transitions_in_one_bar_with_midbar_rearm():
+    """Real-data shape: one completed 1s bar carries >1 completed-5s transition AND
+    (being already armed + recovered past the armed-from extreme) drives a REARM on
+    the base snapshot. A later transition snapshot in the SAME bar must not reach the
+    engine's arm check with arm_depth_atr >= threshold and no pullback start
+    (regression: ValueError PULLBACK_START_REQUIRED_AT_ARM)."""
+    from collections import namedtuple
+
+    S = namedtuple("S", "regime close_ts")
+    T = namedtuple("T", "timeframe available_ts previous current")
+
+    rt = _runtime()
+    _feed_seconds(rt, 0, 100, _steady_bull)
+    rt.on_prevailing_regime(direction=1, start_ns=100 * NS, start_price=_steady_bull(100))
+    _feed_seconds(rt, 100, 320, _steady_bull)
+    # arm via a 1s intrabar low spike (>1 ATR adverse from the running extreme)
+    _feed_seconds(rt, 320, 321, _steady_bull, low_fn=lambda t: 15.0)
+    assert rt._arm_ts is not None
+    armed_at = rt._arm_ts
+
+    # one bar that (a) prints a new favorable extreme well above the armed-from
+    # extreme -> engine REARMs, (b) also has a full-range >1 ATR adverse excursion
+    # from that new extreme, (c) carries two completed-5s transitions.
+    base = _steady_bull(321)
+    hi = base + 400.0
+    lo = hi - 25.0  # 2.5 ATR adverse from the new extreme, same bar
+    trs = (
+        T("5s", 322 * NS, S(1, 320 * NS), S(-1, 322 * NS)),
+        T("5s", 322 * NS, S(-1, 322 * NS), S(1, 322 * NS)),
+    )
+    ev = rt.on_completed_1s(
+        ts_event=321 * NS, ts_init=322 * NS,
+        open=base, high=hi, low=lo, close=base + 300.0, volume=100.0,
+        completed_1m_atr=ATR, completed_5s_state=1, completed_5s_transitions=trs,
+    )
+    # no crash; the rearm cycle re-established its own pullback start
+    assert rt._arm_ts is None or rt._arm_ts >= armed_at
+    assert all(e.pullback_start_ts <= e.arm_ts for e in ev)
+
+
 def test_non_episode_compiled_studies_resolve_checkpoint_grid_runtime():
     import glob
     for cs_path in glob.glob(str(REPO / "studies" / "*" / "compiled_study.json")):

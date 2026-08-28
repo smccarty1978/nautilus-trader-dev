@@ -2,18 +2,14 @@
   "study_id": "deep_pullback_5s_reacceleration_model",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "556d3c616fe78323176c2c593924aa9e102afa1b",
+  "git_commit_hash": "0fcce218d8dd595863878754997e26f52af36812",
   "source_state_binding": {
-    "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "556d3c616fe78323176c2c593924aa9e102afa1b",
-    "git_commit_is_sufficient_provenance": false,
+    "provenance_strength": "COMMITTED",
+    "git_commit_hash": "0fcce218d8dd595863878754997e26f52af36812",
+    "git_commit_is_sufficient_provenance": true,
     "working_tree_dirty": true,
     "source_state_sha256": "4f27b1e5db2c8c6348b6ed59af65b9d366668979c855dafede37ae51139dc6a0",
-    "dependencies_diverging_from_commit": [
-      "features/trackers/generic_regime_geometry.py",
-      "studies/deep_pullback_5s_reacceleration_model/SPEC.md",
-      "studies/deep_pullback_5s_reacceleration_model/study.yaml"
-    ],
+    "dependencies_diverging_from_commit": [],
     "source_files": {
       "features/registry.py": {
         "sha256": "0cbc2cf555e05d75299a07e99496dd48c7023353cb78bb4573d5c0132f57bfcc",
@@ -37,7 +33,7 @@
       },
       "features/trackers/generic_regime_geometry.py": {
         "sha256": "2e51db55a288be5163803b037ef38258d9232de58785700bf31d9b5b52d38645",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       },
       "features/trackers/generic_rolling_productivity.py": {
         "sha256": "eb5f07231547978421a6b65fdfb809a4c8af6dc9350a7731a3fe8a5026dd5bbd",
@@ -49,11 +45,11 @@
       },
       "studies/deep_pullback_5s_reacceleration_model/SPEC.md": {
         "sha256": "90833d3791c053b043c8b72dc44aa3122a7133409c7ad05a33b7883ef0a5e11c",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       },
       "studies/deep_pullback_5s_reacceleration_model/study.yaml": {
         "sha256": "0cb778c5f1ee9c5a39f148cb6afe256191b221c3243e7d1ad39a2dd06320abb1",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       }
     }
   },
@@ -801,5 +797,5 @@
     }
   ],
   "required_gates_evidence": [],
-  "manifest_sha256": "80fada618eef0e13ad0116445490d9eefce6f4eb429b1cf5ce8ed9ca9e587a61"
+  "manifest_sha256": "8960fc7b8447aee0236d3eeaac56dc47c316eb555457d852e8e5d4a7e5b901a3"
 }

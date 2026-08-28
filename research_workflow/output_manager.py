@@ -520,7 +520,8 @@ class OutputManager:
         from scripts.check_feature_surface import validate_feature_surface
 
         surface_report = validate_feature_surface(
-            candidates_df, expected_feats, metadata_columns=declared_metadata,
+            candidates_df, expected_feats,
+            metadata_columns=list(declared_metadata) + sorted(derived_cols),
             collection_universe=collection_universe,
         )
 

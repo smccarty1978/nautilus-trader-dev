@@ -2,17 +2,17 @@
   "study_id": "clean_maturity_flip_model_rolling_productivity",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "fec1ec200950fcb4d25dea73b884726eb142ce67",
+  "git_commit_hash": "0fcce218d8dd595863878754997e26f52af36812",
   "source_state_binding": {
     "provenance_strength": "COMMITTED",
-    "git_commit_hash": "fec1ec200950fcb4d25dea73b884726eb142ce67",
+    "git_commit_hash": "0fcce218d8dd595863878754997e26f52af36812",
     "git_commit_is_sufficient_provenance": true,
     "working_tree_dirty": true,
-    "source_state_sha256": "8c921e1a6575f44e2f1e5809fd81461fc2e7e9225beedf680ae6094aad8b0010",
+    "source_state_sha256": "1e32f6af9118fcb4ac84aa45f74cc8d7d1c5f4de4e5e2e58559b2eb5a81d1c9e",
     "dependencies_diverging_from_commit": [],
     "source_files": {
       "features/registry.py": {
-        "sha256": "7afb75ad9e70cc6c2f7f935a79178799cd40398a7ef4fa080a755f418ec68ed1",
+        "sha256": "0cbc2cf555e05d75299a07e99496dd48c7023353cb78bb4573d5c0132f57bfcc",
         "state": "COMMITTED"
       },
       "features/trackers/generic_arrival.py": {
@@ -349,5 +349,7 @@
       2026
     ]
   },
-  "manifest_sha256": "d3cff633143d26e56249e3ec272eb16149b166f68d0908836aa5810ad650ae78"
+  "derived_causal_inputs": [],
+  "required_gates_evidence": [],
+  "manifest_sha256": "d5069e396b0c422f57e857be598f6eca4126b2f90ce72b4317db9cf48d68d4a7"
 }

@@ -320,18 +320,23 @@ def validate_smoke_run(
     # the value recorded by the collector -- a deliberate second gate, not a duplicate.
     from scripts.check_feature_surface import validate_feature_surface
 
-    declared_metadata = (study_cfg.get("features", {}) or {}).get("metadata_columns")
+    declared_metadata = list((study_cfg.get("features", {}) or {}).get("metadata_columns") or [])
     collection_universe = None
     if not expected_feature_list:
         # V2 studies declare canonical FeatureInstances; resolve their physical
         # output surface through the same authority used by OutputManager.
         from research_workflow.output_manager import resolve_collection_allowed_feature_aliases
         from backtests.nt_runtime.compiled_study_loader import load_compiled_study
-        collection_universe = resolve_collection_allowed_feature_aliases(
-            load_compiled_study(study_dir).spec.features
+        _spec_features = load_compiled_study(study_dir).spec.features
+        collection_universe = resolve_collection_allowed_feature_aliases(_spec_features)
+        # Declared derived causal inputs (e.g. a frozen external model score) are bound
+        # to their own governed column -- neither a market FeatureInstance nor metadata,
+        # but declared, so not an "undeclared feature column". Mirrors OutputManager.
+        declared_metadata += sorted(
+            di.name for di in (_spec_features.derived_inputs or []) if getattr(di, "name", None)
         )
     surface_report = validate_feature_surface(
-        cand_df, expected_feature_list, metadata_columns=declared_metadata,
+        cand_df, expected_feature_list, metadata_columns=declared_metadata or None,
         collection_universe=collection_universe,
     )
     if not surface_report.passed:
@@ -360,24 +365,43 @@ def validate_smoke_run(
 
     # 9d. EPISODE POPULATION GATING (empirical). If the sealed population contract
     # declares an episode_lifecycle, the collector must emit at most
-    # max_candidates_per_episode candidates per episode -- not one per checkpoint. With
-    # no episode-identity column the prevailing regime (regime_start_ns) is the coarsest
-    # possible episode bound; a ratio well above the per-episode cap proves the
-    # checkpoint grid is still the population generator.
+    # max_candidates_per_episode candidates PER EPISODE -- not one per checkpoint.
+    #
+    # The cap is per *episode* (one arming cycle), identified by the ``episode_id``
+    # metadata column. A contract with ``rearm_on`` deliberately produces several
+    # episodes inside one prevailing 1m regime, so ``regime_start_ns`` is only the
+    # right episode bound when no episode identity is emitted AND the contract cannot
+    # rearm. Using the prevailing regime as the bound for a rearm-enabled contract
+    # would reject correct behaviour.
     _cs_path = study_dir / "compiled_study.json"
     if _cs_path.is_file():
         _pc = (json.loads(_cs_path.read_text(encoding="utf-8")).get("contracts") or {}).get("population_contract") or {}
         _epi = _pc.get("episode_lifecycle")
-        if _epi and "regime_start_ns" in cand_df.columns and len(cand_df):
+        if _epi and len(cand_df):
             cap = int(_epi.get("max_candidates_per_episode") or 1)
-            regimes = int(cand_df["regime_start_ns"].nunique())
-            per_regime_max = int(cand_df.groupby("regime_start_ns").size().max()) if regimes else 0
-            if per_regime_max > cap:
+            can_rearm = bool(_epi.get("rearm_on"))
+            if "episode_id" in cand_df.columns and cand_df["episode_id"].notna().any():
+                episodes = int(cand_df["episode_id"].nunique())
+                per_episode_max = int(cand_df.groupby("episode_id").size().max())
+                bound_name, bound_max, bound_n = "episode", per_episode_max, episodes
+            elif "regime_start_ns" in cand_df.columns:
+                episodes = int(cand_df["regime_start_ns"].nunique())
+                per_episode_max = int(cand_df.groupby("regime_start_ns").size().max()) if episodes else 0
+                bound_name, bound_max, bound_n = "prevailing regime", per_episode_max, episodes
+                if can_rearm and per_episode_max > cap:
+                    raise SmokeValidationError(
+                        "EPISODE_GATING_UNVERIFIABLE: the contract declares rearm_on but the collector "
+                        "emits no episode_id column, so a per-episode cap cannot be checked and the "
+                        "prevailing-regime bound is not valid for a rearm-enabled contract."
+                    )
+            else:
+                bound_name, bound_max, bound_n = None, 0, 0
+            if bound_name is not None and bound_max > cap:
                 raise SmokeValidationError(
                     "EPISODE_POPULATION_NOT_GATED: population_contract.episode_lifecycle declares "
-                    f"max_candidates_per_episode={cap}, but the collector emitted up to {per_regime_max} "
-                    f"candidates within a single prevailing regime ({len(cand_df)} candidates / {regimes} "
-                    f"regimes). EpisodePopulationEngine is not bound; emission is still checkpoint-grid."
+                    f"max_candidates_per_episode={cap}, but the collector emitted up to {bound_max} "
+                    f"candidates within a single {bound_name} ({len(cand_df)} candidates / {bound_n} "
+                    f"{bound_name}s). EpisodePopulationEngine is not bound; emission is still checkpoint-grid."
                 )
 
     # The run itself must not have been filed as valid on a failing surface.
