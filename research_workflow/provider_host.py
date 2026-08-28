@@ -65,6 +65,14 @@ class FeatureOutputBindingMissing(RuntimeError):
     """An adapter was instantiated for a FeatureInstance but produced no output for it."""
 
 
+class NonMonotonicRuntimeEvent(RuntimeError):
+    """A dispatched data-stream event is not strictly after the last event of its stream."""
+
+
+class SnapshotBeforeLatestRuntimeEvent(RuntimeError):
+    """snapshot(decision_ts) was called with decision_ts earlier than an ingested event."""
+
+
 @dataclass(frozen=True)
 class InstanceSpec:
     """One compiled FeatureInstance the host must realize at runtime."""
@@ -125,6 +133,14 @@ class _BaseAdapter:
         self.instances = tuple(instances)
         self.physical_aliases = tuple(i.physical_alias for i in self.instances)
 
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        """Adapter-declared realizability (F-4). Fail closed: an adapter that does not
+        override this cannot emit anything. Concrete adapters check the canonical name,
+        the parameter combination, and that a snapshot path renders this exact alias --
+        it is NOT ``alias in the requested list`` (which would be tautological)."""
+        return False
+
     def required_streams(self) -> frozenset[str]:
         out: set[str] = set()
         for inst in self.instances:
@@ -160,6 +176,14 @@ class ArrivalVelocityAdapter(_BaseAdapter):
         self._provider = GenericArrivalVelocityProvider(
             max_lookback_bars=max(60, 2 * max(lookbacks or [20]) + 1)
         )
+
+    _CANONICAL = frozenset({"arrival_velocity", "arrival_acceleration"})
+
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        if spec.canonical_name not in cls._CANONICAL:
+            return False
+        return str(spec.parameters.get("input_timeframe", "1s")) == "1s"
 
     def required_streams(self) -> frozenset[str]:
         return frozenset({STREAM_COMPLETED_1S})
@@ -198,15 +222,31 @@ class ContextAdapter(_BaseAdapter):
     ``RegimeEngine`` exactly: ALPHA3 = 0.5 EMA of the 1m high and low, midpoint per
     completed 1m bar.
 
-    REVIEW (§9): the sealed Model C parent's compact path computes ``ema_slope`` as a
-    fixed 5-step lookback ((-1) vs (-6)); the deep-pullback FeatureInstance declares
-    ``lookback: 20``. Whether Family A must be byte-parity with the frozen Model C
-    inputs or canonically re-parameterized is a scientific question for the review /
-    Stage 3 Model C scorer integration -- this adapter computes the declared param.
+    FAMILY-A AUTHORITY (F-A). The frozen Model C parent
+    (``clean_maturity_flip_model_rolling_productivity``) was trained on its collector's
+    compact-path value for this input:
+
+        research_workflow/generic_collector.py :: _get_context_features
+        ema_slope = (short_ema_history[-1] - short_ema_history[-6]) / (5 * atr)
+        # 0.0 while len(short_ema_history) < 6
+
+    ``short_ema_history`` is exactly this adapter's ``_midpoints`` series. So the realized
+    ``ema_slope`` for ``ema_role: short`` on this path is a FIVE-step midpoint slope
+    normalized by ``5 * atr`` -- the FeatureInstance ``lookback`` parameter is legacy
+    nominal metadata that neither the sealed parent runtime nor this adapter consumes
+    (the parent declares ``lookback: 20`` yet computes 5). Model C is
+    ``retrain_prohibited``; this adapter reproduces the parent value exactly rather than
+    "modernising" it to a 20-step slope. See ``FROZEN_FAMILY_A_EMA_SLOPE_STEPS``.
+    ``GenericContextProvider.ema_slope(values, lookback=5, atr)`` is byte-identical to
+    the parent formula, including the 0.0-below-6 warmup, so no separate transform is
+    introduced -- the canonical provider IS the implementation, called with the frozen
+    step count.
     """
 
     canonical_provider = "features.trackers.generic_context.GenericContextProvider"
     ALPHA3 = 0.5
+    # The frozen Model C parent's realized ema_slope step count (see class docstring).
+    FROZEN_FAMILY_A_EMA_SLOPE_STEPS = 5
 
     def __init__(self, instances: Sequence[InstanceSpec]) -> None:
         super().__init__(instances)
@@ -231,13 +271,19 @@ class ContextAdapter(_BaseAdapter):
             self._ema_l = self.ALPHA3 * l + (1 - self.ALPHA3) * self._ema_l
         self._midpoints.append((self._ema_h + self._ema_l) / 2.0)
 
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        return spec.canonical_name == "ema_slope" and spec.parameters.get("ema_role") == "short"
+
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
         out: Dict[str, Any] = {}
         for inst in self.instances:
             if inst.canonical_name == "ema_slope":
-                lookback = int(inst.parameters.get("lookback", 20))
+                # F-A: frozen Model C parent parity -- 5-step slope / (5*atr), 0.0 below 6.
+                # `lookback` in the instance is legacy nominal and is NOT consumed here.
                 out[inst.physical_alias] = self._provider.ema_slope(
-                    values=list(self._midpoints), lookback=lookback, atr=atr,
+                    values=list(self._midpoints),
+                    lookback=self.FROZEN_FAMILY_A_EMA_SLOPE_STEPS, atr=atr,
                 )
         return out
 
@@ -254,6 +300,29 @@ class StructuralGeometryAdapter(_BaseAdapter):
     """
 
     canonical_provider = "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider"
+
+    # Exact keys StructuralRegimeGeometryTracker.snapshot() can return (+ the one
+    # adapter-derived ratio). An alias outside this set has no snapshot path here.
+    _SNAPSHOT_KEYS = frozenset({
+        f"{ctx}_{tf}_regime_{metric}"
+        for ctx, tf in (("prior", "1m"), ("prior", "5m"))
+        for metric in ("duration_min", "range_atr", "net_directional_move_atr", "mfe_atr",
+                       "range_atr_per_min", "net_move_atr_per_min", "efficiency")
+    } | {
+        "current_5m_regime_age_min", "current_5m_regime_range_atr", "current_5m_regime_mfe_atr",
+        "current_5m_directional_displacement_atr", "current_5m_regime_range_atr_per_min",
+        "current_5m_regime_range_checkpoint_atr", "current_5m_regime_efficiency",
+        "distance_to_completed_5m_high_atr", "distance_to_completed_5m_low_atr",
+        "current_1m_move_outside_completed_5m_range",
+        "structural_max_expansion_atr", "structural_current_expansion_atr",
+        "structural_giveback_atr", "structural_retention_ratio",
+        "structural_expansion_atr_per_min", "regime_expansion_atr_per_min",
+        "structural_max_expansion_checkpoint_atr", "structural_current_expansion_checkpoint_atr",
+    })
+
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        return spec.physical_alias in cls._SNAPSHOT_KEYS
 
     def __init__(self, instances: Sequence[InstanceSpec]) -> None:
         super().__init__(instances)
@@ -324,6 +393,16 @@ class RollingProductivityAdapter(_BaseAdapter):
 
     canonical_provider = "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider"
 
+    _CANONICAL = frozenset({
+        "rolling_retention_ratio", "rolling_current_progress_atr", "rolling_max_progress_atr",
+        "rolling_giveback_atr", "rolling_max_speed_atr_per_min", "rolling_current_speed_atr_per_min",
+        "rolling_max_speed_vs_lifetime", "rolling_current_speed_vs_lifetime",
+    })
+
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        return spec.canonical_name in cls._CANONICAL and "window" in spec.parameters
+
     def __init__(self, instances: Sequence[InstanceSpec]) -> None:
         super().__init__(instances)
         from features.trackers.generic_rolling_productivity import GenericRollingProductivityProvider
@@ -373,6 +452,13 @@ class EpisodeGeometryAdapter(_BaseAdapter):
         "pullback_recovery_from_extreme_atr", "pullback_fraction_of_structural_move",
         "pullback_elapsed_seconds", "pullback_post_arm_seconds",
     }
+    _POPULATION_SUPPLIED = {
+        "seconds_since_prevailing_directional_extreme", "prior_deep_pullback_count",
+    }
+
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        return spec.physical_alias in (cls._DIRECT | cls._POPULATION_SUPPLIED)
 
     def __init__(self, instances: Sequence[InstanceSpec]) -> None:
         super().__init__(instances)
@@ -416,6 +502,30 @@ class EpisodeGeometryAdapter(_BaseAdapter):
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
         out: Dict[str, Any] = {i.physical_alias: None for i in self.instances}
         structural_pts = episode_state.get("structural_expansion_points")
+
+        # Stage 3: the population runtime is the episode-lifecycle authority. When it
+        # hands its canonical GenericEpisodeGeometryProvider output through
+        # `episode_state["episode_geometry"]`, read that -- do NOT independently replay.
+        handoff = episode_state.get("episode_geometry")
+        if handoff is not None:
+            mdp = handoff.get("max_depth_points")
+            for inst in self.instances:
+                alias = inst.physical_alias
+                if alias == "pullback_fraction_of_structural_move":
+                    out[alias] = (
+                        (mdp / structural_pts)
+                        if (mdp is not None and structural_pts not in (None, 0)) else
+                        handoff.get(alias)
+                    )
+                elif alias in self._DIRECT:
+                    out[alias] = handoff.get(alias)
+                elif alias == "seconds_since_prevailing_directional_extreme":
+                    out[alias] = handoff.get(alias)
+                elif alias == "prior_deep_pullback_count":
+                    out[alias] = episode_state.get("prior_deep_pullback_count")
+            return out
+
+        # Stage 1 standalone path: drive this adapter's own provider.
         geom: Mapping[str, Any] = {}
         if self._active and self._armed:
             geom = self._provider.candidate_snapshot(
@@ -444,12 +554,22 @@ class CompletedRegimeGeometryAdapter(_BaseAdapter):
     before the flip-back. That is exactly the provider's *prior* 5s regime at candidate
     T, so ``prior_snapshot(timeframe="5s", ...)``'s recovery outputs are renamed to the
     ``counter_regime`` aliases.
-    5m: ``current_5m_regime_direction`` from the additive ``current_snapshot`` accessor.
-    ``regime_alignment`` = agreement of the current completed 1m and 5m regime directions
-    (both from this provider's own state, fed the 1m and 5m completed streams).
+    5m: ``current_5m_regime_direction`` from the ``current_snapshot`` accessor.
+    ``regime_alignment``: the canonical polarity lives in
+    ``GenericCompletedRegimeGeometryProvider.alignment`` (F-D) -- {+1 agree, -1 disagree,
+    null if either current completed regime direction is unavailable}; this adapter only
+    forwards it.
     """
 
     canonical_provider = "features.trackers.generic_regime_geometry.GenericCompletedRegimeGeometryProvider"
+    _EMITTABLE = frozenset({
+        "recovery_from_counter_regime_extreme_atr", "fraction_of_counter_regime_move_recovered",
+        "current_5m_regime_direction", "regime_alignment",
+    })
+
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        return spec.physical_alias in cls._EMITTABLE
 
     def __init__(self, instances: Sequence[InstanceSpec]) -> None:
         super().__init__(instances)
@@ -482,10 +602,14 @@ class CompletedRegimeGeometryAdapter(_BaseAdapter):
         }.get(event_type)
         if tf is None:
             return
+        direction = int(event.get("direction", 0) or 0)
+        atr = float(event.get("atr", 0.0) or 0.0)
+        if direction not in (-1, 1) or not math.isfinite(atr) or atr <= 0.0:
+            return  # warmup / neutral bar: no completed regime state to record
         self._provider.on_completed_bar(
-            timeframe=tf, close_ts=int(event["close_ts"]), direction=int(event["direction"]),
+            timeframe=tf, close_ts=int(event["close_ts"]), direction=direction,
             open_=float(event["open"]), high=float(event["high"]), low=float(event["low"]),
-            close=float(event["close"]), atr=float(event["atr"]),
+            close=float(event["close"]), atr=atr,
         )
 
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
@@ -501,22 +625,38 @@ class CompletedRegimeGeometryAdapter(_BaseAdapter):
             self._provider.current_snapshot(timeframe="5m", checkpoint_ns=int(decision_ts))
             if self._needs_5m else {"available": False}
         )
-        cur1m = (
-            self._provider.current_snapshot(timeframe="1m", checkpoint_ns=int(decision_ts))
-            if self._needs_1m else {"available": False}
+        # Stage 3 counter-5s identity guard (§4). The recovery features may only populate
+        # when the provider's prior 5s regime IS the opposite-prevailing counter regime the
+        # population runtime's counter-event established -- not "whichever prior 5s regime".
+        counter_dir = episode_state.get("counter_regime_direction")
+        prevailing = episode_state.get("prevailing_direction")
+        counter_ok = (
+            "counter_regime_direction" not in episode_state  # Stage 1 standalone: no gate
+            or (counter_dir is not None and prevailing is not None
+                and int(counter_dir) == -int(prevailing))
         )
+        counter_close = episode_state.get("counter_regime_close_ts")
+        if counter_ok and counter_close not in (None, -1) and prior5s.get("available"):
+            # the provider's prior 5s regime must not end BEFORE the counter regime the
+            # population saw (they are the same regime; allow provider end_ns >= that close)
+            prior_end = prior5s.get("prior_5s_regime_completed_close_ts") or prior5s.get("completed_close_ts")
+            if prior_end is not None and int(prior_end) < int(counter_close):
+                counter_ok = False
         for inst in self.instances:
             alias = inst.physical_alias
             if alias == "recovery_from_counter_regime_extreme_atr":
-                out[alias] = prior5s.get("prior_5s_regime_recovery_from_extreme_atr") if prior5s.get("available") else None
+                out[alias] = prior5s.get("prior_5s_regime_recovery_from_extreme_atr") if (prior5s.get("available") and counter_ok) else None
             elif alias == "fraction_of_counter_regime_move_recovered":
-                out[alias] = prior5s.get("prior_5s_regime_fraction_move_recovered") if prior5s.get("available") else None
+                out[alias] = prior5s.get("prior_5s_regime_fraction_move_recovered") if (prior5s.get("available") and counter_ok) else None
             elif alias == "current_5m_regime_direction":
                 out[alias] = cur5m.get("current_5m_regime_direction") if cur5m.get("available") else None
             elif alias == "regime_alignment":
-                d5 = cur5m.get("current_5m_regime_direction") if cur5m.get("available") else None
-                d1 = cur1m.get("current_1m_regime_direction") if cur1m.get("available") else None
-                out[alias] = None if d5 is None or d1 is None else (1 if d5 == d1 else -1)
+                src_tf = inst.parameters.get("source_timeframe", "1m")
+                ref_tf = inst.parameters.get("reference_timeframe", "5m")
+                out[alias] = self._provider.alignment(
+                    source_timeframe=src_tf, reference_timeframe=ref_tf,
+                    checkpoint_ns=int(decision_ts),
+                )["regime_alignment"]
         return out
 
 
@@ -524,6 +664,13 @@ class OHLCVDeltaAdapter(_BaseAdapter):
     """``GenericOHLCVDeltaProvider`` -- direction-normalized estimated-delta pressure."""
 
     canonical_provider = "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider"
+    _CANONICAL = frozenset({"trend_normalized_est_delta_sum", "trend_normalized_est_delta_sum_ratio"})
+
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        if spec.canonical_name not in cls._CANONICAL:
+            return False
+        return str(spec.parameters.get("direction_reference", "prevailing_1m")) == "prevailing_1m"
 
     def __init__(self, instances: Sequence[InstanceSpec]) -> None:
         super().__init__(instances)
@@ -580,6 +727,43 @@ ADAPTER_REGISTRY: Dict[str, Callable[[Sequence[InstanceSpec]], RuntimeProviderAd
 }
 
 
+# F-5 timestamps for a normalized event:
+#   stream_ts -- per-stream monotonic key (strictly increasing within the stream)
+#   avail_ts  -- causal availability (when the event became readable); drives the global
+#                _latest_event_ts a snapshot may not precede
+# For 5s/5m completed buckets the two differ: the bucket close_ts precedes the 1s bar it
+# is published through, but the snapshot guard must key off the publication instant.
+def _event_stream_ts(event_type: str, event: Mapping[str, Any]) -> Optional[int]:
+    if event_type == STREAM_COMPLETED_1S:
+        v = event.get("ts_init")
+    elif event_type == STREAM_COMPLETED_1M:
+        v = event.get("ts_init", event.get("close_ts"))
+    elif event_type in (STREAM_COMPLETED_5M, STREAM_COMPLETED_5S):
+        v = event.get("close_ts")
+    else:
+        v = None
+    return None if v is None else int(v)
+
+
+def _event_avail_ts(event_type: str, event: Mapping[str, Any]) -> Optional[int]:
+    if event_type in (STREAM_COMPLETED_5M, STREAM_COMPLETED_5S):
+        v = event.get("available_ts", event.get("close_ts"))
+    elif event_type == STREAM_COMPLETED_1S:
+        v = event.get("ts_init")
+    elif event_type == STREAM_COMPLETED_1M:
+        v = event.get("ts_init", event.get("close_ts"))
+    elif event_type in (EVENT_REGIME_TRANSITION_1M, EVENT_EPISODE_START):
+        v = event.get("start_ns")
+    else:  # EVENT_EPISODE_TERMINATE
+        v = None
+    return None if v is None else int(v)
+
+
+# Back-compat alias used by earlier tests.
+def _event_ts(event_type: str, event: Mapping[str, Any]) -> Optional[int]:
+    return _event_avail_ts(event_type, event)
+
+
 @dataclass
 class ProviderHost:
     """Instantiated adapters for one compiled study's feature surface."""
@@ -587,6 +771,10 @@ class ProviderHost:
     instances: Tuple[InstanceSpec, ...]
     adapters: Tuple[RuntimeProviderAdapter, ...]
     _alias_to_provider: Dict[str, str] = field(default_factory=dict)
+    _unbound: Dict[str, str] = field(default_factory=dict)
+    # F-5 causal ordering state
+    _stream_last_ts: Dict[str, int] = field(default_factory=dict)
+    _latest_event_ts: int = -1
 
     # ---- construction ------------------------------------------------------ #
     @classmethod
@@ -605,6 +793,7 @@ class ProviderHost:
 
         adapters: List[RuntimeProviderAdapter] = []
         alias_to_provider: Dict[str, str] = {}
+        unbound: Dict[str, str] = {}
         for provider_path, group in by_provider.items():
             factory = ADAPTER_REGISTRY.get(provider_path)
             if factory is None:
@@ -613,10 +802,24 @@ class ProviderHost:
                     f"(needed by {[g.physical_alias for g in group]}) has no registered "
                     f"RuntimeProviderAdapter"
                 )
-            adapters.append(factory(group))
+            # F-4: an adapter must positively declare it can emit each requested spec --
+            # not merely be handed it. A spec its snapshot path cannot render is unbound.
+            for g in group:
+                if not factory.can_emit(g):
+                    unbound[g.physical_alias] = (
+                        f"{factory.__name__} does not declare a snapshot path for "
+                        f"{g.canonical_name} {dict(g.parameters)}"
+                    )
+            try:
+                adapters.append(factory(group))
+            except Exception as exc:  # construction rejected an unsupported combination
+                for g in group:
+                    unbound.setdefault(g.physical_alias, f"{type(exc).__name__}: {exc}")
+                continue
             for g in group:
                 alias_to_provider[g.physical_alias] = provider_path
-        return cls(tuple(specs), tuple(adapters), alias_to_provider)
+        host = cls(tuple(specs), tuple(adapters), alias_to_provider, unbound)
+        return host
 
     @staticmethod
     def _resolve_instance_specs(
@@ -672,7 +875,33 @@ class ProviderHost:
         Lifecycle events (regime transition, episode start/terminate) are delivered to
         every adapter; the adapter ignores what it does not use. Data-stream events go
         only to adapters that declared the stream.
+
+        F-5 causal guard. Each data stream must be strictly time-monotonic (differing
+        timeframe streams may still interleave legitimately -- there is no global event
+        order). Every timestamped event advances ``_latest_event_ts``, which
+        :meth:`snapshot` then refuses to precede -- so a future event dispatched after a
+        historical snapshot request fails closed instead of silently contaminating a
+        timestamp-free wrapped provider (arrival/context).
         """
+        stream_ts = _event_stream_ts(event_type, event)
+        avail_ts = _event_avail_ts(event_type, event)
+        if event_type in ALL_STREAMS and stream_ts is not None:
+            last = self._stream_last_ts.get(event_type)
+            if last is not None and stream_ts <= last:
+                raise NonMonotonicRuntimeEvent(
+                    f"NON_MONOTONIC_RUNTIME_EVENT: {event_type} close_ts {stream_ts} not strictly after {last}"
+                )
+            self._stream_last_ts[event_type] = stream_ts
+        if avail_ts is not None:
+            # 5s/5m bucket close_ts legitimately precedes the 1s bar it is published
+            # through; only its availability instant is bound not to precede prior events.
+            if avail_ts < self._latest_event_ts and event_type not in (STREAM_COMPLETED_5M, STREAM_COMPLETED_5S):
+                raise NonMonotonicRuntimeEvent(
+                    f"NON_MONOTONIC_RUNTIME_EVENT: {event_type} avail_ts {avail_ts} precedes an "
+                    f"ingested event at {self._latest_event_ts}"
+                )
+            self._latest_event_ts = max(self._latest_event_ts, avail_ts)
+
         if event_type in ALL_STREAMS:
             for adapter in self.adapters:
                 if event_type in adapter.required_streams():
@@ -690,7 +919,16 @@ class ProviderHost:
         Raises ``FeatureOutputBindingMissing`` if any declared alias is absent from the
         merged adapter output -- a present key with a ``None`` value is a permitted null
         (feature_null_policies), an absent key is an unbound feature.
+
+        Raises ``SnapshotBeforeLatestRuntimeEvent`` (F-5) if ``decision_ts`` precedes an
+        already-dispatched event -- reading provider state at an earlier point than the
+        events fed into it would return future-contaminated values.
         """
+        if int(decision_ts) < self._latest_event_ts:
+            raise SnapshotBeforeLatestRuntimeEvent(
+                f"SNAPSHOT_BEFORE_LATEST_RUNTIME_EVENT: decision_ts {int(decision_ts)} < last "
+                f"dispatched event ts {self._latest_event_ts}"
+            )
         state = dict(episode_state or {})
         merged: Dict[str, Any] = {}
         # Deterministic order: structural first so cross-adapter derivations can read it.
@@ -725,23 +963,37 @@ class ProviderHost:
 
     # ---- static realizability metadata --------------------------------- #
     def binding_metadata(self) -> List[Dict[str, Any]]:
-        """Machine-readable per-FeatureInstance runtime binding record."""
-        adapter_by_provider = {a.canonical_provider: a for a in self.adapters}
+        """Machine-readable per-FeatureInstance runtime binding record.
+
+        F-4: ``bound`` is the adapter's own ``can_emit`` verdict (canonical name +
+        parameter combination + a snapshot path that renders this exact alias), NOT
+        ``alias in the requested list``. ``snapshot_output_binding`` names the concrete
+        realization path so the record proves more than "an adapter class exists".
+        """
+        registry = ADAPTER_REGISTRY
         records: List[Dict[str, Any]] = []
         for spec in self.instances:
-            adapter = adapter_by_provider.get(spec.canonical_provider)
+            factory = registry.get(spec.canonical_provider)
+            adapter = next(
+                (a for a in self.adapters if a.canonical_provider == spec.canonical_provider), None
+            )
+            can_emit = bool(factory is not None and factory.can_emit(spec))
+            unbound_reason = self._unbound.get(spec.physical_alias)
             records.append({
                 "canonical_name": spec.canonical_name,
                 "parameters": dict(spec.parameters),
                 "canonical_provider": spec.canonical_provider,
-                "runtime_adapter": type(adapter).__name__ if adapter else None,
+                "runtime_adapter": (factory.__name__ if factory is not None else None),
+                "runtime_adapter_instantiated": adapter is not None,
                 "required_streams": sorted(
-                    adapter.required_streams() if adapter else spec.required_streams
+                    adapter.required_streams() if adapter is not None else spec.required_streams
                 ),
                 "physical_alias": spec.physical_alias,
-                "bound": bool(
-                    adapter is not None and spec.physical_alias in adapter.physical_aliases
+                "snapshot_output_binding": (
+                    f"{factory.__name__}.snapshot -> {spec.physical_alias}" if can_emit else None
                 ),
+                "bound": can_emit and unbound_reason is None,
+                "unbound_reason": unbound_reason if not (can_emit and unbound_reason is None) else None,
             })
         return records
 
@@ -761,6 +1013,7 @@ class ProviderHost:
 __all__ = [
     "ProviderHost", "InstanceSpec", "RuntimeProviderAdapter", "ADAPTER_REGISTRY",
     "RuntimeProviderBindingMissing", "FeatureOutputBindingMissing",
+    "NonMonotonicRuntimeEvent", "SnapshotBeforeLatestRuntimeEvent",
     "ArrivalVelocityAdapter", "ContextAdapter", "StructuralGeometryAdapter",
     "RollingProductivityAdapter", "EpisodeGeometryAdapter",
     "CompletedRegimeGeometryAdapter", "OHLCVDeltaAdapter",

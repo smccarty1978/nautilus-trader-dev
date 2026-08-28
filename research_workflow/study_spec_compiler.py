@@ -108,10 +108,23 @@ def _deep_pullback_projection(request: dict[str, Any], study: Path) -> dict[str,
             "required_event": {"source": "generic_completed_5s_regime_state", "bar_state": "completed", "availability_timestamp": "completed_source_bar_ts_init", "relation": "opposite_prevailing", "active_at_arm_counts": True},
             "emit_condition": {"source": "generic_completed_5s_regime_state", "bar_state": "completed", "availability_timestamp": "completed_source_bar_ts_init", "from_relation": "opposite_prevailing", "to_relation": "aligned_prevailing", "strictly_after_arm": True},
             "rearm_on": ["new_favorable_extreme"], "terminate_on": ["prevailing_regime_flip"], "max_candidates_per_episode": candidate["candidates_per_episode"]}
-    derived = {"name": "frozen_model_c_score", "kind": "frozen_external_model_score", "parent_study_id": dep["parent_study_id"],
+    # Frozen external Model-C scorer binding (Stage 3). The scorer
+    # (research_workflow.external_model_scoring.FrozenExternalModelScorer) needs the
+    # parent's fitted-model + preprocessing artifact identities and a LONG/SHORT arm
+    # mapping. Artifact SHAs are read from the parent study at compile time so a parent
+    # artifact change forces a recompile (exact provenance, matching derived_inputs.py).
+    _surface = list(dep["ordered_model_c_feature_surface"])
+    _parent_dir = study.parent / dep["parent_study_id"]
+    _model_art = "artifacts/train_fitted_models.joblib"
+    _prep_art = "artifacts/preprocessing_manifest.json"
+    derived = {"name": "model_c_score_at_candidate", "kind": "frozen_external_model_score", "parent_study_id": dep["parent_study_id"],
         "parent_train_freeze_artifact": dep["parent_train_freeze_artifact"], "parent_train_freeze_artifact_sha256": dep["parent_train_freeze_artifact_sha256"],
         "parent_frozen_execution_composite_sha256": dep["parent_frozen_execution_composite_sha256"], "model_hashes": dep["model_hashes"],
-        "preprocessing_hash": dep["preprocessing_sha256"], "ordered_feature_surfaces": {"MODEL_C": dep["ordered_model_c_feature_surface"]},
+        "preprocessing_hash": dep["preprocessing_sha256"],
+        "model_artifact_path": _model_art, "model_artifact_sha256": _sha(_parent_dir / _model_art),
+        "preprocessing_artifact_path": _prep_art, "preprocessing_artifact_sha256": _sha(_parent_dir / _prep_art),
+        "ordered_feature_surfaces": {"LONG_C": _surface, "SHORT_C": _surface},
+        "direction_arm_mapping": {"LONG": "LONG_C", "SHORT": "SHORT_C"},
         "availability_reference": dep["candidate_score"]["availability_reference"], "retrain_prohibited": True}
     proto = request["model"].get("proposed_inner_train_chronology", {})
     return {"study": {"id": study.name, "type": "flip_prediction", "description": request["research_question"]},
@@ -121,12 +134,17 @@ def _deep_pullback_projection(request: dict[str, Any], study: Path) -> dict[str,
                    "required_forward_outcomes": [{"id": target_id, "entry_reference": "next_bar_open", "horizon_seconds": target["horizon_seconds"], "max_tracking_seconds": target["horizon_seconds"], "excursion_units": ["atr"], "bar_inclusion": "fully_forward", "session_end_censoring": True, "max_gap_seconds": 1, "atr_source": request["target_atr"]["source"], "atr_frozen_at": request["target_atr"]["frozen_at"], "ordered_barriers": [{"id": target_id, "favorable_atr": target["favorable_barrier_atr"], "adverse_atr": target["adverse_barrier_atr"], "horizon_seconds": target["horizon_seconds"]}]}]},
         # mode "none" == no selection: the ordered `instances` list IS the final surface,
         # so feature_count is exactly its length (not the schema's 25-feature default).
-        # metadata_columns = the candidate key only: this episode-population study persists
-        # no extra runtime observables on the candidates frame (episode/barrier bookkeeping
-        # lives on the observations frame). Matches clean_tradable_reversal's contract and
-        # keeps the collector's emitted set == OutputManager's declared set.
+        # metadata_columns: the canonical candidate key triple (observation_ts /
+        # regime_start_ns=prevailing_regime_start_ns / checkpoint_index=per-regime episode
+        # index) PLUS the governed episode identity the population runtime establishes.
+        # checkpoint_index makes (regime_start_ns, checkpoint_index) unique per deep-pullback
+        # episode inside one prevailing 1m regime -- no collision.
         "features": {"source": "canonical_verified_definition_universe", "instances": instances, "derived_inputs": [derived],
-                     "metadata_columns": ["observation_ts", "regime_start_ns", "checkpoint_index"],
+                     "metadata_columns": ["observation_ts", "regime_start_ns", "checkpoint_index",
+                                          "prevailing_regime_start_ns", "episode_id", "arm_ts",
+                                          "candidate_ts", "triggering_completed_5s_ts",
+                                          "pullback_start_ts", "prevailing_direction",
+                                          "counter_regime_close_ts", "frozen_atr_arm", "atr_t"],
                      "selection": {"mode": "none", "source": "canonical_verified_definition_universe",
                                    "feature_count": len(instances), "direction_specific": False}},
         "model": {"family": request["model"]["allowed_family"], "arms": ["BROAD"], "selection": {"search_method": "none", "allowed_families": [{"family": request["model"]["allowed_family"]}], "tuning_years": proto.get("selection_fit_years", []) + proto.get("selection_validation_years", []), "final_train_validation_years": proto.get("final_train_validation_years", [])}},

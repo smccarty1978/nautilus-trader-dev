@@ -1,14 +1,14 @@
 {
   "evidence_schema_version": 2,
   "study_id": "deep_pullback_5s_reacceleration_model",
-  "status": "BLOCKED",
-  "audit_ready": false,
-  "execution_composite_sha256": "a52f1924710cea19310151fdc71bcab0b4e2e23706462d492c1332acfa2814ea",
-  "preflight_run_id": "20260828T032638Z_83a1835749cc",
-  "generated_at_utc": "2026-08-28T03:26:38.633273+00:00",
-  "elapsed_seconds": 6.44,
-  "code_hash": "83a1835749cc883b33aefd935cd1855fd642fd6e0394a38633a6388cfc1a14c0",
-  "spec_hash": "1fae810354961f79f639f21fb3c06f5ba4d44ce4be049b4186e59a6b33b6d67a",
+  "status": "CLEAR",
+  "audit_ready": true,
+  "execution_composite_sha256": "4799492da4ddd394fa78ba211d7264281737315446dcda045258c6fa4503f01c",
+  "preflight_run_id": "20260828T133035Z_c383a55c8ffa",
+  "generated_at_utc": "2026-08-28T13:30:35.644338+00:00",
+  "elapsed_seconds": 79.23,
+  "code_hash": "c383a55c8ffa83c8f381a7bc014079de38c46b81fcff308f7c8b830507c637ec",
+  "spec_hash": "90833d3791c053b043c8b72dc44aa3122a7133409c7ad05a33b7883ef0a5e11c",
   "checks_run": [
     "EXECUTION_MANIFEST",
     "CAUSAL_LINT",
@@ -16,7 +16,8 @@
     "FEATURE_PROMOTION",
     "RESEARCH_DECISION_FIDELITY",
     "REQUIRED_GATES",
-    "RUNTIME_CONTRACT_BINDING"
+    "RUNTIME_CONTRACT_BINDING",
+    "CAUSAL_INVARIANTS"
   ],
   "check_outcomes": {
     "EXECUTION_MANIFEST": "PASSED",
@@ -25,7 +26,8 @@
     "FEATURE_PROMOTION": "PASSED",
     "RESEARCH_DECISION_FIDELITY": "PASSED",
     "REQUIRED_GATES": "PASSED",
-    "RUNTIME_CONTRACT_BINDING": "FAILED"
+    "RUNTIME_CONTRACT_BINDING": "PASSED",
+    "CAUSAL_INVARIANTS": "PASSED"
   },
   "is_compiled_study": true,
   "authority_type": "study",
@@ -39,17 +41,13 @@
     "RUNTIME_CONTRACT_BINDING",
     "CAUSAL_INVARIANTS"
   ],
-  "required_checks_missing": [
-    "RUNTIME_CONTRACT_BINDING",
-    "CAUSAL_INVARIANTS"
-  ],
-  "checks_complete": false,
+  "required_checks_missing": [],
+  "checks_complete": true,
   "diagnostic_mode": false,
-  "failed_gate": "RUNTIME_CONTRACT_BINDING",
-  "failure_ids": [
-    "RUNTIME_CONTRACT_BINDING_MISSING"
-  ],
-  "failure_packet": "audit/failure_packet.json",
-  "required_next_action": "FIX_BEFORE_AUDIT",
-  "evidence_sha256": "2e8a9b7aa61ee42348224c2584dd0b449308461c62cf715c42214a2b7512276f"
+  "failed_gate": null,
+  "failure_ids": [],
+  "failure_packet": null,
+  "required_next_action": "READY_FOR_AUDIT",
+  "evidence_sha256": "38529f39f1b89945a749c9282c8a256fb9766492b3b09ca1d69cdf6e8eb962d2",
+  "superseded_failure_packet": "audit/failure_packet.json"
 }

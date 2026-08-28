@@ -1,17 +1,20 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "20260828T032638Z_83a1835749cc",
-  "generated_at_utc": "2026-08-28T03:26:38.633273+00:00",
-  "code_hash": "83a1835749cc883b33aefd935cd1855fd642fd6e0394a38633a6388cfc1a14c0",
-  "superseded": false,
-  "failed_gate": "RUNTIME_CONTRACT_BINDING",
+  "preflight_run_id": "blocked_deep_pullback_5s_reacceleration_model",
+  "generated_at_utc": "2026-08-28T13:24:23.090729+00:00",
+  "code_hash": "",
+  "superseded": true,
+  "failed_gate": "EXECUTION_MANIFEST",
   "failure_ids": [
-    "RUNTIME_CONTRACT_BINDING_MISSING"
+    "POST_FREEZE_MUTATION"
   ],
   "failure_details": [
     {
-      "message": "population_contract.episode_lifecycle: declared [arm -> required counter-event -> first flip-back emit; max_candidates_per_episode=1] has no runtime binding -> required research_workflow.episode_population.EpisodePopulationEngine (collector does not declare SUPPORTS_EPISODE_LIFECYCLE; it would emit on the checkpoint grid instead of one candidate per deep-pullback episode)"
+      "message": "POST_FREEZE_MUTATION: Execution composite mutated after FREEZE. Current composite 5058373070c6... != Frozen composite 356d53b41b4d...\nAdded files: ['repo:research_workflow/external_model_scoring.py']\nModified/Mutated files: ['repo:research_workflow/generic_collector.py', 'repo:research_workflow/population_runtime.py', 'repo:research_workflow/provider_host.py', 'repo:research_workflow/runtime_bindings.py']"
     }
   ],
-  "recommended_smallest_investigation_scope": "Inspect findings in RUNTIME_CONTRACT_BINDING and fix locally before requesting audit."
+  "recommended_smallest_investigation_scope": "Inspect and revert post-freeze mutations.",
+  "superseded_by_preflight_run_id": "20260828T133035Z_c383a55c8ffa",
+  "superseded_at_utc": "2026-08-28T13:30:35.644338+00:00",
+  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
 }

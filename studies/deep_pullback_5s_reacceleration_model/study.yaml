@@ -234,8 +234,18 @@ features:
   - observation_ts
   - regime_start_ns
   - checkpoint_index
+  - prevailing_regime_start_ns
+  - episode_id
+  - arm_ts
+  - candidate_ts
+  - triggering_completed_5s_ts
+  - pullback_start_ts
+  - prevailing_direction
+  - counter_regime_close_ts
+  - frozen_atr_arm
+  - atr_t
   derived_inputs:
-  - name: frozen_model_c_score
+  - name: model_c_score_at_candidate
     kind: frozen_external_model_score
     parent_study_id: clean_maturity_flip_model_rolling_productivity
     parent_train_freeze_artifact: artifacts/train_experiment_freeze_repaired.json
@@ -245,8 +255,12 @@ features:
       LONG_C: a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38
       SHORT_C: 5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf
     preprocessing_hash: 0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4
+    model_artifact_path: artifacts/train_fitted_models.joblib
+    model_artifact_sha256: 03f602c5b38915c2a80ef474aba0ca95c6d3fbcb634243c24b8fa0a63a1aaa89
+    preprocessing_artifact_path: artifacts/preprocessing_manifest.json
+    preprocessing_artifact_sha256: d74dd6931cfb198e3093e9db3de96e98c23ccd483b0869a3a6342735faa9baa0
     ordered_feature_surfaces:
-      MODEL_C:
+      LONG_C:
       - arrival_velocity
       - arrival_acceleration
       - ema_slope
@@ -260,6 +274,23 @@ features:
       - rolling_300s_current_progress_atr
       - rolling_300s_max_progress_atr
       - rolling_300s_giveback_atr
+      SHORT_C:
+      - arrival_velocity
+      - arrival_acceleration
+      - ema_slope
+      - prior_1m_regime_efficiency
+      - prior_1m_regime_mfe_atr
+      - prior_1m_regime_range_atr
+      - prior_5m_regime_efficiency
+      - prior_5m_regime_mfe_atr
+      - prior_5m_regime_range_atr
+      - rolling_300s_retention_ratio
+      - rolling_300s_current_progress_atr
+      - rolling_300s_max_progress_atr
+      - rolling_300s_giveback_atr
+    direction_arm_mapping:
+      LONG: LONG_C
+      SHORT: SHORT_C
     availability_reference: decision_ts
     retrain_prohibited: true
 model:

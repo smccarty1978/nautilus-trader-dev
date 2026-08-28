@@ -130,6 +130,38 @@ class GenericCompletedRegimeGeometryProvider:
             )
         return result
 
+    def alignment(
+        self, *, source_timeframe: str, reference_timeframe: str, checkpoint_ns: int,
+    ) -> dict:
+        """Directional agreement of two current completed regimes (canonical F-D).
+
+            +1   : current completed ``source_timeframe`` regime direction agrees with
+                   the current completed ``reference_timeframe`` regime direction
+            -1   : the two disagree
+            null : either required completed regime direction is unavailable
+                   (no regime yet, or the latest state is not completed by checkpoint_ns)
+
+        There is no zero state -- ``_Regime.direction`` is only ever -1 or +1. Both
+        directions come from :meth:`current_snapshot`, which enforces the completed-state
+        causal guard, so no forming ``source_timeframe`` or ``reference_timeframe`` bar
+        can change the value before its completed availability.
+        """
+        src = self.current_snapshot(timeframe=source_timeframe, checkpoint_ns=checkpoint_ns)
+        ref = self.current_snapshot(timeframe=reference_timeframe, checkpoint_ns=checkpoint_ns)
+        if not src.get("available") or not ref.get("available"):
+            return {
+                "available": False, "unavailable_reason": "REGIME_DIRECTION_UNAVAILABLE",
+                "regime_alignment": None,
+            }
+        d_src = src[f"current_{source_timeframe}_regime_direction"]
+        d_ref = ref[f"current_{reference_timeframe}_regime_direction"]
+        return {
+            "available": True,
+            "source_completed_close_ts": src["completed_close_ts"],
+            "reference_completed_close_ts": ref["completed_close_ts"],
+            "regime_alignment": 1 if d_src == d_ref else -1,
+        }
+
     def prior_snapshot(
         self, *, timeframe: str, checkpoint_ns: int,
         candidate_price: float | None = None, candidate_atr: float | None = None,

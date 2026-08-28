@@ -70,22 +70,51 @@ def _load_collector_class(strategy_class: str | None):
     )
 
 
+def _collector_dispatches_population_runtime(cls) -> bool:
+    """Structural proof that the collector actually drives the population runtime -- the
+    ``SUPPORTS_EPISODE_LIFECYCLE`` flag alone must never satisfy the gate (§11)."""
+    import inspect
+
+    try:
+        src = inspect.getsource(cls)
+    except (OSError, TypeError):
+        return False
+    return (
+        "resolve_population_runtime(" in src
+        and "_population_runtime.on_completed_1s(" in src
+        and "_population_runtime.on_prevailing_regime(" in src
+        and "not getattr(self, \"_episode_mode\", False)" in src  # checkpoint grid disabled
+    )
+
+
 def collector_runtime_capabilities(strategy_class: str | None) -> Dict[str, Any]:
     """The collector's own honest declaration of what it executes.
 
-    ``supports_episode_lifecycle`` -- whether it runs ``EpisodePopulationEngine`` for a
-    ``population_contract.episode_lifecycle`` population. Absent reads as False, which
-    is the fail-closed default.
+    ``supports_episode_lifecycle`` -- True only when the collector BOTH declares
+    ``SUPPORTS_EPISODE_LIFECYCLE`` AND its source genuinely dispatches the generic
+    population runtime (arms/emits from ``EpisodePopulationEngine``, no checkpoint-grid
+    candidate emission). Absent / declaration-only reads as False.
     """
     cls = _load_collector_class(strategy_class)
+    declared = bool(getattr(cls, "SUPPORTS_EPISODE_LIFECYCLE", False))
+    dispatches = _collector_dispatches_population_runtime(cls)
     return {
         "strategy_class": getattr(cls, "__module__", "?") + "." + getattr(cls, "__name__", "?"),
-        "supports_episode_lifecycle": bool(getattr(cls, "SUPPORTS_EPISODE_LIFECYCLE", False)),
+        "supports_episode_lifecycle": declared and dispatches,
+        "declares_episode_lifecycle": declared,
+        "dispatches_population_runtime": dispatches,
     }
 
 
-def verify_runtime_contract(study_dir: str | Path) -> Dict[str, Any]:
+def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dict[str, Any]:
     """Every declared execution primitive must have an executable runtime binding.
+
+    ``scope``:
+      * ``"all"`` (default) -- episode-lifecycle primitive AND feature-provider
+        realizability. Used by the study-execution (active-authority) preflight.
+      * ``"features_only"`` -- feature-provider realizability only. Used by the
+        feature-candidate preflight, which validates the feature bundle, not the
+        collector's population runtime (that is gated on the active seal).
 
     Static, fail-closed. Currently binds the one primitive whose runtime component is
     canonically singular and statically verifiable:
@@ -114,16 +143,42 @@ def verify_runtime_contract(study_dir: str | Path) -> Dict[str, Any]:
     missing: List[Dict[str, Any]] = []
     population_contract = contracts.get("population_contract") or {}
     episode = population_contract.get("episode_lifecycle")
-    if episode and not caps["supports_episode_lifecycle"]:
-        missing.append({
-            "primitive": "population_contract.episode_lifecycle",
-            "declared": "arm -> required counter-event -> first flip-back emit; "
-                        f"max_candidates_per_episode={episode.get('max_candidates_per_episode')}",
-            "required_binding": EPISODE_LIFECYCLE_RUNTIME,
-            "collector": caps["strategy_class"],
-            "reason": "collector does not declare SUPPORTS_EPISODE_LIFECYCLE; it would emit on "
-                      "the checkpoint grid instead of one candidate per deep-pullback episode",
-        })
+    if episode and scope != "features_only":
+        # The dispatcher must resolve episode_lifecycle to EpisodePopulationEngine and
+        # NOT to the checkpoint grid, AND the collector source must genuinely drive it.
+        binding_ok = caps["supports_episode_lifecycle"]
+        reason = ""
+        if not caps["declares_episode_lifecycle"]:
+            reason = "collector does not declare SUPPORTS_EPISODE_LIFECYCLE"
+        elif not caps["dispatches_population_runtime"]:
+            reason = ("collector declares SUPPORTS_EPISODE_LIFECYCLE but its source does not "
+                      "dispatch resolve_population_runtime / on_completed_1s / "
+                      "on_prevailing_regime, or still emits from the checkpoint grid")
+        if binding_ok:
+            try:
+                from research_workflow.episode_population import EpisodePopulationEngine
+                from research_workflow.population_runtime import (
+                    EpisodePopulationRuntime, resolve_population_runtime,
+                )
+                rt = resolve_population_runtime({"episode_lifecycle": episode})
+                if not isinstance(rt, EpisodePopulationRuntime) or rt.emits_from_checkpoint_grid():
+                    binding_ok = False
+                    reason = "resolve_population_runtime did not bind episode_lifecycle to EpisodePopulationEngine"
+                elif rt.engine_class is not EpisodePopulationEngine:
+                    binding_ok = False
+                    reason = "population runtime engine is not EpisodePopulationEngine"
+            except Exception as e:  # pragma: no cover - defensive
+                binding_ok = False
+                reason = f"{type(e).__name__}: {e}"
+        if not binding_ok:
+            missing.append({
+                "primitive": "population_contract.episode_lifecycle",
+                "declared": "arm -> required counter-event -> first flip-back emit; "
+                            f"max_candidates_per_episode={episode.get('max_candidates_per_episode')}",
+                "required_binding": EPISODE_LIFECYCLE_RUNTIME,
+                "collector": caps["strategy_class"],
+                "reason": reason or "population runtime binding could not be verified",
+            })
 
     # --- feature-provider realizability (provider_host runtime mode only) ---------
     # A study is provider_host mode iff it declares an episode_lifecycle population --
@@ -164,6 +219,57 @@ def verify_runtime_contract(study_dir: str | Path) -> Dict[str, Any]:
                 "reason": f"{type(e).__name__}: {e}",
             })
 
+    # --- (4) frozen derived-input scorer binding (Stage 3) ----------------------
+    # A declared frozen_external_model_score must actually bind against the parent's
+    # on-disk artifacts (identities + arm mapping), not just be declared.
+    features = spec.get("features", {}) or contracts.get("feature_contract", {}) or {}
+    derived = (features.get("derived_inputs") or features.get("derived_causal_inputs") or [])
+    scorer_bound = None
+    for di in derived:
+        # Only the Stage-3 runtime-bound form (carries the fitted-model artifact + arm
+        # mapping) is verified here; an older declaration-only frozen score is covered by
+        # research_workflow/derived_inputs.py's provenance gate instead.
+        if di.get("kind") != "frozen_external_model_score" or not di.get("model_artifact_path"):
+            continue
+        scorer_bound = False
+        try:
+            from research.schemas.study_spec import DerivedCausalInputSpec
+            from research_workflow.external_model_scoring import FrozenExternalModelScorer
+            spec_di = DerivedCausalInputSpec.model_validate(di)
+            parent_dir = study_dir.parents[0] / spec_di.parent_study_id
+            FrozenExternalModelScorer.bind(spec_di, parent_dir=parent_dir)
+            scorer_bound = True
+        except Exception as e:
+            missing.append({
+                "primitive": f"derived_input:{di.get('name')}",
+                "declared": di.get("kind"),
+                "required_binding": "research_workflow.external_model_scoring.FrozenExternalModelScorer",
+                "collector": caps["strategy_class"],
+                "reason": f"{type(e).__name__}: {e}",
+            })
+
+    # --- (5) output-row persistence path (Stage 3) -----------------------------
+    # An episode study's governed row carries episode identity + the derived score
+    # column; both must be declared so OutputManager admits them.
+    output_row_ok = None
+    if episode and scope != "features_only":
+        meta_cols = set((features.get("metadata_columns") or []))
+        required_meta = {"observation_ts", "regime_start_ns", "checkpoint_index",
+                         "episode_id", "arm_ts", "candidate_ts"}
+        missing_meta = sorted(required_meta - meta_cols)
+        derived_names = {di.get("name") for di in derived if di.get("name")}
+        output_row_ok = not missing_meta and bool(derived_names)
+        if not output_row_ok:
+            missing.append({
+                "primitive": "output_row_persistence",
+                "declared": f"metadata_columns={sorted(meta_cols)}",
+                "required_binding": "research_workflow.output_manager.OutputManager",
+                "collector": caps["strategy_class"],
+                "reason": (f"episode candidate row is not fully declared: "
+                           f"missing metadata {missing_meta or 'none'}; "
+                           f"derived score column declared={bool(derived_names)}"),
+            })
+
     return {
         "passed": not missing,
         "missing": missing,
@@ -177,5 +283,7 @@ def verify_runtime_contract(study_dir: str | Path) -> Dict[str, Any]:
                  "bound": sum(1 for m in provider_host_meta if m["bound"])}
                 if provider_host_meta is not None else None
             ),
+            "derived_scorer_bound": scorer_bound,
+            "output_row_persistence_declared": output_row_ok,
         },
     }

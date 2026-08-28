@@ -1,37 +1,17 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "20260827T150131Z_c54cc47f1707",
-  "generated_at_utc": "2026-08-27T15:01:31.281951+00:00",
-  "code_hash": "c54cc47f1707f0c665c142dcc007b6680e32053ab69d0dff144b6c1a78294220",
-  "superseded": true,
-  "failed_gate": "ARTIFACT_SCHEMA",
+  "preflight_run_id": "20260828T042256Z_68f13294e5ee",
+  "generated_at_utc": "2026-08-28T04:22:56.593113+00:00",
+  "code_hash": "68f13294e5eeb12bf072ed9984088cfa7526b210ba6f695bb6f481377c7f168e",
+  "superseded": false,
+  "failed_gate": "RUNTIME_CONTRACT_BINDING",
   "failure_ids": [
-    "SEAL_SCHEMA",
-    "INCOMPLETE_TERMINAL_EVIDENCE",
-    "SEAL_NO_EVIDENCE"
+    "RUNTIME_CONTRACT_BINDING_MISSING"
   ],
   "failure_details": [
     {
-      "severity": "CRITICAL",
-      "code": "SEAL_SCHEMA",
-      "artifact": "studies\\deep_pullback_5s_reacceleration_model\\audit\\candidate_promotion_check.json",
-      "message": "Missing 'seal_id'"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "INCOMPLETE_TERMINAL_EVIDENCE",
-      "artifact": "studies\\deep_pullback_5s_reacceleration_model\\audit\\candidate_promotion_check.json",
-      "message": "Terminal promotion manifest missing required fields: ['model_sha256', 'feature_list_sha256', 'code_sha256', 'spec_sha256', 'validation_report_sha256', 'audit_status_sha256', 'preflight_sha256', 'test_evidence_sha256', 'promotion_timestamp']"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "SEAL_NO_EVIDENCE",
-      "artifact": "studies\\deep_pullback_5s_reacceleration_model\\audit\\candidate_promotion_check.json",
-      "message": "Seal manifest has no persisted evidence dictionary"
+      "message": "population_contract.episode_lifecycle: declared [arm -> required counter-event -> first flip-back emit; max_candidates_per_episode=1] has no runtime binding -> required research_workflow.episode_population.EpisodePopulationEngine (collector does not declare SUPPORTS_EPISODE_LIFECYCLE; it would emit on the checkpoint grid instead of one candidate per deep-pullback episode)"
     }
   ],
-  "recommended_smallest_investigation_scope": "Inspect findings in ARTIFACT_SCHEMA and fix locally before requesting audit.",
-  "superseded_by_preflight_run_id": "20260827T224743Z_b031a02c887c",
-  "superseded_at_utc": "2026-08-27T22:47:43.972568+00:00",
-  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+  "recommended_smallest_investigation_scope": "Inspect findings in RUNTIME_CONTRACT_BINDING and fix locally before requesting audit."
 }

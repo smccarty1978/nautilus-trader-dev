@@ -578,7 +578,10 @@ def run_preflight(
         _begin("RUNTIME_CONTRACT_BINDING")
         try:
             from research_workflow.runtime_bindings import verify_runtime_contract
-            _rt = verify_runtime_contract(study_dir)
+            # The feature-candidate preflight validates the feature bundle, not the
+            # collector's population runtime (that is gated on the active seal).
+            _rt_scope = "features_only" if feature_authority == "candidate" else "all"
+            _rt = verify_runtime_contract(study_dir, scope=_rt_scope)
             if not _rt["passed"]:
                 failed_gate = "RUNTIME_CONTRACT_BINDING"
                 _mark("RUNTIME_CONTRACT_BINDING", "FAILED")

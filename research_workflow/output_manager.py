@@ -451,7 +451,13 @@ class OutputManager:
             self.study_data.spec.features, authority=self.feature_authority,
         )
 
-        allowed_columns = set(expected_feats) | metadata_contract | set(collection_universe)
+        # Declared derived causal inputs (e.g. a frozen external model score) are bound to
+        # their own column and are neither a market FeatureInstance nor metadata.
+        derived_cols = {
+            di.name for di in (self.study_data.spec.features.derived_inputs or [])
+            if getattr(di, "name", None)
+        }
+        allowed_columns = set(expected_feats) | metadata_contract | set(collection_universe) | derived_cols
 
         # Check for duplicate column names. D1: this already ran unconditionally regardless
         # of row count -- a duplicate column name is a schema defect, not a data defect --

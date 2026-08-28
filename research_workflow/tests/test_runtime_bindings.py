@@ -16,27 +16,51 @@ from research_workflow.runtime_bindings import (
 )
 
 
-def test_generic_collector_does_not_support_episode_lifecycle():
+def test_generic_collector_now_dispatches_the_population_runtime():
     caps = collector_runtime_capabilities("research_workflow.generic_collector.GenericStudyCollector")
-    assert caps["supports_episode_lifecycle"] is False
+    # Stage 2: the flag AND a real dispatch path are both required.
+    assert caps["declares_episode_lifecycle"] is True
+    assert caps["dispatches_population_runtime"] is True
+    assert caps["supports_episode_lifecycle"] is True
 
 
-def test_episode_lifecycle_without_collector_support_is_missing_binding(tmp_path):
+class _StubCollectorNoDispatch:
+    """A collector that declares the flag but never drives the population runtime."""
+    SUPPORTS_EPISODE_LIFECYCLE = True
+
+
+def test_declaration_alone_does_not_satisfy_the_episode_gate(tmp_path, monkeypatch):
+    import research_workflow.runtime_bindings as rb
+    monkeypatch.setattr(rb, "_load_collector_class", lambda _sc: _StubCollectorNoDispatch)
     study = tmp_path / "s"
     study.mkdir()
     (study / "compiled_study.json").write_text(json.dumps({
-        "spec": {"execution": {}},
+        "spec": {"execution": {"strategy_class": "x.Stub"}},
         "contracts": {
-            "population_contract": {"episode_lifecycle": {"max_candidates_per_episode": 1}},
+            "population_contract": {"episode_lifecycle": {
+                "arm_condition": {"kind": "directional_adverse_excursion", "threshold_atr": 1.0,
+                                  "price_source": "completed_1s_intrabar"},
+                "required_event": {"kind": "direction_relation", "source": "completed_5s_regime",
+                                   "bar_state": "completed",
+                                   "availability_timestamp": "completed_source_bar_ts_init",
+                                   "relation": "opposite_prevailing", "active_at_arm_counts": True},
+                "emit_condition": {"kind": "direction_transition", "source": "completed_5s_regime",
+                                   "bar_state": "completed",
+                                   "availability_timestamp": "completed_source_bar_ts_init",
+                                   "from_relation": "opposite_prevailing",
+                                   "to_relation": "aligned_prevailing", "strictly_after_arm": True},
+                "rearm_on": ["new_favorable_extreme"], "terminate_on": ["prevailing_regime_flip"],
+                "max_candidates_per_episode": 1,
+            }},
             "feature_contract": {"resolved_feature_instances": []},
         },
     }))
     result = verify_runtime_contract(study)
     assert result["passed"] is False
-    assert {m["primitive"] for m in result["missing"]} == {"population_contract.episode_lifecycle"}
-    assert result["missing"][0]["required_binding"] == (
-        "research_workflow.episode_population.EpisodePopulationEngine"
-    )
+    prims = {m["primitive"] for m in result["missing"]}
+    assert "population_contract.episode_lifecycle" in prims
+    episode_miss = next(m for m in result["missing"] if m["primitive"] == "population_contract.episode_lifecycle")
+    assert "does not dispatch" in episode_miss["reason"]
 
 
 def test_non_episode_population_passes(tmp_path):
@@ -49,14 +73,15 @@ def test_non_episode_population_passes(tmp_path):
     assert verify_runtime_contract(study)["passed"] is True
 
 
-def test_real_deep_pullback_study_is_blocked_on_episode_binding():
+def test_real_deep_pullback_study_episode_binding_is_satisfied():
     study = Path(__file__).resolve().parents[2] / "studies" / "deep_pullback_5s_reacceleration_model"
     if not (study / "compiled_study.json").is_file():
         pytest.skip("deep_pullback study is not scaffolded in this tree")
     result = verify_runtime_contract(study)
-    assert result["passed"] is False
     assert result["checked"]["episode_lifecycle_declared"] is True
-    assert "population_contract.episode_lifecycle" in {m["primitive"] for m in result["missing"]}
+    # Stage 2: the episode primitive is now bound; no episode_lifecycle miss remains.
+    assert "population_contract.episode_lifecycle" not in {m["primitive"] for m in result["missing"]}
+    assert result["checked"]["provider_host_bindings"] == {"required": 34, "bound": 34}
 
 
 def test_existing_non_episode_studies_are_not_regressed():

@@ -1306,7 +1306,7 @@
   },
   "derived_causal_inputs": [
     {
-      "name": "frozen_model_c_score",
+      "name": "model_c_score_at_candidate",
       "kind": "frozen_external_model_score",
       "parent_study_id": "clean_maturity_flip_model_rolling_productivity",
       "parent_train_freeze_artifact": "artifacts/train_experiment_freeze_repaired.json",

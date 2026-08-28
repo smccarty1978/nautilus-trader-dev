@@ -277,6 +277,21 @@ def build_collector_config_kwargs(
         cfg_kwargs["required_checkpoint_identities_path"] = (
             str(study_data.study_dir / rel) if rel else ""
         )
+    if hasattr(strategy_binding.config_cls, "episode_lifecycle"):
+        # Compiled population_contract.episode_lifecycle -> generic population runtime.
+        _pop = (study_data.contracts.get("population_contract", {}) or {})
+        _el = _pop.get("episode_lifecycle") or {}
+        if _el:
+            cfg_kwargs["episode_lifecycle"] = dict(_el)
+            # Stage 3: the ProviderHost feature contract + the frozen Model-C derived scorer.
+            _fc = study_data.contracts.get("feature_contract", {}) or {}
+            if _fc and hasattr(strategy_binding.config_cls, "feature_contract"):
+                cfg_kwargs["feature_contract"] = dict(_fc)
+            _di = (spec.features.derived_inputs if spec.features else None) or []
+            if _di and hasattr(strategy_binding.config_cls, "derived_inputs"):
+                cfg_kwargs["derived_inputs"] = tuple(
+                    d.model_dump(mode="json") if hasattr(d, "model_dump") else dict(d) for d in _di
+                )
     if hasattr(strategy_binding.config_cls, "feature_list"):
         cfg_kwargs["feature_list"] = spec.features.feature_list
     if hasattr(strategy_binding.config_cls, "feature_requirements"):

@@ -232,6 +232,14 @@ class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
     feature_authority: str = "active"
     session: str = "RTH"                     # resolved via utils.session_boundaries
     session_end_censoring: bool = True       # from target_contract.censoring_policy
+    # Compiled population_contract.episode_lifecycle (empty for non-episode studies).
+    # When populated, the collector runs the generic population runtime
+    # (research_workflow.population_runtime) instead of emitting on the checkpoint grid.
+    episode_lifecycle: dict = {}
+    # Compiled feature_contract (for the Stage-3 ProviderHost) and derived_causal_inputs
+    # (for the frozen Model-C scorer). Empty for non-episode / non-provider_host studies.
+    feature_contract: dict = {}
+    derived_inputs: tuple = ()
     # Partitioned collection may replay causal lookahead bars while retaining only
     # primary-interval candidates.  None preserves the ordinary study-wide surface.
     primary_start_ts: Optional[int] = None
@@ -242,11 +250,13 @@ class FlipPredictionCollector(Strategy):
     """Canonical event-driven collector strategy for flip prediction research."""
 
     # --- Honest runtime capability declaration (research_workflow.runtime_bindings) ---
-    # This collector emits on the causal-checkpoint grid. It does NOT run
-    # EpisodePopulationEngine for a population_contract.episode_lifecycle population,
-    # so preflight's RUNTIME_CONTRACT_BINDING gate fails closed for any study that
-    # declares one until a collector that genuinely executes it sets this True.
-    SUPPORTS_EPISODE_LIFECYCLE = False
+    # For a population_contract.episode_lifecycle study this collector runs the generic
+    # population runtime (research_workflow.population_runtime.resolve_population_runtime
+    # -> EpisodePopulationRuntime -> EpisodePopulationEngine) and does NOT emit any
+    # candidate from the checkpoint grid. runtime_bindings verifies the real dispatch
+    # path, not just this flag.
+    SUPPORTS_EPISODE_LIFECYCLE = True
+    EPISODE_POPULATION_RUNTIME = "research_workflow.population_runtime.resolve_population_runtime"
 
     def __init__(self, config: FlipPredictionCollectorConfig) -> None:
         super().__init__(config)
@@ -410,6 +420,54 @@ class FlipPredictionCollector(Strategy):
             self, self._study_feature_aliases
         )
 
+        # --- Generic population runtime dispatch (Stage 2) ------------------------
+        # The compiled population_contract decides WHEN a candidate exists. For an
+        # episode_lifecycle study that is EpisodePopulationEngine (via the generic
+        # dispatcher), and the checkpoint grid must NOT emit candidates. Non-episode
+        # studies keep the existing checkpoint-grid path unchanged.
+        from research_workflow.population_runtime import resolve_population_runtime
+        _episode_lc = dict(getattr(config, "episode_lifecycle", {}) or {})
+        _pop_contract = (
+            {"episode_lifecycle": _episode_lc} if _episode_lc
+            else {"population_type": "regime_state"}
+        )
+        self._population_runtime = resolve_population_runtime(_pop_contract)
+        self._episode_mode = not self._population_runtime.emits_from_checkpoint_grid()
+        self._episode_candidate_events: List[Any] = []
+        self._episode_candidates_this_regime = 0
+
+        # --- Stage 3: ProviderHost feature realization + frozen Model-C scorer -----
+        self._provider_host = None
+        self._model_c_scorer = None
+        self._model_c_surface: tuple[str, ...] = ()
+        self._regime_feed = None
+        if self._episode_mode:
+            from research_workflow.provider_host import ProviderHost
+            from research_workflow.completed_regime_state import CompletedRegimeStateFeed
+            fc = dict(getattr(config, "feature_contract", {}) or {})
+            if fc:
+                self._provider_host = ProviderHost.from_feature_contract(
+                    {"contracts": {"feature_contract": fc}},
+                    feature_authority=self._feature_authority,
+                )
+            self._regime_feed = CompletedRegimeStateFeed(["5s", "5m"])
+            di_list = list(getattr(config, "derived_inputs", ()) or [])
+            if di_list:
+                from research.schemas.study_spec import DerivedCausalInputSpec
+                from research_workflow.external_model_scoring import FrozenExternalModelScorer
+                di = DerivedCausalInputSpec.model_validate(di_list[0])
+                self._model_c_derived_name = di.name
+                self._model_c_surface = tuple(
+                    (di.ordered_feature_surfaces or {}).get("LONG_C", [])
+                )
+                # phase0 manifest: <repo>/studies/<study>/artifacts/phase0_source_manifest.json
+                parent_dir = Path(config.phase0_manifest_path).resolve().parents[2] / di.parent_study_id
+                self._model_c_scorer = FrozenExternalModelScorer.bind(di, parent_dir=parent_dir)
+
+    def get_episode_candidate_events(self) -> List[Any]:
+        """Population-runtime candidate events (Stage 2/3 internal record)."""
+        return list(self._episode_candidate_events)
+
     def _append_candidate(self, record: Dict[str, Any]) -> None:
         """Emit only the study-declared surface plus canonical key/metadata fields."""
         if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
@@ -421,6 +479,11 @@ class FlipPredictionCollector(Strategy):
         keep = {"observation_ts", "regime_start_ns", "checkpoint_index", "triggering_1s_ts_init"}
         keep.update(self._metadata_columns)
         keep.update(aliases)
+        # Stage 3: the frozen derived-input score column (declared in features.derived_inputs).
+        for _di in (getattr(self.cfg, "derived_inputs", ()) or ()):
+            _n = _di.get("name") if isinstance(_di, dict) else getattr(_di, "name", None)
+            if _n:
+                keep.add(_n)
         self.candidates_log.append({key: value for key, value in record.items() if key in keep})
 
     def on_start(self) -> None:
@@ -502,6 +565,10 @@ class FlipPredictionCollector(Strategy):
                     self.ohlcv_tracker.accumulate_regime(buf_ts, buf_h, buf_l, buf_v, buf_d)
                 self.ohlcv_tracker.accumulate_rth(buf_v, buf_d)
 
+        # Stage 3: completed 1m bar -> ProviderHost (ema-slope series, structural geometry).
+        if getattr(self, "_episode_mode", False):
+            self._episode_dispatch_1m(ts_avail, o, h, l, c, new_regime, atr_val)
+
         # 4. Handle regime transition (flips)
         if new_regime != old_regime and new_regime != 0:
             self._on_regime_flip(
@@ -520,6 +587,11 @@ class FlipPredictionCollector(Strategy):
                 atr_start=atr_val,
                 prior_end_close=self.last_close or c,
             )
+            if getattr(self, "_episode_mode", False):
+                self._episode_regime_transition(
+                    new_regime, ts_avail, o, atr_val, self.last_close or c,
+                )
+                self._episode_candidates_this_regime = 0
             self.bars_in_regime = 0
             self.bars_since_breach_1m = []
             self.breach_price = None
@@ -721,6 +793,13 @@ class FlipPredictionCollector(Strategy):
         self.mfe_progress_count = 0
         self.next_checkpoint_index = 0
 
+        # Stage 2: a true prevailing-1m regime boundary is the ONLY thing that starts a
+        # new episode (the engine TERMINATEs the old one on the next snapshot).
+        if getattr(self, "_episode_mode", False):
+            self._population_runtime.on_prevailing_regime(
+                direction=new_regime, start_ns=flip_ts, start_price=open_price,
+            )
+
     def _handle_1s_bar(self, bar: Bar) -> None:
         ts_event = int(bar.ts_event)
         ts_avail = int(bar.ts_init)
@@ -765,6 +844,12 @@ class FlipPredictionCollector(Strategy):
             self.structural_geometry_tracker.on_1s(ts_avail, h, l, c)
             self.rolling_productivity_tracker.on_completed_1s(ts_avail, h, l, c)
 
+        # Stage 2/3: episode_lifecycle studies determine candidate existence through the
+        # generic population runtime, driven by completed 1s + completed 5s regime state,
+        # and (Stage 3) realize the full governed candidate row via ProviderHost + scorer.
+        if getattr(self, "_episode_mode", False):
+            self._episode_dispatch_1s(ts_event, ts_avail, o, h, l, c, v)
+
         if self.active_regime_dir != 0:
             self.highest_high_since_flip = max(self.highest_high_since_flip, h)
             self.lowest_low_since_flip = min(self.lowest_low_since_flip, l)
@@ -776,7 +861,9 @@ class FlipPredictionCollector(Strategy):
                 self.mfe_progress_last_extreme_ts = ts_event
                 self.mfe_progress_previous_extreme = current_mfe
 
-            while self.regime_start_ns > 0:
+            # Episode-lifecycle studies must NOT emit population rows from the checkpoint
+            # grid -- the population runtime above owns candidate existence.
+            while self.regime_start_ns > 0 and not getattr(self, "_episode_mode", False):
                 T = self.regime_start_ns + (
                     self.next_checkpoint_index + 1
                 ) * int(self.cfg.checkpoint_interval_seconds) * NS
@@ -802,6 +889,140 @@ class FlipPredictionCollector(Strategy):
 
         self.last_close = c
         self.last_ts_seen = ts_avail
+
+    # --- Stage 3: episode-lifecycle runtime integration --------------------------
+    def _episode_dispatch_1s(self, ts_event, ts_init, o, h, l, c, v) -> None:
+        """One completed 1s bar: drive the shared 5s/5m feed, the ProviderHost, and the
+        population runtime; realize any emitted candidate into a full governed row."""
+        from research_workflow.provider_host import (
+            STREAM_COMPLETED_1S, STREAM_COMPLETED_5S, STREAM_COMPLETED_5M,
+        )
+        transitions_5s: list = []
+        transitions_5m: list = []
+        if self._regime_feed is not None:
+            for tr in self._regime_feed.on_completed_1s_bar(
+                ts_event=int(ts_event), ts_init=int(ts_init),
+                open=float(o), high=float(h), low=float(l), close=float(c), volume=float(v),
+            ):
+                (transitions_5s if tr.timeframe == "5s" else transitions_5m).append(tr)
+
+        if self._provider_host is not None:
+            self._provider_host.dispatch(STREAM_COMPLETED_1S, {
+                "ts_init": int(ts_init), "open": float(o), "high": float(h),
+                "low": float(l), "close": float(c), "volume": float(v),
+            })
+            for tr in transitions_5s:
+                if self._bucket_ready(tr):
+                    self._provider_host.dispatch(STREAM_COMPLETED_5S, self._bucket_event(tr, ts_init))
+            for tr in transitions_5m:
+                if self._bucket_ready(tr):
+                    self._provider_host.dispatch(STREAM_COMPLETED_5M, self._bucket_event(tr, ts_init))
+
+        cur5s = self._regime_feed.state("5s", decision_ts=int(ts_init)) if self._regime_feed is not None else None
+        new_events = self._population_runtime.on_completed_1s(
+            ts_event=int(ts_event), ts_init=int(ts_init), open=float(o), high=float(h),
+            low=float(l), close=float(c), volume=float(v),
+            completed_1m_atr=self.regime_engine.atr,
+            completed_5s_state=(int(cur5s.regime) if cur5s is not None else None),
+            completed_5s_transitions=tuple(transitions_5s),
+        )
+        for ev in new_events:
+            self._episode_candidate_events.append(ev)
+            row = self._build_episode_candidate_row(ev, price_at_T=float(c), ts_avail=int(ts_init))
+            self._append_candidate(row)
+            self._track_pending(row, int(ev.candidate_ts))
+            self._episode_candidates_this_regime += 1
+
+    @staticmethod
+    def _bucket_ready(tr) -> bool:
+        """A completed regime bucket is usable only once its own timeframe ATR has warmed
+        (nan/None/<=0 during warmup) and a directional regime is established."""
+        s = tr.current
+        if s is None or int(s.regime) not in (-1, 1):
+            return False
+        a = s.atr
+        return a is not None and np.isfinite(a) and float(a) > 0.0
+
+    @staticmethod
+    def _bucket_event(tr, available_ts: int) -> Dict[str, Any]:
+        s = tr.current
+        return {
+            "close_ts": int(s.close_ts), "available_ts": int(available_ts),
+            "direction": int(s.regime), "open": float(s.open), "high": float(s.high),
+            "low": float(s.low), "close": float(s.close), "atr": float(s.atr),
+        }
+
+    def _episode_dispatch_1m(self, ts_init, o, h, l, c, new_regime, atr_val) -> None:
+        """Completed 1m bar -> ProviderHost. ContextAdapter needs EVERY completed 1m
+        (EMA-slope series); the regime-geometry adapter self-skips warmup/neutral bars."""
+        if self._provider_host is None:
+            return
+        from research_workflow.provider_host import STREAM_COMPLETED_1M
+        self._provider_host.dispatch(STREAM_COMPLETED_1M, {
+            "ts_init": int(ts_init), "close_ts": int(ts_init), "direction": int(new_regime or 0),
+            "open": float(o), "high": float(h), "low": float(l), "close": float(c),
+            "volume": 0.0, "atr": float(atr_val),
+        })
+
+    def _episode_regime_transition(self, direction, start_ns, start_price, atr_start, prior_end_close) -> None:
+        # Structural geometry has no causal meaning before the 1m Wilder ATR warms up.
+        if self._provider_host is None or not (float(atr_start) > 0.0):
+            return
+        from research_workflow.provider_host import EVENT_REGIME_TRANSITION_1M
+        self._provider_host.dispatch(EVENT_REGIME_TRANSITION_1M, {
+            "direction": int(direction), "start_ns": int(start_ns),
+            "start_price": float(start_price), "atr_start": float(atr_start),
+            "prior_end_close": float(prior_end_close),
+        })
+
+    def _build_episode_candidate_row(self, ev, *, price_at_T: float, ts_avail: int) -> Dict[str, Any]:
+        atr_t = float(self.regime_engine.atr or 0.0)
+        geom = self._population_runtime.episode_geometry_snapshot(
+            candidate_ts=int(ev.candidate_ts), candidate_price=float(price_at_T),
+            candidate_atr=atr_t if atr_t > 0 else 1e-9,
+        )
+        episode_state = {
+            "prevailing_direction": int(ev.prevailing_direction),
+            "episode_geometry": geom,
+            "prior_deep_pullback_count": int(ev.prior_deep_pullback_count),
+            "counter_regime_direction": int(ev.counter_regime_direction),
+            "counter_regime_close_ts": int(ev.counter_regime_close_ts),
+            "regime_expansion_atr_per_min": None,
+        }
+        feats: Dict[str, Any] = {}
+        if self._provider_host is not None:
+            feats = dict(self._provider_host.snapshot(
+                decision_ts=int(ev.candidate_ts), price=float(price_at_T),
+                atr=atr_t if atr_t > 0 else 1e-9, episode_state=episode_state,
+            ))
+        row: Dict[str, Any] = {
+            "observation_ts": int(ev.candidate_ts),
+            "regime_start_ns": int(ev.prevailing_regime_start_ns),
+            "regime_direction": int(ev.prevailing_direction),
+            "checkpoint_index": int(ev.arming_cycle_index),
+            "prevailing_regime_start_ns": int(ev.prevailing_regime_start_ns),
+            "episode_id": str(ev.episode_id),
+            "arm_ts": int(ev.arm_ts),
+            "candidate_ts": int(ev.candidate_ts),
+            "triggering_completed_5s_ts": int(ev.triggering_completed_5s_ts),
+            "pullback_start_ts": int(ev.pullback_start_ts),
+            "prevailing_direction": int(ev.prevailing_direction),
+            "counter_regime_close_ts": int(ev.counter_regime_close_ts),
+            "frozen_atr_arm": float(ev.frozen_atr_arm),
+            "atr_t": atr_t,
+            "triggering_1s_ts_init": int(ts_avail),
+            **feats,
+        }
+        if self._model_c_scorer is not None and self._model_c_surface:
+            avail = {name: int(ev.candidate_ts) for name in self._model_c_surface}
+            obs = self._model_c_scorer.score(
+                {name: feats.get(name) for name in self._model_c_surface},
+                checkpoint_ts=int(ev.candidate_ts),
+                direction="LONG" if ev.prevailing_direction == 1 else "SHORT",
+                availability_ts=avail,
+            )
+            row[getattr(self, "_model_c_derived_name", "model_c_score_at_candidate")] = float(obs.score)
+        return row
 
     def _compute_running_mfe(self, direction: int) -> float:
         atr = self.regime_frozen_atr
