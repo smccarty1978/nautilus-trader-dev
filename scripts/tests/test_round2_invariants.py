@@ -54,6 +54,15 @@ from scripts.tests._study_copy import copy_study_as_fresh_identity
 
 STUDY_DIR = REPO_ROOT / "studies" / "Gemini_clean_maturity_flip_rolling_5m_productivity"
 
+# The tests that only need *some* real, currently-compilable study to exercise generic
+# gate mechanics (smoke acceptance, warmup domain locks) use this one. STUDY_DIR above is
+# a historical study whose feature declarations predate current registry contracts, so it
+# can no longer be recompiled against the framework and load_compiled_study() correctly
+# rejects its stale compiled_study.json. Tests that specifically exercise historical audit
+# evidence keep using STUDY_DIR; tests that just need a loadable spec use this sibling,
+# which is the maintained current member of the same study family.
+CURRENT_STUDY_DIR = REPO_ROOT / "studies" / "Codex_clean_maturity_flip_rolling_5m_productivity"
+
 
 
 def _plant_compliant_audit_reports(tmp_study, pass_num=10):
@@ -177,7 +186,7 @@ def test_seal_fails_closed_on_authority_and_governance_tampering(target_rel, tmp
 def test_full_stage_rejects_missing_smoke_acceptance(tmp_path):
     """Verifies that collect mode rejects stage=FULL when smoke_acceptance.json is missing."""
     tmp_study = tmp_path / "study"
-    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(CURRENT_STUDY_DIR, tmp_study)
 
     sacc_file = tmp_study / "artifacts" / "smoke_acceptance.json"
     if sacc_file.exists():
@@ -197,7 +206,7 @@ def test_full_stage_rejects_missing_smoke_acceptance(tmp_path):
 def test_full_stage_rejects_stale_smoke_acceptance(tmp_path):
     """Verifies that collect mode rejects stage=FULL when smoke_acceptance.json has a mismatched seal hash."""
     tmp_study = tmp_path / "study"
-    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(CURRENT_STUDY_DIR, tmp_study)
 
     sacc_file = tmp_study / "artifacts" / "smoke_acceptance.json"
     sacc_file.parent.mkdir(parents=True, exist_ok=True)
@@ -225,7 +234,7 @@ def test_full_stage_accepts_valid_smoke_acceptance(tmp_path, monkeypatch):
     passing all 11 smoke gates and reaching the post-gate execution logic without NameError.
     """
     tmp_study = tmp_path / "study"
-    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(CURRENT_STUDY_DIR, tmp_study)
 
     _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
@@ -295,7 +304,7 @@ def test_gate_rejects_contradictory_acceptance(tmp_path):
     future_source_violations_count == 0 but exact_timestamp_equality_verified is False.
     """
     tmp_study = tmp_path / "study"
-    copy_study_as_fresh_identity(STUDY_DIR, tmp_study)
+    copy_study_as_fresh_identity(CURRENT_STUDY_DIR, tmp_study)
 
     _plant_compliant_audit_reports(tmp_study)
     issue_causal_audit_status_from_report(tmp_study, pass_num=10, repo_root=REPO_ROOT)
@@ -352,7 +361,7 @@ def test_warmup_cannot_enter_locked_dev_year():
     Warmup of 5 days (starting 2024-12-27) enters locked DEV partition.
     Must raise UnauthorizedExecutionDomainError unless authorized OOS token exists.
     """
-    cdata = load_compiled_study(STUDY_DIR)
+    cdata = load_compiled_study(CURRENT_STUDY_DIR)
 
     synthetic_spec = cdata.spec.model_copy(deep=True)
     synthetic_spec.chronology.train = [2025]
@@ -361,7 +370,7 @@ def test_warmup_cannot_enter_locked_dev_year():
 
     synth_cdata = CompiledStudyData(
         study_id=cdata.study_id,
-        study_dir=STUDY_DIR,
+        study_dir=CURRENT_STUDY_DIR,
         study_type=cdata.study_type,
         spec=synthetic_spec,
         spec_sha256=cdata.spec_sha256,
@@ -369,8 +378,14 @@ def test_warmup_cannot_enter_locked_dev_year():
         raw_compiled_json=cdata.raw_compiled_json,
     )
 
+    # CURRENT_STUDY_DIR declares execution.data_requirements.authorized_dates, so the
+    # requested main window would otherwise be refused by the exact-date gate before the
+    # warmup-domain gate is reached. Authorizing exactly the main window isolates the gate
+    # under test: the warmup (2024-12-27..) still enters locked DEV year 2024.
+    main_window = ["2025-01-0" + str(d) for d in range(1, 10)] + ["2025-01-10"]
     with pytest.raises(UnauthorizedExecutionDomainError) as excinfo:
-        resolve_data_plan(synth_cdata, start_date="2025-01-01", end_date="2025-01-10", warmup_days=5, repo_root=REPO_ROOT)
+        resolve_data_plan(synth_cdata, start_date="2025-01-01", end_date="2025-01-10", warmup_days=5,
+                          repo_root=REPO_ROOT, authorized_dates_override=main_window)
     assert "UNAUTHORIZED_WARMUP_DOMAIN" in str(excinfo.value)
 
 
