@@ -249,6 +249,34 @@ run happens before preflight is `CLEAR` and both reviews have issued a status.
 3. **Targeted tests beat global CI.** `research_workflow/test_selection.py` picks the tests a
    change requires. Running the whole suite repeatedly is latency, not diligence.
 
+### Terminal closure — `STUDY_CLOSED`
+
+A study is closed by writing a valid `artifacts/study_closure.json`:
+
+```json
+{ "schema_version": 1, "study_id": "<dir name>", "status": "CLOSED",
+  "outcome": "DIAGNOSTIC_NEGATIVE", "terminal_decision": "P5_NO_MEANINGFUL_SIGNAL" }
+```
+
+`research_workflow/study_closure.py` validates it (schema, `status == "CLOSED"`,
+`study_id` matches the directory, non-empty `outcome`/`terminal_decision`, and — when
+`research_decision.yaml` declares `terminal_decisions` — the decision must be one of them,
+as a key, a value, or the `KEY_VALUE` concatenation).
+
+`WorkflowEngine.advance()` recognizes it **first**, before any deterministic leaf and before
+stages 9/10/14/15 (TRAIN authorization, TRAIN execution, OOS open, OOS). It returns
+`terminal_state = STUDY_CLOSED`, `next_deterministic_action = null`, and surfaces the closure
+`study_id / status / outcome / terminal_decision` and the artifact's `canonical_file_sha256`
+without reinterpretation. It rewrites nothing but `workflow_state.json` — no seal, no
+authorization metadata, no prior artifact is touched, and authorization is not evaluated (so
+`experiment_authorization.json` is not regenerated). A **present but invalid** closure
+artifact yields `terminal_state = STUDY_CLOSURE_INVALID` with the reason — it never silently
+falls back to offering TRAIN/OOS.
+
+Closure is not reopened by deleting or renaming the artifact. There is no governed
+reopen/revision mechanism yet; a closed study stays closed. The per-study terminal record
+lives in `studies/<id>/CLOSURE.md` (see `docs/DOCUMENT_MAP.md`).
+
 ### TRAIN / OOS discipline
 
 `research_workflow/experiment.py` is the whole authority.

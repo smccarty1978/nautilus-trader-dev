@@ -108,6 +108,11 @@ class WorkflowEngine:
         if self._audit_current(self.study/"audit/contract_status.json"): gates.append("CONTRACT_AUDIT")
         return gates
     def _authorization(self) -> str:
+        # A study with a closure artifact (valid or malformed) is not an authorization
+        # context; do not touch experiment_authorization.json (load_authorization would
+        # regenerate it from study.yaml).
+        if (self.study / "artifacts" / "study_closure.json").is_file():
+            return "STUDY_CLOSED"
         try:
             from research_workflow.experiment import load_authorization
             artifact = self.study / "artifacts" / "experiment_authorization.json"
@@ -193,7 +198,45 @@ class WorkflowEngine:
     def _implementation_contract(self, result: dict[str, Any]) -> None:
         p = self.study / "artifacts" / "implementation_contract.json"; p.parent.mkdir(exist_ok=True)
         p.write_text(json.dumps({"capability_identity": result.get("error", "unresolved_capability"), "semantic_contract": result.get("detail"), "provider_or_collector_class_expected": result.get("expected_class"), "parameters": result.get("parameters", {}), "availability_reset_null_semantics": result.get("semantics", {}), "required_tests": result.get("required_tests", []), "affected_generic_interface": result.get("interface"), "expected_resume_point": "CAPABILITIES_RECONCILED"}, indent=2) + "\n", encoding="utf-8")
+    def _closed_state(self, closure: dict[str, Any]) -> dict[str, Any]:
+        """Terminal STUDY_CLOSED state. Reads only; rewrites nothing but workflow_state.json.
+
+        Authorization is deliberately not evaluated here (that path can regenerate
+        experiment_authorization.json), and no TRAIN/OOS actionable next_action is offered.
+        """
+        from research_workflow.study_closure import closure_summary
+
+        files = self._fingerprints()
+        state = {
+            "study_id": self.study.name, "current_stage": "STUDY_CLOSED", "terminal_state": "STUDY_CLOSED",
+            "terminal_reason": None, "next_deterministic_action": None,
+            "authorization_state": "STUDY_CLOSED", "blockers": [],
+            "actions_executed_this_run": [], "completed_gates": self._completed_gates(), "stale_gates": [],
+            "study_closure": closure_summary(self.study, closure),
+            "current_authority_hashes": files, "fingerprints": files,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        state["timestamps"] = {k: (self.study / p).stat().st_mtime if (self.study / p).exists() else None
+                               for k, p in {"prepared": "audit/frozen_execution_manifest.json",
+                                            "readiness": "audit/readiness.json", "preflight": "audit/preflight.json",
+                                            "causal": "audit/status.json", "contract": "audit/contract_status.json",
+                                            "seal": "artifacts/preexec_audit_seal.json",
+                                            "smoke": "artifacts/smoke_reconciled.json"}.items()}
+        (self.study / "workflow_state.json").write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return state
+
     def advance(self) -> dict[str, Any]:
+        # A closed study is terminal: recognized before any TRAIN/OOS authorization or
+        # execution branch, and before any deterministic leaf runs.
+        from research_workflow.study_closure import StudyClosureInvalid, load_study_closure
+
+        try:
+            closure = load_study_closure(self.study)
+        except StudyClosureInvalid as exc:
+            return self._state("STUDY_CLOSURE_INVALID", blockers=[{"detail": str(exc)}])
+        if closure is not None:
+            return self._closed_state(closure)
+
         # The loop is the central invariant: an authorized deterministic leaf is always run.
         previous = _read(self.study / "workflow_state.json")
         force = self._earliest_stale_stage(previous)
