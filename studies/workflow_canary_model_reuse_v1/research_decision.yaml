@@ -1,0 +1,13 @@
+research_question: >-
+  CANARY ONLY. Does Study A's preserved model resolve and reproduce identical
+  golden scores through the frozen-external-model binding path, by immutable
+  model_id, without reopening the closed source study?
+baseline_feature_selection: {mode: none}
+model_arms: {REUSE_ONLY: "references workflow_canary_ordered_barrier_v1's frozen model by model_id"}
+variable_being_tested: ["closed-study frozen-external-model reuse by immutable model_id"]
+chronology: {train: [2023], dev: [2024], prohibited: [2025, 2026]}
+primary_comparison: "reuse_parity_pass_vs_fail"
+terminal_question: "Is the closed-study model-reuse binding path sound?"
+terminal_decisions: {CLOSED_STUDY_MODEL_REUSE_PASS: REUSE_VERIFIED, CLOSED_STUDY_MODEL_REUSE_FAIL: REUSE_BLOCKER}
+scientific_status: VALID_DIAGNOSTIC
+disposable: true

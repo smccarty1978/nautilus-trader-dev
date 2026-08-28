@@ -1,0 +1,138 @@
+study:
+  id: workflow_canary_ordered_barrier_v1
+  type: flip_prediction
+  risk_tier: 1
+  description: 'Disposable 30-minute workflow canary. Proves the repaired research
+    workflow executes the real normal path end-to-end (create -> compile -> readiness
+    -> preflight -> seal -> TRAIN authorize -> bounded real TRAIN collection -> governed
+    LightGBM fit -> model preservation -> TRAIN freeze -> study closure -> STUDY_CLOSED)
+    on a tiny TRAIN-only fixture, and that the compiled ordered_barrier target primitive
+    resolves to OrderedBarrierTargetRuntime with the collected target outputs coming
+    from that runtime. Canary mechanics only; not research.
+
+    '
+operation:
+  kind: train_evaluate
+  target_metric: roc_auc
+instrument:
+  symbol: NQ
+  venue: XCME
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+  qualification:
+    established: true
+    age_gate_seconds: 300
+target:
+  type: composite
+  direction: opposite
+  conditions:
+  - id: flip_within_60s
+    kind: flip
+    event: opposite_regime_flip
+    direction: opposite
+    horizon_seconds: 60
+  - id: ordered_barrier_canary
+    kind: ordered_barrier
+    forward_outcome_id: fo_canary_60s
+    barrier_id: barrier_canary
+  condition_logic: AND
+  required_forward_outcomes:
+  - id: fo_canary_60s
+    entry_reference: next_bar_open
+    horizon_seconds: 60
+    max_tracking_seconds: 60
+    excursion_units:
+    - atr
+    bar_inclusion: fully_forward
+    session_end_censoring: true
+    max_gap_seconds: 1
+    atr_source: latest_causally_completed_1m_wilder_atr_14_available_at_T
+    atr_frozen_at: decision_ts
+    ordered_barriers:
+    - id: barrier_canary
+      favorable_atr: 0.25
+      adverse_atr: 0.25
+      horizon_seconds: 60
+  decision_reference: decision_ts
+features:
+  source: canonical_verified_definition_universe
+  instances:
+  - feature: arrival_velocity
+    parameters:
+      input_timeframe: 1s
+      lookback: 20
+      bar_state: completed
+  - feature: arrival_acceleration
+    parameters:
+      input_timeframe: 1s
+      short_lookback: 20
+      bar_state: completed
+  - feature: ema_slope
+    parameters:
+      ema_role: short
+      lookback: 20
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  timing_contract: verified
+  metadata_columns:
+  - observation_ts
+  - regime_start_ns
+  - checkpoint_index
+model:
+  mode: training
+  family: lightgbm
+  arms:
+  - CANARY_SINGLE
+  params:
+    n_estimators: 20
+    max_depth: 3
+    learning_rate: 0.1
+    num_leaves: 7
+    min_child_samples: 5
+    random_state: 42
+    deterministic: true
+    n_jobs: 1
+chronology:
+  train:
+  - 2023
+  dev:
+  - 2024
+  prohibited:
+  - 2025
+  - 2026
+  warmup:
+    days_before_partition: 1
+    allowed: true
+    candidate_emission: false
+    target_generation: false
+    permitted_partition_relationship: pre_train_only
+stratification: {}
+baseline: {}
+lineage: {}
+execution:
+  runtime: nautilustrader
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
+  data_requirements:
+    dataset_id: NQ_v0_2020_2026
+  progress_seconds: 30
+  bounded: true
+acceptance:
+  criteria:
+    C1: compiled ordered_barrier target primitive resolves to OrderedBarrierTargetRuntime
+    C2: 'bounded independent target replay: zero disposition / binary-label / censoring
+      mismatches'
+    C3: tiny governed LightGBM fit persists an immutable hash-verified model plus
+      golden prediction fixture
+    C4: study reaches terminal STUDY_CLOSED with next_deterministic_action null and
+      the model still loadable
+bespoke: {}

@@ -421,6 +421,16 @@ class FlipPredictionCollector(Strategy):
         _ordered = ((config.target_contract or {}).get("required_forward_outcomes") or [])
         _barriers = [b for fo in _ordered for b in (fo.get("ordered_barriers") or [])]
         self._ordered_barrier = dict(_barriers[0]) if _barriers else {}
+        # Entry-reference + gap policy are TARGET-contract concerns: the collector reads
+        # them off the compiled forward-outcome spec and hands them to the target runtime,
+        # which owns entry-reference resolution.  The population candidate builder never
+        # synthesizes a target-specific entry price.
+        self._ordered_barrier_entry_reference = (
+            _ordered[0].get("entry_reference", "next_bar_open") if _ordered else "next_bar_open"
+        )
+        self._ordered_barrier_max_gap_seconds = (
+            _ordered[0].get("max_gap_seconds") if _ordered else None
+        )
 
         # Telemetry & Output logs
         self.candidates_log: List[Dict[str, Any]] = []
@@ -631,6 +641,42 @@ class FlipPredictionCollector(Strategy):
         """
         if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
             return
+
+        if getattr(self, "_target_primitive", "flip_within_horizon") == "ordered_barrier":
+            if not self._ordered_barrier:
+                raise RuntimeError("TARGET_RUNTIME_MISMATCH: ordered_barrier has no compiled barrier")
+            # The population supplies candidate identity, T, and the causal candidate-time
+            # ATR.  The TARGET runtime owns entry-reference resolution -- the candidate
+            # builder must never synthesize a target-specific entry_price.
+            frozen_atr = self._frozen_target_atr_at_T(cand_record)
+            direction = int(cand_record.get("regime_direction", self.active_regime_dir))
+            candidate = {
+                "observation_ts": int(cand_record["observation_ts"]),
+                "regime_start_ns": cand_record["regime_start_ns"],
+                "regime_direction": direction,
+                "checkpoint_index": cand_record["checkpoint_index"],
+                "direction": direction,
+                "atr": frozen_atr,
+                "favorable_atr": float(self._ordered_barrier["favorable_atr"]),
+                "adverse_atr": float(self._ordered_barrier["adverse_atr"]),
+                # The ordered-barrier horizon is the compiled barrier's own
+                # horizon_seconds (target_contract.required_forward_outcomes[].
+                # ordered_barriers[].horizon_seconds), NOT cfg.horizon_seconds -- the
+                # latter falls back to 300 when the target declares no top-level
+                # horizon (build_collector_config_kwargs), which is wrong for a
+                # forward-outcome-scoped barrier.
+                "horizon_seconds": int(self._ordered_barrier.get("horizon_seconds")
+                                       or self.cfg.horizon_seconds),
+                "session_close_ts": (
+                    session_close_ns(T, self.cfg.session)
+                    if self.cfg.session_end_censoring else None
+                ),
+                "max_gap_seconds": getattr(self, "_ordered_barrier_max_gap_seconds", None),
+                "entry_reference": getattr(self, "_ordered_barrier_entry_reference", "next_bar_open"),
+            }
+            self.pending_candidates.append(self._target_runtime.open_pending(candidate))
+            return
+
         pending = {
             "observation_ts": cand_record["observation_ts"],
             "regime_start_ns": cand_record["regime_start_ns"],
@@ -642,23 +688,28 @@ class FlipPredictionCollector(Strategy):
                 if self.cfg.session_end_censoring else None
             ),
         }
-        if getattr(self, "_target_primitive", "flip_within_horizon") == "ordered_barrier":
-            if not self._ordered_barrier:
-                raise RuntimeError("TARGET_RUNTIME_MISMATCH: ordered_barrier has no compiled barrier")
-            entry_price = cand_record.get("entry_price")
-            frozen_atr = cand_record.get("target_frozen_atr", cand_record.get("atr_t"))
-            if entry_price is None or frozen_atr is None or float(frozen_atr) <= 0:
-                raise RuntimeError("TARGET_RUNTIME_REFERENCE_MISSING: ordered barrier requires decision entry price and positive frozen ATR")
-            pending.update({"entry_price": float(entry_price),
-                            "atr": float(frozen_atr),
-                            "direction": int(cand_record.get("regime_direction", self.active_regime_dir)),
-                            "favorable_atr": float(self._ordered_barrier["favorable_atr"]),
-                            "adverse_atr": float(self._ordered_barrier["adverse_atr"]), "events": []})
         self.pending_candidates.append(pending)
         horizon_end = T + int(self.cfg.horizon_seconds) * NS
         next_horizon = getattr(self, "_next_pending_horizon_ns", None)
         if next_horizon is None or horizon_end < next_horizon:
             self._next_pending_horizon_ns = horizon_end
+
+    @staticmethod
+    def _frozen_target_atr_at_T(cand_record: Dict[str, Any]) -> float:
+        """The causal candidate-time ATR the ordered barrier is frozen against.
+
+        Normalized so both population paths expose the same target-time state: the
+        checkpoint grid writes ``atr``; the episode row writes ``atr_t`` /
+        ``target_frozen_atr``.  Every source is ATR from completed bars at or before T.
+        """
+        for key in ("target_frozen_atr", "atr_t", "atr"):
+            value = cand_record.get(key)
+            if value is not None and float(value) > 0:
+                return float(value)
+        raise RuntimeError(
+            "TARGET_FROZEN_ATR_MISSING: no positive candidate-time ATR "
+            "(target_frozen_atr / atr_t / atr) on the candidate record"
+        )
 
     def _emit_observation(
         self,
@@ -705,39 +756,56 @@ class FlipPredictionCollector(Strategy):
         })
 
     def _resolve_ordered_barriers(self, event: Optional[Dict[str, Any]], *, now_ts: int, final: bool = False) -> None:
-        """Dispatch completed 1s OHLC/gap events to OrderedBarrierTargetRuntime."""
+        """Stream completed 1s execution bars to OrderedBarrierTargetRuntime.
+
+        The runtime resolves the compiled ``entry_reference`` (``next_bar_open``) on the
+        first bar strictly after T and owns every barrier first-touch decision; the
+        collector only decides retention vs. run-end censoring.
+        """
+        _map = {"POSITIVE": DISPOSITION_POSITIVE, "NEGATIVE": DISPOSITION_NEGATIVE,
+                "CENSORED": DISPOSITION_CENSORED}
         remaining: List[Dict[str, Any]] = []
         for cand in self.pending_candidates:
             if event is not None:
-                cand["events"].append(event)
+                self._target_runtime.ingest_bar(cand, event)
+
+            # The entry reference has not been observed yet: keep waiting, unless the
+            # run is ending -- then the entry itself is unobservable -> DATA_END censor.
+            if not cand.get("entry_resolved"):
+                if final:
+                    self._emit_observation(cand, DISPOSITION_CENSORED, None,
+                                           censor_reason=CENSOR_DATA_END, censored_at_ts=now_ts)
+                else:
+                    remaining.append(cand)
+                continue
+
             if final and now_ts < cand["horizon_end_ts"]:
                 self._emit_observation(cand, DISPOSITION_CENSORED, None,
                                        censor_reason=CENSOR_DATA_END, censored_at_ts=now_ts)
                 continue
-            # The runtime owns barrier first-touch decisions.  A live favorable or
-            # adverse touch terminates immediately; only PENDING waits for horizon.
-            live = self._target_runtime.terminal(cand, cand["events"], final=False)
+
+            live = self._target_runtime.terminal(cand, final=False)
             if live.disposition != "PENDING":
-                collector_disposition = {"POSITIVE": DISPOSITION_POSITIVE, "NEGATIVE": DISPOSITION_NEGATIVE,
-                                         "CENSORED": DISPOSITION_CENSORED}[live.disposition]
-                self._emit_observation(cand, collector_disposition,
-                                       live.resolved_at_ts if collector_disposition == DISPOSITION_POSITIVE else None,
+                disp = _map[live.disposition]
+                self._emit_observation(cand, disp,
+                                       live.resolved_at_ts if disp == DISPOSITION_POSITIVE else None,
                                        censor_reason=live.censor_reason, censored_at_ts=live.resolved_at_ts)
                 continue
             # Inclusive horizon: retain through its exact completed timestamp.
             if not final and now_ts <= cand["horizon_end_ts"]:
                 remaining.append(cand)
                 continue
-            result = self._target_runtime.terminal(cand, cand["events"], final=True)
-            collector_disposition = {"POSITIVE": DISPOSITION_POSITIVE, "NEGATIVE": DISPOSITION_NEGATIVE,
-                                     "CENSORED": DISPOSITION_CENSORED}[result.disposition]
+            result = self._target_runtime.terminal(cand, final=True)
+            disp = _map[result.disposition]
             self._emit_observation(
-                cand, collector_disposition,
-                result.resolved_at_ts if collector_disposition == DISPOSITION_POSITIVE else None,
+                cand, disp,
+                result.resolved_at_ts if disp == DISPOSITION_POSITIVE else None,
                 censor_reason=result.censor_reason, censored_at_ts=result.resolved_at_ts,
             )
         self.pending_candidates = remaining
-        self._next_pending_horizon_ns = min((c["horizon_end_ts"] for c in remaining), default=None)
+        self._next_pending_horizon_ns = min(
+            (c["horizon_end_ts"] for c in remaining if c.get("entry_resolved")), default=None
+        )
 
     def _sweep_elapsed_horizons(self, now_ts: int, final: bool = False) -> None:
         """Resolves pending candidates whose horizon has fully elapsed with no flip.
@@ -959,7 +1027,8 @@ class FlipPredictionCollector(Strategy):
             max_gap = int(((self.cfg.target_contract or {}).get("required_forward_outcomes") or [{}])[0].get("max_gap_seconds", 0))
             gap = bool(previous is not None and max_gap and (ts_avail - previous) > max_gap * NS)
             self._resolve_ordered_barriers(
-                {"ts": int(ts_avail), "high": h, "low": l, "gap": gap}, now_ts=int(ts_avail),
+                {"ts": int(ts_avail), "open": o, "high": h, "low": l, "gap": gap},
+                now_ts=int(ts_avail),
             )
         # Resolve any candidate whose forward horizon has now fully elapsed. Ordered
         # after checkpoint evaluation so a candidate declared at T is never swept by the
@@ -1093,8 +1162,10 @@ class FlipPredictionCollector(Strategy):
             "prevailing_direction": int(ev.prevailing_direction),
             "counter_regime_close_ts": int(ev.counter_regime_close_ts),
             "frozen_atr_arm": float(ev.frozen_atr_arm),
+            # Candidate-time ATR is generic target-time state (same key both population
+            # paths); the TARGET runtime resolves the ordered-barrier entry_reference
+            # from the forward tape, so no entry_price is synthesized here.
             "atr_t": atr_t,
-            "entry_price": float(price_at_T),
             "target_frozen_atr": atr_t,
             "triggering_1s_ts_init": int(ts_avail),
             **feats,
@@ -1173,6 +1244,11 @@ class FlipPredictionCollector(Strategy):
         atr = self.regime_frozen_atr
         if atr <= 0:
             return
+        # Target-time ATR: the latest causally completed 1m Wilder ATR(14) available AT T
+        # (target_contract atr_source / atr_frozen_at: decision_ts).  Distinct from ``atr``
+        # (regime-start frozen ATR used for feature normalization) -- carried separately so
+        # the ordered-barrier half-width is frozen at T identically to the episode path.
+        target_atr_t = float(self.regime_engine.atr or 0.0)
 
         current_mfe = self._compute_running_mfe(direction)
         current_mae = self._compute_running_mae(direction)
@@ -1361,6 +1437,7 @@ class FlipPredictionCollector(Strategy):
                 "regime_age_seconds": regime_age_s,
                 "close": price_at_T,
                 "atr": atr,
+                "target_frozen_atr": target_atr_t,
                 "running_mfe_atr": current_mfe,
                 "running_mae_atr": current_mae,
                 "current_pnl_atr": current_pnl,
@@ -1463,6 +1540,7 @@ class FlipPredictionCollector(Strategy):
                 "regime_age_seconds": regime_age_s,
                 "close": price_at_T,
                 "atr": atr,
+                "target_frozen_atr": target_atr_t,
                 "running_mfe_atr": current_mfe,
                 "running_mae_atr": current_mae,
                 "current_pnl_atr": current_pnl,
@@ -1569,6 +1647,7 @@ class FlipPredictionCollector(Strategy):
             "regime_age_seconds": regime_age_s,
             "close": price_at_T,
             "atr": atr,
+            "target_frozen_atr": target_atr_t,
             "running_mfe_atr": current_mfe,
             "running_mae_atr": current_mae,
             "current_pnl_atr": current_pnl,

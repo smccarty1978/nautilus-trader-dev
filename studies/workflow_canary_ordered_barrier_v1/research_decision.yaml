@@ -1,0 +1,41 @@
+research_question: >-
+  CANARY ONLY (not research). Can the repaired research workflow execute the real normal
+  path end-to-end on a tiny TRAIN-only fixture, with the compiled ordered_barrier target
+  primitive resolving to OrderedBarrierTargetRuntime and the collected target outputs
+  coming from that runtime?
+
+baseline_feature_selection:
+  mode: none
+
+model_arms:
+  CANARY_SINGLE: "one tiny fixed LightGBM configuration, deterministic seed, no tuning, no model search"
+
+variable_being_tested:
+  - "end-to-end executability of the repaired workflow normal path (create -> compile -> readiness -> preflight -> seal -> authorize -> bounded TRAIN collect -> fit -> preserve -> TRAIN freeze -> closure -> STUDY_CLOSED)"
+  - "ordered_barrier compiled-primitive -> OrderedBarrierTargetRuntime binding and collected-target provenance"
+
+chronology:
+  train: [2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+
+primary_comparison: "canary_pass_vs_fail"
+
+terminal_question: "Is the repaired workflow ready to run the next real study?"
+
+prohibited_changes:
+  - expand_to_full_feature_registry
+  - introduce_unconstrained_search
+  - expansion_beyond_authorized_dates
+  - unauthorized_feature_discovery
+
+allowed_changes:
+  - run_targeted_synthetic_and_bounded_governed_validation
+  - fix_smallest_deterministic_workflow_defect_with_one_regression_test
+
+terminal_decisions:
+  WORKFLOW_CANARY_PASS: CANARY_COMPLETE
+  WORKFLOW_CANARY_FAIL: CANARY_BLOCKER_REPORTED
+
+scientific_status: VALID_DIAGNOSTIC
+disposable: true

@@ -1,0 +1,60 @@
+{
+  "study_name": "workflow_canary_ordered_barrier_v1",
+  "validator_version": 2,
+  "validator_file_sha256": "9bb845812566a30159f2e2f247871728ae8f9f6ead128804c9875ddfdb209531",
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\workflow_canary_ordered_barrier_v1\\runs\\20260828_212944_workflow_canary_ordered_barrier_v1_day",
+  "candidates_parquet_sha256": "890b266f690df6049f1b6dc232c73f25ad6f7b1d48129b5ec6a34869cd6008ca",
+  "sealed_composite_sha256": "f79ecff8a466e6ae3fce130f42d3f9ab355915ea032ec8b1a5adc57eece05408",
+  "execution_manifest_composite_sha256": "f79ecff8a466e6ae3fce130f42d3f9ab355915ea032ec8b1a5adc57eece05408",
+  "smoke_date": "2023-03-03",
+  "candidate_rows_total": 1984,
+  "candidates_count_total": 1984,
+  "candidates_count_target_day": 1984,
+  "duplicate_candidates_count": 0,
+  "causality_rows_examined": 1984,
+  "causality_coverage_pct": 100.0,
+  "future_source_violations_count": 0,
+  "exact_timestamp_equality_verified": true,
+  "feature_count": 5,
+  "feature_list_sha256": "29320bb57473a82562988542423341ce43e9f4ae2a93089cf52a3a284fd97394",
+  "feature_surface_validation": {
+    "passed": true,
+    "rows": 1984,
+    "declared_features": [],
+    "emitted_features": [],
+    "metadata_columns": [
+      "checkpoint_index",
+      "observation_ts",
+      "regime_start_ns",
+      "triggering_1s_ts_init"
+    ],
+    "collection_universe_columns": [
+      "arrival_acceleration",
+      "arrival_velocity",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr"
+    ],
+    "undeclared_columns": [],
+    "per_feature": {},
+    "findings": []
+  },
+  "candidate_disposition_reconciliation": {
+    "candidates": 1984,
+    "observations": 1984,
+    "passed": true,
+    "findings": [],
+    "undisposed_candidates": 0,
+    "orphaned_observations": 0,
+    "duplicate_observations": 0,
+    "disposition_counts": {
+      "LABELED_NEGATIVE": 841,
+      "LABELED_POSITIVE": 822,
+      "CENSORED": 321
+    }
+  },
+  "observations_count": 1984,
+  "deterministic_validation_verified": true,
+  "status": "ACCEPTED",
+  "validated_at": "2026-08-28T21:29:59.557723+00:00"
+}

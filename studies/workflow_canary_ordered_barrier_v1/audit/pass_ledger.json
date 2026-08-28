@@ -1,0 +1,65 @@
+{
+  "ledger_version": 1,
+  "entries": [
+    {
+      "audit_type": "causal",
+      "pass": 2,
+      "audited_execution_composite_sha256": "b24fc7a7989a043e843dc41e4c8530935ac56d6ac00678749809885c720e5316",
+      "audit_report_sha256": "693767f70548c1386b7649d69f07ef4a389fb31ff148b2fb2fefe8ec05a458a8",
+      "audit_report_path": "audit/pass_02.md",
+      "auditor": "lookahead-auditor",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-28T21:09:32.223840+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 2,
+      "audited_execution_composite_sha256": "b24fc7a7989a043e843dc41e4c8530935ac56d6ac00678749809885c720e5316",
+      "audit_report_sha256": "ba7eeb352b167bd96029e1690130839340c1f001ada4bfd6be0eb2ba86917ae7",
+      "audit_report_path": "audit/contract_pass_02.md",
+      "auditor": "contract-checker",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-28T21:09:38.074326+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 3,
+      "audited_execution_composite_sha256": "3af4f5e71cd9f8930fafc8b2c83a900fd0dd11ea35f73eb984a6fb3aca286336",
+      "audit_report_sha256": "002db8f4eca52aec9a48b1bf92fba9bdd3f14136df4bcdc83bdfa9012744fd32",
+      "audit_report_path": "audit/pass_03.md",
+      "auditor": "lookahead-auditor",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-28T21:20:19.338754+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 3,
+      "audited_execution_composite_sha256": "3af4f5e71cd9f8930fafc8b2c83a900fd0dd11ea35f73eb984a6fb3aca286336",
+      "audit_report_sha256": "5f98284cb65ef279967fb3086c186eba5cdc122bbe3f3dd987ac9a586c5f9938",
+      "audit_report_path": "audit/contract_pass_03.md",
+      "auditor": "contract-checker",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-28T21:20:25.132997+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 4,
+      "audited_execution_composite_sha256": "f79ecff8a466e6ae3fce130f42d3f9ab355915ea032ec8b1a5adc57eece05408",
+      "audit_report_sha256": "c4a341c13a5cdf35ecb93465430d413d788e486b0170baf0907525d167494274",
+      "audit_report_path": "audit/pass_04.md",
+      "auditor": "lookahead-auditor",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-28T21:29:16.092003+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 4,
+      "audited_execution_composite_sha256": "f79ecff8a466e6ae3fce130f42d3f9ab355915ea032ec8b1a5adc57eece05408",
+      "audit_report_sha256": "cd6271e5dd34d74e18b7c09764377cb4432664474f4ab58f1eddac34bbf6bfe0",
+      "audit_report_path": "audit/contract_pass_04.md",
+      "auditor": "contract-checker",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-08-28T21:29:21.939040+00:00"
+    }
+  ]
+}

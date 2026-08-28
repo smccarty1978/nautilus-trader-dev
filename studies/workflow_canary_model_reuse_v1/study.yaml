@@ -1,0 +1,55 @@
+study:
+  id: workflow_canary_model_reuse_v1
+  type: bespoke
+  risk_tier: 1
+  description: >
+    Disposable canary. Exercises only the closed-study frozen-external-model reuse path --
+    references workflow_canary_ordered_barrier_v1's preserved model by immutable model_id.
+    No market-data collection, no fit. CLOSED.
+
+operation:
+  kind: bespoke_operation
+
+instrument:
+  symbol: NQ
+  venue: XCME
+
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+
+target:
+  type: flip
+  direction: opposite
+  horizon_seconds: 60
+
+features:
+  source: canonical_verified_definition_universe
+  derived_inputs:
+    - name: canary_parent_score
+      kind: frozen_external_model_score
+      model_id: 88fbba9568763c4122f6a8b98f096222cb8b656b9238525b4542f90ae3d2a2ce
+      availability_reference: decision_ts
+      retrain_prohibited: true
+
+chronology:
+  train: [2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+
+execution:
+  runtime: nautilustrader
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
+  bounded: true
+
+bespoke:
+  reason: >
+    No study of its own -- a disposable verification that a CLOSED study's preserved model
+    resolves and reproduces identical golden scores through the frozen-external-model
+    binding path by immutable model_id, without reopening the source study's lifecycle.
+  unsupported_contract_element: standalone_frozen_model_reuse_verification
+  canonical_type_considered: flip_prediction
+  reusable_extension_considered: none
+  custom_scope:
+    - ../workflow_canary_ordered_barrier_v1/_work/canary_closure_and_reuse.py

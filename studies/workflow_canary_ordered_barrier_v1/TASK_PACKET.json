@@ -1,0 +1,511 @@
+{
+  "task_packet_version": "1.0",
+  "study_id": "workflow_canary_ordered_barrier_v1",
+  "study_type": "flip_prediction",
+  "spec_sha256": "5f875f5db704c58989f837cf1fda28d679c4d0e701001cd1b71ff0fe5f98f981",
+  "risk_tier": 1,
+  "runtime": "nautilustrader",
+  "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
+  "contracts": {
+    "population_contract": {
+      "instrument": {
+        "symbol": "NQ",
+        "venue": "XCME"
+      },
+      "population_type": "regime_state",
+      "prevailing_regime": "both",
+      "session": "RTH",
+      "qualification": {
+        "established": true,
+        "age_gate_seconds": 300
+      },
+      "causal_checkpoint": {
+        "checkpoint_frequency": "5s",
+        "checkpoint_grid_origin": "regime_start_ns",
+        "triggering_stream": "completed_1s_bar",
+        "observation_timing": "interval_close"
+      }
+    },
+    "target_contract": {
+      "primitive": "ordered_barrier",
+      "target_type": "composite",
+      "event": "regime_flip",
+      "direction": "opposite",
+      "horizon_seconds": 60,
+      "confirmation": {
+        "mode": "bar_close",
+        "confirmation_bars": 1
+      },
+      "censoring_policy": {
+        "session_end_censoring": true,
+        "max_horizon_seconds": 60
+      },
+      "decision_reference": "decision_ts",
+      "conditions": [
+        {
+          "id": "flip_within_60s",
+          "kind": "flip",
+          "event": "opposite_regime_flip",
+          "direction": "opposite",
+          "horizon_seconds": 60,
+          "confirmation": null
+        },
+        {
+          "id": "ordered_barrier_canary",
+          "kind": "ordered_barrier",
+          "forward_outcome_id": "fo_canary_60s",
+          "barrier_id": "barrier_canary"
+        }
+      ],
+      "condition_logic": "AND",
+      "required_forward_outcomes": [
+        {
+          "id": "fo_canary_60s",
+          "spec_sha256": "d3863035ea247a7280be575f1cfaeedef704e0f1a7d6bb15ccbf12aa9214ed2a",
+          "entry_reference": "next_bar_open",
+          "horizon_seconds": 60,
+          "max_tracking_seconds": 60,
+          "excursion_units": [
+            "atr"
+          ],
+          "bar_inclusion": "fully_forward",
+          "session_end_censoring": true,
+          "max_gap_seconds": 1,
+          "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
+          "atr_frozen_at": "decision_ts",
+          "ordered_barriers": [
+            {
+              "id": "barrier_canary",
+              "favorable_atr": 0.25,
+              "adverse_atr": 0.25,
+              "horizon_seconds": 60
+            }
+          ],
+          "generated_outcome_columns": [
+            "entry_id",
+            "candidate_key",
+            "study_id",
+            "source_period",
+            "regime_id",
+            "decision_ts",
+            "entry_ts",
+            "direction",
+            "entry_price",
+            "entry_atr",
+            "model_id",
+            "model_hash",
+            "score",
+            "score_decile",
+            "threshold_id",
+            "maturity_bucket",
+            "maturity_seconds",
+            "selector_id",
+            "mfe_60s_atr",
+            "mae_60s_atr",
+            "return_60s_atr",
+            "time_to_mfe_60s",
+            "time_to_mae_60s",
+            "price_60s",
+            "status_60s",
+            "mfe_mae_ratio_60s",
+            "return_over_mae_60s",
+            "mfe_minus_mae_60s",
+            "retained_mfe_fraction_60s",
+            "giveback_from_mfe_60s",
+            "max_mfe_atr",
+            "max_mae_atr",
+            "final_return_atr",
+            "time_to_max_mfe",
+            "time_to_max_mae",
+            "final_price",
+            "max_mfe_mae_ratio",
+            "final_return_over_mae",
+            "max_mfe_minus_max_mae",
+            "retained_mfe_fraction_final",
+            "giveback_from_max_mfe",
+            "ordered_barrier_canary_disposition",
+            "ordered_barrier_canary_binary_label",
+            "ordered_barrier_canary_favorable_touch_ts",
+            "ordered_barrier_canary_adverse_touch_ts",
+            "ordered_barrier_canary_time_to_favorable",
+            "ordered_barrier_canary_time_to_adverse",
+            "ordered_barrier_canary_first_touch_ambiguous",
+            "ordered_barrier_canary_censor_reason",
+            "ordered_barrier_canary_resolved_at_ts",
+            "outcome_status",
+            "censor_reason",
+            "resolved_at_ts",
+            "tracked_seconds",
+            "bars_observed",
+            "first_bar_ts",
+            "last_bar_ts",
+            "max_gap_seconds_observed",
+            "spec_sha256",
+            "entry_sha256",
+            "authorization_sha256",
+            "source_freeze_sha256"
+          ]
+        }
+      ]
+    },
+    "feature_contract": {
+      "source_key": null,
+      "feature_count": 5,
+      "feature_list": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr"
+      ],
+      "resolved_feature_instances": [
+        {
+          "requested": "arrival_velocity",
+          "canonical_name": "arrival_velocity",
+          "parameters": {
+            "input_timeframe": "1s",
+            "lookback": 20,
+            "bar_state": "completed"
+          },
+          "physical_alias": "arrival_velocity"
+        },
+        {
+          "requested": "arrival_acceleration",
+          "canonical_name": "arrival_acceleration",
+          "parameters": {
+            "input_timeframe": "1s",
+            "short_lookback": 20,
+            "bar_state": "completed"
+          },
+          "physical_alias": "arrival_acceleration"
+        },
+        {
+          "requested": "ema_slope",
+          "canonical_name": "ema_slope",
+          "parameters": {
+            "ema_role": "short",
+            "lookback": 20
+          },
+          "physical_alias": "ema_slope"
+        },
+        {
+          "requested": "prior_1m_regime_efficiency",
+          "canonical_name": "regime_efficiency",
+          "parameters": {
+            "timeframe": "1m",
+            "context": "prior",
+            "bar_state": "completed"
+          },
+          "physical_alias": "prior_1m_regime_efficiency"
+        },
+        {
+          "requested": "prior_1m_regime_mfe_atr",
+          "canonical_name": "regime_mfe_atr",
+          "parameters": {
+            "timeframe": "1m",
+            "context": "prior",
+            "bar_state": "completed"
+          },
+          "physical_alias": "prior_1m_regime_mfe_atr"
+        }
+      ],
+      "feature_list_sha256": "29320bb57473a82562988542423341ce43e9f4ae2a93089cf52a3a284fd97394",
+      "bound_trackers": [
+        "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "features.trackers.generic_context.GenericContextProvider",
+        "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider"
+      ],
+      "families": [
+        "['arrival_velocity']",
+        "['context']",
+        "['structural_regime_geometry']"
+      ],
+      "source_timeframes": [
+        "completed_1m",
+        "completed_1s"
+      ],
+      "feature_statuses": {
+        "arrival_velocity": "verified",
+        "arrival_acceleration": "verified",
+        "ema_slope": "verified",
+        "prior_1m_regime_efficiency": "verified",
+        "prior_1m_regime_mfe_atr": "verified"
+      },
+      "feature_null_policies": {
+        "arrival_velocity": "allow",
+        "arrival_acceleration": "allow",
+        "ema_slope": "allow",
+        "prior_1m_regime_efficiency": "allow",
+        "prior_1m_regime_mfe_atr": "allow"
+      },
+      "contains_provisional_features": [],
+      "directional_mapping": "direction_normalized",
+      "timing_contract": "verified",
+      "runtime_data_requirements": {
+        "resolved_instances": [
+          {
+            "requested": "arrival_velocity",
+            "canonical_name": "arrival_velocity",
+            "parameters": {
+              "input_timeframe": "1s",
+              "lookback": 20,
+              "bar_state": "completed"
+            },
+            "physical_alias": "arrival_velocity",
+            "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+            "family": [
+              "arrival_velocity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "arrival_velocity",
+              "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "arrival_acceleration",
+            "canonical_name": "arrival_acceleration",
+            "parameters": {
+              "input_timeframe": "1s",
+              "short_lookback": 20,
+              "bar_state": "completed"
+            },
+            "physical_alias": "arrival_acceleration",
+            "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+            "family": [
+              "arrival_velocity"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "arrival_acceleration",
+              "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            }
+          },
+          {
+            "requested": "ema_slope",
+            "canonical_name": "ema_slope",
+            "parameters": {
+              "ema_role": "short",
+              "lookback": 20
+            },
+            "physical_alias": "ema_slope",
+            "provider": "features.trackers.generic_context.GenericContextProvider",
+            "family": [
+              "context"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "ema_slope",
+              "provider": "features.trackers.generic_context.GenericContextProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "regime_efficiency",
+            "canonical_name": "regime_efficiency",
+            "parameters": {
+              "timeframe": "1m",
+              "context": "prior",
+              "bar_state": "completed"
+            },
+            "physical_alias": "prior_1m_regime_efficiency",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_efficiency",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          },
+          {
+            "requested": "regime_mfe_atr",
+            "canonical_name": "regime_mfe_atr",
+            "parameters": {
+              "timeframe": "1m",
+              "context": "prior",
+              "bar_state": "completed"
+            },
+            "physical_alias": "prior_1m_regime_mfe_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "family": [
+              "structural_regime_geometry"
+            ],
+            "dtype": "float64",
+            "status": "verified",
+            "input_requirements": {
+              "canonical_name": "regime_mfe_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            }
+          }
+        ],
+        "required_streams": [
+          "completed_1m",
+          "completed_1s"
+        ],
+        "rolling_windows": [],
+        "aliases": [
+          "arrival_velocity",
+          "arrival_acceleration",
+          "ema_slope",
+          "prior_1m_regime_efficiency",
+          "prior_1m_regime_mfe_atr"
+        ]
+      },
+      "derived_causal_inputs": []
+    },
+    "execution_contract": {
+      "runtime": "nautilustrader",
+      "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
+      "bounded_execution": true,
+      "progress_seconds": 30,
+      "checkpoint": null,
+      "chronology": {
+        "train": [
+          2023
+        ],
+        "dev": [
+          2024
+        ],
+        "diagnostic": [],
+        "prohibited": [
+          2025,
+          2026
+        ]
+      }
+    },
+    "timestamp_contract": {
+      "source": "databento_glbx_mdp3",
+      "instrument_symbol": "NQ",
+      "measured_catalog_rel_path": "data/catalog/NQ_v0_2020_2026",
+      "raw_timestamp_semantic": "OPEN_STAMPED",
+      "raw_index_field": "ts_event",
+      "timezone": "UTC",
+      "offline_research_aggregation": {
+        "pandas_rule": "resample(rule, label='right', closed='left')",
+        "semantic": "CLOSE_STAMPED"
+      },
+      "nautilus_catalog": {
+        "ts_event_semantic": "OPEN_STAMPED",
+        "ts_init_semantic": "CLOSE_STAMPED",
+        "causal_dispatch_field": "ts_init",
+        "availability_invariant": "if nt_ts_event_semantic == 'OPEN_STAMPED': ts_init - ts_event == bar_duration_ns",
+        "timeframe_deltas_ns": {
+          "1-SECOND": 1000000000,
+          "1-MINUTE": 60000000000,
+          "3-MINUTE": 180000000000,
+          "5-MINUTE": 300000000000
+        },
+        "empirical_measurement": {
+          "status": "MEASURED",
+          "catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+          "measurements": {
+            "NQ.XCME-1-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 60000000000,
+              "observed_deltas_ns": [
+                60000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-1-SECOND-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 1000000000,
+              "observed_deltas_ns": [
+                1000000000
+              ],
+              "pass": true
+            },
+            "NQ.XCME-5-MINUTE-LAST-EXTERNAL": {
+              "sample_count": 1000,
+              "expected_delta_ns": 300000000000,
+              "observed_deltas_ns": [
+                300000000000
+              ],
+              "pass": true
+            }
+          }
+        }
+      },
+      "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"
+    },
+    "deliverables_contract": {
+      "contract_version": 1,
+      "authorized_modes": [
+        "collect"
+      ],
+      "deliverables_by_mode": {
+        "collect": [
+          "candidates.parquet",
+          "observations.parquet",
+          "collection_manifest.json",
+          "run_manifest.json",
+          "status.json"
+        ]
+      },
+      "artifact_metadata": {
+        "candidates.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "observations.parquet": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "collection_manifest.json": {
+          "mode": "collect",
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir/collection"
+        },
+        "run_manifest.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::OutputManager",
+          "relative_to": "run_dir"
+        },
+        "status.json": {
+          "modes": [
+            "collect",
+            "backtest"
+          ],
+          "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+          "relative_to": "run_dir"
+        }
+      },
+      "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
+    },
+    "lineage": {
+      "has_parent": false
+    },
+    "baseline": {
+      "has_baseline": false
+    },
+    "required_gates": [],
+    "model_selection": null
+  },
+  "preflight_required": true,
+  "preflight_status": "PENDING_EXECUTION"
+}
