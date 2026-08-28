@@ -94,11 +94,19 @@ excluded).
 
 ## Artifact status
 
-`train_experiment_freeze.json`, `experiment_models.json`, `experiment_authorization.json`,
-`model_selection_manifest.json`, `train_freeze_lineage.json` describe a pooled BROAD model fit
-against the **wrong** (legacy regime-flip) target. They are retained as reproducible evidence
-of what was executed and are **NOT an accepted lineage**; they must not be used to authorize
-OOS. `train_fitted_models.joblib` is gitignored/regenerable.
+`experiment_models.json`, `model_selection_manifest.json`, `train_freeze_lineage.json`,
+`population_target_gate.json` and `train_experiment_freeze.WRONG_TARGET_NOT_A_LINEAGE.json`
+(renamed from `train_experiment_freeze.json`) describe a pooled BROAD model fit against the
+**wrong** (legacy regime-flip) target. They are retained as reproducible evidence of what was
+executed and are **NOT an accepted lineage**. `train_fitted_models.joblib` is
+gitignored/regenerable.
+
+**OOS is structurally locked:** `research_workflow.experiment.assert_oos_open` requires
+`artifacts/train_experiment_freeze.json` (the exact filename), which no longer exists →
+`TrainFreezeRequired`. `experiment_authorization.json` is only chronology metadata
+(`train=[2021,2022,2023] oos=[2024] prohibited=[2025,2026]`) and `load_authorization`
+regenerates it from `study.yaml` on demand; it does **not** authorize OOS by itself and is
+left as the normal tracked artifact.
 
 ## Related memory
 
