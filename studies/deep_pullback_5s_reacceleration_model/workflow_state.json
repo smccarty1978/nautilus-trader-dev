@@ -1,5 +1,7 @@
 {
-  "actions_executed_this_run": [],
+  "actions_executed_this_run": [
+    "TRAIN_EXECUTION"
+  ],
   "authorization_state": "TRAIN_AUTHORIZED",
   "blockers": [],
   "completed_gates": [
@@ -30,7 +32,7 @@
     "train_authorization": "9ebdcd9065de92dffbb5ba1da0b498037199e4675bdfe38c60ab6cd4dea021a1",
     "train_freeze": null
   },
-  "current_stage": "TRAIN_AUTHORIZATION_REQUIRED",
+  "current_stage": "TRAIN_EXECUTION",
   "fingerprints": {
     "active_authority_bundle": "91a2742a161f31166f78191918afc15b8d1ee2b4f7273e4012007123641766ec",
     "active_feature_authority": "01fc2ddae798ff0e87686a2220cc0d356550ded99c2fea06ffbb6f09e3b9f1f4",
@@ -52,12 +54,12 @@
     "train_authorization": "9ebdcd9065de92dffbb5ba1da0b498037199e4675bdfe38c60ab6cd4dea021a1",
     "train_freeze": null
   },
-  "next_deterministic_action": "run_with_advance",
+  "next_deterministic_action": "await_train_freeze",
   "stale_gates": [],
   "study_id": "deep_pullback_5s_reacceleration_model",
   "terminal_reason": null,
-  "terminal_state": "TRAIN_AUTHORIZATION_REQUIRED",
-  "timestamp": "2026-08-28T14:47:13.124893+00:00",
+  "terminal_state": "TRAIN_EXECUTION",
+  "timestamp": "2026-08-28T15:39:07.999100+00:00",
   "timestamps": {
     "causal": 1787927437.2035143,
     "contract": 1787927442.1900208,
