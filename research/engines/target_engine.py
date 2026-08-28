@@ -110,6 +110,12 @@ def compile_target_contract(target_spec: TargetSpec) -> Dict[str, Any]:
     """
     effective_horizon = resolve_effective_horizon(target_spec)
     contract = {
+        # This is an execution primitive, not presentation metadata.  The collector
+        # resolves it through research_workflow.target_runtime and never guesses from
+        # a historical target_type string.
+        "primitive": "ordered_barrier" if (
+            target_spec.conditions or any((fo.ordered_barriers or []) for fo in (target_spec.required_forward_outcomes or []))
+        ) else "flip_within_horizon",
         "target_type": target_spec.type,
         "event": target_spec.event or "regime_flip",
         "direction": target_spec.direction,

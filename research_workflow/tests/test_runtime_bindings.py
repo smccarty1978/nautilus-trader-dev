@@ -105,6 +105,20 @@ def test_preflight_required_checks_include_runtime_binding():
     assert "RUNTIME_CONTRACT_BINDING" in REQUIRED_STUDY_CHECKS
 
 
+def test_target_runtime_binding_is_proven_and_unknown_target_blocks(tmp_path):
+    study = tmp_path / "s"; study.mkdir()
+    payload = {"spec": {"execution": {}}, "contracts": {"population_contract": {},
+        "feature_contract": {"resolved_feature_instances": []}, "target_contract": {"primitive": "ordered_barrier"}}}
+    (study / "compiled_study.json").write_text(json.dumps(payload))
+    ok = verify_runtime_contract(study)
+    assert ok["passed"] and ok["checked"]["target_runtime"]["runtime"] == "OrderedBarrierTargetRuntime"
+    payload["contracts"]["target_contract"]["primitive"] = "not_a_target"
+    (study / "compiled_study.json").write_text(json.dumps(payload))
+    failed = verify_runtime_contract(study)
+    assert failed["passed"] is False
+    assert "TARGET_RUNTIME_MISMATCH" in failed["missing"][0]["reason"]
+
+
 def test_episode_study_is_provider_host_mode_and_all_features_bind():
     study = Path(__file__).resolve().parents[2] / "studies" / "deep_pullback_5s_reacceleration_model"
     if not (study / "compiled_study.json").is_file():

@@ -249,6 +249,27 @@ run happens before preflight is `CLEAR` and both reviews have issued a status.
 3. **Targeted tests beat global CI.** `research_workflow/test_selection.py` picks the tests a
    change requires. Running the whole suite repeatedly is latency, not diligence.
 
+### Runtime and model lineage (future governed studies)
+
+```
+StudySpec -> PopulationRuntime + ProviderHost + TargetRuntime -> governed collection
+-> stage-scoped modeling execution -> persistent ModelArtifact -> TRAIN freeze
+-> OOS authorization -> study closure
+```
+
+New compiled studies bind `target_contract.primitive` to a `TargetRuntime`:
+`flip_within_horizon` to `FlipTargetRuntime`, and `ordered_barrier` to
+`OrderedBarrierTargetRuntime`. Unknown primitives or a collector path that does not
+dispatch the resolved runtime fail preflight (`TARGET_RUNTIME_MISMATCH`). A bounded,
+independent target replay must show zero disposition and binary-label mismatches before TRAIN.
+
+The TRAIN freeze binds `COLLECTION_PRODUCER_CLOSURE`, `TARGET_RUNTIME_CLOSURE`, and
+`MODELING_EXECUTION_CLOSURE`. Modeling-only changes stale fit/freeze without invalidating
+valid collection partitions. Every governed fit persists an immutable, hash-verified model
+record and golden-score fixture. Scientific validity and artifact availability are separate:
+closed studies retain loadable artifacts. A permitted child derived input resolves by immutable
+`model_id`, validates artifact/golden parity, and never reopens its source study.
+
 ### Terminal closure — `STUDY_CLOSED`
 
 A study is closed by writing a valid `artifacts/study_closure.json`:

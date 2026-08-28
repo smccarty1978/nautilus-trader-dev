@@ -357,18 +357,19 @@ class DerivedCausalInputSpec(BaseModel):
 
     name: str = Field(..., description="Column name this input is bound to")
     kind: Literal["frozen_external_model_score"] = "frozen_external_model_score"
-    parent_study_id: str = Field(..., description="Upstream study directory id")
-    parent_train_freeze_artifact: str = Field(
-        ..., description="Relative path within the parent study to its authoritative TRAIN freeze"
+    model_id: Optional[str] = Field(None, description="Immutable preserved-model registry identity")
+    parent_study_id: Optional[str] = Field(None, description="Upstream study directory id")
+    parent_train_freeze_artifact: Optional[str] = Field(
+        None, description="Relative path within the parent study to its authoritative TRAIN freeze"
     )
-    parent_train_freeze_artifact_sha256: str = Field(
-        ..., description="sha256 of the exact file bytes at parent_train_freeze_artifact"
+    parent_train_freeze_artifact_sha256: Optional[str] = Field(
+        None, description="sha256 of the exact file bytes at parent_train_freeze_artifact"
     )
-    parent_frozen_execution_composite_sha256: str = Field(
-        ..., description="Parent's audited execution composite, from its audit/status.json"
+    parent_frozen_execution_composite_sha256: Optional[str] = Field(
+        None, description="Parent's audited execution composite, from its audit/status.json"
     )
-    model_hashes: Dict[str, str] = Field(..., description="Per-arm fit_identity_sha256 values, must match the parent freeze")
-    preprocessing_hash: str = Field(...)
+    model_hashes: Dict[str, str] = Field(default_factory=dict, description="Per-arm fit_identity_sha256 values, must match the parent freeze")
+    preprocessing_hash: Optional[str] = Field(None)
     score_artifact_path: Optional[str] = Field(
         None, description="A materialized score table, if consumed instead of the raw model artifact"
     )
@@ -401,6 +402,20 @@ class DerivedCausalInputSpec(BaseModel):
                 "may never permit upstream retraining"
             )
         return v
+
+    @model_validator(mode="after")
+    def validate_model_binding_xor(self):
+        legacy = (self.parent_study_id, self.parent_train_freeze_artifact,
+                  self.parent_train_freeze_artifact_sha256,
+                  self.parent_frozen_execution_composite_sha256,
+                  self.model_hashes, self.preprocessing_hash)
+        complete_legacy = all(legacy)
+        any_legacy = any(legacy)
+        if self.model_id and any_legacy:
+            raise ValueError("DERIVED_INPUT_BINDING_XOR: model_id binding may not include legacy binding fields")
+        if not self.model_id and not complete_legacy:
+            raise ValueError("DERIVED_INPUT_BINDING_XOR: declare model_id or a complete legacy binding")
+        return self
 
 
 class FeaturesSpec(BaseModel):
@@ -871,6 +886,14 @@ class StudySpec(BaseModel):
     def compute_sha256(self) -> str:
         """Computes deterministic canonical SHA-256 hash of the StudySpec."""
         data_dict = self.model_dump(exclude_none=False)
+        # `model_id` is an additive, opt-in derived-input binding (see
+        # DerivedCausalInputSpec.validate_model_binding_xor). Studies compiled before it
+        # existed declare a legacy binding and never set it; dropping the null key keeps
+        # their canonical spec hash byte-identical so an additive schema field cannot
+        # stale an already-compiled (or sealed, or closed) study.
+        for _di in ((data_dict.get("features") or {}).get("derived_inputs") or []):
+            if isinstance(_di, dict) and _di.get("model_id") is None:
+                _di.pop("model_id", None)
         canonical_json = json.dumps(data_dict, sort_keys=True, indent=None)
         return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
 

@@ -72,9 +72,11 @@ def compile_study(study_path: Path) -> int:
         # its mode-partitioned deliverables contract in hand.
         config_dir = study_path / "config"
         config_dir.mkdir(exist_ok=True)
-        deliverables_path = config_dir / "deliverables_contract.json"
-        with open(deliverables_path, "w", encoding="utf-8") as f:
-            json.dump(result.contracts["deliverables_contract"], f, indent=2)
+        deliverables = result.contracts.get("deliverables_contract")
+        if deliverables is not None:
+            deliverables_path = config_dir / "deliverables_contract.json"
+            with open(deliverables_path, "w", encoding="utf-8") as f:
+                json.dump(deliverables, f, indent=2)
 
     print(result.summary_card)
     return 0

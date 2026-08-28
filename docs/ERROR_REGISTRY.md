@@ -98,6 +98,10 @@ condition, not a Packet B defect.
 
 ## IDENTITY / READINESS
 
+| `TARGET_RUNTIME_MISMATCH` | PREFLIGHT runtime binding | `<study>/audit/preflight.json` | Compare compiled `target_contract.primitive`, resolved target runtime, and collector dispatch evidence. |
+| `UNKNOWN_TARGET_PRIMITIVE` | target resolution | preflight failure packet | Only `flip_within_horizon` and `ordered_barrier` are executable primitives. |
+| `PRESERVED_MODEL_MISSING` / `PRESERVED_MODEL_CORRUPT` | frozen external model resolution | `studies/model_registry/<model_id>.json` | Verify the immutable registry record, artifact hash, and golden fixture. |
+
 | Code | Owning stage | Artifact | Smallest investigation scope |
 |---|---|---|---|
 | `READINESS_IDENTITY_INSTABILITY` | READINESS (R8) | `<study>/audit/readiness.json` → `r8_double_identity` | `research_workflow/readiness.py::verify_identity_double_resolution` — `resolve_execution_manifest` returned two different `composite_sha256` values (or two different resolved file sets) across back-to-back calls with no mutation in between; check for non-determinism in hashing or a file changing on disk mid-resolution |

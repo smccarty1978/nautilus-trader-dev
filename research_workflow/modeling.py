@@ -42,8 +42,12 @@ def fit_models(
     dataset_identity_sha256: Optional[str] = None,
     estimator: str = "gradient_boosting",
     hyperparameters: Optional[Dict[str, Any]] = None,
+    preprocessing_identity: Optional[Dict[str, Any]] = None,
+    direction_routing: Optional[Mapping[str, str]] = None,
 ) -> Dict[str, Any]:
     """Fit declared arms on one TRAIN partition and persist model provenance."""
+    from research_workflow.experiment import _assert_study_open
+    _assert_study_open(Path(study_path).resolve())
     if "_partition" not in meta or set(meta["_partition"].dropna()) != {"train"}:
         raise ValueError("fit_models requires a single TRAIN partition")
     # A forward outcome resolves after the entry it describes, so it is a label. The
@@ -67,7 +71,28 @@ def fit_models(
     )
     out = Path(study_path).resolve() / "artifacts" / "experiment_models.json"
     manifest = write_model_manifest(models, out)
-    return {"models": models, "manifest": manifest, "path": str(out)}
+    from research_workflow.modeling_closure import resolve_modeling_closure
+    from research_workflow.model_artifacts import persist_models
+    study = Path(study_path).resolve()
+    collection = {}
+    frozen = study / "audit" / "frozen_execution_manifest.json"
+    if frozen.is_file(): collection["COLLECTION_PRODUCER_CLOSURE"] = json.loads(frozen.read_text()).get("frozen_execution_composite_sha256")
+    target = ((json.loads((study / "compiled_study.json").read_text()).get("contracts") or {}).get("target_contract") or {}) if (study / "compiled_study.json").is_file() else {}
+    from research_workflow.target_runtime import resolve_target_runtime_closure
+    driver_relpaths = list(((json.loads((study / "compiled_study.json").read_text()).get("spec", {}).get("execution", {}) or {}).get("modeling_driver_relpaths", [])) if (study / "compiled_study.json").is_file() else [])
+    closures = {**collection, "TARGET_RUNTIME_CLOSURE": resolve_target_runtime_closure(study)["target_runtime_closure_sha256"], **resolve_modeling_closure(study, driver_relpaths=driver_relpaths)}
+    compiled_payload = json.loads((study / "compiled_study.json").read_text()) if (study / "compiled_study.json").is_file() else {}
+    contracts = compiled_payload.get("contracts") or {}
+    try:
+        from research_workflow.experiment import load_authorization
+        years = list(load_authorization(study).train_years)
+    except Exception:
+        years = []
+    persisted = persist_models(study, models, manifest,
+        feature_contract_identity=__import__("research.analysis.identity", fromlist=["canonical_sha256"]).canonical_sha256(contracts.get("feature_contract") or {}),
+        target_identity=closures["TARGET_RUNTIME_CLOSURE"], preprocessing_identity=preprocessing_identity or {"kind":"identity","identity":"identity"},
+        train_frame_identity=dataset_identity_sha256, training_years=years, closures=closures, direction_routing=direction_routing)
+    return {"models": models, "manifest": manifest, "path": str(out), "model_artifacts": persisted}
 
 
 def freeze_train_artifacts(
@@ -83,6 +108,7 @@ def freeze_train_artifacts(
     study_spec: Optional[Any] = None,
     model_selection_manifest_path: Optional[str | Path] = None,
     dataset_identity_sha256: Optional[str] = None,
+    model_artifact_records: Optional[list[Mapping[str, Any]]] = None,
 ) -> Path:
     """Freeze all TRAIN-derived objects before any OOS frame is accepted.
 
@@ -101,6 +127,8 @@ def freeze_train_artifacts(
     * any ``study_spec.required_gates`` staged ``"train_freeze"`` must be satisfied
       (``research_workflow.gates.assert_gates_satisfied``).
     """
+    from research_workflow.experiment import _assert_study_open
+    _assert_study_open(Path(study_path).resolve())
     if "_partition" not in meta or set(meta["_partition"].dropna()) != {"train"}:
         raise ValueError("freeze_train_artifacts requires TRAIN-only metadata")
     # The frozen feature sets are what OOS scoring replays. Guarding them here as well
@@ -183,5 +211,23 @@ def freeze_train_artifacts(
         "model_selection_manifest_sha256": (
             selection_manifest.get("manifest_sha256") if selection_manifest else None
         ),
+    }
+    study = Path(study_path).resolve()
+    explicit_new = False
+    if (study / "compiled_study.json").is_file():
+        explicit_new = bool(((json.loads((study / "compiled_study.json").read_text()).get("contracts") or {}).get("target_contract") or {}).get("primitive"))
+    if explicit_new:
+        records = list(model_artifact_records or [])
+        arms = set((models_manifest.get("arms") or {}))
+        if {r.get("model_role") for r in records} != arms:
+            raise ValueError("GOVERNED_MODEL_ARTIFACT_BINDING_REQUIRED: freeze requires exactly one persisted artifact record per model arm")
+        payload["model_artifacts"] = [{k:r.get(k) for k in ("model_id","model_role","artifact_path","artifact_sha256","golden_fixture_path","golden_fixture_sha256","native_booster_path","native_booster_sha256")} for r in records]
+    from research_workflow.modeling_closure import resolve_modeling_closure
+    from research_workflow.target_runtime import resolve_target_runtime_closure
+    driver_relpaths = list(((json.loads((study / "compiled_study.json").read_text()).get("spec", {}).get("execution", {}) or {}).get("modeling_driver_relpaths", [])) if (study / "compiled_study.json").is_file() else [])
+    payload["stage_scoped_lineage"] = {
+        "COLLECTION_PRODUCER_CLOSURE": (json.loads((study / "audit" / "frozen_execution_manifest.json").read_text()).get("frozen_execution_composite_sha256") if (study / "audit" / "frozen_execution_manifest.json").is_file() else None),
+        "TARGET_RUNTIME_CLOSURE": resolve_target_runtime_closure(study)["target_runtime_closure_sha256"],
+        "MODELING_EXECUTION_CLOSURE": resolve_modeling_closure(study, driver_relpaths=driver_relpaths)["modeling_execution_composite_sha256"],
     }
     return write_train_freeze(study_path, payload)

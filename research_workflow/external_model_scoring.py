@@ -37,15 +37,25 @@ class DerivedScoreObservation:
 class FrozenExternalModelScorer:
     """Load once, verify exact identities, and score causal snapshots without fitting."""
 
-    def __init__(self, spec: DerivedCausalInputSpec, parent_dir: Path, bundle) -> None:
+    def __init__(self, spec: DerivedCausalInputSpec, parent_dir: Path, bundle, recovered: Mapping | None = None) -> None:
         self.spec = spec
         self.parent_dir = parent_dir
         self._bundle = bundle
+        self._recovered = dict(recovered or {})
 
     @classmethod
     def bind(
         cls, spec: DerivedCausalInputSpec, *, parent_dir: str | Path
     ) -> "FrozenExternalModelScorer":
+        # New workflow declarations bind by immutable registry id and intentionally
+        # do not consult the source study's current lifecycle state.
+        if spec.model_id:
+            from research_workflow.model_artifacts import resolve_model
+            registry = Path(parent_dir).resolve().parents[0] / "model_registry"
+            rec = resolve_model(spec.model_id, registry_root=registry)
+            artifact = rec.get("_artifact_path", rec["artifact_path"])
+            bundle = joblib.load(artifact)
+            return cls(spec, Path(artifact).parent, bundle, rec)
         required = {
             "model_artifact_path": spec.model_artifact_path,
             "model_artifact_sha256": spec.model_artifact_sha256,
@@ -127,10 +137,12 @@ class FrozenExternalModelScorer:
         availability_ts: Mapping[str, int],
     ) -> DerivedScoreObservation:
         direction = str(direction).upper()
-        arm = (self.spec.direction_arm_mapping or {}).get(direction)
+        routing = self._recovered.get("direction_routing") or self.spec.direction_arm_mapping or {}
+        arm = routing.get(direction) or (self._recovered.get("model_role") if len(routing) <= 1 else None)
         if arm is None:
             raise ExternalModelScoringError(f"no frozen arm mapping for {direction!r}")
-        features = list((self.spec.ordered_feature_surfaces or {})[arm])
+        surfaces = self.spec.ordered_feature_surfaces or {}
+        features = list(surfaces.get(arm) or self._recovered.get("ordered_model_inputs") or [])
         missing = [name for name in features if name not in causal_snapshot]
         missing_availability = [name for name in features if name not in availability_ts]
         if missing or missing_availability:
@@ -159,8 +171,8 @@ class FrozenExternalModelScorer:
             latest_input_availability_ts=max(int(availability_ts[n]) for n in features),
             direction=direction,
             arm=arm,
-            model_hash=self.spec.model_hashes[arm],
-            preprocessing_hash=self.spec.preprocessing_hash,
+            model_hash=(self.spec.model_hashes or {}).get(arm, rec.get("fit_identity_sha256", "")),
+            preprocessing_hash=self.spec.preprocessing_hash or self._recovered.get("preprocessing_identity", ""),
         )
 
 

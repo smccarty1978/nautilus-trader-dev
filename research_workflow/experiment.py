@@ -29,6 +29,14 @@ class ExperimentAuthorizationError(ExperimentError):
 class TrainFreezeRequired(ExperimentError):
     pass
 
+def _assert_study_open(path: Path) -> None:
+    from research_workflow.study_closure import StudyClosureInvalid, load_study_closure
+    try:
+        if load_study_closure(path) is not None:
+            raise ExperimentAuthorizationError("STUDY_CLOSED: closure is terminal and non-destructive")
+    except StudyClosureInvalid as exc:
+        raise ExperimentAuthorizationError(f"STUDY_CLOSURE_INVALID: {exc}") from exc
+
 
 @dataclass(frozen=True)
 class ExperimentAuthorization:
@@ -69,6 +77,7 @@ def _load_study(study_path: Path) -> Dict[str, Any]:
 def authorize_experiment(study_path: str | Path, *, write: bool = True) -> ExperimentAuthorization:
     """Materialize explicit TRAIN/OOS/prohibited year authority from the study contract."""
     path = Path(study_path).resolve()
+    _assert_study_open(path)
     payload = _load_study(path)
     study_id = str((payload.get("study") or {}).get("id") or path.name)
     chronology = payload.get("chronology") or {}
@@ -206,6 +215,7 @@ def write_train_freeze(study_path: str | Path, payload: Mapping[str, Any]) -> Pa
 def assert_oos_open(study_path: str | Path) -> Dict[str, Any]:
     """Fail closed unless a valid TRAIN freeze exists and is bound to current authorization."""
     path = Path(study_path).resolve()
+    _assert_study_open(path)
     auth = load_authorization(path)
     freeze = path / "artifacts" / "train_experiment_freeze.json"
     if not freeze.is_file():
@@ -213,6 +223,21 @@ def assert_oos_open(study_path: str | Path) -> Dict[str, Any]:
     payload = json.loads(freeze.read_text(encoding="utf-8"))
     if payload.get("partition") != "train" or payload.get("authorization_sha256") != auth.authorization_sha256:
         raise TrainFreezeRequired("TRAIN freeze is stale or not bound to current authorization")
+    lineage = payload.get("stage_scoped_lineage")
+    if lineage is not None:  # additive: historical freezes remain valid as legacy.
+        from research_workflow.modeling_closure import resolve_modeling_closure
+        from scripts.resolve_execution_manifest import resolve_execution_manifest
+        from research_workflow.target_runtime import resolve_target_runtime_closure
+        frozen_collection = lineage.get("COLLECTION_PRODUCER_CLOSURE")
+        if frozen_collection is not None and resolve_execution_manifest(path)[0] != frozen_collection:
+            raise TrainFreezeRequired("TRAIN_COLLECTION_CLOSURE_STALE: collection-producing code changed")
+        if lineage.get("TARGET_RUNTIME_CLOSURE") != resolve_target_runtime_closure(path)["target_runtime_closure_sha256"]:
+            raise TrainFreezeRequired("TRAIN_TARGET_RUNTIME_CLOSURE_STALE: target runtime changed")
+        compiled = path / "compiled_study.json"
+        drivers = list(((json.loads(compiled.read_text()).get("spec", {}).get("execution", {}) or {}).get("modeling_driver_relpaths", [])) if compiled.is_file() else [])
+        current = resolve_modeling_closure(path, driver_relpaths=drivers)["modeling_execution_composite_sha256"]
+        if lineage.get("MODELING_EXECUTION_CLOSURE") != current:
+            raise TrainFreezeRequired("TRAIN_MODELING_CLOSURE_STALE: modeling code changed after TRAIN freeze")
     return payload
 
 

@@ -86,6 +86,15 @@ def _collector_dispatches_population_runtime(cls) -> bool:
         and "not getattr(self, \"_episode_mode\", False)" in src  # checkpoint grid disabled
     )
 
+def _collector_dispatches_target_runtime(cls) -> bool:
+    import inspect
+    try:
+        src = inspect.getsource(cls)
+    except (OSError, TypeError):
+        return False
+    return ("resolve_target_runtime(" in src and "_resolve_ordered_barriers(" in src
+            and ".terminal(" in src)
+
 
 def collector_runtime_capabilities(strategy_class: str | None) -> Dict[str, Any]:
     """The collector's own honest declaration of what it executes.
@@ -141,6 +150,30 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
     caps = collector_runtime_capabilities(strategy_class)
 
     missing: List[Dict[str, Any]] = []
+    target_contract = contracts.get("target_contract") or {}
+    target_checked = None
+    if target_contract.get("primitive") is not None and scope != "features_only":
+        target_checked = {"primitive": target_contract.get("primitive"), "dispatch": _collector_dispatches_target_runtime(_load_collector_class(strategy_class))}
+        try:
+            from research_workflow.target_runtime import resolve_target_runtime
+            runtime = resolve_target_runtime(target_contract)
+            target_checked["runtime"] = type(runtime).__name__
+            from research_workflow.target_runtime import resolve_target_runtime_closure
+            target_checked["target_runtime_closure_sha256"] = resolve_target_runtime_closure(study_dir)["target_runtime_closure_sha256"]
+            if not target_checked["dispatch"]:
+                raise RuntimeBindingError("collector source does not dispatch resolved TargetRuntime")
+        except Exception as e:
+            missing.append({"primitive": "target_contract.primitive", "declared": target_contract.get("primitive"),
+                            "required_binding": "research_workflow.target_runtime.TargetRuntime", "collector": caps["strategy_class"],
+                            "reason": f"TARGET_RUNTIME_MISMATCH: {type(e).__name__}: {e}"})
+    modeling_checked = None
+    if target_contract.get("primitive") is not None and scope != "features_only":
+        try:
+            from research_workflow.modeling_closure import resolve_modeling_closure
+            drivers = list(((spec.get("execution") or {}).get("modeling_driver_relpaths") or []))
+            modeling_checked = resolve_modeling_closure(study_dir, driver_relpaths=drivers)["modeling_execution_composite_sha256"]
+        except Exception as e:
+            missing.append({"primitive":"modeling_execution_closure", "declared": "governed", "required_binding":"research_workflow.modeling_closure", "collector":caps["strategy_class"], "reason":f"MODELING_EXECUTION_CLOSURE_MISMATCH: {e}"})
     population_contract = contracts.get("population_contract") or {}
     episode = population_contract.get("episode_lifecycle")
     if episode and scope != "features_only":
@@ -285,5 +318,7 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
             ),
             "derived_scorer_bound": scorer_bound,
             "output_row_persistence_declared": output_row_ok,
+            "target_runtime": target_checked,
+            "modeling_execution_closure_sha256": modeling_checked,
         },
     }

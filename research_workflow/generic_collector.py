@@ -232,6 +232,7 @@ class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
     feature_authority: str = "active"
     session: str = "RTH"                     # resolved via utils.session_boundaries
     session_end_censoring: bool = True       # from target_contract.censoring_policy
+    target_contract: dict = {}
     # Compiled population_contract.episode_lifecycle (empty for non-episode studies).
     # When populated, the collector runs the generic population runtime
     # (research_workflow.population_runtime) instead of emitting on the checkpoint grid.
@@ -408,6 +409,18 @@ class FlipPredictionCollector(Strategy):
         self.last_close: Optional[float] = None
         # Latest observed event time, used to stamp when a run-end censoring occurred.
         self.last_ts_seen: Optional[int] = None
+        # Target contract is authoritative for all terminal labels.  A contract with no
+        # explicit ``primitive`` key is a legacy compiled study (compiled before the
+        # target-runtime binding existed): it keeps the historical flip labeling until it
+        # is recompiled.  Every newly compiled contract carries ``primitive`` and is
+        # dispatched strictly (an unknown primitive fails closed).
+        from research_workflow.target_runtime import resolve_target_runtime
+        _tc = config.target_contract or {}
+        self._target_runtime = resolve_target_runtime(_tc, legacy_mode="primitive" not in _tc)
+        self._target_primitive = self._target_runtime.primitive
+        _ordered = ((config.target_contract or {}).get("required_forward_outcomes") or [])
+        _barriers = [b for fo in _ordered for b in (fo.get("ordered_barriers") or [])]
+        self._ordered_barrier = dict(_barriers[0]) if _barriers else {}
 
         # Telemetry & Output logs
         self.candidates_log: List[Dict[str, Any]] = []
@@ -618,7 +631,7 @@ class FlipPredictionCollector(Strategy):
         """
         if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
             return
-        self.pending_candidates.append({
+        pending = {
             "observation_ts": cand_record["observation_ts"],
             "regime_start_ns": cand_record["regime_start_ns"],
             "regime_direction": cand_record["regime_direction"],
@@ -628,7 +641,20 @@ class FlipPredictionCollector(Strategy):
                 session_close_ns(T, self.cfg.session)
                 if self.cfg.session_end_censoring else None
             ),
-        })
+        }
+        if getattr(self, "_target_primitive", "flip_within_horizon") == "ordered_barrier":
+            if not self._ordered_barrier:
+                raise RuntimeError("TARGET_RUNTIME_MISMATCH: ordered_barrier has no compiled barrier")
+            entry_price = cand_record.get("entry_price")
+            frozen_atr = cand_record.get("target_frozen_atr", cand_record.get("atr_t"))
+            if entry_price is None or frozen_atr is None or float(frozen_atr) <= 0:
+                raise RuntimeError("TARGET_RUNTIME_REFERENCE_MISSING: ordered barrier requires decision entry price and positive frozen ATR")
+            pending.update({"entry_price": float(entry_price),
+                            "atr": float(frozen_atr),
+                            "direction": int(cand_record.get("regime_direction", self.active_regime_dir)),
+                            "favorable_atr": float(self._ordered_barrier["favorable_atr"]),
+                            "adverse_atr": float(self._ordered_barrier["adverse_atr"]), "events": []})
+        self.pending_candidates.append(pending)
         horizon_end = T + int(self.cfg.horizon_seconds) * NS
         next_horizon = getattr(self, "_next_pending_horizon_ns", None)
         if next_horizon is None or horizon_end < next_horizon:
@@ -652,6 +678,16 @@ class FlipPredictionCollector(Strategy):
         cand_ts = cand["observation_ts"]
         time_to_flip_s = ((flip_ts - cand_ts) / NS) if flip_ts is not None else None
 
+        # Small historical collector fixtures construct via ``__new__`` and do not
+        # run __init__; retain their explicit legacy flip semantics.
+        runtime = getattr(self, "_target_runtime", None)
+        if runtime is None:
+            from research_workflow.target_runtime import resolve_target_runtime
+            runtime = resolve_target_runtime({}, legacy_mode=True)
+        target_result = runtime.from_disposition(
+            disposition, resolved_at_ts=(censored_at_ts if flip_ts is None else flip_ts),
+            censor_reason=censor_reason,
+        )
         self.observations_log.append({
             "observation_ts": cand_ts,
             "regime_start_ns": cand["regime_start_ns"],
@@ -659,18 +695,49 @@ class FlipPredictionCollector(Strategy):
             "checkpoint_index": cand["checkpoint_index"],
             "flip_ts": flip_ts,
             "time_to_flip_seconds": time_to_flip_s,
-            "target_flip_within_horizon": (
-                1 if disposition == DISPOSITION_POSITIVE
-                else 0 if disposition == DISPOSITION_NEGATIVE
-                else None
-            ),
-            "disposition": disposition,
-            "censored": int(disposition == DISPOSITION_CENSORED),
-            "censor_reason": censor_reason,
+            "target_flip_within_horizon": target_result.label,
+            "disposition": target_result.disposition,
+            "censored": int(target_result.disposition == DISPOSITION_CENSORED),
+            "censor_reason": target_result.censor_reason,
             "horizon_end_ts": cand.get("horizon_end_ts"),
             "session_close_ts": cand.get("session_close_ts"),
-            "resolved_at_ts": censored_at_ts if flip_ts is None else flip_ts,
+            "resolved_at_ts": target_result.resolved_at_ts,
         })
+
+    def _resolve_ordered_barriers(self, event: Optional[Dict[str, Any]], *, now_ts: int, final: bool = False) -> None:
+        """Dispatch completed 1s OHLC/gap events to OrderedBarrierTargetRuntime."""
+        remaining: List[Dict[str, Any]] = []
+        for cand in self.pending_candidates:
+            if event is not None:
+                cand["events"].append(event)
+            if final and now_ts < cand["horizon_end_ts"]:
+                self._emit_observation(cand, DISPOSITION_CENSORED, None,
+                                       censor_reason=CENSOR_DATA_END, censored_at_ts=now_ts)
+                continue
+            # The runtime owns barrier first-touch decisions.  A live favorable or
+            # adverse touch terminates immediately; only PENDING waits for horizon.
+            live = self._target_runtime.terminal(cand, cand["events"], final=False)
+            if live.disposition != "PENDING":
+                collector_disposition = {"POSITIVE": DISPOSITION_POSITIVE, "NEGATIVE": DISPOSITION_NEGATIVE,
+                                         "CENSORED": DISPOSITION_CENSORED}[live.disposition]
+                self._emit_observation(cand, collector_disposition,
+                                       live.resolved_at_ts if collector_disposition == DISPOSITION_POSITIVE else None,
+                                       censor_reason=live.censor_reason, censored_at_ts=live.resolved_at_ts)
+                continue
+            # Inclusive horizon: retain through its exact completed timestamp.
+            if not final and now_ts <= cand["horizon_end_ts"]:
+                remaining.append(cand)
+                continue
+            result = self._target_runtime.terminal(cand, cand["events"], final=True)
+            collector_disposition = {"POSITIVE": DISPOSITION_POSITIVE, "NEGATIVE": DISPOSITION_NEGATIVE,
+                                     "CENSORED": DISPOSITION_CENSORED}[result.disposition]
+            self._emit_observation(
+                cand, collector_disposition,
+                result.resolved_at_ts if collector_disposition == DISPOSITION_POSITIVE else None,
+                censor_reason=result.censor_reason, censored_at_ts=result.resolved_at_ts,
+            )
+        self.pending_candidates = remaining
+        self._next_pending_horizon_ns = min((c["horizon_end_ts"] for c in remaining), default=None)
 
     def _sweep_elapsed_horizons(self, now_ts: int, final: bool = False) -> None:
         """Resolves pending candidates whose horizon has fully elapsed with no flip.
@@ -697,6 +764,9 @@ class FlipPredictionCollector(Strategy):
             return
         if not self.pending_candidates:
             self._next_pending_horizon_ns = None
+            return
+        if getattr(self, "_target_primitive", "flip_within_horizon") == "ordered_barrier":
+            self._resolve_ordered_barriers(None, now_ts=now_ts, final=final)
             return
         next_horizon = getattr(self, "_next_pending_horizon_ns", None)
         if not final and next_horizon is not None and now_ts < next_horizon:
@@ -759,9 +829,11 @@ class FlipPredictionCollector(Strategy):
         self.pending_candidates = []
 
     def _on_regime_flip(self, new_regime: int, flip_ts: int, open_price: float, close_price: float, atr_val: float) -> None:
+        # Ordered barriers are resolved exclusively from completed 1s OHLC events;
+        # an old regime-flip path must never override the compiled target primitive.
         # Resolve pending observations on opposing flip
         target_dir = -self.active_regime_dir if self.is_both_directions else self.target_dir
-        if (self.active_regime_dir in (-1, 1)) and new_regime == target_dir:
+        if getattr(self, "_target_primitive", "flip_within_horizon") != "ordered_barrier" and (self.active_regime_dir in (-1, 1)) and new_regime == target_dir:
             for cand in self.pending_candidates:
                 cand_ts = cand["observation_ts"]
                 within_horizon = cand_ts <= flip_ts <= cand["horizon_end_ts"]
@@ -882,6 +954,13 @@ class FlipPredictionCollector(Strategy):
                 self._evaluate_checkpoint(T, price_at_T=c, direction=self.active_regime_dir, triggering_1s_ts_init=ts_avail)
                 self.next_checkpoint_index += 1
 
+        if self._target_primitive == "ordered_barrier":
+            previous = self.last_ts_seen
+            max_gap = int(((self.cfg.target_contract or {}).get("required_forward_outcomes") or [{}])[0].get("max_gap_seconds", 0))
+            gap = bool(previous is not None and max_gap and (ts_avail - previous) > max_gap * NS)
+            self._resolve_ordered_barriers(
+                {"ts": int(ts_avail), "high": h, "low": l, "gap": gap}, now_ts=int(ts_avail),
+            )
         # Resolve any candidate whose forward horizon has now fully elapsed. Ordered
         # after checkpoint evaluation so a candidate declared at T is never swept by the
         # same bar that created it.
@@ -1015,6 +1094,8 @@ class FlipPredictionCollector(Strategy):
             "counter_regime_close_ts": int(ev.counter_regime_close_ts),
             "frozen_atr_arm": float(ev.frozen_atr_arm),
             "atr_t": atr_t,
+            "entry_price": float(price_at_T),
+            "target_frozen_atr": atr_t,
             "triggering_1s_ts_init": int(ts_avail),
             **feats,
         }

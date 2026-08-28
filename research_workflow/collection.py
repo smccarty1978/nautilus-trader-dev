@@ -38,6 +38,8 @@ def collect_period(
     it never bypasses the runtime chronology gate.
     """
     path = Path(study_path).resolve()
+    from research_workflow.experiment import _assert_study_open
+    _assert_study_open(path)
     auth = load_authorization(path)
     years = assert_period_authorized(auth, period)
     if period in {"oos", "dev"}:

@@ -34,6 +34,13 @@ def run_collect_mode(
     primary_interval: Optional[Tuple[int, int]] = None,
 ) -> Dict[str, Any]:
     """Runs a study in 'collect' mode through the NautilusTrader BacktestEngine."""
+    # Closure is checked before even loading the compiled study / planning catalog IO.
+    from research_workflow.study_closure import StudyClosureInvalid, load_study_closure
+    try:
+        if load_study_closure(Path(study_path)) is not None:
+            raise RuntimeError("STUDY_CLOSED: direct collection is prohibited")
+    except StudyClosureInvalid as exc:
+        raise RuntimeError(f"STUDY_CLOSURE_INVALID: {exc}") from exc
     # 1. Load and validate compiled study
     study_data = load_compiled_study(study_path)
     spec = study_data.spec
@@ -313,6 +320,8 @@ def build_collector_config_kwargs(
     if hasattr(strategy_binding.config_cls, "session_end_censoring"):
         censoring = (study_data.contracts.get("target_contract", {}) or {}).get("censoring_policy", {})
         cfg_kwargs["session_end_censoring"] = bool(censoring.get("session_end_censoring", True))
+    if hasattr(strategy_binding.config_cls, "target_contract"):
+        cfg_kwargs["target_contract"] = dict(study_data.contracts.get("target_contract", {}) or {})
     # Phase-zero authentication gate (fail-closed). A collector that declares this field
     # authenticates itself against a manifest at a study-relative path; this runtime never
     # knew about the field before, so it was always left at its "" default and every such
