@@ -973,6 +973,36 @@ same `build_outcome_columns()` the forward-outcome guard already protects, so
 `forward_outcomes.guard.OUTCOME_COLUMN_PATTERNS` directly, rather than a second scanner.
 A target declaring no `conditions` compiles exactly as it always has.
 
+**Execution.** A target with **≥ 2 conditions** compiles to `primitive: "composite"` and
+carries an explicit `target_expression` tree plus `censoring_composition`.
+`research_workflow/target_expression.py::compile_target_expression` builds the executable
+Boolean tree (`And` / `Or` over per-condition `PrimitiveTarget` leaves — `flip` →
+`flip_within_horizon`, `ordered_barrier` → `ordered_barrier`; `excursion`/`return` are
+represented for provenance but have no runtime and fail closed at
+`resolve_target_runtime`). `research_workflow/target_runtime.py::CompositeTargetRuntime`
+owns one child `TargetRuntime` per condition, streams **both** the 1s execution tape (to
+ordered-barrier children) and the prevailing-regime flips (to flip children), and composes
+their terminal results. `research_workflow/generic_collector.py::_resolve_composite` is the
+collector dispatch; `research_workflow/target_replay_oracle.py::replay_expression` is the
+independent second implementation (re-parses `conditions`/`condition_logic` itself, does not
+import the runtime's compiler). Preflight's `RUNTIME_CONTRACT_BINDING` check re-derives the
+expression from the contract and refuses (`TARGET_EXPRESSION_DRIFT` /
+`COMPOSITE_RUNTIME_EXPRESSION_MISMATCH`) if the embedded tree, the compiled tree and the
+runtime's tree are not identical.
+
+**Composition semantics — monotone `worst_status`, no Boolean short-circuit**
+(researcher-authorized 2026-08-28). A composite target is `RESOLVED` (carries a 0/1 label)
+**only when every child is itself resolved**. If any child is `CENSORED` / `AMBIGUOUS` /
+otherwise unresolved, the composite is `CENSORED`, carrying the worst child censor reason
+under the monotone severity ordering of
+`research_workflow.forward_outcomes.contracts.worst_status`. Only when every child has a
+label does `AND` (all True) / `OR` (any True) run. `AND(False, CENSORED) → NEGATIVE` and
+`OR(True, CENSORED) → POSITIVE` are **not** allowed — they would hide an unobservable
+required child and weaken target provenance. This is enforced identically in the compiled
+contract (`censoring_composition: "monotone_worst_status"`), the runtime, the replay
+oracle, and `research_workflow/tests/test_composite_target_expression.py`; there is no
+study-specific branch.
+
 ### 20.2 Derived causal inputs
 
 `FeaturesSpec.derived_inputs` (`DerivedCausalInputSpec`, initial `kind:

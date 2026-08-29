@@ -2,10 +2,10 @@
   "study_name": "workflow_canary_ordered_barrier_v1",
   "validator_version": 2,
   "validator_file_sha256": "9bb845812566a30159f2e2f247871728ae8f9f6ead128804c9875ddfdb209531",
-  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\workflow_canary_ordered_barrier_v1\\runs\\20260828_212944_workflow_canary_ordered_barrier_v1_day",
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\workflow_canary_ordered_barrier_v1\\runs\\20260829_034933_workflow_canary_ordered_barrier_v1_day",
   "candidates_parquet_sha256": "890b266f690df6049f1b6dc232c73f25ad6f7b1d48129b5ec6a34869cd6008ca",
-  "sealed_composite_sha256": "f79ecff8a466e6ae3fce130f42d3f9ab355915ea032ec8b1a5adc57eece05408",
-  "execution_manifest_composite_sha256": "f79ecff8a466e6ae3fce130f42d3f9ab355915ea032ec8b1a5adc57eece05408",
+  "sealed_composite_sha256": "93b33fadc8d21d186e93995e28f761f1bc3bc9641a10eb99c6d9715675d1fa69",
+  "execution_manifest_composite_sha256": "93b33fadc8d21d186e93995e28f761f1bc3bc9641a10eb99c6d9715675d1fa69",
   "smoke_date": "2023-03-03",
   "candidate_rows_total": 1984,
   "candidates_count_total": 1984,
@@ -48,13 +48,13 @@
     "orphaned_observations": 0,
     "duplicate_observations": 0,
     "disposition_counts": {
-      "LABELED_NEGATIVE": 841,
-      "LABELED_POSITIVE": 822,
-      "CENSORED": 321
+      "LABELED_NEGATIVE": 1225,
+      "CENSORED": 749,
+      "LABELED_POSITIVE": 10
     }
   },
   "observations_count": 1984,
   "deterministic_validation_verified": true,
   "status": "ACCEPTED",
-  "validated_at": "2026-08-28T21:29:59.557723+00:00"
+  "validated_at": "2026-08-29T03:49:56.672447+00:00"
 }

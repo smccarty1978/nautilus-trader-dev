@@ -12,7 +12,7 @@
         "prior_1m_regime_mfe_atr"
       ],
       "n_features": 5,
-      "n_rows": 1663,
+      "n_rows": 1235,
       "seed": 42,
       "hyperparameters": {
         "n_estimators": 20,
@@ -31,7 +31,7 @@
         "eval_partitions": [],
         "description": "derived from the metadata partition column"
       },
-      "dataset_identity_sha256": "2870c1374239cfd8b7cb15954283cdc5aaebe51688da50dee83050905d6f5e86",
+      "dataset_identity_sha256": "09d382f1e624fc986f4cb620533ace200d5f1604640dfebcabc80678e54108e2",
       "analysis_spec_sha256": "daced18b6ab2d9a07e77929462e8fa4d0a9b3123efd312af58ab0e958913fcb2",
       "library_versions": {
         "python": "3.13.7",
@@ -40,15 +40,15 @@
         "sklearn": "1.7.2",
         "lightgbm": "4.6.0"
       },
-      "model_sha256": "6affc00a6827a2ead0281e95129f94d23f95a99000adb02e09485b9d50cbdca2",
-      "x_content_sha256": "332079ed69bb1c21d8f38025b39f37a1d3f3a9e0ab206ee8bb72a21ccc440f9f",
-      "y_content_sha256": "b2cdf54a846fbb9973d84a80611006742e7acc731c1803a2ab95a24da1e4efb3",
+      "model_sha256": "5f53105a32a04499e4fb83287666eb973a214e133e9ba684c32fbc7b3242ac92",
+      "x_content_sha256": "5e877788c73599625f070e87b0ab641db91435170fca1e3e2d2e579db23d4fd7",
+      "y_content_sha256": "0a285d39841fb4058bceebccd236c26eb0a35b44c5b8851986d91b64fe78cbe7",
       "partition_provenance": "meta_partition",
       "prediction_sha256": null,
       "threshold_freeze": null,
       "modeling_version": "1.0.0",
-      "fitted_utc": "2026-08-28T21:30:16.459487+00:00",
-      "fit_identity_sha256": "8599e8c7a5764e2e750c87eeb2c9d04439329968800889be28672b1d9d766924"
+      "fitted_utc": "2026-08-29T04:20:34.617000+00:00",
+      "fit_identity_sha256": "85ea1df4992cee18ea3fc695f59bf94f2e11e0ca0c10651b6951534d7a3bcf00"
     }
   }
 }

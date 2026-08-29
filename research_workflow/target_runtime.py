@@ -2,6 +2,13 @@
 
 Target labels are runtime semantics.  This module is deliberately independent from
 the collector so a bounded replay can prove the emitted disposition before TRAIN.
+
+A ``composite`` target (``condition_logic: AND``/``OR`` over two or more conditions) is
+executed by :class:`CompositeTargetRuntime`, which owns one child ``TargetRuntime`` per
+condition and composes their terminal results through
+:mod:`research_workflow.target_expression` -- MONOTONE ``worst_status`` composition, no
+Boolean short-circuit (see that module).  A single-condition or plain ``flip`` target is
+unchanged.
 """
 from __future__ import annotations
 
@@ -10,22 +17,31 @@ import hashlib, json
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-POSITIVE, NEGATIVE, CENSORED = "POSITIVE", "NEGATIVE", "CENSORED"
+from research_workflow.target_expression import (
+    CENSORED,
+    NEGATIVE,
+    PENDING,
+    POSITIVE,
+    TargetExpression,
+    TargetExpressionError,
+    TargetResult,
+    compile_target_expression,
+    runtime_executable,
+)
+
 NS = 1_000_000_000
 
-class TargetRuntimeError(RuntimeError): pass
 
-@dataclass(frozen=True)
-class TargetResult:
-    disposition: str
-    label: int | None
-    resolved_at_ts: int | None = None
-    censor_reason: str | None = None
+class TargetRuntimeError(RuntimeError): pass
 
 class TargetRuntime:
     primitive: str = ""
     def terminal(self, candidate: Mapping[str, Any], events: Iterable[Mapping[str, Any]], *, final: bool = True) -> TargetResult:
         raise NotImplementedError
+    def ingest_flip(self, pending: dict, flip_event: Mapping[str, Any]) -> None:
+        """A prevailing-regime flip observed on the forward path.  No-op for runtimes
+        whose label does not depend on flip events (ordered barrier)."""
+        return None
     def from_disposition(self, disposition: str, *, resolved_at_ts: int | None = None,
                          censor_reason: str | None = None) -> TargetResult:
         if disposition in {POSITIVE, "LABELED_POSITIVE"}: return TargetResult(disposition, 1, resolved_at_ts)
@@ -34,18 +50,102 @@ class TargetRuntime:
 
 class FlipTargetRuntime(TargetRuntime):
     primitive = "flip_within_horizon"
-    def terminal(self, candidate, events, *, final=True):
+
+    # -- runtime-owned pending lifecycle (composite child) ---------------------
+    def open_pending(self, candidate: Mapping[str, Any]) -> dict:
+        T = int(candidate["observation_ts"])
+        horizon_s = int(candidate["horizon_seconds"])
+        role = str(candidate.get("target_direction_role", "opposite"))
+        prevailing = int(
+            candidate.get("regime_direction", candidate.get("direction", 0)) or 0
+        )
+        # "opposite" -> the flip that ends the prevailing regime; "same" -> a flip back
+        # into it; 0 (unknown) -> any established flip.
+        target_direction = {
+            "opposite": -prevailing,
+            "same": prevailing,
+        }.get(role, 0)
+        return {
+            "flip_events": [],
+            "observation_ts": T,
+            "horizon_end_ts": T + horizon_s * NS,
+            "session_close_ts": (
+                int(candidate["session_close_ts"])
+                if candidate.get("session_close_ts") is not None else None
+            ),
+            "target_direction": int(target_direction),
+            "max_gap_seconds": (
+                int(candidate["max_gap_seconds"])
+                if candidate.get("max_gap_seconds") is not None else None
+            ),
+            "gap": False,
+            "gap_ts": None,
+            "prev_ts": T,
+            "last_ts": T,
+        }
+
+    def ingest_bar(self, pending: dict, bar: Mapping[str, Any]) -> None:
+        if "flip_events" not in pending:
+            return
+        ts = int(bar["ts"])
+        if ts <= pending["prev_ts"]:
+            pending["last_ts"] = max(pending["last_ts"], ts)
+            return
+        # Same gap rule as the ordered-barrier child: an explicit gap flag OR an inter-bar
+        # delta over max_gap_seconds interrupts the flip window.
+        mg = pending.get("max_gap_seconds")
+        if not pending["gap"] and (
+            bar.get("gap") or (mg is not None and ts - pending["prev_ts"] > mg * NS)
+        ):
+            pending["gap"], pending["gap_ts"] = True, ts
+        pending["prev_ts"] = ts
+        pending["last_ts"] = ts
+
+    def ingest_flip(self, pending: dict, flip_event: Mapping[str, Any]) -> None:
+        if "flip_events" not in pending:
+            return
+        pending["flip_events"].append(
+            {"ts": int(flip_event["ts"]), "direction": int(flip_event.get("direction", 0))}
+        )
+
+    def terminal(self, candidate, events=None, *, final=True):
+        if "flip_events" in candidate:
+            return self._terminal_pending(candidate, final=final)
+        return self._terminal_legacy(candidate, events, final=final)
+
+    @staticmethod
+    def _terminal_legacy(candidate, events, *, final):
         end = int(candidate["horizon_end_ts"]); start = int(candidate["observation_ts"])
         close = candidate.get("session_close_ts")
         if close is not None and end > int(close):
             return TargetResult(CENSORED, None, int(close), "SESSION_END")
-        for e in events:
+        for e in events or ():
             ts = int(e["ts"])
             if e.get("gap"):
                 return TargetResult(CENSORED, None, ts, "GAP")
             if start <= ts <= end and e.get("flip"):
                 return TargetResult(POSITIVE, 1, ts)
-        return TargetResult(NEGATIVE, 0, end) if final else TargetResult("PENDING", None)
+        return TargetResult(NEGATIVE, 0, end) if final else TargetResult(PENDING, None)
+
+    @staticmethod
+    def _terminal_pending(pending, *, final):
+        start = int(pending["observation_ts"]); end = int(pending["horizon_end_ts"])
+        close = pending.get("session_close_ts")
+        if close is not None and end > int(close):
+            return TargetResult(CENSORED, None, int(close), "SESSION_END")
+        gap_ts = int(pending["gap_ts"]) if pending.get("gap") and pending.get("gap_ts") is not None else None
+        # A flip is only observed if it lands within the horizon AND before any tape gap.
+        limit = end if gap_ts is None else min(end, gap_ts)
+        tgt = int(pending.get("target_direction", 0))
+        for fe in sorted(pending["flip_events"], key=lambda x: int(x["ts"])):
+            ts = int(fe["ts"])
+            if start < ts <= limit and (tgt == 0 or int(fe["direction"]) == tgt):
+                return TargetResult(POSITIVE, 1, ts)
+        if gap_ts is not None and gap_ts <= end:
+            return TargetResult(CENSORED, None, gap_ts, "GAP")
+        if final or int(pending.get("last_ts", start)) >= end:
+            return TargetResult(NEGATIVE, 0, end)
+        return TargetResult(PENDING, None)
 
 class OrderedBarrierTargetRuntime(TargetRuntime):
     """Asymmetric direction-normalized favorable/adverse ATR barrier race.
@@ -145,13 +245,13 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
         legacy = "entry_resolved" not in pending
         if legacy:
             if pending.get("entry_price") is None:
-                return TargetResult("PENDING", None)
+                return TargetResult(PENDING, None)
             entry_ts = int(pending["observation_ts"])
             entry_price = float(pending["entry_price"])
             horizon_end_ts = int(pending["horizon_end_ts"])
         else:
             if not pending["entry_resolved"]:
-                return TargetResult("PENDING", None)
+                return TargetResult(PENDING, None)
             entry_ts = int(pending["entry_ts"])
             entry_price = float(pending["entry_price"])
             horizon_end_ts = int(pending["horizon_end_ts"])
@@ -199,23 +299,177 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
         last_ts = int(evs[-1]["ts"]) if evs else entry_ts
         if final or last_ts >= horizon_end_ts:
             return TargetResult(NEGATIVE, 0, horizon_end_ts)  # TIMEOUT -> negative
-        return TargetResult("PENDING", None)
+        return TargetResult(PENDING, None)
+
+
+class CompositeTargetRuntime(TargetRuntime):
+    """Executes the FULL compiled Boolean target expression.
+
+    Owns one child ``TargetRuntime`` per condition and composes their terminal results
+    through :func:`research_workflow.target_expression.compose_child_results`
+    (monotone ``worst_status``, no short-circuit).  Unknown / non-executable
+    composition fails closed at construction.
+    """
+
+    primitive = "composite"
+
+    def __init__(self, contract: Mapping[str, Any]):
+        self.expression: TargetExpression = compile_target_expression(contract)
+        runtime_executable(self.expression)  # fail closed on excursion/return leaves
+        self._leaves = {leaf.condition_id: leaf for leaf in self.expression.leaves()}
+        self._child_runtimes: dict[str, TargetRuntime] = {}
+        for cid, leaf in self._leaves.items():
+            cls = _RUNTIMES.get(leaf.primitive)
+            if cls is None:  # pragma: no cover - runtime_executable already guarded
+                raise TargetRuntimeError(f"UNKNOWN_TARGET_PRIMITIVE: {leaf.primitive!r}")
+            self._child_runtimes[cid] = cls()
+
+    # -- identity ------------------------------------------------------------
+    def canonical(self) -> str:
+        return self.expression.canonical()
+
+    def expression_dict(self) -> dict[str, Any]:
+        return self.expression.to_dict()
+
+    # -- pending lifecycle --------------------------------------------------
+    def open_pending(self, candidate: Mapping[str, Any]) -> dict:
+        T = int(candidate["observation_ts"])
+        session_close = (
+            int(candidate["session_close_ts"])
+            if candidate.get("session_close_ts") is not None else None
+        )
+        prevailing = int(
+            candidate.get("regime_direction", candidate.get("direction", 0)) or 0
+        )
+        children: dict[str, dict] = {}
+        horizon_ends: list[int] = []
+        for cid, leaf in self._leaves.items():
+            p = dict(leaf.params)
+            child_candidate = {
+                "observation_ts": T,
+                "regime_start_ns": candidate.get("regime_start_ns"),
+                "regime_direction": prevailing,
+                "direction": prevailing,
+                "checkpoint_index": candidate.get("checkpoint_index"),
+                "session_close_ts": session_close,
+            }
+            if leaf.primitive == "flip_within_horizon":
+                child_candidate["horizon_seconds"] = int(p["horizon_seconds"])
+                child_candidate["target_direction_role"] = str(p.get("target_direction_role", "opposite"))
+                child_candidate["max_gap_seconds"] = p.get("max_gap_seconds")
+                horizon_ends.append(T + int(p["horizon_seconds"]) * NS)
+            elif leaf.primitive == "ordered_barrier":
+                child_candidate["atr"] = float(candidate["atr"])
+                child_candidate["favorable_atr"] = float(p["favorable_atr"])
+                child_candidate["adverse_atr"] = float(p["adverse_atr"])
+                child_candidate["horizon_seconds"] = int(p["horizon_seconds"])
+                child_candidate["entry_reference"] = str(p.get("entry_reference", "next_bar_open"))
+                child_candidate["max_gap_seconds"] = p.get("max_gap_seconds")
+                if not p.get("session_end_censoring", False):
+                    child_candidate["session_close_ts"] = None
+                horizon_ends.append(T + int(p["horizon_seconds"]) * NS)
+            children[cid] = self._child_runtimes[cid].open_pending(child_candidate)
+        return {
+            "__composite__": True,
+            "observation_ts": T,
+            "regime_start_ns": candidate.get("regime_start_ns"),
+            "regime_direction": prevailing,
+            "checkpoint_index": candidate.get("checkpoint_index"),
+            "session_close_ts": session_close,
+            "children": children,
+            "horizon_end_ts": max(horizon_ends) if horizon_ends else T,
+            "entry_resolved": True,  # refined by ingest_bar; composite has no single entry
+        }
+
+    def parity_row(self, pending: Mapping[str, Any], actual: Mapping[str, Any]) -> dict:
+        """Assemble an independent-replay parity row from a resolved composite pending.
+
+        The oracle (``validate_target_parity`` -> ``replay_expression``) re-derives the
+        label from the contract + these raw causal inputs (the 1s tape and the observed
+        flips), never from a per-child ``TargetResult`` the runtime computed.
+        """
+        events: list = []
+        flip_events: list = []
+        atr = None
+        for cid, child in pending["children"].items():
+            prim = self._leaves[cid].primitive
+            if prim == "ordered_barrier":
+                events = [dict(e) for e in child.get("events", ())]
+                atr = child.get("atr")
+            elif prim == "flip_within_horizon":
+                flip_events = [dict(f) for f in child.get("flip_events", ())]
+        return {
+            "candidate": {
+                "observation_ts": int(pending["observation_ts"]),
+                "atr": atr,
+                "direction": int(pending["regime_direction"]),
+                "regime_direction": int(pending["regime_direction"]),
+                "session_close_ts": pending.get("session_close_ts"),
+            },
+            "events": events,
+            "flip_events": flip_events,
+            "actual": dict(actual),
+        }
+
+    def ingest_bar(self, pending: dict, bar: Mapping[str, Any]) -> None:
+        for cid, child in pending["children"].items():
+            self._child_runtimes[cid].ingest_bar(child, bar)
+        # Keep the sweep bookkeeping honest: an ordered-barrier child's deadline is only
+        # known once its next_bar_open entry has resolved.
+        ends = [pending["observation_ts"]]
+        all_entered = True
+        for child in pending["children"].values():
+            if "entry_resolved" in child:  # ordered-barrier child
+                if child["entry_resolved"] and child.get("horizon_end_ts") is not None:
+                    ends.append(int(child["horizon_end_ts"]))
+                else:
+                    all_entered = False
+            elif "horizon_end_ts" in child:  # flip child
+                ends.append(int(child["horizon_end_ts"]))
+        pending["horizon_end_ts"] = max(ends)
+        pending["entry_resolved"] = all_entered
+
+    def ingest_flip(self, pending: dict, flip_event: Mapping[str, Any]) -> None:
+        for cid, child in pending["children"].items():
+            self._child_runtimes[cid].ingest_flip(child, flip_event)
+
+    def terminal(self, pending, events=None, *, final=True, now_ts: int | None = None):
+        child_results: dict[str, TargetResult] = {}
+        for cid, child in pending["children"].items():
+            res = self._child_runtimes[cid].terminal(child, final=final)
+            if res.disposition == PENDING and final:
+                # An unresolved required child at run end is unobservable -> DATA_END,
+                # which the monotone rule turns into a censored composite.
+                res = TargetResult(CENSORED, None, now_ts, "DATA_END")
+            child_results[cid] = res
+        return self.expression.evaluate(child_results)
+
 
 _RUNTIMES = {"flip_within_horizon": FlipTargetRuntime, "ordered_barrier": OrderedBarrierTargetRuntime}
+
+
 def resolve_target_runtime_closure(study_dir: str | Path) -> dict[str, Any]:
     """Identity of target contract, runtime/oracle code, and actual collector dispatch."""
     study = Path(study_dir).resolve()
     compiled_path = study / "compiled_study.json"
     compiled = json.loads(compiled_path.read_text(encoding="utf-8")) if compiled_path.is_file() else {}
     root = Path(__file__).resolve().parents[1]
-    files = [root / "research_workflow/target_runtime.py", root / "research_workflow/target_replay_oracle.py", root / "research_workflow/generic_collector.py"]
+    files = [root / "research_workflow/target_runtime.py", root / "research_workflow/target_expression.py",
+             root / "research_workflow/target_replay_oracle.py", root / "research_workflow/generic_collector.py"]
     parts = {"target_contract": (compiled.get("contracts") or {}).get("target_contract") or {}}
     parts["files"] = {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     return {"target_runtime_closure_sha256": hashlib.sha256(json.dumps(parts, sort_keys=True, separators=(",", ":")).encode()).hexdigest(), "components": parts}
+
+
 def resolve_target_runtime(contract: Mapping[str, Any], *, legacy_mode: bool = False) -> TargetRuntime:
     primitive = contract.get("primitive")
     if primitive is None and legacy_mode:
         primitive = "flip_within_horizon"
+    if str(primitive) == "composite":
+        try:
+            return CompositeTargetRuntime(contract)
+        except TargetExpressionError as exc:
+            raise TargetRuntimeError(str(exc)) from exc
     cls = _RUNTIMES.get(str(primitive))
     if cls is None:
         raise TargetRuntimeError(f"UNKNOWN_TARGET_PRIMITIVE: {primitive!r}")
@@ -223,7 +477,7 @@ def resolve_target_runtime(contract: Mapping[str, Any], *, legacy_mode: bool = F
 
 _DISPOSITION_ALIASES = {
     "LABELED_POSITIVE": POSITIVE, "LABELED_NEGATIVE": NEGATIVE,
-    "POSITIVE": POSITIVE, "NEGATIVE": NEGATIVE, "CENSORED": CENSORED, "PENDING": "PENDING",
+    "POSITIVE": POSITIVE, "NEGATIVE": NEGATIVE, "CENSORED": CENSORED, "PENDING": PENDING,
 }
 
 
@@ -235,17 +489,25 @@ def validate_target_parity(contract: Mapping[str, Any], rows: Iterable[Mapping[s
     """Compare the runtime's emitted disposition against the INDEPENDENT replay oracle.
 
     The oracle re-derives candidate T, the frozen candidate-time ATR, the first
-    qualifying 1s open after T, and the ordered-barrier path from the contract and the
-    causal tape -- it never reads a runtime-internal pending field such as a
-    pre-populated ``entry_price``.  Disposition names are normalized so the collector's
-    ``LABELED_POSITIVE``/``LABELED_NEGATIVE`` compare equal to the oracle's
-    ``POSITIVE``/``NEGATIVE``.
+    qualifying 1s open after T, the ordered-barrier path, the flip window, AND the
+    Boolean composition -- from the contract and the causal tape.  It never reads a
+    runtime-internal pending field such as a pre-populated ``entry_price`` or a
+    per-child ``TargetResult`` computed by the runtime.  Disposition names are
+    normalized so the collector's ``LABELED_*`` compare equal to the oracle's bare
+    names.
+
+    A composite row supplies ``events`` (the 1s tape, carrying ``open``) and
+    ``flip_events`` (the observed prevailing-regime flips).
     """
     runtime = resolve_target_runtime(contract, legacy_mode=legacy_mode)
     dm = lm = cm = 0; total = 0; examples = []
     for row in rows:
-        from research_workflow.target_replay_oracle import replay
-        if runtime.primitive == "ordered_barrier":
+        from research_workflow.target_replay_oracle import replay, replay_expression
+        if runtime.primitive == "composite":
+            oracle = replay_expression(
+                contract, row["candidate"], row.get("events", ()), row.get("flip_events", ())
+            )
+        elif runtime.primitive == "ordered_barrier":
             oracle = replay(contract, row["candidate"], row.get("events", ()))
         else:
             oracle = runtime.terminal(row["candidate"], row.get("events", ())).__dict__
@@ -268,4 +530,6 @@ def validate_target_parity(contract: Mapping[str, Any], rows: Iterable[Mapping[s
             "censoring_mismatches": cm,
             "passed": dm == 0 and lm == 0 and cm == 0, "examples": examples[:10]}
 
-__all__ = ["TargetRuntimeError", "TargetResult", "FlipTargetRuntime", "OrderedBarrierTargetRuntime", "resolve_target_runtime", "validate_target_parity"]
+__all__ = ["TargetRuntimeError", "TargetResult", "FlipTargetRuntime", "OrderedBarrierTargetRuntime",
+           "CompositeTargetRuntime", "resolve_target_runtime", "resolve_target_runtime_closure",
+           "validate_target_parity", "POSITIVE", "NEGATIVE", "CENSORED", "PENDING", "NS"]

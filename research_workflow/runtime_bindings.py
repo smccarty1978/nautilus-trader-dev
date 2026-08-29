@@ -93,7 +93,7 @@ def _collector_dispatches_target_runtime(cls) -> bool:
     except (OSError, TypeError):
         return False
     return ("resolve_target_runtime(" in src and "_resolve_ordered_barriers(" in src
-            and ".terminal(" in src)
+            and "_resolve_composite(" in src and ".terminal(" in src)
 
 
 def collector_runtime_capabilities(strategy_class: str | None) -> Dict[str, Any]:
@@ -162,6 +162,43 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
             target_checked["target_runtime_closure_sha256"] = resolve_target_runtime_closure(study_dir)["target_runtime_closure_sha256"]
             if not target_checked["dispatch"]:
                 raise RuntimeBindingError("collector source does not dispatch resolved TargetRuntime")
+            # PREFLIGHT_EXPRESSION_BINDING: the executable Boolean expression the runtime
+            # will run MUST equal the expression compiled from the contract's own
+            # conditions/condition_logic AND the target_expression tree embedded in the
+            # contract.  A drift (hand-edited target_expression, a stale contract, a
+            # runtime that would drop a child) fails closed here.
+            from research_workflow.target_expression import (
+                compile_target_expression,
+                serialize_expression,
+            )
+
+            compiled_expr = serialize_expression(target_contract)
+            target_checked["expression_binding"] = {
+                "compiled_from_conditions": compiled_expr,
+                "embedded_in_contract": target_contract.get("target_expression"),
+                "runtime_canonical_matches": None,
+                "censoring_composition": target_contract.get("censoring_composition"),
+            }
+            if target_contract.get("conditions"):
+                embedded = target_contract.get("target_expression")
+                if embedded is not None and embedded != compiled_expr:
+                    raise RuntimeBindingError(
+                        "TARGET_EXPRESSION_DRIFT: contract.target_expression does not match "
+                        "the expression compiled from contract.conditions/condition_logic"
+                    )
+                if str(target_contract.get("primitive")) == "composite":
+                    import json as _json
+
+                    runtime_canonical = runtime.canonical()
+                    want = _json.dumps(compiled_expr, sort_keys=True, separators=(",", ":"))
+                    target_checked["expression_binding"]["runtime_canonical_matches"] = (
+                        runtime_canonical == want
+                    )
+                    if runtime_canonical != want:
+                        raise RuntimeBindingError(
+                            "COMPOSITE_RUNTIME_EXPRESSION_MISMATCH: CompositeTargetRuntime "
+                            "would execute a different expression than the compiled contract"
+                        )
         except Exception as e:
             missing.append({"primitive": "target_contract.primitive", "declared": target_contract.get("primitive"),
                             "required_binding": "research_workflow.target_runtime.TargetRuntime", "collector": caps["strategy_class"],

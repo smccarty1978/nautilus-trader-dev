@@ -5,7 +5,9 @@
 
 Second disposable canary. Exercises only the frozen-external-model reuse path: references
 the preserved model of the CLOSED study `workflow_canary_ordered_barrier_v1` by immutable
-`model_id` (`88fbba9568763c4122f6a8b98f096222cb8b656b9238525b4542f90ae3d2a2ce`).
+`model_id` (`be1bda56e1e60cd578bb064be209560c76955b6127bed6d0e3eff6e6554e4818` — the
+corrected **composite-target** canary model, re-verified 2026-08-29; the pre-fix
+barrier-only model `88fbba95…` is superseded and retained only as forensic history).
 
 No market-data collection. Verified:
 

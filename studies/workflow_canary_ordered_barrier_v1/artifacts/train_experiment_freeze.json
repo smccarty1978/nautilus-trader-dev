@@ -10,7 +10,7 @@
     ]
   },
   "model_hashes": {
-    "CANARY_SINGLE": "8599e8c7a5764e2e750c87eeb2c9d04439329968800889be28672b1d9d766924"
+    "CANARY_SINGLE": "85ea1df4992cee18ea3fc695f59bf94f2e11e0ca0c10651b6951534d7a3bcf00"
   },
   "preprocessing_hash": "2ddb73c223b65dec9b27eec4a49a390465067f8c33c2ef79d0edbb81fefa1a7e",
   "thresholds": {
@@ -18,19 +18,19 @@
       "p90": {
         "method": "quantile",
         "parameter": 0.9,
-        "threshold": 0.5639129910657972,
+        "threshold": 0.01251363872730377,
         "derivation_population": "train"
       },
       "p95": {
         "method": "quantile",
         "parameter": 0.95,
-        "threshold": 0.5979173720183701,
+        "threshold": 0.021191454649722295,
         "derivation_population": "train"
       },
       "p97_5": {
         "method": "quantile",
         "parameter": 0.975,
-        "threshold": 0.63869263800364,
+        "threshold": 0.03464838307946264,
         "derivation_population": "train"
       }
     }
@@ -38,15 +38,15 @@
   "deciles": {
     "CANARY_SINGLE": {
       "boundaries": [
-        0.38742321324960843,
-        0.45665422023089414,
-        0.4880130119702895,
-        0.4996959257811719,
-        0.5039319402494621,
-        0.5139687185680043,
-        0.5256930490041654,
-        0.5417003320927185,
-        0.5639129910657972
+        0.001634731744725281,
+        0.0020756430504642654,
+        0.002557765974707421,
+        0.002955484053072219,
+        0.003891161445474551,
+        0.004443571860098091,
+        0.005624609308909038,
+        0.007056234724659493,
+        0.01251363872730377
       ],
       "derivation": "TRAIN_ONLY"
     }
@@ -54,24 +54,24 @@
   "model_selection_manifest_sha256": null,
   "model_artifacts": [
     {
-      "model_id": "88fbba9568763c4122f6a8b98f096222cb8b656b9238525b4542f90ae3d2a2ce",
+      "model_id": "be1bda56e1e60cd578bb064be209560c76955b6127bed6d0e3eff6e6554e4818",
       "model_role": "CANARY_SINGLE",
-      "artifact_path": "workflow_canary_ordered_barrier_v1/artifacts/models/88fbba9568763c4122f6a8b98f096222cb8b656b9238525b4542f90ae3d2a2ce.joblib",
-      "artifact_sha256": "66ef5ed7e94ed14d13989267de562537924008fca07bf1320ab98b1d7aae9f2a",
-      "golden_fixture_path": "workflow_canary_ordered_barrier_v1/artifacts/models/88fbba9568763c4122f6a8b98f096222cb8b656b9238525b4542f90ae3d2a2ce.golden.json",
-      "golden_fixture_sha256": "8d9f1d59ff9d7d667aa8859635248bb4f6ca3cf3c6841bd78ab427f3a90aa4ef",
-      "native_booster_path": "workflow_canary_ordered_barrier_v1/artifacts/models/88fbba9568763c4122f6a8b98f096222cb8b656b9238525b4542f90ae3d2a2ce.booster.txt",
-      "native_booster_sha256": "a3e55799eca44e24ec1f27f8fc470a0192664152830f7b8266ccb47dc9e4f457"
+      "artifact_path": "workflow_canary_ordered_barrier_v1/artifacts/models/be1bda56e1e60cd578bb064be209560c76955b6127bed6d0e3eff6e6554e4818.joblib",
+      "artifact_sha256": "503e873d595aebca995d0ccf2ff0bd4bd7983c79c540e57cfabcbdb7535d043c",
+      "golden_fixture_path": "workflow_canary_ordered_barrier_v1/artifacts/models/be1bda56e1e60cd578bb064be209560c76955b6127bed6d0e3eff6e6554e4818.golden.json",
+      "golden_fixture_sha256": "e391c473d4e34c6d84dcc1658c5476e511198943b800cb4e7d5175a3f6409792",
+      "native_booster_path": "workflow_canary_ordered_barrier_v1/artifacts/models/be1bda56e1e60cd578bb064be209560c76955b6127bed6d0e3eff6e6554e4818.booster.txt",
+      "native_booster_sha256": "726312cd78d2929bf28c06ab56f9d58a45c76bce038e34801254f64cf265dbac"
     }
   ],
   "stage_scoped_lineage": {
-    "COLLECTION_PRODUCER_CLOSURE": "f79ecff8a466e6ae3fce130f42d3f9ab355915ea032ec8b1a5adc57eece05408",
-    "TARGET_RUNTIME_CLOSURE": "8d4ef67a2d06a1af20a4da86d574cc47a3176d45bb11521c1d2d8cae143d1379",
-    "MODELING_EXECUTION_CLOSURE": "fd6806dad6502c98b748ef14fedce6b4156d05028cf7f08d28c7a5b5d357df85"
+    "COLLECTION_PRODUCER_CLOSURE": "93b33fadc8d21d186e93995e28f761f1bc3bc9641a10eb99c6d9715675d1fa69",
+    "TARGET_RUNTIME_CLOSURE": "aabcc76f4aa8482bac669e32812500a72c358906dd987c2600c448112b63f9b8",
+    "MODELING_EXECUTION_CLOSURE": "ed5de9b11849746a484c045d587f688d831a0a18d89d8b73ebaffc413ea4dc99"
   },
   "schema_version": 1,
   "study_id": "workflow_canary_ordered_barrier_v1",
   "authorization_sha256": "ef937ba43e10b7727687716d4747efef0b691ea79d68c4ba3077866822c4066f",
-  "generated_at_utc": "2026-08-28T21:30:17.479274+00:00",
-  "freeze_sha256": "7dae3f3d876ccce50ef5d843afb81057eb46b37b50aad0ad9888c9812a8645d6"
+  "generated_at_utc": "2026-08-29T04:20:35.912131+00:00",
+  "freeze_sha256": "b63bf524e6b2c9419136fd6d11856de9dd1166fe4a15d09927998199ce70e6a7"
 }

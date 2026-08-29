@@ -1,5 +1,5 @@
 {
-  "primitive": "ordered_barrier",
+  "primitive": "composite",
   "target_type": "composite",
   "event": "regime_flip",
   "direction": "opposite",
@@ -118,5 +118,38 @@
         "source_freeze_sha256"
       ]
     }
-  ]
+  ],
+  "target_expression": {
+    "node": "and",
+    "logic": "AND",
+    "censoring_composition": "monotone_worst_status",
+    "no_short_circuit": true,
+    "children": [
+      {
+        "node": "primitive",
+        "condition_id": "flip_within_60s",
+        "primitive": "flip_within_horizon",
+        "params": {
+          "horizon_seconds": 60,
+          "target_direction_role": "opposite"
+        }
+      },
+      {
+        "node": "primitive",
+        "condition_id": "ordered_barrier_canary",
+        "primitive": "ordered_barrier",
+        "params": {
+          "adverse_atr": 0.25,
+          "barrier_id": "barrier_canary",
+          "entry_reference": "next_bar_open",
+          "favorable_atr": 0.25,
+          "forward_outcome_id": "fo_canary_60s",
+          "horizon_seconds": 60,
+          "max_gap_seconds": 1,
+          "session_end_censoring": true
+        }
+      }
+    ]
+  },
+  "censoring_composition": "monotone_worst_status"
 }

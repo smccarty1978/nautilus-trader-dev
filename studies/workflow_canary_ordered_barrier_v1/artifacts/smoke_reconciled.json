@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "seal_sha256": "64b7cd018019c3a82a9283d62ec9bd749d09c5dea4f3b714b26d4e37177be286",
+  "execution_composite_sha256": "93b33fadc8d21d186e93995e28f761f1bc3bc9641a10eb99c6d9715675d1fa69",
+  "reconciliation": {
+    "runs_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\workflow_canary_ordered_barrier_v1\\runs",
+    "runs": [
+      {
+        "run_id": "20260829_032501_workflow_canary_ordered_barrier_v1_day",
+        "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\workflow_canary_ordered_barrier_v1\\runs\\20260829_032501_workflow_canary_ordered_barrier_v1_day",
+        "has_manifest": true,
+        "has_status": true,
+        "study_id": "workflow_canary_ordered_barrier_v1",
+        "manifest_status": "COMPLETED",
+        "status_status": "SUCCESS",
+        "state": "SUCCESS",
+        "reason": "run recorded its own terminal status",
+        "reconciled_at_utc": "2026-08-29T03:49:56.673706+00:00"
+      },
+      {
+        "run_id": "20260829_033753_workflow_canary_ordered_barrier_v1_day",
+        "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\workflow_canary_ordered_barrier_v1\\runs\\20260829_033753_workflow_canary_ordered_barrier_v1_day",
+        "has_manifest": true,
+        "has_status": true,
+        "study_id": "workflow_canary_ordered_barrier_v1",
+        "manifest_status": "FAILED",
+        "status_status": "FAILED",
+        "state": "FAILED",
+        "reason": "run recorded its own terminal status",
+        "reconciled_at_utc": "2026-08-29T03:49:56.673706+00:00"
+      },
+      {
+        "run_id": "20260829_034933_workflow_canary_ordered_barrier_v1_day",
+        "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\workflow_canary_ordered_barrier_v1\\runs\\20260829_034933_workflow_canary_ordered_barrier_v1_day",
+        "has_manifest": true,
+        "has_status": true,
+        "study_id": "workflow_canary_ordered_barrier_v1",
+        "manifest_status": "COMPLETED",
+        "status_status": "SUCCESS",
+        "state": "SUCCESS",
+        "reason": "run recorded its own terminal status",
+        "reconciled_at_utc": "2026-08-29T03:49:56.673706+00:00"
+      }
+    ],
+    "counts": {
+      "SUCCESS": 2,
+      "FAILED": 1
+    }
+  }
+}

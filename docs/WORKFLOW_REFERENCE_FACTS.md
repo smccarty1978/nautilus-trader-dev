@@ -103,24 +103,27 @@ timeframes aggregated from completed lower-timeframe bars) are rules and live in
 
 ## Known defects (framework backlog)
 
-**`generic_collector.py` ignores a compiled ordered-barrier `target_contract`.**
-The target engine compiles `required_forward_outcomes` (ordered ±ATR barrier specs) into
-`compiled_study.json`, and `docs/RESEARCH_WORKFLOW.md` §9 describes a streaming
-`forward_outcomes` tracker — but `research_workflow/generic_collector.py` never instantiates
-`research_workflow/forward_outcomes/tracker.py`. For every candidate (checkpoint **and**
-episode paths) it resolves `disposition` / `target_flip_within_horizon` through its legacy
-path (`_track_pending` / `_emit_observation` / `_sweep_elapsed_horizons` / `_on_regime_flip`):
-`LABELED_POSITIVE` iff the opposing 1m regime flip lands within the horizon, `LABELED_NEGATIVE`
-iff the horizon elapses with no opposing flip, `CENSORED` iff the horizon crosses the RTH
-session close. `atr_t` is stored on the row but never used for labeling; no
-`favorable ≥ favorable_atr·ATR_T` / `adverse ≥ adverse_atr·ATR_T`, no ambiguous-first-touch.
-Any `flip_prediction` study whose `target_contract.target_type` is `composite` with
-`ordered_barrier` conditions is therefore collecting the wrong target.
-Discovered 2026-08-28 (`studies/deep_pullback_5s_reacceleration_model/`, exhaustive 1s-bar
-replay: 51.7% binary-label disagreement, `artifacts/target_replay_diagnostic.json`). Repair
-is a collector-runtime change → new runtime closure → re-seal → re-collect. Backlog item;
-not yet scheduled (the study that surfaced it closed diagnostic-negative under the correct
-target, so there is no live consumer forcing the fix).
+**RESOLVED 2026-08-28/29 — compiled `ordered_barrier` / `composite` targets are now
+executed.** `research_workflow/target_runtime.py` (`OrderedBarrierTargetRuntime`,
+`CompositeTargetRuntime`), `research_workflow/target_expression.py`,
+`research_workflow/target_replay_oracle.py` and `research_workflow/generic_collector.py`
+now resolve every compiled `primitive` from the contract:
+* a single `ordered_barrier` condition runs the ±ATR barrier race off the 1s tape with the
+  entry reference resolved from `next_bar_open` and the barrier ATR frozen at T (fixed
+  first, proven by `studies/workflow_canary_ordered_barrier_v1`);
+* a `composite` target (≥ 2 conditions) runs the **full** compiled Boolean expression —
+  every child conjoined/disjoined per `condition_logic`, monotone `worst_status` censoring,
+  no Boolean short-circuit (`docs/RESEARCH_WORKFLOW.md` §20.1).
+
+Historically `generic_collector.py` resolved every candidate through a legacy 1m-regime-flip
+path regardless of the compiled contract, and a `composite` `AND(flip, ordered_barrier)`
+compiled to `primitive: "ordered_barrier"` with the `flip` child silently dropped — and the
+replay oracle shared the omission so parity falsely passed (51.7% binary-label disagreement
+found in `studies/deep_pullback_5s_reacceleration_model/artifacts/target_replay_diagnostic.json`,
+2026-08-28). `studies/deep_pullback_5s_reacceleration_model` closed diagnostic-negative under
+the correct label and is not reopened. `studies/workflow_canary_ordered_barrier_v1` (a
+composite `AND` canary) was re-sealed, re-collected, re-fit, re-frozen and re-closed under
+the corrected semantics; its pre-fix `target_replay_parity.json` is a HISTORICAL_FALSE_PASS.
 
 **`GenericRollingProductivityProvider` (`Rolling5mProductivityTracker`) requires an exact
 contiguous window of printed 1s bars** (301/301 for `window=300s`). NQ 1s bars print only on

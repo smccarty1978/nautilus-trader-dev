@@ -431,6 +431,19 @@ class FlipPredictionCollector(Strategy):
         self._ordered_barrier_max_gap_seconds = (
             _ordered[0].get("max_gap_seconds") if _ordered else None
         )
+        # A composite target (>= 2 conditions) is executed by CompositeTargetRuntime,
+        # which owns one child runtime per condition and conjoins/disjoins them per
+        # condition_logic (monotone worst_status censoring, no short-circuit). The
+        # collector streams BOTH the 1s tape and prevailing-regime flips to it.
+        self._composite_target = self._target_primitive == "composite"
+        self._composite_parity_rows: List[Dict[str, Any]] = []
+        self._composite_gap_seconds = None
+        if self._composite_target:
+            _gaps = [
+                fo.get("max_gap_seconds") for fo in _ordered
+                if fo.get("max_gap_seconds") is not None
+            ]
+            self._composite_gap_seconds = min(_gaps) if _gaps else None
 
         # Telemetry & Output logs
         self.candidates_log: List[Dict[str, Any]] = []
@@ -642,6 +655,23 @@ class FlipPredictionCollector(Strategy):
         if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
             return
 
+        if getattr(self, "_target_primitive", "flip_within_horizon") == "composite":
+            direction = int(cand_record.get("regime_direction", self.active_regime_dir))
+            candidate = {
+                "observation_ts": int(cand_record["observation_ts"]),
+                "regime_start_ns": cand_record["regime_start_ns"],
+                "regime_direction": direction,
+                "direction": direction,
+                "checkpoint_index": cand_record["checkpoint_index"],
+                "atr": self._frozen_target_atr_at_T(cand_record),
+                "session_close_ts": (
+                    session_close_ns(T, self.cfg.session)
+                    if self.cfg.session_end_censoring else None
+                ),
+            }
+            self.pending_candidates.append(self._target_runtime.open_pending(candidate))
+            return
+
         if getattr(self, "_target_primitive", "flip_within_horizon") == "ordered_barrier":
             if not self._ordered_barrier:
                 raise RuntimeError("TARGET_RUNTIME_MISMATCH: ordered_barrier has no compiled barrier")
@@ -807,6 +837,80 @@ class FlipPredictionCollector(Strategy):
             (c["horizon_end_ts"] for c in remaining if c.get("entry_resolved")), default=None
         )
 
+    def _resolve_composite(self, event: Optional[Dict[str, Any]], *, now_ts: int, final: bool = False) -> None:
+        """Stream one completed 1s bar to every pending composite candidate.
+
+        The CompositeTargetRuntime routes the bar to each ordered-barrier child and
+        the prevailing-regime flips (fed separately via :meth:`_on_regime_flip`) to
+        each flip child, then composes their terminal results through the compiled
+        Boolean expression -- monotone ``worst_status`` censoring, no short-circuit.
+        The collector only decides retention vs. run-end resolution.
+        """
+        _map = {"POSITIVE": DISPOSITION_POSITIVE, "NEGATIVE": DISPOSITION_NEGATIVE,
+                "CENSORED": DISPOSITION_CENSORED}
+        remaining: List[Dict[str, Any]] = []
+        for cand in self.pending_candidates:
+            if event is not None:
+                self._target_runtime.ingest_bar(cand, event)
+
+            live = self._target_runtime.terminal(cand, final=False, now_ts=now_ts)
+            if live.disposition != "PENDING":
+                self._emit_composite(cand, live)
+                continue
+            # Inclusive horizon: retain through its exact completed timestamp so a flip
+            # coincident with horizon_end still lands (same rule as the flip sweep).
+            if not final and now_ts <= cand["horizon_end_ts"]:
+                remaining.append(cand)
+                continue
+            self._emit_composite(cand, self._target_runtime.terminal(cand, final=True, now_ts=now_ts))
+        self.pending_candidates = remaining
+        self._next_pending_horizon_ns = min(
+            (c["horizon_end_ts"] for c in remaining), default=None
+        )
+
+    def _emit_composite(self, cand: Dict[str, Any], result) -> None:
+        """Emit one composite observation and stash an independent-replay parity row.
+
+        The parity row carries only raw causal inputs (the retained 1s tape, the observed
+        flips, the frozen ATR); ``research_workflow.target_runtime.validate_target_parity``
+        re-derives the label from the contract via the independent oracle and a divergence
+        is a defect (written to ``composite_target_replay_parity.json`` by collect mode).
+        """
+        _map = {"POSITIVE": DISPOSITION_POSITIVE, "NEGATIVE": DISPOSITION_NEGATIVE,
+                "CENSORED": DISPOSITION_CENSORED}
+        disp = _map[result.disposition]
+        self._emit_observation(
+            cand, disp,
+            result.resolved_at_ts if disp == DISPOSITION_POSITIVE else None,
+            censor_reason=result.censor_reason, censored_at_ts=result.resolved_at_ts,
+        )
+        obs = self.observations_log[-1]
+        self._composite_parity_rows.append(self._target_runtime.parity_row(cand, {
+            "disposition": obs["disposition"],
+            "label": obs["target_flip_within_horizon"],
+            "censor_reason": obs["censor_reason"],
+        }))
+
+    def get_composite_target_parity(self) -> Optional[Dict[str, Any]]:
+        """Independent-oracle parity over every emitted composite observation.
+
+        Returns ``None`` for a non-composite study.  Consumed by collect mode, which
+        writes ``composite_target_replay_parity.json`` into the run directory.
+        """
+        if not getattr(self, "_composite_target", False):
+            return None
+        from research_workflow.target_runtime import validate_target_parity
+
+        report = validate_target_parity(self.cfg.target_contract, self._composite_parity_rows)
+        contract = self.cfg.target_contract or {}
+        report["target_expression"] = contract.get("target_expression")
+        report["censoring_composition"] = contract.get("censoring_composition")
+        if not report.get("passed") and os.environ.get("NT_COMPOSITE_PARITY_DUMP"):
+            import pickle
+            with open(os.environ["NT_COMPOSITE_PARITY_DUMP"], "wb") as fh:
+                pickle.dump(self._composite_parity_rows, fh)
+        return report
+
     def _sweep_elapsed_horizons(self, now_ts: int, final: bool = False) -> None:
         """Resolves pending candidates whose horizon has fully elapsed with no flip.
 
@@ -835,6 +939,9 @@ class FlipPredictionCollector(Strategy):
             return
         if getattr(self, "_target_primitive", "flip_within_horizon") == "ordered_barrier":
             self._resolve_ordered_barriers(None, now_ts=now_ts, final=final)
+            return
+        if getattr(self, "_target_primitive", "flip_within_horizon") == "composite":
+            self._resolve_composite(None, now_ts=now_ts, final=final)
             return
         next_horizon = getattr(self, "_next_pending_horizon_ns", None)
         if not final and next_horizon is not None and now_ts < next_horizon:
@@ -897,11 +1004,16 @@ class FlipPredictionCollector(Strategy):
         self.pending_candidates = []
 
     def _on_regime_flip(self, new_regime: int, flip_ts: int, open_price: float, close_price: float, atr_val: float) -> None:
-        # Ordered barriers are resolved exclusively from completed 1s OHLC events;
-        # an old regime-flip path must never override the compiled target primitive.
-        # Resolve pending observations on opposing flip
+        # Ordered barriers are resolved exclusively from completed 1s OHLC events; a
+        # composite target's flip child consumes flips through its own runtime. The
+        # legacy flip-clearing path below runs ONLY for a bare flip_within_horizon
+        # target -- it must never override any other compiled primitive.
+        _prim = getattr(self, "_target_primitive", "flip_within_horizon")
+        if _prim == "composite":
+            for cand in self.pending_candidates:
+                self._target_runtime.ingest_flip(cand, {"ts": int(flip_ts), "direction": int(new_regime)})
         target_dir = -self.active_regime_dir if self.is_both_directions else self.target_dir
-        if getattr(self, "_target_primitive", "flip_within_horizon") != "ordered_barrier" and (self.active_regime_dir in (-1, 1)) and new_regime == target_dir:
+        if _prim == "flip_within_horizon" and (self.active_regime_dir in (-1, 1)) and new_regime == target_dir:
             for cand in self.pending_candidates:
                 cand_ts = cand["observation_ts"]
                 within_horizon = cand_ts <= flip_ts <= cand["horizon_end_ts"]
@@ -1027,6 +1139,14 @@ class FlipPredictionCollector(Strategy):
             max_gap = int(((self.cfg.target_contract or {}).get("required_forward_outcomes") or [{}])[0].get("max_gap_seconds", 0))
             gap = bool(previous is not None and max_gap and (ts_avail - previous) > max_gap * NS)
             self._resolve_ordered_barriers(
+                {"ts": int(ts_avail), "open": o, "high": h, "low": l, "gap": gap},
+                now_ts=int(ts_avail),
+            )
+        elif self._target_primitive == "composite":
+            previous = self.last_ts_seen
+            max_gap = getattr(self, "_composite_gap_seconds", None) or 0
+            gap = bool(previous is not None and max_gap and (ts_avail - previous) > int(max_gap) * NS)
+            self._resolve_composite(
                 {"ts": int(ts_avail), "open": o, "high": h, "low": l, "gap": gap},
                 now_ts=int(ts_avail),
             )

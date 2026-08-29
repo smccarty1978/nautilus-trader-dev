@@ -102,20 +102,40 @@ def resolve_effective_horizon(target_spec: TargetSpec) -> int | None:
     return next(iter(horizons))
 
 
+def _execution_primitive(target_spec: TargetSpec) -> str:
+    """The execution primitive the collector dispatches on.
+
+    * >= 2 conditions -> ``composite`` (executed by ``CompositeTargetRuntime``, which
+      runs the FULL Boolean expression -- every child conjoined/disjoined per
+      ``condition_logic``, monotone ``worst_status`` censoring, no short-circuit).
+    * exactly 1 condition -> that condition's own primitive.
+    * 0 conditions, but an ordered barrier is declared -> ``ordered_barrier``.
+    * otherwise -> ``flip_within_horizon``.
+    """
+    conditions = target_spec.conditions or []
+    if len(conditions) >= 2:
+        return "composite"
+    if len(conditions) == 1:
+        return "ordered_barrier" if conditions[0].kind == "ordered_barrier" else "flip_within_horizon"
+    if any((fo.ordered_barriers or []) for fo in (target_spec.required_forward_outcomes or [])):
+        return "ordered_barrier"
+    return "flip_within_horizon"
+
+
 def compile_target_contract(target_spec: TargetSpec) -> Dict[str, Any]:
     """Compiles the authoritative target contract dictionary.
 
     A target with no declared ``conditions`` compiles exactly as it always has --
-    composite-target fields are additive, never required.
+    composite-target fields are additive, never required.  A target with >= 2 conditions
+    additionally carries an explicit ``target_expression`` tree (the compiled Boolean
+    expression the runtime executes) and ``censoring_composition``.
     """
     effective_horizon = resolve_effective_horizon(target_spec)
     contract = {
         # This is an execution primitive, not presentation metadata.  The collector
         # resolves it through research_workflow.target_runtime and never guesses from
         # a historical target_type string.
-        "primitive": "ordered_barrier" if (
-            target_spec.conditions or any((fo.ordered_barriers or []) for fo in (target_spec.required_forward_outcomes or []))
-        ) else "flip_within_horizon",
+        "primitive": _execution_primitive(target_spec),
         "target_type": target_spec.type,
         "event": target_spec.event or "regime_flip",
         "direction": target_spec.direction,
@@ -137,4 +157,15 @@ def compile_target_contract(target_spec: TargetSpec) -> Dict[str, Any]:
         contract["conditions"] = [_compile_condition(c) for c in target_spec.conditions]
         contract["condition_logic"] = target_spec.condition_logic
         contract["required_forward_outcomes"] = required_forward_outcomes
+        # The explicit executable Boolean expression + its censoring-composition identity.
+        # `compile_target_expression` reads only this contract, so the embedded tree and
+        # the tree the runtime builds are the same object by construction; the preflight
+        # RUNTIME_CONTRACT_BINDING check re-derives and compares them (fail closed on drift).
+        from research_workflow.target_expression import (
+            CENSORING_COMPOSITION,
+            serialize_expression,
+        )
+
+        contract["target_expression"] = serialize_expression(contract)
+        contract["censoring_composition"] = CENSORING_COMPOSITION
     return contract

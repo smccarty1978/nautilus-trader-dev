@@ -406,6 +406,26 @@ def _execute_collect(
 
         snapshot = telemetry.stop()
 
+    # 7b. Composite-target independent replay parity (composite studies only). The
+    # collector accumulates raw causal inputs per emitted observation; the oracle
+    # re-derives every label from the compiled contract. A divergence is a defect.
+        get_parity = getattr(strategy, "get_composite_target_parity", None)
+        if callable(get_parity):
+            parity = get_parity()
+            if parity is not None:
+                import json as _json
+                (output_mgr.run_dir / "composite_target_replay_parity.json").write_text(
+                    _json.dumps(parity, indent=2, default=str) + "\n", encoding="utf-8"
+                )
+                if not parity.get("passed", False):
+                    raise RuntimeError(
+                        f"COMPOSITE_TARGET_REPLAY_PARITY_FAILED: "
+                        f"{parity.get('disposition_mismatches')} disposition / "
+                        f"{parity.get('binary_label_mismatches')} label / "
+                        f"{parity.get('censoring_mismatches')} censoring mismatches over "
+                        f"{parity.get('rows_compared')} rows"
+                    )
+
     # 8. Persist artifacts & update run manifests
         status_data = output_mgr.persist_collection(candidates_df, observations_df, snapshot)
 

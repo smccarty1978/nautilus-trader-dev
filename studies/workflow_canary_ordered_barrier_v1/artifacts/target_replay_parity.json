@@ -1,18 +1,35 @@
 {
-  "date": "2023-03-03",
-  "primitive": "ordered_barrier",
-  "entry_reference": "next_bar_open",
-  "rows_compared": 9700,
-  "rows_compared_via_oracle": 9700,
-  "rows_no_tape_verified_censored": 0,
-  "disposition_mismatches": 0,
-  "binary_label_mismatches": 0,
-  "censoring_mismatches": 0,
-  "passed": true,
-  "disposition_counts": {
-    "LABELED_POSITIVE": 4093,
-    "LABELED_NEGATIVE": 4400,
-    "CENSORED": 1207
-  },
-  "examples": []
+  "status": "HISTORICAL_FALSE_PASS",
+  "authoritative_for_composite_target_parity": false,
+  "non_authoritative_reason": "NON_AUTHORITATIVE_FOR_COMPOSITE_TARGET_PARITY",
+  "explanation": [
+    "This artifact records the PRE-composition-fix parity run. The study's target is",
+    "composite AND(flip_within_60s, ordered_barrier_canary), but at the time this ran",
+    "BOTH the collector runtime AND the replay oracle evaluated only the ordered_barrier",
+    "child -- the flip_within_60s condition was silently dropped on both sides, so they",
+    "agreed while measuring the wrong label. 'passed: true' below is a false pass.",
+    "The authoritative composite parity is:",
+    "  runs/<latest>/composite_target_replay_parity.json  (full target_expression, monotone",
+    "  worst_status composition, independent replay_expression oracle).",
+    "Preserved verbatim as forensic evidence -- do not delete."
+  ],
+  "superseded_by": "runs/*/composite_target_replay_parity.json",
+  "original_artifact": {
+    "date": "2023-03-03",
+    "primitive": "ordered_barrier",
+    "entry_reference": "next_bar_open",
+    "rows_compared": 9700,
+    "rows_compared_via_oracle": 9700,
+    "rows_no_tape_verified_censored": 0,
+    "disposition_mismatches": 0,
+    "binary_label_mismatches": 0,
+    "censoring_mismatches": 0,
+    "passed": true,
+    "disposition_counts": {
+      "LABELED_POSITIVE": 4093,
+      "LABELED_NEGATIVE": 4400,
+      "CENSORED": 1207
+    },
+    "examples": []
+  }
 }

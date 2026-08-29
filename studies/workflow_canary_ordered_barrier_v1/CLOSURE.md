@@ -1,78 +1,111 @@
 # CLOSURE — workflow_canary_ordered_barrier_v1
 
 **Status:** CLOSED · **Outcome:** WORKFLOW_CANARY_PASS · **Terminal decision:** CANARY_COMPLETE
-**Closed:** 2026-08-28 · disposable / test-only · scientific_status: VALID_DIAGNOSTIC (canary mechanics only — never a research or production model)
+**Closed:** 2026-08-29 · disposable / test-only · scientific_status: VALID_DIAGNOSTIC (canary mechanics only — never a research or production model)
 
 ## Purpose
 
-30-minute canary proving the repaired research workflow executes the real normal path
-end-to-end on a tiny TRAIN-only fixture, and that a compiled `ordered_barrier` target
-primitive resolves to `OrderedBarrierTargetRuntime` with the collected target outputs
-coming from that runtime — **population-agnostically** (checkpoint-grid, not just
-episode-lifecycle) and **faithfully to the compiled `TargetContract`**
-(`entry_reference: next_bar_open`, barrier ATR frozen at the decision timestamp T,
-barrier horizon = the forward outcome's declared 60s).
+Bounded workflow canary proving the repaired research workflow executes the real normal
+path end-to-end on a tiny TRAIN-only fixture, and that a **composite** `target_contract`
+(`condition_logic: AND` over a `flip` condition and an `ordered_barrier` condition) is
+executed as the **full compiled Boolean expression** — every child conjoined per
+`condition_logic`, monotone `worst_status` censoring, **no Boolean short-circuit** — with
+the collected target outputs coming from that runtime, and an independent replay oracle
+agreeing row-for-row.
 
 ## The framework fix this canary drove
 
-`research_workflow/target_runtime.py`, `research_workflow/target_replay_oracle.py`,
-`research_workflow/generic_collector.py` (+ `research_workflow/tests/test_ordered_barrier_entry_reference.py`).
+`research_workflow/target_expression.py` *(new)*, `research_workflow/target_runtime.py`,
+`research_workflow/target_replay_oracle.py`, `research_workflow/generic_collector.py`,
+`research_workflow/runtime_bindings.py`, `research/engines/target_engine.py`,
+`backtests/nt_runtime/modes/collect.py` (+ tests
+`research_workflow/tests/test_composite_target_expression.py`,
+`test_single_primitive_ordered_barrier_regression.py`).
 
-`OrderedBarrierTargetRuntime` was only reachable from the `episode_lifecycle` population
-path, because `generic_collector._track_pending` required the population candidate builder
-to pre-populate a target-specific `entry_price`; the checkpoint-grid path raised
-`TARGET_RUNTIME_REFERENCE_MISSING`. Now:
+Before this fix, a `composite` target compiled to `primitive: "ordered_barrier"` and the
+collector emitted **only** the ordered-barrier race — the `flip_within_60s` child was
+silently dropped, and the replay oracle shared the omission so parity falsely passed
+(`artifacts/target_replay_parity.json`, now marked **HISTORICAL_FALSE_PASS /
+NON_AUTHORITATIVE_FOR_COMPOSITE_TARGET_PARITY**, preserved verbatim as forensic evidence).
 
-- **`OrderedBarrierTargetRuntime.open_pending(candidate)`** builds a runtime-owned pending
-  observation from candidate-time state only (identity, T, frozen candidate-time ATR,
-  barrier ATR distances, barrier horizon, session close, max gap). No `entry_price`.
-- **`OrderedBarrierTargetRuntime.ingest_bar(pending, bar)`** streams the causal 1s
-  execution tape and resolves `entry_reference: next_bar_open` on the first bar strictly
-  after T (that bar's OPEN); `entry_ts = ts_close − 1s`; horizon deadline measured from
-  `entry_ts`, not from T. The tape retains `open` so an independent replay can re-derive
-  the entry.
-- **`generic_collector`** routes BOTH population paths through `open_pending`; the episode
-  path's `entry_price = price_at_T` line was removed. `_frozen_target_atr_at_T` normalizes
-  `target_frozen_atr` / `atr_t` / `atr` so both paths freeze the barrier ATR at the same
-  latest-completed-1m Wilder ATR available at T. The barrier horizon comes from the
-  compiled `ordered_barriers[].horizon_seconds` (60), not `cfg.horizon_seconds` (which
-  defaults to 300 when the target has no top-level horizon).
-- **`target_replay_oracle.replay`** is an independent re-implementation: it derives the
-  entry reference and barrier race from the compiled contract and the tape, never from a
-  pre-populated field. `validate_target_parity` now also gates on `censoring_mismatches`.
+Now:
 
-Causal audit (lookahead-auditor) and contract audit (contract-checker): **CLEAR** across
-passes 01–04. Two carried non-blocking notes (`max_gap_seconds=1` study-power; legacy
-oracle fixture branch) and one carried framework limitation
-(composite `condition_logic: "AND"` with a `flip` condition is compiled to
-`primitive: ordered_barrier` but the `flip` condition is never conjoined by the collector —
-also affects `clean_tradable_reversal`; immaterial here, every emitted label is a valid
-ordered-barrier label).
+- `compile_target_contract` compiles a target with ≥ 2 conditions to `primitive:
+  "composite"` and embeds an explicit `target_expression` tree plus
+  `censoring_composition: "monotone_worst_status"`.
+- `research_workflow/target_expression.py::compile_target_expression` builds the executable
+  `And` / `Or` tree over per-condition `PrimitiveTarget` leaves (`flip` →
+  `flip_within_horizon`, `ordered_barrier` → `ordered_barrier`; `excursion` / `return`
+  represented for provenance but fail closed at `resolve_target_runtime`).
+- `CompositeTargetRuntime` owns one child `TargetRuntime` per condition, streams **both**
+  the causal 1s execution tape (to ordered-barrier children) and the prevailing-regime
+  flips (to flip children), and composes their terminal results. Composition is monotone
+  `worst_status` (anchored to `research_workflow.forward_outcomes.contracts.worst_status`):
+  a composite is RESOLVED only when every child is resolved; any CENSORED / AMBIGUOUS /
+  unresolved child → composite CENSORED with the worst child censor reason. `AND(False,
+  CENSORED) → NEGATIVE` and `OR(True, CENSORED) → POSITIVE` are **not** allowed.
+- `generic_collector._resolve_composite` is the collector dispatch; it also accumulates raw
+  causal inputs per emitted observation and runs the independent oracle
+  (`get_composite_target_parity()`), which collect mode writes to
+  `composite_target_replay_parity.json` and **fails the run** on any mismatch.
+- `target_replay_oracle.replay_expression` is a deliberately separate second implementation:
+  it re-parses `conditions` / `condition_logic` off the contract itself (never imports
+  `compile_target_expression`), carries its own censor-severity table, and re-implements the
+  monotone composition (`_compose_monotone`).
+- Preflight `RUNTIME_CONTRACT_BINDING` re-derives the expression from the contract and
+  refuses on drift (`TARGET_EXPRESSION_DRIFT` / `COMPOSITE_RUNTIME_EXPRESSION_MISMATCH`).
 
-## What ran (sealed composite `f79ecff8a466e6ae3fce130f42d3f9ab355915ea032ec8b1a5adc57eece05408`)
+Causal review (lookahead-auditor) and contract review (contract-checker): **CLEAR** at the
+final composite `93b33fadc8d21d186e93995e28f761f1bc3bc9641a10eb99c6d9715675d1fa69`
+(passes 01–09; earlier passes are the iterative-fix history, retained by the durable
+`audit_lineage/` anchor).
+
+## Authoring mechanism
+
+The authored `study_spec` is embedded in `research_decision.yaml` so
+`scripts/run_research_workflow.py --advance` drives compile → prepare/freeze → readiness →
+preflight → causal/contract → seal → smoke deterministically. This is the **generic**
+documented compiler path (`research_workflow/study_spec_compiler.py` line 172:
+`request.get("study_spec") or request.get("study_yaml")`), exercised by
+`research_workflow/tests/test_workflow_engine.py` — not a canary special case.
+
+## What ran (sealed composite `93b33fadc8d21d186e93995e28f761f1bc3bc9641a10eb99c6d9715675d1fa69`)
 
 | Stage | Result |
 |---|---|
-| create → compile → fidelity → PREPARE → READINESS R1–R10 → PREFLIGHT | PASS / CLEAR |
-| causal review · contract review (distinct reviewers, passes 01–04) | CLEAR / CLEAR |
+| compile (`primitive: composite`, `target_expression` embedded) → PREPARE → READINESS R1–R10 → PREFLIGHT | PASS / CLEAR |
+| causal review · contract review (distinct reviewers, passes 01–09) | CLEAR / CLEAR |
 | SEAL · NT SMOKE (2023-03-03) · validate_smoke · reconcile | sealed · ACCEPTED |
+| **composite target replay parity** (smoke, independent `replay_expression` oracle) | **9700 rows · 0 disposition · 0 binary-label · 0 censoring mismatches** — `artifacts/composite_target_replay_parity.json` |
 | AUTHORIZE (`ef937ba4…`) | train [2023], oos [2024] |
-| bounded authorized TRAIN collect — 2023-03-03 RTH | 1984 candidates · 822 SUCCESS / 841 FAILURE-or-TIMEOUT / 321 CENSORED |
-| target replay parity (independent oracle vs runtime, 9700 rows) | 0 disposition · 0 binary-label · 0 censoring mismatches |
-| MERGE (1 partition) | 1663 resolved · dataset identity `2870c137…` |
-| FIT — one fixed LightGBM, deterministic seed 42, no tuning | model_id `88fbba9568763c4122f6a8b98f096222cb8b656b9238525b4542f90ae3d2a2ce` |
-| model artifact + golden fixture + `validate_golden_predictions` | `66ef5ed7…` · `8d9f1d59…` · PASS |
-| TRAIN FREEZE | `7dae3f3d…` |
+| bounded authorized TRAIN collect — **2023-03-03 RTH only** (governed `run_collect_mode(stage="day", date_range=("2023-03-03","2023-03-03"), experiment_authorization=runtime_authorization(study,"train"))`; NOT a full-year run) | 1984 candidates · 1225 NEGATIVE / 10 POSITIVE / 749 CENSORED |
+| MERGE (1 partition) | 1235 resolved (10 positive / 1225 negative) · dataset identity `09d382f1…` |
+| FIT — one fixed LightGBM, deterministic seed 42, no tuning | model_id `be1bda56e1e60cd578bb064be209560c76955b6127bed6d0e3eff6e6554e4818` |
+| model artifact + golden fixture + `validate_golden_predictions` | `503e873d…` · `e391c473…` · PASS |
+| TRAIN FREEZE | `b63bf524e6b2c9419136fd6d11856de9dd1166fe4a15d09927998199ce70e6a7` |
 | study closure → `WorkflowEngine.advance()` | `terminal_state = STUDY_CLOSED`, `next_deterministic_action = null` |
 | model resolvable / loadable / golden-parity AFTER closure | PASS |
-| Study B (`workflow_canary_model_reuse_v1`) reuse by immutable model_id | scores reproduced, source study not reopened, no runtime code change |
+| Study B (`workflow_canary_model_reuse_v1`) reuse by immutable model_id | scores reproduced (≤ 1e-12), source study not reopened, no runtime code change → STUDY_CLOSED |
 
-OOS (2024/2025/2026) never accessed. No existing scientific study modified.
+Full-year TRAIN: **not run.** OOS (2024/2025/2026): **never accessed.** No existing
+scientific study modified.
+
+## Old canary evidence
+
+`artifacts/target_replay_parity.json` — **HISTORICAL_FALSE_PASS**,
+**NON_AUTHORITATIVE_FOR_COMPOSITE_TARGET_PARITY**. Preserved verbatim (original data under
+`original_artifact`). The authoritative composite parity is
+`artifacts/composite_target_replay_parity.json` (and the per-run copy under `runs/`).
+
+The pre-fix model `88fbba9568763c4122f6a8b98f096222cb8b656b9238525b4542f90ae3d2a2ce`
+(barrier-only label) is superseded; the authoritative canary model is
+`be1bda56e1e60cd578bb064be209560c76955b6127bed6d0e3eff6e6554e4818` (composite label,
+`primitive: composite`, full `target_expression`, monotone `worst_status`, corrected
+runtime + corrected independent replay).
 
 ## Disposable artifacts
 
 `studies/workflow_canary_ordered_barrier_v1/` and `studies/workflow_canary_model_reuse_v1/`
-plus `studies/model_registry/88fbba95….json` and the model artifact under this study's
+plus `studies/model_registry/be1bda56….json` and the model artifact under this study's
 `artifacts/models/`. Safe to delete once the framework fix is committed — nothing
-scientific depends on them. Do not delete before the registry/closure verification is no
-longer needed as evidence.
+scientific depends on them.

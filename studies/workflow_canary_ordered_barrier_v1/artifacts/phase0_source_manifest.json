@@ -2,17 +2,14 @@
   "study_id": "workflow_canary_ordered_barrier_v1",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "c4ae619aa57b1cebbd873cce3e13fda85312032f",
+  "git_commit_hash": "b0eabc31657689db0fd48e2f3a924b3a3d4894b7",
   "source_state_binding": {
-    "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "c4ae619aa57b1cebbd873cce3e13fda85312032f",
-    "git_commit_is_sufficient_provenance": false,
+    "provenance_strength": "COMMITTED",
+    "git_commit_hash": "b0eabc31657689db0fd48e2f3a924b3a3d4894b7",
+    "git_commit_is_sufficient_provenance": true,
     "working_tree_dirty": true,
     "source_state_sha256": "961cc8f39cc8aa6342b56ed0a333934189a419c6a809054e7f14e5dabc5671de",
-    "dependencies_diverging_from_commit": [
-      "studies/workflow_canary_ordered_barrier_v1/SPEC.md",
-      "studies/workflow_canary_ordered_barrier_v1/study.yaml"
-    ],
+    "dependencies_diverging_from_commit": [],
     "source_files": {
       "features/registry.py": {
         "sha256": "0cbc2cf555e05d75299a07e99496dd48c7023353cb78bb4573d5c0132f57bfcc",
@@ -32,11 +29,11 @@
       },
       "studies/workflow_canary_ordered_barrier_v1/SPEC.md": {
         "sha256": "97320df5368eb2b998cd4b1d5f12061d5fc2eae96f54cc2222b8aac4030d6996",
-        "state": "UNTRACKED_OR_NEW"
+        "state": "COMMITTED"
       },
       "studies/workflow_canary_ordered_barrier_v1/study.yaml": {
         "sha256": "49f63617f7a1f91be058b826f2938de9e45039b46362231815f3771bb65adda8",
-        "state": "UNTRACKED_OR_NEW"
+        "state": "COMMITTED"
       }
     }
   },
@@ -182,5 +179,5 @@
   },
   "derived_causal_inputs": [],
   "required_gates_evidence": [],
-  "manifest_sha256": "258e8525a685c54adfbd20283dba24445a9bcba629cc0e99341b213dc79fd77f"
+  "manifest_sha256": "0042733efdc463c31fcbf34075492f1e681cf835a1ff6d4831b829b056cbd034"
 }
