@@ -1,0 +1,102 @@
+{
+  "run_id": "20260827_031149_clean_maturity_flip_model_180s_horizon_full",
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "status": "SUCCESS",
+  "feature_surface_validation": {
+    "passed": true,
+    "rows": 475529,
+    "declared_features": [],
+    "emitted_features": [],
+    "metadata_columns": [
+      "checkpoint_index",
+      "new_progress_windows",
+      "observation_ts",
+      "regime_age_seconds",
+      "regime_start_ns",
+      "retained_mfe_ratio",
+      "running_mfe_atr",
+      "triggering_1s_ts_init"
+    ],
+    "collection_universe_columns": [
+      "arrival_acceleration",
+      "arrival_velocity",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_giveback_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_retention_ratio"
+    ],
+    "undeclared_columns": [],
+    "per_feature": {},
+    "findings": []
+  },
+  "candidate_disposition_reconciliation": {
+    "candidates": 475529,
+    "observations": 475529,
+    "passed": true,
+    "findings": [],
+    "undisposed_candidates": 0,
+    "orphaned_observations": 0,
+    "duplicate_observations": 0,
+    "disposition_counts": {
+      "LABELED_NEGATIVE": 396263,
+      "LABELED_POSITIVE": 76263,
+      "CENSORED": 3003
+    }
+  },
+  "population_funnel": null,
+  "stage": "full",
+  "wall_time_seconds": 391.495,
+  "total_bars_processed": 13832528,
+  "candidates_count": 475529,
+  "observations_count": 475529,
+  "throughput_bars_per_sec": 35332.6,
+  "memory": {
+    "baseline_process_rss_mb": 196.82,
+    "peak_process_rss_mb": 3960.59,
+    "rss_delta_mb": 3763.76,
+    "python_tracemalloc_peak_mb": 0.0
+  },
+  "bars_breakdown": {
+    "loaded": {
+      "1s": 13472895,
+      "1m": 359633
+    },
+    "callbacks": {
+      "1s": 13472895,
+      "1m": 359633
+    },
+    "ts_event_ranges": {
+      "1s": {
+        "first": null,
+        "last": null
+      },
+      "1m": {
+        "first": null,
+        "last": null
+      }
+    },
+    "ts_init_ranges": {
+      "1s": {
+        "first": null,
+        "last": null
+      },
+      "1m": {
+        "first": null,
+        "last": null
+      }
+    }
+  },
+  "output_artifacts": {
+    "candidates_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031149_clean_maturity_flip_model_180s_horizon_full\\collection\\candidates.parquet",
+    "observations_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031149_clean_maturity_flip_model_180s_horizon_full\\collection\\observations.parquet",
+    "collection_manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031149_clean_maturity_flip_model_180s_horizon_full\\collection\\collection_manifest.json"
+  },
+  "end_time_utc": "2026-08-27T03:18:22.142220+00:00"
+}

@@ -100,6 +100,7 @@ def main():
     # 5. Assemble packet
     packet = {
         "study_name": study_dir.name,
+        "study_id": study_dir.name,
         "spec_content": spec_content,
         "code_files": code_files,
         "changed_files": changed_files,

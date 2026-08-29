@@ -2,7 +2,7 @@
   "task_packet_version": "1.0",
   "study_id": "clean_maturity_flip_model_180s_horizon",
   "study_type": "flip_prediction",
-  "spec_sha256": "e6a3fd9e9e2ce759e259dce9a7bd49243c876b46499b4423bae04bbb7ea7ea3f",
+  "spec_sha256": "e363badf226991c99ebef50892f468d79d04be59f5abd7ffb5cac5a702fad1e0",
   "risk_tier": 2,
   "runtime": "nautilustrader",
   "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
@@ -31,6 +31,7 @@
       }
     },
     "target_contract": {
+      "primitive": "flip_within_horizon",
       "target_type": "flip",
       "event": "prevailing_1m_regime_transition",
       "direction": "both",
@@ -49,116 +50,116 @@
       "source_key": null,
       "feature_count": 13,
       "feature_list": [
-        "regime_efficiency",
-        "regime_mfe_atr",
-        "regime_range_atr",
-        "regime_efficiency",
-        "regime_mfe_atr",
-        "regime_range_atr",
-        "rolling_retention_ratio",
-        "rolling_current_progress_atr",
-        "rolling_max_progress_atr",
-        "rolling_giveback_atr",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
         "arrival_velocity",
         "arrival_acceleration",
         "ema_slope"
       ],
       "resolved_feature_instances": [
         {
-          "requested": "regime_efficiency",
+          "requested": "prior_1m_regime_efficiency",
+          "canonical_name": "regime_efficiency",
+          "parameters": {
+            "timeframe": "1m",
+            "context": "prior",
+            "bar_state": "completed"
+          },
+          "physical_alias": "prior_1m_regime_efficiency"
+        },
+        {
+          "requested": "prior_1m_regime_mfe_atr",
+          "canonical_name": "regime_mfe_atr",
+          "parameters": {
+            "timeframe": "1m",
+            "context": "prior",
+            "bar_state": "completed"
+          },
+          "physical_alias": "prior_1m_regime_mfe_atr"
+        },
+        {
+          "requested": "prior_1m_regime_range_atr",
+          "canonical_name": "regime_range_atr",
+          "parameters": {
+            "timeframe": "1m",
+            "context": "prior",
+            "bar_state": "completed"
+          },
+          "physical_alias": "prior_1m_regime_range_atr"
+        },
+        {
+          "requested": "prior_5m_regime_efficiency",
           "canonical_name": "regime_efficiency",
           "parameters": {
             "timeframe": "5m",
             "context": "prior",
             "bar_state": "completed"
           },
-          "physical_alias": "regime_efficiency"
+          "physical_alias": "prior_5m_regime_efficiency"
         },
         {
-          "requested": "regime_mfe_atr",
+          "requested": "prior_5m_regime_mfe_atr",
           "canonical_name": "regime_mfe_atr",
           "parameters": {
             "timeframe": "5m",
             "context": "prior",
             "bar_state": "completed"
           },
-          "physical_alias": "regime_mfe_atr"
+          "physical_alias": "prior_5m_regime_mfe_atr"
         },
         {
-          "requested": "regime_range_atr",
+          "requested": "prior_5m_regime_range_atr",
           "canonical_name": "regime_range_atr",
           "parameters": {
             "timeframe": "5m",
             "context": "prior",
             "bar_state": "completed"
           },
-          "physical_alias": "regime_range_atr"
+          "physical_alias": "prior_5m_regime_range_atr"
         },
         {
-          "requested": "regime_efficiency",
-          "canonical_name": "regime_efficiency",
-          "parameters": {
-            "timeframe": "5m",
-            "context": "prior",
-            "bar_state": "completed"
-          },
-          "physical_alias": "regime_efficiency"
-        },
-        {
-          "requested": "regime_mfe_atr",
-          "canonical_name": "regime_mfe_atr",
-          "parameters": {
-            "timeframe": "5m",
-            "context": "prior",
-            "bar_state": "completed"
-          },
-          "physical_alias": "regime_mfe_atr"
-        },
-        {
-          "requested": "regime_range_atr",
-          "canonical_name": "regime_range_atr",
-          "parameters": {
-            "timeframe": "5m",
-            "context": "prior",
-            "bar_state": "completed"
-          },
-          "physical_alias": "regime_range_atr"
-        },
-        {
-          "requested": "rolling_retention_ratio",
+          "requested": "rolling_300s_retention_ratio",
           "canonical_name": "rolling_retention_ratio",
           "parameters": {
             "window": "300s",
             "update_every": "1s"
           },
-          "physical_alias": "rolling_retention_ratio"
+          "physical_alias": "rolling_300s_retention_ratio"
         },
         {
-          "requested": "rolling_current_progress_atr",
+          "requested": "rolling_300s_current_progress_atr",
           "canonical_name": "rolling_current_progress_atr",
           "parameters": {
             "window": "300s",
             "update_every": "1s"
           },
-          "physical_alias": "rolling_current_progress_atr"
+          "physical_alias": "rolling_300s_current_progress_atr"
         },
         {
-          "requested": "rolling_max_progress_atr",
+          "requested": "rolling_300s_max_progress_atr",
           "canonical_name": "rolling_max_progress_atr",
           "parameters": {
             "window": "300s",
             "update_every": "1s"
           },
-          "physical_alias": "rolling_max_progress_atr"
+          "physical_alias": "rolling_300s_max_progress_atr"
         },
         {
-          "requested": "rolling_giveback_atr",
+          "requested": "rolling_300s_giveback_atr",
           "canonical_name": "rolling_giveback_atr",
           "parameters": {
             "window": "300s",
             "update_every": "1s"
           },
-          "physical_alias": "rolling_giveback_atr"
+          "physical_alias": "rolling_300s_giveback_atr"
         },
         {
           "requested": "arrival_velocity",
@@ -190,7 +191,7 @@
           "physical_alias": "ema_slope"
         }
       ],
-      "feature_list_sha256": "4e46c0b3dcdcfab2b47fce9fbda95ec1c92e0e7905f67728f30953910251df33",
+      "feature_list_sha256": "38c0201fe2b0fec3070b7a226353d7782778aa82bace3b6070de8844d9d04d32",
       "bound_trackers": [
         "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
         "features.trackers.generic_context.GenericContextProvider",
@@ -209,25 +210,31 @@
         "completed_5m"
       ],
       "feature_statuses": {
-        "regime_efficiency": "verified",
-        "regime_mfe_atr": "verified",
-        "regime_range_atr": "verified",
-        "rolling_retention_ratio": "verified",
-        "rolling_current_progress_atr": "verified",
-        "rolling_max_progress_atr": "verified",
-        "rolling_giveback_atr": "verified",
+        "prior_1m_regime_efficiency": "verified",
+        "prior_1m_regime_mfe_atr": "verified",
+        "prior_1m_regime_range_atr": "verified",
+        "prior_5m_regime_efficiency": "verified",
+        "prior_5m_regime_mfe_atr": "verified",
+        "prior_5m_regime_range_atr": "verified",
+        "rolling_300s_retention_ratio": "verified",
+        "rolling_300s_current_progress_atr": "verified",
+        "rolling_300s_max_progress_atr": "verified",
+        "rolling_300s_giveback_atr": "verified",
         "arrival_velocity": "verified",
         "arrival_acceleration": "verified",
         "ema_slope": "verified"
       },
       "feature_null_policies": {
-        "regime_efficiency": "allow",
-        "regime_mfe_atr": "allow",
-        "regime_range_atr": "allow",
-        "rolling_retention_ratio": "allow",
-        "rolling_current_progress_atr": "allow",
-        "rolling_max_progress_atr": "allow",
-        "rolling_giveback_atr": "allow",
+        "prior_1m_regime_efficiency": "allow",
+        "prior_1m_regime_mfe_atr": "allow",
+        "prior_1m_regime_range_atr": "allow",
+        "prior_5m_regime_efficiency": "allow",
+        "prior_5m_regime_mfe_atr": "allow",
+        "prior_5m_regime_range_atr": "allow",
+        "rolling_300s_retention_ratio": "allow",
+        "rolling_300s_current_progress_atr": "allow",
+        "rolling_300s_max_progress_atr": "allow",
+        "rolling_300s_giveback_atr": "allow",
         "arrival_velocity": "allow",
         "arrival_acceleration": "allow",
         "ema_slope": "allow"
@@ -712,7 +719,7 @@
     "baseline": {
       "has_baseline": true,
       "study": "clean_maturity_flip_model_rolling_productivity",
-      "manifest_sha256": "c150bee7109a526324b8240bb580139a70a5502dabdcbb40aeca4b6f6a41843c",
+      "manifest_sha256": null,
       "results_sha256": null
     },
     "required_gates": [],
@@ -721,8 +728,7 @@
         {
           "family": "lightgbm",
           "fixed_hyperparameters": {
-            "verbosity": -1,
-            "random_state": 42
+            "verbosity": -1
           },
           "tunable_hyperparameters": [
             {
@@ -786,11 +792,7 @@
       "primary_selection_metric": "pr_auc",
       "primary_selection_metric_direction": "maximize",
       "secondary_metrics": [
-        "brier_score",
-        "precision_at_p90",
-        "precision_at_p95",
-        "precision_at_p97_5",
-        "resolved_count"
+        "brier"
       ],
       "calibration_required": true,
       "simpler_model_tie_preference": true,

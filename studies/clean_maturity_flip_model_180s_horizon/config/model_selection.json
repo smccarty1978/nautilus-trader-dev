@@ -3,8 +3,7 @@
     {
       "family": "lightgbm",
       "fixed_hyperparameters": {
-        "verbosity": -1,
-        "random_state": 42
+        "verbosity": -1
       },
       "tunable_hyperparameters": [
         {
@@ -68,11 +67,7 @@
   "primary_selection_metric": "pr_auc",
   "primary_selection_metric_direction": "maximize",
   "secondary_metrics": [
-    "brier_score",
-    "precision_at_p90",
-    "precision_at_p95",
-    "precision_at_p97_5",
-    "resolved_count"
+    "brier"
   ],
   "calibration_required": true,
   "simpler_model_tie_preference": true,

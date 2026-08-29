@@ -1,96 +1,23 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "20260827T050706Z_0ec560d06b4d",
-  "generated_at_utc": "2026-08-27T05:07:06.302082+00:00",
-  "code_hash": "0ec560d06b4d788ab066642f0113e48f749a172565d7d44557cd599dd702cb13",
+  "preflight_run_id": "20260829T061449Z_cbe59c2c6d2f",
+  "generated_at_utc": "2026-08-29T06:14:49.790193+00:00",
+  "code_hash": "cbe59c2c6d2f5a426e830ff156827dd6f81a9992bc3096d65487d3d66e611236",
   "superseded": true,
   "failed_gate": "ARTIFACT_SCHEMA",
   "failure_ids": [
-    "STATUS_SCHEMA",
-    "STATUS_SCHEMA",
-    "STATUS_SCHEMA",
-    "STATUS_SCHEMA",
-    "STATUS_SCHEMA",
-    "STATUS_SCHEMA",
-    "STATUS_SCHEMA",
-    "STATUS_SCHEMA"
+    "PACKET_SCHEMA"
   ],
   "failure_details": [
     {
-      "severity": "WARNING",
-      "code": "STATUS_VERDICT",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_030311_clean_maturity_flip_model_180s_horizon_day\\status.json",
-      "message": "Unusual verdict value: SUCCESS"
-    },
-    {
       "severity": "CRITICAL",
-      "code": "STATUS_SCHEMA",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_030311_clean_maturity_flip_model_180s_horizon_day\\status.json",
-      "message": "Missing or non-integer field 'critical'"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "STATUS_SCHEMA",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_030311_clean_maturity_flip_model_180s_horizon_day\\status.json",
-      "message": "Missing or non-integer field 'warning'"
-    },
-    {
-      "severity": "WARNING",
-      "code": "STATUS_VERDICT",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_030522_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Unusual verdict value: SUCCESS"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "STATUS_SCHEMA",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_030522_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Missing or non-integer field 'critical'"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "STATUS_SCHEMA",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_030522_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Missing or non-integer field 'warning'"
-    },
-    {
-      "severity": "WARNING",
-      "code": "STATUS_VERDICT",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031149_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Unusual verdict value: SUCCESS"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "STATUS_SCHEMA",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031149_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Missing or non-integer field 'critical'"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "STATUS_SCHEMA",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031149_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Missing or non-integer field 'warning'"
-    },
-    {
-      "severity": "WARNING",
-      "code": "STATUS_VERDICT",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031827_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Unusual verdict value: SUCCESS"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "STATUS_SCHEMA",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031827_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Missing or non-integer field 'critical'"
-    },
-    {
-      "severity": "CRITICAL",
-      "code": "STATUS_SCHEMA",
-      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260827_031827_clean_maturity_flip_model_180s_horizon_full\\status.json",
-      "message": "Missing or non-integer field 'warning'"
+      "code": "PACKET_SCHEMA",
+      "artifact": "studies\\clean_maturity_flip_model_180s_horizon\\audit\\audit_packet.json",
+      "message": "Missing study identifier in audit packet"
     }
   ],
   "recommended_smallest_investigation_scope": "Inspect findings in ARTIFACT_SCHEMA and fix locally before requesting audit.",
-  "superseded_by_preflight_run_id": "20260827T054031Z_59ad5a594c9e",
-  "superseded_at_utc": "2026-08-27T05:40:31.044505+00:00",
+  "superseded_by_preflight_run_id": "20260829T061652Z_523bc5ee35c9",
+  "superseded_at_utc": "2026-08-29T06:16:52.543321+00:00",
   "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
 }

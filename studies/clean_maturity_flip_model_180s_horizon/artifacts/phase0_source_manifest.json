@@ -2,19 +2,19 @@
   "study_id": "clean_maturity_flip_model_180s_horizon",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "cc23a48c77548e5097d5c51f298f2975ee95f02b",
+  "git_commit_hash": "bec2354faa6b907b229183a6d73d7375bc7433ba",
   "source_state_binding": {
     "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "cc23a48c77548e5097d5c51f298f2975ee95f02b",
+    "git_commit_hash": "bec2354faa6b907b229183a6d73d7375bc7433ba",
     "git_commit_is_sufficient_provenance": false,
     "working_tree_dirty": true,
-    "source_state_sha256": "8502c4940d318b43d7c8988c92c156b8705a0c79ccf6a2b3dc752c7336b337e2",
+    "source_state_sha256": "a804440e6ae6c3008570bbf8ba28d8edb23d416ddfefc7f519cf61bbb546170c",
     "dependencies_diverging_from_commit": [
-      "studies/clean_maturity_flip_model_180s_horizon/study.yaml"
+      "studies/clean_maturity_flip_model_180s_horizon/SPEC.md"
     ],
     "source_files": {
       "features/registry.py": {
-        "sha256": "7afb75ad9e70cc6c2f7f935a79178799cd40398a7ef4fa080a755f418ec68ed1",
+        "sha256": "0cbc2cf555e05d75299a07e99496dd48c7023353cb78bb4573d5c0132f57bfcc",
         "state": "COMMITTED"
       },
       "features/trackers/generic_arrival.py": {
@@ -34,17 +34,17 @@
         "state": "COMMITTED"
       },
       "studies/clean_maturity_flip_model_180s_horizon/SPEC.md": {
-        "sha256": "b6a228703605bb67afe5d708da19b31e1cd2ef5a4ae0483d19bd9ec68cdbf15a",
-        "state": "COMMITTED"
+        "sha256": "f5d37442f2519cbb69ae7fef1b2944e04caa15a3317aa68c380d0c7f93b716d2",
+        "state": "MODIFIED"
       },
       "studies/clean_maturity_flip_model_180s_horizon/study.yaml": {
         "sha256": "f924191c294afa33c0caade45b9ed1f96ce406252f002b59f8891cb3b88ca580",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       }
     }
   },
   "study_yaml_sha256": "f924191c294afa33c0caade45b9ed1f96ce406252f002b59f8891cb3b88ca580",
-  "spec_md_sha256": "b6a228703605bb67afe5d708da19b31e1cd2ef5a4ae0483d19bd9ec68cdbf15a",
+  "spec_md_sha256": "f5d37442f2519cbb69ae7fef1b2944e04caa15a3317aa68c380d0c7f93b716d2",
   "clean_lineage_start": null,
   "invalidated_prior_runs_count": 0,
   "invalidated_prior_runs": [],
@@ -353,5 +353,5 @@
   },
   "derived_causal_inputs": [],
   "required_gates_evidence": [],
-  "manifest_sha256": "3ceab368b4eec240f16ace93bb6f8109959f902554787a0346609278cfb3ca43"
+  "manifest_sha256": "c125c39fc424155cda6bb495e30c6b7c92d590473e3bcb19fd68116f2ff5d466"
 }

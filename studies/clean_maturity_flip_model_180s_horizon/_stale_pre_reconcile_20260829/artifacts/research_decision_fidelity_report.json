@@ -1,0 +1,58 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon",
+  "decision_contract": {
+    "research_question": "Does shortening the Stage-1 imminent-flip prediction horizon from 300s to 180s improve flip prediction precision/discrimination and the economic quality of high-confidence predictions, while preserving a significant amount of favorable excursion opportunity?",
+    "baseline": {
+      "short": "parent's exact canonical feature instances (A/B/C), target horizon shortened only",
+      "long": "parent's exact canonical feature instances (A/B/C), target horizon shortened only"
+    },
+    "baseline_feature_selection": {
+      "mode": "none"
+    },
+    "model_arms": {
+      "A": "explicit canonical baseline (arrival_velocity, arrival_acceleration, ema_slope) -- identical to parent",
+      "B": "A plus completed-bar prior 1m/5m structural regime geometry -- identical to parent",
+      "C": "B plus completed-1s rolling 300s productivity -- identical to parent"
+    },
+    "variable_being_tested": [
+      "flip_target_horizon_seconds"
+    ],
+    "prohibited_changes": [
+      "change_feature_surface_after_seeing_predictive_performance",
+      "change_target_after_seeing_predictive_performance",
+      "use_2024_to_change_model_design",
+      "use_2024_2025_2026_for_target_selection",
+      "use_2024_2025_2026_for_feature_selection",
+      "use_2024_2025_2026_for_population_definition",
+      "introduce_unconstrained_search",
+      "unauthorized_feature_discovery",
+      "expand_to_full_feature_registry",
+      "expansion_beyond_authorized_dates"
+    ],
+    "allowed_changes": [
+      "evaluate_180s_flip_target_instead_of_300s",
+      "evaluate_model_arms_a_b_c_untuned_at_parent_hyperparameters",
+      "bounded_hyperparameter_search_on_the_untuned_winner_only",
+      "stratify_by_maturity_buckets_and_direction",
+      "compute_descriptive_multi_horizon_forward_outcomes_180s_and_300s_post_hoc"
+    ],
+    "chronology": {
+      "train": [
+        2021,
+        2022,
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": "Frozen 300s Model C (parent baseline) vs. frozen untuned 180s architecture winner vs. frozen tuned 180s winner, on 2024 OOS, opened only after explicit post-freeze authorization.\n",
+    "terminal_question": "Does tightening the flip-prediction horizon to 180s remove bad predictions faster than it removes valuable reversal opportunity?\n"
+  },
+  "findings": []
+}
