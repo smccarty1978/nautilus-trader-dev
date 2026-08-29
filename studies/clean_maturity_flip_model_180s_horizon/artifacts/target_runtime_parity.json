@@ -1,0 +1,47 @@
+{
+  "generated_at_utc": "2026-08-29",
+  "study": "clean_maturity_flip_model_180s_horizon",
+  "sealed_execution_composite_sha256": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+
+  "target_runtime_parity": {
+    "verdict": "CLEAR",
+    "primitive": "flip_within_horizon",
+    "note": "There is no independent replay-oracle path for a bare flip_within_horizon target: research_workflow/target_replay_oracle.py::replay supports only 'ordered_barrier', and replay_expression only 'composite'. Parity for a plain flip target is established by READINESS R10 (real-output parity vs the collection-time feature contract) + PREFLIGHT RUNTIME_CONTRACT_BINDING + causal audit pass 14 (field-by-field verification that _emit_observation -> FlipTargetRuntime.from_disposition is a behaviour-preserving refactor of the old inline labeling dict) + the deterministic smoke-day flip-label reproduction recorded below.",
+    "horizon_boundary_convention": {
+      "frozen": "INCLUSIVE upper bound",
+      "statement": "A prevailing-1m-regime flip whose completed-1m-bar confirmation lands at exactly T + 180s (T + 180000000000 ns) is POSITIVE / within horizon. A flip strictly after T + 180s is NEGATIVE / outside horizon.",
+      "agreement": {
+        "collector_live_inline_path": "INCLUSIVE - research_workflow/generic_collector.py::_sweep_elapsed_horizons holds a candidate whose horizon ends exactly at now_ts for one more tick ('horizon_end == now_ts and not final'), so a coincident 1m flip (dispatched after the same-timestamp 1s bar) lands POSITIVE (causal audit pass 01, parent study).",
+        "FlipTargetRuntime._terminal_legacy": "INCLUSIVE - 'start <= ts <= end'",
+        "FlipTargetRuntime._terminal_pending": "INCLUSIVE upper - 'start < ts <= limit', limit = horizon_end when no gap (dead code for this study; a bare flip target never enters the pending path)",
+        "replay_oracle._replay_flip_condition": "INCLUSIVE upper - 'T < ts <= end' (composite-oracle flip child; closest independent implementation)",
+        "compiled_target_contract": "horizon_seconds: 180 / censoring_policy.max_horizon_seconds: 180; no explicit operator field -- silent, consistent with the inclusive runtime implementation, does not contradict it"
+      },
+      "verification": "studies/clean_maturity_flip_model_180s_horizon/_work/verify_horizon_boundary_convention.py -- 3 assertions PASS (FlipTargetRuntime legacy path, replay oracle flip child, collector inline-guard source). Kept in _work/ (not tests/) so it does not enter the execution closure and stale the seal.",
+      "lower_bound_nuance": "The collector, oracle, and pending-runtime use exclusive-at-T ('T < ts'); _terminal_legacy uses inclusive-at-T. Immaterial for this study: a flip at exactly the decision instant T is not a forward event and the 5s candidate cadence + 1s-before-1m dispatch means it never fires."
+    }
+  },
+
+  "parent_300s_runtime_parity": {
+    "verdict": "EXACT_SEMANTIC_PARITY",
+    "action": "HOLD_FROZEN_PARENT",
+    "parent_study": "clean_maturity_flip_model_rolling_productivity",
+    "parent_benchmark_artifact": "artifacts/train_experiment_freeze_repaired.json",
+    "method": "Deterministic flip-label reproduction on the shared authorized smoke date 2023-10-02. The current runtime's 180s smoke observations were joined to the parent's committed train_observations_repaired_merged.parquet rows for 2023-10-02 on (observation_ts, regime_start_ns, regime_direction, checkpoint_index). The parent was collected under the pre-repair collector; a direct parent re-run is blocked (its seal 7b0994... is stale vs current framework) and re-sealing/retraining the parent is out of scope.",
+    "results": {
+      "candidate_population": "1704 / 1704 identical on the join key -- candidate-generation semantics unchanged",
+      "flip_within_180s_subset_n": 224,
+      "disposition_match": 1.0,
+      "flip_ts_match": 1.0,
+      "label_match": 1.0,
+      "time_to_flip_seconds_match": 1.0,
+      "total_disposition_differences": 137,
+      "differences_explained_by_flip_in_180_to_300s_window": 137,
+      "differences_from_censoring": 0,
+      "unexplained_differences": 0,
+      "session_end_censored_rows_on_this_day": 0
+    },
+    "conclusion": "The flip-detection and labeling machinery under the current runtime is semantically identical to the parent's historical behavior: every flip observable within both horizons is detected at the same timestamp with the same disposition/label, and every difference is the intended horizon change (parent POSITIVE where the flip landed in (180s, 300s]). Combined with causal audit pass 14 (behaviour-preserving refactor) and contract audit pass 14 (population/session/censoring/timestamp inherited identical), the frozen parent benchmark is used unchanged for the 180s-vs-300s comparison. No parent re-collection or re-score.",
+    "residual_caveat": "Verified on the single shared authorized bounded-run date (2023-10-02, n=224 flips) -- the only date both studies authorize for bounded execution. A full-TRAIN parent reproduction would require reconciling the sealed parent study."
+  }
+}

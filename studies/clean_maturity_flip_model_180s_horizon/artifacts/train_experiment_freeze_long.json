@@ -1,0 +1,85 @@
+{
+  "partition": "train",
+  "feature_sets": {
+    "C": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr"
+    ]
+  },
+  "model_hashes": {
+    "C": "25737fcd6830a60f8b5cb4a97293ceef8cabcf0efdc1910792a71c7127a9ae60"
+  },
+  "preprocessing_hash": "96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8",
+  "thresholds": {
+    "C": {
+      "p90": {
+        "method": "quantile",
+        "parameter": 0.9,
+        "threshold": 0.2852887899663343,
+        "derivation_population": "train"
+      },
+      "p95": {
+        "method": "quantile",
+        "parameter": 0.95,
+        "threshold": 0.32770330252959395,
+        "derivation_population": "train"
+      },
+      "p97_5": {
+        "method": "quantile",
+        "parameter": 0.975,
+        "threshold": 0.3639796684339806,
+        "derivation_population": "train"
+      }
+    }
+  },
+  "deciles": {
+    "C": {
+      "boundaries": [
+        0.06716255061987056,
+        0.0959974733851858,
+        0.11533470936210777,
+        0.13324590970726913,
+        0.14980039904362538,
+        0.17164852705760078,
+        0.20171761499125726,
+        0.23767264775091101,
+        0.2852887899663343
+      ],
+      "derivation": "TRAIN_ONLY"
+    }
+  },
+  "model_selection_manifest_sha256": "c005787af311ec13708df4d4be68797b6d492eef3d8acf1f87ef85379f9704f1",
+  "model_artifacts": [
+    {
+      "model_id": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+      "model_role": "C",
+      "artifact_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389.joblib",
+      "artifact_sha256": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+      "golden_fixture_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389.golden.json",
+      "golden_fixture_sha256": "0906cc842cb3e0fa8e860af7e197ef9fbc9c9bd9611041bdba8c040fe9244a80",
+      "native_booster_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389.booster.txt",
+      "native_booster_sha256": "3686a5d2b25b15ef3bb31d24483ddd808c6812e4142baa3d124cd45dbdba7f86"
+    }
+  ],
+  "stage_scoped_lineage": {
+    "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+    "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+    "MODELING_EXECUTION_CLOSURE": "ed5de9b11849746a484c045d587f688d831a0a18d89d8b73ebaffc413ea4dc99"
+  },
+  "schema_version": 1,
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+  "generated_at_utc": "2026-08-29T07:05:33.393699+00:00",
+  "freeze_sha256": "3b0b4799d0ef3b391c40ae3ab837fe0941bc5739c2d1f3e660a4bf8221bbe64b"
+}

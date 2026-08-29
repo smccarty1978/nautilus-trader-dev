@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "search_method": "random",
+  "max_trials": 24,
+  "random_seed": 42,
+  "tuning_years": [
+    2021,
+    2022
+  ],
+  "final_train_validation_years": [
+    2023
+  ],
+  "primary_selection_metric": "pr_auc",
+  "primary_selection_metric_direction": "maximize",
+  "secondary_metrics": [
+    "brier"
+  ],
+  "declared_search_space_size": null,
+  "attempted_draw_count": 24,
+  "unique_evaluated_count": 24,
+  "search_space_exhausted": false,
+  "attempts": {
+    "C": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.06597076978316395,
+          "max_depth": 3,
+          "n_estimators": 100,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3082555974196749
+        ],
+        "average_score": 0.3082555974196749
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.06543367060584497,
+          "max_depth": 3,
+          "n_estimators": 300,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.2881754893798778
+        ],
+        "average_score": 0.2881754893798778
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.039440343780424526,
+          "max_depth": 5,
+          "n_estimators": 100,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3107680713121842
+        ],
+        "average_score": 0.3107680713121842
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.029083922675345254,
+          "max_depth": 3,
+          "n_estimators": 300,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3041530154058125
+        ],
+        "average_score": 0.3041530154058125
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.02754301947728003,
+          "max_depth": 5,
+          "n_estimators": 300,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3052455226535846
+        ],
+        "average_score": 0.3052455226535846
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.04121104666078603,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 31,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3029468055062148
+        ],
+        "average_score": 0.3029468055062148
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.06151889011627744,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3004760001696366
+        ],
+        "average_score": 0.3004760001696366
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.02828315521526488,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3086876793494253
+        ],
+        "average_score": 0.3086876793494253
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.036862754389988345,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3061416899089052
+        ],
+        "average_score": 0.3061416899089052
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.030614145882839516,
+          "max_depth": 5,
+          "n_estimators": 100,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3047774664726244
+        ],
+        "average_score": 0.3047774664726244
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.02445004930574217,
+          "max_depth": 5,
+          "n_estimators": 200,
+          "num_leaves": 31,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.2952307457084925
+        ],
+        "average_score": 0.2952307457084925
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.03205921029406638,
+          "max_depth": 5,
+          "n_estimators": 300,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30408368132116564
+        ],
+        "average_score": 0.30408368132116564
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.027254232246330383,
+          "max_depth": 5,
+          "n_estimators": 100,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30485518129077227
+        ],
+        "average_score": 0.30485518129077227
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.028861842631876633,
+          "max_depth": 5,
+          "n_estimators": 200,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.31086040493892564
+        ],
+        "average_score": 0.31086040493892564
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.08066331905706195,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.2947064557536283
+        ],
+        "average_score": 0.2947064557536283
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.055635802200620345,
+          "max_depth": 4,
+          "n_estimators": 200,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.28776654325134804
+        ],
+        "average_score": 0.28776654325134804
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.035428564717249415,
+          "max_depth": 4,
+          "n_estimators": 300,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.2992070943533369
+        ],
+        "average_score": 0.2992070943533369
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.09030742454102285,
+          "max_depth": 5,
+          "n_estimators": 300,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.27149821501616445
+        ],
+        "average_score": 0.27149821501616445
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.05557260723101661,
+          "max_depth": 5,
+          "n_estimators": 300,
+          "num_leaves": 4,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.29381011624166126
+        ],
+        "average_score": 0.29381011624166126
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.042085841761169834,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30166906146650546
+        ],
+        "average_score": 0.30166906146650546
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.03370496650952895,
+          "max_depth": 5,
+          "n_estimators": 100,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.3085991348441683
+        ],
+        "average_score": 0.3085991348441683
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.07306894931633574,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.29172110933744794
+        ],
+        "average_score": 0.29172110933744794
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.02808669736575327,
+          "max_depth": 3,
+          "n_estimators": 300,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.30193717186480035
+        ],
+        "average_score": 0.30193717186480035
+      },
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.057433060863871295,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 16,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.29608991247021055
+        ],
+        "average_score": 0.29608991247021055
+      }
+    ]
+  },
+  "winner": {
+    "C": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.028861842631876633,
+        "max_depth": 5,
+        "n_estimators": 200,
+        "num_leaves": 4,
+        "verbosity": -1
+      },
+      "inner_validation_score": 0.31086040493892564,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    }
+  },
+  "final_validation_metric": {
+    "C": {
+      "pr_auc": 0.2948155546981063,
+      "brier": 0.12279326019343346
+    }
+  },
+  "final_validation_reasons": {
+    "C": []
+  },
+  "final_validation_policy": "gated",
+  "final_validation_status": "PASS",
+  "no_retuning_after_final_validation_assertion": true,
+  "generated_at_utc": "2026-08-29T07:05:30.222597+00:00",
+  "manifest_sha256": "948863b1c474aa92d7eedd6ad904b5199c2f9f83e5368aabfa169ef0068ef6d2"
+}

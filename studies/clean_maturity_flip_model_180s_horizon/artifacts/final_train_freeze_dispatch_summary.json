@@ -1,0 +1,110 @@
+{
+  "LONG": {
+    "status": "FROZEN",
+    "arm": "C",
+    "n_rows": 642087,
+    "models_manifest_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\experiment_models_long.json",
+    "train_freeze_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\train_experiment_freeze_long.json",
+    "thresholds": {
+      "C": {
+        "p90": {
+          "method": "quantile",
+          "parameter": 0.9,
+          "threshold": 0.2852887899663343,
+          "derivation_population": "train"
+        },
+        "p95": {
+          "method": "quantile",
+          "parameter": 0.95,
+          "threshold": 0.32770330252959395,
+          "derivation_population": "train"
+        },
+        "p97_5": {
+          "method": "quantile",
+          "parameter": 0.975,
+          "threshold": 0.3639796684339806,
+          "derivation_population": "train"
+        }
+      }
+    },
+    "stage_scoped_lineage": {
+      "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+      "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+      "MODELING_EXECUTION_CLOSURE": "ed5de9b11849746a484c045d587f688d831a0a18d89d8b73ebaffc413ea4dc99"
+    },
+    "model_artifacts": [
+      {
+        "model_id": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+        "model_role": "C",
+        "artifact_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389.joblib",
+        "artifact_sha256": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+        "golden_fixture_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389.golden.json",
+        "golden_fixture_sha256": "0906cc842cb3e0fa8e860af7e197ef9fbc9c9bd9611041bdba8c040fe9244a80",
+        "native_booster_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389.booster.txt",
+        "native_booster_sha256": "3686a5d2b25b15ef3bb31d24483ddd808c6812e4142baa3d124cd45dbdba7f86"
+      }
+    ],
+    "tuned_hyperparameters": {
+      "learning_rate": 0.039440343780424526,
+      "max_depth": 5,
+      "n_estimators": 100,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "random_seed": 42
+  },
+  "SHORT": {
+    "status": "FROZEN",
+    "arm": "C",
+    "n_rows": 737005,
+    "models_manifest_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\experiment_models_short.json",
+    "train_freeze_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\train_experiment_freeze_short.json",
+    "thresholds": {
+      "C": {
+        "p90": {
+          "method": "quantile",
+          "parameter": 0.9,
+          "threshold": 0.28485631865861344,
+          "derivation_population": "train"
+        },
+        "p95": {
+          "method": "quantile",
+          "parameter": 0.95,
+          "threshold": 0.33222113070660036,
+          "derivation_population": "train"
+        },
+        "p97_5": {
+          "method": "quantile",
+          "parameter": 0.975,
+          "threshold": 0.37673375655439945,
+          "derivation_population": "train"
+        }
+      }
+    },
+    "stage_scoped_lineage": {
+      "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+      "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+      "MODELING_EXECUTION_CLOSURE": "ed5de9b11849746a484c045d587f688d831a0a18d89d8b73ebaffc413ea4dc99"
+    },
+    "model_artifacts": [
+      {
+        "model_id": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4",
+        "model_role": "C",
+        "artifact_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4.joblib",
+        "artifact_sha256": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a",
+        "golden_fixture_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4.golden.json",
+        "golden_fixture_sha256": "ab28886d9e79682aa3b9b8af8d8338dda2cd8381e34492750dd2e85111762f32",
+        "native_booster_path": "clean_maturity_flip_model_180s_horizon/artifacts/models/4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4.booster.txt",
+        "native_booster_sha256": "dc134a9aecb6bb9303095d7a8eee0ec5a105f516e30237d0e1d2f17016ad1aac"
+      }
+    ],
+    "tuned_hyperparameters": {
+      "learning_rate": 0.028861842631876633,
+      "max_depth": 5,
+      "n_estimators": 200,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "random_seed": 42
+  }
+}

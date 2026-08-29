@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "search_method": "none",
+  "max_trials": null,
+  "random_seed": 42,
+  "tuning_years": [
+    2021,
+    2022
+  ],
+  "final_train_validation_years": null,
+  "primary_selection_metric": "brier",
+  "primary_selection_metric_direction": "minimize",
+  "secondary_metrics": null,
+  "declared_search_space_size": 1,
+  "attempted_draw_count": 0,
+  "unique_evaluated_count": 1,
+  "search_space_exhausted": false,
+  "attempts": {
+    "A": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.05,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.12641452378135465
+        ],
+        "average_score": 0.12641452378135465
+      }
+    ],
+    "B": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.05,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.1277516583064872
+        ],
+        "average_score": 0.1277516583064872
+      }
+    ],
+    "C": [
+      {
+        "family": "lightgbm",
+        "hyperparameters": {
+          "learning_rate": 0.05,
+          "max_depth": 3,
+          "n_estimators": 200,
+          "num_leaves": 8,
+          "verbosity": -1
+        },
+        "fold_scores": [
+          0.12511331701209732
+        ],
+        "average_score": 0.12511331701209732
+      }
+    ]
+  },
+  "winner": {
+    "A": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "n_estimators": 200,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "inner_validation_score": 0.12641452378135465,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    },
+    "B": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "n_estimators": 200,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "inner_validation_score": 0.1277516583064872,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    },
+    "C": {
+      "family": "lightgbm",
+      "hyperparameters": {
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "n_estimators": 200,
+        "num_leaves": 8,
+        "verbosity": -1
+      },
+      "inner_validation_score": 0.12511331701209732,
+      "winner_selection_reason": {
+        "rule": "best_primary_metric",
+        "tie_break_applied": false
+      }
+    }
+  },
+  "final_validation_metric": {
+    "A": {},
+    "B": {},
+    "C": {}
+  },
+  "final_validation_reasons": {
+    "A": [],
+    "B": [],
+    "C": []
+  },
+  "final_validation_policy": "report_only",
+  "final_validation_status": "PASS",
+  "no_retuning_after_final_validation_assertion": true,
+  "generated_at_utc": "2026-08-29T07:04:42.397278+00:00",
+  "manifest_sha256": "08979215d6797cbb91b6d8ee63f8d58b2388da1b8e1fef26be7e261907a5a034"
+}

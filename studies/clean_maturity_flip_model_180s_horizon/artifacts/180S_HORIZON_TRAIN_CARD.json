@@ -1,0 +1,424 @@
+{
+  "study": "clean_maturity_flip_model_180s_horizon",
+  "stop_point": "TRAIN freeze + TRAIN-only comparison card",
+  "OOS_ACCESSED": "NO",
+  "2025_2026_ACCESSED": "NO",
+  "framework_reconciliation": {
+    "current_workflow_used": true,
+    "old_artifacts_stale": true,
+    "parameterized_feature_identity_reconciled": "YES - prior_1m_* / prior_5m_* now distinct; feature_list_sha256 4e46c0b3 -> 38c0201f; semantic surface unchanged",
+    "execution_closure_valid": true,
+    "sealed_composite": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+    "feature_list_sha256": "38c0201fe2b0fec3070b7a226353d7782778aa82bace3b6070de8844d9d04d32",
+    "spec_sha256": "e363badf226991c99ebef50892f468d79d04be59f5abd7ffb5cac5a702fad1e0",
+    "causal_audit": "CLEAR pass 14 (lookahead-auditor) 0 critical / 0 warning / 2 notes (deferred to parity gate)",
+    "contract_audit": "CLEAR pass 14 (contract-checker) 0 blocking / 0 warning",
+    "seal": "LOCKED"
+  },
+  "parent_300s": {
+    "authoritative_study": "clean_maturity_flip_model_rolling_productivity",
+    "frozen_execution_composite": "7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8",
+    "benchmark_artifact": "artifacts/train_experiment_freeze_repaired.json",
+    "model_family": "lightgbm 4.6.0 LGBMClassifier (established by joblib deserialization)",
+    "feature_surfaces": "A=3 / B=9 / C=13; identical canonical identities + parameters to the child",
+    "model_hashes": {
+      "LONG_C": "a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38",
+      "SHORT_C": "5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf"
+    },
+    "OOS_2024": "already scored in the parent study - NOT touched here"
+  },
+  "parent_300s_runtime_parity": {
+    "verdict": "EXACT_SEMANTIC_PARITY",
+    "action": "HOLD_FROZEN_PARENT",
+    "evidence": "shared authorized date 2023-10-02: 1704/1704 candidates identical on join key; 224/224 flips observable within both horizons match exactly on disposition + flip_ts + label + time_to_flip; all 137 disposition differences explained by a flip in (180s,300s]; 0 from censoring; 0 unexplained. Combined with causal pass 14 (new flip labeling = behaviour-preserving refactor of the legacy inline path) and contract pass 14 (population/session/censoring/timestamp inherited identical). Parent used unchanged for the 180s-vs-300s comparison; no parent re-collection or re-score.",
+    "artifact": "artifacts/target_runtime_parity.json"
+  },
+  "target_runtime_parity": {
+    "verdict": "CLEAR",
+    "exact_horizon_boundary_convention": "INCLUSIVE upper bound: a prevailing-1m-regime flip whose completed-1m-bar confirmation lands at exactly T + 180s is POSITIVE / within horizon; strictly after is NEGATIVE. Verified identical across (a) the collector live inline path (_sweep_elapsed_horizons one-tick hold), (b) FlipTargetRuntime._terminal_legacy / _terminal_pending (ts <= end), (c) the replay-oracle flip child _replay_flip_condition (T < ts <= end). 3 assertions in _work/verify_horizon_boundary_convention.py pass. No independent replay oracle exists for a bare flip_within_horizon primitive; parity is covered by READINESS R10 + PREFLIGHT RUNTIME_CONTRACT_BINDING + causal pass 14 field-by-field verification."
+  },
+  "target_180s": {
+    "exact_event": "prevailing_1m_regime_transition, direction both",
+    "horizon": "180s",
+    "confirmation": "completed_1m_bar x1 (the regime engine has no separate raw/confirmed flip event; the flip IS the confirmation)",
+    "population": "1,387,411 candidates (identical to parent); 1,379,092 labeled (LABELED_POSITIVE 226,315 / LABELED_NEGATIVE 1,152,777 / CENSORED 8,319 - fewer than parent's 13,894, the expected mechanical consequence of the shorter horizon near the RTH close)",
+    "chronology": "TRAIN [2021, 2022, 2023]; 2024 sealed; 2025/2026 prohibited"
+  },
+  "LONG": {
+    "base_rate_180s": 0.1679,
+    "base_rate_300s": 0.2943,
+    "n_labeled_180s": 642087,
+    "n_labeled_300s": 639304,
+    "A": {
+      "pr_auc_val2022": 0.2764,
+      "brier_val2022": 0.1264
+    },
+    "B": {
+      "pr_auc_val2022": 0.2665,
+      "brier_val2022": 0.1278
+    },
+    "C": {
+      "pr_auc_val2022": 0.2941,
+      "brier_val2022": 0.1251
+    },
+    "selected_architecture": "C",
+    "selected_using": "PR-AUC (maximize) on fit=2021/val=2022; tie tol 0.005; brier then n_features then arm-name tie-break; 2023 never loaded in Phase 1",
+    "tie_break_applied": false,
+    "tuned_hyperparameters": {
+      "learning_rate": 0.039440343780424526,
+      "max_depth": 5,
+      "n_estimators": 100,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "tuning": "random search, 24 unique trials, seed 42, arm C only, fit=2021/val=2022",
+    "inner_validation_pr_auc_2021_to_2022": 0.3096,
+    "2023_reject_only": {
+      "PR_AUC": 0.3235,
+      "brier": 0.1291,
+      "gate": "max_degradation_vs_inner_validation <= 0.15 AND brier <= 0.30",
+      "status": "PASS"
+    },
+    "train_freeze": {
+      "arm": "C",
+      "n_rows": 642087,
+      "model_artifact_sha256": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+      "model_id": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+      "golden_fixture_sha256": "0906cc842cb3e0fa8e860af7e197ef9fbc9c9bd9611041bdba8c040fe9244a80",
+      "thresholds_TRAIN_ONLY": {
+        "p90": 0.2853,
+        "p95": 0.3277,
+        "p97_5": 0.364
+      },
+      "stage_scoped_lineage": {
+        "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+        "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+        "MODELING_EXECUTION_CLOSURE": "ed5de9b11849746a484c045d587f688d831a0a18d89d8b73ebaffc413ea4dc99"
+      }
+    },
+    "vs_300s_classification_full_train": {
+      "roc_auc_180s": 0.7047,
+      "roc_auc_300s": 0.6754,
+      "roc_auc_delta": 0.0293,
+      "pr_auc_180s": 0.328,
+      "pr_auc_300s": 0.467,
+      "pr_auc_delta": -0.139,
+      "pr_auc_over_base_rate_180s": 1.953,
+      "pr_auc_over_base_rate_300s": 1.587,
+      "brier_180s": 0.1289,
+      "brier_300s": 0.1908,
+      "flip_rate_delta_at_base": -0.1263
+    },
+    "high_score_precision_and_timing": {
+      "p90": {
+        "180s": {
+          "flip_rate": 0.393,
+          "precision_lift": 2.34,
+          "median_sec_to_flip": 70.0
+        },
+        "300s": {
+          "flip_rate": 0.555,
+          "precision_lift": 1.89,
+          "median_sec_to_flip": 100.0
+        }
+      },
+      "p97_5": {
+        "180s": {
+          "flip_rate": 0.502,
+          "precision_lift": 2.99,
+          "median_sec_to_flip": 50.0
+        },
+        "300s": {
+          "flip_rate": 0.697,
+          "precision_lift": 2.37,
+          "median_sec_to_flip": 75.0
+        }
+      }
+    },
+    "economic_path_first_crossing": {
+      "note": "one entry per regime at the frozen threshold; forward path on 1s bars; Wilder ATR(14) 1m diagnostic",
+      "p90": {
+        "n_180s": 4266,
+        "n_300s": 4213,
+        "median_sec_to_flip": {
+          "180s": 130.0,
+          "300s": 185.0
+        },
+        "MFE_at_300s_ATR_median": {
+          "180s": 0.93,
+          "300s": 0.949
+        },
+        "MAE_at_180s_ATR_median": {
+          "180s": 0.748,
+          "300s": 0.743
+        },
+        "eventual_max_MFE_ATR_median": {
+          "180s": 1.314,
+          "300s": 1.357
+        },
+        "eventual_max_MAE_ATR_median": {
+          "180s": 1.361,
+          "300s": 1.371
+        },
+        "P_MFE_ge_1_ATR": {
+          "180s": 0.611,
+          "300s": 0.62
+        },
+        "P_MFE_ge_2_ATR": {
+          "180s": 0.302,
+          "300s": 0.311
+        },
+        "P_MFE_ge_3_ATR": {
+          "180s": 0.127,
+          "300s": 0.13
+        },
+        "one_to_one_tradeability_success_within_300s": {
+          "180s": 0.426,
+          "300s": 0.43
+        },
+        "favorable_before_adverse_1ATR": {
+          "180s": 0.491,
+          "300s": 0.497
+        }
+      },
+      "p95": {
+        "n_180s": 3227,
+        "MFE_at_300s_ATR_median": {
+          "180s": 0.934,
+          "300s": 0.963
+        },
+        "eventual_max_MFE_ATR_median": {
+          "180s": 1.318,
+          "300s": 1.395
+        },
+        "one_to_one_tradeability_success_within_300s": {
+          "180s": 0.424,
+          "300s": 0.438
+        }
+      }
+    },
+    "vs_300s_deltas": {
+      "PR_AUC_delta": -0.139,
+      "ROC_AUC_delta": 0.0293,
+      "calibration_delta_brier": -0.0619,
+      "flip_rate_delta": -0.1263,
+      "median_seconds_to_flip_delta_p90_crossing": -55.0,
+      "remaining_MFE_delta_at_300s_ATR": -0.019,
+      "MAE_delta_at_180s_ATR": 0.005,
+      "one_to_one_tradeability_delta": -0.003
+    }
+  },
+  "SHORT": {
+    "base_rate_180s": 0.1608,
+    "base_rate_300s": 0.2793,
+    "n_labeled_180s": 737005,
+    "n_labeled_300s": 734213,
+    "A": {
+      "pr_auc_val2022": 0.2855,
+      "brier_val2022": 0.1301
+    },
+    "B": {
+      "pr_auc_val2022": 0.2684,
+      "brier_val2022": 0.1319
+    },
+    "C": {
+      "pr_auc_val2022": 0.2973,
+      "brier_val2022": 0.129
+    },
+    "selected_architecture": "C",
+    "selected_using": "PR-AUC (maximize) on fit=2021/val=2022; tie tol 0.005; brier then n_features then arm-name tie-break; 2023 never loaded in Phase 1",
+    "tie_break_applied": false,
+    "tuned_hyperparameters": {
+      "learning_rate": 0.028861842631876633,
+      "max_depth": 5,
+      "n_estimators": 200,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "tuning": "random search, 24 unique trials, seed 42, arm C only, fit=2021/val=2022",
+    "inner_validation_pr_auc_2021_to_2022": 0.3109,
+    "2023_reject_only": {
+      "PR_AUC": 0.2948,
+      "brier": 0.1228,
+      "gate": "max_degradation_vs_inner_validation <= 0.15 AND brier <= 0.30",
+      "status": "PASS"
+    },
+    "train_freeze": {
+      "arm": "C",
+      "n_rows": 737005,
+      "model_artifact_sha256": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a",
+      "model_id": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4",
+      "golden_fixture_sha256": "ab28886d9e79682aa3b9b8af8d8338dda2cd8381e34492750dd2e85111762f32",
+      "thresholds_TRAIN_ONLY": {
+        "p90": 0.2849,
+        "p95": 0.3322,
+        "p97_5": 0.3767
+      },
+      "stage_scoped_lineage": {
+        "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+        "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+        "MODELING_EXECUTION_CLOSURE": "ed5de9b11849746a484c045d587f688d831a0a18d89d8b73ebaffc413ea4dc99"
+      }
+    },
+    "vs_300s_classification_full_train": {
+      "roc_auc_180s": 0.7051,
+      "roc_auc_300s": 0.6768,
+      "roc_auc_delta": 0.0283,
+      "pr_auc_180s": 0.317,
+      "pr_auc_300s": 0.4496,
+      "pr_auc_delta": -0.1326,
+      "pr_auc_over_base_rate_180s": 1.972,
+      "pr_auc_over_base_rate_300s": 1.61,
+      "brier_180s": 0.1246,
+      "brier_300s": 0.1852,
+      "flip_rate_delta_at_base": -0.1186
+    },
+    "high_score_precision_and_timing": {
+      "p90": {
+        "180s": {
+          "flip_rate": 0.38,
+          "precision_lift": 2.36,
+          "median_sec_to_flip": 70.0
+        },
+        "300s": {
+          "flip_rate": 0.538,
+          "precision_lift": 1.93,
+          "median_sec_to_flip": 100.0
+        }
+      },
+      "p97_5": {
+        "180s": {
+          "flip_rate": 0.487,
+          "precision_lift": 3.03,
+          "median_sec_to_flip": 55.0
+        },
+        "300s": {
+          "flip_rate": 0.662,
+          "precision_lift": 2.37,
+          "median_sec_to_flip": 75.0
+        }
+      }
+    },
+    "economic_path_first_crossing": {
+      "note": "one entry per regime at the frozen threshold; forward path on 1s bars; Wilder ATR(14) 1m diagnostic",
+      "p90": {
+        "n_180s": 4761,
+        "n_300s": 4697,
+        "median_sec_to_flip": {
+          "180s": 130.0,
+          "300s": 185.0
+        },
+        "MFE_at_300s_ATR_median": {
+          "180s": 0.909,
+          "300s": 0.94
+        },
+        "MAE_at_180s_ATR_median": {
+          "180s": 0.684,
+          "300s": 0.683
+        },
+        "eventual_max_MFE_ATR_median": {
+          "180s": 1.3,
+          "300s": 1.338
+        },
+        "eventual_max_MAE_ATR_median": {
+          "180s": 1.338,
+          "300s": 1.295
+        },
+        "P_MFE_ge_1_ATR": {
+          "180s": 0.598,
+          "300s": 0.615
+        },
+        "P_MFE_ge_2_ATR": {
+          "180s": 0.312,
+          "300s": 0.319
+        },
+        "P_MFE_ge_3_ATR": {
+          "180s": 0.143,
+          "300s": 0.146
+        },
+        "one_to_one_tradeability_success_within_300s": {
+          "180s": 0.426,
+          "300s": 0.433
+        },
+        "favorable_before_adverse_1ATR": {
+          "180s": 0.503,
+          "300s": 0.51
+        }
+      },
+      "p95": {
+        "n_180s": 3719,
+        "MFE_at_300s_ATR_median": {
+          "180s": 0.916,
+          "300s": 0.939
+        },
+        "eventual_max_MFE_ATR_median": {
+          "180s": 1.288,
+          "300s": 1.357
+        },
+        "one_to_one_tradeability_success_within_300s": {
+          "180s": 0.424,
+          "300s": 0.431
+        }
+      }
+    },
+    "vs_300s_deltas": {
+      "PR_AUC_delta": -0.1326,
+      "ROC_AUC_delta": 0.0283,
+      "calibration_delta_brier": -0.0607,
+      "flip_rate_delta": -0.1186,
+      "median_seconds_to_flip_delta_p90_crossing": -55.0,
+      "remaining_MFE_delta_at_300s_ATR": -0.031,
+      "MAE_delta_at_180s_ATR": 0.002,
+      "one_to_one_tradeability_delta": -0.007
+    }
+  },
+  "ECONOMIC_PRESERVATION": {
+    "does_180s_leave_meaningful_post_signal_excursion": "YES",
+    "does_accuracy_improvement_come_at_cost_of_MFE": "NO - MFE, MAE, eventual excursion, P(MFE>=k ATR) and 1:1 tradeability are all within ~1-5% of the 300s benchmark at matched frozen first-crossing thresholds, both directions, p90 and p95",
+    "evidence": "At the p90 first-crossing population the 180s signal fires ~55s closer to the flip (median 130s vs 185s to flip) yet the subsequent path is essentially unchanged: MFE at 300s post-signal ~0.91-0.93 ATR (180s) vs ~0.94-0.95 (300s); eventual max MFE ~1.30 ATR vs ~1.35; MAE identical; 1:1 favorable-before-adverse within 300s ~0.43 for BOTH horizons; P(MFE>=1 ATR) ~0.60 vs ~0.62. The tighter horizon removes weak predictions faster than it removes reversal opportunity."
+  },
+  "TRAIN_FREEZE": {
+    "status": "FROZEN (both directions)",
+    "merge_sha256": "f60de141642554208472d76ef75d0937ac655f8064d2111adc6af0b9d3087666",
+    "merged_train_rows": 1387411,
+    "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+    "LONG_freeze_sha256": "3b0b4799d0ef3b391c40ae3ab837fe0941bc5739c2d1f3e660a4bf8221bbe64b",
+    "SHORT_freeze_sha256": "558830668efe11c569688e985e256a3af73e94f04893aa74c11a2a8efa2959d1",
+    "LONG_model_hash": "25737fcd6830a60f8b5cb4a97293ceef8cabcf0efdc1910792a71c7127a9ae60",
+    "SHORT_model_hash": "3c480affc677f64b712540f8e55df67d7f14fe9921ad9baa293b96bf70cdaa6f",
+    "feature_order": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr"
+    ],
+    "preprocessing_hash": "96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8 (calibration none, raw feature surface)",
+    "library_versions": {
+      "python": "3.13.7",
+      "numpy": "2.3.3",
+      "pandas": "2.3.3",
+      "sklearn": "1.7.2",
+      "lightgbm": "4.6.0"
+    },
+    "reproducibility": "deterministic - seed 42 throughout; Phase 1/2/3 rerun produced byte-identical selection; immutable per-model golden-score fixtures persisted in studies/model_registry/; stage-scoped lineage binds COLLECTION_PRODUCER bd2e9cf1 / TARGET_RUNTIME 54dc9897 / MODELING_EXECUTION ed5de9b1"
+  },
+  "INTERPRETATION": {
+    "verdict": "CLASSIFICATION_BETTER_AND_TIMING_BETTER_WITH_ECONOMIC_MOVE_PRESERVED",
+    "better_flip_classifier": "YES - ROC-AUC rises +0.028/+0.028 (LONG/SHORT) and base-rate-relative PR-AUC lift rises (1.95x vs 1.59x at the full surface; ~3.0x vs ~2.4x precision lift at the p97.5 crossing). Raw PR-AUC and Brier fall, but only because the 180s base rate is ~half the 300s base rate.",
+    "better_timing_signal": "YES - at matched frozen thresholds the 180s first-crossing fires ~50-55s closer to the flip (median 130s vs 185s at p90; 105s vs 155s at p95).",
+    "economic_move_preserved": "YES - MFE, MAE, eventual excursion, P(MFE>=k ATR) and 1:1 tradeability are all within a few percent of the 300s benchmark. The shorter horizon does not trivialize the prediction.",
+    "direction_specific_findings": "LONG and SHORT behave near-identically on every axis; no directional divergence.",
+    "one_to_one_tradeability_readout": "~43% of high-confidence first-crossings reach +1 ATR favorable before -1 ATR adverse within 300s (50% over a full 600s race) - real but roughly coin-flip, at BOTH horizons. This is descriptive evidence for the next research question (a model predicting flip + favorable MFE/MAE geometry), not a tradeable edge on its own.",
+    "recommended_next_step": "Open 2024 OOS on the frozen 180s winner vs the frozen 300s parent to confirm the TRAIN picture holds out of sample, then scope the flip + MFE/MAE-geometry model on the 180s horizon."
+  },
+  "READY_FOR_RESEARCHER_OOS_DECISION": true
+}

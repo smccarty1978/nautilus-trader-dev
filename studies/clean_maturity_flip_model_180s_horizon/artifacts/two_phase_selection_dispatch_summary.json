@@ -1,0 +1,72 @@
+{
+  "LONG": {
+    "status": "PASS_DIRECTION",
+    "winning_arm": "C",
+    "per_arm_pr_auc": {
+      "A": 0.2763535441480495,
+      "B": 0.2664817851055258,
+      "C": 0.29410071634783347
+    },
+    "per_arm_brier": {
+      "A": 0.12641452378135465,
+      "B": 0.1277516583064872,
+      "C": 0.12511331701209732
+    },
+    "tie_break_applied": false,
+    "tie_break_trace": [
+      "pr_auc per arm: {'A': 0.2763535441480495, 'B': 0.2664817851055258, 'C': 0.29410071634783347}",
+      "within tie_tolerance_pr_auc=0.005: ['C']"
+    ],
+    "tuned_hyperparameters": {
+      "learning_rate": 0.039440343780424526,
+      "max_depth": 5,
+      "n_estimators": 100,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "inner_validation_score": 0.30962585339970716,
+    "final_validation_status": "PASS",
+    "final_validation_metrics": {
+      "pr_auc": 0.3234728767048036,
+      "brier": 0.12911170166038222
+    },
+    "final_validation_reasons": [],
+    "summary": "LONG_PASS: arm C passed the 2023 reject-only gate with hyperparameters {'learning_rate': 0.039440343780424526, 'max_depth': 5, 'n_estimators': 100, 'num_leaves': 4, 'verbosity': -1}.",
+    "manifest_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\model_selection_manifest_long.json"
+  },
+  "SHORT": {
+    "status": "PASS_DIRECTION",
+    "winning_arm": "C",
+    "per_arm_pr_auc": {
+      "A": 0.2855222369850452,
+      "B": 0.26838351113932957,
+      "C": 0.29729641151965985
+    },
+    "per_arm_brier": {
+      "A": 0.1300853284848413,
+      "B": 0.1319292950074604,
+      "C": 0.1289578013967565
+    },
+    "tie_break_applied": false,
+    "tie_break_trace": [
+      "pr_auc per arm: {'A': 0.2855222369850452, 'B': 0.26838351113932957, 'C': 0.29729641151965985}",
+      "within tie_tolerance_pr_auc=0.005: ['C']"
+    ],
+    "tuned_hyperparameters": {
+      "learning_rate": 0.028861842631876633,
+      "max_depth": 5,
+      "n_estimators": 200,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "inner_validation_score": 0.31086040493892564,
+    "final_validation_status": "PASS",
+    "final_validation_metrics": {
+      "pr_auc": 0.2948155546981063,
+      "brier": 0.12279326019343346
+    },
+    "final_validation_reasons": [],
+    "summary": "SHORT_PASS: arm C passed the 2023 reject-only gate with hyperparameters {'learning_rate': 0.028861842631876633, 'max_depth': 5, 'n_estimators': 200, 'num_leaves': 4, 'verbosity': -1}.",
+    "manifest_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\artifacts\\model_selection_manifest_short.json"
+  }
+}
