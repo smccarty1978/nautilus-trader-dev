@@ -235,16 +235,21 @@ def _flip_params(condition: Mapping[str, Any], contract: Mapping[str, Any]) -> d
             f"FLIP_CONDITION_HORIZON_MISSING: condition {condition.get('id')!r} declares "
             f"no horizon_seconds and the contract carries none"
         )
-    return {
+    ret: dict[str, Any] = {
         "horizon_seconds": int(horizon),
-        # "opposite" is the only flip direction any composite here declares; kept as a
-        # role string so the runtime resolves it against the live prevailing direction.
         "target_direction_role": str(condition.get("direction") or contract.get("direction") or "opposite"),
-        "session_end_censoring": bool(condition.get("session_end_censoring", False)),
-        "max_gap_seconds": (int(condition["max_gap_seconds"])
-                            if condition.get("max_gap_seconds") is not None else None),
-        "confirmation": condition.get("confirmation") or contract.get("confirmation"),
     }
+    if condition.get("session_end_censoring") is not None:
+        ret["session_end_censoring"] = bool(condition["session_end_censoring"])
+    elif contract.get("session_end_censoring") is not None:
+        ret["session_end_censoring"] = bool(contract["session_end_censoring"])
+    max_gap = condition.get("max_gap_seconds") if condition.get("max_gap_seconds") is not None else contract.get("max_gap_seconds")
+    if max_gap is not None:
+        ret["max_gap_seconds"] = int(max_gap)
+    conf = condition.get("confirmation") or contract.get("confirmation")
+    if conf:
+        ret["confirmation"] = conf
+    return ret
 
 
 def _ordered_barrier_params(
@@ -328,9 +333,7 @@ def compile_target_expression(contract: Mapping[str, Any]) -> TargetExpression:
         elif primitive == "ordered_barrier":
             fos = contract.get("required_forward_outcomes") or []
             bindings = [(f, b) for f in fos for b in (f.get("ordered_barriers") or [])]
-            if len(bindings) != 1:
-                raise TargetExpressionError("ORDERED_BARRIER_IDENTITY_REQUIRED: a root ordered-barrier target must declare exactly one barrier")
-            if bindings:
+            if len(bindings) == 1:
                 fo, b = bindings[0]
                 params = {
                     "forward_outcome_id": str(fo.get("id")),
@@ -346,6 +349,14 @@ def compile_target_expression(contract: Mapping[str, Any]) -> TargetExpression:
                     ),
                     "atr_source": fo.get("atr_source"),
                 }
+            elif "favorable_atr" in contract and "adverse_atr" in contract:
+                params = {
+                    "favorable_atr": float(contract["favorable_atr"]),
+                    "adverse_atr": float(contract["adverse_atr"]),
+                    "horizon_seconds": int(contract.get("horizon_seconds", 10)),
+                }
+            else:
+                raise TargetExpressionError("ORDERED_BARRIER_IDENTITY_REQUIRED: a root ordered-barrier target must declare exactly one barrier")
         return PrimitiveTarget("__root__", primitive, params)
 
     if len(conditions) == 1:

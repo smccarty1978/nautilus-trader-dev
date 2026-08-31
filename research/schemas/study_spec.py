@@ -219,7 +219,7 @@ class FlipConditionSpec(BaseModel):
     # A composite primitive owns its own censoring semantics.  These defaults are
     # deliberately explicit at compile time; a target-level convenience setting may
     # not reinterpret a child.
-    session_end_censoring: bool = False
+    session_end_censoring: Optional[bool] = None
     max_gap_seconds: Optional[int] = Field(None, gt=0)
 
 
@@ -1031,6 +1031,12 @@ class StudySpec(BaseModel):
         for _di in ((data_dict.get("features") or {}).get("derived_inputs") or []):
             if isinstance(_di, dict) and _di.get("model_id") is None:
                 _di.pop("model_id", None)
+        for _cond in ((data_dict.get("target") or {}).get("conditions") or []):
+            if isinstance(_cond, dict):
+                if _cond.get("session_end_censoring") is None:
+                    _cond.pop("session_end_censoring", None)
+                if _cond.get("max_gap_seconds") is None:
+                    _cond.pop("max_gap_seconds", None)
         canonical_json = json.dumps(data_dict, sort_keys=True, indent=None)
         return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
 

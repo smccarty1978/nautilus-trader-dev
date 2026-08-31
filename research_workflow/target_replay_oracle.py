@@ -222,7 +222,8 @@ def _replay_flip_condition(
     horizon = cond.get("horizon_seconds") if cond.get("horizon_seconds") is not None else contract.get("horizon_seconds")
     horizon_s = int(horizon)
     end = T + horizon_s * NS
-    session_close_ts = candidate.get("session_close_ts") if cond.get("session_end_censoring", False) else None
+    session_censoring = cond.get("session_end_censoring", contract.get("session_end_censoring", True))
+    session_close_ts = candidate.get("session_close_ts") if session_censoring else None
     if session_close_ts is not None and end > int(session_close_ts):
         return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
 

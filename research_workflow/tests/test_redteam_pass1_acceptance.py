@@ -134,6 +134,7 @@ def test_acc09_bare_flip_parity_catches_corruption(monkeypatch):
 
 # 10. OOS analysis becomes stale after TRAIN/model identity change
 def test_acc10_oos_analysis_goes_stale(tmp_path, monkeypatch):
+    import hashlib
     import research_workflow.analysis as amod
     from research_workflow.analysis import analyze_results
     from research_workflow.experiment import authorize_experiment
@@ -147,6 +148,16 @@ def test_acc10_oos_analysis_goes_stale(tmp_path, monkeypatch):
     auth = json.loads((s / "artifacts" / "experiment_authorization.json").read_text())
 
     def _freeze(tag):
+        reg_dir = s.parent / "model_registry"
+        reg_dir.mkdir(exist_ok=True)
+        art_file = s / "models/m.joblib"; art_file.parent.mkdir(exist_ok=True); art_file.write_bytes(b"dummy")
+        gold_file = s / "models/m_gold.json"; gold_file.write_bytes(b"gold")
+        reg_dir.joinpath("m.json").write_text(json.dumps({
+            "model_id": "m", "artifact_path": str(art_file.relative_to(s.parent)),
+            "artifact_sha256": hashlib.sha256(art_file.read_bytes()).hexdigest(),
+            "golden_fixture_path": str(gold_file.relative_to(s.parent)),
+            "golden_fixture_sha256": hashlib.sha256(gold_file.read_bytes()).hexdigest(),
+        }))
         (s / "artifacts" / "train_experiment_freeze.json").write_text(json.dumps({
             "partition": "train", "authorization_sha256": auth["authorization_sha256"],
             "freeze_sha256": tag, "model_artifacts": [{"model_id": "m", "model_role": "A"}],

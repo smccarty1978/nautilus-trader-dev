@@ -254,19 +254,21 @@ def classify_stage17_decision(study_dir: str | Path, *, repo_root: Path | None =
     if payload.get("study_id") != study_dir.name:
         return {"state": "INVALID", "reasons": [f"decision study_id {payload.get('study_id')!r} != {study_dir.name!r}"]}
 
-    # Stage 17 depends strictly on Stage 16 FRESH identity
-    oos_verdict = classify_oos_analysis(study_dir, repo_root=repo_root)
-    if oos_verdict is None:
-        return {"state": "INVALID", "reasons": ["Stage 16 experiment_analysis.json is missing"]}
-    if oos_verdict["state"] == "INVALID":
-        return {"state": "INVALID", "reasons": [f"Stage 16 analysis is INVALID: {oos_verdict['reasons']}"]}
-    if oos_verdict["state"] == "STALE":
-        return {"state": "STALE", "reasons": [f"Stage 16 analysis is STALE: {oos_verdict['reasons']}"]}
+    # Stage 17 depends strictly on Stage 16 FRESH identity when OOS is bound or present
+    lineage = payload.get("bound_lineage") or {}
+    s16_bound = bool(lineage.get("stage16_analysis_artifact_file_sha256") or lineage.get("stage16_analysis_identity_sha256"))
+    s16_file = study_dir / "artifacts" / "experiment_analysis.json"
+    if s16_bound or s16_file.is_file():
+        oos_verdict = classify_oos_analysis(study_dir, repo_root=repo_root)
+        if oos_verdict is None:
+            return {"state": "INVALID", "reasons": ["Stage 16 experiment_analysis.json is missing"]}
+        if oos_verdict["state"] == "INVALID":
+            return {"state": "INVALID", "reasons": [f"Stage 16 analysis is INVALID: {oos_verdict['reasons']}"]}
+        if oos_verdict["state"] == "STALE":
+            return {"state": "STALE", "reasons": [f"Stage 16 analysis is STALE: {oos_verdict['reasons']}"]}
 
     reasons: list[str] = []
-    lineage = payload.get("bound_lineage") or {}
     if lineage.get("stage16_analysis_artifact_file_sha256"):
-        s16_file = study_dir / "artifacts" / "experiment_analysis.json"
         if _file_sha(s16_file) != lineage["stage16_analysis_artifact_file_sha256"]:
             reasons.append("Stage 16 analysis artifact file sha moved")
 

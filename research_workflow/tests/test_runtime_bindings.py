@@ -108,7 +108,8 @@ def test_preflight_required_checks_include_runtime_binding():
 def test_target_runtime_binding_is_proven_and_unknown_target_blocks(tmp_path):
     study = tmp_path / "s"; study.mkdir()
     payload = {"spec": {"execution": {}}, "contracts": {"population_contract": {},
-        "feature_contract": {"resolved_feature_instances": []}, "target_contract": {"primitive": "ordered_barrier"}}}
+        "feature_contract": {"resolved_feature_instances": []},
+        "target_contract": {"primitive": "ordered_barrier", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 10}}}
     (study / "compiled_study.json").write_text(json.dumps(payload))
     ok = verify_runtime_contract(study)
     assert ok["passed"] and ok["checked"]["target_runtime"]["runtime"] == "OrderedBarrierTargetRuntime"

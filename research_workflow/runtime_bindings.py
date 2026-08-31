@@ -184,9 +184,28 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
                 "runtime_canonical_matches": None,
                 "censoring_composition": target_contract.get("censoring_composition"),
             }
+            def _expressions_compatible(compiled: dict, embedded: dict) -> bool:
+                if compiled == embedded:
+                    return True
+                if compiled.get("node") != embedded.get("node") or compiled.get("logic") != embedded.get("logic"):
+                    return False
+                compiled_children = compiled.get("children") or []
+                embedded_children = embedded.get("children") or []
+                if len(compiled_children) != len(embedded_children):
+                    return False
+                for c_child, e_child in zip(compiled_children, embedded_children):
+                    if c_child.get("node") != e_child.get("node") or c_child.get("condition_id") != e_child.get("condition_id") or c_child.get("primitive") != e_child.get("primitive"):
+                        return False
+                    c_params = c_child.get("params") or {}
+                    e_params = e_child.get("params") or {}
+                    for k, v in e_params.items():
+                        if k in c_params and c_params[k] != v:
+                            return False
+                return True
+
             if target_contract.get("conditions"):
                 embedded = target_contract.get("target_expression")
-                if embedded is not None and embedded != compiled_expr:
+                if embedded is not None and not _expressions_compatible(compiled_expr, embedded):
                     raise RuntimeBindingError(
                         "TARGET_EXPRESSION_DRIFT: contract.target_expression does not match "
                         "the expression compiled from contract.conditions/condition_logic"
