@@ -734,13 +734,32 @@ class ExecutionSpec(BaseModel):
     observation_policy: Optional[Dict[str, Any]] = Field(
         default=None, description="Observation timing policy (exact_grid, parent_bar_close, event_driven)"
     )
+    modeling_driver_relpaths: Optional[List[str]] = Field(
+        default=None,
+        exclude_if=lambda value: not value,
+        description=(
+            "Study-relative paths to study-local modeling driver module(s) (e.g. "
+            "'implementation/train_merge_fit_freeze.py') that compose governed modeling "
+            "APIs (fit / model-selection / freeze / pre-fit gate scope). Declaring a "
+            "driver here binds its exact file bytes -- and its transitive import closure "
+            "-- into MODELING_EXECUTION_CLOSURE (research_workflow/modeling_closure.py), "
+            "so a modeling-only edit to it stales the TRAIN freeze / blocks OOS without "
+            "invalidating collection. A study-local implementation module that imports a "
+            "governed modeling API but is NOT declared here fails closed before fit "
+            "(research_workflow/modeling_drivers.py). Additive and hash-neutral: absent, "
+            "null and [] all serialize identically (the exclude_if drops the key), so "
+            "adding this field never stales an already-compiled study."
+        ),
+    )
     # NOTE: authorized modes are deliberately NOT a StudySpec field.
     # `compute_sha256` hashes `model_dump(exclude_none=False)`, so any additional field --
     # even an unset optional one -- changes every study's spec hash and marks every
-    # existing compiled_study.json stale. The mode-partitioned deliverables contract
-    # therefore derives its modes from `operation.kind` in the compiler instead
-    # (research/engines/deliverables_engine.py). Adding a declarative override here needs
-    # a deliberate spec-version bump and a recompile of every study.
+    # existing compiled_study.json stale (UNLESS, like `modeling_driver_relpaths` above,
+    # it carries an `exclude_if` that drops it from `model_dump` when unset). The
+    # mode-partitioned deliverables contract therefore derives its modes from
+    # `operation.kind` in the compiler instead (research/engines/deliverables_engine.py).
+    # Adding a declarative override here needs a deliberate spec-version bump and a
+    # recompile of every study.
 
 
 class AcceptanceSpec(BaseModel):
