@@ -1,0 +1,55 @@
+{
+  "model_id": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6",
+  "arm": "C",
+  "ordered_inputs": [
+    "arrival_velocity",
+    "arrival_acceleration",
+    "ema_slope",
+    "prior_1m_regime_efficiency",
+    "prior_1m_regime_mfe_atr",
+    "prior_1m_regime_range_atr",
+    "prior_5m_regime_efficiency",
+    "prior_5m_regime_mfe_atr",
+    "prior_5m_regime_range_atr",
+    "rolling_300s_retention_ratio",
+    "rolling_300s_current_progress_atr",
+    "rolling_300s_max_progress_atr",
+    "rolling_300s_giveback_atr"
+  ],
+  "rows": [
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "expected_scores": [
+    0.24219954770309957,
+    0.06641784869116485
+  ]
+}

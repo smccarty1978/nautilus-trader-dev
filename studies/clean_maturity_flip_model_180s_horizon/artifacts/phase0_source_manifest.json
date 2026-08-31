@@ -2,16 +2,14 @@
   "study_id": "clean_maturity_flip_model_180s_horizon",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "7a1b52cd36456c4c2c47202a42318ab81c14eb27",
+  "git_commit_hash": "8244a4bfca038eb32bafb593b5175f427e07f919",
   "source_state_binding": {
-    "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "7a1b52cd36456c4c2c47202a42318ab81c14eb27",
-    "git_commit_is_sufficient_provenance": false,
+    "provenance_strength": "COMMITTED",
+    "git_commit_hash": "8244a4bfca038eb32bafb593b5175f427e07f919",
+    "git_commit_is_sufficient_provenance": true,
     "working_tree_dirty": true,
     "source_state_sha256": "90d82c780ebbb2cf1a9ffb3b4464498680640a15fcee072c2be53fb4fec4ecf4",
-    "dependencies_diverging_from_commit": [
-      "studies/clean_maturity_flip_model_180s_horizon/study.yaml"
-    ],
+    "dependencies_diverging_from_commit": [],
     "source_files": {
       "features/registry.py": {
         "sha256": "0cbc2cf555e05d75299a07e99496dd48c7023353cb78bb4573d5c0132f57bfcc",
@@ -39,7 +37,7 @@
       },
       "studies/clean_maturity_flip_model_180s_horizon/study.yaml": {
         "sha256": "f7503dbf6b90f9a5996f45e894a05aeca4b6c5ba242077c2d3ab147cff018c31",
-        "state": "MODIFIED"
+        "state": "COMMITTED"
       }
     }
   },
@@ -353,5 +351,5 @@
   },
   "derived_causal_inputs": [],
   "required_gates_evidence": [],
-  "manifest_sha256": "5d6741ac881ecc98e5e5b7e0e36b231b9888e6c04d80572c5ce74373bfc8646b"
+  "manifest_sha256": "861e475e778e8ff32b66c57b4eba45ac8b08f974e5be84c3320e06e5e62e31d2"
 }
