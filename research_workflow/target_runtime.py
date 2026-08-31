@@ -126,6 +126,31 @@ class FlipTargetRuntime(TargetRuntime):
             {"ts": int(flip_event["ts"]), "direction": int(flip_event.get("direction", 0))}
         )
 
+    def parity_row(self, pending: Mapping[str, Any], actual: Mapping[str, Any]) -> dict:
+        """RT-07: an independent-replay parity row from a resolved flip pending.
+
+        Carries only raw causal inputs -- candidate T, the prevailing direction, the
+        observed prevailing-regime flips, the retained tape (for the gap rule) -- so
+        ``validate_target_parity`` re-derives the label through
+        ``target_replay_oracle._replay_flip_condition`` and never reads a
+        ``TargetResult`` this runtime computed.  ``regime_direction`` is emitted so the
+        oracle's default ``role == "opposite"`` yields the same target direction the
+        runtime resolved from ``target_direction_role``.
+        """
+        tgt = int(pending.get("target_direction", 0))
+        prevailing = -tgt if tgt else int(pending.get("regime_direction", 0))
+        return {
+            "candidate": {
+                "observation_ts": int(pending["observation_ts"]),
+                "regime_direction": prevailing,
+                "direction": prevailing,
+                "session_close_ts": pending.get("session_close_ts"),
+            },
+            "flip_events": [dict(f) for f in pending.get("flip_events", ())],
+            "events": [dict(b) for b in pending.get("tape", ())],
+            "actual": dict(actual),
+        }
+
     def terminal(self, candidate, events=None, *, final=True):
         if "flip_events" in candidate:
             return self._terminal_pending(candidate, final=final)
@@ -669,7 +694,14 @@ def validate_target_parity(contract: Mapping[str, Any], rows: Iterable[Mapping[s
         elif runtime.primitive == "ordered_barrier":
             oracle = replay(contract, row["candidate"], row.get("events", ()))
         else:
-            oracle = runtime.terminal(row["candidate"], row.get("events", ())).__dict__
+            # RT-07: a bare flip_within_horizon target is checked against the SAME
+            # independent replay implementation as a composite flip child
+            # (target_replay_oracle._replay_flip_condition, reached via replay_expression) --
+            # never against FlipTargetRuntime.terminal(), which would make the runtime its
+            # own oracle.
+            oracle = replay_expression(
+                contract, row["candidate"], row.get("events", ()), row.get("flip_events", ())
+            )
         actual = row["actual"]
         total += 1
         d_bad = _norm_disposition(actual.get("disposition")) != _norm_disposition(oracle["disposition"])
