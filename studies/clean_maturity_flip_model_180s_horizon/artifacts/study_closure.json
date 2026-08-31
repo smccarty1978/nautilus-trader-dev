@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "status": "CLOSED",
+  "outcome": "DIAGNOSTIC_NEGATIVE",
+  "terminal_decision": "MIXED",
+  "closed_at_utc": "2026-08-31T16:20:23.913759+00:00",
+  "bound_evidence": {
+    "execution_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "preexec_seal_status": "LOCKED",
+    "preexec_seal_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "preexec_seal_artifact_sha256": "7c1389c15c7192261b33cec25d4f2903abb9ff02e9e2ba424e263e7f84adb24a",
+    "causal_audit": {
+      "pass": 17,
+      "verdict": "CLEAR",
+      "report": "audit/pass_17.md",
+      "report_sha256": "a0f0cfb78d09d2acd3783fd9cc635357b779b46dd76ae101644fc9f91513c894",
+      "auditor": "lookahead-auditor"
+    },
+    "contract_audit": {
+      "pass": 16,
+      "verdict": "CLEAR",
+      "report": "audit/contract_pass_16.md",
+      "report_sha256": "48241bc065fdb3a301ca7e0abc899a28ac244778ae1f84b3bb8f556835f1b031",
+      "auditor": "contract-checker"
+    },
+    "train_freeze_sha256": "26c1b0c958155b8edb403312a61518e720a7f1b96981b064c788dc9ebfafe7a7",
+    "refreshed_model_ids": {
+      "LONG_C": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c",
+      "SHORT_C": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6"
+    },
+    "modeling_execution_closure_sha256": "fb4183e49b1223fb5511e92f9b6977a3e1f19f697311ba5b0d3fb637a20d9bda",
+    "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+    "oos_lineage_reconciliation": {
+      "path": "artifacts/oos_lineage_reconciliation.json",
+      "identity_sha256": "9a713d1a11b3e8471ef0fc72fedad5baa840f79700534f630fc4830ee7bc277b",
+      "artifact_file_sha256": "77705cd397c42d31c1045b6ae9ee2e8ae5bf76b59efdef3278799fa04ee6e374",
+      "decision": "REUSABLE_WITH_LINEAGE_REBINDING"
+    },
+    "oos_reconciled_authority": {
+      "path": "artifacts/oos_reconciled_authority.json",
+      "identity_sha256": "7174bd6885ddef470374c80a03b7a758735b884424e6e720acecb1df820ac21e",
+      "artifact_file_sha256": "a74c8460f552e20373cb9e998e85c3215e1273308860869772f4d4293da43435"
+    },
+    "stage16_analysis": {
+      "path": "artifacts/experiment_analysis.json",
+      "identity_sha256": "9f4c29e30699bb496575b5488191a944f7e0d6155c69a35e1e91332d5c625382",
+      "artifact_file_sha256": "d2280c89bf280521c8402cf5aa2485d389b2dcc2022897508004230cb30b6945",
+      "lineage_state": "FRESH"
+    },
+    "stage17_research_decision": {
+      "path": "artifacts/research_decision_stage17.json",
+      "identity_sha256": "cd8bfb923b23e84658f830e91efee7d4765daed7f16643cfbd41644bee12a6e4",
+      "artifact_file_sha256": "3b5d1c97492035c35e7fdb438a6661488fb05ff707daf34cff05dbaeb02ecdba"
+    },
+    "final_report": {
+      "path": "results/STUDY_REPORT.md",
+      "sha256": "3efa119bebec67c8aa130548b28060e252004f93493e0051a7a1e2c7164f69e5"
+    }
+  },
+  "research_interpretation": {
+    "classification_axis": "PASS / OOS-REPLICATED -- the 180s Model C classifier improves checkpoint-level discrimination vs the frozen 300s parent (ROC-AUC +0.05 LONG / +0.046 SHORT on 2024) and that improvement replicates out of sample.",
+    "economic_actionable_axis": "NOT ESTABLISHED -- first-fire / regime-level discrimination is ~chance (ROC-AUC ~0.50) and the frozen P90-tail 2024 economic return is ~0.",
+    "overall": "A diagnostic classifier improvement exists but does not produce demonstrated monetizable first-fire discrimination. The 180s models are retained as valid diagnostic classifiers; the horizon change is NOT promoted as an actionable trading signal."
+  },
+  "models": {
+    "LONG_C": {
+      "model_id": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c",
+      "preserved": true,
+      "artifact_status": "PRESERVED_AND_LOADABLE",
+      "scientific_status_registry": "UNASSESSED",
+      "reuse_status_registry": "PERMITTED",
+      "score_semantics": "predict_proba_positive",
+      "ordered_model_inputs_count": 13,
+      "native_booster_present": true,
+      "artifact_sha256": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+      "golden_fixture_sha256": "f7ba292411570017d70b792ba5b27dc68ae40dd7d62b959277de6db539788bad"
+    },
+    "SHORT_C": {
+      "model_id": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6",
+      "preserved": true,
+      "artifact_status": "PRESERVED_AND_LOADABLE",
+      "scientific_status_registry": "UNASSESSED",
+      "reuse_status_registry": "PERMITTED",
+      "score_semantics": "predict_proba_positive",
+      "ordered_model_inputs_count": 13,
+      "native_booster_present": true,
+      "artifact_sha256": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a",
+      "golden_fixture_sha256": "0bcaf917307e0991d7397010a9e86e64fe3cda1390310bbe1eacd62fa27ea946"
+    }
+  },
+  "model_scientific_assessment": {
+    "assessment": "VALID_DIAGNOSTIC",
+    "rationale": "Valid target and valid model with negative economics. The frozen 180s Model C classifiers are scientifically useful diagnostic models (real, OOS-replicated checkpoint-level discrimination); they are explicitly NOT INVALID_TARGET.",
+    "registry_scientific_status_value": "UNASSESSED",
+    "capability_note": "There is no governed function to assign scientific_status on an existing model_registry record (persist_models writes UNASSESSED; register_historical_model is for byte-registering a different id). This closure is the authoritative diagnostic assessment. The registry records remain UNASSESSED + reuse_status PERMITTED, which passes the RT-09 derived-input reuse gate (UNASSESSED is 'not flagged invalid'); VALID_DIAGNOSTIC reuse-as-derived-input additionally requires an explicit policy.",
+    "reuse_policy": "Discoverable for future GOVERNED derived-input use if a child study's reuse policy explicitly permits diagnostic-derived input (research_workflow.model_artifacts.assert_scientific_status_reusable). Never as a primary target."
+  },
+  "authorized_further_work": [],
+  "prohibited": [
+    "promotion of this classifier to a strategy / deployment",
+    "further classifier tuning",
+    "threshold / P90 modification",
+    "further 2024 optimization",
+    "OOS threshold search",
+    "any rescue attempt on this study",
+    "new 2024 / 2025 / 2026 data access"
+  ],
+  "further_economic_research_requires": "a SEPARATE study with a SEPARATELY-frozen research_decision.yaml against an economic-quality target/objective (e.g. P(clean reversal) / E[MFE] / target-before-stop) -- NOT continued work on this classifier.",
+  "no_governed_reopen_path": true,
+  "closure_identity_sha256": "eb7407678fe79e8a4594c56b879246c05ee78e37d3b23fdacc9c4191c9d64957"
+}
