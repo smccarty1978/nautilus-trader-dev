@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 from enum import Enum
-from typing import Annotated, Any, Dict, List, Literal, Optional, Union
+from typing import Annotated, Any, ClassVar, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
@@ -108,6 +108,78 @@ class EpisodeLifecycleSpec(BaseModel):
         return self
 
 
+class PopulationQualificationSpec(BaseModel):
+    """Typed, closed qualification schema for the existing population primitives (RT-06).
+
+    ``qualification`` used to be ``Dict[str, Any]`` -- an unknown authored key compiled,
+    sealed, and was silently ignored (``clean_tradable_reversal`` alone carried nine keys,
+    only one of which any code reads). Every field a real study authors is now declared
+    here, in one of three groups, and ``extra="forbid"`` rejects anything else at compile
+    time. Per-field ``exclude_if`` keeps ``model_dump`` byte-identical to the old dict so
+    this does not stale an existing study's ``spec_sha256``.
+
+    Group A -- consumed by the ESTABLISHED-FILTER population runtime
+      (``research_workflow.generic_collector``: ``_evaluate_checkpoint`` /
+      ``build_collector_config_kwargs``). The default population test.
+    Group B -- consumed by the IDENTITY-ALLOWLIST population runtime. When
+      ``required_checkpoint_identities_path`` is set it is the ONLY test applied and the
+      established filter is not evaluated (RESEARCH_WORKFLOW.md §7); the other group-B keys
+      are frozen-population provenance.
+    Group C -- ANALYSIS-SLICE metadata. Not a runtime gate and never a model input; drives
+      maturity-stratified reporting and is traced from ``research_decision.yaml``. Declared
+      here so it is a typed, documented field rather than a silently-ignored key.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    # -- Group A: established filter ----------------------------------------------
+    established: Optional[bool] = Field(None, exclude_if=lambda v: v is None)
+    age_gate_seconds: Optional[int] = Field(None, exclude_if=lambda v: v is None)
+    cadence_seconds: Optional[int] = Field(None, exclude_if=lambda v: v is None)
+    running_mfe_atr_gte: Optional[float] = Field(None, exclude_if=lambda v: v is None)
+    new_progress_windows_gte: Optional[int] = Field(None, exclude_if=lambda v: v is None)
+    retained_mfe_ratio_gte: Optional[float] = Field(None, exclude_if=lambda v: v is None)
+
+    # -- Group B: identity allowlist + its provenance ---------------------------
+    required_checkpoint_identities_path: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    required_checkpoint_identities_sha256: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    population_version: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    selection: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    stage1_score_threshold_source: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    stage1_score_threshold_derivation: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+
+    # -- Group C: analysis-slice metadata (never a runtime gate) ----------------
+    primary_maturity_buckets: Optional[List[str]] = Field(None, exclude_if=lambda v: v is None)
+    diagnostic_maturity_buckets: Optional[List[str]] = Field(None, exclude_if=lambda v: v is None)
+    maturity_role: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+
+    #: Keys the generic collector runtime actually consumes. A machine-readable list so
+    #: preflight can re-assert coverage against the *selected* runtime (RT-06).
+    ESTABLISHED_FILTER_KEYS: ClassVar[frozenset] = frozenset({
+        "established", "age_gate_seconds", "cadence_seconds", "running_mfe_atr_gte",
+        "new_progress_windows_gte", "retained_mfe_ratio_gte",
+    })
+    IDENTITY_ALLOWLIST_KEYS: ClassVar[frozenset] = frozenset({"required_checkpoint_identities_path"})
+    RUNTIME_CONSUMED_KEYS: ClassVar[frozenset] = ESTABLISHED_FILTER_KEYS | IDENTITY_ALLOWLIST_KEYS
+
+    @model_validator(mode="after")
+    def validate_mutually_exclusive_population_tests(self) -> "PopulationQualificationSpec":
+        if self.required_checkpoint_identities_path is not None:
+            established_thresholds = [
+                k for k in ("age_gate_seconds", "running_mfe_atr_gte",
+                            "new_progress_windows_gte", "retained_mfe_ratio_gte")
+                if getattr(self, k) is not None
+            ] + (["established"] if self.established else [])
+            if established_thresholds:
+                raise ValueError(
+                    "POPULATION_QUALIFICATION_TESTS_MUTUALLY_EXCLUSIVE: "
+                    "required_checkpoint_identities_path (identity allowlist) is the only "
+                    "qualification test applied when set; it may not be combined with the "
+                    f"established-filter keys {established_thresholds} (RESEARCH_WORKFLOW.md §7)"
+                )
+        return self
+
+
 class PopulationSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -116,8 +188,9 @@ class PopulationSpec(BaseModel):
         None, description="Prevailing regime direction, e.g. bearish, bullish"
     )
     session: str = Field("RTH", description="Session filter, e.g. RTH, ETH, ALL")
-    qualification: Optional[Dict[str, Any]] = Field(
-        default=None, description="Qualification rules, e.g. age_gate_seconds, established"
+    qualification: Optional[PopulationQualificationSpec] = Field(
+        default=None,
+        description="Typed, closed qualification rules -- see PopulationQualificationSpec",
     )
     episode_lifecycle: Optional[EpisodeLifecycleSpec] = Field(
         None, exclude_if=lambda value: value is None

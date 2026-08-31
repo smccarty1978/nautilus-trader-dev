@@ -266,7 +266,10 @@ def build_collector_config_kwargs(
         cfg_kwargs["target_direction"] = spec.target.direction or "bearish"
     if hasattr(strategy_binding.config_cls, "horizon_seconds"):
         cfg_kwargs["horizon_seconds"] = spec.target.horizon_seconds or 300
-    qualification = spec.population.qualification or {}
+    # qualification is a typed PopulationQualificationSpec (RT-06); collapse to the
+    # historical dict of set keys so the .get(..., default) wiring below is unchanged.
+    _q = spec.population.qualification
+    qualification = _q.model_dump(exclude_none=True) if _q is not None and hasattr(_q, "model_dump") else (_q or {})
     if hasattr(strategy_binding.config_cls, "age_gate_seconds"):
         cfg_kwargs["age_gate_seconds"] = int(qualification.get("age_gate_seconds", 120))
     if hasattr(strategy_binding.config_cls, "established_required"):
