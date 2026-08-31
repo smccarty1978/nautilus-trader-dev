@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "period": "oos",
+  "partition_ids": [
+    "oos-2024"
+  ],
+  "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+  "train_freeze_sha256": "b2f802550d91243d404ba7cc5837832ae6a98e269ffa771473047e07b966dc9a",
+  "feature_instance_hashes": [
+    "29cfe8fb8b50a65f60b105118c190f48cf34d0c25ade449d16db33cf740eae81"
+  ],
+  "contract_hashes": [
+    "c2bbc2f087ac545f7de8c98a751a6efd9020bc3d09a630158a503851d13c7683"
+  ],
+  "candidate_rows": 450973,
+  "observation_rows": 450973,
+  "duplicate_candidate_keys": 0,
+  "duplicate_observation_keys": 0,
+  "disposition_counts": {
+    "LABELED_NEGATIVE": 381594,
+    "LABELED_POSITIVE": 66811,
+    "CENSORED": 2568
+  },
+  "observation_year_counts": {
+    "2024": 450973
+  },
+  "forward_timestamp_year_ranges": {
+    "flip_ts": [
+      2024,
+      2024
+    ],
+    "horizon_end_ts": [
+      2024,
+      2024
+    ],
+    "session_close_ts": [
+      2024,
+      2024
+    ],
+    "resolved_at_ts": [
+      2024,
+      2024
+    ]
+  },
+  "oos_pristine_2024_only": true,
+  "candidate_columns": [
+    "observation_ts",
+    "regime_start_ns",
+    "checkpoint_index",
+    "regime_age_seconds",
+    "running_mfe_atr",
+    "new_progress_windows",
+    "retained_mfe_ratio",
+    "triggering_1s_ts_init",
+    "prior_1m_regime_efficiency",
+    "prior_1m_regime_mfe_atr",
+    "prior_1m_regime_range_atr",
+    "prior_5m_regime_efficiency",
+    "prior_5m_regime_mfe_atr",
+    "prior_5m_regime_range_atr",
+    "rolling_300s_retention_ratio",
+    "rolling_300s_current_progress_atr",
+    "rolling_300s_max_progress_atr",
+    "rolling_300s_giveback_atr",
+    "arrival_velocity",
+    "arrival_acceleration",
+    "ema_slope"
+  ],
+  "observation_columns": [
+    "observation_ts",
+    "regime_start_ns",
+    "regime_direction",
+    "checkpoint_index",
+    "flip_ts",
+    "time_to_flip_seconds",
+    "target_flip_within_horizon",
+    "disposition",
+    "censored",
+    "censor_reason",
+    "horizon_end_ts",
+    "session_close_ts",
+    "resolved_at_ts"
+  ],
+  "reconciliation_passed": true,
+  "merge_sha256": "5c121ef8bd2779cefd494c8b9a78c4d3f0c6c5868381e0b626f65cce076290c9"
+}

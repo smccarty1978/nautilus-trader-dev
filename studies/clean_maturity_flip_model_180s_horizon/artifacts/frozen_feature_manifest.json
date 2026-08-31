@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "partition": "train",
+  "feature_sets": {
+    "LONG_C": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr"
+    ],
+    "SHORT_C": [
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr"
+    ]
+  },
+  "feature_contract_sha256": null,
+  "feature_list_sha256": "38c0201fe2b0fec3070b7a226353d7782778aa82bace3b6070de8844d9d04d32",
+  "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+  "derived_mirror_of": "train_experiment_freeze.json"
+}

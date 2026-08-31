@@ -1,0 +1,29 @@
+{
+  "status": "OOS_UNLOCKED",
+  "oos_year": 2024,
+  "authorized_at_utc": "2026-08-31T03:18:28.932393+00:00",
+  "prerequisite_hashes": {
+    "phase0_manifest": "265f6b6b1a8729b31ec1d77031c7841f24899636451eddd4223c9d8273f14a90",
+    "train_collection": "692aa4a3af2b96a8eb38a105de2d6a02460fcc781aa63ff358b74ab94684c21e",
+    "frozen_feature_manifest": "22fdeb120305b2d826113d428070f9a5266f98c1fae0b0eca73f4e595e96ca55",
+    "preprocessing_manifest": "2657de215096e4bef82663ced0c085b8cdf7b19e87917cf671a34cd446781954",
+    "model_manifest": "77d6325e731734d8a21d538e57bda9fb0b7e361685ed9bbaccb8e678e127bc6d"
+  },
+  "preexec_seal_artifact_sha256": "a2b2c26b417ac62abca2e38fcc9b2822524c083d808b185bf8000ffe0397bc42",
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "lineage_audit": {
+    "runs_inspected_count": 4,
+    "inspected_runs": [
+      "20260829_062955_clean_maturity_flip_model_180s_horizon_day",
+      "20260829_064049_clean_maturity_flip_model_180s_horizon_full",
+      "20260829_064713_clean_maturity_flip_model_180s_horizon_full",
+      "20260829_065354_clean_maturity_flip_model_180s_horizon_full"
+    ],
+    "oos_year": 2024,
+    "oos_leaks_count": 0,
+    "oos_leaks": [],
+    "pristine_oos_proven": true
+  },
+  "pristine_oos_measured": true,
+  "unlock_token_sha256": "60201b79b5658bb8fbaba7a9072f0f538eeb02e899467cbb4018427d580e497e"
+}
