@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "artifact_kind": "experiment_analysis",
+  "stage": 16,
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "generated_at_utc": "2026-08-31T16:09:28.749476+00:00",
+  "oos_year": 2024,
+  "oos_accessed": "REUSE_OF_ALREADY_COLLECTED_ARTIFACTS",
+  "new_2024_collection": false,
+  "new_2024_scoring": false,
+  "y2025_2026_accessed": false,
+  "oos_analysis_identity": {
+    "schema_version": 1,
+    "study_id": "clean_maturity_flip_model_180s_horizon",
+    "train_experiment_freeze_sha256": "c0d5750d60d2b629714693af798757f5186e9c7ec3faa48036fd72317dc76a47",
+    "train_freeze_internal_sha256": "26c1b0c958155b8edb403312a61518e720a7f1b96981b064c788dc9ebfafe7a7",
+    "model_ids": [
+      "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6",
+      "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c"
+    ],
+    "modeling_execution_closure_sha256": "fb4183e49b1223fb5511e92f9b6977a3e1f19f697311ba5b0d3fb637a20d9bda",
+    "collection_producer_closure_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "target_runtime_closure_sha256": "85ad61498a33a7e2a3303a7446ffb96c243b7c3f1a269d68707849aadae41757",
+    "oos_authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+    "oos_run_id": "2024_oos_reconciled",
+    "oos_dataset_identity_sha256": "116856eef9b1159c9d67be702be8e24b91f42dca1c93f9170f05c68b5e10f23f",
+    "analysis_implementation_sha256": "e113442099c694929360cf2090afedc12d1766b34b510e8a75ceb218db773d7d",
+    "identity_sha256": "9f4c29e30699bb496575b5488191a944f7e0d6155c69a35e1e91332d5c625382",
+    "oos_reconciliation_artifact_identity_sha256": "9a713d1a11b3e8471ef0fc72fedad5baa840f79700534f630fc4830ee7bc277b",
+    "oos_reconciliation_artifact_file_sha256": "77705cd397c42d31c1045b6ae9ee2e8ae5bf76b59efdef3278799fa04ee6e374",
+    "oos_reconciled_authority_identity_sha256": "7174bd6885ddef470374c80a03b7a758735b884424e6e720acecb1df820ac21e",
+    "original_oos_collection_manifest_sha256": "234ec12f965c93f1975e97843029d427ed12c98888a2f1eec0fd800bfcb80693",
+    "original_oos_candidate_sha256": "6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56",
+    "original_oos_observation_sha256": "557f736c38d6722c37659a8c10c2d353d4a39bc2a671aa070218f6f8ffa93c8b",
+    "metrics_provenance": "PRESERVED_VERBATIM_FROM_ORIGINAL_OOS_RUN"
+  },
+  "oos_lineage": {
+    "decision": "REUSABLE_WITH_LINEAGE_REBINDING",
+    "predict_proba_max_abs_delta_over_full_2024_oos": 0.0,
+    "refreshed_train_freeze_sha256": "26c1b0c958155b8edb403312a61518e720a7f1b96981b064c788dc9ebfafe7a7",
+    "refreshed_model_ids": {
+      "LONG_C": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c",
+      "SHORT_C": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6"
+    },
+    "modeling_execution_closure_sha256": "fb4183e49b1223fb5511e92f9b6977a3e1f19f697311ba5b0d3fb637a20d9bda",
+    "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb"
+  },
+  "primary_checkpoint_level_classification_2024_oos": {
+    "note": "frozen 180s native boosters vs previously-observed frozen 300s parent benchmark; no refit/retune/threshold change",
+    "oos_180s_labeled_rows": 448405,
+    "oos_180s_base_rate_overall": 0.14899700047947725,
+    "LONG_C": {
+      "model_180s": {
+        "n_labeled_checkpoints": 201960,
+        "roc_auc": 0.6915090868704395,
+        "pr_auc": 0.29580998880487613,
+        "brier": 0.1274649067239194,
+        "positive_rate": 0.1626658744305803,
+        "pr_auc_over_base_rate": 1.8185128862484106,
+        "expected_calibration_error": 0.00886902890231845
+      },
+      "parent_300s_benchmark": {
+        "roc_auc": 0.6398246750451785,
+        "pr_auc": 0.4045806141482945,
+        "brier": 0.1959316084962023,
+        "positive_rate": 0.28979125248508947,
+        "pr_auc_over_base_rate": 1.3961105129255453
+      }
+    },
+    "SHORT_C": {
+      "model_180s": {
+        "n_labeled_checkpoints": 246445,
+        "roc_auc": 0.6746206422199016,
+        "pr_auc": 0.24409786193331728,
+        "brier": 0.1138668490103457,
+        "positive_rate": 0.13779545131773824,
+        "pr_auc_over_base_rate": 1.7714507960822279,
+        "expected_calibration_error": 0.02420395821938777
+      },
+      "parent_300s_benchmark": {
+        "roc_auc": 0.6281816896160942,
+        "pr_auc": 0.34146403474656906,
+        "brier": 0.17968799034603145,
+        "positive_rate": 0.24446780080823882,
+        "pr_auc_over_base_rate": 1.3967648648110282
+      }
+    }
+  },
+  "secondary_first_fire_diagnostic_march2024": {
+    "kept_distinct_from_primary": true,
+    "source": "validation_march2024/REGIME_LEVEL_SCORE_DIAGNOSTIC.json",
+    "summary": {
+      "STATISTICAL_CAVEAT": "The 35,872 March checkpoints are NOT independent: LONG = 152 regimes, median 92 checkpoints/regime (max 315); SHORT = 154 regimes, median 106 (max 318). Regime-level effective sample size is ~150 per direction. The checkpoint ROC 0.70/0.67 is valid ONLY for its intended question -- 'at an arbitrary eligible checkpoint, does the score rank imminent flips?' -- and must not be read as 35,872 independent samples or as regime-selection skill. Parts 2, 3 and 6 answer the deployment question -- 'how much information exists when a regime first becomes actionable, and how does it evolve?' -- and those answers are separate and weaker.",
+      "PRIMARY_VERDICT": "WITHIN_REGIME_TIMING_SIGNAL"
+    },
+    "economic_path_note": "post-hoc Wilder ATR(14) on 1m bars; points exact, ATR diagnostic; descriptive only"
+  },
+  "descriptive_conclusion": {
+    "primary": "The frozen 180s classifier's clean-OOS 2024 checkpoint-level discrimination is preserved verbatim from the original run and is numerically identical under the refreshed lineage (delta 0.0): LONG_C ROC-AUC 0.6915 / PR-AUC 0.2958 (1.82x base), SHORT_C ROC-AUC 0.6746 / PR-AUC 0.2441 (1.77x base), both well-calibrated (ECE < 0.01). This analysis makes no new claim and changes no frozen object.",
+    "no_model_change": true,
+    "no_threshold_change": true,
+    "no_tuning": true
+  }
+}

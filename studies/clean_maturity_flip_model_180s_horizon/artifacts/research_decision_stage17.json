@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "artifact_kind": "research_decision_stage17",
+  "stage": 17,
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "generated_at_utc": "2026-08-31T16:12:16.119514+00:00",
+  "research_question": "Does shortening the Stage-1 imminent-flip prediction horizon 300s -> 180s improve flip-prediction precision/discrimination AND the economic quality of high-confidence predictions, while preserving favorable-excursion opportunity?",
+  "bound_lineage": {
+    "execution_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "preexec_seal_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "preexec_seal_artifact_sha256": "7c1389c15c7192261b33cec25d4f2903abb9ff02e9e2ba424e263e7f84adb24a",
+    "refreshed_train_freeze_sha256": "26c1b0c958155b8edb403312a61518e720a7f1b96981b064c788dc9ebfafe7a7",
+    "refreshed_model_ids": {
+      "LONG_C": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c",
+      "SHORT_C": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6"
+    },
+    "modeling_execution_closure_sha256": "fb4183e49b1223fb5511e92f9b6977a3e1f19f697311ba5b0d3fb637a20d9bda",
+    "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+    "oos_reconciled_authority_identity_sha256": "7174bd6885ddef470374c80a03b7a758735b884424e6e720acecb1df820ac21e",
+    "oos_lineage_reconciliation_identity_sha256": "9a713d1a11b3e8471ef0fc72fedad5baa840f79700534f630fc4830ee7bc277b",
+    "stage16_analysis_identity_sha256": "9f4c29e30699bb496575b5488191a944f7e0d6155c69a35e1e91332d5c625382",
+    "stage16_analysis_artifact_file_sha256": "d2280c89bf280521c8402cf5aa2485d389b2dcc2022897508004230cb30b6945",
+    "stage16_lineage_state": "FRESH",
+    "causal_audit": {
+      "pass": 17,
+      "verdict": "CLEAR",
+      "report": "audit/pass_17.md",
+      "report_sha256": "a0f0cfb78d09d2acd3783fd9cc635357b779b46dd76ae101644fc9f91513c894"
+    },
+    "contract_audit": {
+      "pass": 16,
+      "verdict": "CLEAR",
+      "report": "audit/contract_pass_16.md",
+      "report_sha256": "48241bc065fdb3a301ca7e0abc899a28ac244778ae1f84b3bb8f556835f1b031"
+    }
+  },
+  "selection_outcome": {
+    "LONG": {
+      "status": "PASS_DIRECTION",
+      "winning_arm": "C",
+      "final_validation_2023": "PASS",
+      "tuned_hyperparameters": {
+        "learning_rate": 0.039440343780424526,
+        "max_depth": 5,
+        "n_estimators": 100,
+        "num_leaves": 4,
+        "verbosity": -1
+      }
+    },
+    "SHORT": {
+      "status": "PASS_DIRECTION",
+      "winning_arm": "C",
+      "final_validation_2023": "PASS",
+      "tuned_hyperparameters": {
+        "learning_rate": 0.028861842631876633,
+        "max_depth": 5,
+        "n_estimators": 200,
+        "num_leaves": 4,
+        "verbosity": -1
+      }
+    },
+    "concordant": true
+  },
+  "oos_2024_evidence": {
+    "reconciliation_decision": "REUSABLE_WITH_LINEAGE_REBINDING",
+    "predict_proba_max_abs_delta_over_full_2024_oos": 0.0,
+    "checkpoint_level_classification": {
+      "LONG_C_180s": {
+        "roc_auc": 0.6915090868704395,
+        "pr_auc": 0.29580998880487613,
+        "pr_auc_over_base": 1.8185128862484106,
+        "brier": 0.1274649067239194
+      },
+      "LONG_300s_parent": {
+        "roc_auc": 0.6398246750451785,
+        "pr_auc": 0.4045806141482945,
+        "pr_auc_over_base": 1.3961105129255453
+      },
+      "SHORT_C_180s": {
+        "roc_auc": 0.6746206422199016,
+        "pr_auc": 0.24409786193331728,
+        "pr_auc_over_base": 1.7714507960822279,
+        "brier": 0.1138668490103457
+      },
+      "SHORT_300s_parent": {
+        "roc_auc": 0.6281816896160942,
+        "pr_auc": 0.34146403474656906,
+        "pr_auc_over_base": 1.3967648648110282
+      },
+      "roc_auc_delta_180s_minus_300s": {
+        "LONG": 0.0517,
+        "SHORT": 0.0464
+      },
+      "relationship_replicates_train_to_oos": true
+    },
+    "first_fire_regime_level_march2024": {
+      "LONG_roc_auc": 0.4954044117647059,
+      "LONG_pr_auc_over_base": 1.2829943668834258,
+      "interpretation": "first-eligible-per-regime discrimination is at / near chance"
+    },
+    "economic_path_frozen_tail_p90": {
+      "LONG_180s_return_atr_mean": -0.04432707125954286,
+      "LONG_180s_mfe_atr_mean": 0.8625154093949166,
+      "LONG_300s_return_atr_mean": -0.008693611961678819,
+      "LONG_180s_1to1_success_rate": 0.41141586360266863,
+      "interpretation": "return_atr ~ 0 for both horizons; 180s truncates ~0.25 ATR of eventual favourable excursion"
+    }
+  },
+  "terminal_decision": "MIXED",
+  "terminal_decision_axes": {
+    "architecture_selection": "PASS both directions at arm C (BASELINE_PLUS_STRUCTURAL_PLUS_ROLLING_5M); concordant; neither direction hit the 2023 reject-only D gate.",
+    "classification_discrimination": "IMPROVED and OOS-REPLICATED -- 180s checkpoint-level ROC-AUC is +0.05 (LONG) / +0.046 (SHORT) over the frozen 300s parent on 2024, and the TRAIN->OOS relationship replicates (March 2024 checkpoint ROC-AUC ~0.70/0.67 consistent).",
+    "economic_quality_and_opportunity": "NOT ESTABLISHED -- at the frozen P90 tail the 2024 forward path return_atr is ~0 for both horizons, and the regime-level / first-fire signal is at chance (ROC-AUC ~0.50). The classification gain does not translate to a monetizable or actionable edge."
+  },
+  "terminal_answer_to_research_question": "PARTIAL. The 180s horizon produces a measurably better flip-prediction CLASSIFIER (discrimination, calibration, tail precision, time-to-flip) and that improvement replicates out-of-sample. It does NOT improve the economic quality of high-confidence predictions and the actionable first-fire signal remains at chance -- so the compound research question (classifier AND economics) is not satisfied.",
+  "promotion": "NOT PROMOTED",
+  "promotion_rationale": "Consistent with this study family: high checkpoint-level AUC does not equal PnL discrimination; the frozen 180s models are a real but non-monetizable diagnostic result. No deployment / strategy step is warranted on this evidence.",
+  "prohibited_and_not_done": [
+    "new_2024_collection",
+    "new_2024_scoring",
+    "model_change",
+    "threshold_recomputation",
+    "tuning",
+    "feature_change",
+    "target_change",
+    "new_oos_optimization"
+  ],
+  "next_research_decision": "If the economic axis is to be pursued, it requires a SEPARATE, separately-frozen Study-2/Study-3 (economic-quality target, e.g. P(clean reversal) / E[MFE] / target-before-stop) -- not a modification of this classifier.",
+  "decision_identity_sha256": "cd8bfb923b23e84658f830e91efee7d4765daed7f16643cfbd41644bee12a6e4"
+}

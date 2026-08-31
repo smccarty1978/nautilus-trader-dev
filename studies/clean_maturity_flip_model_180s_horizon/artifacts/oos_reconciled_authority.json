@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "artifact_kind": "oos_reconciled_authority",
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "generated_at_utc": "2026-08-31T16:08:06.822783+00:00",
+  "meaning": "The historical 2024 OOS outputs are AUTHORIZED FOR REUSE as the governed OOS evidence under the refreshed TRAIN/model lineage, because numeric equivalence is proven in the reconciliation artifact. This is NOT a claim that the historical OOS run was originally produced under the refreshed lineage.",
+  "oos_year": 2024,
+  "no_new_2024_collection": true,
+  "no_new_2024_scoring": true,
+  "historical_oos_artifacts_mutated": false,
+  "original_oos_artifacts": {
+    "oos_candidates_merged": {
+      "path": "artifacts/oos_candidates_merged.parquet",
+      "sha256": "6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56"
+    },
+    "oos_observations_merged": {
+      "path": "artifacts/oos_observations_merged.parquet",
+      "sha256": "557f736c38d6722c37659a8c10c2d353d4a39bc2a671aa070218f6f8ffa93c8b"
+    },
+    "oos_collection_manifest": {
+      "path": "artifacts/oos_collection_manifest.json",
+      "sha256": "234ec12f965c93f1975e97843029d427ed12c98888a2f1eec0fd800bfcb80693"
+    },
+    "oos_2024_classification_timing": {
+      "path": "artifacts/oos_2024_classification_timing.json",
+      "sha256": "695e40df25f66a2c294bb53223a19ed096414fc206eb6e0baad3f862bd6c20ba"
+    },
+    "oos_2024_economic_path": {
+      "path": "artifacts/oos_2024_economic_path.json",
+      "sha256": "24717e6a079bcad75911303bfb98f10523dc9bdd9f29c9947c75c61946c04af6"
+    },
+    "card_2024_oos": {
+      "path": "artifacts/2024_OOS_CARD.json",
+      "sha256": "0bfec7b854d5c69fc3b4f63af627065e6a6917931649eb4c6ebb8a3ab17019c6"
+    },
+    "oos_unlock": {
+      "path": "artifacts/oos_unlock.json",
+      "sha256": "ce222e7bcb1daa405e46f09eaa6f4b8ecb102ae5d2a58e2209f2893812534d48"
+    }
+  },
+  "original_oos_lineage_as_run": {
+    "train_freeze_sha256": "b2f802550d91243d404ba7cc5837832ae6a98e269ffa771473047e07b966dc9a",
+    "model_ids": {
+      "LONG_C": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+      "SHORT_C": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4"
+    },
+    "execution_composite_sha256": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+    "stage_scoped_lineage": {
+      "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+      "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+      "MODELING_EXECUTION_CLOSURE": "7541e123e40732d8020e3c3062ae69e6ce8e30cd6b73e7ae277dd0214f180908"
+    }
+  },
+  "reconciliation": {
+    "path": "artifacts/oos_lineage_reconciliation.json",
+    "artifact_file_sha256": "77705cd397c42d31c1045b6ae9ee2e8ae5bf76b59efdef3278799fa04ee6e374",
+    "reconciliation_identity_sha256": "9a713d1a11b3e8471ef0fc72fedad5baa840f79700534f630fc4830ee7bc277b",
+    "decision": "REUSABLE_WITH_LINEAGE_REBINDING",
+    "predict_proba_max_abs_delta_over_full_2024_oos": 0.0
+  },
+  "refreshed_lineage": {
+    "execution_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "preexec_seal_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "preexec_seal_artifact_sha256": "7c1389c15c7192261b33cec25d4f2903abb9ff02e9e2ba424e263e7f84adb24a",
+    "train_freeze_sha256": "26c1b0c958155b8edb403312a61518e720a7f1b96981b064c788dc9ebfafe7a7",
+    "model_ids": {
+      "LONG_C": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c",
+      "SHORT_C": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6"
+    },
+    "model_artifact_sha256": {
+      "LONG_C": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+      "SHORT_C": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a"
+    },
+    "preprocessing_hash": "96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8",
+    "thresholds": {
+      "LONG_C": {
+        "p90": {
+          "method": "quantile",
+          "parameter": 0.9,
+          "threshold": 0.2852887899663343,
+          "derivation_population": "train"
+        },
+        "p95": {
+          "method": "quantile",
+          "parameter": 0.95,
+          "threshold": 0.32770330252959395,
+          "derivation_population": "train"
+        },
+        "p97_5": {
+          "method": "quantile",
+          "parameter": 0.975,
+          "threshold": 0.3639796684339806,
+          "derivation_population": "train"
+        }
+      },
+      "SHORT_C": {
+        "p90": {
+          "method": "quantile",
+          "parameter": 0.9,
+          "threshold": 0.28485631865861344,
+          "derivation_population": "train"
+        },
+        "p95": {
+          "method": "quantile",
+          "parameter": 0.95,
+          "threshold": 0.33222113070660036,
+          "derivation_population": "train"
+        },
+        "p97_5": {
+          "method": "quantile",
+          "parameter": 0.975,
+          "threshold": 0.37673375655439945,
+          "derivation_population": "train"
+        }
+      }
+    },
+    "stage_scoped_lineage": {
+      "COLLECTION_PRODUCER_CLOSURE": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+      "TARGET_RUNTIME_CLOSURE": "85ad61498a33a7e2a3303a7446ffb96c243b7c3f1a269d68707849aadae41757",
+      "MODELING_EXECUTION_CLOSURE": "fb4183e49b1223fb5511e92f9b6977a3e1f19f697311ba5b0d3fb637a20d9bda"
+    },
+    "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+    "causal_audit": {
+      "pass": 17,
+      "verdict": "CLEAR",
+      "report": "audit/pass_17.md",
+      "report_sha256": "a0f0cfb78d09d2acd3783fd9cc635357b779b46dd76ae101644fc9f91513c894"
+    },
+    "contract_audit": {
+      "pass": 16,
+      "verdict": "CLEAR",
+      "report": "audit/contract_pass_16.md",
+      "report_sha256": "48241bc065fdb3a301ca7e0abc899a28ac244778ae1f84b3bb8f556835f1b031"
+    }
+  },
+  "authorized_for": [
+    "stage_16_analysis",
+    "stage_17_decision"
+  ],
+  "prohibited": [
+    "new_2024_collection",
+    "new_2024_scoring",
+    "model_change",
+    "threshold_change",
+    "tuning",
+    "feature_change",
+    "target_change"
+  ],
+  "authority_identity_sha256": "7174bd6885ddef470374c80a03b7a758735b884424e6e720acecb1df820ac21e"
+}

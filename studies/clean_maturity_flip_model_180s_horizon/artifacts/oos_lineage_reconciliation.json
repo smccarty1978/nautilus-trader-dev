@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "artifact_kind": "oos_lineage_reconciliation",
+  "study_id": "clean_maturity_flip_model_180s_horizon",
+  "generated_at_utc": "2026-08-31T16:07:20.203253+00:00",
+  "reconciliation_decision": "REUSABLE_WITH_LINEAGE_REBINDING",
+  "trigger": "Red-Team Remediation Pass 1 merge + execution.modeling_driver_relpaths declaration moved the execution closure and forced a deterministic lineage TRAIN re-freeze. The 2024 OOS run predates it.",
+  "no_new_2024_collection": true,
+  "no_new_2024_scoring_analysis": true,
+  "historical_oos_artifacts_mutated": false,
+  "prior_lineage": {
+    "execution_composite_sha256": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+    "preexec_seal_composite_sha256": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+    "train_freeze_sha256": "b2f802550d91243d404ba7cc5837832ae6a98e269ffa771473047e07b966dc9a",
+    "model_ids": {
+      "LONG_C": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+      "SHORT_C": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4"
+    },
+    "stage_scoped_lineage": {
+      "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+      "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+      "MODELING_EXECUTION_CLOSURE": "7541e123e40732d8020e3c3062ae69e6ce8e30cd6b73e7ae277dd0214f180908"
+    }
+  },
+  "refreshed_lineage": {
+    "execution_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "preexec_seal_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+    "preexec_seal_artifact_sha256": "7c1389c15c7192261b33cec25d4f2903abb9ff02e9e2ba424e263e7f84adb24a",
+    "train_freeze_sha256": "26c1b0c958155b8edb403312a61518e720a7f1b96981b064c788dc9ebfafe7a7",
+    "model_ids": {
+      "LONG_C": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c",
+      "SHORT_C": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6"
+    },
+    "model_artifact_sha256": {
+      "LONG_C": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+      "SHORT_C": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a"
+    },
+    "stage_scoped_lineage": {
+      "COLLECTION_PRODUCER_CLOSURE": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+      "TARGET_RUNTIME_CLOSURE": "85ad61498a33a7e2a3303a7446ffb96c243b7c3f1a269d68707849aadae41757",
+      "MODELING_EXECUTION_CLOSURE": "fb4183e49b1223fb5511e92f9b6977a3e1f19f697311ba5b0d3fb637a20d9bda"
+    },
+    "causal_audit": {
+      "pass": 17,
+      "verdict": "CLEAR",
+      "report": "audit/pass_17.md",
+      "report_sha256": "a0f0cfb78d09d2acd3783fd9cc635357b779b46dd76ae101644fc9f91513c894"
+    },
+    "contract_audit": {
+      "pass": 16,
+      "verdict": "CLEAR",
+      "report": "audit/contract_pass_16.md",
+      "report_sha256": "48241bc065fdb3a301ca7e0abc899a28ac244778ae1f84b3bb8f556835f1b031"
+    }
+  },
+  "unchanged_authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+  "original_oos_identities": {
+    "oos_year": 2024,
+    "oos_candidate_sha256": "6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56",
+    "oos_observation_sha256": "557f736c38d6722c37659a8c10c2d353d4a39bc2a671aa070218f6f8ffa93c8b",
+    "oos_collection_manifest_train_freeze_sha256": "b2f802550d91243d404ba7cc5837832ae6a98e269ffa771473047e07b966dc9a",
+    "oos_classification_timing_aggregate_freeze_sha256": "b2f802550d91243d404ba7cc5837832ae6a98e269ffa771473047e07b966dc9a",
+    "card_frozen_identities": {
+      "aggregate_train_freeze_sha256": "b2f802550d91243d404ba7cc5837832ae6a98e269ffa771473047e07b966dc9a",
+      "LONG_model_id": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+      "SHORT_model_id": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4",
+      "preprocessing_hash": "96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8",
+      "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+      "stage_scoped_lineage": {
+        "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+        "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+        "MODELING_EXECUTION_CLOSURE": "7541e123e40732d8020e3c3062ae69e6ce8e30cd6b73e7ae277dd0214f180908"
+      },
+      "target": "prevailing 1m regime flip within (T, T+180s], inclusive upper bound",
+      "thresholds_TRAIN_only": {
+        "LONG_C": {
+          "p90": {
+            "method": "quantile",
+            "parameter": 0.9,
+            "threshold": 0.2852887899663343,
+            "derivation_population": "train"
+          },
+          "p95": {
+            "method": "quantile",
+            "parameter": 0.95,
+            "threshold": 0.32770330252959395,
+            "derivation_population": "train"
+          },
+          "p97_5": {
+            "method": "quantile",
+            "parameter": 0.975,
+            "threshold": 0.3639796684339806,
+            "derivation_population": "train"
+          }
+        },
+        "SHORT_C": {
+          "p90": {
+            "method": "quantile",
+            "parameter": 0.9,
+            "threshold": 0.28485631865861344,
+            "derivation_population": "train"
+          },
+          "p95": {
+            "method": "quantile",
+            "parameter": 0.95,
+            "threshold": 0.33222113070660036,
+            "derivation_population": "train"
+          },
+          "p97_5": {
+            "method": "quantile",
+            "parameter": 0.975,
+            "threshold": 0.37673375655439945,
+            "derivation_population": "train"
+          }
+        }
+      },
+      "no_refit_no_retune_no_threshold_change": true
+    }
+  },
+  "equivalence_proofs": {
+    "authorization": {
+      "pass": true,
+      "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb"
+    },
+    "features": {
+      "pass": true,
+      "feature_list_sha256": "38c0201fe2b0fec3070b7a226353d7782778aa82bace3b6070de8844d9d04d32",
+      "count": 13,
+      "config_feature_order": "structural_first",
+      "model_and_oos_scoring_feature_order": "arrival_first",
+      "model_feature_set": [
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr"
+      ],
+      "names_as_set_unchanged": true
+    },
+    "target": {
+      "pass": true,
+      "primitive": "flip_within_horizon",
+      "horizon_seconds": 180,
+      "session_end_censoring": true
+    },
+    "preprocessing": {
+      "pass": true,
+      "preprocessing_hash": "96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8"
+    },
+    "thresholds": {
+      "pass": true,
+      "LONG_C": {
+        "p90": 0.2852887899663343,
+        "p95": 0.32770330252959395,
+        "p97_5": 0.3639796684339806
+      },
+      "SHORT_C": {
+        "p90": 0.28485631865861344,
+        "p95": 0.33222113070660036,
+        "p97_5": 0.37673375655439945
+      }
+    },
+    "model_bytes": {
+      "pass": true,
+      "per_model": {
+        "LONG_C": {
+          "prior_model_id": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+          "refreshed_model_id": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c",
+          "prior_artifact_bytes_sha256": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+          "refreshed_artifact_bytes_sha256": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+          "artifact_bytes_identical": true,
+          "refreshed_bytes_match_freeze_record": true,
+          "fit_identity_sha256": "25737fcd6830a60f8b5cb4a97293ceef8cabcf0efdc1910792a71c7127a9ae60",
+          "prior_registry_scientific_status": "UNASSESSED",
+          "refreshed_registry_scientific_status": "UNASSESSED"
+        },
+        "SHORT_C": {
+          "prior_model_id": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4",
+          "refreshed_model_id": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6",
+          "prior_artifact_bytes_sha256": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a",
+          "refreshed_artifact_bytes_sha256": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a",
+          "artifact_bytes_identical": true,
+          "refreshed_bytes_match_freeze_record": true,
+          "fit_identity_sha256": "3c480affc677f64b712540f8e55df67d7f14fe9921ad9baa293b96bf70cdaa6f",
+          "prior_registry_scientific_status": "UNASSESSED",
+          "refreshed_registry_scientific_status": "UNASSESSED"
+        }
+      }
+    },
+    "predictions": {
+      "pass": true,
+      "predict_proba_max_abs_delta_over_full_2024_oos": 0.0,
+      "per_model": {
+        "LONG_C": {
+          "oos_rows_scored": 203150,
+          "predict_proba_max_abs_delta": 0.0,
+          "identical": true
+        },
+        "SHORT_C": {
+          "oos_rows_scored": 247823,
+          "predict_proba_max_abs_delta": 0.0,
+          "identical": true
+        }
+      },
+      "data_source": "already-collected artifacts/oos_{candidates,observations}_merged.parquet",
+      "new_collection": false,
+      "new_scoring_analysis": false
+    },
+    "population": {
+      "pass": true,
+      "oos_candidate_rows": 450973,
+      "oos_candidate_sha256": "6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56",
+      "oos_observation_sha256": "557f736c38d6722c37659a8c10c2d353d4a39bc2a671aa070218f6f8ffa93c8b",
+      "disposition_counts": {
+        "LABELED_NEGATIVE": 381594,
+        "LABELED_POSITIVE": 66811,
+        "CENSORED": 2568
+      },
+      "qualification_semantic_values_unchanged": true,
+      "checkpoint_identity_semantics_unchanged": true,
+      "readiness_R1_R10": "PASS",
+      "readiness_r10_real_output_parity": "PASS",
+      "all_13_features_present_in_oos_candidate_parquet": true,
+      "forward_timestamps_year_ranges": {
+        "flip_ts": [
+          2024,
+          2024
+        ],
+        "horizon_end_ts": [
+          2024,
+          2024
+        ],
+        "session_close_ts": [
+          2024,
+          2024
+        ],
+        "resolved_at_ts": [
+          2024,
+          2024
+        ]
+      }
+    }
+  },
+  "rebinding_map": {
+    "train_freeze_sha256": {
+      "from": "b2f802550d91243d404ba7cc5837832ae6a98e269ffa771473047e07b966dc9a",
+      "to": "26c1b0c958155b8edb403312a61518e720a7f1b96981b064c788dc9ebfafe7a7"
+    },
+    "LONG_C_model_id": {
+      "from": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+      "to": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c"
+    },
+    "SHORT_C_model_id": {
+      "from": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4",
+      "to": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6"
+    },
+    "stage_scoped_lineage": {
+      "from": {
+        "COLLECTION_PRODUCER_CLOSURE": "bd2e9cf145a7408cff84613fec65149a94c296eeafad6194b42d427df4203e0e",
+        "TARGET_RUNTIME_CLOSURE": "54dc9897df2f3711e11dc33270f36f2a716fd16c1efb844e46921dc89e6e01fb",
+        "MODELING_EXECUTION_CLOSURE": "7541e123e40732d8020e3c3062ae69e6ce8e30cd6b73e7ae277dd0214f180908"
+      },
+      "to": {
+        "COLLECTION_PRODUCER_CLOSURE": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+        "TARGET_RUNTIME_CLOSURE": "85ad61498a33a7e2a3303a7446ffb96c243b7c3f1a269d68707849aadae41757",
+        "MODELING_EXECUTION_CLOSURE": "fb4183e49b1223fb5511e92f9b6977a3e1f19f697311ba5b0d3fb637a20d9bda"
+      }
+    }
+  },
+  "meaning": "The historical 2024 OOS outputs are AUTHORIZED FOR REUSE under the refreshed TRAIN/model lineage because numeric equivalence is proven. This does NOT claim the historical OOS run was produced under the refreshed lineage.",
+  "reconciliation_identity_sha256": "9a713d1a11b3e8471ef0fc72fedad5baa840f79700534f630fc4830ee7bc277b"
+}
