@@ -8,7 +8,7 @@ from typing import Any, Callable
 
 from research_workflow.study_spec_compiler import compile_approved_request
 
-TERMINALS = {"READY_FOR_TRAIN_AUTHORIZATION", "TRAIN_AUTHORIZATION_REQUIRED", "OOS_AUTHORIZATION_REQUIRED", "IMPLEMENTATION_REQUIRED", "SEMANTIC_DECISION_REQUIRED", "AUTHORITY_CONFLICT", "SAFETY_OR_AUTHORIZATION_BLOCK", "TRUE_CAPABILITY_GAP", "TRUE_SCHEMA_GAP", "COMPLETE"}
+TERMINALS = {"READY_FOR_TRAIN_AUTHORIZATION", "TRAIN_AUTHORIZATION_REQUIRED", "OOS_AUTHORIZATION_REQUIRED", "IMPLEMENTATION_REQUIRED", "SEMANTIC_DECISION_REQUIRED", "AUTHORITY_CONFLICT", "SAFETY_OR_AUTHORIZATION_BLOCK", "TRUE_CAPABILITY_GAP", "TRUE_SCHEMA_GAP", "COMPLETE", "STUDY_CLOSED", "STUDY_CLOSURE_INVALID"}
 
 def _read(p: Path) -> dict[str, Any]:
     try: return json.loads(p.read_text(encoding="utf-8"))
@@ -98,10 +98,12 @@ class WorkflowEngine:
         state["completed_gates"] = self._completed_gates()
         # RT-13: an existing OOS analysis artifact is only authoritative while FRESH.
         try:
-            from research_workflow.oos_analysis_lineage import classify_oos_analysis
+            from research_workflow.oos_analysis_lineage import classify_oos_analysis, classify_stage17_decision
             state["oos_analysis_state"] = classify_oos_analysis(self.study)
+            state["stage17_decision_state"] = classify_stage17_decision(self.study)
         except Exception:  # pragma: no cover - never block workflow state on this
             state["oos_analysis_state"] = None
+            state["stage17_decision_state"] = None
         state["timestamps"] = {k: (self.study / p).stat().st_mtime if (self.study / p).exists() else None for k,p in {"prepared":"audit/frozen_execution_manifest.json","readiness":"audit/readiness.json","preflight":"audit/preflight.json","causal":"audit/status.json","contract":"audit/contract_status.json","seal":"artifacts/preexec_audit_seal.json","smoke":"artifacts/smoke_reconciled.json"}.items()}
         (self.study / "workflow_state.json").write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return state

@@ -43,6 +43,21 @@ def _study(tmp_path: Path) -> Path:
 
 def _freeze(s: Path, *, internal="freeze-v1", modeling="modeling-closure-v1"):
     auth = json.loads((s / "artifacts" / "experiment_authorization.json").read_text())
+    reg_dir = s.parent / "model_registry"
+    reg_dir.mkdir(exist_ok=True)
+    art_file = s / "models" / "m-123.joblib"
+    art_file.parent.mkdir(exist_ok=True)
+    art_file.write_bytes(b"dummy-model-artifact")
+    gold_file = s / "models" / "m-123_golden.json"
+    gold_file.write_bytes(b"dummy-golden")
+    import hashlib
+    reg_dir.joinpath("m-123.json").write_text(json.dumps({
+        "model_id": "m-123",
+        "artifact_path": str(art_file.relative_to(s.parent)),
+        "artifact_sha256": hashlib.sha256(art_file.read_bytes()).hexdigest(),
+        "golden_fixture_path": str(gold_file.relative_to(s.parent)),
+        "golden_fixture_sha256": hashlib.sha256(gold_file.read_bytes()).hexdigest(),
+    }))
     (s / "artifacts" / "train_experiment_freeze.json").write_text(json.dumps({
         "partition": "train",
         "authorization_sha256": auth["authorization_sha256"],
