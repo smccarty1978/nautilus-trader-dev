@@ -318,8 +318,17 @@ def build_collector_config_kwargs(
     if hasattr(strategy_binding.config_cls, "session"):
         cfg_kwargs["session"] = spec.population.session or "RTH"
     if hasattr(strategy_binding.config_cls, "session_end_censoring"):
-        censoring = (study_data.contracts.get("target_contract", {}) or {}).get("censoring_policy", {})
-        cfg_kwargs["session_end_censoring"] = bool(censoring.get("session_end_censoring", True))
+        # Authoritative source: the target contract's own resolved session policy
+        # (research/engines/target_engine.resolve_session_end_censoring), surfaced at
+        # target_contract.session_end_censoring. `censoring_policy.session_end_censoring`
+        # is the same value in the historical shape; it is the fallback only for a
+        # contract compiled before the top-level key existed. Never a hard-coded default.
+        _tc = study_data.contracts.get("target_contract", {}) or {}
+        if "session_end_censoring" in _tc:
+            cfg_kwargs["session_end_censoring"] = bool(_tc["session_end_censoring"])
+        else:
+            _cp = _tc.get("censoring_policy", {}) or {}
+            cfg_kwargs["session_end_censoring"] = bool(_cp.get("session_end_censoring", True))
     if hasattr(strategy_binding.config_cls, "target_contract"):
         cfg_kwargs["target_contract"] = dict(study_data.contracts.get("target_contract", {}) or {})
     # Phase-zero authentication gate (fail-closed). A collector that declares this field

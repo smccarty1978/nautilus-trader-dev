@@ -270,6 +270,19 @@ class TargetSpec(BaseModel):
     confirmation: Optional[Dict[str, Any]] = Field(
         default=None, description="Confirmation parameters, e.g. bars_required, ticks_required"
     )
+    session_end_censoring: Optional[bool] = Field(
+        default=None,
+        exclude_if=lambda value: value is None,
+        description=(
+            "Whether a candidate whose resolution window extends past its own session "
+            "close is CENSORED rather than labeled. Authoritative for a plain flip "
+            "target; a composite / ordered-barrier target instead carries this on each "
+            "required_forward_outcomes entry (RequiredForwardOutcomeSpec.session_end_"
+            "censoring) and target_engine derives the collector-global value from those. "
+            "Left unset, a plain flip target keeps the historical default (True). "
+            "Additive and hash-neutral (excluded from model_dump when None)."
+        ),
+    )
     # -- composite target support -------------------------------------------------
     # A study with no `conditions` declared compiles exactly as it always has -- these
     # fields are additive and never required.
