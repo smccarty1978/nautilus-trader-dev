@@ -293,15 +293,23 @@ def build_collector_config_kwargs(
         _el = _pop.get("episode_lifecycle") or {}
         if _el:
             cfg_kwargs["episode_lifecycle"] = dict(_el)
-            # Stage 3: the ProviderHost feature contract + the frozen Model-C derived scorer.
+            # Stage 3: the ProviderHost feature contract.
             _fc = study_data.contracts.get("feature_contract", {}) or {}
             if _fc and hasattr(strategy_binding.config_cls, "feature_contract"):
                 cfg_kwargs["feature_contract"] = dict(_fc)
-            _di = (spec.features.derived_inputs if spec.features else None) or []
-            if _di and hasattr(strategy_binding.config_cls, "derived_inputs"):
-                cfg_kwargs["derived_inputs"] = tuple(
-                    d.model_dump(mode="json") if hasattr(d, "model_dump") else dict(d) for d in _di
-                )
+    # RT-04: the ordered frozen derived-input scorers are population-agnostic -- pass the
+    # runtime-scored declarations for a checkpoint-grid study too. A score_artifact_path-
+    # only (pre-materialized, joined offline) form is NOT passed to the collector.
+    _di = (spec.features.derived_inputs if spec.features else None) or []
+    _runtime_di = [
+        d for d in _di
+        if getattr(d, "kind", None) == "frozen_external_model_score"
+        and (getattr(d, "model_artifact_path", None) or getattr(d, "model_id", None))
+    ]
+    if _runtime_di and hasattr(strategy_binding.config_cls, "derived_inputs"):
+        cfg_kwargs["derived_inputs"] = tuple(
+            d.model_dump(mode="json") if hasattr(d, "model_dump") else dict(d) for d in _runtime_di
+        )
     if hasattr(strategy_binding.config_cls, "feature_list"):
         cfg_kwargs["feature_list"] = spec.features.feature_list
     if hasattr(strategy_binding.config_cls, "feature_requirements"):

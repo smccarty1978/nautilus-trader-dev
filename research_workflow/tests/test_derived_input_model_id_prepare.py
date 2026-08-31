@@ -98,11 +98,25 @@ def test_invalid_target_scientific_status_fails_closed(tmp_path):
         verify_derived_causal_inputs(spec, repo_root=tmp_path)
 
 
-def test_unassessed_scientific_status_fails_closed(tmp_path):
+def test_unassessed_scientific_status_is_allowed_when_reuse_permitted(tmp_path):
+    # UNASSESSED is not a *flag* of invalidity; reuse_status PERMITTED is the owner's
+    # deliberate act. Only an explicitly-invalid status is a hard block (RT-09).
     model_id = _register_model(tmp_path, scientific_status="UNASSESSED")
     spec = _spec_with_model_id(model_id)
-    with pytest.raises(DerivedInputBindingError, match="SCIENTIFICALLY_INVALID"):
-        verify_derived_causal_inputs(spec, repo_root=tmp_path)
+    records = verify_derived_causal_inputs(spec, repo_root=tmp_path)
+    assert records[0]["scientific_status"] == "UNASSESSED"
+
+
+def test_valid_diagnostic_requires_explicit_policy(tmp_path):
+    from research_workflow.model_artifacts import (
+        ModelArtifactError,
+        assert_scientific_status_reusable,
+    )
+
+    rec = {"model_id": "m", "scientific_status": "VALID_DIAGNOSTIC"}
+    with pytest.raises(ModelArtifactError, match="REQUIRES_POLICY"):
+        assert_scientific_status_reusable(rec)
+    assert_scientific_status_reusable(rec, {"allow_diagnostic": True})  # no raise
 
 
 def test_legacy_parent_study_binding_still_works(tmp_path):

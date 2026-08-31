@@ -57,35 +57,36 @@ def persist_models(study_path: str | Path, models: Mapping[str, Any], manifest: 
         records.append({**record, "_studies_root": str(studies_root), "_artifact_path": str(model_path)})
     return {"records":records, "registry_dir":str(root)}
 
-#: scientific_status values that permit reuse as a scientifically-valid *derived causal
-#: input* to another study, and under what condition. Anything not listed (INVALID_TARGET,
-#: UNASSESSED, an unknown value) is never reusable that way -- validity is never inferred
-#: from "the artifact loads" + "reuse_status == PERMITTED" (RT-09).
-_DERIVED_INPUT_SCIENTIFIC_STATUS = {"VALID_PRIMARY": "always", "VALID_DIAGNOSTIC": "policy"}
+# scientific_status handling for reuse AS A DERIVED CAUSAL INPUT (RT-09). Validity is
+# never inferred from "the artifact loads" + "reuse_status == PERMITTED":
+#   * an explicitly-invalid status is a HARD block, always;
+#   * VALID_DIAGNOSTIC is reusable only under an explicit policy;
+#   * VALID_PRIMARY and UNASSESSED pass (reuse_status is the owner's deliberate act; an
+#     UNASSESSED model has not been *flagged* invalid -- but an INVALID_TARGET one has).
+_SCIENTIFIC_STATUS_BLOCKED = frozenset({"INVALID_TARGET", "INVALID", "REJECTED", "SCIENTIFICALLY_INVALID"})
+_SCIENTIFIC_STATUS_POLICY_GATED = frozenset({"VALID_DIAGNOSTIC"})
 
 
 def assert_scientific_status_reusable(record: Mapping[str, Any], policy: Mapping[str, Any] | None = None) -> None:
     """Fail closed unless the model's ``scientific_status`` permits reuse as a derived
     causal input. ``policy`` may carry ``allow_diagnostic: true`` or a
     ``diagnostic_allowlist`` of model_ids to permit a ``VALID_DIAGNOSTIC`` model."""
-    status = record.get("scientific_status")
+    status = str(record.get("scientific_status") or "UNASSESSED")
     mid = record.get("model_id")
-    rule = _DERIVED_INPUT_SCIENTIFIC_STATUS.get(str(status))
-    if rule == "always":
-        return
-    if rule == "policy":
+    if status in _SCIENTIFIC_STATUS_BLOCKED:
+        raise ModelArtifactError(
+            f"PRESERVED_MODEL_SCIENTIFICALLY_INVALID: model {mid} scientific_status="
+            f"{status!r} is never reusable as a scientifically valid derived causal input"
+        )
+    if status in _SCIENTIFIC_STATUS_POLICY_GATED:
         pol = policy or {}
         if pol.get("allow_diagnostic") is True or mid in set(pol.get("diagnostic_allowlist") or ()):
             return
         raise ModelArtifactError(
             f"PRESERVED_MODEL_SCIENTIFIC_STATUS_REQUIRES_POLICY: model {mid} is "
-            f"VALID_DIAGNOSTIC; consuming a diagnostic-derived model as a causal input "
-            f"requires an explicit reuse policy (allow_diagnostic / diagnostic_allowlist)"
+            f"{status}; consuming a diagnostic-derived model as a causal input requires "
+            f"an explicit reuse policy (allow_diagnostic / diagnostic_allowlist)"
         )
-    raise ModelArtifactError(
-        f"PRESERVED_MODEL_SCIENTIFICALLY_INVALID: model {mid} scientific_status="
-        f"{status!r} is not reusable as a scientifically valid derived causal input"
-    )
 
 
 def resolve_model(model_id: str, *, registry_root: str | Path,
