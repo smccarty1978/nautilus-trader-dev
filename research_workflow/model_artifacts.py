@@ -57,11 +57,49 @@ def persist_models(study_path: str | Path, models: Mapping[str, Any], manifest: 
         records.append({**record, "_studies_root": str(studies_root), "_artifact_path": str(model_path)})
     return {"records":records, "registry_dir":str(root)}
 
-def resolve_model(model_id: str, *, registry_root: str | Path) -> dict[str, Any]:
+#: scientific_status values that permit reuse as a scientifically-valid *derived causal
+#: input* to another study, and under what condition. Anything not listed (INVALID_TARGET,
+#: UNASSESSED, an unknown value) is never reusable that way -- validity is never inferred
+#: from "the artifact loads" + "reuse_status == PERMITTED" (RT-09).
+_DERIVED_INPUT_SCIENTIFIC_STATUS = {"VALID_PRIMARY": "always", "VALID_DIAGNOSTIC": "policy"}
+
+
+def assert_scientific_status_reusable(record: Mapping[str, Any], policy: Mapping[str, Any] | None = None) -> None:
+    """Fail closed unless the model's ``scientific_status`` permits reuse as a derived
+    causal input. ``policy`` may carry ``allow_diagnostic: true`` or a
+    ``diagnostic_allowlist`` of model_ids to permit a ``VALID_DIAGNOSTIC`` model."""
+    status = record.get("scientific_status")
+    mid = record.get("model_id")
+    rule = _DERIVED_INPUT_SCIENTIFIC_STATUS.get(str(status))
+    if rule == "always":
+        return
+    if rule == "policy":
+        pol = policy or {}
+        if pol.get("allow_diagnostic") is True or mid in set(pol.get("diagnostic_allowlist") or ()):
+            return
+        raise ModelArtifactError(
+            f"PRESERVED_MODEL_SCIENTIFIC_STATUS_REQUIRES_POLICY: model {mid} is "
+            f"VALID_DIAGNOSTIC; consuming a diagnostic-derived model as a causal input "
+            f"requires an explicit reuse policy (allow_diagnostic / diagnostic_allowlist)"
+        )
+    raise ModelArtifactError(
+        f"PRESERVED_MODEL_SCIENTIFICALLY_INVALID: model {mid} scientific_status="
+        f"{status!r} is not reusable as a scientifically valid derived causal input"
+    )
+
+
+def resolve_model(model_id: str, *, registry_root: str | Path,
+                  reuse_intent: str | None = None,
+                  reuse_policy: Mapping[str, Any] | None = None) -> dict[str, Any]:
     p=Path(registry_root).resolve()/f"{model_id}.json"
     if not p.is_file(): raise ModelArtifactError(f"PRESERVED_MODEL_MISSING: {model_id}")
     rec=json.loads(p.read_text(encoding="utf-8")); studies_root=Path(registry_root).resolve().parent; artifact=_resolve(studies_root, rec["artifact_path"])
     if rec.get("reuse_status") != "PERMITTED": raise ModelArtifactError("PRESERVED_MODEL_REUSE_PROHIBITED")
+    # RT-09: reuse AS A DERIVED CAUSAL INPUT additionally requires a compatible
+    # scientific_status. Other callers (golden self-check, an internal load) keep the
+    # historical reuse_status-only gate.
+    if reuse_intent == "derived_causal_input":
+        assert_scientific_status_reusable(rec, reuse_policy)
     preprocessing = rec.get("preprocessing_identity") or {"kind": "identity"}
     if not isinstance(preprocessing, Mapping) or preprocessing.get("kind") != "identity":
         # No transform artifact/loader is yet part of the governed reusable-model
