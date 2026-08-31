@@ -1,0 +1,240 @@
+{
+  "card": "MARCH_REGIME_LEVEL_SCORE_DIAGNOSTIC",
+  "inputs_used": {
+    "score": "validation_march2024/artifacts/score_parity_detail.parquet :: ref_score (== nt_score, verified 0.0)",
+    "outcome": "validation_march2024/artifacts/outcome_parity.parquet :: *_ref columns",
+    "regime_direction": "artifacts/oos_observations_merged.parquet (March slice, committed fa47c4e)",
+    "regime_age_seconds": "artifacts/oos_candidates_merged.parquet (March slice)",
+    "thresholds": "artifacts/train_experiment_freeze.json (frozen TRAIN, verbatim)"
+  },
+  "frozen_thresholds": {
+    "LONG": {
+      "p90": 0.2852887899663343,
+      "p95": 0.32770330252959395,
+      "p97_5": 0.3639796684339806
+    },
+    "SHORT": {
+      "p90": 0.28485631865861344,
+      "p95": 0.33222113070660036,
+      "p97_5": 0.37673375655439945
+    }
+  },
+  "CHECKPOINT_REFERENCE": {
+    "LONG": {
+      "rows": 16954,
+      "regimes": 152,
+      "median_checkpoints_per_regime": 92.0,
+      "max_checkpoints_per_regime": 315,
+      "ROC_AUC": 0.701,
+      "PR_AUC": 0.302,
+      "base_rate": 0.18,
+      "pr_auc_lift": 1.68,
+      "every_eligible_5s_checkpoint_is_one_observation": true
+    },
+    "SHORT": {
+      "rows": 18668,
+      "regimes": 154,
+      "median_checkpoints_per_regime": 105.5,
+      "max_checkpoints_per_regime": 318,
+      "ROC_AUC": 0.672,
+      "PR_AUC": 0.277,
+      "base_rate": 0.164,
+      "pr_auc_lift": 1.69,
+      "every_eligible_5s_checkpoint_is_one_observation": true
+    }
+  },
+  "FIRST_ELIGIBLE_PER_REGIME": {
+    "LONG": {
+      "n": 152,
+      "ROC_AUC": 0.495,
+      "PR_AUC": 0.135,
+      "base_rate": 0.105,
+      "lift": 1.28,
+      "brier": 0.095,
+      "distinguishes_near_term_flip_regimes_at_first_observation": "NO"
+    },
+    "SHORT": {
+      "n": 154,
+      "ROC_AUC": 0.455,
+      "PR_AUC": 0.089,
+      "base_rate": 0.084,
+      "lift": 1.06,
+      "brier": 0.08,
+      "distinguishes_near_term_flip_regimes_at_first_observation": "NO"
+    }
+  },
+  "FIRST_P90": {
+    "LONG": {
+      "n": 115,
+      "flip_180_rate": 0.289,
+      "lift_vs_first_checkpoint_base": 2.75,
+      "median_seconds_to_flip_positives": 110.0,
+      "ROC_AUC_within_tail": 0.542,
+      "within_tail_interpretability_caveat": "threshold-selected population, restricted score range -> ROC/PR limited",
+      "higher_score_predictive": "WEAK"
+    },
+    "SHORT": {
+      "n": 124,
+      "flip_180_rate": 0.252,
+      "lift_vs_first_checkpoint_base": 2.99,
+      "median_seconds_to_flip_positives": 105.0,
+      "ROC_AUC_within_tail": 0.621,
+      "within_tail_interpretability_caveat": "threshold-selected population, restricted score range -> ROC/PR limited",
+      "higher_score_predictive": "WEAK"
+    }
+  },
+  "PRE_FLIP_SCORE_RAMP": {
+    "LONG": {
+      "median_score_T180": 0.161,
+      "median_score_T120": 0.199,
+      "median_score_T60": 0.212,
+      "median_score_T30": 0.245,
+      "pct_P90_T180": 0.109,
+      "pct_P90_T120": 0.151,
+      "pct_P90_T60": 0.148,
+      "pct_P90_T30": 0.295,
+      "first_P90_median_seconds_before_flip": 147.5,
+      "per_regime_rise_T180_to_T60_median": 0.035192119658429194,
+      "per_regime_rise_T180_to_T60_p25": -0.010760455487030834,
+      "systematic_ramp": "YES"
+    },
+    "SHORT": {
+      "median_score_T180": 0.154,
+      "median_score_T120": 0.162,
+      "median_score_T60": 0.202,
+      "median_score_T30": 0.24,
+      "pct_P90_T180": 0.122,
+      "pct_P90_T120": 0.127,
+      "pct_P90_T60": 0.164,
+      "pct_P90_T30": 0.323,
+      "first_P90_median_seconds_before_flip": 115.0,
+      "per_regime_rise_T180_to_T60_median": 0.03474362753880758,
+      "per_regime_rise_T180_to_T60_p25": -0.022742350091489144,
+      "systematic_ramp": "YES"
+    }
+  },
+  "NONFLIPPING_CONTROL_PART5": {
+    "LONG": [
+      {
+        "regime_age_bin": "0-300",
+        "n_pos_checkpoints": 40,
+        "n_neg_checkpoints": 930,
+        "median_score_pos": 0.13547523319332477,
+        "median_score_neg": 0.11518025980439209,
+        "pct_ge_P90_pos": 0.0,
+        "pct_ge_P90_neg": 0.004301075268817204
+      },
+      {
+        "regime_age_bin": "300-600",
+        "n_pos_checkpoints": 552,
+        "n_neg_checkpoints": 3700,
+        "median_score_pos": 0.18120859820041785,
+        "median_score_neg": 0.13181990593548945,
+        "pct_ge_P90_pos": 0.08876811594202899,
+        "pct_ge_P90_neg": 0.021621621621621623
+      },
+      {
+        "regime_age_bin": "600-900",
+        "n_pos_checkpoints": 824,
+        "n_neg_checkpoints": 3529,
+        "median_score_pos": 0.18876988728977387,
+        "median_score_neg": 0.1451067974162256,
+        "pct_ge_P90_pos": 0.1529126213592233,
+        "pct_ge_P90_neg": 0.06772456786625106
+      },
+      {
+        "regime_age_bin": "900-1800",
+        "n_pos_checkpoints": 1636,
+        "n_neg_checkpoints": 5722,
+        "median_score_pos": 0.23016706936462436,
+        "median_score_neg": 0.16020978558921667,
+        "pct_ge_P90_pos": 0.2787286063569682,
+        "pct_ge_P90_neg": 0.1494232785739252
+      },
+      {
+        "regime_age_bin": "1800-inf",
+        "n_pos_checkpoints": 6,
+        "n_neg_checkpoints": 15,
+        "median_score_pos": 0.23533876460693376,
+        "median_score_neg": 0.13270769073558877,
+        "pct_ge_P90_pos": 0.16666666666666666,
+        "pct_ge_P90_neg": 0.06666666666666667
+      }
+    ],
+    "SHORT": [
+      {
+        "regime_age_bin": "0-300",
+        "n_pos_checkpoints": 85,
+        "n_neg_checkpoints": 853,
+        "median_score_pos": 0.11295988443845789,
+        "median_score_neg": 0.09897670186221874,
+        "pct_ge_P90_pos": 0.0,
+        "pct_ge_P90_neg": 0.011723329425556858
+      },
+      {
+        "regime_age_bin": "300-600",
+        "n_pos_checkpoints": 448,
+        "n_neg_checkpoints": 3892,
+        "median_score_pos": 0.15313571079274035,
+        "median_score_neg": 0.12263100120849785,
+        "pct_ge_P90_pos": 0.05803571428571429,
+        "pct_ge_P90_neg": 0.02826310380267215
+      },
+      {
+        "regime_age_bin": "600-900",
+        "n_pos_checkpoints": 852,
+        "n_neg_checkpoints": 3986,
+        "median_score_pos": 0.18173286013313616,
+        "median_score_neg": 0.14068562946000357,
+        "pct_ge_P90_pos": 0.176056338028169,
+        "pct_ge_P90_neg": 0.07200200702458605
+      },
+      {
+        "regime_age_bin": "900-1800",
+        "n_pos_checkpoints": 1679,
+        "n_neg_checkpoints": 6850,
+        "median_score_pos": 0.20812193223670522,
+        "median_score_neg": 0.14845259675861822,
+        "pct_ge_P90_pos": 0.2418106015485408,
+        "pct_ge_P90_neg": 0.12934306569343065
+      },
+      {
+        "regime_age_bin": "1800-inf",
+        "n_pos_checkpoints": 2,
+        "n_neg_checkpoints": 21,
+        "median_score_pos": 0.14660099468246354,
+        "median_score_neg": 0.15038270813477972,
+        "pct_ge_P90_pos": 0.0,
+        "pct_ge_P90_neg": 0.047619047619047616
+      }
+    ]
+  },
+  "MAX_SCORE_PER_REGIME": {
+    "RETROSPECTIVE_ONLY": true,
+    "LONG": {
+      "descriptive_ROC_vs_ever_flip": 0.429,
+      "descriptive_PR_vs_ever_flip": 0.791,
+      "bottom_quartile_eventual_flip_rate": 0.821,
+      "top_quartile_eventual_flip_rate": 0.718
+    },
+    "SHORT": {
+      "descriptive_ROC_vs_ever_flip": 0.438,
+      "descriptive_PR_vs_ever_flip": 0.768,
+      "bottom_quartile_eventual_flip_rate": 0.775,
+      "top_quartile_eventual_flip_rate": 0.675
+    }
+  },
+  "INTERPRETATION": {
+    "between_regime_signal": "negligible-to-negative (first-eligible ROC ~0.49/0.46; max-score ROC 0.43/0.44, inverted top quartile)",
+    "within_regime_timing_signal": "present and systematic both directions; carries the entire ~0.20 ROC gain over first-checkpoint",
+    "first_P90_is_early_warning": "YES -- median ~115-148s before the flip; confidence keeps rising afterward",
+    "score_after_P90_adds_information": "WEAK -- non-monotonic across first-fire score quartiles",
+    "checkpoint_ROC_dependence_caveat": "The 35,872 March checkpoints are NOT independent: LONG = 152 regimes, median 92 checkpoints/regime (max 315); SHORT = 154 regimes, median 106 (max 318). Regime-level effective sample size is ~150 per direction. The checkpoint ROC 0.70/0.67 is valid ONLY for its intended question -- 'at an arbitrary eligible checkpoint, does the score rank imminent flips?' -- and must not be read as 35,872 independent samples or as regime-selection skill. Parts 2, 3 and 6 answer the deployment question -- 'how much information exists when a regime first becomes actionable, and how does it evolve?' -- and those answers are separate and weaker."
+  },
+  "PRIMARY_VERDICT": "WITHIN_REGIME_TIMING_SIGNAL",
+  "MODEL_CHANGED": "NO",
+  "THRESHOLD_CHANGED": "NO",
+  "NT_RERUN": "NO",
+  "NEW_OOS_ACCESSED": "NO",
+  "2025_2026_ACCESSED": "NO"
+}
