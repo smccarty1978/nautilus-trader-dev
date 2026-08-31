@@ -1,7 +1,7 @@
 {
   "study_id": "clean_maturity_flip_model_180s_horizon",
   "study_type": "flip_prediction",
-  "spec_sha256": "e363badf226991c99ebef50892f468d79d04be59f5abd7ffb5cac5a702fad1e0",
+  "spec_sha256": "f31494da3721056704658dcf448cc9391b6915be1d32cabf090005ea1e81f7db",
   "spec": {
     "study": {
       "id": "clean_maturity_flip_model_180s_horizon",
@@ -23,12 +23,12 @@
       "prevailing_regime": "both",
       "session": "RTH",
       "qualification": {
+        "established": true,
         "age_gate_seconds": 120,
+        "cadence_seconds": 5,
         "running_mfe_atr_gte": 1.0,
         "new_progress_windows_gte": 2,
-        "retained_mfe_ratio_gte": 0.5,
-        "cadence_seconds": 5,
-        "established": true
+        "retained_mfe_ratio_gte": 0.5
       }
     },
     "target": {
@@ -329,7 +329,11 @@
       "checkpoint": null,
       "progress_seconds": 60,
       "bounded": true,
-      "observation_policy": null
+      "observation_policy": null,
+      "modeling_driver_relpaths": [
+        "implementation/final_train_freeze.py",
+        "implementation/two_phase_selection.py"
+      ]
     },
     "acceptance": {
       "criteria": {
@@ -355,12 +359,12 @@
       "prevailing_regime": "both",
       "session": "RTH",
       "qualification": {
+        "established": true,
         "age_gate_seconds": 120,
+        "cadence_seconds": 5,
         "running_mfe_atr_gte": 1.0,
         "new_progress_windows_gte": 2,
-        "retained_mfe_ratio_gte": 0.5,
-        "cadence_seconds": 5,
-        "established": true
+        "retained_mfe_ratio_gte": 0.5
       },
       "causal_checkpoint": {
         "checkpoint_frequency": "5s",
@@ -379,6 +383,7 @@
         "mode": "completed_1m_bar",
         "confirmation_bars": 1
       },
+      "session_end_censoring": true,
       "censoring_policy": {
         "session_end_censoring": true,
         "max_horizon_seconds": 180

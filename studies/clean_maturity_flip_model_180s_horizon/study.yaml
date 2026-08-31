@@ -248,6 +248,12 @@ execution:
     - '2023-10-02'
   progress_seconds: 60
   bounded: true
+  # RT-01 lineage declaration: these study-local modules compose governed modeling
+  # APIs (fit / model-selection / freeze), so their bytes must be inside
+  # MODELING_EXECUTION_CLOSURE. Lineage-only -- no science change.
+  modeling_driver_relpaths:
+  - implementation/final_train_freeze.py
+  - implementation/two_phase_selection.py
 acceptance:
   criteria:
     minimum_structural_block_coverage: 0.9
