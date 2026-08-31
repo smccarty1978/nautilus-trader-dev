@@ -65,7 +65,7 @@ def test_composite_derives_from_forward_outcomes():
                 "id": "fo",
                 "horizon_seconds": 300,
                 "entry_reference": "next_bar_open",
-                "atr_source": "prior_1m_atr",
+                    "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
                 "atr_frozen_at": "decision_ts",
                 "ordered_barriers": [
                     {"id": "bar", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 300}

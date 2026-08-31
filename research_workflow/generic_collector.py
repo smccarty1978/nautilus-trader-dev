@@ -419,17 +419,20 @@ class FlipPredictionCollector(Strategy):
         self._target_runtime = resolve_target_runtime(_tc, legacy_mode="primitive" not in _tc)
         self._target_primitive = self._target_runtime.primitive
         _ordered = ((config.target_contract or {}).get("required_forward_outcomes") or [])
-        _barriers = [b for fo in _ordered for b in (fo.get("ordered_barriers") or [])]
-        self._ordered_barrier = dict(_barriers[0]) if _barriers else {}
+        from research_workflow.target_expression import compile_target_expression
+        _expression = compile_target_expression(_tc)
+        _ordered_leaves = [leaf for leaf in _expression.leaves() if leaf.primitive == "ordered_barrier"]
+        _ordered_params = dict(_ordered_leaves[0].params) if len(_ordered_leaves) == 1 and self._target_primitive == "ordered_barrier" else {}
+        self._ordered_barrier = _ordered_params
         # Entry-reference + gap policy are TARGET-contract concerns: the collector reads
         # them off the compiled forward-outcome spec and hands them to the target runtime,
         # which owns entry-reference resolution.  The population candidate builder never
         # synthesizes a target-specific entry price.
         self._ordered_barrier_entry_reference = (
-            _ordered[0].get("entry_reference", "next_bar_open") if _ordered else "next_bar_open"
+            _ordered_params.get("entry_reference", "next_bar_open")
         )
         self._ordered_barrier_max_gap_seconds = (
-            _ordered[0].get("max_gap_seconds") if _ordered else None
+            _ordered_params.get("max_gap_seconds")
         )
         # A composite target (>= 2 conditions) is executed by CompositeTargetRuntime,
         # which owns one child runtime per condition and conjoins/disjoins them per
@@ -437,13 +440,8 @@ class FlipPredictionCollector(Strategy):
         # collector streams BOTH the 1s tape and prevailing-regime flips to it.
         self._composite_target = self._target_primitive == "composite"
         self._composite_parity_rows: List[Dict[str, Any]] = []
-        self._composite_gap_seconds = None
-        if self._composite_target:
-            _gaps = [
-                fo.get("max_gap_seconds") for fo in _ordered
-                if fo.get("max_gap_seconds") is not None
-            ]
-            self._composite_gap_seconds = min(_gaps) if _gaps else None
+        self._ordered_barrier_parity_rows: List[Dict[str, Any]] = []
+        self._composite_gap_seconds = None  # retained only for historical test fixtures; never used for execution
 
         # Telemetry & Output logs
         self.candidates_log: List[Dict[str, Any]] = []
@@ -715,6 +713,7 @@ class FlipPredictionCollector(Strategy):
                 "direction": direction,
                 "checkpoint_index": cand_record["checkpoint_index"],
                 "atr": self._frozen_target_atr_at_T(cand_record),
+                "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
                 "session_close_ts": (
                     session_close_ns(T, self.cfg.session)
                     if self.cfg.session_end_censoring else None
@@ -738,6 +737,10 @@ class FlipPredictionCollector(Strategy):
                 "checkpoint_index": cand_record["checkpoint_index"],
                 "direction": direction,
                 "atr": frozen_atr,
+                "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
+                "declared_atr_source": self._ordered_barrier.get("atr_source"),
+                "forward_outcome_id": self._ordered_barrier.get("forward_outcome_id"),
+                "barrier_id": self._ordered_barrier.get("barrier_id"),
                 "favorable_atr": float(self._ordered_barrier["favorable_atr"]),
                 "adverse_atr": float(self._ordered_barrier["adverse_atr"]),
                 # The ordered-barrier horizon is the compiled barrier's own
@@ -746,8 +749,8 @@ class FlipPredictionCollector(Strategy):
                 # latter falls back to 300 when the target declares no top-level
                 # horizon (build_collector_config_kwargs), which is wrong for a
                 # forward-outcome-scoped barrier.
-                "horizon_seconds": int(self._ordered_barrier.get("horizon_seconds")
-                                       or self.cfg.horizon_seconds),
+                "horizon_seconds": int(self._ordered_barrier["horizon_seconds"] if self._ordered_barrier.get("horizon_seconds") is not None
+                                       else self.cfg.horizon_seconds),
                 "session_close_ts": (
                     session_close_ns(T, self.cfg.session)
                     if self.cfg.session_end_censoring else None
@@ -856,6 +859,7 @@ class FlipPredictionCollector(Strategy):
                 if final:
                     self._emit_observation(cand, DISPOSITION_CENSORED, None,
                                            censor_reason=CENSOR_DATA_END, censored_at_ts=now_ts)
+                    self._record_ordered_barrier_parity(cand)
                 else:
                     remaining.append(cand)
                 continue
@@ -863,6 +867,7 @@ class FlipPredictionCollector(Strategy):
             if final and now_ts < cand["horizon_end_ts"]:
                 self._emit_observation(cand, DISPOSITION_CENSORED, None,
                                        censor_reason=CENSOR_DATA_END, censored_at_ts=now_ts)
+                self._record_ordered_barrier_parity(cand)
                 continue
 
             live = self._target_runtime.terminal(cand, final=False)
@@ -871,6 +876,7 @@ class FlipPredictionCollector(Strategy):
                 self._emit_observation(cand, disp,
                                        live.resolved_at_ts if disp == DISPOSITION_POSITIVE else None,
                                        censor_reason=live.censor_reason, censored_at_ts=live.resolved_at_ts)
+                self._record_ordered_barrier_parity(cand)
                 continue
             # Inclusive horizon: retain through its exact completed timestamp.
             if not final and now_ts <= cand["horizon_end_ts"]:
@@ -883,10 +889,32 @@ class FlipPredictionCollector(Strategy):
                 result.resolved_at_ts if disp == DISPOSITION_POSITIVE else None,
                 censor_reason=result.censor_reason, censored_at_ts=result.resolved_at_ts,
             )
+            self._record_ordered_barrier_parity(cand)
         self.pending_candidates = remaining
         self._next_pending_horizon_ns = min(
             (c["horizon_end_ts"] for c in remaining if c.get("entry_resolved")), default=None
         )
+
+    def _record_ordered_barrier_parity(self, cand: Mapping[str, Any]) -> None:
+        """Record every primitive ordered-barrier result for independent replay."""
+        if not self.observations_log:
+            return
+        obs = self.observations_log[-1]
+        rows = getattr(self, "_ordered_barrier_parity_rows", None)
+        if rows is None:  # narrow __new__ fixtures bypass normal collector initialization
+            rows = self._ordered_barrier_parity_rows = []
+        rows.append({
+            "candidate": {
+                "observation_ts": int(cand["observation_ts"]),
+                "session_close_ts": cand.get("session_close_ts"),
+                "atr": cand.get("atr"),
+                "atr_source": cand.get("atr_source"),
+                "direction": cand.get("direction", cand.get("regime_direction")),
+            },
+            "events": [dict(e) for e in cand.get("events", ())],
+            "actual": {"disposition": obs["disposition"], "label": obs["target_flip_within_horizon"],
+                       "censor_reason": obs["censor_reason"]},
+        })
 
     def _resolve_composite(self, event: Optional[Dict[str, Any]], *, now_ts: int, final: bool = False) -> None:
         """Stream one completed 1s bar to every pending composite candidate.
@@ -948,11 +976,14 @@ class FlipPredictionCollector(Strategy):
         Returns ``None`` for a non-composite study.  Consumed by collect mode, which
         writes ``composite_target_replay_parity.json`` into the run directory.
         """
-        if not getattr(self, "_composite_target", False):
+        primitive = getattr(self, "_target_primitive", None)
+        if primitive not in {"composite", "ordered_barrier"}:
             return None
         from research_workflow.target_runtime import validate_target_parity
 
-        report = validate_target_parity(self.cfg.target_contract, self._composite_parity_rows)
+        rows = (self._composite_parity_rows if primitive == "composite"
+                else self._ordered_barrier_parity_rows)
+        report = validate_target_parity(self.cfg.target_contract, rows)
         contract = self.cfg.target_contract or {}
         report["target_expression"] = contract.get("target_expression")
         report["censoring_composition"] = contract.get("censoring_composition")
@@ -1187,18 +1218,14 @@ class FlipPredictionCollector(Strategy):
 
         if self._target_primitive == "ordered_barrier":
             previous = self.last_ts_seen
-            max_gap = int(((self.cfg.target_contract or {}).get("required_forward_outcomes") or [{}])[0].get("max_gap_seconds", 0))
-            gap = bool(previous is not None and max_gap and (ts_avail - previous) > max_gap * NS)
             self._resolve_ordered_barriers(
-                {"ts": int(ts_avail), "open": o, "high": h, "low": l, "gap": gap},
+                {"ts": int(ts_avail), "open": o, "high": h, "low": l, "gap": False},
                 now_ts=int(ts_avail),
             )
         elif self._target_primitive == "composite":
             previous = self.last_ts_seen
-            max_gap = getattr(self, "_composite_gap_seconds", None) or 0
-            gap = bool(previous is not None and max_gap and (ts_avail - previous) > int(max_gap) * NS)
             self._resolve_composite(
-                {"ts": int(ts_avail), "open": o, "high": h, "low": l, "gap": gap},
+                {"ts": int(ts_avail), "open": o, "high": h, "low": l, "gap": False},
                 now_ts=int(ts_avail),
             )
         # Resolve any candidate whose forward horizon has now fully elapsed. Ordered

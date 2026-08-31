@@ -30,6 +30,7 @@ from research_workflow.target_expression import (
 )
 
 NS = 1_000_000_000
+SUPPORTED_ATR_SOURCE = "latest_causally_completed_1m_wilder_atr_14_available_at_T"
 
 
 class TargetRuntimeError(RuntimeError): pass
@@ -212,16 +213,19 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
     CONSUMED_SEMANTIC_FIELDS = frozenset({
         "horizon_seconds", "session_end_censoring", "max_gap_seconds",
         "entry_reference", "bar_inclusion", "excursion_units", "ordered_barriers",
-        "favorable_atr", "adverse_atr", "max_tracking_seconds",
+        "favorable_atr", "adverse_atr", "max_tracking_seconds", "atr_source",
     })
     PROVENANCE_ONLY_SEMANTIC_FIELDS = frozenset({
-        "atr_source", "atr_frozen_at", "id", "spec_id", "spec_sha256",
+        "atr_frozen_at", "id", "spec_id", "spec_sha256",
         "generated_outcome_columns",
     })
     SUPPORTED_SEMANTIC_VALUES = {
         "entry_reference": {"next_bar_open"},
         "bar_inclusion": {"fully_forward"},
     }
+
+    def __init__(self, binding: Mapping[str, Any] | None = None):
+        self._binding = dict(binding or {})
 
     # -- runtime-owned pending lifecycle ---------------------------------------
     def open_pending(self, candidate: Mapping[str, Any]) -> dict:
@@ -230,6 +234,15 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
         No ``entry_price``: the execution reference is resolved from the forward
         tape by :meth:`ingest_bar` according to the contract's ``entry_reference``.
         """
+        for field in ("forward_outcome_id", "barrier_id"):
+            expected = self._binding.get(field)
+            if expected is not None and candidate.get(field) != expected:
+                raise TargetRuntimeError("ORDERED_BARRIER_IDENTITY_BINDING_MISMATCH")
+        declared_source = candidate.get("declared_atr_source", self._binding.get("atr_source"))
+        source = candidate.get("atr_source")
+        if declared_source is not None:
+            if declared_source != SUPPORTED_ATR_SOURCE or source != declared_source:
+                raise TargetRuntimeError("TARGET_ATR_SOURCE_BINDING_MISMATCH")
         atr = float(candidate["atr"])
         if not (atr > 0):
             raise TargetRuntimeError(
@@ -250,6 +263,8 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
             "checkpoint_index": candidate.get("checkpoint_index"),
             "direction": int(candidate.get("direction", candidate.get("regime_direction", 1))),
             "atr": atr,
+            "atr_source": source,
+            "declared_atr_source": declared_source,
             "favorable_atr": float(candidate["favorable_atr"]),
             "adverse_atr": float(candidate["adverse_atr"]),
             "horizon_seconds": int(candidate["horizon_seconds"]),
@@ -388,7 +403,7 @@ class CompositeTargetRuntime(TargetRuntime):
             cls = _RUNTIMES.get(leaf.primitive)
             if cls is None:  # pragma: no cover - runtime_executable already guarded
                 raise TargetRuntimeError(f"UNKNOWN_TARGET_PRIMITIVE: {leaf.primitive!r}")
-            self._child_runtimes[cid] = cls()
+            self._child_runtimes[cid] = cls(leaf.params) if leaf.primitive == "ordered_barrier" else cls()
 
     # -- identity ------------------------------------------------------------
     def canonical(self) -> str:
@@ -423,6 +438,8 @@ class CompositeTargetRuntime(TargetRuntime):
                 child_candidate["horizon_seconds"] = int(p["horizon_seconds"])
                 child_candidate["target_direction_role"] = str(p.get("target_direction_role", "opposite"))
                 child_candidate["max_gap_seconds"] = p.get("max_gap_seconds")
+                if not p.get("session_end_censoring", False):
+                    child_candidate["session_close_ts"] = None
                 horizon_ends.append(T + int(p["horizon_seconds"]) * NS)
             elif leaf.primitive == "ordered_barrier":
                 child_candidate["atr"] = float(candidate["atr"])
@@ -431,6 +448,10 @@ class CompositeTargetRuntime(TargetRuntime):
                 child_candidate["horizon_seconds"] = int(p["horizon_seconds"])
                 child_candidate["entry_reference"] = str(p.get("entry_reference", "next_bar_open"))
                 child_candidate["max_gap_seconds"] = p.get("max_gap_seconds")
+                child_candidate["declared_atr_source"] = p.get("atr_source")
+                child_candidate["atr_source"] = candidate.get("atr_source")
+                child_candidate["forward_outcome_id"] = p.get("forward_outcome_id")
+                child_candidate["barrier_id"] = p.get("barrier_id")
                 if not p.get("session_end_censoring", False):
                     child_candidate["session_close_ts"] = None
                 horizon_ends.append(T + int(p["horizon_seconds"]) * NS)
@@ -471,6 +492,8 @@ class CompositeTargetRuntime(TargetRuntime):
                 "direction": int(pending["regime_direction"]),
                 "regime_direction": int(pending["regime_direction"]),
                 "session_close_ts": pending.get("session_close_ts"),
+                "atr_source": atr and next((c.get("atr_source") for c in pending["children"].values()
+                                              if c.get("atr_source") is not None), None),
             },
             "events": events,
             "flip_events": flip_events,
@@ -657,6 +680,14 @@ def resolve_target_runtime(contract: Mapping[str, Any], *, legacy_mode: bool = F
     cls = _RUNTIMES.get(str(primitive))
     if cls is None:
         raise TargetRuntimeError(f"UNKNOWN_TARGET_PRIMITIVE: {primitive!r}")
+    if str(primitive) == "ordered_barrier":
+        if not contract.get("required_forward_outcomes"):
+            return cls()  # isolated legacy fixtures carry a pre-resolved candidate
+        expression = compile_target_expression(contract)
+        leaves = expression.leaves()
+        if len(leaves) != 1 or leaves[0].primitive != "ordered_barrier":
+            raise TargetRuntimeError("ORDERED_BARRIER_IDENTITY_REQUIRED")
+        return cls(leaves[0].params)
     return cls()
 
 _DISPOSITION_ALIASES = {
@@ -724,4 +755,4 @@ def validate_target_parity(contract: Mapping[str, Any], rows: Iterable[Mapping[s
 __all__ = ["TargetRuntimeError", "TargetResult", "FlipTargetRuntime", "OrderedBarrierTargetRuntime",
            "CompositeTargetRuntime", "resolve_target_runtime", "resolve_target_runtime_closure",
            "assert_target_semantic_field_coverage",
-           "validate_target_parity", "POSITIVE", "NEGATIVE", "CENSORED", "PENDING", "NS"]
+           "validate_target_parity", "POSITIVE", "NEGATIVE", "CENSORED", "PENDING", "NS", "SUPPORTED_ATR_SOURCE"]

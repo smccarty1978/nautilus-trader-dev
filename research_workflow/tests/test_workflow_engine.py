@@ -125,7 +125,7 @@ def test_ordered_barrier_atr_provenance_rejects_non_decision_freeze():
     from research.schemas.study_spec import RequiredForwardOutcomeSpec
     import pytest
     with pytest.raises(ValueError, match="ORDERED_BARRIER_ATR_MUST_FREEZE_AT_DECISION"):
-        RequiredForwardOutcomeSpec(id="x", horizon_seconds=10, atr_source="completed_atr", atr_frozen_at="entry_ts", ordered_barriers=[{"id":"b","favorable_atr":1,"adverse_atr":1,"horizon_seconds":10}])
+        RequiredForwardOutcomeSpec(id="x", horizon_seconds=10, atr_source="latest_causally_completed_1m_wilder_atr_14_available_at_T", atr_frozen_at="entry_ts", ordered_barriers=[{"id":"b","favorable_atr":1,"adverse_atr":1,"horizon_seconds":10}])
 
 # The following are distinct regression assertions for the generic acceptance matrix.
 def test_verified_capability_does_not_call_reconciliation(tmp_path):

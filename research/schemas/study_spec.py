@@ -206,10 +206,22 @@ class FlipConditionSpec(BaseModel):
     kind: Literal["flip"] = "flip"
     event: Optional[str] = Field(None, description="Target event name, e.g. regime_flip")
     direction: Optional[str] = Field(None, description="Target direction, e.g. bullish, bearish")
-    horizon_seconds: Optional[int] = Field(None, description="Prediction horizon in seconds")
-    confirmation: Optional[Dict[str, Any]] = Field(
-        default=None, description="Confirmation parameters, e.g. bars_required, ticks_required"
-    )
+    horizon_seconds: Optional[int] = Field(None, gt=0, description="Prediction horizon in seconds")
+    confirmation: Optional["TargetConfirmationSpec"] = Field(default=None)
+    # A composite primitive owns its own censoring semantics.  These defaults are
+    # deliberately explicit at compile time; a target-level convenience setting may
+    # not reinterpret a child.
+    session_end_censoring: bool = False
+    max_gap_seconds: Optional[int] = Field(None, gt=0)
+
+
+class TargetConfirmationSpec(BaseModel):
+    """The only confirmation semantics implemented by the flip runtime today."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["bar_close", "completed_1m_bar"] = "bar_close"
+    confirmation_bars: Literal[1] = 1
 
 
 class ExcursionConditionSpec(BaseModel):
@@ -295,9 +307,9 @@ class RequiredForwardOutcomeSpec(BaseModel):
 
     id: str = Field(..., description="Unique id referenced by condition forward_outcome_id values")
     entry_reference: Literal["decision_close", "next_bar_open", "confirmation_close", "explicit"] = "next_bar_open"
-    horizon_seconds: int = Field(..., description="Measurement horizon in seconds")
+    horizon_seconds: int = Field(..., gt=0, description="Measurement horizon in seconds")
     max_tracking_seconds: Optional[int] = Field(
-        None, description="Tracking budget; defaults to horizon_seconds when unset"
+        None, gt=0, description="Tracking budget; defaults to horizon_seconds when unset"
     )
     excursion_units: List[Literal["points", "atr", "ticks"]] = Field(default_factory=lambda: ["atr"])
     bar_inclusion: Literal["fully_forward", "close_after_entry"] = "fully_forward"
@@ -307,7 +319,7 @@ class RequiredForwardOutcomeSpec(BaseModel):
     )
     # Provenance of the numeric ``ProposedEntry.entry_atr`` used by ATR barriers.
     # It is declarative identity, not another calculated ATR stream.
-    atr_source: Optional[str] = Field(None)
+    atr_source: Optional[Literal["latest_causally_completed_1m_wilder_atr_14_available_at_T"]] = Field(None)
     atr_frozen_at: Optional[Literal["decision_ts", "entry_ts", "confirmation_ts"]] = Field(None)
     ordered_barriers: Optional[List[OrderedBarrierRequirementSpec]] = Field(
         None, exclude_if=lambda value: value is None
@@ -319,11 +331,13 @@ class RequiredForwardOutcomeSpec(BaseModel):
         ids = [b.id for b in barriers]
         if len(ids) != len(set(ids)):
             raise ValueError(f"DUPLICATE_ORDERED_BARRIER_ID: {ids}")
-        budget = self.max_tracking_seconds or self.horizon_seconds
+        budget = self.max_tracking_seconds if self.max_tracking_seconds is not None else self.horizon_seconds
         if any(b.horizon_seconds > budget for b in barriers):
             raise ValueError("ORDERED_BARRIER_HORIZON_EXCEEDS_TRACKING_BUDGET")
         if (self.atr_source is None) != (self.atr_frozen_at is None):
             raise ValueError("ATR_PROVENANCE_REQUIRES_SOURCE_AND_FREEZE_REFERENCE")
+        if barriers and self.atr_source is None:
+            raise ValueError("ORDERED_BARRIER_ATR_SOURCE_REQUIRED")
         if barriers and self.atr_frozen_at is not None and self.atr_frozen_at != "decision_ts":
             raise ValueError("ORDERED_BARRIER_ATR_MUST_FREEZE_AT_DECISION")
         return self
@@ -337,12 +351,8 @@ class TargetSpec(BaseModel):
     direction: Optional[str] = Field(
         None, description="Target direction, e.g. bullish (for bearish prevailing), bearish"
     )
-    horizon_seconds: Optional[int] = Field(
-        None, description="Prediction horizon in seconds, e.g. 300"
-    )
-    confirmation: Optional[Dict[str, Any]] = Field(
-        default=None, description="Confirmation parameters, e.g. bars_required, ticks_required"
-    )
+    horizon_seconds: Optional[int] = Field(None, gt=0, description="Prediction horizon in seconds, e.g. 300")
+    confirmation: Optional[TargetConfirmationSpec] = Field(default=None)
     session_end_censoring: Optional[bool] = Field(
         default=None,
         exclude_if=lambda value: value is None,
@@ -377,6 +387,8 @@ class TargetSpec(BaseModel):
     @model_validator(mode="after")
     def validate_composite_target(self) -> TargetSpec:
         conditions = self.conditions or []
+        if self.required_forward_outcomes and self.session_end_censoring is not None:
+            raise ValueError("COMPOSITE_SESSION_POLICY_MUST_BE_CHILD_OWNED")
         if len(conditions) > 1 and not self.condition_logic:
             raise ValueError(
                 "TARGET_CONDITION_LOGIC_REQUIRED: a composite target with more than one "

@@ -50,7 +50,8 @@ def _contract(logic="AND", flip_horizon=HORIZON, favorable=0.25, adverse=0.25,
         "condition_logic": logic,
         "conditions": [
             {"id": "flip_c", "kind": "flip", "event": "opposite_regime_flip",
-             "direction": "opposite", "horizon_seconds": flip_horizon},
+             "direction": "opposite", "horizon_seconds": flip_horizon,
+             "session_end_censoring": session_end_censoring, "max_gap_seconds": max_gap},
             {"id": "barrier_c", "kind": "ordered_barrier",
              "forward_outcome_id": "fo", "barrier_id": "b"},
         ],
@@ -355,7 +356,7 @@ def test_expression_binding_detects_drifted_target_expression(tmp_path):
         ],
         "required_forward_outcomes": [{
             "id": "fo", "entry_reference": "next_bar_open", "horizon_seconds": 60,
-            "max_gap_seconds": 1, "atr_source": "x", "atr_frozen_at": "decision_ts",
+            "max_gap_seconds": 1, "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T", "atr_frozen_at": "decision_ts",
             "ordered_barriers": [{"id": "b", "favorable_atr": 0.25, "adverse_atr": 0.25, "horizon_seconds": 60}],
         }],
     }

@@ -228,17 +228,8 @@ TargetExpression = PrimitiveTarget | And | Or
 
 
 # --- compilation --------------------------------------------------------------------
-def _min_max_gap_seconds(contract: Mapping[str, Any]) -> int | None:
-    gaps = [
-        fo.get("max_gap_seconds")
-        for fo in (contract.get("required_forward_outcomes") or [])
-        if fo.get("max_gap_seconds") is not None
-    ]
-    return min(int(g) for g in gaps) if gaps else None
-
-
 def _flip_params(condition: Mapping[str, Any], contract: Mapping[str, Any]) -> dict[str, Any]:
-    horizon = condition.get("horizon_seconds") or contract.get("horizon_seconds")
+    horizon = condition.get("horizon_seconds") if condition.get("horizon_seconds") is not None else contract.get("horizon_seconds")
     if horizon is None:
         raise TargetExpressionError(
             f"FLIP_CONDITION_HORIZON_MISSING: condition {condition.get('id')!r} declares "
@@ -249,10 +240,10 @@ def _flip_params(condition: Mapping[str, Any], contract: Mapping[str, Any]) -> d
         # "opposite" is the only flip direction any composite here declares; kept as a
         # role string so the runtime resolves it against the live prevailing direction.
         "target_direction_role": str(condition.get("direction") or contract.get("direction") or "opposite"),
-        # The flip is observable only over a contiguous tape: the same max_gap the
-        # forward outcome declares bounds the flip window too (matches the ordered-barrier
-        # child and the replay oracle).
-        "max_gap_seconds": _min_max_gap_seconds(contract),
+        "session_end_censoring": bool(condition.get("session_end_censoring", False)),
+        "max_gap_seconds": (int(condition["max_gap_seconds"])
+                            if condition.get("max_gap_seconds") is not None else None),
+        "confirmation": condition.get("confirmation") or contract.get("confirmation"),
     }
 
 
@@ -287,6 +278,7 @@ def _ordered_barrier_params(
         "max_gap_seconds": (
             int(fo["max_gap_seconds"]) if fo.get("max_gap_seconds") is not None else None
         ),
+        "atr_source": fo.get("atr_source"),
     }
 
 
@@ -335,10 +327,11 @@ def compile_target_expression(contract: Mapping[str, Any]) -> TargetExpression:
             }
         elif primitive == "ordered_barrier":
             fos = contract.get("required_forward_outcomes") or []
-            barriers = [b for f in fos for b in (f.get("ordered_barriers") or [])]
-            if barriers:
-                fo = fos[0]
-                b = barriers[0]
+            bindings = [(f, b) for f in fos for b in (f.get("ordered_barriers") or [])]
+            if len(bindings) != 1:
+                raise TargetExpressionError("ORDERED_BARRIER_IDENTITY_REQUIRED: a root ordered-barrier target must declare exactly one barrier")
+            if bindings:
+                fo, b = bindings[0]
                 params = {
                     "forward_outcome_id": str(fo.get("id")),
                     "barrier_id": str(b["id"]),
@@ -351,6 +344,7 @@ def compile_target_expression(contract: Mapping[str, Any]) -> TargetExpression:
                         int(fo["max_gap_seconds"])
                         if fo.get("max_gap_seconds") is not None else None
                     ),
+                    "atr_source": fo.get("atr_source"),
                 }
         return PrimitiveTarget("__root__", primitive, params)
 

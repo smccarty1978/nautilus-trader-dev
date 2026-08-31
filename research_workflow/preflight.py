@@ -160,6 +160,31 @@ class PreflightEvidenceError(RuntimeError):
     """Raised when downstream tooling is handed preflight evidence it cannot rely on."""
 
 
+def verify_target_atr_source_binding(target_contract: Dict[str, Any]) -> Dict[str, Any]:
+    """Preflight-side verification of the sole executable ordered-barrier ATR producer.
+
+    This deliberately does not trust the runtime's selected value: it verifies the
+    compiled declaration independently before seal.  The runtime and replay oracle
+    repeat the identity check against each candidate/parity row.
+    """
+    from research_workflow.target_runtime import SUPPORTED_ATR_SOURCE
+
+    checked = []
+    for fo in target_contract.get("required_forward_outcomes") or []:
+        if not (fo.get("ordered_barriers") or []):
+            continue
+        source = fo.get("atr_source")
+        frozen_at = fo.get("atr_frozen_at")
+        if source != SUPPORTED_ATR_SOURCE or frozen_at != "decision_ts":
+            raise PreflightEvidenceError(
+                "TARGET_ATR_SOURCE_BINDING_INVALID: ordered-barrier forward outcome "
+                f"{fo.get('id')!r} must bind {SUPPORTED_ATR_SOURCE!r} at decision_ts"
+            )
+        checked.append({"forward_outcome_id": fo.get("id"), "atr_source": source,
+                        "atr_frozen_at": frozen_at})
+    return {"checked": checked, "passed": True}
+
+
 def compute_evidence_sha256(data: Dict[str, Any]) -> str:
     """Self-binding hash over the fields that decide readiness."""
     payload = {k: data.get(k) for k in EVIDENCE_BOUND_FIELDS}
@@ -582,6 +607,9 @@ def run_preflight(
             # collector's population runtime (that is gated on the active seal).
             _rt_scope = "features_only" if feature_authority == "candidate" else "all"
             _rt = verify_runtime_contract(study_dir, scope=_rt_scope)
+            _compiled_target = (json.loads((study_dir / "compiled_study.json").read_text(encoding="utf-8"))
+                                .get("contracts", {}).get("target_contract", {}))
+            _rt["target_atr_source_binding"] = verify_target_atr_source_binding(_compiled_target)
             if not _rt["passed"]:
                 failed_gate = "RUNTIME_CONTRACT_BINDING"
                 _mark("RUNTIME_CONTRACT_BINDING", "FAILED")

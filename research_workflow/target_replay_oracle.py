@@ -19,6 +19,7 @@ from __future__ import annotations
 from typing import Iterable, Mapping
 
 NS = 1_000_000_000
+SUPPORTED_ATR_SOURCE = "latest_causally_completed_1m_wilder_atr_14_available_at_T"
 
 # Independent copy of the monotone censor severity (kept deliberately separate from
 # research_workflow.target_expression._CENSOR_SEVERITY so the oracle can catch a drift
@@ -53,6 +54,10 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         raise ValueError(f"ORACLE_UNKNOWN_TARGET_PRIMITIVE: {primitive!r}")
 
     barrier, entry_reference, session_end_censoring, max_gap_seconds = _contract_barrier(contract)
+    declared_source = next((fo.get("atr_source") for fo in (contract.get("required_forward_outcomes") or [])
+                            if fo.get("atr_source") is not None), None)
+    if declared_source is not None and (declared_source != SUPPORTED_ATR_SOURCE or candidate.get("atr_source") != declared_source):
+        return {"disposition": "CENSORED", "label": None, "censor_reason": "ATR_SOURCE_BINDING"}
     if entry_reference not in ("next_bar_open",):
         raise ValueError(f"ORACLE_UNSUPPORTED_ENTRY_REFERENCE: {entry_reference!r}")
 
@@ -145,6 +150,9 @@ def _replay_ordered_barrier_condition(
 
     T = int(candidate["observation_ts"])
     atr = float(candidate["atr"])
+    declared_source = fo.get("atr_source")
+    if declared_source is not None and (declared_source != SUPPORTED_ATR_SOURCE or candidate.get("atr_source") != declared_source):
+        return {"disposition": "CENSORED", "label": None, "censor_reason": "ATR_SOURCE_BINDING"}
     if not (atr > 0):
         return {"disposition": "CENSORED", "label": None, "censor_reason": "FROZEN_ATR_NONPOSITIVE"}
     direction = int(candidate.get("direction", candidate.get("regime_direction", 1)))
@@ -211,9 +219,10 @@ def _replay_flip_condition(
     ``CENSORED`` (``GAP``), not silently ``DATA_END`` or ``NEGATIVE``.
     """
     T = int(candidate["observation_ts"])
-    horizon_s = int(cond.get("horizon_seconds") or contract.get("horizon_seconds"))
+    horizon = cond.get("horizon_seconds") if cond.get("horizon_seconds") is not None else contract.get("horizon_seconds")
+    horizon_s = int(horizon)
     end = T + horizon_s * NS
-    session_close_ts = candidate.get("session_close_ts")
+    session_close_ts = candidate.get("session_close_ts") if cond.get("session_end_censoring", False) else None
     if session_close_ts is not None and end > int(session_close_ts):
         return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
 
@@ -228,12 +237,8 @@ def _replay_flip_condition(
             first_flip_ts = ts
             break
 
-    gaps = [
-        fo.get("max_gap_seconds")
-        for fo in (contract.get("required_forward_outcomes") or [])
-        if fo.get("max_gap_seconds") is not None
-    ]
-    max_gap_ns = min(gaps) * NS if gaps else None
+    max_gap_seconds = cond.get("max_gap_seconds")
+    max_gap_ns = int(max_gap_seconds) * NS if max_gap_seconds is not None else None
     first_gap_ts = None
     prev = T
     for e in sorted((dict(x) for x in events), key=lambda x: int(x["ts"])):

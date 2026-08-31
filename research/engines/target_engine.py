@@ -40,7 +40,7 @@ def _compile_forward_outcome_spec(spec: RequiredForwardOutcomeSpec) -> Dict[str,
     fo = ForwardOutcomeSpec(
         spec_id=spec.id,
         horizons_seconds=(spec.horizon_seconds,),
-        max_tracking_seconds=spec.max_tracking_seconds or spec.horizon_seconds,
+        max_tracking_seconds=(spec.max_tracking_seconds if spec.max_tracking_seconds is not None else spec.horizon_seconds),
         excursion_units=tuple(spec.excursion_units),
         reference_price=entry_reference_map[spec.entry_reference],
         bar_inclusion=bar_inclusion_map[spec.bar_inclusion],
@@ -121,6 +121,8 @@ def resolve_session_end_censoring(target_spec: TargetSpec) -> bool:
     This replaces a hard-coded ``True`` that ignored the authored value entirely, so an
     authored ``session_end_censoring = false`` can no longer execute as ``true``.
     """
+    if target_spec.required_forward_outcomes and target_spec.session_end_censoring is not None:
+        raise ValueError("COMPOSITE_SESSION_POLICY_MUST_BE_CHILD_OWNED")
     if target_spec.session_end_censoring is not None:
         return bool(target_spec.session_end_censoring)
     outcomes = target_spec.required_forward_outcomes or []
@@ -168,10 +170,10 @@ def compile_target_contract(target_spec: TargetSpec) -> Dict[str, Any]:
         "event": target_spec.event or "regime_flip",
         "direction": target_spec.direction,
         "horizon_seconds": effective_horizon,
-        "confirmation": target_spec.confirmation or {
+        "confirmation": (target_spec.confirmation.model_dump() if target_spec.confirmation is not None else {
             "mode": "bar_close",
             "confirmation_bars": 1,
-        },
+        }),
         # Authoritative session-resolution policy, resolved from the authored TargetSpec /
         # required_forward_outcomes -- never a hard-coded True.  `censoring_policy` is the
         # historical shape the collector reads; `session_end_censoring` is the same value
@@ -179,7 +181,7 @@ def compile_target_contract(target_spec: TargetSpec) -> Dict[str, Any]:
         "session_end_censoring": session_end_censoring,
         "censoring_policy": {
             "session_end_censoring": session_end_censoring,
-            "max_horizon_seconds": effective_horizon or 300,
+            "max_horizon_seconds": effective_horizon if effective_horizon is not None else 300,
         },
         "decision_reference": target_spec.decision_reference,
     }

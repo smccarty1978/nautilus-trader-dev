@@ -83,7 +83,8 @@ def _collector():
     obj._benchmark_mode = ""
     obj._target_primitive = "ordered_barrier"
     obj._target_runtime = resolve_target_runtime(tc)
-    obj._ordered_barrier = {"favorable_atr": 0.25, "adverse_atr": 0.25, "horizon_seconds": HORIZON}
+    obj._ordered_barrier = {"forward_outcome_id": "fo", "barrier_id": "b",
+                            "favorable_atr": 0.25, "adverse_atr": 0.25, "horizon_seconds": HORIZON}
     obj._ordered_barrier_entry_reference = "next_bar_open"
     obj._ordered_barrier_max_gap_seconds = 1
     obj.active_regime_dir = 1
@@ -107,13 +108,19 @@ def test_primitive_collector_runtime_and_oracle_still_agree_on_success():
 
     tape = [{"ts": ts, "open": o, "high": h, "low": l, "gap": False} for ts, o, h, l in bars]
     report = validate_target_parity(_contract(), [{
-        "candidate": {"observation_ts": T0, "session_close_ts": None, "atr": 10.0, "direction": 1},
+            "candidate": {"observation_ts": T0, "session_close_ts": None, "atr": 10.0, "direction": 1,
+                          "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T"},
         "events": tape,
         "actual": {"disposition": obs["disposition"], "label": obs["target_flip_within_horizon"],
                    "censor_reason": obs["censor_reason"]},
     }])
     assert report["passed"], report["examples"]
     assert report["primitive"] == "ordered_barrier"
+    # The collector emits the same independent replay evidence for a primitive
+    # ordered-barrier target; collect mode persists this returned report.
+    persisted_report = obj.get_composite_target_parity()
+    assert persisted_report["passed"], persisted_report["examples"]
+    assert persisted_report["rows_compared"] == 1
 
 
 def test_primitive_timeout_is_negative_not_censored():

@@ -100,9 +100,11 @@ def test_asymmetric_ordered_barrier_target_compiles_to_runtime_contract():
         }],
         "required_forward_outcomes": [{
             "id": "path", "entry_reference": "next_bar_open",
-            "horizon_seconds": 300, "max_tracking_seconds": 300,
-            "max_gap_seconds": 1,
-            "ordered_barriers": [{
+                "horizon_seconds": 300, "max_tracking_seconds": 300,
+                "max_gap_seconds": 1,
+                "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
+                "atr_frozen_at": "decision_ts",
+                "ordered_barriers": [{
                 "id": "primary", "favorable_atr": 1.0,
                 "adverse_atr": 0.75, "horizon_seconds": 300,
             }],
@@ -125,9 +127,10 @@ def test_composite_target_without_top_level_horizon_surfaces_forward_outcome_hor
         "type": "composite", "decision_reference": "decision_ts",
         "conditions": [{"id": "cont", "kind": "ordered_barrier", "forward_outcome_id": "path", "barrier_id": "primary"}],
         "required_forward_outcomes": [{
-            "id": "path", "entry_reference": "next_bar_open",
-            "horizon_seconds": 300, "max_tracking_seconds": 300, "max_gap_seconds": 1,
-            "ordered_barriers": [{"id": "primary", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 300}],
+                "id": "path", "entry_reference": "next_bar_open",
+                "horizon_seconds": 300, "max_tracking_seconds": 300, "max_gap_seconds": 1,
+                "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T", "atr_frozen_at": "decision_ts",
+                "ordered_barriers": [{"id": "primary", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 300}],
         }],
     }
     spec = StudySpec.model_validate(dict(BASE_SPEC, target=target))
@@ -145,8 +148,8 @@ def test_composite_target_with_conflicting_forward_outcome_horizons_fails_closed
             {"id": "b", "kind": "ordered_barrier", "forward_outcome_id": "p2", "barrier_id": "b2"},
         ],
         "required_forward_outcomes": [
-            {"id": "p1", "horizon_seconds": 300, "ordered_barriers": [{"id": "b1", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 300}]},
-            {"id": "p2", "horizon_seconds": 120, "ordered_barriers": [{"id": "b2", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 120}]},
+            {"id": "p1", "horizon_seconds": 300, "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T", "atr_frozen_at": "decision_ts", "ordered_barriers": [{"id": "b1", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 300}]},
+            {"id": "p2", "horizon_seconds": 120, "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T", "atr_frozen_at": "decision_ts", "ordered_barriers": [{"id": "b2", "favorable_atr": 1.0, "adverse_atr": 0.75, "horizon_seconds": 120}]},
         ],
     }
     spec = StudySpec.model_validate(dict(BASE_SPEC, target=target))
@@ -163,6 +166,7 @@ def test_ordered_barrier_condition_must_reference_declared_barrier():
         }],
         "required_forward_outcomes": [{
             "id": "path", "horizon_seconds": 300,
+            "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T", "atr_frozen_at": "decision_ts",
             "ordered_barriers": [{
                 "id": "primary", "favorable_atr": 1.0,
                 "adverse_atr": 0.75, "horizon_seconds": 300,
