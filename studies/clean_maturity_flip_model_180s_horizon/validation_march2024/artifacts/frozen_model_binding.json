@@ -1,0 +1,62 @@
+{
+  "bundle_id": "frozen_180s_combined_LONG_C_SHORT_C",
+  "kind": "combined_frozen_bundle",
+  "construction": "verbatim per-direction estimators from the two frozen single-arm joblibs; no refit, no recreation from parameters",
+  "artifact_path": "validation_march2024/artifacts/frozen_180s_combined_bundle.joblib",
+  "artifact_sha256": "85cfad4375b2d196fc66e8d77d9c3dfc24f25bc474b66dff0624f762608ddbf4",
+  "arms": [
+    "LONG_C",
+    "SHORT_C"
+  ],
+  "direction_arm_mapping": {
+    "LONG": "LONG_C",
+    "SHORT": "SHORT_C"
+  },
+  "ordered_feature_surface": [
+    "arrival_velocity",
+    "arrival_acceleration",
+    "ema_slope",
+    "prior_1m_regime_efficiency",
+    "prior_1m_regime_mfe_atr",
+    "prior_1m_regime_range_atr",
+    "prior_5m_regime_efficiency",
+    "prior_5m_regime_mfe_atr",
+    "prior_5m_regime_range_atr",
+    "rolling_300s_retention_ratio",
+    "rolling_300s_current_progress_atr",
+    "rolling_300s_max_progress_atr",
+    "rolling_300s_giveback_atr"
+  ],
+  "preprocessing_hash": "96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8",
+  "frozen_TRAIN_P90": {
+    "LONG": 0.2852887899663343,
+    "SHORT": 0.28485631865861344
+  },
+  "components": {
+    "LONG_C": {
+      "source_model_id": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+      "source_joblib_sha256": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+      "fit_identity_sha256": "25737fcd6830a60f8b5cb4a97293ceef8cabcf0efdc1910792a71c7127a9ae60"
+    },
+    "SHORT_C": {
+      "source_model_id": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4",
+      "source_joblib_sha256": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a",
+      "fit_identity_sha256": "3c480affc677f64b712540f8e55df67d7f14fe9921ad9baa293b96bf70cdaa6f"
+    }
+  },
+  "golden_score_parity": {
+    "LONG_C": {
+      "golden_fixture": "139fb532d28ee6c1020cdf300ac1bb1b1673d528475aef3a66f7e41976f04389",
+      "n": 2,
+      "max_abs_delta": 0.0,
+      "pass": true
+    },
+    "SHORT_C": {
+      "golden_fixture": "4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4",
+      "n": 2,
+      "max_abs_delta": 0.0,
+      "pass": true
+    }
+  },
+  "aggregate_train_freeze_sha256": "b2f802550d91243d404ba7cc5837832ae6a98e269ffa771473047e07b966dc9a"
+}

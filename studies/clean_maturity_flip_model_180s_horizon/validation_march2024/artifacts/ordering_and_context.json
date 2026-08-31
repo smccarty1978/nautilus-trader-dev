@@ -1,0 +1,104 @@
+{
+  "validation_month": "2024-03-01 through 2024-03-31",
+  "same_timestamp_event_ordering": {
+    "mechanism": "utils.causal_registration.add_bars_causal_order (engine_builder.py:240) -- identical code in both runs",
+    "helper_contract_1s_before_coincident_1m": true,
+    "boundary_feature_parity": {
+      "ordinary_5s_boundary": {
+        "n": 35872,
+        "max_abs_feature_delta": 0.0
+      },
+      "1m_boundary": {
+        "n": 3039,
+        "max_abs_feature_delta": 0.0
+      },
+      "regime_flip_boundary_within_5s": {
+        "n": 140,
+        "max_abs_feature_delta": 0.0
+      },
+      "regime_first_checkpoint": {
+        "n": 312,
+        "max_abs_feature_delta": 0.0
+      }
+    },
+    "same_timestamp_ordering_parity": "PASS"
+  },
+  "golden_score_parity_full_matrix": {
+    "LONG": {
+      "n_rows": 203150,
+      "combined_bundle_vs_native_booster_max_abs": 0.0,
+      "combined_bundle_vs_perdirection_joblib_max_abs": 0.0
+    },
+    "SHORT": {
+      "n_rows": 247823,
+      "combined_bundle_vs_native_booster_max_abs": 0.0,
+      "combined_bundle_vs_perdirection_joblib_max_abs": 0.0
+    },
+    "PASS": true
+  },
+  "first_fire_diagnostics": {
+    "LONG": {
+      "first_fire_signals": 115,
+      "RTH_trading_days": 20,
+      "mean_signals_per_day": 5.75,
+      "median_signals_per_day": 6.0,
+      "p10_signals_per_day": 3.8000000000000003,
+      "p90_signals_per_day": 7.100000000000001,
+      "days_with_0": 0,
+      "days_with_1": 1,
+      "days_with_2": 1,
+      "days_with_3plus": 18,
+      "pct_eligible_regimes_firing": 0.7467532467532467,
+      "flip_within_180s_rate": 0.28695652173913044,
+      "median_seconds_to_flip": 110.0
+    },
+    "SHORT": {
+      "first_fire_signals": 124,
+      "RTH_trading_days": 20,
+      "mean_signals_per_day": 6.2,
+      "median_signals_per_day": 6.0,
+      "p10_signals_per_day": 4.0,
+      "p90_signals_per_day": 8.0,
+      "days_with_0": 0,
+      "days_with_1": 0,
+      "days_with_2": 0,
+      "days_with_3plus": 20,
+      "pct_eligible_regimes_firing": 0.7848101265822784,
+      "flip_within_180s_rate": 0.25,
+      "median_seconds_to_flip": 105.0
+    },
+    "ALL": {
+      "first_fire_signals": 239,
+      "RTH_trading_days": 20,
+      "mean_signals_per_day": 11.95,
+      "median_signals_per_day": 12.0,
+      "p10_signals_per_day": 9.9,
+      "p90_signals_per_day": 14.0,
+      "days_with_0": 0,
+      "days_with_1": 0,
+      "days_with_2": 0,
+      "days_with_3plus": 20,
+      "pct_eligible_regimes_firing": 0.7660256410256411,
+      "flip_within_180s_rate": 0.26778242677824265,
+      "median_seconds_to_flip": 110.0
+    }
+  },
+  "checkpoint_level_context": {
+    "LONG": {
+      "note": "CHECKPOINT-LEVEL tail (every qualifying checkpoint), NOT first-fire; not expected to equal first-fire stats",
+      "march_checkpoint_base_rate": 0.1803704140615784,
+      "march_p90_checkpoint_retained_frac": 0.10658288801456339,
+      "march_p90_checkpoint_flip_prob": 0.34897846493649914,
+      "full_2024_oos_p90_checkpoint_flip_prob": 0.35644957096638064,
+      "full_2024_oos_base_rate": 0.1626658744305803
+    },
+    "SHORT": {
+      "note": "CHECKPOINT-LEVEL tail (every qualifying checkpoint), NOT first-fire; not expected to equal first-fire stats",
+      "march_checkpoint_base_rate": 0.1642382686950932,
+      "march_p90_checkpoint_retained_frac": 0.10009021917953617,
+      "march_p90_checkpoint_flip_prob": 0.31023454157782515,
+      "full_2024_oos_p90_checkpoint_flip_prob": 0.2968835891581039,
+      "full_2024_oos_base_rate": 0.13779545131773824
+    }
+  }
+}

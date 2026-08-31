@@ -1,0 +1,120 @@
+{
+  "status": "COLLECTED",
+  "partition": {
+    "partition_id": "oos-2024-03",
+    "period": "oos",
+    "primary_start": "2024-03-01",
+    "primary_end": "2024-03-31",
+    "warmup_start": "2024-02-24",
+    "warmup_end": "2024-03-31",
+    "lookahead_start": "2024-03-31",
+    "lookahead_end": "2024-04-01",
+    "authorization_sha256": "19534de9bec8932da8b5b690c892bb4ea4324741865cae208c0270c8c0dd30fb",
+    "source_identity": "catalog-authority",
+    "feature_instance_sha256": "29cfe8fb8b50a65f60b105118c190f48cf34d0c25ade449d16db33cf740eae81",
+    "contract_sha256": "c2bbc2f087ac545f7de8c98a751a6efd9020bc3d09a630158a503851d13c7683"
+  },
+  "provenance_sha256": "63c0b67db0c932e39a39f3d9ebd39fe0be1d8997cb34aa4a0e05e78ae748036b",
+  "run": {
+    "run_id": "20260831_042411_clean_maturity_flip_model_180s_horizon_full",
+    "study_id": "clean_maturity_flip_model_180s_horizon",
+    "status": "SUCCESS",
+    "feature_surface_validation": {
+      "passed": true,
+      "rows": 35872,
+      "declared_features": [],
+      "emitted_features": [],
+      "metadata_columns": [
+        "checkpoint_index",
+        "new_progress_windows",
+        "observation_ts",
+        "regime_age_seconds",
+        "regime_start_ns",
+        "retained_mfe_ratio",
+        "running_mfe_atr",
+        "triggering_1s_ts_init"
+      ],
+      "collection_universe_columns": [
+        "arrival_acceleration",
+        "arrival_velocity",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_giveback_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_retention_ratio"
+      ],
+      "undeclared_columns": [],
+      "per_feature": {},
+      "findings": []
+    },
+    "candidate_disposition_reconciliation": {
+      "candidates": 35872,
+      "observations": 35872,
+      "passed": true,
+      "findings": [],
+      "undisposed_candidates": 0,
+      "orphaned_observations": 0,
+      "duplicate_observations": 0,
+      "disposition_counts": {
+        "LABELED_NEGATIVE": 29498,
+        "LABELED_POSITIVE": 6124,
+        "CENSORED": 250
+      }
+    },
+    "population_funnel": null,
+    "stage": "full",
+    "wall_time_seconds": 87.547,
+    "total_bars_processed": 1215938,
+    "candidates_count": 35872,
+    "observations_count": 35872,
+    "throughput_bars_per_sec": 13888.9,
+    "memory": {
+      "baseline_process_rss_mb": 199.61,
+      "peak_process_rss_mb": 566.6,
+      "rss_delta_mb": 366.99,
+      "python_tracemalloc_peak_mb": 0.0
+    },
+    "bars_breakdown": {
+      "loaded": {
+        "1s": 1181342,
+        "1m": 34596
+      },
+      "callbacks": {
+        "1s": 1181342,
+        "1m": 34596
+      },
+      "ts_event_ranges": {
+        "1s": {
+          "first": null,
+          "last": null
+        },
+        "1m": {
+          "first": null,
+          "last": null
+        }
+      },
+      "ts_init_ranges": {
+        "1s": {
+          "first": null,
+          "last": null
+        },
+        "1m": {
+          "first": null,
+          "last": null
+        }
+      }
+    },
+    "output_artifacts": {
+      "candidates_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260831_042411_clean_maturity_flip_model_180s_horizon_full\\collection\\candidates.parquet",
+      "observations_parquet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260831_042411_clean_maturity_flip_model_180s_horizon_full\\collection\\observations.parquet",
+      "collection_manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_180s_horizon\\runs\\20260831_042411_clean_maturity_flip_model_180s_horizon_full\\collection\\collection_manifest.json"
+    },
+    "end_time_utc": "2026-08-31T04:25:39.177259+00:00"
+  }
+}
