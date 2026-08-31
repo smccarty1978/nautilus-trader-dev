@@ -96,6 +96,12 @@ class WorkflowEngine:
         self.study.mkdir(parents=True, exist_ok=True)
         state["actions_executed_this_run"] = list(self.executed)
         state["completed_gates"] = self._completed_gates()
+        # RT-13: an existing OOS analysis artifact is only authoritative while FRESH.
+        try:
+            from research_workflow.oos_analysis_lineage import classify_oos_analysis
+            state["oos_analysis_state"] = classify_oos_analysis(self.study)
+        except Exception:  # pragma: no cover - never block workflow state on this
+            state["oos_analysis_state"] = None
         state["timestamps"] = {k: (self.study / p).stat().st_mtime if (self.study / p).exists() else None for k,p in {"prepared":"audit/frozen_execution_manifest.json","readiness":"audit/readiness.json","preflight":"audit/preflight.json","causal":"audit/status.json","contract":"audit/contract_status.json","seal":"artifacts/preexec_audit_seal.json","smoke":"artifacts/smoke_reconciled.json"}.items()}
         (self.study / "workflow_state.json").write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return state

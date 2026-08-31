@@ -93,14 +93,44 @@ def first_crossings(frame: pd.DataFrame, *, score_column: str, threshold_records
     return rows
 
 
-def analyze_results(study_path: str | Path, frame: pd.DataFrame, *, score_columns: Mapping[str, str], target_column: str, output_name: str = "experiment_analysis.json") -> Dict[str, Any]:
-    """Persist a structured analysis artifact bound to the study authorization."""
+def analyze_results(
+    study_path: str | Path,
+    frame: pd.DataFrame,
+    *,
+    score_columns: Mapping[str, str],
+    target_column: str,
+    output_name: str = "experiment_analysis.json",
+    oos_run_id: str | None = None,
+    oos_dataset_identity_sha256: str | None = None,
+) -> Dict[str, Any]:
+    """Persist a structured OOS analysis artifact bound to its full lineage (RT-13).
+
+    Beyond ``study_id`` / ``authorization_sha256``, the artifact binds the exact TRAIN
+    freeze file bytes, the frozen model ids, the stage-scoped closures, the OOS
+    authorization + run/dataset identity, and this analysis code's own identity, plus a
+    self-binding ``identity_sha256``. ``research_workflow.oos_analysis_lineage.
+    classify_oos_analysis`` re-resolves all of it and returns FRESH / STALE / INVALID.
+    """
+    from research.analysis.modeling import frame_content_identity
+    from research_workflow.oos_analysis_lineage import build_oos_analysis_identity
+
     path = Path(study_path).resolve()
     auth = load_authorization(path)
-    # Analysis is an OOS operation; this gate also verifies a TRAIN freeze exists.
-    assert_oos_open(path)
+    # Analysis is an OOS operation; this gate also verifies a TRAIN freeze exists and is
+    # bound to the current authorization, and returns the freeze payload.
+    freeze = assert_oos_open(path)
     result = classification_results(frame, score_columns=score_columns, target_column=target_column)
-    result.update({"study_id": auth.study_id, "authorization_sha256": auth.authorization_sha256, "rows": int(len(frame))})
+    if oos_dataset_identity_sha256 is None:
+        oos_dataset_identity_sha256 = frame_content_identity(frame.reindex(sorted(frame.columns), axis=1))
+    result.update({
+        "study_id": auth.study_id,
+        "authorization_sha256": auth.authorization_sha256,
+        "rows": int(len(frame)),
+        "oos_analysis_identity": build_oos_analysis_identity(
+            path, freeze=freeze, oos_run_id=oos_run_id,
+            oos_dataset_identity_sha256=oos_dataset_identity_sha256,
+        ),
+    })
     out = path / "artifacts" / output_name
     out.write_text(json.dumps(result, indent=2, default=str) + "\n", encoding="utf-8")
     return result
