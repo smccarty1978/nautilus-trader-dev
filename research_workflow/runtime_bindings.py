@@ -162,6 +162,11 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
             target_checked["target_runtime_closure_sha256"] = resolve_target_runtime_closure(study_dir)["target_runtime_closure_sha256"]
             if not target_checked["dispatch"]:
                 raise RuntimeBindingError("collector source does not dispatch resolved TargetRuntime")
+            # RT-05: every non-default semantic field the contract authors must be
+            # executed by the resolved runtime (or recorded as provenance-only), never
+            # silently ignored. Fails closed with TARGET_SEMANTIC_FIELD_UNSUPPORTED.
+            from research_workflow.target_runtime import assert_target_semantic_field_coverage
+            target_checked["semantic_field_coverage"] = assert_target_semantic_field_coverage(target_contract)
             # PREFLIGHT_EXPRESSION_BINDING: the executable Boolean expression the runtime
             # will run MUST equal the expression compiled from the contract's own
             # conditions/condition_logic AND the target_expression tree embedded in the

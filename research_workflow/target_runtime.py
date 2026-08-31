@@ -51,6 +51,24 @@ class TargetRuntime:
 class FlipTargetRuntime(TargetRuntime):
     primitive = "flip_within_horizon"
 
+    # RT-05: semantic target-contract fields this runtime actually consumes at execution
+    # time, and the allowed values where the runtime supports only a subset. A non-default
+    # authored value for a semantic field that is in neither CONSUMED_SEMANTIC_FIELDS nor
+    # PROVENANCE_ONLY_SEMANTIC_FIELDS (for the resolved runtime) is rejected before seal
+    # (TARGET_SEMANTIC_FIELD_UNSUPPORTED) rather than silently ignored.
+    CONSUMED_SEMANTIC_FIELDS = frozenset({
+        "horizon_seconds", "session_end_censoring", "max_gap_seconds",
+        "event", "direction", "target_direction_role", "confirmation",
+    })
+    PROVENANCE_ONLY_SEMANTIC_FIELDS = frozenset()
+    # A flip event IS a completed-bar regime flip confirmed over one bar -- that is the
+    # regime engine's intrinsic behaviour, so a matching confirmation is satisfied by
+    # construction. Anything else (multi-bar confirmation, a tick mode) has no runtime.
+    SUPPORTED_SEMANTIC_VALUES = {
+        "confirmation.mode": {"bar_close", "completed_1m_bar"},
+        "confirmation.confirmation_bars": {None, 1},
+    }
+
     # -- runtime-owned pending lifecycle (composite child) ---------------------
     def open_pending(self, candidate: Mapping[str, Any]) -> dict:
         T = int(candidate["observation_ts"])
@@ -164,6 +182,21 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
     """
 
     primitive = "ordered_barrier"
+
+    # RT-05 -- see FlipTargetRuntime.
+    CONSUMED_SEMANTIC_FIELDS = frozenset({
+        "horizon_seconds", "session_end_censoring", "max_gap_seconds",
+        "entry_reference", "bar_inclusion", "excursion_units", "ordered_barriers",
+        "favorable_atr", "adverse_atr", "max_tracking_seconds",
+    })
+    PROVENANCE_ONLY_SEMANTIC_FIELDS = frozenset({
+        "atr_source", "atr_frozen_at", "id", "spec_id", "spec_sha256",
+        "generated_outcome_columns",
+    })
+    SUPPORTED_SEMANTIC_VALUES = {
+        "entry_reference": {"next_bar_open"},
+        "bar_inclusion": {"fully_forward"},
+    }
 
     # -- runtime-owned pending lifecycle ---------------------------------------
     def open_pending(self, candidate: Mapping[str, Any]) -> dict:
@@ -313,6 +346,14 @@ class CompositeTargetRuntime(TargetRuntime):
 
     primitive = "composite"
 
+    # RT-05: the composite runtime's own bookkeeping fields; per-condition semantics are
+    # covered by the child runtimes' declarations (see assert_target_semantic_field_coverage).
+    CONSUMED_SEMANTIC_FIELDS = frozenset({
+        "conditions", "condition_logic", "target_expression", "censoring_composition",
+        "required_forward_outcomes", "horizon_seconds", "session_end_censoring",
+    })
+    PROVENANCE_ONLY_SEMANTIC_FIELDS = frozenset()
+
     def __init__(self, contract: Mapping[str, Any]):
         self.expression: TargetExpression = compile_target_expression(contract)
         runtime_executable(self.expression)  # fail closed on excursion/return leaves
@@ -461,6 +502,124 @@ def resolve_target_runtime_closure(study_dir: str | Path) -> dict[str, Any]:
     return {"target_runtime_closure_sha256": hashlib.sha256(json.dumps(parts, sort_keys=True, separators=(",", ":")).encode()).hexdigest(), "components": parts}
 
 
+# --------------------------------------------------------------------------- #
+# RT-05 -- accepted target semantic-field coverage
+# --------------------------------------------------------------------------- #
+# Semantic contract fields that a study can author and that a runtime could silently
+# ignore. Value = the set of "present but semantically inert" values (a default that is a
+# documented no-op). A value outside this set for a field the resolved runtime neither
+# consumes nor treats as provenance-only fails closed before seal.
+_TARGET_SEMANTIC_FIELDS: dict[str, tuple] = {
+    "confirmation": ({"mode": "bar_close", "confirmation_bars": 1},),
+    "bar_inclusion": ("fully_forward",),
+    "entry_reference": ("next_bar_open",),
+    "atr_source": (),
+    "atr_frozen_at": (),
+    "excursion_units": (["atr"],),
+    "max_gap_seconds": (),
+}
+
+_RUNTIME_CLASSES = {
+    "flip_within_horizon": FlipTargetRuntime,
+    "ordered_barrier": OrderedBarrierTargetRuntime,
+    "composite": CompositeTargetRuntime,
+}
+
+
+def _semantic_field_sites(contract: Mapping[str, Any]):
+    """Yield (location, field, value) for every semantic field authored in the contract
+    -- top level, each required_forward_outcomes entry, each conditions entry."""
+    for f in _TARGET_SEMANTIC_FIELDS:
+        if f in contract:
+            yield ("target", f, contract[f])
+    for i, fo in enumerate(contract.get("required_forward_outcomes") or []):
+        for f in _TARGET_SEMANTIC_FIELDS:
+            if f in fo:
+                yield (f"required_forward_outcomes[{i}]", f, fo[f])
+    for i, cond in enumerate(contract.get("conditions") or []):
+        for f in _TARGET_SEMANTIC_FIELDS:
+            if f in cond:
+                yield (f"conditions[{i}]", f, cond[f])
+
+
+def _is_inert(field: str, value: Any) -> bool:
+    if value is None:
+        return True
+    return any(value == inert for inert in _TARGET_SEMANTIC_FIELDS[field])
+
+
+def _allowed_semantic_fields(primitive: str, contract: Mapping[str, Any]) -> tuple[set, list]:
+    """(allowed field names, [runtime classes]) for the resolved primitive."""
+    if primitive == "composite":
+        classes = [CompositeTargetRuntime]
+        for leaf in (contract.get("conditions") or []):
+            kind = leaf.get("kind")
+            prim = {"flip": "flip_within_horizon", "ordered_barrier": "ordered_barrier"}.get(kind)
+            if prim and _RUNTIME_CLASSES.get(prim) not in classes:
+                classes.append(_RUNTIME_CLASSES[prim])
+    else:
+        cls = _RUNTIME_CLASSES.get(primitive)
+        classes = [cls] if cls else []
+    allowed: set = set()
+    for cls in classes:
+        allowed |= set(getattr(cls, "CONSUMED_SEMANTIC_FIELDS", frozenset()))
+        allowed |= set(getattr(cls, "PROVENANCE_ONLY_SEMANTIC_FIELDS", frozenset()))
+    return allowed, classes
+
+
+def assert_target_semantic_field_coverage(contract: Mapping[str, Any]) -> dict[str, Any]:
+    """Fail closed (``TARGET_SEMANTIC_FIELD_UNSUPPORTED``) if the compiled target contract
+    authors a non-default semantic field the resolved runtime neither executes nor records
+    as provenance -- so an accepted field can never be silently ignored (RT-05).
+
+    Returns a coverage report on success.
+    """
+    primitive = str(contract.get("primitive") or "flip_within_horizon")
+    allowed, classes = _allowed_semantic_fields(primitive, contract)
+    if not classes:
+        raise TargetRuntimeError(f"UNKNOWN_TARGET_PRIMITIVE: {primitive!r}")
+
+    unsupported: list[str] = []
+    checked: list[dict] = []
+    for location, field, value in _semantic_field_sites(contract):
+        if _is_inert(field, value):
+            checked.append({"where": location, "field": field, "status": "inert_default"})
+            continue
+        if field not in allowed:
+            unsupported.append(
+                f"{location}.{field}={value!r} -- {primitive} runtime has no implementation "
+                f"for it (neither consumed nor provenance-only)"
+            )
+            continue
+        # Constrained-value check for any runtime class that supports only a subset.
+        for cls in classes:
+            svv = getattr(cls, "SUPPORTED_SEMANTIC_VALUES", {})
+            if field in svv and value not in svv[field]:
+                unsupported.append(
+                    f"{location}.{field}={value!r} -- {cls.__name__} supports only "
+                    f"{sorted(str(v) for v in svv[field])}"
+                )
+            if isinstance(value, Mapping):
+                for sub, allowed_vals in svv.items():
+                    if sub.startswith(field + "."):
+                        key = sub.split(".", 1)[1]
+                        if value.get(key) not in allowed_vals:
+                            unsupported.append(
+                                f"{location}.{sub}={value.get(key)!r} -- {cls.__name__} "
+                                f"supports only {sorted(str(v) for v in allowed_vals)}"
+                            )
+        checked.append({"where": location, "field": field, "status": "consumed_or_provenance"})
+
+    if unsupported:
+        raise TargetRuntimeError(
+            "TARGET_SEMANTIC_FIELD_UNSUPPORTED: the compiled target contract authors "
+            "semantic field(s) the runtime does not execute; reject them or implement "
+            f"the semantics before seal: {unsupported}"
+        )
+    return {"primitive": primitive, "runtime_classes": [c.__name__ for c in classes],
+            "allowed_fields": sorted(allowed), "checked": checked, "passed": True}
+
+
 def resolve_target_runtime(contract: Mapping[str, Any], *, legacy_mode: bool = False) -> TargetRuntime:
     primitive = contract.get("primitive")
     if primitive is None and legacy_mode:
@@ -532,4 +691,5 @@ def validate_target_parity(contract: Mapping[str, Any], rows: Iterable[Mapping[s
 
 __all__ = ["TargetRuntimeError", "TargetResult", "FlipTargetRuntime", "OrderedBarrierTargetRuntime",
            "CompositeTargetRuntime", "resolve_target_runtime", "resolve_target_runtime_closure",
+           "assert_target_semantic_field_coverage",
            "validate_target_parity", "POSITIVE", "NEGATIVE", "CENSORED", "PENDING", "NS"]
