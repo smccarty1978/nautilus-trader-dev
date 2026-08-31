@@ -4,6 +4,7 @@ Executes live ML research surface generation inside NautilusTrader event loop.
 """
 
 import hashlib
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -287,6 +288,10 @@ def build_collector_config_kwargs(
         cfg_kwargs["required_checkpoint_identities_path"] = (
             str(study_data.study_dir / rel) if rel else ""
         )
+    if hasattr(strategy_binding.config_cls, "required_checkpoint_identities_sha256"):
+        cfg_kwargs["required_checkpoint_identities_sha256"] = (
+            str(qualification.get("required_checkpoint_identities_sha256") or "")
+        )
     if hasattr(strategy_binding.config_cls, "episode_lifecycle"):
         # Compiled population_contract.episode_lifecycle -> generic population runtime.
         _pop = (study_data.contracts.get("population_contract", {}) or {})
@@ -448,6 +453,11 @@ def _execute_collect(
 
     # 8. Persist artifacts & update run manifests
         status_data = output_mgr.persist_collection(candidates_df, observations_df, snapshot)
+        allowlist_lineage = getattr(strategy, "_required_checkpoint_identities_lineage", None)
+        if allowlist_lineage is not None:
+            manifest = json.loads(output_mgr.manifest_path.read_text(encoding="utf-8"))
+            manifest["population_allowlist_lineage"] = allowlist_lineage
+            output_mgr.manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
     # 9. Print deterministic summary card
         print(f"""======================================================================

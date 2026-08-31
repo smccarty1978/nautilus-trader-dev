@@ -48,16 +48,22 @@ def resolve_modeling_closure(study_dir: str | Path, *, driver_relpaths: List[str
     roles, the seed, the fit call or the freeze call is inside the composite.
     """
     study_dir = Path(study_dir).resolve()
+    # Declaration is the authority; the detector below is only a fail-safe for
+    # undeclared participation / generated subprocess paths.
+    from research_workflow.modeling_drivers import assert_declared_modeling_drivers
+    declared = list(driver_relpaths or [])
+    assert_declared_modeling_drivers(study_dir, declared)
     seeds: List[Path] = [REPO_ROOT / rel for rel in _MODELING_API_SEEDS]
-    for rel in driver_relpaths or []:
-        seeds.append(study_dir / rel)
+    driver_files = [(study_dir / rel).resolve() for rel in declared]
+    # Shell wrappers are direct closure members but not Python AST seeds.
+    seeds.extend(p for p in driver_files if p.suffix == ".py")
 
     closure, unresolved = compute_ast_closure(seeds, REPO_ROOT)
     if unresolved:
         raise RuntimeError(f"MODELING_CLOSURE_UNRESOLVED: {unresolved}")
 
     file_sha256: Dict[str, str] = {}
-    for p in sorted(closure):
+    for p in sorted(set(closure) | set(driver_files)):
         try:
             rel = p.relative_to(REPO_ROOT).as_posix()
             key = f"repo:{rel}"
@@ -75,7 +81,7 @@ def resolve_modeling_closure(study_dir: str | Path, *, driver_relpaths: List[str
         "file_count": len(file_sha256),
         "file_sha256_map": file_sha256,
         "api_seeds": list(_MODELING_API_SEEDS),
-        "driver_seeds": list(driver_relpaths or []),
+        "driver_seeds": sorted(declared),
     }
 
 

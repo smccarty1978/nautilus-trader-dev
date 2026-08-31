@@ -7,6 +7,7 @@ and forward outcome observation inside the NT event loop on streaming bars.
 from __future__ import annotations
 
 import os
+import hashlib
 from collections import deque
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -201,6 +202,18 @@ class RegimeEngine:
         return self.regime
 
 
+def verify_checkpoint_identities_authority(path: str | Path, declared_sha256: str) -> Dict[str, str]:
+    """Verify allowlist bytes before any parquet decoder/candidate generation runs."""
+    resolved = Path(path).resolve()
+    actual = hashlib.sha256(resolved.read_bytes()).hexdigest()
+    if not declared_sha256 or actual != str(declared_sha256).lower():
+        raise RuntimeError(
+            "REQUIRED_CHECKPOINT_IDENTITIES_SHA256_MISMATCH: identity allowlist "
+            "content does not match the compiled population authority"
+        )
+    return {"path": str(resolved), "sha256": actual}
+
+
 class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
     instrument_id: str = "NQ.XCME"
     bar_type_1s: str = "NQ.XCME-1-SECOND-LAST-EXTERNAL"
@@ -222,6 +235,7 @@ class FlipPredictionCollectorConfig(StrategyConfig, frozen=True):
     # rediscover membership. Path is resolved relative to the study directory by the
     # generic config-kwargs builder; empty string disables this path entirely.
     required_checkpoint_identities_path: str = ""
+    required_checkpoint_identities_sha256: str = ""
     running_mfe_atr_gte: float = 1.0
     new_progress_windows_gte: int = 2
     retained_mfe_ratio_gte: float = 0.5
@@ -316,8 +330,13 @@ class FlipPredictionCollector(Strategy):
         # path that silently resolved to "no restriction" would collect an unbounded
         # population under a name that promises a specific, frozen one.
         self._required_identities: Optional[frozenset] = None
+        self._required_checkpoint_identities_lineage: Optional[Dict[str, str]] = None
         if config.required_checkpoint_identities_path:
-            ident_df = pd.read_parquet(config.required_checkpoint_identities_path)
+            self._required_checkpoint_identities_lineage = verify_checkpoint_identities_authority(
+                config.required_checkpoint_identities_path, config.required_checkpoint_identities_sha256,
+            )
+            allowlist_path = Path(self._required_checkpoint_identities_lineage["path"])
+            ident_df = pd.read_parquet(allowlist_path)
             missing_cols = {"regime_start_ns", "checkpoint_index"} - set(ident_df.columns)
             if missing_cols:
                 raise RuntimeError(

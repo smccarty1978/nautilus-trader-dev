@@ -57,7 +57,8 @@ def test_identity_allowlist_and_analysis_slice_keys_accepted():
 def test_identity_allowlist_not_combinable_with_established_filter():
     with pytest.raises(Exception, match="MUTUALLY_EXCLUSIVE"):
         PopulationQualificationSpec.model_validate(
-            {"required_checkpoint_identities_path": "x", "age_gate_seconds": 120}
+            {"required_checkpoint_identities_path": "x", "required_checkpoint_identities_sha256": "a" * 64,
+             "age_gate_seconds": 120}
         )
 
 

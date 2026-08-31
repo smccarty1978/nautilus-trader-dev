@@ -142,7 +142,9 @@ class PopulationQualificationSpec(BaseModel):
 
     # -- Group B: identity allowlist + its provenance ---------------------------
     required_checkpoint_identities_path: Optional[str] = Field(None, exclude_if=lambda v: v is None)
-    required_checkpoint_identities_sha256: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    required_checkpoint_identities_sha256: Optional[str] = Field(
+        None, pattern=r"^[0-9a-fA-F]{64}$", exclude_if=lambda v: v is None
+    )
     population_version: Optional[str] = Field(None, exclude_if=lambda v: v is None)
     selection: Optional[str] = Field(None, exclude_if=lambda v: v is None)
     stage1_score_threshold_source: Optional[str] = Field(None, exclude_if=lambda v: v is None)
@@ -159,12 +161,16 @@ class PopulationQualificationSpec(BaseModel):
         "established", "age_gate_seconds", "cadence_seconds", "running_mfe_atr_gte",
         "new_progress_windows_gte", "retained_mfe_ratio_gte",
     })
-    IDENTITY_ALLOWLIST_KEYS: ClassVar[frozenset] = frozenset({"required_checkpoint_identities_path"})
+    IDENTITY_ALLOWLIST_KEYS: ClassVar[frozenset] = frozenset({
+        "required_checkpoint_identities_path", "required_checkpoint_identities_sha256",
+    })
     RUNTIME_CONSUMED_KEYS: ClassVar[frozenset] = ESTABLISHED_FILTER_KEYS | IDENTITY_ALLOWLIST_KEYS
 
     @model_validator(mode="after")
     def validate_mutually_exclusive_population_tests(self) -> "PopulationQualificationSpec":
         if self.required_checkpoint_identities_path is not None:
+            if self.required_checkpoint_identities_sha256 is None:
+                raise ValueError("REQUIRED_CHECKPOINT_IDENTITIES_SHA256_REQUIRED")
             established_thresholds = [
                 k for k in ("age_gate_seconds", "running_mfe_atr_gte",
                             "new_progress_windows_gte", "retained_mfe_ratio_gte")
@@ -177,6 +183,8 @@ class PopulationQualificationSpec(BaseModel):
                     "qualification test applied when set; it may not be combined with the "
                     f"established-filter keys {established_thresholds} (RESEARCH_WORKFLOW.md §7)"
                 )
+        elif self.required_checkpoint_identities_sha256 is not None:
+            raise ValueError("REQUIRED_CHECKPOINT_IDENTITIES_PATH_REQUIRED")
         return self
 
 

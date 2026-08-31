@@ -26,6 +26,7 @@ RT-01 asks for.
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 from typing import Iterable, List
 
@@ -70,6 +71,93 @@ def _imports_governed_modeling(py_path: Path) -> bool:
     return False
 
 
+def _study_local_path(study: Path, source: Path, value: str) -> Path | None:
+    """Resolve a literal study-local module/script without guessing external imports."""
+    raw = Path(value)
+    candidates = []
+    if raw.suffix in {".py", ".sh"}:
+        candidates.extend([study / raw, source.parent / raw])
+    else:
+        dotted = value.replace(".", "/")
+        candidates.extend([study / f"{dotted}.py", study / dotted / "__init__.py"])
+        if value.startswith("implementation."):
+            candidates.append(study / f"{dotted}.py")
+    for candidate in candidates:
+        candidate = candidate.resolve()
+        try:
+            candidate.relative_to(study)
+        except ValueError:
+            continue
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _literal(node: ast.AST) -> str | None:
+    return node.value if isinstance(node, ast.Constant) and isinstance(node.value, str) else None
+
+
+def _executed_local_helpers(study: Path, path: Path) -> tuple[set[Path], list[str]]:
+    """Declared-driver detector: direct imports, literal dynamic imports and entrypoints.
+
+    This is deliberately a fail-safe detector, not dependency authority.  It recognizes
+    only literal local targets. A dynamic/non-literal execution path is itself rejected:
+    it cannot be closure-bound honestly.
+    """
+    if path.suffix == ".sh":
+        helpers, errors = set(), []
+        for line in path.read_text(encoding="utf-8").splitlines():
+            match = re.search(r"(?:python(?:3)?|py)\s+['\"]?([^'\"\s;]+)", line)
+            if match:
+                target = _study_local_path(study, path, match.group(1))
+                if target is None: errors.append(f"MODELING_DRIVER_SHELL_ENTRYPOINT_UNRESOLVED:{path.name}")
+                else: helpers.add(target)
+        return helpers, errors
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, ValueError):
+        return set(), [f"MODELING_DRIVER_UNPARSEABLE:{path}"]
+    helpers, errors = set(), []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                target = _study_local_path(study, path, alias.name)
+                if target: helpers.add(target)
+        elif isinstance(node, ast.ImportFrom) and node.level > 0:
+            for alias in node.names:
+                rel = ("." * node.level) + ((node.module + ".") if node.module else "") + alias.name
+                # Relative resolution is delegated to the normal AST closure; also bind
+                # the obvious sibling helper for the declaration detector.
+                target = _study_local_path(study, path, f"{alias.name}.py")
+                if target: helpers.add(target)
+        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            for alias in node.names:
+                target = _study_local_path(study, path, f"{node.module}.{alias.name}")
+                if target: helpers.add(target)
+        elif isinstance(node, ast.Call):
+            name = ""
+            if isinstance(node.func, ast.Attribute): name = node.func.attr
+            elif isinstance(node.func, ast.Name): name = node.func.id
+            if name in {"import_module", "__import__"}:
+                value = _literal(node.args[0]) if node.args else None
+                if value is None: errors.append(f"MODELING_DRIVER_DYNAMIC_IMPORT_UNRESOLVED:{path.name}")
+                else:
+                    target = _study_local_path(study, path, value)
+                    if target: helpers.add(target)
+            elif name in {"run", "call", "check_call", "check_output", "Popen"}:
+                if not node.args: continue
+                arg = node.args[0]
+                values = [ _literal(x) for x in arg.elts ] if isinstance(arg, (ast.List, ast.Tuple)) else []
+                if len(values) < 2 or any(v is None for v in values[1:]):
+                    errors.append(f"MODELING_DRIVER_SUBPROCESS_UNRESOLVED:{path.name}")
+                    continue
+                for value in values[1:]:
+                    target = _study_local_path(study, path, value)
+                    if target:
+                        helpers.add(target)
+    return helpers, errors
+
+
 def find_participating_modeling_modules(study_dir: str | Path) -> List[str]:
     """Study-relative posix paths of ``implementation/*.py`` modules that import a
     governed modeling API. ``__init__.py`` is skipped."""
@@ -94,7 +182,18 @@ def assert_declared_modeling_drivers(
 
     Returns the list of participating modules on success (may be empty).
     """
+    study = Path(study_dir).resolve()
     declared = {Path(str(r)).as_posix() for r in (declared_relpaths or [])}
+    declared_paths = set()
+    for rel in declared:
+        path = (study / rel).resolve()
+        try:
+            path.relative_to(study)
+        except ValueError as exc:
+            raise UndeclaredModelingDriverError(f"MODELING_DRIVER_PATH_ESCAPES_STUDY:{rel}") from exc
+        if not path.is_file():
+            raise UndeclaredModelingDriverError(f"MODELING_DRIVER_DECLARED_MISSING:{rel}")
+        declared_paths.add(path)
     participating = find_participating_modeling_modules(study_dir)
     undeclared = [rel for rel in participating if rel not in declared]
     if undeclared:
@@ -104,6 +203,28 @@ def assert_declared_modeling_drivers(
             f"execution.modeling_driver_relpaths: {undeclared}. Declare them in study.yaml "
             "(they then enter MODELING_EXECUTION_CLOSURE and a modeling-only edit stales "
             "the TRAIN freeze) or remove the governed import."
+        )
+    pending = list(declared_paths)
+    seen: set[Path] = set()
+    errors: list[str] = []
+    missing_helpers: list[str] = []
+    while pending:
+        path = pending.pop()
+        if path in seen: continue
+        seen.add(path)
+        helpers, scan_errors = _executed_local_helpers(study, path)
+        errors.extend(scan_errors)
+        for helper in helpers:
+            rel = helper.relative_to(study).as_posix()
+            if rel not in declared:
+                missing_helpers.append(rel)
+            else:
+                pending.append(helper)
+    if errors or missing_helpers:
+        raise UndeclaredModelingDriverError(
+            "MODELING_DRIVER_UNDECLARED: declared modeling execution reaches undeclared "
+            f"helper(s) {sorted(set(missing_helpers))} or unresolvable dynamic/subprocess "
+            f"entrypoint(s) {sorted(set(errors))}"
         )
     return participating
 
