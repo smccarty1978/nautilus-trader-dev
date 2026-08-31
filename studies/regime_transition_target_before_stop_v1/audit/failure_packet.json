@@ -1,0 +1,29 @@
+{
+  "status": "BLOCKED",
+  "preflight_run_id": "20260831T201352Z_ae2d36c1453d",
+  "generated_at_utc": "2026-08-31T20:13:52.407937+00:00",
+  "code_hash": "ae2d36c1453d704d1bfb03265101da73eb87dfc3798a856a2385a6e10f6ee91a",
+  "superseded": true,
+  "failed_gate": "RESEARCH_DECISION_FIDELITY",
+  "failure_ids": [
+    "RESEARCH_DECISION_FIDELITY_MISMATCH"
+  ],
+  "failure_details": [
+    {
+      "message": "  [CRITICAL] UNKNOWN_PROHIBITION: research_decision.yaml specifies unrecognized prohibited_change: 'Silently modifying checkpoint cadence or qualification criteria' (known: ['broaden_arm_c_into_a_feature_mining_pass', 'change_feature_surface_after_seeing_predictive_performance', 'change_target_after_seeing_predictive_performance', 'coerce_censored_target_rows_to_negative', 'expand_to_full_feature_registry', 'expansion_beyond_authorized_dates', 'introduce_unconstrained_search', 'modify_baseline_top25', 'replace_frozen_top25', 'rerank_baseline_features', 'retrain_or_reselect_stage1', 'unauthorized_feature_discovery', 'use_2024_2025_2026_for_feature_selection', 'use_2024_2025_2026_for_population_definition', 'use_2024_2025_2026_for_target_selection', 'use_2024_to_change_model_design'])"
+    },
+    {
+      "message": "  [CRITICAL] UNKNOWN_PROHIBITION: research_decision.yaml specifies unrecognized prohibited_change: 'Conditioning candidate selection on future outcomes, MFE, MAE, or regime flip' (known: ['broaden_arm_c_into_a_feature_mining_pass', 'change_feature_surface_after_seeing_predictive_performance', 'change_target_after_seeing_predictive_performance', 'coerce_censored_target_rows_to_negative', 'expand_to_full_feature_registry', 'expansion_beyond_authorized_dates', 'introduce_unconstrained_search', 'modify_baseline_top25', 'replace_frozen_top25', 'rerank_baseline_features', 'retrain_or_reselect_stage1', 'unauthorized_feature_discovery', 'use_2024_2025_2026_for_feature_selection', 'use_2024_2025_2026_for_population_definition', 'use_2024_2025_2026_for_target_selection', 'use_2024_to_change_model_design'])"
+    },
+    {
+      "message": "  [CRITICAL] UNKNOWN_PROHIBITION: research_decision.yaml specifies unrecognized prohibited_change: 'Accessing 2024 OOS partition before TRAIN freeze and authorization' (known: ['broaden_arm_c_into_a_feature_mining_pass', 'change_feature_surface_after_seeing_predictive_performance', 'change_target_after_seeing_predictive_performance', 'coerce_censored_target_rows_to_negative', 'expand_to_full_feature_registry', 'expansion_beyond_authorized_dates', 'introduce_unconstrained_search', 'modify_baseline_top25', 'replace_frozen_top25', 'rerank_baseline_features', 'retrain_or_reselect_stage1', 'unauthorized_feature_discovery', 'use_2024_2025_2026_for_feature_selection', 'use_2024_2025_2026_for_population_definition', 'use_2024_2025_2026_for_target_selection', 'use_2024_to_change_model_design'])"
+    },
+    {
+      "message": "  [CRITICAL] UNKNOWN_PROHIBITION: research_decision.yaml specifies unrecognized prohibited_change: 'Accessing prohibited 2025 or 2026 data' (known: ['broaden_arm_c_into_a_feature_mining_pass', 'change_feature_surface_after_seeing_predictive_performance', 'change_target_after_seeing_predictive_performance', 'coerce_censored_target_rows_to_negative', 'expand_to_full_feature_registry', 'expansion_beyond_authorized_dates', 'introduce_unconstrained_search', 'modify_baseline_top25', 'replace_frozen_top25', 'rerank_baseline_features', 'retrain_or_reselect_stage1', 'unauthorized_feature_discovery', 'use_2024_2025_2026_for_feature_selection', 'use_2024_2025_2026_for_population_definition', 'use_2024_2025_2026_for_target_selection', 'use_2024_to_change_model_design'])"
+    }
+  ],
+  "recommended_smallest_investigation_scope": "Inspect findings in RESEARCH_DECISION_FIDELITY and fix locally before requesting audit.",
+  "superseded_by_preflight_run_id": "20260831T205323Z_5be0df2bc27b",
+  "superseded_at_utc": "2026-08-31T20:53:23.328589+00:00",
+  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+}

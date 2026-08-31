@@ -170,3 +170,62 @@ def test_workflow_state_none_without_analysis(tmp_path):
     from research_workflow.workflow_engine import WorkflowEngine
 
     assert WorkflowEngine(s)._state("COMPLETE")["oos_analysis_state"] is None
+
+
+# --------------------------------------------------------------------------- #
+# Fix 3 -- TRAIN-only Stage 17 decisions must be anchored, never blindly FRESH
+# --------------------------------------------------------------------------- #
+def _stage17(s: Path, body: dict) -> None:
+    (s / "artifacts" / "research_decision_stage17.json").write_text(json.dumps(
+        {"schema_version": 1, "artifact_kind": "research_decision_stage17", "stage": 17,
+         "study_id": s.name, "terminal_decision": "PASS", **body}))
+
+
+def test_stage17_empty_bound_lineage_is_invalid(tmp_path):
+    from research_workflow.oos_analysis_lineage import classify_stage17_decision
+    s = _study(tmp_path)
+    _freeze(s)
+    _stage17(s, {"bound_lineage": {}})
+    v = classify_stage17_decision(s)
+    assert v["state"] == "INVALID" and "empty bound_lineage" in v["reasons"][0]
+    _stage17(s, {})  # no bound_lineage key at all
+    assert classify_stage17_decision(s)["state"] == "INVALID"
+
+
+def test_train_only_stage17_missing_required_anchor_is_invalid(tmp_path):
+    from research_workflow.oos_analysis_lineage import classify_stage17_decision
+    s = _study(tmp_path)
+    _freeze(s, internal="freeze-x", modeling="mec-x")
+    # everything but modeling_execution_closure
+    _stage17(s, {"bound_lineage": {
+        "train_freeze_sha256": "freeze-x", "model_ids": ["m-123"],
+        "authorization_sha256": "a"}})
+    v = classify_stage17_decision(s)
+    assert v["state"] == "INVALID" and "modeling_execution_closure" in v["reasons"][0]
+
+
+def test_train_only_stage17_with_minimum_anchors_is_fresh(tmp_path):
+    from research_workflow.oos_analysis_lineage import classify_stage17_decision
+    s = _study(tmp_path)
+    _freeze(s, internal="freeze-x", modeling="mec-x")
+    _stage17(s, {"bound_lineage": {
+        "train_freeze_sha256": "freeze-x",
+        "model_ids": ["m-123"],
+        "modeling_execution_closure_sha256": "mec-x",
+        "authorization_sha256": "a"}})
+    assert classify_stage17_decision(s)["state"] == "FRESH"
+
+
+def test_train_only_stage17_goes_stale_when_train_freeze_rewritten(tmp_path):
+    from research_workflow.oos_analysis_lineage import classify_stage17_decision
+    s = _study(tmp_path)
+    _freeze(s, internal="freeze-x", modeling="mec-x")
+    _stage17(s, {"bound_lineage": {
+        "train_freeze_sha256": "freeze-x",
+        "model_ids": ["m-123"],
+        "modeling_execution_closure_sha256": "mec-x",
+        "authorization_sha256": "a"}})
+    assert classify_stage17_decision(s)["state"] == "FRESH"
+    _freeze(s, internal="freeze-y", modeling="mec-x")  # re-freeze TRAIN
+    v = classify_stage17_decision(s)
+    assert v["state"] == "STALE" and any("TRAIN freeze changed" in r for r in v["reasons"])

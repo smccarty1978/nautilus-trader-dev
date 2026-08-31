@@ -1,0 +1,199 @@
+study:
+  id: regime_transition_target_before_stop_v1
+  type: bespoke
+  risk_tier: 2
+  description: NQ Regime-Transition Research Study 2. Evaluates whether causal information
+    available at candidate time T discriminates regime-transition candidates whose
+    subsequent path reaches a favorable target (+1.00 ATR) before hitting a predefined
+    adverse stop (0.50, 1.00, 1.50 ATR) within 300 seconds on fully-forward sparse
+    trade-bearing 1s LAST bars (1-SECOND-LAST-EXTERNAL).
+operation:
+  kind: train_evaluate
+  target_metric: pr_auc
+instrument:
+  symbol: NQ
+  venue: XCME
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+  qualification:
+    established: true
+    age_gate_seconds: 120
+    cadence_seconds: 5
+    running_mfe_atr_gte: 1.0
+    new_progress_windows_gte: 2
+    retained_mfe_ratio_gte: 0.5
+target:
+  type: composite
+  conditions:
+  - id: barrier_tp_1_0_sl_1_0
+    kind: ordered_barrier
+    forward_outcome_id: target_before_stop_300s
+    barrier_id: barrier_tp_1_0_sl_1_0
+  required_forward_outcomes:
+  - id: target_before_stop_300s
+    entry_reference: next_bar_open
+    horizon_seconds: 300
+    max_tracking_seconds: 300
+    excursion_units:
+    - atr
+    bar_inclusion: fully_forward
+    session_end_censoring: true
+    atr_source: latest_causally_completed_1m_wilder_atr_14_available_at_T
+    atr_frozen_at: decision_ts
+    ordered_barriers:
+    - id: barrier_tp_1_0_sl_0_5
+      favorable_atr: 1.0
+      adverse_atr: 0.5
+      horizon_seconds: 300
+    - id: barrier_tp_1_0_sl_1_0
+      favorable_atr: 1.0
+      adverse_atr: 1.0
+      horizon_seconds: 300
+    - id: barrier_tp_1_0_sl_1_5
+      favorable_atr: 1.0
+      adverse_atr: 1.5
+      horizon_seconds: 300
+  decision_reference: decision_ts
+features:
+  source: canonical_verified_definition_universe
+  selection:
+    mode: none
+    source: canonical_verified_definition_universe
+    feature_count: 13
+    direction_specific: false
+    ranking_method: frozen_train_only_temporal_rank
+  instances:
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: rolling_retention_ratio
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_current_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_max_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_giveback_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: arrival_velocity
+    parameters:
+      input_timeframe: 1s
+      lookback: 20
+      bar_state: completed
+  - feature: arrival_acceleration
+    parameters:
+      input_timeframe: 1s
+      short_lookback: 20
+      bar_state: completed
+  - feature: ema_slope
+    parameters:
+      ema_role: short
+      lookback: 20
+  timing_contract: verified
+  metadata_columns:
+  - observation_ts
+  - regime_start_ns
+  - checkpoint_index
+  - regime_age_seconds
+  - running_mfe_atr
+  - new_progress_windows
+  - retained_mfe_ratio
+model:
+  mode: training
+  family: lightgbm
+  arms:
+  - BASELINE_13_RAW
+  params:
+    n_estimators: 200
+    learning_rate: 0.05
+    max_depth: 3
+    num_leaves: 8
+    verbosity: -1
+    random_state: 42
+    deterministic: true
+    n_jobs: 1
+chronology:
+  train:
+  - 2021
+  - 2022
+  - 2023
+  dev:
+  - 2024
+  prohibited:
+  - 2025
+  - 2026
+  warmup:
+    days_before_partition: 1
+    allowed: true
+    candidate_emission: false
+    target_generation: false
+    permitted_partition_relationship: pre_train_only
+stratification: {}
+baseline: {}
+lineage: {}
+execution:
+  runtime: nautilustrader
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
+  data_requirements:
+    dataset_id: NQ_v0_2020_2026
+  progress_seconds: 30
+  bounded: true
+acceptance:
+  criteria:
+    C1: 'Ordered-barrier runtime binding: compiled ordered_barrier target primitive
+      resolves to OrderedBarrierTargetRuntime'
+    C2: Three predefined target-before-stop arms (TP 1.0/SL 0.5, TP 1.0/SL 1.0, TP
+      1.0/SL 1.5) bound under causal ATR freeze at T and next_bar_open entry reference
+    C3: Zero disposition/label/censoring divergence between runtime and independent
+      replay oracle on synthetic ordered-barrier fixtures
+    C4: Separate LONG/SHORT models trained across 2021-2023 without 2024 leakage
+    C5: First-fire / regime-level actionable score evaluation defined strictly on
+      TRAIN
+bespoke:
+  reason: Economic-quality classification research study predicting asymmetric ordered-barrier
+    target-before-stop outcomes (+1.00 ATR favorable vs 0.5/1.0/1.5 ATR adverse stops
+    within 300s) on fully-forward 1s bars rather than binary regime flips.
+  unsupported_contract_element: Pure asymmetric ordered-barrier race target unconditioned
+    on subsequent regime flip event
+  canonical_type_considered: flip_prediction
+  reusable_extension_considered: Reused governed GenericStudyCollector and OrderedBarrierTargetRuntime;
+    bespoke used strictly for schema typing since flip_prediction compiler expects
+    a flip condition in composite targets.
+  custom_scope:
+  - implementation/target_before_stop_diagnostics.py

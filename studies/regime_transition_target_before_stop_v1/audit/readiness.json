@@ -1,0 +1,140 @@
+{
+  "dataset_id": "NQ_v0_2020_2026",
+  "feature_authority": "active",
+  "generated_at_utc": "2026-08-31T20:19:37.006488+00:00",
+  "overall_status": "PASS",
+  "prepared_execution_identity": "5d70077b5199c398846b755b89cbdfd698aa93f0a1562a65d9757e850a3e37c5",
+  "r10_real_nonempty_output_parity": {
+    "candidate_rows_observed": 1,
+    "code": "REAL_NONEMPTY_OUTPUT_PARITY",
+    "detail": "first real non-empty candidate surface is contained in OutputManager's resolved collection universe",
+    "emitted_feature_count": 13,
+    "emitted_features": [
+      "arrival_acceleration",
+      "arrival_velocity",
+      "ema_slope",
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_giveback_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_retention_ratio"
+    ],
+    "metadata_count": 8,
+    "passed": true,
+    "recognized_metadata_columns": [
+      "checkpoint_index",
+      "new_progress_windows",
+      "observation_ts",
+      "regime_age_seconds",
+      "regime_start_ns",
+      "retained_mfe_ratio",
+      "running_mfe_atr",
+      "triggering_1s_ts_init"
+    ],
+    "resolved_universe_count": 13,
+    "unexpected_columns": []
+  },
+  "r1_dataset_identity": {
+    "code": "DATASET_IDENTITY_OK",
+    "dataset_spec_dataset_id": "NQ_v0_2020_2026",
+    "declared_dataset_id": "NQ_v0_2020_2026",
+    "detail": "declared dataset_id == DatasetSpec authority == resolved catalog == CausalDataLoader.catalog_path == actual catalog on disk",
+    "passed": true,
+    "resolved_catalog_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+    "run_end": "2023-03-03T23:59:59.999999999+00:00",
+    "warmup_start": "2023-02-26T00:00:00+00:00"
+  },
+  "r2_1m_timestamp": {
+    "code": "TIMESTAMP_CONTRACT_OK",
+    "detail": "1m: ts_init - ts_event == 60000000000 for all 200 sampled bars",
+    "expected_delta_ns": 60000000000,
+    "passed": true,
+    "sampled": 200,
+    "stream": "1m"
+  },
+  "r2_1s_timestamp": {
+    "code": "TIMESTAMP_CONTRACT_OK",
+    "detail": "1s: ts_init - ts_event == 1000000000 for all 200 sampled bars",
+    "expected_delta_ns": 1000000000,
+    "passed": true,
+    "sampled": 200,
+    "stream": "1s"
+  },
+  "r2_derived_5m": {
+    "code": "DERIVED_5M_PATH_OK",
+    "completed_5m_count": 264,
+    "detail": "CompletedMinuteFiveMinuteAggregator produced 264 completed 5m bar(s) from 1321 completed 1m parents; no external 5m catalog stream opened",
+    "passed": true,
+    "source_1m_count": 1321
+  },
+  "r3_instrument_precision": {
+    "code": "INSTRUMENT_PRECISION_OK",
+    "detail": "loaded bars are precision-compatible with the governed instrument definition",
+    "instrument_id": "NQ.XCME",
+    "passed": true,
+    "price_increment": "0.25",
+    "price_precision": 2
+  },
+  "r4_callback_order": {
+    "code": "CALLBACK_ORDER_OK",
+    "detail": "no causal inversions across 259559 recorded (ts_init, timeframe) callbacks",
+    "events": 259559,
+    "passed": true,
+    "probe_1m_events": 6899,
+    "probe_1s_events": 252660
+  },
+  "r5_real_collector": {
+    "code": "REAL_COLLECTOR_INSTANTIATED",
+    "collector_class": "FlipPredictionCollector",
+    "detail": "constructor + phase0 authorization succeeded",
+    "passed": true
+  },
+  "r6_output_interface": {
+    "code": "OUTPUT_INTERFACE_OK",
+    "collector_class": "FlipPredictionCollector",
+    "detail": "real collector implements the candidates/observations extraction interface",
+    "passed": true
+  },
+  "r7_synthetic_schema": {
+    "code": "SYNTHETIC_SCHEMA_OK",
+    "detail": "synthetic candidate/observation fixture validated through the real OutputManager path (schema, feature source, metadata, candidate key, observation key)",
+    "feature_checked": "arrival_acceleration",
+    "passed": true,
+    "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\regime_transition_target_before_stop_v1\\_work\\readiness_schema_fixture\\20260831_201933_regime_transition_target_before_stop_v1_day",
+    "run_id": "20260831_201933_regime_transition_target_before_stop_v1_day"
+  },
+  "r8_double_identity": {
+    "code": "IDENTITY_STABLE",
+    "composite_sha256": "5d70077b5199c398846b755b89cbdfd698aa93f0a1562a65d9757e850a3e37c5",
+    "coverage_pct": 100.0,
+    "detail": "execution identity resolved twice with exact equality",
+    "files_resolved": 144,
+    "passed": true,
+    "unresolved_dependencies": []
+  },
+  "r9_alternate_opener": {
+    "code": "NO_ALTERNATE_CATALOG_OPENERS",
+    "detail": "zero alternate catalog openers under studies/<study>/**/*.py",
+    "passed": true,
+    "violations": 0
+  },
+  "required_gates": {
+    "code": "REQUIRED_GATES_SATISFIED",
+    "detail": "0 gate(s) evaluated",
+    "gates": [],
+    "passed": true
+  },
+  "resolved_catalog": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026",
+  "run_window": {
+    "end_date": "2023-03-03",
+    "stage": "day",
+    "start_date": "2023-03-03"
+  },
+  "schema_version": 1,
+  "study": "regime_transition_target_before_stop_v1"
+}

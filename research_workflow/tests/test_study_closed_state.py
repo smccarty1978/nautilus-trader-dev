@@ -92,16 +92,61 @@ def test_closed_short_circuits_train_authorization(tmp_path):
 
 # 2 -----------------------------------------------------------------------------
 def test_closed_short_circuits_oos_branches(tmp_path):
+    import hashlib
     study = _study_at_train_gate(tmp_path)
     # make the study otherwise land on an OOS branch
-    (study / "artifacts" / "train_experiment_freeze.json").write_text(
-        json.dumps({"partition": "train", "authorization_sha256": "x"}))
+    freeze_p = study / "artifacts" / "train_experiment_freeze.json"
+    freeze_p.write_text(json.dumps({"partition": "train", "authorization_sha256": "x"}))
     (study / "artifacts" / "experiment_authorization.json").write_text(
         json.dumps({"schema_version": 1, "study_id": study.name}))
-    _write_closure(study, _closure(study))
+    seal_p = study / "artifacts" / "preexec_audit_seal.json"
+    # The study reached TRAIN: its closure must now bind the mandatory terminal evidence.
+    _write_closure(study, _closure(study, bound_evidence={
+        "train_freeze_sha256": hashlib.sha256(freeze_p.read_bytes()).hexdigest(),
+        "preexec_seal_artifact_sha256": hashlib.sha256(seal_p.read_bytes()).hexdigest(),
+    }))
     result = WorkflowEngine(study, actions=_actions()).advance()
     assert result["terminal_state"] == "STUDY_CLOSED"
     assert result["next_deterministic_action"] is None
+
+
+def test_train_reached_closure_with_empty_bound_evidence_is_invalid(tmp_path):
+    """Fix 1: a study that reached TRAIN cannot close behind an evidence-free closure."""
+    study = _study_at_train_gate(tmp_path)
+    (study / "artifacts" / "train_experiment_freeze.json").write_text(
+        json.dumps({"partition": "train", "authorization_sha256": "x"}))
+    _write_closure(study, _closure(study))  # no bound_evidence
+    result = WorkflowEngine(study, actions=_actions()).advance()
+    assert result["terminal_state"] == "STUDY_CLOSURE_INVALID"
+    assert "STUDY_CLOSURE_EVIDENCE_MISSING" in result["blockers"][0]["detail"]
+
+    _write_closure(study, _closure(study, bound_evidence={}))
+    result = WorkflowEngine(study, actions=_actions()).advance()
+    assert result["terminal_state"] == "STUDY_CLOSURE_INVALID"
+    assert "STUDY_CLOSURE_EVIDENCE_MISSING" in result["blockers"][0]["detail"]
+
+
+def test_train_reached_closure_missing_one_mandatory_key_is_invalid(tmp_path):
+    """Fix 1: binding the TRAIN freeze but not the present preexec seal still fails."""
+    import hashlib
+    study = _study_at_train_gate(tmp_path)
+    freeze_p = study / "artifacts" / "train_experiment_freeze.json"
+    freeze_p.write_text(json.dumps({"partition": "train"}))
+    _write_closure(study, _closure(study, bound_evidence={
+        "train_freeze_sha256": hashlib.sha256(freeze_p.read_bytes()).hexdigest(),
+    }))
+    result = WorkflowEngine(study, actions=_actions()).advance()
+    assert result["terminal_state"] == "STUDY_CLOSURE_INVALID"
+    assert "preexec seal" in result["blockers"][0]["detail"]
+
+
+def test_pre_execution_closure_needs_no_terminal_evidence(tmp_path):
+    """Fix 1: a study closed before any governed execution stage is unaffected."""
+    study = _study_at_train_gate(tmp_path)
+    assert not (study / "artifacts" / "train_experiment_freeze.json").exists()
+    _write_closure(study, _closure(study))  # no bound_evidence, nothing reached
+    result = WorkflowEngine(study, actions=_actions()).advance()
+    assert result["terminal_state"] == "STUDY_CLOSED"
 
 
 # 3 -----------------------------------------------------------------------------

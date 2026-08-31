@@ -46,24 +46,68 @@ def test_valid_primary_passes_but_unassessed_is_not_scientific_approval():
         assert_scientific_status_reusable({"model_id": "m"})
 
 
-def test_status_assignment_preserves_model_identity_and_binds_evidence(tmp_path):
-    study, rec = _persist_lgbm(tmp_path)
-    decision = tmp_path / "decision.json"
-    decision_body = {"study_id": "s", "decision": "valid"}
-    decision_body["decision_identity_sha256"] = canonical_sha256(decision_body)
+def _write_canonical_closure(study, rec, *, extra_bound=None):
+    """Write the source study's own artifacts/study_closure.json + Stage 17 decision."""
+    import hashlib
+    arts = study / "artifacts"; arts.mkdir(parents=True, exist_ok=True)
+    decision = arts / "research_decision_stage17.json"
+    decision_body = {"schema_version": 1, "artifact_kind": "research_decision_stage17", "stage": 17,
+                     "study_id": study.name, "terminal_decision": "valid",
+                     "bound_lineage": {
+                         "train_freeze_sha256": "synthetic-train-freeze",
+                         "model_ids": [rec["model_id"]],
+                         "modeling_execution_closure_sha256": "synthetic-modeling-closure",
+                         "authorization_sha256": "synthetic-auth"}}
+    decision_body["decision_identity_sha256"] = canonical_sha256(
+        {k: v for k, v in decision_body.items() if k != "decision_identity_sha256"})
     decision.write_text(json.dumps(decision_body))
-    closure = tmp_path / "closure.json"
-    closure_body = {"status": "CLOSED", "study_id": "s", "model_ids": [rec["model_id"]],
-                    "bound_evidence": {"stage17_research_decision": {
-                        "path": "decision.json", "sha256": __import__("hashlib").sha256(decision.read_bytes()).hexdigest()}}}
+    bound = {"stage17_research_decision": {
+        "path": "artifacts/research_decision_stage17.json",
+        "sha256": hashlib.sha256(decision.read_bytes()).hexdigest()}}
+    bound.update(extra_bound or {})
+    closure = arts / "study_closure.json"
+    closure_body = {"schema_version": 1, "study_id": study.name, "status": "CLOSED",
+                    "outcome": "DIAGNOSTIC_POSITIVE", "terminal_decision": "valid",
+                    "model_ids": [rec["model_id"]], "bound_evidence": bound}
     closure_body["closure_identity_sha256"] = canonical_sha256(closure_body)
     closure.write_text(json.dumps(closure_body))
+    return closure, decision
+
+
+def test_status_assignment_preserves_model_identity_and_binds_evidence(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    closure, decision = _write_canonical_closure(study, rec)
     updated = assign_scientific_status(model_id=rec["model_id"], registry_root=study.parent / "model_registry",
                                        scientific_status="VALID_PRIMARY", closure_evidence_path=closure,
                                        decision_evidence_path=decision)
     assert updated["model_id"] == rec["model_id"]
     assert updated["artifact_sha256"] == rec["artifact_sha256"]
     assert updated["scientific_status_audit_history"][-1]["closure_evidence_sha256"]
+
+
+def test_status_assignment_rejects_noncanonical_closure_copy(tmp_path):
+    """Fix 2: a self-consistent closure file placed anywhere but the study's own
+    artifacts/study_closure.json cannot authorize promotion."""
+    study, rec = _persist_lgbm(tmp_path)
+    canonical_closure, decision = _write_canonical_closure(study, rec)
+    copy = tmp_path / "elsewhere_study_closure.json"
+    copy.write_text(canonical_closure.read_text())
+    with pytest.raises(ModelArtifactError, match="CLOSURE_NOT_CANONICAL"):
+        assign_scientific_status(model_id=rec["model_id"], registry_root=study.parent / "model_registry",
+                                 scientific_status="VALID_PRIMARY", closure_evidence_path=copy,
+                                 decision_evidence_path=decision)
+
+
+def test_status_assignment_rejects_model_id_not_in_closure_evidence(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    closure, decision = _write_canonical_closure(study, rec)
+    body = json.loads(closure.read_text()); body["model_ids"] = ["some_other_model"]
+    body["closure_identity_sha256"] = canonical_sha256({k: v for k, v in body.items() if k != "closure_identity_sha256"})
+    closure.write_text(json.dumps(body))
+    with pytest.raises(ModelArtifactError, match="CLOSURE_MODEL_UNBOUND"):
+        assign_scientific_status(model_id=rec["model_id"], registry_root=study.parent / "model_registry",
+                                 scientific_status="VALID_PRIMARY", closure_evidence_path=closure,
+                                 decision_evidence_path=decision)
 
 
 def test_loadable_joblib_golden_mismatch_never_uses_native_fallback(tmp_path):

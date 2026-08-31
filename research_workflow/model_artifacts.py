@@ -208,32 +208,67 @@ def assign_scientific_status(*, model_id: str, registry_root: str | Path, scient
     if not closure.is_file() or not decision.is_file(): raise ModelArtifactError("SCIENTIFIC_STATUS_EVIDENCE_MISSING")
     record = json.loads(path.read_text(encoding="utf-8"))
     if record.get("model_id") != model_id: raise ModelArtifactError("SCIENTIFIC_STATUS_MODEL_ID_MISMATCH")
+    source_study_id = record.get("study_id")
+    if not source_study_id:
+        raise ModelArtifactError("SCIENTIFIC_STATUS_SOURCE_STUDY_UNKNOWN")
+
+    # Promotion authority is the CANONICAL governed closure of the source study --
+    # ``<studies>/<study_id>/artifacts/study_closure.json`` -- never a copy elsewhere.
+    study_dir = (registry.parent / str(source_study_id)).resolve()
+    canonical_closure = (study_dir / "artifacts" / "study_closure.json").resolve()
+    if closure != canonical_closure:
+        raise ModelArtifactError(
+            "SCIENTIFIC_STATUS_CLOSURE_NOT_CANONICAL: promotion requires the source study's "
+            f"own artifacts/study_closure.json ({canonical_closure}), not {closure}"
+        )
+
+    # Full terminal-closure authentication: schema, CLOSED, study_id == dir, declared
+    # closure identity, and every bound-evidence artifact (seal / TRAIN freeze / Stage 16
+    # freshness / Stage 17 freshness / reconciliation / model artifacts).
+    from research_workflow.study_closure import StudyClosureInvalid, load_study_closure
     try:
-        closure_body = json.loads(closure.read_text(encoding="utf-8"))
+        closure_body = load_study_closure(study_dir)
+    except StudyClosureInvalid as exc:
+        raise ModelArtifactError(f"SCIENTIFIC_STATUS_CLOSURE_NOT_AUTHENTICATED: {exc}") from exc
+    if not isinstance(closure_body, dict):
+        raise ModelArtifactError("SCIENTIFIC_STATUS_CLOSURE_NOT_AUTHENTICATED: no closure record")
+    try:
         decision_body = json.loads(decision.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ModelArtifactError("SCIENTIFIC_STATUS_EVIDENCE_MALFORMED") from exc
-    if closure_body.get("status") != "CLOSED" or closure_body.get("study_id") != record.get("study_id"):
-        raise ModelArtifactError("SCIENTIFIC_STATUS_CLOSURE_NOT_AUTHENTICATED")
-    model_ids = set(closure_body.get("model_ids") or (closure_body.get("bound_evidence") or {}).get("model_ids") or ())
-    if model_id not in model_ids:
+    if closure_body.get("study_id") != source_study_id or study_dir.name != source_study_id:
+        raise ModelArtifactError("SCIENTIFIC_STATUS_CLOSURE_STUDY_ID_MISMATCH")
+
+    # model_id must be named in the authoritative closure evidence.
+    bound_evidence = closure_body.get("bound_evidence") or {}
+    named_models = set(closure_body.get("model_ids") or ()) | set(bound_evidence.get("model_ids") or ())
+    for container in (closure_body.get("models"), bound_evidence.get("refreshed_model_ids"),
+                      closure_body.get("bound_evidence", {}).get("refreshed_model_ids")):
+        if isinstance(container, Mapping):
+            for v in container.values():
+                if isinstance(v, Mapping) and v.get("model_id"): named_models.add(v["model_id"])
+                elif isinstance(v, str): named_models.add(v)
+    if model_id not in named_models:
         raise ModelArtifactError("SCIENTIFIC_STATUS_CLOSURE_MODEL_UNBOUND")
-    bound = (closure_body.get("bound_evidence") or {}).get("stage17_research_decision")
+
+    # Stage 17 decision must be bound by the closure, resolve to the canonical decision
+    # artifact, match byte-for-byte, and be internally self-consistent.
+    bound = bound_evidence.get("stage17_research_decision")
     if not isinstance(bound, Mapping) or not bound.get("path") or not bound.get("sha256"):
         raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_UNBOUND")
-    study_root = closure.parent.parent if closure.parent.name == "artifacts" else closure.parent
+    canonical_decision = (study_dir / "artifacts" / "research_decision_stage17.json").resolve()
     bound_path = Path(str(bound["path"]))
-    resolved_candidates = {
-        bound_path.resolve() if bound_path.is_absolute() else (closure.parent / bound_path).resolve(),
-        (study_root / bound_path).resolve(),
-    }
-    if decision not in resolved_candidates or _sha(decision) != bound.get("sha256"):
+    resolved_bound = bound_path.resolve() if bound_path.is_absolute() else (study_dir / bound_path).resolve()
+    if decision != canonical_decision or resolved_bound != canonical_decision or _sha(decision) != bound.get("sha256"):
         raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_BINDING_MISMATCH")
+    if decision_body.get("study_id") != source_study_id:
+        raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_STUDY_ID_MISMATCH")
     declared_decision_identity = decision_body.get("decision_identity_sha256")
-    if declared_decision_identity:
-        computed = canonical_sha256({k: v for k, v in decision_body.items() if k != "decision_identity_sha256"})
-        if computed != declared_decision_identity:
-            raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_IDENTITY_MISMATCH")
+    if not declared_decision_identity:
+        raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_IDENTITY_MISSING")
+    computed = canonical_sha256({k: v for k, v in decision_body.items() if k != "decision_identity_sha256"})
+    if computed != declared_decision_identity:
+        raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_IDENTITY_MISMATCH")
     declared_closure_identity = closure_body.get("closure_identity_sha256")
     if declared_closure_identity:
         computed = canonical_sha256({k: v for k, v in closure_body.items() if k != "closure_identity_sha256"})

@@ -34,18 +34,36 @@ def test_synthetic_closed_model_reuse_without_runtime_code_change(tmp_path):
     parity=validate_target_parity({"primitive":"ordered_barrier"}, [{"candidate":{"observation_ts":0,"horizon_end_ts":1,"entry_price":100.,"atr":1.,"direction":1,"favorable_atr":1.,"adverse_atr":1.},"events":[{"ts":1,"high":101.,"low":100.}],"actual":{"disposition":"POSITIVE","label":1}}])
     assert parity["passed"]
     source.joinpath("artifacts").mkdir(exist_ok=True)
-    decision_p = source.joinpath("artifacts/research_decision_stage17.json")
-    decision_body = {"study_id": "source", "terminal_decision": "ship_it"}
-    from research.analysis.identity import canonical_sha256
-    decision_body["decision_identity_sha256"] = canonical_sha256(decision_body)
-    decision_p.write_text(json.dumps(decision_body))
     import hashlib
+    from research.analysis.identity import canonical_sha256
+    freeze_p = source.joinpath("artifacts/train_experiment_freeze.json")
+    freeze_sha = hashlib.sha256(freeze_p.read_bytes()).hexdigest()
+    _freeze_json = json.loads(freeze_p.read_text())
+    _modeling_closure = (
+        (_freeze_json.get("stage_scoped_lineage") or {}).get("MODELING_EXECUTION_CLOSURE")
+        or "synthetic-modeling-closure"
+    )
+    decision_p = source.joinpath("artifacts/research_decision_stage17.json")
+    decision_body = {
+        "schema_version": 1, "artifact_kind": "research_decision_stage17", "stage": 17,
+        "study_id": "source", "terminal_decision": "ship_it",
+        "bound_lineage": {
+            "train_freeze_sha256": freeze_sha,
+            "model_ids": [rec["model_id"]],
+            "modeling_execution_closure_sha256": _modeling_closure,
+            "authorization_sha256": "synthetic-auth",
+        },
+    }
+    decision_body["decision_identity_sha256"] = canonical_sha256(
+        {k: v for k, v in decision_body.items() if k != "decision_identity_sha256"})
+    decision_p.write_text(json.dumps(decision_body))
     dec_sha = hashlib.sha256(decision_p.read_bytes()).hexdigest()
     closure_body = {
         "schema_version": 1, "study_id": "source", "status": "CLOSED",
         "outcome": "DIAGNOSTIC_POSITIVE", "terminal_decision": "ship_it",
         "model_ids": [rec["model_id"]],
         "bound_evidence": {
+            "train_freeze_sha256": freeze_sha,
             "stage17_research_decision": {
                 "path": "artifacts/research_decision_stage17.json",
                 "sha256": dec_sha,

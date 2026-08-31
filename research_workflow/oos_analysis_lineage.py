@@ -272,6 +272,57 @@ def classify_stage17_decision(study_dir: str | Path, *, repo_root: Path | None =
         if _file_sha(s16_file) != lineage["stage16_analysis_artifact_file_sha256"]:
             reasons.append("Stage 16 analysis artifact file sha moved")
 
+    # A Stage 17 decision must be anchored to *something*: an empty bound_lineage is
+    # never a fresh authority, whether or not the study reached OOS.
+    if not lineage:
+        return {"state": "INVALID", "reasons": ["Stage 17 decision carries an empty bound_lineage"]}
+
+    # No-OOS / TRAIN-only study: require the minimum authoritative anchors and verify
+    # them against the study's current on-disk TRAIN freeze.
+    oos_reached = bool(s16_bound or s16_file.is_file())
+    if not oos_reached:
+        train_freeze_anchor = (
+            lineage.get("refreshed_train_freeze_sha256")
+            or lineage.get("train_freeze_sha256")
+            or lineage.get("train_experiment_freeze_sha256")
+        )
+        model_anchor = lineage.get("refreshed_model_ids") or lineage.get("model_ids")
+        modeling_closure_anchor = lineage.get("modeling_execution_closure_sha256")
+        seal_or_auth_anchor = (
+            lineage.get("preexec_seal_artifact_sha256")
+            or lineage.get("preexec_seal_composite_sha256")
+            or lineage.get("authorization_sha256")
+            or lineage.get("execution_composite_sha256")
+        )
+        missing_anchors = [
+            name for name, value in (
+                ("train_freeze", train_freeze_anchor),
+                ("model_identities", model_anchor),
+                ("modeling_execution_closure", modeling_closure_anchor),
+                ("seal_or_authorization", seal_or_auth_anchor),
+            ) if not value
+        ]
+        if missing_anchors:
+            return {"state": "INVALID", "reasons": [
+                f"TRAIN-only Stage 17 decision is missing required lineage anchor(s): {missing_anchors}"]}
+
+        freeze_path = study_dir / "artifacts" / "train_experiment_freeze.json"
+        if freeze_path.is_file():
+            try:
+                cur_freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+            except ValueError:
+                return {"state": "INVALID", "reasons": ["current TRAIN freeze is unreadable"]}
+            cur_train_anchors = {
+                cur_freeze.get("freeze_sha256"),
+                _file_sha(freeze_path),
+            }
+            if train_freeze_anchor not in cur_train_anchors:
+                reasons.append("TRAIN freeze changed since this Stage 17 decision was produced")
+            cur_lineage = cur_freeze.get("stage_scoped_lineage") or {}
+            if (modeling_closure_anchor
+                    and cur_lineage.get("MODELING_EXECUTION_CLOSURE") not in (None, modeling_closure_anchor)):
+                reasons.append("modeling execution closure moved since this Stage 17 decision")
+
     return {"state": "STALE" if reasons else "FRESH", "reasons": reasons}
 
 

@@ -1,0 +1,51 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\regime_transition_target_before_stop_v1",
+  "decision_contract": {
+    "research_question": "Can causal information available at candidate time T discriminate regime-transition candidates whose subsequent path reaches a favorable target (+1.00 ATR) before hitting a fixed adverse ATR stop (0.50, 1.00, 1.50 ATR) within 300 seconds on fully-forward 1s bars?",
+    "baseline": {
+      "short": "13 canonical raw causal features on qualified prevailing regime candidates",
+      "long": "13 canonical raw causal features on qualified prevailing regime candidates"
+    },
+    "baseline_feature_selection": {
+      "mode": "none"
+    },
+    "model_arms": {
+      "BASELINE_13_RAW": "13 canonical raw causal features from Model-C surface"
+    },
+    "variable_being_tested": [
+      "Target-before-stop economic path predictability across 0.50, 1.00, and 1.50 ATR adverse stop arms"
+    ],
+    "prohibited_changes": [
+      "unauthorized_feature_discovery",
+      "change_feature_surface_after_seeing_predictive_performance",
+      "change_target_after_seeing_predictive_performance",
+      "coerce_censored_target_rows_to_negative",
+      "expansion_beyond_authorized_dates",
+      "use_2024_2025_2026_for_feature_selection",
+      "use_2024_2025_2026_for_population_definition",
+      "use_2024_2025_2026_for_target_selection",
+      "use_2024_to_change_model_design"
+    ],
+    "allowed_changes": [
+      "Independent evaluation of the three predefined stop arms (SL 0.5, 1.0, 1.5 ATR)"
+    ],
+    "chronology": {
+      "train": [
+        2021,
+        2022,
+        2023
+      ],
+      "dev": [
+        2024
+      ],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": "Discrimination of +1.00 ATR favorable before adverse stop across predefined stop arms",
+    "terminal_question": "Does causal information at T reliably predict target-before-stop economic path quality?"
+  },
+  "findings": []
+}

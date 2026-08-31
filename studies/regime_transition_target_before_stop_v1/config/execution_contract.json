@@ -1,0 +1,25 @@
+{
+  "runtime": "nautilustrader",
+  "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
+  "bounded_execution": true,
+  "progress_seconds": 30,
+  "checkpoint": null,
+  "custom_scope": [
+    "implementation/target_before_stop_diagnostics.py"
+  ],
+  "chronology": {
+    "train": [
+      2021,
+      2022,
+      2023
+    ],
+    "dev": [
+      2024
+    ],
+    "diagnostic": [],
+    "prohibited": [
+      2025,
+      2026
+    ]
+  }
+}

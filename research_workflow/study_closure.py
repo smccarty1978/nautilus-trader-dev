@@ -66,7 +66,56 @@ def _validate_terminal_decision(study_dir: Path, terminal_decision: str) -> None
         )
 
 
+def _require_mandatory_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> None:
+    """A closure may be terminal only if ``bound_evidence`` binds the evidence that is
+    mandatory for the lifecycle stage the study *actually reached* (proven by the stage's
+    own artifact being present on disk).
+
+    A study closed before any governed execution stage (no TRAIN freeze / analysis /
+    decision / reconciliation artifact) carries no mandatory terminal evidence and is
+    unaffected. Once TRAIN/OOS/Stage16/Stage17 was reached, a missing or empty
+    ``bound_evidence`` -- or one that omits a stage it reached -- is
+    ``STUDY_CLOSURE_INVALID`` (never a reopen: the workflow engine surfaces it as a
+    terminal blocked state).
+    """
+    art = study_dir / "artifacts"
+    reached_train = (art / "train_experiment_freeze.json").is_file()
+    reached_s16 = (art / "experiment_analysis.json").is_file()
+    reached_s17 = (art / "research_decision_stage17.json").is_file()
+    reached_recon = (art / "oos_lineage_reconciliation.json").is_file()
+    reached_recon_auth = (art / "oos_reconciled_authority.json").is_file()
+    if not (reached_train or reached_s16 or reached_s17 or reached_recon or reached_recon_auth):
+        return
+
+    bound = data.get("bound_evidence")
+    bound = bound if isinstance(bound, dict) else {}
+
+    required: list[tuple[str, tuple[str, ...]]] = []
+    if reached_train:
+        required.append(("TRAIN freeze", ("train_freeze_sha256",)))
+        if (art / "preexec_audit_seal.json").is_file():
+            required.append(("preexec seal", ("preexec_seal_artifact_sha256", "preexec_seal_composite_sha256")))
+    if reached_s16:
+        required.append(("Stage 16 analysis", ("stage16_analysis",)))
+    if reached_s17:
+        required.append(("Stage 17 decision", ("stage17_research_decision",)))
+    if reached_recon:
+        required.append(("OOS lineage reconciliation", ("oos_lineage_reconciliation",)))
+    if reached_recon_auth:
+        required.append(("OOS reconciled authority", ("oos_reconciled_authority",)))
+
+    missing = [f"{label} (one of {list(keys)})" for label, keys in required
+               if not any(k in bound for k in keys)]
+    if not bound or missing:
+        raise StudyClosureInvalid(
+            "STUDY_CLOSURE_EVIDENCE_MISSING: closure omits mandatory terminal evidence for "
+            f"the lifecycle stage(s) the study reached: {missing or ['bound_evidence is empty']}"
+        )
+
+
 def _authenticate_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> None:
+    _require_mandatory_bound_evidence(study_dir, data)
+
     bound = data.get("bound_evidence")
     if not isinstance(bound, dict) or not bound:
         return

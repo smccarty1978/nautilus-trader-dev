@@ -1,0 +1,9 @@
+{
+  "reason": "Economic-quality classification research study predicting asymmetric ordered-barrier target-before-stop outcomes (+1.00 ATR favorable vs 0.5/1.0/1.5 ATR adverse stops within 300s) on fully-forward 1s bars rather than binary regime flips.",
+  "unsupported_contract_element": "Pure asymmetric ordered-barrier race target unconditioned on subsequent regime flip event",
+  "canonical_type_considered": "flip_prediction",
+  "reusable_extension_considered": "Reused governed GenericStudyCollector and OrderedBarrierTargetRuntime; bespoke used strictly for schema typing since flip_prediction compiler expects a flip condition in composite targets.",
+  "custom_scope": [
+    "implementation/target_before_stop_diagnostics.py"
+  ]
+}

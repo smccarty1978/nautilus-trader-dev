@@ -32,18 +32,29 @@ _ORACLE_CENSOR_SEVERITY = {
 }
 
 
-def _contract_barrier(contract: Mapping) -> tuple[dict | None, str, bool, int | None]:
+def _contract_barrier(contract: Mapping, candidate: Mapping | None = None) -> tuple[dict | None, str, bool, int | None]:
     """(ordered_barrier, entry_reference, session_end_censoring, max_gap_seconds)."""
     barrier = None
     entry_reference = "next_bar_open"
     session_end_censoring = False
     max_gap_seconds = None
+    target_barrier_id = None
+    if candidate and candidate.get("barrier_id"):
+        target_barrier_id = candidate.get("barrier_id")
+    elif contract.get("conditions"):
+        for cond in contract["conditions"]:
+            if cond.get("barrier_id"):
+                target_barrier_id = cond.get("barrier_id")
+                break
     for fo in (contract.get("required_forward_outcomes") or []):
         entry_reference = fo.get("entry_reference", entry_reference)
         session_end_censoring = bool(fo.get("session_end_censoring", session_end_censoring))
         max_gap_seconds = fo.get("max_gap_seconds", max_gap_seconds)
         for b in (fo.get("ordered_barriers") or []):
-            barrier = dict(b)
+            if target_barrier_id is None or b.get("id") == target_barrier_id:
+                barrier = dict(b)
+                break
+        if barrier is not None:
             break
     return barrier, entry_reference, session_end_censoring, max_gap_seconds
 
@@ -53,7 +64,7 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
     if primitive != "ordered_barrier":
         raise ValueError(f"ORACLE_UNKNOWN_TARGET_PRIMITIVE: {primitive!r}")
 
-    barrier, entry_reference, session_end_censoring, max_gap_seconds = _contract_barrier(contract)
+    barrier, entry_reference, session_end_censoring, max_gap_seconds = _contract_barrier(contract, candidate)
     declared_source = next((fo.get("atr_source") for fo in (contract.get("required_forward_outcomes") or [])
                             if fo.get("atr_source") is not None), None)
     if declared_source is not None and (declared_source != SUPPORTED_ATR_SOURCE or candidate.get("atr_source") != declared_source):
