@@ -50,16 +50,16 @@ class FrozenExternalModelScorer:
         # New workflow declarations bind by immutable registry id and intentionally
         # do not consult the source study's current lifecycle state.
         if spec.model_id:
-            from research_workflow.model_artifacts import resolve_model
+            from research_workflow.model_artifacts import load_model_bundle, resolve_model
             registry = Path(parent_dir).resolve().parents[0] / "model_registry"
             # RT-09: consuming a frozen model as a derived causal input enforces
-            # scientific_status, not just reuse_status.
+            # scientific_status + recorded runtime identity, not just reuse_status.
             rec = resolve_model(
                 spec.model_id, registry_root=registry,
                 reuse_intent="derived_causal_input",
             )
             artifact = rec.get("_artifact_path", rec["artifact_path"])
-            bundle = joblib.load(artifact)
+            bundle = load_model_bundle(rec)  # joblib load, with native-booster recovery
             return cls(spec, Path(artifact).parent, bundle, rec)
         required = {
             "model_artifact_path": spec.model_artifact_path,

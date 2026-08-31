@@ -9,6 +9,12 @@ from research.analysis.identity import canonical_sha256
 
 class ModelArtifactError(RuntimeError): pass
 def _sha(p: Path) -> str: return hashlib.sha256(p.read_bytes()).hexdigest()
+def _library_versions() -> dict:
+    try:
+        from research.analysis.modeling import library_versions
+        return dict(library_versions())
+    except Exception:
+        return {}
 def _relative(studies_root: Path, path: Path) -> str:
     return path.resolve().relative_to(studies_root.resolve()).as_posix()
 def _resolve(studies_root: Path, value: str) -> Path:
@@ -44,7 +50,8 @@ def persist_models(study_path: str | Path, models: Mapping[str, Any], manifest: 
         if golden.exists() and golden.read_text(encoding="utf-8") != golden_body:
             raise ModelArtifactError("IMMUTABLE_MODEL_GOLDEN_CONFLICT")
         if not golden.exists(): golden.write_text(golden_body, encoding="utf-8")
-        record={"schema_version":1,"model_id":immutable,"study_id":study.name,"model_role":arm,"artifact_path":_relative(studies_root, model_path),"artifact_sha256":_sha(model_path),"golden_fixture_path":_relative(studies_root, golden),"golden_fixture_sha256":_sha(golden),"model_family":rec.get("estimator"),"hyperparameters":rec.get("hyperparameters"),"ordered_model_inputs":rec.get("ordered_features"),"feature_contract_identity":feature_contract_identity,"target_identity":target_identity,"preprocessing_identity":preprocessing_identity or {"kind":"identity","identity":"identity"},"train_frame_population_identity":train_frame_identity,"training_years":training_years or [],"closure_identities":dict(closures or {}),"score_semantics":"predict_proba_positive","direction_routing":routing,"scientific_status":"UNASSESSED","artifact_status":"PRESERVED_AND_LOADABLE","reuse_status":"PERMITTED"}
+        _libs = _library_versions()
+        record={"schema_version":1,"model_id":immutable,"study_id":study.name,"model_role":arm,"artifact_path":_relative(studies_root, model_path),"artifact_sha256":_sha(model_path),"golden_fixture_path":_relative(studies_root, golden),"golden_fixture_sha256":_sha(golden),"model_family":rec.get("estimator"),"hyperparameters":rec.get("hyperparameters"),"ordered_model_inputs":rec.get("ordered_features"),"feature_contract_identity":feature_contract_identity,"target_identity":target_identity,"preprocessing_identity":preprocessing_identity or {"kind":"identity","identity":"identity"},"train_frame_population_identity":train_frame_identity,"training_years":training_years or [],"closure_identities":dict(closures or {}),"score_semantics":"predict_proba_positive","direction_routing":routing,"scientific_status":"UNASSESSED","artifact_status":"PRESERVED_AND_LOADABLE","reuse_status":"PERMITTED","library_versions":_libs,"runtime_identity_sha256":canonical_sha256(_libs)}
         # LightGBM's native representation is independently portable.
         if rec.get("estimator") == "lightgbm" and hasattr(estimator, "booster_"):
             native = artifact_dir / f"{immutable}.booster.txt"
@@ -101,6 +108,18 @@ def resolve_model(model_id: str, *, registry_root: str | Path,
     # historical reuse_status-only gate.
     if reuse_intent == "derived_causal_input":
         assert_scientific_status_reusable(rec, reuse_policy)
+        # RT-09: also verify the recorded environment/library identity. A record with no
+        # library_versions predates the field -> unverifiable, allowed (conservative). A
+        # recorded-but-drifted identity is refused unless the policy allows it.
+        recorded_runtime = rec.get("runtime_identity_sha256")
+        if recorded_runtime and recorded_runtime != canonical_sha256(_library_versions()):
+            if not (reuse_policy or {}).get("allow_runtime_drift"):
+                raise ModelArtifactError(
+                    f"MODEL_RUNTIME_IDENTITY_DRIFT: model {model_id} was fit under "
+                    f"{rec.get('library_versions')!r}; the current environment differs. "
+                    f"Set reuse_policy.allow_runtime_drift to override after verifying "
+                    f"score parity."
+                )
     preprocessing = rec.get("preprocessing_identity") or {"kind": "identity"}
     if not isinstance(preprocessing, Mapping) or preprocessing.get("kind") != "identity":
         # No transform artifact/loader is yet part of the governed reusable-model
@@ -111,9 +130,54 @@ def resolve_model(model_id: str, *, registry_root: str | Path,
     validate_golden_prediction(rec)
     return rec
 
+
+def load_model_bundle(record: Mapping[str, Any]) -> dict:
+    """Load the fitted-estimator bundle for a resolved registry ``record``.
+
+    RT-09 native recovery: if ``joblib.load`` fails (a pickle broken by a library
+    upgrade) and a native LightGBM booster was preserved, rebuild the bundle from the
+    booster and require the golden fixture to reproduce before returning it -- otherwise
+    fail closed. No generic migration is attempted.
+    """
+    artifact = record.get("_artifact_path", record["artifact_path"])
+    try:
+        return joblib.load(artifact)
+    except Exception as joblib_err:
+        native_rel = record.get("native_booster_path")
+        if not native_rel:
+            raise ModelArtifactError(f"PRESERVED_MODEL_UNLOADABLE: {joblib_err}") from joblib_err
+        studies_root = Path(record.get("_studies_root", Path.cwd())).resolve()
+        native = _resolve(studies_root, native_rel)
+        if not native.is_file() or _sha(native) != record.get("native_booster_sha256"):
+            raise ModelArtifactError("PRESERVED_MODEL_NATIVE_BOOSTER_CORRUPT") from joblib_err
+        try:
+            import lightgbm as lgb
+        except Exception as e:  # pragma: no cover
+            raise ModelArtifactError("PRESERVED_MODEL_NATIVE_RECOVERY_UNAVAILABLE") from e
+
+        class _BoosterProbaShim:
+            def __init__(self, booster): self._b = booster
+            def predict_proba(self, X):
+                import numpy as _np
+                p = _np.asarray(self._b.predict(X), dtype=float)
+                return _np.column_stack([1.0 - p, p])
+
+        arm = record["model_role"]
+        bundle = {arm: {"estimator": _BoosterProbaShim(lgb.Booster(model_file=str(native))),
+                        "fit_identity_sha256": None}}
+        rec_for_golden = {**record, "_native_recovered": True}
+        # Validate against the golden fixture using this recovered estimator.
+        g = json.loads(_resolve(studies_root, record["golden_fixture_path"]).read_text())
+        got = bundle[arm]["estimator"].predict_proba(pd.DataFrame(g["rows"], columns=g["ordered_inputs"]))[:, 1]
+        if len(got) != len(g["expected_scores"]) or any(
+            abs(float(a) - float(b)) > 1e-9 for a, b in zip(got, g["expected_scores"])
+        ):
+            raise ModelArtifactError("PRESERVED_MODEL_NATIVE_RECOVERY_GOLDEN_MISMATCH") from joblib_err
+        return bundle
+
 def score_preserved_model(model_id: str, frame: pd.DataFrame, *, registry_root: str | Path) -> list[float]:
     rec = resolve_model(model_id, registry_root=registry_root)
-    bundle = joblib.load(rec.get("_artifact_path", rec["artifact_path"])); estimator = bundle[rec["model_role"]]["estimator"]
+    bundle = load_model_bundle(rec); estimator = bundle[rec["model_role"]]["estimator"]
     return [float(v) for v in estimator.predict_proba(frame[list(rec["ordered_model_inputs"])])[:, 1]]
 
 def validate_golden_prediction(record: Mapping[str, Any]) -> bool:
