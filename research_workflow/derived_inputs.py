@@ -62,7 +62,50 @@ def _invalidated_basenames(parent_dir: Path) -> set[str]:
     return names
 
 
+def _verify_model_id(di: DerivedCausalInputSpec, repo_root: Path) -> Dict[str, Any]:
+    """RT-03: a registry-only ``model_id`` binding. PREPARE verifies it against the
+    immutable model registry (no parent-study lifecycle is consulted), mirroring what
+    ``FrozenExternalModelScorer.bind`` already does at collection time."""
+    from research_workflow.model_artifacts import ModelArtifactError, resolve_model
+
+    registry_root = repo_root / "studies" / "model_registry"
+    try:
+        rec = resolve_model(
+            di.model_id, registry_root=registry_root,
+            reuse_intent="derived_causal_input",
+        )
+    except ModelArtifactError as exc:
+        raise DerivedInputBindingError(
+            f"DERIVED_INPUT_MODEL_ID_UNRESOLVED: {di.name!r} binds model_id="
+            f"{di.model_id!r}: {exc}"
+        ) from exc
+
+    # resolve_model already proved: registry record exists, artifact present +
+    # hash-valid, reuse_status == PERMITTED, preprocessing contract available, golden
+    # prediction reproduces, scientific_status compatible. Additionally require the
+    # ordered model inputs so a child study can bind its causal snapshot to them.
+    if not rec.get("ordered_model_inputs"):
+        raise DerivedInputBindingError(
+            f"DERIVED_INPUT_MODEL_INPUTS_MISSING: {di.name!r} model_id={di.model_id!r} "
+            f"registry record has no ordered_model_inputs"
+        )
+    return {
+        "name": di.name,
+        "binding": "model_id",
+        "model_id": di.model_id,
+        "artifact_sha256": rec.get("artifact_sha256"),
+        "golden_fixture_sha256": rec.get("golden_fixture_sha256"),
+        "ordered_model_inputs": list(rec["ordered_model_inputs"]),
+        "scientific_status": rec.get("scientific_status"),
+        "reuse_status": rec.get("reuse_status"),
+        "availability_reference": di.availability_reference,
+        "verified": True,
+    }
+
+
 def _verify_one(di: DerivedCausalInputSpec, repo_root: Path) -> Dict[str, Any]:
+    if di.model_id:
+        return _verify_model_id(di, repo_root)
     parent_dir = repo_root / "studies" / di.parent_study_id
     artifact_path = parent_dir / di.parent_train_freeze_artifact
 

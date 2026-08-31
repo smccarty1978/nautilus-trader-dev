@@ -266,7 +266,10 @@ def build_collector_config_kwargs(
         cfg_kwargs["target_direction"] = spec.target.direction or "bearish"
     if hasattr(strategy_binding.config_cls, "horizon_seconds"):
         cfg_kwargs["horizon_seconds"] = spec.target.horizon_seconds or 300
-    qualification = spec.population.qualification or {}
+    # qualification is a typed PopulationQualificationSpec (RT-06); collapse to the
+    # historical dict of set keys so the .get(..., default) wiring below is unchanged.
+    _q = spec.population.qualification
+    qualification = _q.model_dump(exclude_none=True) if _q is not None and hasattr(_q, "model_dump") else (_q or {})
     if hasattr(strategy_binding.config_cls, "age_gate_seconds"):
         cfg_kwargs["age_gate_seconds"] = int(qualification.get("age_gate_seconds", 120))
     if hasattr(strategy_binding.config_cls, "established_required"):
@@ -290,15 +293,23 @@ def build_collector_config_kwargs(
         _el = _pop.get("episode_lifecycle") or {}
         if _el:
             cfg_kwargs["episode_lifecycle"] = dict(_el)
-            # Stage 3: the ProviderHost feature contract + the frozen Model-C derived scorer.
+            # Stage 3: the ProviderHost feature contract.
             _fc = study_data.contracts.get("feature_contract", {}) or {}
             if _fc and hasattr(strategy_binding.config_cls, "feature_contract"):
                 cfg_kwargs["feature_contract"] = dict(_fc)
-            _di = (spec.features.derived_inputs if spec.features else None) or []
-            if _di and hasattr(strategy_binding.config_cls, "derived_inputs"):
-                cfg_kwargs["derived_inputs"] = tuple(
-                    d.model_dump(mode="json") if hasattr(d, "model_dump") else dict(d) for d in _di
-                )
+    # RT-04: the ordered frozen derived-input scorers are population-agnostic -- pass the
+    # runtime-scored declarations for a checkpoint-grid study too. A score_artifact_path-
+    # only (pre-materialized, joined offline) form is NOT passed to the collector.
+    _di = (spec.features.derived_inputs if spec.features else None) or []
+    _runtime_di = [
+        d for d in _di
+        if getattr(d, "kind", None) == "frozen_external_model_score"
+        and (getattr(d, "model_artifact_path", None) or getattr(d, "model_id", None))
+    ]
+    if _runtime_di and hasattr(strategy_binding.config_cls, "derived_inputs"):
+        cfg_kwargs["derived_inputs"] = tuple(
+            d.model_dump(mode="json") if hasattr(d, "model_dump") else dict(d) for d in _runtime_di
+        )
     if hasattr(strategy_binding.config_cls, "feature_list"):
         cfg_kwargs["feature_list"] = spec.features.feature_list
     if hasattr(strategy_binding.config_cls, "feature_requirements"):
@@ -318,8 +329,17 @@ def build_collector_config_kwargs(
     if hasattr(strategy_binding.config_cls, "session"):
         cfg_kwargs["session"] = spec.population.session or "RTH"
     if hasattr(strategy_binding.config_cls, "session_end_censoring"):
-        censoring = (study_data.contracts.get("target_contract", {}) or {}).get("censoring_policy", {})
-        cfg_kwargs["session_end_censoring"] = bool(censoring.get("session_end_censoring", True))
+        # Authoritative source: the target contract's own resolved session policy
+        # (research/engines/target_engine.resolve_session_end_censoring), surfaced at
+        # target_contract.session_end_censoring. `censoring_policy.session_end_censoring`
+        # is the same value in the historical shape; it is the fallback only for a
+        # contract compiled before the top-level key existed. Never a hard-coded default.
+        _tc = study_data.contracts.get("target_contract", {}) or {}
+        if "session_end_censoring" in _tc:
+            cfg_kwargs["session_end_censoring"] = bool(_tc["session_end_censoring"])
+        else:
+            _cp = _tc.get("censoring_policy", {}) or {}
+            cfg_kwargs["session_end_censoring"] = bool(_cp.get("session_end_censoring", True))
     if hasattr(strategy_binding.config_cls, "target_contract"):
         cfg_kwargs["target_contract"] = dict(study_data.contracts.get("target_contract", {}) or {})
     # Phase-zero authentication gate (fail-closed). A collector that declares this field

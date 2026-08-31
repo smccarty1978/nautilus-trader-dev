@@ -15,6 +15,20 @@ from research_workflow.forward_outcomes.guard import (
 )
 
 
+def _declared_modeling_driver_relpaths(study_path: str | Path) -> list[str]:
+    """The study's declared ``execution.modeling_driver_relpaths`` (RT-01), or ``[]``.
+
+    Read from the compiled spec so it matches what
+    ``research_workflow.modeling_closure.resolve_modeling_closure`` folds into
+    ``MODELING_EXECUTION_CLOSURE``. Absent / null / [] all yield ``[]``.
+    """
+    compiled = Path(study_path).resolve() / "compiled_study.json"
+    if not compiled.is_file():
+        return []
+    spec = json.loads(compiled.read_text(encoding="utf-8")).get("spec") or {}
+    return list((spec.get("execution") or {}).get("modeling_driver_relpaths") or [])
+
+
 class ModelSelectionBindingRequired(RuntimeError):
     """study.model.selection declares a search, but no selection manifest was supplied."""
 
@@ -48,6 +62,12 @@ def fit_models(
     """Fit declared arms on one TRAIN partition and persist model provenance."""
     from research_workflow.experiment import _assert_study_open
     _assert_study_open(Path(study_path).resolve())
+    # RT-01: a study-local module that participates in governed modeling must be declared
+    # so its bytes are inside MODELING_EXECUTION_CLOSURE. Fail closed before the fit.
+    from research_workflow.modeling_drivers import assert_declared_modeling_drivers
+    assert_declared_modeling_drivers(
+        study_path, _declared_modeling_driver_relpaths(study_path)
+    )
     if "_partition" not in meta or set(meta["_partition"].dropna()) != {"train"}:
         raise ValueError("fit_models requires a single TRAIN partition")
     # A forward outcome resolves after the entry it describes, so it is a label. The
@@ -79,7 +99,7 @@ def fit_models(
     if frozen.is_file(): collection["COLLECTION_PRODUCER_CLOSURE"] = json.loads(frozen.read_text()).get("frozen_execution_composite_sha256")
     target = ((json.loads((study / "compiled_study.json").read_text()).get("contracts") or {}).get("target_contract") or {}) if (study / "compiled_study.json").is_file() else {}
     from research_workflow.target_runtime import resolve_target_runtime_closure
-    driver_relpaths = list(((json.loads((study / "compiled_study.json").read_text()).get("spec", {}).get("execution", {}) or {}).get("modeling_driver_relpaths", [])) if (study / "compiled_study.json").is_file() else [])
+    driver_relpaths = _declared_modeling_driver_relpaths(study)
     closures = {**collection, "TARGET_RUNTIME_CLOSURE": resolve_target_runtime_closure(study)["target_runtime_closure_sha256"], **resolve_modeling_closure(study, driver_relpaths=driver_relpaths)}
     compiled_payload = json.loads((study / "compiled_study.json").read_text()) if (study / "compiled_study.json").is_file() else {}
     contracts = compiled_payload.get("contracts") or {}
@@ -183,6 +203,13 @@ def freeze_train_artifacts(
     """
     from research_workflow.experiment import _assert_study_open
     _assert_study_open(Path(study_path).resolve())
+    # RT-01: same fail-closed check as fit_models -- a set can be frozen without ever
+    # passing through fit_models, and an undeclared driver that assembles it would sit
+    # outside MODELING_EXECUTION_CLOSURE.
+    from research_workflow.modeling_drivers import assert_declared_modeling_drivers
+    assert_declared_modeling_drivers(
+        study_path, _declared_modeling_driver_relpaths(study_path)
+    )
     if "_partition" not in meta or set(meta["_partition"].dropna()) != {"train"}:
         raise ValueError("freeze_train_artifacts requires TRAIN-only metadata")
     # The frozen feature sets are what OOS scoring replays. Guarding them here as well
@@ -289,7 +316,7 @@ def freeze_train_artifacts(
         payload["model_artifacts"] = [{k:r.get(k) for k in ("model_id","model_role","artifact_path","artifact_sha256","golden_fixture_path","golden_fixture_sha256","native_booster_path","native_booster_sha256")} for r in records]
     from research_workflow.modeling_closure import resolve_modeling_closure
     from research_workflow.target_runtime import resolve_target_runtime_closure
-    driver_relpaths = list(((json.loads((study / "compiled_study.json").read_text()).get("spec", {}).get("execution", {}) or {}).get("modeling_driver_relpaths", [])) if (study / "compiled_study.json").is_file() else [])
+    driver_relpaths = _declared_modeling_driver_relpaths(study)
     payload["stage_scoped_lineage"] = {
         "COLLECTION_PRODUCER_CLOSURE": (json.loads((study / "audit" / "frozen_execution_manifest.json").read_text()).get("frozen_execution_composite_sha256") if (study / "audit" / "frozen_execution_manifest.json").is_file() else None),
         "TARGET_RUNTIME_CLOSURE": resolve_target_runtime_closure(study)["target_runtime_closure_sha256"],

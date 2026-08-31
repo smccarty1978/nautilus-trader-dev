@@ -472,10 +472,8 @@ class FlipPredictionCollector(Strategy):
         self._episode_candidate_events: List[Any] = []
         self._episode_candidates_this_regime = 0
 
-        # --- Stage 3: ProviderHost feature realization + frozen Model-C scorer -----
+        # --- Stage 3: ProviderHost feature realization ----------------------------
         self._provider_host = None
-        self._model_c_scorer = None
-        self._model_c_surface: tuple[str, ...] = ()
         self._regime_feed = None
         if self._episode_mode:
             from research_workflow.provider_host import ProviderHost
@@ -487,27 +485,82 @@ class FlipPredictionCollector(Strategy):
                     feature_authority=self._feature_authority,
                 )
             self._regime_feed = CompletedRegimeStateFeed(["5s", "5m"])
-            di_list = list(getattr(config, "derived_inputs", ()) or [])
-            if di_list:
-                from research.schemas.study_spec import DerivedCausalInputSpec
-                from research_workflow.external_model_scoring import FrozenExternalModelScorer
-                di = DerivedCausalInputSpec.model_validate(di_list[0])
-                self._model_c_derived_name = di.name
-                self._model_c_surface = tuple(
-                    (di.ordered_feature_surfaces or {}).get("LONG_C", [])
-                )
-                # phase0 manifest: <repo>/studies/<study>/artifacts/phase0_source_manifest.json
-                parent_dir = Path(config.phase0_manifest_path).resolve().parents[2] / di.parent_study_id
-                self._model_c_scorer = FrozenExternalModelScorer.bind(di, parent_dir=parent_dir)
+
+        # --- Frozen derived-input scorers (RT-04) --------------------------------
+        # An ORDERED list, one scorer per declared features.derived_inputs entry --
+        # never just di_list[0], and independent of population type. Every declared
+        # input produces exactly one output column of the same name; a declared input
+        # whose scorer cannot bind fails here (fail closed, before any row is emitted).
+        self._derived_scorers: List[Dict[str, Any]] = []
+        di_list = list(getattr(config, "derived_inputs", ()) or [])
+        if di_list:
+            from research.schemas.study_spec import DerivedCausalInputSpec
+            from research_workflow.external_model_scoring import FrozenExternalModelScorer
+
+            # phase0 manifest lives at <studies_root>/<study>/artifacts/phase0_source_manifest.json,
+            # so parents[2] is the studies root -- and bind() needs a parent_dir under it.
+            _studies_root = None
+            if getattr(config, "phase0_manifest_path", ""):
+                _studies_root = Path(config.phase0_manifest_path).resolve().parents[2]
+            seen_names: set[str] = set()
+            for raw in di_list:
+                di = raw if isinstance(raw, DerivedCausalInputSpec) else DerivedCausalInputSpec.model_validate(raw)
+                if di.name in seen_names:
+                    raise RuntimeError(f"DERIVED_INPUT_DUPLICATE_NAME: {di.name!r}")
+                seen_names.add(di.name)
+                _root = _studies_root or Path.cwd()
+                parent_dir = _root / (di.parent_study_id or "_model_id_binding")
+                scorer = FrozenExternalModelScorer.bind(di, parent_dir=parent_dir)
+                self._derived_scorers.append({
+                    "name": di.name,
+                    "scorer": scorer,
+                    "surface": {
+                        "LONG": scorer.ordered_inputs("LONG"),
+                        "SHORT": scorer.ordered_inputs("SHORT"),
+                    },
+                })
+        # Back-compat alias for the single-scorer episode row builder / tests.
+        self._model_c_derived_name = (
+            self._derived_scorers[0]["name"] if self._derived_scorers else "model_c_score_at_candidate"
+        )
 
     def get_episode_candidate_events(self) -> List[Any]:
         """Population-runtime candidate events (Stage 2/3 internal record)."""
         return list(self._episode_candidate_events)
 
+    def _apply_derived_scores(self, record: Dict[str, Any]) -> None:
+        """RT-04: fill EVERY declared frozen derived-input score column on ``record``,
+        in declaration order, for both checkpoint-grid and episode populations.
+
+        One column per declared input; a column always exists (``None`` when the
+        direction-appropriate surface has a null input or is not declared). No
+        undeclared score column is ever written.
+        """
+        if not self._derived_scorers:
+            return
+        _dir = record.get("prevailing_direction", record.get("regime_direction"))
+        direction = "LONG" if int(_dir or 0) == 1 else "SHORT"
+        ts = int(record.get("candidate_ts", record.get("observation_ts", 0)))
+        for s in self._derived_scorers:
+            name = s["name"]
+            record.setdefault(name, None)
+            surf = s["surface"].get(direction) or []
+            if not surf:
+                continue
+            inputs = {n: record.get(n) for n in surf}
+            if any(v is None for v in inputs.values()):
+                continue
+            obs = s["scorer"].score(
+                inputs, checkpoint_ts=ts, direction=direction,
+                availability_ts={n: ts for n in surf},
+            )
+            record[name] = float(obs.score)
+
     def _append_candidate(self, record: Dict[str, Any]) -> None:
         """Emit only the study-declared surface plus canonical key/metadata fields."""
         if getattr(self, "_benchmark_mode", "") in {"checkpoint_only", "baseline", "structural", "rolling", "full_no_target"}:
             return
+        self._apply_derived_scores(record)
         aliases = set(self._study_feature_aliases or self.cfg.feature_list or ())
         # Causality evidence is a runtime metadata field, not a feature.  It is
         # required by the smoke validator to prove source availability for every
@@ -515,11 +568,9 @@ class FlipPredictionCollector(Strategy):
         keep = {"observation_ts", "regime_start_ns", "checkpoint_index", "triggering_1s_ts_init"}
         keep.update(self._metadata_columns)
         keep.update(aliases)
-        # Stage 3: the frozen derived-input score column (declared in features.derived_inputs).
-        for _di in (getattr(self.cfg, "derived_inputs", ()) or ()):
-            _n = _di.get("name") if isinstance(_di, dict) else getattr(_di, "name", None)
-            if _n:
-                keep.add(_n)
+        # RT-04: exactly the declared derived-input score columns, no more.
+        for s in self._derived_scorers:
+            keep.add(s["name"])
         self.candidates_log.append({key: value for key, value in record.items() if key in keep})
 
     def on_start(self) -> None:
@@ -1290,21 +1341,12 @@ class FlipPredictionCollector(Strategy):
             "triggering_1s_ts_init": int(ts_avail),
             **feats,
         }
-        score_col = getattr(self, "_model_c_derived_name", "model_c_score_at_candidate")
-        row[score_col] = None
-        if self._model_c_scorer is not None and self._model_c_surface:
-            # The frozen Model-C score is a derived causal input: it obeys availability
-            # like any feature. If any of the 13 parent-surface inputs is null at candidate
-            # T (e.g. no completed prior 1m/5m regime yet early in a session), the score is
-            # null -- the candidate ROW still persists. It is NEVER fabricated.
-            inputs = {name: feats.get(name) for name in self._model_c_surface}
-            if all(v is not None for v in inputs.values()):
-                obs = self._model_c_scorer.score(
-                    inputs, checkpoint_ts=int(ev.candidate_ts),
-                    direction="LONG" if ev.prevailing_direction == 1 else "SHORT",
-                    availability_ts={name: int(ev.candidate_ts) for name in self._model_c_surface},
-                )
-                row[score_col] = float(obs.score)
+        # Every declared derived-input column is filled by _apply_derived_scores in
+        # _append_candidate (RT-04: one implementation, all scorers, both population
+        # types). The score obeys availability like any feature -- null inputs -> null
+        # score, the candidate row still persists, the value is never fabricated.
+        for _s in self._derived_scorers:
+            row.setdefault(_s["name"], None)
         return row
 
     def _compute_running_mfe(self, direction: int) -> float:

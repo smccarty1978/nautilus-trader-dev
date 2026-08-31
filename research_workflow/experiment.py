@@ -234,7 +234,7 @@ def assert_oos_open(study_path: str | Path) -> Dict[str, Any]:
         if lineage.get("TARGET_RUNTIME_CLOSURE") != resolve_target_runtime_closure(path)["target_runtime_closure_sha256"]:
             raise TrainFreezeRequired("TRAIN_TARGET_RUNTIME_CLOSURE_STALE: target runtime changed")
         compiled = path / "compiled_study.json"
-        drivers = list(((json.loads(compiled.read_text()).get("spec", {}).get("execution", {}) or {}).get("modeling_driver_relpaths", [])) if compiled.is_file() else [])
+        drivers = list((((json.loads(compiled.read_text()).get("spec") or {}).get("execution") or {}).get("modeling_driver_relpaths") or []) if compiled.is_file() else [])
         current = resolve_modeling_closure(path, driver_relpaths=drivers)["modeling_execution_composite_sha256"]
         if lineage.get("MODELING_EXECUTION_CLOSURE") != current:
             raise TrainFreezeRequired("TRAIN_MODELING_CLOSURE_STALE: modeling code changed after TRAIN freeze")

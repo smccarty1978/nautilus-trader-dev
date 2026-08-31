@@ -1,0 +1,146 @@
+"""RT-09 -- model reuse enforces scientific_status + recorded runtime identity, and can
+recover a LightGBM model natively when joblib cannot load it.
+"""
+from __future__ import annotations
+
+import json
+
+import pandas as pd
+import pytest
+
+from research.analysis.identity import canonical_sha256
+from research.analysis.modeling import FittedModel, FitProvenance
+from research_workflow.model_artifacts import (
+    ModelArtifactError,
+    assert_scientific_status_reusable,
+    load_model_bundle,
+    persist_models,
+    resolve_model,
+)
+
+
+# --------------------------------------------------------------------------- #
+# scientific_status
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("status", ["INVALID_TARGET", "INVALID", "REJECTED"])
+def test_explicitly_invalid_status_is_never_reusable(status):
+    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
+        assert_scientific_status_reusable({"model_id": "m", "scientific_status": status})
+
+
+def test_valid_diagnostic_needs_explicit_policy():
+    rec = {"model_id": "m", "scientific_status": "VALID_DIAGNOSTIC"}
+    with pytest.raises(ModelArtifactError, match="REQUIRES_POLICY"):
+        assert_scientific_status_reusable(rec)
+    assert_scientific_status_reusable(rec, {"allow_diagnostic": True})
+    assert_scientific_status_reusable(rec, {"diagnostic_allowlist": ["m"]})
+
+
+def test_valid_primary_and_unassessed_pass():
+    assert_scientific_status_reusable({"model_id": "m", "scientific_status": "VALID_PRIMARY"})
+    assert_scientific_status_reusable({"model_id": "m", "scientific_status": "UNASSESSED"})
+    assert_scientific_status_reusable({"model_id": "m"})  # missing -> UNASSESSED
+
+
+# --------------------------------------------------------------------------- #
+# fixtures
+# --------------------------------------------------------------------------- #
+def _persist_lgbm(tmp_path):
+    from lightgbm import LGBMClassifier
+
+    study = tmp_path / "studies" / "s"
+    study.mkdir(parents=True)
+    X = pd.DataFrame({"x": [0.0, 1.0, 0.2, 0.8, 0.5, 0.9], "y": [1.0, 0.0, 0.7, 0.3, 0.5, 0.1]})
+    est = LGBMClassifier(n_estimators=4, min_child_samples=1, verbose=-1).fit(X, [0, 1, 0, 1, 0, 1])
+    prov = FitProvenance("A", "lightgbm", ["x", "y"], 6, 2, 0, {}, {}, None, None, {}, "x")
+    out = persist_models(
+        study, {"A": FittedModel(est, prov)},
+        {"arms": {"A": {**prov.to_dict(), "fit_identity_sha256": prov.fit_identity_sha256,
+                        "estimator": "lightgbm", "ordered_features": ["x", "y"]}}},
+    )
+    return study, out["records"][0]
+
+
+def _promote(study, model_id, **fields):
+    reg = study.parent / "model_registry" / f"{model_id}.json"
+    body = json.loads(reg.read_text())
+    body.update(fields)
+    reg.write_text(json.dumps(body))
+
+
+# --------------------------------------------------------------------------- #
+# runtime identity drift
+# --------------------------------------------------------------------------- #
+def test_resolve_records_runtime_identity(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    body = json.loads((study.parent / "model_registry" / f"{rec['model_id']}.json").read_text())
+    assert body["library_versions"] and body["runtime_identity_sha256"]
+
+
+def test_runtime_identity_drift_is_refused_for_derived_input(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    _promote(study, rec["model_id"], scientific_status="VALID_PRIMARY",
+             runtime_identity_sha256="deadbeef" * 8)
+    root = study.parent / "model_registry"
+    with pytest.raises(ModelArtifactError, match="RUNTIME_IDENTITY_DRIFT"):
+        resolve_model(rec["model_id"], registry_root=root, reuse_intent="derived_causal_input")
+    # allowed with an explicit override, and never checked for a non-derived load
+    resolve_model(rec["model_id"], registry_root=root, reuse_intent="derived_causal_input",
+                  reuse_policy={"allow_runtime_drift": True})
+    resolve_model(rec["model_id"], registry_root=root)
+
+
+def test_missing_runtime_identity_is_unverifiable_not_blocked(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    _promote(study, rec["model_id"], scientific_status="VALID_PRIMARY")
+    body = json.loads((study.parent / "model_registry" / f"{rec['model_id']}.json").read_text())
+    body.pop("runtime_identity_sha256", None)
+    (study.parent / "model_registry" / f"{rec['model_id']}.json").write_text(json.dumps(body))
+    resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
+                  reuse_intent="derived_causal_input")  # no raise
+
+
+# --------------------------------------------------------------------------- #
+# native LightGBM recovery
+# --------------------------------------------------------------------------- #
+def test_native_booster_recovers_when_joblib_fails(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    from pathlib import Path
+
+    resolved = resolve_model(rec["model_id"], registry_root=study.parent / "model_registry")
+    assert resolved.get("native_booster_path")
+    # break the joblib pickle; the native booster + golden fixture carry the recovery
+    Path(resolved["_artifact_path"]).write_bytes(b"not a valid joblib pickle")
+    bundle = load_model_bundle(resolved)
+    est = bundle[resolved["model_role"]]["estimator"]
+    got = est.predict_proba(pd.DataFrame([[0.0, 1.0]], columns=["x", "y"]))
+    assert got.shape == (1, 2)
+
+
+def test_native_recovery_fails_closed_on_golden_mismatch(tmp_path):
+    from pathlib import Path
+
+    study, rec = _persist_lgbm(tmp_path)
+    resolved = resolve_model(rec["model_id"], registry_root=study.parent / "model_registry")
+    Path(resolved["_artifact_path"]).write_bytes(b"broken")
+    golden = Path(resolved["_studies_root"]) / resolved["golden_fixture_path"]
+    g = json.loads(golden.read_text())
+    g["expected_scores"] = [0.123456, 0.654321]
+    golden.write_text(json.dumps(g))
+    with pytest.raises(ModelArtifactError, match="NATIVE_RECOVERY_GOLDEN_MISMATCH"):
+        load_model_bundle(resolved)
+
+
+def test_no_native_booster_and_broken_joblib_is_unloadable(tmp_path):
+    from pathlib import Path
+
+    study, rec = _persist_lgbm(tmp_path)
+    resolved = resolve_model(rec["model_id"], registry_root=study.parent / "model_registry")
+    reg = study.parent / "model_registry" / f"{rec['model_id']}.json"
+    body = json.loads(reg.read_text())
+    body.pop("native_booster_path", None)
+    reg.write_text(json.dumps(body))
+    resolved2 = resolve_model(rec["model_id"], registry_root=study.parent / "model_registry")
+    Path(resolved2["_artifact_path"]).write_bytes(b"broken")
+    with pytest.raises(ModelArtifactError, match="UNLOADABLE"):
+        load_model_bundle(resolved2)

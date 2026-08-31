@@ -14,8 +14,13 @@ def compile_population_contract(
     inst_spec: InstrumentSpec,
 ) -> Dict[str, Any]:
     """Compiles the authoritative population contract dictionary."""
-    qual = pop_spec.qualification or {}
-    cadence = qual.get("cadence_seconds") if isinstance(qual, dict) else None
+    # qualification is a typed PopulationQualificationSpec (RT-06); the compiled contract
+    # keeps the historical dict shape, so dump only the set fields.
+    qual = (
+        pop_spec.qualification.model_dump(exclude_none=True, mode="json")
+        if pop_spec.qualification is not None else {}
+    )
+    cadence = qual.get("cadence_seconds")
     if cadence:
         chk_freq = f"{cadence}s"
     else:

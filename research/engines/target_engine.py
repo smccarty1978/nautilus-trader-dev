@@ -102,6 +102,33 @@ def resolve_effective_horizon(target_spec: TargetSpec) -> int | None:
     return next(iter(horizons))
 
 
+def resolve_session_end_censoring(target_spec: TargetSpec) -> bool:
+    """The single authoritative collector-global ``session_end_censoring`` value.
+
+    Priority, highest first:
+
+    1. ``TargetSpec.session_end_censoring`` -- an explicit author decision on a plain
+       flip target (the only place it can be authored for a flip).
+    2. The ``required_forward_outcomes`` entries -- a composite / ordered-barrier target
+       authors censoring per forward-outcome (``RequiredForwardOutcomeSpec``); the
+       collector needs one global bool that decides whether ``session_close_ts`` is
+       computed at all, and each ``CompositeTargetRuntime`` child then re-applies its own
+       per-outcome value.  ``any(...)`` so a single censored child still gets a session
+       close to test against.
+    3. Historical default ``True`` -- a plain flip target that authors nothing keeps the
+       behavior every existing flip study was collected under.
+
+    This replaces a hard-coded ``True`` that ignored the authored value entirely, so an
+    authored ``session_end_censoring = false`` can no longer execute as ``true``.
+    """
+    if target_spec.session_end_censoring is not None:
+        return bool(target_spec.session_end_censoring)
+    outcomes = target_spec.required_forward_outcomes or []
+    if outcomes:
+        return any(bool(fo.session_end_censoring) for fo in outcomes)
+    return True
+
+
 def _execution_primitive(target_spec: TargetSpec) -> str:
     """The execution primitive the collector dispatches on.
 
@@ -131,6 +158,7 @@ def compile_target_contract(target_spec: TargetSpec) -> Dict[str, Any]:
     expression the runtime executes) and ``censoring_composition``.
     """
     effective_horizon = resolve_effective_horizon(target_spec)
+    session_end_censoring = resolve_session_end_censoring(target_spec)
     contract = {
         # This is an execution primitive, not presentation metadata.  The collector
         # resolves it through research_workflow.target_runtime and never guesses from
@@ -144,8 +172,13 @@ def compile_target_contract(target_spec: TargetSpec) -> Dict[str, Any]:
             "mode": "bar_close",
             "confirmation_bars": 1,
         },
+        # Authoritative session-resolution policy, resolved from the authored TargetSpec /
+        # required_forward_outcomes -- never a hard-coded True.  `censoring_policy` is the
+        # historical shape the collector reads; `session_end_censoring` is the same value
+        # surfaced at top level so a consumer binds to the target contract's own policy.
+        "session_end_censoring": session_end_censoring,
         "censoring_policy": {
-            "session_end_censoring": True,
+            "session_end_censoring": session_end_censoring,
             "max_horizon_seconds": effective_horizon or 300,
         },
         "decision_reference": target_spec.decision_reference,

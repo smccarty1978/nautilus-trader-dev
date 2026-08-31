@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 from enum import Enum
-from typing import Annotated, Any, Dict, List, Literal, Optional, Union
+from typing import Annotated, Any, ClassVar, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
@@ -108,6 +108,78 @@ class EpisodeLifecycleSpec(BaseModel):
         return self
 
 
+class PopulationQualificationSpec(BaseModel):
+    """Typed, closed qualification schema for the existing population primitives (RT-06).
+
+    ``qualification`` used to be ``Dict[str, Any]`` -- an unknown authored key compiled,
+    sealed, and was silently ignored (``clean_tradable_reversal`` alone carried nine keys,
+    only one of which any code reads). Every field a real study authors is now declared
+    here, in one of three groups, and ``extra="forbid"`` rejects anything else at compile
+    time. Per-field ``exclude_if`` keeps ``model_dump`` byte-identical to the old dict so
+    this does not stale an existing study's ``spec_sha256``.
+
+    Group A -- consumed by the ESTABLISHED-FILTER population runtime
+      (``research_workflow.generic_collector``: ``_evaluate_checkpoint`` /
+      ``build_collector_config_kwargs``). The default population test.
+    Group B -- consumed by the IDENTITY-ALLOWLIST population runtime. When
+      ``required_checkpoint_identities_path`` is set it is the ONLY test applied and the
+      established filter is not evaluated (RESEARCH_WORKFLOW.md §7); the other group-B keys
+      are frozen-population provenance.
+    Group C -- ANALYSIS-SLICE metadata. Not a runtime gate and never a model input; drives
+      maturity-stratified reporting and is traced from ``research_decision.yaml``. Declared
+      here so it is a typed, documented field rather than a silently-ignored key.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    # -- Group A: established filter ----------------------------------------------
+    established: Optional[bool] = Field(None, exclude_if=lambda v: v is None)
+    age_gate_seconds: Optional[int] = Field(None, exclude_if=lambda v: v is None)
+    cadence_seconds: Optional[int] = Field(None, exclude_if=lambda v: v is None)
+    running_mfe_atr_gte: Optional[float] = Field(None, exclude_if=lambda v: v is None)
+    new_progress_windows_gte: Optional[int] = Field(None, exclude_if=lambda v: v is None)
+    retained_mfe_ratio_gte: Optional[float] = Field(None, exclude_if=lambda v: v is None)
+
+    # -- Group B: identity allowlist + its provenance ---------------------------
+    required_checkpoint_identities_path: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    required_checkpoint_identities_sha256: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    population_version: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    selection: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    stage1_score_threshold_source: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+    stage1_score_threshold_derivation: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+
+    # -- Group C: analysis-slice metadata (never a runtime gate) ----------------
+    primary_maturity_buckets: Optional[List[str]] = Field(None, exclude_if=lambda v: v is None)
+    diagnostic_maturity_buckets: Optional[List[str]] = Field(None, exclude_if=lambda v: v is None)
+    maturity_role: Optional[str] = Field(None, exclude_if=lambda v: v is None)
+
+    #: Keys the generic collector runtime actually consumes. A machine-readable list so
+    #: preflight can re-assert coverage against the *selected* runtime (RT-06).
+    ESTABLISHED_FILTER_KEYS: ClassVar[frozenset] = frozenset({
+        "established", "age_gate_seconds", "cadence_seconds", "running_mfe_atr_gte",
+        "new_progress_windows_gte", "retained_mfe_ratio_gte",
+    })
+    IDENTITY_ALLOWLIST_KEYS: ClassVar[frozenset] = frozenset({"required_checkpoint_identities_path"})
+    RUNTIME_CONSUMED_KEYS: ClassVar[frozenset] = ESTABLISHED_FILTER_KEYS | IDENTITY_ALLOWLIST_KEYS
+
+    @model_validator(mode="after")
+    def validate_mutually_exclusive_population_tests(self) -> "PopulationQualificationSpec":
+        if self.required_checkpoint_identities_path is not None:
+            established_thresholds = [
+                k for k in ("age_gate_seconds", "running_mfe_atr_gte",
+                            "new_progress_windows_gte", "retained_mfe_ratio_gte")
+                if getattr(self, k) is not None
+            ] + (["established"] if self.established else [])
+            if established_thresholds:
+                raise ValueError(
+                    "POPULATION_QUALIFICATION_TESTS_MUTUALLY_EXCLUSIVE: "
+                    "required_checkpoint_identities_path (identity allowlist) is the only "
+                    "qualification test applied when set; it may not be combined with the "
+                    f"established-filter keys {established_thresholds} (RESEARCH_WORKFLOW.md §7)"
+                )
+        return self
+
+
 class PopulationSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -116,8 +188,9 @@ class PopulationSpec(BaseModel):
         None, description="Prevailing regime direction, e.g. bearish, bullish"
     )
     session: str = Field("RTH", description="Session filter, e.g. RTH, ETH, ALL")
-    qualification: Optional[Dict[str, Any]] = Field(
-        default=None, description="Qualification rules, e.g. age_gate_seconds, established"
+    qualification: Optional[PopulationQualificationSpec] = Field(
+        default=None,
+        description="Typed, closed qualification rules -- see PopulationQualificationSpec",
     )
     episode_lifecycle: Optional[EpisodeLifecycleSpec] = Field(
         None, exclude_if=lambda value: value is None
@@ -269,6 +342,19 @@ class TargetSpec(BaseModel):
     )
     confirmation: Optional[Dict[str, Any]] = Field(
         default=None, description="Confirmation parameters, e.g. bars_required, ticks_required"
+    )
+    session_end_censoring: Optional[bool] = Field(
+        default=None,
+        exclude_if=lambda value: value is None,
+        description=(
+            "Whether a candidate whose resolution window extends past its own session "
+            "close is CENSORED rather than labeled. Authoritative for a plain flip "
+            "target; a composite / ordered-barrier target instead carries this on each "
+            "required_forward_outcomes entry (RequiredForwardOutcomeSpec.session_end_"
+            "censoring) and target_engine derives the collector-global value from those. "
+            "Left unset, a plain flip target keeps the historical default (True). "
+            "Additive and hash-neutral (excluded from model_dump when None)."
+        ),
     )
     # -- composite target support -------------------------------------------------
     # A study with no `conditions` declared compiles exactly as it always has -- these
@@ -734,13 +820,32 @@ class ExecutionSpec(BaseModel):
     observation_policy: Optional[Dict[str, Any]] = Field(
         default=None, description="Observation timing policy (exact_grid, parent_bar_close, event_driven)"
     )
+    modeling_driver_relpaths: Optional[List[str]] = Field(
+        default=None,
+        exclude_if=lambda value: not value,
+        description=(
+            "Study-relative paths to study-local modeling driver module(s) (e.g. "
+            "'implementation/train_merge_fit_freeze.py') that compose governed modeling "
+            "APIs (fit / model-selection / freeze / pre-fit gate scope). Declaring a "
+            "driver here binds its exact file bytes -- and its transitive import closure "
+            "-- into MODELING_EXECUTION_CLOSURE (research_workflow/modeling_closure.py), "
+            "so a modeling-only edit to it stales the TRAIN freeze / blocks OOS without "
+            "invalidating collection. A study-local implementation module that imports a "
+            "governed modeling API but is NOT declared here fails closed before fit "
+            "(research_workflow/modeling_drivers.py). Additive and hash-neutral: absent, "
+            "null and [] all serialize identically (the exclude_if drops the key), so "
+            "adding this field never stales an already-compiled study."
+        ),
+    )
     # NOTE: authorized modes are deliberately NOT a StudySpec field.
     # `compute_sha256` hashes `model_dump(exclude_none=False)`, so any additional field --
     # even an unset optional one -- changes every study's spec hash and marks every
-    # existing compiled_study.json stale. The mode-partitioned deliverables contract
-    # therefore derives its modes from `operation.kind` in the compiler instead
-    # (research/engines/deliverables_engine.py). Adding a declarative override here needs
-    # a deliberate spec-version bump and a recompile of every study.
+    # existing compiled_study.json stale (UNLESS, like `modeling_driver_relpaths` above,
+    # it carries an `exclude_if` that drops it from `model_dump` when unset). The
+    # mode-partitioned deliverables contract therefore derives its modes from
+    # `operation.kind` in the compiler instead (research/engines/deliverables_engine.py).
+    # Adding a declarative override here needs a deliberate spec-version bump and a
+    # recompile of every study.
 
 
 class AcceptanceSpec(BaseModel):

@@ -162,6 +162,11 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
             target_checked["target_runtime_closure_sha256"] = resolve_target_runtime_closure(study_dir)["target_runtime_closure_sha256"]
             if not target_checked["dispatch"]:
                 raise RuntimeBindingError("collector source does not dispatch resolved TargetRuntime")
+            # RT-05: every non-default semantic field the contract authors must be
+            # executed by the resolved runtime (or recorded as provenance-only), never
+            # silently ignored. Fails closed with TARGET_SEMANTIC_FIELD_UNSUPPORTED.
+            from research_workflow.target_runtime import assert_target_semantic_field_coverage
+            target_checked["semantic_field_coverage"] = assert_target_semantic_field_coverage(target_contract)
             # PREFLIGHT_EXPRESSION_BINDING: the executable Boolean expression the runtime
             # will run MUST equal the expression compiled from the contract's own
             # conditions/condition_logic AND the target_expression tree embedded in the
@@ -289,26 +294,46 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
                 "reason": f"{type(e).__name__}: {e}",
             })
 
-    # --- (4) frozen derived-input scorer binding (Stage 3) ----------------------
-    # A declared frozen_external_model_score must actually bind against the parent's
-    # on-disk artifacts (identities + arm mapping), not just be declared.
+    # --- (4) frozen derived-input scorer binding (Stage 3 / RT-04) --------------
+    # EVERY declared frozen_external_model_score must bind an executable scorer, 1:1,
+    # with a unique output-column name, independent of population type. A declared
+    # input with no bindable scorer fails preflight rather than silently producing a
+    # null column; no undeclared score is emitted (the collector's keep-set is exactly
+    # these names).
     features = spec.get("features", {}) or contracts.get("feature_contract", {}) or {}
     derived = (features.get("derived_inputs") or features.get("derived_causal_inputs") or [])
     scorer_bound = None
+    _bound_names: List[str] = []
+
+    def _is_runtime_scored(di: Dict[str, Any]) -> bool:
+        # A derived input the collector must SCORE at collection time: it carries a
+        # fitted-model artifact or an immutable model_id. A `score_artifact_path`-only
+        # form is a pre-materialized score table joined offline -- covered by
+        # research_workflow/derived_inputs.py's provenance gate, not scored here.
+        return bool(di.get("model_artifact_path") or di.get("model_id"))
+
+    _declared_names = [
+        di.get("name") for di in derived
+        if di.get("kind") == "frozen_external_model_score" and _is_runtime_scored(di)
+    ]
     for di in derived:
-        # Only the Stage-3 runtime-bound form (carries the fitted-model artifact + arm
-        # mapping) is verified here; an older declaration-only frozen score is covered by
-        # research_workflow/derived_inputs.py's provenance gate instead.
-        if di.get("kind") != "frozen_external_model_score" or not di.get("model_artifact_path"):
+        if di.get("kind") != "frozen_external_model_score" or not _is_runtime_scored(di):
             continue
         scorer_bound = False
         try:
             from research.schemas.study_spec import DerivedCausalInputSpec
             from research_workflow.external_model_scoring import FrozenExternalModelScorer
             spec_di = DerivedCausalInputSpec.model_validate(di)
-            parent_dir = study_dir.parents[0] / spec_di.parent_study_id
+            # bind() derives the model registry as parent_dir.parents[0]/model_registry
+            # for a model_id binding, so parent_dir must be a directory under studies/;
+            # study_dir itself works (a legacy binding overrides it with the parent).
+            parent_dir = (
+                (study_dir.parents[0] / spec_di.parent_study_id)
+                if spec_di.parent_study_id else study_dir
+            )
             FrozenExternalModelScorer.bind(spec_di, parent_dir=parent_dir)
             scorer_bound = True
+            _bound_names.append(spec_di.name)
         except Exception as e:
             missing.append({
                 "primitive": f"derived_input:{di.get('name')}",
@@ -317,6 +342,23 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
                 "collector": caps["strategy_class"],
                 "reason": f"{type(e).__name__}: {e}",
             })
+    if _declared_names and len(set(_declared_names)) != len(_declared_names):
+        missing.append({
+            "primitive": "derived_inputs.name_uniqueness",
+            "declared": _declared_names,
+            "required_binding": "one output column per declared derived input",
+            "collector": caps["strategy_class"],
+            "reason": f"DERIVED_INPUT_DUPLICATE_NAME: {_declared_names}",
+        })
+    if _declared_names and sorted(_bound_names) != sorted(n for n in _declared_names if n):
+        missing.append({
+            "primitive": "derived_inputs.scorer_coverage",
+            "declared": _declared_names,
+            "required_binding": "exactly one bound scorer per declared derived input",
+            "collector": caps["strategy_class"],
+            "reason": (f"DERIVED_INPUT_SCORER_UNBOUND: declared {_declared_names}, "
+                       f"bound {_bound_names}"),
+        })
 
     # --- (5) output-row persistence path (Stage 3) -----------------------------
     # An episode study's governed row carries episode identity + the derived score

@@ -50,11 +50,16 @@ class FrozenExternalModelScorer:
         # New workflow declarations bind by immutable registry id and intentionally
         # do not consult the source study's current lifecycle state.
         if spec.model_id:
-            from research_workflow.model_artifacts import resolve_model
+            from research_workflow.model_artifacts import load_model_bundle, resolve_model
             registry = Path(parent_dir).resolve().parents[0] / "model_registry"
-            rec = resolve_model(spec.model_id, registry_root=registry)
+            # RT-09: consuming a frozen model as a derived causal input enforces
+            # scientific_status + recorded runtime identity, not just reuse_status.
+            rec = resolve_model(
+                spec.model_id, registry_root=registry,
+                reuse_intent="derived_causal_input",
+            )
             artifact = rec.get("_artifact_path", rec["artifact_path"])
-            bundle = joblib.load(artifact)
+            bundle = load_model_bundle(rec)  # joblib load, with native-booster recovery
             return cls(spec, Path(artifact).parent, bundle, rec)
         required = {
             "model_artifact_path": spec.model_artifact_path,
@@ -128,6 +133,23 @@ class FrozenExternalModelScorer:
             raise ExternalModelScoringError("preprocessing identity does not match parent TRAIN freeze")
         return cls(spec, parent, bundle)
 
+    def _arm_for(self, direction: str) -> str:
+        direction = str(direction).upper()
+        routing = self._recovered.get("direction_routing") or self.spec.direction_arm_mapping or {}
+        arm = routing.get(direction) or (self._recovered.get("model_role") if len(routing) <= 1 else None)
+        if arm is None:
+            raise ExternalModelScoringError(f"no frozen arm mapping for {direction!r}")
+        return arm
+
+    def ordered_inputs(self, direction: str) -> list[str]:
+        """The ordered causal-feature surface this scorer needs for ``direction`` -- from
+        the spec's ``ordered_feature_surfaces`` or, for a ``model_id`` binding, the
+        registry record's ``ordered_model_inputs`` (RT-04: the collector reads this to
+        assemble the snapshot for every declared derived input, not just the first)."""
+        arm = self._arm_for(direction)
+        surfaces = self.spec.ordered_feature_surfaces or {}
+        return list(surfaces.get(arm) or self._recovered.get("ordered_model_inputs") or [])
+
     def score(
         self,
         causal_snapshot: Mapping[str, float],
@@ -137,10 +159,7 @@ class FrozenExternalModelScorer:
         availability_ts: Mapping[str, int],
     ) -> DerivedScoreObservation:
         direction = str(direction).upper()
-        routing = self._recovered.get("direction_routing") or self.spec.direction_arm_mapping or {}
-        arm = routing.get(direction) or (self._recovered.get("model_role") if len(routing) <= 1 else None)
-        if arm is None:
-            raise ExternalModelScoringError(f"no frozen arm mapping for {direction!r}")
+        arm = self._arm_for(direction)
         surfaces = self.spec.ordered_feature_surfaces or {}
         features = list(surfaces.get(arm) or self._recovered.get("ordered_model_inputs") or [])
         missing = [name for name in features if name not in causal_snapshot]
