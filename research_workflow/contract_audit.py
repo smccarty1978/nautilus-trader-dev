@@ -105,10 +105,14 @@ def _check_model_selection_binding_present(study: Path, spec: dict[str, Any]) ->
     if not freeze_path.is_file():
         return {"name": "model_selection_binding_present", "passed": True,
                 "detail": "TRAIN not yet frozen; nothing to bind yet"}
-    manifest_path = study / "artifacts" / "model_selection_manifest.json"
-    present = manifest_path.is_file()
+    # A two-phase / direction-qualified study emits per-direction manifests
+    # (model_selection_manifest_long.json, ...); a single-model study emits
+    # model_selection_manifest.json. Either satisfies the binding-present check.
+    manifests = sorted(study.glob("artifacts/model_selection_manifest*.json"))
+    present = bool(manifests)
     return {"name": "model_selection_binding_present", "passed": present,
-            "detail": None if present else "TRAIN frozen but no model_selection_manifest.json found"}
+            "manifests": [p.name for p in manifests],
+            "detail": None if present else "TRAIN frozen but no model_selection_manifest*.json found"}
 
 
 def run_contract_review(study_path: str | Path, **_: Any) -> dict[str, Any]:

@@ -95,6 +95,59 @@ def fit_models(
     return {"models": models, "manifest": manifest, "path": str(out), "model_artifacts": persisted}
 
 
+def _resolve_selection_bindings(
+    model_selection_manifest_path: "str | Path | Mapping[str, str | Path]",
+    feature_sets: Mapping[str, list[str]],
+) -> Dict[str, tuple[Dict[str, Any], Optional[Dict[str, Any]], Path]]:
+    """Bind every frozen arm to a selection-manifest winner.
+
+    ``model_selection_manifest_path`` is either a single manifest (str/Path) shared
+    by all arms, or a per-arm mapping ``{arm: path}`` -- the latter lets a
+    direction-qualified aggregate freeze (arms ``LONG_C`` / ``SHORT_C``) bind each
+    direction to its own two-phase selection manifest without collapsing them.
+
+    Winner resolution for arm ``a`` in its manifest: exact key ``a`` if present,
+    else -- when the manifest declares exactly one winner -- that sole winner
+    (a per-direction manifest has one). Anything else resolves to ``None`` and the
+    caller fails closed. Renaming an arm never skips the check.
+    """
+    if isinstance(model_selection_manifest_path, Mapping):
+        per_arm = {arm: Path(p) for arm, p in model_selection_manifest_path.items()}
+    else:
+        shared = Path(model_selection_manifest_path)
+        per_arm = {arm: shared for arm in feature_sets}
+    out: Dict[str, tuple[Dict[str, Any], Optional[Dict[str, Any]], Path]] = {}
+    cache: Dict[Path, Dict[str, Any]] = {}
+    for arm in feature_sets:
+        path = per_arm.get(arm)
+        if path is None:
+            raise ModelSelectionBindingRequired(
+                f"MODEL_SELECTION_BINDING_REQUIRED: no selection manifest supplied for arm {arm!r}"
+            )
+        manifest = cache.get(path)
+        if manifest is None:
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+            cache[path] = manifest
+        winners = manifest.get("winner") or {}
+        winner = winners.get(arm)
+        if winner is None and len(winners) == 1:
+            winner = next(iter(winners.values()))
+        out[arm] = (manifest, winner, path)
+    return out
+
+
+def _selection_manifest_sha_field(
+    selection_bindings: Optional[Dict[str, tuple[Dict[str, Any], Any, Path]]],
+) -> Any:
+    if not selection_bindings:
+        return None
+    shas = {arm: manifest.get("manifest_sha256") for arm, (manifest, _, _) in selection_bindings.items()}
+    uniq = set(shas.values())
+    if len(uniq) == 1:
+        return next(iter(uniq))
+    return shas
+
+
 def freeze_train_artifacts(
     study_path: str | Path,
     *,
@@ -106,9 +159,10 @@ def freeze_train_artifacts(
     thresholds: Optional[Mapping[str, Any]] = None,
     deciles: Optional[Mapping[str, Any]] = None,
     study_spec: Optional[Any] = None,
-    model_selection_manifest_path: Optional[str | Path] = None,
+    model_selection_manifest_path: Optional[str | Path | Mapping[str, str | Path]] = None,
     dataset_identity_sha256: Optional[str] = None,
     model_artifact_records: Optional[list[Mapping[str, Any]]] = None,
+    extra_payload: Optional[Mapping[str, Any]] = None,
 ) -> Path:
     """Freeze all TRAIN-derived objects before any OOS frame is accepted.
 
@@ -140,6 +194,7 @@ def freeze_train_artifacts(
         )
 
     selection_manifest: Optional[Dict[str, Any]] = None
+    selection_bindings: Optional[Dict[str, tuple[Dict[str, Any], Dict[str, Any], Path]]] = None
     selection = getattr(getattr(study_spec, "model", None), "selection", None)
     if selection is not None and selection.search_method != "none":
         if model_selection_manifest_path is None:
@@ -148,11 +203,16 @@ def freeze_train_artifacts(
                 f"search_method={selection.search_method!r}; freeze_train_artifacts "
                 "requires model_selection_manifest_path"
             )
-        selection_manifest = json.loads(Path(model_selection_manifest_path).read_text(encoding="utf-8"))
-        for arm in feature_sets:
-            winner = (selection_manifest.get("winner") or {}).get(arm)
+        selection_bindings = _resolve_selection_bindings(model_selection_manifest_path, feature_sets)
+        for arm, (manifest, winner, manifest_path) in selection_bindings.items():
+            # Fail closed: an arm frozen under a declared search MUST trace to a winner.
+            # Renaming an arm (e.g. C -> LONG_C) does not exempt it -- a direction-qualified
+            # arm binds against the sole winner of its direction-specific manifest.
             if winner is None:
-                continue
+                raise ModelSelectionBindingMismatch(
+                    f"MODEL_SELECTION_BINDING_MISMATCH: arm {arm!r} freezes under a declared "
+                    f"hyperparameter search but no winner in {manifest_path} traces to it"
+                )
             frozen_rec = (models_manifest.get("arms") or {}).get(arm) or {}
             if frozen_rec.get("hyperparameters") != winner.get("hyperparameters"):
                 raise ModelSelectionBindingMismatch(
@@ -160,20 +220,23 @@ def freeze_train_artifacts(
                     f"{frozen_rec.get('hyperparameters')!r}, which does not match the selection "
                     f"manifest's winner {winner.get('hyperparameters')!r}"
                 )
-            if frozen_rec.get("seed") != selection_manifest.get("random_seed"):
+            if frozen_rec.get("seed") != manifest.get("random_seed"):
                 raise ModelSelectionBindingMismatch(
                     f"MODEL_SELECTION_BINDING_MISMATCH: arm {arm!r} freezes seed "
                     f"{frozen_rec.get('seed')!r}, which does not match the selection "
-                    f"manifest's random_seed {selection_manifest.get('random_seed')!r}"
+                    f"manifest's random_seed {manifest.get('random_seed')!r}"
                 )
-        if (selection_manifest.get("final_validation_policy") == "gated"
-                and selection_manifest.get("final_validation_status") != "PASS"):
-            raise ModelSelectionFinalValidationFailed(
-                "MODEL_SELECTION_FINAL_VALIDATION_FAILED: the selection manifest's gated "
-                f"final-validation status is {selection_manifest.get('final_validation_status')!r}, "
-                f"not PASS -- reasons: {selection_manifest.get('final_validation_reasons')!r}. "
-                "The freeze refuses; it does not re-derive, re-search, or adjust hyperparameters."
-            )
+            if (manifest.get("final_validation_policy") == "gated"
+                    and manifest.get("final_validation_status") != "PASS"):
+                raise ModelSelectionFinalValidationFailed(
+                    "MODEL_SELECTION_FINAL_VALIDATION_FAILED: the selection manifest's gated "
+                    f"final-validation status is {manifest.get('final_validation_status')!r}, "
+                    f"not PASS -- reasons: {manifest.get('final_validation_reasons')!r}. "
+                    "The freeze refuses; it does not re-derive, re-search, or adjust hyperparameters."
+                )
+        # Backward-compatible single-manifest handle for the payload sha field below.
+        if len(selection_bindings) == 1:
+            selection_manifest = next(iter(selection_bindings.values()))[0]
 
     if study_spec is not None and getattr(study_spec, "required_gates", None):
         from research_workflow.gates import assert_gates_satisfied
@@ -208,10 +271,12 @@ def freeze_train_artifacts(
         "preprocessing_hash": preprocessing_hash,
         "thresholds": threshold_payload,
         "deciles": dict(deciles or {}),
-        "model_selection_manifest_sha256": (
-            selection_manifest.get("manifest_sha256") if selection_manifest else None
-        ),
+        "model_selection_manifest_sha256": _selection_manifest_sha_field(selection_bindings),
     }
+    for _k, _v in dict(extra_payload or {}).items():
+        if _k in payload:
+            raise ValueError(f"extra_payload may not override reserved freeze key {_k!r}")
+        payload[_k] = _v
     study = Path(study_path).resolve()
     explicit_new = False
     if (study / "compiled_study.json").is_file():
