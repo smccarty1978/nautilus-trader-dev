@@ -68,16 +68,15 @@ def persist_models(study_path: str | Path, models: Mapping[str, Any], manifest: 
 # never inferred from "the artifact loads" + "reuse_status == PERMITTED":
 #   * an explicitly-invalid status is a HARD block, always;
 #   * VALID_DIAGNOSTIC is reusable only under an explicit policy;
-#   * VALID_PRIMARY and UNASSESSED pass (reuse_status is the owner's deliberate act; an
-#     UNASSESSED model has not been *flagged* invalid -- but an INVALID_TARGET one has).
-_SCIENTIFIC_STATUS_BLOCKED = frozenset({"INVALID_TARGET", "INVALID", "REJECTED", "SCIENTIFICALLY_INVALID"})
+#   * VALID_PRIMARY passes; UNASSESSED is not scientific approval and is blocked.
+_SCIENTIFIC_STATUS_BLOCKED = frozenset({"INVALID_TARGET", "INVALID", "REJECTED", "SCIENTIFICALLY_INVALID", "UNASSESSED"})
 _SCIENTIFIC_STATUS_POLICY_GATED = frozenset({"VALID_DIAGNOSTIC"})
 
 
 def assert_scientific_status_reusable(record: Mapping[str, Any], policy: Mapping[str, Any] | None = None) -> None:
     """Fail closed unless the model's ``scientific_status`` permits reuse as a derived
-    causal input. ``policy`` may carry ``allow_diagnostic: true`` or a
-    ``diagnostic_allowlist`` of model_ids to permit a ``VALID_DIAGNOSTIC`` model."""
+    causal input. A VALID_DIAGNOSTIC model needs the closed, model-specific derived
+    input policy; UNASSESSED is never implicit scientific approval."""
     status = str(record.get("scientific_status") or "UNASSESSED")
     mid = record.get("model_id")
     if status in _SCIENTIFIC_STATUS_BLOCKED:
@@ -87,12 +86,13 @@ def assert_scientific_status_reusable(record: Mapping[str, Any], policy: Mapping
         )
     if status in _SCIENTIFIC_STATUS_POLICY_GATED:
         pol = policy or {}
-        if pol.get("allow_diagnostic") is True or mid in set(pol.get("diagnostic_allowlist") or ()):
+        if (pol.get("kind") == "diagnostic_derived_causal_input"
+                and pol.get("model_id") == mid):
             return
         raise ModelArtifactError(
             f"PRESERVED_MODEL_SCIENTIFIC_STATUS_REQUIRES_POLICY: model {mid} is "
             f"{status}; consuming a diagnostic-derived model as a causal input requires "
-            f"an explicit reuse policy (allow_diagnostic / diagnostic_allowlist)"
+            f"an explicit closed diagnostic_reuse_policy bound to this model_id"
         )
 
 
@@ -127,7 +127,13 @@ def resolve_model(model_id: str, *, registry_root: str | Path,
         raise ModelArtifactError("MODEL_PREPROCESSING_UNAVAILABLE")
     if not artifact.is_file() or _sha(artifact) != rec.get("artifact_sha256"): raise ModelArtifactError("PRESERVED_MODEL_CORRUPT")
     rec["_studies_root"] = str(studies_root); rec["_artifact_path"] = str(artifact)
-    validate_golden_prediction(rec)
+    golden = _resolve(studies_root, rec["golden_fixture_path"])
+    if not golden.is_file() or _sha(golden) != rec.get("golden_fixture_sha256"):
+        raise ModelArtifactError("MODEL_GOLDEN_FIXTURE_CORRUPT")
+    if rec.get("native_booster_path"):
+        native = _resolve(studies_root, rec["native_booster_path"])
+        if not native.is_file() or _sha(native) != rec.get("native_booster_sha256"):
+            raise ModelArtifactError("PRESERVED_MODEL_NATIVE_BOOSTER_CORRUPT")
     return rec
 
 
@@ -141,7 +147,7 @@ def load_model_bundle(record: Mapping[str, Any]) -> dict:
     """
     artifact = record.get("_artifact_path", record["artifact_path"])
     try:
-        return joblib.load(artifact)
+        bundle = joblib.load(artifact)
     except Exception as joblib_err:
         native_rel = record.get("native_booster_path")
         if not native_rel:
@@ -165,30 +171,84 @@ def load_model_bundle(record: Mapping[str, Any]) -> dict:
         arm = record["model_role"]
         bundle = {arm: {"estimator": _BoosterProbaShim(lgb.Booster(model_file=str(native))),
                         "fit_identity_sha256": None}}
-        rec_for_golden = {**record, "_native_recovered": True}
-        # Validate against the golden fixture using this recovered estimator.
-        g = json.loads(_resolve(studies_root, record["golden_fixture_path"]).read_text())
-        got = bundle[arm]["estimator"].predict_proba(pd.DataFrame(g["rows"], columns=g["ordered_inputs"]))[:, 1]
-        if len(got) != len(g["expected_scores"]) or any(
-            abs(float(a) - float(b)) > 1e-9 for a, b in zip(got, g["expected_scores"])
-        ):
-            raise ModelArtifactError("PRESERVED_MODEL_NATIVE_RECOVERY_GOLDEN_MISMATCH") from joblib_err
+        try:
+            validate_golden_prediction(record, bundle=bundle)
+        except ModelArtifactError as exc:
+            raise ModelArtifactError("PRESERVED_MODEL_NATIVE_RECOVERY_GOLDEN_MISMATCH") from exc
         return bundle
+    # A loadable artifact is authoritative. Its golden mismatch is a model-integrity
+    # failure, not an artifact-load failure, so native fallback is forbidden.
+    validate_golden_prediction(record, bundle=bundle)
+    return bundle
 
 def score_preserved_model(model_id: str, frame: pd.DataFrame, *, registry_root: str | Path) -> list[float]:
     rec = resolve_model(model_id, registry_root=registry_root)
     bundle = load_model_bundle(rec); estimator = bundle[rec["model_role"]]["estimator"]
     return [float(v) for v in estimator.predict_proba(frame[list(rec["ordered_model_inputs"])])[:, 1]]
 
-def validate_golden_prediction(record: Mapping[str, Any]) -> bool:
+def validate_golden_prediction(record: Mapping[str, Any], bundle: Mapping[str, Any] | None = None) -> bool:
     # New paths are relative to studies/, while historical absolute records remain readable.
     studies_root=Path(record.get("_studies_root", Path.cwd())).resolve()
     golden=_resolve(studies_root, record["golden_fixture_path"]); artifact=Path(record.get("_artifact_path", _resolve(studies_root, record["artifact_path"])))
     if not golden.is_file() or _sha(golden)!=record.get("golden_fixture_sha256"): raise ModelArtifactError("MODEL_GOLDEN_FIXTURE_CORRUPT")
-    g=json.loads(golden.read_text()); bundle=joblib.load(artifact); arm=record["model_role"]; est=bundle[arm]["estimator"]
+    g=json.loads(golden.read_text()); bundle=bundle if bundle is not None else joblib.load(artifact); arm=record["model_role"]; est=bundle[arm]["estimator"]
     got=est.predict_proba(pd.DataFrame(g["rows"], columns=g["ordered_inputs"]))[:,1]
     if len(got)!=len(g["expected_scores"]) or any(abs(float(a)-float(b))>1e-12 for a,b in zip(got,g["expected_scores"])): raise ModelArtifactError("MODEL_GOLDEN_PREDICTION_MISMATCH")
     return True
+
+
+def assign_scientific_status(*, model_id: str, registry_root: str | Path, scientific_status: str,
+                             closure_evidence_path: str | Path, decision_evidence_path: str | Path) -> dict:
+    """Governed scientific-status assignment without changing model/artifact identity."""
+    if scientific_status not in {"VALID_PRIMARY", "VALID_DIAGNOSTIC", "INVALID_TARGET", "INVALID", "REJECTED"}:
+        raise ModelArtifactError("SCIENTIFIC_STATUS_INVALID")
+    registry = Path(registry_root).resolve(); path = registry / f"{model_id}.json"
+    if not path.is_file(): raise ModelArtifactError("PRESERVED_MODEL_MISSING")
+    closure, decision = Path(closure_evidence_path).resolve(), Path(decision_evidence_path).resolve()
+    if not closure.is_file() or not decision.is_file(): raise ModelArtifactError("SCIENTIFIC_STATUS_EVIDENCE_MISSING")
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if record.get("model_id") != model_id: raise ModelArtifactError("SCIENTIFIC_STATUS_MODEL_ID_MISMATCH")
+    try:
+        closure_body = json.loads(closure.read_text(encoding="utf-8"))
+        decision_body = json.loads(decision.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ModelArtifactError("SCIENTIFIC_STATUS_EVIDENCE_MALFORMED") from exc
+    if closure_body.get("status") != "CLOSED" or closure_body.get("study_id") != record.get("study_id"):
+        raise ModelArtifactError("SCIENTIFIC_STATUS_CLOSURE_NOT_AUTHENTICATED")
+    model_ids = set(closure_body.get("model_ids") or (closure_body.get("bound_evidence") or {}).get("model_ids") or ())
+    if model_id not in model_ids:
+        raise ModelArtifactError("SCIENTIFIC_STATUS_CLOSURE_MODEL_UNBOUND")
+    bound = (closure_body.get("bound_evidence") or {}).get("stage17_research_decision")
+    if not isinstance(bound, Mapping) or not bound.get("path") or not bound.get("sha256"):
+        raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_UNBOUND")
+    study_root = closure.parent.parent if closure.parent.name == "artifacts" else closure.parent
+    bound_path = Path(str(bound["path"]))
+    resolved_candidates = {
+        bound_path.resolve() if bound_path.is_absolute() else (closure.parent / bound_path).resolve(),
+        (study_root / bound_path).resolve(),
+    }
+    if decision not in resolved_candidates or _sha(decision) != bound.get("sha256"):
+        raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_BINDING_MISMATCH")
+    declared_decision_identity = decision_body.get("decision_identity_sha256")
+    if declared_decision_identity:
+        computed = canonical_sha256({k: v for k, v in decision_body.items() if k != "decision_identity_sha256"})
+        if computed != declared_decision_identity:
+            raise ModelArtifactError("SCIENTIFIC_STATUS_DECISION_IDENTITY_MISMATCH")
+    declared_closure_identity = closure_body.get("closure_identity_sha256")
+    if declared_closure_identity:
+        computed = canonical_sha256({k: v for k, v in closure_body.items() if k != "closure_identity_sha256"})
+        if computed != declared_closure_identity:
+            raise ModelArtifactError("SCIENTIFIC_STATUS_CLOSURE_IDENTITY_MISMATCH")
+    assignment = {"scientific_status": scientific_status,
+                  "closure_evidence_path": str(closure), "closure_evidence_sha256": _sha(closure),
+                  "closure_identity_sha256": declared_closure_identity,
+                  "decision_evidence_path": str(decision), "decision_evidence_sha256": _sha(decision),
+                  "decision_identity_sha256": declared_decision_identity}
+    assignment["assignment_sha256"] = canonical_sha256(assignment)
+    record["scientific_status"] = scientific_status
+    record.setdefault("scientific_status_audit_history", []).append(assignment)
+    path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return record
 
 def register_historical_model(*, study_dir: str | Path, artifact_relpath: str,
                               model_role: str = "HISTORICAL", scientific_status: str = "INVALID_TARGET") -> dict[str, Any]:

@@ -449,6 +449,14 @@ class FeatureSelectionSpec(BaseModel):
     )
 
 
+class DiagnosticModelReusePolicySpec(BaseModel):
+    """Closed authorization to consume one VALID_DIAGNOSTIC model causally."""
+
+    model_config = ConfigDict(extra="forbid")
+    kind: Literal["diagnostic_derived_causal_input"] = "diagnostic_derived_causal_input"
+    model_id: str
+
+
 class DerivedCausalInputSpec(BaseModel):
     """A causal input that is NOT a canonical market FeatureInstance.
 
@@ -497,6 +505,10 @@ class DerivedCausalInputSpec(BaseModel):
     availability_reference: Literal["decision_ts", "entry_ts", "confirmation_ts"] = "decision_ts"
     retrain_prohibited: bool = Field(
         True, description="Must be True for this kind -- the child study may never retrain the upstream model"
+    )
+    diagnostic_reuse_policy: Optional[DiagnosticModelReusePolicySpec] = Field(
+        None, exclude_if=lambda value: value is None,
+        description="Closed explicit authorization required only for VALID_DIAGNOSTIC model reuse",
     )
 
     @field_validator("retrain_prohibited")

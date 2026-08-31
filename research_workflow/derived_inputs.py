@@ -73,6 +73,8 @@ def _verify_model_id(di: DerivedCausalInputSpec, repo_root: Path) -> Dict[str, A
         rec = resolve_model(
             di.model_id, registry_root=registry_root,
             reuse_intent="derived_causal_input",
+            reuse_policy=(di.diagnostic_reuse_policy.model_dump()
+                          if di.diagnostic_reuse_policy is not None else None),
         )
     except ModelArtifactError as exc:
         raise DerivedInputBindingError(

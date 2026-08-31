@@ -57,6 +57,8 @@ class FrozenExternalModelScorer:
             rec = resolve_model(
                 spec.model_id, registry_root=registry,
                 reuse_intent="derived_causal_input",
+                reuse_policy=(spec.diagnostic_reuse_policy.model_dump()
+                              if spec.diagnostic_reuse_policy is not None else None),
             )
             artifact = rec.get("_artifact_path", rec["artifact_path"])
             bundle = load_model_bundle(rec)  # joblib load, with native-booster recovery

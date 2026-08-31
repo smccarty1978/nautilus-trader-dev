@@ -16,7 +16,10 @@ from research_workflow.model_artifacts import (
     load_model_bundle,
     persist_models,
     resolve_model,
+    assign_scientific_status,
 )
+from research.schemas.study_spec import DerivedCausalInputSpec
+from research_workflow.external_model_scoring import FrozenExternalModelScorer
 
 
 # --------------------------------------------------------------------------- #
@@ -32,14 +35,48 @@ def test_valid_diagnostic_needs_explicit_policy():
     rec = {"model_id": "m", "scientific_status": "VALID_DIAGNOSTIC"}
     with pytest.raises(ModelArtifactError, match="REQUIRES_POLICY"):
         assert_scientific_status_reusable(rec)
-    assert_scientific_status_reusable(rec, {"allow_diagnostic": True})
-    assert_scientific_status_reusable(rec, {"diagnostic_allowlist": ["m"]})
+    assert_scientific_status_reusable(rec, {"kind": "diagnostic_derived_causal_input", "model_id": "m"})
 
 
-def test_valid_primary_and_unassessed_pass():
+def test_valid_primary_passes_but_unassessed_is_not_scientific_approval():
     assert_scientific_status_reusable({"model_id": "m", "scientific_status": "VALID_PRIMARY"})
-    assert_scientific_status_reusable({"model_id": "m", "scientific_status": "UNASSESSED"})
-    assert_scientific_status_reusable({"model_id": "m"})  # missing -> UNASSESSED
+    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
+        assert_scientific_status_reusable({"model_id": "m", "scientific_status": "UNASSESSED"})
+    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
+        assert_scientific_status_reusable({"model_id": "m"})
+
+
+def test_status_assignment_preserves_model_identity_and_binds_evidence(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    decision = tmp_path / "decision.json"
+    decision_body = {"study_id": "s", "decision": "valid"}
+    decision_body["decision_identity_sha256"] = canonical_sha256(decision_body)
+    decision.write_text(json.dumps(decision_body))
+    closure = tmp_path / "closure.json"
+    closure_body = {"status": "CLOSED", "study_id": "s", "model_ids": [rec["model_id"]],
+                    "bound_evidence": {"stage17_research_decision": {
+                        "path": "decision.json", "sha256": __import__("hashlib").sha256(decision.read_bytes()).hexdigest()}}}
+    closure_body["closure_identity_sha256"] = canonical_sha256(closure_body)
+    closure.write_text(json.dumps(closure_body))
+    updated = assign_scientific_status(model_id=rec["model_id"], registry_root=study.parent / "model_registry",
+                                       scientific_status="VALID_PRIMARY", closure_evidence_path=closure,
+                                       decision_evidence_path=decision)
+    assert updated["model_id"] == rec["model_id"]
+    assert updated["artifact_sha256"] == rec["artifact_sha256"]
+    assert updated["scientific_status_audit_history"][-1]["closure_evidence_sha256"]
+
+
+def test_loadable_joblib_golden_mismatch_never_uses_native_fallback(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    resolved = resolve_model(rec["model_id"], registry_root=study.parent / "model_registry")
+    golden = study.parent / resolved["golden_fixture_path"]
+    body = json.loads(golden.read_text()); body["expected_scores"] = [0.0, 0.0]
+    golden.write_text(json.dumps(body))
+    # Use an in-memory record with an updated fixture hash: resolver identity validation
+    # has already passed, and only the successful joblib representation is at issue.
+    resolved["golden_fixture_sha256"] = __import__("hashlib").sha256(golden.read_bytes()).hexdigest()
+    with pytest.raises(ModelArtifactError, match="MODEL_GOLDEN_PREDICTION_MISMATCH"):
+        load_model_bundle(resolved)
 
 
 # --------------------------------------------------------------------------- #
@@ -115,6 +152,38 @@ def test_native_booster_recovers_when_joblib_fails(tmp_path):
     est = bundle[resolved["model_role"]]["estimator"]
     got = est.predict_proba(pd.DataFrame([[0.0, 1.0]], columns=["x", "y"]))
     assert got.shape == (1, 2)
+
+
+def test_native_recovery_is_reachable_through_real_scorer_bind(tmp_path):
+    """Registry bind -> verified native recovery -> golden parity -> usable scorer."""
+    study, rec = _persist_lgbm(tmp_path)
+    reg = study.parent / "model_registry" / f"{rec['model_id']}.json"
+    body = json.loads(reg.read_text())
+    body["scientific_status"] = "VALID_PRIMARY"
+    artifact = study.parent / body["artifact_path"]
+    artifact.write_bytes(b"unloadable-but-authoritatively-registered")
+    body["artifact_sha256"] = __import__("hashlib").sha256(artifact.read_bytes()).hexdigest()
+    reg.write_text(json.dumps(body))
+    spec = DerivedCausalInputSpec.model_validate({"name": "upstream", "model_id": rec["model_id"]})
+    scorer = FrozenExternalModelScorer.bind(spec, parent_dir=study)
+    got = scorer.score({"x": 0.0, "y": 1.0}, checkpoint_ts=1, direction="LONG",
+                       availability_ts={"x": 1, "y": 1})
+    assert 0.0 <= got.score <= 1.0
+
+
+def test_native_recovery_scorer_bind_rejects_golden_mismatch(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    reg = study.parent / "model_registry" / f"{rec['model_id']}.json"
+    body = json.loads(reg.read_text()); body["scientific_status"] = "VALID_PRIMARY"
+    artifact = study.parent / body["artifact_path"]; artifact.write_bytes(b"unloadable")
+    body["artifact_sha256"] = __import__("hashlib").sha256(artifact.read_bytes()).hexdigest()
+    golden = study.parent / body["golden_fixture_path"]
+    fixture = json.loads(golden.read_text()); fixture["expected_scores"] = [0.0, 0.0]
+    golden.write_text(json.dumps(fixture)); body["golden_fixture_sha256"] = __import__("hashlib").sha256(golden.read_bytes()).hexdigest()
+    reg.write_text(json.dumps(body))
+    spec = DerivedCausalInputSpec.model_validate({"name": "upstream", "model_id": rec["model_id"]})
+    with pytest.raises(ModelArtifactError, match="NATIVE_RECOVERY_GOLDEN_MISMATCH"):
+        FrozenExternalModelScorer.bind(spec, parent_dir=study)
 
 
 def test_native_recovery_fails_closed_on_golden_mismatch(tmp_path):
