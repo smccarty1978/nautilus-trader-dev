@@ -139,6 +139,107 @@ class GovernedStudyController:
         frozen = _read(self.study / "audit" / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
         return bool(frozen and _clear(path) and _read(path).get("audited_execution_composite_sha256") == frozen and fp.get("current_execution_composite") == frozen)
 
+    def _current_study_spec_sha256(self) -> str | None:
+        """Validate the authored StudySpec; never ask the compiler to infer legacy intent."""
+        try:
+            import yaml
+            from research.schemas.study_spec import StudySpec
+            payload = yaml.safe_load((self.study / "study.yaml").read_text(encoding="utf-8")) or {}
+            return StudySpec.model_validate(payload).compute_sha256()
+        except Exception:
+            return None
+
+    def _repo_artifact(self, value: Any) -> Path | None:
+        """Resolve a manifest artifact only when it is a file inside this repository."""
+        if not isinstance(value, dict) or not isinstance(value.get("path"), str):
+            return None
+        raw = Path(value["path"])
+        if raw.is_absolute() or ".." in raw.parts:
+            return None
+        resolved = (self.repo_root / raw).resolve()
+        if self.repo_root not in resolved.parents or not resolved.is_file():
+            return None
+        return resolved
+
+    def _manifest_is_tracked(self, manifest: Path) -> bool:
+        """Require the working manifest bytes to match the tracked Git blob exactly."""
+        try:
+            relative = manifest.resolve().relative_to(self.repo_root)
+            index = subprocess.run(
+                ["git", "ls-files", "--stage", "--", str(relative)], cwd=self.repo_root,
+                text=True, capture_output=True, check=False,
+            )
+            working = subprocess.run(
+                ["git", "hash-object", "--", str(relative)], cwd=self.repo_root,
+                text=True, capture_output=True, check=False,
+            )
+            fields = index.stdout.strip().split()
+            return (
+                index.returncode == 0
+                and working.returncode == 0
+                and len(fields) >= 4
+                and fields[2] == "0"
+                and fields[1] == working.stdout.strip()
+            )
+        except (OSError, ValueError):
+            return False
+
+    def _valid_resume_handoff(self, fp: dict[str, str | None]) -> dict[str, Any] | None:
+        """Return a validated legacy TRAIN handoff, or None without exposing a boundary."""
+        manifest_path = self.study / "artifacts/resume_manifest.json"
+        manifest = _read(manifest_path)
+        if not manifest or manifest.get("study_id") != self.study.name:
+            return None
+        # This is deliberately narrower than missing compiler lineage: it is a
+        # declared, completed legacy semantic phase with a still-unauthorized next one.
+        if (manifest.get("frozen_at_phase") != "PHASE_C_COMPLETE" or manifest.get("study_status") != "READY_FOR_PHASE_D_MODELING"
+                or manifest.get("recollection_required") is not False or not isinstance(manifest.get("next_phase"), str)):
+            return None
+        if manifest.get("phase_d_authorized") is not False or manifest.get("oos_accessed") is not False:
+            return None
+        # Legacy manifests predate a self-SHA field. Git's indexed blob is their
+        # immutable outer identity; every referenced artifact is independently SHA-256
+        # verified below. A merely tracked but locally modified manifest is rejected.
+        if not self._manifest_is_tracked(manifest_path):
+            return None
+        spec_sha = self._current_study_spec_sha256()
+        compiled = _read(self.study / "compiled_study.json")
+        if not spec_sha or manifest.get("spec_sha256") != spec_sha or compiled.get("spec_sha256") != spec_sha:
+            return None
+        frozen = _read(self.study / "audit/frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
+        seal_composite = manifest.get("seal_composite_sha256")
+        identities = (seal_composite, frozen, fp.get("execution_composite"), fp.get("current_execution_composite"))
+        if not all(isinstance(x, str) and len(x) == 64 for x in identities) or len(set(identities)) != 1:
+            return None
+        try:
+            from research_workflow.seal import verify_preexec_audit_seal
+            verify_preexec_audit_seal(self.study)
+        except Exception:
+            return None
+        declarations = [manifest.get("authoritative_train_target"), *(manifest.get("verified_artifacts") or {}).values()]
+        if not declarations or any(not isinstance(item, dict) for item in declarations): return None
+        for item in declarations:
+            artifact = self._repo_artifact(item)
+            if artifact is None or _sha(artifact) != item.get("sha256"): return None
+            if "row_count" in item:
+                try:
+                    import pyarrow.parquet as pq
+                    metadata = pq.ParquetFile(artifact).metadata
+                    if metadata.num_rows != item["row_count"]: return None
+                    if item.get("columns") and metadata.schema.names != item["columns"]: return None
+                except Exception:
+                    return None
+        # The manifest is a legacy exception only when the modern factory can identify
+        # the semantic boundary without writing a compatibility projection.
+        try:
+            from research_workflow.study_spec_compiler import compile_approved_request
+            projection = compile_approved_request(self.study, write=False)
+            if projection.get("ok") or projection.get("terminal") != "SEMANTIC_DECISION_REQUIRED":
+                return None
+        except Exception:
+            return None
+        return manifest
+
     def _fresh_stage(self, stage: str, fp: dict[str, str | None]) -> bool:
         prior = _read(self.work / "status.json")
         mapping = {"approved_request": 1, "study_spec": 2, "compiled_study": 2, "execution_freeze": 2,
@@ -213,9 +314,9 @@ class GovernedStudyController:
         path = self.work / "failure_packet.json"; _json(path, data); return path
 
     def _card(self, state: ControllerState, stage: str, *, artifact: Path | None = None, blocker: BlockerType | None = None,
-              reason: str | None = None, dry_run: bool = False, last: str | None = None) -> dict[str, Any]:
+              reason: str | None = None, dry_run: bool = False, last: str | None = None, next_state: str | None = None) -> dict[str, Any]:
         fp = self._fingerprints(); failure = self._failure(state, blocker, reason or "", fp, last) if blocker and not dry_run else None
-        typed = ControllerStatus("BLOCKED" if blocker else "OK", state.value, stage, state.value, blocker.value if blocker else None, str(artifact) if artifact else None, _sha(artifact) if artifact else None, _read(self.work / "test_summary.json").get("counts", {}))
+        typed = ControllerStatus("BLOCKED" if blocker else "OK", state.value, stage, next_state or state.value, blocker.value if blocker else None, str(artifact) if artifact else None, _sha(artifact) if artifact else None, _read(self.work / "test_summary.json").get("counts", {}))
         card = {"STATUS": typed.status, "state": typed.state, "stage": typed.stage, "next_state": typed.next_state,
                 "actions_executed": self.ran, "artifact": str(artifact) if artifact else None, "sha256": _sha(artifact) if artifact else None,
                 "failure_packet": str(failure) if failure else None, "blocker_code": typed.blocker_code, "test_counts": typed.test_counts, "schema_version": typed.schema_version, "dry_run": dry_run, "fingerprints": fp,
@@ -229,6 +330,12 @@ class GovernedStudyController:
         if safety["unsafe_dirty_paths"]:
             return self._card(ControllerState.NEEDS_COMPILE, "worktree", blocker=BlockerType.WORKTREE_CONTAMINATION,
                               reason="unowned dirty paths: " + ", ".join(safety["unsafe_dirty_paths"]), dry_run=dry_run)
+        handoff = self._valid_resume_handoff(fp)
+        if handoff is not None:
+            return self._card(ControllerState.PHASE_D_MODELING_READY_NOT_AUTHORIZED, "phase_handoff",
+                              artifact=self.study / "artifacts/resume_manifest.json", blocker=BlockerType.SEMANTIC_BLOCKER,
+                              reason="validated legacy TRAIN handoff requires explicit Phase D authorization", dry_run=dry_run,
+                              next_state=handoff["next_phase"])
         last = None
         for stage in STAGE_ORDER[:STAGE_ORDER.index(through) + 1]:
             fp = self._fingerprints()

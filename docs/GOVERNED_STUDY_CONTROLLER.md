@@ -10,12 +10,19 @@ collector, audit implementation, analysis loader, or seal path.
 | `NEEDS_CAUSAL_AUDIT` / `NEEDS_CONTRACT_AUDIT` | Current independent review is missing | Give the generated compact packet to the named independent auditor; controller never judges it. |
 | `READY_TO_SEAL` | Both current audit JSON artifacts are CLEAR | Controller uses the existing seal implementation. |
 | `READY_TO_COLLECT` onward | Execution requires an approved study-specific operation | Register/use the standard governed API; OOS remains accessible only through `assert_oos_open`. |
+| `PHASE_D_MODELING_READY_NOT_AUTHORIZED` | A tracked, hash-validated legacy TRAIN handoff is complete through its declared frozen phase | The controller stops before any lifecycle action and returns the manifest's exact next phase; explicit semantic authorization is required. |
 
 Use `--inspect` or `--dry-run` for a non-mutating state card, `--json` for one compact JSON
 record, and repeat `--owned-path <repo-relative-path>` only for intentional local edits. Before
 any controller write, unowned dirty files produce `WORKTREE_CONTAMINATION`; nothing is reverted.
 This enforces **ONE_WRITER_PER_WORKTREE**: one implementation owner, one causal auditor, and one
 contract auditor (an optional repo scout is read-only; replacements are exceptional).
+
+For a legacy handoff manifest with no self-hash field, the controller requires its working bytes
+to match the tracked Git index blob and independently validates every declared artifact path, file hash, and any
+declared Parquet row count/schema. Missing compiler lineage alone never activates this exception:
+the modern compiler must specifically return `SEMANTIC_DECISION_REQUIRED` in its non-writing
+projection, and the current seal and execution composite must still verify.
 
 The controller saves detailed evidence under `studies/<id>/_work/controller/`: `status.json`,
 `progress.json`, current `failure_packet.json`, and audit packets. Verbose child output is stored
