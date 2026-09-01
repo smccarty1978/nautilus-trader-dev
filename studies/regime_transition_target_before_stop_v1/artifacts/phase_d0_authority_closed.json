@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "study_id": "regime_transition_target_before_stop_v1",
+  "record_type": "PHASE_D0_TRAIN_TARGET_AUTHORITY_CLOSURE",
+  "status": "CLOSED_PASS",
+  "closed_at_utc": "2026-09-01T19:05:00Z",
+  "summary": "Phase D.0 TRAIN target-authority reconciliation is closed. The authoritative TRAIN target is 21d598... It is independently bound by every preserved Phase C authority (freeze card, finalized resume manifest, Phase C.3 differential reconciliation, Phase D.0 logical reconciliation). The previously reported byte hash 785d95... was withdrawn by the study owner as unsupported/stale; it is not present in any authorized TRAIN artifact or preserved Phase C lineage and is removed as an execution blocker.",
+  "authoritative_train_target": {
+    "path": "studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/phase_c2_reconciled_targets.parquet",
+    "byte_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "on_disk_byte_sha256_verified": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "logical_content_sha256": {
+      "candidate_and_target": "5444c88fa32717f6031fa2d98a86880fc9c9d6049880ab19ec7d64b58b4f02d3",
+      "target_only": "552690f09c48d7a1208574e0aefa73aa10c0d0b717a34c9ff86474468e893b95"
+    },
+    "row_count": 1387411
+  },
+  "prior_unsupported_hash": {
+    "byte_sha256": "785d95ee2be118eeebf6c4be0f09a5626359f13e791b86968cebdfbca5fdb291",
+    "status": "WITHDRAWN_UNSUPPORTED_STALE",
+    "artifact_found": false,
+    "evidence_status": "NOT_PRESENT_IN_AUTHORIZED_TRAIN_ARTIFACTS_OR_PRESERVED_PHASE_C_EVIDENCE",
+    "disposition": "PRESERVED_FOR_PROVENANCE_ONLY; NOT_AN_EXECUTION_BLOCKER"
+  },
+  "binding_evidence": {
+    "phase_c_freeze_card": "PHASE_C_FREEZE_CARD.md §2 -> 21d598",
+    "resume_manifest": "artifacts/resume_manifest.json (sha 9b8f7552...) -> 21d598",
+    "phase_c3_differential_reconciliation": "_work/train_merged_collection/phase_c3_differential_reconciliation.json (sha 87401e75...) -> 21d598, oracle 639/639",
+    "phase_d0_logical_reconciliation": "_work/phase_d0_logical_reconciliation.json -> logical 5444c88f..., 0 mismatches",
+    "phase_d0_authority_reconciliation": "artifacts/train_target_authority_reconciliation.json (sha 1ed5690e...) -> action CONFIRM_PRESERVED_PHASE_C_AUTHORITY"
+  },
+  "authority_reconciliation": "PASS",
+  "constraints_held": {
+    "phase_c_not_rerun": true,
+    "targets_not_regenerated": true,
+    "phase_c_evidence_not_rewritten": true,
+    "oos_2024_accessed": false,
+    "prohibited_years_accessed": false,
+    "modeling_started": false
+  },
+  "phase_d_modeling": {
+    "train_target_authority": "RECONCILED",
+    "execution_status": "BLOCKED",
+    "blocker_type": "CAPABILITY_BLOCKER",
+    "blocker_ref": "artifacts/phase_d_modeling_failure_packet.json (sha a98797e3...)",
+    "blocker_summary": "Sealed contract declares one fixed model arm (BASELINE_13_RAW) with model.selection=null and no execution.modeling_driver_relpaths. Authorized Phase D protocol needs six direction-by-stop cells, a bounded expanding-window TRAIN-only selection protocol, decile/first-fire/timeout/regime-level diagnostics, and per-candidate model persistence. No declared governed driver composes this; requires reusable-layer implementation + study-contract re-declaration + PREPARE/READINESS/PREFLIGHT/audits/SEAL before any TRAIN fit.",
+    "authorized_to_start_modeling_this_turn": false
+  },
+  "next_action": "Await explicit study-owner authorization to begin the Phase D modeling-composition repair (implement governed six-cell modeling driver at the reusable layer, re-declare study contract, re-seal). No 2024 access. No ad-hoc model fitting."
+}

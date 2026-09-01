@@ -1,8 +1,8 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "20260901T032235Z_c9cfdb9184b2",
-  "generated_at_utc": "2026-09-01T03:22:35.460760+00:00",
-  "code_hash": "c9cfdb9184b2d1a0769caebd5eba287190383c91a99f4647f0692170e2a019f6",
+  "preflight_run_id": "20260901T202206Z_3d31c19b3c17",
+  "generated_at_utc": "2026-09-01T20:22:06.051261+00:00",
+  "code_hash": "3d31c19b3c175743ed2d6896e00c993f2addf23f459714f898f9b59a3902f7e5",
   "superseded": true,
   "failed_gate": "CAUSAL_INVARIANTS",
   "failure_ids": [
@@ -10,23 +10,23 @@
   ],
   "failure_details": [
     {
-      "message": "FAILED scripts/tests/test_readiness.py::test_r7_synthetic_valid_output_schema_passes"
+      "message": "ERROR scripts/tests/test_phase0_source_lineage.py::test_source_state_sha_changes_with_content"
     },
     {
-      "message": "FAILED scripts/tests/test_readiness.py::test_r7_malformed_schema_fails_via_real_output_manager"
+      "message": "ERROR scripts/tests/test_phase0_source_lineage.py::test_manifest_claiming_an_incompatible_commit_is_rejected"
     },
     {
-      "message": "FAILED scripts/tests/test_readiness.py::test_r10_parity_reports_real_surface_counts_and_catches_injected_bad_alias"
+      "message": "ERROR scripts/tests/test_phase0_source_lineage.py::test_drifted_dependency_is_rejected"
     },
     {
-      "message": "FAILED scripts/tests/test_readiness.py::test_r10_candidate_authority_uses_the_same_outputmanager_resolver_path"
+      "message": "ERROR scripts/tests/test_phase0_source_lineage.py::test_manifest_without_a_binding_is_rejected"
     },
     {
-      "message": "7 failed, 211 passed in 136.99s (0:02:16)"
+      "message": "217 passed, 7 skipped, 8 errors in 231.79s (0:03:51)"
     }
   ],
   "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit.",
-  "superseded_by_preflight_run_id": "20260901T141227Z_d59b938717d5",
-  "superseded_at_utc": "2026-09-01T14:12:27.483501+00:00",
+  "superseded_by_preflight_run_id": "20260901T202420Z_3d31c19b3c17",
+  "superseded_at_utc": "2026-09-01T20:24:20.001828+00:00",
   "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
 }

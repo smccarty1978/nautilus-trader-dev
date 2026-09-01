@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "study_id": "regime_transition_target_before_stop_v1",
+  "phase": "PHASE_D_MODELING",
+  "status": "BLOCKED",
+  "blocker_type": "CAPABILITY_BLOCKER",
+  "exact_reason": "The preserved sealed study contract declares a single fixed model arm (BASELINE_13_RAW), model.selection=null, and no execution.modeling_driver_relpaths. The authorized Phase D protocol requires six direction-by-stop-arm cells, a bounded multi-configuration expanding 2021->2022 and 2021+2022->2023 evaluation protocol, score-decile/first-fire/timeout/regime-level diagnostics, and per-candidate model persistence. No existing declared governed driver composes that protocol for this study. Running a new study-local or ad-hoc driver would be outside MODELING_EXECUTION_CLOSURE and would bypass the required contract/freshness/audit lifecycle.",
+  "last_successful_stage": "PHASE_D0_TRAIN_TARGET_AUTHORITY_RECONCILIATION",
+  "seal_verification": {
+    "status": "PASS",
+    "current_execution_composite_sha256": "4dcdc0307cbf90e0ef0d16bb1f7d805cf6770857d7cfcd649f2019976c0c8f7f",
+    "sealed_execution_composite_sha256": "4dcdc0307cbf90e0ef0d16bb1f7d805cf6770857d7cfcd649f2019976c0c8f7f",
+    "seal_path": "artifacts/preexec_audit_seal.json"
+  },
+  "train_target_authority": {
+    "path": "_work/train_merged_collection/phase_c2_reconciled_targets.parquet",
+    "byte_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "logical_candidate_and_target_sha256": "5444c88fa32717f6031fa2d98a86880fc9c9d6049880ab19ec7d64b58b4f02d3",
+    "authority_reconciliation_path": "artifacts/train_target_authority_reconciliation.json",
+    "authority_reconciliation_sha256": "1ed5690ed1dd74d59dac2bd2ebbc613a63e3b966f2d5a6eb2b7bf855dad9f690"
+  },
+  "input_readiness": {
+    "candidate_rows": 1387411,
+    "observation_rows": 1387411,
+    "candidate_observation_ordered_identity_match": true,
+    "observed_year_range": [2021, 2023],
+    "regime_direction_values": [-1, 1],
+    "feature_contract_count": 13,
+    "feature_contract_sha256": "38c0201fe2b0fec3070b7a226353d7782778aa82bace3b6070de8844d9d04d32",
+    "lightgbm_available": true,
+    "lightgbm_version": "4.6.0"
+  },
+  "missing_governed_composition": {
+    "required_cells": ["LONG_SL0_5", "LONG_SL1_0", "LONG_SL1_5", "SHORT_SL0_5", "SHORT_SL1_0", "SHORT_SL1_5"],
+    "missing_contract_bindings": [
+      "model arms for six direction-by-stop cells",
+      "bounded candidate configuration set",
+      "TRAIN-only selection policy over both approved temporal validation folds",
+      "declared study-local modeling driver in execution.modeling_driver_relpaths"
+    ],
+    "generic_components_inspected": [
+      "research_workflow.model_selection.run_model_selection",
+      "research_workflow.modeling.fit_models",
+      "research_workflow.modeling.freeze_train_artifacts",
+      "research_workflow.model_artifacts.persist_models"
+    ],
+    "why_generic_components_are_insufficient_as_is": "run_model_selection supports a declared tuning/final-validation split and persists a selection manifest, but the current compiled contract declares no selection protocol. fit_models accepts declared analysis arms only and cannot derive the six Phase D cells from the frozen one-arm contract. Neither API constructs the required study-specific direction/stop joins and diagnostics without a declared modeling driver."
+  },
+  "affected_artifacts": [
+    "compiled_study.json",
+    "study.yaml",
+    "audit/frozen_execution_manifest.json",
+    "artifacts/preexec_audit_seal.json"
+  ],
+  "relevant_files": [
+    "study.yaml",
+    "compiled_study.json",
+    "config/feature_contract.json",
+    "research_workflow/model_selection.py",
+    "research_workflow/modeling.py",
+    "research_workflow/modeling_drivers.py"
+  ],
+  "allowed_actions": [
+    "Implement or extend a reusable governed Phase D modeling composition at the owning reusable layer.",
+    "Declare its study-local driver and exact six-cell/selection protocol in the study contract.",
+    "Run bounded synthetic composition tests, then PREPARE, READINESS, PREFLIGHT, independent audits, and SEAL before TRAIN fitting."
+  ],
+  "prohibited_actions": [
+    "Fit an ad-hoc or undeclared model.",
+    "Modify target, candidate, observation, or Phase C evidence artifacts.",
+    "Open or access 2024.",
+    "Access 2025 or 2026.",
+    "Treat this failure packet as authorization to advance lifecycle stages."
+  ],
+  "oos_accessed": false,
+  "deterministic_repair_possible": true,
+  "modeling_started": false
+}

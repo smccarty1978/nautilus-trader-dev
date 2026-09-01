@@ -35,5 +35,18 @@ prohibited_changes:
 allowed_changes:
   - "Independent evaluation of the three predefined stop arms (SL 0.5, 1.0, 1.5 ATR)"
 
+phase_d_modeling_protocol:
+  authorization: "TRAIN_ONLY"
+  train_years: [2021, 2022, 2023]
+  oos_locked: [2024]
+  prohibited_years: [2025, 2026]
+  target_population: "POSITIVE versus NEGATIVE_SL only; all censor dispositions excluded"
+  cells: [LONG_SL0_5, LONG_SL1_0, LONG_SL1_5, SHORT_SL0_5, SHORT_SL1_0, SHORT_SL1_5]
+  validation_folds:
+    - {train: [2021], validate: 2022}
+    - {train: [2021, 2022], validate: 2023}
+  selection: "fixed 36-config LightGBM grid; stable worst-fold ROC, then mean ROC, mean PR, lower ROC dispersion, config order"
+  model_family: "LightGBM binary classifier, seed 42, natural prevalence"
+
 primary_comparison: "Discrimination of +1.00 ATR favorable before adverse stop across predefined stop arms"
 terminal_question: "Does causal information at T reliably predict target-before-stop economic path quality?"

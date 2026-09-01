@@ -1,7 +1,8 @@
 {
   "contract_version": 1,
   "authorized_modes": [
-    "collect"
+    "collect",
+    "modeling"
   ],
   "deliverables_by_mode": {
     "collect": [
@@ -10,6 +11,10 @@
       "collection_manifest.json",
       "run_manifest.json",
       "status.json"
+    ],
+    "modeling": [
+      "phase_d_modeling_report.json",
+      "phase_d_model_artifacts.json"
     ]
   },
   "artifact_metadata": {
@@ -43,6 +48,16 @@
       ],
       "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
       "relative_to": "run_dir"
+    },
+    "phase_d_modeling_report.json": {
+      "mode": "modeling",
+      "producer": "declared Phase D modeling driver",
+      "relative_to": "study_dir/artifacts/phase_d"
+    },
+    "phase_d_model_artifacts.json": {
+      "mode": "modeling",
+      "producer": "declared Phase D modeling driver",
+      "relative_to": "study_dir/artifacts/phase_d"
     }
   },
   "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."

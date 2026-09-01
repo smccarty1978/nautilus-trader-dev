@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "study_id": "regime_transition_target_before_stop_v1",
+  "phase": "PHASE_D0_TRAIN_TARGET_AUTHORITY_RECONCILIATION",
+  "status": "PASS",
+  "root_cause": "SUPERSEDED_REPORTED_HASH",
+  "root_cause_detail": "The previously reported byte SHA256 785d95ee... was withdrawn by the study owner as unsupported and stale. It was not found in authorized TRAIN artifacts or preserved Phase C lineage. The preserved Phase C.3 reconciliation, finalized resume manifest, freeze card, and current target artifact all directly bind 21d598a8... .",
+  "constraints": {
+    "modeling_started": false,
+    "target_regenerated": false,
+    "target_labels_altered": false,
+    "oos_2024_accessed": false,
+    "prohibited_years_accessed": false
+  },
+  "superseded_reported_hash": {
+    "byte_sha256": "785d95ee2be118eeebf6c4be0f09a5626359f13e791b86968cebdfbca5fdb291",
+    "authority_status": "UNSUPPORTED",
+    "artifact_found": false,
+    "path": null,
+    "row_count": null,
+    "logical_content_sha256": null,
+    "evidence_status": "NOT_PRESENT_IN_AUTHORIZED_TRAIN_ARTIFACTS_OR_PRESERVED_PHASE_C_EVIDENCE"
+  },
+  "current_artifact": {
+    "path": "studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/phase_c2_reconciled_targets.parquet",
+    "byte_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "size_bytes": 5867920,
+    "modified_utc": "2026-09-01T14:21:21.7800849Z",
+    "row_count": 1387411,
+    "column_count": 12,
+    "columns": [
+      "target_tp1_sl0_5_label",
+      "target_tp1_sl0_5_disposition",
+      "target_tp1_sl0_5_censor_reason",
+      "target_tp1_sl0_5_resolution_seconds",
+      "target_tp1_sl1_0_label",
+      "target_tp1_sl1_0_disposition",
+      "target_tp1_sl1_0_censor_reason",
+      "target_tp1_sl1_0_resolution_seconds",
+      "target_tp1_sl1_5_label",
+      "target_tp1_sl1_5_disposition",
+      "target_tp1_sl1_5_censor_reason",
+      "target_tp1_sl1_5_resolution_seconds"
+    ],
+    "parquet_metadata": {
+      "created_by": "parquet-cpp-arrow version 25.0.0",
+      "format_version": "2.6",
+      "row_groups": 2
+    }
+  },
+  "artifact_inventory": [
+    {
+      "path": "C:/Users/Scott McCarty/Projects/Nautilus Trader/studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/phase_c2_reconciled_targets.parquet",
+      "byte_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+      "size_bytes": 5867920,
+      "row_count": 1387411,
+      "modified_utc": "2026-09-01T14:21:21.7800849Z"
+    },
+    {
+      "path": "C:/Users/Scott McCarty/Projects/Nautilus Trader-regime-transition-target/studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/phase_c2_reconciled_targets.parquet",
+      "byte_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+      "size_bytes": 5867920,
+      "row_count": 1387411,
+      "modified_utc": "2026-09-01T14:21:21.7800849Z"
+    }
+  ],
+  "logical_identity": {
+    "method": "Exact ordered Arrow IPC batches of 65536 rows over observation_ts, regime_start_ns, checkpoint_index, and all 12 target columns; schema metadata and chunk layout normalized; no row reorder, rounding, coercion, null conversion, or column dropping.",
+    "current_candidate_and_target_sha256": "5444c88fa32717f6031fa2d98a86880fc9c9d6049880ab19ec7d64b58b4f02d3",
+    "current_target_only_sha256": "552690f09c48d7a1208574e0aefa73aa10c0d0b717a34c9ff86474468e893b95",
+    "observation_embedded_candidate_and_target_sha256": "5444c88fa32717f6031fa2d98a86880fc9c9d6049880ab19ec7d64b58b4f02d3",
+    "logical_equivalence_to_superseded_reported_hash": "NOT_APPLICABLE_UNSUPPORTED_HASH_WITHDRAWN"
+  },
+  "exact_current_cross_check": {
+    "candidate_identity_mismatches": {
+      "observation_ts": 0,
+      "regime_start_ns": 0,
+      "checkpoint_index": 0
+    },
+    "row_order_mismatches": 0,
+    "disposition_mismatches": 0,
+    "label_mismatches": 0,
+    "censor_reason_mismatches": 0,
+    "resolution_seconds_mismatches": 0,
+    "entry_ts_comparison": "NOT_PRESENT_IN_TARGET_ARTIFACT",
+    "atr_or_value_comparison": "NOT_PRESENT_IN_TARGET_ARTIFACT",
+    "other_target_column_mismatches": 0,
+    "comparison_authority": "phase_c2 candidate identities plus target columns embedded in the Phase C observation artifact"
+  },
+  "c3_accounting": {
+    "tp1_sl0_5": {
+      "POS": 435019,
+      "NEG_SL": 885589,
+      "TIMEOUT": 52771,
+      "SESSION_END": 13853,
+      "GAP": 0,
+      "AMBIGUOUS": 126,
+      "DATA_END": 53,
+      "total": 1387411
+    },
+    "tp1_sl1_0": {
+      "POS": 577984,
+      "NEG_SL": 574900,
+      "TIMEOUT": 220536,
+      "SESSION_END": 13860,
+      "GAP": 0,
+      "AMBIGUOUS": 78,
+      "DATA_END": 53,
+      "total": 1387411
+    },
+    "tp1_sl1_5": {
+      "POS": 616427,
+      "NEG_SL": 346198,
+      "TIMEOUT": 410829,
+      "SESSION_END": 13864,
+      "GAP": 0,
+      "AMBIGUOUS": 40,
+      "DATA_END": 53,
+      "total": 1387411
+    },
+    "matches_declared_counts": true,
+    "impossible_cross_arm_transitions": 0,
+    "cross_arm_invariants_pass": true,
+    "phase_c3_oracle_agreements": 639,
+    "phase_c3_oracle_samples": 639
+  },
+  "lineage": {
+    "last_writer": "studies/regime_transition_target_before_stop_v1/_work/generate_phase_c2_train_artifacts.py",
+    "write_behavior": "The generator reads an existing target when present and later unconditionally writes targets_df to the canonical parquet path.",
+    "write_time_utc": "2026-09-01T14:21:21.7800849Z",
+    "phase_c2_report_time_utc": "2026-09-01T14:21:46Z",
+    "phase_c3_report_time_utc": "2026-09-01T14:41:02.8996918Z",
+    "phase_c3_report_sha256": "87401e75560f0d25e2fa837808cdf72c37f51055a0bf575cc66e287a28647dab",
+    "phase_c3_bound_target_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "resume_manifest_sha256": "9b8f755289a06611494de8b9e0782936afc39b7226c84c32cd0b6ae2035c2719",
+    "resume_manifest_bound_target_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "freeze_card_bound_target_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "strongest_conclusion": "21d598a8... was already the byte authority when Phase C.3 reconciliation ran. No evidence establishes that 785d95ee... was ever the Phase C.3 artifact."
+  },
+  "authority_decision": {
+    "action": "CONFIRM_PRESERVED_PHASE_C_AUTHORITY_AND_AUTHORIZE_PHASE_D_TRAIN_MODELING",
+    "authoritative_train_target_path": "studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/phase_c2_reconciled_targets.parquet",
+    "authoritative_train_target_sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "authoritative_logical_content_sha256": {
+      "candidate_and_target": "5444c88fa32717f6031fa2d98a86880fc9c9d6049880ab19ec7d64b58b4f02d3",
+      "target_only": "552690f09c48d7a1208574e0aefa73aa10c0d0b717a34c9ff86474468e893b95"
+    },
+    "reason": "The study owner withdrew the unsupported 785d95ee... reported hash. The current 21d598a8... target is independently bound by every preserved Phase C authority and passes exact current-target identity, target-semantic, accounting, and cross-arm checks.",
+    "ready_for_phase_d_modeling": true
+  },
+  "phase_d_authorization": {
+    "authorized": true,
+    "scope": "TRAIN_MODELING_ONLY",
+    "train_years": [2021, 2022, 2023],
+    "oos_years_locked": [2024],
+    "prohibited_years": [2025, 2026],
+    "target_population": ["POSITIVE", "NEGATIVE_SL"],
+    "excluded_dispositions_or_censor_reasons": ["TIMEOUT", "SESSION_END", "GAP", "AMBIGUOUS", "DATA_END"],
+    "oos_access_authorized": false,
+    "modeling_started": false
+  }
+}
