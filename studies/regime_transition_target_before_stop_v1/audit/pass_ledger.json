@@ -100,6 +100,36 @@
       "auditor": "Contract Checker (Claude 3.7 Sonnet)",
       "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
       "issued_at": "2026-09-01T14:13:04.126673+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 6,
+      "audited_execution_composite_sha256": "8065d438b4e24f84a51e827d27171c04de5feb7dd58e615d77aaa8bf6b87091c",
+      "audit_report_sha256": "45ebd8d6230d24ab495fb5486509af5e71971b49c09ed1bcf2c401bb120e2c1b",
+      "audit_report_path": "audit/contract_pass_06.md",
+      "auditor": "Codex-PhaseD-Contract-20260901",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-09-01T18:51:23.993328+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 8,
+      "audited_execution_composite_sha256": "4f45256b975f8f3b4ef310f941a00a0efbe16e4c62e5b193e769c8fa4a0b3ea9",
+      "audit_report_sha256": "3d5d746ed7c62de653fe48ce20c9e10d8370ef378756ef52897a20050e08dbf3",
+      "audit_report_path": "audit/pass_08.md",
+      "auditor": "lookahead-auditor",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-09-01T22:02:31.176856+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 8,
+      "audited_execution_composite_sha256": "4f45256b975f8f3b4ef310f941a00a0efbe16e4c62e5b193e769c8fa4a0b3ea9",
+      "audit_report_sha256": "c9f87485928a8f15d1301346db0962bfac1fe9201020cc0b2116f0123a91750f",
+      "audit_report_path": "audit/contract_pass_08.md",
+      "auditor": "contract-checker",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-09-01T22:02:47.188581+00:00"
     }
   ]
 }
