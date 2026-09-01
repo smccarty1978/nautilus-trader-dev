@@ -67,10 +67,27 @@ def run_collect_mode(
         # lower-level planner to construct its bounded plan.
         period = str(experiment_authorization.get("period"))
         years = sorted(study_data.spec.chronology.train if period == "train" else study_data.spec.chronology.dev or [])
-        if not years and date_range is None:
-            raise RuntimeError(f"EXPERIMENT_AUTHORIZATION_EMPTY: {period}")
-        requested_start, requested_end = date_range or (f"{years[0]}-01-01", f"{years[-1]}-12-31")
-        verified = verify_runtime_authorization(study_data.study_dir, experiment_authorization, requested_start, requested_end)
+        if period == "diagnostic":
+            # Diagnostic authorization is issued by the frozen-parent dispatcher,
+            # not by the child TRAIN/OOS authority. Its signed explicit date list is
+            # nevertheless verified before planning any catalog access.
+            from research.analysis.identity import canonical_sha256
+            verified_hash = canonical_sha256({k: v for k, v in experiment_authorization.items() if k != "runtime_authorization_sha256"})
+            if experiment_authorization.get("runtime_authorization_sha256") != verified_hash:
+                raise RuntimeError("DIAGNOSTIC_RUNTIME_AUTHORIZATION_INVALID")
+            dates = experiment_authorization.get("dates") or []
+            if not dates or any(__import__("pandas").Timestamp(d).year != 2024 for d in dates):
+                raise RuntimeError("FIRST_P90_DIAGNOSTIC_2024_ONLY")
+            requested_start, requested_end = date_range or (dates[0], dates[-1])
+            requested = {d.strftime("%Y-%m-%d") for d in __import__("pandas").date_range(requested_start, requested_end, freq="D")}
+            if not requested.issubset(set(dates)):
+                raise RuntimeError("DIAGNOSTIC_RUNTIME_DATE_UNAUTHORIZED")
+            verified = {"dates": dates}
+        else:
+            if not years and date_range is None:
+                raise RuntimeError(f"EXPERIMENT_AUTHORIZATION_EMPTY: {period}")
+            requested_start, requested_end = date_range or (f"{years[0]}-01-01", f"{years[-1]}-12-31")
+            verified = verify_runtime_authorization(study_data.study_dir, experiment_authorization, requested_start, requested_end)
         authorized_dates_override = verified["dates"]
     run_plan = resolve_run_plan(
         study_data, stage=stage, reference_date=date_override,
@@ -347,6 +364,14 @@ def build_collector_config_kwargs(
             cfg_kwargs["session_end_censoring"] = bool(_cp.get("session_end_censoring", True))
     if hasattr(strategy_binding.config_cls, "target_contract"):
         cfg_kwargs["target_contract"] = dict(study_data.contracts.get("target_contract", {}) or {})
+    # A diagnostic surface is opt-in solely through the compiled operation.  Never
+    # pass this payload to an ordinary collector merely because a similarly named
+    # extension is present in a contract.
+    if getattr(getattr(spec, "operation", None), "kind", None) == "diagnostic_followup" and hasattr(strategy_binding.config_cls, "diagnostic_followup"):
+        cfg_kwargs["diagnostic_followup"] = {
+            "enabled": True,
+            **dict((study_data.contracts.get("diagnostic_followup") or {})),
+        }
     # Phase-zero authentication gate (fail-closed). A collector that declares this field
     # authenticates itself against a manifest at a study-relative path; this runtime never
     # knew about the field before, so it was always left at its "" default and every such
@@ -452,7 +477,13 @@ def _execute_collect(
                     )
 
     # 8. Persist artifacts & update run manifests
-        status_data = output_mgr.persist_collection(candidates_df, observations_df, snapshot)
+        diagnostic_df = None
+        if getattr(getattr(spec, "operation", None), "kind", None) == "diagnostic_followup":
+            diagnostic_getter = getattr(strategy, "get_diagnostic_dataframe", None)
+            if not callable(diagnostic_getter):
+                raise RuntimeError("DIAGNOSTIC_OUTPUT_INTERFACE_MISSING")
+            diagnostic_df = diagnostic_getter()
+        status_data = output_mgr.persist_collection(candidates_df, observations_df, snapshot, diagnostic_df=diagnostic_df)
         allowlist_lineage = getattr(strategy, "_required_checkpoint_identities_lineage", None)
         if allowlist_lineage is not None:
             manifest = json.loads(output_mgr.manifest_path.read_text(encoding="utf-8"))

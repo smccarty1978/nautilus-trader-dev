@@ -1,7 +1,7 @@
 {
   "study_id": "regime_transition_target_before_stop_v1",
   "study_type": "bespoke",
-  "spec_sha256": "dff79ad0c5290d17c27df317cd6d168bcfa7b5d1b7f0b651cbd1ee62873ef9fe",
+  "spec_sha256": "1f1e6f9e4eda502b3d4b538ffefb774564eb33304ff5b5b7dd388ed8a89e9df8",
   "spec": {
     "study": {
       "id": "regime_transition_target_before_stop_v1",
@@ -14,6 +14,7 @@
       "target_metric": "pr_auc",
       "reconciliation_target": null
     },
+    "diagnostic_followup": null,
     "instrument": {
       "symbol": "NQ",
       "venue": "XCME"
@@ -57,6 +58,7 @@
           ],
           "bar_inclusion": "fully_forward",
           "session_end_censoring": true,
+          "horizon_expiry_policy": "censor",
           "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
           "atr_frozen_at": "decision_ts",
           "ordered_barriers": [
@@ -64,19 +66,22 @@
               "id": "barrier_tp_1_0_sl_0_5",
               "favorable_atr": 1.0,
               "adverse_atr": 0.5,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             },
             {
               "id": "barrier_tp_1_0_sl_1_0",
               "favorable_atr": 1.0,
               "adverse_atr": 1.0,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             },
             {
               "id": "barrier_tp_1_0_sl_1_5",
               "favorable_atr": 1.0,
               "adverse_atr": 1.5,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             }
           ]
         }
@@ -355,7 +360,7 @@
       "required_forward_outcomes": [
         {
           "id": "target_before_stop_300s",
-          "spec_sha256": "b70483a5f3dbc4312e25246d81eaba4a0015da5651457a589334cb4b4bbd72a5",
+          "spec_sha256": "658385e841469d64c956571be045dcc14fc28c1076b33aa1dc25ec5fef3706d5",
           "entry_reference": "next_bar_open",
           "horizon_seconds": 300,
           "max_tracking_seconds": 300,
@@ -364,6 +369,7 @@
           ],
           "bar_inclusion": "fully_forward",
           "session_end_censoring": true,
+          "horizon_expiry_policy": "censor",
           "max_gap_seconds": null,
           "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
           "atr_frozen_at": "decision_ts",
@@ -372,19 +378,22 @@
               "id": "barrier_tp_1_0_sl_0_5",
               "favorable_atr": 1.0,
               "adverse_atr": 0.5,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             },
             {
               "id": "barrier_tp_1_0_sl_1_0",
               "favorable_atr": 1.0,
               "adverse_atr": 1.0,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             },
             {
               "id": "barrier_tp_1_0_sl_1_5",
               "favorable_atr": 1.0,
               "adverse_atr": 1.5,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             }
           ],
           "generated_outcome_columns": [
@@ -482,6 +491,7 @@
           "entry_reference": "next_bar_open",
           "favorable_atr": 1.0,
           "forward_outcome_id": "target_before_stop_300s",
+          "horizon_expiry_policy": "censor",
           "horizon_seconds": 300,
           "max_gap_seconds": null,
           "session_end_censoring": true

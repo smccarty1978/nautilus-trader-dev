@@ -94,6 +94,8 @@ _CENSOR_SEVERITY: dict[str | None, int] = {
     "CENSORED_SESSION": 1,
     "HORIZON": 2,
     "CENSORED_HORIZON": 2,
+    "TIMEOUT": 2,
+    "CENSORED_TIMEOUT": 2,
     "GAP": 3,
     "DATA_END": 3,
     "CENSORED_DATA_END": 3,
@@ -284,6 +286,7 @@ def _ordered_barrier_params(
             int(fo["max_gap_seconds"]) if fo.get("max_gap_seconds") is not None else None
         ),
         "atr_source": fo.get("atr_source"),
+        "horizon_expiry_policy": str(barrier.get("horizon_expiry_policy", fo.get("horizon_expiry_policy", "censor"))),
     }
 
 
@@ -318,25 +321,22 @@ def compile_target_expression(contract: Mapping[str, Any]) -> TargetExpression:
     * no ``conditions`` -> single ``PrimitiveTarget`` on ``contract["primitive"]``
       (or ``flip_within_horizon`` when unset -- a legacy pre-``primitive`` contract).
     * one condition -> single ``PrimitiveTarget`` for that condition.
-    * >= 2 conditions -> ``And`` / ``Or`` per ``condition_logic`` (fail closed otherwise).
+    * >= 2 conditions -> ``And`` / ``Or`` node over the per-condition leaves.
     """
-    conditions = list(contract.get("conditions") or [])
-
+    conditions = contract.get("conditions") or []
     if not conditions:
-        primitive = contract.get("primitive") or "flip_within_horizon"
-        params: dict[str, Any] = {}
-        if primitive == "flip_within_horizon" and contract.get("horizon_seconds") is not None:
-            params = {
-                "horizon_seconds": int(contract["horizon_seconds"]),
-                "target_direction_role": str(contract.get("direction") or "opposite"),
-            }
+        primitive = contract.get("primitive", "flip_within_horizon")
+        if primitive not in _RUNTIME_EXECUTABLE_PRIMITIVES:
+            raise TargetExpressionError(f"UNSUPPORTED_ROOT_TARGET_PRIMITIVE: {primitive!r}")
+        if primitive == "flip_within_horizon":
+            params = _flip_params({}, contract)
         elif primitive == "ordered_barrier":
             fos = contract.get("required_forward_outcomes") or []
-            bindings = [(f, b) for f in fos for b in (f.get("ordered_barriers") or [])]
-            if len(bindings) == 1:
-                fo, b = bindings[0]
+            if len(fos) == 1 and len(fos[0].get("ordered_barriers") or []) == 1:
+                fo = fos[0]
+                b = fo["ordered_barriers"][0]
                 params = {
-                    "forward_outcome_id": str(fo.get("id")),
+                    "forward_outcome_id": str(fo["id"]),
                     "barrier_id": str(b["id"]),
                     "favorable_atr": float(b["favorable_atr"]),
                     "adverse_atr": float(b["adverse_atr"]),
@@ -348,12 +348,14 @@ def compile_target_expression(contract: Mapping[str, Any]) -> TargetExpression:
                         if fo.get("max_gap_seconds") is not None else None
                     ),
                     "atr_source": fo.get("atr_source"),
+                    "horizon_expiry_policy": str(b.get("horizon_expiry_policy", fo.get("horizon_expiry_policy", "censor"))),
                 }
             elif "favorable_atr" in contract and "adverse_atr" in contract:
                 params = {
                     "favorable_atr": float(contract["favorable_atr"]),
                     "adverse_atr": float(contract["adverse_atr"]),
                     "horizon_seconds": int(contract.get("horizon_seconds", 10)),
+                    "horizon_expiry_policy": str(contract.get("horizon_expiry_policy", "censor")),
                 }
             else:
                 raise TargetExpressionError("ORDERED_BARRIER_IDENTITY_REQUIRED: a root ordered-barrier target must declare exactly one barrier")

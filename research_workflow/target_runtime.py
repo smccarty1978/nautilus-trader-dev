@@ -214,6 +214,7 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
         "horizon_seconds", "session_end_censoring", "max_gap_seconds",
         "entry_reference", "bar_inclusion", "excursion_units", "ordered_barriers",
         "favorable_atr", "adverse_atr", "max_tracking_seconds", "atr_source",
+        "horizon_expiry_policy",
     })
     PROVENANCE_ONLY_SEMANTIC_FIELDS = frozenset({
         "atr_frozen_at", "id", "spec_id", "spec_sha256",
@@ -222,6 +223,7 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
     SUPPORTED_SEMANTIC_VALUES = {
         "entry_reference": {"next_bar_open"},
         "bar_inclusion": {"fully_forward"},
+        "horizon_expiry_policy": {"censor", "negative"},
     }
 
     def __init__(self, binding: Mapping[str, Any] | None = None):
@@ -255,6 +257,16 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
                 f"TARGET_ENTRY_REFERENCE_UNSUPPORTED: this runtime resolves "
                 f"'next_bar_open' only, not {entry_reference!r}"
             )
+        horizon_expiry_policy = str(
+            candidate.get(
+                "horizon_expiry_policy",
+                self._binding.get("horizon_expiry_policy", "censor"),
+            )
+        ).lower()
+        if horizon_expiry_policy not in {"censor", "negative"}:
+            raise TargetRuntimeError(
+                f"TARGET_HORIZON_EXPIRY_POLICY_UNSUPPORTED: {horizon_expiry_policy!r}"
+            )
         obs_ts = int(candidate["observation_ts"])
         return {
             "observation_ts": obs_ts,
@@ -268,6 +280,7 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
             "favorable_atr": float(candidate["favorable_atr"]),
             "adverse_atr": float(candidate["adverse_atr"]),
             "horizon_seconds": int(candidate["horizon_seconds"]),
+            "horizon_expiry_policy": horizon_expiry_policy,
             "session_close_ts": (
                 int(candidate["session_close_ts"])
                 if candidate.get("session_close_ts") is not None else None
@@ -371,7 +384,13 @@ class OrderedBarrierTargetRuntime(TargetRuntime):
 
         last_ts = int(evs[-1]["ts"]) if evs else entry_ts
         if final or last_ts >= horizon_end_ts:
-            return TargetResult(NEGATIVE, 0, horizon_end_ts)  # TIMEOUT -> negative
+            policy = pending.get("horizon_expiry_policy", "censor")
+            if policy == "censor":
+                return TargetResult(CENSORED, None, horizon_end_ts, "TIMEOUT")
+            elif policy == "negative":
+                return TargetResult(NEGATIVE, 0, horizon_end_ts)
+            else:
+                raise TargetRuntimeError(f"UNKNOWN_HORIZON_EXPIRY_POLICY: {policy!r}")
         return TargetResult(PENDING, None)
 
 
@@ -452,6 +471,7 @@ class CompositeTargetRuntime(TargetRuntime):
                 child_candidate["atr_source"] = candidate.get("atr_source")
                 child_candidate["forward_outcome_id"] = p.get("forward_outcome_id")
                 child_candidate["barrier_id"] = p.get("barrier_id")
+                child_candidate["horizon_expiry_policy"] = p.get("horizon_expiry_policy", "censor")
                 if not p.get("session_end_censoring", False):
                     child_candidate["session_close_ts"] = None
                 horizon_ends.append(T + int(p["horizon_seconds"]) * NS)

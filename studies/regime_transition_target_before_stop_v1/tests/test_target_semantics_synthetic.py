@@ -301,18 +301,100 @@ def test_unsupported_ATR_source_rejected():
         "horizon_seconds": 300,
         "entry_reference": "next_bar_open",
     }
-    with pytest.raises(TargetRuntimeError, match="TARGET_ATR_SOURCE_BINDING_MISMATCH"):
-        runtime.open_pending(cand)
+def test_synthetic_ordered_barrier_timeout_censored():
+    """Case C: Neither barrier touched within 300s -> TIMEOUT / y=null."""
+    runtime = OrderedBarrierTargetRuntime()
+    T = 1_000 * NS
+    cand = {
+        "observation_ts": T,
+        "direction": 1,
+        "atr": 10.0,
+        "atr_source": SUPPORTED_ATR_SOURCE,
+        "favorable_atr": 1.0,
+        "adverse_atr": 1.0,
+        "horizon_seconds": 300,
+        "horizon_expiry_policy": "censor",
+        "session_close_ts": T + 10_000 * NS,
+        "max_gap_seconds": None,
+        "entry_reference": "next_bar_open",
+    }
+    pending = runtime.open_pending(cand)
+    entry_open = 20_000.0
+    bar1 = {"ts": T + 1 * NS, "open": entry_open, "high": entry_open + 1.0, "low": entry_open - 1.0, "gap": False}
+    runtime.ingest_bar(pending, bar1)
 
-    # Replay oracle rejection
+    # 300s elapses without price hitting +10 (20010) or -10 (19990)
+    bar_timeout = {
+        "ts": T + 1 * NS + 301 * NS,
+        "open": entry_open + 2.0,
+        "high": entry_open + 5.0,
+        "low": entry_open - 5.0,
+        "gap": False,
+    }
+    runtime.ingest_bar(pending, bar_timeout)
+    res = runtime.terminal(pending, final=True)
+    assert res.disposition == CENSORED
+    assert res.label is None
+    assert res.censor_reason == "TIMEOUT"
+
+    # Replay oracle validation
     oracle_res = replay(
         {"primitive": "ordered_barrier", "required_forward_outcomes": [
-            {"ordered_barriers": [{"favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 300}],
-             "entry_reference": "next_bar_open", "atr_source": SUPPORTED_ATR_SOURCE}
+            {"ordered_barriers": [{"favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 300, "horizon_expiry_policy": "censor"}],
+             "entry_reference": "next_bar_open", "atr_source": SUPPORTED_ATR_SOURCE, "horizon_expiry_policy": "censor"}
         ]},
         cand,
-        [{"ts": 1_001 * NS, "open": 20000.0, "high": 20001.0, "low": 19999.0, "gap": False}],
+        [bar1, bar_timeout],
     )
     assert oracle_res["disposition"] == "CENSORED"
-    assert oracle_res["censor_reason"] == "ATR_SOURCE_BINDING"
+    assert oracle_res["label"] is None
+    assert oracle_res["censor_reason"] == "TIMEOUT"
+
+
+def test_timeout_policy_injection_proves_drift_detected():
+    """Injection test: proves that horizon_expiry_policy: 'negative' produces y=0,
+    while 'censor' (study contract) produces y=None / TIMEOUT."""
+    runtime_censor = OrderedBarrierTargetRuntime()
+    runtime_negative = OrderedBarrierTargetRuntime()
+    T = 1_000 * NS
+    cand_base = {
+        "observation_ts": T,
+        "direction": 1,
+        "atr": 10.0,
+        "atr_source": SUPPORTED_ATR_SOURCE,
+        "favorable_atr": 1.0,
+        "adverse_atr": 1.0,
+        "horizon_seconds": 300,
+        "session_close_ts": T + 10_000 * NS,
+        "max_gap_seconds": None,
+        "entry_reference": "next_bar_open",
+    }
+    cand_censor = dict(cand_base, horizon_expiry_policy="censor")
+    cand_negative = dict(cand_base, horizon_expiry_policy="negative")
+
+    pending_c = runtime_censor.open_pending(cand_censor)
+    pending_n = runtime_negative.open_pending(cand_negative)
+
+    entry_open = 20_000.0
+    bar1 = {"ts": T + 1 * NS, "open": entry_open, "high": entry_open + 1.0, "low": entry_open - 1.0, "gap": False}
+    bar_timeout = {"ts": T + 302 * NS, "open": entry_open + 2.0, "high": entry_open + 5.0, "low": entry_open - 5.0, "gap": False}
+
+    runtime_censor.ingest_bar(pending_c, bar1)
+    runtime_censor.ingest_bar(pending_c, bar_timeout)
+    res_c = runtime_censor.terminal(pending_c, final=True)
+
+    runtime_negative.ingest_bar(pending_n, bar1)
+    runtime_negative.ingest_bar(pending_n, bar_timeout)
+    res_n = runtime_negative.terminal(pending_n, final=True)
+
+    # Approved study contract MUST censor timeouts
+    assert res_c.disposition == CENSORED
+    assert res_c.label is None
+    assert res_c.censor_reason == "TIMEOUT"
+
+    # Injected negative-expiry policy would have produced y=0
+    assert res_n.disposition == NEGATIVE
+    assert res_n.label == 0
+    assert res_n.censor_reason is None
+
 

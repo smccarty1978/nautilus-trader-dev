@@ -1,0 +1,46 @@
+{
+  "status": "PASSED",
+  "study_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\first_p90_warning_horizon_2024",
+  "decision_contract": {
+    "research_question": "For the frozen parent scores, what happens after the first inclusive P90 warning in each full-2024 RTH regime, descriptively and without any model selection?\n",
+    "baseline": {
+      "short": "frozen_parent_score_path",
+      "long": "frozen_parent_score_path"
+    },
+    "baseline_feature_selection": {
+      "mode": "none"
+    },
+    "model_arms": {
+      "LONG": "frozen_parent_long",
+      "SHORT": "frozen_parent_short"
+    },
+    "variable_being_tested": [
+      "first_inclusive_frozen_p90_warning_followup"
+    ],
+    "prohibited_changes": [
+      "use_2024_to_change_model_design",
+      "introduce_unconstrained_search",
+      "unauthorized_feature_discovery",
+      "expand_to_full_feature_registry",
+      "expansion_beyond_authorized_dates"
+    ],
+    "allowed_changes": [
+      "descriptive_frozen_score_followup"
+    ],
+    "chronology": {
+      "train": [
+        2021
+      ],
+      "dev": [
+        2023
+      ],
+      "prohibited": [
+        2025,
+        2026
+      ]
+    },
+    "primary_comparison": null,
+    "terminal_question": null
+  },
+  "findings": []
+}

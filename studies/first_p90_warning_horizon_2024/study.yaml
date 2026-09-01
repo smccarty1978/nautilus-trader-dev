@@ -1,0 +1,175 @@
+study:
+  id: first_p90_warning_horizon_2024
+  type: flip_prediction
+  risk_tier: 1
+  description: Frozen-parent first-P90 warning horizon diagnostic; 2024 RTH only.
+operation:
+  kind: diagnostic_followup
+diagnostic_followup:
+  thresholds:
+    LONG: {p90: 0.2852887899663343, p95: 0.32770330252959395, p97_5: 0.3639796684339806}
+    SHORT: {p90: 0.28485631865861344, p95: 0.33222113070660036, p97_5: 0.37673375655439945}
+  score_columns: {LONG: parent_long_score, SHORT: parent_short_score}
+  horizon_seconds: 600
+  checkpoint_seconds: 5
+  session: RTH
+  first_fire: earliest_eligible_checkpoint_score_gte_frozen_p90_per_regime
+  subtype_semantics: [FAST, LATE, SLOW, FAILED_WARNING_SCORE_COLLAPSE, FAILED_WARNING_PERSISTENT_HIGH, SESSION_CENSORED]
+  control_semantics: latest_valid_score_lt_p90_same_regime_age_bucket_tod_cell_strictly_before_fire
+  parent_study: clean_maturity_flip_model_180s_horizon
+  parent_candidates_sha256: 6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56
+  parent_observations_sha256: 557f736c38d6722c37659a8c10c2d353d4a39bc2a671aa070218f6f8ffa93c8b
+  march_first_reference: ../clean_maturity_flip_model_180s_horizon/validation_march2024/artifacts/first_p90_parity.parquet
+  march_first_reference_sha256: 52437d73c1cf0705001bb2534d1c3a6e8cbe401585f46e3534968c7bb1e22616
+  march_outcome_reference: ../clean_maturity_flip_model_180s_horizon/validation_march2024/artifacts/outcome_parity.parquet
+  march_outcome_reference_sha256: 4241fad9bf368105053dfa3f2fbb7a76e5767bef362a8eb958cbe76f72e460f7
+instrument:
+  symbol: NQ
+  venue: XCME
+population:
+  type: regime_state
+  prevailing_regime: both
+  session: RTH
+  qualification:
+    established: true
+    age_gate_seconds: 300
+    cadence_seconds: 5
+target:
+  type: flip
+  event: prevailing_1m_regime_transition
+  direction: both
+  horizon_seconds: 600
+  confirmation:
+    mode: completed_1m_bar
+    confirmation_bars: 1
+  decision_reference: decision_ts
+features:
+  source: canonical_verified_definition_universe
+  selection:
+    mode: none
+    source: canonical_verified_definition_universe
+    feature_count: 13
+    direction_specific: false
+    ranking_method: frozen_train_only_temporal_rank
+  instances:
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 1m
+      context: prior
+      bar_state: completed
+  - feature: regime_efficiency
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_mfe_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: regime_range_atr
+    parameters:
+      timeframe: 5m
+      context: prior
+      bar_state: completed
+  - feature: rolling_retention_ratio
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_current_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_max_progress_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: rolling_giveback_atr
+    parameters:
+      window: 300s
+      update_every: 1s
+  - feature: arrival_velocity
+    parameters:
+      input_timeframe: 1s
+      lookback: 20
+      bar_state: completed
+  - feature: arrival_acceleration
+    parameters:
+      input_timeframe: 1s
+      short_lookback: 20
+      bar_state: completed
+  - feature: ema_slope
+    parameters:
+      ema_role: short
+      lookback: 20
+  derived_inputs:
+  - name: parent_long_score
+    kind: frozen_external_model_score
+    model_id: ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c
+    diagnostic_reuse_policy:
+      kind: diagnostic_derived_causal_input
+      model_id: ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c
+      parent_study_id: clean_maturity_flip_model_180s_horizon
+      parent_closure_path: artifacts/study_closure.json
+      parent_closure_sha256: 805100865f51cc99fcbd917f69db332912bf6620444961c97a4997109e4b6ccf
+      parent_closure_identity_sha256: eb7407678fe79e8a4594c56b879246c05ee78e37d3b23fdacc9c4191c9d64957
+      expected_assessment: VALID_DIAGNOSTIC
+      artifact_sha256: c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512
+  - name: parent_short_score
+    kind: frozen_external_model_score
+    model_id: 209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6
+    diagnostic_reuse_policy:
+      kind: diagnostic_derived_causal_input
+      model_id: 209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6
+      parent_study_id: clean_maturity_flip_model_180s_horizon
+      parent_closure_path: artifacts/study_closure.json
+      parent_closure_sha256: 805100865f51cc99fcbd917f69db332912bf6620444961c97a4997109e4b6ccf
+      parent_closure_identity_sha256: eb7407678fe79e8a4594c56b879246c05ee78e37d3b23fdacc9c4191c9d64957
+      expected_assessment: VALID_DIAGNOSTIC
+      artifact_sha256: cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a
+  timing_contract: verified
+model:
+  mode: scoring
+  family: frozen_parent_models
+chronology:
+  train:
+  - 2021
+  dev:
+  - 2023
+  diagnostic:
+  - 2024
+  prohibited:
+  - 2025
+  - 2026
+stratification: {}
+baseline:
+  study: clean_maturity_flip_model_180s_horizon
+lineage:
+  parent_study: clean_maturity_flip_model_180s_horizon
+  parent_manifest_sha256: 6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56
+  intended_changes:
+  - diagnostic_first_p90_followup_only
+  frozen: []
+execution:
+  runtime: nautilustrader
+  strategy_class: research_workflow.generic_collector.GenericStudyCollector
+  data_requirements:
+    dataset_id: NQ_v0_2020_2026
+    authorized_dates:
+    - '2024-03-01'
+  progress_seconds: 60
+  bounded: true
+acceptance:
+  criteria:
+    minimum_structural_block_coverage: 0.0
+bespoke: {}

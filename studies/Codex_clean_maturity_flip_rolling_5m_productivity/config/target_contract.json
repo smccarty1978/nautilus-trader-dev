@@ -1,0 +1,17 @@
+{
+  "primitive": "flip_within_horizon",
+  "target_type": "flip",
+  "event": "prevailing_1m_regime_transition",
+  "direction": "both",
+  "horizon_seconds": 300,
+  "confirmation": {
+    "mode": "completed_1m_bar",
+    "confirmation_bars": 1
+  },
+  "session_end_censoring": true,
+  "censoring_policy": {
+    "session_end_censoring": true,
+    "max_horizon_seconds": 300
+  },
+  "decision_reference": "decision_ts"
+}

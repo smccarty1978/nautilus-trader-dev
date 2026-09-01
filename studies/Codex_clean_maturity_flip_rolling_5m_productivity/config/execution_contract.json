@@ -1,0 +1,22 @@
+{
+  "runtime": "nautilustrader",
+  "strategy_class": "studies.Codex_clean_maturity_flip_rolling_5m_productivity.implementation.collector.CleanFlipCollector",
+  "bounded_execution": true,
+  "progress_seconds": 60,
+  "checkpoint": null,
+  "chronology": {
+    "train": [
+      2021,
+      2022,
+      2023
+    ],
+    "dev": [
+      2024
+    ],
+    "diagnostic": [],
+    "prohibited": [
+      2025,
+      2026
+    ]
+  }
+}

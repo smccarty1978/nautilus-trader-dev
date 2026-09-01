@@ -287,9 +287,7 @@ TargetConditionSpec = Annotated[
     ],
     Field(discriminator="kind"),
 ]
-
-
-class OrderedBarrierRequirementSpec(BaseModel):
+class OrderedBarrierRequirementSpec(BaseModel):
     """Schema-layer declaration compiled to the runtime OrderedBarrierSpec."""
 
     model_config = ConfigDict(extra="forbid")
@@ -298,6 +296,9 @@ class OrderedBarrierRequirementSpec(BaseModel):
     favorable_atr: float = Field(..., gt=0)
     adverse_atr: float = Field(..., gt=0)
     horizon_seconds: int = Field(..., gt=0)
+    horizon_expiry_policy: Optional[Literal["censor", "negative"]] = Field(
+        "censor", description="Disposition when horizon expires without touching either barrier"
+    )
 
 
 class RequiredForwardOutcomeSpec(BaseModel):
@@ -322,6 +323,9 @@ class RequiredForwardOutcomeSpec(BaseModel):
     excursion_units: List[Literal["points", "atr", "ticks"]] = Field(default_factory=lambda: ["atr"])
     bar_inclusion: Literal["fully_forward", "close_after_entry"] = "fully_forward"
     session_end_censoring: bool = False
+    horizon_expiry_policy: Optional[Literal["censor", "negative"]] = Field(
+        "censor", description="Disposition when horizon expires without touching either barrier"
+    )
     max_gap_seconds: Optional[int] = Field(
         None, gt=0, exclude_if=lambda value: value is None
     )
@@ -450,11 +454,36 @@ class FeatureSelectionSpec(BaseModel):
 
 
 class DiagnosticModelReusePolicySpec(BaseModel):
-    """Closed authorization to consume one VALID_DIAGNOSTIC model causally."""
+    """Closed, evidence-bound authorization for diagnostic derived-model reuse.
+
+    A registry ``UNASSESSED`` record is not approved merely because its source closure
+    assessed it.  Its child declaration must pin that closure's byte and canonical
+    identities, the exact assessed model byte, and the expected diagnostic assessment.
+    """
 
     model_config = ConfigDict(extra="forbid")
     kind: Literal["diagnostic_derived_causal_input"] = "diagnostic_derived_causal_input"
     model_id: str
+    parent_study_id: str
+    parent_closure_path: Literal["artifacts/study_closure.json"]
+    parent_closure_sha256: str = Field(..., pattern=r"^[0-9a-fA-F]{64}$")
+    parent_closure_identity_sha256: str = Field(..., pattern=r"^[0-9a-fA-F]{64}$")
+    expected_assessment: Literal["VALID_DIAGNOSTIC"] = "VALID_DIAGNOSTIC"
+    artifact_sha256: str = Field(..., pattern=r"^[0-9a-fA-F]{64}$")
+    # Runtime drift is exceptional: when requested it must be tied to a concrete,
+    # hash-pinned parent-study evidence artifact rather than a bare boolean.
+    allow_runtime_drift: bool = False
+    runtime_drift_evidence_path: Optional[str] = None
+    runtime_drift_evidence_sha256: Optional[str] = Field(None, pattern=r"^[0-9a-fA-F]{64}$")
+
+    @model_validator(mode="after")
+    def validate_runtime_drift_evidence(self) -> "DiagnosticModelReusePolicySpec":
+        evidence = (self.runtime_drift_evidence_path, self.runtime_drift_evidence_sha256)
+        if self.allow_runtime_drift and not all(evidence):
+            raise ValueError("DIAGNOSTIC_REUSE_RUNTIME_DRIFT_EVIDENCE_REQUIRED")
+        if not self.allow_runtime_drift and any(evidence):
+            raise ValueError("DIAGNOSTIC_REUSE_RUNTIME_DRIFT_EVIDENCE_UNEXPECTED")
+        return self
 
 
 class DerivedCausalInputSpec(BaseModel):
@@ -915,6 +944,7 @@ class OperationSpec(BaseModel):
         "runtime_population_parity",
         "score_parity",
         "execution_economics",
+        "diagnostic_followup",
         "bespoke_operation",
     ] = Field("train_evaluate", description="Specific research operation type")
     target_metric: Optional[str] = Field(None, description="Primary quantitative evaluation metric")
@@ -926,6 +956,10 @@ class StudySpec(BaseModel):
 
     study: StudyMetadata
     operation: OperationSpec = Field(default_factory=OperationSpec)
+    # Immutable operational parameters for the one generic diagnostic follow-up
+    # runtime.  Kept opaque to the generic StudySpec; its exact validation and
+    # execution binding live with the diagnostic runtime/compiler.
+    diagnostic_followup: Optional[Dict[str, Any]] = Field(default=None)
     instrument: InstrumentSpec
     population: PopulationSpec
     target: TargetSpec

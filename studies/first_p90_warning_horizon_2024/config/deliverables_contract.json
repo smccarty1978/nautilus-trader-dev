@@ -1,0 +1,64 @@
+{
+  "contract_version": 1,
+  "authorized_modes": [
+    "collect",
+    "analysis"
+  ],
+  "deliverables_by_mode": {
+    "collect": [
+      "candidates.parquet",
+      "observations.parquet",
+      "collection_manifest.json",
+      "run_manifest.json",
+      "status.json"
+    ],
+    "analysis": [
+      "scores.parquet",
+      "metrics.json"
+    ]
+  },
+  "artifact_metadata": {
+    "candidates.parquet": {
+      "mode": "collect",
+      "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+      "relative_to": "run_dir/collection"
+    },
+    "observations.parquet": {
+      "mode": "collect",
+      "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+      "relative_to": "run_dir/collection"
+    },
+    "collection_manifest.json": {
+      "mode": "collect",
+      "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+      "relative_to": "run_dir/collection"
+    },
+    "run_manifest.json": {
+      "modes": [
+        "collect",
+        "backtest"
+      ],
+      "producer": "backtests/nt_runtime/output_manager.py::OutputManager",
+      "relative_to": "run_dir"
+    },
+    "status.json": {
+      "modes": [
+        "collect",
+        "backtest"
+      ],
+      "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
+      "relative_to": "run_dir"
+    },
+    "scores.parquet": {
+      "mode": "analysis",
+      "producer": "model scoring stage",
+      "relative_to": "study_dir/results"
+    },
+    "metrics.json": {
+      "mode": "analysis",
+      "producer": "analysis stage",
+      "relative_to": "study_dir/results"
+    }
+  },
+  "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
+}

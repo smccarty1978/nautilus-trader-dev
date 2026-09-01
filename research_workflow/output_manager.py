@@ -412,6 +412,8 @@ class OutputManager:
         candidates_df: pd.DataFrame,
         observations_df: pd.DataFrame,
         telemetry: TelemetrySnapshot,
+        *,
+        diagnostic_df: Optional[pd.DataFrame] = None,
     ) -> Dict[str, Any]:
         """Saves collection parquets, updates status and manifest."""
         # Packet E: captured before the warmup-window filter below reassigns
@@ -551,6 +553,23 @@ class OutputManager:
         cand_hash = compute_file_sha256(cand_path)
         obs_hash = compute_file_sha256(obs_path)
 
+        diagnostic_path = None
+        diagnostic_hash = None
+        if diagnostic_df is not None:
+            if getattr(getattr(self.study_data.spec, "operation", None), "kind", None) != "diagnostic_followup":
+                raise ValueError("DIAGNOSTIC_OUTPUT_OPERATION_MISMATCH")
+            required_diagnostic = {
+                "regime_start_ns", "direction", "anchor_ts", "scheduled_ts", "offset_s",
+                "score", "score_valid", "score_reason", "terminal_reason", "terminal_ts",
+                "market_path_status", "score_path_status",
+            }
+            missing_diagnostic = required_diagnostic - set(diagnostic_df.columns)
+            if missing_diagnostic:
+                raise ValueError(f"DIAGNOSTIC_OUTPUT_SCHEMA_MISSING: {sorted(missing_diagnostic)}")
+            diagnostic_path = self.collection_dir / "diagnostic_followup.parquet"
+            diagnostic_df.to_parquet(diagnostic_path, index=False)
+            diagnostic_hash = compute_file_sha256(diagnostic_path)
+
         collection_manifest = {
             "run_id": self.run_id,
             "study_id": self.study_data.study_id,
@@ -566,6 +585,11 @@ class OutputManager:
             "candidate_disposition_reconciliation": reconciliation,
             "population_funnel": population_funnel,
         }
+        if diagnostic_path is not None:
+            collection_manifest["diagnostic_followup"] = {
+                "count": len(diagnostic_df), "sha256": diagnostic_hash,
+                "columns": list(diagnostic_df.columns), "path": str(diagnostic_path),
+            }
         col_manifest_path = self.collection_dir / "collection_manifest.json"
         with open(col_manifest_path, "w", encoding="utf-8") as f:
             json.dump(collection_manifest, f, indent=2)
@@ -611,6 +635,8 @@ class OutputManager:
             },
             "end_time_utc": datetime.now(timezone.utc).isoformat(),
         }
+        if diagnostic_path is not None:
+            status_data["output_artifacts"]["diagnostic_followup_parquet"] = str(diagnostic_path)
 
         with open(self.status_path, "w", encoding="utf-8") as f:
             json.dump(status_data, f, indent=2)
@@ -645,6 +671,9 @@ class OutputManager:
             },
             "end_time_utc": datetime.now(timezone.utc).isoformat(),
         })
+        if diagnostic_path is not None:
+            manifest_data["outputs"]["diagnostic_followup_count"] = len(diagnostic_df)
+            manifest_data["outputs"]["diagnostic_followup_sha256"] = diagnostic_hash
 
         with open(self.manifest_path, "w", encoding="utf-8") as f:
             json.dump(manifest_data, f, indent=2)

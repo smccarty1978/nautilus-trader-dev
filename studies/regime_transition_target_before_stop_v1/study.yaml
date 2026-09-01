@@ -40,6 +40,7 @@ target:
     - atr
     bar_inclusion: fully_forward
     session_end_censoring: true
+    horizon_expiry_policy: censor
     atr_source: latest_causally_completed_1m_wilder_atr_14_available_at_T
     atr_frozen_at: decision_ts
     ordered_barriers:
@@ -47,14 +48,17 @@ target:
       favorable_atr: 1.0
       adverse_atr: 0.5
       horizon_seconds: 300
+      horizon_expiry_policy: censor
     - id: barrier_tp_1_0_sl_1_0
       favorable_atr: 1.0
       adverse_atr: 1.0
       horizon_seconds: 300
+      horizon_expiry_policy: censor
     - id: barrier_tp_1_0_sl_1_5
       favorable_atr: 1.0
       adverse_atr: 1.5
       horizon_seconds: 300
+      horizon_expiry_policy: censor
   decision_reference: decision_ts
 features:
   source: canonical_verified_definition_universe

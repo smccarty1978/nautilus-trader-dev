@@ -4,6 +4,7 @@ recover a LightGBM model natively when joblib cannot load it.
 from __future__ import annotations
 
 import json
+import hashlib
 
 import pandas as pd
 import pytest
@@ -147,6 +148,121 @@ def _promote(study, model_id, **fields):
     body = json.loads(reg.read_text())
     body.update(fields)
     reg.write_text(json.dumps(body))
+
+
+def _diagnostic_reuse_policy(study, rec):
+    closure = study / "artifacts" / "study_closure.json"
+    body = json.loads(closure.read_text())
+    return {
+        "kind": "diagnostic_derived_causal_input", "model_id": rec["model_id"],
+        "parent_study_id": study.name, "parent_closure_path": "artifacts/study_closure.json",
+        "parent_closure_sha256": hashlib.sha256(closure.read_bytes()).hexdigest(),
+        "parent_closure_identity_sha256": body["closure_identity_sha256"],
+        "expected_assessment": "VALID_DIAGNOSTIC", "artifact_sha256": rec["artifact_sha256"],
+    }
+
+
+def _write_diagnostic_reuse_closure(study, rec):
+    arts = study / "artifacts"; arts.mkdir(exist_ok=True)
+    for name in ("causal.md", "contract.md"):
+        (arts / name).write_text(name)
+    freeze = arts / "train_experiment_freeze.json"
+    freeze.write_text(json.dumps({"freeze_sha256": "synthetic-freeze"}))
+    closure = {
+        "schema_version": 1, "study_id": study.name, "status": "CLOSED",
+        "closed_at_utc": "2026-01-01T00:00:00+00:00",
+        "outcome": "DIAGNOSTIC", "terminal_decision": "diagnostic",
+        "models": {"A": {"model_id": rec["model_id"], "artifact_sha256": rec["artifact_sha256"]}},
+        "model_scientific_assessment": {
+            "assessment": "VALID_DIAGNOSTIC",
+            "reuse_policy": "Discoverable for future GOVERNED derived-input use if a child study's reuse policy explicitly permits diagnostic-derived input.",
+        },
+        "bound_evidence": {
+            "train_freeze_sha256": hashlib.sha256(freeze.read_bytes()).hexdigest(),
+            "causal_audit": {"verdict": "CLEAR", "report": "artifacts/causal.md"},
+            "contract_audit": {"verdict": "CLEAR", "report": "artifacts/contract.md"},
+        },
+    }
+    closure["closure_identity_sha256"] = canonical_sha256(
+        {k: v for k, v in closure.items() if k != "closed_at_utc"})
+    (arts / "study_closure.json").write_text(json.dumps(closure))
+
+
+def _refresh_closure_identity(study):
+    path = study / "artifacts" / "study_closure.json"
+    body = json.loads(path.read_text())
+    body["closure_identity_sha256"] = canonical_sha256(
+        {k: v for k, v in body.items()
+         if k not in {"closed_at_utc", "closure_identity_sha256"}})
+    path.write_text(json.dumps(body))
+
+
+def test_unassessed_model_can_bind_only_to_authenticated_diagnostic_closure(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    _write_diagnostic_reuse_closure(study, rec)
+    policy = _diagnostic_reuse_policy(study, rec)
+    resolved = resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
+                             reuse_intent="derived_causal_input", reuse_policy=policy)
+    assert resolved["model_id"] == rec["model_id"]
+    spec = DerivedCausalInputSpec.model_validate({"name": "upstream", "model_id": rec["model_id"],
+                                                  "diagnostic_reuse_policy": policy})
+    scorer = FrozenExternalModelScorer.bind(spec, parent_dir=study)
+    score = scorer.score({"x": 0.0, "y": 1.0}, checkpoint_ts=1, direction="LONG",
+                         availability_ts={"x": 1, "y": 1})
+    assert 0.0 <= score.score <= 1.0
+
+
+@pytest.mark.parametrize("mutation, error", [
+    ("sha", "CLOSURE_SHA_MISMATCH"), ("identity", "CLOSURE_IDENTITY_MISMATCH"),
+    ("status", "CLOSURE_INVALID"), ("assessment", "ASSESSMENT_MISMATCH"),
+    ("model", "CLOSURE_INVALID"), ("artifact", "MODEL_BINDING_MISMATCH"),
+    ("audit", "AUDIT_EVIDENCE_MISSING"), ("authorization", "NOT_AUTHORIZED"),
+])
+def test_unassessed_reuse_evidence_mismatches_fail_closed(tmp_path, mutation, error):
+    study, rec = _persist_lgbm(tmp_path)
+    _write_diagnostic_reuse_closure(study, rec)
+    policy = _diagnostic_reuse_policy(study, rec)
+    path = study / "artifacts" / "study_closure.json"; body = json.loads(path.read_text())
+    if mutation == "sha":
+        policy["parent_closure_sha256"] = "0" * 64
+    elif mutation == "identity":
+        policy["parent_closure_identity_sha256"] = "0" * 64
+    else:
+        if mutation == "status": body["status"] = "OPEN"
+        elif mutation == "assessment": body["model_scientific_assessment"]["assessment"] = "INVALID"
+        elif mutation == "model": body["models"]["A"]["model_id"] = "other"
+        elif mutation == "artifact": body["models"]["A"]["artifact_sha256"] = "0" * 64
+        elif mutation == "audit": body["bound_evidence"].pop("causal_audit")
+        elif mutation == "authorization": body["model_scientific_assessment"]["reuse_policy"] = "not authorized"
+        path.write_text(json.dumps(body)); _refresh_closure_identity(study)
+        policy = _diagnostic_reuse_policy(study, rec)
+    with pytest.raises(ModelArtifactError, match=error):
+        resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
+                      reuse_intent="derived_causal_input", reuse_policy=policy)
+
+
+def test_invalid_registry_status_never_yields_to_closure_evidence(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    _write_diagnostic_reuse_closure(study, rec); policy = _diagnostic_reuse_policy(study, rec)
+    _promote(study, rec["model_id"], scientific_status="INVALID")
+    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
+        resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
+                      reuse_intent="derived_causal_input", reuse_policy=policy)
+
+
+def test_unassessed_runtime_drift_requires_hash_bound_parent_evidence(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    _write_diagnostic_reuse_closure(study, rec); policy = _diagnostic_reuse_policy(study, rec)
+    _promote(study, rec["model_id"], runtime_identity_sha256="deadbeef" * 8)
+    with pytest.raises(ModelArtifactError, match="RUNTIME_IDENTITY_DRIFT"):
+        resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
+                      reuse_intent="derived_causal_input", reuse_policy=policy)
+    evidence = study / "artifacts" / "runtime_drift_parity.json"; evidence.write_text("verified")
+    policy.update({"allow_runtime_drift": True,
+                   "runtime_drift_evidence_path": "artifacts/runtime_drift_parity.json",
+                   "runtime_drift_evidence_sha256": hashlib.sha256(evidence.read_bytes()).hexdigest()})
+    resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
+                  reuse_intent="derived_causal_input", reuse_policy=policy)
 
 
 # --------------------------------------------------------------------------- #

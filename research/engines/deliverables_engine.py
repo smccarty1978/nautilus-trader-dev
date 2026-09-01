@@ -100,6 +100,7 @@ OPERATION_MODES: Dict[str, List[str]] = {
     "runtime_population_parity": ["collect"],
     "score_parity": ["collect"],
     "execution_economics": ["collect", "backtest"],
+    "diagnostic_followup": ["collect", "analysis"],
     "bespoke_operation": ["collect"],
 }
 

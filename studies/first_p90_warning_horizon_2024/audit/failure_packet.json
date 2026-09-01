@@ -1,0 +1,32 @@
+{
+  "status": "BLOCKED",
+  "preflight_run_id": "20260901T010515Z_91d8194fb4b6",
+  "generated_at_utc": "2026-09-01T01:05:15.111153+00:00",
+  "code_hash": "91d8194fb4b6ebc010ab8cf3c1a88aa3a1a26cea188fa1b44d549277e7445a1e",
+  "superseded": true,
+  "failed_gate": "CAUSAL_INVARIANTS",
+  "failure_ids": [
+    "INVARIANT_TEST_FAILURE"
+  ],
+  "failure_details": [
+    {
+      "message": "Saved to: C:\\Users\\Scott McCarty\\AppData\\Local\\Temp\\pytest-of-Scott McCarty\\pytest-1417\\test_prepare_freeze_lifecycle_0\\studies\\test_freeze_study\\audit\\frozen_execution_manifest.json"
+    },
+    {
+      "message": "============================================================"
+    },
+    {
+      "message": "=========================== short test summary info ==========================="
+    },
+    {
+      "message": "FAILED scripts/tests/test_freeze_boundary.py::test_prepare_freeze_lifecycle_and_mutations"
+    },
+    {
+      "message": "1 failed, 196 passed in 83.32s (0:01:23)"
+    }
+  ],
+  "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit.",
+  "superseded_by_preflight_run_id": "20260901T010806Z_91d8194fb4b6",
+  "superseded_at_utc": "2026-09-01T01:08:06.314757+00:00",
+  "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
+}

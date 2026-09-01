@@ -1,0 +1,50 @@
+study_id: first_p90_warning_horizon_2024
+decision_type: governed_diagnostic_followup
+research_question: >
+  For the frozen parent scores, what happens after the first inclusive P90 warning
+  in each full-2024 RTH regime, descriptively and without any model selection?
+baseline: {short: frozen_parent_score_path, long: frozen_parent_score_path}
+baseline_feature_selection: {mode: none}
+model_arms: {LONG: frozen_parent_long, SHORT: frozen_parent_short}
+variable_being_tested: [first_inclusive_frozen_p90_warning_followup]
+prohibited_changes:
+  - use_2024_to_change_model_design
+  - introduce_unconstrained_search
+  - unauthorized_feature_discovery
+  - expand_to_full_feature_registry
+  - expansion_beyond_authorized_dates
+allowed_changes: [descriptive_frozen_score_followup]
+objective: >
+  Descriptively characterize the first inclusive frozen-P90 warning in each 2024 RTH
+  regime and its subsequent prevailing-1m flip timing without fitting, tuning, or changing Stage-1.
+chronology:
+  train: [2021]
+  dev: [2023]
+  diagnostic: [2024]
+  prohibited: [2025, 2026]
+parent_dependency:
+  study: clean_maturity_flip_model_180s_horizon
+  candidates_sha256: 6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56
+  observations_sha256: 557f736c38d6722c37659a8c10c2d353d4a39bc2a671aa070218f6f8ffa93c8b
+  rows: 450973
+  march_first_p90_parity_sha256: 52437d73c1cf0705001bb2534d1c3a6e8cbe401585f46e3534968c7bb1e22616
+  march_outcome_parity_sha256: 4241fad9bf368105053dfa3f2fbb7a76e5767bef362a8eb958cbe76f72e460f7
+frozen_thresholds:
+  LONG: {p90: 0.2852887899663343, p95: 0.32770330252959395, p97_5: 0.3639796684339806}
+  SHORT: {p90: 0.28485631865861344, p95: 0.33222113070660036, p97_5: 0.37673375655439945}
+prohibitions: [retrain, tune, threshold_derivation, stage2, new_collection_before_seal, access_2025, access_2026]
+warning_contract:
+  first_fire: earliest_eligible_checkpoint_score_gte_frozen_p90_per_regime
+  score_grid_seconds: 5
+  terminal: [accepted_opposing_prevailing_1m_flip, 600s, rth_close, market_or_data_censor]
+  subtypes: [FAST, LATE, SLOW, FAILED_WARNING_SCORE_COLLAPSE, FAILED_WARNING_PERSISTENT_HIGH, SESSION_CENSORED]
+  controls: latest_valid_score_lt_p90_same_regime_age_bucket_tod_cell_strictly_before_fire
+deliverables:
+  - first_p90_warning_horizon_contract.json
+  - first_p90_time_to_flip_detail.parquet
+  - first_p90_cumulative_incidence.json
+  - first_p90_negative_decomposition.json
+  - first_p90_control_comparison.json
+  - first_p90_score_evolution.parquet
+  - first_p90_warning_subtypes.json
+  - FIRST_P90_WARNING_HORIZON_REPORT.md

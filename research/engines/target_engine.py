@@ -48,12 +48,14 @@ def _compile_forward_outcome_spec(spec: RequiredForwardOutcomeSpec) -> Dict[str,
         max_gap_seconds=spec.max_gap_seconds,
         atr_source=spec.atr_source,
         atr_frozen_at=spec.atr_frozen_at,
+        horizon_expiry_policy=spec.horizon_expiry_policy or "censor",
         ordered_barriers=tuple(
             OrderedBarrierSpec(
                 barrier_id=b.id,
                 favorable_atr=b.favorable_atr,
                 adverse_atr=b.adverse_atr,
                 horizon_seconds=b.horizon_seconds,
+                horizon_expiry_policy=b.horizon_expiry_policy or spec.horizon_expiry_policy or "censor",
             )
             for b in (spec.ordered_barriers or [])
         ),
@@ -67,6 +69,7 @@ def _compile_forward_outcome_spec(spec: RequiredForwardOutcomeSpec) -> Dict[str,
         "excursion_units": list(fo.excursion_units),
         "bar_inclusion": spec.bar_inclusion,
         "session_end_censoring": spec.session_end_censoring,
+        "horizon_expiry_policy": spec.horizon_expiry_policy or "censor",
         "max_gap_seconds": spec.max_gap_seconds,
         "atr_source": spec.atr_source,
         "atr_frozen_at": spec.atr_frozen_at,

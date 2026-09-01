@@ -139,6 +139,51 @@ def assert_period_authorized(auth: ExperimentAuthorization, period: str) -> tupl
     raise ExperimentAuthorizationError(f"unknown experiment period: {period!r}")
 
 
+def authorize_diagnostic_period(study_path: str | Path, *, parent_study_path: str | Path) -> Dict[str, Any]:
+    """Authorize a child diagnostic year already opened by its frozen parent.
+
+    This intentionally does not classify the diagnostic year as child TRAIN or OOS,
+    and is planning-only until the normal seal boundary permits NT execution.
+    """
+    path = Path(study_path).resolve()
+    parent = Path(parent_study_path).resolve()
+    _assert_study_open(path)
+    child = _load_study(path)
+    years = tuple(sorted({int(y) for y in ((child.get("chronology") or {}).get("diagnostic") or [])}))
+    prohibited = {int(y) for y in ((child.get("chronology") or {}).get("prohibited") or [])}
+    if not years:
+        raise ExperimentAuthorizationError("DIAGNOSTIC_YEARS_REQUIRED")
+    if set(years) & prohibited:
+        raise ExperimentAuthorizationError("DIAGNOSTIC_YEAR_PROHIBITED")
+    parent_auth = load_authorization(parent)
+    if not set(years).issubset(set(parent_auth.oos_years)):
+        raise ExperimentAuthorizationError("DIAGNOSTIC_PARENT_OPEN_AUTHORITY_MISSING")
+    body = {"schema_version": 1, "period": "diagnostic", "years": list(years),
+            "parent_study": parent_auth.study_id,
+            "parent_authorization_sha256": parent_auth.authorization_sha256}
+    body["authorization_sha256"] = canonical_sha256(body)
+    return body
+
+
+def authorize_first_p90_diagnostic_period(study_path: str | Path, *, parent_study_path: str | Path, start_date: str, end_date: str) -> Dict[str, Any]:
+    """Diagnostic authority that refuses Apr-Dec until the March gate passes."""
+    if start_date > end_date or pd.Timestamp(start_date).year != 2024 or pd.Timestamp(end_date).year != 2024:
+        raise ExperimentAuthorizationError("FIRST_P90_DIAGNOSTIC_2024_ONLY")
+    auth = authorize_diagnostic_period(study_path, parent_study_path=parent_study_path)
+    if end_date > "2024-03-31":
+        from research_workflow.first_p90_gate import require_march_gate
+        compiled = json.loads((Path(study_path) / "compiled_study.json").read_text(encoding="utf-8"))
+        diag = (compiled.get("contracts") or {}).get("diagnostic_followup") or {}
+        gate = require_march_gate(study_path,
+            expected_first=diag.get("march_first_reference_sha256"),
+            expected_outcome=diag.get("march_outcome_reference_sha256"))
+        auth["march_gate_sha256"] = canonical_sha256(gate)
+    auth["dates"] = [d.strftime("%Y-%m-%d") for d in pd.date_range(start_date, end_date, freq="D")]
+    auth["period"] = "diagnostic"
+    auth["runtime_authorization_sha256"] = canonical_sha256(auth)
+    return auth
+
+
 def runtime_authorization(study_path: str | Path, period: str) -> Dict[str, Any]:
     """Create an authenticated exact calendar-date plan for the NT runtime."""
     path = Path(study_path).resolve()

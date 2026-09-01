@@ -114,6 +114,7 @@ class OrderedBarrierSpec:
     favorable_atr: float
     adverse_atr: float
     horizon_seconds: int
+    horizon_expiry_policy: str = "censor"
 
     def __post_init__(self) -> None:
         if not re.fullmatch(r"[a-z][a-z0-9_]*", self.barrier_id):
@@ -124,9 +125,13 @@ class OrderedBarrierSpec:
             raise ForwardOutcomeError("ordered barrier distances must be positive")
         if int(self.horizon_seconds) <= 0:
             raise ForwardOutcomeError("ordered barrier horizon_seconds must be positive")
+        policy = str(self.horizon_expiry_policy).lower()
+        if policy not in {"censor", "negative"}:
+            raise ForwardOutcomeError("ordered barrier horizon_expiry_policy must be 'censor' or 'negative'")
         object.__setattr__(self, "favorable_atr", float(self.favorable_atr))
         object.__setattr__(self, "adverse_atr", float(self.adverse_atr))
         object.__setattr__(self, "horizon_seconds", int(self.horizon_seconds))
+        object.__setattr__(self, "horizon_expiry_policy", policy)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -195,6 +200,7 @@ class ForwardOutcomeSpec:
     ordered_barriers: Tuple[OrderedBarrierSpec, ...] = ()
     confirmation: Optional[ConfirmationSpec] = None
     direction_convention: str = "SIGNED_BY_DIRECTION"
+    horizon_expiry_policy: str = "censor"
 
     VALID_UNITS = ("points", "atr", "ticks")
 
@@ -283,6 +289,7 @@ class ForwardOutcomeSpec:
             "ordered_barriers": [b.to_dict() for b in self.ordered_barriers],
             "confirmation": self.confirmation.to_dict() if self.confirmation else None,
             "direction_convention": self.direction_convention,
+            "horizon_expiry_policy": self.horizon_expiry_policy,
         }
 
     @property

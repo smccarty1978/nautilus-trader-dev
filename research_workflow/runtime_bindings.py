@@ -379,6 +379,38 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
                        f"bound {_bound_names}"),
         })
 
+    # Diagnostic follow-up is a distinct, runtime-scored operation.  Its first-fire
+    # threshold and direction binding are frozen contract inputs, not defaults the
+    # collector may infer from 2024 data.
+    diagnostic_checked = None
+    if ((spec.get("operation") or {}).get("kind") == "diagnostic_followup"
+            and contracts.get("diagnostic_followup") is not None and scope != "features_only"):
+        diagnostic_checked = False
+        diag = contracts.get("diagnostic_followup") or {}
+        thresholds = diag.get("thresholds") or {}
+        score_columns = diag.get("score_columns") or diag.get("model_bindings") or {}
+        errors = []
+        derived_names = {di.get("name") for di in derived if di.get("name")}
+        for side in ("LONG", "SHORT"):
+            try:
+                raw_threshold = thresholds[side]
+                threshold = float(raw_threshold.get("p90") if isinstance(raw_threshold, dict) else raw_threshold)
+                if not __import__("math").isfinite(threshold):
+                    raise ValueError("not finite")
+            except Exception:
+                errors.append(f"{side}:threshold")
+            if score_columns.get(side) not in derived_names:
+                errors.append(f"{side}:frozen_scorer")
+        diagnostic_checked = not errors
+        if errors:
+            missing.append({
+                "primitive": "operation.diagnostic_followup",
+                "declared": diag,
+                "required_binding": "direction-bound frozen thresholds and FrozenExternalModelScorer",
+                "collector": caps["strategy_class"],
+                "reason": f"DIAGNOSTIC_FOLLOWUP_BINDING_MISSING: {errors}",
+            })
+
     # --- (5) output-row persistence path (Stage 3) -----------------------------
     # An episode study's governed row carries episode identity + the derived score
     # column; both must be declared so OutputManager admits them.
@@ -415,6 +447,7 @@ def verify_runtime_contract(study_dir: str | Path, *, scope: str = "all") -> Dic
                 if provider_host_meta is not None else None
             ),
             "derived_scorer_bound": scorer_bound,
+            "diagnostic_followup_bound": diagnostic_checked,
             "output_row_persistence_declared": output_row_ok,
             "target_runtime": target_checked,
             "modeling_execution_closure_sha256": modeling_checked,

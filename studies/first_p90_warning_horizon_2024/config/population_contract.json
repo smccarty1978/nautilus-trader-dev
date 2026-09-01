@@ -1,0 +1,20 @@
+{
+  "instrument": {
+    "symbol": "NQ",
+    "venue": "XCME"
+  },
+  "population_type": "regime_state",
+  "prevailing_regime": "both",
+  "session": "RTH",
+  "qualification": {
+    "established": true,
+    "age_gate_seconds": 300,
+    "cadence_seconds": 5
+  },
+  "causal_checkpoint": {
+    "checkpoint_frequency": "5s",
+    "checkpoint_grid_origin": "regime_start_ns",
+    "triggering_stream": "completed_1s_bar",
+    "observation_timing": "interval_close"
+  }
+}

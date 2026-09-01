@@ -67,6 +67,7 @@ class _Collector(FlipPredictionCollector):
         self.mfe_progress_last_extreme_ts = None
         self.mfe_progress_count = 0
         self.next_checkpoint_index = 0
+        self._diagnostic_anchors = {}
 
     def add_candidate(self, T: int):
         self._track_pending(

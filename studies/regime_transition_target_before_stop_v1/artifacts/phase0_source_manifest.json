@@ -2,16 +2,15 @@
   "study_id": "regime_transition_target_before_stop_v1",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "fcd0d78d4a6e05b03649dbdae39bc3d1611f523e",
+  "git_commit_hash": "60ae8a4d9c2135b165ea7dea607f626490342e89",
   "source_state_binding": {
     "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "fcd0d78d4a6e05b03649dbdae39bc3d1611f523e",
+    "git_commit_hash": "60ae8a4d9c2135b165ea7dea607f626490342e89",
     "git_commit_is_sufficient_provenance": false,
     "working_tree_dirty": true,
-    "source_state_sha256": "fec717153cae00bd39a97b051176623324f5af587321f25b7a0f5340ba6a9e27",
+    "source_state_sha256": "d59018db43a47dd95dfa0904e508bed465f3ace0c2a158ed9eb74782cdcc4b18",
     "dependencies_diverging_from_commit": [
-      "studies/regime_transition_target_before_stop_v1/SPEC.md",
-      "studies/regime_transition_target_before_stop_v1/study.yaml"
+      "studies/regime_transition_target_before_stop_v1/SPEC.md"
     ],
     "source_files": {
       "features/registry.py": {
@@ -35,17 +34,17 @@
         "state": "COMMITTED"
       },
       "studies/regime_transition_target_before_stop_v1/SPEC.md": {
-        "sha256": "713262d2eb039f9a2a860da48be275e075caf849e225b4601475d46b227b2ea8",
-        "state": "UNTRACKED_OR_NEW"
+        "sha256": "2f61371536efa2a97aeb7e361f41ba87baa95b8f023b4b8c20f079f82981a7f6",
+        "state": "MODIFIED"
       },
       "studies/regime_transition_target_before_stop_v1/study.yaml": {
         "sha256": "87148e4cc24f9710d2efd1bb8e246a8603e44e8b1d376f99eeef3811eae6425b",
-        "state": "UNTRACKED_OR_NEW"
+        "state": "COMMITTED"
       }
     }
   },
   "study_yaml_sha256": "87148e4cc24f9710d2efd1bb8e246a8603e44e8b1d376f99eeef3811eae6425b",
-  "spec_md_sha256": "713262d2eb039f9a2a860da48be275e075caf849e225b4601475d46b227b2ea8",
+  "spec_md_sha256": "2f61371536efa2a97aeb7e361f41ba87baa95b8f023b4b8c20f079f82981a7f6",
   "clean_lineage_start": null,
   "invalidated_prior_runs_count": 0,
   "invalidated_prior_runs": [],
@@ -354,5 +353,5 @@
   },
   "derived_causal_inputs": [],
   "required_gates_evidence": [],
-  "manifest_sha256": "cf14c7bede7dc89f8eb4ff60cd9566f0475f5f19467f42fe8b5a8a625212194d"
+  "manifest_sha256": "73f2081f03108ad6d8b677a4f30fa322090f54a18c4ae602f72091fb193f48b4"
 }

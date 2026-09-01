@@ -99,6 +99,8 @@ def _verify_model_id(di: DerivedCausalInputSpec, repo_root: Path) -> Dict[str, A
         "golden_fixture_sha256": rec.get("golden_fixture_sha256"),
         "ordered_model_inputs": list(rec["ordered_model_inputs"]),
         "scientific_status": rec.get("scientific_status"),
+        "scientific_assessment_evidence": (di.diagnostic_reuse_policy.model_dump()
+                                             if di.diagnostic_reuse_policy is not None else None),
         "reuse_status": rec.get("reuse_status"),
         "availability_reference": di.availability_reference,
         "verified": True,

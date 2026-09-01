@@ -60,7 +60,7 @@ class FlipPredictionCompiler(BaseStudyCompiler):
             return FitDecision.BESPOKE_REQUIRED
 
         # Research operation check: only train_evaluate and artifact_reconstruction are canonical flip_prediction
-        allowed_operations = {"train_evaluate", "artifact_reconstruction"}
+        allowed_operations = {"train_evaluate", "artifact_reconstruction", "diagnostic_followup"}
         if spec.operation.kind not in allowed_operations:
             return FitDecision.BESPOKE_REQUIRED
 
@@ -123,6 +123,16 @@ class FlipPredictionCompiler(BaseStudyCompiler):
             "required_gates": [g.model_dump() for g in (spec.required_gates or [])],
             "model_selection": spec.model.selection.model_dump() if (spec.model and spec.model.selection) else None,
         }
+        if spec.operation.kind == "diagnostic_followup":
+            diag = dict(spec.diagnostic_followup or {})
+            thresholds = diag.get("thresholds") or {}
+            bindings = diag.get("score_columns") or {}
+            if set(thresholds) != {"LONG", "SHORT"} or set(bindings) != {"LONG", "SHORT"}:
+                raise ValueError("DIAGNOSTIC_FOLLOWUP_BINDING_MISSING")
+            names = {d.name for d in ((spec.features.derived_inputs if spec.features else None) or [])}
+            if not set(bindings.values()).issubset(names):
+                raise ValueError("DIAGNOSTIC_FOLLOWUP_SCORER_NOT_DECLARED")
+            contracts["diagnostic_followup"] = diag
 
         # 3. Render SPEC.md
         spec_md = self._render_spec_md(spec, spec_hash, contracts)

@@ -26,6 +26,7 @@ SUPPORTED_ATR_SOURCE = "latest_causally_completed_1m_wilder_atr_14_available_at_
 # in either direction).
 _ORACLE_CENSOR_SEVERITY = {
     None: 0, "SESSION_END": 1, "CENSORED_SESSION": 1, "HORIZON": 2, "CENSORED_HORIZON": 2,
+    "TIMEOUT": 2, "CENSORED_TIMEOUT": 2,
     "GAP": 3, "DATA_END": 3, "CENSORED_DATA_END": 3, "AMBIGUOUS_SAME_BAR_TOUCH": 4,
     "AMBIGUOUS_FIRST_TOUCH": 4, "FROZEN_ATR_NONPOSITIVE": 5, "UNRESOLVED_CHILD": 5,
     "MISSING_DATA": 6,
@@ -133,6 +134,12 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
             return {"disposition": "POSITIVE", "label": 1, "censor_reason": None}
         if hit_bad:
             return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
+    policy = str(
+        barrier.get("horizon_expiry_policy", candidate.get("horizon_expiry_policy", "censor")) if barrier
+        else candidate.get("horizon_expiry_policy", "censor")
+    ).lower()
+    if policy == "censor":
+        return {"disposition": "CENSORED", "label": None, "censor_reason": "TIMEOUT"}
     return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
 
 
@@ -211,6 +218,11 @@ def _replay_ordered_barrier_condition(
             return {"disposition": "POSITIVE", "label": 1, "censor_reason": None}
         if hit_bad:
             return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
+    policy = str(
+        barrier.get("horizon_expiry_policy", fo.get("horizon_expiry_policy", "censor"))
+    ).lower()
+    if policy == "censor":
+        return {"disposition": "CENSORED", "label": None, "censor_reason": "TIMEOUT"}
     return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
 
 

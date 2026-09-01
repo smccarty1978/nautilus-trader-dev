@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "study_id": "regime_transition_target_before_stop_v1",
+  "frozen_at_phase": "PHASE_C_COMPLETE",
+  "next_phase": "PHASE_D_MODELING",
+  "study_status": "READY_FOR_PHASE_D_MODELING",
+  "phase_d_authorized": false,
+  "recollection_required": false,
+  "oos_accessed": false,
+  "spec_sha256": "1f1e6f9e4eda502b3d4b538ffefb774564eb33304ff5b5b7dd388ed8a89e9df8",
+  "seal_composite_sha256": "4dcdc0307cbf90e0ef0d16bb1f7d805cf6770857d7cfcd649f2019976c0c8f7f",
+  "authoritative_train_target": {
+    "path": "studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/phase_c2_reconciled_targets.parquet",
+    "sha256": "21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e",
+    "row_count": 1387411,
+    "columns": [
+      "target_tp1_sl0_5_label",
+      "target_tp1_sl0_5_disposition",
+      "target_tp1_sl0_5_censor_reason",
+      "target_tp1_sl0_5_resolution_seconds",
+      "target_tp1_sl1_0_label",
+      "target_tp1_sl1_0_disposition",
+      "target_tp1_sl1_0_censor_reason",
+      "target_tp1_sl1_0_resolution_seconds",
+      "target_tp1_sl1_5_label",
+      "target_tp1_sl1_5_disposition",
+      "target_tp1_sl1_5_censor_reason",
+      "target_tp1_sl1_5_resolution_seconds"
+    ]
+  },
+  "chronology": {
+    "train_years": [
+      2021,
+      2022,
+      2023
+    ],
+    "oos_years": [
+      2024
+    ],
+    "prohibited_years": [
+      2025,
+      2026
+    ],
+    "oos_status": "LOCKED_UNACCESSED"
+  },
+  "target_semantics": {
+    "positive": {
+      "disposition": "POSITIVE",
+      "label": 1.0,
+      "condition": "Favorable TP barrier (+1.0 ATR) hit before adverse SL and t <= 300s"
+    },
+    "negative_sl": {
+      "disposition": "NEGATIVE",
+      "label": 0.0,
+      "condition": "Adverse SL barrier hit before favorable TP and t <= 300s"
+    },
+    "timeout": {
+      "disposition": "CENSORED",
+      "label": null,
+      "censor_reason": "TIMEOUT",
+      "condition": "300s horizon elapsed with neither barrier hit"
+    },
+    "session_end": {
+      "disposition": "CENSORED",
+      "label": null,
+      "censor_reason": "SESSION_END",
+      "condition": "300s observation window crosses 15:15 CT close"
+    },
+    "ambiguous": {
+      "disposition": "CENSORED",
+      "label": null,
+      "censor_reason": "AMBIGUOUS_SAME_BAR_TOUCH",
+      "condition": "TP and SL touched in same 1s bar"
+    },
+    "gap": {
+      "disposition": "CENSORED",
+      "label": null,
+      "censor_reason": "GAP",
+      "condition": "Explicit source continuity gap"
+    },
+    "data_end": {
+      "disposition": "CENSORED",
+      "label": null,
+      "censor_reason": "DATA_END",
+      "condition": "Feed termination before horizon end"
+    },
+    "stream_semantics": "sparse 1s LAST external stream (no synthetic forward-fill)",
+    "entry_reference": "next_bar_open",
+    "atr_provenance": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
+    "atr_frozen_at": "decision_ts"
+  },
+  "feature_contract": {
+    "feature_count": 13,
+    "feature_names": [
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "model_family": "Model-C feature surface"
+  },
+  "population_contract": {
+    "name": "qualified_prevailing_regime_checkpoint_population",
+    "session": "RTH (08:30 - 15:15 CT)",
+    "cadence_seconds": 5,
+    "age_gate_seconds": 120,
+    "running_mfe_atr_gte": 1.0,
+    "new_progress_windows_gte": 2,
+    "retained_mfe_ratio_gte": 0.5,
+    "trade_direction": "OPPOSITE_PREVAILING (-1 * regime_direction)",
+    "total_candidates": 1387411,
+    "long_candidates": 645960,
+    "short_candidates": 741451
+  },
+  "verified_artifacts": {
+    "candidates_parquet": {
+      "path": "studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/candidates.parquet",
+      "sha256": "440098b68e1d0f9de96baecf102b51c73711094e9eab89b93063af930e67d9e4",
+      "row_count": 1387411
+    },
+    "observations_parquet": {
+      "path": "studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/observations.parquet",
+      "sha256": "06ce1f2945c4c1e8e03efeed53b1d60e11547774ab92700bd02f08689a79eb18",
+      "row_count": 1387411
+    },
+    "phase_c2_feasibility_report_json": {
+      "path": "studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/phase_c2_feasibility_report.json",
+      "sha256": "c6e174c898b1e53027b3ecc2177ed7b5076b04f95e46014b7538287cb6e32ead",
+      "verdict": "PASS"
+    },
+    "phase_c3_differential_reconciliation_json": {
+      "path": "studies/regime_transition_target_before_stop_v1/_work/train_merged_collection/phase_c3_differential_reconciliation.json",
+      "sha256": "87401e75560f0d25e2fa837808cdf72c37f51055a0bf575cc66e287a28647dab",
+      "verdict": "PASS"
+    },
+    "preexec_audit_seal_json": {
+      "path": "studies/regime_transition_target_before_stop_v1/artifacts/preexec_audit_seal.json",
+      "sha256": "2a3d6e605b6784b93c3dc13dc23e5ee898f6a37408d3cc92e7a4729f3cd69206",
+      "status": "PREEXEC_AUDIT_SEAL_VALID"
+    },
+    "compiled_study_json": {
+      "path": "studies/regime_transition_target_before_stop_v1/compiled_study.json",
+      "sha256": "048b53101847edc1cc2e009ba8176ebcd07f0b2d290d498701036232d0db718e"
+    }
+  },
+  "git_environment": {
+    "branch": "chore/redteam-remediation-pass-2",
+    "head": "60ae8a4 Add regime transition target-before-stop study implementation and tests",
+    "worktree_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader"
+  },
+  "timestamp_utc": "2026-09-01T14:53:22.634622+00:00"
+}

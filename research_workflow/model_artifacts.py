@@ -73,12 +73,95 @@ _SCIENTIFIC_STATUS_BLOCKED = frozenset({"INVALID_TARGET", "INVALID", "REJECTED",
 _SCIENTIFIC_STATUS_POLICY_GATED = frozenset({"VALID_DIAGNOSTIC"})
 
 
-def assert_scientific_status_reusable(record: Mapping[str, Any], policy: Mapping[str, Any] | None = None) -> None:
+def _assert_parent_runtime_drift_evidence(policy: Mapping[str, Any], parent_dir: Path) -> None:
+    """A closure-bound UNASSESSED exception cannot turn runtime drift into a boolean
+    override.  Its evidence is an exact, contained file from the declared parent."""
+    if not policy.get("allow_runtime_drift"):
+        return
+    rel, expected = policy.get("runtime_drift_evidence_path"), policy.get("runtime_drift_evidence_sha256")
+    if not isinstance(rel, str) or not isinstance(expected, str):
+        raise ModelArtifactError("DIAGNOSTIC_REUSE_RUNTIME_DRIFT_EVIDENCE_REQUIRED")
+    evidence = (parent_dir / rel).resolve()
+    if parent_dir.resolve() not in evidence.parents or not evidence.is_file() or _sha(evidence) != expected:
+        raise ModelArtifactError("DIAGNOSTIC_REUSE_RUNTIME_DRIFT_EVIDENCE_MISMATCH")
+
+
+def _assert_unassessed_diagnostic_reuse(record: Mapping[str, Any], policy: Mapping[str, Any] | None,
+                                        *, studies_root: Path) -> None:
+    """Authenticate the sole exception to the UNASSESSED derived-input block.
+
+    The closure's model and assessment fields are structured.  Schema v1 closures have
+    no structured reuse boolean, so the dedicated ``reuse_policy`` field is checked
+    only after the closed structured evidence set has authenticated the closure.
+    """
+    pol = policy or {}
+    required = ("parent_study_id", "parent_closure_path", "parent_closure_sha256",
+                "parent_closure_identity_sha256", "expected_assessment", "artifact_sha256")
+    if (pol.get("kind") != "diagnostic_derived_causal_input" or pol.get("model_id") != record.get("model_id")
+            or any(not pol.get(k) for k in required)):
+        raise ModelArtifactError("PRESERVED_MODEL_SCIENTIFICALLY_INVALID: UNASSESSED_REUSE_EVIDENCE_REQUIRED")
+    parent_id = str(pol["parent_study_id"])
+    parent_dir = (studies_root / parent_id).resolve()
+    if parent_dir.parent != studies_root.resolve() or parent_dir.name != parent_id:
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_PARENT_INVALID")
+    if pol.get("parent_closure_path") != "artifacts/study_closure.json":
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_CLOSURE_NOT_CANONICAL")
+    closure_path = (parent_dir / pol["parent_closure_path"]).resolve()
+    if not closure_path.is_file() or _sha(closure_path) != pol["parent_closure_sha256"]:
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_CLOSURE_SHA_MISMATCH")
+    from research.analysis.identity import canonical_sha256
+    from research_workflow.study_closure import StudyClosureInvalid, load_study_closure
+    try:
+        closure = load_study_closure(parent_dir)
+    except StudyClosureInvalid as exc:
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_CLOSURE_INVALID") from exc
+    if not closure or closure.get("closure_identity_sha256") != pol["parent_closure_identity_sha256"]:
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_CLOSURE_IDENTITY_MISMATCH")
+    # The terminal-closure writer deliberately excludes its wall-clock timestamp and
+    # inserts closure_identity_sha256 only after hashing.  Match that canonical
+    # identity convention; file bytes are independently pinned above.
+    if canonical_sha256({k: v for k, v in closure.items()
+                         if k not in {"closed_at_utc", "closure_identity_sha256"}}) != closure["closure_identity_sha256"]:
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_CLOSURE_IDENTITY_MISMATCH")
+    models = closure.get("models")
+    assessment = closure.get("model_scientific_assessment")
+    if not isinstance(models, Mapping) or not isinstance(assessment, Mapping):
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_CLOSURE_EVIDENCE_MISSING")
+    matching = [m for m in models.values() if isinstance(m, Mapping) and m.get("model_id") == record.get("model_id")]
+    if len(matching) != 1 or matching[0].get("artifact_sha256") != record.get("artifact_sha256") or pol["artifact_sha256"] != record.get("artifact_sha256"):
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_MODEL_BINDING_MISMATCH")
+    if assessment.get("assessment") != pol["expected_assessment"] or assessment.get("assessment") != "VALID_DIAGNOSTIC":
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_ASSESSMENT_MISMATCH")
+    # v1's only authorization carrier is this dedicated closure field.  Do not infer
+    # permission from outcome, rationale, or registry reuse_status.
+    authorization = assessment.get("reuse_policy")
+    if not (isinstance(authorization, Mapping) and authorization.get("allows_governed_diagnostic_derived_input") is True) and not (
+        isinstance(authorization, str)
+        and "GOVERNED derived-input use" in authorization
+        and "explicitly permits diagnostic-derived input" in authorization
+    ):
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_NOT_AUTHORIZED")
+    bound = closure.get("bound_evidence")
+    if not isinstance(bound, Mapping) or not all(isinstance(bound.get(k), Mapping) and bound[k].get("verdict") == "CLEAR" for k in ("causal_audit", "contract_audit")) or not bound.get("train_freeze_sha256"):
+        raise ModelArtifactError("PRESERVED_MODEL_UNASSESSED_REUSE_AUDIT_EVIDENCE_MISSING")
+    _assert_parent_runtime_drift_evidence(pol, parent_dir)
+
+
+def assert_scientific_status_reusable(record: Mapping[str, Any], policy: Mapping[str, Any] | None = None,
+                                      *, studies_root: Path | None = None) -> None:
     """Fail closed unless the model's ``scientific_status`` permits reuse as a derived
     causal input. A VALID_DIAGNOSTIC model needs the closed, model-specific derived
     input policy; UNASSESSED is never implicit scientific approval."""
     status = str(record.get("scientific_status") or "UNASSESSED")
     mid = record.get("model_id")
+    if status == "UNASSESSED":
+        if studies_root is None:
+            raise ModelArtifactError(
+                f"PRESERVED_MODEL_SCIENTIFICALLY_INVALID: model {mid} scientific_status="
+                "'UNASSESSED' is never reusable without closure-bound diagnostic evidence"
+            )
+        _assert_unassessed_diagnostic_reuse(record, policy, studies_root=studies_root)
+        return
     if status in _SCIENTIFIC_STATUS_BLOCKED:
         raise ModelArtifactError(
             f"PRESERVED_MODEL_SCIENTIFICALLY_INVALID: model {mid} scientific_status="
@@ -107,7 +190,7 @@ def resolve_model(model_id: str, *, registry_root: str | Path,
     # scientific_status. Other callers (golden self-check, an internal load) keep the
     # historical reuse_status-only gate.
     if reuse_intent == "derived_causal_input":
-        assert_scientific_status_reusable(rec, reuse_policy)
+        assert_scientific_status_reusable(rec, reuse_policy, studies_root=studies_root)
         # RT-09: also verify the recorded environment/library identity. A record with no
         # library_versions predates the field -> unverifiable, allowed (conservative). A
         # recorded-but-drifted identity is refused unless the policy allows it.
