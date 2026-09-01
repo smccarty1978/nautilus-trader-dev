@@ -3,8 +3,14 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pyarrow as pa
+import pyarrow.parquet as pq
+import yaml
+
+from research.schemas.study_spec import StudySpec
 from research_workflow.controller_contracts import ControllerState
 from research_workflow.governed_controller import ControllerActions, GovernedStudyController, _materialize_preflight_tests, compact_card
+from research_workflow.workflow_engine import _sha
 
 
 def _write(path, payload):
@@ -128,6 +134,97 @@ def test_materializes_authoritative_preflight_test_outcome(tmp_path):
 
 
 def _read_json(path): return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _legacy_handoff(tmp_path, monkeypatch):
+    """A minimal, fully-bound legacy TRAIN handoff; no collection input is opened."""
+    study, controller, calls, composite = _controller(tmp_path)
+    controller.repo_root = tmp_path.resolve()
+    controller._manifest_is_tracked = lambda _: True
+    authored = {
+        "study": {"id": "s", "type": "flip_prediction", "description": "legacy"},
+        "instrument": {"symbol": "NQ", "venue": "XCME"},
+        "population": {"type": "regime_state"},
+        "target": {"type": "flip", "horizon_seconds": 300},
+        "features": {"source": "canonical_verified_definition_universe"},
+        "chronology": {"train": [2021], "dev": [2022], "prohibited": [2025, 2026]},
+        "execution": {"runtime": "nautilustrader"},
+    }
+    spec_sha = StudySpec.model_validate(authored).compute_sha256()
+    (study / "study.yaml").write_text(yaml.safe_dump(authored), encoding="utf-8")
+    _write(study / "compiled_study.json", {"spec_sha256": spec_sha})
+    _write(study / "audit/frozen_execution_manifest.json", {"frozen_execution_composite_sha256": composite})
+    _write(study / "artifacts/preexec_audit_seal.json", {"seal": "fixture"})
+    target = study / "_work/train/targets.parquet"; target.parent.mkdir(parents=True)
+    pq.write_table(pa.table({"label": [1.0]}), target)
+    manifest = {
+        "study_id": "s", "frozen_at_phase": "PHASE_C_COMPLETE", "next_phase": "PHASE_D_MODELING",
+        "study_status": "READY_FOR_PHASE_D_MODELING", "phase_d_authorized": False, "recollection_required": False,
+        "oos_accessed": False, "spec_sha256": spec_sha, "seal_composite_sha256": composite,
+        "authoritative_train_target": {"path": "s/_work/train/targets.parquet", "sha256": _sha(target), "row_count": 1, "columns": ["label"]},
+        "verified_artifacts": {
+            "compiled": {"path": "s/compiled_study.json", "sha256": _sha(study / "compiled_study.json")},
+            "seal": {"path": "s/artifacts/preexec_audit_seal.json", "sha256": _sha(study / "artifacts/preexec_audit_seal.json")},
+        },
+    }
+    _write(study / "artifacts/resume_manifest.json", manifest)
+    monkeypatch.setattr("research_workflow.study_spec_compiler.compile_approved_request",
+                        lambda study, write=False: {"ok": False, "terminal": "SEMANTIC_DECISION_REQUIRED"})
+    monkeypatch.setattr("research_workflow.seal.verify_preexec_audit_seal", lambda _: True)
+    return study, controller, calls, composite, manifest
+
+
+def test_legacy_handoff_a_valid_returns_phase_d_without_collection(tmp_path, monkeypatch):
+    study, controller, calls, _, _ = _legacy_handoff(tmp_path, monkeypatch)
+    controller.actions.collection = lambda _: calls.append("collection")
+    card = controller.run(through="analyze", dry_run=True)
+    assert card["state"] == ControllerState.PHASE_D_MODELING_READY_NOT_AUTHORIZED.value
+    assert card["stage"] == "phase_handoff" and card["next_state"] == "PHASE_D_MODELING"
+    assert card["blocker_code"] == "SEMANTIC_BLOCKER" and calls == []
+
+
+def test_legacy_handoff_b_bad_artifact_falls_through(tmp_path, monkeypatch):
+    study, controller, _, _, manifest = _legacy_handoff(tmp_path, monkeypatch)
+    manifest["verified_artifacts"]["compiled"]["sha256"] = "0" * 64
+    _write(study / "artifacts/resume_manifest.json", manifest)
+    assert controller.run(through="compile", dry_run=True)["state"] == ControllerState.NEEDS_COMPILE.value
+
+
+def test_legacy_handoff_c_seal_mismatch_falls_through(tmp_path, monkeypatch):
+    _, controller, _, _, _ = _legacy_handoff(tmp_path, monkeypatch)
+    def stale_seal(_):
+        raise RuntimeError("stale seal")
+    monkeypatch.setattr("research_workflow.seal.verify_preexec_audit_seal", stale_seal)
+    assert controller.run(through="compile", dry_run=True)["state"] == ControllerState.NEEDS_COMPILE.value
+
+
+def test_legacy_handoff_d_current_composite_mismatch_falls_through(tmp_path, monkeypatch):
+    _, controller, _, composite, _ = _legacy_handoff(tmp_path, monkeypatch)
+    controller._fingerprints = lambda: {"execution_composite": composite, "current_execution_composite": "b" * 64}
+    assert controller.run(through="compile", dry_run=True)["state"] == ControllerState.NEEDS_COMPILE.value
+
+
+def test_legacy_handoff_e_oos_access_rejected_without_opening_data(tmp_path, monkeypatch):
+    study, controller, _, _, manifest = _legacy_handoff(tmp_path, monkeypatch)
+    manifest["oos_accessed"] = True
+    _write(study / "artifacts/resume_manifest.json", manifest)
+    assert controller.run(through="compile", dry_run=True)["state"] == ControllerState.NEEDS_COMPILE.value
+
+
+def test_legacy_handoff_f_modern_study_with_missing_lineage_still_compiles(tmp_path, monkeypatch):
+    _, controller, _, _, _ = _legacy_handoff(tmp_path, monkeypatch)
+    monkeypatch.setattr("research_workflow.study_spec_compiler.compile_approved_request",
+                        lambda study, write=False: {"ok": True, "spec_sha256": "fixture"})
+    assert controller.run(through="compile", dry_run=True)["state"] == ControllerState.NEEDS_COMPILE.value
+
+
+def test_legacy_handoff_g_remains_non_executable_until_authorized(tmp_path, monkeypatch):
+    _, controller, calls, _, _ = _legacy_handoff(tmp_path, monkeypatch)
+    controller.actions.collection = lambda _: calls.append("collection")
+    card = controller.run(through="collection", dry_run=False)
+    assert card["state"] == ControllerState.PHASE_D_MODELING_READY_NOT_AUTHORIZED.value
+    assert card["blocker_code"] == "SEMANTIC_BLOCKER"
+    assert calls == []
 
 
 def test_synthetic_git_worktree_resume_and_verbose_child(tmp_path):
