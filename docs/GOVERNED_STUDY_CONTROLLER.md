@@ -1,0 +1,58 @@
+# Governed study controller
+
+`python scripts/run_governed_study.py --study studies/<id> --through seal` is the compact,
+resumable operator surface over the existing governed lifecycle. It does not create a second
+collector, audit implementation, analysis loader, or seal path.
+
+| State | Meaning | Intervention |
+| --- | --- | --- |
+| `NEEDS_COMPILE` through `NEEDS_PREFLIGHT`, then `NEEDS_TESTS` | A stale or missing deterministic gate | Order is compile, prepare, readiness, canonical preflight, test-evidence extraction; tests are not rerun. |
+| `NEEDS_CAUSAL_AUDIT` / `NEEDS_CONTRACT_AUDIT` | Current independent review is missing | Give the generated compact packet to the named independent auditor; controller never judges it. |
+| `READY_TO_SEAL` | Both current audit JSON artifacts are CLEAR | Controller uses the existing seal implementation. |
+| `READY_TO_COLLECT` onward | Execution requires an approved study-specific operation | Register/use the standard governed API; OOS remains accessible only through `assert_oos_open`. |
+
+Use `--inspect` or `--dry-run` for a non-mutating state card, `--json` for one compact JSON
+record, and repeat `--owned-path <repo-relative-path>` only for intentional local edits. Before
+any controller write, unowned dirty files produce `WORKTREE_CONTAMINATION`; nothing is reverted.
+This enforces **ONE_WRITER_PER_WORKTREE**: one implementation owner, one causal auditor, and one
+contract auditor (an optional repo scout is read-only; replacements are exceptional).
+
+The controller saves detailed evidence under `studies/<id>/_work/controller/`: `status.json`,
+`progress.json`, current `failure_packet.json`, and audit packets. Verbose child output is stored
+as `logs/<stage>.log`; compact stdout contains only status, state, stage, artifact, hash, and
+next state. This changes the normal interaction from repeatedly pasting lifecycle/audit output
+to reading one card and acting only at a named gate, substantially reducing model context while
+preserving the existing causal, audit, seal, and OOS guards.
+
+Supported `--through` names are `compile`, `prepare`, `readiness`, `preflight`, `tests`,
+`causal_audit`, `contract_audit`, `seal`, `collection`, `reconcile`, and `analyze`. Fresh artifacts are skipped; fingerprint drift restarts at the earliest affected lifecycle stage
+and continues only downstream. Interrupted work resumes from artifacts rather than rerunning
+completed gates. `--max-runtime`, `--stale-progress-timeout`, and `--rss-limit-mb` are retained
+on the controller and the verbose-child adapter uses `scripts.run_bounded_study.monitor_process`.
+No real collection or OOS execution is initiated by the default CLI.
+
+Late execution stages are deliberately conservative: collection, reconciliation, and analysis
+are fresh only with a controller receipt under `_work/controller/receipts/` whose output hashes
+and current execution composite validate. A collection receipt also names every intended
+partition and PASS status. Ordinary smoke/day run manifests never satisfy collection. The
+registered operation must return this output contract; otherwise the controller reports a
+capability/runtime packet instead of inferring completion.
+
+The production collection leaf calls only `collection.build_year_partitions` and
+`collection.collect_partition`. It records one atomic partition record and progress update
+after each completed partition, and revalidates a resumed record against its `PartitionSpec`,
+current verified pre-execution seal identities, terminal `run_manifest.json`/`status.json`, primary dates, and the three
+collection artifacts. Candidate and observation bytes must match both the run and collection
+manifest hashes; the terminal manifest and status bytes are receipt evidence too. A missing or
+mismatched run launch identity is rejected. A corrupt or stale partition is rerun by itself; it is never promoted from a
+record alone. Reconciliation requires exactly the currently declared partition set, uses both
+`partitioning.reconcile_partitions` and `scripts.reconcile_runs.classify_run`, and persists
+the resulting run classifications and artifact hashes.
+
+Production actions never set synthetic artifact trust. The test-only `synthetic_test` escape
+is available solely on explicitly constructed fixture actions. Analysis requires all three
+explicit inputs (`--analysis-frame`, `--score-columns-json`, `--target-column`), binds the
+frame and canonical configuration hashes, and invokes `research_workflow.analysis.analyze_results`
+so its `assert_oos_open` guard remains authoritative. Controller action stdout/stderr and
+tracebacks stay in `_work/controller/logs/`; receipts record the stage log path/hash when one
+exists.
