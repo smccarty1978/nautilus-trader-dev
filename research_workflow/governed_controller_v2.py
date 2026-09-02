@@ -56,7 +56,10 @@ class V2StudyController(GovernedStudyController):
         return bool(frozen and st.get("verdict") == "CLEAR" and st.get("audited_execution_composite_sha256") == frozen and fp.get("current_execution_composite") == frozen)
 
     def _fresh_stage(self, stage: str, fp: dict[str, str | None]) -> bool:
-        plan_ok = bool(fp.get("compiled_plan") and fp.get("plan_spec_sha256") == fp.get("study_spec"))
+        # a compiled plan is current only if the spec is unchanged AND the closure it was compiled against
+        # (host modules, compiler, bound providers) still hashes to the same composite
+        plan_ok = bool(fp.get("compiled_plan") and fp.get("plan_spec_sha256") == fp.get("study_spec")
+                       and fp.get("plan_closure_composite") and fp.get("plan_closure_composite") == fp.get("current_execution_composite"))
         closure_ok = bool(fp.get("execution_composite") and fp.get("execution_composite") == fp.get("current_execution_composite"))
         if stage == "compile":
             return plan_ok

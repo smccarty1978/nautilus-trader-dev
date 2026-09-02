@@ -138,6 +138,7 @@ class V2Lifecycle:
         return {
             "study_spec": spec_sha256(self.study), "compiled_plan": _sha(self.study / PLAN_NAME),
             "plan_sha256": plan.get("plan_sha256"), "plan_spec_sha256": plan.get("spec_sha256"),
+            "plan_closure_composite": (plan.get("closure") or {}).get("composite_sha256"),
             "execution_freeze": _sha(self.audit / "frozen_execution_manifest.json"),
             "execution_composite": frozen.get("frozen_execution_composite_sha256"),
             "current_execution_composite": self.current_composite(),
