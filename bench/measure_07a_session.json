@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "kind": "performance_baseline",
+  "status": "MEASUREMENT_ONLY_NOT_A_GATE",
+  "generated_at_utc": "2026-09-02T06:42:47.501444+00:00",
+  "git_head": "c38dbd0464cbaf43ddef552850513798bbf0b7ed",
+  "environment": {
+    "python": "3.13.7",
+    "nautilus_trader": "1.230.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_count": 20
+  },
+  "method": "Record the current-runtime performance baseline (Phase 0E) as bench/baseline_v0.json.",
+  "repeats": 3,
+  "series": {
+    "full": {
+      "mode": "full",
+      "runs": [
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 76.08928149999701,
+          "replay_seconds": 75.06366610000259,
+          "setup_seconds": 1.0256153999944218,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2843.3330143462395,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.22265625,
+            "after_data_load": 273.08203125,
+            "after_replay": 520.96875,
+            "telemetry_peak": 526.18,
+            "growth_during_replay": 247.88671875,
+            "parent_sampled_peak": 526.18359375
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_1"
+        },
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 80.04741510000895,
+          "replay_seconds": 78.98731959998258,
+          "setup_seconds": 1.0600955000263639,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2702.0919443890975,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.32421875,
+            "after_data_load": 273.62890625,
+            "after_replay": 521.703125,
+            "telemetry_peak": 527.02,
+            "growth_during_replay": 248.07421875,
+            "parent_sampled_peak": 527.03515625
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_2"
+        },
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 79.01454769997508,
+          "replay_seconds": 77.97249250000459,
+          "setup_seconds": 1.0420551999704912,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2737.260194676827,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.10546875,
+            "after_data_load": 273.609375,
+            "after_replay": 521.1171875,
+            "telemetry_peak": 525.9,
+            "growth_during_replay": 247.5078125,
+            "parent_sampled_peak": 525.8984375
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_3"
+        }
+      ],
+      "events_per_second": {
+        "n": 3,
+        "mean": 2760.895051137388,
+        "min": 2702.0919443890975,
+        "max": 2843.3330143462395,
+        "stdev": 73.52696641772364
+      },
+      "replay_seconds": {
+        "n": 3,
+        "mean": 77.34115939999658,
+        "min": 75.06366610000259,
+        "max": 78.98731959998258,
+        "stdev": 2.0365903636594656
+      },
+      "wall_seconds": {
+        "n": 3,
+        "mean": 78.38374809999368,
+        "min": 76.08928149999701,
+        "max": 80.04741510000895,
+        "stdev": 2.053079759870127
+      },
+      "peak_rss_mb": {
+        "n": 3,
+        "mean": 526.3723958333334,
+        "min": 525.8984375,
+        "max": 527.03515625,
+        "stdev": 0.5914110661406716
+      },
+      "rss_growth_during_replay_mb": {
+        "n": 3,
+        "mean": 247.82291666666666,
+        "min": 247.5078125,
+        "max": 248.07421875,
+        "stdev": 0.28854295934578067
+      }
+    }
+  },
+  "decomposition": {},
+  "previous_runs": [
+    {
+      "generated_at_utc": "2026-09-02T06:41:57.156568+00:00",
+      "git_head": "c38dbd0464cbaf43ddef552850513798bbf0b7ed"
+    }
+  ]
+}

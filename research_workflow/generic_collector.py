@@ -102,6 +102,36 @@ CANDIDATE_STEP_NS = 5 * NS
 CANDIDATE_TIMEOUT_NS = 1800 * NS
 
 
+# ---------------------------------------------------------------------------
+# Hot-path timeframe arithmetic (platform-v2 item 07, fix B).
+#
+# America/Chicago is a whole-hour offset from UTC (CST -6h, CDT -5h), so a Chicago
+# 5-minute calendar boundary is exactly a UTC 5-minute boundary: no tz conversion is
+# needed to detect it. Minutes since the 08:30 CT open only needs the hour offset of the
+# CT calendar day, which is constant within any UTC hour; the session table in
+# utils.session_boundaries already resolves that once per hour. Equivalence to the
+# pandas/tz path is verified by scripts/tests/test_hot_path_equivalence.py across a full
+# year including both DST transitions.
+# ---------------------------------------------------------------------------
+_FIVE_MIN_NS = 300 * NS
+
+
+def is_five_minute_boundary_ns(ts_ns: int) -> bool:
+    """True when ``ts_ns`` (UTC ns) lands on a Chicago 5-minute calendar boundary (second == 0)."""
+    return int(ts_ns) % _FIVE_MIN_NS == 0
+
+
+def minutes_since_rth_open_ns(ts_ns: int) -> int:
+    """(CT hour - 8) * 60 + (CT minute - 30) from wall-clock components.
+
+    The Chicago offset is a whole number of hours, so the CT minute equals the UTC minute
+    and only the hour needs the (per-UTC-hour cached) tz lookup.
+    """
+    from utils.session_boundaries import ct_hour_of_day
+    minute = (int(ts_ns) // (60 * NS)) % 60
+    return (ct_hour_of_day(int(ts_ns)) - 8) * 60 + (minute - 30)
+
+
 class FastOHLCVRingBuffer:
     """Zero-allocation circular buffer for 1-second OHLCV rolling window statistics."""
     def __init__(self, capacity: int = 3600):
@@ -596,15 +626,13 @@ class FlipPredictionCollector(Strategy):
             self.long_ema_history.append((self.regime_engine.ema9_h + (self.regime_engine.ema9_l or self.regime_engine.ema9_h)) / 2.0)
 
         # 2. Check 5m boundary and dispatch completed 5m bar to Structural Tracker
-        ts_pd = pd.Timestamp(ts_avail, tz="UTC").tz_convert("America/Chicago")
-        minute_of_day = ts_pd.hour * 60 + ts_pd.minute
-
+        # (integer arithmetic; see is_five_minute_boundary_ns)
         if self._current_5m_open is None:
             self._current_5m_open = o
         self._current_5m_high = max(self._current_5m_high, h)
         self._current_5m_low = min(self._current_5m_low, l)
 
-        if minute_of_day % 5 == 0:
+        if is_five_minute_boundary_ns(ts_avail):
             self.structural_geometry_tracker.on_5m_bar(
                 close_ts=ts_avail,
                 direction=self.active_regime_dir if self.active_regime_dir != 0 else new_regime,
@@ -1389,8 +1417,7 @@ class FlipPredictionCollector(Strategy):
         if len(self.long_ema_history) >= 6:
             ema_slope_long = (self.long_ema_history[-1] - self.long_ema_history[-6]) / (5 * atr)
 
-        ts_pd = pd.Timestamp(T, tz="UTC").tz_convert("America/Chicago")
-        minutes_since_open = (ts_pd.hour - 8) * 60 + (ts_pd.minute - 30)
+        minutes_since_open = minutes_since_rth_open_ns(T)
         # Canonical boundary, not a third inline re-derivation (this one previously
         # ended RTH at 15:00 while the accumulator above ended it at 15:15).
         is_rth = 1.0 if is_in_session(T, self.cfg.session) else 0.0

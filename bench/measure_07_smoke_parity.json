@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "kind": "performance_baseline",
+  "status": "MEASUREMENT_ONLY_NOT_A_GATE",
+  "generated_at_utc": "2026-09-02T06:56:59.131336+00:00",
+  "git_head": "c38dbd0464cbaf43ddef552850513798bbf0b7ed",
+  "environment": {
+    "python": "3.13.7",
+    "nautilus_trader": "1.230.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_count": 20
+  },
+  "method": "Record the current-runtime performance baseline (Phase 0E) as bench/baseline_v0.json.",
+  "repeats": 1,
+  "series": {
+    "smoke": {
+      "mode": "smoke",
+      "runs": [
+        {
+          "configuration": "smoke",
+          "tag": "smoke_1",
+          "failed": true,
+          "returncode": 1,
+          "stderr_tail": "cott McCarty\\Projects\\Nautilus Trader-platform-v2\\scripts\\bench_baseline.py\", line 86, in _child\n    result = collect.run_collect_mode(\n        study_path=SMOKE_STUDY, stage=\"day\", date_override=REPLAY_DATE,\n        output_dir=WORK / \"smoke_runs\", log_level=\"ERROR\",\n    )\n  File \"C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-platform-v2\\backtests\\nt_runtime\\modes\\collect.py\", line 54, in run_collect_mode\n    verify_frozen_execution_identity(study_data.study_dir, REPO_ROOT)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-platform-v2\\scripts\\resolve_execution_manifest.py\", line 954, in verify_frozen_execution_identity\n    raise PostFreezeMutationError(\n    ...<3 lines>...\n    )\nscripts.resolve_execution_manifest.PostFreezeMutationError: POST_FREEZE_MUTATION: Execution composite mutated after FREEZE. Current composite 4ddda2dee365... != Frozen composite 1a6eed85254d...\nAdded files: ['repo:features/trackers/regime_dual_ema.py', 'repo:research_workflow/model_store.py', 'repo:research_workflow/roots.py']\nModified/Mutated files: ['repo:backtests/nt_runtime/data_plan.py', 'repo:collectors/collector_v2/regime_engine.py', 'repo:research/engines/timestamp_engine.py', 'repo:research/schemas/dataset_spec.py', 'repo:research_workflow/generic_collector.py', 'repo:research_workflow/model_artifacts.py', 'repo:research_workflow/provider_host.py', 'repo:utils/session_boundaries.py', 'study:dataset:NQ_v0_2020_2026']\n"
+        }
+      ],
+      "events_per_second": null,
+      "replay_seconds": null,
+      "wall_seconds": null,
+      "peak_rss_mb": null,
+      "rss_growth_during_replay_mb": null
+    },
+    "parity": {
+      "mode": "parity",
+      "runs": [
+        {
+          "configuration": "parity",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 75.65586210001493,
+          "replay_seconds": 74.58563690001029,
+          "setup_seconds": 1.0702252000046428,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2861.556311252342,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.17578125,
+            "after_data_load": 273.62109375,
+            "after_replay": 521.46875,
+            "telemetry_peak": 526.6,
+            "growth_during_replay": 247.84765625,
+            "parent_sampled_peak": 531.16015625
+          },
+          "result_status": "SUCCESS",
+          "tag": "parity_1"
+        }
+      ],
+      "events_per_second": {
+        "n": 1,
+        "mean": 2861.556311252342,
+        "min": 2861.556311252342,
+        "max": 2861.556311252342,
+        "stdev": 0.0
+      },
+      "replay_seconds": {
+        "n": 1,
+        "mean": 74.58563690001029,
+        "min": 74.58563690001029,
+        "max": 74.58563690001029,
+        "stdev": 0.0
+      },
+      "wall_seconds": {
+        "n": 1,
+        "mean": 75.65586210001493,
+        "min": 75.65586210001493,
+        "max": 75.65586210001493,
+        "stdev": 0.0
+      },
+      "peak_rss_mb": {
+        "n": 1,
+        "mean": 531.16015625,
+        "min": 531.16015625,
+        "max": 531.16015625,
+        "stdev": 0.0
+      },
+      "rss_growth_during_replay_mb": {
+        "n": 1,
+        "mean": 247.84765625,
+        "min": 247.84765625,
+        "max": 247.84765625,
+        "stdev": 0.0
+      }
+    }
+  },
+  "decomposition": {},
+  "previous_runs": [
+    {
+      "generated_at_utc": "2026-09-02T06:56:21.368156+00:00",
+      "git_head": "c38dbd0464cbaf43ddef552850513798bbf0b7ed"
+    }
+  ]
+}

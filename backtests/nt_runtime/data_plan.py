@@ -358,7 +358,11 @@ def resolve_data_plan(
                 f"DatasetSpec authority file at {dataset_spec_path}"
             )
         dataset_spec = load_dataset_spec(dataset_spec_path)
-        expected_catalog_path = (repo_root / dataset_spec.catalog_rel_path).resolve()
+        # Declared authority resolves through the same machine-local root resolver as the
+        # product catalog (research_workflow.roots); the legacy repo-relative path applies only
+        # when no catalog_roots are configured.
+        from research_workflow.roots import resolve_dataset as _resolve_dataset
+        expected_catalog_path = _resolve_dataset(dataset_spec.dataset_id, repo_root, catalog_rel_path=dataset_spec.catalog_rel_path).catalog_path
         if expected_catalog_path != plan.catalog_path:
             raise WrongPhysicalDatasetError(
                 f"WRONG_PHYSICAL_DATASET: DatasetSpec '{declared_dataset_id}' declares catalog "

@@ -1,0 +1,40 @@
+{
+  "item": "07_performance",
+  "status": "PASS",
+  "commit": null,
+  "baseline": "bench/baseline_v0.json (Phase 0E, main 8172755): full 2,747 +/- 24 events/s, floor 57,735, smoke 2,693, target runtime ~92% of replay",
+  "measurements": "bench/measurements_07_hot_path.json + bench/measure_07{a,b,c}.json + bench/measure_07_output_parity.json",
+  "deltas_pct": {
+    "A_session_table": 0.5,
+    "B_integer_5m_boundary": 2.6,
+    "C_cadence_routing_table": 2.4
+  },
+  "output_parity": "candidates + observations byte-identical to the Phase 0E baseline smoke run (1,704 rows each) with all three fixes",
+  "tests": {
+    "scripts/tests/test_hot_path_equivalence.py": "6 passed (session/close/5m/minutes across a year incl. DST; provider routing)",
+    "provider_host + collector surface": "passed"
+  },
+  "artifacts": [
+    "backtests/nt_runtime/data_plan.py",
+    "bench/measure_07_output_parity.json",
+    "bench/measure_07_smoke_parity.json",
+    "bench/measure_07a_session.json",
+    "bench/measure_07b_bucket.json",
+    "bench/measure_07c_cadence.json",
+    "bench/measurements_07_hot_path.json",
+    "research_workflow/closure_hash.py",
+    "research_workflow/generic_collector.py",
+    "research_workflow/provider_host.py",
+    "research_workflow/workspace.py",
+    "scripts/bench_baseline.py",
+    "scripts/tests/test_closure_narrowing.py",
+    "scripts/tests/test_hot_path_equivalence.py",
+    "scripts/tests/test_roots.py",
+    "scripts/tests/test_workspace.py",
+    "utils/session_boundaries.py"
+  ],
+  "defect_fixed_en_route": "resolve_data_plan A2.2 declared-path check now routes through research_workflow.roots (worktree without a repo-relative catalog copy previously failed WRONG_PHYSICAL_DATASET); regression test added",
+  "not_done": "no gates created; target-runtime optimization deferred (DO SOON)",
+  "next_stage": "08_workspace",
+  "blocker": null
+}

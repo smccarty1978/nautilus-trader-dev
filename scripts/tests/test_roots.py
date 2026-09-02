@@ -144,3 +144,23 @@ def test_data_plan_uses_root_resolution(tmp_path: Path, monkeypatch: pytest.Monk
     assert plan.catalog_path == cat.resolve()
     assert plan.dataset_id == "NQ_v0_2020_2026" and plan.dataset_logical_digest == m["logical_digest"]
     assert plan.dataset_resolution == "configured_root"
+
+
+def test_resolve_data_plan_declared_check_uses_root_resolution(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """resolve_data_plan's declared==resolved (A2.2) check must compare against the root-resolved
+    DatasetSpec catalog, not the repo-relative path -- otherwise every worktree without a
+    catalog directory of its own fails WRONG_PHYSICAL_DATASET under configured roots."""
+    from backtests.nt_runtime import data_plan as dp
+    root = tmp_path / "root"; cat = _fake_catalog(root / "NQ_v0_2020_2026"); m = write_dataset_manifest(cat, "NQ_v0_2020_2026", "NQ.XCME")
+    repo = tmp_path / "repo"; (repo / "research" / "datasets").mkdir(parents=True)
+    real_spec = Path(dp.__file__).resolve().parents[2] / "research" / "datasets" / "NQ_v0_2020_2026.yaml"
+    spec = yaml.safe_load(real_spec.read_text(encoding="utf-8")); spec["logical_digest"] = m["logical_digest"]
+    (repo / "research" / "datasets" / "NQ_v0_2020_2026.yaml").write_text(yaml.safe_dump(spec), encoding="utf-8")
+    monkeypatch.setenv(roots.CONFIG_ENV, str(_config(tmp_path, [root])))
+
+    class _Spec:  # minimal CompiledStudyData stand-in: only what resolve_data_plan reads
+        pass
+    plan = dp.resolve_catalog_plan("NQ", "2023-01-03", "2023-01-03", repo_root=repo)
+    expected = roots.resolve_dataset("NQ_v0_2020_2026", repo, catalog_rel_path=spec["catalog_rel_path"]).catalog_path
+    assert plan.catalog_path == expected == cat.resolve()
+    assert (repo / "data" / "catalog" / "NQ_v0_2020_2026").exists() is False  # no repo-relative copy needed
