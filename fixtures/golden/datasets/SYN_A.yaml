@@ -1,0 +1,10 @@
+# Synthetic execution instrument for the golden end-to-end fixture (never a real catalog).
+dataset_id: SYN_A
+instrument_id: SYN_A.XSYN
+instrument: {instrument_id: SYN_A.XSYN, venue: XSYN, multiplier: "1.0", price_increment: "0.25"}
+catalog_rel_path: fixtures/golden/catalog/SYN_A
+logical_digest: synthetic-golden-fixture-v1
+streams:
+  1s: {source: external, bar_type: SYN_A.XSYN-1-SECOND-LAST-EXTERNAL, source_timestamp_semantics: interval_open, availability_rule: interval_end, ts_init_delta_ns: 1000000000}
+  1m: {source: external, bar_type: SYN_A.XSYN-1-MINUTE-LAST-EXTERNAL, source_timestamp_semantics: interval_open, availability_rule: interval_end, ts_init_delta_ns: 60000000000}
+coverage: {start: "2030-01-07T08:50:00Z", end: "2030-01-08T12:57:30Z"}

@@ -74,8 +74,8 @@ def _tf_ns(tf: str) -> int:
     return duration_seconds(tf) * NS
 
 
-def _dataset_yaml(repo_root: Path, dataset_id: str) -> Optional[Dict[str, Any]]:
-    p = repo_root / "research" / "datasets" / f"{dataset_id}.yaml"
+def _dataset_yaml(repo_root: Path, dataset_id: str, datasets_dir: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    p = (Path(datasets_dir) if datasets_dir else (repo_root / "research" / "datasets")) / f"{dataset_id}.yaml"
     if not p.is_file():
         return None
     return yaml.safe_load(p.read_text(encoding="utf-8")) or {}
@@ -103,10 +103,13 @@ def _instrument_facts(symbol: str, dataset: Mapping[str, Any]) -> Optional[Dict[
 class _Ctx:
     """Mutable compile context."""
 
-    def __init__(self, spec: StudySpecV2, repo_root: Path, registry: Mapping[str, Any]) -> None:
+    def __init__(self, spec: StudySpecV2, repo_root: Path, registry: Mapping[str, Any],
+                 datasets_dir: Optional[Path] = None, extra_bindings: Optional[Mapping[str, Any]] = None) -> None:
         self.spec = spec
         self.repo_root = repo_root
         self.registry = registry
+        self.datasets_dir = datasets_dir
+        self.extra_bindings = dict(extra_bindings or {})
         self.gaps = CapabilityGapReport(spec.study.id)
         self.instruments: Dict[str, Dict[str, Any]] = {}
         self.streams: List[Dict[str, Any]] = []
@@ -133,7 +136,7 @@ def _resolve_streams(ctx: _Ctx) -> None:
     spec = ctx.spec
     for i, s in enumerate(spec.streams):
         where = f"streams[{i}]"
-        ds = _dataset_yaml(ctx.repo_root, s.dataset)
+        ds = _dataset_yaml(ctx.repo_root, s.dataset, ctx.datasets_dir)
         if ds is None:
             ctx.gap(GapKind.UNAVAILABLE_STREAM, where, f"dataset {s.dataset!r} has no committed DatasetSpec",
                     dataset=s.dataset)
@@ -202,9 +205,11 @@ def _resolve_streams(ctx: _Ctx) -> None:
 # --------------------------------------------------------------------------- #
 # stage 2: trackers
 # --------------------------------------------------------------------------- #
-def _binding_table() -> Dict[str, Any]:
+def _binding_table(extra: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
     from features.trackers.host_bindings import TRACKER_BINDINGS
-    return dict(TRACKER_BINDINGS)
+    table = dict(TRACKER_BINDINGS)
+    table.update(dict(extra or {}))
+    return table
 
 
 def _resolve_stream_ref(ctx: _Ctx, value: Any, symbol: str) -> Optional[str]:
@@ -218,7 +223,7 @@ def _resolve_stream_ref(ctx: _Ctx, value: Any, symbol: str) -> Optional[str]:
 
 
 def _resolve_trackers(ctx: _Ctx) -> None:
-    table = _binding_table()
+    table = _binding_table(ctx.extra_bindings)
     from research_workflow.host.interfaces import REQUIRED
     declared = ctx.spec.context
     # dependency order: a tracker may only reference trackers declared before it (after topo-sort)
@@ -317,14 +322,45 @@ def _resolve_trackers(ctx: _Ctx) -> None:
         ctx.tracker_meta[name] = cls
         ctx.tracker_stream[name] = (inputs.get("bars") or {}).get("stream")
         ctx.binding_proof.append({"kind": "tracker", "id": name, "capability": cap, "implementation": entry["implementation"], "bound": True})
-        ctx.closure_files.add(Path(importlib.import_module(cls.__module__).__file__).resolve().relative_to(ctx.repo_root).as_posix())
+        try:
+            ctx.closure_files.add(Path(importlib.import_module(cls.__module__).__file__).resolve().relative_to(ctx.repo_root).as_posix())
+        except ValueError:
+            pass
 
 
 # --------------------------------------------------------------------------- #
 # stage 3: features
 # --------------------------------------------------------------------------- #
+def _resolve_synthetic_features(ctx: _Ctx) -> None:
+    fs = ctx.spec.features
+    table = _binding_table(ctx.extra_bindings)
+    cls = table.get("feature_host.synthetic")
+    if cls is None:
+        ctx.gap(GapKind.MISSING_CAPABILITY, "features.host", "no synthetic feature host is registered for this compile")
+        return
+    columns = dict(fs.columns or {})
+    for col, ref in columns.items():
+        _validate_ref(ctx, ref, f"features.columns.{col}")
+    if not columns:
+        ctx.features = None
+        return
+    impl = f"{cls.__module__}.{cls.__name__}"
+    ctx.features = {"host_id": _FEATURE_HOST_ID, "implementation": impl, "instances": [], "routing": {}, "snapshot": {},
+                    "aliases": list(columns), "required_events": [], "synthetic": True}
+    ctx.feature_aliases = list(columns)
+    ctx.trackers.append({"id": _FEATURE_HOST_ID, "capability": cls.CAPABILITY, "implementation": impl, "params": {"columns": columns},
+                         "inputs": {}, "subscriptions": [], "fields": ["aliases"], "epoch_fields": [], "events": [],
+                         "cadence": cls.CADENCE, "warmup_bars": 0, "instrument": ctx.execution_symbol})
+    ctx.tracker_meta[_FEATURE_HOST_ID] = cls
+    for col in columns:
+        ctx.binding_proof.append({"kind": "feature", "id": col, "capability": cls.CAPABILITY, "implementation": impl, "bound": True})
+
+
 def _resolve_features(ctx: _Ctx) -> None:
     fs = ctx.spec.features
+    if fs.host == "synthetic":
+        _resolve_synthetic_features(ctx)
+        return
     items = [inst.model_dump() | {k: v for k, v in (inst.model_extra or {}).items()} for inst in fs.instances]
     try:
         expanded = expand_instances(items)
@@ -547,6 +583,8 @@ def _compile_predicate(ctx: _Ctx, text: Optional[str], where: str, *, allow_even
                     ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, where,
                             f"event test {root}.{attr} is only valid inside a trigger graph, not in {where}", predicate=text)
                     ok = False
+                elif attr in ("turned", "crossed") and "changed" in cls.EVENTS:
+                    pass  # a turn test is the sub-epoch view of the tracker's own 'changed' events
                 elif attr not in cls.EVENTS and f"{attr}_seq" not in cls.FIELDS and attr not in cls.FIELDS:
                     ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"{root} ({cls.CAPABILITY}) emits no {attr!r} event",
                             predicate=text, closest=_closest(attr, list(cls.EVENTS)))
@@ -725,13 +763,22 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
                 hz = o.horizon
                 if hz is None:
                     ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.horizon", "an event outcome needs outcome.horizon")
-                role = "opposite"
+                role, target_direction = "opposite", 0
                 args = ast_.get("args") or {}
                 if "against" in args:
                     role = "opposite"
                 elif "to" in args:
-                    role = "same"
-                flip = {"horizon_ns": duration_seconds(hz) * NS if hz else None, "source": path[0], "role": role, "inclusive_start": True}
+                    to = args["to"]
+                    val = to.get("value") if to.get("op") == "const" else None
+                    if to.get("op") == "neg" and to["arg"].get("op") == "const":
+                        val = -to["arg"]["value"]
+                    if val in (-1, 1):
+                        role, target_direction = "absolute", int(val)
+                    else:
+                        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "outcome.event",
+                                "flipped(to=...) accepts an absolute direction literal (-1 or 1); relative targets use against=position")
+                flip = {"horizon_ns": duration_seconds(hz) * NS if hz else None, "source": path[0], "role": role,
+                        "inclusive_start": True, "target_direction": target_direction}
     if o.items:
         ctx.gap(GapKind.MISSING_CAPABILITY, "outcome.items",
                 "exit items (stop_move/trail/event exits) require the trade execution sink, which is not available in this phase")
@@ -780,11 +827,28 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
     for col, ref in (ctx.spec.features.metadata or {}).items():
         if _validate_ref(ctx, ref, f"features.metadata.{col}"):
             metadata.append({"column": col, "ref": ref})
-    derived = [d.name for d in ctx.spec.features.derived_inputs]
-    if derived:
-        ctx.gap(GapKind.MISSING_CAPABILITY, "features.derived_inputs",
-                "frozen external model scores are not yet bound in the platform-v2 host (model.frozen_external_score)",
-                names=derived)
+    derived = []
+    for d in ctx.spec.features.derived_inputs:
+        body = d.model_dump() | dict(d.model_extra or {})
+        if body.get("kind") != "frozen_external_model_score":
+            ctx.gap(GapKind.MISSING_CAPABILITY, f"features.derived_inputs.{d.name}", f"unknown derived input kind {body.get('kind')!r}",
+                    closest="frozen_external_model_score")
+            continue
+        from features.trackers.host_bindings import FrozenExternalScoreBinding
+        direction_ref = population.get("direction")
+        if not direction_ref:
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, f"features.derived_inputs.{d.name}", "a frozen external score needs population.direction")
+            continue
+        impl = f"{FrozenExternalScoreBinding.__module__}.{FrozenExternalScoreBinding.__name__}"
+        ctx.trackers.append({"id": f"derived.{d.name}", "capability": FrozenExternalScoreBinding.CAPABILITY, "implementation": impl,
+                             "params": {"spec": body, "direction": direction_ref}, "inputs": {}, "subscriptions": [],
+                             "fields": [], "epoch_fields": [], "events": [], "cadence": FrozenExternalScoreBinding.CADENCE,
+                             "warmup_bars": 0, "instrument": ctx.execution_symbol, "derived_column": d.name})
+        ctx.tracker_meta[f"derived.{d.name}"] = FrozenExternalScoreBinding
+        ctx.binding_proof.append({"kind": "derived_input", "id": d.name, "capability": FrozenExternalScoreBinding.CAPABILITY,
+                                  "implementation": impl, "bound": True})
+        ctx.closure_files.add("research_workflow/external_model_scoring.py")
+        derived.append(d.name)
     return {"identity": ["observation_ts", "regime_start_ns", "checkpoint_index"], "metadata": metadata,
             "features": list(ctx.feature_aliases), "derived": derived, "observation": list(outcome.get("observation_columns") or [])}
 
@@ -865,7 +929,8 @@ def _resolve_warmup_and_availability(ctx: _Ctx) -> Tuple[Dict[str, Any], Dict[st
 # --------------------------------------------------------------------------- #
 # entry point
 # --------------------------------------------------------------------------- #
-def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Optional[Mapping[str, Any]] = None) -> CompileOutcome:
+def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Optional[Mapping[str, Any]] = None,
+                  datasets_dir: Optional[Path] = None, extra_bindings: Optional[Mapping[str, Any]] = None) -> CompileOutcome:
     repo_root = Path(repo_root)
     if registry is None:
         from research_workflow.capabilities import load_registry
@@ -887,7 +952,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
             else:
                 report.add(GapKind.INVALID_PARAMETERIZATION, "spec", str(exc))
             return CompileOutcome(None, report)
-    ctx = _Ctx(spec, repo_root, registry)
+    ctx = _Ctx(spec, repo_root, registry, datasets_dir=datasets_dir, extra_bindings=extra_bindings)
     _resolve_streams(ctx)
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)

@@ -131,6 +131,8 @@ class DerivedInputSpec(BaseModel):
 
 
 class FeaturesSpec(_Strict):
+    host: Literal["provider_host", "synthetic"] = "provider_host"
+    columns: Dict[str, str] = Field(default_factory=dict)         # synthetic host: column -> reference
     instances: List[FeatureInstanceSpec] = Field(default_factory=list)
     metadata: Dict[str, str] = Field(default_factory=dict)      # output column -> 'tracker.field'
     derived_inputs: List[DerivedInputSpec] = Field(default_factory=list)

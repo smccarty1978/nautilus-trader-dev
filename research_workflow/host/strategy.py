@@ -33,8 +33,9 @@ class HostCore:
 
     def __init__(self, plan: Mapping[str, Any], *, session_table: Any, primary_interval: Optional[Tuple[int, int]] = None,
                  ledger: Optional[List[Dict[str, Any]]] = None, progress_path: Optional[str] = None,
-                 progress_every_bars: int = 0) -> None:
+                 progress_every_bars: int = 0, studies_root: Optional[str] = None) -> None:
         self.plan = dict(plan)
+        self.studies_root = studies_root
         self.session_table = session_table
         self.primary_start, self.primary_end = (primary_interval if primary_interval else (None, None))
         self.progress_path = progress_path
@@ -65,7 +66,10 @@ class HostCore:
                     inputs_resolved[key] = self.trackers[ref]
                 elif "stream" in binding:
                     inputs_resolved[key] = binding["stream"]
-            obj = cls(t.get("params") or {}, inputs_resolved)
+            params = dict(t.get("params") or {})
+            if getattr(cls, "NEEDS_STUDIES_ROOT", False):
+                params.setdefault("studies_root", self.studies_root)
+            obj = cls(params, inputs_resolved)
             self.trackers[t["id"]] = obj
             self._tracker_ids.append(t["id"])
             self.epoch_fields[t["id"]] = set(getattr(cls, "EPOCH_FIELDS", ()) or ())
@@ -88,6 +92,7 @@ class HostCore:
         self.feature_columns = list(self.plan["columns"].get("features") or [])
         self.feature_host = self.trackers.get((self.plan.get("features") or {}).get("host_id", "features")) if self.plan.get("features") else None
         self.derived_columns = list(self.plan["columns"].get("derived") or [])
+        self.derived_bindings = [(t["derived_column"], self.trackers[t["id"]]) for t in self.plan["trackers"] if t.get("derived_column")]
 
         # grid state
         self._grid_next_index = 0
@@ -119,7 +124,8 @@ class HostCore:
 
         # sink
         candidate_columns = self.identity_columns + [c for c, _ in self.metadata_columns if c not in self.identity_columns] + self.feature_columns + self.derived_columns
-        self.sink = CollectionSink(candidate_columns, self.kernel.observation_columns, ledger=ledger)
+        self.sink = CollectionSink(candidate_columns, self.kernel.observation_columns, ledger=ledger,
+                                   primary_interval=(self.primary_start, self.primary_end))
         self.candidates_emitted = 0
         self.epochs_evaluated = 0
         self.last_ts_seen: Optional[int] = None
@@ -153,6 +159,7 @@ class HostCore:
 
     # -- ingestion --------------------------------------------------------------------------
     def ingest(self, bar: BarView) -> None:
+        self._turn_events = []
         self.mux.ingest(bar)
         self._bars_processed += 1
         if self.progress_every_bars and self._bars_processed % self.progress_every_bars == 0:
@@ -173,8 +180,9 @@ class HostCore:
         self._deferred_opens = keep
 
     def _deliver(self, bar: BarView) -> None:
-        self.last_ts_seen = max(self.last_ts_seen or 0, bar.ts_init)
-        self._turn_events = []
+        if bar.stream == self.outcome_stream:
+            # run-end censoring is measured on the outcome (execution) stream only
+            self.last_ts_seen = max(self.last_ts_seen or 0, bar.ts_init)
         if self._deferred_opens:
             self._flush_deferred_opens(bar.ts_init)
         for tracker, key, tid in self._stream_subscribers.get(bar.stream, ()):
@@ -187,7 +195,7 @@ class HostCore:
             rows = self.kernel.drain_rows()
             if rows:
                 for r in rows:
-                    self.sink.observations.append(r)
+                    self.sink.add_observation(r)
 
     def _route_events(self, source_id: str, tracker: Any) -> None:
         events = tracker.drain_events()
@@ -199,7 +207,7 @@ class HostCore:
                 self.kernel.on_flip(int(p["start_ns"]), int(p["direction"]), int(p["prev_direction"]))
                 rows = self.kernel.drain_rows()
                 for r in rows:
-                    self.sink.observations.append(r)
+                    self.sink.add_observation(r)
             if source_id in self.sub_epoch_sources and ev.name == "changed":
                 p = ev.payload
                 if int(p.get("prev_direction", 0)) in (-1, 1) and int(p["direction"]) in (-1, 1):
@@ -243,10 +251,6 @@ class HostCore:
         self.mux.assert_epoch_visibility(T, self.execution_streams)
         epoch = EpochView(T=T, price=bar.close, bar=bar, trackers=self.trackers, grid_index=grid_index)
         if not self.session_table.in_session(T):
-            return
-        if self.primary_start is not None and T < self.primary_start:
-            return
-        if self.primary_end is not None and T > self.primary_end:
             return
         if self.qualify is not None and not self.qualify(epoch):
             return
@@ -292,8 +296,10 @@ class HostCore:
         if self.feature_host is not None:
             feats = self.feature_host.snapshot(epoch, self.resolve)
             row.update(feats)
-        self.sink.candidates.append(row)
-        self.candidates_emitted += 1
+        for col, binding in self.derived_bindings:
+            row[col] = binding.derive(row, epoch, self.resolve)
+        if self.sink.add_candidate(row):
+            self.candidates_emitted += 1
         identity = {"observation_ts": T, "regime_start_ns": row["regime_start_ns"], "checkpoint_index": row["checkpoint_index"]}
         if self.atr_through_ts and self.atr_ref:
             self._deferred_opens.append((identity, T, direction, epoch))
@@ -308,7 +314,7 @@ class HostCore:
         self._flush_deferred_opens(None)
         self.kernel.finalize(self.last_ts_seen)
         for r in self.kernel.drain_rows():
-            self.sink.observations.append(r)
+            self.sink.add_observation(r)
         self._heartbeat(final=True)
         return self.sink.frames()
 
@@ -326,7 +332,8 @@ class HostCore:
 
     def stats(self) -> Dict[str, Any]:
         return {"bars": self._bars_processed, "bars_by_stream": dict(self.mux.bars_seen), "candidates": self.candidates_emitted,
-                "observations": len(self.sink.observations), "epochs": self.epochs_evaluated, "pending_at_end": len(self.kernel.pending)}
+                "observations": len(self.sink.observations), "epochs": self.epochs_evaluated, "pending_at_end": len(self.kernel.pending),
+                "dropped_outside_primary": {"candidates": self.sink.dropped_candidates, "observations": self.sink.dropped_observations}}
 
 
 # --------------------------------------------------------------------------- #
@@ -351,6 +358,7 @@ if Strategy is not object:
         progress_path: str = ""
         progress_every_bars: int = 0
         ledger_enabled: bool = False
+        studies_root: str = ""
 
     class GovernedHostStrategy(Strategy):
         """NT face of the host: subscribes to the plan's external streams, forwards bars."""
@@ -365,7 +373,8 @@ if Strategy is not object:
                 interval = (config.primary_start_ts, config.primary_end_ts)
             self.ledger: Optional[List[Dict[str, Any]]] = [] if config.ledger_enabled else None
             self.core = HostCore(plan, session_table=table, primary_interval=interval, ledger=self.ledger,
-                                 progress_path=(config.progress_path or None), progress_every_bars=config.progress_every_bars)
+                                 progress_path=(config.progress_path or None), progress_every_bars=config.progress_every_bars,
+                                 studies_root=(config.studies_root or None))
             self._bar_types: Dict[Any, str] = {}
             for s in plan["streams"]:
                 if s.get("bar_type"):

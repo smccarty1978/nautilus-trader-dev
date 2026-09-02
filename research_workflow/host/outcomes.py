@@ -71,8 +71,9 @@ class BarrierArm:
 class FlipItem:
     horizon_ns: int
     source: str                 # tracker id whose "changed" events are the flip events
-    role: str = "opposite"      # target direction relative to the prevailing direction
+    role: str = "opposite"      # "opposite" | "same" (relative to prevailing) | "absolute" (target_direction)
     inclusive_start: bool = True
+    target_direction: int = 0   # used when role == "absolute"
 
 
 @dataclass(frozen=True)
@@ -106,7 +107,7 @@ class LabelOutcomeContract:
                    max_gap_ns=(int(spec["max_gap_ns"]) if spec.get("max_gap_ns") is not None else None),
                    same_bar_rule=str(spec.get("same_bar_rule", "ambiguous_censor")), arms=arms,
                    flip=(FlipItem(int(flip["horizon_ns"]), str(flip["source"]), str(flip.get("role", "opposite")),
-                                  bool(flip.get("inclusive_start", True))) if flip else None),
+                                  bool(flip.get("inclusive_start", True)), int(flip.get("target_direction", 0) or 0)) if flip else None),
                    primary_arm=spec.get("primary_arm"), composition=spec.get("composition"),
                    direction_sign=int(spec.get("direction_sign", 1)),
                    data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None))
@@ -247,7 +248,7 @@ class LabelOutcomeKernel:
             # legacy collector path: every pending candidate is resolved on a qualifying flip
             keep: List[_Pending] = []
             for p in self.pending:
-                target = -p.prevailing if role == "opposite" else (p.prevailing if role == "same" else 0)
+                target = self._target(p, role)
                 if target != 0 and new_direction != target:
                     keep.append(p)
                     continue
@@ -264,11 +265,20 @@ class LabelOutcomeKernel:
         for p in self.pending:
             if p.flip_state is not None or p.flip_ts is not None:
                 continue
-            target = -p.prevailing if role == "opposite" else (p.prevailing if role == "same" else 0)
+            target = self._target(p, role)
             if target and new_direction != target:
                 continue
             if p.T < flip_ts <= p.flip_end:
                 p.flip_ts = flip_ts
+
+    def _target(self, p: _Pending, role: str) -> int:
+        if role == "opposite":
+            return -p.prevailing
+        if role == "same":
+            return p.prevailing
+        if role == "absolute":
+            return int(self.c.flip.target_direction)
+        return 0
 
     def _finish_flip(self, p: _Pending, disposition: str, at: int, reason: Optional[str], flip_ts: Optional[int]) -> None:
         p.flip_state, p.flip_at, p.flip_reason, p.flip_ts = disposition, at, reason, flip_ts

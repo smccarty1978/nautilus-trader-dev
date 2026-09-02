@@ -168,7 +168,9 @@ class StreamMux:
             raise CausalOrderViolation(f"NON_MONOTONIC_STREAM: {bar.stream} ts_init {bar.ts_init} <= {last}")
         self.visible_through[bar.stream] = bar.ts_init
         self.bars_seen[bar.stream] += 1
-        self._deliver(bar)
+        # Derived buckets completed by this bar are delivered BEFORE the source bar itself:
+        # a bucket closing at T is complete at T, and the accepted feed semantics publish it
+        # as part of the source bar's availability instant, ahead of any decision at T.
         aggs = self._aggregators.get(bar.stream)
         if aggs:
             published: List[Tuple[int, int, BarView]] = []
@@ -178,6 +180,7 @@ class StreamMux:
             published.sort(key=lambda t: (t[0], t[1]))
             for _, _, out in published:
                 self._apply(out)
+        self._deliver(bar)
 
     # -- the assertion ------------------------------------------------------------
     def assert_epoch_visibility(self, T: int, execution_streams: Sequence[str]) -> None:

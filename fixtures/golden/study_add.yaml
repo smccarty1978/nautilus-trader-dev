@@ -1,0 +1,33 @@
+# Add-to-winner: requires the trade execution sink, which is out of scope for this phase.
+# The compiler must return a typed MISSING_CAPABILITY gap at triggers.add, not a plan.
+study: {id: golden_add, tier: 2, question: "Golden fixture: add-to-winner composition (typed gap in this phase)"}
+streams:
+  - {dataset: SYN_A, timeframes: [1s, 5s, 1m]}
+context:
+  regime:    {tracker: synthetic.level_regime, timeframe: 1m, level: 100.0, atr: 2.0}
+  regime_5s: {tracker: synthetic.level_regime, timeframe: 5s, level: 100.5, atr: 2.0}
+  pullback:  {tracker: synthetic.pullback, bars: 1s, regime: regime, threshold_atr: 2.5}
+population:
+  session: RTH
+  cadence: completed_1s
+  qualify: "regime.dir != 0"
+  direction: regime.dir
+  anchor_identity: regime.start_ns
+triggers:
+  states:
+    WATCH: {enter_when: "pullback.depth_atr >= 2.5", expire_when: "age(WATCH) > 60s"}
+  entry: {when: "state == WATCH and regime_5s.turned(to=regime.dir)", reference: next_bar_open}
+  add: {when: "in_position and regime_5s.turned(to=regime.dir)", max_adds: 1}
+features:
+  host: synthetic
+  columns: {f_close: epoch.price}
+outcome:
+  kind: trade
+  direction: regime.dir
+  atr: regime.atr
+  atr_availability: at_decision_delivery
+  horizon: 60s
+  barrier: {id: tp1_sl1, favorable_atr: 1.0, adverse_atr: 1.0}
+  fill_model: {order_type: market, latency_bars: 0, slippage_ticks: 0, spread_ticks: 1}
+chronology: {train: [2030], dev: [], prohibited: []}
+model: none

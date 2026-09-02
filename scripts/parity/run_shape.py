@@ -97,7 +97,8 @@ def main() -> int:
     tag = a.tag or f"{a.start}_{a.end}"
     t0 = time.perf_counter()
     run = run_plan_on_catalog(plan, start_date=a.start, end_date=(a.run_end or a.end), repo_root=MAIN_REPO, primary_interval=(start_ns, end_ns),
-                              warmup_days=a.warmup_days, progress_path=out_dir / f"{tag}.progress.json", ledger=a.ledger)
+                              warmup_days=a.warmup_days, progress_path=out_dir / f"{tag}.progress.json", ledger=a.ledger,
+                              studies_root=MAIN_REPO / "studies")
     elapsed = time.perf_counter() - t0
     cands, obs = run["candidates"], run["observations"]
     ref_c, ref_o = load_reference(a.shape, start_ns, end_ns)

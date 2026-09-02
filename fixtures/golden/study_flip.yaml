@@ -1,0 +1,23 @@
+study: {id: golden_flip, tier: 2, question: "Golden fixture: checkpoint grid + regime-flip-within-horizon label"}
+streams:
+  - {dataset: SYN_A, timeframes: [1s, 1m]}
+context:
+  regime: {tracker: synthetic.level_regime, timeframe: 1m, level: 100.0, atr: 2.0}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime.start_ns, max_age: 900s}
+  qualify: "regime.age_s >= 10s and regime.frozen_atr > 0"
+  direction: regime.dir
+  anchor_identity: regime.start_ns
+triggers: every_candidate
+features:
+  host: synthetic
+  columns: {f_close: epoch.price, f_dir: regime.dir}
+outcome:
+  kind: label
+  event: regime.flipped
+  horizon: 60s
+  direction: regime.dir
+  session_end: censor
+chronology: {train: [2030], dev: [], prohibited: []}
+model: none

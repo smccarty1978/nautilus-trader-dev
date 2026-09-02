@@ -645,12 +645,60 @@ class FeatureHostBinding(BaseBinding):
                                         episode_state=episode_state, family_a_atr=fam))
 
 
+# --------------------------------------------------------------------------- #
+# feature.frozen_external_score  (derived causal input: another study's frozen model)
+# --------------------------------------------------------------------------- #
+class FrozenExternalScoreBinding(BaseBinding):
+    """A frozen parent model's score at the candidate, as one output column.
+
+    Wraps ``research_workflow.external_model_scoring.FrozenExternalModelScorer``: the
+    parent's ordered feature surface is read off the realised candidate row, the arm is
+    selected by the candidate direction, and a null input yields a null score (never a
+    fabricated value).  The parent study directory is resolved under ``studies_root``
+    (a machine-local location the runner supplies; never part of the plan identity).
+    """
+
+    CAPABILITY = "feature.frozen_external_score"
+    PARAMS = {"spec": REQUIRED, "direction": REQUIRED, "studies_root": None}
+    INPUTS = {}
+    CADENCE = "per_candidate"
+    NEEDS_STUDIES_ROOT = True
+
+    def __init__(self, params: Mapping[str, Any], inputs: Mapping[str, Any]) -> None:
+        super().__init__(params, inputs)
+        from pathlib import Path
+        from research.schemas.study_spec import DerivedCausalInputSpec
+        from research_workflow.external_model_scoring import FrozenExternalModelScorer
+        spec = DerivedCausalInputSpec.model_validate(self.params["spec"])
+        root = self.params.get("studies_root")
+        if not root:
+            raise RuntimeError("FROZEN_EXTERNAL_SCORE_STUDIES_ROOT_MISSING")
+        parent_dir = Path(root) / (spec.parent_study_id or "_model_id_binding")
+        self._scorer = FrozenExternalModelScorer.bind(spec, parent_dir=parent_dir)
+        self.name = spec.name
+        self._surface = {"LONG": self._scorer.ordered_inputs("LONG"), "SHORT": self._scorer.ordered_inputs("SHORT")}
+        self.direction_ref = str(self.params["direction"])
+
+    def derive(self, row: Mapping[str, Any], epoch: EpochView, resolve) -> Any:
+        direction = "LONG" if int(resolve(self.direction_ref, epoch) or 0) == 1 else "SHORT"
+        surf = self._surface.get(direction) or []
+        if not surf:
+            return None
+        inputs = {n: row.get(n) for n in surf}
+        if any(v is None or (isinstance(v, float) and math.isnan(v)) for v in inputs.values()):
+            return None
+        ts = int(epoch.T)
+        obs = self._scorer.score(inputs, checkpoint_ts=ts, direction=direction, availability_ts={n: ts for n in surf})
+        return float(obs.score)
+
+
 TRACKER_BINDINGS: Dict[str, type] = {
     DualEmaRegimeBinding.CAPABILITY: DualEmaRegimeBinding,
     RegimeExcursionBinding.CAPABILITY: RegimeExcursionBinding,
     CalendarRegimeBarBinding.CAPABILITY: CalendarRegimeBarBinding,
     PullbackEpisodeBinding.CAPABILITY: PullbackEpisodeBinding,
     FeatureHostBinding.CAPABILITY: FeatureHostBinding,
+    FrozenExternalScoreBinding.CAPABILITY: FrozenExternalScoreBinding,
 }
 
 
@@ -659,4 +707,4 @@ def implementation_path(cls: type) -> str:
 
 
 __all__ = ["BaseBinding", "DualEmaRegimeBinding", "RegimeExcursionBinding", "CalendarRegimeBarBinding",
-           "PullbackEpisodeBinding", "FeatureHostBinding", "TRACKER_BINDINGS", "implementation_path"]
+           "PullbackEpisodeBinding", "FeatureHostBinding", "FrozenExternalScoreBinding", "TRACKER_BINDINGS", "implementation_path"]

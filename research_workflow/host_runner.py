@@ -13,8 +13,9 @@ from research_workflow.host.strategy import HostCore
 
 
 def sort_bars_causal(bars: Iterable[BarView], durations: Mapping[str, int]) -> List[BarView]:
-    """Same tie rule as the NT loader order: at equal ts_init the shorter timeframe first."""
-    return sorted(bars, key=lambda b: (b.ts_init, durations[b.stream]))
+    """Same tie rule as the NT loader order: at equal ts_init the shorter timeframe first.
+    Bars of streams the plan does not declare are dropped (an unsubscribed stream)."""
+    return sorted((b for b in bars if b.stream in durations), key=lambda b: (b.ts_init, durations[b.stream]))
 
 
 def run_plan_on_bars(plan: Mapping[str, Any], bars: Iterable[BarView], *, session_table: Any,
@@ -111,7 +112,7 @@ def run_plan_with_engine(plan: Mapping[str, Any], bars: Sequence[BarView], *, se
 def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: str, repo_root: Optional[Path] = None,
                         primary_interval: Optional[Tuple[int, int]] = None, warmup_days: int = 5, log_level: str = "ERROR",
                         session_table_spec: Optional[Mapping[str, Any]] = None, progress_path: Optional[Path] = None,
-                        progress_every_bars: int = 200_000, ledger: bool = False) -> Dict[str, Any]:
+                        progress_every_bars: int = 200_000, ledger: bool = False, studies_root: Optional[Path] = None) -> Dict[str, Any]:
     """Governed-catalog run for the plan's execution instrument (single instrument this phase)."""
     from backtests.nt_runtime.data_plan import resolve_catalog_plan, verify_launch_dataset_bytes
     from backtests.nt_runtime.engine_builder import build_engine
@@ -132,7 +133,7 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
                                      primary_start_ts=(primary_interval[0] if primary_interval else None),
                                      primary_end_ts=(primary_interval[1] if primary_interval else None),
                                      progress_path=str(progress_path) if progress_path else "", progress_every_bars=progress_every_bars,
-                                     ledger_enabled=ledger)
+                                     ledger_enabled=ledger, studies_root=str(studies_root or (repo_root / "studies")))
     strategy = GovernedHostStrategy(cfg)
     engine.add_strategy(strategy)
     t0 = time.perf_counter()
