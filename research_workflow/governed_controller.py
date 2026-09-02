@@ -18,13 +18,23 @@ from research_workflow.controller_contracts import AuditPacket, BlockerType, Con
 from research_workflow.workflow_engine import WorkflowActions, WorkflowEngine, _clear, _read, _sha
 
 
-STAGE_ORDER = ("compile", "prepare", "readiness", "preflight", "tests", "causal_audit", "contract_audit", "seal", "collection", "reconcile", "analyze")
+STAGE_ORDER = ("compile", "prepare", "readiness", "preflight", "tests", "causal_audit", "contract_audit", "seal",
+               "smoke", "collection", "reconcile", "merge", "fit", "freeze", "oos", "analyze", "close")
+# Stages whose freshness is a hash-bound receipt under _work/controller/receipts/<stage>.json.
+RECEIPT_STAGES = ("smoke", "collection", "reconcile", "merge", "fit", "freeze", "oos", "analyze", "close")
 _STAGE_STATE = {"compile": ControllerState.NEEDS_COMPILE, "prepare": ControllerState.NEEDS_PREPARE,
                 "readiness": ControllerState.NEEDS_READINESS, "preflight": ControllerState.NEEDS_PREFLIGHT,
                 "tests": ControllerState.NEEDS_TESTS,
                 "causal_audit": ControllerState.NEEDS_CAUSAL_AUDIT, "contract_audit": ControllerState.NEEDS_CONTRACT_AUDIT,
-                "seal": ControllerState.READY_TO_SEAL, "collection": ControllerState.READY_TO_COLLECT,
-                "reconcile": ControllerState.READY_TO_RECONCILE, "analyze": ControllerState.READY_TO_ANALYZE}
+                "seal": ControllerState.READY_TO_SEAL, "smoke": ControllerState.READY_TO_SMOKE, "collection": ControllerState.READY_TO_COLLECT,
+                "reconcile": ControllerState.READY_TO_RECONCILE, "merge": ControllerState.READY_TO_MERGE, "fit": ControllerState.READY_TO_FIT,
+                "freeze": ControllerState.READY_TO_FREEZE, "oos": ControllerState.READY_TO_OOS, "analyze": ControllerState.READY_TO_ANALYZE,
+                "close": ControllerState.READY_TO_CLOSE}
+# The state a fully fresh --through=<stage> run reports.
+_DONE_STATE = {"seal": ControllerState.READY_TO_SMOKE, "smoke": ControllerState.READY_TO_COLLECT, "collection": ControllerState.READY_TO_RECONCILE,
+               "reconcile": ControllerState.READY_TO_MERGE, "merge": ControllerState.READY_TO_FIT, "fit": ControllerState.READY_TO_FREEZE,
+               "freeze": ControllerState.READY_TO_OOS, "oos": ControllerState.READY_TO_ANALYZE, "analyze": ControllerState.READY_TO_CLOSE,
+               "close": ControllerState.STUDY_CLOSED}
 
 
 def _json(path: Path, data: dict[str, Any]) -> None:
@@ -43,9 +53,15 @@ class ControllerActions:
     preflight: Callable[[Path], Any] | None = None
     tests: Callable[[Path], Any] | None = None
     seal: Callable[[Path], Any] | None = None
+    smoke: Callable[[Path], Any] | None = None
     collection: Callable[[Path], Any] | None = None
     reconcile: Callable[[Path], Any] | None = None
+    merge: Callable[[Path], Any] | None = None
+    fit: Callable[[Path], Any] | None = None
+    freeze: Callable[[Path], Any] | None = None
+    oos: Callable[[Path], Any] | None = None
     analyze: Callable[[Path], Any] | None = None
+    close: Callable[[Path], Any] | None = None
 
     def __post_init__(self) -> None:
         leaves = WorkflowActions()
@@ -270,8 +286,17 @@ class GovernedStudyController:
             except Exception: return False
         if stage == "collection":
             return self._receipt_current("collection", fp, require_partitions=True)
+        if stage == "oos":
+            return self._receipt_current("oos", fp, require_partitions=True)
         if stage == "reconcile": return stale > 8 and self._receipt_current("reconcile", fp)
-        if stage == "analyze": return self._receipt_current("analyze", fp)
+        if stage == "close":
+            # A valid closure artifact is terminal regardless of receipts (study_closure is the authority).
+            try:
+                from research_workflow.study_closure import load_study_closure
+                return load_study_closure(self.study) is not None
+            except Exception:
+                return False
+        if stage in RECEIPT_STAGES: return self._receipt_current(stage, fp)
         return False
 
     def _receipt_current(self, stage: str, fp: dict[str, str | None], *, require_partitions: bool = False) -> bool:
@@ -293,7 +318,7 @@ class GovernedStudyController:
         outputs = [{"path": str(Path(p)), "sha256": _sha(Path(p))} for p in paths]
         if not outputs or any(not x["sha256"] for x in outputs): raise RuntimeError(f"{stage.upper()}_OUTPUT_CONTRACT_INVALID")
         partitions = [{**p, "status": "PASS"} if isinstance(p, dict) and p.get("status") in {"PASS", "SUCCESS", "COMPLETED"} else p for p in result.get("partitions", [])]
-        if stage == "collection" and (not partitions or not all(isinstance(p, dict) and p.get("id") and p.get("status") in {"PASS", "SUCCESS", "COMPLETED"} for p in partitions)):
+        if stage in {"collection", "oos"} and (not partitions or not all(isinstance(p, dict) and p.get("id") and p.get("status") in {"PASS", "SUCCESS", "COMPLETED"} for p in partitions)):
             raise RuntimeError("COLLECTION_PARTITION_CONTRACT_INVALID")
         log = self.work / "logs" / f"{stage}.log"
         _json(self.work / "receipts" / f"{stage}.json", {"schema_version": 1, "stage": stage, "status": "PASS", "execution_composite_sha256": fp.get("execution_composite"), "outputs": outputs, "partitions": partitions, "log": {"path": str(log), "sha256": _sha(log)} if log.is_file() else None})
@@ -359,15 +384,21 @@ class GovernedStudyController:
                 log = self.work / "logs" / f"{stage}.log"; log.parent.mkdir(parents=True, exist_ok=True)
                 with log.open("a", encoding="utf-8") as handle, contextlib.redirect_stdout(handle), contextlib.redirect_stderr(handle):
                     result = action(self.study)
-                if stage in {"collection", "reconcile", "analyze"}: self._write_receipt(stage, result, fp)
+                if stage in RECEIPT_STAGES:
+                    self._write_receipt(stage, result, fp)
+                    # A re-executed stage invalidates every downstream receipt (never the closure artifact).
+                    for later in RECEIPT_STAGES[RECEIPT_STAGES.index(stage) + 1:]:
+                        stale_receipt = self.work / "receipts" / f"{later}.json"
+                        if stale_receipt.is_file() and later != "close":
+                            stale_receipt.unlink()
                 self.ran.append(stage)
             except Exception as exc:
                 with (self.work / "logs" / f"{stage}.log").open("a", encoding="utf-8") as handle: traceback.print_exc(file=handle)
                 return self._card(state, stage, blocker=BlockerType.RUNTIME_FAILURE, reason=f"{type(exc).__name__}: {exc}", last=last)
             last = stage
-        if through in {"collection", "reconcile", "analyze"} and not self._fresh_stage(through, self._fingerprints()):
+        if through in RECEIPT_STAGES and not self._fresh_stage(through, self._fingerprints()):
             return self._card(_STAGE_STATE[through], through, last=last)
-        final_state = ControllerState.COMPLETE if through == "analyze" else ({"seal": ControllerState.READY_TO_COLLECT, "collection": ControllerState.READY_TO_RECONCILE, "reconcile": ControllerState.READY_TO_ANALYZE}.get(through, _STAGE_STATE[through]))
+        final_state = _DONE_STATE.get(through, _STAGE_STATE[through])
         return self._card(final_state, through, last=last)
 
 

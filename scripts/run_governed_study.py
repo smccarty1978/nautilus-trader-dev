@@ -23,6 +23,9 @@ def main() -> int:
     ap.add_argument("--analysis-frame")
     ap.add_argument("--score-columns-json")
     ap.add_argument("--target-column")
+    ap.add_argument("--label-column", help="binary label column for the fit/freeze stages (required unless the target contract declares one)")
+    ap.add_argument("--period", default="train")
+    ap.add_argument("--closure-outcome"); ap.add_argument("--closure-decision")
     ns = ap.parse_args()
     actions = None
     if ns.execute_authorized:
@@ -31,7 +34,8 @@ def main() -> int:
         if any(supplied) and not all(supplied): ap.error("analysis options must be supplied together")
         import json
         config = {"frame_path": ns.analysis_frame, "score_columns": json.loads(ns.score_columns_json), "target_column": ns.target_column} if all(supplied) else None
-        actions = production_actions(execute_authorized=True, analysis_config=config)
+        closure = {"outcome": ns.closure_outcome, "terminal_decision": ns.closure_decision} if (ns.closure_outcome or ns.closure_decision) else None
+        actions = production_actions(execute_authorized=True, analysis_config=config, label_column=ns.label_column, period=ns.period, closure=closure)
     card = GovernedStudyController(ns.study, actions=actions, owned_paths=tuple(ns.owned_path), max_runtime=ns.max_runtime,
                                   stale_progress_timeout=ns.stale_progress_timeout, rss_limit_mb=ns.rss_limit_mb).run(
                                       through=ns.through, inspect=ns.inspect, dry_run=ns.dry_run)

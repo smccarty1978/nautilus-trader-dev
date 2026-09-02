@@ -53,7 +53,7 @@ def test_audit_handoff_resume_and_seal_are_idempotent(tmp_path):
     assert result["state"] == ControllerState.NEEDS_CONTRACT_AUDIT.value
     _write(study / "audit/contract_status.json", {"status": "CLEAR", "audited_execution_composite_sha256": composite})
     result = c.run(through="seal")
-    assert result["state"] == ControllerState.READY_TO_COLLECT.value and calls[-1] == "seal"
+    assert result["state"] == ControllerState.READY_TO_SMOKE.value and calls[-1] == "seal"
     before = list(calls); c.run(through="seal"); assert calls == before
 
 

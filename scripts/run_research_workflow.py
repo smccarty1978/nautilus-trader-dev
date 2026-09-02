@@ -1,16 +1,18 @@
-#!/usr/bin/env python3
-"""Advance an artifact-governed study to its next real terminal gate."""
-import argparse, json, sys
-from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
-from research_workflow.workflow_engine import run_workflow
+"""DEPRECATED operator entry point -- superseded by the governed controller.
+
+    python scripts/research.py study run --study studies/<id> --through <stage>
+
+This shim refuses to run and prints a compact card; the module it wrapped is retained
+only for sealed studies whose execution closure names it.
+"""
+from __future__ import annotations
+import json, sys
+
 def main() -> int:
-    p = argparse.ArgumentParser(); p.add_argument("--study", required=True); p.add_argument("--advance", action="store_true"); p.add_argument("--smoke", action="store_true")
-    p.add_argument("--execute-train", action="store_true",
-                   help="permit partitioned TRAIN collection once the study reaches an authorized train gate (touches data)")
-    a = p.parse_args()
-    if not a.advance: p.error("--advance is required to execute workflow actions")
-    result = run_workflow(a.study, smoke=a.smoke, execute_authorized=a.execute_train)
-    print(json.dumps(result, indent=2, sort_keys=True)); return 0
-if __name__ == "__main__": raise SystemExit(main())
+    print(json.dumps({"STATUS": "DEPRECATED", "entry_point": __file__.replace("\\", "/").rsplit("/", 1)[-1],
+                      "use": "python scripts/research.py study run --study studies/<id> --through <stage>",
+                      "reason": "one governed controller is the sole operator surface (platform-v2 item 04)"}))
+    return 2
+
+if __name__ == "__main__":
+    raise SystemExit(main())

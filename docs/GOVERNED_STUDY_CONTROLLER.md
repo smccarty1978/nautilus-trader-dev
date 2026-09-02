@@ -63,3 +63,29 @@ frame and canonical configuration hashes, and invokes `research_workflow.analysi
 so its `assert_oos_open` guard remains authoritative. Controller action stdout/stderr and
 tracebacks stay in `_work/controller/logs/`; receipts record the stage log path/hash when one
 exists.
+
+## Stages (platform-v2, item 04)
+
+The controller is the sole operator surface. `--through` accepts, in order:
+
+`compile, prepare, readiness, preflight, tests, causal_audit, contract_audit, seal, smoke,
+collection, reconcile, merge, fit, freeze, oos, analyze, close`.
+
+Every stage from `smoke` on is receipt-bound (`_work/controller/receipts/<stage>.json`, hash-bound
+to the execution composite and to the stage's output bytes). Re-executing a stage invalidates
+every downstream receipt. `close` is terminal: a valid `artifacts/study_closure.json` is the
+authority and is never rewritten.
+
+| Stage | Owns | Notes |
+| --- | --- | --- |
+| `smoke` | bounded 1-day real run + reconciliation | `--execute-authorized` |
+| `merge` | deterministic merge of reconciled TRAIN partitions | writes `_work/controller/merged/{candidates,observations}.parquet` + `identity.json` |
+| `fit` | governed TRAIN fit via `modeling.fit_models` (+ `model_selection` when declared) | label column is declared by the target contract (`label_column`) or passed with `--label-column`; never guessed |
+| `freeze` | `modeling.freeze_train_artifacts` from the controller's own fit | TRAIN-only thresholds/deciles; binds the merge identity |
+| `oos` | OOS collection | opens only through `experiment.assert_oos_open`; partition records under `_work/controller/partitions/oos/` |
+| `close` | records an operator-supplied terminal decision | `--closure-outcome` + `--closure-decision`; the controller never decides the science |
+
+`scripts/run_research_workflow.py`, `scripts/run_partitioned_train_collection.py` and
+`scripts/reconcile_study_capabilities.py` are deprecated shims that print a card and exit 2.
+`research_workflow/lifecycle.py` and `workflow_engine.py` remain internal leaves, not operator
+entry points. Sealed studies keep their historical execution authority at their own commit.
