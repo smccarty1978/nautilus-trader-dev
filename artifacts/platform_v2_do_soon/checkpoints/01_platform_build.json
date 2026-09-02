@@ -1,0 +1,45 @@
+{
+  "checkpoint": "01_platform_build",
+  "written_at": "2026-09-02",
+  "branch": "chore/platform-v2-do-soon",
+  "commit": "e1fca46",
+  "course_correction": "Build Platform V2 first; historical studies are immutable reference fixtures; proof studies are fresh v2 studies created through the CLI/controller with zero study Python.",
+  "pieces": {
+    "01_capability_registry": {"status": "DONE", "where": "research_workflow/capabilities.py (_host_bindings introspects TRACKER_BINDINGS, ENTRY_REFERENCES, host trigger/outcome kernels; status_override honored); registry.json regenerated"},
+    "02_six_kind_grammar": {"status": "DONE", "where": "research_workflow/grammar/spec.py, predicates.py, expansion.py"},
+    "03_static_compiler": {"status": "DONE", "where": "research_workflow/grammar/compiler.py (no catalog opened; binding proof; closure hash v2)"},
+    "04_typed_capability_gap": {"status": "DONE", "where": "research_workflow/grammar/gaps.py; controller emits CAPABILITY_BLOCKER cards"},
+    "05_thin_runtime_host": {"status": "DONE", "where": "research_workflow/host/* (lint CLEAR), host_runner.py"},
+    "06_provider_tracker_dispatch": {"status": "DONE", "where": "features/trackers/host_bindings.py, ProviderHost reuse"},
+    "07_trigger_state_engine": {"status": "DONE", "where": "research_workflow/host/triggers.py"},
+    "08_label_outcome_contract": {"status": "DONE", "where": "research_workflow/host/outcomes.py (barrier/flip/composite; oracle-tested)"},
+    "09_trade_contract_type_boundary": {"status": "DONE (typed only, no sink)", "where": "research_workflow/host/outcomes.py TradeExecutionContract; entry references mark executable vs research marks"},
+    "10_entry_reference_library": {"status": "DONE", "where": "research_workflow/entry_references.py"},
+    "11_columnar_sink": {"status": "DONE", "where": "research_workflow/host/sink.py"},
+    "12_model_artifact_flow": {"status": "DONE", "where": "lifecycle_v2.fit -> model_store.store_model (registry tier, golden frame sized to population)"},
+    "13_controller_owned_fit_freeze_oos": {"status": "DONE", "where": "research_workflow/lifecycle_v2.py + governed_controller_v2.py; test_lifecycle_v2 runs a fresh study compile->close"},
+    "14_audit_packet_generation": {"status": "DONE", "where": "research_workflow/audit_packets_v2.py; ingest via `research audit ingest`"},
+    "15_workspace_flow": {"status": "DONE", "where": "research_workflow/workspace.py v2 skeleton; scripts/tests/test_workspace.py proves it compiles"},
+    "16_machine_local_roots": {"status": "DONE (pre-existing)", "where": "research_workflow/roots.py; host_runner.resolve_dataset_plan for non-default dataset ids"},
+    "17_capability_proposal_flow": {"status": "DONE (untested on a real gap yet)", "where": "research_workflow/capability_flow.py; `research cap propose/scaffold/promote`"},
+    "18_compact_status_cards": {"status": "DONE", "where": "governed_controller.compact_card; every CLI verb prints one JSON card"},
+    "19_deterministic_resume": {"status": "DONE", "where": "V2StudyController._fresh_stage over receipts/fingerprints; test asserts a closed study re-runs nothing"},
+    "20_performance_instrumentation": {"status": "DONE (bench not yet run)", "where": "host strategy NT_HOST_PROFILE profile; scripts/bench_host.py; `research bench`"}
+  },
+  "tests": {
+    "platform_new": {"test_grammar_v2": 14, "test_host_core": 12, "test_golden_fixture": 6, "test_lifecycle_v2": 2, "test_dataset_v2": 3, "test_workspace": 7, "status": "ALL PASS"},
+    "full_suite_branch": {"failed": 40, "passed": 511},
+    "baseline_same_files_main": {"failed": 35},
+    "branch_only_failures": [
+      "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row",
+      "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_19_historical_closed_artifact_preserved",
+      "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_20_current_180s_study_outputs_unmodified",
+      "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+      "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing"
+    ],
+    "branch_only_failures_cause": "ENVIRONMENTAL: all five need studies/clean_maturity_flip_model_rolling_productivity/artifacts/train_fitted_models.joblib, which is gitignored (*.joblib) and present only in the main repo checkout, not in the fresh worktree. Verified by the error text (model artifact missing / bound model artifact corrupt-missing / DERIVED_INPUT_SCORER_UNBOUND). Not a regression.",
+    "pre_existing_failures": "35 identical at baseline (handoff families: stage3_integration, population_qualification_strictness, modeling_driver_lineage, redteam pass1/pass2, ordered_barrier_entry_reference, diagnostic_followup_collector, target_runtime timeout/gap, stage4_parity, single_primitive regression, composite OR flip, features candidate_authority / feature_system_v2)"
+  },
+  "dataset_v2": {"status": "BUILDING", "builder": "research_workflow/dataset_v2.py", "script": "scripts/build_dataset_v2.py", "proof": "scripts/prove_bar_equivalence.py (not yet run)", "nq_build_log": "artifacts/platform_v2_do_soon/dataset_v2/build_NQ.progress.log"},
+  "next": ["finish NQ/ES V2 builds + equivalence proof", "three fresh proof studies via `research study new` + controller", "bench", "audits via packets", "docs", "final cards"]
+}
