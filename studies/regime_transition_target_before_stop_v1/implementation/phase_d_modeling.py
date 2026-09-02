@@ -127,13 +127,20 @@ def load_phase_c_inputs(
     cols = list(feature_columns)
     if len(cols) != FEATURE_COUNT or len(set(cols)) != FEATURE_COUNT:
         raise PhaseDProtocolError("PHASE_D_FEATURE_CONTRACT_NOT_EXACTLY_13")
-    missing = [c for c in cols if c not in observations]
+    # Phase-C surface layout: the 13 causal features live on the CANDIDATE surface
+    # (the feature/population surface); ``regime_direction`` lives on the OBSERVATION
+    # surface alongside the resolution bookkeeping.  The two frames are row-aligned on
+    # the identity keys (asserted above).
+    missing = [c for c in cols if c not in candidates]
     if missing:
         raise PhaseDProtocolError(f"PHASE_D_FEATURE_COLUMNS_MISSING:{missing}")
-    direction_col = next((c for c in ("regime_direction", "direction", "prevailing_regime") if c in candidates), None)
+    direction_col = next((c for c in ("regime_direction", "direction", "prevailing_regime") if c in observations), None)
     if direction_col is None:
         raise PhaseDProtocolError("PHASE_D_DIRECTION_COLUMN_MISSING")
-    out = pd.concat([candidates.reset_index(drop=True), observations[cols].reset_index(drop=True),
+    if direction_col in candidates:
+        raise PhaseDProtocolError(f"PHASE_D_DIRECTION_COLUMN_AMBIGUOUS:{direction_col}")
+    out = pd.concat([candidates.reset_index(drop=True),
+                     observations[[direction_col]].reset_index(drop=True),
                      targets.reset_index(drop=True)], axis=1)
     if out.columns.duplicated().any():
         raise PhaseDProtocolError("PHASE_D_DUPLICATE_JOIN_COLUMN")

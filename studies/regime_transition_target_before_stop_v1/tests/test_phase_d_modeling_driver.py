@@ -47,10 +47,14 @@ def _fixture(tmp_path: Path):
                 regime_start = int(pd.Timestamp(f"{year}-01-01", tz="UTC").value + (direction + 2) * 1_000_000 + regime)
                 for checkpoint in range(5):
                     ts = int(pd.Timestamp(f"{year}-01-02", tz="UTC").value + (regime * 10 + checkpoint) * 1_000_000_000)
+                    # Phase-C surface layout: features + population metadata on the
+                    # candidate surface; regime_direction + resolution bookkeeping on
+                    # the observation surface.
                     candidates.append({"observation_ts": ts, "regime_start_ns": regime_start, "checkpoint_index": checkpoint,
-                                       "regime_direction": direction})
+                                       "regime_age_seconds": 120 + checkpoint * 5, "running_mfe_atr": 1.0 + 0.1 * checkpoint,
+                                       **{f: float((checkpoint + regime + year + direction + i) % 7) for i, f in enumerate(features)}})
                     observations.append({"observation_ts": ts, "regime_start_ns": regime_start, "checkpoint_index": checkpoint,
-                                         **{f: float((checkpoint + regime + year + direction + i) % 7) for i, f in enumerate(features)}})
+                                         "regime_direction": direction})
                     row = {}
                     for suffix in ("sl0_5", "sl1_0", "sl1_5"):
                         disposition = "TIMEOUT" if checkpoint == 4 else ("POSITIVE" if checkpoint % 2 else "NEGATIVE")

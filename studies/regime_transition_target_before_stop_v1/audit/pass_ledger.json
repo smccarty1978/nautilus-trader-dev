@@ -130,6 +130,26 @@
       "auditor": "contract-checker",
       "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
       "issued_at": "2026-09-01T22:02:47.188581+00:00"
+    },
+    {
+      "audit_type": "causal",
+      "pass": 9,
+      "audited_execution_composite_sha256": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
+      "audit_report_sha256": "df807d943bd96538618bd4ca027e22f993640a683413f9f8346408ce89dec3a0",
+      "audit_report_path": "audit/pass_09.md",
+      "auditor": "lookahead-auditor",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-09-02T02:57:43.889458+00:00"
+    },
+    {
+      "audit_type": "contract",
+      "pass": 9,
+      "audited_execution_composite_sha256": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
+      "audit_report_sha256": "4a71009196cb5f0e74d8a3cb3280aeef28c5f387001a22b2f9369c4ebed9b857",
+      "audit_report_path": "audit/contract_pass_09.md",
+      "auditor": "contract-checker",
+      "reviewer_provenance_strength": "DECLARED_IDENTITY_ONLY",
+      "issued_at": "2026-09-02T02:57:59.008036+00:00"
     }
   ]
 }

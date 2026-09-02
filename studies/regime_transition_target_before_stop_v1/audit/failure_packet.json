@@ -1,8 +1,8 @@
 {
   "status": "BLOCKED",
-  "preflight_run_id": "20260901T202206Z_3d31c19b3c17",
-  "generated_at_utc": "2026-09-01T20:22:06.051261+00:00",
-  "code_hash": "3d31c19b3c175743ed2d6896e00c993f2addf23f459714f898f9b59a3902f7e5",
+  "preflight_run_id": "20260902T025128Z_1fb7762a34dd",
+  "generated_at_utc": "2026-09-02T02:51:28.911289+00:00",
+  "code_hash": "1fb7762a34ddaf6afcf617d58edf26461481d0f52ae899991e513cd71d276d45",
   "superseded": true,
   "failed_gate": "CAUSAL_INVARIANTS",
   "failure_ids": [
@@ -10,23 +10,23 @@
   ],
   "failure_details": [
     {
-      "message": "ERROR scripts/tests/test_phase0_source_lineage.py::test_source_state_sha_changes_with_content"
-    },
-    {
-      "message": "ERROR scripts/tests/test_phase0_source_lineage.py::test_manifest_claiming_an_incompatible_commit_is_rejected"
-    },
-    {
       "message": "ERROR scripts/tests/test_phase0_source_lineage.py::test_drifted_dependency_is_rejected"
     },
     {
       "message": "ERROR scripts/tests/test_phase0_source_lineage.py::test_manifest_without_a_binding_is_rejected"
     },
     {
-      "message": "217 passed, 7 skipped, 8 errors in 231.79s (0:03:51)"
+      "message": "FAILED scripts/tests/test_readiness.py::test_r5_real_collector_instantiates_with_fresh_phase0_authorization"
+    },
+    {
+      "message": "FAILED scripts/tests/test_readiness.py::test_r8_double_identity_resolution_passes"
+    },
+    {
+      "message": "2 failed, 222 passed, 8 errors in 282.67s (0:04:42)"
     }
   ],
   "recommended_smallest_investigation_scope": "Inspect findings in CAUSAL_INVARIANTS and fix locally before requesting audit.",
-  "superseded_by_preflight_run_id": "20260901T210518Z_65da39a19801",
-  "superseded_at_utc": "2026-09-01T21:05:18.828953+00:00",
+  "superseded_by_preflight_run_id": "20260902T025345Z_1fb7762a34dd",
+  "superseded_at_utc": "2026-09-02T02:53:45.510889+00:00",
   "note": "Retained as forensic evidence of an earlier BLOCKED preflight. This is NOT the current state: audit/preflight.json is authoritative, and a consumer must treat superseded=true as historical."
 }

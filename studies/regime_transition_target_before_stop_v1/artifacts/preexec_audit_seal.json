@@ -1,8 +1,8 @@
 {
-  "seal_id": "preexec_seal_regime_transition_target_before_stop_v1_4f45256b975f8f3b",
+  "seal_id": "preexec_seal_regime_transition_target_before_stop_v1_1a6eed85254d052c",
   "study_name": "regime_transition_target_before_stop_v1",
   "seal_status": "LOCKED",
-  "composite_seal_hash": "4f45256b975f8f3b4ef310f941a00a0efbe16e4c62e5b193e769c8fa4a0b3ea9",
+  "composite_seal_hash": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
   "reviewer_provenance": {
     "causal": {
       "declared_auditor": "lookahead-auditor",
@@ -20,15 +20,15 @@
   "causal_audit_verdict": {
     "audit_type": "causal",
     "auditor": "lookahead-auditor",
-    "pass": 8,
+    "pass": 9,
     "verdict": "CLEAR",
     "critical": 0,
     "warning": 0,
     "note": 4,
     "causal_contract": "ts_avail <= T (latest_source_ts_init <= observation_ts)",
-    "audited_execution_composite_sha256": "4f45256b975f8f3b4ef310f941a00a0efbe16e4c62e5b193e769c8fa4a0b3ea9",
-    "audit_report_sha256": "3d5d746ed7c62de653fe48ce20c9e10d8370ef378756ef52897a20050e08dbf3",
-    "audit_report_path": "audit/pass_08.md",
+    "audited_execution_composite_sha256": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
+    "audit_report_sha256": "df807d943bd96538618bd4ca027e22f993640a683413f9f8346408ce89dec3a0",
+    "audit_report_path": "audit/pass_09.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "lookahead-auditor",
@@ -177,7 +177,7 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
       "study:SPEC.md": "8b251df047938149ea67f2b529a4edfc01c406b24e0433caa7acd4b5418438c0",
-      "study:artifacts/phase0_source_manifest.json": "4b533719e0608656d006e7390f7708d269af2efa0a12507a4f911b35d3e788ba",
+      "study:artifacts/phase0_source_manifest.json": "1fd86b8a4c5a9bfeb72f9be5853da329163e9da301e9afe6804f4cebe9b49fbe",
       "study:compiled_study.json": "2c6219b49a3b5293e8e363039ce2494d0d6a53add7d6d336cfb934b74ea81ec2",
       "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
       "study:config/bespoke_justification.json": "b9297928b905ffb017d3c6f8a50ff4edd3cfe0eec903b9c8effd648661454e5a",
@@ -189,18 +189,18 @@
       "study:config/target_contract.json": "0fde2b5af996e8296786702ac7e1301f2c1344e4548d3409c4cc2b4192fd652b",
       "study:config/timestamp_contract.json": "707a33b91ef04d0b15607a777314d3d6d4aeeeef70dbc7bd25d3bb006f0c2546",
       "study:dataset:NQ_v0_2020_2026": "20cd3365a0013fed0691cfad09d43abc92b4a0dd9760633373d15f5ea895a146",
-      "study:implementation/phase_d_modeling.py": "03c2e4bacefe537ea87086d88b60db537c507d8b750cf38da373da27c238e1e2",
+      "study:implementation/phase_d_modeling.py": "139a13d3b9fccfbd66104f89ce42350a6338e97b3faff1a943b5eef5d3ef2daf",
       "study:implementation/target_before_stop_diagnostics.py": "b0a2524f82d09ad428679df9493f464f9c061f75c699eafc50495d96bb2214b1",
       "study:research_decision.yaml": "d57550104a5e562897c06dcbab0d70451a3d67333d73401bc4312b05027925e7",
       "study:study.yaml": "7ced4a04e875a21ebba7afc59072ad534ced8858eb1be12a9c4d8a1debac454c",
-      "study:tests/test_phase_d_modeling_driver.py": "de2ea3c755834b7afa0a86304bf5fde34737ec596bf0d920babe4717e8af4887",
+      "study:tests/test_phase_d_modeling_driver.py": "ae90216e6bb396b5a638c3d2c841ca4598f7ef55c62224088067bae6d289a944",
       "study:tests/test_study_contracts.py": "99397f22a87773ea0f2cd8886d66dcb726bae3e8732d9a39fa2ae1f75c08fcb1",
       "study:tests/test_target_semantics_synthetic.py": "39d4940e140a436d4fe81193ff5b6823dba9fa2a476ec52e286bba9e2d34b0a0"
     },
-    "timestamp": "2026-09-01T22:02:31.146640+00:00",
-    "ingested_from": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmp.sSTDU0gCJ6.md",
+    "timestamp": "2026-09-02T02:57:43.836924+00:00",
+    "ingested_from": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\c77ae014-cefe-4013-8285-b77d94ed1ff2\\scratchpad\\p09_causal.md",
     "ingested_by": "lookahead-auditor",
-    "source_sha256": "3d5d746ed7c62de653fe48ce20c9e10d8370ef378756ef52897a20050e08dbf3",
+    "source_sha256": "df807d943bd96538618bd4ca027e22f993640a683413f9f8346408ce89dec3a0",
     "ingestion_validated": [
       "markdown_report_only",
       "strict_v2_parse",
@@ -214,15 +214,15 @@
   "contract_audit_verdict": {
     "audit_type": "contract",
     "auditor": "contract-checker",
-    "pass": 8,
+    "pass": 9,
     "verdict": "CLEAR",
     "critical": 0,
     "blocking": 0,
     "warning": 0,
     "not_verified": 0,
-    "audited_execution_composite_sha256": "4f45256b975f8f3b4ef310f941a00a0efbe16e4c62e5b193e769c8fa4a0b3ea9",
-    "audit_report_sha256": "c9f87485928a8f15d1301346db0962bfac1fe9201020cc0b2116f0123a91750f",
-    "audit_report_path": "audit/contract_pass_08.md",
+    "audited_execution_composite_sha256": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
+    "audit_report_sha256": "4a71009196cb5f0e74d8a3cb3280aeef28c5f387001a22b2f9369c4ebed9b857",
+    "audit_report_path": "audit/contract_pass_09.md",
     "transcript_sha256": null,
     "reviewer_provenance": {
       "declared_auditor": "contract-checker",
@@ -371,7 +371,7 @@
       "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
       "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
       "study:SPEC.md": "8b251df047938149ea67f2b529a4edfc01c406b24e0433caa7acd4b5418438c0",
-      "study:artifacts/phase0_source_manifest.json": "4b533719e0608656d006e7390f7708d269af2efa0a12507a4f911b35d3e788ba",
+      "study:artifacts/phase0_source_manifest.json": "1fd86b8a4c5a9bfeb72f9be5853da329163e9da301e9afe6804f4cebe9b49fbe",
       "study:compiled_study.json": "2c6219b49a3b5293e8e363039ce2494d0d6a53add7d6d336cfb934b74ea81ec2",
       "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
       "study:config/bespoke_justification.json": "b9297928b905ffb017d3c6f8a50ff4edd3cfe0eec903b9c8effd648661454e5a",
@@ -383,18 +383,18 @@
       "study:config/target_contract.json": "0fde2b5af996e8296786702ac7e1301f2c1344e4548d3409c4cc2b4192fd652b",
       "study:config/timestamp_contract.json": "707a33b91ef04d0b15607a777314d3d6d4aeeeef70dbc7bd25d3bb006f0c2546",
       "study:dataset:NQ_v0_2020_2026": "20cd3365a0013fed0691cfad09d43abc92b4a0dd9760633373d15f5ea895a146",
-      "study:implementation/phase_d_modeling.py": "03c2e4bacefe537ea87086d88b60db537c507d8b750cf38da373da27c238e1e2",
+      "study:implementation/phase_d_modeling.py": "139a13d3b9fccfbd66104f89ce42350a6338e97b3faff1a943b5eef5d3ef2daf",
       "study:implementation/target_before_stop_diagnostics.py": "b0a2524f82d09ad428679df9493f464f9c061f75c699eafc50495d96bb2214b1",
       "study:research_decision.yaml": "d57550104a5e562897c06dcbab0d70451a3d67333d73401bc4312b05027925e7",
       "study:study.yaml": "7ced4a04e875a21ebba7afc59072ad534ced8858eb1be12a9c4d8a1debac454c",
-      "study:tests/test_phase_d_modeling_driver.py": "de2ea3c755834b7afa0a86304bf5fde34737ec596bf0d920babe4717e8af4887",
+      "study:tests/test_phase_d_modeling_driver.py": "ae90216e6bb396b5a638c3d2c841ca4598f7ef55c62224088067bae6d289a944",
       "study:tests/test_study_contracts.py": "99397f22a87773ea0f2cd8886d66dcb726bae3e8732d9a39fa2ae1f75c08fcb1",
       "study:tests/test_target_semantics_synthetic.py": "39d4940e140a436d4fe81193ff5b6823dba9fa2a476ec52e286bba9e2d34b0a0"
     },
-    "timestamp": "2026-09-01T22:02:47.156426+00:00",
-    "ingested_from": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmp.0oJhb8aFDU.md",
+    "timestamp": "2026-09-02T02:57:58.957854+00:00",
+    "ingested_from": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\c77ae014-cefe-4013-8285-b77d94ed1ff2\\scratchpad\\p09_contract.md",
     "ingested_by": "contract-checker",
-    "source_sha256": "c9f87485928a8f15d1301346db0962bfac1fe9201020cc0b2116f0123a91750f",
+    "source_sha256": "4a71009196cb5f0e74d8a3cb3280aeef28c5f387001a22b2f9369c4ebed9b857",
     "ingestion_validated": [
       "markdown_report_only",
       "strict_v2_parse",
@@ -535,7 +535,7 @@
     "repo:utils/runner/data.py": "40d8aaccdb703e06c7ebadcb2f62df2b86477d88ae73b3cd61c7e25ce9c8c0ae",
     "repo:utils/session_boundaries.py": "30fce945728088c0e572732131eb8b623acecf58fcfbee3f3cd2c67464bb0b59",
     "study:SPEC.md": "8b251df047938149ea67f2b529a4edfc01c406b24e0433caa7acd4b5418438c0",
-    "study:artifacts/phase0_source_manifest.json": "4b533719e0608656d006e7390f7708d269af2efa0a12507a4f911b35d3e788ba",
+    "study:artifacts/phase0_source_manifest.json": "1fd86b8a4c5a9bfeb72f9be5853da329163e9da301e9afe6804f4cebe9b49fbe",
     "study:compiled_study.json": "2c6219b49a3b5293e8e363039ce2494d0d6a53add7d6d336cfb934b74ea81ec2",
     "study:config/baseline.json": "6e2778e24b92d40e40fc53e4f412bb1648737a6fe299a174edafd65443bba673",
     "study:config/bespoke_justification.json": "b9297928b905ffb017d3c6f8a50ff4edd3cfe0eec903b9c8effd648661454e5a",
@@ -547,15 +547,15 @@
     "study:config/target_contract.json": "0fde2b5af996e8296786702ac7e1301f2c1344e4548d3409c4cc2b4192fd652b",
     "study:config/timestamp_contract.json": "707a33b91ef04d0b15607a777314d3d6d4aeeeef70dbc7bd25d3bb006f0c2546",
     "study:dataset:NQ_v0_2020_2026": "20cd3365a0013fed0691cfad09d43abc92b4a0dd9760633373d15f5ea895a146",
-    "study:implementation/phase_d_modeling.py": "03c2e4bacefe537ea87086d88b60db537c507d8b750cf38da373da27c238e1e2",
+    "study:implementation/phase_d_modeling.py": "139a13d3b9fccfbd66104f89ce42350a6338e97b3faff1a943b5eef5d3ef2daf",
     "study:implementation/target_before_stop_diagnostics.py": "b0a2524f82d09ad428679df9493f464f9c061f75c699eafc50495d96bb2214b1",
     "study:research_decision.yaml": "d57550104a5e562897c06dcbab0d70451a3d67333d73401bc4312b05027925e7",
     "study:study.yaml": "7ced4a04e875a21ebba7afc59072ad534ced8858eb1be12a9c4d8a1debac454c",
-    "study:tests/test_phase_d_modeling_driver.py": "de2ea3c755834b7afa0a86304bf5fde34737ec596bf0d920babe4717e8af4887",
+    "study:tests/test_phase_d_modeling_driver.py": "ae90216e6bb396b5a638c3d2c841ca4598f7ef55c62224088067bae6d289a944",
     "study:tests/test_study_contracts.py": "99397f22a87773ea0f2cd8886d66dcb726bae3e8732d9a39fa2ae1f75c08fcb1",
     "study:tests/test_target_semantics_synthetic.py": "39d4940e140a436d4fe81193ff5b6823dba9fa2a476ec52e286bba9e2d34b0a0",
-    "study:audit/status.json": "95f66707cf02d07c0ca54177fd853fafae8b3fb453d0171da7e3b798d7955775",
-    "study:audit/contract_status.json": "4fddf8e1a0f74950982210193a7470ced89b30a37308df39011bc75a32aa0389",
+    "study:audit/status.json": "3a4aeb504c61dfbbf36d91082ef59081a3f21c91b12720663eb6980325ae6509",
+    "study:audit/contract_status.json": "d3d903c590bdbc1c49505a297bd31841f690d51f47ff0431c0e67d8627e6df39",
     "study:audit/contract_pass_01.md": "d9b53a360ef2d95004e7e43d03b99fbd56b860a508e5df57df0c082387f235fd",
     "study:audit/contract_pass_02.md": "be844d404cb6d28081694813577f1d24b7dff9d2c9a9e6ca171598e498b172a3",
     "study:audit/contract_pass_03.md": "053bfad781f455b7b70e506f02a924bfc99c2ab9101e16bbfdae6a526a32a726",
@@ -563,13 +563,15 @@
     "study:audit/contract_pass_05.md": "58a8e6b0613468b0386502d378e9f240c61d04d74f13edf38e38db0bfe5308f9",
     "study:audit/contract_pass_06.md": "45ebd8d6230d24ab495fb5486509af5e71971b49c09ed1bcf2c401bb120e2c1b",
     "study:audit/contract_pass_08.md": "c9f87485928a8f15d1301346db0962bfac1fe9201020cc0b2116f0123a91750f",
+    "study:audit/contract_pass_09.md": "4a71009196cb5f0e74d8a3cb3280aeef28c5f387001a22b2f9369c4ebed9b857",
     "study:audit/pass_01.md": "c73b19b0a8c9c0f49ffeb19d355ef4a4095fd8e15c8885eb5bdbf02e80e9babb",
     "study:audit/pass_02.md": "732bfc2fc0d8643f947ba83525760d812a8777eae919a157db7a99ec90c29f0b",
     "study:audit/pass_03.md": "9b135f9f0cc409dd84e7df12787c5678f3c5e16e7b335e57af426a3683a9af05",
     "study:audit/pass_04.md": "518dcd6d9c78fd90dc195bcb2c1ac4c65c7bf7314d9e51168f0a9438d1f260c0",
     "study:audit/pass_05.md": "bfc77725412c865e0c33e628b6d5d519f10a95892325c6b9079fedd90a55318c",
     "study:audit/pass_06.md": "fcdc5c01b71fdbae1c493ed3110eecb28df404ac4c0af84a041c845c937a4c38",
-    "study:audit/pass_08.md": "3d5d746ed7c62de653fe48ce20c9e10d8370ef378756ef52897a20050e08dbf3"
+    "study:audit/pass_08.md": "3d5d746ed7c62de653fe48ce20c9e10d8370ef378756ef52897a20050e08dbf3",
+    "study:audit/pass_09.md": "df807d943bd96538618bd4ca027e22f993640a683413f9f8346408ce89dec3a0"
   },
   "evidence": {
     "repo_backtests_nt_runtime___init___py": {
@@ -1090,7 +1092,7 @@
     },
     "study_artifacts_phase0_source_manifest_json": {
       "path": "study:artifacts/phase0_source_manifest.json",
-      "sha256": "4b533719e0608656d006e7390f7708d269af2efa0a12507a4f911b35d3e788ba"
+      "sha256": "1fd86b8a4c5a9bfeb72f9be5853da329163e9da301e9afe6804f4cebe9b49fbe"
     },
     "study_compiled_study_json": {
       "path": "study:compiled_study.json",
@@ -1138,7 +1140,7 @@
     },
     "study_implementation_phase_d_modeling_py": {
       "path": "study:implementation/phase_d_modeling.py",
-      "sha256": "03c2e4bacefe537ea87086d88b60db537c507d8b750cf38da373da27c238e1e2"
+      "sha256": "139a13d3b9fccfbd66104f89ce42350a6338e97b3faff1a943b5eef5d3ef2daf"
     },
     "study_implementation_target_before_stop_diagnostics_py": {
       "path": "study:implementation/target_before_stop_diagnostics.py",
@@ -1154,7 +1156,7 @@
     },
     "study_tests_test_phase_d_modeling_driver_py": {
       "path": "study:tests/test_phase_d_modeling_driver.py",
-      "sha256": "de2ea3c755834b7afa0a86304bf5fde34737ec596bf0d920babe4717e8af4887"
+      "sha256": "ae90216e6bb396b5a638c3d2c841ca4598f7ef55c62224088067bae6d289a944"
     },
     "study_tests_test_study_contracts_py": {
       "path": "study:tests/test_study_contracts.py",
@@ -1166,11 +1168,11 @@
     },
     "study_audit_status_json": {
       "path": "study:audit/status.json",
-      "sha256": "95f66707cf02d07c0ca54177fd853fafae8b3fb453d0171da7e3b798d7955775"
+      "sha256": "3a4aeb504c61dfbbf36d91082ef59081a3f21c91b12720663eb6980325ae6509"
     },
     "study_audit_contract_status_json": {
       "path": "study:audit/contract_status.json",
-      "sha256": "4fddf8e1a0f74950982210193a7470ced89b30a37308df39011bc75a32aa0389"
+      "sha256": "d3d903c590bdbc1c49505a297bd31841f690d51f47ff0431c0e67d8627e6df39"
     },
     "study_audit_contract_pass_01_md": {
       "path": "study:audit/contract_pass_01.md",
@@ -1200,6 +1202,10 @@
       "path": "study:audit/contract_pass_08.md",
       "sha256": "c9f87485928a8f15d1301346db0962bfac1fe9201020cc0b2116f0123a91750f"
     },
+    "study_audit_contract_pass_09_md": {
+      "path": "study:audit/contract_pass_09.md",
+      "sha256": "4a71009196cb5f0e74d8a3cb3280aeef28c5f387001a22b2f9369c4ebed9b857"
+    },
     "study_audit_pass_01_md": {
       "path": "study:audit/pass_01.md",
       "sha256": "c73b19b0a8c9c0f49ffeb19d355ef4a4095fd8e15c8885eb5bdbf02e80e9babb"
@@ -1227,6 +1233,10 @@
     "study_audit_pass_08_md": {
       "path": "study:audit/pass_08.md",
       "sha256": "3d5d746ed7c62de653fe48ce20c9e10d8370ef378756ef52897a20050e08dbf3"
+    },
+    "study_audit_pass_09_md": {
+      "path": "study:audit/pass_09.md",
+      "sha256": "df807d943bd96538618bd4ca027e22f993640a683413f9f8346408ce89dec3a0"
     }
   }
 }
