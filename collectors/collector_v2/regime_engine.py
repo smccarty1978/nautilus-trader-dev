@@ -55,6 +55,8 @@ class RegimeStateEngine:
 
         self._regime: int = 0
         self._bars_in_regime: int = 0
+        from features.trackers.regime_dual_ema import DualEmaRegimeTracker
+        self._tracker = DualEmaRegimeTracker(timeframe=timeframe, short_period=3, long_period=9, atr_period=atr_period)
 
     @property
     def timeframe(self) -> str:
@@ -68,58 +70,14 @@ class RegimeStateEngine:
         """Called by aggregator when a TF bucket completes. Updates
         all state and writes a frozen CompletedBarState."""
         h, l, c = completed.high, completed.low, completed.close
-
-        # ---- EMA update ----
-        if self._ema3_h is None:
-            self._ema3_h = h
-            self._ema9_h = h
-            self._ema3_l = l
-            self._ema9_l = l
-        else:
-            self._ema3_h = (self.ALPHA3 * h
-                              + (1 - self.ALPHA3) * self._ema3_h)
-            self._ema9_h = (self.ALPHA9 * h
-                              + (1 - self.ALPHA9) * self._ema9_h)
-            self._ema3_l = (self.ALPHA3 * l
-                              + (1 - self.ALPHA3) * self._ema3_l)
-            self._ema9_l = (self.ALPHA9 * l
-                              + (1 - self.ALPHA9) * self._ema9_l)
-
-        # ---- ATR update (Wilder) ----
-        if self._prev_close is None:
-            tr = h - l
-        else:
-            tr = max(h - l, abs(h - self._prev_close),
-                       abs(l - self._prev_close))
+        # Single authoritative implementation of the math: features.trackers.regime_dual_ema.
+        upd = self._tracker.observe(h, l, c)
+        self._ema3_h, self._ema9_h = upd.ema_short_high, upd.ema_long_high
+        self._ema3_l, self._ema9_l = upd.ema_short_low, upd.ema_long_low
         self._prev_close = c
-        if self._atr is None:
-            self._tr_warmup.append(tr)
-            if len(self._tr_warmup) == self._atr_period:
-                self._atr = sum(self._tr_warmup) / self._atr_period
-        else:
-            self._atr = (
-                (self._atr * (self._atr_period - 1) + tr)
-                / self._atr_period)
-
-        # ---- Regime ----
-        new_regime = self._regime
-        if c > self._ema3_h and c > self._ema9_h:
-            new_regime = 1
-        elif c < self._ema3_l and c < self._ema9_l:
-            new_regime = -1
-
-        if new_regime == 0:
-            # Indeterminate (e.g. very early) — keep sticky regime
-            pass
-        elif new_regime == self._regime:
-            self._bars_in_regime += 1
-        else:
-            # Flip OR first valid regime
-            if self._regime == 0:
-                self._bars_in_regime = 1
-            else:
-                self._bars_in_regime = 1
-            self._regime = new_regime
+        self._atr = upd.atr
+        self._regime = upd.regime
+        self._bars_in_regime = upd.bars_in_regime
 
         # ---- Write CompletedBarState ----
         state = CompletedBarState(

@@ -51,51 +51,19 @@ class LiteRegimeEngine:
 
         self.regime: int = 0
         self.bars_in_regime: int = 0
+        from features.trackers.regime_dual_ema import DualEmaRegimeTracker
+        self._tracker = DualEmaRegimeTracker(timeframe="1m", short_period=3, long_period=9, atr_period=atr_period)
 
     def update(self, bucket: _OpenBucket) -> None:
         h, l, c = bucket.high, bucket.low, bucket.close
-
-        # EMA update
-        if self._ema3_h is None:
-            self._ema3_h = h
-            self._ema9_h = h
-            self._ema3_l = l
-            self._ema9_l = l
-        else:
-            a3, a9 = self.ALPHA3, self.ALPHA9
-            self._ema3_h = a3 * h + (1 - a3) * self._ema3_h
-            self._ema9_h = a9 * h + (1 - a9) * self._ema9_h
-            self._ema3_l = a3 * l + (1 - a3) * self._ema3_l
-            self._ema9_l = a9 * l + (1 - a9) * self._ema9_l
-
-        # Wilder ATR(14)
-        if self._prev_close is None:
-            tr = h - l
-        else:
-            tr = max(h - l, abs(h - self._prev_close), abs(l - self._prev_close))
+        # Single authoritative implementation of the math: features.trackers.regime_dual_ema.
+        upd = self._tracker.observe(h, l, c)
+        self._ema3_h, self._ema9_h = upd.ema_short_high, upd.ema_long_high
+        self._ema3_l, self._ema9_l = upd.ema_short_low, upd.ema_long_low
         self._prev_close = c
-        if self._atr is None:
-            self._atr_warmup.append(tr)
-            if len(self._atr_warmup) == self._atr_period:
-                self._atr = sum(self._atr_warmup) / self._atr_period
-                self._atr_warmup = []
-        else:
-            self._atr = (self._atr * (self._atr_period - 1) + tr) / self._atr_period
-
-        # Regime detection (exact match to RegimeStateEngine)
-        new_regime = self.regime
-        if c > self._ema3_h and c > self._ema9_h:
-            new_regime = 1
-        elif c < self._ema3_l and c < self._ema9_l:
-            new_regime = -1
-
-        if new_regime == 0:
-            pass  # indeterminate — keep sticky regime
-        elif new_regime == self.regime:
-            self.bars_in_regime += 1
-        else:
-            self.bars_in_regime = 1
-            self.regime = new_regime
+        self._atr = upd.atr
+        self.regime = upd.regime
+        self.bars_in_regime = upd.bars_in_regime
 
     @property
     def atr(self) -> Optional[float]:

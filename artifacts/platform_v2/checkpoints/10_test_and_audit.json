@@ -1,0 +1,23 @@
+{
+  "item": "10_test_and_audit",
+  "status": "PARTIAL",
+  "commit": null,
+  "tests": {
+    "consolidated": "483 passed, 4 failed (all 4 pre-existing on baseline), 13 skipped",
+    "post_remediation_targeted": "72 passed, 1 pre-existing failure (test_end_to_end_1day_collect_run_nonzero_candidates)"
+  },
+  "audits": {
+    "contract_pass_01": "CLEAR (0 critical, 0 warning, 2 notes) at 2138cc4",
+    "causal_pass_01": "BLOCKED (2 critical, 1 warning) at 2138cc4",
+    "causal_pass_02": "BLOCKED (adjudication: __all__ FIXED, DST FIXED, live-digest NOT FIXED/partial; 1 new critical: launch-time byte verification; 1 warning: relative wildcard imports) at 2b1ac38",
+    "remediation_after_pass_02": "committed (launch-time verify_launch_dataset_bytes in collect.py; relative wildcard targets) with tests; NOT re-audited (one bounded re-audit budget spent)"
+  },
+  "packet": "artifacts/platform_v2/audit/migration_packet.json",
+  "reports": [
+    "artifacts/platform_v2/audit/causal_pass_01.md",
+    "artifacts/platform_v2/audit/contract_pass_01.md",
+    "artifacts/platform_v2/audit/causal_pass_02.md"
+  ],
+  "blocker": "CAUSAL_AUDIT_BLOCKED_AT_PASS_02 (remediation committed, awaiting causal pass 03)",
+  "next_stage": "morning: one causal pass 03 adjudicating pass-02 findings against b9ff8c8+"
+}

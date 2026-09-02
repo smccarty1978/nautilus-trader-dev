@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "kind": "performance_baseline",
+  "status": "MEASUREMENT_ONLY_NOT_A_GATE",
+  "generated_at_utc": "2026-09-02T06:52:09.096360+00:00",
+  "git_head": "c38dbd0464cbaf43ddef552850513798bbf0b7ed",
+  "environment": {
+    "python": "3.13.7",
+    "nautilus_trader": "1.230.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_count": 20
+  },
+  "method": "Record the current-runtime performance baseline (Phase 0E) as bench/baseline_v0.json.",
+  "repeats": 3,
+  "series": {
+    "full": {
+      "mode": "full",
+      "runs": [
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 77.23380320001161,
+          "replay_seconds": 76.25077730001067,
+          "setup_seconds": 0.9830259000009391,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2799.066548007113,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.3125,
+            "after_data_load": 280.3046875,
+            "after_replay": 523.72265625,
+            "telemetry_peak": 528.96,
+            "growth_during_replay": 243.41796875,
+            "parent_sampled_peak": 528.96484375
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_1"
+        },
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 75.58903440000722,
+          "replay_seconds": 74.59476020000875,
+          "setup_seconds": 0.9942741999984719,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2861.2063290737005,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.25,
+            "after_data_load": 273.37109375,
+            "after_replay": 521.21484375,
+            "telemetry_peak": 526.49,
+            "growth_during_replay": 247.84375,
+            "parent_sampled_peak": 526.4921875
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_2"
+        },
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 77.70075130002806,
+          "replay_seconds": 76.72516440000618,
+          "setup_seconds": 0.9755869000218809,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2781.7600870462625,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.10546875,
+            "after_data_load": 273.00390625,
+            "after_replay": 521.28515625,
+            "telemetry_peak": 526.55,
+            "growth_during_replay": 248.28125,
+            "parent_sampled_peak": 526.55859375
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_3"
+        }
+      ],
+      "events_per_second": {
+        "n": 3,
+        "mean": 2814.010988042359,
+        "min": 2781.7600870462625,
+        "max": 2861.2063290737005,
+        "stdev": 41.77832642705854
+      },
+      "replay_seconds": {
+        "n": 3,
+        "mean": 75.85690063334187,
+        "min": 74.59476020000875,
+        "max": 76.72516440000618,
+        "stdev": 1.1184854202229308
+      },
+      "wall_seconds": {
+        "n": 3,
+        "mean": 76.84119630001562,
+        "min": 75.58903440000722,
+        "max": 77.70075130002806,
+        "stdev": 1.1092529918380851
+      },
+      "peak_rss_mb": {
+        "n": 3,
+        "mean": 527.3385416666666,
+        "min": 526.4921875,
+        "max": 528.96484375,
+        "stdev": 1.4088102417289992
+      },
+      "rss_growth_during_replay_mb": {
+        "n": 3,
+        "mean": 246.51432291666666,
+        "min": 243.41796875,
+        "max": 248.28125,
+        "stdev": 2.6904290376398188
+      }
+    }
+  },
+  "decomposition": {}
+}

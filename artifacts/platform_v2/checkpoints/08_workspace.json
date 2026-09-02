@@ -1,0 +1,17 @@
+{
+  "item": "08_workspace",
+  "status": "PASS",
+  "commit": null,
+  "tests": {
+    "scripts/tests/test_workspace.py": "6 passed on a throwaway git repo: branch+sibling worktree+scaffold+lease, second writer refused (WRITER_LEASE_HELD), duplicate refused, dirty source refused, ws list states live/stale/dead + reclaim, invalid id"
+  },
+  "cli": [
+    "research study new <id> [--from-question f] [--dataset id]",
+    "research ws list"
+  ],
+  "design": "no junctions in the normal path (datasets/models resolve via ~/.nt_research/config.yaml roots); lease files under leases_dir with pid/owner/worktree; ws list reports branches, worktrees, owners, leases, stale/dead leases, dirty state",
+  "note": "research_workflow/workspace.py and its tests were included in the item 07 commit (git add -A); this checkpoint records the item boundary",
+  "real_repo_smoke": "research ws list executed read-only against the platform-v2 worktree",
+  "next_stage": "09_execution_closure",
+  "blocker": null
+}

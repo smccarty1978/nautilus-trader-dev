@@ -132,8 +132,14 @@ def compile_timestamp_contract(
 
     if catalog_path is None:
         catalog_path = resolve_catalog_for_symbol(instrument_symbol)
-
-    cat_p = (repo_root / catalog_path).resolve()
+        # Physical location via the machine-local root resolver; the contract keeps
+        # recording the committed repo-relative name as its measured identity.
+        from backtests.nt_runtime.data_plan import PRODUCT_CATALOGS
+        from research_workflow.roots import resolve_dataset
+        prod = PRODUCT_CATALOGS[(instrument_symbol or "").strip().upper()]
+        cat_p = resolve_dataset(prod["dataset_id"], repo_root, catalog_rel_path=catalog_path).catalog_path
+    else:
+        cat_p = (repo_root / catalog_path).resolve()
     measurements = measure_catalog_bar_semantics(cat_p)
 
     # An instrument contract must carry its own instrument's evidence. Measuring the

@@ -1,0 +1,19 @@
+{
+  "item": "09_execution_closure",
+  "status": "PASS",
+  "commit": null,
+  "design": "hash algorithm recorded per frozen manifest (audit/frozen_execution_manifest.json: hash_algorithm). v1 = historical canonical text hash (all existing sealed manifests, implicit when absent). v2 = docstring/comment/__all__-stripped AST hash for .py files, canonical text hash for everything else; membership of the closure is unchanged (AST import closure + package inits + governance authority files).",
+  "tests": {
+    "scripts/tests/test_closure_narrowing.py": "6 passed (doc/comment/__all__/formatting/CRLF edits keep v2 hash; constant/default-arg/expression/import/new-function edits move it; unparseable falls back; frozen algorithm authoritative; sealed regime-transition study resolves under v1 with identical membership)",
+    "scripts/tests/test_execution_closure.py": "executable edit moves the composite; documentation-only edit leaves v2 unchanged and moves v1"
+  },
+  "backward_authority": "sealed v1 studies verify under v1 unchanged (verify_frozen_execution_identity reads the recorded algorithm); new PREPARE freezes record v2",
+  "artifacts": [
+    "research_workflow/prepare.py",
+    "scripts/resolve_execution_manifest.py",
+    "scripts/tests/test_closure_narrowing.py",
+    "scripts/tests/test_execution_closure.py"
+  ],
+  "next_stage": "10_test_and_audit",
+  "blocker": null
+}

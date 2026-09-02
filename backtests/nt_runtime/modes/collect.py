@@ -216,6 +216,9 @@ def run_collect_mode(
         study_data, start_date=run_plan.start_date, end_date=run_plan.end_date,
         authorized_dates_override=authorized_dates_override,
     )
+    # 2b. Launch-time dataset byte verification (never trust a recorded digest at launch).
+    from backtests.nt_runtime.data_plan import verify_launch_dataset_bytes
+    dataset_bytes_verification = verify_launch_dataset_bytes(data_plan)
 
     # 3. Resolve strategy binding
     binding_key = spec.execution.strategy_class or "flip_prediction_collector"

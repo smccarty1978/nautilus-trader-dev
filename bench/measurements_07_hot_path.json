@@ -1,0 +1,65 @@
+{
+  "status": "MEASUREMENT_ONLY_NOT_A_GATE",
+  "baseline_full_events_per_s": {
+    "n": 3,
+    "mean": 2747.2244329201676,
+    "min": 2722.2763769675857,
+    "max": 2770.720343865559,
+    "stdev": 24.254608346547407
+  },
+  "fix_A_session_integer_table": {
+    "after": {
+      "n": 3,
+      "mean": 2760.895051137388,
+      "min": 2702.0919443890975,
+      "max": 2843.3330143462395,
+      "stdev": 73.52696641772364
+    },
+    "delta_pct": 0.5,
+    "semantics": "scripts/tests/test_hot_path_equivalence.py (year incl. DST) PASS",
+    "retained": true
+  },
+  "fix_B_integer_5m_boundary_and_minutes_since_open": {
+    "after": {
+      "n": 3,
+      "mean": 2818.098231812506,
+      "min": 2811.5896351243314,
+      "max": 2831.0261573085745,
+      "stdev": 11.196000866940425
+    },
+    "delta_pct": 2.58,
+    "semantics": "equivalence across year incl. DST PASS (minutes-since-open corrected to wall-clock hour after a DST-day defect was caught by the test)",
+    "retained": true
+  },
+  "fix_C_provider_dispatch_routing_table": {
+    "after": {
+      "n": 3,
+      "mean": 2814.010988042359,
+      "min": 2781.7600870462625,
+      "max": 2861.2063290737005,
+      "stdev": 41.77832642705854
+    },
+    "delta_pct": 2.43,
+    "semantics": "routing equivalence test PASS; no measurable change on this study because its compact surface bypasses ProviderHost",
+    "retained": true
+  },
+  "output_parity": {
+    "baseline_run": "20260902_054609_regime_transition_target_before_stop_v1_day",
+    "new_run": "20260902_065700_regime_transition_target_before_stop_v1_day",
+    "candidates": {
+      "baseline_rows": 1704,
+      "new_rows": 1704,
+      "columns_equal": true,
+      "content_identity_equal": true,
+      "frame_equals": true
+    },
+    "observations": {
+      "baseline_rows": 1704,
+      "new_rows": 1704,
+      "columns_equal": true,
+      "content_identity_equal": true,
+      "frame_equals": true
+    }
+  },
+  "interpretation": "the three semantics-preserving fixes move the full-surface replay from 2,747 to ~2,815 events/s (+2.5%); the compiled ordered-barrier/composite target runtime remains ~92% of replay time (bench/baseline_v0.json decomposition) and is the next optimization target (DO SOON, not tonight)"
+}

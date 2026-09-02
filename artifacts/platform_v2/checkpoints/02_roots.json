@@ -1,0 +1,37 @@
+{
+  "item": "02_roots",
+  "status": "PASS",
+  "commit": null,
+  "tests": {
+    "scripts/tests/test_roots.py": "12 passed",
+    "scripts/tests/test_data_plan_resolver.py+test_readiness.py": "passed (3 legacy-mode tests made hermetic)"
+  },
+  "artifacts": [
+    "backtests/nt_runtime/data_plan.py",
+    "docs/RESEARCH_WORKFLOW.md",
+    "research/datasets/ES_v0_2020_2026.yaml",
+    "research/datasets/NQ_v0_2020_2026.yaml",
+    "research/datasets/YM_v0_2024.yaml",
+    "research/engines/timestamp_engine.py",
+    "research/schemas/dataset_spec.py",
+    "research_workflow/readiness.py",
+    "research_workflow/roots.py",
+    "scripts/research.py",
+    "scripts/tests/test_data_plan_resolver.py",
+    "scripts/tests/test_readiness.py",
+    "scripts/tests/test_roots.py"
+  ],
+  "config": "~/.nt_research/config.yaml (catalog_roots -> main repo data/catalog; model_root ~/.nt_research/models)",
+  "hashes": {
+    "NQ_v0_2020_2026": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+    "ES_v0_2020_2026": "9fa50102a121327212231e2d46fc6484fce6d4c9c7d1458b3ac7ef4c54c02ba0",
+    "YM_v0_2024": "6f532e9bf8f7db8c200244a2c14feb773fbadde6600206449fcb51f19887878e"
+  },
+  "notes": [
+    "on-disk dataset_manifest.json written into each catalog dir (data/, gitignored)",
+    "platform-v2 worktree resolves catalogs via configured root with no junction",
+    "model_root configured; model store layout + migration land in item 03"
+  ],
+  "next_stage": "03_model_contract_v2",
+  "blocker": null
+}

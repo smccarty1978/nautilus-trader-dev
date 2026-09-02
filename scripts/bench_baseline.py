@@ -87,6 +87,17 @@ def _child(cfg: str, out_path: Path) -> None:
             study_path=SMOKE_STUDY, stage="day", date_override=REPLAY_DATE,
             output_dir=WORK / "smoke_runs", log_level="ERROR",
         )
+    elif cfg == "parity":
+        # Full real workload WITH persistence, seal/identity verification bypassed: used to
+        # prove that a platform change on a branch (which legitimately stales the sealed
+        # study's composite) reproduces the baseline outputs byte-for-byte.
+        import scripts.resolve_execution_manifest as execution_manifest
+        collect.verify_preexec_audit_seal = lambda *a, **k: True
+        execution_manifest.verify_frozen_execution_identity = lambda *a, **k: None
+        result = collect.run_collect_mode(
+            study_path=SMOKE_STUDY, stage="day", date_override=REPLAY_DATE,
+            output_dir=WORK / "parity_runs", log_level="ERROR",
+        )
     else:
         import scripts.resolve_execution_manifest as execution_manifest
         from research_workflow import output_manager
@@ -165,7 +176,12 @@ def main() -> int:
     ap.add_argument("--child"); ap.add_argument("--out"); ap.add_argument("--repeats", type=int, default=REPEATS)
     ap.add_argument("--skip-smoke", action="store_true"); ap.add_argument("--skip-decomposition", action="store_true")
     ap.add_argument("--only-decomposition", action="store_true", help="run only the decomposition controls and merge into an existing baseline file")
+    ap.add_argument("--series", help="comma-separated subset of floor,full,smoke to (re)run; others are kept from the existing file")
+    ap.add_argument("--output", help="output path (default bench/baseline_v0.json)")
     a = ap.parse_args()
+    global OUT
+    if a.output:
+        OUT = Path(a.output)
     if a.child:
         _child(a.child, Path(a.out)); return 0
 
@@ -183,10 +199,14 @@ def main() -> int:
         prev = json.loads(OUT.read_text(encoding="utf-8"))
         report["series"] = prev.get("series", {}); report["decomposition"] = prev.get("decomposition", {})
         report["previous_runs"] = (prev.get("previous_runs") or []) + [{"generated_at_utc": prev.get("generated_at_utc"), "git_head": prev.get("git_head")}]
-    for cfg in ("floor:empty_generic", "full:full", "smoke:smoke"):
+    for cfg in ("floor:empty_generic", "full:full", "smoke:smoke", "parity:parity"):
         label, mode = cfg.split(":")
         if a.only_decomposition or (mode == "smoke" and a.skip_smoke):
             continue
+        if a.series and label not in {x.strip() for x in a.series.split(",")}:
+            continue
+        if label == "parity" and not a.series:
+            continue  # parity runs only when explicitly requested
         runs = [_run_child(mode, f"{label}_{i+1}") for i in range(a.repeats)]
         report["series"][label] = {
             "mode": mode, "runs": runs,

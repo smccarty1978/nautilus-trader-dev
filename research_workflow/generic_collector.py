@@ -31,6 +31,7 @@ from features.trackers.range_position import RangePositionTracker
 from features.registry import resolve_runtime_feature_aliases
 from backtests.nt_runtime.phase0 import authorize_execution
 from utils.session_boundaries import is_in_session, session_close_ns
+from features.trackers.regime_dual_ema import DualEmaRegimeTracker
 from research_workflow.execution_plan import CompiledExecutionPlan
 
 from datetime import datetime, timezone
@@ -101,6 +102,36 @@ CANDIDATE_STEP_NS = 5 * NS
 CANDIDATE_TIMEOUT_NS = 1800 * NS
 
 
+# ---------------------------------------------------------------------------
+# Hot-path timeframe arithmetic (platform-v2 item 07, fix B).
+#
+# America/Chicago is a whole-hour offset from UTC (CST -6h, CDT -5h), so a Chicago
+# 5-minute calendar boundary is exactly a UTC 5-minute boundary: no tz conversion is
+# needed to detect it. Minutes since the 08:30 CT open only needs the hour offset of the
+# CT calendar day, which is constant within any UTC hour; the session table in
+# utils.session_boundaries already resolves that once per hour. Equivalence to the
+# pandas/tz path is verified by scripts/tests/test_hot_path_equivalence.py across a full
+# year including both DST transitions.
+# ---------------------------------------------------------------------------
+_FIVE_MIN_NS = 300 * NS
+
+
+def is_five_minute_boundary_ns(ts_ns: int) -> bool:
+    """True when ``ts_ns`` (UTC ns) lands on a Chicago 5-minute calendar boundary (second == 0)."""
+    return int(ts_ns) % _FIVE_MIN_NS == 0
+
+
+def minutes_since_rth_open_ns(ts_ns: int) -> int:
+    """(CT hour - 8) * 60 + (CT minute - 30) from wall-clock components.
+
+    The Chicago offset is a whole number of hours, so the CT minute equals the UTC minute
+    and only the hour needs the (per-UTC-hour cached) tz lookup.
+    """
+    from utils.session_boundaries import ct_hour_of_day
+    minute = (int(ts_ns) // (60 * NS)) % 60
+    return (ct_hour_of_day(int(ts_ns)) - 8) * 60 + (minute - 30)
+
+
 class FastOHLCVRingBuffer:
     """Zero-allocation circular buffer for 1-second OHLCV rolling window statistics."""
     def __init__(self, capacity: int = 3600):
@@ -153,53 +184,19 @@ class FastOHLCVRingBuffer:
             self._rth_abs_delta_cum += abs(d)
 
 
-class RegimeEngine:
-    """Standardized 14-period Wilder ATR & Dual-EMA Regime Tracker."""
+class RegimeEngine(DualEmaRegimeTracker):
+    """Legacy name for the single authoritative dual-EMA regime tracker.
+
+    The formula lives in ``features/trackers/regime_dual_ema.py`` (``tracker.regime.dual_ema``);
+    this subclass only preserves the constructor signature and attribute names
+    (``regime``, ``atr``, ``ema3_h`` ...) the collector has always used.
+    """
     ALPHA3 = 0.5
     ALPHA9 = 0.2
     ATR_P = 14
 
     def __init__(self) -> None:
-        self.ema3_h: Optional[float] = None
-        self.ema9_h: Optional[float] = None
-        self.ema3_l: Optional[float] = None
-        self.ema9_l: Optional[float] = None
-        self.prev_c: Optional[float] = None
-        self.atr_warmup: List[float] = []
-        self.atr: Optional[float] = None
-        self.regime: int = 0  # +1 = bullish, -1 = bearish, 0 = neutral
-
-    def update(self, h: float, l: float, c: float) -> int:
-        if self.ema3_h is None:
-            self.ema3_h = self.ema9_h = h
-            self.ema3_l = self.ema9_l = l
-        else:
-            self.ema3_h = self.ALPHA3 * h + (1 - self.ALPHA3) * self.ema3_h
-            self.ema9_h = self.ALPHA9 * h + (1 - self.ALPHA9) * self.ema9_h
-            self.ema3_l = self.ALPHA3 * l + (1 - self.ALPHA3) * self.ema3_l
-            self.ema9_l = self.ALPHA9 * l + (1 - self.ALPHA9) * self.ema9_l
-
-        tr = h - l if self.prev_c is None else max(h - l, abs(h - self.prev_c), abs(l - self.prev_c))
-        self.prev_c = c
-
-        if self.atr is None:
-            self.atr_warmup.append(tr)
-            if len(self.atr_warmup) == self.ATR_P:
-                self.atr = sum(self.atr_warmup) / self.ATR_P
-                self.atr_warmup = []
-        else:
-            self.atr = (self.atr * (self.ATR_P - 1) + tr) / self.ATR_P
-
-        new_regime = self.regime
-        if c > (self.ema3_h or 0) and c > (self.ema9_h or 0):
-            new_regime = 1
-        elif c < (self.ema3_l or 0) and c < (self.ema9_l or 0):
-            new_regime = -1
-
-        if new_regime != 0 and new_regime != self.regime:
-            self.regime = new_regime
-
-        return self.regime
+        super().__init__(timeframe="1m", short_period=3, long_period=9, atr_period=14)
 
 
 def verify_checkpoint_identities_authority(path: str | Path, declared_sha256: str) -> Dict[str, str]:
@@ -629,15 +626,13 @@ class FlipPredictionCollector(Strategy):
             self.long_ema_history.append((self.regime_engine.ema9_h + (self.regime_engine.ema9_l or self.regime_engine.ema9_h)) / 2.0)
 
         # 2. Check 5m boundary and dispatch completed 5m bar to Structural Tracker
-        ts_pd = pd.Timestamp(ts_avail, tz="UTC").tz_convert("America/Chicago")
-        minute_of_day = ts_pd.hour * 60 + ts_pd.minute
-
+        # (integer arithmetic; see is_five_minute_boundary_ns)
         if self._current_5m_open is None:
             self._current_5m_open = o
         self._current_5m_high = max(self._current_5m_high, h)
         self._current_5m_low = min(self._current_5m_low, l)
 
-        if minute_of_day % 5 == 0:
+        if is_five_minute_boundary_ns(ts_avail):
             self.structural_geometry_tracker.on_5m_bar(
                 close_ts=ts_avail,
                 direction=self.active_regime_dir if self.active_regime_dir != 0 else new_regime,
@@ -1422,8 +1417,7 @@ class FlipPredictionCollector(Strategy):
         if len(self.long_ema_history) >= 6:
             ema_slope_long = (self.long_ema_history[-1] - self.long_ema_history[-6]) / (5 * atr)
 
-        ts_pd = pd.Timestamp(T, tz="UTC").tz_convert("America/Chicago")
-        minutes_since_open = (ts_pd.hour - 8) * 60 + (ts_pd.minute - 30)
+        minutes_since_open = minutes_since_rth_open_ns(T)
         # Canonical boundary, not a third inline re-derivation (this one previously
         # ended RTH at 15:00 while the accumulator above ended it at 15:15).
         is_rth = 1.0 if is_in_session(T, self.cfg.session) else 0.0

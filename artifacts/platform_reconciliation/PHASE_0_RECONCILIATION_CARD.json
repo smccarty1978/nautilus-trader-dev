@@ -1,0 +1,48 @@
+{
+  "PHASE_0_RECONCILIATION_CARD": {
+    "INVENTORY": "PASS",
+    "AUTHORITATIVE_PLATFORM_BASE": {"commit": "fde7a96"},
+    "AUTHORITATIVE_CONTROLLER": {"commit": "fad65a0 (study branch; = f711f50 + fad65a0; f711f50 is byte-identical to standalone 3d3820f)"},
+    "MIXED_COMMITS": {"count": 2, "commits": ["b69739a", "4e8afb5"], "all_hunks_classified": "YES", "note": "24 MIXED commits exist in the linear history below fde7a96 and fast-forwarded with it; only the two on the study branch required extraction"},
+    "MERGES": {
+      "redteam_to_main": "fast-forward 8ee8ddd -> fde7a96 (62 commits)",
+      "controller_to_main": "merge --no-ff chore/platform-reconciled (081180b) -> 7f3c0fe",
+      "regime_transition_to_main": "merge --no-ff study/regime-transition-target-before-stop-v1 (edd5560) -> 81be6bd; zero conflicts; history preserved"
+    },
+    "BASELINE_TESTS": {
+      "reconciled_branch_full_selection": {"passed": 1594, "failed": 63, "skipped": 7, "classification": "61 fail identically on base fde7a96; 2 (research/engines/tests/test_preserved_timestamp_reuse.py) fail identically on the study branch edd5560; 0 introduced by reconciliation"},
+      "main_targeted": {"passed": 269, "failed": 0, "scope": "STUDY_CORE_TESTS + controller + workflow engine + model reuse + regime-transition study tests"},
+      "vertical_slice": "VERTICAL_SLICE_CLEAR (10/10 stages)"
+    },
+    "REGIME_TRANSITION": {
+      "target_sha_unchanged": "YES (21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e present in artifacts/train_target_authority_reconciliation.json and 6 other study files)",
+      "phase_d_status": "DIAGNOSTIC_NEGATIVE by metrics (max selected validation ROC-AUC 0.5183 across 6 cells x 2 folds; 444 artifacts, 36 configs); recorded in commit edd5560 message and phase_d_modeling_report.json; no study_closure.json yet",
+      "2024_accessed": "NO (oos_accessed=false in phase_d_modeling_report.json, phase_d0_authority_closed.json, phase_d_modeling_failure_packet.json, resume_manifest.json)",
+      "model_manifest_count": "444/444 report model ids resolve in studies/model_registry on main with bytes present; 468 registry manifests reference the study in total",
+      "seal": "LOCKED at 1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36; re-resolves identically on main (148 closure files); no path reconciliation required"
+    },
+    "MODEL_BYTES": {
+      "durable_or_preserved": "PRESERVED in C:/Users/Scott McCarty/Projects/Nautilus Trader-regime-transition-target/studies/regime_transition_target_before_stop_v1/artifacts/models/ (468 joblib + 468 booster.txt + 468 golden.json, 282 MB, gitignored) - the only copy",
+      "cleanup_safe": "NO for that worktree; it was not removed"
+    },
+    "BENCHMARK": {
+      "baseline_written": "YES",
+      "path": "bench/baseline_v0.json",
+      "summary": {"floor_events_per_s": 57735, "full_surface_events_per_s": 2747, "real_smoke_events_per_s": 2693, "smoke_peak_rss_mb": 532, "smoke_rss_growth_mb": 248, "decomposition": {"checkpoint_only": 37250, "baseline": 37162, "structural": 35969, "rolling": 35407, "full_no_target": 32917, "full": 2729}},
+      "finding": "the ordered-barrier/composite target runtime accounts for ~92% of replay time on regime_transition_target_before_stop_v1; measurements only, not gates"
+    },
+    "TAG": {"baseline/2026-09-platform": "CREATED at 8172755", "archive/governed-study-controller-v1": "CREATED at 3d3820f"},
+    "WORKTREE_CLEANUP": {
+      "completed": "YES: removed Nautilus Trader-governed-controller (detached; stray '# post-audit edit' diff saved as detached_worktree_features_engine.patch; 13 KB controller dry-run residue saved under detached_worktree_controller_work/) and Nautilus Trader-governed-controller-clean; deleted 9 merged/superseded branches",
+      "remaining_unmerged_worktrees": "none unmerged; Nautilus Trader-regime-transition-target kept (merged, holds model bytes)"
+    },
+    "MAIN": {"clean": "YES", "head": "8172755"},
+    "READY_FOR_PLATFORM_V2": true,
+    "NEW_SEMANTIC_QUESTIONS": "NONE",
+    "notes": [
+      "studies/clean_maturity_flip_model_rolling_productivity is STALE_COMPILED_STUDY on main (pre-existing); not recompiled",
+      "scripts/run_collector_ablation_matrix.py has a stale persist_collection stub (pre-existing); scripts/bench_baseline.py carries the corrected stub",
+      "31 local branches remain: main, study/regime-transition-target-before-stop-v1, and 29 older study/* branches untouched"
+    ]
+  }
+}

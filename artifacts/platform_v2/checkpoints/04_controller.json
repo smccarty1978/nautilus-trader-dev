@@ -1,0 +1,37 @@
+{
+  "item": "04_controller",
+  "status": "PASS",
+  "commit": null,
+  "tests": {
+    "research_workflow/tests/test_controller_stages_v2.py": "12 passed",
+    "existing controller/engine tests": "46 passed (one expectation updated: post-seal state is READY_TO_SMOKE)"
+  },
+  "artifacts": [
+    "docs/GOVERNED_STUDY_CONTROLLER.md",
+    "research_workflow/controller_actions.py",
+    "research_workflow/controller_contracts.py",
+    "research_workflow/governed_controller.py",
+    "research_workflow/tests/test_controller_stages_v2.py",
+    "research_workflow/tests/test_governed_controller.py",
+    "scripts/_legacy_reconcile_study_capabilities.py",
+    "scripts/_legacy_run_partitioned_train_collection.py",
+    "scripts/_legacy_run_research_workflow.py",
+    "scripts/reconcile_study_capabilities.py",
+    "scripts/run_governed_study.py",
+    "scripts/run_partitioned_train_collection.py",
+    "scripts/run_research_workflow.py"
+  ],
+  "stages": "compile prepare readiness preflight tests causal_audit contract_audit seal smoke collection reconcile merge fit freeze oos analyze close",
+  "retired": [
+    "scripts/run_research_workflow.py -> deprecation shim",
+    "scripts/run_partitioned_train_collection.py -> deprecation shim",
+    "scripts/reconcile_study_capabilities.py -> deprecation shim (reconcile leaf retained for the engine)"
+  ],
+  "kept_internal": [
+    "research_workflow/lifecycle.py",
+    "research_workflow/workflow_engine.py",
+    "research_workflow/hooks/resume.py"
+  ],
+  "next_stage": "05_capability_registry",
+  "blocker": null
+}

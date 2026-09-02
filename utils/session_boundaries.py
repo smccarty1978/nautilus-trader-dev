@@ -90,6 +90,56 @@ def _to_ct(ts_ns: int) -> pd.Timestamp:
     return pd.Timestamp(int(ts_ns), tz="UTC").tz_convert(CT)
 
 
+# ---------------------------------------------------------------------------
+# Hot-path session table (platform-v2 item 07).
+#
+# ``is_in_session`` and ``session_close_ns`` are called on the collector's 1s/checkpoint
+# path. Converting a pandas Timestamp through a tz database per call is the dominant cost of
+# that path relative to the integer comparison it answers. Within any single UTC hour the
+# Chicago calendar date, weekday and UTC offset are constant (DST transitions happen on the
+# hour in UTC), so one tz conversion per UTC hour yields the RTH window of that CT calendar
+# day as two UTC nanosecond integers; every timestamp in that hour is then classified with
+# integer comparisons. Semantics are byte-identical to the pandas path (verified by
+# scripts/tests/test_hot_path_equivalence.py across a full year including DST days).
+# ---------------------------------------------------------------------------
+_HOUR_NS = 3_600_000_000_000
+_DAY_NS = 86_400_000_000_000
+_SESSION_HOUR_CACHE: dict = {}
+
+
+def _session_hour_entry(ts_ns: int, session: str) -> tuple:
+    """(start_utc_ns, end_utc_ns, is_weekday) for the CT calendar day containing ``ts_ns``."""
+    key = (int(ts_ns) // _HOUR_NS, session)
+    entry = _SESSION_HOUR_CACHE.get(key)
+    if entry is None:
+        start, end = resolve_session_window(session)
+        ct = _to_ct(key[0] * _HOUR_NS)
+        # Wall-clock construction (not midnight + Timedelta): on a DST-transition day the
+        # absolute-time arithmetic lands an hour off; the wall clock is what "08:30 CT" means.
+        start_utc = int(pd.Timestamp(ct.year, ct.month, ct.day, start.hour, start.minute, start.second, tz=CT).tz_convert("UTC").value)
+        end_utc = int(pd.Timestamp(ct.year, ct.month, ct.day, end.hour, end.minute, end.second, tz=CT).tz_convert("UTC").value)
+        entry = (start_utc, end_utc, ct.weekday() < 5)
+        if len(_SESSION_HOUR_CACHE) > 200_000:
+            _SESSION_HOUR_CACHE.clear()
+        _SESSION_HOUR_CACHE[key] = entry
+    return entry
+
+
+_CT_HOUR_CACHE: dict = {}
+
+
+def ct_hour_of_day(ts_ns: int) -> int:
+    """Chicago wall-clock hour (0-23) of ``ts_ns``; the UTC->CT offset is constant within a UTC hour."""
+    key = int(ts_ns) // _HOUR_NS
+    hour = _CT_HOUR_CACHE.get(key)
+    if hour is None:
+        hour = int(_to_ct(key * _HOUR_NS).hour)
+        if len(_CT_HOUR_CACHE) > 200_000:
+            _CT_HOUR_CACHE.clear()
+        _CT_HOUR_CACHE[key] = hour
+    return hour
+
+
 def is_in_session(ts_ns: int, session: str = "RTH") -> bool:
     """Is a completed-bar close timestamp (ns, UTC) inside the declared session?
 
@@ -101,6 +151,18 @@ def is_in_session(ts_ns: int, session: str = "RTH") -> bool:
         return True
     if key == "ETH":
         return not is_in_session(ts_ns, "RTH")
+    start_utc, end_utc, weekday = _session_hour_entry(int(ts_ns), key)
+    t = int(ts_ns)
+    return weekday and (t > start_utc) and (t <= end_utc)
+
+
+def is_in_session_reference(ts_ns: int, session: str = "RTH") -> bool:
+    """The pandas/tz reference implementation, kept for equivalence tests only."""
+    key = (session or "").strip().upper()
+    if key == "ALL":
+        return True
+    if key == "ETH":
+        return not is_in_session_reference(ts_ns, "RTH")
     start, end = resolve_session_window(key)
     ts = _to_ct(ts_ns)
     t = ts.time()
@@ -113,11 +175,17 @@ def session_close_ns(ts_ns: int, session: str = "RTH") -> int:
     This is what makes ``session_end_censoring`` computable: a candidate whose forward
     horizon extends past this instant cannot be resolved from in-session data alone.
     """
+    key = (session or "").strip().upper()
+    return _session_hour_entry(int(ts_ns), key)[1]
+
+
+def session_close_ns_reference(ts_ns: int, session: str = "RTH") -> int:
+    """The pandas/tz reference implementation, kept for equivalence tests only."""
     _start, end = resolve_session_window(session)
     ts = _to_ct(ts_ns)
-    close_ct = ts.normalize() + pd.Timedelta(
-        hours=end.hour, minutes=end.minute, seconds=end.second
-    )
+    # Wall-clock close of the CT calendar day (DST-safe; the legacy midnight+Timedelta form was
+    # an hour off on the two transition days, which are Sundays and therefore never RTH).
+    close_ct = pd.Timestamp(ts.year, ts.month, ts.day, end.hour, end.minute, end.second, tz=CT)
     return int(close_ct.tz_convert("UTC").value)
 
 

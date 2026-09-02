@@ -27,7 +27,8 @@ def persist_models(study_path: str | Path, models: Mapping[str, Any], manifest: 
                    feature_contract_identity: str | None = None, target_identity: str | None = None,
                    preprocessing_identity: str | None = None, train_frame_identity: str | None = None,
                    training_years: list[int] | None = None, closures: Mapping[str, Any] | None = None,
-                   direction_routing: Mapping[str, str] | None = None) -> dict[str, Any]:
+                   direction_routing: Mapping[str, str] | None = None, tier_v2: str = "registry",
+                   selection_status_v2: str = "selected", golden_train_frame: Any = None) -> dict[str, Any]:
     study = Path(study_path).resolve(); studies_root = study.parents[0]; root = studies_root / "model_registry"; root.mkdir(parents=True, exist_ok=True)
     artifact_dir = study / "artifacts" / "models"; artifact_dir.mkdir(parents=True, exist_ok=True)
     bundle = {arm: {"estimator": m.estimator, "fit_identity_sha256": m.provenance.fit_identity_sha256} for arm, m in models.items()}
@@ -62,6 +63,25 @@ def persist_models(study_path: str | Path, models: Mapping[str, Any], manifest: 
             raise ModelArtifactError("IMMUTABLE_MODEL_REGISTRY_CONFLICT")
         if not registry.exists(): registry.write_text(registry_body, encoding="utf-8")
         records.append({**record, "_studies_root": str(studies_root), "_artifact_path": str(model_path)})
+        # Model contract v2: mirror the reusable model into the configured model store
+        # (research_workflow.model_store) under the SAME model_id. Store failure never
+        # invalidates the fit; the v1 record above remains authoritative for legacy readers.
+        try:
+            from research_workflow.roots import resolve_model_root
+            if resolve_model_root() is not None:
+                from research_workflow import model_store as _ms
+                _lin = _ms.ModelLineage(study_id=study.name, cell_id=None, direction=None, target_arm=None, fold_id=None, config_id=None,
+                    seed=rec.get("seed"), ordered_inputs=list(rec.get("ordered_features") or []), feature_contract_sha256=feature_contract_identity,
+                    preprocessing_contract_sha256=(preprocessing_identity or {}).get("identity") if isinstance(preprocessing_identity, dict) else None,
+                    target_contract_sha256=target_identity, target_frame_identity=None, training_population_identity=train_frame_identity,
+                    train_years=list(training_years or []), validation_years=[], hyperparameters=dict(rec.get("hyperparameters") or {}),
+                    family=str(rec.get("estimator") or "sklearn"), fit_identity_sha256=rec.get("fit_identity_sha256"), closure_identities=dict(closures or {}), model_role=arm)
+                _ms.store_model(model_id=immutable, estimator=estimator, lineage=_lin, tier=tier_v2, selection_status=selection_status_v2,
+                                metrics=dict(rec.get("metrics") or {}), golden_train_frame=golden_train_frame,
+                                legacy_registry_record={k: record.get(k) for k in ("artifact_path","artifact_sha256","golden_fixture_path","golden_fixture_sha256","native_booster_path","native_booster_sha256")})
+                records[-1]["model_store_v2"] = True
+        except Exception as _exc:  # pragma: no cover - the store is additive
+            records[-1]["model_store_v2_error"] = f"{type(_exc).__name__}: {_exc}"
     return {"records":records, "registry_dir":str(root)}
 
 # scientific_status handling for reuse AS A DERIVED CAUSAL INPUT (RT-09). Validity is

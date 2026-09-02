@@ -1,0 +1,68 @@
+{
+  "item": "05_capability_registry",
+  "status": "PASS",
+  "commit": null,
+  "tests": {
+    "scripts/tests/test_capabilities.py": "10 passed"
+  },
+  "artifacts": [
+    "research_workflow/capabilities.py",
+    "research_workflow/capabilities/registry.json",
+    "research_workflow/capabilities_index.yaml",
+    "scripts/tests/test_capabilities.py"
+  ],
+  "capability_count": 179,
+  "summary": {
+    "datasets": {
+      "broken": 0,
+      "count": 3
+    },
+    "entry_references": {
+      "broken": 0,
+      "count": 3
+    },
+    "features": {
+      "broken": 0,
+      "count": 143
+    },
+    "model_drivers": {
+      "broken": 0,
+      "count": 4
+    },
+    "outcomes": {
+      "broken": 0,
+      "count": 4
+    },
+    "streams": {
+      "broken": 0,
+      "count": 9
+    },
+    "total": 179,
+    "trackers": {
+      "broken": 1,
+      "count": 4
+    },
+    "trigger_primitives": {
+      "broken": 0,
+      "count": 3
+    },
+    "validation_protocols": {
+      "broken": 0,
+      "count": 6
+    }
+  },
+  "content_sha256": "ced8f4c6249ce89e48393047043af9d954bdc166434e8ce8f7375cee3dee9d67",
+  "cli": [
+    "research cap list [kind] [--status]",
+    "research cap describe <id>",
+    "research cap search <text>",
+    "research cap generate [--check]"
+  ],
+  "notes": [
+    "features (143) and datasets/streams introspected; other kinds seeded by capabilities_index.yaml and verified at generation",
+    "tracker.regime.dual_ema is 'broken' until item 06 lands its implementation and parity test",
+    "no benchmark fields; cost_class derived from update_cadence"
+  ],
+  "next_stage": "06_regime_tracker",
+  "blocker": null
+}

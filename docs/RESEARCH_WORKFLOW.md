@@ -804,6 +804,34 @@ and report it. A substituted source produces a result nothing downstream will fl
 
 ---
 
+### Machine-local roots (datasets and the model store)
+
+`research_workflow/roots.py`. A study binds a `dataset_id`; the committed
+`research/datasets/<id>.yaml` carries the dataset's `logical_digest` (content digest of the
+immutable catalog files). The physical directory is found through the operator's
+machine-local configuration, never through a path stored in any artifact:
+
+```yaml
+# ~/.nt_research/config.yaml   (or $NT_RESEARCH_CONFIG)
+catalog_roots:
+  - D:/market-data/catalog        # holds <dataset_id>/dataset_manifest.json
+model_root: ~/.nt_research/models
+```
+
+- With `catalog_roots` configured, resolution is **only** `dataset_id -> committed digest ->
+  a root whose `<dataset_id>/dataset_manifest.json` carries that digest`. No repo-relative
+  fallback (`DATASET_ROOT_UNRESOLVED`). Conflicting digests across roots fail
+  (`DUPLICATE_DATASET_CONFLICT`); identical copies in several roots are fine.
+- Without a config the legacy repo-relative `catalog_rel_path` applies unchanged.
+- READINESS R1 additionally proves the opened catalog's on-disk digest equals the committed one.
+- Receipts and `DataPlan` record `dataset_id` + digest + resolution kind, not the path.
+- `python scripts/research.py data manifest <id>` writes the on-disk manifest and prints the
+  digest to commit; `research data verify <id> [--recompute]` proves resolution.
+- Worktrees no longer need a catalog junction. A junction to exactly `data/catalog/<id>` remains
+  a documented manual fallback for a machine with no config.
+
+---
+
 ## 14. Research pattern
 
 Prediction of a **structural** event and prediction of a **tradable** event are distinct

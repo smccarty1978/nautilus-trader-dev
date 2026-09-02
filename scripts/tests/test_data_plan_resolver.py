@@ -48,7 +48,8 @@ def test_governed_catalog_resolves_successfully():
     assert plan.catalog_path == REAL_NQ_CATALOG.resolve()
 
 
-def test_missing_governed_catalog_fails_closed(tmp_path: Path):
+def test_missing_governed_catalog_fails_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("NT_RESEARCH_CONFIG", str(tmp_path / "absent.yaml"))  # legacy repo-relative mode
     empty_repo_root = tmp_path / "repo_with_no_catalog"
     empty_repo_root.mkdir()
     with pytest.raises(GovernedCatalogNotFoundError, match="GOVERNED_CATALOG_NOT_FOUND"):
@@ -60,6 +61,7 @@ def test_cwd_fallback_cannot_select_an_alternate_catalog(tmp_path: Path, monkeyp
     repo_root-relative path was missing. Plant a directory at that same relative path
     under a decoy CWD and prove it is never opened.
     """
+    monkeypatch.setenv("NT_RESEARCH_CONFIG", str(tmp_path / "absent.yaml"))  # legacy repo-relative mode
     decoy_cwd = tmp_path / "decoy_cwd"
     (decoy_cwd / "data" / "catalog" / "NQ_v0_2020_2026").mkdir(parents=True)
 

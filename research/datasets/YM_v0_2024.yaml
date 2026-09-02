@@ -1,0 +1,39 @@
+# DatasetSpec authority for the YM_v0_2024 physical catalog (binding layer over
+# backtests/nt_runtime/data_plan.py:PRODUCT_CATALOGS["YM"]). 5m is derived at runtime
+# from completed 1m bars; the catalog-level 5m stream is not used by governed studies.
+
+dataset_id: YM_v0_2024
+instrument_id: YM.XCBT
+catalog_rel_path: data/catalog/YM_v0_2024   # legacy/transitional only; ignored once catalog_roots are configured
+
+# Scientific identity of the immutable catalog (research_workflow.roots).
+logical_digest: 6f532e9bf8f7db8c200244a2c14feb773fbadde6600206449fcb51f19887878e
+digest_method: sha256(sorted(relpath,size,sha256(bytes)) under <catalog>/data)
+
+provenance:
+  source: databento
+  manifest_path: null
+  expected_hash: null
+
+streams:
+  1s:
+    source: external
+    bar_type: YM.XCBT-1-SECOND-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 1000000000
+  1m:
+    source: external
+    bar_type: YM.XCBT-1-MINUTE-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 60000000000
+  5m:
+    source: derived
+    external_catalog_stream: false
+    derived_from: 1m
+    aggregator: CompletedMinuteFiveMinuteAggregator
+
+coverage:
+  start: '2024-01-01T23:01:00Z'
+  end: '2024-12-31T00:00:00Z'

@@ -780,6 +780,12 @@ class ProviderHost:
     # F-5 causal ordering state
     _stream_last_ts: Dict[str, int] = field(default_factory=dict)
     _latest_event_ts: int = -1
+    # Declared-cadence routing table (platform-v2 item 07, fix C): stream -> the adapters
+    # that declared it, computed once from ``required_streams()`` on first dispatch. The
+    # previous per-event ``adapter.required_streams()`` call rebuilt a frozenset for every
+    # adapter on every 1s bar. Routing semantics are identical (verified by
+    # scripts/tests/test_hot_path_equivalence.py).
+    _subscribers: Dict[str, Tuple[Any, ...]] = field(default_factory=dict)
 
     # ---- construction ------------------------------------------------------ #
     @classmethod
@@ -908,9 +914,12 @@ class ProviderHost:
             self._latest_event_ts = max(self._latest_event_ts, avail_ts)
 
         if event_type in ALL_STREAMS:
-            for adapter in self.adapters:
-                if event_type in adapter.required_streams():
-                    adapter.on_event(event_type, event)
+            subscribers = self._subscribers.get(event_type)
+            if subscribers is None:
+                subscribers = tuple(a for a in self.adapters if event_type in a.required_streams())
+                self._subscribers[event_type] = subscribers
+            for adapter in subscribers:
+                adapter.on_event(event_type, event)
         else:
             for adapter in self.adapters:
                 adapter.on_event(event_type, event)
