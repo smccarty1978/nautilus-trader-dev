@@ -1,0 +1,82 @@
+# DatasetSpec authority for the immutable ES_1S_V2 catalog (Dataset V2).
+# Built by research_workflow.dataset_v2 -- native 1s rows only, never forward-filled; 1m is a build-time
+# aggregation of the same seconds; 5m stays a runtime derivation. Reference tables live under <catalog>/reference/.
+dataset_id: ES_1S_V2
+instrument_id: ES.XCME
+schema_version: 2
+catalog_rel_path: null
+logical_digest: 9f38a41edca5b72a71866846ec9aa15d4cf205388d22aabe025250eefbf0068a
+digest_method: sha256(sorted(relpath,size,sha256(bytes)) under <catalog>/data)
+reference_digest: 52df910ab396eedd687eb89ad01970cef83285538c9f110905df366f9a307ef6
+provenance:
+  source: databento *.v.0 raw yearly parquet (native rows, no fill)
+  build_manifest: build_manifest.json
+  builder_sha256: 96df4872426d8d09d21973e339577209214db6e12288bd0ee2199fa6a7c5ceb3
+  sources:
+  - year: '2020'
+    sha256: b035fd00963850e87e9fbd95c78bd332ba54bbf1a939dbf10d2934680d8f3b69
+    rows: 12237750
+  - year: '2021'
+    sha256: 426ae9708c7c301da9cbe63558242f0f71ca75842835fb7ab66f82476f784199
+    rows: 10430626
+  - year: '2022'
+    sha256: cd04ee0c27f06963537748abf710f023f334b5d6cdb53c9f7b8ae7b45600e58c
+    rows: 12857420
+  - year: '2023'
+    sha256: c9e97dd757d6dd180c9ab08ed00e7acf9d3a691039c5831bb0f24b29a13b7a86
+    rows: 10508576
+  - year: '2024'
+    sha256: 2c0b7cdc05b578f43ca05dd0d5405f42fe686a0c70df9c1d882162b1d2761622
+    rows: 10188727
+  - year: '2025'
+    sha256: 8a7ca69624e16d1ec6b4356f6f8b47a78823a52a5041a9182957c4b25fd3f202
+    rows: 11268686
+  - year: 2026_ytd
+    sha256: 8b514bc20a78427625c2b6bb219a23116ea3e1063828733e5075c575aa212608
+    rows: 4303062
+rules:
+  forward_fill: false
+  native_rows_only: true
+instrument:
+  instrument_id: ES.XCME
+  venue: XCME
+  multiplier: '50.0'
+  price_increment: '0.25'
+streams:
+  1s:
+    source: external
+    bar_type: ES.XCME-1-SECOND-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 1000000000
+  1m:
+    source: external
+    bar_type: ES.XCME-1-MINUTE-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 60000000000
+    derivation: build_time_from_native_1s(closed=left,label=left,minute_exists_iff_native_second)
+    equivalence_proof: artifacts/platform_v2_do_soon/dataset_v2/equivalence_<SYMBOL>.json
+  5m:
+    source: derived
+    external_catalog_stream: false
+    derived_from: 1m
+    aggregator: runtime_complete_calendar_bucket
+reference_tables:
+- gaps
+- holidays
+- maintenance
+- out_of_calendar
+- rolls
+- sessions
+coverage:
+  start: '2020-01-01T23:00:00+00:00'
+  end: '2026-04-29T23:59:59+00:00'
+  years:
+  - '2020'
+  - '2021'
+  - '2022'
+  - '2023'
+  - '2024'
+  - '2025'
+  - 2026_ytd
