@@ -1,0 +1,212 @@
+# Curated seed for the generated capability registry (research_workflow/capabilities.py).
+#
+# Features and datasets are introspected from their authorities and never listed here.
+# Every entry below names an implementation the generator verifies at generation time
+# (module importable, attribute present); an entry whose implementation is missing is
+# emitted with status: broken so the registry never silently claims a capability.
+#
+# No hand-maintained benchmark fields. Measured provider cost lives in bench/*.json.
+
+trackers:
+  - id: tracker.regime.dual_ema
+    version: 1
+    description: Canonical dual-EMA(3/9 high-low) regime state with Wilder ATR(14), parameterized by timeframe/instrument; parity-tested against the accepted collector_v2 engine.
+    implementation: features.trackers.regime_dual_ema.DualEmaRegimeTracker
+    parameters: [timeframe, instrument, short_period, long_period, atr_period]
+    dependencies: [stream.completed_bar]
+    update_cadence: per_source_bar
+    required_tests: [features/tests/test_regime_dual_ema_parity.py]
+  - id: tracker.regime.completed_state_feed
+    version: 1
+    description: Completed-bar regime state for several timeframes, aggregated from completed 1s bars; exposes only causally available frozen states.
+    implementation: research_workflow.completed_regime_state.CompletedRegimeStateFeed
+    parameters: [timeframes, atr_period]
+    dependencies: [stream.completed_1s]
+    update_cadence: per_1s
+    required_tests: [research_workflow/tests/test_population_runtime.py]
+  - id: tracker.episode.population_engine
+    version: 1
+    description: Episode lifecycle (arm on adverse excursion, re-arm on new favorable extreme, terminate on prevailing flip) driving candidate existence.
+    implementation: research_workflow.episode_population.EpisodePopulationEngine
+    parameters: [rearm_on, terminate_on, arm_condition]
+    dependencies: [tracker.regime.completed_state_feed, stream.completed_1s]
+    update_cadence: per_1s
+    required_tests: [research_workflow/tests/test_episode_population.py]
+  - id: tracker.forward.observation
+    version: 1
+    description: Streaming per-entry forward-path observation (MFE/MAE/horizon) for proposed entries; labels only, never inputs.
+    implementation: research_workflow.forward_outcomes.tracker.ForwardObservation
+    parameters: [spec]
+    dependencies: [stream.completed_1s]
+    update_cadence: per_1s
+    required_tests: [research_workflow/tests/test_forward_outcomes.py]
+
+trigger_primitives:
+  - id: trigger.population.established_filter
+    version: 1
+    description: Checkpoint-grid candidate qualification (age gate, running MFE, progress windows, retained MFE ratio) evaluated at each cadence checkpoint.
+    implementation: research_workflow.generic_collector.FlipPredictionCollector
+    parameters: [age_gate_seconds, cadence_seconds, running_mfe_atr_gte, new_progress_windows_gte, retained_mfe_ratio_gte, session]
+    dependencies: [tracker.regime.dual_ema, stream.completed_1s]
+    update_cadence: per_candidate
+    required_tests: [scripts/tests/test_population_funnel.py]
+  - id: trigger.population.identity_allowlist
+    version: 1
+    description: Candidate qualification by an externally frozen (regime_start_ns, checkpoint_index) identity table.
+    implementation: research_workflow.generic_collector.verify_checkpoint_identities_authority
+    parameters: [required_checkpoint_identities_path]
+    dependencies: [trigger.population.established_filter]
+    update_cadence: per_candidate
+    required_tests: [research_workflow/tests/test_population_qualification_strictness.py]
+  - id: trigger.episode.lifecycle
+    version: 1
+    description: Watch/arm/emit state machine over completed 5s regime turns within a prevailing 1m regime (deep-pullback family).
+    implementation: research_workflow.population_runtime.EpisodePopulationRuntime
+    parameters: [episode_lifecycle]
+    dependencies: [tracker.episode.population_engine]
+    update_cadence: per_1s
+    required_tests: [research_workflow/tests/test_population_runtime.py]
+
+outcomes:
+  - id: outcome.flip_within_horizon
+    version: 1
+    description: Prevailing regime flips within the declared horizon (binary label, session-end censoring).
+    implementation: research_workflow.target_runtime.FlipTargetRuntime
+    parameters: [horizon_seconds, direction, session_end_censoring]
+    dependencies: [tracker.regime.dual_ema]
+    update_cadence: per_source_event
+    required_tests: [research_workflow/tests/test_target_runtime.py]
+  - id: outcome.ordered_barrier
+    version: 1
+    description: Favorable-before-adverse ATR barrier race off the 1s tape, entry reference and ATR frozen at T; censor/negative expiry policy.
+    implementation: research_workflow.target_runtime.OrderedBarrierTargetRuntime
+    parameters: [favorable_atr, adverse_atr, horizon_seconds, horizon_expiry_policy, entry_reference, atr_frozen_at]
+    dependencies: [stream.completed_1s, entry.next_bar_open]
+    update_cadence: per_1s
+    required_tests: [research_workflow/tests/test_ordered_barrier_entry_reference.py, research_workflow/tests/test_single_primitive_ordered_barrier_regression.py]
+  - id: outcome.composite
+    version: 1
+    description: AND/OR composition of outcome children with monotone worst_status censoring; independent replay oracle.
+    implementation: research_workflow.target_runtime.CompositeTargetRuntime
+    parameters: [conditions, condition_logic]
+    dependencies: [outcome.flip_within_horizon, outcome.ordered_barrier]
+    update_cadence: per_1s
+    required_tests: [research_workflow/tests/test_composite_target_expression.py]
+  - id: outcome.forward_excursion
+    version: 1
+    description: Forward MFE/MAE/return path labels for proposed entries (post-event artifact, guarded from model inputs).
+    implementation: research_workflow.forward_outcomes.contracts.ForwardOutcomeSpec
+    parameters: [horizon_seconds, excursion_units, bar_inclusion, session_end_censoring]
+    dependencies: [tracker.forward.observation]
+    update_cadence: per_1s
+    required_tests: [research_workflow/tests/test_forward_outcomes.py]
+
+entry_references:
+  - id: entry.decision_close
+    version: 1
+    description: Price of the completed bar at the decision timestamp (research mark, not a fill).
+    implementation: research_workflow.forward_outcomes.contracts.ReferencePrice
+    parameters: []
+    dependencies: []
+    update_cadence: per_candidate
+    required_tests: [research_workflow/tests/test_ordered_barrier_entry_reference.py]
+  - id: entry.next_bar_open
+    version: 1
+    description: Open of the next bar after the decision timestamp (default entry reference).
+    implementation: research_workflow.forward_outcomes.contracts.ReferencePrice
+    parameters: []
+    dependencies: []
+    update_cadence: per_candidate
+    required_tests: [research_workflow/tests/test_ordered_barrier_entry_reference.py]
+  - id: entry.confirmation_close
+    version: 1
+    description: Close of the confirming bar.
+    implementation: research_workflow.forward_outcomes.contracts.ReferencePrice
+    parameters: []
+    dependencies: []
+    update_cadence: per_candidate
+    required_tests: [research_workflow/tests/test_forward_outcomes.py]
+
+model_drivers:
+  - id: model.lightgbm
+    version: 1
+    description: LightGBM classifier; canonical representation = native text booster (portable).
+    implementation: research.analysis.modeling.fit_model
+    parameters: [n_estimators, learning_rate, max_depth, num_leaves, min_data_in_leaf, seed]
+    dependencies: []
+    update_cadence: offline_only
+    required_tests: [scripts/tests/test_analysis_modeling.py, scripts/tests/test_model_store.py]
+  - id: model.gradient_boosting
+    version: 1
+    description: scikit-learn GradientBoostingClassifier; canonical representation = environment-bound pickle.
+    implementation: research.analysis.modeling.fit_model
+    parameters: [n_estimators, learning_rate, max_depth, seed]
+    dependencies: []
+    update_cadence: offline_only
+    required_tests: [scripts/tests/test_analysis_modeling.py]
+  - id: model.logistic_regression
+    version: 1
+    description: scikit-learn LogisticRegression; canonical representation = environment-bound pickle.
+    implementation: research.analysis.modeling.fit_model
+    parameters: [C, max_iter, seed]
+    dependencies: []
+    update_cadence: offline_only
+    required_tests: [scripts/tests/test_analysis_modeling.py]
+  - id: model.frozen_external_score
+    version: 1
+    description: Another study's frozen TRAIN score as a derived causal input, resolved by model_id through the model store.
+    implementation: research_workflow.external_model_scoring.ExternalModelScoringError
+    parameters: [model_id, availability_reference]
+    dependencies: [model.lightgbm]
+    update_cadence: per_candidate
+    required_tests: [research_workflow/tests/test_external_model_scoring.py]
+
+validation_protocols:
+  - id: validation.model_selection.grid
+    version: 1
+    description: Bounded TRAIN-only grid search over choice domains with walk-forward tuning folds; refuses grids exceeding max_trials.
+    implementation: research_workflow.model_selection.run_model_selection
+    parameters: [max_trials, tuning_years, final_train_validation_years, primary_selection_metric]
+    dependencies: [model.lightgbm]
+    update_cadence: offline_only
+    required_tests: [scripts/tests/test_study_spec_extensions.py]
+  - id: validation.model_selection.random
+    version: 1
+    description: Bounded TRAIN-only random search counting unique configurations; deterministic from random_seed.
+    implementation: research_workflow.model_selection.run_model_selection
+    parameters: [max_trials, random_seed, tuning_years, final_train_validation_years]
+    dependencies: [model.lightgbm]
+    update_cadence: offline_only
+    required_tests: [scripts/tests/test_study_spec_extensions.py]
+  - id: validation.final_train_validation.gated
+    version: 1
+    description: Accept/reject the already-selected winner on final_train_validation_years; never re-selects.
+    implementation: research_workflow.modeling.freeze_train_artifacts
+    parameters: [final_validation_policy, final_validation_requirements]
+    dependencies: [validation.model_selection.grid]
+    update_cadence: offline_only
+    required_tests: [scripts/tests/test_direction_qualified_freeze_binding.py]
+  - id: validation.readiness.r1_r10
+    version: 1
+    description: READINESS gate R1-R10 on bounded real samples (dataset identity + digest, timestamp contracts, callback order, collector construction, output interface, identity stability, alternate opener scan, first-output parity).
+    implementation: research_workflow.readiness.run_readiness
+    parameters: []
+    dependencies: []
+    update_cadence: offline_only
+    required_tests: [scripts/tests/test_readiness.py]
+  - id: validation.preflight.deterministic
+    version: 1
+    description: Deterministic preflight (EXECUTION_MANIFEST, CAUSAL_LINT, ARTIFACT_SCHEMA, FEATURE_PROMOTION, RESEARCH_DECISION_FIDELITY, CAUSAL_INVARIANTS, REQUIRED_GATES).
+    implementation: research_workflow.preflight.run_preflight
+    parameters: []
+    dependencies: []
+    update_cadence: offline_only
+    required_tests: [scripts/tests/test_research_preflight.py]
+  - id: validation.target_replay_oracle
+    version: 1
+    description: Independent second implementation of target resolution; zero-mismatch parity required before TRAIN.
+    implementation: research_workflow.target_replay_oracle.replay_expression
+    parameters: []
+    dependencies: [outcome.composite]
+    update_cadence: offline_only
+    required_tests: [research_workflow/tests/test_bare_flip_independent_parity.py]

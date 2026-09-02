@@ -1,0 +1,5390 @@
+{
+  "content_sha256": "ced8f4c6249ce89e48393047043af9d954bdc166434e8ce8f7375cee3dee9d67",
+  "generated_at_utc": "2026-09-02T06:34:41.052907+00:00",
+  "kinds": {
+    "datasets": [
+      {
+        "cost_class": "offline_only",
+        "coverage": {
+          "end": "2026-04-30T00:00:00Z",
+          "start": "2020-01-01T23:01:00Z"
+        },
+        "dependencies": [],
+        "description": "ES.XCME catalog ES_v0_2020_2026",
+        "id": "dataset.ES_v0_2020_2026",
+        "implementation": "research/datasets/ES_v0_2020_2026.yaml",
+        "instrument_id": "ES.XCME",
+        "kind": "datasets",
+        "logical_digest": "9fa50102a121327212231e2d46fc6484fce6d4c9c7d1458b3ac7ef4c54c02ba0",
+        "name": "ES_v0_2020_2026",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_roots.py",
+          "scripts/tests/test_dataset_spec.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": "9fa50102a121"
+      },
+      {
+        "cost_class": "offline_only",
+        "coverage": {
+          "end": "2026-04-30T00:00:00Z",
+          "start": "2020-01-01T23:01:00Z"
+        },
+        "dependencies": [],
+        "description": "NQ.XCME catalog NQ_v0_2020_2026",
+        "id": "dataset.NQ_v0_2020_2026",
+        "implementation": "research/datasets/NQ_v0_2020_2026.yaml",
+        "instrument_id": "NQ.XCME",
+        "kind": "datasets",
+        "logical_digest": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+        "name": "NQ_v0_2020_2026",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_roots.py",
+          "scripts/tests/test_dataset_spec.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": "1a0d41d8da97"
+      },
+      {
+        "cost_class": "offline_only",
+        "coverage": {
+          "end": "2024-12-31T00:00:00Z",
+          "start": "2024-01-01T23:01:00Z"
+        },
+        "dependencies": [],
+        "description": "YM.XCBT catalog YM_v0_2024",
+        "id": "dataset.YM_v0_2024",
+        "implementation": "research/datasets/YM_v0_2024.yaml",
+        "instrument_id": "YM.XCBT",
+        "kind": "datasets",
+        "logical_digest": "6f532e9bf8f7db8c200244a2c14feb773fbadde6600206449fcb51f19887878e",
+        "name": "YM_v0_2024",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_roots.py",
+          "scripts/tests/test_dataset_spec.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": "6f532e9bf8f7"
+      }
+    ],
+    "entry_references": [
+      {
+        "cost_class": "per_candidate",
+        "dependencies": [],
+        "description": "Price of the completed bar at the decision timestamp (research mark, not a fill).",
+        "id": "entry.decision_close",
+        "implementation": "research_workflow.forward_outcomes.contracts.ReferencePrice",
+        "implementation_note": "Declared execution-price convention.",
+        "implementation_verified": true,
+        "kind": "entry_references",
+        "missing_tests": [],
+        "name": "decision_close",
+        "parameters": [],
+        "required_tests": [
+          "research_workflow/tests/test_ordered_barrier_entry_reference.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      },
+      {
+        "cost_class": "per_candidate",
+        "dependencies": [],
+        "description": "Open of the next bar after the decision timestamp (default entry reference).",
+        "id": "entry.next_bar_open",
+        "implementation": "research_workflow.forward_outcomes.contracts.ReferencePrice",
+        "implementation_note": "Declared execution-price convention.",
+        "implementation_verified": true,
+        "kind": "entry_references",
+        "missing_tests": [],
+        "name": "next_bar_open",
+        "parameters": [],
+        "required_tests": [
+          "research_workflow/tests/test_ordered_barrier_entry_reference.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      },
+      {
+        "cost_class": "per_candidate",
+        "dependencies": [],
+        "description": "Close of the confirming bar.",
+        "id": "entry.confirmation_close",
+        "implementation": "research_workflow.forward_outcomes.contracts.ReferencePrice",
+        "implementation_note": "Declared execution-price convention.",
+        "implementation_verified": true,
+        "kind": "entry_references",
+        "missing_tests": [],
+        "name": "confirmation_close",
+        "parameters": [],
+        "required_tests": [
+          "research_workflow/tests/test_forward_outcomes.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      }
+    ],
+    "features": [
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature abs_delta_cum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.abs_delta_cum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "abs_delta_cum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_audit_execution_api.py"
+        ],
+        "reset_policies": [
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature abs_delta_per_atr_moved (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.abs_delta_per_atr_moved",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 9,
+        "name": "abs_delta_per_atr_moved",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start",
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature abs_delta_per_point_moved (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.abs_delta_per_point_moved",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "abs_delta_per_point_moved",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature accel (arrival_volume)",
+        "dtype": "float64",
+        "id": "feature.accel",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "accel",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [
+          "research_workflow/tests/test_population_runtime.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature activity_duration_median (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.activity_duration_median",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 5,
+        "name": "activity_duration_median",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature activity_flip_count (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.activity_flip_count",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "activity_flip_count",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature activity_regime_count (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.activity_regime_count",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 5,
+        "name": "activity_regime_count",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature activity_regime_count_std (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.activity_regime_count_std",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "activity_regime_count_std",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature aligned_price_minus_center (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.aligned_price_minus_center",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "aligned_price_minus_center",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature arrival_acceleration (arrival_velocity)",
+        "dtype": "float64",
+        "id": "feature.arrival_acceleration",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "arrival_acceleration",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "bar_state",
+          "input_timeframe",
+          "short_lookback"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_forward_outcomes.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_workflow_engine.py",
+          "scripts/tests/test_direction_qualified_freeze_binding.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature arrival_deceleration (arrival_velocity)",
+        "dtype": "float64",
+        "id": "feature.arrival_deceleration",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "arrival_deceleration",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature arrival_jerk (arrival_velocity)",
+        "dtype": "float64",
+        "id": "feature.arrival_jerk",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "arrival_jerk",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "derivative_order"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature arrival_velocity (arrival_velocity)",
+        "dtype": "float64",
+        "id": "feature.arrival_velocity",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 4,
+        "name": "arrival_velocity",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "bar_state",
+          "input_timeframe",
+          "lookback"
+        ],
+        "required_tests": [
+          "features/tests/test_feature_ctl_request_resolution.py",
+          "research_workflow/tests/test_forward_outcomes.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_provider_host_audit.py",
+          "research_workflow/tests/test_stage3_integration.py",
+          "research_workflow/tests/test_workflow_engine.py",
+          "scripts/tests/test_direction_qualified_freeze_binding.py",
+          "scripts/tests/test_feature_binding_identity.py",
+          "scripts/tests/test_study_factory.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature arrival_velocity_max (arrival_velocity)",
+        "dtype": "float64",
+        "id": "feature.arrival_velocity_max",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "arrival_velocity_max",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "bar_state",
+          "input_timeframe",
+          "lookback",
+          "velocity_lookback"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature arrival_velocity_ratio (arrival_velocity)",
+        "dtype": "float64",
+        "id": "feature.arrival_velocity_ratio",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "arrival_velocity_ratio",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "bar_state",
+          "input_timeframe",
+          "long_lookback",
+          "short_lookback"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature available (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.available",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "available",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_forward_outcomes.py",
+          "research_workflow/tests/test_provider_host_audit.py",
+          "research_workflow/tests/test_stage3_integration.py",
+          "scripts/tests/test_analysis_loader.py",
+          "scripts/tests/test_rt_blockers.py"
+        ],
+        "reset_policies": [
+          "event_start",
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature bar_est_bear_volume (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.bar_est_bear_volume",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "bar_est_bear_volume",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature bar_est_bull_volume (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.bar_est_bull_volume",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "bar_est_bull_volume",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature bar_est_delta (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.bar_est_delta",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "bar_est_delta",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature bar_est_delta_ratio (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.bar_est_delta_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "bar_est_delta_ratio",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature bar_volume (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.bar_volume",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "bar_volume",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature bar_zero_range (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.bar_zero_range",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "bar_zero_range",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature center_slope_acceleration (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.center_slope_acceleration",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "center_slope_acceleration",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature center_slope_change (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.center_slope_change",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "center_slope_change",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature center_spread (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.center_spread",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "center_spread",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe",
+          "timeframe_2"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature clean_score (pullback_1m)",
+        "dtype": "float64",
+        "id": "feature.clean_score",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "clean_score",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature climax (arrival_volume)",
+        "dtype": "float64",
+        "id": "feature.climax",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "climax",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature close_vs_range (pullback_1s)",
+        "dtype": "float64",
+        "id": "feature.close_vs_range",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "close_vs_range",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature consecutive_down (pullback_1s)",
+        "dtype": "float64",
+        "id": "feature.consecutive_down",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "consecutive_down",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature consecutive_up (pullback_1s)",
+        "dtype": "float64",
+        "id": "feature.consecutive_up",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "consecutive_up",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_provider_parameterization.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature cross_family_slope_vs_reg_count (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.cross_family_slope_vs_reg_count",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "cross_family_slope_vs_reg_count",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature cross_family_spread_vs_reg_count (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.cross_family_spread_vs_reg_count",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "cross_family_spread_vs_reg_count",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature crosses_per_minute (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.crosses_per_minute",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "crosses_per_minute",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature directional_volume_ratio (arrival_volume)",
+        "dtype": "float64",
+        "id": "feature.directional_volume_ratio",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "directional_volume_ratio",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "direction",
+          "window"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature distance_to_completed_range_high_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.distance_to_completed_range_high_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "distance_to_completed_range_high_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "reference_timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature distance_to_completed_range_low_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.distance_to_completed_range_low_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "distance_to_completed_range_low_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "reference_timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature distance_to_level (price_level_context)",
+        "dtype": "float64",
+        "id": "feature.distance_to_level",
+        "implementation": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_price_levels.py",
+        "kind": "features",
+        "legacy_alias_count": 87,
+        "name": "distance_to_level",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "level",
+          "level_context",
+          "normalization",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none",
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature downbar_vol_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.downbar_vol_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "downbar_vol_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature duration_median (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.duration_median",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "duration_median",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "lookback"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature duration_ratio (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.duration_ratio",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "duration_ratio",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "denominator_lookback",
+          "numerator_lookback"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature elapsed_seconds (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.elapsed_seconds",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "elapsed_seconds",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [
+          "scripts/tests/test_nt_runner_collect.py"
+        ],
+        "reset_policies": [
+          "event_start",
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature ema_slope (context)",
+        "dtype": "float64",
+        "id": "feature.ema_slope",
+        "implementation": "features.trackers.generic_context.GenericContextProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_context.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "ema_slope",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "ema_role",
+          "lookback"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_provider_parameterization.py",
+          "research_workflow/tests/test_forward_outcomes.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_provider_host_audit.py",
+          "research_workflow/tests/test_stage3_integration.py",
+          "research_workflow/tests/test_workflow_engine.py",
+          "scripts/tests/test_direction_qualified_freeze_binding.py",
+          "scripts/tests/test_feature_binding_identity.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_abs_delta_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_abs_delta_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 9,
+        "name": "est_abs_delta_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start",
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_bear_vol_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_bear_vol_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "est_bear_vol_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_bull_vol_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_bull_vol_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "est_bull_vol_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_delta_cum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_delta_cum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "est_delta_cum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_delta_neg_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_delta_neg_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "est_delta_neg_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_delta_pos_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_delta_pos_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "est_delta_pos_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_delta_ratio (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_delta_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 9,
+        "name": "est_delta_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start",
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_delta_ratio_cum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_delta_ratio_cum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "est_delta_ratio_cum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_delta_ratio_minus (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_delta_ratio_minus",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "est_delta_ratio_minus",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe",
+          "timeframe_2"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_delta_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_delta_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 9,
+        "name": "est_delta_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start",
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature est_delta_sum_minus_scaled (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.est_delta_sum_minus_scaled",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "est_delta_sum_minus_scaled",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe",
+          "timeframe_2"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature first_half_est_delta_ratio (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.first_half_est_delta_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "first_half_est_delta_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature first_half_vol (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.first_half_vol",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "first_half_vol",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_5s"
+        ],
+        "description": "Canonical feature fraction_of_counter_regime_move_recovered (counter_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.fraction_of_counter_regime_move_recovered",
+        "implementation": "features.trackers.generic_regime_geometry.GenericCompletedRegimeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_regime_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "fraction_of_counter_regime_move_recovered",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_feature_system_v2.py",
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature fraction_of_time_on_adverse_side (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.fraction_of_time_on_adverse_side",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "fraction_of_time_on_adverse_side",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature fraction_of_time_on_favorable_side (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.fraction_of_time_on_favorable_side",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "fraction_of_time_on_favorable_side",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature higher_lows_count (pullback_1m, pullback_1s)",
+        "dtype": "float64",
+        "id": "feature.higher_lows_count",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "higher_lows_count",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature late_minus_early_delta_ratio (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.late_minus_early_delta_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "late_minus_early_delta_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature late_vs_early_vol_ratio (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.late_vs_early_vol_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "late_vs_early_vol_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature lower_highs_count (pullback_1m, pullback_1s)",
+        "dtype": "float64",
+        "id": "feature.lower_highs_count",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "lower_highs_count",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature move_outside_completed_range (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.move_outside_completed_range",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "move_outside_completed_range",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "reference_bar_state",
+          "reference_timeframe",
+          "source_bar_state",
+          "source_timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_feature_system_v2.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature nearest_level_geometry (price_level_context)",
+        "dtype": "float64",
+        "id": "feature.nearest_level_geometry",
+        "implementation": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_price_levels.py",
+        "kind": "features",
+        "legacy_alias_count": 10,
+        "name": "nearest_level_geometry",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "level_context",
+          "metric"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature ordering_changes (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.ordering_changes",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "ordering_changes",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature ordering_state (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.ordering_state",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "ordering_state",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature price_change_atr (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.price_change_atr",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 9,
+        "name": "price_change_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start",
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature price_change_points (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.price_change_points",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "price_change_points",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature price_cross_count (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.price_cross_count",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "price_cross_count",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature price_level_aggregate (price_level_context)",
+        "dtype": "float64",
+        "id": "feature.price_level_aggregate",
+        "implementation": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_price_levels.py",
+        "kind": "features",
+        "legacy_alias_count": 57,
+        "name": "price_level_aggregate",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "level_context",
+          "metric",
+          "timeframe"
+        ],
+        "required_tests": [
+          "scripts/tests/test_nt_runner_collect.py"
+        ],
+        "reset_policies": [
+          "none",
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature price_level_available (price_level_context)",
+        "dtype": "float64",
+        "id": "feature.price_level_available",
+        "implementation": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_price_levels.py",
+        "kind": "features",
+        "legacy_alias_count": 31,
+        "name": "price_level_available",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "level",
+          "level_context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none",
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature price_level_position (price_level_context)",
+        "dtype": "float64",
+        "id": "feature.price_level_position",
+        "implementation": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_price_levels.py",
+        "kind": "features",
+        "legacy_alias_count": 29,
+        "name": "price_level_position",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "level",
+          "level_context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none",
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature price_level_value (price_level_context)",
+        "dtype": "float64",
+        "id": "feature.price_level_value",
+        "implementation": "features.trackers.generic_price_levels.GenericPriceLevelProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_price_levels.py",
+        "kind": "features",
+        "legacy_alias_count": 33,
+        "name": "price_level_value",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "level",
+          "level_context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none",
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature prior_deep_pullback_count (pullback_sequence_maturity)",
+        "dtype": "float64",
+        "id": "feature.prior_deep_pullback_count",
+        "implementation": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_episode_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "prior_deep_pullback_count",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "timeframe",
+          "context",
+          "bar_state",
+          "threshold_atr"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_provider_host_audit.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_bars (pullback_1m)",
+        "dtype": "float64",
+        "id": "feature.pullback_bars",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "pullback_bars",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_current_depth_atr (pullback_episode_geometry)",
+        "dtype": "float64",
+        "id": "feature.pullback_current_depth_atr",
+        "implementation": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_episode_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "pullback_current_depth_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "scope"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_stage3_integration.py",
+          "research_workflow/tests/test_workflow_engine.py"
+        ],
+        "reset_policies": [
+          "episode"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_depth_atr (pullback_1m)",
+        "dtype": "float64",
+        "id": "feature.pullback_depth_atr",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "pullback_depth_atr",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_efficiency (pullback_1m)",
+        "dtype": "float64",
+        "id": "feature.pullback_efficiency",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "pullback_efficiency",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_elapsed_seconds (pullback_episode_geometry)",
+        "dtype": "float64",
+        "id": "feature.pullback_elapsed_seconds",
+        "implementation": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_episode_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "pullback_elapsed_seconds",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "scope"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "episode"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_fraction_of_structural_move (pullback_episode_geometry)",
+        "dtype": "float64",
+        "id": "feature.pullback_fraction_of_structural_move",
+        "implementation": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_episode_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "pullback_fraction_of_structural_move",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "scope"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "episode"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_linearity (pullback_1s)",
+        "dtype": "float64",
+        "id": "feature.pullback_linearity",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "pullback_linearity",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_max_depth_atr (pullback_episode_geometry)",
+        "dtype": "float64",
+        "id": "feature.pullback_max_depth_atr",
+        "implementation": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_episode_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "pullback_max_depth_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "scope",
+          "extreme_source"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "episode"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_post_arm_seconds (pullback_episode_geometry)",
+        "dtype": "float64",
+        "id": "feature.pullback_post_arm_seconds",
+        "implementation": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_episode_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "pullback_post_arm_seconds",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "scope"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "episode"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature pullback_recovery_from_extreme_atr (pullback_episode_geometry)",
+        "dtype": "float64",
+        "id": "feature.pullback_recovery_from_extreme_atr",
+        "implementation": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_episode_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "pullback_recovery_from_extreme_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "scope"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "episode"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature range_atr (ohlcv_est_delta, pullback_1s)",
+        "dtype": "float64",
+        "id": "feature.range_atr",
+        "implementation": "features.trackers.generic_bar_geometry.GenericRangeATRProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_bar_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 10,
+        "name": "range_atr",
+        "null_policies": [
+          "allow",
+          "disallow"
+        ],
+        "parameters": [
+          "context",
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_provider_parameterization.py"
+        ],
+        "reset_policies": [
+          "event_start",
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature range_points (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.range_points",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "range_points",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature range_position (range_position)",
+        "dtype": "float64",
+        "id": "feature.range_position",
+        "implementation": "features.trackers.generic_bar_geometry.GenericRangePositionProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_bar_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "range_position",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "lookback",
+          "timeframe"
+        ],
+        "required_tests": [
+          "scripts/tests/test_range_position_availability.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_5s"
+        ],
+        "description": "Canonical feature recovery_from_counter_regime_extreme_atr (counter_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.recovery_from_counter_regime_extreme_atr",
+        "implementation": "features.trackers.generic_regime_geometry.GenericCompletedRegimeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_regime_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "recovery_from_counter_regime_extreme_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_feature_system_v2.py",
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature regime_age (context)",
+        "dtype": "float64",
+        "id": "feature.regime_age",
+        "implementation": "features.trackers.generic_context.GenericContextProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_context.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "regime_age",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "unit"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_age_min (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_age_min",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "regime_age_min",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_alignment (completed_regime_context)",
+        "dtype": "float64",
+        "id": "feature.regime_alignment",
+        "implementation": "features.trackers.generic_regime_geometry.GenericCompletedRegimeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_regime_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "regime_alignment",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "source_timeframe",
+          "reference_timeframe",
+          "context",
+          "bar_state"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_provider_host_audit.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_direction (completed_regime_context)",
+        "dtype": "float64",
+        "id": "feature.regime_direction",
+        "implementation": "features.trackers.generic_regime_geometry.GenericCompletedRegimeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_regime_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "regime_direction",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "timeframe",
+          "context",
+          "bar_state"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_bare_flip_independent_parity.py",
+          "research_workflow/tests/test_composite_target_expression.py",
+          "research_workflow/tests/test_multiple_derived_inputs.py",
+          "research_workflow/tests/test_oos_analysis_lineage.py",
+          "research_workflow/tests/test_ordered_barrier_entry_reference.py",
+          "research_workflow/tests/test_provider_host_audit.py",
+          "research_workflow/tests/test_redteam_pass1_acceptance.py",
+          "research_workflow/tests/test_redteam_pass2_acceptance.py",
+          "research_workflow/tests/test_redteam_pass2_target_semantics.py",
+          "research_workflow/tests/test_single_primitive_ordered_barrier_regression.py",
+          "research_workflow/tests/test_stage3_integration.py",
+          "research_workflow/tests/test_target_runtime.py",
+          "research_workflow/tests/test_target_session_policy_fidelity.py",
+          "scripts/tests/test_analysis_loader.py",
+          "scripts/tests/test_analysis_redteam_regressions.py",
+          "scripts/tests/test_analysis_reporting.py",
+          "scripts/tests/test_analysis_spec_slices_metrics.py",
+          "scripts/tests/test_registry_universe_output_contract.py",
+          "scripts/tests/test_target_censoring.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_directional_displacement_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_directional_displacement_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "regime_directional_displacement_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_duration_min (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_duration_min",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "regime_duration_min",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_feature_system_v2.py",
+          "features/tests/test_generic_episode_geometry.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_efficiency (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_efficiency",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "regime_efficiency",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_feature_ctl_request_resolution.py",
+          "features/tests/test_feature_system_v2.py",
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host_audit.py",
+          "research_workflow/tests/test_stage3_integration.py",
+          "scripts/tests/test_capabilities.py",
+          "scripts/tests/test_generic_contract_audit.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_expansion_atr_per_min (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_expansion_atr_per_min",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "regime_expansion_atr_per_min",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_provider_host_audit.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_mfe_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_mfe_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "regime_mfe_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [
+          "scripts/tests/test_generic_contract_audit.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_net_directional_move_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_net_directional_move_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "regime_net_directional_move_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_net_move_atr_per_min (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_net_move_atr_per_min",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "regime_net_move_atr_per_min",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_range_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_range_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "regime_range_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [
+          "scripts/tests/test_generic_contract_audit.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature regime_range_atr_per_min (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.regime_range_atr_per_min",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "regime_range_atr_per_min",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature regime_sequence_metric (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.regime_sequence_metric",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 100,
+        "name": "regime_sequence_metric",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "lookback",
+          "metric"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature relative_volume (arrival_volume)",
+        "dtype": "float64",
+        "id": "feature.relative_volume",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "relative_volume",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "aggregation_lookback",
+          "bar_state",
+          "baseline_lookback",
+          "input_timeframe"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_provider_parameterization.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature retracement_pct (pullback_1m)",
+        "dtype": "float64",
+        "id": "feature.retracement_pct",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "retracement_pct",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature rolling_current_progress_atr (rolling_5m_productivity)",
+        "dtype": "float64",
+        "id": "feature.rolling_current_progress_atr",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_rolling_productivity.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "rolling_current_progress_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "update_every",
+          "window"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature rolling_current_speed_atr_per_min (rolling_5m_productivity)",
+        "dtype": "float64",
+        "id": "feature.rolling_current_speed_atr_per_min",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_rolling_productivity.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "rolling_current_speed_atr_per_min",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "update_every",
+          "window"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature rolling_current_speed_vs_lifetime (rolling_5m_productivity)",
+        "dtype": "float64",
+        "id": "feature.rolling_current_speed_vs_lifetime",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_rolling_productivity.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "rolling_current_speed_vs_lifetime",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "update_every",
+          "window"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature rolling_giveback_atr (rolling_5m_productivity)",
+        "dtype": "float64",
+        "id": "feature.rolling_giveback_atr",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_rolling_productivity.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "rolling_giveback_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "update_every",
+          "window"
+        ],
+        "required_tests": [
+          "scripts/tests/test_generic_contract_audit.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature rolling_max_progress_atr (rolling_5m_productivity)",
+        "dtype": "float64",
+        "id": "feature.rolling_max_progress_atr",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_rolling_productivity.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "rolling_max_progress_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "update_every",
+          "window"
+        ],
+        "required_tests": [
+          "scripts/tests/test_generic_contract_audit.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature rolling_max_speed_atr_per_min (rolling_5m_productivity)",
+        "dtype": "float64",
+        "id": "feature.rolling_max_speed_atr_per_min",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_rolling_productivity.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "rolling_max_speed_atr_per_min",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "update_every",
+          "window"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature rolling_max_speed_vs_lifetime (rolling_5m_productivity)",
+        "dtype": "float64",
+        "id": "feature.rolling_max_speed_vs_lifetime",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_rolling_productivity.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "rolling_max_speed_vs_lifetime",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "update_every",
+          "window"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature rolling_retention_ratio (rolling_5m_productivity)",
+        "dtype": "float64",
+        "id": "feature.rolling_retention_ratio",
+        "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_rolling_productivity.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "rolling_retention_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "update_every",
+          "window"
+        ],
+        "required_tests": [
+          "features/tests/test_feature_system_v2.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature second_half_est_delta_ratio (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.second_half_est_delta_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "second_half_est_delta_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature second_half_vol (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.second_half_vol",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "second_half_vol",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature seconds_in_current_ordering (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.seconds_in_current_ordering",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "seconds_in_current_ordering",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature seconds_since_prevailing_directional_extreme (pullback_sequence_maturity)",
+        "dtype": "float64",
+        "id": "feature.seconds_since_prevailing_directional_extreme",
+        "implementation": "features.trackers.generic_episode_geometry.GenericEpisodeGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_episode_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "seconds_since_prevailing_directional_extreme",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "timeframe",
+          "context",
+          "bar_state"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_provider_host.py",
+          "research_workflow/tests/test_stage3_integration.py"
+        ],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature session_elapsed (context)",
+        "dtype": "float64",
+        "id": "feature.session_elapsed",
+        "implementation": "features.trackers.generic_context.GenericContextProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_context.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "session_elapsed",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "session",
+          "unit"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature session_membership (context)",
+        "dtype": "float64",
+        "id": "feature.session_membership",
+        "implementation": "features.trackers.generic_context.GenericContextProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_context.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "session_membership",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "session"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature slope__aligned_atr (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.slope__aligned_atr",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 9,
+        "name": "slope__aligned_atr",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe",
+          "timeframe_2"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature spike (arrival_volume)",
+        "dtype": "float64",
+        "id": "feature.spike",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "spike",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [],
+        "required_tests": [
+          "research_workflow/tests/test_population_runtime.py",
+          "scripts/tests/test_resampling.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature spread_change (regime_median_center_slope_alignment)",
+        "dtype": "float64",
+        "id": "feature.spread_change",
+        "implementation": "features.trackers.generic_median_center.GenericMedianCenterCompatibilityProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_median_center.py",
+        "kind": "features",
+        "legacy_alias_count": 3,
+        "name": "spread_change",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "timeframe",
+          "timeframe_2"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature structural_current_expansion_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.structural_current_expansion_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "structural_current_expansion_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature structural_expansion_atr_per_min (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.structural_expansion_atr_per_min",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "structural_expansion_atr_per_min",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature structural_giveback_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.structural_giveback_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "structural_giveback_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature structural_max_expansion_atr (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.structural_max_expansion_atr",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "structural_max_expansion_atr",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s",
+          "stream.completed_5m"
+        ],
+        "description": "Canonical feature structural_retention_ratio (structural_regime_geometry)",
+        "dtype": "float64",
+        "id": "feature.structural_retention_ratio",
+        "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_structural_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "structural_retention_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature swing_count (pullback_1m, pullback_1s)",
+        "dtype": "float64",
+        "id": "feature.swing_count",
+        "implementation": "features.trackers.generic_pullback.GenericPullbackProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_pullback.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "swing_count",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "scope",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature trend_normalized_est_delta_sum (direction_normalized_ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.trend_normalized_est_delta_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "trend_normalized_est_delta_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "window",
+          "update_every",
+          "direction_reference"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_stage3_integration.py",
+          "scripts/tests/test_feature_binding_identity.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature trend_normalized_est_delta_sum_ratio (direction_normalized_ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.trend_normalized_est_delta_sum_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 0,
+        "name": "trend_normalized_est_delta_sum_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "numerator_window",
+          "denominator_window",
+          "update_every",
+          "direction_reference"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_episode_geometry.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature up_down_vol_ratio (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.up_down_vol_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "up_down_vol_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature upbar_vol_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.upbar_vol_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "upbar_vol_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature vol_cum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.vol_cum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "vol_cum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [
+          "scripts/tests/test_nt_runner_collect.py"
+        ],
+        "reset_policies": [
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature vol_max (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.vol_max",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "vol_max",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe",
+          "timeframe_2"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature vol_mean (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.vol_mean",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "vol_mean",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe",
+          "timeframe_2"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature vol_sum (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.vol_sum",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 9,
+        "name": "vol_sum",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start",
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature vol_sum_vs_ratio (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.vol_sum_vs_ratio",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "vol_sum_vs_ratio",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe",
+          "timeframe_2"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature volume_per_atr_moved (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.volume_per_atr_moved",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 9,
+        "name": "volume_per_atr_moved",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start",
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature volume_per_point_moved (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.volume_per_point_moved",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "volume_per_point_moved",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m",
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature volume_per_second (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.volume_per_second",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 2,
+        "name": "volume_per_second",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "context"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "event_start",
+          "session_boundary"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature volume_price_correlation (arrival_volume)",
+        "dtype": "float64",
+        "id": "feature.volume_price_correlation",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "volume_price_correlation",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "window"
+        ],
+        "required_tests": [
+          "features/tests/test_generic_provider_parameterization.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature volume_trend (arrival_volume)",
+        "dtype": "float64",
+        "id": "feature.volume_trend",
+        "implementation": "features.trackers.generic_arrival.GenericArrivalVolumeProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_arrival.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "volume_trend",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "window"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1m"
+        ],
+        "description": "Canonical feature wick_imbalance (wick_imbalance)",
+        "dtype": "float64",
+        "id": "feature.wick_imbalance",
+        "implementation": "features.trackers.generic_bar_geometry.GenericWickImbalanceProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_bar_geometry.py",
+        "kind": "features",
+        "legacy_alias_count": 1,
+        "name": "wick_imbalance",
+        "null_policies": [
+          "allow"
+        ],
+        "parameters": [
+          "bar_state",
+          "timeframe"
+        ],
+        "required_tests": [
+          "scripts/tests/test_deliverables_and_generated_contracts.py"
+        ],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Canonical feature window_available (ohlcv_est_delta)",
+        "dtype": "float64",
+        "id": "feature.window_available",
+        "implementation": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/generic_ohlcv_delta.py",
+        "kind": "features",
+        "legacy_alias_count": 8,
+        "name": "window_available",
+        "null_policies": [
+          "disallow"
+        ],
+        "parameters": [
+          "context",
+          "timeframe"
+        ],
+        "required_tests": [],
+        "reset_policies": [
+          "none"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "active"
+      }
+    ],
+    "model_drivers": [
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "LightGBM classifier; canonical representation = native text booster (portable).",
+        "id": "model.lightgbm",
+        "implementation": "research.analysis.modeling.fit_model",
+        "implementation_note": "Fits one arm and records complete provenance.",
+        "implementation_verified": true,
+        "kind": "model_drivers",
+        "missing_tests": [],
+        "name": "lightgbm",
+        "parameters": [
+          "n_estimators",
+          "learning_rate",
+          "max_depth",
+          "num_leaves",
+          "min_data_in_leaf",
+          "seed"
+        ],
+        "required_tests": [
+          "scripts/tests/test_analysis_modeling.py",
+          "scripts/tests/test_model_store.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "scikit-learn GradientBoostingClassifier; canonical representation = environment-bound pickle.",
+        "id": "model.gradient_boosting",
+        "implementation": "research.analysis.modeling.fit_model",
+        "implementation_note": "Fits one arm and records complete provenance.",
+        "implementation_verified": true,
+        "kind": "model_drivers",
+        "missing_tests": [],
+        "name": "gradient_boosting",
+        "parameters": [
+          "n_estimators",
+          "learning_rate",
+          "max_depth",
+          "seed"
+        ],
+        "required_tests": [
+          "scripts/tests/test_analysis_modeling.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "scikit-learn LogisticRegression; canonical representation = environment-bound pickle.",
+        "id": "model.logistic_regression",
+        "implementation": "research.analysis.modeling.fit_model",
+        "implementation_note": "Fits one arm and records complete provenance.",
+        "implementation_verified": true,
+        "kind": "model_drivers",
+        "missing_tests": [],
+        "name": "logistic_regression",
+        "parameters": [
+          "C",
+          "max_iter",
+          "seed"
+        ],
+        "required_tests": [
+          "scripts/tests/test_analysis_modeling.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "per_candidate",
+        "dependencies": [
+          "model.lightgbm"
+        ],
+        "description": "Another study's frozen TRAIN score as a derived causal input, resolved by model_id through the model store.",
+        "id": "model.frozen_external_score",
+        "implementation": "research_workflow.external_model_scoring.ExternalModelScoringError",
+        "implementation_note": "",
+        "implementation_verified": true,
+        "kind": "model_drivers",
+        "missing_tests": [],
+        "name": "frozen_external_score",
+        "parameters": [
+          "model_id",
+          "availability_reference"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_external_model_scoring.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      }
+    ],
+    "outcomes": [
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "tracker.regime.dual_ema"
+        ],
+        "description": "Prevailing regime flips within the declared horizon (binary label, session-end censoring).",
+        "id": "outcome.flip_within_horizon",
+        "implementation": "research_workflow.target_runtime.FlipTargetRuntime",
+        "implementation_note": "",
+        "implementation_verified": true,
+        "kind": "outcomes",
+        "missing_tests": [],
+        "name": "flip_within_horizon",
+        "parameters": [
+          "horizon_seconds",
+          "direction",
+          "session_end_censoring"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_target_runtime.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_event",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s",
+          "entry.next_bar_open"
+        ],
+        "description": "Favorable-before-adverse ATR barrier race off the 1s tape, entry reference and ATR frozen at T; censor/negative expiry policy.",
+        "id": "outcome.ordered_barrier",
+        "implementation": "research_workflow.target_runtime.OrderedBarrierTargetRuntime",
+        "implementation_note": "Asymmetric direction-normalized favorable/adverse ATR barrier race.",
+        "implementation_verified": true,
+        "kind": "outcomes",
+        "missing_tests": [],
+        "name": "ordered_barrier",
+        "parameters": [
+          "favorable_atr",
+          "adverse_atr",
+          "horizon_seconds",
+          "horizon_expiry_policy",
+          "entry_reference",
+          "atr_frozen_at"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_ordered_barrier_entry_reference.py",
+          "research_workflow/tests/test_single_primitive_ordered_barrier_regression.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "outcome.flip_within_horizon",
+          "outcome.ordered_barrier"
+        ],
+        "description": "AND/OR composition of outcome children with monotone worst_status censoring; independent replay oracle.",
+        "id": "outcome.composite",
+        "implementation": "research_workflow.target_runtime.CompositeTargetRuntime",
+        "implementation_note": "Executes the FULL compiled Boolean target expression.",
+        "implementation_verified": true,
+        "kind": "outcomes",
+        "missing_tests": [],
+        "name": "composite",
+        "parameters": [
+          "conditions",
+          "condition_logic"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_composite_target_expression.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "tracker.forward.observation"
+        ],
+        "description": "Forward MFE/MAE/return path labels for proposed entries (post-event artifact, guarded from model inputs).",
+        "id": "outcome.forward_excursion",
+        "implementation": "research_workflow.forward_outcomes.contracts.ForwardOutcomeSpec",
+        "implementation_note": "Declarative description of the future-path measurement.",
+        "implementation_verified": true,
+        "kind": "outcomes",
+        "missing_tests": [],
+        "name": "forward_excursion",
+        "parameters": [
+          "horizon_seconds",
+          "excursion_units",
+          "bar_inclusion",
+          "session_end_censoring"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_forward_outcomes.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      }
+    ],
+    "streams": [
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.ES_v0_2020_2026"
+        ],
+        "description": "1s external catalog stream of ES_v0_2020_2026",
+        "id": "stream.ES_v0_2020_2026.1s",
+        "implementation": "ES.XCME-1-SECOND-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "ES_v0_2020_2026:1s",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9fa50102a121"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.ES_v0_2020_2026"
+        ],
+        "description": "1m external catalog stream of ES_v0_2020_2026",
+        "id": "stream.ES_v0_2020_2026.1m",
+        "implementation": "ES.XCME-1-MINUTE-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "ES_v0_2020_2026:1m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9fa50102a121"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.ES_v0_2020_2026",
+          "stream.ES_v0_2020_2026.1m"
+        ],
+        "description": "5m derived stream of ES_v0_2020_2026",
+        "id": "stream.ES_v0_2020_2026.5m",
+        "implementation": "CompletedMinuteFiveMinuteAggregator",
+        "kind": "streams",
+        "name": "ES_v0_2020_2026:5m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9fa50102a121"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_v0_2020_2026"
+        ],
+        "description": "1s external catalog stream of NQ_v0_2020_2026",
+        "id": "stream.NQ_v0_2020_2026.1s",
+        "implementation": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "NQ_v0_2020_2026:1s",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "1a0d41d8da97"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_v0_2020_2026"
+        ],
+        "description": "1m external catalog stream of NQ_v0_2020_2026",
+        "id": "stream.NQ_v0_2020_2026.1m",
+        "implementation": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "NQ_v0_2020_2026:1m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "1a0d41d8da97"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_v0_2020_2026",
+          "stream.NQ_v0_2020_2026.1m"
+        ],
+        "description": "5m derived stream of NQ_v0_2020_2026",
+        "id": "stream.NQ_v0_2020_2026.5m",
+        "implementation": "CompletedMinuteFiveMinuteAggregator",
+        "kind": "streams",
+        "name": "NQ_v0_2020_2026:5m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "1a0d41d8da97"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.YM_v0_2024"
+        ],
+        "description": "1s external catalog stream of YM_v0_2024",
+        "id": "stream.YM_v0_2024.1s",
+        "implementation": "YM.XCBT-1-SECOND-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "YM_v0_2024:1s",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "6f532e9bf8f7"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.YM_v0_2024"
+        ],
+        "description": "1m external catalog stream of YM_v0_2024",
+        "id": "stream.YM_v0_2024.1m",
+        "implementation": "YM.XCBT-1-MINUTE-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "YM_v0_2024:1m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "6f532e9bf8f7"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.YM_v0_2024",
+          "stream.YM_v0_2024.1m"
+        ],
+        "description": "5m derived stream of YM_v0_2024",
+        "id": "stream.YM_v0_2024.5m",
+        "implementation": "CompletedMinuteFiveMinuteAggregator",
+        "kind": "streams",
+        "name": "YM_v0_2024:5m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "6f532e9bf8f7"
+      }
+    ],
+    "trackers": [
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "stream.completed_bar"
+        ],
+        "description": "Canonical dual-EMA(3/9 high-low) regime state with Wilder ATR(14), parameterized by timeframe/instrument; parity-tested against the accepted collector_v2 engine.",
+        "id": "tracker.regime.dual_ema",
+        "implementation": "features.trackers.regime_dual_ema.DualEmaRegimeTracker",
+        "implementation_note": "module import failed: ModuleNotFoundError: No module named 'features.trackers.regime_dual_ema'",
+        "implementation_verified": false,
+        "kind": "trackers",
+        "missing_tests": [
+          "features/tests/test_regime_dual_ema_parity.py"
+        ],
+        "name": "regime.dual_ema",
+        "parameters": [
+          "timeframe",
+          "instrument",
+          "short_period",
+          "long_period",
+          "atr_period"
+        ],
+        "required_tests": [
+          "features/tests/test_regime_dual_ema_parity.py"
+        ],
+        "status": "broken",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Completed-bar regime state for several timeframes, aggregated from completed 1s bars; exposes only causally available frozen states.",
+        "id": "tracker.regime.completed_state_feed",
+        "implementation": "research_workflow.completed_regime_state.CompletedRegimeStateFeed",
+        "implementation_note": "Aggregate completed 1s bars and expose only causally available frozen states.",
+        "implementation_verified": true,
+        "kind": "trackers",
+        "missing_tests": [],
+        "name": "regime.completed_state_feed",
+        "parameters": [
+          "timeframes",
+          "atr_period"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_population_runtime.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "tracker.regime.completed_state_feed",
+          "stream.completed_1s"
+        ],
+        "description": "Episode lifecycle (arm on adverse excursion, re-arm on new favorable extreme, terminate on prevailing flip) driving candidate existence.",
+        "id": "tracker.episode.population_engine",
+        "implementation": "research_workflow.episode_population.EpisodePopulationEngine",
+        "implementation_note": "Evaluate one declared directional threshold/transition episode protocol.",
+        "implementation_verified": true,
+        "kind": "trackers",
+        "missing_tests": [],
+        "name": "episode.population_engine",
+        "parameters": [
+          "rearm_on",
+          "terminate_on",
+          "arm_condition"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_episode_population.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "stream.completed_1s"
+        ],
+        "description": "Streaming per-entry forward-path observation (MFE/MAE/horizon) for proposed entries; labels only, never inputs.",
+        "id": "tracker.forward.observation",
+        "implementation": "research_workflow.forward_outcomes.tracker.ForwardObservation",
+        "implementation_note": "Mutable per-entry future-path state. One instance per live proposed entry.",
+        "implementation_verified": true,
+        "kind": "trackers",
+        "missing_tests": [],
+        "name": "forward.observation",
+        "parameters": [
+          "spec"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_forward_outcomes.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      }
+    ],
+    "trigger_primitives": [
+      {
+        "cost_class": "per_candidate",
+        "dependencies": [
+          "tracker.regime.dual_ema",
+          "stream.completed_1s"
+        ],
+        "description": "Checkpoint-grid candidate qualification (age gate, running MFE, progress windows, retained MFE ratio) evaluated at each cadence checkpoint.",
+        "id": "trigger.population.established_filter",
+        "implementation": "research_workflow.generic_collector.FlipPredictionCollector",
+        "implementation_note": "Canonical event-driven collector strategy for flip prediction research.",
+        "implementation_verified": true,
+        "kind": "trigger_primitives",
+        "missing_tests": [],
+        "name": "population.established_filter",
+        "parameters": [
+          "age_gate_seconds",
+          "cadence_seconds",
+          "running_mfe_atr_gte",
+          "new_progress_windows_gte",
+          "retained_mfe_ratio_gte",
+          "session"
+        ],
+        "required_tests": [
+          "scripts/tests/test_population_funnel.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      },
+      {
+        "cost_class": "per_candidate",
+        "dependencies": [
+          "trigger.population.established_filter"
+        ],
+        "description": "Candidate qualification by an externally frozen (regime_start_ns, checkpoint_index) identity table.",
+        "id": "trigger.population.identity_allowlist",
+        "implementation": "research_workflow.generic_collector.verify_checkpoint_identities_authority",
+        "implementation_note": "Verify allowlist bytes before any parquet decoder/candidate generation runs.",
+        "implementation_verified": true,
+        "kind": "trigger_primitives",
+        "missing_tests": [],
+        "name": "population.identity_allowlist",
+        "parameters": [
+          "required_checkpoint_identities_path"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_population_qualification_strictness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "tracker.episode.population_engine"
+        ],
+        "description": "Watch/arm/emit state machine over completed 5s regime turns within a prevailing 1m regime (deep-pullback family).",
+        "id": "trigger.episode.lifecycle",
+        "implementation": "research_workflow.population_runtime.EpisodePopulationRuntime",
+        "implementation_note": "Binds ``population_contract.episode_lifecycle`` to ``EpisodePopulationEngine``.",
+        "implementation_verified": true,
+        "kind": "trigger_primitives",
+        "missing_tests": [],
+        "name": "episode.lifecycle",
+        "parameters": [
+          "episode_lifecycle"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_population_runtime.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      }
+    ],
+    "validation_protocols": [
+      {
+        "cost_class": "offline_only",
+        "dependencies": [
+          "model.lightgbm"
+        ],
+        "description": "Bounded TRAIN-only grid search over choice domains with walk-forward tuning folds; refuses grids exceeding max_trials.",
+        "id": "validation.model_selection.grid",
+        "implementation": "research_workflow.model_selection.run_model_selection",
+        "implementation_note": "Runs the declared bounded search per arm and writes",
+        "implementation_verified": true,
+        "kind": "validation_protocols",
+        "missing_tests": [],
+        "name": "model_selection.grid",
+        "parameters": [
+          "max_trials",
+          "tuning_years",
+          "final_train_validation_years",
+          "primary_selection_metric"
+        ],
+        "required_tests": [
+          "scripts/tests/test_study_spec_extensions.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [
+          "model.lightgbm"
+        ],
+        "description": "Bounded TRAIN-only random search counting unique configurations; deterministic from random_seed.",
+        "id": "validation.model_selection.random",
+        "implementation": "research_workflow.model_selection.run_model_selection",
+        "implementation_note": "Runs the declared bounded search per arm and writes",
+        "implementation_verified": true,
+        "kind": "validation_protocols",
+        "missing_tests": [],
+        "name": "model_selection.random",
+        "parameters": [
+          "max_trials",
+          "random_seed",
+          "tuning_years",
+          "final_train_validation_years"
+        ],
+        "required_tests": [
+          "scripts/tests/test_study_spec_extensions.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [
+          "validation.model_selection.grid"
+        ],
+        "description": "Accept/reject the already-selected winner on final_train_validation_years; never re-selects.",
+        "id": "validation.final_train_validation.gated",
+        "implementation": "research_workflow.modeling.freeze_train_artifacts",
+        "implementation_note": "Freeze all TRAIN-derived objects before any OOS frame is accepted.",
+        "implementation_verified": true,
+        "kind": "validation_protocols",
+        "missing_tests": [],
+        "name": "final_train_validation.gated",
+        "parameters": [
+          "final_validation_policy",
+          "final_validation_requirements"
+        ],
+        "required_tests": [
+          "scripts/tests/test_direction_qualified_freeze_binding.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "READINESS gate R1-R10 on bounded real samples (dataset identity + digest, timestamp contracts, callback order, collector construction, output interface, identity stability, alternate opener scan, first-output parity).",
+        "id": "validation.readiness.r1_r10",
+        "implementation": "research_workflow.readiness.run_readiness",
+        "implementation_note": "Runs R1-R9 and persists the READINESS artifact. Does not raise on a failed check",
+        "implementation_verified": true,
+        "kind": "validation_protocols",
+        "missing_tests": [],
+        "name": "readiness.r1_r10",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "Deterministic preflight (EXECUTION_MANIFEST, CAUSAL_LINT, ARTIFACT_SCHEMA, FEATURE_PROMOTION, RESEARCH_DECISION_FIDELITY, CAUSAL_INVARIANTS, REQUIRED_GATES).",
+        "id": "validation.preflight.deterministic",
+        "implementation": "research_workflow.preflight.run_preflight",
+        "implementation_note": "",
+        "implementation_verified": true,
+        "kind": "validation_protocols",
+        "missing_tests": [],
+        "name": "preflight.deterministic",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_research_preflight.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [
+          "outcome.composite"
+        ],
+        "description": "Independent second implementation of target resolution; zero-mismatch parity required before TRAIN.",
+        "id": "validation.target_replay_oracle",
+        "implementation": "research_workflow.target_replay_oracle.replay_expression",
+        "implementation_note": "Independently evaluate the FULL compiled target expression.",
+        "implementation_verified": true,
+        "kind": "validation_protocols",
+        "missing_tests": [],
+        "name": "target_replay_oracle",
+        "parameters": [],
+        "required_tests": [
+          "research_workflow/tests/test_bare_flip_independent_parity.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      }
+    ]
+  },
+  "schema_version": 1,
+  "summary": {
+    "datasets": {
+      "broken": 0,
+      "count": 3
+    },
+    "entry_references": {
+      "broken": 0,
+      "count": 3
+    },
+    "features": {
+      "broken": 0,
+      "count": 143
+    },
+    "model_drivers": {
+      "broken": 0,
+      "count": 4
+    },
+    "outcomes": {
+      "broken": 0,
+      "count": 4
+    },
+    "streams": {
+      "broken": 0,
+      "count": 9
+    },
+    "total": 179,
+    "trackers": {
+      "broken": 1,
+      "count": 4
+    },
+    "trigger_primitives": {
+      "broken": 0,
+      "count": 3
+    },
+    "validation_protocols": {
+      "broken": 0,
+      "count": 6
+    }
+  }
+}
