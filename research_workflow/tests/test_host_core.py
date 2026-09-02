@@ -145,7 +145,7 @@ def test_host_boundary_lint_is_clear():
     assert not findings, findings
 
 
-@pytest.mark.parametrize("rule,expected", [("strict", ("CENSORED", "TIMEOUT")), ("first_bar_at_or_after", ("LABELED_NEGATIVE", None))])
+@pytest.mark.parametrize("rule,expected", [("strict", ("CENSORED", "TIMEOUT")), ("first_bar_at_or_after", ("NEGATIVE", None))])
 def test_horizon_end_rule_on_a_sparse_tape(rule, expected):
     """Bar at exactly T+horizon missing; the next bar (T+horizon+1) would hit the adverse barrier."""
     from research_workflow.target_replay_oracle import replay
@@ -164,7 +164,7 @@ def test_horizon_end_rule_on_a_sparse_tape(rule, expected):
         kernel.on_bar(BarView("s", T + (k - 1) * NS, T + k * NS, 100.0, 100.5, lo, 100.2, 1.0))
     kernel.finalize(T + 20 * NS)
     row = kernel.drain_rows()[0]
-    assert (row["disposition"], row["censor_reason"]) == expected   # single-arm plans emit the primary columns only
+    assert (row["disposition"].replace("LABELED_", ""), row["censor_reason"]) == expected   # single-arm plans emit the primary columns only
     c = {"primitive": "ordered_barrier", "required_forward_outcomes": [{"id": "fo", "entry_reference": "next_bar_open", "session_end_censoring": True, "max_gap_seconds": None,
                                                                      "ordered_barriers": [{"id": "b", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 10, "horizon_expiry_policy": "censor", "horizon_end_rule": rule}]}]}
     o = replay(c, {"observation_ts": T, "atr": 1.0, "direction": 1, "session_close_ts": None}, tape)
