@@ -85,6 +85,7 @@ class LabelOutcomeContract:
     session_end_censoring: bool
     max_gap_ns: Optional[int]
     same_bar_rule: str
+    horizon_end_rule: str = "strict"
     arms: Tuple[BarrierArm, ...] = ()
     flip: Optional[FlipItem] = None
     primary_arm: Optional[str] = None
@@ -103,7 +104,7 @@ class LabelOutcomeContract:
         flip = spec.get("flip")
         return cls(kernel=str(spec["kernel"]), direction_ref=str(spec["direction"]), atr_ref=spec.get("atr"),
                    entry_reference=str(spec.get("entry_reference", "next_bar_open")),
-                   session_end_censoring=bool(spec.get("session_end_censoring", True)),
+                   session_end_censoring=bool(spec.get("session_end_censoring", True)), horizon_end_rule=str(spec.get("horizon_end_rule", "strict")),
                    max_gap_ns=(int(spec["max_gap_ns"]) if spec.get("max_gap_ns") is not None else None),
                    same_bar_rule=str(spec.get("same_bar_rule", "ambiguous_censor")), arms=arms,
                    flip=(FlipItem(int(flip["horizon_ns"]), str(flip["source"]), str(flip.get("role", "opposite")),
@@ -318,8 +319,25 @@ class LabelOutcomeKernel:
                     if p.arm_state[i] is not None:
                         continue
                     end = p.arm_end[i]
-                    if ts > end:
+                    past_end = ts > end
+                    if past_end and self.c.horizon_end_rule == "strict":
                         self._expire_arm(p, i)
+                        continue
+                    if past_end:
+                        # first_bar_at_or_after: this bar is evaluated for a hit, then the arm expires
+                        d = p.direction
+                        good, bad = p.arm_good[i], p.arm_bad[i]
+                        hit_good = hi >= good if d > 0 else lo <= good
+                        hit_bad = lo <= bad if d > 0 else hi >= bad
+                        if hit_good and hit_bad:
+                            adverse_first = self.c.same_bar_rule == "adverse_first"
+                            self._resolve_arm(p, i, NEGATIVE if adverse_first else CENSORED, ts, None if adverse_first else "AMBIGUOUS_SAME_BAR_TOUCH")
+                        elif hit_good:
+                            self._resolve_arm(p, i, POSITIVE, ts, None)
+                        elif hit_bad:
+                            self._resolve_arm(p, i, NEGATIVE, ts, None)
+                        else:
+                            self._expire_arm(p, i)
                         continue
                     if p.session_close is not None and ts > p.session_close:
                         self._resolve_arm(p, i, CENSORED, ts, "SESSION_END")
