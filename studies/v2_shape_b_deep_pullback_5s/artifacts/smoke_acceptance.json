@@ -1,0 +1,57 @@
+{
+  "candidates_count_total": 89,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true
+  },
+  "date": "2021-01-05",
+  "execution_manifest_composite_sha256": "0db52eeff6bbe048a4bf6adb8652df4aa94b14915e1f311a851a2b5ebd7fcca0",
+  "generated_at_utc": "2026-09-02T19:33:54.848228+00:00",
+  "manifest": {
+    "candidates_sha256": "8814b0445a5a4f2687ed592a7ff62b54fd365d3c0a5d899a4d35c96d1c4b5e5e",
+    "composite_seal_hash": "870ef6adcee87cb35b597de1d85a69bdb175429cd12e7cc6deff52ac7fb1680a",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2021-01-05",
+    "elapsed_s": 8.362532999948598,
+    "execution_manifest_sha256": "0db52eeff6bbe048a4bf6adb8652df4aa94b14915e1f311a851a2b5ebd7fcca0",
+    "kind": "smoke",
+    "observations_sha256": "90170536370333d7aa2003bae2ef0b1b253e0bc25fbc29c452cc8a71508bdd21",
+    "plan_sha256": "e4d66bedf80ebc239e377dd41994e7ab83c4d8bfd670d7056c3e3ae34595300d",
+    "rows": {
+      "candidates": 89,
+      "observations": 89
+    },
+    "stats": {
+      "bars": 103305,
+      "bars_by_stream": {
+        "nq_1m": 2790,
+        "nq_1s": 100515,
+        "nq_5m": 54,
+        "nq_5s": 10600
+      },
+      "candidates": 89,
+      "dropped_outside_primary": {
+        "candidates": 73,
+        "observations": 73
+      },
+      "epochs": 100515,
+      "observations": 89,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-02T19:33:54.832066+00:00"
+  },
+  "observations_count_total": 89,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-platform-v2-do-soon-v2_shape_b_deep_pullback_5s\\studies\\v2_shape_b_deep_pullback_5s\\runs\\20260902_193343_v2_shape_b_deep_pullback_5s_smoke",
+  "sealed_composite_sha256": "870ef6adcee87cb35b597de1d85a69bdb175429cd12e7cc6deff52ac7fb1680a",
+  "status": "ACCEPTED",
+  "study_name": "v2_shape_b_deep_pullback_5s",
+  "validator": "research_workflow.lifecycle_v2"
+}

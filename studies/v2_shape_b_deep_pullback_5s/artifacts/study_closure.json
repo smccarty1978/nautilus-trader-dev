@@ -1,0 +1,15 @@
+{
+  "bound_evidence": {
+    "preexec_seal_artifact_sha256": "93175a5f3fa404b5bf9330b7f3c02b9cfe4c2171885d1449fae8aaa5b71429b0",
+    "preexec_seal_composite_sha256": "870ef6adcee87cb35b597de1d85a69bdb175429cd12e7cc6deff52ac7fb1680a",
+    "train_freeze_sha256": "0e9e8dbcf6c48fddec76fcd6cf38cdee7c53c6fc904aca64089d1724f288e325"
+  },
+  "closed_at_utc": "2026-09-02T20:14:46.102490+00:00",
+  "outcome": "PARITY_PASS_WITH_EXPLAINED_DIVERGENCE: 2021 TRAIN 18805/18805 candidates exact (46 cols), 2022 OOS 21886/21886 exact; 16 session_close_ts rows differ by one DST hour on transition Sundays (reference-side defect, labels identical)",
+  "plan_sha256": "e4d66bedf80ebc239e377dd41994e7ab83c4d8bfd670d7056c3e3ae34595300d",
+  "platform": "v2",
+  "schema_version": 1,
+  "status": "CLOSED",
+  "study_id": "v2_shape_b_deep_pullback_5s",
+  "terminal_decision": "PLATFORM_V2_SHAPE_B_PROVEN: stateful trigger graph, derived 5s/5m, expiry/re-arm and frozen external score reproduced by a declarative study with zero study Python"
+}
