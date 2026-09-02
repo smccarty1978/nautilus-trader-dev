@@ -23,6 +23,8 @@ some are cited from git history and audit trails. **They are never a source of i
 
 ## AUTHORITATIVE
 
+- `docs/RESEARCH_WORKFLOW.md` §21 and `docs/GOVERNED_STUDY_CONTROLLER.md` (Platform V2 section) describe the declarative V2 research flow (2026-09-02). Older flow descriptions in §3/§7 remain authoritative for sealed historical studies only.
+
 | Document | Scope |
 |---|---|
 | `docs/RESEARCH_WORKFLOW.md` | The end-to-end research system: architecture, Feature V2, lifecycle, collector, forward outcomes, scripts, autonomy, data safety |

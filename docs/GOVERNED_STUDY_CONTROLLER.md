@@ -89,3 +89,33 @@ authority and is never rewritten.
 `scripts/reconcile_study_capabilities.py` are deprecated shims that print a card and exit 2.
 `research_workflow/lifecycle.py` and `workflow_engine.py` remain internal leaves, not operator
 entry points. Sealed studies keep their historical execution authority at their own commit.
+
+## Platform V2 studies
+
+A study whose `study.yaml` is grammar-v2 (`research_workflow.lifecycle_v2.is_v2_study`) is
+dispatched by `scripts/run_governed_study.py` / `research study run` to
+`research_workflow.governed_controller_v2.V2StudyController`, whose leaves live in
+`research_workflow/lifecycle_v2.py`. The stage order and receipt rules are unchanged; the
+stage bodies are:
+
+| Stage | V2 body | Artifact |
+| --- | --- | --- |
+| `compile` | static compile; typed gaps → `CAPABILITY_BLOCKER` card | `compiled_plan.json`, `artifacts/compile_card.json` |
+| `prepare` | experiment authorization + execution manifest from the plan closure | `artifacts/experiment_authorization.json`, `audit/frozen_execution_manifest.json` |
+| `readiness` | R1 dataset roots + bytes, R3 session table, R5 binding proof, R8 host lint, R9 closure current | `audit/readiness.json` |
+| `preflight` | plan bound to spec, manifest, executable entry reference, outcome guard, chronology role table, predicates compile, causal invariants | `audit/preflight.json` |
+| `tests` | pytest over the platform test set | `_work/controller/test_summary.json` |
+| `causal_audit` / `contract_audit` | writes the compact packet; blocks until `research audit ingest` binds a CLEAR report to the frozen composite | `_work/controller/audit_packet_*.json`, `audit/status.json`, `audit/contract_status.json` |
+| `seal` | pre-execution seal over plan + audits | `artifacts/preexec_audit_seal.json` |
+| `smoke` | one authorized day (`--smoke-date` or `chronology.authorized_dates[0]`) with acceptance checks | `runs/<stamp>_<id>_smoke/`, `artifacts/smoke_acceptance.json` |
+| `collection` | one child process per TRAIN year (`python -m research_workflow.lifecycle_v2 partition ...`), manifests, resume | `_work/controller/partitions/train/<year>/` |
+| `reconcile` / `merge` | partition reconciliation; deterministic merge + identity | `_work/controller/merged/` |
+| `fit` | train mode: governed fit → model store (registry tier); score mode: frozen models scored per declared subset, nothing trained | `artifacts/experiment_models.json` |
+| `freeze` | TRAIN freeze binding model hashes and the merge identity | `artifacts/train_experiment_freeze.json` |
+| `oos` / `analyze` | dev-year partitions after `assert_oos_open`; metrics per model | `_work/controller/partitions/oos/`, `artifacts/experiment_analysis_v2.json` |
+| `close` | operator decision → `study_closure.json` validated by `load_study_closure` | `artifacts/study_closure.json` |
+
+A V2 study owns its own directory (the scaffold is untracked until the researcher commits it);
+every other dirty path is still contamination. Options: `--smoke-date`, `--years`,
+`--studies-root` (parent studies for frozen external scores), `--max-runtime` for year runs.
+

@@ -169,9 +169,14 @@ def _resolve_streams(ctx: _Ctx) -> None:
         finest = min(externals, key=_tf_ns)
         for tf in s.timeframes:
             key = f"{symbol.lower()}_{tf}"
+            # Only the finest external timeframe of the execution instrument carries epochs. Every coarser
+            # EXTERNAL timeframe (the 1m bar closing exactly at an epoch T) is a context stream: the host
+            # multiplexer queues it until an execution bar with a strictly later ts_init arrives, so its
+            # "strictly before the epoch" visibility is enforced in code rather than by feed ordering.
+            role = s.role if (s.role == "context" or tf == finest or tf not in externals) else "context"
             entry: Dict[str, Any] = {"key": key, "instrument": symbol, "timeframe": tf, "duration_ns": _tf_ns(tf),
-                                     "role": s.role, "same_ts": s.same_ts,
-                                     "visibility": "at_epoch" if s.role == "execution" else "strictly_before"}
+                                     "role": role, "same_ts": s.same_ts,
+                                     "visibility": "at_epoch" if role == "execution" else "strictly_before"}
             if tf in externals:
                 st = externals[tf]
                 entry.update({"source": "external", "bar_type": st.get("bar_type"),
