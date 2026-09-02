@@ -1,0 +1,249 @@
+"""Capability addition flow: search -> propose -> scaffold -> implement + test -> promote.
+
+One process for every primitive kind.  A proposal is a ~20-line YAML naming the kind,
+the semantics, availability/reset/null/gap policy, parameters, two studies it would
+serve, the closest existing primitive and why it does not fit, and the composition
+that was tried (the compiler error it produced).  ``scaffold`` generates the binding
+skeleton with the contract declarations filled in, a synthetic-fixture test and a
+registry seed entry with ``status: candidate``.  ``promote`` requires the test file, a
+passing bounded test run and a parity/oracle artifact, then marks the seed ``verified``
+so ``research cap generate`` publishes it.
+
+Anti-bloat gates are mechanical: no composition attempt -> refused; a name already
+registered -> refused; fewer than two named studies -> refused.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import yaml
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+PROPOSALS_DIR = REPO_ROOT / "research_workflow" / "capabilities" / "proposals"
+SEED_PATH = REPO_ROOT / "research_workflow" / "capabilities_index.yaml"
+KINDS = {"tracker", "feature", "trigger", "outcome", "entry", "feature_host"}
+_NAME_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$")
+
+
+class CapabilityFlowError(RuntimeError):
+    pass
+
+
+def _registry_ids() -> set:
+    from research_workflow.capabilities import load_registry
+    try:
+        reg = load_registry()
+    except RuntimeError:
+        return set()
+    return {e["id"] for k in reg["kinds"].values() for e in k}
+
+
+def validate_proposal(proposal: Dict[str, Any]) -> List[str]:
+    problems: List[str] = []
+    for key in ("kind", "name", "semantics", "availability_rule", "parameters", "serves_studies", "closest_existing", "composition_attempted"):
+        if key not in proposal:
+            problems.append(f"missing field {key!r}")
+    if proposal.get("kind") not in KINDS:
+        problems.append(f"kind must be one of {sorted(KINDS)}")
+    name = str(proposal.get("name", ""))
+    if not _NAME_RE.match(name):
+        problems.append("name must be dotted lowercase, e.g. tracker.lead_lag.flip_offset")
+    if not name.startswith(str(proposal.get("kind", "")) + "."):
+        problems.append("name must start with '<kind>.'")
+    if f"{name}" in _registry_ids():
+        problems.append(f"{name} is already registered (compose it instead)")
+    studies = proposal.get("serves_studies") or []
+    if not isinstance(studies, list) or len(studies) < 2:
+        problems.append("serves_studies must name at least two studies (or a study family) -- one study means study-local (tier 3)")
+    ca = proposal.get("composition_attempted") or {}
+    if not isinstance(ca, dict) or not ca.get("spec_fragment") or not ca.get("compiler_gap"):
+        problems.append("composition_attempted must record the spec fragment tried and the compiler gap it produced")
+    closest = proposal.get("closest_existing") or {}
+    if not isinstance(closest, dict) or not closest.get("id") or not closest.get("why_not"):
+        problems.append("closest_existing must name an existing primitive id and why it does not fit")
+    for pol in ("reset_policy", "null_policy", "gap_policy"):
+        if pol not in proposal:
+            problems.append(f"missing {pol}")
+    return problems
+
+
+def propose(path: Path) -> Dict[str, Any]:
+    proposal = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    problems = validate_proposal(proposal)
+    if problems:
+        return {"STATUS": "REFUSED", "problems": problems, "proposal": str(path)}
+    PROPOSALS_DIR.mkdir(parents=True, exist_ok=True)
+    dest = PROPOSALS_DIR / f"{proposal['name']}.yaml"
+    body = dict(proposal)
+    body["proposal_sha256"] = hashlib.sha256(json.dumps(proposal, sort_keys=True, default=str).encode()).hexdigest()
+    body["status"] = "proposed"
+    body["proposed_at_utc"] = datetime.now(timezone.utc).isoformat()
+    dest.write_text(yaml.safe_dump(body, sort_keys=False), encoding="utf-8")
+    return {"STATUS": "PROPOSED", "id": proposal["name"], "proposal": str(dest.relative_to(REPO_ROOT)).replace("\\", "/"),
+            "next": f"python scripts/research.py cap scaffold {proposal['name']}"}
+
+
+def _binding_template(p: Dict[str, Any], class_name: str) -> str:
+    params = dict(p.get("parameters") or {})
+    param_lines = ", ".join(f'"{k}": {("REQUIRED" if v == "required" else repr(v))}' for k, v in params.items())
+    inputs = dict(p.get("inputs") or {"bars": "stream"})
+    fields = list(p.get("fields") or ["value"])
+    events = list(p.get("events") or [])
+    return f'''"""{p['name']} -- {p['semantics'].strip()}
+
+Availability: {p['availability_rule']}
+Reset: {p['reset_policy']} | Null: {p['null_policy']} | Gap: {p['gap_policy']}
+Generated by `research cap scaffold`; implement ``on_bar``/``on_event``/``epoch_value`` and keep the
+declarations below truthful -- the compiler and the registry read them.
+"""
+from __future__ import annotations
+
+from typing import Any, Mapping
+
+from features.trackers.host_bindings import BaseBinding
+from research_workflow.host.interfaces import REQUIRED, BarView, EmittedEvent, EpochView
+
+
+class {class_name}(BaseBinding):
+    CAPABILITY = "{p['name']}"
+    PARAMS = {{{param_lines}}}
+    INPUTS = {json.dumps(inputs)}
+    FIELDS = {tuple(fields)!r}
+    EPOCH_FIELDS = ()
+    EVENTS = {tuple(events)!r}
+    SUBSCRIBES = ()
+    WARMUP_BARS = 0
+    CADENCE = "per_source_bar"
+
+    def __init__(self, params: Mapping[str, Any], inputs: Mapping[str, Any]) -> None:
+        super().__init__(params, inputs)
+        # TODO: initialise state from self.params / self.inputs
+        self.value = None
+
+    def on_bar(self, input_key: str, bar: BarView) -> None:
+        raise NotImplementedError("{p['name']}: implement the semantics declared in the proposal")
+
+    def on_event(self, input_key: str, event: EmittedEvent) -> None:
+        return None
+
+    def epoch_value(self, name: str, epoch: EpochView) -> Any:
+        raise KeyError(name)
+'''
+
+
+def _test_template(p: Dict[str, Any], module: str, class_name: str) -> str:
+    return f'''"""Synthetic-fixture test for {p['name']} (generated by `research cap scaffold`).
+
+Every registered primitive must prove: (1) the availability rule -- a value read at T does
+not change when a bar with ts_init > T is appended; (2) the declared null/gap policy.
+"""
+from research_workflow.host.interfaces import BarView
+from {module} import {class_name}
+
+
+def _bars(n, start=1_000_000_000, step=1_000_000_000):
+    return [BarView("s", start + i * step, start + (i + 1) * step, 100.0 + i, 101.0 + i, 99.0 + i, 100.5 + i, 1.0) for i in range(n)]
+
+
+def test_availability_rule_value_at_T_is_immutable():
+    b = {class_name}({{}}, {{"bars": "s"}})
+    bars = _bars(5)
+    for bar in bars[:3]:
+        b.on_bar("bars", bar)
+    before = {{f: getattr(b, f, None) for f in {class_name}.FIELDS}}
+    b.on_bar("bars", bars[3])   # a later bar must not rewrite what was readable at T
+    # TODO: assert the fields that are frozen at T are unchanged
+    assert before is not None
+
+
+def test_null_policy_before_warmup():
+    b = {class_name}({{}}, {{"bars": "s"}})
+    # TODO: assert declared null behaviour before WARMUP_BARS
+    assert b.WARMUP_BARS >= 0
+'''
+
+
+def scaffold(name: str) -> Dict[str, Any]:
+    src = PROPOSALS_DIR / f"{name}.yaml"
+    if not src.is_file():
+        raise CapabilityFlowError(f"PROPOSAL_MISSING: {src}")
+    p = yaml.safe_load(src.read_text(encoding="utf-8")) or {}
+    problems = validate_proposal(p)
+    if problems:
+        return {"STATUS": "REFUSED", "problems": problems}
+    kind = p["kind"]
+    slug = name.split(".", 1)[1].replace(".", "_")
+    class_name = "".join(part.capitalize() for part in slug.split("_")) + "Binding"
+    module_path = REPO_ROOT / "features" / "trackers" / f"{slug}.py"
+    test_path = REPO_ROOT / "features" / "tests" / f"test_{slug}.py"
+    if module_path.exists() or test_path.exists():
+        raise CapabilityFlowError(f"SCAFFOLD_EXISTS: {module_path} or {test_path}")
+    module = f"features.trackers.{slug}"
+    module_path.write_text(_binding_template(p, class_name), encoding="utf-8")
+    test_path.write_text(_test_template(p, module, class_name), encoding="utf-8")
+    seed = yaml.safe_load(SEED_PATH.read_text(encoding="utf-8")) or {}
+    kind_key = {"tracker": "trackers", "feature": "features", "trigger": "trigger_primitives", "outcome": "outcomes", "entry": "entry_references", "feature_host": "trackers"}[kind]
+    entries = seed.setdefault(kind_key, []) or []
+    entries.append({"id": name, "version": 1, "description": str(p["semantics"]).strip().splitlines()[0], "implementation": f"{module}.{class_name}",
+                    "parameters": list((p.get("parameters") or {}).keys()), "dependencies": list(p.get("dependencies") or []),
+                    "update_cadence": p.get("update_cadence", "per_source_bar"), "required_tests": [str(test_path.relative_to(REPO_ROOT)).replace("\\", "/")],
+                    "status_override": "candidate", "proposal": str(src.relative_to(REPO_ROOT)).replace("\\", "/")})
+    seed[kind_key] = entries
+    SEED_PATH.write_text(yaml.safe_dump(seed, sort_keys=False), encoding="utf-8")
+    p["status"] = "scaffolded"; p["scaffold"] = {"module": str(module_path.relative_to(REPO_ROOT)).replace("\\", "/"), "test": str(test_path.relative_to(REPO_ROOT)).replace("\\", "/"), "class": class_name}
+    src.write_text(yaml.safe_dump(p, sort_keys=False), encoding="utf-8")
+    return {"STATUS": "SCAFFOLDED", "id": name, "module": p["scaffold"]["module"], "test": p["scaffold"]["test"], "class": class_name,
+            "next": ["implement the binding", "make the test real", f"python scripts/research.py cap promote {name} --parity <artifact.json>"]}
+
+
+def promote(name: str, *, parity_artifact: Optional[Path] = None, run_tests: bool = True) -> Dict[str, Any]:
+    src = PROPOSALS_DIR / f"{name}.yaml"
+    if not src.is_file():
+        raise CapabilityFlowError(f"PROPOSAL_MISSING: {src}")
+    p = yaml.safe_load(src.read_text(encoding="utf-8")) or {}
+    sc = p.get("scaffold") or {}
+    test_path = REPO_ROOT / str(sc.get("test", ""))
+    problems: List[str] = []
+    if not sc or not test_path.is_file():
+        problems.append("scaffold/test missing")
+    if parity_artifact is None or not Path(parity_artifact).is_file():
+        problems.append("a parity/oracle artifact (json) is required")
+    else:
+        art = json.loads(Path(parity_artifact).read_text(encoding="utf-8"))
+        if art.get("passed") is not True:
+            problems.append("parity artifact does not report passed=true")
+    if "NotImplementedError" in (REPO_ROOT / str(sc.get("module", ""))).read_text(encoding="utf-8") if sc.get("module") else True:
+        problems.append("binding still raises NotImplementedError")
+    test_result = None
+    if not problems and run_tests:
+        r = subprocess.run([sys.executable, "-m", "pytest", "-q", str(test_path)], cwd=str(REPO_ROOT), capture_output=True, text=True)
+        test_result = {"returncode": r.returncode, "tail": (r.stdout + r.stderr)[-800:]}
+        if r.returncode != 0:
+            problems.append("bounded test run failed")
+    if problems:
+        return {"STATUS": "REFUSED", "id": name, "problems": problems, "tests": test_result}
+    seed = yaml.safe_load(SEED_PATH.read_text(encoding="utf-8")) or {}
+    for entries in seed.values():
+        for e in entries or []:
+            if e.get("id") == name:
+                e.pop("status_override", None)
+                e["version"] = int(e.get("version", 1))
+                e["promotion"] = {"parity_artifact": str(Path(parity_artifact)), "parity_sha256": hashlib.sha256(Path(parity_artifact).read_bytes()).hexdigest(),
+                                  "promoted_at_utc": datetime.now(timezone.utc).isoformat()}
+    SEED_PATH.write_text(yaml.safe_dump(seed, sort_keys=False), encoding="utf-8")
+    p["status"] = "promoted"
+    src.write_text(yaml.safe_dump(p, sort_keys=False), encoding="utf-8")
+    from research_workflow.capabilities import generate
+    reg = generate()
+    return {"STATUS": "PROMOTED", "id": name, "registry_sha256": reg["content_sha256"], "tests": test_result,
+            "next": "commit the binding, the test, capabilities_index.yaml and registry.json together"}
+
+
+__all__ = ["propose", "scaffold", "promote", "validate_proposal", "CapabilityFlowError", "PROPOSALS_DIR"]

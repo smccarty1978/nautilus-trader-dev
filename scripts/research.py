@@ -5,10 +5,15 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
     research data manifest <dataset_id> [--catalog <dir>]   write <catalog>/dataset_manifest.json, print digest
     research data verify <dataset_id>                        resolve through configured roots and verify digest
     research data roots                                      show the machine-local root configuration
-    research cap list [kind] | describe <id> | search <text>  generated capability registry
-    research study new <id> [--from-question <file>]         branch + sibling worktree + lease + skeleton
+    research cap list [kind] | describe <id> | search <text>  generated capability registry (zero tokens)
+    research cap propose <yaml> | scaffold <id> | promote <id> --parity <json>   capability addition flow
+    research study new <id> [--from-question <file>]         branch + sibling worktree + lease + v2 skeleton
+    research study compile --study <dir>                     static compile -> compiled_plan.json | typed CapabilityGap
+    research study status --study <dir>                      non-mutating controller state card
+    research study run --study <dir> --through <stage> ...   the governed controller (v1 or v2 by grammar)
+    research audit ingest --study <dir> --type causal|contract --report <md> [--author <id>]
+    research bench [--series host_c,host_a,golden]           host performance measurement vs bench/baseline_v0.json
     research ws list                                         branches, worktrees, owners, leases, dirty state
-    research study run --study <dir> --through <stage> ...   delegates to scripts/run_governed_study.py
 """
 from __future__ import annotations
 
@@ -60,7 +65,7 @@ def cmd_data_verify(ns: argparse.Namespace) -> int:
     from research_workflow.roots import compute_catalog_digest, resolve_dataset
     try:
         r = resolve_dataset(ns.dataset_id, ROOT)
-    except Exception as exc:  # typed errors carry their code in the message
+    except Exception as exc:
         return _card({"dataset_id": ns.dataset_id, "error": f"{type(exc).__name__}: {exc}"}, ok=False)
     payload = {"dataset_id": r.dataset_id, "resolution": r.resolution, "logical_digest": r.logical_digest}
     if ns.recompute:
@@ -71,27 +76,81 @@ def cmd_data_verify(ns: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
-# delegations (filled by later platform-v2 items)
+# capabilities
 # ---------------------------------------------------------------------------
 
 def cmd_cap(ns: argparse.Namespace) -> int:
+    if ns.cmd in ("propose", "scaffold", "promote"):
+        from research_workflow.capability_flow import CapabilityFlowError, promote, propose, scaffold
+        try:
+            if ns.cmd == "propose":
+                out = propose(Path(ns.proposal))
+            elif ns.cmd == "scaffold":
+                out = scaffold(ns.capability_id)
+            else:
+                out = promote(ns.capability_id, parity_artifact=Path(ns.parity) if ns.parity else None, run_tests=not ns.no_tests)
+        except CapabilityFlowError as exc:
+            return _card({"error": str(exc)}, ok=False)
+        status = out.pop("STATUS", "OK")
+        return _card({"flow": status, **out}, ok=status in {"PROPOSED", "SCAFFOLDED", "PROMOTED"})
     from research_workflow.capabilities import cli as cap_cli
     return cap_cli(ns)
 
+
+# ---------------------------------------------------------------------------
+# studies
+# ---------------------------------------------------------------------------
 
 def cmd_study_new(ns: argparse.Namespace) -> int:
     from research_workflow.workspace import study_new
     return _card(study_new(ns.study_id, repo_root=ROOT, question_file=ns.from_question, dataset_id=ns.dataset))
 
 
-def cmd_ws_list(_: argparse.Namespace) -> int:
-    from research_workflow.workspace import ws_list
-    return _card(ws_list(repo_root=ROOT))
+def cmd_study_compile(ns: argparse.Namespace) -> int:
+    from research_workflow.grammar import compile_study, load_spec
+    study = Path(ns.study).resolve()
+    out = compile_study(load_spec(study), repo_root=ROOT)
+    if not out.ok:
+        return _card({"study": str(study), **out.gaps.to_dict()}, ok=False)
+    if not ns.dry_run:
+        out.plan.write(study / "compiled_plan.json")
+    return _card({"study": str(study), **out.plan.card(), "written": not ns.dry_run})
+
+
+def cmd_study_status(ns: argparse.Namespace) -> int:
+    from research_workflow.governed_controller import compact_card
+    from research_workflow.governed_controller_v2 import controller_for
+    card = controller_for(ns.study).run(through="close", inspect=True)
+    print(compact_card(card, as_json=True))
+    return 0
 
 
 def cmd_study_run(ns: argparse.Namespace, extra: list[str]) -> int:
     cmd = [sys.executable, str(ROOT / "scripts" / "run_governed_study.py"), *extra]
     return subprocess.run(cmd, cwd=str(ROOT)).returncode
+
+
+def cmd_audit_ingest(ns: argparse.Namespace) -> int:
+    from research_workflow.lifecycle_v2 import LifecycleV2Error, ingest_audit_report, is_v2_study
+    study = Path(ns.study).resolve()
+    if not is_v2_study(study):
+        return _card({"error": "v1 studies ingest through scripts/run_preexec_audits.py --ingest"}, ok=False)
+    try:
+        out = ingest_audit_report(study, ns.type, Path(ns.report), ns.author)
+    except Exception as exc:
+        return _card({"error": f"{type(exc).__name__}: {exc}"}, ok=False)
+    status = out.pop("STATUS")
+    return _card({"ingest": status, **out}, ok=status == "OK")
+
+
+def cmd_bench(ns: argparse.Namespace) -> int:
+    cmd = [sys.executable, str(ROOT / "scripts" / "bench_host.py"), "--series", ns.series, "--repeats", str(ns.repeats)]
+    return subprocess.run(cmd, cwd=str(ROOT)).returncode
+
+
+def cmd_ws_list(_: argparse.Namespace) -> int:
+    from research_workflow.workspace import ws_list
+    return _card(ws_list(repo_root=ROOT))
 
 
 # ---------------------------------------------------------------------------
@@ -146,10 +205,21 @@ def main(argv: list[str] | None = None) -> int:
     c = cap.add_parser("describe"); c.add_argument("capability_id"); c.set_defaults(fn=cmd_cap)
     c = cap.add_parser("search"); c.add_argument("text"); c.set_defaults(fn=cmd_cap)
     c = cap.add_parser("generate"); c.add_argument("--check", action="store_true"); c.set_defaults(fn=cmd_cap)
+    c = cap.add_parser("propose"); c.add_argument("proposal"); c.set_defaults(fn=cmd_cap)
+    c = cap.add_parser("scaffold"); c.add_argument("capability_id"); c.set_defaults(fn=cmd_cap)
+    c = cap.add_parser("promote"); c.add_argument("capability_id"); c.add_argument("--parity"); c.add_argument("--no-tests", action="store_true"); c.set_defaults(fn=cmd_cap)
 
     study = sub.add_parser("study").add_subparsers(dest="cmd", required=True)
     n = study.add_parser("new"); n.add_argument("study_id"); n.add_argument("--from-question"); n.add_argument("--dataset", default="NQ_v0_2020_2026"); n.set_defaults(fn=cmd_study_new)
+    sc = study.add_parser("compile"); sc.add_argument("--study", required=True); sc.add_argument("--dry-run", action="store_true"); sc.set_defaults(fn=cmd_study_compile)
+    ss = study.add_parser("status"); ss.add_argument("--study", required=True); ss.set_defaults(fn=cmd_study_status)
     r = study.add_parser("run"); r.set_defaults(fn=cmd_study_run, passthrough=True)
+
+    audit = sub.add_parser("audit").add_subparsers(dest="cmd", required=True)
+    ai = audit.add_parser("ingest"); ai.add_argument("--study", required=True); ai.add_argument("--type", required=True, choices=["causal", "contract"])
+    ai.add_argument("--report", required=True); ai.add_argument("--author"); ai.set_defaults(fn=cmd_audit_ingest)
+
+    b = sub.add_parser("bench"); b.add_argument("--series", default="host_c,host_a,golden"); b.add_argument("--repeats", type=int, default=3); b.set_defaults(fn=cmd_bench)
 
     model = sub.add_parser("model").add_subparsers(dest="cmd", required=True)
     model.add_parser("list").set_defaults(fn=cmd_model_list)

@@ -1,6 +1,6 @@
 {
-  "content_sha256": "b751c14d99a4c6e137ff4172d12d17ba0a461a3a5ac89db0231b4c299dcbfa9a",
-  "generated_at_utc": "2026-09-02T06:37:30.105424+00:00",
+  "content_sha256": "a9aee3d14c35ff499d4f1cede80fc85ad27c2475d9a592739c97cbfa3e730f23",
+  "generated_at_utc": "2026-09-02T18:30:31.303485+00:00",
   "kinds": {
     "datasets": [
       {
@@ -76,11 +76,50 @@
         "version": "6f532e9bf8f7"
       }
     ],
-    "entry_references": [
+    "derived_inputs": [
       {
         "cost_class": "per_candidate",
         "dependencies": [],
+        "description": "A frozen parent model's score at the candidate, as one output column.",
+        "epoch_fields": [],
+        "events": [],
+        "fields": [],
+        "id": "feature.frozen_external_score",
+        "implementation": "features.trackers.host_bindings.FrozenExternalScoreBinding",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/host_bindings.py",
+        "inputs": {},
+        "kind": "derived_inputs",
+        "name": "frozen_external_score",
+        "parameters": [
+          "spec",
+          "direction",
+          "studies_root"
+        ],
+        "platform": "v2",
+        "required_parameters": [
+          "spec",
+          "direction"
+        ],
+        "required_tests": [],
+        "status": "verified",
+        "subscribes": [],
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1,
+        "warmup_bars": 0
+      }
+    ],
+    "entry_references": [
+      {
+        "contracts": [
+          "research_mark"
+        ],
+        "cost_class": "per_candidate",
+        "dependencies": [],
         "description": "Price of the completed bar at the decision timestamp (research mark, not a fill).",
+        "executable": false,
+        "host_binding": "research_workflow.entry_references",
         "id": "entry.decision_close",
         "implementation": "research_workflow.forward_outcomes.contracts.ReferencePrice",
         "implementation_note": "Declared execution-price convention.",
@@ -89,6 +128,7 @@
         "missing_tests": [],
         "name": "decision_close",
         "parameters": [],
+        "platform": "v2",
         "required_tests": [
           "research_workflow/tests/test_ordered_barrier_entry_reference.py"
         ],
@@ -98,9 +138,15 @@
         "version": 1
       },
       {
+        "contracts": [
+          "label",
+          "trade"
+        ],
         "cost_class": "per_candidate",
         "dependencies": [],
         "description": "Open of the next bar after the decision timestamp (default entry reference).",
+        "executable": true,
+        "host_binding": "research_workflow.host.outcomes.LabelOutcomeKernel",
         "id": "entry.next_bar_open",
         "implementation": "research_workflow.forward_outcomes.contracts.ReferencePrice",
         "implementation_note": "Declared execution-price convention.",
@@ -109,6 +155,7 @@
         "missing_tests": [],
         "name": "next_bar_open",
         "parameters": [],
+        "platform": "v2",
         "required_tests": [
           "research_workflow/tests/test_ordered_barrier_entry_reference.py"
         ],
@@ -118,9 +165,15 @@
         "version": 1
       },
       {
+        "contracts": [
+          "label",
+          "trade"
+        ],
         "cost_class": "per_candidate",
         "dependencies": [],
         "description": "Close of the confirming bar.",
+        "executable": false,
+        "host_binding": "research_workflow.entry_references",
         "id": "entry.confirmation_close",
         "implementation": "research_workflow.forward_outcomes.contracts.ReferencePrice",
         "implementation_note": "Declared execution-price convention.",
@@ -129,6 +182,7 @@
         "missing_tests": [],
         "name": "confirmation_close",
         "parameters": [],
+        "platform": "v2",
         "required_tests": [
           "research_workflow/tests/test_forward_outcomes.py"
         ],
@@ -136,6 +190,131 @@
         "unresolved_dependencies": [],
         "update_cadence": "per_candidate",
         "version": 1
+      },
+      {
+        "contracts": [
+          "label",
+          "trade"
+        ],
+        "cost_class": "per_candidate",
+        "dependencies": [],
+        "description": "Alias of next_bar_open on a sparse tape: a no-print second resolves to the next printed bar and the delay is recorded.",
+        "executable": true,
+        "fill_model": {
+          "latency_bars": 0,
+          "reference_price": "next_bar_open",
+          "slippage_ticks": 0.0,
+          "spread_ticks": 0.0
+        },
+        "id": "entry.next_printed_bar_open",
+        "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel",
+        "kind": "entry_references",
+        "name": "next_printed_bar_open",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py"
+        ],
+        "sparse_rule": "no-print seconds are skipped; entry lands on the next printed bar; delay = entry_ts - T",
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      },
+      {
+        "contracts": [
+          "trade"
+        ],
+        "cost_class": "per_candidate",
+        "dependencies": [],
+        "description": "Resting limit at a declared price; fill only when the tape trades through it (trade contract only; not bound in this phase).",
+        "executable": false,
+        "fill_model": {
+          "order_type": "limit"
+        },
+        "id": "entry.limit_at",
+        "implementation": "research_workflow.entry_references",
+        "kind": "entry_references",
+        "name": "limit_at",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py"
+        ],
+        "sparse_rule": "first printed bar strictly after the decision timestamp",
+        "status": "candidate",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      },
+      {
+        "contracts": [
+          "trade"
+        ],
+        "cost_class": "per_candidate",
+        "dependencies": [],
+        "description": "Stop order at a declared price; fill at or beyond it (trade contract only; not bound in this phase).",
+        "executable": false,
+        "fill_model": {
+          "order_type": "stop"
+        },
+        "id": "entry.stop_at",
+        "implementation": "research_workflow.entry_references",
+        "kind": "entry_references",
+        "name": "stop_at",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py"
+        ],
+        "sparse_rule": "first printed bar strictly after the decision timestamp",
+        "status": "candidate",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_candidate",
+        "version": 1
+      }
+    ],
+    "feature_hosts": [
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [],
+        "description": "The declared feature surface, realised by ``research_workflow.provider_host.ProviderHost``.",
+        "epoch_fields": [
+          "structural_snapshot_ready"
+        ],
+        "events": [],
+        "fields": [
+          "aliases"
+        ],
+        "id": "feature_host.provider_host",
+        "implementation": "features.trackers.host_bindings.FeatureHostBinding",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/host_bindings.py",
+        "inputs": {},
+        "kind": "feature_hosts",
+        "name": "provider_host",
+        "parameters": [
+          "instances",
+          "routing",
+          "snapshot",
+          "feature_authority"
+        ],
+        "platform": "v2",
+        "required_parameters": [
+          "instances",
+          "routing",
+          "snapshot"
+        ],
+        "required_tests": [],
+        "status": "verified",
+        "subscribes": [
+          "regime_bar",
+          "changed"
+        ],
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_event",
+        "version": 1,
+        "warmup_bars": 0
       }
     ],
     "features": [
@@ -625,6 +804,7 @@
         "required_tests": [
           "features/tests/test_generic_episode_geometry.py",
           "research_workflow/tests/test_forward_outcomes.py",
+          "research_workflow/tests/test_grammar_v2.py",
           "research_workflow/tests/test_provider_host_audit.py",
           "research_workflow/tests/test_stage3_integration.py",
           "scripts/tests/test_analysis_loader.py",
@@ -2980,6 +3160,7 @@
           "features/tests/test_regime_dual_ema_parity.py",
           "research_workflow/tests/test_bare_flip_independent_parity.py",
           "research_workflow/tests/test_composite_target_expression.py",
+          "research_workflow/tests/test_golden_fixture.py",
           "research_workflow/tests/test_multiple_derived_inputs.py",
           "research_workflow/tests/test_oos_analysis_lineage.py",
           "research_workflow/tests/test_ordered_barrier_entry_reference.py",
@@ -4829,6 +5010,84 @@
         "unresolved_dependencies": [],
         "update_cadence": "per_1s",
         "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "entry.next_bar_open"
+        ],
+        "description": "Label contract: N barrier arms from one next_bar_open entry; SESSION_END/TIMEOUT/GAP/AMBIGUOUS/DATA_END censoring; per-arm columns.",
+        "id": "outcome.label.barrier_race",
+        "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel",
+        "kind": "outcomes",
+        "name": "label.barrier_race",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "entry.next_bar_open"
+        ],
+        "description": "Label contract: regime change of a declared role within an inclusive horizon; session censoring; hold-at-equality sweep.",
+        "id": "outcome.label.flip_within_horizon",
+        "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel",
+        "kind": "outcomes",
+        "name": "label.flip_within_horizon",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [
+          "entry.next_bar_open"
+        ],
+        "description": "Label contract: barrier arms AND/OR a flip child with monotone worst-status censoring.",
+        "id": "outcome.label.composite",
+        "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel",
+        "kind": "outcomes",
+        "name": "label.composite",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
+      },
+      {
+        "cost_class": "per_1s",
+        "dependencies": [],
+        "description": "Trade execution contract type (order/fill semantics); typed only in this phase -- no sink.",
+        "id": "outcome.trade.contract",
+        "implementation": "research_workflow.host.outcomes.TradeExecutionContract",
+        "kind": "outcomes",
+        "name": "trade.contract",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py"
+        ],
+        "status": "candidate",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_1s",
+        "version": 1
       }
     ],
     "streams": [
@@ -5023,10 +5282,41 @@
           "stream.completed_bar"
         ],
         "description": "Canonical dual-EMA(3/9 high-low) regime state with Wilder ATR(14), parameterized by timeframe/instrument; parity-tested against the accepted collector_v2 engine.",
+        "epoch_fields": [
+          "age_s"
+        ],
+        "events": [
+          "regime_bar",
+          "changed",
+          "flipped"
+        ],
+        "fields": [
+          "dir",
+          "prev_dir",
+          "dir_pre_bar_or_current",
+          "atr",
+          "start_ns",
+          "start_price",
+          "frozen_atr",
+          "changed",
+          "flipped",
+          "changed_seq",
+          "flipped_seq",
+          "bars_in_regime",
+          "last_bar_close_ts",
+          "last_bar_close",
+          "last_reference_close",
+          "prev_bar_close_ts"
+        ],
+        "host_binding": "features.trackers.host_bindings.DualEmaRegimeBinding",
         "id": "tracker.regime.dual_ema",
         "implementation": "features.trackers.regime_dual_ema.DualEmaRegimeTracker",
         "implementation_note": "Completed-bar dual-EMA regime state. Feed one completed bar per ``update``.",
         "implementation_verified": true,
+        "inputs": {
+          "bars": "stream",
+          "reference": "stream?"
+        },
         "kind": "trackers",
         "missing_tests": [],
         "name": "regime.dual_ema",
@@ -5036,6 +5326,10 @@
           "short_period",
           "long_period",
           "atr_period"
+        ],
+        "platform": "v2",
+        "required_parameters": [
+          "timeframe"
         ],
         "required_tests": [
           "features/tests/test_regime_dual_ema_parity.py"
@@ -5120,6 +5414,152 @@
         "unresolved_dependencies": [],
         "update_cadence": "per_1s",
         "version": 1
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [],
+        "description": "Directional pullback depth since the prevailing regime's favorable extreme.",
+        "epoch_fields": [
+          "counter_close_ts_at",
+          "counter_direction_at",
+          "triggering_event_close_ts"
+        ],
+        "events": [
+          "new_leg",
+          "terminated"
+        ],
+        "fields": [
+          "dir",
+          "depth_atr",
+          "start_known",
+          "armed",
+          "arm_ts",
+          "frozen_atr_arm",
+          "pullback_start_ts",
+          "prevailing_extreme_ts",
+          "favorable_extreme",
+          "arming_cycle_index",
+          "prior_deep_pullback_count",
+          "episode_id",
+          "counter_regime_direction",
+          "counter_regime_close_ts",
+          "new_leg_seq",
+          "terminated_seq",
+          "prevailing_regime_start_ns",
+          "max_depth_points"
+        ],
+        "id": "tracker.pullback.depth_since_extreme",
+        "implementation": "features.trackers.host_bindings.PullbackEpisodeBinding",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/host_bindings.py",
+        "inputs": {
+          "atr_source": "tracker",
+          "bars": "stream",
+          "intermediate": "tracker",
+          "regime": "tracker"
+        },
+        "kind": "trackers",
+        "name": "pullback.depth_since_extreme",
+        "parameters": [
+          "threshold_atr",
+          "extreme_source"
+        ],
+        "platform": "v2",
+        "required_parameters": [
+          "threshold_atr"
+        ],
+        "required_tests": [],
+        "status": "verified",
+        "subscribes": [
+          "changed",
+          "regime_bar"
+        ],
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": 1,
+        "warmup_bars": 0
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [],
+        "description": "Running MFE/MAE since the regime start in regime-frozen-ATR units, with the",
+        "epoch_fields": [],
+        "events": [],
+        "fields": [
+          "dir",
+          "frozen_atr",
+          "atr",
+          "mfe_atr",
+          "mae_atr",
+          "pnl_atr",
+          "retained_ratio",
+          "progress_windows",
+          "start_price",
+          "highest_high",
+          "lowest_low",
+          "last_close",
+          "last_ts"
+        ],
+        "id": "tracker.regime.excursion",
+        "implementation": "features.trackers.host_bindings.RegimeExcursionBinding",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/host_bindings.py",
+        "inputs": {
+          "bars": "stream",
+          "regime": "tracker"
+        },
+        "kind": "trackers",
+        "name": "regime.excursion",
+        "parameters": [
+          "progress_gap"
+        ],
+        "platform": "v2",
+        "required_parameters": [],
+        "required_tests": [],
+        "status": "verified",
+        "subscribes": [
+          "changed"
+        ],
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": 1,
+        "warmup_bars": 0
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [],
+        "description": "Calendar-boundary regime bars from a lower-timeframe completed stream.",
+        "epoch_fields": [],
+        "events": [
+          "regime_bar"
+        ],
+        "fields": [
+          "last_close_ts"
+        ],
+        "id": "tracker.regime_bar.calendar_bucket",
+        "implementation": "features.trackers.host_bindings.CalendarRegimeBarBinding",
+        "implementation_exists": true,
+        "implementation_path": "features/trackers/host_bindings.py",
+        "inputs": {
+          "bars": "stream",
+          "regime": "tracker"
+        },
+        "kind": "trackers",
+        "name": "regime_bar.calendar_bucket",
+        "parameters": [
+          "bucket"
+        ],
+        "platform": "v2",
+        "required_parameters": [
+          "bucket"
+        ],
+        "required_tests": [],
+        "status": "verified",
+        "subscribes": [],
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": 1,
+        "warmup_bars": 0
       }
     ],
     "trigger_primitives": [
@@ -5199,6 +5639,63 @@
         "status": "verified",
         "unresolved_dependencies": [],
         "update_cadence": "per_1s",
+        "version": 1
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [],
+        "description": "Host-owned checkpoint grid: epochs every N seconds from a tracker anchor, missing seconds skipped, bounded by max_age.",
+        "id": "trigger.host.grid_cadence",
+        "implementation": "research_workflow.host.strategy.HostCore",
+        "kind": "trigger_primitives",
+        "name": "host.grid_cadence",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py",
+          "research_workflow/tests/test_host_core.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_event",
+        "version": 1
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [],
+        "description": "Host-owned epoch per completed bar of a declared stream.",
+        "id": "trigger.host.completed_bar_cadence",
+        "implementation": "research_workflow.host.strategy.HostCore",
+        "kind": "trigger_primitives",
+        "name": "host.completed_bar_cadence",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py",
+          "research_workflow/tests/test_host_core.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_event",
+        "version": 1
+      },
+      {
+        "cost_class": "per_source_event",
+        "dependencies": [],
+        "description": "Host-owned OBSERVE->WATCH->ARMED->ENTERED state engine over compiled predicates (reset/expire/chain/precedence/cooldown/max_per_watch).",
+        "id": "trigger.host.state_graph",
+        "implementation": "research_workflow.host.triggers.TriggerEngine",
+        "kind": "trigger_primitives",
+        "name": "host.state_graph",
+        "parameters": [],
+        "platform": "v2",
+        "required_tests": [
+          "research_workflow/tests/test_golden_fixture.py",
+          "research_workflow/tests/test_host_core.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_event",
         "version": 1
       }
     ],
@@ -5352,9 +5849,17 @@
       "broken": 0,
       "count": 3
     },
+    "derived_inputs": {
+      "broken": 0,
+      "count": 1
+    },
     "entry_references": {
       "broken": 0,
-      "count": 3
+      "count": 6
+    },
+    "feature_hosts": {
+      "broken": 0,
+      "count": 1
     },
     "features": {
       "broken": 0,
@@ -5366,20 +5871,20 @@
     },
     "outcomes": {
       "broken": 0,
-      "count": 4
+      "count": 8
     },
     "streams": {
       "broken": 0,
       "count": 9
     },
-    "total": 179,
+    "total": 194,
     "trackers": {
       "broken": 0,
-      "count": 4
+      "count": 7
     },
     "trigger_primitives": {
       "broken": 0,
-      "count": 3
+      "count": 6
     },
     "validation_protocols": {
       "broken": 0,

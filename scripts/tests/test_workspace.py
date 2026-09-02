@@ -81,3 +81,16 @@ def test_ws_list_reports_worktrees_owners_and_lease_states(env: Path, tmp_path: 
 def test_invalid_study_id(env: Path):
     with pytest.raises(ws.WorkspaceError, match="STUDY_ID_INVALID"):
         ws.study_new("bad id/with slash", repo_root=env)
+
+
+def test_v2_skeleton_compiles_statically_without_study_python(env: Path):
+    """`research study new` yields a grammar-v2 study.yaml that the static compiler binds with no gaps."""
+    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.lifecycle_v2 import is_v2_study
+    card = ws.study_new("demo_zeta", repo_root=env)
+    study = Path(card["worktree"]) / "studies" / "demo_zeta"
+    assert is_v2_study(study)
+    out = compile_study(load_spec(study / "study.yaml"), repo_root=Path(__file__).resolve().parents[2])
+    assert out.ok, out.card()
+    assert out.plan.card()["catalog_opened"] is False and all(b["bound"] for b in out.plan.binding_proof)
+    assert not list(study.glob("**/*.py"))

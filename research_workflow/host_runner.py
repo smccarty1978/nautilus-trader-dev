@@ -109,6 +109,39 @@ def run_plan_with_engine(plan: Mapping[str, Any], bars: Sequence[BarView], *, se
     return {"candidates": candidates, "observations": observations, "stats": stats, "elapsed_s": elapsed, "ledger": ledger_rows}
 
 
+def _is_product_default_dataset(symbol: str, dataset_id: str) -> bool:
+    from backtests.nt_runtime.data_plan import PRODUCT_CATALOGS
+    prod = PRODUCT_CATALOGS.get(symbol.upper())
+    return bool(prod and prod.get("dataset_id") == dataset_id)
+
+
+def resolve_dataset_plan(dataset_id: str, start_date: str, end_date: str, *, warmup_days: int, repo_root: Path):
+    """DataPlan for a committed DatasetSpec (research/datasets/<id>.yaml) resolved through machine-local roots.
+    Used for datasets that are not a product's V0 default (Dataset V2); the V0 resolver is left untouched."""
+    import pandas as pd
+    import yaml
+    from backtests.nt_runtime.data_plan import DataPlan
+    from research_workflow.roots import committed_dataset_spec_path, resolve_dataset
+    spec_path = committed_dataset_spec_path(dataset_id, repo_root)
+    if not spec_path.is_file():
+        raise RuntimeError(f"DATASET_SPEC_MISSING: {spec_path}")
+    spec = yaml.safe_load(spec_path.read_text(encoding="utf-8"))
+    inst = spec.get("instrument") or {}
+    instrument_id = str(spec.get("instrument_id") or inst.get("instrument_id"))
+    symbol, venue = instrument_id.split(".")[0], str(inst.get("venue") or instrument_id.split(".")[-1])
+    resolved = resolve_dataset(dataset_id, repo_root, catalog_rel_path=spec.get("catalog_rel_path"))
+    streams = spec.get("streams") or {}
+    start_dt = pd.Timestamp(f"{start_date} 00:00:00", tz="UTC")
+    end_dt = pd.Timestamp(f"{end_date} 23:59:59.999999999", tz="UTC")
+    if start_dt > end_dt:
+        raise ValueError(f"start_date ({start_date}) cannot be after end_date ({end_date})")
+    return DataPlan(symbol=symbol, venue=venue, instrument_id=instrument_id, multiplier=str(inst.get("multiplier")), price_increment=str(inst.get("price_increment")),
+                    catalog_path=resolved.catalog_path, bar_type_1s=streams["1s"]["bar_type"], bar_type_1m=streams["1m"]["bar_type"],
+                    start_dt=start_dt, end_dt=end_dt, warmup_days=warmup_days, warmup_start_dt=start_dt - pd.Timedelta(days=warmup_days),
+                    raw_timestamp_semantic="OPEN_STAMPED", ts_init_delta_1s_ns=int(streams["1s"]["ts_init_delta_ns"]), ts_init_delta_1m_ns=int(streams["1m"]["ts_init_delta_ns"]),
+                    dataset_id=dataset_id, dataset_logical_digest=resolved.logical_digest, dataset_resolution=resolved.resolution)
+
+
 def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: str, repo_root: Optional[Path] = None,
                         primary_interval: Optional[Tuple[int, int]] = None, warmup_days: int = 5, log_level: str = "ERROR",
                         session_table_spec: Optional[Mapping[str, Any]] = None, progress_path: Optional[Path] = None,
@@ -120,8 +153,11 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
 
     repo_root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[2]
     exec_symbol = next(sym for sym, f in plan["instruments"].items() if f["role"] == "execution")
-    data_plan = resolve_catalog_plan(exec_symbol, start_date, end_date, warmup_days=warmup_days, repo_root=repo_root)
     declared = plan["instruments"][exec_symbol]
+    if declared.get("dataset_id") and not _is_product_default_dataset(exec_symbol, declared["dataset_id"]):
+        data_plan = resolve_dataset_plan(declared["dataset_id"], start_date, end_date, warmup_days=warmup_days, repo_root=repo_root)
+    else:
+        data_plan = resolve_catalog_plan(exec_symbol, start_date, end_date, warmup_days=warmup_days, repo_root=repo_root)
     if declared.get("dataset_id") and data_plan.dataset_id != declared["dataset_id"]:
         raise RuntimeError(f"WRONG_PHYSICAL_DATASET: plan declares {declared['dataset_id']}, resolver gave {data_plan.dataset_id}")
     if declared.get("dataset_digest") and data_plan.dataset_logical_digest and declared["dataset_digest"] != data_plan.dataset_logical_digest:
@@ -150,4 +186,4 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
             "window": {"start": start_date, "end": end_date, "warmup_days": warmup_days}, "ledger": ledger_rows}
 
 
-__all__ = ["run_plan_on_bars", "run_plan_with_engine", "run_plan_on_catalog", "sort_bars_causal"]
+__all__ = ["run_plan_on_bars", "run_plan_with_engine", "run_plan_on_catalog", "resolve_dataset_plan", "sort_bars_causal"]

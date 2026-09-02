@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import importlib
 import json
+import os
 import time
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
@@ -129,6 +130,9 @@ class HostCore:
         self.candidates_emitted = 0
         self.epochs_evaluated = 0
         self.last_ts_seen: Optional[int] = None
+        # performance instrumentation (bench mode only): seconds per component
+        self._profile_enabled = bool(os.environ.get("NT_HOST_PROFILE"))
+        self._profile: Dict[str, float] = {}
 
     # -- reference resolution -------------------------------------------------------------
     def resolve(self, ref: str, epoch: EpochView) -> Any:
@@ -185,6 +189,23 @@ class HostCore:
             self.last_ts_seen = max(self.last_ts_seen or 0, bar.ts_init)
         if self._deferred_opens:
             self._flush_deferred_opens(bar.ts_init)
+        if self._profile_enabled:
+            prof = self._profile
+            for tracker, key, tid in self._stream_subscribers.get(bar.stream, ()):
+                t0 = time.perf_counter()
+                tracker.on_bar(key, bar)
+                self._route_events(tid, tracker)
+                prof[f"tracker.{tid}"] = prof.get(f"tracker.{tid}", 0.0) + (time.perf_counter() - t0)
+            if bar.stream == self.epoch_stream:
+                t0 = time.perf_counter(); self._epochs(bar); prof["epochs"] = prof.get("epochs", 0.0) + (time.perf_counter() - t0)
+            if bar.stream == self.outcome_stream:
+                t0 = time.perf_counter()
+                self.kernel.on_bar(bar)
+                rows = self.kernel.drain_rows()
+                for r in rows:
+                    self.sink.add_observation(r)
+                prof["outcome_kernel"] = prof.get("outcome_kernel", 0.0) + (time.perf_counter() - t0)
+            return
         for tracker, key, tid in self._stream_subscribers.get(bar.stream, ()):
             tracker.on_bar(key, bar)
             self._route_events(tid, tracker)
@@ -294,7 +315,12 @@ class HostCore:
             else:
                 row[col] = v
         if self.feature_host is not None:
-            feats = self.feature_host.snapshot(epoch, self.resolve)
+            if self._profile_enabled:
+                t0 = time.perf_counter()
+                feats = self.feature_host.snapshot(epoch, self.resolve)
+                self._profile["feature_snapshot"] = self._profile.get("feature_snapshot", 0.0) + (time.perf_counter() - t0)
+            else:
+                feats = self.feature_host.snapshot(epoch, self.resolve)
             row.update(feats)
         for col, binding in self.derived_bindings:
             row[col] = binding.derive(row, epoch, self.resolve)
@@ -331,9 +357,15 @@ class HostCore:
             pass
 
     def stats(self) -> Dict[str, Any]:
-        return {"bars": self._bars_processed, "bars_by_stream": dict(self.mux.bars_seen), "candidates": self.candidates_emitted,
-                "observations": len(self.sink.observations), "epochs": self.epochs_evaluated, "pending_at_end": len(self.kernel.pending),
-                "dropped_outside_primary": {"candidates": self.sink.dropped_candidates, "observations": self.sink.dropped_observations}}
+        out = {"bars": self._bars_processed, "bars_by_stream": dict(self.mux.bars_seen), "candidates": self.candidates_emitted,
+               "observations": len(self.sink.observations), "epochs": self.epochs_evaluated, "pending_at_end": len(self.kernel.pending),
+               "dropped_outside_primary": {"candidates": self.sink.dropped_candidates, "observations": self.sink.dropped_observations}}
+        if self._profile_enabled:
+            total = sum(self._profile.values()) or 1.0
+            digits = 4  # host-constant: profile rounding
+            out["profile"] = {"seconds": {k: round(v, digits) for k, v in self._profile.items()},
+                              "share": {k: round(v / total, digits) for k, v in self._profile.items()}, "measured_total_s": round(total, digits)}
+        return out
 
 
 # --------------------------------------------------------------------------- #

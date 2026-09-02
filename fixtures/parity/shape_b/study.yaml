@@ -94,13 +94,37 @@ features:
         counter_regime_direction: pullback.counter_direction_at
         counter_regime_close_ts: pullback.counter_close_ts_at
         regime_expansion_atr_per_min: "const:null"
+  derived_inputs:
+    - name: model_c_score_at_candidate
+      kind: frozen_external_model_score
+      parent_study_id: clean_maturity_flip_model_rolling_productivity
+      parent_train_freeze_artifact: artifacts/train_experiment_freeze_repaired.json
+      parent_train_freeze_artifact_sha256: c5bd68ca503a2395b7ca695354fae5a5968b44c95aef74290bb59d952e4f49a9
+      parent_frozen_execution_composite_sha256: 7b0994145ce702fedbf3b589a98fa869b09ef57253a17722b8de25931cbb96c8
+      model_hashes:
+        LONG_C: a341ae262496ac30338f861535bf2dae45c301dff2d8753a8c4ce0821f555d38
+        SHORT_C: 5aa9f0c897e9b60bb83ab7d7c6b1f20411d261264dae4e5bfd753f6ed0bda0cf
+      preprocessing_hash: 0833da444eaafa8a8cfaae3740addaab9b904abf93be109843315691e62b6be4
+      model_artifact_path: artifacts/train_fitted_models.joblib
+      model_artifact_sha256: 03f602c5b38915c2a80ef474aba0ca95c6d3fbcb634243c24b8fa0a63a1aaa89
+      preprocessing_artifact_path: artifacts/preprocessing_manifest.json
+      preprocessing_artifact_sha256: d74dd6931cfb198e3093e9db3de96e98c23ccd483b0869a3a6342735faa9baa0
+      ordered_feature_surfaces:
+        LONG_C: [arrival_velocity, arrival_acceleration, ema_slope, prior_1m_regime_efficiency, prior_1m_regime_mfe_atr, prior_1m_regime_range_atr, prior_5m_regime_efficiency, prior_5m_regime_mfe_atr, prior_5m_regime_range_atr, rolling_300s_retention_ratio, rolling_300s_current_progress_atr, rolling_300s_max_progress_atr, rolling_300s_giveback_atr]
+        SHORT_C: [arrival_velocity, arrival_acceleration, ema_slope, prior_1m_regime_efficiency, prior_1m_regime_mfe_atr, prior_1m_regime_range_atr, prior_5m_regime_efficiency, prior_5m_regime_mfe_atr, prior_5m_regime_range_atr, rolling_300s_retention_ratio, rolling_300s_current_progress_atr, rolling_300s_max_progress_atr, rolling_300s_giveback_atr]
+      direction_arm_mapping: {LONG: LONG_C, SHORT: SHORT_C}
+      availability_reference: decision_ts
+      retrain_prohibited: true
 outcome:
   # The frozen TRAIN frames of the reference were labeled by the collector's legacy flip
   # path (prevailing 1m regime flips within 300s, RTH session-end censoring); the sealed
   # ordered barrier was not wired into the collector at collection time (memory:
   # forward_outcome_target_not_wired_into_collector).  Parity reproduces what was persisted.
+  # The reference collector ran with its default prevailing_regime='bullish' / target='bearish'
+  # configuration, so only a flip INTO the bearish regime resolves candidates (pending
+  # candidates survive an intermediate flip the other way).
   kind: label
-  event: regime_1m.flipped
+  event: regime_1m.flipped(to=-1)
   horizon: 300s
   direction: regime_1m.dir
   session_end: censor

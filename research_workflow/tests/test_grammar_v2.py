@@ -1,0 +1,112 @@
+"""Grammar and compiler tests: the predicate language stays tiny, set-expansion is exact,
+gaps are typed, and the three parity compositions compile without opening a catalog."""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from research_workflow.grammar import compile_study, load_spec
+from research_workflow.grammar.expansion import expand_instances
+from research_workflow.grammar.gaps import GapKind
+from research_workflow.grammar.predicates import PredicateSyntaxError, parse_predicate, referenced_roots, render
+
+ROOT = Path(__file__).resolve().parents[2]
+GOLDEN = ROOT / "fixtures" / "golden"
+
+
+def test_predicates_parse_and_render_canonically():
+    cases = {
+        "a.x >= 120s and b.y >= 1.0": "a.x >= 120s and b.y >= 1.0",
+        "state == WATCH and r5.turned(from=-r1.dir, to=r1.dir) and age(WATCH) > 0": "state == WATCH and r5.turned(from=-r1.dir, to=r1.dir) and age(WATCH) > 0",
+        "not (a.x in [1, 2]) or b.flipped": "not (a.x in [1, 2]) or b.flipped",
+        "x.depth_atr >= 2.5": "x.depth_atr >= 2.5",
+    }
+    for text, canon in cases.items():
+        ast = parse_predicate(text)
+        assert render(ast) == canon
+        assert render(parse_predicate(render(ast))) == canon
+
+
+def test_predicate_language_rejects_arithmetic_and_unknown_syntax():
+    for bad in ("a.x + 1 > 0", "a.x * b.y > 1", "foo(", "a.x >", "lambda: 1", "a.x ** 2"):
+        with pytest.raises(PredicateSyntaxError):
+            parse_predicate(bad)
+
+
+def test_referenced_roots():
+    assert referenced_roots(parse_predicate("a.x > 1 and b.turned(to=c.dir) or state == WATCH")) == {"a", "b", "c", "state"}
+
+
+def test_set_expansion_is_cartesian_and_ordered():
+    rows = expand_instances([{"feature": "f", "over": {"timeframe": ["1m", "5m"], "context": ["prior", "current"]}, "bar_state": "completed"}])
+    assert [r["parameters"] for r in rows] == [
+        {"bar_state": "completed", "timeframe": "1m", "context": "prior"}, {"bar_state": "completed", "timeframe": "1m", "context": "current"},
+        {"bar_state": "completed", "timeframe": "5m", "context": "prior"}, {"bar_state": "completed", "timeframe": "5m", "context": "current"}]
+    with pytest.raises(ValueError):
+        expand_instances([{"feature": "f", "over": {"timeframe": ["1m"]}, "alias": "x"}])
+
+
+@pytest.mark.parametrize("shape", ["shape_a", "shape_b", "shape_c"])
+def test_parity_compositions_compile_statically(shape):
+    out = compile_study(load_spec(ROOT / "fixtures" / "parity" / shape / "study.yaml"), repo_root=ROOT)
+    assert out.ok, out.card()
+    card = out.plan.card()
+    assert card["catalog_opened"] is False
+    assert all(b["bound"] for b in out.plan.binding_proof)
+    assert out.plan.plan_sha256 and out.plan.closure["composite_sha256"]
+
+
+def _gap_kinds(spec):
+    out = compile_study(spec, repo_root=ROOT)
+    assert not out.ok
+    return {(g.kind, g.where) for g in out.gaps.gaps}
+
+
+def _base():
+    return load_spec(ROOT / "fixtures" / "parity" / "shape_a" / "study.yaml")
+
+
+def test_gap_missing_capability():
+    spec = _base(); spec["context"]["nope"] = {"tracker": "regime.does_not_exist", "timeframe": "1m"}
+    assert (GapKind.MISSING_CAPABILITY, "context.nope") in _gap_kinds(spec)
+
+
+def test_gap_invalid_parameterization():
+    spec = _base(); spec["context"]["regime_1m"]["bogus_param"] = 3
+    assert (GapKind.INVALID_PARAMETERIZATION, "context.regime_1m") in _gap_kinds(spec)
+
+
+def test_gap_unavailable_stream():
+    spec = _base(); spec["streams"][0]["dataset"] = "NO_SUCH_DATASET"
+    assert (GapKind.UNAVAILABLE_STREAM, "streams[0]") in _gap_kinds(spec)
+
+
+def test_gap_unsupported_composition_event_in_qualify():
+    spec = _base(); spec["population"]["qualify"] = "regime_1m.flipped"
+    assert (GapKind.UNSUPPORTED_COMPOSITION, "population.qualify") in _gap_kinds(spec)
+
+
+def test_gap_semantic_decision_chronology_double_use():
+    spec = _base(); spec["model"] = {"family": "lightgbm", "validation": {"protocol": "model_selection.random", "tuning_years": [2021, 2022, 2023], "final_train_validation_years": [2023]}}
+    assert any(k == GapKind.SEMANTIC_DECISION_REQUIRED for k, _ in _gap_kinds(spec))
+
+
+def test_gap_ambiguous_temporal_semantics_atr_availability():
+    spec = load_spec(ROOT / "fixtures" / "parity" / "shape_c" / "study.yaml")
+    spec["outcome"].pop("atr_availability")
+    assert (GapKind.AMBIGUOUS_TEMPORAL_SEMANTICS, "outcome.atr_availability") in _gap_kinds(spec)
+
+
+def test_label_contract_refuses_decision_close_entry():
+    spec = load_spec(ROOT / "fixtures" / "parity" / "shape_c" / "study.yaml")
+    spec["outcome"]["entry_reference"] = "decision_close"
+    assert (GapKind.INVALID_PARAMETERIZATION, "outcome.entry_reference") in _gap_kinds(spec)
+
+
+def test_same_timestamp_opt_in_requires_a_decision():
+    from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
+    spec = load_spec(GOLDEN / "study_barrier.yaml")
+    spec["streams"][1]["same_ts"] = "available"
+    out = compile_study(spec, repo_root=ROOT, datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS)
+    assert not out.ok and any(g.kind == GapKind.SEMANTIC_DECISION_REQUIRED for g in out.gaps.gaps)
