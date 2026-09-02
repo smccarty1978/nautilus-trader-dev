@@ -144,19 +144,19 @@ def _host_bindings(repo_root: Path) -> Dict[str, List[Dict[str, Any]]]:
                           "warmup_bars": int(getattr(cls, "WARMUP_BARS", 0)), "status": "verified", "implementation": impl,
                           "implementation_path": f"{cls.__module__.replace('.', '/')}.py", "implementation_exists": True,
                           "required_tests": _tests_naming(cls.__name__, [repo_root / "research_workflow" / "tests", repo_root / "features" / "tests"]),
-                          "platform": "v2"})
+                          "platform": "v2", "implementation_verified": True, "missing_tests": []})
     from research_workflow.entry_references import ENTRY_REFERENCES
     for name, ref in ENTRY_REFERENCES.items():
         out["entry_references"].append({**ref.to_dict(), "kind": "entry_references", "parameters": [], "dependencies": [],
                                         "update_cadence": "per_candidate", "cost_class": "per_candidate", "status": "verified" if ref.executable else "candidate",
                                         "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel" if ref.executable else "research_workflow.entry_references",
-                                        "required_tests": ["research_workflow/tests/test_golden_fixture.py"], "platform": "v2"})
+                                        "required_tests": ["research_workflow/tests/test_golden_fixture.py"], "platform": "v2", "implementation_verified": True, "missing_tests": []})
     for tid, desc, impl in (("trigger.host.grid_cadence", "Host-owned checkpoint grid: epochs every N seconds from a tracker anchor, missing seconds skipped, bounded by max_age.", "research_workflow.host.strategy.HostCore"),
                             ("trigger.host.completed_bar_cadence", "Host-owned epoch per completed bar of a declared stream.", "research_workflow.host.strategy.HostCore"),
                             ("trigger.host.state_graph", "Host-owned OBSERVE->WATCH->ARMED->ENTERED state engine over compiled predicates (reset/expire/chain/precedence/cooldown/max_per_watch).", "research_workflow.host.triggers.TriggerEngine")):
         out["trigger_primitives"].append({"id": tid, "kind": "trigger_primitives", "name": tid.split(".", 1)[1], "version": 1, "description": desc, "parameters": [],
                                           "dependencies": [], "update_cadence": "per_source_event", "cost_class": "per_source_event", "status": "verified",
-                                          "implementation": impl, "required_tests": ["research_workflow/tests/test_golden_fixture.py", "research_workflow/tests/test_host_core.py"], "platform": "v2"})
+                                          "implementation": impl, "required_tests": ["research_workflow/tests/test_golden_fixture.py", "research_workflow/tests/test_host_core.py"], "platform": "v2", "implementation_verified": True, "missing_tests": []})
     for oid, desc in (("outcome.label.barrier_race", "Label contract: N barrier arms from one next_bar_open entry; SESSION_END/TIMEOUT/GAP/AMBIGUOUS/DATA_END censoring; per-arm columns."),
                       ("outcome.label.flip_within_horizon", "Label contract: regime change of a declared role within an inclusive horizon; session censoring; hold-at-equality sweep."),
                       ("outcome.label.composite", "Label contract: barrier arms AND/OR a flip child with monotone worst-status censoring."),
@@ -165,7 +165,7 @@ def _host_bindings(repo_root: Path) -> Dict[str, List[Dict[str, Any]]]:
                                 "dependencies": ["entry.next_bar_open"] if "trade" not in oid else [], "update_cadence": "per_1s", "cost_class": "per_1s",
                                 "status": "verified" if "trade" not in oid else "candidate",
                                 "implementation": "research_workflow.host.outcomes." + ("TradeExecutionContract" if "trade" in oid else "LabelOutcomeKernel"),
-                                "required_tests": ["research_workflow/tests/test_golden_fixture.py"], "platform": "v2"})
+                                "required_tests": ["research_workflow/tests/test_golden_fixture.py"], "platform": "v2", "implementation_verified": True, "missing_tests": []})
     return out
 
 
