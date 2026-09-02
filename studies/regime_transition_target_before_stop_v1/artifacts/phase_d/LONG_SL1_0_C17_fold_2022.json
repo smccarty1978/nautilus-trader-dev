@@ -1,0 +1,61 @@
+{
+  "modeling_version": "1.0.0",
+  "arms": {
+    "LONG_SL1_0_C17_fold_2022": {
+      "arm": "LONG_SL1_0_C17_fold_2022",
+      "estimator": "lightgbm",
+      "ordered_features": [
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "n_features": 13,
+      "n_rows": 197741,
+      "seed": 42,
+      "hyperparameters": {
+        "max_depth": 5,
+        "num_leaves": 15,
+        "learning_rate": 0.03,
+        "min_data_in_leaf": 500,
+        "n_estimators": 200,
+        "n_jobs": 1,
+        "deterministic": true,
+        "verbosity": -1
+      },
+      "split_policy": {
+        "kind": "explicit_index",
+        "fit_partitions": [],
+        "eval_partitions": [],
+        "description": "Phase D fold_2022 expanding temporal regime-grouped"
+      },
+      "dataset_identity_sha256": "b4e05ae0237824cada2f7d8a9975dffc288a468294e931ba2749eb967fd7482b",
+      "analysis_spec_sha256": null,
+      "library_versions": {
+        "python": "3.13.7",
+        "numpy": "2.3.3",
+        "pandas": "2.3.3",
+        "sklearn": "1.7.2",
+        "lightgbm": "4.6.0"
+      },
+      "model_sha256": "53e83491c9d25a8a09780bcaa7ed1d027e732effbcd52fa053d8d374d4ff9332",
+      "x_content_sha256": "06e748171bad149a141485b592ba421a8b37bc52f9caf865b8d34e4aca58bbb3",
+      "y_content_sha256": "8b347781a948083a4efcbd8a5475e1f9c19665200cc59437d866b0dbb9496ea1",
+      "partition_provenance": "meta_partition",
+      "prediction_sha256": null,
+      "threshold_freeze": null,
+      "modeling_version": "1.0.0",
+      "fitted_utc": "2026-09-02T03:20:17.693357+00:00",
+      "fit_identity_sha256": "791e3f48860739dd639f2703229939a45b39bd366d371498c565d0c2edaf3552"
+    }
+  }
+}
