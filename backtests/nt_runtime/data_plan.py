@@ -126,6 +126,7 @@ PRODUCT_CATALOGS: Dict[str, Dict[str, Any]] = {
         "multiplier": "20.0",
         "price_increment": "0.25",
         "catalog_rel_path": "data/catalog/NQ_v0_2020_2026",
+        "dataset_id": "NQ_v0_2020_2026",
         "bar_type_1s": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
         "bar_type_1m": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
         "raw_timestamp_semantic": "OPEN_STAMPED",
@@ -139,6 +140,7 @@ PRODUCT_CATALOGS: Dict[str, Dict[str, Any]] = {
         "multiplier": "50.0",
         "price_increment": "0.25",
         "catalog_rel_path": "data/catalog/ES_v0_2020_2026",
+        "dataset_id": "ES_v0_2020_2026",
         "bar_type_1s": "ES.XCME-1-SECOND-LAST-EXTERNAL",
         "bar_type_1m": "ES.XCME-1-MINUTE-LAST-EXTERNAL",
         "raw_timestamp_semantic": "OPEN_STAMPED",
@@ -152,6 +154,7 @@ PRODUCT_CATALOGS: Dict[str, Dict[str, Any]] = {
         "multiplier": "5.0",
         "price_increment": "1",
         "catalog_rel_path": "data/catalog/YM_v0_2024",
+        "dataset_id": "YM_v0_2024",
         "bar_type_1s": "YM.XCBT-1-SECOND-LAST-EXTERNAL",
         "bar_type_1m": "YM.XCBT-1-MINUTE-LAST-EXTERNAL",
         "raw_timestamp_semantic": "OPEN_STAMPED",
@@ -210,6 +213,10 @@ class DataPlan:
     raw_timestamp_semantic: str
     ts_init_delta_1s_ns: int
     ts_init_delta_1m_ns: int
+    # Dataset identity (research_workflow.roots): receipts record these, never catalog_path.
+    dataset_id: Optional[str] = None
+    dataset_logical_digest: Optional[str] = None
+    dataset_resolution: Optional[str] = None
 
 
 def resolve_catalog_plan(
@@ -251,7 +258,12 @@ def resolve_catalog_plan(
         raise ValueError(f"Unsupported product '{symbol}'. Supported: {list(PRODUCT_CATALOGS.keys())}")
 
     prod = PRODUCT_CATALOGS[symbol]
-    catalog_path = (repo_root / prod["catalog_rel_path"]).resolve()
+    # Machine-local root resolution (research_workflow.roots). With catalog_roots
+    # configured the dataset is located ONLY by dataset_id + committed logical digest;
+    # without a config the legacy repo-relative catalog_rel_path applies unchanged.
+    from research_workflow.roots import resolve_dataset
+    resolved = resolve_dataset(prod["dataset_id"], repo_root, catalog_rel_path=prod["catalog_rel_path"])
+    catalog_path = resolved.catalog_path
     if not catalog_path.exists():
         # A2.1: fail closed. The prior behaviour re-resolved `prod["catalog_rel_path"]`
         # relative to the process CWD, which could silently open a different physical
@@ -288,6 +300,9 @@ def resolve_catalog_plan(
         raw_timestamp_semantic=prod["raw_timestamp_semantic"],
         ts_init_delta_1s_ns=prod["ts_init_delta_1s_ns"],
         ts_init_delta_1m_ns=prod["ts_init_delta_1m_ns"],
+        dataset_id=resolved.dataset_id,
+        dataset_logical_digest=resolved.logical_digest,
+        dataset_resolution=resolved.resolution,
     )
 
 

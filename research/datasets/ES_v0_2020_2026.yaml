@@ -1,0 +1,39 @@
+# DatasetSpec authority for the ES_v0_2020_2026 physical catalog (binding layer over
+# backtests/nt_runtime/data_plan.py:PRODUCT_CATALOGS["ES"]). 5m is derived at runtime
+# from completed 1m bars; the catalog-level 5m stream is not used by governed studies.
+
+dataset_id: ES_v0_2020_2026
+instrument_id: ES.XCME
+catalog_rel_path: data/catalog/ES_v0_2020_2026   # legacy/transitional only; ignored once catalog_roots are configured
+
+# Scientific identity of the immutable catalog (research_workflow.roots).
+logical_digest: 9fa50102a121327212231e2d46fc6484fce6d4c9c7d1458b3ac7ef4c54c02ba0
+digest_method: sha256(sorted(relpath,size,sha256(bytes)) under <catalog>/data)
+
+provenance:
+  source: databento
+  manifest_path: null
+  expected_hash: null
+
+streams:
+  1s:
+    source: external
+    bar_type: ES.XCME-1-SECOND-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 1000000000
+  1m:
+    source: external
+    bar_type: ES.XCME-1-MINUTE-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 60000000000
+  5m:
+    source: derived
+    external_catalog_stream: false
+    derived_from: 1m
+    aggregator: CompletedMinuteFiveMinuteAggregator
+
+coverage:
+  start: '2020-01-01T23:01:00Z'
+  end: '2026-04-30T00:00:00Z'

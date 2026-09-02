@@ -13,7 +13,12 @@
 
 dataset_id: NQ_v0_2020_2026
 instrument_id: NQ.XCME
-catalog_rel_path: data/catalog/NQ_v0_2020_2026
+catalog_rel_path: data/catalog/NQ_v0_2020_2026   # legacy/transitional only; ignored once catalog_roots are configured
+
+# Scientific identity of the immutable catalog (research_workflow.roots). Machine-local
+# catalog roots are matched against this digest; receipts record it, never a path.
+logical_digest: 1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f
+digest_method: sha256(sorted(relpath,size,sha256(bytes)) under <catalog>/data)
 
 provenance:
   source: databento

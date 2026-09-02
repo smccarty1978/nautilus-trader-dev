@@ -1,0 +1,128 @@
+"""``research`` -- the single operator CLI over the governed platform.
+
+Every command prints one compact JSON card on stdout; verbose output goes to disk.
+
+    research data manifest <dataset_id> [--catalog <dir>]   write <catalog>/dataset_manifest.json, print digest
+    research data verify <dataset_id>                        resolve through configured roots and verify digest
+    research data roots                                      show the machine-local root configuration
+    research cap list [kind] | describe <id> | search <text>  generated capability registry
+    research study new <id> [--from-question <file>]         branch + sibling worktree + lease + skeleton
+    research ws list                                         branches, worktrees, owners, leases, dirty state
+    research study run --study <dir> --through <stage> ...   delegates to scripts/run_governed_study.py
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
+def _card(payload: dict, *, ok: bool = True) -> int:
+    print(json.dumps({"STATUS": "OK" if ok else "FAIL", **payload}, indent=None, sort_keys=True, default=str))
+    return 0 if ok else 2
+
+
+# ---------------------------------------------------------------------------
+# data
+# ---------------------------------------------------------------------------
+
+def cmd_data_roots(_: argparse.Namespace) -> int:
+    from research_workflow.roots import load_config
+    return _card({"roots": load_config().as_dict()})
+
+
+def cmd_data_manifest(ns: argparse.Namespace) -> int:
+    from research_workflow.roots import committed_dataset_spec_path, load_config, write_dataset_manifest
+    import yaml
+    spec_path = committed_dataset_spec_path(ns.dataset_id, ROOT)
+    spec = yaml.safe_load(spec_path.read_text(encoding="utf-8")) if spec_path.is_file() else {}
+    if ns.catalog:
+        catalog = Path(ns.catalog).resolve()
+    else:
+        cfg = load_config()
+        candidates = [r / ns.dataset_id for r in cfg.catalog_roots if (r / ns.dataset_id).is_dir()]
+        catalog = candidates[0] if candidates else (ROOT / str(spec.get("catalog_rel_path", f"data/catalog/{ns.dataset_id}"))).resolve()
+    manifest = write_dataset_manifest(catalog, ns.dataset_id, spec.get("instrument_id"))
+    committed = spec.get("logical_digest")
+    return _card({"dataset_id": ns.dataset_id, "catalog": str(catalog), "logical_digest": manifest["logical_digest"],
+                  "file_count": manifest["file_count"], "total_bytes": manifest["total_bytes"],
+                  "committed_digest": committed, "matches_committed": (committed == manifest["logical_digest"]) if committed else None,
+                  "next": None if committed == manifest["logical_digest"] else f"set logical_digest in {spec_path.relative_to(ROOT).as_posix()} and commit"})
+
+
+def cmd_data_verify(ns: argparse.Namespace) -> int:
+    from research_workflow.roots import compute_catalog_digest, resolve_dataset
+    try:
+        r = resolve_dataset(ns.dataset_id, ROOT)
+    except Exception as exc:  # typed errors carry their code in the message
+        return _card({"dataset_id": ns.dataset_id, "error": f"{type(exc).__name__}: {exc}"}, ok=False)
+    payload = {"dataset_id": r.dataset_id, "resolution": r.resolution, "logical_digest": r.logical_digest}
+    if ns.recompute:
+        actual = compute_catalog_digest(r.catalog_path)["logical_digest"]
+        payload.update({"recomputed_digest": actual, "bytes_match_manifest": actual == r.logical_digest})
+        return _card(payload, ok=actual == r.logical_digest)
+    return _card(payload)
+
+
+# ---------------------------------------------------------------------------
+# delegations (filled by later platform-v2 items)
+# ---------------------------------------------------------------------------
+
+def cmd_cap(ns: argparse.Namespace) -> int:
+    from research_workflow.capabilities import cli as cap_cli
+    return cap_cli(ns)
+
+
+def cmd_study_new(ns: argparse.Namespace) -> int:
+    from research_workflow.workspace import study_new
+    return _card(study_new(ns.study_id, repo_root=ROOT, question_file=ns.from_question, dataset_id=ns.dataset))
+
+
+def cmd_ws_list(_: argparse.Namespace) -> int:
+    from research_workflow.workspace import ws_list
+    return _card(ws_list(repo_root=ROOT))
+
+
+def cmd_study_run(ns: argparse.Namespace, extra: list[str]) -> int:
+    cmd = [sys.executable, str(ROOT / "scripts" / "run_governed_study.py"), *extra]
+    return subprocess.run(cmd, cwd=str(ROOT)).returncode
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="research", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="group", required=True)
+
+    data = sub.add_parser("data").add_subparsers(dest="cmd", required=True)
+    data.add_parser("roots").set_defaults(fn=cmd_data_roots)
+    m = data.add_parser("manifest"); m.add_argument("dataset_id"); m.add_argument("--catalog"); m.set_defaults(fn=cmd_data_manifest)
+    v = data.add_parser("verify"); v.add_argument("dataset_id"); v.add_argument("--recompute", action="store_true"); v.set_defaults(fn=cmd_data_verify)
+
+    cap = sub.add_parser("cap").add_subparsers(dest="cmd", required=True)
+    c = cap.add_parser("list"); c.add_argument("kind", nargs="?"); c.add_argument("--status"); c.set_defaults(fn=cmd_cap)
+    c = cap.add_parser("describe"); c.add_argument("capability_id"); c.set_defaults(fn=cmd_cap)
+    c = cap.add_parser("search"); c.add_argument("text"); c.set_defaults(fn=cmd_cap)
+    c = cap.add_parser("generate"); c.add_argument("--check", action="store_true"); c.set_defaults(fn=cmd_cap)
+
+    study = sub.add_parser("study").add_subparsers(dest="cmd", required=True)
+    n = study.add_parser("new"); n.add_argument("study_id"); n.add_argument("--from-question"); n.add_argument("--dataset", default="NQ_v0_2020_2026"); n.set_defaults(fn=cmd_study_new)
+    r = study.add_parser("run"); r.set_defaults(fn=cmd_study_run, passthrough=True)
+
+    ws = sub.add_parser("ws").add_subparsers(dest="cmd", required=True)
+    ws.add_parser("list").set_defaults(fn=cmd_ws_list)
+
+    ns, extra = ap.parse_known_args(argv)
+    if getattr(ns, "passthrough", False):
+        return ns.fn(ns, extra)
+    if extra:
+        ap.error(f"unrecognized arguments: {extra}")
+    return ns.fn(ns)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

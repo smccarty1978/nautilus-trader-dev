@@ -98,7 +98,8 @@ def test_r1_exact_declared_resolved_opened_dataset_parity_passes():
     assert data_plan.catalog_path == REAL_NQ_CATALOG.resolve()
 
 
-def test_r1_wrong_physical_catalog_fails(tmp_path: Path):
+def test_r1_wrong_physical_catalog_fails(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("NT_RESEARCH_CONFIG", str(tmp_path / "absent.yaml"))  # legacy repo-relative mode
     """DatasetSpec.dataset_id itself disagrees with the study's declared dataset_id --
     resolve_catalog_plan/resolve_data_plan's own path-based A2.2 check cannot see this
     (the paths still match); verify_dataset_identity_chain's own DatasetSpec.dataset_id

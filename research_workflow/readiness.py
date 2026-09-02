@@ -160,7 +160,12 @@ def verify_dataset_identity_chain(
             f"DatasetSpec authority file at {dataset_spec_path}"
         )
     dataset_spec = load_dataset_spec(dataset_spec_path)
-    expected_catalog_path = (repo_root / dataset_spec.catalog_rel_path).resolve()
+    # The DatasetSpec authority resolves through the same machine-local root resolver the
+    # data plan used (research_workflow.roots); with catalog_roots configured that is by
+    # dataset_id + committed logical digest, otherwise the legacy repo-relative path.
+    from research_workflow.roots import read_dataset_manifest, resolve_dataset
+    expected = resolve_dataset(dataset_spec.dataset_id, repo_root, catalog_rel_path=dataset_spec.catalog_rel_path)
+    expected_catalog_path = expected.catalog_path
     loader = CausalDataLoader(data_plan.catalog_path)
 
     if dataset_spec.dataset_id != declared_dataset_id:
@@ -182,6 +187,15 @@ def verify_dataset_identity_chain(
         raise WrongPhysicalDatasetError(
             f"WRONG_PHYSICAL_DATASET: resolved catalog path does not exist on disk: {data_plan.catalog_path}"
         )
+    # Digest identity: when the committed DatasetSpec declares a logical digest, the opened
+    # catalog must carry an on-disk manifest with the same digest.
+    on_disk = read_dataset_manifest(data_plan.catalog_path)
+    if dataset_spec.logical_digest:
+        if not on_disk or on_disk.get("logical_digest") != dataset_spec.logical_digest:
+            raise WrongPhysicalDatasetError(
+                f"WRONG_PHYSICAL_DATASET: opened catalog digest {(on_disk or {}).get('logical_digest')} != "
+                f"committed DatasetSpec logical_digest {dataset_spec.logical_digest}"
+            )
 
     return _result(
         True, "DATASET_IDENTITY_OK",
@@ -189,6 +203,8 @@ def verify_dataset_identity_chain(
         "CausalDataLoader.catalog_path == actual catalog on disk",
         declared_dataset_id=declared_dataset_id,
         dataset_spec_dataset_id=dataset_spec.dataset_id,
+        dataset_logical_digest=dataset_spec.logical_digest or (on_disk or {}).get("logical_digest"),
+        dataset_resolution=expected.resolution,
         resolved_catalog_path=str(data_plan.catalog_path),
         warmup_start=data_plan.warmup_start_dt.isoformat(),
         run_end=data_plan.end_dt.isoformat(),

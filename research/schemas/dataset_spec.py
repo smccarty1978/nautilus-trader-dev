@@ -71,7 +71,13 @@ class DatasetSpec(BaseModel):
 
     dataset_id: str = Field(..., description="Identifier a study references via execution.data_requirements.dataset_id")
     instrument_id: str = Field(..., description="NautilusTrader instrument id, e.g. NQ.XCME")
-    catalog_rel_path: str = Field(..., description="Repo-relative path to the physical ParquetDataCatalog")
+    catalog_rel_path: str = Field(..., description="Repo-relative path to the physical ParquetDataCatalog (legacy/transitional resolution only; ignored once catalog_roots are configured)")
+    logical_digest: Optional[str] = Field(
+        None,
+        description="Content digest of the immutable catalog (research_workflow.roots.compute_catalog_digest). "
+                    "This is the dataset's scientific identity; machine-local roots are matched against it.",
+    )
+    digest_method: Optional[str] = Field(None, description="How logical_digest was computed (research_workflow.roots.DIGEST_METHOD)")
     provenance: DatasetProvenance = Field(default_factory=DatasetProvenance)
     streams: Dict[str, StreamSpec] = Field(..., description="Per-timeframe stream contracts, keyed '1s'/'1m'/'5m'")
     coverage: DatasetCoverage
