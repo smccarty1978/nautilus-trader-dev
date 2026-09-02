@@ -1,19 +1,19 @@
 {
   "study": "v2_shape_c_barrier_race_fade",
   "shape": "c",
-  "partition": "train",
-  "year": 2021,
+  "partition": "oos",
+  "year": 2022,
   "rows": {
-    "runtime_candidates": 453768,
-    "reference_candidates": 453768,
-    "runtime_observations": 453768,
-    "reference_observations": 453768
+    "runtime_candidates": 475529,
+    "reference_candidates": 475529,
+    "runtime_observations": 475529,
+    "reference_observations": 475529
   },
   "candidates": {
     "passed": true,
-    "reference_rows": 453768,
-    "runtime_rows": 453768,
-    "common_rows": 453768,
+    "reference_rows": 475529,
+    "runtime_rows": 475529,
+    "common_rows": 475529,
     "only_in_reference": 0,
     "only_in_runtime": 0,
     "duplicate_keys": {
@@ -31,9 +31,9 @@
   },
   "observations": {
     "passed": false,
-    "reference_rows": 453768,
-    "runtime_rows": 453768,
-    "common_rows": 453768,
+    "reference_rows": 475529,
+    "runtime_rows": 475529,
+    "common_rows": 475529,
     "only_in_reference": 0,
     "only_in_runtime": 0,
     "duplicate_keys": {
@@ -42,59 +42,67 @@
     },
     "missing_columns": [],
     "columns_compared": 13,
-    "value_mismatches": 306,
+    "value_mismatches": 116,
     "per_column": {
+      "target_tp1_sl0_5_label": {
+        "mismatches": 3,
+        "max_abs_diff": 0.0
+      },
+      "target_tp1_sl0_5_disposition": {
+        "mismatches": 3,
+        "max_abs_diff": null
+      },
       "target_tp1_sl0_5_censor_reason": {
-        "mismatches": 47,
+        "mismatches": 7,
         "max_abs_diff": null
       },
       "target_tp1_sl0_5_resolution_seconds": {
-        "mismatches": 47,
-        "max_abs_diff": 6600.0
+        "mismatches": 7,
+        "max_abs_diff": 17742.0
       },
       "target_tp1_sl1_0_label": {
-        "mismatches": 1,
+        "mismatches": 7,
         "max_abs_diff": 0.0
       },
       "target_tp1_sl1_0_disposition": {
-        "mismatches": 1,
+        "mismatches": 7,
         "max_abs_diff": null
       },
       "target_tp1_sl1_0_censor_reason": {
-        "mismatches": 50,
+        "mismatches": 14,
         "max_abs_diff": null
       },
       "target_tp1_sl1_0_resolution_seconds": {
-        "mismatches": 50,
-        "max_abs_diff": 18001.0
+        "mismatches": 14,
+        "max_abs_diff": 17912.0
       },
       "target_tp1_sl1_5_label": {
-        "mismatches": 3,
+        "mismatches": 10,
         "max_abs_diff": 0.0
       },
       "target_tp1_sl1_5_disposition": {
-        "mismatches": 3,
+        "mismatches": 10,
         "max_abs_diff": null
       },
       "target_tp1_sl1_5_censor_reason": {
-        "mismatches": 52,
+        "mismatches": 17,
         "max_abs_diff": null
       },
       "target_tp1_sl1_5_resolution_seconds": {
-        "mismatches": 52,
-        "max_abs_diff": 18001.0
+        "mismatches": 17,
+        "max_abs_diff": 17996.0
       }
     },
     "first_divergence": {
-      "timestamp": 1611090900000000000,
+      "timestamp": 1647375000000000000,
       "key": [
-        1611090900000000000,
-        1611090240000000000,
-        131
+        1647375000000000000,
+        1647374580000000000,
+        83
       ],
-      "column": "target_tp1_sl0_5_censor_reason",
-      "reference": "DATA_END",
-      "runtime": "SESSION_END"
+      "column": "target_tp1_sl1_0_censor_reason",
+      "reference": "SESSION_END",
+      "runtime": "TIMEOUT"
     },
     "tolerance": 1e-09,
     "only_in_reference_examples": [],

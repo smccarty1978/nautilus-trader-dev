@@ -1,23 +1,11 @@
 {
-  "features": [
-    "prior_1m_regime_efficiency",
-    "prior_1m_regime_mfe_atr",
-    "prior_1m_regime_range_atr",
-    "prior_5m_regime_efficiency",
-    "prior_5m_regime_mfe_atr",
-    "prior_5m_regime_range_atr",
-    "rolling_300s_retention_ratio",
-    "rolling_300s_current_progress_atr",
-    "rolling_300s_max_progress_atr",
-    "rolling_300s_giveback_atr",
-    "arrival_velocity",
-    "arrival_acceleration",
-    "ema_slope"
-  ],
-  "generated_at_utc": "2026-09-02T20:54:58.865154+00:00",
-  "mode": "score",
-  "model_id": null,
-  "models": [
+  "contract": "label",
+  "dispositions": {
+    "CENSORED": 79873,
+    "LABELED_NEGATIVE": 197589,
+    "LABELED_POSITIVE": 198067
+  },
+  "frozen_models_oos": [
     {
       "id": "a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1",
       "inputs": [
@@ -47,17 +35,17 @@
         ]
       },
       "metrics_by_year": {
-        "2021": {
-          "brier": 0.19666069915767584,
-          "n": 234984,
-          "positives": 76752,
-          "pr_auc": 0.5837079218891105,
-          "roc_auc": 0.7368492051133388,
-          "score_digest": "814fc57a8858f9b6c2601fc10ce2085b09780d14e8e561c536faa5d66699586d"
+        "2022": {
+          "brier": 0.22641710163905251,
+          "n": 229985,
+          "positives": 76263,
+          "pr_auc": 0.3424951131812346,
+          "roc_auc": 0.5119456609842061,
+          "score_digest": "27281ed5ad7c51457cd80774e3f0c3deab4cf628e156db326deea2b4391324f7"
         }
       },
       "name": "LONG_SL0_5",
-      "rows_scored": 234984,
+      "rows_scored": 229985,
       "subset": {
         "regime_direction": 1
       }
@@ -91,17 +79,17 @@
         ]
       },
       "metrics_by_year": {
-        "2021": {
-          "brier": 0.2130676688379666,
-          "n": 197742,
-          "positives": 99698,
-          "pr_auc": 0.7707636222817071,
-          "roc_auc": 0.7682943617688374,
-          "score_digest": "5ab5435446b70c5990a61c29f725ccb89c721fc5bddd9523f58512e7b2d1a2e1"
+        "2022": {
+          "brier": 0.25686572974092786,
+          "n": 199686,
+          "positives": 100721,
+          "pr_auc": 0.5154841235868558,
+          "roc_auc": 0.513500980469089,
+          "score_digest": "55fbed6ba414e1761bbac161e929a4729486d38140756d134237efe7ad5227f1"
         }
       },
       "name": "LONG_SL1_0",
-      "rows_scored": 197742,
+      "rows_scored": 199686,
       "subset": {
         "regime_direction": 1
       }
@@ -135,17 +123,17 @@
         ]
       },
       "metrics_by_year": {
-        "2021": {
-          "brier": 0.20324896766316963,
-          "n": 161113,
-          "positives": 105092,
-          "pr_auc": 0.8308141419711027,
-          "roc_auc": 0.7402207899730616,
-          "score_digest": "090f3b6339c6e8476c0f8a746276aa81074426edd6c3335bed4a6b795597672f"
+        "2022": {
+          "brier": 0.23305429526655477,
+          "n": 165992,
+          "positives": 107026,
+          "pr_auc": 0.6530075584812609,
+          "roc_auc": 0.5131733373747928,
+          "score_digest": "3c84aafaefa21a4ee598fc013b29a78a96681810c3f5404a37e677974de61aa3"
         }
       },
       "name": "LONG_SL1_5",
-      "rows_scored": 161113,
+      "rows_scored": 165992,
       "subset": {
         "regime_direction": 1
       }
@@ -179,17 +167,17 @@
         ]
       },
       "metrics_by_year": {
-        "2021": {
-          "brier": 0.21673863455118555,
-          "n": 196662,
-          "positives": 66426,
-          "pr_auc": 0.46699588420064664,
-          "roc_auc": 0.6393158822260181,
-          "score_digest": "1e7ffb99c3cb3b370e56595bb21aa660fc3546f8cdb723c354d1da5938ea5768"
+        "2022": {
+          "brier": 0.22156213016047185,
+          "n": 222295,
+          "positives": 72776,
+          "pr_auc": 0.3318252105999416,
+          "roc_auc": 0.5060967682508329,
+          "score_digest": "170b7d4341a555b6de5d2b9e5cbfcf5e68cd3f22531c6cf16c9a2dc23c438936"
         }
       },
       "name": "SHORT_SL0_5",
-      "rows_scored": 196662,
+      "rows_scored": 222295,
       "subset": {
         "regime_direction": -1
       }
@@ -223,17 +211,17 @@
         ]
       },
       "metrics_by_year": {
-        "2021": {
-          "brier": 0.23252300645885038,
-          "n": 178316,
-          "positives": 90759,
-          "pr_auc": 0.6927841434106078,
-          "roc_auc": 0.6963333780734281,
-          "score_digest": "ab0a364a6565c0b77436917d30c0714364e1114490c5c4b29c62e56bd447cbf5"
+        "2022": {
+          "brier": 0.2521348125466254,
+          "n": 195970,
+          "positives": 97346,
+          "pr_auc": 0.5083097221464308,
+          "roc_auc": 0.5170213890300422,
+          "score_digest": "c669ba9d9995d246f2f4977540d0939e5fada851ff450159278f8b93589c70e1"
         }
       },
       "name": "SHORT_SL1_0",
-      "rows_scored": 178316,
+      "rows_scored": 195970,
       "subset": {
         "regime_direction": -1
       }
@@ -267,6 +255,103 @@
         ]
       },
       "metrics_by_year": {
+        "2022": {
+          "brier": 0.2381293116715031,
+          "n": 164122,
+          "positives": 103901,
+          "pr_auc": 0.6481753260040098,
+          "roc_auc": 0.5182995814599582,
+          "score_digest": "fbe7a85a41107c18c6431ba06d16ff74805bd2e39274e742de64d81d20a212c8"
+        }
+      },
+      "name": "SHORT_SL1_5",
+      "rows_scored": 164122,
+      "subset": {
+        "regime_direction": -1
+      }
+    }
+  ],
+  "generated_at_utc": "2026-09-02T21:28:22.207507+00:00",
+  "oos_years": [
+    2022
+  ],
+  "plan_sha256": "5655c7fbf30180566076fb433bc615ae1846c9b3ecdb25da6b40a1b43d866831",
+  "rows": 475529,
+  "schema_version": 2,
+  "train_metrics": [
+    {
+      "id": "a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1",
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.19666069915767584,
+          "n": 234984,
+          "positives": 76752,
+          "pr_auc": 0.5837079218891105,
+          "roc_auc": 0.7368492051133388,
+          "score_digest": "814fc57a8858f9b6c2601fc10ce2085b09780d14e8e561c536faa5d66699586d"
+        }
+      },
+      "name": "LONG_SL0_5"
+    },
+    {
+      "id": "98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8",
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.2130676688379666,
+          "n": 197742,
+          "positives": 99698,
+          "pr_auc": 0.7707636222817071,
+          "roc_auc": 0.7682943617688374,
+          "score_digest": "5ab5435446b70c5990a61c29f725ccb89c721fc5bddd9523f58512e7b2d1a2e1"
+        }
+      },
+      "name": "LONG_SL1_0"
+    },
+    {
+      "id": "546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f",
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.20324896766316963,
+          "n": 161113,
+          "positives": 105092,
+          "pr_auc": 0.8308141419711027,
+          "roc_auc": 0.7402207899730616,
+          "score_digest": "090f3b6339c6e8476c0f8a746276aa81074426edd6c3335bed4a6b795597672f"
+        }
+      },
+      "name": "LONG_SL1_5"
+    },
+    {
+      "id": "1b285fe3e30ba26a6dd44facd79acd2a1ba86699c85253345caa7677fac19909",
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.21673863455118555,
+          "n": 196662,
+          "positives": 66426,
+          "pr_auc": 0.46699588420064664,
+          "roc_auc": 0.6393158822260181,
+          "score_digest": "1e7ffb99c3cb3b370e56595bb21aa660fc3546f8cdb723c354d1da5938ea5768"
+        }
+      },
+      "name": "SHORT_SL0_5"
+    },
+    {
+      "id": "45c2c6227edca652e6f5d052aa7476bbdb4e83652ce3aeb3ea202724cd60c80b",
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.23252300645885038,
+          "n": 178316,
+          "positives": 90759,
+          "pr_auc": 0.6927841434106078,
+          "roc_auc": 0.6963333780734281,
+          "score_digest": "ab0a364a6565c0b77436917d30c0714364e1114490c5c4b29c62e56bd447cbf5"
+        }
+      },
+      "name": "SHORT_SL1_0"
+    },
+    {
+      "id": "36ba0ed6e64e5a487a519bffa77f77a10ba83100157cbbf0e87cf284387a00b4",
+      "metrics_by_year": {
         "2021": {
           "brier": 0.19249024500153816,
           "n": 153553,
@@ -276,26 +361,7 @@
           "score_digest": "40ec1340c3ff3e45c3a7a16bb6bb3a3b132337aea8c297f2946774cd54449771"
         }
       },
-      "name": "SHORT_SL1_5",
-      "rows_scored": 153553,
-      "subset": {
-        "regime_direction": -1
-      }
+      "name": "SHORT_SL1_5"
     }
-  ],
-  "new_models_trained": false,
-  "plan_sha256": "5655c7fbf30180566076fb433bc615ae1846c9b3ecdb25da6b40a1b43d866831",
-  "reused_model_ids": [
-    "a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1",
-    "98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8",
-    "546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f",
-    "1b285fe3e30ba26a6dd44facd79acd2a1ba86699c85253345caa7677fac19909",
-    "45c2c6227edca652e6f5d052aa7476bbdb4e83652ce3aeb3ea202724cd60c80b",
-    "36ba0ed6e64e5a487a519bffa77f77a10ba83100157cbbf0e87cf284387a00b4"
-  ],
-  "rows": {
-    "total": 453768
-  },
-  "schema_version": 2,
-  "training_population_identity": "5b3aadb459318262ad472df1eb0a5dd97ced9b564e30b787856171098de565a1"
+  ]
 }
