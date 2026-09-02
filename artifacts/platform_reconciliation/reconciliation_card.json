@@ -1,0 +1,61 @@
+{
+  "phase": "0B_CONTROLLER_RECONCILIATION",
+  "status": "CLEAN",
+  "authoritative_platform_base": "fde7a96",
+  "authoritative_controller": {
+    "source": "study/regime-transition-target-before-stop-v1 @ fad65a0 (= f711f50 + fad65a0)",
+    "proof": "git diff 3d3820f f711f50 is empty; fad65a0 adds +214/-2 across 4 controller files; the standalone controller branch is a strict content subset"
+  },
+  "reconciled_branch": "chore/platform-reconciled",
+  "commits": [
+    {
+      "sha": "bec5ede",
+      "what": "Phase 0A inventory + merge plan + detached-worktree stray diff patch"
+    },
+    {
+      "sha": "de10868",
+      "what": "cherry-pick -x f711f50 (controller v2, PLATFORM)"
+    },
+    {
+      "sha": "ed31985",
+      "what": "cherry-pick -x fad65a0 (sealed legacy semantic handoffs, PLATFORM)"
+    },
+    {
+      "sha": "d82fea3",
+      "what": "platform hunks of MIXED b69739a: 9 files (timestamp_engine, deliverables_engine, study_spec, bespoke, compiler, modeling, study_factory, freeze-boundary test, preserved-timestamp test)"
+    },
+    {
+      "sha": "7865119",
+      "what": "platform hunk of MIXED 4e8afb5: research_workflow/experiment.py"
+    }
+  ],
+  "mixed_commits": {
+    "count": 2,
+    "all_hunks_classified": true,
+    "study_hunks_left_on_study_branch": true
+  },
+  "platform_parity_with_study_branch": "git diff chore/platform-reconciled edd5560 -- . ':!studies' ':!audit_lineage' ':!artifacts/platform_reconciliation' is EMPTY",
+  "tests": {
+    "command": "pytest <61 selected scripts/tests> research_workflow/tests research/engines/tests/test_preserved_timestamp_reuse.py",
+    "passed": 1594,
+    "failed": 63,
+    "skipped": 7,
+    "duration_s": 2204,
+    "classification": {
+      "pre_existing_on_base_fde7a96": 61,
+      "pre_existing_on_study_branch_edd5560": 2,
+      "introduced_by_reconciliation": 0
+    },
+    "evidence": {
+      "base_rerun": "61/61 of the base-existing failures also fail at fde7a96 (pytest_base.log)",
+      "study_rerun": "61 failed + 2 skipped at edd5560 incl. both test_preserved_timestamp_reuse tests (KeyError at :131/:141) (pytest_study.log)"
+    },
+    "known_pre_existing_classes": [
+      "scripts/tests/test_round2_invariants.py Windows raw-bytes vs canonical hash (documented in docs/WORKFLOW_REFERENCE_FACTS.md)",
+      "test_stage3_integration / test_rt_final_blockers / test_nt_runner_* : fail identically on base"
+    ]
+  },
+  "side_effects_observed": "the selected test run mutates 5 tracked study files (clean_maturity_180s workflow_state.json, es_wick_imbalance_acceptance_v2 audit/*); reverted with git checkout -- before commit",
+  "semantic_changes": "none; no study.yaml, contract, seal, freeze, model artifact or catalog touched",
+  "ready_to_merge": true
+}
