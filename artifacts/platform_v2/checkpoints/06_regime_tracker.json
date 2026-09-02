@@ -1,0 +1,30 @@
+{
+  "item": "06_regime_tracker",
+  "status": "PASS",
+  "commit": null,
+  "tests": {
+    "features/tests/test_regime_dual_ema_parity.py": "4 passed: exact in-memory parity vs legacy generic RegimeEngine and collector_v2 RegimeStateEngine (regime, ATR 1e-12, bars_in_regime); real-data parity vs frozen regime-complete store 2021-01 (flip timestamps + directions, >500 regimes, zero missing/extra)",
+    "affected suites": "131 passed, 1 pre-existing failure (test_ordered_barrier_timeout_gap_ambiguous_and_exact_boundary)"
+  },
+  "artifacts": [
+    "collectors/collector_v2/regime_engine.py",
+    "features/tests/test_regime_dual_ema_parity.py",
+    "features/trackers/regime_dual_ema.py",
+    "research_workflow/capabilities/registry.json",
+    "research_workflow/capabilities_index.yaml",
+    "research_workflow/generic_collector.py",
+    "utils/regime_engine.py"
+  ],
+  "canonical": "features/trackers/regime_dual_ema.py DualEmaRegimeTracker (tracker.regime.dual_ema) parameterized by timeframe/instrument/short_period/long_period/atr_period; semantics unchanged",
+  "delegating_now": [
+    "research_workflow/generic_collector.RegimeEngine (subclass, same attribute names)",
+    "collectors/collector_v2/regime_engine.RegimeStateEngine (registry role kept, math delegated)",
+    "utils/regime_engine.LiteRegimeEngine (math delegated)"
+  ],
+  "remaining_active_definitions": {
+    "indicators/regime/indicator.py RegimeIndicators + indicator_v2.py RegimeIndicatorsV2": "NautilusTrader-indicator based legacy engines used by features/collector.py (legacy feature engine) and backtests/studies (historical); different numerics (NT EMA seeding) -> left frozen, not delegated"
+  },
+  "duplicate_active_implementations_of_the_formula_remaining": 0,
+  "next_stage": "07_performance",
+  "blocker": null
+}

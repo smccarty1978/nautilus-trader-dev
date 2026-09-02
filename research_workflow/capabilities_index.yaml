@@ -155,7 +155,7 @@ model_drivers:
   - id: model.frozen_external_score
     version: 1
     description: Another study's frozen TRAIN score as a derived causal input, resolved by model_id through the model store.
-    implementation: research_workflow.external_model_scoring.ExternalModelScoringError
+    implementation: research_workflow.external_model_scoring.FrozenExternalModelScorer
     parameters: [model_id, availability_reference]
     dependencies: [model.lightgbm]
     update_cadence: per_candidate

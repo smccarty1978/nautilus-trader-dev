@@ -1,6 +1,6 @@
 {
-  "content_sha256": "ced8f4c6249ce89e48393047043af9d954bdc166434e8ce8f7375cee3dee9d67",
-  "generated_at_utc": "2026-09-02T06:34:41.052907+00:00",
+  "content_sha256": "b751c14d99a4c6e137ff4172d12d17ba0a461a3a5ac89db0231b4c299dcbfa9a",
+  "generated_at_utc": "2026-09-02T06:37:30.105424+00:00",
   "kinds": {
     "datasets": [
       {
@@ -2977,6 +2977,7 @@
         ],
         "required_tests": [
           "features/tests/test_generic_episode_geometry.py",
+          "features/tests/test_regime_dual_ema_parity.py",
           "research_workflow/tests/test_bare_flip_independent_parity.py",
           "research_workflow/tests/test_composite_target_expression.py",
           "research_workflow/tests/test_multiple_derived_inputs.py",
@@ -4699,8 +4700,8 @@
         ],
         "description": "Another study's frozen TRAIN score as a derived causal input, resolved by model_id through the model store.",
         "id": "model.frozen_external_score",
-        "implementation": "research_workflow.external_model_scoring.ExternalModelScoringError",
-        "implementation_note": "",
+        "implementation": "research_workflow.external_model_scoring.FrozenExternalModelScorer",
+        "implementation_note": "Load once, verify exact identities, and score causal snapshots without fitting.",
         "implementation_verified": true,
         "kind": "model_drivers",
         "missing_tests": [],
@@ -5024,12 +5025,10 @@
         "description": "Canonical dual-EMA(3/9 high-low) regime state with Wilder ATR(14), parameterized by timeframe/instrument; parity-tested against the accepted collector_v2 engine.",
         "id": "tracker.regime.dual_ema",
         "implementation": "features.trackers.regime_dual_ema.DualEmaRegimeTracker",
-        "implementation_note": "module import failed: ModuleNotFoundError: No module named 'features.trackers.regime_dual_ema'",
-        "implementation_verified": false,
+        "implementation_note": "Completed-bar dual-EMA regime state. Feed one completed bar per ``update``.",
+        "implementation_verified": true,
         "kind": "trackers",
-        "missing_tests": [
-          "features/tests/test_regime_dual_ema_parity.py"
-        ],
+        "missing_tests": [],
         "name": "regime.dual_ema",
         "parameters": [
           "timeframe",
@@ -5041,7 +5040,7 @@
         "required_tests": [
           "features/tests/test_regime_dual_ema_parity.py"
         ],
-        "status": "broken",
+        "status": "verified",
         "unresolved_dependencies": [],
         "update_cadence": "per_source_bar",
         "version": 1
@@ -5375,7 +5374,7 @@
     },
     "total": 179,
     "trackers": {
-      "broken": 1,
+      "broken": 0,
       "count": 4
     },
     "trigger_primitives": {

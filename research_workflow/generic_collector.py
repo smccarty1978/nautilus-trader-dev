@@ -31,6 +31,7 @@ from features.trackers.range_position import RangePositionTracker
 from features.registry import resolve_runtime_feature_aliases
 from backtests.nt_runtime.phase0 import authorize_execution
 from utils.session_boundaries import is_in_session, session_close_ns
+from features.trackers.regime_dual_ema import DualEmaRegimeTracker
 from research_workflow.execution_plan import CompiledExecutionPlan
 
 from datetime import datetime, timezone
@@ -153,53 +154,19 @@ class FastOHLCVRingBuffer:
             self._rth_abs_delta_cum += abs(d)
 
 
-class RegimeEngine:
-    """Standardized 14-period Wilder ATR & Dual-EMA Regime Tracker."""
+class RegimeEngine(DualEmaRegimeTracker):
+    """Legacy name for the single authoritative dual-EMA regime tracker.
+
+    The formula lives in ``features/trackers/regime_dual_ema.py`` (``tracker.regime.dual_ema``);
+    this subclass only preserves the constructor signature and attribute names
+    (``regime``, ``atr``, ``ema3_h`` ...) the collector has always used.
+    """
     ALPHA3 = 0.5
     ALPHA9 = 0.2
     ATR_P = 14
 
     def __init__(self) -> None:
-        self.ema3_h: Optional[float] = None
-        self.ema9_h: Optional[float] = None
-        self.ema3_l: Optional[float] = None
-        self.ema9_l: Optional[float] = None
-        self.prev_c: Optional[float] = None
-        self.atr_warmup: List[float] = []
-        self.atr: Optional[float] = None
-        self.regime: int = 0  # +1 = bullish, -1 = bearish, 0 = neutral
-
-    def update(self, h: float, l: float, c: float) -> int:
-        if self.ema3_h is None:
-            self.ema3_h = self.ema9_h = h
-            self.ema3_l = self.ema9_l = l
-        else:
-            self.ema3_h = self.ALPHA3 * h + (1 - self.ALPHA3) * self.ema3_h
-            self.ema9_h = self.ALPHA9 * h + (1 - self.ALPHA9) * self.ema9_h
-            self.ema3_l = self.ALPHA3 * l + (1 - self.ALPHA3) * self.ema3_l
-            self.ema9_l = self.ALPHA9 * l + (1 - self.ALPHA9) * self.ema9_l
-
-        tr = h - l if self.prev_c is None else max(h - l, abs(h - self.prev_c), abs(l - self.prev_c))
-        self.prev_c = c
-
-        if self.atr is None:
-            self.atr_warmup.append(tr)
-            if len(self.atr_warmup) == self.ATR_P:
-                self.atr = sum(self.atr_warmup) / self.ATR_P
-                self.atr_warmup = []
-        else:
-            self.atr = (self.atr * (self.ATR_P - 1) + tr) / self.ATR_P
-
-        new_regime = self.regime
-        if c > (self.ema3_h or 0) and c > (self.ema9_h or 0):
-            new_regime = 1
-        elif c < (self.ema3_l or 0) and c < (self.ema9_l or 0):
-            new_regime = -1
-
-        if new_regime != 0 and new_regime != self.regime:
-            self.regime = new_regime
-
-        return self.regime
+        super().__init__(timeframe="1m", short_period=3, long_period=9, atr_period=14)
 
 
 def verify_checkpoint_identities_authority(path: str | Path, declared_sha256: str) -> Dict[str, str]:
