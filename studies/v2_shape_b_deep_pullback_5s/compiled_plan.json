@@ -7,7 +7,7 @@
         "id": "regime_1m",
         "kind": "tracker",
         "stream": "nq_1m",
-        "visibility": "at_epoch"
+        "visibility": "strictly_before"
       },
       {
         "availability": "completed_bar_ts_init",
@@ -726,7 +726,7 @@
     }
   },
   "closure": {
-    "composite_sha256": "3f2706959401e687fe2e644399ad8bff9c3502e09522b6a0ac99b9643f17615e",
+    "composite_sha256": "0db52eeff6bbe048a4bf6adb8652df4aa94b14915e1f311a851a2b5ebd7fcca0",
     "file_count": 27,
     "files": {
       "features/trackers/generic_arrival.py": "29201991c71821f27e014238338eb1d0d5910c4e2b2f5984d09e1a47f5703e75",
@@ -738,7 +738,7 @@
       "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
       "features/trackers/host_bindings.py": "253625ddbc412ca20198f12f6d86b2bf324ce22baf016b29b0cf5adef8467903",
       "research_workflow/external_model_scoring.py": "7c7095c7f59a42425d3c475afda5b07a541be8131cfc15c57b560dc32d927ba1",
-      "research_workflow/grammar/compiler.py": "5413fd427d936d0a79fe6f3fa5524e2269dae7537002511c3e95b036e4fcdcbd",
+      "research_workflow/grammar/compiler.py": "46125a0c7ceaa3c64250dc5b0f6112d36e383dcdbb40219f55c50f38bf8c89f0",
       "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
       "research_workflow/grammar/plan.py": "b6125afc5042d1720586174b1452d2ef95241ffebe4ee126b13e2dc0679ba871",
       "research_workflow/grammar/predicates.py": "7b0fa449a526e3f0d9a7eca1444b5e35f381426517172716651a28042831c417",
@@ -1706,7 +1706,7 @@
     "session_end_censoring": true,
     "stream": "nq_1s"
   },
-  "plan_sha256": "53711751a59a2b14355d9a45f23e649cf9f4a125f292d74adecff2d320034ee9",
+  "plan_sha256": "e4d66bedf80ebc239e377dd41994e7ab83c4d8bfd670d7056c3e3ae34595300d",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1774,12 +1774,12 @@
       "duration_ns": 60000000000,
       "instrument": "NQ",
       "key": "nq_1m",
-      "role": "execution",
+      "role": "context",
       "same_ts": "unavailable",
       "source": "external",
       "timeframe": "1m",
       "ts_init_delta_ns": 60000000000,
-      "visibility": "at_epoch"
+      "visibility": "strictly_before"
     },
     {
       "aggregation": "complete_bucket",
