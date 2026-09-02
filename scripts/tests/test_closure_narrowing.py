@@ -114,3 +114,13 @@ def test_all_edit_moves_hash_for_wildcard_imported_modules_only(tmp_path: Path):
     (tmp_path / "__init__.py").write_text("")
     targets = ch.wildcard_import_targets([importer, mod], tmp_path)
     assert mod.resolve() in targets and importer.resolve() not in targets
+
+
+def test_relative_wildcard_imports_are_resolved(tmp_path: Path):
+    """Audit pass-02 WARNING: `from . import *` / `from .sub import *` targets keep __all__."""
+    pkg = tmp_path / "pkg"; pkg.mkdir(); (pkg / "__init__.py").write_text("")
+    (pkg / "sub.py").write_text(CODE)
+    (pkg / "sibling.py").write_text(CODE)
+    (pkg / "user.py").write_text("from .sub import *\nfrom . import *\n")
+    targets = ch.wildcard_import_targets([pkg / "user.py", pkg / "sub.py", pkg / "sibling.py", pkg / "__init__.py"], tmp_path)
+    assert (pkg / "sub.py").resolve() in targets and (pkg / "__init__.py").resolve() in targets

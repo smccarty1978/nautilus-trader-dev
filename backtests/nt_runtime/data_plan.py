@@ -459,3 +459,20 @@ def resolve_data_plan(
     )
 
     return plan
+
+
+def verify_launch_dataset_bytes(data_plan: "DataPlan") -> Dict[str, Any]:
+    """Launch-time authority check: recompute the catalog's content digest from the bytes on
+    disk and require it to equal the dataset identity the plan resolved (causal audit pass-02
+    CRITICAL: R1 runs once at readiness; every real collection launch must prove the bytes
+    itself). Returns the recomputed digest record. No-op when the dataset declares no digest.
+    """
+    if not data_plan.dataset_logical_digest:
+        return {"status": "NO_DECLARED_DIGEST", "dataset_id": data_plan.dataset_id}
+    from research_workflow.roots import DatasetDigestMismatch, verify_dataset_bytes
+    try:
+        digest = verify_dataset_bytes(data_plan.catalog_path, data_plan.dataset_logical_digest)
+    except DatasetDigestMismatch as exc:
+        raise WrongPhysicalDatasetError(f"WRONG_PHYSICAL_DATASET: launch-time byte verification failed: {exc}") from exc
+    return {"status": "VERIFIED", "dataset_id": data_plan.dataset_id, "logical_digest": digest["logical_digest"], "file_count": digest["file_count"], "total_bytes": digest["total_bytes"]}
+

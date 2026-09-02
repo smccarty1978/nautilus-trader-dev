@@ -111,10 +111,27 @@ def wildcard_import_targets(files, repo_root: Path) -> set:
         except (SyntaxError, UnicodeDecodeError, ValueError):
             continue
         for node in ast.walk(tree):
-            if isinstance(node, ast.ImportFrom) and node.module and any(a.name == "*" for a in node.names):
-                resolved = resolve_module_to_path(node.module, f, Path(repo_root))
-                if resolved is not None:
-                    targets.add(Path(resolved).resolve())
+            if not (isinstance(node, ast.ImportFrom) and any(a.name == "*" for a in node.names)):
+                continue
+            module = node.module
+            if node.level:  # relative form: from . import *, from ..pkg import *
+                try:
+                    pkg_parts = list(f.resolve().relative_to(Path(repo_root).resolve()).parent.parts)
+                except ValueError:
+                    continue
+                base = pkg_parts[: len(pkg_parts) - (node.level - 1)] if node.level > 1 else pkg_parts
+                module = ".".join(base + ([node.module] if node.module else []))
+                if not module:
+                    continue
+            if not module:
+                continue
+            resolved = resolve_module_to_path(module, f, Path(repo_root))
+            if resolved is None and node.level:
+                candidate = Path(repo_root) / (module.replace(".", "/") + ".py")
+                pkg_init = Path(repo_root) / module.replace(".", "/") / "__init__.py"
+                resolved = candidate if candidate.is_file() else (pkg_init if pkg_init.is_file() else None)
+            if resolved is not None:
+                targets.add(Path(resolved).resolve())
     return targets
 
 

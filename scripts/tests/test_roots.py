@@ -183,3 +183,21 @@ def test_live_file_drift_is_detected_on_resolution(tmp_path: Path, monkeypatch: 
     (cat / "data" / "bar" / "extra.parquet").write_bytes(b"x")
     with pytest.raises(roots.DatasetFilesDrifted):
         resolve_dataset("DS", repo)
+
+
+def test_launch_time_byte_verification_catches_same_size_edit(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """Audit pass-02 CRITICAL: the collect launch path recomputes the digest from bytes."""
+    from backtests.nt_runtime import data_plan as dp
+    root = tmp_path / "root"; cat = _fake_catalog(root / "NQ_v0_2020_2026"); m = write_dataset_manifest(cat, "NQ_v0_2020_2026", "NQ.XCME")
+    repo = tmp_path / "repo"; (repo / "research" / "datasets").mkdir(parents=True)
+    spec = yaml.safe_load((Path(dp.__file__).resolve().parents[2] / "research" / "datasets" / "NQ_v0_2020_2026.yaml").read_text(encoding="utf-8"))
+    spec["logical_digest"] = m["logical_digest"]
+    (repo / "research" / "datasets" / "NQ_v0_2020_2026.yaml").write_text(yaml.safe_dump(spec), encoding="utf-8")
+    monkeypatch.setenv(roots.CONFIG_ENV, str(_config(tmp_path, [root])))
+    plan = dp.resolve_catalog_plan("NQ", "2023-01-03", "2023-01-03", repo_root=repo)
+    assert dp.verify_launch_dataset_bytes(plan)["status"] == "VERIFIED"
+    part = cat / "data" / "bar" / "X.Y-1-SECOND-LAST-EXTERNAL" / "part-0.parquet"
+    part.write_bytes(b"barz")  # same size, different bytes
+    plan2 = dp.resolve_catalog_plan("NQ", "2023-01-03", "2023-01-03", repo_root=repo)  # cheap check passes
+    with pytest.raises(dp.WrongPhysicalDatasetError):
+        dp.verify_launch_dataset_bytes(plan2)
