@@ -1,0 +1,47 @@
+{
+  "config": {
+    "config_path": "C:\\Users\\Scott McCarty\\.nt_research\\config.yaml",
+    "catalog_roots": [
+      "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog"
+    ],
+    "model_root": "C:\\Users\\Scott McCarty\\.nt_research\\models",
+    "leases_dir": "C:\\Users\\Scott McCarty\\.nt_research\\leases",
+    "worktree_root": "C:\\Users\\Scott McCarty\\Projects"
+  },
+  "datasets": {
+    "NQ_v0_2020_2026": {
+      "resolution": "configured_root",
+      "logical_digest": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+      "bytes_verified": true,
+      "file_count": 4,
+      "total_bytes": 1932601644,
+      "seconds": 1.7
+    },
+    "ES_v0_2020_2026": {
+      "resolution": "configured_root",
+      "logical_digest": "9fa50102a121327212231e2d46fc6484fce6d4c9c7d1458b3ac7ef4c54c02ba0",
+      "bytes_verified": true,
+      "file_count": 4,
+      "total_bytes": 1593978862,
+      "seconds": 1.3
+    },
+    "YM_v0_2024": {
+      "resolution": "configured_root",
+      "logical_digest": "6f532e9bf8f7db8c200244a2c14feb773fbadde6600206449fcb51f19887878e",
+      "bytes_verified": true,
+      "file_count": 3,
+      "total_bytes": 154623455,
+      "seconds": 0.2
+    }
+  },
+  "model_store": {
+    "total": 468,
+    "by_tier": {
+      "registry": 12,
+      "ledger": 456
+    },
+    "golden_validated": 468,
+    "golden_failed": [],
+    "joblib_verified": 12
+  }
+}

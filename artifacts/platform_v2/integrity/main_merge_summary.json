@@ -1,0 +1,11 @@
+{
+  "tests_on_main": {
+    "passed": 734,
+    "failed": 37,
+    "new_failures": 0,
+    "note": "37 failures are pre-existing (61-set from baseline plus 2 features/tests failures that also fail at tag baseline/2026-09-platform: stale 129-definition expectation vs 143 canonical definitions)",
+    "log": "session scratchpad pytest_main_full.log"
+  },
+  "seal_note": "regime_transition_target_before_stop_v1 seal composite 1a6eed85... re-resolves on main as 7a297eac... (v1, 152 files) because the platform closure changed; the seal's execution authority is tag baseline/2026-09-platform",
+  "audit_state": "causal pass 02 BLOCKED with remediation committed (b9ff8c8) and not re-audited; contract pass 01 CLEAR"
+}
