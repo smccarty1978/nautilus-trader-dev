@@ -1,9 +1,9 @@
 {
   "dataset_id": "NQ_v0_2020_2026",
   "feature_authority": "active",
-  "generated_at_utc": "2026-08-31T20:19:37.006488+00:00",
+  "generated_at_utc": "2026-09-02T02:46:20.263438+00:00",
   "overall_status": "PASS",
-  "prepared_execution_identity": "5d70077b5199c398846b755b89cbdfd698aa93f0a1562a65d9757e850a3e37c5",
+  "prepared_execution_identity": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
   "r10_real_nonempty_output_parity": {
     "candidate_rows_observed": 1,
     "code": "REAL_NONEMPTY_OUTPUT_PARITY",
@@ -105,15 +105,15 @@
     "detail": "synthetic candidate/observation fixture validated through the real OutputManager path (schema, feature source, metadata, candidate key, observation key)",
     "feature_checked": "arrival_acceleration",
     "passed": true,
-    "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\regime_transition_target_before_stop_v1\\_work\\readiness_schema_fixture\\20260831_201933_regime_transition_target_before_stop_v1_day",
-    "run_id": "20260831_201933_regime_transition_target_before_stop_v1_day"
+    "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-regime-transition-target\\studies\\regime_transition_target_before_stop_v1\\_work\\readiness_schema_fixture\\20260902_024608_regime_transition_target_before_stop_v1_day",
+    "run_id": "20260902_024608_regime_transition_target_before_stop_v1_day"
   },
   "r8_double_identity": {
     "code": "IDENTITY_STABLE",
-    "composite_sha256": "5d70077b5199c398846b755b89cbdfd698aa93f0a1562a65d9757e850a3e37c5",
+    "composite_sha256": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
     "coverage_pct": 100.0,
     "detail": "execution identity resolved twice with exact equality",
-    "files_resolved": 144,
+    "files_resolved": 148,
     "passed": true,
     "unresolved_dependencies": []
   },

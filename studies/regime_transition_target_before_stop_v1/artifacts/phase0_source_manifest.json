@@ -2,16 +2,14 @@
   "study_id": "regime_transition_target_before_stop_v1",
   "authenticated": true,
   "feature_authority": "active",
-  "git_commit_hash": "60ae8a4d9c2135b165ea7dea607f626490342e89",
+  "git_commit_hash": "4e8afb5940373122fe4fe7310a68a4e379913528",
   "source_state_binding": {
-    "provenance_strength": "WORKING_TREE",
-    "git_commit_hash": "60ae8a4d9c2135b165ea7dea607f626490342e89",
-    "git_commit_is_sufficient_provenance": false,
+    "provenance_strength": "COMMITTED",
+    "git_commit_hash": "4e8afb5940373122fe4fe7310a68a4e379913528",
+    "git_commit_is_sufficient_provenance": true,
     "working_tree_dirty": true,
-    "source_state_sha256": "d59018db43a47dd95dfa0904e508bed465f3ace0c2a158ed9eb74782cdcc4b18",
-    "dependencies_diverging_from_commit": [
-      "studies/regime_transition_target_before_stop_v1/SPEC.md"
-    ],
+    "source_state_sha256": "338cbd54edc5c056dfada5f2d5ba87ad182c2015794ba9c4307bf1050292e7df",
+    "dependencies_diverging_from_commit": [],
     "source_files": {
       "features/registry.py": {
         "sha256": "0cbc2cf555e05d75299a07e99496dd48c7023353cb78bb4573d5c0132f57bfcc",
@@ -34,17 +32,17 @@
         "state": "COMMITTED"
       },
       "studies/regime_transition_target_before_stop_v1/SPEC.md": {
-        "sha256": "2f61371536efa2a97aeb7e361f41ba87baa95b8f023b4b8c20f079f82981a7f6",
-        "state": "MODIFIED"
+        "sha256": "24cce286f423f2df4d577ed777fd44e50da36895ea55d9e087c996e45bbe7fa5",
+        "state": "COMMITTED"
       },
       "studies/regime_transition_target_before_stop_v1/study.yaml": {
-        "sha256": "87148e4cc24f9710d2efd1bb8e246a8603e44e8b1d376f99eeef3811eae6425b",
+        "sha256": "ff92b33d48d60ea40f28e90c00b70b98f4b2c0c2713839b566d0511fb5c5e0d1",
         "state": "COMMITTED"
       }
     }
   },
-  "study_yaml_sha256": "87148e4cc24f9710d2efd1bb8e246a8603e44e8b1d376f99eeef3811eae6425b",
-  "spec_md_sha256": "2f61371536efa2a97aeb7e361f41ba87baa95b8f023b4b8c20f079f82981a7f6",
+  "study_yaml_sha256": "ff92b33d48d60ea40f28e90c00b70b98f4b2c0c2713839b566d0511fb5c5e0d1",
+  "spec_md_sha256": "24cce286f423f2df4d577ed777fd44e50da36895ea55d9e087c996e45bbe7fa5",
   "clean_lineage_start": null,
   "invalidated_prior_runs_count": 0,
   "invalidated_prior_runs": [],
@@ -353,5 +351,5 @@
   },
   "derived_causal_inputs": [],
   "required_gates_evidence": [],
-  "manifest_sha256": "73f2081f03108ad6d8b677a4f30fa322090f54a18c4ae602f72091fb193f48b4"
+  "manifest_sha256": "dbd185151ffd0240931ed176e2d09135ad470d6af748f7ec8555c2e080a8dae9"
 }

@@ -1,7 +1,7 @@
 {
   "study_id": "regime_transition_target_before_stop_v1",
   "study_type": "bespoke",
-  "spec_sha256": "1f1e6f9e4eda502b3d4b538ffefb774564eb33304ff5b5b7dd388ed8a89e9df8",
+  "spec_sha256": "9b949bee31d86d576b0d1fdf091b1e519e4e0aa3fd68abc151ddf42d68aeb1a7",
   "spec": {
     "study": {
       "id": "regime_transition_target_before_stop_v1",
@@ -10,7 +10,7 @@
       "description": "NQ Regime-Transition Research Study 2. Evaluates whether causal information available at candidate time T discriminates regime-transition candidates whose subsequent path reaches a favorable target (+1.00 ATR) before hitting a predefined adverse stop (0.50, 1.00, 1.50 ATR) within 300 seconds on fully-forward sparse trade-bearing 1s LAST bars (1-SECOND-LAST-EXTERNAL)."
     },
     "operation": {
-      "kind": "train_evaluate",
+      "kind": "phase_d_modeling",
       "target_metric": "pr_auc",
       "reconciliation_target": null
     },
@@ -221,19 +221,71 @@
       "mode": "training",
       "family": "lightgbm",
       "arms": [
-        "BASELINE_13_RAW"
+        "LONG_SL0_5",
+        "LONG_SL1_0",
+        "LONG_SL1_5",
+        "SHORT_SL0_5",
+        "SHORT_SL1_0",
+        "SHORT_SL1_5"
       ],
       "artifact_path": null,
       "artifact_sha256": null,
       "params": {
-        "n_estimators": 200,
-        "learning_rate": 0.05,
-        "max_depth": 3,
-        "num_leaves": 8,
-        "verbosity": -1,
-        "random_state": 42,
-        "deterministic": true,
-        "n_jobs": 1
+        "phase_d_protocol": "expanding_temporal_regime_grouped_v1",
+        "random_seed": 42,
+        "target_dispositions": [
+          "POSITIVE",
+          "NEGATIVE"
+        ],
+        "excluded_dispositions": [
+          "TIMEOUT",
+          "SESSION_END",
+          "GAP",
+          "AMBIGUOUS",
+          "DATA_END"
+        ],
+        "validation_folds": [
+          {
+            "train": [
+              2021
+            ],
+            "validate": 2022
+          },
+          {
+            "train": [
+              2021,
+              2022
+            ],
+            "validate": 2023
+          }
+        ],
+        "candidate_grid": {
+          "max_depth": [
+            3,
+            5,
+            7
+          ],
+          "num_leaves": [
+            7,
+            15,
+            31
+          ],
+          "learning_rate": [
+            0.03,
+            0.05
+          ],
+          "min_data_in_leaf": [
+            100,
+            500
+          ]
+        },
+        "selection_priority": [
+          "stable_worst_fold_roc_auc",
+          "mean_roc_auc",
+          "mean_pr_auc",
+          "lower_roc_auc_dispersion",
+          "fixed_configuration_order"
+        ]
       },
       "selection": null
     },
@@ -286,7 +338,10 @@
       "checkpoint": null,
       "progress_seconds": 30,
       "bounded": true,
-      "observation_policy": null
+      "observation_policy": null,
+      "modeling_driver_relpaths": [
+        "implementation/phase_d_modeling.py"
+      ]
     },
     "acceptance": {
       "criteria": {
@@ -303,7 +358,8 @@
       "canonical_type_considered": "flip_prediction",
       "reusable_extension_considered": "Reused governed GenericStudyCollector and OrderedBarrierTargetRuntime; bespoke used strictly for schema typing since flip_prediction compiler expects a flip condition in composite targets.",
       "custom_scope": [
-        "implementation/target_before_stop_diagnostics.py"
+        "implementation/target_before_stop_diagnostics.py",
+        "implementation/phase_d_modeling.py"
       ]
     },
     "required_gates": null
@@ -1037,7 +1093,8 @@
       "progress_seconds": 30,
       "checkpoint": null,
       "custom_scope": [
-        "implementation/target_before_stop_diagnostics.py"
+        "implementation/target_before_stop_diagnostics.py",
+        "implementation/phase_d_modeling.py"
       ],
       "chronology": {
         "train": [
@@ -1113,7 +1170,8 @@
     "deliverables_contract": {
       "contract_version": 1,
       "authorized_modes": [
-        "collect"
+        "collect",
+        "modeling"
       ],
       "deliverables_by_mode": {
         "collect": [
@@ -1122,6 +1180,10 @@
           "collection_manifest.json",
           "run_manifest.json",
           "status.json"
+        ],
+        "modeling": [
+          "phase_d_modeling_report.json",
+          "phase_d_model_artifacts.json"
         ]
       },
       "artifact_metadata": {
@@ -1155,6 +1217,16 @@
           ],
           "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
           "relative_to": "run_dir"
+        },
+        "phase_d_modeling_report.json": {
+          "mode": "modeling",
+          "producer": "declared Phase D modeling driver",
+          "relative_to": "study_dir/artifacts/phase_d"
+        },
+        "phase_d_model_artifacts.json": {
+          "mode": "modeling",
+          "producer": "declared Phase D modeling driver",
+          "relative_to": "study_dir/artifacts/phase_d"
         }
       },
       "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
@@ -1171,7 +1243,8 @@
       "canonical_type_considered": "flip_prediction",
       "reusable_extension_considered": "Reused governed GenericStudyCollector and OrderedBarrierTargetRuntime; bespoke used strictly for schema typing since flip_prediction compiler expects a flip condition in composite targets.",
       "custom_scope": [
-        "implementation/target_before_stop_diagnostics.py"
+        "implementation/target_before_stop_diagnostics.py",
+        "implementation/phase_d_modeling.py"
       ]
     }
   },

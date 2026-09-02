@@ -2,7 +2,7 @@
   "task_packet_version": "1.0",
   "study_id": "regime_transition_target_before_stop_v1",
   "study_type": "bespoke",
-  "spec_sha256": "f0a68846d75791123454af54685702668e14f14ab5a12613dc4c5b4c9dffeb1c",
+  "spec_sha256": "9b949bee31d86d576b0d1fdf091b1e519e4e0aa3fd68abc151ddf42d68aeb1a7",
   "risk_tier": 2,
   "runtime": "nautilustrader",
   "strategy_class": "research_workflow.generic_collector.GenericStudyCollector",
@@ -58,7 +58,7 @@
       "required_forward_outcomes": [
         {
           "id": "target_before_stop_300s",
-          "spec_sha256": "b70483a5f3dbc4312e25246d81eaba4a0015da5651457a589334cb4b4bbd72a5",
+          "spec_sha256": "658385e841469d64c956571be045dcc14fc28c1076b33aa1dc25ec5fef3706d5",
           "entry_reference": "next_bar_open",
           "horizon_seconds": 300,
           "max_tracking_seconds": 300,
@@ -67,6 +67,7 @@
           ],
           "bar_inclusion": "fully_forward",
           "session_end_censoring": true,
+          "horizon_expiry_policy": "censor",
           "max_gap_seconds": null,
           "atr_source": "latest_causally_completed_1m_wilder_atr_14_available_at_T",
           "atr_frozen_at": "decision_ts",
@@ -75,19 +76,22 @@
               "id": "barrier_tp_1_0_sl_0_5",
               "favorable_atr": 1.0,
               "adverse_atr": 0.5,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             },
             {
               "id": "barrier_tp_1_0_sl_1_0",
               "favorable_atr": 1.0,
               "adverse_atr": 1.0,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             },
             {
               "id": "barrier_tp_1_0_sl_1_5",
               "favorable_atr": 1.0,
               "adverse_atr": 1.5,
-              "horizon_seconds": 300
+              "horizon_seconds": 300,
+              "horizon_expiry_policy": "censor"
             }
           ],
           "generated_outcome_columns": [
@@ -185,6 +189,7 @@
           "entry_reference": "next_bar_open",
           "favorable_atr": 1.0,
           "forward_outcome_id": "target_before_stop_300s",
+          "horizon_expiry_policy": "censor",
           "horizon_seconds": 300,
           "max_gap_seconds": null,
           "session_end_censoring": true
@@ -730,7 +735,8 @@
       "progress_seconds": 30,
       "checkpoint": null,
       "custom_scope": [
-        "implementation/target_before_stop_diagnostics.py"
+        "implementation/target_before_stop_diagnostics.py",
+        "implementation/phase_d_modeling.py"
       ],
       "chronology": {
         "train": [
@@ -806,7 +812,8 @@
     "deliverables_contract": {
       "contract_version": 1,
       "authorized_modes": [
-        "collect"
+        "collect",
+        "modeling"
       ],
       "deliverables_by_mode": {
         "collect": [
@@ -815,6 +822,10 @@
           "collection_manifest.json",
           "run_manifest.json",
           "status.json"
+        ],
+        "modeling": [
+          "phase_d_modeling_report.json",
+          "phase_d_model_artifacts.json"
         ]
       },
       "artifact_metadata": {
@@ -848,6 +859,16 @@
           ],
           "producer": "backtests/nt_runtime/output_manager.py::persist_collection",
           "relative_to": "run_dir"
+        },
+        "phase_d_modeling_report.json": {
+          "mode": "modeling",
+          "producer": "declared Phase D modeling driver",
+          "relative_to": "study_dir/artifacts/phase_d"
+        },
+        "phase_d_model_artifacts.json": {
+          "mode": "modeling",
+          "producer": "declared Phase D modeling driver",
+          "relative_to": "study_dir/artifacts/phase_d"
         }
       },
       "note": "Authoritative deliverable set. The contract-checker consumes this and MUST NOT assemble its own list; a checker that derives its own scope cannot detect scope loss. Artifacts for modes not listed in authorized_modes are out of scope for this study and must not be reported as missing."
@@ -864,7 +885,8 @@
       "canonical_type_considered": "flip_prediction",
       "reusable_extension_considered": "Reused governed GenericStudyCollector and OrderedBarrierTargetRuntime; bespoke used strictly for schema typing since flip_prediction compiler expects a flip condition in composite targets.",
       "custom_scope": [
-        "implementation/target_before_stop_diagnostics.py"
+        "implementation/target_before_stop_diagnostics.py",
+        "implementation/phase_d_modeling.py"
       ]
     }
   },

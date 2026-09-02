@@ -8,7 +8,7 @@ study:
     adverse stop (0.50, 1.00, 1.50 ATR) within 300 seconds on fully-forward sparse
     trade-bearing 1s LAST bars (1-SECOND-LAST-EXTERNAL).
 operation:
-  kind: train_evaluate
+  kind: phase_d_modeling
   target_metric: pr_auc
 instrument:
   symbol: NQ
@@ -142,16 +142,31 @@ model:
   mode: training
   family: lightgbm
   arms:
-  - BASELINE_13_RAW
+  - LONG_SL0_5
+  - LONG_SL1_0
+  - LONG_SL1_5
+  - SHORT_SL0_5
+  - SHORT_SL1_0
+  - SHORT_SL1_5
   params:
-    n_estimators: 200
-    learning_rate: 0.05
-    max_depth: 3
-    num_leaves: 8
-    verbosity: -1
-    random_state: 42
-    deterministic: true
-    n_jobs: 1
+    phase_d_protocol: expanding_temporal_regime_grouped_v1
+    random_seed: 42
+    target_dispositions: [POSITIVE, NEGATIVE] # NEGATIVE is the runtime spelling of semantic NEGATIVE_SL
+    excluded_dispositions: [TIMEOUT, SESSION_END, GAP, AMBIGUOUS, DATA_END]
+    validation_folds:
+    - {train: [2021], validate: 2022}
+    - {train: [2021, 2022], validate: 2023}
+    candidate_grid:
+      max_depth: [3, 5, 7]
+      num_leaves: [7, 15, 31]
+      learning_rate: [0.03, 0.05]
+      min_data_in_leaf: [100, 500]
+    selection_priority:
+    - stable_worst_fold_roc_auc
+    - mean_roc_auc
+    - mean_pr_auc
+    - lower_roc_auc_dispersion
+    - fixed_configuration_order
 chronology:
   train:
   - 2021
@@ -178,6 +193,8 @@ execution:
     dataset_id: NQ_v0_2020_2026
   progress_seconds: 30
   bounded: true
+  modeling_driver_relpaths:
+  - implementation/phase_d_modeling.py
 acceptance:
   criteria:
     C1: 'Ordered-barrier runtime binding: compiled ordered_barrier target primitive
@@ -201,3 +218,4 @@ bespoke:
     a flip condition in composite targets.
   custom_scope:
   - implementation/target_before_stop_diagnostics.py
+  - implementation/phase_d_modeling.py
