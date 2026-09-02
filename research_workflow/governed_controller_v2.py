@@ -25,7 +25,16 @@ class V2StudyController(GovernedStudyController):
             compile=lc.compile, prepare=lc.prepare, readiness=lc.readiness, preflight=lc.preflight, tests=lc.tests, seal=lc.seal,
             smoke=lc.smoke, collection=lc.collection, reconcile=lc.reconcile, merge=lc.merge, fit=lc.fit, freeze=lc.freeze,
             oos=lc.oos, analyze=lc.analyze, close=lc.close)
-        super().__init__(study, actions=actions, owned_paths=owned_paths, max_runtime=max_runtime,
+        # A v2 study owns its own directory: the CLI scaffolds it untracked and the lifecycle writes
+        # compiled_plan.json / audit / artifacts / runs / _work under it. Everything else stays governed.
+        owned = list(owned_paths)
+        try:
+            rel = Path(study).resolve().relative_to(lc.repo_root.resolve())
+            if rel.parts and str(rel) not in owned:
+                owned.append(str(rel).replace("\\", "/"))
+        except ValueError:
+            pass
+        super().__init__(study, actions=actions, owned_paths=tuple(owned), max_runtime=max_runtime,
                          stale_progress_timeout=stale_progress_timeout, rss_limit_mb=rss_limit_mb, repo_root=repo_root)
         self.custom_actions = False
         self.artifact_trust_mode = "production"
