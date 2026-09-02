@@ -107,6 +107,7 @@ def run_prepare_and_freeze(study_dir: Path):
     frozen_data = {
         "study_id": study_dir.name,
         "frozen_execution_composite_sha256": composite_sha,
+        "hash_algorithm": manifest_data.get("hash_algorithm", "v1"),
         "resolved_execution_file_list": sorted(list(file_hashes.keys())),
         "file_sha256_map": file_hashes,
         "compiled_study_sha256": compiled_study_sha,

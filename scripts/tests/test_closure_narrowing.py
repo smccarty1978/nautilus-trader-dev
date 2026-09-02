@@ -63,7 +63,8 @@ def test_executable_changes_move_v2_hash(tmp_path: Path):
 def test_v1_still_moves_on_docstring_edit_and_non_python_uses_text_hash(tmp_path: Path):
     a = _write(tmp_path, "a.py", CODE); b = _write(tmp_path, "b.py", CODE.replace('"""Doc."""', '"""Other."""'))
     assert ch.canonical_text_sha256(a) != ch.canonical_text_sha256(b)
-    j1 = _write(tmp_path, "x.json", '{"a": 1}\n'); j2 = _write(tmp_path, "y.json", '{"a": 1}\r\n'); j3 = _write(tmp_path, "z.json", '{"a": 2}\n')
+    j1, j2, j3 = tmp_path / "x.json", tmp_path / "y.json", tmp_path / "z.json"
+    j1.write_bytes(b'{"a": 1}\n'); j2.write_bytes(b'{"a": 1}\r\n'); j3.write_bytes(b'{"a": 2}\n')  # bytes: no platform newline translation
     assert ch.hash_file_v2(j1) == ch.hash_file_v2(j2) != ch.hash_file_v2(j3)
 
 

@@ -64,9 +64,16 @@ def canonical_file_sha256(file_path: Path) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _hash_file(file_path: Path) -> str:
-    """Computes the canonical SHA-256 hash of a file (see canonical_file_sha256)."""
-    return canonical_file_sha256(file_path)
+def _hash_file(file_path: Path, hash_algorithm: str = "v1") -> str:
+    """Hash one closure file under the named algorithm (research_workflow.closure_hash).
+
+    ``v1`` is the historical canonical text hash; ``v2`` hashes Python sources by their
+    docstring/__all__-stripped AST so documentation-only edits do not move a composite.
+    """
+    if hash_algorithm == "v1":
+        return canonical_file_sha256(file_path)
+    from research_workflow.closure_hash import HASH_ALGORITHMS
+    return HASH_ALGORITHMS[hash_algorithm](file_path)
 
 
 def resolve_module_to_path(module_name: str, current_file: Path, repo_root: Path) -> Optional[Path]:
@@ -715,6 +722,7 @@ def resolve_execution_manifest(
     strict: bool = True,
     feature_authority: str = "active",
     authority_type: Optional[str] = None,
+    hash_algorithm: Optional[str] = None,
 ) -> Tuple[str, Dict[str, str], Dict[str, Any]]:
     """Dynamically resolves the full transitive closure across Runtime, Contract Authority, and Governance graphs.
 
@@ -736,6 +744,10 @@ def resolve_execution_manifest(
 
     study_dir = study_dir.resolve()
     repo_root = repo_root.resolve()
+    # The algorithm a sealed study was frozen with is authoritative for that study; only a
+    # study with no frozen manifest takes the current default (research_workflow.closure_hash).
+    from research_workflow.closure_hash import resolve_hash_algorithm
+    hash_algorithm = resolve_hash_algorithm(study_dir, hash_algorithm)
 
     # resolve_execution_file_paths installs and restores its own Path.relative_to
     # monkeypatch internally, so by the time it returns the true original is back in
@@ -817,7 +829,7 @@ def resolve_execution_manifest(
             p = combined_paths[key]
             if not p.exists():
                 raise FileNotFoundError(f"Resolved execution dependency does not exist on disk: {p}")
-            file_hashes[key] = _hash_file(p)
+            file_hashes[key] = _hash_file(p, hash_algorithm)
 
         runtime_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in runtime_closure_set])
         contract_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in contract_closure_set])
@@ -848,6 +860,7 @@ def resolve_execution_manifest(
         "feature_authority": feature_authority,
         "entrypoint": "backtests/nt_runtime/modes/collect.py",
         "composite_sha256": composite_sha256,
+        "hash_algorithm": hash_algorithm,
         "closure_includes_package_inits": True,
         "runtime_expected": runtime_count + n_runtime_unres,
         "runtime_resolved": runtime_count,
@@ -930,13 +943,15 @@ def verify_frozen_execution_identity(study_path: Path, repo_root: Optional[Path]
 
     # Re-resolve through the same typed authority mode used at prepare.  A
     # feature-candidate freeze must never fall back to the active study closure.
+    # The frozen manifest's own hash algorithm is authoritative (v1 when unrecorded).
     authority_type = frozen_data.get("authority_type")
+    frozen_algorithm = str(frozen_data.get("hash_algorithm") or "v1")
     if authority_type == "feature_candidate":
         current_composite, current_hashes, _ = resolve_execution_manifest(
-            study_path, repo_root, feature_authority="candidate", authority_type=authority_type
+            study_path, repo_root, feature_authority="candidate", authority_type=authority_type, hash_algorithm=frozen_algorithm
         )
     else:
-        current_composite, current_hashes, _ = resolve_execution_manifest(study_path, repo_root)
+        current_composite, current_hashes, _ = resolve_execution_manifest(study_path, repo_root, hash_algorithm=frozen_algorithm)
 
     # Compare
     added = [k for k in current_hashes if k not in frozen_hashes]

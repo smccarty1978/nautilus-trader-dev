@@ -154,7 +154,9 @@ def test_changing_an_execution_affecting_file_changes_the_composite(tmp_path: Pa
     original = target.read_bytes()
     before, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
     try:
-        target.write_bytes(original + b"\n# execution-affecting edit\n")
+        # An EXECUTABLE edit (a new module-level binding), not a comment: under the v2
+        # semantic closure hash a comment/docstring-only edit is deliberately invisible.
+        target.write_bytes(original + b"\nEXECUTION_AFFECTING_EDIT = 1\n")
         after, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
     finally:
         target.write_bytes(original)
@@ -162,6 +164,25 @@ def test_changing_an_execution_affecting_file_changes_the_composite(tmp_path: Pa
 
     restored, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
     assert restored == before, "composite is not a pure function of file content"
+
+
+def test_documentation_only_edit_does_not_move_a_v2_composite_but_moves_v1(tmp_path: Path):
+    """Item 09: docstring/comment/__all__-only edits to an executed dependency leave the v2
+    composite unchanged; the same edit still moves the historical v1 composite, so sealed
+    v1 studies keep their exact authority."""
+    target = REPO_ROOT / "features" / "engine.py"
+    original = target.read_bytes()
+    before_v2, hashes_v2, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT, hash_algorithm="v2")
+    before_v1, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT, hash_algorithm="v1")
+    try:
+        target.write_bytes(original + b"\n# documentation-only edit\n")
+        after_v2, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT, hash_algorithm="v2")
+        after_v1, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT, hash_algorithm="v1")
+    finally:
+        target.write_bytes(original)
+    assert "repo:features/engine.py" in hashes_v2
+    assert after_v2 == before_v2, "a comment-only edit moved the v2 composite"
+    assert after_v1 != before_v1, "v1 must still bind bytes"
 
 
 @pytest.mark.skipif(not (ES_STUDY / "study.yaml").exists(), reason="ES study absent")
