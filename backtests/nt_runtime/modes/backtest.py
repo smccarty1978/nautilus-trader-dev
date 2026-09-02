@@ -33,7 +33,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 
-from backtests.nt_runtime.data_plan import DataPlan, resolve_catalog_plan, resolve_data_plan
+from backtests.nt_runtime.data_plan import DataPlan, resolve_catalog_plan, resolve_data_plan, verify_launch_dataset_bytes
 from backtests.nt_runtime.engine_builder import (
     ExecutionMode,
     InvalidExecutionModeError,
@@ -410,6 +410,10 @@ def resolve_backtest_plan(
         )
     else:
         data_plan = resolve_catalog_plan(symbol, start_date, end_date, warmup_days, repo_root)
+    # Launch-time dataset byte verification: the SAME governed verifier collect mode uses
+    # (causal audit pass-03 CRITICAL). Runs here, in plan resolution, so no caller can reach
+    # build_engine / CausalDataLoader with an unverified catalog.
+    verify_launch_dataset_bytes(data_plan)
 
     typed_params = coerce_params(binding.config_cls, params or {})
 
