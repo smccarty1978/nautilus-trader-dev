@@ -169,3 +169,27 @@ def test_horizon_end_rule_on_a_sparse_tape(rule, expected):
                                                                      "ordered_barriers": [{"id": "b", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 10, "horizon_expiry_policy": "censor", "horizon_end_rule": rule}]}]}
     o = replay(c, {"observation_ts": T, "atr": 1.0, "direction": 1, "session_close_ts": None}, tape)
     assert (o["disposition"], o["censor_reason"]) == expected
+
+
+def test_first_bar_at_or_after_never_crosses_the_session_close():
+    """The horizon end falls on a missing second right at the close; the next bar belongs to the next session."""
+    from research_workflow.target_replay_oracle import replay
+    T = 1000 * NS
+    close = T + 10 * NS
+    contract = LabelOutcomeContract.from_plan({"contract": "label", "kernel": "barrier", "direction": "d", "atr": "a", "entry_reference": "next_bar_open",
+                                               "session_end_censoring": True, "max_gap_ns": None, "same_bar_rule": "ambiguous_censor", "horizon_end_rule": "first_bar_at_or_after",
+                                               "arms": [{"id": "x", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_ns": 10 * NS, "expiry": "censor", "prefix": "x"}], "primary_arm": "x"})
+    kernel = LabelOutcomeKernel(contract, _Sessions(close))
+    kernel.open({"observation_ts": T, "regime_start_ns": 0, "checkpoint_index": 0}, T, 1, 1.0)
+    tape = []
+    for k in list(range(1, 10)) + [18000]:                 # T+10 missing; next bar five hours later would hit the adverse barrier
+        lo = 99.0 if k == 18000 else 100.0
+        tape.append({"ts": T + k * NS, "open": 100.0, "high": 100.5, "low": lo, "close": 100.2, "gap": False})
+        kernel.on_bar(BarView("s", T + (k - 1) * NS, T + k * NS, 100.0, 100.5, lo, 100.2, 1.0))
+    kernel.finalize(T + 20000 * NS)
+    row = kernel.drain_rows()[0]
+    assert (row["disposition"], row["censor_reason"]) == ("CENSORED", "TIMEOUT")
+    c = {"primitive": "ordered_barrier", "required_forward_outcomes": [{"id": "fo", "entry_reference": "next_bar_open", "session_end_censoring": True, "max_gap_seconds": None,
+                                                                     "ordered_barriers": [{"id": "b", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 10, "horizon_expiry_policy": "censor", "horizon_end_rule": "first_bar_at_or_after"}]}]}
+    o = replay(c, {"observation_ts": T, "atr": 1.0, "direction": 1, "session_close_ts": close}, tape)
+    assert (o["disposition"], o["censor_reason"]) == ("CENSORED", "TIMEOUT")
