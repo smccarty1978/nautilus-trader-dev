@@ -4,6 +4,8 @@ receipts and gates as :mod:`research_workflow.governed_controller`; the leaves a
 the study is authored in the six-kind grammar."""
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import hashlib
 import json
 from pathlib import Path
@@ -12,6 +14,31 @@ from typing import Any, Optional
 from research_workflow.controller_contracts import BlockerType, ControllerState
 from research_workflow.governed_controller import (RECEIPT_STAGES, STAGE_ORDER, ControllerActions, GovernedStudyController, _STAGE_STATE, _json, _read, _sha)
 from research_workflow.lifecycle_v2 import CapabilityGapBlocked, V2Lifecycle, V2Options, is_v2_study
+
+
+def _pid_alive(pid: int) -> bool:
+    try:
+        import psutil  # type: ignore
+        return psutil.pid_exists(pid)
+    except Exception:
+        pass
+    try:
+        import ctypes
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        h = ctypes.windll.kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        if not h:
+            return False
+        code = ctypes.c_ulong()
+        ok = ctypes.windll.kernel32.GetExitCodeProcess(h, ctypes.byref(code))
+        ctypes.windll.kernel32.CloseHandle(h)
+        return bool(ok) and code.value == 259   # STILL_ACTIVE
+    except Exception:
+        import os
+        try:
+            os.kill(pid, 0)
+            return True
+        except OSError:
+            return False
 
 
 class V2StudyController(GovernedStudyController):
@@ -109,9 +136,45 @@ class V2StudyController(GovernedStudyController):
         _json(path, packet)
         return path
 
+    def _acquire_run_lock(self) -> dict[str, Any] | None:
+        """One live controller per study. A stale lock (dead pid) is replaced; a live one blocks."""
+        import os
+        lock = self.work / "run.lock"
+        existing = _read(lock)
+        pid = int(existing.get("pid") or 0)
+        if pid and pid != os.getpid() and _pid_alive(pid):
+            return {"pid": pid, "started_at_utc": existing.get("started_at_utc"), "through": existing.get("through")}
+        _json(lock, {"pid": os.getpid(), "started_at_utc": datetime.now(timezone.utc).isoformat(), "through": self._through})
+        return None
+
+    def _release_run_lock(self) -> None:
+        import os
+        lock = self.work / "run.lock"
+        if int(_read(lock).get("pid") or 0) == os.getpid():
+            try:
+                lock.unlink()
+            except OSError:
+                pass
+
     def run(self, *, through: str = "seal", inspect: bool = False, dry_run: bool = False) -> dict[str, Any]:
         if through not in STAGE_ORDER:
             raise ValueError(f"unknown --through {through}")
+        self._through = through
+        if not (inspect or dry_run):
+            live = self._acquire_run_lock()
+            if live:
+                card = self._card(ControllerState.NEEDS_COMPILE, "worktree", blocker=BlockerType.RUNTIME_FAILURE,
+                                  reason=f"STUDY_RUN_ALREADY_LIVE: pid {live['pid']} started {live['started_at_utc']} (--through {live['through']}); one controller per study",
+                                  last=None)
+                card["blocker_code"] = "STUDY_RUN_ALREADY_LIVE"
+                return card
+        try:
+            return self._run_locked(through=through, inspect=inspect, dry_run=dry_run)
+        finally:
+            if not (inspect or dry_run):
+                self._release_run_lock()
+
+    def _run_locked(self, *, through: str, inspect: bool, dry_run: bool) -> dict[str, Any]:
         # typed capability gaps are a first-class blocker, never a runtime failure
         fp = self._fingerprints()
         if not (inspect or dry_run) and not self._fresh_stage("compile", fp) and not self._worktree()["unsafe_dirty_paths"]:
