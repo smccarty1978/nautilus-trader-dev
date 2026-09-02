@@ -94,10 +94,11 @@ def test_declared_dataset_spec_path_equals_resolver_path_for_real_study():
     not (CLEAN_FLIP_STUDY / "compiled_study.json").exists() or not REAL_NQ_CATALOG.exists(),
     reason="CleanFlip study or real NQ catalog absent",
 )
-def test_drifted_dataset_spec_catalog_path_is_rejected(tmp_path: Path):
+def test_drifted_dataset_spec_catalog_path_is_rejected(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """If the referenced DatasetSpec disagrees with resolve_catalog_plan's own result, the
     runtime must refuse rather than silently trusting the resolver alone.
     """
+    monkeypatch.setenv("NT_RESEARCH_CONFIG", str(tmp_path / "absent.yaml"))  # legacy repo-relative mode
     compiled_data = load_compiled_study(CLEAN_FLIP_STUDY)
 
     fake_repo_root = tmp_path / "repo"

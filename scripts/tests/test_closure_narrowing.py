@@ -124,3 +124,38 @@ def test_relative_wildcard_imports_are_resolved(tmp_path: Path):
     (pkg / "user.py").write_text("from .sub import *\nfrom . import *\n")
     targets = ch.wildcard_import_targets([pkg / "user.py", pkg / "sub.py", pkg / "sibling.py", pkg / "__init__.py"], tmp_path)
     assert (pkg / "sub.py").resolve() in targets and (pkg / "__init__.py").resolve() in targets
+
+
+NL = chr(10)
+
+
+def test_level2_relative_wildcard_target_enters_closure_and_binds_composite(tmp_path: Path):
+    """Audit pass-03 WARNING: ``from ..sibling import *`` (level 2) -- the target enters the
+    execution closure, its executable code binds the v2 composite, and unrelated code does not."""
+    from scripts.resolve_execution_manifest import compute_ast_closure
+    repo = tmp_path / "repo"
+    pkg = repo / "pkg"; inner = pkg / "inner"; inner.mkdir(parents=True)
+    (pkg / "__init__.py").write_text(""); (inner / "__init__.py").write_text("")
+    (pkg / "sibling.py").write_text(CODE)
+    (inner / "user.py").write_text("from ..sibling import *" + NL + NL + NL + "def run():" + NL + "    return f(9)" + NL)
+    (repo / "unrelated.py").write_text("X = 1" + NL)
+
+    def composite():
+        visited, unresolved = compute_ast_closure([inner / "user.py"], repo)
+        assert unresolved == []
+        files = sorted(Path(v).resolve() for v in visited)
+        stars = ch.wildcard_import_targets(files, repo)
+        return "|".join(f"{f.relative_to(repo).as_posix()}={ch.hash_file_v2(f, keep_all=f in stars)}" for f in files), files, stars
+
+    base, files, stars = composite()
+    assert (pkg / "sibling.py").resolve() in files          # target entered the closure
+    assert (pkg / "sibling.py").resolve() in stars          # and is recognised as a star target (level 2)
+    assert (repo / "unrelated.py").resolve() not in files
+    (pkg / "sibling.py").write_text(CODE.replace("CONST = 1.5", "CONST = 2.5"))
+    assert composite()[0] != base                            # executable change behind the wildcard moves it
+    (pkg / "sibling.py").write_text(CODE.replace('__all__ = ["f"]', '__all__ = ["f", "C"]'))
+    assert composite()[0] != base                            # __all__ of a star-imported module binds
+    (pkg / "sibling.py").write_text(CODE.replace('"""Doc."""', '"""Other."""'))
+    assert composite()[0] == base                            # docstring-only: unchanged
+    (repo / "unrelated.py").write_text("X = 2" + NL)
+    assert composite()[0] == base                            # unrelated module: unchanged

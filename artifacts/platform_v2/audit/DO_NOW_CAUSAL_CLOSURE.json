@@ -1,0 +1,17 @@
+{
+  "platform_v2_do_now_causal_closure": {
+    "status": "CLOSED",
+    "final_causal_audit": "pass 04 CLEAR at b5feebf",
+    "contract_audit": "pass 01 CLEAR at 2138cc4",
+    "history": [
+      "pass 01 BLOCKED (2 critical, 1 warning) at 2138cc4",
+      "pass 02 BLOCKED (1 critical, 1 warning) at 2b1ac38",
+      "pass 03 BLOCKED (1 critical, 1 warning) at f9150f2",
+      "pass 04 CLEAR at b5feebf"
+    ],
+    "scientific_authorities_changed": false,
+    "oos_2024_accessed": false,
+    "models_retrained": false,
+    "residual_out_of_scope": "backtests/run_staged_backtest.py (frozen legacy reference) builds its own engine without launch verification; pre-existing, not governed"
+  }
+}
