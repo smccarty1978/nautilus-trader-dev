@@ -1,0 +1,47 @@
+{
+  "family": "lightgbm",
+  "features": [
+    "prior_1m_regime_efficiency",
+    "prior_5m_regime_efficiency",
+    "prior_1m_regime_mfe_atr",
+    "prior_5m_regime_mfe_atr",
+    "prior_1m_regime_range_atr",
+    "prior_5m_regime_range_atr",
+    "rolling_300s_retention_ratio",
+    "rolling_300s_current_progress_atr",
+    "rolling_300s_max_progress_atr",
+    "rolling_300s_giveback_atr",
+    "arrival_velocity",
+    "arrival_acceleration",
+    "ema_slope"
+  ],
+  "final_train_validation_years": [],
+  "generated_at_utc": "2026-09-02T20:06:57.094874+00:00",
+  "hyperparameters": {
+    "deterministic": true,
+    "learning_rate": 0.03,
+    "max_depth": 3,
+    "min_data_in_leaf": 100,
+    "n_estimators": 200,
+    "n_jobs": 1,
+    "num_leaves": 7,
+    "verbosity": -1
+  },
+  "label_column": "target_flip_within_horizon",
+  "metrics": {
+    "final_validation": null,
+    "folds": []
+  },
+  "model_id": "fad4c0e93766a08af7ea6a489a12e14c7d065206c3986f36f1e8a648ea436c0c",
+  "model_store_tier": "registry",
+  "plan_sha256": "c291d96614549145e3295d3bb99c43b2275ffc34d75279cda52cc1154033093a",
+  "rows": {
+    "binary": 451101,
+    "total": 453768
+  },
+  "schema_version": 2,
+  "training_population_identity": "0d2166efae01b530aaa78b52d9a21e828ccf1a6104786844d90eb3bb01b73e1a",
+  "tuning_years": [
+    2021
+  ]
+}

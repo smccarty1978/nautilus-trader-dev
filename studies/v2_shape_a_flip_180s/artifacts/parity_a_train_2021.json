@@ -1,0 +1,54 @@
+{
+  "study": "v2_shape_a_flip_180s",
+  "shape": "a",
+  "partition": "train",
+  "year": 2021,
+  "rows": {
+    "runtime_candidates": 453768,
+    "reference_candidates": 453768,
+    "runtime_observations": 453768,
+    "reference_observations": 453768
+  },
+  "candidates": {
+    "passed": true,
+    "reference_rows": 453768,
+    "runtime_rows": 453768,
+    "common_rows": 453768,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 18,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "observations": {
+    "passed": true,
+    "reference_rows": 453768,
+    "runtime_rows": 453768,
+    "common_rows": 453768,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 10,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "passed": true,
+  "historical_study_modified": false
+}
