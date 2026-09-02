@@ -145,7 +145,7 @@ def test_host_boundary_lint_is_clear():
     assert not findings, findings
 
 
-@pytest.mark.parametrize("rule,expected", [("strict", ("CENSORED", "TIMEOUT")), ("first_bar_at_or_after", ("NEGATIVE", None))])
+@pytest.mark.parametrize("rule,expected", [("strict", ("CENSORED", "TIMEOUT")), ("first_bar_at_or_after", ("LABELED_NEGATIVE", None))])
 def test_horizon_end_rule_on_a_sparse_tape(rule, expected):
     """Bar at exactly T+horizon missing; the next bar (T+horizon+1) would hit the adverse barrier."""
     from research_workflow.target_replay_oracle import replay
