@@ -1,0 +1,42 @@
+{
+  "item": "03_model_contract_v2",
+  "status": "PASS",
+  "commit": null,
+  "tests": {
+    "scripts/tests/test_model_store.py": "11 passed",
+    "scripts/tests/test_roots.py": "12 passed",
+    "modeling/selection/freeze/study suite": "167 passed, 7 pre-existing failures (all in the baseline failure set), 0 new"
+  },
+  "artifacts": [
+    "conftest.py",
+    "research_workflow/model_artifacts.py",
+    "research_workflow/model_migration.py",
+    "research_workflow/model_selection.py",
+    "research_workflow/model_store.py",
+    "research_workflow/roots.py",
+    "scripts/research.py",
+    "scripts/tests/test_model_store.py",
+    "scripts/tests/test_roots.py",
+    "studies/regime_transition_target_before_stop_v1/artifacts/model_store_migration.json"
+  ],
+  "store": {
+    "root": "~/.nt_research/models",
+    "models": 468,
+    "registry_selected": 12,
+    "ledger_rejected": 456,
+    "joblib_exports_verified": 12,
+    "golden_frames": "468 x 256 real TRAIN rows from _work/train_merged_collection/candidates.parquet (1,387,411 rows)",
+    "golden_validate_sample": "max_abs_diff 0.0"
+  },
+  "identity": "model_id unchanged for all 468; canonical = LightGBM native text (portable); legacy joblib bundle preserved as verified export; legacy v1 registry records untouched; legacy bytes in the study worktree untouched",
+  "hooks": [
+    "model_artifacts.persist_models mirrors registry-tier models into the v2 store when model_root is configured (additive, never fails the fit)",
+    "model_selection._fit_and_score records every candidate fit in the ledger (bytes + studies/<id>/artifacts/fits/<fit_id>.json)",
+    "conftest.py isolates the model store root for the whole test suite (NT_RESEARCH_MODEL_ROOT)"
+  ],
+  "not_done": [
+    "ONNX exports not run for the 12 registry models (available via 'research model export <id> --format onnx'; the family exporter is installed)"
+  ],
+  "next_stage": "04_controller",
+  "blocker": null
+}

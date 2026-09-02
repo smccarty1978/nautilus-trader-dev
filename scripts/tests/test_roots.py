@@ -124,6 +124,7 @@ def test_wrong_digest_only_copy_is_conflict_not_silent_use(tmp_path: Path, monke
 
 
 def test_model_root_from_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("NT_RESEARCH_MODEL_ROOT", raising=False)  # the suite-wide override must not mask the config value
     monkeypatch.setenv(roots.CONFIG_ENV, str(_config(tmp_path, [tmp_path / "r"], model_root=tmp_path / "models")))
     cfg = load_config()
     assert cfg.model_root == (tmp_path / "models").resolve()

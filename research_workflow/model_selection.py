@@ -249,6 +249,7 @@ def _walk_forward_folds(tuning_years: Sequence[int]) -> List[Dict[str, Any]]:
 def _fit_and_score(
     X: pd.DataFrame, y: pd.Series, meta: pd.DataFrame, fit_years: Sequence[int], val_year: int,
     *, family: str, hyperparameters: Dict[str, Any], seed: int, metric_name: str,
+    study_path: "str | Path | None" = None, arm: str = "", config_index: "int | None" = None,
 ) -> Optional[float]:
     fit_mask = meta["_year"].isin(fit_years)
     val_mask = meta["_year"] == val_year
@@ -260,7 +261,20 @@ def _fit_and_score(
         split_policy=SplitPolicy(kind="explicit_index", description="model_selection inner fold"),
     )
     scores = model.predict_proba(X[val_mask.values])
-    return _metric_value(metric_name, y[val_mask.values], scores)
+    value = _metric_value(metric_name, y[val_mask.values], scores)
+    # Model contract v2 fit ledger: every actual candidate fit leaves bytes + a permanent row.
+    if study_path is not None:
+        try:
+            from research_workflow.model_store import record_fit
+            fit_id = model.provenance.fit_identity_sha256
+            record_fit(study_path=Path(study_path), fit_id=fit_id, estimator=model, family=family,
+                       row={"selection_status": "candidate", "arm": arm, "config_id": (f"C{config_index}" if config_index is not None else None),
+                            "fold_id": f"fit_{'_'.join(str(y_) for y_ in fit_years)}_val_{val_year}", "fit_years": list(fit_years), "validation_year": int(val_year),
+                            "seed": seed, "hyperparameters": dict(hyperparameters), "ordered_inputs": list(model.provenance.ordered_features),
+                            "metrics": {metric_name: value}, "fit_identity_sha256": fit_id, "library_versions": dict(model.provenance.library_versions)})
+        except Exception:  # the ledger is additive; a store failure never changes selection
+            pass
+    return value
 
 
 def _evaluate_final_validation(
@@ -353,6 +367,7 @@ def run_model_selection(
                     X, y, meta, fold["fit_years"], fold["val_year"],
                     family=cand.family, hyperparameters=cand.as_dict(), seed=spec.random_seed or 0,
                     metric_name=spec.primary_selection_metric or "roc_auc",
+                    study_path=study_path, arm=arm, config_index=candidates.index(cand),
                 )
                 for fold in folds
             ] if folds else [None]

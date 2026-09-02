@@ -94,6 +94,44 @@ def cmd_study_run(ns: argparse.Namespace, extra: list[str]) -> int:
     return subprocess.run(cmd, cwd=str(ROOT)).returncode
 
 
+# ---------------------------------------------------------------------------
+# model store
+# ---------------------------------------------------------------------------
+
+def cmd_model_list(_: argparse.Namespace) -> int:
+    from research_workflow.model_store import list_store
+    rows = list_store()
+    return _card({"count": len(rows), "by_tier": {t: sum(1 for r in rows if r["tier"] == t) for t in ("registry", "ledger")}, "models": rows[:50]})
+
+
+def cmd_model_validate(ns: argparse.Namespace) -> int:
+    from research_workflow.model_store import validate_golden
+    try:
+        return _card(validate_golden(ns.model_id))
+    except Exception as exc:
+        return _card({"model_id": ns.model_id, "error": f"{type(exc).__name__}: {exc}"}, ok=False)
+
+
+def cmd_model_export(ns: argparse.Namespace) -> int:
+    from research_workflow.model_store import add_export
+    rec = add_export(ns.model_id, ns.format)
+    return _card({"model_id": ns.model_id, "export": {k: rec.get(k) for k in ("format", "status", "byte_sha256", "error")}, "equivalence": rec.get("equivalence")}, ok=rec.get("status") == "verified")
+
+
+def cmd_model_migrate(ns: argparse.Namespace) -> int:
+    import pandas as pd
+    from research_workflow.model_migration import migrate_legacy_records, selected_configs_from_phase_d_report
+    study_dir = ROOT / "studies" / ns.study
+    report_path = study_dir / "artifacts" / "phase_d" / "phase_d_modeling_report.json"
+    selected = selected_configs_from_phase_d_report(report_path) if report_path.is_file() else {}
+    frame = pd.read_parquet(ns.train_frame) if ns.train_frame else None
+    report = migrate_legacy_records(study_id=ns.study, registry_root=ROOT / "studies" / "model_registry", bytes_root=Path(ns.bytes_root) / "studies",
+                                    train_frame=frame, selected=selected, exports=tuple(ns.export or ()), limit=ns.limit)
+    out = study_dir / "artifacts" / "model_store_migration.json"
+    out.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
+    return _card({"report": str(out), **{k: report[k] for k in ("records", "migrated", "already_present", "tiers", "exports")}, "failed": len(report["failed"]), "first_failures": report["failed"][:3]}, ok=not report["failed"])
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="research", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="group", required=True)
@@ -112,6 +150,13 @@ def main(argv: list[str] | None = None) -> int:
     study = sub.add_parser("study").add_subparsers(dest="cmd", required=True)
     n = study.add_parser("new"); n.add_argument("study_id"); n.add_argument("--from-question"); n.add_argument("--dataset", default="NQ_v0_2020_2026"); n.set_defaults(fn=cmd_study_new)
     r = study.add_parser("run"); r.set_defaults(fn=cmd_study_run, passthrough=True)
+
+    model = sub.add_parser("model").add_subparsers(dest="cmd", required=True)
+    model.add_parser("list").set_defaults(fn=cmd_model_list)
+    mv = model.add_parser("validate"); mv.add_argument("model_id"); mv.set_defaults(fn=cmd_model_validate)
+    me = model.add_parser("export"); me.add_argument("model_id"); me.add_argument("--format", default="joblib"); me.set_defaults(fn=cmd_model_export)
+    mm = model.add_parser("migrate"); mm.add_argument("--study", required=True); mm.add_argument("--bytes-root", required=True, help="repo/worktree root holding studies/<id>/artifacts/models bytes")
+    mm.add_argument("--train-frame", help="parquet of TRAIN rows for real-row golden frames"); mm.add_argument("--export", action="append"); mm.add_argument("--limit", type=int); mm.set_defaults(fn=cmd_model_migrate)
 
     ws = sub.add_parser("ws").add_subparsers(dest="cmd", required=True)
     ws.add_parser("list").set_defaults(fn=cmd_ws_list)

@@ -101,8 +101,11 @@ def config_path() -> Optional[Path]:
 def load_config(path: Optional[Path] = None) -> RootConfig:
     """Load the machine-local root configuration; absent config -> inactive (legacy mode)."""
     p = path if path is not None else config_path()
+    # Test/process-local override of the model store root (never of catalog roots): lets a
+    # test suite keep the operator's catalogs while isolating every fit it persists.
+    model_override = os.environ.get("NT_RESEARCH_MODEL_ROOT")
     if p is None:
-        return RootConfig(None, (), None, DEFAULT_CONFIG_DIR / "leases", None)
+        return RootConfig(None, (), _expand(model_override) if model_override else None, DEFAULT_CONFIG_DIR / "leases", None)
     import yaml
     raw = yaml.safe_load(Path(p).read_text(encoding="utf-8")) or {}
     if not isinstance(raw, dict):
@@ -111,7 +114,7 @@ def load_config(path: Optional[Path] = None) -> RootConfig:
     if not isinstance(roots_raw, list) or any(not isinstance(r, str) for r in roots_raw):
         raise RootConfigError("ROOT_CONFIG_MALFORMED: catalog_roots must be a list of strings")
     roots = tuple(_expand(r) for r in roots_raw)
-    model_root = _expand(raw["model_root"]) if raw.get("model_root") else None
+    model_root = _expand(model_override) if model_override else (_expand(raw["model_root"]) if raw.get("model_root") else None)
     leases = _expand(raw["leases_dir"]) if raw.get("leases_dir") else Path(p).resolve().parent / "leases"
     worktree_root = _expand(raw["worktree_root"]) if raw.get("worktree_root") else None
     return RootConfig(Path(p).resolve(), roots, model_root, leases, worktree_root)
