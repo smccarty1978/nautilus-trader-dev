@@ -62,6 +62,7 @@ outcome:
   atr: regime_1m.atr
   atr_availability: through_decision_ts   # authority 21d598a8...: the 1m bar closing exactly at T is applied before the ATR is frozen
   horizon: 300s
+  horizon_end_rule: first_bar_at_or_after   # authority 21d598a8...: the first bar at/after the horizon end is still evaluated for a hit
   session_end: censor
   barrier:
     primary: barrier_tp_1_0_sl_1_0
@@ -77,11 +78,12 @@ chronology:
   authorized_dates: ['2021-01-05']
 model:
   mode: score            # frozen models from the store; no new models are trained
+  # cells are keyed by the PREVAILING regime direction (LONG cell = regime_direction +1): verified by in-sample scoring, 0.77 vs 0.50 AUC
   models:
-    - {id: a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1, name: LONG_SL0_5, label: target_tp1_sl0_5_label, subset: {regime_direction: -1}}
-    - {id: 98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8, name: LONG_SL1_0, label: target_tp1_sl1_0_label, subset: {regime_direction: -1}}
-    - {id: 546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f, name: LONG_SL1_5, label: target_tp1_sl1_5_label, subset: {regime_direction: -1}}
-    - {id: 1b285fe3e30ba26a6dd44facd79acd2a1ba86699c85253345caa7677fac19909, name: SHORT_SL0_5, label: target_tp1_sl0_5_label, subset: {regime_direction: 1}}
-    - {id: 45c2c6227edca652e6f5d052aa7476bbdb4e83652ce3aeb3ea202724cd60c80b, name: SHORT_SL1_0, label: target_tp1_sl1_0_label, subset: {regime_direction: 1}}
-    - {id: 36ba0ed6e64e5a487a519bffa77f77a10ba83100157cbbf0e87cf284387a00b4, name: SHORT_SL1_5, label: target_tp1_sl1_5_label, subset: {regime_direction: 1}}
+    - {id: a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1, name: LONG_SL0_5, label: target_tp1_sl0_5_label, subset: {regime_direction: 1}}
+    - {id: 98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8, name: LONG_SL1_0, label: target_tp1_sl1_0_label, subset: {regime_direction: 1}}
+    - {id: 546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f, name: LONG_SL1_5, label: target_tp1_sl1_5_label, subset: {regime_direction: 1}}
+    - {id: 1b285fe3e30ba26a6dd44facd79acd2a1ba86699c85253345caa7677fac19909, name: SHORT_SL0_5, label: target_tp1_sl0_5_label, subset: {regime_direction: -1}}
+    - {id: 45c2c6227edca652e6f5d052aa7476bbdb4e83652ce3aeb3ea202724cd60c80b, name: SHORT_SL1_0, label: target_tp1_sl1_0_label, subset: {regime_direction: -1}}
+    - {id: 36ba0ed6e64e5a487a519bffa77f77a10ba83100157cbbf0e87cf284387a00b4, name: SHORT_SL1_5, label: target_tp1_sl1_5_label, subset: {regime_direction: -1}}
 
