@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-09-01T00:00:00Z",
+  "inventory": "artifacts/platform_reconciliation/inventory.json",
+  "topology": {
+    "finding": "All branches touched since 2026-08-25 form one linear chain. main(8ee8ddd) -> study/clean_tradable_reversal(bec2354, +32) -> chore/redteam-remediation-pass-1(c0e7090, +48) -> study/clean_maturity_flip_180s_reconcile(63b140a, +55) -> chore/redteam-remediation-pass-2(fde7a96, +62) -> { chore/governed-study-controller(3d3820f, +63) | study/regime-transition-target-before-stop-v1(edd5560, +68) }.",
+    "controller_equivalence": "git diff 3d3820f f711f50 is empty: the standalone controller commit is byte-identical to the study branch's first controller commit. The study branch adds fad65a0 (+214/-2 across 4 controller files). The study branch's controller is therefore a strict superset and is the authoritative controller.",
+    "chore/generic-workflow-defect-repair and chore/workflow-hardening-remediation": "already ancestors of main; nothing to merge."
+  },
+  "authoritative_platform_base": "fde7a96",
+  "authoritative_controller_source": "study/regime-transition-target-before-stop-v1 @ fad65a0 (f711f50 + fad65a0)",
+  "content_ownership_decisions": [
+    {"commit": "f711f50", "classification": "PLATFORM", "action": "cherry-pick whole onto reconciled platform branch"},
+    {"commit": "fad65a0", "classification": "PLATFORM", "action": "cherry-pick whole onto reconciled platform branch"},
+    {"commit": "b69739a", "classification": "MIXED", "action": "cherry-pick -n; keep only the 9 PLATFORM files (research/engines/deliverables_engine.py, research/engines/tests/test_preserved_timestamp_reuse.py, research/engines/timestamp_engine.py, research/schemas/study_spec.py, research/study_types/bespoke.py, research_workflow/compiler.py, research_workflow/modeling.py, research_workflow/study_factory.py, scripts/tests/test_freeze_boundary.py); the 27 STUDY_LOCAL files stay on the study branch unchanged and arrive via the study merge"},
+    {"commit": "4e8afb5", "classification": "MIXED", "action": "cherry-pick -n; keep only research_workflow/experiment.py; 20 STUDY_LOCAL files arrive via the study merge"},
+    {"commit": "a345718", "classification": "STUDY_LOCAL", "action": "no platform extraction; arrives via the study merge"},
+    {"commit": "edd5560", "classification": "STUDY_LOCAL", "action": "no platform extraction (studies/model_registry manifests are study-produced); arrives via the study merge"},
+    {"commit": "3d3820f", "classification": "PLATFORM", "action": "superseded by content (identical to f711f50); tag as archive/governed-study-controller-v1, do not merge, delete branch after tag"}
+  ],
+  "unknown_classification_commits": {
+    "count": 4,
+    "commits": ["7b44615", "9bbbe5c", "95635d5", "fde7a96"],
+    "resolution": "All four are already in the linear history below fde7a96 and fast-forward with it; the UNKNOWN files are archive/, scratch/, and root housekeeping files (inspect_data.py, run_*.bat/.cmd). No ownership decision is required for a fast-forward. Recorded, not blocking."
+  },
+  "detached_worktree_dirty_file": {
+    "worktree": "C:/Users/Scott McCarty/Projects/Nautilus Trader-governed-controller",
+    "file": "features/engine.py",
+    "diff": "two appended lines: a blank line and the comment '# post-audit edit'",
+    "assessment": "test residue from exercising the controller's WORKTREE_CONTAMINATION check; not a platform change",
+    "action": "saved as artifacts/platform_reconciliation/detached_worktree_features_engine.patch; not carried forward"
+  },
+  "merge_order": [
+    {"step": 1, "into": "main", "from": "chore/redteam-remediation-pass-2 (fde7a96)", "mode": "fast-forward", "brings": "62 commits, including study/clean_tradable_reversal, chore/redteam-remediation-pass-1 and study/clean_maturity_flip_180s_reconcile histories, which are ancestors"},
+    {"step": 2, "into": "main", "from": "chore/platform-reconciled (new branch from fde7a96 with the four extractions above)", "mode": "merge --no-ff", "brings": "controller v2 and the Phase-D platform fixes with no study files"},
+    {"step": 3, "into": "main", "from": "study/regime-transition-target-before-stop-v1 (edd5560)", "mode": "merge --no-ff", "brings": "study-local history including the Phase D result and 468 registry manifests; platform files are byte-identical to step 2 so no conflicts are expected", "constraint": "history preserved, no squash, no rewrite of sealed commits"}
+  ],
+  "not_merged": [
+    {"branch": "study/clean_tradable_reversal", "reason": "already an ancestor after step 1"},
+    {"branch": "chore/redteam-remediation-pass-1", "reason": "already an ancestor after step 1"},
+    {"branch": "study/clean_maturity_flip_180s_reconcile", "reason": "already an ancestor after step 1"},
+    {"branch": "chore/governed-study-controller", "reason": "content superseded by step 2; tagged then deleted"},
+    {"branch": "all other study/* branches (older than 2026-08-25)", "reason": "unfinished or historical studies; untouched by this phase"}
+  ],
+  "model_bytes": {
+    "location": "C:/Users/Scott McCarty/Projects/Nautilus Trader-regime-transition-target/studies/regime_transition_target_before_stop_v1/artifacts/models/",
+    "counts": {"joblib": 468, "booster_txt": 468, "golden_json": 468, "size": "282M"},
+    "report_model_artifact_count": 444,
+    "report_ids_resolving_to_registry_and_bytes": 444,
+    "registry_manifests_referencing_study": 468,
+    "note": "24 registry manifests beyond the 444 in the Phase D report are earlier/adjacent fits from the same study; all bytes are gitignored and exist only in this worktree",
+    "rule": "the regime-transition worktree is NOT removed in Phase 0F; its bytes are the only copy"
+  },
+  "stop_conditions_checked": {
+    "ownership_ambiguity": "none: every file in every commit ahead of main has exactly one owner under the classification rules",
+    "semantic_change": "none planned: no study.yaml, contract, seal, freeze, or model artifact is edited"
+  }
+}

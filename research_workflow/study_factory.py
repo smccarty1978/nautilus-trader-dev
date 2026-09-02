@@ -42,9 +42,8 @@ def get_compiler_for_spec(spec: StudySpec):
         raise ValueError(f"UNSUPPORTED_STUDY_TYPE: {spec.study.type}")
 
 
-def materialize_compiled_study(spec: StudySpec, study_dir: Path, *, write_study_yaml: bool = False) -> dict:
-    """Write only derived StudySpec artifacts using the canonical compiler rendering."""
-    result = get_compiler_for_spec(spec).compile(spec)
+def materialize_compile_result(spec: StudySpec, result, study_dir: Path, *, write_study_yaml: bool = False) -> dict:
+    """Write the complete canonical derived-artifact set from one compile result."""
     study_dir.mkdir(parents=True, exist_ok=True)
     if write_study_yaml:
         with open(study_dir / "study.yaml", "w", encoding="utf-8") as f:
@@ -60,6 +59,14 @@ def materialize_compiled_study(spec: StudySpec, study_dir: Path, *, write_study_
     tests = study_dir / "tests"; tests.mkdir(exist_ok=True)
     (tests / "test_study_contracts.py").write_text(generate_test_file_content(spec, result), encoding="utf-8")
     return {"spec_sha256": result.spec_sha256, "contracts": result.contracts}
+
+
+def materialize_compiled_study(spec: StudySpec, study_dir: Path, *, write_study_yaml: bool = False) -> dict:
+    """Compile once, then write only canonical derived StudySpec artifacts."""
+    compiler = get_compiler_for_spec(spec)
+    from research.engines.timestamp_engine import compile_with_timestamp_evidence_adapter
+    result = compile_with_timestamp_evidence_adapter(compiler, spec, study_dir)
+    return materialize_compile_result(spec, result, study_dir, write_study_yaml=write_study_yaml)
 
 
 def generate_test_file_content(spec: StudySpec, result) -> str:

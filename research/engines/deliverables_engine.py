@@ -74,6 +74,8 @@ KNOWN_ARTIFACT_PRODUCERS: Dict[str, Dict[str, str]] = {
         "producer": "analysis stage",
         "relative_to": "study_dir/results",
     },
+    "phase_d_modeling_report.json": {"mode": "modeling", "producer": "declared Phase D modeling driver", "relative_to": "study_dir/artifacts/phase_d"},
+    "phase_d_model_artifacts.json": {"mode": "modeling", "producer": "declared Phase D modeling driver", "relative_to": "study_dir/artifacts/phase_d"},
 }
 
 # What each mode emits when it runs to completion. Collect mode is exhaustive here
@@ -88,6 +90,7 @@ MODE_DELIVERABLES: Dict[str, List[str]] = {
     ],
     "backtest": ["triggers.parquet", "run_manifest.json", "status.json"],
     "analysis": ["scores.parquet", "metrics.json"],
+    "modeling": ["phase_d_modeling_report.json", "phase_d_model_artifacts.json"],
 }
 
 
@@ -101,6 +104,7 @@ OPERATION_MODES: Dict[str, List[str]] = {
     "score_parity": ["collect"],
     "execution_economics": ["collect", "backtest"],
     "diagnostic_followup": ["collect", "analysis"],
+    "phase_d_modeling": ["collect", "modeling"],
     "bespoke_operation": ["collect"],
 }
 

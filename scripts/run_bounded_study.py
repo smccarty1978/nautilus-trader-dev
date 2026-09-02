@@ -25,7 +25,8 @@ def monitor_process(
     timeout_sec: float,
     stale_timeout_sec: float,
     progress_file_path: Optional[Path],
-    out_status_path: Path
+    out_status_path: Path,
+    rss_limit_mb: Optional[float] = None,
 ) -> None:
     print(f"[RUNNER] Launching: {' '.join(cmd_args)}")
     start_time = time.time()
@@ -90,6 +91,11 @@ def monitor_process(
                     for child in p.children(recursive=True):
                         mem += child.memory_info().rss
                     peak_memory_mb = max(peak_memory_mb, mem / (1024 * 1024))
+                    if rss_limit_mb is not None and peak_memory_mb > rss_limit_mb:
+                        status = "rss_limit"
+                        proc.terminate()
+                        print(f"[RUNNER] Terminated process due to RSS limit (> {rss_limit_mb} MB)")
+                        break
                 except Exception:
                     pass
 
@@ -128,6 +134,7 @@ def monitor_process(
         "exit_code": exit_code,
         "elapsed_seconds": int(elapsed_seconds),
         "peak_memory_mb": int(peak_memory_mb),
+        "pid": proc.pid,
         "log_file": str(run_log_path)
     }
 
@@ -147,6 +154,7 @@ def main():
     ap.add_argument("--stale-timeout", type=float, default=120.0, help="Maximum seconds without progress updates")
     ap.add_argument("--progress-file", type=str, default=None, help="Log or output file to watch for modification updates")
     ap.add_argument("--out-status", type=str, default="backtests/results/status.json", help="Output path for the status JSON record")
+    ap.add_argument("--rss-limit-mb", type=float, default=None, help="Maximum aggregate process RSS in MB")
     args = ap.parse_args()
 
     # Parse command arguments split by whitespace
@@ -159,7 +167,8 @@ def main():
         timeout_sec=args.timeout,
         stale_timeout_sec=args.stale_timeout,
         progress_file_path=progress_path,
-        out_status_path=Path(args.out_status)
+        out_status_path=Path(args.out_status),
+        rss_limit_mb=args.rss_limit_mb,
     )
 
 

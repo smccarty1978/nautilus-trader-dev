@@ -74,12 +74,29 @@ def _load_study(study_path: Path) -> Dict[str, Any]:
     return payload
 
 
+def _repo_relative_study_ref(path: Path) -> str:
+    """Worktree-independent study identity for the authorization record.
+
+    Scientific authorization must not be pinned to an absolute checkout path -- the
+    same governed study runs from ``.../Nautilus Trader`` and from an isolated
+    ``git worktree`` copy, and both must resolve the same authorization hash. We
+    record the repo-relative POSIX path (``studies/<id>``); if the study somehow
+    lives outside this repo, fall back to its directory name.
+    """
+    repo_root = Path(__file__).resolve().parents[1]
+    try:
+        return path.relative_to(repo_root).as_posix()
+    except ValueError:
+        return path.name
+
+
 def authorize_experiment(study_path: str | Path, *, write: bool = True) -> ExperimentAuthorization:
     """Materialize explicit TRAIN/OOS/prohibited year authority from the study contract."""
     path = Path(study_path).resolve()
     _assert_study_open(path)
     payload = _load_study(path)
     study_id = str((payload.get("study") or {}).get("id") or path.name)
+    study_ref = _repo_relative_study_ref(path)
     chronology = payload.get("chronology") or {}
     train = tuple(sorted({int(y) for y in chronology.get("train") or []}))
     oos = tuple(sorted({int(y) for y in chronology.get("dev") or []}))
@@ -91,7 +108,7 @@ def authorize_experiment(study_path: str | Path, *, write: bool = True) -> Exper
     body = {
         "schema_version": 1,
         "study_id": study_id,
-        "study_path": str(path),
+        "study_path": study_ref,
         "train_years": list(train),
         "oos_years": list(oos),
         "prohibited_years": list(prohibited),
@@ -105,7 +122,7 @@ def authorize_experiment(study_path: str | Path, *, write: bool = True) -> Exper
         artifact.write_text(json.dumps(body, indent=2) + "\n", encoding="utf-8")
     return ExperimentAuthorization(
         study_id=study_id,
-        study_path=str(path),
+        study_path=study_ref,
         train_years=train,
         oos_years=oos,
         prohibited_years=prohibited,
@@ -126,7 +143,14 @@ def load_authorization(study_path: str | Path) -> ExperimentAuthorization:
     if payload.get("authorization_sha256") != expected:
         raise ExperimentAuthorizationError("experiment authorization artifact hash mismatch")
     current = authorize_experiment(path, write=False)
-    if current.authorization_sha256 != expected:
+    # Staleness is a *chronology* question, not a checkout-path question: an artifact
+    # written from a different worktree (absolute ``study_path``) is still valid as
+    # long as the authorized year roles still match ``study.yaml``.  Comparing the
+    # full hash would reject a legacy absolute-path record even when nothing
+    # scientific changed.
+    if (current.train_years, current.oos_years, current.prohibited_years) != (
+        tuple(payload["train_years"]), tuple(payload["oos_years"]), tuple(payload["prohibited_years"])
+    ):
         raise ExperimentAuthorizationError("experiment authorization is stale relative to study.yaml")
     return current
 

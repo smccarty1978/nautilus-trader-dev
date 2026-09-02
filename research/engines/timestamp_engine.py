@@ -6,7 +6,9 @@ from actual catalog parquet data files.
 
 from __future__ import annotations
 
-import os
+import copy
+import hashlib
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -16,6 +18,10 @@ import pandas as pd
 class CatalogTimestampSemanticError(RuntimeError):
     """Raised when measured catalog timestamp semantics violate causal contracts."""
     pass
+
+
+class PreservedTimestampEvidenceReuseError(CatalogTimestampSemanticError):
+    """A sealed timestamp contract cannot safely be reused for this recompile."""
 
 
 EXPECTED_TIMEFRAME_DELTAS_NS = {
@@ -170,3 +176,151 @@ def compile_timestamp_contract(
         "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE",
     }
     return contract
+
+
+def preserved_timestamp_contract_for_modeling_recompile(
+    study_dir: Path,
+    new_spec: Any,
+) -> Dict[str, Any]:
+    """Authenticate a sealed timestamp contract when an isolated worktree lacks data.
+
+    This is intentionally not a general ``catalog unavailable`` fallback.  It is only
+    available to an existing sealed study whose current edit is limited to Phase-D
+    modeling declarations.  Collection/data/instrument/timestamp edits, a missing
+    or altered sealed predecessor, and every new study still require a live empirical
+    measurement through :func:`compile_timestamp_contract`.
+    """
+    study = Path(study_dir).resolve()
+    compiled_path = study / "compiled_study.json"
+    frozen_path = study / "audit" / "frozen_execution_manifest.json"
+    seal_path = study / "artifacts" / "preexec_audit_seal.json"
+    timestamp_path = study / "config" / "timestamp_contract.json"
+    required = (compiled_path, frozen_path, seal_path, timestamp_path)
+    if not all(path.is_file() for path in required):
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_EVIDENCE_MISSING")
+    compiled_bytes = compiled_path.read_bytes()
+    compiled_sha = hashlib.sha256(compiled_bytes).hexdigest()
+    try:
+        compiled = json.loads(compiled_bytes)
+        frozen = json.loads(frozen_path.read_text(encoding="utf-8"))
+        seal = json.loads(seal_path.read_text(encoding="utf-8"))
+        prior = json.loads(timestamp_path.read_text(encoding="utf-8"))
+        from research.schemas.study_spec import StudySpec
+        old_spec = StudySpec.model_validate(compiled["spec"])
+    except Exception as exc:
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_EVIDENCE_MALFORMED") from exc
+    if old_spec.compute_sha256() != compiled.get("spec_sha256"):
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_PRIOR_SPEC_HASH_INVALID")
+
+    # Idempotent-recompile path.  The first authenticated modeling-only transition writes
+    # ``evidence_provenance`` into ``config/timestamp_contract.json`` and leaves
+    # ``compiled_study.json`` as an already-transitioned Phase-D descendant of the sealed
+    # predecessor.  Every subsequent compile in the same lifecycle (PREPARE re-compiles,
+    # readiness re-compiles) then re-enters this function with a compiled_study.json that
+    # no longer byte-matches the frozen/sealed predecessor, and with a frozen manifest that
+    # PREPARE has legitimately re-written.  Re-authenticate transitively against the still
+    # sealed predecessor recorded in ``preexec_audit_seal.json`` (immutable until the
+    # causal-audit acceptance re-seals), and require that study.yaml has not drifted past
+    # the spec that the first transition authenticated.
+    _prov = (prior.get("evidence_provenance") or {}) if isinstance(prior, dict) else {}
+    _sealed_compiled_sha = (seal.get("file_hashes") or {}).get("study:compiled_study.json")
+    idempotent_recompile = (
+        _prov.get("mode") == "PRESERVED_SEALED_MODELING_ONLY_REUSE"
+        and _prov.get("prior_compiled_study_sha256") == _sealed_compiled_sha
+        and _prov.get("sealed_execution_composite_sha256") == seal.get("composite_seal_hash")
+        and (compiled.get("spec") or {}).get("operation", {}).get("kind") == "phase_d_modeling"
+        and new_spec.compute_sha256() == compiled.get("spec_sha256")
+    )
+
+    if not idempotent_recompile:
+        if frozen.get("compiled_study_sha256") != compiled_sha:
+            raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_FROZEN_COMPILED_BINDING_MISMATCH")
+        if seal.get("composite_seal_hash") != frozen.get("frozen_execution_composite_sha256"):
+            raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_SEAL_COMPOSITE_MISMATCH")
+        if _sealed_compiled_sha != compiled_sha:
+            raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_SEAL_COMPILED_BINDING_MISMATCH")
+
+    old = old_spec.model_dump(mode="json")
+    new = new_spec.model_dump(mode="json")
+    # Only model declarations and the corresponding declared study-local driver may
+    # change.  The rest of the executable/collection authority compares exactly.
+    old_model, new_model = old.pop("model", None), new.pop("model", None)
+    if old_model is None or new_model is None:
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_MODEL_DECLARATION_MISSING")
+    old_execution, new_execution = old.get("execution") or {}, new.get("execution") or {}
+    old_drivers = set(old_execution.pop("modeling_driver_relpaths", []) or [])
+    new_drivers = set(new_execution.pop("modeling_driver_relpaths", []) or [])
+    if not new_drivers or not old_drivers <= new_drivers:
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_DRIVER_DECLARATION_INVALID")
+    old_bespoke, new_bespoke = old.get("bespoke") or {}, new.get("bespoke") or {}
+    old_scope = set(old_bespoke.pop("custom_scope", []) or [])
+    new_scope = set(new_bespoke.pop("custom_scope", []) or [])
+    if not old_scope <= new_scope or not (new_scope - old_scope) <= new_drivers:
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_CUSTOM_SCOPE_CHANGED")
+    old_operation, new_operation = old.get("operation") or {}, new.get("operation") or {}
+    exact_phase_d_transition = (
+        old_operation.get("kind") == "train_evaluate"
+        and new_operation.get("kind") == "phase_d_modeling"
+        and {k: v for k, v in old_operation.items() if k != "kind"}
+        == {k: v for k, v in new_operation.items() if k != "kind"}
+    )
+    if exact_phase_d_transition:
+        # The only allowed non-modeling declaration delta is the existing study's
+        # Phase-D mode transition, needed to compile its literal modeling outputs.
+        old["operation"] = new_operation
+    elif old_operation != new_operation:
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_OPERATION_CHANGED")
+    if old != new:
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_NONMODELING_CONTRACT_CHANGED")
+
+    symbol = new_spec.instrument.symbol.upper()
+    if prior.get("instrument_symbol") != symbol:
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_INSTRUMENT_MISMATCH")
+    expected_catalog = resolve_catalog_for_symbol(symbol)
+    if prior.get("measured_catalog_rel_path") != expected_catalog:
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_CATALOG_AUTHORITY_MISMATCH")
+    nt = prior.get("nautilus_catalog") or {}
+    measurement = nt.get("empirical_measurement") or {}
+    measurements = measurement.get("measurements") or {}
+    if (measurement.get("status") != "MEASURED" or not measurements
+            or any(not record.get("pass") for record in measurements.values())
+            or any(not str(name).upper().startswith(symbol + ".") for name in measurements)):
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_MEASUREMENT_INVALID")
+    semantic = (prior.get("raw_timestamp_semantic"), prior.get("raw_index_field"),
+                nt.get("ts_event_semantic"), nt.get("ts_init_semantic"), nt.get("causal_dispatch_field"),
+                prior.get("causal_rule"))
+    if semantic != ("OPEN_STAMPED", "ts_event", "OPEN_STAMPED", "CLOSE_STAMPED", "ts_init", "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE"):
+        raise PreservedTimestampEvidenceReuseError("PRESERVED_TIMESTAMP_REUSE_SEMANTICS_INVALID")
+
+    reused = copy.deepcopy(prior)
+    reused["evidence_provenance"] = {
+        "mode": "PRESERVED_SEALED_MODELING_ONLY_REUSE",
+        "newly_measured": False,
+        # Anchored to the sealed predecessor (immutable until the causal-audit re-seal),
+        # never to the live compiled bytes -- otherwise an idempotent recompile would
+        # rewrite its own anchor and break the next recompile's re-authentication.
+        "prior_compiled_study_sha256": _sealed_compiled_sha,
+        "prior_spec_sha256": _prov.get("prior_spec_sha256") if idempotent_recompile else compiled["spec_sha256"],
+        "frozen_execution_composite_sha256": frozen.get("frozen_execution_composite_sha256"),
+        "sealed_execution_composite_sha256": seal["composite_seal_hash"],
+        "idempotent_recompile": bool(idempotent_recompile),
+    }
+    return reused
+
+
+def compile_with_timestamp_evidence_adapter(compiler: Any, spec: Any, study_dir: Path) -> Any:
+    """Compile normally, then apply the sole authenticated missing-catalog fallback.
+
+    Both the study factory and the lifecycle compiler call this one adapter.  Keeping
+    it here prevents the two entrypoints from diverging into subtly different
+    timestamp-evidence policies.
+    """
+    try:
+        return compiler.compile(spec)
+    except CatalogTimestampSemanticError:
+        # Flip studies have no bespoke modeling-only escape hatch.  A timestamp
+        # failure for them remains the original failure, not a reuse opportunity.
+        if getattr(getattr(spec, "study", None), "type", None) != "bespoke":
+            raise
+        preserved = preserved_timestamp_contract_for_modeling_recompile(study_dir, spec)
+        return compiler.compile(spec, timestamp_contract_override=preserved)
