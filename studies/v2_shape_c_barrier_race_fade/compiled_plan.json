@@ -7,7 +7,7 @@
         "id": "regime_1m",
         "kind": "tracker",
         "stream": "nq_1m",
-        "visibility": "at_epoch"
+        "visibility": "strictly_before"
       },
       {
         "availability": "completed_bar_ts_init",
@@ -23,7 +23,7 @@
         "id": "regime_bar_5m",
         "kind": "tracker",
         "stream": "nq_1m",
-        "visibility": "at_epoch"
+        "visibility": "strictly_before"
       },
       {
         "availability": "completed_bar_ts_init",
@@ -317,7 +317,7 @@
     }
   },
   "closure": {
-    "composite_sha256": "b7792ad8515f0dd6f1f74a7546db9a9c86fba2ae90345cf27498600ac384b443",
+    "composite_sha256": "7676acfb42fa863b0d0aaae57ae1859e3340b4d549c66367cd68f871d04e1515",
     "file_count": 23,
     "files": {
       "features/trackers/generic_arrival.py": "29201991c71821f27e014238338eb1d0d5910c4e2b2f5984d09e1a47f5703e75",
@@ -325,7 +325,7 @@
       "features/trackers/generic_rolling_productivity.py": "d0dcaa18e56debf27178e1e4c071f173f41988e5df57be8ee215303673f8e4a4",
       "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
       "features/trackers/host_bindings.py": "253625ddbc412ca20198f12f6d86b2bf324ce22baf016b29b0cf5adef8467903",
-      "research_workflow/grammar/compiler.py": "5413fd427d936d0a79fe6f3fa5524e2269dae7537002511c3e95b036e4fcdcbd",
+      "research_workflow/grammar/compiler.py": "46125a0c7ceaa3c64250dc5b0f6112d36e383dcdbb40219f55c50f38bf8c89f0",
       "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
       "research_workflow/grammar/plan.py": "b6125afc5042d1720586174b1452d2ef95241ffebe4ee126b13e2dc0679ba871",
       "research_workflow/grammar/predicates.py": "7b0fa449a526e3f0d9a7eca1444b5e35f381426517172716651a28042831c417",
@@ -879,7 +879,7 @@
     "session_end_censoring": true,
     "stream": "nq_1s"
   },
-  "plan_sha256": "4ef702f7b144c0118cb58fcddbcbc56e62a91f570bbbbddfba91a0ebf4471a15",
+  "plan_sha256": "1d10914656e732f42af1fc16b63c05d01cb13babbdc825ae8ef2802814748df5",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1011,12 +1011,12 @@
       "duration_ns": 60000000000,
       "instrument": "NQ",
       "key": "nq_1m",
-      "role": "execution",
+      "role": "context",
       "same_ts": "unavailable",
       "source": "external",
       "timeframe": "1m",
       "ts_init_delta_ns": 60000000000,
-      "visibility": "at_epoch"
+      "visibility": "strictly_before"
     }
   ],
   "study": {
