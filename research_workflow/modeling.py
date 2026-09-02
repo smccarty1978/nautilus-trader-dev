@@ -156,6 +156,40 @@ def _resolve_selection_bindings(
     return out
 
 
+def fit_temporal_fold(
+    study_path: str | Path, X: pd.DataFrame, y: pd.Series, *, arm: str,
+    estimator: str, seed: int, hyperparameters: Dict[str, Any],
+    dataset_identity_sha256: str | None, split_policy: SplitPolicy, meta: pd.DataFrame,
+):
+    """Governed single-arm primitive for declared temporal-fold compositions.
+
+    ``fit_models`` owns the normal multi-arm partition fit.  This narrow primitive
+    preserves its hard gates for a study that has declared expanding temporal folds
+    and therefore cannot use one all-TRAIN estimator fit.
+    """
+    from research_workflow.experiment import _assert_study_open
+    _assert_study_open(Path(study_path).resolve())
+    from research_workflow.modeling_drivers import assert_declared_modeling_drivers
+    assert_declared_modeling_drivers(study_path, _declared_modeling_driver_relpaths(study_path))
+    if "_partition" not in meta or set(meta["_partition"].dropna()) != {"train"}:
+        raise ValueError("fit_temporal_fold requires TRAIN-only metadata")
+    if len(meta) != len(X):
+        raise ValueError("fit_temporal_fold metadata length mismatch")
+    guard_training_frame(X, list(X.columns), context="fit_temporal_fold feature matrix")
+    compiled = json.loads((Path(study_path) / "compiled_study.json").read_text(encoding="utf-8"))
+    from research.schemas.study_spec import StudySpec
+    study_spec = StudySpec.model_validate(compiled.get("spec") or {})
+    if getattr(study_spec, "required_gates", None):
+        from research_workflow.gates import assert_gates_satisfied
+        assert_gates_satisfied(study_path, study_spec, stage="pre_fit", dataset_identity_sha256=dataset_identity_sha256)
+    if not isinstance(split_policy, SplitPolicy) or split_policy.kind != "explicit_index":
+        raise ValueError("fit_temporal_fold requires explicit_index split provenance")
+    from research.analysis.modeling import fit_model
+    return fit_model(X, y, arm=arm, estimator=estimator, seed=seed,
+        hyperparameters=hyperparameters, split_policy=split_policy,
+        dataset_identity_sha256=dataset_identity_sha256, meta=meta)
+
+
 def _selection_manifest_sha_field(
     selection_bindings: Optional[Dict[str, tuple[Dict[str, Any], Any, Path]]],
 ) -> Any:

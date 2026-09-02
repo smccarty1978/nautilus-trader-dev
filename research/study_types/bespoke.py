@@ -24,7 +24,7 @@ class BespokeStudyCompiler(BaseStudyCompiler):
     def evaluate_fit(self, spec: StudySpec) -> FitDecision:
         return FitDecision.BESPOKE_REQUIRED
 
-    def compile(self, spec: StudySpec) -> CompileResult:
+    def compile(self, spec: StudySpec, *, timestamp_contract_override: Dict[str, Any] | None = None) -> CompileResult:
         fit = self.evaluate_fit(spec)
         spec_hash = spec.compute_sha256()
 
@@ -37,7 +37,7 @@ class BespokeStudyCompiler(BaseStudyCompiler):
         pop_contract = compile_population_contract(spec.population, spec.instrument)
         target_contract = compile_target_contract(spec.target)
         feat_contract = compile_feature_contract(spec.features)
-        ts_contract = compile_timestamp_contract(spec.instrument.symbol)
+        ts_contract = timestamp_contract_override or compile_timestamp_contract(spec.instrument.symbol)
         lineage_info = validate_lineage(spec)
         baseline_info = validate_baseline(spec.baseline)
 

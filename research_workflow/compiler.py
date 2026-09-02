@@ -47,36 +47,22 @@ def compile_study(study_path: Path) -> int:
         compiler = BespokeStudyCompiler()
 
     try:
-        result = compiler.compile(spec)
+        from research.engines.timestamp_engine import compile_with_timestamp_evidence_adapter
+        # Keep PREPARE's compile path identical to the study-factory path.  The
+        # adapter still measures live evidence first and only permits the sealed
+        # modeling-only reuse condition when that measurement is unavailable.
+        result = compile_with_timestamp_evidence_adapter(compiler, spec, yaml_path.parent)
     except Exception as e:
         import traceback
         traceback.print_exc()
         print(f"[ERROR] Study compilation failed: {e}", file=sys.stderr)
         return 1
 
-    # If compiling an existing directory, verify compiled contract match
+    # Materialize through the factory's canonical writer.  PREPARE used to emit
+    # only compiled_study + deliverables, leaving SPEC/config/test artifacts stale.
     if study_path.is_dir():
-        compiled_data = {
-            "study_id": spec.study.id,
-            "study_type": spec.study.type,
-            "spec_sha256": result.spec_sha256,
-            "spec": spec.model_dump(),
-            "contracts": result.contracts,
-            "strategy_class": result.nt_strategy_class,
-        }
-        compiled_json_path = study_path / "compiled_study.json"
-        with open(compiled_json_path, "w", encoding="utf-8") as f:
-            json.dump(compiled_data, f, indent=2)
-        # This is derived authority, never a hand-maintained study artifact.  The
-        # compiler is the only place that already has the validated StudySpec and
-        # its mode-partitioned deliverables contract in hand.
-        config_dir = study_path / "config"
-        config_dir.mkdir(exist_ok=True)
-        deliverables = result.contracts.get("deliverables_contract")
-        if deliverables is not None:
-            deliverables_path = config_dir / "deliverables_contract.json"
-            with open(deliverables_path, "w", encoding="utf-8") as f:
-                json.dump(deliverables, f, indent=2)
+        from research_workflow.study_factory import materialize_compile_result
+        materialize_compile_result(spec, result, study_path)
 
     print(result.summary_card)
     return 0

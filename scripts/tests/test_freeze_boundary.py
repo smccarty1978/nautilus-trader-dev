@@ -15,7 +15,33 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 STUDY_DIR = REPO_ROOT / "studies" / "Codex_clean_maturity_flip_rolling_5m_productivity"
 
 
-def test_prepare_freeze_lifecycle_and_mutations(tmp_path):
+def _synthetic_timestamp_contract(symbol: str) -> dict:
+    """Explicit evidence fixture for this non-catalog PREPARE boundary test.
+
+    This test exercises freeze mutation detection, not timestamp measurement.  It
+    must not turn an absent catalog into assumed production evidence, so the mocked
+    compiler dependency carries a complete, unmistakably synthetic passing record.
+    """
+    return {
+        "source": "synthetic_test_fixture",
+        "instrument_symbol": symbol.upper(),
+        "measured_catalog_rel_path": "synthetic://no-catalog-access",
+        "raw_timestamp_semantic": "OPEN_STAMPED",
+        "raw_index_field": "ts_event",
+        "timezone": "UTC",
+        "nautilus_catalog": {
+            "ts_event_semantic": "OPEN_STAMPED", "ts_init_semantic": "CLOSE_STAMPED",
+            "causal_dispatch_field": "ts_init",
+            "empirical_measurement": {"status": "MEASURED", "synthetic_test_only": True,
+                "measurements": {f"{symbol.upper()}.XCME-1-SECOND-LAST-SYNTHETIC": {
+                    "sample_count": 1, "expected_delta_ns": 1_000_000_000,
+                    "observed_deltas_ns": [1_000_000_000], "pass": True}}},
+        },
+        "causal_rule": "FULL_BAR_OHLCV_AVAILABLE_ONLY_AT_INTERVAL_CLOSE",
+    }
+
+
+def test_prepare_freeze_lifecycle_and_mutations(tmp_path, monkeypatch):
     # Copy study to temp path to create a fresh environment with studies directory
     temp_study = tmp_path / "studies" / "test_freeze_study"
     copy_study_as_fresh_identity(STUDY_DIR, temp_study)
@@ -36,7 +62,10 @@ def test_prepare_freeze_lifecycle_and_mutations(tmp_path):
     phase0_text = phase0_py.read_text(encoding="utf-8")
     phase0_py.write_text(phase0_text.replace("Codex_clean_maturity_flip_rolling_5m_productivity", "test_freeze_study"), encoding="utf-8")
 
-    # 1. Run PREPARE and FREEZE
+    # 1. Run PREPARE and FREEZE. This is a fresh synthetic identity, so sealed
+    # reuse is intentionally unavailable; provide explicit synthetic evidence at
+    # the compiler dependency instead of weakening the production timestamp gate.
+    monkeypatch.setattr("research.study_types.flip_prediction.compile_timestamp_contract", _synthetic_timestamp_contract)
     run_prepare_and_freeze(temp_study)
 
     # Verify that freeze manifest was written

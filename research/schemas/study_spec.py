@@ -945,6 +945,7 @@ class OperationSpec(BaseModel):
         "score_parity",
         "execution_economics",
         "diagnostic_followup",
+        "phase_d_modeling",
         "bespoke_operation",
     ] = Field("train_evaluate", description="Specific research operation type")
     target_metric: Optional[str] = Field(None, description="Primary quantitative evaluation metric")
