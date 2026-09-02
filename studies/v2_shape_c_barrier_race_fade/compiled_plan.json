@@ -317,7 +317,7 @@
     }
   },
   "closure": {
-    "composite_sha256": "7676acfb42fa863b0d0aaae57ae1859e3340b4d549c66367cd68f871d04e1515",
+    "composite_sha256": "ecfb18141c0ac4cde99b38ad59c2457cb4e833f51af2e4a14994d5bed976a57f",
     "file_count": 23,
     "files": {
       "features/trackers/generic_arrival.py": "29201991c71821f27e014238338eb1d0d5910c4e2b2f5984d09e1a47f5703e75",
@@ -325,14 +325,14 @@
       "features/trackers/generic_rolling_productivity.py": "d0dcaa18e56debf27178e1e4c071f173f41988e5df57be8ee215303673f8e4a4",
       "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
       "features/trackers/host_bindings.py": "253625ddbc412ca20198f12f6d86b2bf324ce22baf016b29b0cf5adef8467903",
-      "research_workflow/grammar/compiler.py": "46125a0c7ceaa3c64250dc5b0f6112d36e383dcdbb40219f55c50f38bf8c89f0",
+      "research_workflow/grammar/compiler.py": "fc2feae74f178e407f8ba255d3d2270745b13ba77df4288e05a4a5d981abf79d",
       "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
       "research_workflow/grammar/plan.py": "b6125afc5042d1720586174b1452d2ef95241ffebe4ee126b13e2dc0679ba871",
       "research_workflow/grammar/predicates.py": "7b0fa449a526e3f0d9a7eca1444b5e35f381426517172716651a28042831c417",
-      "research_workflow/grammar/spec.py": "820063e7b560273789bdf26125fa42ada17d5d4804e26ba592ab0476816bc0d2",
+      "research_workflow/grammar/spec.py": "16819f2dee09b22daaca18ee2f1a380346783791d9a4c03f93e9d63f262d4d19",
       "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
       "research_workflow/host/mux.py": "63f4b606895181ead566de12b10f783d380ed9c0bf0bd650ac43b76588e1708d",
-      "research_workflow/host/outcomes.py": "df282c3eac33ef329d19dfde51f554277ed4cdd18976c79c558e17015847dd30",
+      "research_workflow/host/outcomes.py": "d1167be434309099f247c14c0c187000510cc25d3dc6f240f28196b4a708dac9",
       "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
       "research_workflow/host/sink.py": "c0e353d2cd2f23f4c4142927b9e06a90b52ff70ff365a8dd188fb43ec0e0959f",
       "research_workflow/host/strategy.py": "59f4cca85697b4d82296d7a5e440d72353c8af15d3770a68c51c78c99b5eb66e",
@@ -341,7 +341,7 @@
       "research_workflow/provider_host.py": "6a06b45f61b0507e5f024db3adfd724b5c4f28534631f502b2555f0bb19646e5",
       "research_workflow/sessions.py": "466ab8fa792ccb7864da1f72c3ac2f81bb49bdb4e034f8be8a6fd5e5a45e8636",
       "research_workflow/target_expression.py": "cb2980ed3b1563ce2eee981896ab04ef101179a569dffdc975bbfb5bddd40045",
-      "research_workflow/target_replay_oracle.py": "8960803bd2b49cf3fe427b23a9361d74cbcbf940a1278d185b90577d0f9ac63a",
+      "research_workflow/target_replay_oracle.py": "02b585c210bf18ce3550dfb638c85592e990d8d22f806863b53e9d4d316c3675",
       "utils/session_boundaries.py": "15bbb046337a9fd2ed119e64fb79de5dab5d37608a0f6b9a7d1b9a73a20d5b0f"
     },
     "hash_algorithm": "v2"
@@ -760,7 +760,7 @@
         "label": "target_tp1_sl0_5_label",
         "name": "LONG_SL0_5",
         "subset": {
-          "regime_direction": -1
+          "regime_direction": 1
         }
       },
       {
@@ -768,7 +768,7 @@
         "label": "target_tp1_sl1_0_label",
         "name": "LONG_SL1_0",
         "subset": {
-          "regime_direction": -1
+          "regime_direction": 1
         }
       },
       {
@@ -776,7 +776,7 @@
         "label": "target_tp1_sl1_5_label",
         "name": "LONG_SL1_5",
         "subset": {
-          "regime_direction": -1
+          "regime_direction": 1
         }
       },
       {
@@ -784,7 +784,7 @@
         "label": "target_tp1_sl0_5_label",
         "name": "SHORT_SL0_5",
         "subset": {
-          "regime_direction": 1
+          "regime_direction": -1
         }
       },
       {
@@ -792,7 +792,7 @@
         "label": "target_tp1_sl1_0_label",
         "name": "SHORT_SL1_0",
         "subset": {
-          "regime_direction": 1
+          "regime_direction": -1
         }
       },
       {
@@ -800,7 +800,7 @@
         "label": "target_tp1_sl1_5_label",
         "name": "SHORT_SL1_5",
         "subset": {
-          "regime_direction": 1
+          "regime_direction": -1
         }
       }
     ],
@@ -843,6 +843,7 @@
     "direction_sign": -1,
     "entry_reference": "next_bar_open",
     "flip": null,
+    "horizon_end_rule": "first_bar_at_or_after",
     "kernel": "barrier",
     "label_column": "target_flip_within_horizon",
     "max_gap_ns": null,
@@ -879,7 +880,7 @@
     "session_end_censoring": true,
     "stream": "nq_1s"
   },
-  "plan_sha256": "1d10914656e732f42af1fc16b63c05d01cb13babbdc825ae8ef2802814748df5",
+  "plan_sha256": "5655c7fbf30180566076fb433bc615ae1846c9b3ecdb25da6b40a1b43d866831",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -992,7 +993,7 @@
     "kind": "legacy",
     "session": "RTH"
   },
-  "spec_sha256": "22c65108c2db9bb14b58ff5ba88a35f30138be9eef8da3145ff288494d3ed20a",
+  "spec_sha256": "6af88d1207b9c60f3f81bfa3a97aa772df4430c76d3c12fea20194dd3f3cd069",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",

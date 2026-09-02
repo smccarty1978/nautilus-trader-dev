@@ -1,0 +1,114 @@
+{
+  "study": "v2_shape_c_barrier_race_fade",
+  "shape": "c",
+  "partition": "train",
+  "year": 2021,
+  "rows": {
+    "runtime_candidates": 453768,
+    "reference_candidates": 453768,
+    "runtime_observations": 453768,
+    "reference_observations": 453768
+  },
+  "candidates": {
+    "passed": true,
+    "reference_rows": 453768,
+    "runtime_rows": 453768,
+    "common_rows": 453768,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 18,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "observations": {
+    "passed": false,
+    "reference_rows": 453768,
+    "runtime_rows": 453768,
+    "common_rows": 453768,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 13,
+    "value_mismatches": 414,
+    "per_column": {
+      "target_tp1_sl0_5_label": {
+        "mismatches": 6,
+        "max_abs_diff": 0.0
+      },
+      "target_tp1_sl0_5_disposition": {
+        "mismatches": 6,
+        "max_abs_diff": null
+      },
+      "target_tp1_sl0_5_censor_reason": {
+        "mismatches": 53,
+        "max_abs_diff": null
+      },
+      "target_tp1_sl0_5_resolution_seconds": {
+        "mismatches": 53,
+        "max_abs_diff": 6600.0
+      },
+      "target_tp1_sl1_0_label": {
+        "mismatches": 9,
+        "max_abs_diff": 0.0
+      },
+      "target_tp1_sl1_0_disposition": {
+        "mismatches": 9,
+        "max_abs_diff": null
+      },
+      "target_tp1_sl1_0_censor_reason": {
+        "mismatches": 56,
+        "max_abs_diff": null
+      },
+      "target_tp1_sl1_0_resolution_seconds": {
+        "mismatches": 56,
+        "max_abs_diff": 6600.0
+      },
+      "target_tp1_sl1_5_label": {
+        "mismatches": 17,
+        "max_abs_diff": 0.0
+      },
+      "target_tp1_sl1_5_disposition": {
+        "mismatches": 17,
+        "max_abs_diff": null
+      },
+      "target_tp1_sl1_5_censor_reason": {
+        "mismatches": 66,
+        "max_abs_diff": null
+      },
+      "target_tp1_sl1_5_resolution_seconds": {
+        "mismatches": 66,
+        "max_abs_diff": 6600.0
+      }
+    },
+    "first_divergence": {
+      "timestamp": 1610744925000000000,
+      "key": [
+        1610744925000000000,
+        1610743440000000000,
+        296
+      ],
+      "column": "target_tp1_sl1_0_label",
+      "reference": 0.0,
+      "runtime": null
+    },
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "explained_divergences": null,
+  "passed": false,
+  "historical_study_modified": false
+}

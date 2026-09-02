@@ -1,0 +1,55 @@
+{
+  "candidates_count_total": 1591,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true
+  },
+  "date": "2021-01-05",
+  "execution_manifest_composite_sha256": "7676acfb42fa863b0d0aaae57ae1859e3340b4d549c66367cd68f871d04e1515",
+  "generated_at_utc": "2026-09-02T19:35:18.512962+00:00",
+  "manifest": {
+    "candidates_sha256": "3ade1910a714c606eba946a2ff574eb05dd2d70d93d6fe5a20230bf2c6854c57",
+    "composite_seal_hash": "f43a79b8e51c2f1ac88225cbb6685604ba5126805130e4a862e12c64e95de993",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2021-01-05",
+    "elapsed_s": 5.16972970002098,
+    "execution_manifest_sha256": "7676acfb42fa863b0d0aaae57ae1859e3340b4d549c66367cd68f871d04e1515",
+    "kind": "smoke",
+    "observations_sha256": "136149bdcd7d3aeea6042ffdc356993b78d5a6fba504b0ca91f1cba75ea4c420",
+    "plan_sha256": "1d10914656e732f42af1fc16b63c05d01cb13babbdc825ae8ef2802814748df5",
+    "rows": {
+      "candidates": 1591,
+      "observations": 1591
+    },
+    "stats": {
+      "bars": 103305,
+      "bars_by_stream": {
+        "nq_1m": 2790,
+        "nq_1s": 100515
+      },
+      "candidates": 1591,
+      "dropped_outside_primary": {
+        "candidates": 1469,
+        "observations": 1469
+      },
+      "epochs": 16836,
+      "observations": 1591,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-02T19:35:18.494635+00:00"
+  },
+  "observations_count_total": 1591,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-platform-v2-do-soon-v2_shape_c_barrier_race_fade\\studies\\v2_shape_c_barrier_race_fade\\runs\\20260902_193510_v2_shape_c_barrier_race_fade_smoke",
+  "sealed_composite_sha256": "f43a79b8e51c2f1ac88225cbb6685604ba5126805130e4a862e12c64e95de993",
+  "status": "ACCEPTED",
+  "study_name": "v2_shape_c_barrier_race_fade",
+  "validator": "research_workflow.lifecycle_v2"
+}

@@ -1,0 +1,301 @@
+{
+  "features": [
+    "prior_1m_regime_efficiency",
+    "prior_1m_regime_mfe_atr",
+    "prior_1m_regime_range_atr",
+    "prior_5m_regime_efficiency",
+    "prior_5m_regime_mfe_atr",
+    "prior_5m_regime_range_atr",
+    "rolling_300s_retention_ratio",
+    "rolling_300s_current_progress_atr",
+    "rolling_300s_max_progress_atr",
+    "rolling_300s_giveback_atr",
+    "arrival_velocity",
+    "arrival_acceleration",
+    "ema_slope"
+  ],
+  "generated_at_utc": "2026-09-02T20:10:59.240371+00:00",
+  "mode": "score",
+  "model_id": null,
+  "models": [
+    {
+      "id": "a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1",
+      "inputs": [
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "label": "target_tp1_sl0_5_label",
+      "lineage": {
+        "cell_id": "LONG_SL0_5",
+        "direction": "LONG",
+        "family": "lightgbm",
+        "study_id": "regime_transition_target_before_stop_v1",
+        "target_arm": "SL0_5",
+        "train_years": [
+          2021
+        ]
+      },
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.23009047690053677,
+          "n": 196659,
+          "positives": 66425,
+          "pr_auc": 0.3429583639400107,
+          "roc_auc": 0.5062854117156155,
+          "score_digest": "0545efdab25b329c6718f151473ddce33efac40c86ed55a86b716f701258cb61"
+        }
+      },
+      "name": "LONG_SL0_5",
+      "rows_scored": 196659,
+      "subset": {
+        "regime_direction": -1
+      }
+    },
+    {
+      "id": "98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8",
+      "inputs": [
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "label": "target_tp1_sl1_0_label",
+      "lineage": {
+        "cell_id": "LONG_SL1_0",
+        "direction": "LONG",
+        "family": "lightgbm",
+        "study_id": "regime_transition_target_before_stop_v1",
+        "target_arm": "SL1_0",
+        "train_years": [
+          2021
+        ]
+      },
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.26077536316704014,
+          "n": 178311,
+          "positives": 90758,
+          "pr_auc": 0.5098234272202388,
+          "roc_auc": 0.5033153758302777,
+          "score_digest": "fcb8d3a6b5ebf6a94258216f5fdcda995d095e7be96ae41485c5c28e87c34e11"
+        }
+      },
+      "name": "LONG_SL1_0",
+      "rows_scored": 178311,
+      "subset": {
+        "regime_direction": -1
+      }
+    },
+    {
+      "id": "546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f",
+      "inputs": [
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "label": "target_tp1_sl1_5_label",
+      "lineage": {
+        "cell_id": "LONG_SL1_5",
+        "direction": "LONG",
+        "family": "lightgbm",
+        "study_id": "regime_transition_target_before_stop_v1",
+        "target_arm": "SL1_5",
+        "train_years": [
+          2021
+        ]
+      },
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.23994307918479735,
+          "n": 153547,
+          "positives": 98333,
+          "pr_auc": 0.6361318781273189,
+          "roc_auc": 0.4938557153736782,
+          "score_digest": "13ed6f424d689753b1cc5671fb88eff02b91a1b27f999429e7c7b41aff4c1ec0"
+        }
+      },
+      "name": "LONG_SL1_5",
+      "rows_scored": 153547,
+      "subset": {
+        "regime_direction": -1
+      }
+    },
+    {
+      "id": "1b285fe3e30ba26a6dd44facd79acd2a1ba86699c85253345caa7677fac19909",
+      "inputs": [
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "label": "target_tp1_sl0_5_label",
+      "lineage": {
+        "cell_id": "SHORT_SL0_5",
+        "direction": "SHORT",
+        "family": "lightgbm",
+        "study_id": "regime_transition_target_before_stop_v1",
+        "target_arm": "SL0_5",
+        "train_years": [
+          2021
+        ]
+      },
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.22139532681730983,
+          "n": 234981,
+          "positives": 76751,
+          "pr_auc": 0.32844880092633766,
+          "roc_auc": 0.5015807460321793,
+          "score_digest": "6bae3f9fd5c79d857199adbff62e7c872d98038cae94181ce9fb29223349f4dd"
+        }
+      },
+      "name": "SHORT_SL0_5",
+      "rows_scored": 234981,
+      "subset": {
+        "regime_direction": 1
+      }
+    },
+    {
+      "id": "45c2c6227edca652e6f5d052aa7476bbdb4e83652ce3aeb3ea202724cd60c80b",
+      "inputs": [
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "label": "target_tp1_sl1_0_label",
+      "lineage": {
+        "cell_id": "SHORT_SL1_0",
+        "direction": "SHORT",
+        "family": "lightgbm",
+        "study_id": "regime_transition_target_before_stop_v1",
+        "target_arm": "SL1_0",
+        "train_years": [
+          2021
+        ]
+      },
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.2531186277723445,
+          "n": 197737,
+          "positives": 99694,
+          "pr_auc": 0.5084088613411106,
+          "roc_auc": 0.507266650083871,
+          "score_digest": "756cc1cb563b499469e14e40d9e1d78e456717796315457978d0a0a5685711ff"
+        }
+      },
+      "name": "SHORT_SL1_0",
+      "rows_scored": 197737,
+      "subset": {
+        "regime_direction": 1
+      }
+    },
+    {
+      "id": "36ba0ed6e64e5a487a519bffa77f77a10ba83100157cbbf0e87cf284387a00b4",
+      "inputs": [
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "label": "target_tp1_sl1_5_label",
+      "lineage": {
+        "cell_id": "SHORT_SL1_5",
+        "direction": "SHORT",
+        "family": "lightgbm",
+        "study_id": "regime_transition_target_before_stop_v1",
+        "target_arm": "SL1_5",
+        "train_years": [
+          2021
+        ]
+      },
+      "metrics_by_year": {
+        "2021": {
+          "brier": 0.23515361774025922,
+          "n": 161099,
+          "positives": 105084,
+          "pr_auc": 0.649492387518349,
+          "roc_auc": 0.4960847889529473,
+          "score_digest": "2f18dcae11d4f841fdf5bd4062048393e9f05f5e366509cafcf3359a01ab7ecb"
+        }
+      },
+      "name": "SHORT_SL1_5",
+      "rows_scored": 161099,
+      "subset": {
+        "regime_direction": 1
+      }
+    }
+  ],
+  "new_models_trained": false,
+  "plan_sha256": "1d10914656e732f42af1fc16b63c05d01cb13babbdc825ae8ef2802814748df5",
+  "reused_model_ids": [
+    "a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1",
+    "98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8",
+    "546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f",
+    "1b285fe3e30ba26a6dd44facd79acd2a1ba86699c85253345caa7677fac19909",
+    "45c2c6227edca652e6f5d052aa7476bbdb4e83652ce3aeb3ea202724cd60c80b",
+    "36ba0ed6e64e5a487a519bffa77f77a10ba83100157cbbf0e87cf284387a00b4"
+  ],
+  "rows": {
+    "total": 453768
+  },
+  "schema_version": 2,
+  "training_population_identity": "5b3aadb459318262ad472df1eb0a5dd97ced9b564e30b787856171098de565a1"
+}
