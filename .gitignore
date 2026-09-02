@@ -95,3 +95,9 @@ nul
 studies/*/artifacts/models/*.joblib
 studies/*/artifacts/models/*.booster.txt
 studies/*/artifacts/models/*.golden.json
+
+# platform-v2 parity run outputs (regenerable; JSON reports are kept)
+artifacts/platform_v2_do_soon/parity/**/*.parquet
+artifacts/platform_v2_do_soon/parity/**/*.jsonl
+artifacts/platform_v2_do_soon/parity/**/*.progress.json
+bench/_work/

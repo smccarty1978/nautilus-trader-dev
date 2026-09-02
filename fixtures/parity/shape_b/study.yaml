@@ -1,0 +1,112 @@
+# Parity Shape B: stateful watch -> trigger.
+# Reference: studies/deep_pullback_5s_reacceleration_model (closed; sealed episode contract).
+# The sealed EpisodePopulationEngine lifecycle is expressed as one pullback tracker plus a
+# two-state trigger graph; the emitted candidates, ARM/REARM/TERMINATE events and
+# outcomes must reproduce the frozen TRAIN frames exactly.  Parity fixture only.
+study:
+  id: parity_shape_b_deep_pullback_5s_reacceleration
+  tier: 2
+  question: "After a >= 1.00 ATR pullback inside a prevailing 1m regime, does a completed 5s regime flip back into alignment mark a continuation entry that reaches +1.00 ATR before -0.75 ATR within 300s?"
+streams:
+  - {dataset: NQ_v0_2020_2026, timeframes: [1s, 5s, 1m, 5m]}
+context:
+  regime_1m: {tracker: regime.dual_ema, timeframe: 1m}
+  regime_5s: {tracker: regime.dual_ema, timeframe: 5s}
+  regime_5m: {tracker: regime.dual_ema, timeframe: 5m}
+  pullback:  {tracker: pullback.depth_since_extreme, bars: 1s, regime: regime_1m, atr_source: regime_1m,
+              intermediate: regime_5s, threshold_atr: 1.0, extreme_source: prevailing_directional_extreme}
+population:
+  session: ALL
+  cadence: completed_1s
+  qualify: "regime_1m.dir != 0"
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers:
+  reset_when: "regime_1m.changed or pullback.new_leg"
+  states:
+    WATCH: {enter_when: "pullback.depth_atr >= 1.0 and pullback.start_known"}
+    ARMED: {enter_when: "state == WATCH and regime_5s.dir == -regime_1m.dir", from: [WATCH], chain: true}
+  entry:
+    when: "state == ARMED and regime_5s.turned(from=-regime_1m.dir, to=regime_1m.dir) and age(WATCH) > 0"
+    reference: next_bar_open
+    max_per_watch: 1
+  precedence: [WATCH, ARMED]
+  sub_epochs: tracker_events
+features:
+  instances:
+    - {feature: arrival_velocity,      input_timeframe: 1s, lookback: 20}
+    - {feature: arrival_acceleration,  input_timeframe: 1s, short_lookback: 20}
+    - {feature: ema_slope, ema_role: short, lookback: 20}
+    - {feature: regime_efficiency, timeframe: 1m, context: prior}
+    - {feature: regime_mfe_atr,    timeframe: 1m, context: prior}
+    - {feature: regime_range_atr,  timeframe: 1m, context: prior}
+    - {feature: regime_efficiency, timeframe: 5m, context: prior}
+    - {feature: regime_mfe_atr,    timeframe: 5m, context: prior}
+    - {feature: regime_range_atr,  timeframe: 5m, context: prior}
+    - {feature: rolling_retention_ratio,       window: 300s, update_every: 1s}
+    - {feature: rolling_current_progress_atr,  window: 300s, update_every: 1s}
+    - {feature: rolling_max_progress_atr,      window: 300s, update_every: 1s}
+    - {feature: rolling_giveback_atr,          window: 300s, update_every: 1s}
+    - {feature: pullback_max_depth_atr, scope: current_deep_pullback_episode, extreme_source: prevailing_directional_extreme}
+    - {feature: pullback_current_depth_atr, scope: current_deep_pullback_episode}
+    - {feature: pullback_recovery_from_extreme_atr, scope: current_deep_pullback_episode}
+    - {feature: pullback_fraction_of_structural_move, scope: current_deep_pullback_episode}
+    - {feature: seconds_since_prevailing_directional_extreme, timeframe: 1m, context: current}
+    - {feature: prior_deep_pullback_count, timeframe: 1m, context: current, threshold_atr: 1.0}
+    - {feature: pullback_elapsed_seconds, scope: current_deep_pullback_episode}
+    - {feature: pullback_post_arm_seconds, scope: current_deep_pullback_episode}
+    - {feature: recovery_from_counter_regime_extreme_atr, timeframe: 5s}
+    - {feature: fraction_of_counter_regime_move_recovered, timeframe: 5s}
+    - {feature: trend_normalized_est_delta_sum, over: {window: [5s, 60s, 300s]}, update_every: 1s, direction_reference: prevailing_1m}
+    - {feature: trend_normalized_est_delta_sum_ratio, numerator_window: 5s, denominator_window: 300s, update_every: 1s, direction_reference: prevailing_1m}
+    - {feature: trend_normalized_est_delta_sum_ratio, numerator_window: 60s, denominator_window: 300s, update_every: 1s, direction_reference: prevailing_1m}
+    - {feature: regime_direction, timeframe: 5m, context: current}
+    - {feature: regime_age_min, timeframe: 5m, context: current}
+    - {feature: regime_efficiency, timeframe: 5m, context: current}
+    - {feature: regime_mfe_atr, timeframe: 5m, context: current}
+    - {feature: regime_range_atr, timeframe: 5m, context: current}
+    - {feature: regime_alignment, source_timeframe: 1m, reference_timeframe: 5m, context: current}
+  metadata:
+    checkpoint_index: pullback.arming_cycle_index
+    prevailing_regime_start_ns: regime_1m.start_ns
+    episode_id: pullback.episode_id
+    arm_ts: pullback.arm_ts
+    candidate_ts: epoch.T
+    triggering_completed_5s_ts: pullback.triggering_event_close_ts
+    pullback_start_ts: pullback.pullback_start_ts
+    prevailing_direction: regime_1m.dir
+    counter_regime_close_ts: pullback.counter_close_ts_at
+    frozen_atr_arm: pullback.frozen_atr_arm
+    atr_t: regime_1m.atr
+    triggering_1s_ts_init: epoch.T
+  bindings:
+    completed_1m: {stream: 1m, regime: regime_1m}
+    completed_5s: {tracker: regime_5s, ready_gate: true}
+    completed_5m: {tracker: regime_5m, ready_gate: true}
+    regime_transition_1m: {tracker: regime_1m, requires_atr: true}
+    snapshot:
+      atr: regime_1m.atr
+      family_a_atr: regime_1m.frozen_atr
+      episode_state:
+        prevailing_direction: regime_1m.dir
+        episode_geometry: pullback
+        prior_deep_pullback_count: pullback.prior_deep_pullback_count
+        counter_regime_direction: pullback.counter_direction_at
+        counter_regime_close_ts: pullback.counter_close_ts_at
+        regime_expansion_atr_per_min: "const:null"
+outcome:
+  # The frozen TRAIN frames of the reference were labeled by the collector's legacy flip
+  # path (prevailing 1m regime flips within 300s, RTH session-end censoring); the sealed
+  # ordered barrier was not wired into the collector at collection time (memory:
+  # forward_outcome_target_not_wired_into_collector).  Parity reproduces what was persisted.
+  kind: label
+  event: regime_1m.flipped
+  horizon: 300s
+  direction: regime_1m.dir
+  session_end: censor
+  session: RTH
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+model: none
