@@ -110,3 +110,17 @@ def test_same_timestamp_opt_in_requires_a_decision():
     spec["streams"][1]["same_ts"] = "available"
     out = compile_study(spec, repo_root=ROOT, datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS)
     assert not out.ok and any(g.kind == GapKind.SEMANTIC_DECISION_REQUIRED for g in out.gaps.gaps)
+
+
+def test_score_mode_reuses_frozen_models_and_validates_labels():
+    spec = load_spec(ROOT / "fixtures" / "parity" / "shape_c" / "study.yaml")
+    mid = "0" * 64
+    spec["model"] = {"mode": "score", "models": [{"id": mid, "label": "target_tp1_sl1_0_label", "subset": {"regime_direction": -1}, "name": "LONG_SL1_0"}]}
+    out = compile_study(spec, repo_root=ROOT)
+    assert out.ok, out.card()
+    assert out.plan.model["mode"] == "score" and out.plan.model["models"][0]["name"] == "LONG_SL1_0" and out.plan.model["family"] is None
+    spec["model"]["models"][0]["label"] = "not_a_label"
+    assert (GapKind.INVALID_PARAMETERIZATION, "model.models[0].label") in _gap_kinds(spec)
+    spec["model"] = {"mode": "score"}
+    out = compile_study(spec, repo_root=ROOT)
+    assert not out.ok and any(g.kind == GapKind.INVALID_PARAMETERIZATION for g in out.gaps.gaps)

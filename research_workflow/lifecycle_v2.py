@@ -476,6 +476,8 @@ class V2Lifecycle:
         if not model:
             path = _write(self.artifacts / "fit_summary.json", {"status": "NO_MODEL_DECLARED", "plan_sha256": plan["plan_sha256"], "generated_at_utc": _now()})
             return {"status": "PASS", "outputs": [str(path)]}
+        if model.get("mode") == "score":
+            return self._fit_score_mode(plan, model)
         from research.analysis.metrics import brier, pr_auc, roc_auc
         from research.analysis.modeling import _build_estimator, frame_content_identity
         from research_workflow.forward_outcomes.guard import assert_causal_feature_surface
@@ -529,6 +531,67 @@ class V2Lifecycle:
                                                                    "model_id": model_id, "model_store_tier": manifest.get("tier"), "training_population_identity": merge_identity, "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(path)]}
 
+    def _train_frame_all_labels(self, plan: Dict[str, Any], base: Path | None = None, years: List[int] | None = None):
+        """Candidates joined with every observation column (all arms), for frozen-model scoring."""
+        import pandas as pd
+        if base is None:
+            merged = self.work / "merged"
+            c = pd.read_parquet(merged / "candidates.parquet"); o = pd.read_parquet(merged / "observations.parquet")
+        else:
+            c = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years or []], ignore_index=True)
+            o = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years or []], ignore_index=True)
+        dup = [col for col in o.columns if col in c.columns and col not in KEY]
+        frame = c.merge(o.drop(columns=dup), on=list(KEY), how="inner")
+        frame["_year"] = pd.to_datetime(frame["observation_ts"], unit="ns", utc=True).dt.year
+        return frame
+
+    @staticmethod
+    def _score_models(frame, models: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Score each frozen model on its declared subset; metrics per year plus a score digest for parity."""
+        import hashlib as _h
+        import numpy as np
+        from research.analysis.metrics import brier, pr_auc, roc_auc
+        from research_workflow.model_store import read_manifest, score
+        out = []
+        for m in models:
+            manifest = read_manifest(m["id"])
+            inputs = list(manifest["lineage"]["ordered_inputs"])
+            missing = [c for c in inputs if c not in frame.columns]
+            if missing:
+                raise LifecycleV2Error(f"MODEL_INPUTS_UNBOUND: {m['name']} needs {missing}")
+            rows = frame
+            for col, val in (m.get("subset") or {}).items():
+                if col not in rows.columns:
+                    raise LifecycleV2Error(f"MODEL_SUBSET_COLUMN_MISSING: {col}")
+                rows = rows[rows[col] == val]
+            label = m["label"]
+            binary = rows[rows[label].isin([0, 1, 0.0, 1.0])]
+            per_year = {}
+            for y, part in binary.groupby("_year"):
+                if part[label].nunique() < 2:
+                    per_year[int(y)] = {"n": int(len(part)), "roc_auc": None, "pr_auc": None, "brier": None}
+                    continue
+                s = score(m["id"], part[inputs])
+                per_year[int(y)] = {"n": int(len(part)), "positives": int(part[label].sum()), "roc_auc": roc_auc(part[label], s).to_dict().get("value"),
+                                    "pr_auc": pr_auc(part[label], s).to_dict().get("value"), "brier": brier(part[label], s).to_dict().get("value"),
+                                    "score_digest": _h.sha256(np.round(np.asarray(s, dtype=float), 10).tobytes()).hexdigest()}
+            out.append({**m, "inputs": inputs, "lineage": {k: manifest["lineage"].get(k) for k in ("study_id", "cell_id", "direction", "target_arm", "train_years", "family")},
+                        "rows_scored": int(len(binary)), "metrics_by_year": per_year})
+        return out
+
+    def _fit_score_mode(self, plan: Dict[str, Any], model: Dict[str, Any]) -> Dict[str, Any]:
+        from research_workflow.forward_outcomes.guard import assert_causal_feature_surface
+        frame = self._train_frame_all_labels(plan)
+        scored = self._score_models(frame, model["models"])
+        for m in scored:
+            assert_causal_feature_surface(m["inputs"], context=f"frozen model {m['name']} inputs")
+        merge_identity = _read(self.work / "merged" / "identity.json").get("candidates_identity")
+        path = _write(self.artifacts / "experiment_models.json", {"schema_version": 2, "mode": "score", "plan_sha256": plan["plan_sha256"], "model_id": None,
+                                                                   "reused_model_ids": [m["id"] for m in scored], "models": scored, "rows": {"total": int(len(frame))},
+                                                                   "features": list(plan["columns"]["features"]), "training_population_identity": merge_identity,
+                                                                   "new_models_trained": False, "generated_at_utc": _now()})
+        return {"status": "PASS", "outputs": [str(path)]}
+
     def freeze(self, study: Path | None = None) -> Dict[str, Any]:
         from research_workflow.experiment import write_train_freeze
         plan = load_plan(self.study)
@@ -537,7 +600,8 @@ class V2Lifecycle:
         payload = {"partition": "train", "platform": "v2", "plan_sha256": plan["plan_sha256"],
                    "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
                    "feature_sets": {"primary": list(plan["columns"]["features"])}, "preprocessing_hash": "identity",
-                   "model_hashes": ({"primary": models["model_id"]} if models.get("model_id") else {}), "thresholds": {}, "deciles": {},
+                   "model_hashes": ({"primary": models["model_id"]} if models.get("model_id") else {m["name"]: m["id"] for m in models.get("models") or []}),
+                   "thresholds": {}, "deciles": {}, "new_models_trained": bool(models.get("model_id")),
                    "merge_identity": ident, "metrics": models.get("metrics"), "label_column": plan["outcome"].get("label_column")}
         path = write_train_freeze(self.study, payload)
         return {"status": "PASS", "outputs": [str(path)]}
@@ -563,7 +627,10 @@ class V2Lifecycle:
         frame = c.merge(o[list(KEY) + [label, "disposition"]], on=list(KEY), how="inner")
         summary: Dict[str, Any] = {"rows": int(len(frame)), "dispositions": frame["disposition"].value_counts().to_dict()}
         models = _read(self.artifacts / "experiment_models.json")
-        if models.get("model_id"):
+        if models.get("mode") == "score":
+            summary["frozen_models_oos"] = self._score_models(self._train_frame_all_labels(plan, base, [int(y) for y in years]), models["models"])
+            summary["train_metrics"] = [{k: m[k] for k in ("name", "id", "metrics_by_year")} for m in models["models"]]
+        elif models.get("model_id"):
             from research.analysis.metrics import brier, pr_auc, roc_auc
             from research_workflow.model_store import score
             binary = frame[frame[label].isin([0, 1, 0.0, 1.0])]

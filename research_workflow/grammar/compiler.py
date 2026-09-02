@@ -8,6 +8,8 @@ returns a typed gap.
 """
 from __future__ import annotations
 
+import re
+
 import difflib
 import hashlib
 import importlib
@@ -853,7 +855,7 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
             "features": list(ctx.feature_aliases), "derived": derived, "observation": list(outcome.get("observation_columns") or [])}
 
 
-def _resolve_chronology_and_model(ctx: _Ctx) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
+def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
     ch = ctx.spec.chronology
     train, dev, prohibited, diag = set(ch.train), set(ch.dev), set(ch.prohibited), set(ch.diagnostic)
     for a, b, na, nb in ((train, dev, "train", "dev"), (train, prohibited, "train", "prohibited"), (dev, prohibited, "dev", "prohibited")):
@@ -866,10 +868,22 @@ def _resolve_chronology_and_model(ctx: _Ctx) -> Tuple[Dict[str, Any], Optional[D
         return chronology, None
     kinds = ctx.registry.get("kinds", {})
     families = {e["id"] for e in kinds.get("model_drivers", [])}
-    fam_id = f"model.{model_spec.family}"
-    if fam_id not in families:
+    fam_id = f"model.{model_spec.family}" if model_spec.family else None
+    if model_spec.mode == "train" and fam_id not in families:
         ctx.gap(GapKind.MISSING_CAPABILITY, "model.family", f"model family {model_spec.family!r} is not a registered driver",
                 closest=_closest(fam_id, sorted(families)))
+    scored: List[Dict[str, Any]] = []
+    if model_spec.mode == "score":
+        outcome = outcome_resolved or {}
+        known_labels = {outcome.get("label_column")} | {f"{a.get('prefix')}_label" for a in (outcome.get("arms") or [])}
+        known_labels.discard(None)
+        for i, m in enumerate(model_spec.models):
+            if m.label not in known_labels:
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.models[{i}].label", f"label {m.label!r} is not an outcome column of this study",
+                        closest=_closest(m.label, sorted(known_labels)))
+            if not re.fullmatch(r"[0-9a-f]{64}", m.id):
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.models[{i}].id", "model id must be a model-store sha256")
+            scored.append({"id": m.id, "label": m.label, "subset": dict(m.subset), "name": m.name or m.id[:12]})
     validation = None
     if model_spec.validation is not None:
         v = model_spec.validation
@@ -893,7 +907,7 @@ def _resolve_chronology_and_model(ctx: _Ctx) -> Tuple[Dict[str, Any], Optional[D
         validation = {"protocol": pid, "tuning_years": sorted(tuning), "final_train_validation_years": sorted(final),
                       "max_trials": v.max_trials, "random_seed": v.random_seed, "primary_metric": v.primary_metric,
                       "year_role_table": roles + [{"year": y, "role": "dev_oos"} for y in sorted(dev)] + [{"year": y, "role": "prohibited"} for y in sorted(prohibited)]}
-    return chronology, {"family": fam_id, "params": dict(model_spec.params), "arms": list(model_spec.arms), "validation": validation}
+    return chronology, {"mode": model_spec.mode, "family": fam_id, "params": dict(model_spec.params), "arms": list(model_spec.arms), "validation": validation, "models": scored}
 
 
 def _resolve_closure(ctx: _Ctx) -> Dict[str, Any]:
@@ -962,7 +976,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
     triggers = _resolve_triggers(ctx)
     outcome = _resolve_outcome(ctx, population)
     columns = _resolve_columns(ctx, population, outcome)
-    chronology, model = _resolve_chronology_and_model(ctx)
+    chronology, model = _resolve_chronology_and_model(ctx, outcome)
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
     warmup, availability = _resolve_warmup_and_availability(ctx)

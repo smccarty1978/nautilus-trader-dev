@@ -212,11 +212,29 @@ class ValidationSpec(_Strict):
     primary_metric: Optional[str] = None
 
 
+class ScoredModelSpec(_Strict):
+    """A frozen model reused from the model store: scored, never refit."""
+    id: str                                        # model store id (sha256)
+    label: str                                     # label column the model is evaluated against
+    subset: Dict[str, Any] = Field(default_factory=dict)   # column == value row filters (explicit, no hidden direction semantics)
+    name: Optional[str] = None
+
+
 class ModelSpec(_Strict):
-    family: str
+    mode: Literal["train", "score"] = "train"
+    family: Optional[str] = None                   # required for mode: train
     params: Dict[str, Any] = Field(default_factory=dict)
     arms: List[str] = Field(default_factory=list)
     validation: Optional[ValidationSpec] = None
+    models: List[ScoredModelSpec] = Field(default_factory=list)   # required for mode: score
+
+    @model_validator(mode="after")
+    def _mode(self) -> "ModelSpec":
+        if self.mode == "train" and not self.family:
+            raise ValueError("model.family is required for mode: train")
+        if self.mode == "score" and not self.models:
+            raise ValueError("model.models must list at least one frozen model for mode: score")
+        return self
 
 
 class StudySpecV2(_Strict):
