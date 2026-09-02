@@ -1,0 +1,34 @@
+{
+  "checks": [
+    {
+      "detail": "NQ_1S_V2 resolved via configured_root; digest 9e7aecb7a291 bytes verified",
+      "id": "R1_NQ",
+      "passed": true
+    },
+    {
+      "detail": "0 findings",
+      "id": "R8_host_boundary_lint",
+      "passed": true
+    },
+    {
+      "detail": "39 primitives bound; unbound=[]",
+      "id": "R5_binding_proof",
+      "passed": true
+    },
+    {
+      "detail": "{\"censor_session\": \"RTH\", \"dataset\": \"NQ_1S_V2\", \"kind\": \"legacy\", \"session\": \"ALL\"}",
+      "id": "R3_session_table",
+      "passed": true
+    },
+    {
+      "detail": "current=3f2706959401 frozen=3f2706959401",
+      "id": "R9_closure_current",
+      "passed": true
+    }
+  ],
+  "execution_composite_sha256": "3f2706959401e687fe2e644399ad8bff9c3502e09522b6a0ac99b9643f17615e",
+  "generated_at_utc": "2026-09-02T19:02:21.701396+00:00",
+  "overall_status": "PASS",
+  "plan_sha256": "53711751a59a2b14355d9a45f23e649cf9f4a125f292d74adecff2d320034ee9",
+  "schema_version": 2
+}
