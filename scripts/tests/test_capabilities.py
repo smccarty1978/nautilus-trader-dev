@@ -50,7 +50,9 @@ def test_seeded_entries_are_verified_or_marked_broken(registry):
     seeded = [e for k in ("trackers", "trigger_primitives", "outcomes", "entry_references", "model_drivers", "validation_protocols") for e in registry["kinds"][k]]
     assert seeded
     for e in seeded:
-        assert e["status"] in {"verified", "broken"}
+        # `candidate` is the capability-flow status for scaffolded/promotable primitives and for
+        # non-executable entry references; it never claims a verified implementation.
+        assert e["status"] in {"verified", "broken", "candidate"}
         if e["status"] == "verified":
             assert e["implementation_verified"] and not e["missing_tests"]
 
