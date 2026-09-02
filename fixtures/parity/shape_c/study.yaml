@@ -61,6 +61,7 @@ outcome:
   atr: regime_1m.atr
   atr_availability: through_decision_ts   # authority 21d598a8...: the 1m bar closing exactly at T is applied before the ATR is frozen
   horizon: 300s
+  horizon_end_rule: first_bar_at_or_after   # authority 21d598a8...: the first bar at/after the horizon end is still evaluated for a hit
   session_end: censor
   barrier:
     primary: barrier_tp_1_0_sl_1_0

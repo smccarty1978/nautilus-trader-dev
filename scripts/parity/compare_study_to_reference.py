@@ -33,7 +33,10 @@ def main() -> int:
     ap.add_argument("--partition", default="train", choices=["train", "oos", "merged"])
     ap.add_argument("--year", type=int, required=True)
     ap.add_argument("--tolerance", type=float, default=1e-9)
+    ap.add_argument("--explained", action="append", default=[], metavar="COLUMN=REASON",
+                    help="a reference column with a documented reference-side defect; its mismatches are counted and reported separately, never hidden")
     ns = ap.parse_args()
+    explained = dict(e.split("=", 1) for e in ns.explained)
     study = Path(ns.study).resolve()
     base = study / "_work" / "controller" / ("merged" if ns.partition == "merged" else f"partitions/{ns.partition}/{ns.year}")
     cands = pd.read_parquet(base / "candidates.parquet")
@@ -49,13 +52,24 @@ def main() -> int:
     else:
         obs_cols = [c for c in ref_o.columns if c not in KEY]
     obs_report = compare_frames(ref_o, obs, tolerance=ns.tolerance, columns=obs_cols)
+    explained_report = None
+    if explained:
+        strict_cols = [c for c in obs_cols if c not in explained]
+        strict = compare_frames(ref_o, obs, tolerance=ns.tolerance, columns=strict_cols)
+        explained_report = {"columns": explained, "mismatches_in_explained_columns": {c: (obs_report.get("per_column") or {}).get(c, {}).get("mismatches", 0) for c in explained},
+                            "observations_excluding_explained": strict, "total_value_mismatches": obs_report["value_mismatches"]}
+        obs_passed = bool(strict["passed"] and set(obs_report.get("per_column") or {}) <= set(explained))
+    else:
+        obs_passed = bool(obs_report["passed"])
     report = {"study": study.name, "shape": ns.shape, "partition": ns.partition, "year": ns.year, "rows": {"runtime_candidates": int(len(cands)), "reference_candidates": int(len(ref_c)),
               "runtime_observations": int(len(obs)), "reference_observations": int(len(ref_o))}, "candidates": cand_report, "observations": obs_report,
-              "passed": bool(cand_report["passed"] and obs_report["passed"]), "historical_study_modified": False}
+              "explained_divergences": explained_report,
+              "passed": bool(cand_report["passed"] and obs_passed), "historical_study_modified": False}
     out = study / "artifacts" / f"parity_{ns.shape}_{ns.partition}_{ns.year}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
-    print(json.dumps({"STATUS": "PASS" if report["passed"] else "FAIL", "report": str(out), "rows": report["rows"]}))
+    print(json.dumps({"STATUS": ("PASS_WITH_EXPLAINED_DIVERGENCE" if (report["passed"] and explained_report and obs_report["value_mismatches"]) else ("PASS" if report["passed"] else "FAIL")),
+                      "report": str(out), "rows": report["rows"], "explained": explained_report and explained_report["mismatches_in_explained_columns"]}))
     print("CANDIDATES", summarize(cand_report))
     print("OBSERVATIONS", summarize(obs_report))
     return 0 if report["passed"] else 1

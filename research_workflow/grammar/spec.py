@@ -179,6 +179,11 @@ class OutcomeSpec(_Strict):
     session: Optional[str] = None                  # censoring session (default: population.session)
     max_gap: Optional[str] = None
     same_bar_rule: Literal["ambiguous_censor", "adverse_first"] = "ambiguous_censor"
+    # strict: no bar closing after the horizon end is ever evaluated (a bar closing exactly at the end is).
+    # first_bar_at_or_after: the first bar closing at or after the horizon end is still evaluated for a
+    # barrier hit before expiry (the sealed regime_transition target authority's realized semantics on
+    # sparse seconds; identical to strict on dense tapes).
+    horizon_end_rule: Literal["strict", "first_bar_at_or_after"] = "strict"
     barrier: Optional[Dict[str, Any]] = None       # {favorable_atr, adverse_atr, horizon?, expiry?, arms?: [...]}
     event: Optional[str] = None                    # predicate over tracker events (e.g. 'regime_1m.flipped')
     items: List[OutcomeItemSpec] = Field(default_factory=list)
