@@ -117,7 +117,7 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         if ts <= entry_ts:
             continue
         if ts > horizon_end_ts:
-            if end_rule != "first_bar_at_or_after":
+            if end_rule != "first_bar_at_or_after" or (session_close_ts is not None and ts > int(session_close_ts)):
                 break
             hi, lo = e.get("high"), e.get("low")
             if hi is not None and lo is not None:

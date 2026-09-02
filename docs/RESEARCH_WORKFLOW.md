@@ -1140,7 +1140,7 @@ research question -> research study new -> capability resolution (research cap .
 | feature | `features.instances` (canonical identity + parameters; `over:` set-expansion), `features.metadata`, `features.bindings`, `features.derived_inputs` | `features`, `feature_hosts`, `derived_inputs` |
 | tracker | `context: {name: {tracker: <id>, ...}}` — host-bound stateful trackers (`features/trackers/host_bindings.py`) | `trackers` |
 | trigger graph | `triggers: every_candidate` or `{reset_when, states{enter_when, expire_when, from, chain}, entry{when, reference, max_per_watch, cooldown}, precedence, sub_epochs}` | `trigger_primitives` |
-| outcome | `outcome: {kind: label, event | barrier{arms, primary, expiry} | composition, horizon, direction, relation, atr_availability, session_end, session, entry_reference}` | `outcomes` |
+| outcome | `outcome: {kind: label, event | barrier{arms, primary, expiry} | composition, horizon, horizon_end_rule (strict | first_bar_at_or_after), direction, relation, atr_availability, session_end, session, entry_reference}` | `outcomes` |
 | entry reference | `outcome.entry_reference` / `triggers.entry.reference` from `research_workflow/entry_references.py` (`next_bar_open` is the only executable label reference) | `entry_references` |
 
 Predicates (`population.qualify`, trigger `enter_when`/`expire_when`/`reset_when`/`entry.when`)
@@ -1197,7 +1197,7 @@ the controller writes `_work/controller/audit_packet_{causal,contract}.json`; on
 and one contract auditor each write one report ending in an `AUDIT_SUMMARY_V2` block;
 `research audit ingest --study ... --type causal|contract --report <md>` binds it to the frozen
 execution composite. Long runs are launched detached (`nohup python -u ... & disown`) and
-resumed with the same command: fresh receipts are never re-executed.
+resumed with the same command: fresh receipts are never re-executed. One live controller per study: a second `study run` on a study whose `_work/controller/run.lock` pid is alive is refused with `STUDY_RUN_ALREADY_LIVE`.
 
 ### 21.6 Adding a capability (proposal → scaffold → promotion)
 

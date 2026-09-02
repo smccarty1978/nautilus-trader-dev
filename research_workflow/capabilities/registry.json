@@ -1,8 +1,41 @@
 {
-  "content_sha256": "a9aee3d14c35ff499d4f1cede80fc85ad27c2475d9a592739c97cbfa3e730f23",
-  "generated_at_utc": "2026-09-02T18:30:31.303485+00:00",
+  "content_sha256": "0d0098f64d1fac364712ea8ca0fe91502cbbb183895c8092a2e32f977d3bdf28",
+  "generated_at_utc": "2026-09-02T20:49:32.600420+00:00",
   "kinds": {
     "datasets": [
+      {
+        "cost_class": "offline_only",
+        "coverage": {
+          "end": "2026-04-29T23:59:59+00:00",
+          "start": "2020-01-01T23:00:00+00:00",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025",
+            "2026_ytd"
+          ]
+        },
+        "dependencies": [],
+        "description": "ES.XCME catalog ES_1S_V2",
+        "id": "dataset.ES_1S_V2",
+        "implementation": "research/datasets/ES_1S_V2.yaml",
+        "instrument_id": "ES.XCME",
+        "kind": "datasets",
+        "logical_digest": "9f38a41edca5b72a71866846ec9aa15d4cf205388d22aabe025250eefbf0068a",
+        "name": "ES_1S_V2",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_roots.py",
+          "scripts/tests/test_dataset_spec.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": "9f38a41edca5"
+      },
       {
         "cost_class": "offline_only",
         "coverage": {
@@ -26,6 +59,39 @@
         "unresolved_dependencies": [],
         "update_cadence": "offline_only",
         "version": "9fa50102a121"
+      },
+      {
+        "cost_class": "offline_only",
+        "coverage": {
+          "end": "2026-04-29T23:59:59+00:00",
+          "start": "2020-01-01T23:00:00+00:00",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025",
+            "2026_ytd"
+          ]
+        },
+        "dependencies": [],
+        "description": "NQ.XCME catalog NQ_1S_V2",
+        "id": "dataset.NQ_1S_V2",
+        "implementation": "research/datasets/NQ_1S_V2.yaml",
+        "instrument_id": "NQ.XCME",
+        "kind": "datasets",
+        "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+        "name": "NQ_1S_V2",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_roots.py",
+          "scripts/tests/test_dataset_spec.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": "9e7aecb7a291"
       },
       {
         "cost_class": "offline_only",
@@ -88,8 +154,10 @@
         "implementation": "features.trackers.host_bindings.FrozenExternalScoreBinding",
         "implementation_exists": true,
         "implementation_path": "features/trackers/host_bindings.py",
+        "implementation_verified": true,
         "inputs": {},
         "kind": "derived_inputs",
+        "missing_tests": [],
         "name": "frozen_external_score",
         "parameters": [
           "spec",
@@ -208,7 +276,9 @@
         },
         "id": "entry.next_printed_bar_open",
         "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel",
+        "implementation_verified": true,
         "kind": "entry_references",
+        "missing_tests": [],
         "name": "next_printed_bar_open",
         "parameters": [],
         "platform": "v2",
@@ -234,7 +304,9 @@
         },
         "id": "entry.limit_at",
         "implementation": "research_workflow.entry_references",
+        "implementation_verified": true,
         "kind": "entry_references",
+        "missing_tests": [],
         "name": "limit_at",
         "parameters": [],
         "platform": "v2",
@@ -260,7 +332,9 @@
         },
         "id": "entry.stop_at",
         "implementation": "research_workflow.entry_references",
+        "implementation_verified": true,
         "kind": "entry_references",
+        "missing_tests": [],
         "name": "stop_at",
         "parameters": [],
         "platform": "v2",
@@ -290,8 +364,10 @@
         "implementation": "features.trackers.host_bindings.FeatureHostBinding",
         "implementation_exists": true,
         "implementation_path": "features/trackers/host_bindings.py",
+        "implementation_verified": true,
         "inputs": {},
         "kind": "feature_hosts",
+        "missing_tests": [],
         "name": "provider_host",
         "parameters": [
           "instances",
@@ -3161,6 +3237,7 @@
           "research_workflow/tests/test_bare_flip_independent_parity.py",
           "research_workflow/tests/test_composite_target_expression.py",
           "research_workflow/tests/test_golden_fixture.py",
+          "research_workflow/tests/test_grammar_v2.py",
           "research_workflow/tests/test_multiple_derived_inputs.py",
           "research_workflow/tests/test_oos_analysis_lineage.py",
           "research_workflow/tests/test_ordered_barrier_entry_reference.py",
@@ -5019,7 +5096,9 @@
         "description": "Label contract: N barrier arms from one next_bar_open entry; SESSION_END/TIMEOUT/GAP/AMBIGUOUS/DATA_END censoring; per-arm columns.",
         "id": "outcome.label.barrier_race",
         "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel",
+        "implementation_verified": true,
         "kind": "outcomes",
+        "missing_tests": [],
         "name": "label.barrier_race",
         "parameters": [],
         "platform": "v2",
@@ -5039,7 +5118,9 @@
         "description": "Label contract: regime change of a declared role within an inclusive horizon; session censoring; hold-at-equality sweep.",
         "id": "outcome.label.flip_within_horizon",
         "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel",
+        "implementation_verified": true,
         "kind": "outcomes",
+        "missing_tests": [],
         "name": "label.flip_within_horizon",
         "parameters": [],
         "platform": "v2",
@@ -5059,7 +5140,9 @@
         "description": "Label contract: barrier arms AND/OR a flip child with monotone worst-status censoring.",
         "id": "outcome.label.composite",
         "implementation": "research_workflow.host.outcomes.LabelOutcomeKernel",
+        "implementation_verified": true,
         "kind": "outcomes",
+        "missing_tests": [],
         "name": "label.composite",
         "parameters": [],
         "platform": "v2",
@@ -5077,7 +5160,9 @@
         "description": "Trade execution contract type (order/fill semantics); typed only in this phase -- no sink.",
         "id": "outcome.trade.contract",
         "implementation": "research_workflow.host.outcomes.TradeExecutionContract",
+        "implementation_verified": true,
         "kind": "outcomes",
+        "missing_tests": [],
         "name": "trade.contract",
         "parameters": [],
         "platform": "v2",
@@ -5091,6 +5176,67 @@
       }
     ],
     "streams": [
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.ES_1S_V2"
+        ],
+        "description": "1s external catalog stream of ES_1S_V2",
+        "id": "stream.ES_1S_V2.1s",
+        "implementation": "ES.XCME-1-SECOND-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "ES_1S_V2:1s",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9f38a41edca5"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.ES_1S_V2"
+        ],
+        "description": "1m external catalog stream of ES_1S_V2",
+        "id": "stream.ES_1S_V2.1m",
+        "implementation": "ES.XCME-1-MINUTE-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "ES_1S_V2:1m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9f38a41edca5"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.ES_1S_V2",
+          "stream.ES_1S_V2.1m"
+        ],
+        "description": "5m derived stream of ES_1S_V2",
+        "id": "stream.ES_1S_V2.5m",
+        "implementation": "runtime_complete_calendar_bucket",
+        "kind": "streams",
+        "name": "ES_1S_V2:5m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9f38a41edca5"
+      },
       {
         "availability_rule": "interval_end",
         "cost_class": "per_source_event",
@@ -5151,6 +5297,67 @@
         "unresolved_dependencies": [],
         "update_cadence": "per_source_bar",
         "version": "9fa50102a121"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_1S_V2"
+        ],
+        "description": "1s external catalog stream of NQ_1S_V2",
+        "id": "stream.NQ_1S_V2.1s",
+        "implementation": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "NQ_1S_V2:1s",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9e7aecb7a291"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_1S_V2"
+        ],
+        "description": "1m external catalog stream of NQ_1S_V2",
+        "id": "stream.NQ_1S_V2.1m",
+        "implementation": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "NQ_1S_V2:1m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9e7aecb7a291"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_1S_V2",
+          "stream.NQ_1S_V2.1m"
+        ],
+        "description": "5m derived stream of NQ_1S_V2",
+        "id": "stream.NQ_1S_V2.5m",
+        "implementation": "runtime_complete_calendar_bucket",
+        "kind": "streams",
+        "name": "NQ_1S_V2:5m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9e7aecb7a291"
       },
       {
         "availability_rule": "interval_end",
@@ -5452,6 +5659,7 @@
         "implementation": "features.trackers.host_bindings.PullbackEpisodeBinding",
         "implementation_exists": true,
         "implementation_path": "features/trackers/host_bindings.py",
+        "implementation_verified": true,
         "inputs": {
           "atr_source": "tracker",
           "bars": "stream",
@@ -5459,6 +5667,7 @@
           "regime": "tracker"
         },
         "kind": "trackers",
+        "missing_tests": [],
         "name": "pullback.depth_since_extreme",
         "parameters": [
           "threshold_atr",
@@ -5504,11 +5713,13 @@
         "implementation": "features.trackers.host_bindings.RegimeExcursionBinding",
         "implementation_exists": true,
         "implementation_path": "features/trackers/host_bindings.py",
+        "implementation_verified": true,
         "inputs": {
           "bars": "stream",
           "regime": "tracker"
         },
         "kind": "trackers",
+        "missing_tests": [],
         "name": "regime.excursion",
         "parameters": [
           "progress_gap"
@@ -5540,11 +5751,13 @@
         "implementation": "features.trackers.host_bindings.CalendarRegimeBarBinding",
         "implementation_exists": true,
         "implementation_path": "features/trackers/host_bindings.py",
+        "implementation_verified": true,
         "inputs": {
           "bars": "stream",
           "regime": "tracker"
         },
         "kind": "trackers",
+        "missing_tests": [],
         "name": "regime_bar.calendar_bucket",
         "parameters": [
           "bucket"
@@ -5647,7 +5860,9 @@
         "description": "Host-owned checkpoint grid: epochs every N seconds from a tracker anchor, missing seconds skipped, bounded by max_age.",
         "id": "trigger.host.grid_cadence",
         "implementation": "research_workflow.host.strategy.HostCore",
+        "implementation_verified": true,
         "kind": "trigger_primitives",
+        "missing_tests": [],
         "name": "host.grid_cadence",
         "parameters": [],
         "platform": "v2",
@@ -5666,7 +5881,9 @@
         "description": "Host-owned epoch per completed bar of a declared stream.",
         "id": "trigger.host.completed_bar_cadence",
         "implementation": "research_workflow.host.strategy.HostCore",
+        "implementation_verified": true,
         "kind": "trigger_primitives",
+        "missing_tests": [],
         "name": "host.completed_bar_cadence",
         "parameters": [],
         "platform": "v2",
@@ -5685,7 +5902,9 @@
         "description": "Host-owned OBSERVE->WATCH->ARMED->ENTERED state engine over compiled predicates (reset/expire/chain/precedence/cooldown/max_per_watch).",
         "id": "trigger.host.state_graph",
         "implementation": "research_workflow.host.triggers.TriggerEngine",
+        "implementation_verified": true,
         "kind": "trigger_primitives",
+        "missing_tests": [],
         "name": "host.state_graph",
         "parameters": [],
         "platform": "v2",
@@ -5847,7 +6066,7 @@
   "summary": {
     "datasets": {
       "broken": 0,
-      "count": 3
+      "count": 5
     },
     "derived_inputs": {
       "broken": 0,
@@ -5875,9 +6094,9 @@
     },
     "streams": {
       "broken": 0,
-      "count": 9
+      "count": 15
     },
-    "total": 194,
+    "total": 202,
     "trackers": {
       "broken": 0,
       "count": 7

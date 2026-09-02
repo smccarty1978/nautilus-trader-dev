@@ -119,3 +119,25 @@ def test_controller_reports_typed_capability_gap(tmp_path, monkeypatch):
     card = V2StudyController(study, options=V2Options(datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS), repo_root=ROOT).run(through="compile")
     assert card["STATUS"] == "BLOCKED" and card["blocker_code"] == "CAPABILITY_BLOCKER"
     assert any(g["kind"] == "MISSING_CAPABILITY" and g["where"] == "triggers.add" for g in card["capability_gaps"])
+
+
+def test_second_controller_on_a_live_study_is_refused(tmp_path, monkeypatch):
+    """One controller per study: a live run lock blocks a second run; a dead pid's lock is replaced."""
+    import json as _json_mod
+    from research_workflow.governed_controller_v2 import V2StudyController
+    from research_workflow.lifecycle_v2 import V2Options
+    from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
+    study = tmp_path / "studies" / "lock_study"; study.mkdir(parents=True)
+    shutil.copy(GOLDEN / "study_barrier.yaml", study / "study.yaml")
+    monkeypatch.setattr(V2StudyController, "_worktree", lambda self: {"path": str(ROOT), "branch": "t", "head": "0" * 40, "dirty_paths": [], "unsafe_dirty_paths": []})
+    lock = study / "_work" / "controller" / "run.lock"; lock.parent.mkdir(parents=True)
+    decoy = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    try:
+        lock.write_text(_json_mod.dumps({"pid": decoy.pid, "started_at_utc": "now", "through": "analyze"}))
+        card = V2StudyController(study, options=V2Options(datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS), repo_root=ROOT).run(through="compile")
+        assert card["STATUS"] == "BLOCKED" and card["blocker_code"] == "STUDY_RUN_ALREADY_LIVE"
+    finally:
+        decoy.kill(); decoy.wait()
+    lock.write_text(_json_mod.dumps({"pid": decoy.pid, "started_at_utc": "then", "through": "analyze"}))   # dead pid -> stale lock
+    card = V2StudyController(study, options=V2Options(datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS), repo_root=ROOT).run(through="compile")
+    assert card["STATUS"] == "OK" and not lock.exists()

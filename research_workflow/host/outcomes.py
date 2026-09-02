@@ -324,7 +324,11 @@ class LabelOutcomeKernel:
                         self._expire_arm(p, i)
                         continue
                     if past_end:
-                        # first_bar_at_or_after: this bar is evaluated for a hit, then the arm expires
+                        # first_bar_at_or_after: this bar is evaluated for a hit, then the arm expires --
+                        # but only inside the arm's own session: a bar from the next session is never a fill
+                        if p.session_close is not None and ts > p.session_close:
+                            self._expire_arm(p, i)
+                            continue
                         d = p.direction
                         good, bad = p.arm_good[i], p.arm_bad[i]
                         hit_good = hi >= good if d > 0 else lo <= good
