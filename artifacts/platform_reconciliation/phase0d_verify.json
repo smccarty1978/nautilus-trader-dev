@@ -1,0 +1,86 @@
+{
+  "target_sha_present_in_authority_reconciliation": true,
+  "target_sha_files": [
+    "PHASE_C_FREEZE_CARD.md",
+    "artifacts/phase_d/phase_d_modeling_report.json",
+    "artifacts/phase_d0_authority_closed.json",
+    "artifacts/phase_d_modeling_failure_packet.json",
+    "artifacts/resume_manifest.json",
+    "artifacts/train_target_authority_reconciliation.json",
+    "implementation/phase_d_modeling.py"
+  ],
+  "phase_d": {
+    "model_artifact_count": 444,
+    "configuration_count": 36,
+    "oos_accessed": false,
+    "selected_validation_roc_auc_by_cell": {
+      "LONG_SL0_5": [
+        0.5119,
+        0.5036
+      ],
+      "LONG_SL1_0": [
+        0.5135,
+        0.5032
+      ],
+      "LONG_SL1_5": [
+        0.5132,
+        0.5074
+      ],
+      "SHORT_SL0_5": [
+        0.5061,
+        0.5053
+      ],
+      "SHORT_SL1_0": [
+        0.517,
+        0.5057
+      ],
+      "SHORT_SL1_5": [
+        0.5183,
+        0.5093
+      ]
+    },
+    "max_validation_roc_auc": 0.5183,
+    "diagnostic_negative_by_metrics": true,
+    "closure_artifact_present": false
+  },
+  "oos_flags": {
+    "phase_d0_authority_closed.json": {
+      "oos_accessed_false": true,
+      "any_true": false
+    },
+    "phase_d_modeling_failure_packet.json": {
+      "oos_accessed_false": true,
+      "any_true": false
+    },
+    "resume_manifest.json": {
+      "oos_accessed_false": true,
+      "any_true": false
+    }
+  },
+  "models": {
+    "report_count": 444,
+    "registry_resolves_on_main": 444,
+    "bytes_present_in_study_worktree": 444,
+    "missing": [],
+    "registry_manifests_on_main_for_study": 468
+  },
+  "seal": {
+    "seal_status": "LOCKED",
+    "composite_seal_hash": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
+    "expected_composite": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
+    "seal_matches_expected": true,
+    "frozen_manifest_composite": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
+    "resolved_on_main": "1a6eed85254d052ca84c823a4af5a3d643af83fac57310811720086807077c36",
+    "frozen_equals_resolved": true,
+    "resolver_rc": 0,
+    "resolver_stderr_tail": "",
+    "resolver_note": "re-run directly with PYTHONPATH=. ; 148 files in closure; artifacts/platform_reconciliation/resolved_manifest_main.json",
+    "path_reconciliation_required": false
+  },
+  "vertical_slice": {
+    "status": "VERTICAL_SLICE_CLEAR",
+    "stages_passed": 10,
+    "log": "artifacts/platform_reconciliation/vertical_slice_main.log"
+  },
+  "main_head": "81be6bd"
+}

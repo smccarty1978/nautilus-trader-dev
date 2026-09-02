@@ -1,0 +1,50 @@
+{
+  "STATUS": "BLOCKED",
+  "actions_executed": [],
+  "artifact": null,
+  "dry_run": false,
+  "failure_packet": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-governed-controller\\studies\\clean_tradable_reversal\\_work\\controller\\failure_packet.json",
+  "fingerprints": {
+    "active_authority_bundle": "91a2742a161f31166f78191918afc15b8d1ee2b4f7273e4012007123641766ec",
+    "active_feature_authority": "01fc2ddae798ff0e87686a2220cc0d356550ded99c2fea06ffbb6f09e3b9f1f4",
+    "approved_request": "a3ee2cdef4114fc35da2a7fc6c01c843dee851f4e4a11ce6f34bac182c63d128",
+    "causal_reports": "be94128971a1677c4611e88e434360c63b11e61f29d94a27b42b3274d049be3f",
+    "causal_status": "e13561b7cd9afb698890988949d6ae4498938d53f7b3c2dc3e6fa6abee868b11",
+    "compiled_study": "7e87a67899300ef00fc31fd5eb77f075d1764e0385c88389c3b600d60a10c3e3",
+    "contract_reports": "9406b2083880cd3d8a9267414ac98b493456bd0f52d860cc6d2bbf3165a3e6a2",
+    "contract_status": "ecf2262f1c17b53f52397757fa7b603ff8ae9974d5ca12b92650f11e866de671",
+    "current_execution_composite": "3bba950e063abe09af34aeb520415aa277a14764e255c7abd780ec8b98466133",
+    "execution_composite": "b010f3c7d4599887279c1e988ecb463e23db9b9077047f288cc36244094d7fe9",
+    "execution_freeze": "f4b4d6dc09da4a0b2d4550d7a1bdbff655c8711c620218cd1e722c6ab7b2d69b",
+    "feature_candidate_semantics": null,
+    "frozen_lineage": null,
+    "preflight": "d29ee2d5d256b9ff10e1c219d3056c29482dcafc81b5796b38d45ea8c57733f4",
+    "seal": "f47ef5a474cfed488b985d5538d58313448044088cf4ee5d9db74c83e5f948a4",
+    "smoke": null,
+    "study_spec": "37d466c785ad64a0eaf9ad6f91f5b95a6f905335616972dd812a5e9ad94c81f7",
+    "train_authorization": "139e452ad9f4cba35f9068810c4bcfe2563105797be37fa3671f3d28f1095a45",
+    "train_freeze": "f98d079fcb6940a431f7b7238db7b22b6f3cdaca4cc817fe7ed94c0e340d2bf8"
+  },
+  "next_state": "NEEDS_COMPILE",
+  "sha256": null,
+  "stage": "worktree",
+  "state": "NEEDS_COMPILE",
+  "updated_at": "2026-09-01T15:05:11.210954+00:00",
+  "worktree": {
+    "branch": "chore/governed-study-controller",
+    "dirty_paths": [
+      "features/engine.py",
+      "scripts/run_bounded_study.py",
+      "docs/GOVERNED_STUDY_CONTROLLER.md",
+      "research_workflow/controller_contracts.py",
+      "research_workflow/governed_controller.py",
+      "research_workflow/tests/test_governed_controller.py",
+      "scripts/run_governed_study.py"
+    ],
+    "head": "fde7a96832087e2342e999449cf3cf3abf409f28",
+    "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-governed-controller",
+    "unsafe_dirty_paths": [
+      "features/engine.py"
+    ]
+  }
+}

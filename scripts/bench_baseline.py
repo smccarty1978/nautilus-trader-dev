@@ -31,7 +31,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-ABLATION_STUDY = ROOT / "studies/clean_maturity_flip_model_rolling_productivity"
+ABLATION_STUDY = ROOT / "studies/regime_transition_target_before_stop_v1"  # compiled artifact fresh on main; clean_maturity_flip_model_rolling_productivity is STALE_COMPILED_STUDY and is not recompiled here
 SMOKE_STUDY = ROOT / "studies/regime_transition_target_before_stop_v1"
 REPLAY_DATE = "2023-10-02"
 REPEATS = 3
@@ -94,7 +94,7 @@ def _child(cfg: str, out_path: Path) -> None:
         collect.verify_preexec_audit_seal = lambda *a, **k: True
         execution_manifest.verify_frozen_execution_identity = lambda *a, **k: None
         output_manager.OutputManager.persist_collection = (
-            lambda self, candidates, observations, snapshot: {"status": "BENCHMARK_ONLY"})
+            lambda self, candidates, observations, snapshot, **kw: {"status": "BENCHMARK_ONLY"})
         result = collect.run_collect_mode(
             study_path=ABLATION_STUDY, stage="day", date_override=REPLAY_DATE,
             output_dir=WORK / "ablation" / cfg, log_level="ERROR",
@@ -164,6 +164,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--child"); ap.add_argument("--out"); ap.add_argument("--repeats", type=int, default=REPEATS)
     ap.add_argument("--skip-smoke", action="store_true"); ap.add_argument("--skip-decomposition", action="store_true")
+    ap.add_argument("--only-decomposition", action="store_true", help="run only the decomposition controls and merge into an existing baseline file")
     a = ap.parse_args()
     if a.child:
         _child(a.child, Path(a.out)); return 0
@@ -178,9 +179,13 @@ def main() -> int:
         "method": __doc__.strip().splitlines()[0],
         "repeats": a.repeats, "series": {}, "decomposition": {},
     }
+    if OUT.exists():  # merge: keep previously measured series/decomposition entries not rerun now
+        prev = json.loads(OUT.read_text(encoding="utf-8"))
+        report["series"] = prev.get("series", {}); report["decomposition"] = prev.get("decomposition", {})
+        report["previous_runs"] = (prev.get("previous_runs") or []) + [{"generated_at_utc": prev.get("generated_at_utc"), "git_head": prev.get("git_head")}]
     for cfg in ("floor:empty_generic", "full:full", "smoke:smoke"):
         label, mode = cfg.split(":")
-        if mode == "smoke" and a.skip_smoke:
+        if a.only_decomposition or (mode == "smoke" and a.skip_smoke):
             continue
         runs = [_run_child(mode, f"{label}_{i+1}") for i in range(a.repeats)]
         report["series"][label] = {

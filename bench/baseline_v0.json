@@ -1,0 +1,483 @@
+{
+  "schema_version": 1,
+  "kind": "performance_baseline",
+  "status": "MEASUREMENT_ONLY_NOT_A_GATE",
+  "generated_at_utc": "2026-09-02T06:00:14.317378+00:00",
+  "git_head": "81be6bd730a97788a0b6cb373bfed0bebe3c58cd",
+  "environment": {
+    "python": "3.13.7",
+    "nautilus_trader": "1.230.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_count": 20
+  },
+  "method": "Record the current-runtime performance baseline (Phase 0E) as bench/baseline_v0.json.",
+  "repeats": 3,
+  "series": {
+    "floor": {
+      "mode": "empty_generic",
+      "runs": [
+        {
+          "configuration": "empty_generic",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 4.194109800009755,
+          "replay_seconds": 3.6905537999991793,
+          "setup_seconds": 0.5035560000105761,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 57831.69994705062,
+          "candidates": 0,
+          "rss_mb": {
+            "process_start": 186.5859375,
+            "after_data_load": 272.73046875,
+            "after_replay": 291.5078125,
+            "telemetry_peak": 291.54,
+            "growth_during_replay": 18.77734375,
+            "parent_sampled_peak": 328.41015625
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "floor_1"
+        },
+        {
+          "configuration": "empty_generic",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 4.169590800011065,
+          "replay_seconds": 3.6660100999870338,
+          "setup_seconds": 0.5035807000240311,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 58218.87942991616,
+          "candidates": 0,
+          "rss_mb": {
+            "process_start": 186.375,
+            "after_data_load": 273.109375,
+            "after_replay": 292.09765625,
+            "telemetry_peak": 292.12,
+            "growth_during_replay": 18.98828125,
+            "parent_sampled_peak": 320.23828125
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "floor_2"
+        },
+        {
+          "configuration": "empty_generic",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 4.247545099991839,
+          "replay_seconds": 3.7341963999788277,
+          "setup_seconds": 0.5133487000130117,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 57155.8046601968,
+          "candidates": 0,
+          "rss_mb": {
+            "process_start": 186.2109375,
+            "after_data_load": 272.87890625,
+            "after_replay": 291.2578125,
+            "telemetry_peak": 291.29,
+            "growth_during_replay": 18.37890625,
+            "parent_sampled_peak": 301.8984375
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "floor_3"
+        }
+      ],
+      "events_per_second": {
+        "n": 3,
+        "mean": 57735.46134572119,
+        "min": 57155.8046601968,
+        "max": 58218.87942991616,
+        "stdev": 538.0319626126777
+      },
+      "replay_seconds": {
+        "n": 3,
+        "mean": 3.696920099988347,
+        "min": 3.6660100999870338,
+        "max": 3.7341963999788277,
+        "stdev": 0.03453607111856798
+      },
+      "wall_seconds": {
+        "n": 3,
+        "mean": 4.203748566670886,
+        "min": 4.169590800011065,
+        "max": 4.247545099991839,
+        "stdev": 0.03986097826739762
+      },
+      "peak_rss_mb": {
+        "n": 3,
+        "mean": 316.8489583333333,
+        "min": 301.8984375,
+        "max": 328.41015625,
+        "stdev": 13.576945169840554
+      },
+      "rss_growth_during_replay_mb": {
+        "n": 3,
+        "mean": 18.71484375,
+        "min": 18.37890625,
+        "max": 18.98828125,
+        "stdev": 0.30945784875528687
+      }
+    },
+    "full": {
+      "mode": "full",
+      "runs": [
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 78.62656730000162,
+          "replay_seconds": 77.64864070000476,
+          "setup_seconds": 0.9779265999968629,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2748.6765779273574,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.41015625,
+            "after_data_load": 273.21875,
+            "after_replay": 521.6953125,
+            "telemetry_peak": 526.89,
+            "growth_during_replay": 248.4765625,
+            "parent_sampled_peak": 526.890625
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_1"
+        },
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 78.01708099999814,
+          "replay_seconds": 77.03087049999158,
+          "setup_seconds": 0.986210500006564,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2770.720343865559,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 185.98046875,
+            "after_data_load": 272.67578125,
+            "after_replay": 521.9765625,
+            "telemetry_peak": 527.05,
+            "growth_during_replay": 249.30078125,
+            "parent_sampled_peak": 527.0546875
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_2"
+        },
+        {
+          "configuration": "full",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 79.3665561999951,
+          "replay_seconds": 78.40166480001062,
+          "setup_seconds": 0.9648913999844808,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2722.2763769675857,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.0390625,
+            "after_data_load": 272.90625,
+            "after_replay": 521.58203125,
+            "telemetry_peak": 526.92,
+            "growth_during_replay": 248.67578125,
+            "parent_sampled_peak": 526.9453125
+          },
+          "result_status": "BENCHMARK_ONLY",
+          "tag": "full_3"
+        }
+      ],
+      "events_per_second": {
+        "n": 3,
+        "mean": 2747.2244329201676,
+        "min": 2722.2763769675857,
+        "max": 2770.720343865559,
+        "stdev": 24.254608346547407
+      },
+      "replay_seconds": {
+        "n": 3,
+        "mean": 77.69372533333565,
+        "min": 77.03087049999158,
+        "max": 78.40166480001062,
+        "stdev": 0.686508354911366
+      },
+      "wall_seconds": {
+        "n": 3,
+        "mean": 78.67006816666496,
+        "min": 78.01708099999814,
+        "max": 79.3665561999951,
+        "stdev": 0.6757884823685989
+      },
+      "peak_rss_mb": {
+        "n": 3,
+        "mean": 526.9635416666666,
+        "min": 526.890625,
+        "max": 527.0546875,
+        "stdev": 0.08353653610596583
+      },
+      "rss_growth_during_replay_mb": {
+        "n": 3,
+        "mean": 248.81770833333334,
+        "min": 248.4765625,
+        "max": 249.30078125,
+        "stdev": 0.4300483806509691
+      }
+    },
+    "smoke": {
+      "mode": "smoke",
+      "runs": [
+        {
+          "configuration": "smoke",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 84.92372150000301,
+          "replay_seconds": 78.17277790000662,
+          "setup_seconds": 6.75094359999639,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2730.2470979476593,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 185.71875,
+            "after_data_load": 274.83203125,
+            "after_replay": 522.9375,
+            "telemetry_peak": 528.05,
+            "growth_during_replay": 248.10546875,
+            "parent_sampled_peak": 532.5078125
+          },
+          "result_status": "SUCCESS",
+          "tag": "smoke_1"
+        },
+        {
+          "configuration": "smoke",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 85.2437585000007,
+          "replay_seconds": 79.00674569999683,
+          "setup_seconds": 6.237012800003868,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2701.427556710624,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.50390625,
+            "after_data_load": 275.5625,
+            "after_replay": 523.4375,
+            "telemetry_peak": 528.49,
+            "growth_during_replay": 247.875,
+            "parent_sampled_peak": 533.0390625
+          },
+          "result_status": "SUCCESS",
+          "tag": "smoke_2"
+        },
+        {
+          "configuration": "smoke",
+          "study": "studies/regime_transition_target_before_stop_v1",
+          "replay_date": "2023-10-02",
+          "wall_seconds": 86.9864196999988,
+          "replay_seconds": 80.61594980000518,
+          "setup_seconds": 6.370469899993623,
+          "events": 213431,
+          "bars_loaded_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "callbacks_by_tf": {
+            "1s": 207911,
+            "1m": 5520
+          },
+          "events_per_second": 2647.5033852418405,
+          "candidates": 7320,
+          "rss_mb": {
+            "process_start": 186.5625,
+            "after_data_load": 276.37109375,
+            "after_replay": 524.359375,
+            "telemetry_peak": 529.3,
+            "growth_during_replay": 247.98828125,
+            "parent_sampled_peak": 533.85546875
+          },
+          "result_status": "SUCCESS",
+          "tag": "smoke_3"
+        }
+      ],
+      "events_per_second": {
+        "n": 3,
+        "mean": 2693.0593466333744,
+        "min": 2647.5033852418405,
+        "max": 2730.2470979476593,
+        "stdev": 42.00179404511789
+      },
+      "replay_seconds": {
+        "n": 3,
+        "mean": 79.26515780000288,
+        "min": 78.17277790000662,
+        "max": 80.61594980000518,
+        "stdev": 1.2419157955786684
+      },
+      "wall_seconds": {
+        "n": 3,
+        "mean": 85.7179665666675,
+        "min": 84.92372150000301,
+        "max": 86.9864196999988,
+        "stdev": 1.1101062714602492
+      },
+      "peak_rss_mb": {
+        "n": 3,
+        "mean": 533.1341145833334,
+        "min": 532.5078125,
+        "max": 533.85546875,
+        "stdev": 0.6788376211956146
+      },
+      "rss_growth_during_replay_mb": {
+        "n": 3,
+        "mean": 247.98958333333334,
+        "min": 247.875,
+        "max": 248.10546875,
+        "stdev": 0.11523989217018486
+      }
+    }
+  },
+  "decomposition": {
+    "checkpoint_only": {
+      "replay_seconds": 5.7297065000166185,
+      "events_per_second": 37249.901020127465,
+      "candidates": 0,
+      "failed": null,
+      "stderr_tail": null
+    },
+    "baseline": {
+      "replay_seconds": 5.743263700016541,
+      "events_per_second": 37161.97116273545,
+      "candidates": 0,
+      "failed": null,
+      "stderr_tail": null
+    },
+    "structural": {
+      "replay_seconds": 5.933805000007851,
+      "events_per_second": 35968.65754768106,
+      "candidates": 0,
+      "failed": null,
+      "stderr_tail": null
+    },
+    "rolling": {
+      "replay_seconds": 6.027986500004772,
+      "events_per_second": 35406.68181652879,
+      "candidates": 0,
+      "failed": null,
+      "stderr_tail": null
+    },
+    "full_no_target": {
+      "replay_seconds": 6.483886200003326,
+      "events_per_second": 32917.14157473808,
+      "candidates": 0,
+      "failed": null,
+      "stderr_tail": null
+    },
+    "full": {
+      "replay_seconds": 78.19959939998807,
+      "events_per_second": 2729.310656801556,
+      "candidates": 7320,
+      "failed": null,
+      "stderr_tail": null
+    }
+  },
+  "previous_runs": [
+    {
+      "generated_at_utc": "2026-09-02T05:45:54.049851+00:00",
+      "git_head": "81be6bd730a97788a0b6cb373bfed0bebe3c58cd"
+    },
+    {
+      "generated_at_utc": "2026-09-02T05:51:11.770169+00:00",
+      "git_head": "81be6bd730a97788a0b6cb373bfed0bebe3c58cd"
+    },
+    {
+      "generated_at_utc": "2026-09-02T05:55:46.860470+00:00",
+      "git_head": "81be6bd730a97788a0b6cb373bfed0bebe3c58cd"
+    }
+  ],
+  "findings": {
+    "status": "MEASUREMENT_ONLY_NOT_A_GATE",
+    "replay_day": "2023-10-02 (213,431 NT events: 207,911 x 1s + 5,520 x 1m)",
+    "floor_events_per_second_mean": 57735.46134572119,
+    "full_surface_events_per_second_mean": 2747.2244329201676,
+    "real_smoke_events_per_second_mean": 2693.0593466333744,
+    "smoke_peak_rss_mb_mean": 533.1341145833334,
+    "smoke_rss_growth_during_replay_mb_mean": 247.98958333333334,
+    "decomposition_events_per_second": {
+      "checkpoint_only": 37249.901020127465,
+      "baseline": 37161.97116273545,
+      "structural": 35968.65754768106,
+      "rolling": 35406.68181652879,
+      "full_no_target": 32917.14157473808,
+      "full": 2729.310656801556
+    },
+    "interpretation": [
+      "empty callback floor ~57.7k events/s; checkpoint grid + population qualification ~37k; structural/rolling providers cost <10%; full_no_target ~32.9k",
+      "the compiled composite/ordered-barrier target runtime (3 barrier arms, composite resolution, parity-oracle input accumulation) accounts for ~92% of replay time on regime_transition_target_before_stop_v1 (32.9k -> 2.7k events/s)",
+      "the previously documented 5.73 s / ~37k events/s figure (docs/WORKFLOW_REFERENCE_FACTS.md) was measured on clean_maturity_flip_model_rolling_productivity, a flip-target study; it is consistent with full_no_target here",
+      "RSS grows ~248 MB during one replay day on the smoke run (candidates/observations accumulate as Python lists until on_stop)"
+    ],
+    "notes": [
+      "studies/clean_maturity_flip_model_rolling_productivity has STALE_COMPILED_STUDY on main (study.yaml hash != compiled artifact); not recompiled in Phase 0; ablation controls therefore ran on regime_transition_target_before_stop_v1",
+      "scripts/run_collector_ablation_matrix.py carries a stale persist_collection stub (missing diagnostic_df kwarg) and cannot run unmodified; the same stub is fixed in scripts/bench_baseline.py"
+    ]
+  }
+}
