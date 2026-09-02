@@ -124,3 +124,14 @@ def test_score_mode_reuses_frozen_models_and_validates_labels():
     spec["model"] = {"mode": "score"}
     out = compile_study(spec, repo_root=ROOT)
     assert not out.ok and any(g.kind == GapKind.INVALID_PARAMETERIZATION for g in out.gaps.gaps)
+
+
+def test_coarser_external_timeframes_are_context_streams():
+    """Only the finest external timeframe of the execution instrument carries epochs; the 1m bar closing at
+    an epoch T must be a context stream (visible strictly before the epoch) enforced by the host, not by feed order."""
+    out = compile_study(load_spec(ROOT / "fixtures" / "parity" / "shape_b" / "study.yaml"), repo_root=ROOT)
+    assert out.ok, out.card()
+    roles = {s["key"]: (s["role"], s["visibility"], s["source"]) for s in out.plan.streams}
+    assert roles["nq_1s"] == ("execution", "at_epoch", "external")
+    assert roles["nq_1m"] == ("context", "strictly_before", "external")
+    assert roles["nq_5s"][0] == "execution" and roles["nq_5s"][2] == "derived"
