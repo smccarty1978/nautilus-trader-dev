@@ -62,3 +62,14 @@ def test_provider_host_routes_data_streams_only_to_declared_subscribers():
     host.dispatch(ph.EVENT_REGIME_TRANSITION_1M, {"avail_ts": 301 * NS})
     assert a1.seen == [ph.STREAM_COMPLETED_1S, ph.EVENT_REGIME_TRANSITION_1M]
     assert a2.seen == [ph.STREAM_COMPLETED_5M, ph.EVENT_REGIME_TRANSITION_1M]
+
+
+def test_session_bounds_are_wall_clock_on_dst_days():
+    """Audit pass-01 WARNING: the day bounds are built from the wall clock, so 15:15 CT on a
+    DST-transition Sunday is 15:15 CT, not midnight + 15h15m."""
+    for day in ("2023-03-12", "2023-11-05"):
+        noon = pd.Timestamp(f"{day} 12:00", tz="America/Chicago").tz_convert("UTC").value
+        close = pd.Timestamp(noon, tz="UTC").tz_convert("America/Chicago").normalize()
+        expected = pd.Timestamp(f"{day} 15:15", tz="America/Chicago").tz_convert("UTC").value
+        assert sb.session_close_ns(noon, "RTH") == expected == sb.session_close_ns_reference(noon, "RTH")
+        assert not sb.is_in_session(pd.Timestamp(f"{day} 10:00", tz="America/Chicago").tz_convert("UTC").value)  # Sunday

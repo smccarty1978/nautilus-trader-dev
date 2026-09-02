@@ -101,3 +101,16 @@ def test_resolver_records_algorithm_and_sealed_study_keeps_v1():
     assert c1 != c2  # different algorithm -> different composite, by design
     c1b, _, _ = resolve_execution_manifest(study, repo)
     assert c1b == c1  # deterministic
+
+
+def test_all_edit_moves_hash_for_wildcard_imported_modules_only(tmp_path: Path):
+    """Audit pass-01 CRITICAL: __all__ decides what a star-importer binds, so it stays in the
+    hash of any module that is wildcard-imported inside the closure."""
+    mod = _write(tmp_path, "mod.py", CODE)
+    mod2 = _write(tmp_path, "mod2.py", CODE.replace('__all__ = ["f"]', '__all__ = ["f", "C"]'))
+    assert ch.hash_file_v2(mod) == ch.hash_file_v2(mod2)                       # nobody star-imports it
+    assert ch.hash_file_v2(mod, keep_all=True) != ch.hash_file_v2(mod2, keep_all=True)  # star-imported: __all__ binds
+    importer = _write(tmp_path, "user.py", "from mod import *\n")
+    (tmp_path / "__init__.py").write_text("")
+    targets = ch.wildcard_import_targets([importer, mod], tmp_path)
+    assert mod.resolve() in targets and importer.resolve() not in targets

@@ -164,3 +164,22 @@ def test_resolve_data_plan_declared_check_uses_root_resolution(tmp_path: Path, m
     expected = roots.resolve_dataset("NQ_v0_2020_2026", repo, catalog_rel_path=spec["catalog_rel_path"]).catalog_path
     assert plan.catalog_path == expected == cat.resolve()
     assert (repo / "data" / "catalog" / "NQ_v0_2020_2026").exists() is False  # no repo-relative copy needed
+
+
+def test_live_file_drift_is_detected_on_resolution(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """Audit pass-01 CRITICAL: a catalog edited after its manifest was written must not open silently."""
+    root = tmp_path / "root1"; cat = _fake_catalog(root / "DS"); m = write_dataset_manifest(cat, "DS")
+    repo = _repo(tmp_path, "DS", m["logical_digest"])
+    monkeypatch.setenv(roots.CONFIG_ENV, str(_config(tmp_path, [root])))
+    assert resolve_dataset("DS", repo).catalog_path == cat.resolve()
+    part = cat / "data" / "bar" / "X.Y-1-SECOND-LAST-EXTERNAL" / "part-0.parquet"
+    part.write_bytes(b"bars-extended")  # size changed after the manifest
+    with pytest.raises(roots.DatasetFilesDrifted):
+        resolve_dataset("DS", repo)
+    part.write_bytes(b"barz")  # same size, different bytes: only the byte-level check can see it
+    resolve_dataset("DS", repo)  # cheap check passes by design ...
+    with pytest.raises(DatasetDigestMismatch):
+        roots.verify_dataset_bytes(cat, m["logical_digest"])  # ... R1's authoritative check does not
+    (cat / "data" / "bar" / "extra.parquet").write_bytes(b"x")
+    with pytest.raises(roots.DatasetFilesDrifted):
+        resolve_dataset("DS", repo)

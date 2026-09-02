@@ -114,9 +114,10 @@ def _session_hour_entry(ts_ns: int, session: str) -> tuple:
     if entry is None:
         start, end = resolve_session_window(session)
         ct = _to_ct(key[0] * _HOUR_NS)
-        midnight = ct.normalize()
-        start_utc = int((midnight + pd.Timedelta(hours=start.hour, minutes=start.minute, seconds=start.second)).tz_convert("UTC").value)
-        end_utc = int((midnight + pd.Timedelta(hours=end.hour, minutes=end.minute, seconds=end.second)).tz_convert("UTC").value)
+        # Wall-clock construction (not midnight + Timedelta): on a DST-transition day the
+        # absolute-time arithmetic lands an hour off; the wall clock is what "08:30 CT" means.
+        start_utc = int(pd.Timestamp(ct.year, ct.month, ct.day, start.hour, start.minute, start.second, tz=CT).tz_convert("UTC").value)
+        end_utc = int(pd.Timestamp(ct.year, ct.month, ct.day, end.hour, end.minute, end.second, tz=CT).tz_convert("UTC").value)
         entry = (start_utc, end_utc, ct.weekday() < 5)
         if len(_SESSION_HOUR_CACHE) > 200_000:
             _SESSION_HOUR_CACHE.clear()
@@ -182,9 +183,9 @@ def session_close_ns_reference(ts_ns: int, session: str = "RTH") -> int:
     """The pandas/tz reference implementation, kept for equivalence tests only."""
     _start, end = resolve_session_window(session)
     ts = _to_ct(ts_ns)
-    close_ct = ts.normalize() + pd.Timedelta(
-        hours=end.hour, minutes=end.minute, seconds=end.second
-    )
+    # Wall-clock close of the CT calendar day (DST-safe; the legacy midnight+Timedelta form was
+    # an hour off on the two transition days, which are Sundays and therefore never RTH).
+    close_ct = pd.Timestamp(ts.year, ts.month, ts.day, end.hour, end.minute, end.second, tz=CT)
     return int(close_ct.tz_convert("UTC").value)
 
 

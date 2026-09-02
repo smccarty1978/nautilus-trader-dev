@@ -63,6 +63,10 @@ class DatasetDigestMismatch(RuntimeError):
     """The on-disk dataset manifest digest does not match the committed DatasetSpec digest."""
 
 
+class DatasetFilesDrifted(RuntimeError):
+    """The catalog files on disk no longer match the manifest that was written for them."""
+
+
 @dataclass(frozen=True)
 class RootConfig:
     path: Optional[Path]
@@ -157,6 +161,33 @@ def write_dataset_manifest(catalog_dir: Path, dataset_id: str, instrument_id: Op
     return manifest
 
 
+def verify_dataset_files(catalog_dir: Path, manifest: Dict[str, Any]) -> None:
+    """Cheap live check: every manifest file exists with its recorded size and no extra files
+    appeared under ``data/``. Catches truncation, additions and replacements of different size."""
+    catalog_dir = Path(catalog_dir).resolve()
+    recorded = {e["path"]: int(e["size"]) for e in manifest.get("files") or []}
+    for rel, size in recorded.items():
+        f = catalog_dir / rel
+        if not f.is_file():
+            raise DatasetFilesDrifted(f"DATASET_FILES_DRIFTED: {rel} missing from {catalog_dir}")
+        if f.stat().st_size != size:
+            raise DatasetFilesDrifted(f"DATASET_FILES_DRIFTED: {rel} size {f.stat().st_size} != manifest {size}")
+    data_dir = catalog_dir / "data"
+    if data_dir.is_dir():
+        actual = {p.relative_to(catalog_dir).as_posix() for p in data_dir.rglob("*") if p.is_file()}
+        extra = sorted(actual - set(recorded))
+        if extra:
+            raise DatasetFilesDrifted(f"DATASET_FILES_DRIFTED: files not in manifest: {extra[:5]}")
+
+
+def verify_dataset_bytes(catalog_dir: Path, expected_digest: str) -> Dict[str, Any]:
+    """Authoritative live check: recompute the content digest from the bytes on disk."""
+    digest = compute_catalog_digest(catalog_dir)
+    if digest["logical_digest"] != expected_digest:
+        raise DatasetDigestMismatch(f"DATASET_DIGEST_MISMATCH: live bytes digest {digest['logical_digest']} != expected {expected_digest}")
+    return digest
+
+
 def read_dataset_manifest(catalog_dir: Path) -> Optional[Dict[str, Any]]:
     p = Path(catalog_dir) / DATASET_MANIFEST_NAME
     if not p.is_file():
@@ -216,6 +247,8 @@ def resolve_dataset(dataset_id: str, repo_root: Path, *, config: Optional[RootCo
             digest = on_disk.get("logical_digest")
             if verify_digest and declared_digest and digest != declared_digest:
                 raise DatasetDigestMismatch(f"DATASET_DIGEST_MISMATCH: {dataset_id} on-disk {digest} != committed {declared_digest}")
+            if verify_digest:
+                verify_dataset_files(path, on_disk)
         return ResolvedDataset(dataset_id, path, digest or declared_digest, "legacy_repo_relative", None)
 
     # Configured roots: the only resolution path. No repo-relative fallback.
@@ -252,6 +285,8 @@ def resolve_dataset(dataset_id: str, repo_root: Path, *, config: Optional[RootCo
             f"DATASET_ROOT_UNRESOLVED: no configured catalog root carries {dataset_id} with digest {declared_digest[:12]}...; "
             f"roots={[str(r) for r in cfg.catalog_roots]}")
     root, path, digest = matches[0]
+    if verify_digest:
+        verify_dataset_files(path, read_dataset_manifest(path) or {})
     return ResolvedDataset(dataset_id, path, digest, "configured_root", root)
 
 
@@ -270,7 +305,7 @@ def resolve_model_root(config: Optional[RootConfig] = None, *, create: bool = Fa
 
 __all__ = [
     "CONFIG_ENV", "DIGEST_METHOD", "DATASET_MANIFEST_NAME", "RootConfig", "RootConfigError",
-    "DatasetRootUnresolved", "DuplicateDatasetConflict", "DatasetDigestMismatch", "ResolvedDataset",
+    "DatasetRootUnresolved", "DuplicateDatasetConflict", "DatasetDigestMismatch", "DatasetFilesDrifted", "ResolvedDataset",
     "load_config", "config_path", "compute_catalog_digest", "write_dataset_manifest", "read_dataset_manifest",
-    "resolve_dataset", "committed_dataset_spec_path", "resolve_model_root",
+    "resolve_dataset", "committed_dataset_spec_path", "resolve_model_root", "verify_dataset_files", "verify_dataset_bytes",
 ]

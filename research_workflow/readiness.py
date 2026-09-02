@@ -188,7 +188,8 @@ def verify_dataset_identity_chain(
             f"WRONG_PHYSICAL_DATASET: resolved catalog path does not exist on disk: {data_plan.catalog_path}"
         )
     # Digest identity: when the committed DatasetSpec declares a logical digest, the opened
-    # catalog must carry an on-disk manifest with the same digest.
+    # catalog must carry an on-disk manifest with the same digest AND its live bytes must
+    # reproduce that digest (R1 is a gate: it never trusts a recorded digest alone).
     on_disk = read_dataset_manifest(data_plan.catalog_path)
     if dataset_spec.logical_digest:
         if not on_disk or on_disk.get("logical_digest") != dataset_spec.logical_digest:
@@ -196,6 +197,11 @@ def verify_dataset_identity_chain(
                 f"WRONG_PHYSICAL_DATASET: opened catalog digest {(on_disk or {}).get('logical_digest')} != "
                 f"committed DatasetSpec logical_digest {dataset_spec.logical_digest}"
             )
+        from research_workflow.roots import DatasetDigestMismatch, verify_dataset_bytes
+        try:
+            verify_dataset_bytes(data_plan.catalog_path, dataset_spec.logical_digest)
+        except DatasetDigestMismatch as exc:
+            raise WrongPhysicalDatasetError(f"WRONG_PHYSICAL_DATASET: {exc}") from exc
 
     return _result(
         True, "DATASET_IDENTITY_OK",

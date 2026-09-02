@@ -64,16 +64,17 @@ def canonical_file_sha256(file_path: Path) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _hash_file(file_path: Path, hash_algorithm: str = "v1") -> str:
+def _hash_file(file_path: Path, hash_algorithm: str = "v1", keep_all: bool = False) -> str:
     """Hash one closure file under the named algorithm (research_workflow.closure_hash).
 
     ``v1`` is the historical canonical text hash; ``v2`` hashes Python sources by their
-    docstring/__all__-stripped AST so documentation-only edits do not move a composite.
+    docstring-stripped AST so documentation-only edits do not move a composite. ``keep_all``
+    retains ``__all__`` for modules that are wildcard-imported inside the closure.
     """
     if hash_algorithm == "v1":
         return canonical_file_sha256(file_path)
-    from research_workflow.closure_hash import HASH_ALGORITHMS
-    return HASH_ALGORITHMS[hash_algorithm](file_path)
+    from research_workflow.closure_hash import hash_file_v2
+    return hash_file_v2(file_path, keep_all=keep_all)
 
 
 def resolve_module_to_path(module_name: str, current_file: Path, repo_root: Path) -> Optional[Path]:
@@ -823,13 +824,18 @@ def resolve_execution_manifest(
         gov_unres = closure_data["governance_unresolved"]
         all_unresolved = closure_data["all_unresolved"]
 
-        # Compute SHA-256 for all resolved files
+        # Compute SHA-256 for all resolved files. Under v2, modules that any closure member
+        # star-imports keep their ``__all__`` in the hash (it decides what that importer binds).
+        star_targets = set()
+        if hash_algorithm != "v1":
+            from research_workflow.closure_hash import wildcard_import_targets
+            star_targets = wildcard_import_targets(combined_paths.values(), repo_root)
         file_hashes: Dict[str, str] = {}
         for key in sorted(combined_paths.keys()):
             p = combined_paths[key]
             if not p.exists():
                 raise FileNotFoundError(f"Resolved execution dependency does not exist on disk: {p}")
-            file_hashes[key] = _hash_file(p, hash_algorithm)
+            file_hashes[key] = _hash_file(p, hash_algorithm, keep_all=(p.resolve() in star_targets))
 
         runtime_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in runtime_closure_set])
         contract_keys = sorted([f"repo:{p.relative_to(repo_root).as_posix()}" for p in contract_closure_set])

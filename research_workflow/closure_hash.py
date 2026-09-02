@@ -4,11 +4,12 @@
         frozen manifest written before this module exists is a v1 manifest and keeps
         verifying under v1: sealed studies retain their execution authority unchanged.
 
-``v2``  *semantic* hash for Python sources: the AST with docstrings and module-level
-        ``__all__`` assignments removed, so that comment-only, docstring-only, formatting-only
-        and ``__all__``-only edits do not move a study's composite, while any change to
-        executable code (a constant, an expression, an import, a default argument) does.
-        Non-Python files keep the v1 canonical text/byte hash.
+``v2``  *semantic* hash for Python sources: the AST with docstrings removed -- and, for
+        modules that no closure member star-imports, module-level ``__all__`` removed -- so
+        comment-only, docstring-only, formatting-only and (where inert) ``__all__``-only edits do
+        not move a study's composite, while any change to executable code (a constant, an
+        expression, an import, a default argument, or ``__all__`` of a wildcard-imported module)
+        does. Non-Python files keep the v1 canonical text/byte hash.
 
 The algorithm is recorded in ``audit/frozen_execution_manifest.json`` as ``hash_algorithm``;
 resolution and verification always use the algorithm the frozen manifest names, and only a
@@ -25,7 +26,18 @@ DEFAULT_HASH_ALGORITHM = "v2"
 
 
 class _Strip(ast.NodeTransformer):
-    """Remove docstrings and module-level ``__all__`` assignments."""
+    """Remove docstrings and (unless ``keep_all``) module-level ``__all__`` assignments.
+
+    ``__all__`` IS executable when another closure member does ``from module import *``:
+    editing it changes which names that importer binds. The resolver therefore passes
+    ``keep_all=True`` for every module that is a wildcard-import target inside the closure
+    (see ``wildcard_import_targets``); only modules nobody star-imports get the
+    ``__all__``-insensitive hash.
+    """
+
+    def __init__(self, keep_all: bool = False) -> None:
+        super().__init__()
+        self.keep_all = keep_all
 
     def _strip_docstring(self, node):
         body = getattr(node, "body", None)
@@ -35,11 +47,12 @@ class _Strip(ast.NodeTransformer):
 
     def visit_Module(self, node: ast.Module):
         node = self._strip_docstring(node)
-        node.body = [
-            stmt for stmt in node.body
-            if not (isinstance(stmt, (ast.Assign, ast.AugAssign, ast.AnnAssign)) and any(
-                isinstance(t, ast.Name) and t.id == "__all__" for t in (stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target])))
-        ] or [ast.Pass()]
+        if not self.keep_all:
+            node.body = [
+                stmt for stmt in node.body
+                if not (isinstance(stmt, (ast.Assign, ast.AugAssign, ast.AnnAssign)) and any(
+                    isinstance(t, ast.Name) and t.id == "__all__" for t in (stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target])))
+            ] or [ast.Pass()]
         self.generic_visit(node)
         return node
 
@@ -59,26 +72,50 @@ def canonical_text_sha256(path: Path) -> str:
     return canonical_file_sha256(Path(path))
 
 
-def semantic_python_sha256(path: Path) -> Optional[str]:
-    """sha256 of the docstring/__all__-stripped AST dump; None if the file does not parse."""
+def semantic_python_sha256(path: Path, *, keep_all: bool = False) -> Optional[str]:
+    """sha256 of the docstring-stripped (and, unless ``keep_all``, ``__all__``-stripped) AST dump; None if the file does not parse."""
     try:
         source = Path(path).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n").decode("utf-8")
         tree = ast.parse(source)
     except (SyntaxError, UnicodeDecodeError, ValueError):
         return None
-    tree = _Strip().visit(tree)
+    tree = _Strip(keep_all=keep_all).visit(tree)
     ast.fix_missing_locations(tree)
     dump = ast.dump(tree, include_attributes=False, annotate_fields=True)
-    return hashlib.sha256(("py-ast-v2\n" + dump).encode("utf-8")).hexdigest()
+    tag = "py-ast-v2-keepall\n" if keep_all else "py-ast-v2\n"
+    return hashlib.sha256((tag + dump).encode("utf-8")).hexdigest()
 
 
-def hash_file_v2(path: Path) -> str:
+def hash_file_v2(path: Path, *, keep_all: bool = False) -> str:
     p = Path(path)
     if p.suffix.lower() == ".py":
-        h = semantic_python_sha256(p)
+        h = semantic_python_sha256(p, keep_all=keep_all)
         if h is not None:
             return h
     return canonical_text_sha256(p)
+
+
+def wildcard_import_targets(files, repo_root: Path) -> set:
+    """Resolved paths of every module that some file in ``files`` imports with ``import *``.
+
+    Those modules' ``__all__`` is executable for the closure and must stay in their hash.
+    """
+    from scripts.resolve_execution_manifest import resolve_module_to_path
+    targets = set()
+    for f in files:
+        f = Path(f)
+        if f.suffix.lower() != ".py":
+            continue
+        try:
+            tree = ast.parse(f.read_bytes().replace(b"\r\n", b"\n").decode("utf-8"))
+        except (SyntaxError, UnicodeDecodeError, ValueError):
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module and any(a.name == "*" for a in node.names):
+                resolved = resolve_module_to_path(node.module, f, Path(repo_root))
+                if resolved is not None:
+                    targets.add(Path(resolved).resolve())
+    return targets
 
 
 HASH_ALGORITHMS: Dict[str, Callable[[Path], str]] = {"v1": canonical_text_sha256, "v2": hash_file_v2}
@@ -105,5 +142,5 @@ def resolve_hash_algorithm(study_dir: Path, requested: Optional[str] = None) -> 
     return algo
 
 
-__all__ = ["DEFAULT_HASH_ALGORITHM", "HASH_ALGORITHMS", "canonical_text_sha256", "semantic_python_sha256", "hash_file_v2",
+__all__ = ["DEFAULT_HASH_ALGORITHM", "HASH_ALGORITHMS", "canonical_text_sha256", "semantic_python_sha256", "hash_file_v2", "wildcard_import_targets",
            "frozen_hash_algorithm", "resolve_hash_algorithm"]
