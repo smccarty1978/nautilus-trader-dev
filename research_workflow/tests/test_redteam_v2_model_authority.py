@@ -258,3 +258,84 @@ def test_iv_compiled_availability_table_names_the_rule_and_dependencies():
     assert row["kind"] == "derived_score"
     assert row["availability_rule"] == "max(inputs) ∪ evaluation"
     assert row["dependencies"] == ["f0"]
+
+
+# --------------------------------------------------------------------------- #
+# Packet B follow-up: legacy_v1_committed_registry identity rule
+# --------------------------------------------------------------------------- #
+
+def _git_init(repo: Path) -> None:
+    import subprocess
+    subprocess.run(["git", "init", "-q"], cwd=str(repo), check=True)
+    subprocess.run(["git", "config", "user.email", "t@t"], cwd=str(repo), check=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=str(repo), check=True)
+
+
+def _commit_file(repo: Path, rel: str) -> None:
+    import subprocess
+    subprocess.run(["git", "add", rel], cwd=str(repo), check=True)
+    subprocess.run(["git", "commit", "-q", "-m", f"add {rel}"], cwd=str(repo), check=True)
+
+
+def _legacy_manifest_and_record(root: Path, repo: Path, *, commit: bool = True,
+                                record_overrides: dict | None = None,
+                                legacy_overrides: dict | None = None) -> str:
+    """A migrated-style manifest (identity_rule legacy_v1_immutable_unrecomputable +
+    legacy_registry_record) plus a v1 registry record at studies/model_registry/<id>.json
+    inside a fresh tmp git repo, matching the real migration layout."""
+    model_id, _ = _store(root, identity_rule="legacy_v1_immutable_unrecomputable", target_arm="LEGACY_ARM")
+    manifest_path = ms.model_dir(model_id, root) / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    canonical_sha = manifest["canonical"]["byte_sha256"]  # sklearn_pickle -> compared to artifact_sha256
+    record = {"model_id": model_id, "study_id": manifest["lineage"]["study_id"],
+             "artifact_sha256": canonical_sha, "runtime_identity_sha256": "rt-sha-legacy-1"}
+    record.update(record_overrides or {})
+    legacy = {"runtime_identity_sha256": "rt-sha-legacy-1"}
+    legacy.update(legacy_overrides or {})
+    manifest["legacy_registry_record"] = legacy
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    rec_dir = repo / "studies" / "model_registry"; rec_dir.mkdir(parents=True, exist_ok=True)
+    rec_path = rec_dir / f"{model_id}.json"
+    rec_path.write_text(json.dumps(record), encoding="utf-8")
+    if commit:
+        _commit_file(repo, f"studies/model_registry/{model_id}.json")
+    return model_id
+
+
+@pytest.fixture
+def repo(tmp_path: Path) -> Path:
+    r = tmp_path / "repo"; r.mkdir()
+    _git_init(r)
+    return r
+
+
+def test_legacy_committed_registry_pass(root: Path, repo: Path):
+    model_id = _legacy_manifest_and_record(root, repo)
+    evidence = ms.authenticate_model(model_id, model_root=root, repo_root=repo)
+    assert evidence["identity_rule"] == ms.LEGACY_V1_COMMITTED_REGISTRY_RULE
+    assert evidence["golden"]["status"] == "PASS"
+
+
+def test_legacy_committed_registry_untracked_record_unverifiable(root: Path, repo: Path):
+    model_id = _legacy_manifest_and_record(root, repo, commit=False)
+    with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_UNVERIFIABLE"):
+        ms.authenticate_model(model_id, model_root=root, repo_root=repo)
+
+
+def test_legacy_committed_registry_sha_mismatch(root: Path, repo: Path):
+    model_id = _legacy_manifest_and_record(root, repo, record_overrides={"artifact_sha256": "0" * 64})
+    with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_MISMATCH"):
+        ms.authenticate_model(model_id, model_root=root, repo_root=repo)
+
+
+def test_legacy_committed_registry_study_id_mismatch(root: Path, repo: Path):
+    model_id = _legacy_manifest_and_record(root, repo, record_overrides={"study_id": "some_other_study"})
+    with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_MISMATCH"):
+        ms.authenticate_model(model_id, model_root=root, repo_root=repo)
+
+
+def test_legacy_committed_registry_runtime_identity_mismatch(root: Path, repo: Path):
+    model_id = _legacy_manifest_and_record(root, repo, legacy_overrides={"runtime_identity_sha256": "different"})
+    with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_MISMATCH"):
+        ms.authenticate_model(model_id, model_root=root, repo_root=repo)

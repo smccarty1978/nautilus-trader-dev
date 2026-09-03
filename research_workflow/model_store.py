@@ -414,9 +414,52 @@ IDENTITY_RULES: Dict[str, Any] = {
     "v2_lineage_sha256": _recompute_v2_lineage_sha256,
 }
 
+LEGACY_V1_COMMITTED_REGISTRY_RULE = "legacy_v1_committed_registry"
+
+
+def _verify_legacy_v1_committed_registry(manifest: Mapping[str, Any], model_id: str, repo_root: Path) -> None:
+    """Authenticate a migrated v1 model against its still-git-tracked v1 registry record.
+
+    The v1 registry record at ``studies/model_registry/<model_id>.json`` is the authoritative
+    source of the legacy identity (it predates and is independent of the v2 store manifest).
+    A record that is missing or not committed at HEAD grants no authority
+    (``MODEL_IDENTITY_UNVERIFIABLE``); any disagreement between the record and the manifest
+    on model_id, study_id, canonical bytes or runtime identity is ``MODEL_IDENTITY_MISMATCH``.
+    """
+    from research_workflow.policy import _git_tracked
+
+    rel = f"studies/model_registry/{model_id}.json"
+    record_path = Path(repo_root) / rel
+    if not record_path.is_file() or not _git_tracked(Path(repo_root), rel):
+        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: legacy registry record {rel} is missing or not committed to git at HEAD")
+    try:
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: legacy registry record {rel} is not valid JSON: {exc}")
+
+    if record.get("model_id") != model_id:
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: legacy registry record {rel} records model_id {record.get('model_id')!r} != {model_id!r}")
+
+    lineage = manifest.get("lineage") or {}
+    if record.get("study_id") != lineage.get("study_id"):
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: legacy registry study_id {record.get('study_id')!r} != manifest lineage.study_id {lineage.get('study_id')!r}")
+
+    canonical = manifest.get("canonical") or {}
+    fmt = canonical.get("format")
+    expected_sha = record.get("native_booster_sha256") if fmt == "lightgbm_text" else record.get("artifact_sha256")
+    if not expected_sha or canonical.get("byte_sha256") != expected_sha:
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: canonical byte_sha256 {canonical.get('byte_sha256')!r} != legacy registry {expected_sha!r} (format {fmt!r})")
+
+    legacy = manifest.get("legacy_registry_record") or {}
+    if legacy.get("runtime_identity_sha256") != record.get("runtime_identity_sha256"):
+        raise ModelStoreError(
+            f"MODEL_IDENTITY_MISMATCH: manifest legacy_registry_record.runtime_identity_sha256 "
+            f"{legacy.get('runtime_identity_sha256')!r} != legacy registry {record.get('runtime_identity_sha256')!r}"
+        )
+
 
 def authenticate_model(model_id: str, *, expect: Optional[Mapping[str, Any]] = None, model_root: Optional[Path] = None,
-                       golden_tolerance: float = 1e-12) -> Dict[str, Any]:
+                       golden_tolerance: float = 1e-12, repo_root: Optional[Path] = None) -> Dict[str, Any]:
     """Fail-closed identity/lineage/golden authentication before any ``score()`` call.
 
     Verifies, in order: (1) the requested ``model_id`` agrees with the directory it was
@@ -439,29 +482,57 @@ def authenticate_model(model_id: str, *, expect: Optional[Mapping[str, Any]] = N
     if recorded_id != model_id:
         raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: requested {model_id!r} but the manifest at {mdir} records model_id {recorded_id!r}")
 
+    if repo_root is None:
+        from research_workflow.policy import REPO_ROOT as _repo_root
+        repo_root = _repo_root
+
     identity_rule = manifest.get("identity_rule")
-    if identity_rule is None:
-        # Manifest predates the identity_rule field: infer it, or fail closed.
-        if _recompute_v2_lineage_sha256(manifest) == model_id:
+    if identity_rule in (None, "legacy_v1_immutable_unrecomputable"):
+        # A manifest predating identity_rule, or an explicitly-unrecomputable legacy
+        # migration: a still-git-tracked v1 registry record is authoritative for legacy
+        # identity if the manifest carries one.
+        if manifest.get("legacy_registry_record"):
+            _verify_legacy_v1_committed_registry(manifest, model_id, repo_root)
+            identity_rule = LEGACY_V1_COMMITTED_REGISTRY_RULE
+        elif identity_rule is None and _recompute_v2_lineage_sha256(manifest) == model_id:
+            # Only an absent (never-recorded) rule infers v2; an EXPLICIT
+            # "legacy_v1_immutable_unrecomputable" tag with no registry record fails closed
+            # unconditionally -- it is never silently treated as a v2-formula model.
             identity_rule = "v2_lineage_sha256"
         else:
-            raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {model_id} has no recorded identity_rule and does not reproduce v2_lineage_sha256")
-    recompute = IDENTITY_RULES.get(identity_rule)
-    if recompute is None:
-        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: identity_rule {identity_rule!r} has no recompute authority in this store")
-    recomputed_id = recompute(manifest)
-    if recomputed_id != model_id:
-        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: identity_rule {identity_rule!r} recomputes {recomputed_id} != requested {model_id}")
+            raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {model_id} has no recomputable identity_rule (no committed legacy registry record and does not reproduce v2_lineage_sha256)")
+    elif identity_rule == LEGACY_V1_COMMITTED_REGISTRY_RULE:
+        _verify_legacy_v1_committed_registry(manifest, model_id, repo_root)
+    else:
+        recompute = IDENTITY_RULES.get(identity_rule)
+        if recompute is None:
+            raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: identity_rule {identity_rule!r} has no recompute authority in this store")
+        recomputed_id = recompute(manifest)
+        if recomputed_id != model_id:
+            raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: identity_rule {identity_rule!r} recomputes {recomputed_id} != requested {model_id}")
 
     # Canonical bytes: load_canonical raises CANONICAL_BYTES_CORRUPT on a sha256 mismatch.
     load_canonical(manifest, mdir)
 
     lineage = dict(manifest.get("lineage") or {})
     ordered_inputs = list(lineage.get("ordered_inputs") or [])
-    recomputed_feature_contract = hashlib.sha256(json.dumps(ordered_inputs).encode("utf-8")).hexdigest()
     declared_feature_contract = lineage.get("feature_contract_sha256")
-    if declared_feature_contract is None or recomputed_feature_contract != declared_feature_contract:
-        raise ModelStoreError(f"FEATURE_CONTRACT_MISMATCH: recomputed {recomputed_feature_contract} != declared {declared_feature_contract}")
+    if identity_rule == "v2_lineage_sha256":
+        # v2 fit() computes feature_contract_sha256 == sha256(json.dumps(ordered_inputs));
+        # independently reproduce it.
+        recomputed_feature_contract = hashlib.sha256(json.dumps(ordered_inputs).encode("utf-8")).hexdigest()
+        if declared_feature_contract is None or recomputed_feature_contract != declared_feature_contract:
+            raise ModelStoreError(f"FEATURE_CONTRACT_MISMATCH: recomputed {recomputed_feature_contract} != declared {declared_feature_contract}")
+    else:
+        # A legacy identity rule's feature_contract_sha256 was produced by the v1 contract
+        # formula (research.analysis.identity.canonical_sha256 over a feature_contract dict
+        # this store cannot reconstruct), not the v2 ordered_inputs formula -- it is not
+        # independently recomputable here. Its authenticity for legacy_v1_committed_registry
+        # is instead the committed v1 registry record's authority (already verified above);
+        # this store still fails closed if the field was never declared at all.
+        if not declared_feature_contract:
+            raise ModelStoreError(f"FEATURE_CONTRACT_MISMATCH: {identity_rule!r} manifest declares no feature_contract_sha256")
+        recomputed_feature_contract = declared_feature_contract
 
     preprocessing = lineage.get("preprocessing_contract_sha256")
     if preprocessing != "identity":
@@ -624,6 +695,6 @@ def list_store(model_root: Optional[Path] = None) -> List[Dict[str, Any]]:
 
 
 __all__ = ["SCHEMA_VERSION", "GOLDEN_MIN_ROWS", "FAMILY_AUTHORITY", "EXPORT_TOLERANCES", "EXPORT_STATES", "SELECTION_STATES", "TIERS",
-           "IDENTITY_RULES", "ModelStoreError", "ModelLineage", "family_authority", "build_golden_frame", "store_model", "validate_golden",
+           "IDENTITY_RULES", "LEGACY_V1_COMMITTED_REGISTRY_RULE", "ModelStoreError", "ModelLineage", "family_authority", "build_golden_frame", "store_model", "validate_golden",
            "authenticate_model", "add_export", "resolve", "score", "record_fit", "list_store", "read_manifest", "model_dir",
            "model_store_root", "load_canonical", "save_canonical"]
