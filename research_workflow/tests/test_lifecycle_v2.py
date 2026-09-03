@@ -109,6 +109,32 @@ def test_controller_runs_a_fresh_v2_study_end_to_end(tmp_path, synthetic_bars, m
     assert card["STATUS"] == "OK" and card["state"] == "STUDY_CLOSED" and not card["actions_executed"]
     assert not list(study.glob("**/*.py")), "a v2 study carries no study Python"
 
+    # F1: every DELIVERABLES_BY_STAGE path the golden run produces actually exists on disk --
+    # deliverables_by_stage is built from research_workflow.lifecycle_v2.DELIVERABLES, the same
+    # constant analyze()/etc use to name their own output, so this cannot silently diverge again.
+    import re as _re
+    from research_workflow.audit_packets_v2 import deliverables_for_plan
+    from research_workflow.lifecycle_v2 import load_plan
+    plan = load_plan(study)
+    deliverables = deliverables_for_plan(plan)
+    years_by_stage = {"collection": (2029, 2030), "oos": (2031,)}
+
+    def _expand_braces(rel: str) -> list[str]:
+        m = _re.search(r"\{([^}]+)\}", rel)
+        if not m:
+            return [rel]
+        return [rel[: m.start()] + opt + rel[m.end() :] for opt in m.group(1).split(",")]
+
+    for stage, paths in deliverables.items():
+        for rel in paths:
+            if "<year>" in rel:
+                for year in years_by_stage[stage]:
+                    for expanded in _expand_braces(rel.replace("<year>", str(year))):
+                        assert (study / expanded).is_file(), f"deliverable missing for stage={stage}: {expanded}"
+            else:
+                for expanded in _expand_braces(rel):
+                    assert (study / expanded).is_file(), f"deliverable missing for stage={stage}: {expanded}"
+
 
 def test_controller_reports_typed_capability_gap(tmp_path, monkeypatch):
     from research_workflow.governed_controller_v2 import V2StudyController

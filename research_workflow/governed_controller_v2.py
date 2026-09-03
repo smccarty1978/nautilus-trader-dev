@@ -132,7 +132,12 @@ class V2StudyController(GovernedStudyController):
         plan = load_plan(self.study)
         common = {"study_id": self.study.name, "execution_composite": fp.get("execution_composite") or "", "dirty_paths": self._worktree()["dirty_paths"],
                   "test_summary": _read(self.work / "test_summary.json")}
-        packet = causal_packet(plan, **common) if audit_type == "causal" else contract_packet(plan, **common, seal=_read(self.study / "artifacts/preexec_audit_seal.json"))
+        if audit_type == "causal":
+            packet = causal_packet(plan, **common)
+        else:
+            py_files, py_exception = self.lifecycle._zero_study_python()
+            packet = contract_packet(plan, **common, seal=_read(self.study / "artifacts/preexec_audit_seal.json"),
+                                     study_python={"python_files": py_files, "exception": py_exception})
         path = self.work / f"audit_packet_{audit_type}.json"
         _json(path, packet)
         return path
@@ -204,6 +209,15 @@ class V2StudyController(GovernedStudyController):
         if through not in STAGE_ORDER:
             raise ValueError(f"unknown --through {through}")
         self._through = through
+        # --execute-authorized is the real execution gate: every stage after "seal" (smoke..close)
+        # is refused before the lock is even acquired unless options.execute is True. --inspect and
+        # --dry-run are read-only and are never gated.
+        if not (inspect or dry_run) and not self.options.execute and STAGE_ORDER.index(through) > STAGE_ORDER.index("seal"):
+            card = self._card(ControllerState.READY_TO_SEAL if "seal" in STAGE_ORDER else ControllerState.NEEDS_COMPILE, "seal",
+                              blocker=BlockerType.RUNTIME_FAILURE,
+                              reason=f"EXECUTION_NOT_AUTHORIZED: --through {through} runs a post-seal stage but --execute-authorized was not passed", last=None)
+            card["blocker_code"] = "EXECUTION_NOT_AUTHORIZED"
+            return card
         # STUDY_CLOSED is terminal and recognized before anything else: a valid closure is the authority
         try:
             from research_workflow.study_closure import load_study_closure

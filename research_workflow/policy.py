@@ -43,6 +43,32 @@ _HISTORICAL_AUTHORITY_MARKERS = (
     "artifacts/train_experiment_freeze.json",
 )
 
+# ZERO_STUDY_PYTHON (red-team packet F2): a normal Platform-V2 study commits no executable
+# Python at all -- the six-kind declarative grammar is the whole surface. Sanctioning an
+# exception is a PLATFORM code change (an entry here), never a study-side declaration;
+# study_id -> reason.
+STUDY_PYTHON_EXCEPTIONS: Dict[str, str] = {}
+
+_STUDY_PYTHON_IGNORED_DIRS = ("_work", "runs")
+
+
+def scan_study_python(study_dir: Path) -> List[str]:
+    """Every ``*.py``/``*.pyw``/``*.ipynb`` (case-insensitive extension) committed or
+    untracked under ``study_dir``, except ``_work/`` and ``runs/``. Returns paths relative
+    to ``study_dir`` as posix strings, sorted."""
+    study_dir = Path(study_dir).resolve()
+    found: set[str] = set()
+    if study_dir.is_dir():
+        for path in study_dir.rglob("*"):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(study_dir)
+            if rel.parts and rel.parts[0] in _STUDY_PYTHON_IGNORED_DIRS:
+                continue
+            if path.suffix.lower() in (".py", ".pyw", ".ipynb"):
+                found.add(rel.as_posix())
+    return sorted(found)
+
 
 class OldRuntimePolicyError(RuntimeError):
     pass
@@ -179,4 +205,4 @@ def assert_old_runtime_allowed(study_dir: Path, repo_root: Optional[Path] = None
 
 
 __all__ = ["OLD_RUNTIME_POLICY", "POLICY_RECORDED_AT", "OldRuntimePolicyError", "assert_old_runtime_allowed",
-           "historical_authority", "verify_historical_authority"]
+           "historical_authority", "verify_historical_authority", "STUDY_PYTHON_EXCEPTIONS", "scan_study_python"]

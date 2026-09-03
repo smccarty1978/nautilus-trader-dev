@@ -24,6 +24,9 @@ research question
   -> python scripts/research.py study run --study studies/<id> --through <stage> --execute-authorized
        compile -> prepare -> readiness -> preflight -> tests -> causal_audit -> contract_audit -> seal
        -> smoke -> collection -> reconcile -> merge -> fit -> freeze -> oos -> analyze -> close
+       (`--execute-authorized` is a real gate: every stage after `seal` -- smoke through close --
+       is BLOCKED with `EXECUTION_NOT_AUTHORIZED` unless the flag is present; `--through seal` or
+       earlier never needs it, and `--inspect`/`--dry-run` are unaffected)
   -> runtime host (research_workflow/host) replays the plan causally; the sink writes columnar frames
   -> collection frames -> fit / score (model store) -> freeze -> authorized OOS -> analysis
   -> one causal auditor + one contract auditor read compact packets; `research audit ingest` binds their reports

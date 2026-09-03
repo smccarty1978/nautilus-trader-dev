@@ -32,6 +32,34 @@ KEY = ("observation_ts", "regime_start_ns", "checkpoint_index")
 PLATFORM_TESTS = ("research_workflow/tests/test_golden_fixture.py", "research_workflow/tests/test_grammar_v2.py",
                   "research_workflow/tests/test_host_core.py")
 
+# Single source of truth for the deliverable each stage writes -- research_workflow.audit_packets_v2
+# builds DELIVERABLES_BY_STAGE from this constant so the audit packet cannot silently name a
+# different filename than the one the lifecycle actually writes (red-team packet F1). Values are
+# paths relative to the study directory; a "<year>" placeholder marks a per-partition path.
+DELIVERABLES = {
+    "compile": ["compiled_plan.json"],
+    "prepare": ["audit/frozen_execution_manifest.json", "artifacts/experiment_authorization.json"],
+    "readiness": ["audit/readiness.json"],
+    "preflight": ["audit/preflight.json"],
+    "tests": ["_work/controller/test_summary.json"],
+    "causal_audit": ["audit/status.json"],
+    "contract_audit": ["audit/contract_status.json"],
+    "seal": ["artifacts/preexec_audit_seal.json"],
+    "smoke": ["artifacts/smoke_acceptance.json"],
+    "collection": ["_work/controller/partitions/train/<year>/{candidates,observations}.parquet"],
+    "reconcile": ["_work/controller/reconcile.json"],
+    "merge": ["_work/controller/merged/{candidates,observations}.parquet", "_work/controller/merged/identity.json"],
+    "fit": ["artifacts/experiment_models.json"],
+    "freeze": ["artifacts/train_experiment_freeze.json"],
+    "oos": ["_work/controller/partitions/oos/<year>/{candidates,observations}.parquet"],
+    "analyze": ["artifacts/experiment_analysis_v2.json"],
+    "close": ["artifacts/study_closure.json"],
+}
+# fit additionally writes artifacts/tuning_trials.json (+ tuning_optuna.db for the optuna sampler)
+# when the plan declares a model.search_space; not a fixed filename, so callers that need it
+# should check plan["model"].get("search_space") and add it themselves (see audit_packets_v2).
+FIT_TUNING_DELIVERABLES = ["artifacts/tuning_trials.json"]
+
 
 class CapabilityGapBlocked(RuntimeError):
     def __init__(self, report: Dict[str, Any]) -> None:
@@ -202,6 +230,21 @@ class V2Lifecycle:
         authorization = _read(auth_path) if auth_path.is_file() else None
         return authorized_years(plan, period, requested, authorization=authorization)
 
+    def _require_execute(self, stage: str) -> None:
+        """Guard so a direct programmatic caller of a post-seal leaf (bypassing
+        V2StudyController.run's EXECUTION_NOT_AUTHORIZED gate) cannot execute without
+        --execute-authorized either."""
+        if not self.opts.execute:
+            raise LifecycleV2Error(f"EXECUTION_NOT_AUTHORIZED: {stage} requires --execute-authorized")
+
+    def _zero_study_python(self) -> tuple[List[str], Optional[str]]:
+        """R10 / ZERO_STUDY_PYTHON: any committed study-local executable Python (or notebook)
+        is a reject unless the study id has a platform-sanctioned exception. Returns
+        (python_files, exception_reason_or_None)."""
+        from research_workflow.policy import STUDY_PYTHON_EXCEPTIONS, scan_study_python
+        py_files = scan_study_python(self.study)
+        return py_files, (STUDY_PYTHON_EXCEPTIONS.get(self.study.name) if py_files else None)
+
     def _seal_identities(self) -> Dict[str, str]:
         seal = _read(self.artifacts / "preexec_audit_seal.json")
         if not seal.get("composite_seal_hash"):
@@ -278,6 +321,9 @@ class V2Lifecycle:
         current = self.current_composite()
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
         checks.append({"id": "R9_closure_current", "passed": bool(current and current == frozen), "detail": f"current={str(current)[:12]} frozen={str(frozen)[:12]}"})
+        py_files, py_exception = self._zero_study_python()
+        checks.append({"id": "R10_zero_study_python", "passed": not py_files or py_exception is not None,
+                       "detail": json.dumps({"python_files": py_files, "exception": py_exception})})
         overall = all(c["passed"] for c in checks)
         path = _write(self.audit / "readiness.json", {"schema_version": 2, "overall_status": "PASS" if overall else "FAIL", "checks": checks,
                                                        "execution_composite_sha256": frozen, "plan_sha256": plan["plan_sha256"], "generated_at_utc": _now()})
@@ -299,6 +345,8 @@ class V2Lifecycle:
         outcomes["FORWARD_OUTCOME_GUARD"] = "PASSED" if not leaked else "FAILED"
         model = plan.get("model") or {}
         outcomes["CHRONOLOGY_ROLE_TABLE"] = "PASSED" if (not model or (model.get("validation") or {}).get("year_role_table") is not None or model.get("validation") is None) else "FAILED"
+        py_files, py_exception = self._zero_study_python()
+        outcomes["ZERO_STUDY_PYTHON"] = "PASSED" if (not py_files or py_exception is not None) else f"FAILED: {py_files}"
         try:
             from research_workflow.host.predicate_eval import compile_predicate
             ef = {t["id"]: set(t.get("epoch_fields") or ()) for t in plan["trackers"]}
@@ -319,7 +367,8 @@ class V2Lifecycle:
         ready = all(v == "PASSED" for v in outcomes.values())
         path = _write(self.audit / "preflight.json", {"schema_version": 2, "status": "CLEAR" if ready else "BLOCKED", "audit_ready": ready,
                                                        "check_outcomes": outcomes, "required_checks": list(outcomes), "execution_composite_sha256": frozen,
-                                                       "plan_sha256": plan["plan_sha256"], "leaked_outcome_columns": leaked, "generated_at_utc": _now()})
+                                                       "plan_sha256": plan["plan_sha256"], "leaked_outcome_columns": leaked,
+                                                       "study_python": {"python_files": py_files, "exception": py_exception}, "generated_at_utc": _now()})
         if not ready:
             raise LifecycleV2Error("PREFLIGHT_BLOCKED: " + ", ".join(k for k, v in outcomes.items() if v != "PASSED"))
         return {"status": "PASS", "outputs": [str(path)]}
@@ -384,6 +433,7 @@ class V2Lifecycle:
         return manifest
 
     def smoke(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("smoke")
         plan = load_plan(self.study)
         ids = self._seal_identities()
         date = self.opts.smoke_date or ((plan["chronology"].get("authorized_dates") or [None])[0])
@@ -466,9 +516,11 @@ class V2Lifecycle:
         return {"status": "PASS", "outputs": outputs, "partitions": partitions}
 
     def collection(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("collection")
         return self._collect_period("train")
 
     def reconcile(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("reconcile")
         import pandas as pd
         plan = load_plan(self.study)
         base = self.work / "partitions" / "train"
@@ -505,6 +557,7 @@ class V2Lifecycle:
         return {"status": "PASS", "outputs": [str(path)]}
 
     def merge(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("merge")
         import pandas as pd
         from research.analysis.modeling import frame_content_identity
         plan = load_plan(self.study)
@@ -534,6 +587,7 @@ class V2Lifecycle:
         return frame, label
 
     def fit(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("fit")
         plan = load_plan(self.study)
         model = plan.get("model")
         if not model:
@@ -669,6 +723,7 @@ class V2Lifecycle:
         return {"status": "PASS", "outputs": [str(path)]}
 
     def freeze(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("freeze")
         from research_workflow.experiment import write_train_freeze
         plan = load_plan(self.study)
         models = _read(self.artifacts / "experiment_models.json")
@@ -683,6 +738,7 @@ class V2Lifecycle:
         return {"status": "PASS", "outputs": [str(path)]}
 
     def oos(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("oos")
         from research_workflow.experiment import assert_oos_open
         assert_oos_open(self.study)
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
@@ -691,6 +747,7 @@ class V2Lifecycle:
         return self._collect_period("oos")
 
     def analyze(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("analyze")
         import pandas as pd
         from research_workflow.experiment import assert_oos_open
         assert_oos_open(self.study)
@@ -716,11 +773,13 @@ class V2Lifecycle:
                                       "pr_auc": pr_auc(binary[label], s).to_dict().get("value"), "brier": brier(binary[label], s).to_dict().get("value")}
             summary["train_metrics"] = models.get("metrics")
             summary["model_authentication"] = {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}
-        path = _write(self.artifacts / "experiment_analysis_v2.json", {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
+        analyze_name = Path(DELIVERABLES["analyze"][0]).name
+        path = _write(self.artifacts / analyze_name, {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
                                                                         "oos_years": list(years), "authority": "plan.chronology.dev", **summary, "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(path)]}
 
     def close(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("close")
         closure = self.opts.closure or {}
         if not closure.get("outcome") or not closure.get("terminal_decision"):
             raise LifecycleV2Error("CLOSURE_DECISION_REQUIRED: --closure-outcome and --closure-decision")
