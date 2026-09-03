@@ -1,0 +1,27 @@
+[
+ {
+  "case": "N5a out-of-process partition child (`-m research_workflow.lifecycle_v2 partition`) forwards model_root",
+  "outcome": "child V2Options construction: ['opts = V2Options(studies_root=Path(ns.studies_root) if ns.studies_root else None)']; --model-root flag present: False",
+  "verdict": "BYPASSED"
+ },
+ {
+  "case": "N5b every model-store call inside lifecycle_v2 forwards opts.model_root",
+  "outcome": "call sites by function: {\"fit\": [{\"call\": \"store_model\", \"forwards_model_root\": true, \"line\": 686}], \"_score_models\": [{\"call\": \"authenticate_model\", \"forwards_model_root\": true, \"line\": 718}, {\"call\": \"read_manifest\", \"forwards_model_root\": true, \"line\": 719}, {\"call\": \"score\", \"forwards_model_root\": true, \"line\": 736}], \"analyze\": [{\"call\": \"authenticate_model\", \"forwards_model_root\": true, \"lin",
+  "verdict": "BLOCKED"
+ },
+ {
+  "case": "N5c run_partition (executed in the child with model_root=None) touches no model-store API",
+  "outcome": "model-store names appearing in run_partition: []",
+  "verdict": "BLOCKED"
+ },
+ {
+  "case": "N5d scripts/research.py exposes --model-root for v2 runs",
+  "outcome": "'model_root' in scripts/research.py: False (absent => production runs keep using the configured durable store, which is the intended default)",
+  "verdict": "NOTE"
+ },
+ {
+  "case": "N5e the operator's real model store is unchanged by this audit pass",
+  "outcome": "root=C:\\Users\\Scott McCarty\\.nt_research\\models before=476 after=476 added=[] removed=[]",
+  "verdict": "BLOCKED"
+ }
+]

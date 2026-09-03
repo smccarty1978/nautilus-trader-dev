@@ -1,0 +1,151 @@
+{
+ "rows": [
+  {
+   "stage": "compile",
+   "template": "compiled_plan.json",
+   "path": "compiled_plan.json",
+   "exists": true
+  },
+  {
+   "stage": "prepare",
+   "template": "audit/frozen_execution_manifest.json",
+   "path": "audit/frozen_execution_manifest.json",
+   "exists": true
+  },
+  {
+   "stage": "prepare",
+   "template": "artifacts/experiment_authorization.json",
+   "path": "artifacts/experiment_authorization.json",
+   "exists": true
+  },
+  {
+   "stage": "readiness",
+   "template": "audit/readiness.json",
+   "path": "audit/readiness.json",
+   "exists": true
+  },
+  {
+   "stage": "preflight",
+   "template": "audit/preflight.json",
+   "path": "audit/preflight.json",
+   "exists": true
+  },
+  {
+   "stage": "tests",
+   "template": "_work/controller/test_summary.json",
+   "path": "_work/controller/test_summary.json",
+   "exists": true
+  },
+  {
+   "stage": "causal_audit",
+   "template": "audit/status.json",
+   "path": "audit/status.json",
+   "exists": true
+  },
+  {
+   "stage": "contract_audit",
+   "template": "audit/contract_status.json",
+   "path": "audit/contract_status.json",
+   "exists": true
+  },
+  {
+   "stage": "seal",
+   "template": "artifacts/preexec_audit_seal.json",
+   "path": "artifacts/preexec_audit_seal.json",
+   "exists": true
+  },
+  {
+   "stage": "smoke",
+   "template": "artifacts/smoke_acceptance.json",
+   "path": "artifacts/smoke_acceptance.json",
+   "exists": true
+  },
+  {
+   "stage": "collection",
+   "template": "_work/controller/partitions/train/<year>/{candidates,observations}.parquet",
+   "path": "_work/controller/partitions/train/2029/candidates.parquet",
+   "exists": true
+  },
+  {
+   "stage": "collection",
+   "template": "_work/controller/partitions/train/<year>/{candidates,observations}.parquet",
+   "path": "_work/controller/partitions/train/2030/candidates.parquet",
+   "exists": true
+  },
+  {
+   "stage": "collection",
+   "template": "_work/controller/partitions/train/<year>/{candidates,observations}.parquet",
+   "path": "_work/controller/partitions/train/2029/observations.parquet",
+   "exists": true
+  },
+  {
+   "stage": "collection",
+   "template": "_work/controller/partitions/train/<year>/{candidates,observations}.parquet",
+   "path": "_work/controller/partitions/train/2030/observations.parquet",
+   "exists": true
+  },
+  {
+   "stage": "reconcile",
+   "template": "_work/controller/reconcile.json",
+   "path": "_work/controller/reconcile.json",
+   "exists": true
+  },
+  {
+   "stage": "merge",
+   "template": "_work/controller/merged/{candidates,observations}.parquet",
+   "path": "_work/controller/merged/candidates.parquet",
+   "exists": true
+  },
+  {
+   "stage": "merge",
+   "template": "_work/controller/merged/{candidates,observations}.parquet",
+   "path": "_work/controller/merged/observations.parquet",
+   "exists": true
+  },
+  {
+   "stage": "merge",
+   "template": "_work/controller/merged/identity.json",
+   "path": "_work/controller/merged/identity.json",
+   "exists": true
+  },
+  {
+   "stage": "fit",
+   "template": "artifacts/experiment_models.json",
+   "path": "artifacts/experiment_models.json",
+   "exists": true
+  },
+  {
+   "stage": "freeze",
+   "template": "artifacts/train_experiment_freeze.json",
+   "path": "artifacts/train_experiment_freeze.json",
+   "exists": true
+  },
+  {
+   "stage": "oos",
+   "template": "_work/controller/partitions/oos/<year>/{candidates,observations}.parquet",
+   "path": "_work/controller/partitions/oos/2031/candidates.parquet",
+   "exists": true
+  },
+  {
+   "stage": "oos",
+   "template": "_work/controller/partitions/oos/<year>/{candidates,observations}.parquet",
+   "path": "_work/controller/partitions/oos/2031/observations.parquet",
+   "exists": true
+  },
+  {
+   "stage": "analyze",
+   "template": "artifacts/experiment_analysis_v2.json",
+   "path": "artifacts/experiment_analysis_v2.json",
+   "exists": true
+  },
+  {
+   "stage": "close",
+   "template": "artifacts/study_closure.json",
+   "path": "artifacts/study_closure.json",
+   "exists": true
+  }
+ ],
+ "missing": [],
+ "verdict": "BLOCKED",
+ "study": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmpn06xfk80\\studies\\adv_e2e"
+}

@@ -1,0 +1,36 @@
+{
+ "results": [
+  {
+   "case": "N2-pre V2Options.model_root keeps the fit out of the operator's real store",
+   "outcome": "model ac9c4cd3d257fa02 in tmp store: True; in REAL store: False",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N2a governed analyze() (OOS scoring) after a post-freeze estimator substitution (default expect: study_id only)",
+   "outcome": "COMPLETED; metrics_changed=False before={\"brier\": null, \"n\": 0, \"pr_auc\": null, \"roc_auc\": null} after={\"brier\": null, \"n\": 0, \"pr_auc\": null, \"roc_auc\": null} auth_canonical=1ee9da829e0ecd2c",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "N2b TRAIN freeze records the pre-substitution canonical sha (durable evidence exists)",
+   "outcome": "freeze.model_canonical_sha256={'primary': '47a27aae0d9642251ba6dc215f887d056049044854d00cf5509c03d25d8fe38f'} current_store_canonical=1ee9da829e0ecd2c...",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N2c authenticate_model with expect.canonical_sha256 = the pre-substitution sha",
+   "outcome": "ModelStoreError: CANONICAL_SHA_MISMATCH: expected canonical_sha256='47a27aae0d9642251ba6dc215f887d056049044854d00cf5509c03d25d8fe38f' but manifest records '1ee9da829e0ecd2c1b755ee4dd57d53476cc8ca1a4b2972873d965d277e8e1dc'",
+   "verdict": "BLOCKED"
+  }
+ ],
+ "tmp": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmphjik0znh",
+ "oos_before": {
+  "brier": null,
+  "n": 0,
+  "pr_auc": null,
+  "roc_auc": null
+ },
+ "canonical_before": "47a27aae0d9642251ba6dc215f887d056049044854d00cf5509c03d25d8fe38f",
+ "canonical_after": "1ee9da829e0ecd2c1b755ee4dd57d53476cc8ca1a4b2972873d965d277e8e1dc",
+ "freeze_model_canonical_sha256": {
+  "primary": "47a27aae0d9642251ba6dc215f887d056049044854d00cf5509c03d25d8fe38f"
+ }
+}
