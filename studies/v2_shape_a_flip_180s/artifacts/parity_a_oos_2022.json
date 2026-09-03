@@ -1,0 +1,55 @@
+{
+  "study": "v2_shape_a_flip_180s",
+  "shape": "a",
+  "partition": "oos",
+  "year": 2022,
+  "rows": {
+    "runtime_candidates": 475529,
+    "reference_candidates": 475529,
+    "runtime_observations": 475529,
+    "reference_observations": 475529
+  },
+  "candidates": {
+    "passed": true,
+    "reference_rows": 475529,
+    "runtime_rows": 475529,
+    "common_rows": 475529,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 18,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "observations": {
+    "passed": true,
+    "reference_rows": 475529,
+    "runtime_rows": 475529,
+    "common_rows": 475529,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 10,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "explained_divergences": null,
+  "passed": true,
+  "historical_study_modified": false
+}

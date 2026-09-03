@@ -1,0 +1,15 @@
+{
+  "bound_evidence": {
+    "preexec_seal_artifact_sha256": "76fffd64b618d131f552511f3f6a46c08922056ee026c7834aba4fd3e62a3598",
+    "preexec_seal_composite_sha256": "878126145d56fc996c607358665ea462d7c7f304ca3ee67d5fff2285adde988a",
+    "train_freeze_sha256": "2b83186a74bb77e98f7d5b2592434d7f84d7dd68f6f52ec300b0d76ae0cf9d6d"
+  },
+  "closed_at_utc": "2026-09-02T20:43:52.164062+00:00",
+  "outcome": "PARITY_PASS: 2021 TRAIN 453768/453768 candidates and observations exact (18+10 cols); 2022 OOS 475529/475529 exact; controller-trained lightgbm OOS ROC-AUC 0.684",
+  "plan_sha256": "c291d96614549145e3295d3bb99c43b2275ffc34d75279cda52cc1154033093a",
+  "platform": "v2",
+  "schema_version": 1,
+  "status": "CLOSED",
+  "study_id": "v2_shape_a_flip_180s",
+  "terminal_decision": "PLATFORM_V2_SHAPE_A_PROVEN: checkpoint/classification study created, run, fitted, frozen, OOS-scored and closed by the controller with zero study Python"
+}

@@ -1,0 +1,25 @@
+{
+  "contract": "label",
+  "dispositions": {
+    "CENSORED": 3003,
+    "LABELED_NEGATIVE": 396263,
+    "LABELED_POSITIVE": 76263
+  },
+  "generated_at_utc": "2026-09-02T20:43:09.105185+00:00",
+  "oos_metrics": {
+    "brier": 0.12743993396360057,
+    "n": 472526,
+    "pr_auc": 0.2837433596501728,
+    "roc_auc": 0.6840183909705739
+  },
+  "oos_years": [
+    2022
+  ],
+  "plan_sha256": "c291d96614549145e3295d3bb99c43b2275ffc34d75279cda52cc1154033093a",
+  "rows": 475529,
+  "schema_version": 2,
+  "train_metrics": {
+    "final_validation": null,
+    "folds": []
+  }
+}
