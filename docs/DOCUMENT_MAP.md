@@ -23,6 +23,8 @@ some are cited from git history and audit trails. **They are never a source of i
 
 ## AUTHORITATIVE
 
+- `WORKFLOW.md` (root) is the operator manual for Platform V2 and the first document to read; `docs/QUICKSTART.md`, `docs/RESEARCH_YAML_REFERENCE.md` (generated), `docs/RESEARCH_DISCUSSION_TO_YAML.md` and `docs/AI_AGENTS.md` are its companions (2026-09-02).
+
 - `docs/RESEARCH_WORKFLOW.md` §21 and `docs/GOVERNED_STUDY_CONTROLLER.md` (Platform V2 section) describe the declarative V2 research flow (2026-09-02). Older flow descriptions in §3/§7 remain authoritative for sealed historical studies only.
 
 | Document | Scope |

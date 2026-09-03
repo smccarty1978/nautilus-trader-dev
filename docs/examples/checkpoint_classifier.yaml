@@ -1,0 +1,55 @@
+# EXAMPLE 1 -- minimal checkpoint / classifier study (compiles as-is; see research_workflow/tests/test_docs_v2.py).
+# Every 5 s inside an established 1m regime, snapshot causal features at T and ask whether the prevailing
+# 1m regime flips within 180 s. Zero study Python: every line is a registered primitive.
+study:
+  id: example_checkpoint_classifier
+  tier: 2
+  question: "Does the causal state at T predict a prevailing 1m regime flip within 180s?"
+streams:
+  - {dataset: NQ_1S_V2, timeframes: [1s, 1m]}          # 1s = execution stream (epochs); 1m = context stream (strictly before T)
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, max_age: 1800s, index_column: checkpoint_index}
+  qualify: >
+    excursion.frozen_atr > 0
+    and regime_1m.age_s >= 120s
+    and excursion.mfe_atr >= 1.0
+    and features.structural_snapshot_ready
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+features:
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior}     # set-expansion: two columns
+    - {feature: rolling_giveback_atr, window: 300s, update_every: 1s}
+    - {feature: arrival_velocity, input_timeframe: 1s, lookback: 20}
+    - {feature: ema_slope, ema_role: short, lookback: 20}
+  metadata:
+    regime_age_seconds: regime_1m.age_s
+    triggering_1s_ts_init: epoch.T
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    regime_transition_1m: {tracker: regime_1m, requires_atr: false}
+    snapshot:
+      atr: regime_1m.atr
+      family_a_atr: excursion.frozen_atr
+      episode_state: {prevailing_direction: regime_1m.dir}
+outcome:
+  kind: label
+  event: regime_1m.flipped            # label = 1 if the prevailing regime flips within the horizon
+  horizon: 180s
+  session_end: censor                 # horizon past the RTH close -> CENSORED SESSION_END
+  direction: regime_1m.dir
+chronology:
+  train: [2021]
+  dev: [2022]                         # opened only by the oos stage after the TRAIN freeze
+  prohibited: [2023, 2024, 2025, 2026]
+  authorized_dates: ['2021-01-05']    # smoke day
+model:
+  family: lightgbm
+  params: {max_depth: 3, num_leaves: 7, learning_rate: 0.03, min_data_in_leaf: 100, n_estimators: 200, n_jobs: 1, deterministic: true, verbosity: -1, random_state: 42}
+  validation: {protocol: model_selection.random, tuning_years: [2021], final_train_validation_years: []}

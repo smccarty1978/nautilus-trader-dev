@@ -8,6 +8,9 @@ capability_tier: balanced_coding
 maxTurns: 40
 ---
 
+> STATUS: LEGACY (v1 studies only). Platform V2 studies are driven by the controller: `python scripts/run_governed_study.py --study studies/<id> --through <stage> --execute-authorized` (see WORKFLOW.md).
+
+
 # Research Executor
 
 You run a sealed study through the lifecycle exactly as written. You produce artifacts. You

@@ -1,0 +1,55 @@
+# EXAMPLE 3 -- multi-arm barrier race with explicit semantics (compiles as-is).
+# Three stop-loss arms race against a +1 ATR target in the FADE direction of the prevailing regime.
+# Every semantic decision the Shape C proof surfaced is declared here instead of living in a driver:
+# relation, ATR availability, horizon-end rule, same-bar collision, session censoring, expiry.
+study:
+  id: example_multi_arm_outcome
+  tier: 2
+  question: "Does causal state at T predict +1.00 ATR before -0.50/-1.00/-1.50 ATR within 300s when fading the prevailing regime?"
+streams:
+  - {dataset: NQ_1S_V2, timeframes: [1s, 1m]}
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, max_age: 1800s, index_column: checkpoint_index}
+  qualify: "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and features.structural_snapshot_ready"
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+features:
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: rolling_current_progress_atr, window: 300s, update_every: 1s}
+    - {feature: arrival_acceleration, input_timeframe: 1s, short_lookback: 20}
+  metadata: {regime_age_seconds: regime_1m.age_s, triggering_1s_ts_init: epoch.T}
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    regime_transition_1m: {tracker: regime_1m, requires_atr: false}
+    snapshot: {atr: regime_1m.atr, family_a_atr: excursion.frozen_atr, episode_state: {prevailing_direction: regime_1m.dir}}
+outcome:
+  kind: label
+  entry_reference: next_bar_open
+  direction: regime_1m.dir
+  relation: fade                          # barriers race AGAINST the prevailing direction
+  atr: regime_1m.atr
+  atr_availability: through_decision_ts   # the 1m bar closing exactly at T is applied before the ATR is frozen
+  horizon: 300s
+  horizon_end_rule: first_bar_at_or_after # first bar at/after the horizon end still evaluated (session-bound)
+  same_bar_rule: ambiguous_censor
+  session_end: censor
+  barrier:
+    primary: barrier_tp_1_0_sl_1_0        # the primary arm supplies label_column
+    expiry: censor                        # TIMEOUT censors; 'negative' would label expiry as 0
+    arms:
+      - {id: barrier_tp_1_0_sl_0_5, favorable_atr: 1.0, adverse_atr: 0.5, prefix: target_tp1_sl0_5}
+      - {id: barrier_tp_1_0_sl_1_0, favorable_atr: 1.0, adverse_atr: 1.0, prefix: target_tp1_sl1_0}
+      - {id: barrier_tp_1_0_sl_1_5, favorable_atr: 1.0, adverse_atr: 1.5, prefix: target_tp1_sl1_5}
+chronology:
+  train: [2021]
+  dev: [2022]
+  prohibited: [2023, 2024, 2025, 2026]
+  authorized_dates: ['2021-01-05']
+model: none

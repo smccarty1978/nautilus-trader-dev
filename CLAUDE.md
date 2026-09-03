@@ -2,6 +2,8 @@
 
 **Read in this order:**
 
+0. `WORKFLOW.md` — the current way to work (Platform V2). Read it first; `docs/QUICKSTART.md`,
+   `docs/RESEARCH_YAML_REFERENCE.md`, `docs/RESEARCH_DISCUSSION_TO_YAML.md` and `docs/AI_AGENTS.md` hang off it.
 1. `AGENTS.md` — the shared agent core. Every rule there applies to you.
 2. `docs/RESEARCH_WORKFLOW.md` — the authoritative description of the system.
 3. This file — what Claude specifically is here to do, and what Claude specifically gets

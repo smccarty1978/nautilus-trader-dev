@@ -8,6 +8,9 @@ capability_tier: high_assurance
 maxTurns: 12
 ---
 
+> STATUS: LEGACY. Superseded by `research cap search/describe` and the compiler's typed CapabilityGap (see docs/AI_AGENTS.md). Kept for historical v1 intake only.
+
+
 # Capability Router
 
 Own semantic identity and architecture routing only. Consume deterministic facts

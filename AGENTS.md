@@ -2,6 +2,10 @@
 
 This is the **common core** every agent in this repository inherits, regardless of harness.
 
+- **Read `WORKFLOW.md` first.** It is the current way to work (Platform V2): new studies are declarative
+  `study.yaml` files run by the governed controller, with zero study Python; historical studies are
+  references, not templates; the old runtime is `LEGACY_ONLY_FOR_NEW_RESEARCH`. Agent roles: `docs/AI_AGENTS.md`.
+
 - **Claude** also reads `CLAUDE.md`.
 - **Codex** also reads `CODEX.md`.
 - **The authoritative description of the system is `docs/RESEARCH_WORKFLOW.md`.**

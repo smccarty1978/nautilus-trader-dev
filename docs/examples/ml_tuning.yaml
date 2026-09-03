@@ -1,0 +1,61 @@
+# EXAMPLE 4 -- ML with governed hyperparameter tuning (compiles as-is).
+# Tuning is TRAIN-only and walk-forward by construction: fit on 2021, validate on 2022 for every trial,
+# select by the primary metric, refit the selected configuration on both tuning years, freeze, and only
+# then open 2023 (dev) exactly once through the oos stage. The trial ledger is artifacts/tuning_trials.json.
+study:
+  id: example_ml_tuning
+  tier: 2
+  question: "Does a tuned LightGBM on the causal surface improve 1m-flip prediction over the baseline configuration?"
+streams:
+  - {dataset: NQ_1S_V2, timeframes: [1s, 1m]}
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, max_age: 1800s, index_column: checkpoint_index}
+  qualify: "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and features.structural_snapshot_ready"
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+features:
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: regime_mfe_atr,    over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: rolling_retention_ratio, window: 300s, update_every: 1s}
+    - {feature: rolling_giveback_atr,    window: 300s, update_every: 1s}
+    - {feature: arrival_velocity, input_timeframe: 1s, lookback: 20}
+    - {feature: ema_slope, ema_role: short, lookback: 20}
+  metadata: {regime_age_seconds: regime_1m.age_s, triggering_1s_ts_init: epoch.T}
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    regime_transition_1m: {tracker: regime_1m, requires_atr: false}
+    snapshot: {atr: regime_1m.atr, family_a_atr: excursion.frozen_atr, episode_state: {prevailing_direction: regime_1m.dir}}
+outcome:
+  kind: label
+  event: regime_1m.flipped
+  horizon: 180s
+  session_end: censor
+  direction: regime_1m.dir
+chronology:
+  train: [2021, 2022]
+  dev: [2023]
+  prohibited: [2024, 2025, 2026]
+  authorized_dates: ['2021-01-05']
+model:
+  family: lightgbm
+  params: {n_jobs: 1, deterministic: true, verbosity: -1, random_state: 42}      # fixed; everything searched is in search_space
+  search_space:
+    n_estimators: [100, 200, 400]
+    max_depth: {low: 2, high: 6, int: true}
+    num_leaves: [7, 15, 31]
+    learning_rate: {low: 0.01, high: 0.2, log: true}
+    min_data_in_leaf: [50, 100, 200]
+  validation:
+    protocol: model_selection.random          # or model_selection.optuna when the optuna package is installed
+    tuning_years: [2021, 2022]                # walk-forward fold: fit 2021 -> validate 2022
+    final_train_validation_years: []
+    max_trials: 24                            # bounded, unique configurations
+    random_seed: 42
+    primary_metric: roc_auc

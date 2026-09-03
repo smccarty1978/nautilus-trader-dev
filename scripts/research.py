@@ -196,7 +196,8 @@ def cmd_model_migrate(ns: argparse.Namespace) -> int:
     return _card({"report": str(out), **{k: report[k] for k in ("records", "migrated", "already_present", "tiers", "exports")}, "failed": len(report["failed"]), "first_failures": report["failed"][:3]}, ok=not report["failed"])
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
+    """The full CLI parser (importable for documentation tests)."""
     ap = argparse.ArgumentParser(prog="research", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="group", required=True)
 
@@ -235,7 +236,11 @@ def main(argv: list[str] | None = None) -> int:
 
     ws = sub.add_parser("ws").add_subparsers(dest="cmd", required=True)
     ws.add_parser("list").set_defaults(fn=cmd_ws_list)
+    return ap
 
+
+def main(argv: list[str] | None = None) -> int:
+    ap = build_parser()
     ns, extra = ap.parse_known_args(argv)
     if getattr(ns, "passthrough", False):
         return ns.fn(ns, extra)

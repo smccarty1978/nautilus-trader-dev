@@ -1,0 +1,43 @@
+# EXAMPLE 5 -- ILLUSTRATIVE REGISTRY-BLIND DRAFT (does NOT compile on purpose).
+# A chat model without repository access wrote this from a research discussion. Where it needs a capability
+# it does not know the id of, it wrote `unresolved:<semantic requirement>` instead of inventing a name.
+# `research study compile` returns typed MISSING_CAPABILITY gaps with the closest registered ids, which the
+# study owner resolves with `research cap search` / `research cap describe` and then recompiles.
+study:
+  id: example_registry_blind_draft
+  tier: 2
+  question: "Does a volume-imbalance surge at T predict a +1 ATR move before -1 ATR within 120s?"
+streams:
+  - {dataset: NQ_1S_V2, timeframes: [1s, 1m]}
+context:
+  regime_1m: {tracker: regime.dual_ema, timeframe: 1m}                       # known from the pasted registry excerpt
+  imbalance: {tracker: "unresolved: rolling 60s buy/sell volume imbalance from 1s bars", bars: 1s}   # UNRESOLVED binding
+population:
+  session: RTH
+  cadence: completed_1s
+  qualify: "regime_1m.dir != 0 and imbalance.value >= 0.6"
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+features:
+  instances:
+    - {feature: regime_efficiency, timeframe: 1m, context: prior}
+    - {feature: "unresolved: 60s volume imbalance ratio at T", window: 60s}     # UNRESOLVED binding
+  metadata: {triggering_1s_ts_init: epoch.T}
+outcome:
+  kind: label
+  entry_reference: next_bar_open
+  direction: regime_1m.dir
+  atr: regime_1m.atr
+  atr_availability: through_decision_ts
+  horizon: 120s
+  horizon_end_rule: strict
+  same_bar_rule: ambiguous_censor
+  session_end: censor
+  barrier: {favorable_atr: 1.0, adverse_atr: 1.0, expiry: censor}
+chronology:
+  train: [2021]
+  dev: [2022]
+  prohibited: [2023, 2024, 2025, 2026]
+  authorized_dates: ['2021-01-05']
+model: none

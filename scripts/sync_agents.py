@@ -76,6 +76,10 @@ CODEX_META: dict[str, dict[str, str]] = {
         "name": "capability_router",
         "approval_policy": "never",
     },
+    "results-triager": {
+        "name": "results_triager",
+        "approval_policy": "never",
+    },
 }
 
 # Codex agents with no Claude counterpart -- left untouched by this script.
