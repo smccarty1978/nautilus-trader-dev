@@ -422,6 +422,24 @@ def _recompute_legacy_v1_train_freeze_id(study_id: str, arm: str, fit_identity_s
     return canonical_sha256({"study_id": study_id, "arm": arm, "fit_identity_sha256": fit_identity_sha256, "freeze_sha256": freeze_sha256})
 
 
+def authoritative_freeze_bytes(repo_root: Path, freeze_path: Path) -> bytes:
+    """The ONE source of truth for a legacy TRAIN freeze's bytes: the git HEAD blob at
+    ``freeze_path`` (checkout-independent -- never the working-tree bytes, which on Windows
+    can carry CRLF line endings that a plain ``hashlib``/``read_text`` read would hash
+    differently from the committed blob). Both the migrator (``model_migration.
+    migrate_train_freeze_bundle``, which records ``legacy_registry_record.
+    train_freeze_sha256``) and the verifier (``_verify_legacy_v1_train_freeze``) MUST call
+    this same helper so the two can never diverge again. Raises ``ModelStoreError`` (not
+    ``OldRuntimePolicyError``, so both callers see one exception type) if the freeze is not
+    committed at HEAD or the working tree has drifted from that commit."""
+    from research_workflow.policy import OldRuntimePolicyError, require_committed_identical
+
+    try:
+        return require_committed_identical(repo_root, freeze_path, kind="TRAIN freeze")
+    except OldRuntimePolicyError as exc:
+        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {exc}")
+
+
 def _verify_legacy_v1_train_freeze(manifest: Mapping[str, Any], model_id: str, repo_root: Path) -> None:
     """Authenticate a Model-C-shaped legacy parent -- ONE joblib bundle of several arms
     fit directly by a v1 study, with NO per-model ``studies/model_registry/<model_id>.json``
@@ -445,7 +463,7 @@ def _verify_legacy_v1_train_freeze(manifest: Mapping[str, Any], model_id: str, r
     different arm can never collide with it.
     """
     from research.analysis.identity import canonical_sha256 as _canon
-    from research_workflow.policy import OldRuntimePolicyError, require_committed_identical, verify_historical_authority
+    from research_workflow.policy import OldRuntimePolicyError, verify_historical_authority
 
     lineage = manifest.get("lineage") or {}
     legacy = manifest.get("legacy_registry_record") or {}
@@ -468,10 +486,7 @@ def _verify_legacy_v1_train_freeze(manifest: Mapping[str, Any], model_id: str, r
             f"seal for study {study_id!r} (a freeze with no seal grants no authority): {exc}"
         )
     freeze_path = repo_root / freeze_rel
-    try:
-        freeze_blob = require_committed_identical(repo_root, freeze_path, kind="TRAIN freeze")
-    except OldRuntimePolicyError as exc:
-        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {exc}")
+    freeze_blob = authoritative_freeze_bytes(repo_root, freeze_path)
     if hashlib.sha256(freeze_blob).hexdigest() != freeze_sha_declared:
         raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: TRAIN freeze bytes sha256 != manifest-declared {freeze_sha_declared!r}")
     freeze = json.loads(freeze_blob.decode("utf-8"))

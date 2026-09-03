@@ -145,6 +145,21 @@ def committed_blob(repo_root: Path, rel_posix_path: str) -> Optional[bytes]:
     return r2.stdout
 
 
+def head_blob_git_sha(repo_root: Path, rel_posix_path: str) -> Optional[str]:
+    """The git blob object id (SHA-1) of ``rel_posix_path`` at HEAD, or ``None`` if not
+    committed there. Recorded alongside a ``sha256`` of the blob's bytes purely for audit
+    traceability (which commit's object vouched) -- never used as the identity hash itself."""
+    try:
+        r = subprocess.run(
+            ["git", "rev-parse", "--verify", "-q", f"HEAD:{rel_posix_path}"],
+            cwd=str(repo_root), capture_output=True, text=True,
+        )
+    except OSError:
+        return None
+    sha = r.stdout.strip()
+    return sha if r.returncode == 0 and sha else None
+
+
 def is_committed_identical(repo_root: Path, path: Path) -> bool:
     """True iff ``path`` exists at HEAD in ``repo_root`` AND the current working-tree bytes
     are byte-identical to that HEAD blob. False for untracked, staged-only, deleted-at-HEAD,
