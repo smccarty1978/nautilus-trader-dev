@@ -1,0 +1,1978 @@
+diff --git a/research_workflow/governed_controller_v2.py b/research_workflow/governed_controller_v2.py
+index b61b13e6..3cbff9c2 100644
+--- a/research_workflow/governed_controller_v2.py
++++ b/research_workflow/governed_controller_v2.py
+@@ -8,6 +8,7 @@ from datetime import datetime, timezone
+ 
+ import hashlib
+ import json
++import time
+ from pathlib import Path
+ from typing import Any, Optional
+ 
+@@ -131,35 +132,92 @@ class V2StudyController(GovernedStudyController):
+         plan = load_plan(self.study)
+         common = {"study_id": self.study.name, "execution_composite": fp.get("execution_composite") or "", "dirty_paths": self._worktree()["dirty_paths"],
+                   "test_summary": _read(self.work / "test_summary.json")}
+-        packet = causal_packet(plan, **common) if audit_type == "causal" else contract_packet(plan, **common, seal=_read(self.study / "artifacts/preexec_audit_seal.json"))
++        if audit_type == "causal":
++            packet = causal_packet(plan, **common)
++        else:
++            py_files, py_exception = self.lifecycle._zero_study_python()
++            packet = contract_packet(plan, **common, seal=_read(self.study / "artifacts/preexec_audit_seal.json"),
++                                     study_python={"python_files": py_files, "exception": py_exception})
+         path = self.work / f"audit_packet_{audit_type}.json"
+         _json(path, packet)
+         return path
+ 
++    def _check_writer_lease(self) -> dict[str, Any] | None:
++        """If the study's worktree carries a writer lease (research_workflow.workspace), a live
++        lease held by a different owner blocks the run; a lease held by the current owner is
++        renewed (kind="controller") so a long controller run keeps the workspace's ownership
++        durable past any short-lived CLI process that created it. A worktree with no lease (the
++        main checkout, an ad-hoc worktree) is unaffected."""
++        import os
++        try:
++            from research_workflow import workspace
++        except Exception:
++            return None
++        try:
++            wt_path = Path(self._worktree()["path"]).resolve()
++        except Exception:
++            return None
++        try:
++            leases = workspace.read_leases()
++        except Exception:
++            return None
++        lease = next((l for l in leases if Path(str(l.get("worktree", ""))).resolve() == wt_path), None)
++        if lease is None:
++            return None
++        owner = workspace.current_owner()
++        if lease.get("owner") != owner and lease.get("state") == "live":
++            card = self._card(ControllerState.NEEDS_COMPILE, "worktree", blocker=BlockerType.RUNTIME_FAILURE,
++                              reason=f"WRITER_LEASE_HELD_BY_OTHER: worktree {wt_path} is leased to {lease.get('owner')}", last=None)
++            card["blocker_code"] = "WRITER_LEASE_HELD_BY_OTHER"
++            return card
++        if lease.get("owner") == owner:
++            try:
++                workspace.renew_lease(wt_path, owner=owner, pid=os.getpid(), kind="controller")
++            except Exception:
++                pass
++        return None
++
+     def _acquire_run_lock(self) -> dict[str, Any] | None:
+-        """One live controller per study. A stale lock (dead pid) is replaced; a live one blocks."""
++        """One live controller per study. Acquisition is atomic (research_workflow.locks): a
++        stale lock (dead pid, or an unparseable lock older than 60s) is reclaimed; a live one
++        blocks. Returns None on success, or the live holder's info when blocked."""
+         import os
++        from research_workflow.locks import acquire_exclusive
+         lock = self.work / "run.lock"
+-        existing = _read(lock)
+-        pid = int(existing.get("pid") or 0)
+-        if pid and pid != os.getpid() and _pid_alive(pid):
+-            return {"pid": pid, "started_at_utc": existing.get("started_at_utc"), "through": existing.get("through")}
+-        _json(lock, {"pid": os.getpid(), "started_at_utc": datetime.now(timezone.utc).isoformat(), "through": self._through})
+-        return None
++        payload = {"pid": os.getpid(), "started_at_utc": datetime.now(timezone.utc).isoformat(),
++                   "through": self._through, "host": os.environ.get("COMPUTERNAME") or ""}
++
++        def is_stale(existing: dict | None, mtime: float) -> bool:
++            if not existing:
++                return (time.time() - mtime) > 60
++            pid = int(existing.get("pid") or 0)
++            return not (pid and pid != os.getpid() and _pid_alive(pid))
++
++        result = acquire_exclusive(lock, payload, is_stale=is_stale, max_attempts=3)
++        if result.acquired:
++            return None
++        existing = result.payload or {}
++        return {"pid": existing.get("pid"), "started_at_utc": existing.get("started_at_utc"), "through": existing.get("through")}
+ 
+     def _release_run_lock(self) -> None:
+         import os
++        from research_workflow.locks import release
+         lock = self.work / "run.lock"
+-        if int(_read(lock).get("pid") or 0) == os.getpid():
+-            try:
+-                lock.unlink()
+-            except OSError:
+-                pass
++        release(lock, owns=lambda existing: bool(existing) and int(existing.get("pid") or 0) == os.getpid())
+ 
+     def run(self, *, through: str = "seal", inspect: bool = False, dry_run: bool = False) -> dict[str, Any]:
+         if through not in STAGE_ORDER:
+             raise ValueError(f"unknown --through {through}")
+         self._through = through
++        # --execute-authorized is the real execution gate: every stage after "seal" (smoke..close)
++        # is refused before the lock is even acquired unless options.execute is True. --inspect and
++        # --dry-run are read-only and are never gated.
++        if not (inspect or dry_run) and not self.options.execute and STAGE_ORDER.index(through) > STAGE_ORDER.index("seal"):
++            card = self._card(ControllerState.READY_TO_SEAL if "seal" in STAGE_ORDER else ControllerState.NEEDS_COMPILE, "seal",
++                              blocker=BlockerType.RUNTIME_FAILURE,
++                              reason=f"EXECUTION_NOT_AUTHORIZED: --through {through} runs a post-seal stage but --execute-authorized was not passed", last=None)
++            card["blocker_code"] = "EXECUTION_NOT_AUTHORIZED"
++            return card
+         # STUDY_CLOSED is terminal and recognized before anything else: a valid closure is the authority
+         try:
+             from research_workflow.study_closure import load_study_closure
+@@ -171,6 +229,9 @@ class V2StudyController(GovernedStudyController):
+             card["closure"] = {k: closure.get(k) for k in ("status", "outcome", "terminal_decision", "closed_at_utc")}
+             return card
+         if not (inspect or dry_run):
++            lease_block = self._check_writer_lease()
++            if lease_block is not None:
++                return lease_block
+             live = self._acquire_run_lock()
+             if live:
+                 card = self._card(ControllerState.NEEDS_COMPILE, "worktree", blocker=BlockerType.RUNTIME_FAILURE,
+diff --git a/research_workflow/lifecycle_v2.py b/research_workflow/lifecycle_v2.py
+index 0725c320..5c8729d1 100644
+--- a/research_workflow/lifecycle_v2.py
++++ b/research_workflow/lifecycle_v2.py
+@@ -32,6 +32,34 @@ KEY = ("observation_ts", "regime_start_ns", "checkpoint_index")
+ PLATFORM_TESTS = ("research_workflow/tests/test_golden_fixture.py", "research_workflow/tests/test_grammar_v2.py",
+                   "research_workflow/tests/test_host_core.py")
+ 
++# Single source of truth for the deliverable each stage writes -- research_workflow.audit_packets_v2
++# builds DELIVERABLES_BY_STAGE from this constant so the audit packet cannot silently name a
++# different filename than the one the lifecycle actually writes (red-team packet F1). Values are
++# paths relative to the study directory; a "<year>" placeholder marks a per-partition path.
++DELIVERABLES = {
++    "compile": ["compiled_plan.json"],
++    "prepare": ["audit/frozen_execution_manifest.json", "artifacts/experiment_authorization.json"],
++    "readiness": ["audit/readiness.json"],
++    "preflight": ["audit/preflight.json"],
++    "tests": ["_work/controller/test_summary.json"],
++    "causal_audit": ["audit/status.json"],
++    "contract_audit": ["audit/contract_status.json"],
++    "seal": ["artifacts/preexec_audit_seal.json"],
++    "smoke": ["artifacts/smoke_acceptance.json"],
++    "collection": ["_work/controller/partitions/train/<year>/{candidates,observations}.parquet"],
++    "reconcile": ["_work/controller/reconcile.json"],
++    "merge": ["_work/controller/merged/{candidates,observations}.parquet", "_work/controller/merged/identity.json"],
++    "fit": ["artifacts/experiment_models.json"],
++    "freeze": ["artifacts/train_experiment_freeze.json"],
++    "oos": ["_work/controller/partitions/oos/<year>/{candidates,observations}.parquet"],
++    "analyze": ["artifacts/experiment_analysis_v2.json"],
++    "close": ["artifacts/study_closure.json"],
++}
++# fit additionally writes artifacts/tuning_trials.json (+ tuning_optuna.db for the optuna sampler)
++# when the plan declares a model.search_space; not a fixed filename, so callers that need it
++# should check plan["model"].get("search_space") and add it themselves (see audit_packets_v2).
++FIT_TUNING_DELIVERABLES = ["artifacts/tuning_trials.json"]
++
+ 
+ class CapabilityGapBlocked(RuntimeError):
+     def __init__(self, report: Dict[str, Any]) -> None:
+@@ -93,6 +121,56 @@ def load_plan(study: Path) -> Dict[str, Any]:
+     return plan
+ 
+ 
++def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequence[Any]], *,
++                      authorization: Optional[Mapping[str, Any]] = None) -> List[int]:
++    """Resolve the exact years a stage may execute against its authorized chronology role.
++
++    ``period`` is ``"train"`` (collection/reconcile/merge/fit) or ``"oos"``/``"dev"``
++    (oos/analyze; ``"dev"`` is an alias of ``"oos"``). The CLI may only NARROW the role's
++    declared years, never expand them, and a prohibited year is never executable under
++    either role. ``requested=None`` resolves to exactly the role's authorized years; an
++    empty requested list is rejected outright (it is not "everything").
++
++    If ``authorization`` (the parsed ``artifacts/experiment_authorization.json``) is
++    supplied, its recorded train_years/oos_years/prohibited_years for this role must agree
++    with the plan's chronology, or the authorization artifact is stale and the request is
++    rejected -- a plan re-compiled after PREPARE wrote the authorization artifact must not
++    silently execute against the old, unauthorized role years.
++    """
++    if period not in ("train", "oos", "dev"):
++        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: unknown period {period!r}")
++    role = "train" if period == "train" else "dev"
++    chron = plan.get("chronology") or {}
++    try:
++        role_years = sorted({int(y) for y in (chron.get(role) or [])})
++    except (TypeError, ValueError) as exc:
++        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: plan.chronology.{role} is malformed: {exc}")
++    prohibited = {int(y) for y in (chron.get("prohibited") or [])}
++
++    if authorization is not None:
++        auth_role_key = "train_years" if role == "train" else "oos_years"
++        auth_years = sorted({int(y) for y in (authorization.get(auth_role_key) or [])})
++        auth_prohibited = {int(y) for y in (authorization.get("prohibited_years") or [])}
++        if auth_years != role_years or auth_prohibited != prohibited:
++            raise LifecycleV2Error(
++                f"YEARS_NOT_AUTHORIZED: period={period} stale experiment_authorization.json "
++                f"(plan.chronology.{role}={role_years}/prohibited={sorted(prohibited)} != "
++                f"authorization.{auth_role_key}={auth_years}/prohibited_years={sorted(auth_prohibited)})")
++
++    if requested is None:
++        return role_years
++    try:
++        req = sorted({int(y) for y in requested})
++    except (TypeError, ValueError) as exc:
++        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} requested years malformed: {exc}")
++    if not req:
++        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} requested=[] authorized={role_years} prohibited={sorted(prohibited)}")
++    if any(y in prohibited for y in req) or any(y not in role_years for y in req):
++        raise LifecycleV2Error(
++            f"YEARS_NOT_AUTHORIZED: period={period} requested={req} authorized={role_years} prohibited={sorted(prohibited)}")
++    return req
++
++
+ @dataclass
+ class V2Options:
+     execute: bool = False
+@@ -147,6 +225,26 @@ class V2Lifecycle:
+             "train_freeze": _sha(self.artifacts / "train_experiment_freeze.json"),
+         }
+ 
++    def _authorized_years(self, plan: Dict[str, Any], period: str, requested: Optional[Sequence[Any]] = None) -> List[int]:
++        auth_path = self.artifacts / "experiment_authorization.json"
++        authorization = _read(auth_path) if auth_path.is_file() else None
++        return authorized_years(plan, period, requested, authorization=authorization)
++
++    def _require_execute(self, stage: str) -> None:
++        """Guard so a direct programmatic caller of a post-seal leaf (bypassing
++        V2StudyController.run's EXECUTION_NOT_AUTHORIZED gate) cannot execute without
++        --execute-authorized either."""
++        if not self.opts.execute:
++            raise LifecycleV2Error(f"EXECUTION_NOT_AUTHORIZED: {stage} requires --execute-authorized")
++
++    def _zero_study_python(self) -> tuple[List[str], Optional[str]]:
++        """R10 / ZERO_STUDY_PYTHON: any committed study-local executable Python (or notebook)
++        is a reject unless the study id has a platform-sanctioned exception. Returns
++        (python_files, exception_reason_or_None)."""
++        from research_workflow.policy import STUDY_PYTHON_EXCEPTIONS, scan_study_python
++        py_files = scan_study_python(self.study)
++        return py_files, (STUDY_PYTHON_EXCEPTIONS.get(self.study.name) if py_files else None)
++
+     def _seal_identities(self) -> Dict[str, str]:
+         seal = _read(self.artifacts / "preexec_audit_seal.json")
+         if not seal.get("composite_seal_hash"):
+@@ -182,7 +280,7 @@ class V2Lifecycle:
+         frozen = {"schema_version": 2, "hash_algorithm": plan["closure"]["hash_algorithm"], "authority": "platform_v2_plan_closure",
+                   "plan_sha256": plan["plan_sha256"], "spec_sha256": plan["spec_sha256"],
+                   "frozen_execution_composite_sha256": plan["closure"]["composite_sha256"], "files": plan["closure"]["files"],
+-                  "file_count": plan["closure"]["file_count"], "generated_at_utc": _now()}
++                  "file_count": plan["closure"]["file_count"], "stages": plan["closure"].get("stages") or {}, "generated_at_utc": _now()}
+         path = _write(self.audit / "frozen_execution_manifest.json", frozen)
+         return {"status": "PASS", "outputs": [str(path), str(auth_path)]}
+ 
+@@ -209,14 +307,23 @@ class V2Lifecycle:
+         unbound = [b for b in plan["binding_proof"] if not b.get("bound")]
+         checks.append({"id": "R5_binding_proof", "passed": not unbound, "detail": f"{len(plan['binding_proof'])} primitives bound; unbound={[b['id'] for b in unbound]}"})
+         try:
+-            from research_workflow.sessions import build_session_table
+-            build_session_table(dict(self.opts.session_table_spec or plan["session"]))
+-            checks.append({"id": "R3_session_table", "passed": True, "detail": json.dumps(plan["session"])})
++            from research_workflow.sessions import build_session_table, resolve_calendar_session_spec
++            raw_spec = dict(self.opts.session_table_spec or plan["session"])
++            resolved_spec = resolve_calendar_session_spec(raw_spec, self.repo_root)
++            build_session_table(resolved_spec)
++            detail = {"kind": resolved_spec.get("kind"), "session": resolved_spec.get("session"),
++                      "censor_session": resolved_spec.get("censor_session"), "reference_digest": resolved_spec.get("reference_digest"),
++                      "window_count": len(resolved_spec.get("rows") or []) if resolved_spec.get("kind") == "calendar" else None,
++                      "reference_row_counts": resolved_spec.get("reference_row_counts")}
++            checks.append({"id": "R3_session_table", "passed": True, "detail": json.dumps(detail, default=str)})
+         except Exception as exc:
+-            checks.append({"id": "R3_session_table", "passed": False, "detail": str(exc)})
++            checks.append({"id": "R3_session_table", "passed": False, "detail": f"{type(exc).__name__}: {exc}"})
+         current = self.current_composite()
+         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
+         checks.append({"id": "R9_closure_current", "passed": bool(current and current == frozen), "detail": f"current={str(current)[:12]} frozen={str(frozen)[:12]}"})
++        py_files, py_exception = self._zero_study_python()
++        checks.append({"id": "R10_zero_study_python", "passed": not py_files or py_exception is not None,
++                       "detail": json.dumps({"python_files": py_files, "exception": py_exception})})
+         overall = all(c["passed"] for c in checks)
+         path = _write(self.audit / "readiness.json", {"schema_version": 2, "overall_status": "PASS" if overall else "FAIL", "checks": checks,
+                                                        "execution_composite_sha256": frozen, "plan_sha256": plan["plan_sha256"], "generated_at_utc": _now()})
+@@ -238,6 +345,8 @@ class V2Lifecycle:
+         outcomes["FORWARD_OUTCOME_GUARD"] = "PASSED" if not leaked else "FAILED"
+         model = plan.get("model") or {}
+         outcomes["CHRONOLOGY_ROLE_TABLE"] = "PASSED" if (not model or (model.get("validation") or {}).get("year_role_table") is not None or model.get("validation") is None) else "FAILED"
++        py_files, py_exception = self._zero_study_python()
++        outcomes["ZERO_STUDY_PYTHON"] = "PASSED" if (not py_files or py_exception is not None) else f"FAILED: {py_files}"
+         try:
+             from research_workflow.host.predicate_eval import compile_predicate
+             ef = {t["id"]: set(t.get("epoch_fields") or ()) for t in plan["trackers"]}
+@@ -258,7 +367,8 @@ class V2Lifecycle:
+         ready = all(v == "PASSED" for v in outcomes.values())
+         path = _write(self.audit / "preflight.json", {"schema_version": 2, "status": "CLEAR" if ready else "BLOCKED", "audit_ready": ready,
+                                                        "check_outcomes": outcomes, "required_checks": list(outcomes), "execution_composite_sha256": frozen,
+-                                                       "plan_sha256": plan["plan_sha256"], "leaked_outcome_columns": leaked, "generated_at_utc": _now()})
++                                                       "plan_sha256": plan["plan_sha256"], "leaked_outcome_columns": leaked,
++                                                       "study_python": {"python_files": py_files, "exception": py_exception}, "generated_at_utc": _now()})
+         if not ready:
+             raise LifecycleV2Error("PREFLIGHT_BLOCKED: " + ", ".join(k for k, v in outcomes.items() if v != "PASSED"))
+         return {"status": "PASS", "outputs": [str(path)]}
+@@ -297,9 +407,9 @@ class V2Lifecycle:
+     def _run_window(self, plan: Dict[str, Any], start: str, end: str, primary: tuple, *, progress: Optional[Path], ledger: bool = False) -> Dict[str, Any]:
+         if self.opts.bar_source is not None:
+             from research_workflow.host_runner import run_plan_on_bars
+-            from research_workflow.sessions import build_session_table
++            from research_workflow.sessions import build_session_table, resolve_calendar_session_spec
+             bars = self.opts.bar_source(start, end)
+-            table = build_session_table(dict(self.opts.session_table_spec or plan["session"]))
++            table = build_session_table(resolve_calendar_session_spec(dict(self.opts.session_table_spec or plan["session"]), self.repo_root))
+             ledger_rows: List[Dict[str, Any]] = [] if ledger else None
+             run = run_plan_on_bars(plan, bars, session_table=table, primary_interval=primary, ledger=ledger_rows)
+             run["dataset"] = {"dataset_id": "synthetic", "logical_digest": None, "bytes_verification": "SYNTHETIC"}
+@@ -323,6 +433,7 @@ class V2Lifecycle:
+         return manifest
+ 
+     def smoke(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("smoke")
+         plan = load_plan(self.study)
+         ids = self._seal_identities()
+         date = self.opts.smoke_date or ((plan["chronology"].get("authorized_dates") or [None])[0])
+@@ -377,7 +488,7 @@ class V2Lifecycle:
+     def _collect_period(self, period: str) -> Dict[str, Any]:
+         plan = load_plan(self.study)
+         ids = self._seal_identities()
+-        years = self.opts.years or (plan["chronology"]["train"] if period == "train" else plan["chronology"].get("dev") or [])
++        years = self._authorized_years(plan, period, self.opts.years)
+         if not years:
+             raise LifecycleV2Error(f"NO_YEARS_FOR_PERIOD: {period}")
+         base = self.work / "partitions" / period
+@@ -405,13 +516,15 @@ class V2Lifecycle:
+         return {"status": "PASS", "outputs": outputs, "partitions": partitions}
+ 
+     def collection(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("collection")
+         return self._collect_period("train")
+ 
+     def reconcile(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("reconcile")
+         import pandas as pd
+         plan = load_plan(self.study)
+         base = self.work / "partitions" / "train"
+-        years = self.opts.years or plan["chronology"]["train"]
++        years = self._authorized_years(plan, "train", self.opts.years)
+         findings: List[str] = []
+         schemas, digests, rows = [], set(), 0
+         seen_keys = 0
+@@ -436,17 +549,19 @@ class V2Lifecycle:
+         if len(digests) > 1:
+             findings.append(f"partitions read different dataset digests: {sorted(digests)}")
+         path = _write(self.work / "reconcile.json", {"passed": not findings, "findings": findings, "years": list(years), "rows": rows,
+-                                                    "dataset_digests": sorted(digests), "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
++                                                    "authority": "plan.chronology.train", "dataset_digests": sorted(digests),
++                                                    "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
+                                                     "generated_at_utc": _now()})
+         if findings:
+             raise LifecycleV2Error("RECONCILE_FAILED: " + "; ".join(findings))
+         return {"status": "PASS", "outputs": [str(path)]}
+ 
+     def merge(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("merge")
+         import pandas as pd
+         from research.analysis.modeling import frame_content_identity
+         plan = load_plan(self.study)
+-        years = self.opts.years or plan["chronology"]["train"]
++        years = self._authorized_years(plan, "train", self.opts.years)
+         base = self.work / "partitions" / "train"
+         cands = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years], ignore_index=True)
+         obs = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True)
+@@ -457,7 +572,7 @@ class V2Lifecycle:
+         out = self.work / "merged"; out.mkdir(parents=True, exist_ok=True)
+         cands.to_parquet(out / "candidates.parquet", index=False); obs.to_parquet(out / "observations.parquet", index=False)
+         ident = _write(out / "identity.json", {"candidates_identity": frame_content_identity(cands), "observations_identity": frame_content_identity(obs),
+-                                                "rows": int(len(cands)), "years": list(years), "plan_sha256": plan["plan_sha256"],
++                                                "rows": int(len(cands)), "years": list(years), "authority": "plan.chronology.train", "plan_sha256": plan["plan_sha256"],
+                                                 "candidates_sha256": _sha(out / "candidates.parquet"), "observations_sha256": _sha(out / "observations.parquet"), "generated_at_utc": _now()})
+         return {"status": "PASS", "outputs": [str(out / "candidates.parquet"), str(out / "observations.parquet"), str(ident)]}
+ 
+@@ -472,6 +587,7 @@ class V2Lifecycle:
+         return frame, label
+ 
+     def fit(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("fit")
+         plan = load_plan(self.study)
+         model = plan.get("model")
+         if not model:
+@@ -513,7 +629,7 @@ class V2Lifecycle:
+             from research_workflow.tuning import tune
+             tuning_report = tune(study_id=plan["study"]["id"], frame=binary, features=features, label=label, family=family, base_params=params, seed=seed,
+                                  search_space=model["search_space"], validation=validation, artifacts_dir=self.artifacts,
+-                                 identities={"plan_sha256": plan["plan_sha256"], "population_identity": merge_identity,
++                                 identities={"plan_sha256": plan["plan_sha256"], "population_identity": merge_identity, "execution_closure_composite": closure,
+                                              "target_contract_sha256": hashlib.sha256(json.dumps(plan["outcome"], sort_keys=True, default=str).encode()).hexdigest(),
+                                              "feature_contract_sha256": hashlib.sha256(json.dumps(features).encode()).hexdigest(), "preprocessing_contract_sha256": "identity"})
+             params = dict(tuning_report["selected"]["params"])
+@@ -561,9 +677,11 @@ class V2Lifecycle:
+         import hashlib as _h
+         import numpy as np
+         from research.analysis.metrics import brier, pr_auc, roc_auc
+-        from research_workflow.model_store import read_manifest, score
++        from research_workflow.model_store import authenticate_model, read_manifest, score
+         out = []
+         for m in models:
++            expect = dict(m.get("expect") or {})
++            authentication = authenticate_model(m["id"], expect=expect or None)
+             manifest = read_manifest(m["id"])
+             inputs = list(manifest["lineage"]["ordered_inputs"])
+             missing = [c for c in inputs if c not in frame.columns]
+@@ -586,7 +704,8 @@ class V2Lifecycle:
+                                     "pr_auc": pr_auc(part[label], s).to_dict().get("value"), "brier": brier(part[label], s).to_dict().get("value"),
+                                     "score_digest": _h.sha256(np.round(np.asarray(s, dtype=float), 10).tobytes()).hexdigest()}
+             out.append({**m, "inputs": inputs, "lineage": {k: manifest["lineage"].get(k) for k in ("study_id", "cell_id", "direction", "target_arm", "train_years", "family")},
+-                        "rows_scored": int(len(binary)), "metrics_by_year": per_year})
++                        "rows_scored": int(len(binary)), "metrics_by_year": per_year,
++                        "model_authentication": {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}})
+         return out
+ 
+     def _fit_score_mode(self, plan: Dict[str, Any], model: Dict[str, Any]) -> Dict[str, Any]:
+@@ -599,10 +718,12 @@ class V2Lifecycle:
+         path = _write(self.artifacts / "experiment_models.json", {"schema_version": 2, "mode": "score", "plan_sha256": plan["plan_sha256"], "model_id": None,
+                                                                    "reused_model_ids": [m["id"] for m in scored], "models": scored, "rows": {"total": int(len(frame))},
+                                                                    "features": list(plan["columns"]["features"]), "training_population_identity": merge_identity,
++                                                                   "model_authentication": [m["model_authentication"] for m in scored],
+                                                                    "new_models_trained": False, "generated_at_utc": _now()})
+         return {"status": "PASS", "outputs": [str(path)]}
+ 
+     def freeze(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("freeze")
+         from research_workflow.experiment import write_train_freeze
+         plan = load_plan(self.study)
+         models = _read(self.artifacts / "experiment_models.json")
+@@ -617,6 +738,7 @@ class V2Lifecycle:
+         return {"status": "PASS", "outputs": [str(path)]}
+ 
+     def oos(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("oos")
+         from research_workflow.experiment import assert_oos_open
+         assert_oos_open(self.study)
+         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
+@@ -625,13 +747,14 @@ class V2Lifecycle:
+         return self._collect_period("oos")
+ 
+     def analyze(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("analyze")
+         import pandas as pd
+         from research_workflow.experiment import assert_oos_open
+         assert_oos_open(self.study)
+         plan = load_plan(self.study)
+         label = plan["outcome"].get("label_column") or "target_flip_within_horizon"
+         base = self.work / "partitions" / "oos"
+-        years = self.opts.years or plan["chronology"].get("dev") or []
++        years = self._authorized_years(plan, "oos", self.opts.years)
+         c = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years], ignore_index=True)
+         o = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True)
+         frame = c.merge(o[list(KEY) + [label, "disposition"]], on=list(KEY), how="inner")
+@@ -642,17 +765,21 @@ class V2Lifecycle:
+             summary["train_metrics"] = [{k: m[k] for k in ("name", "id", "metrics_by_year")} for m in models["models"]]
+         elif models.get("model_id"):
+             from research.analysis.metrics import brier, pr_auc, roc_auc
+-            from research_workflow.model_store import score
++            from research_workflow.model_store import authenticate_model, score
++            authentication = authenticate_model(models["model_id"], expect={"study_id": plan["study"]["id"]})
+             binary = frame[frame[label].isin([0, 1, 0.0, 1.0])]
+             s = score(models["model_id"], binary[models["features"]])
+             summary["oos_metrics"] = {"n": int(len(binary)), "roc_auc": roc_auc(binary[label], s).to_dict().get("value"),
+                                       "pr_auc": pr_auc(binary[label], s).to_dict().get("value"), "brier": brier(binary[label], s).to_dict().get("value")}
+             summary["train_metrics"] = models.get("metrics")
+-        path = _write(self.artifacts / "experiment_analysis_v2.json", {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
+-                                                                        "oos_years": list(years), **summary, "generated_at_utc": _now()})
++            summary["model_authentication"] = {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}
++        analyze_name = Path(DELIVERABLES["analyze"][0]).name
++        path = _write(self.artifacts / analyze_name, {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
++                                                                        "oos_years": list(years), "authority": "plan.chronology.dev", **summary, "generated_at_utc": _now()})
+         return {"status": "PASS", "outputs": [str(path)]}
+ 
+     def close(self, study: Path | None = None) -> Dict[str, Any]:
++        self._require_execute("close")
+         closure = self.opts.closure or {}
+         if not closure.get("outcome") or not closure.get("terminal_decision"):
+             raise LifecycleV2Error("CLOSURE_DECISION_REQUIRED: --closure-outcome and --closure-decision")
+diff --git a/research_workflow/locks.py b/research_workflow/locks.py
+new file mode 100644
+index 00000000..174bb28a
+--- /dev/null
++++ b/research_workflow/locks.py
+@@ -0,0 +1,110 @@
++"""Atomic OS-level exclusive-create lock primitive, shared by the controller run lock
++(:mod:`research_workflow.governed_controller_v2`), the writer lease
++(:mod:`research_workflow.workspace`) and the model-store per-model lock
++(:mod:`research_workflow.model_store`).
++
++``os.open(path, O_CREAT | O_EXCL | O_WRONLY)`` is atomic on both POSIX and Windows/NTFS: the
++OS guarantees exactly one caller among any number of concurrent callers observes success: this
++is a check-and-write in a single syscall, not a check-then-write race. Do not use
++``fcntl``/``msvcrt`` byte-range locking here -- this module only creates/removes whole files.
++"""
++from __future__ import annotations
++
++import json
++import os
++import time
++from dataclasses import dataclass
++from pathlib import Path
++from typing import Any, Callable, Mapping, Optional
++
++IsStale = Callable[[Optional[dict], float], bool]
++
++
++class LockError(RuntimeError):
++    pass
++
++
++@dataclass
++class LockResult:
++    acquired: bool
++    path: Path
++    payload: Optional[dict] = None       # ours if acquired, else the current holder's (or None if unparseable)
++    stale_reclaimed: bool = False
++
++
++def _write_new(path: Path, payload: Mapping[str, Any]) -> None:
++    path.parent.mkdir(parents=True, exist_ok=True)
++    fd = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
++    try:
++        data = (json.dumps(dict(payload), indent=2, sort_keys=True, default=str) + "\n").encode("utf-8")
++        os.write(fd, data)
++        os.fsync(fd)
++    finally:
++        os.close(fd)
++
++
++def read_payload(path: Path) -> Optional[dict]:
++    try:
++        return json.loads(Path(path).read_text(encoding="utf-8"))
++    except (OSError, ValueError):
++        return None
++
++
++def acquire_exclusive(path: Path, payload: Mapping[str, Any], *, is_stale: IsStale, max_attempts: int = 3) -> LockResult:
++    """Atomically create ``path`` with ``payload`` as its only content.
++
++    ``is_stale(existing_payload, mtime_epoch_s) -> bool`` decides whether an existing lock file
++    may be removed and the create retried. Bounded to ``max_attempts`` O_EXCL attempts: the
++    loser of a concurrent stale-reclaim race gets exactly one more try (re-reads and re-decides)
++    before giving up -- this never spins.
++    """
++    path = Path(path)
++    last_existing: Optional[dict] = None
++    for attempt in range(max(1, max_attempts)):
++        try:
++            _write_new(path, payload)
++            return LockResult(True, path, dict(payload), stale_reclaimed=attempt > 0)
++        except FileExistsError:
++            existing = read_payload(path)
++            last_existing = existing
++            try:
++                mtime = path.stat().st_mtime
++            except OSError:
++                continue  # vanished between the failed create and stat(); retry
++            if is_stale(existing, mtime):
++                try:
++                    path.unlink()
++                except OSError:
++                    pass
++                continue
++            return LockResult(False, path, existing, stale_reclaimed=False)
++    return LockResult(False, path, last_existing, stale_reclaimed=False)
++
++
++def acquire_wait(path: Path, payload: Mapping[str, Any], *, is_stale: IsStale, timeout_s: float = 30.0,
++                  poll_interval_s: float = 0.05) -> LockResult:
++    """Like :func:`acquire_exclusive` but retries for up to ``timeout_s`` (bounded wait) instead
++    of giving up after ``max_attempts``. Used where a caller should wait out a short-lived holder
++    (e.g. a manifest-mutation lock) rather than fail immediately."""
++    deadline = time.monotonic() + timeout_s
++    while True:
++        result = acquire_exclusive(path, payload, is_stale=is_stale, max_attempts=1)
++        if result.acquired or time.monotonic() >= deadline:
++            return result
++        time.sleep(poll_interval_s)
++
++
++def release(path: Path, *, owns: Callable[[Optional[dict]], bool]) -> bool:
++    """Remove ``path`` only if ``owns(existing_payload)`` is true. Returns whether it removed it."""
++    path = Path(path)
++    existing = read_payload(path)
++    if owns(existing):
++        try:
++            path.unlink()
++            return True
++        except OSError:
++            return False
++    return False
++
++
++__all__ = ["LockError", "LockResult", "acquire_exclusive", "acquire_wait", "release", "read_payload"]
+diff --git a/research_workflow/model_migration.py b/research_workflow/model_migration.py
+index 776d9b73..919f905e 100644
+--- a/research_workflow/model_migration.py
++++ b/research_workflow/model_migration.py
+@@ -16,6 +16,7 @@ final-validation refits are ``registry/final_validation``; everything else is
+ """
+ from __future__ import annotations
+ 
++import hashlib
+ import json
+ import re
+ from pathlib import Path
+@@ -106,9 +107,13 @@ def migrate_legacy_records(*, study_id: str, registry_root: Path, bytes_root: Pa
+                 family=fam, fit_identity_sha256=None, closure_identities=dict(rec.get("closure_identities") or {}), model_role=rec.get("model_role"))
+             existed = (ms.model_dir(mid, model_root) / "manifest.json").is_file()
+             legacy = {k: rec.get(k) for k in ("artifact_path", "artifact_sha256", "golden_fixture_path", "golden_fixture_sha256", "native_booster_path", "native_booster_sha256", "scientific_status", "artifact_status", "reuse_status", "runtime_identity_sha256", "schema_version")}
++            # The v1 model_id was canonical_sha256({study_id, arm, fit_identity, closures}); the
++            # migrated manifest does not retain the raw fit_identity input, so this store cannot
++            # independently recompute it. Name the rule so authenticate_model fails closed
++            # (MODEL_IDENTITY_UNVERIFIABLE) rather than silently trusting the copied id.
+             manifest = ms.store_model(model_id=mid, estimator=None, lineage=lineage, tier=tier, selection_status=status, metrics={},
+                                       golden_train_frame=train_frame, model_root=model_root, scientific_status=rec.get("scientific_status", "UNASSESSED"),
+-                                      legacy_registry_record=legacy, canonical_source_file=src)
++                                      legacy_registry_record=legacy, canonical_source_file=src, identity_rule="legacy_v1_immutable_unrecomputable")
+             if existed:
+                 report["already_present"] += 1
+             else:
+@@ -123,4 +128,79 @@ def migrate_legacy_records(*, study_id: str, registry_root: Path, bytes_root: Pa
+     return report
+ 
+ 
+-__all__ = ["migrate_legacy_records", "selected_configs_from_phase_d_report", "parse_model_role"]
++def migrate_train_freeze_bundle(*, study_id: str, freeze_path: Path, bundle_path: Path, repo_root: Path,
++                                train_frame: Optional[pd.DataFrame] = None, model_root: Optional[Path] = None,
++                                golden_rows: int = ms.GOLDEN_MIN_ROWS, tier: str = "registry",
++                                selection_status: str = "selected") -> Dict[str, Any]:
++    """Import a legacy Model-C-shaped bundle: ONE joblib file mapping arm -> ``{estimator,
++    fit_identity_sha256, provenance}``, whose provenance is a study TRAIN freeze
++    (``freeze_path``), not an individual v1 ``studies/model_registry/<model_id>.json``
++    record (``migrate_legacy_records`` only handles that shape).
++
++    Nothing is retrained; nothing under ``studies/`` is written; every fact this function
++    trusts is either read from the bundle's own bytes or the committed freeze -- never
++    invented. Each arm is registered under ``model_store.LEGACY_V1_TRAIN_FREEZE_RULE``
++    (see ``model_store._verify_legacy_v1_train_freeze``); a bundle arm whose
++    ``fit_identity_sha256`` disagrees with the freeze's ``model_hashes[arm]``, or whose
++    feature family has no ``feature_sets`` entry, fails that arm (not the whole import).
++    """
++    import joblib
++
++    freeze_path = Path(freeze_path).resolve()
++    bundle_path = Path(bundle_path).resolve()
++    repo_root = Path(repo_root).resolve()
++    freeze_rel = freeze_path.relative_to(repo_root).as_posix()
++    freeze_sha = ms._sha(freeze_path)
++    freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
++    if freeze.get("study_id") != study_id:
++        raise ms.ModelStoreError(f"TRAIN_FREEZE_STUDY_MISMATCH: {freeze.get('study_id')!r} != {study_id!r}")
++    bundle = joblib.load(bundle_path)
++    if not isinstance(bundle, Mapping):
++        raise ms.ModelStoreError("BUNDLE_NOT_AN_ARM_MAPPING")
++
++    report: Dict[str, Any] = {
++        "study_id": study_id, "freeze_path": freeze_rel, "freeze_sha256": freeze_sha,
++        "bundle_path": str(bundle_path), "bundle_sha256": ms._sha(bundle_path),
++        "arms": {}, "migrated": 0, "already_present": 0, "failed": [],
++    }
++    for arm, rec in bundle.items():
++        try:
++            fit_identity = rec.get("fit_identity_sha256") if isinstance(rec, Mapping) else None
++            if not fit_identity or freeze.get("model_hashes", {}).get(arm) != fit_identity:
++                raise ms.ModelStoreError(f"BUNDLE_FREEZE_FIT_IDENTITY_MISMATCH: arm={arm}")
++            family = arm.rsplit("_", 1)[-1] if "_" in arm else arm
++            direction = arm.split("_", 1)[0] if "_" in arm else None
++            ordered_inputs = list(freeze.get("feature_sets", {}).get(family) or [])
++            if not ordered_inputs:
++                raise ms.ModelStoreError(f"BUNDLE_FREEZE_FEATURE_SET_MISSING: arm={arm} family={family}")
++            model_id = ms._recompute_legacy_v1_train_freeze_id(study_id, arm, fit_identity, freeze.get("freeze_sha256"))
++            feature_contract = hashlib.sha256(json.dumps(ordered_inputs).encode("utf-8")).hexdigest()
++            lineage = ms.ModelLineage(
++                study_id=study_id, cell_id=None, direction=direction, target_arm=family, fold_id=None, config_id=None,
++                seed=None, ordered_inputs=ordered_inputs, feature_contract_sha256=feature_contract,
++                preprocessing_contract_sha256="identity", target_contract_sha256=freeze.get("target_contract_sha256"),
++                target_frame_identity=None, training_population_identity=freeze.get("merged_dataset_identity_sha256"),
++                train_years=[], validation_years=[], hyperparameters={}, family="lightgbm",
++                fit_identity_sha256=fit_identity, closure_identities={}, model_role=arm,
++            )
++            legacy_registry_record = {
++                "train_freeze_path": freeze_rel, "train_freeze_sha256": freeze_sha, "arm": arm,
++                "train_freeze_preprocessing_hash": freeze.get("preprocessing_hash"),
++                "train_freeze_provenance": freeze.get("provenance"),
++            }
++            existed = (ms.model_dir(model_id, model_root) / "manifest.json").is_file()
++            estimator = rec.get("estimator")
++            manifest = ms.store_model(
++                model_id=model_id, estimator=estimator, lineage=lineage, tier=tier, selection_status=selection_status,
++                metrics={}, golden_train_frame=train_frame, model_root=model_root, scientific_status="UNASSESSED",
++                legacy_registry_record=legacy_registry_record, golden_rows=golden_rows,
++                identity_rule=ms.LEGACY_V1_TRAIN_FREEZE_RULE,
++            )
++            report["arms"][arm] = {"model_id": model_id, "status": "already_present" if existed else "migrated", "tier": manifest.get("tier")}
++            report["already_present" if existed else "migrated"] += 1
++        except Exception as exc:
++            report["failed"].append({"arm": arm, "error": f"{type(exc).__name__}: {exc}"})
++    return report
++
++
++__all__ = ["migrate_legacy_records", "selected_configs_from_phase_d_report", "parse_model_role", "migrate_train_freeze_bundle"]
+diff --git a/research_workflow/model_store.py b/research_workflow/model_store.py
+index 97a01aba..64e2813f 100644
+--- a/research_workflow/model_store.py
++++ b/research_workflow/model_store.py
+@@ -31,7 +31,10 @@ from __future__ import annotations
+ 
+ import hashlib
+ import json
++import os
+ import shutil
++import time
++import uuid
+ from dataclasses import dataclass, field
+ from datetime import datetime, timezone
+ from pathlib import Path
+@@ -281,57 +284,105 @@ def read_manifest(model_id: str, model_root: Optional[Path] = None) -> Dict[str,
+     return _read(p)
+ 
+ 
++def _model_lock(mdir_parent_models: Path, model_id: str):
++    """Bounded-wait per-model lock (research_workflow.locks): serializes ``add_export`` /
++    manifest-mutation against the same model_id. Returns a context manager."""
++    from contextlib import contextmanager
++    from research_workflow.locks import acquire_wait, release
++    lock_path = mdir_parent_models / model_id / ".lock"
++
++    @contextmanager
++    def _cm():
++        lock_path.parent.mkdir(parents=True, exist_ok=True)
++        payload = {"pid": os.getpid(), "acquired_at_utc": _now()}
++        result = acquire_wait(lock_path, payload, is_stale=lambda existing, mtime: (time.time() - mtime) > 30, timeout_s=30.0)
++        if not result.acquired:
++            raise ModelStoreError(f"MODEL_LOCK_TIMEOUT: {model_id}")
++        try:
++            yield
++        finally:
++            release(lock_path, owns=lambda existing: bool(existing) and int(existing.get("pid") or 0) == os.getpid())
++    return _cm()
++
++
+ def store_model(*, model_id: str, estimator: Any, lineage: ModelLineage, tier: str, selection_status: str,
+                 metrics: Mapping[str, Any], golden_train_frame: Optional[pd.DataFrame], model_root: Optional[Path] = None,
+                 scientific_status: str = "UNASSESSED", legacy_registry_record: Optional[Mapping[str, Any]] = None,
+-                canonical_source_file: Optional[Path] = None, golden_rows: int = GOLDEN_MIN_ROWS) -> Dict[str, Any]:
++                canonical_source_file: Optional[Path] = None, golden_rows: int = GOLDEN_MIN_ROWS,
++                identity_rule: str = "v2_lineage_sha256") -> Dict[str, Any]:
+     """Persist a model into the store (idempotent: identical model_id must reproduce identical canonical bytes).
+ 
++    Same-ID concurrent writers never see a half-written directory and never lost-update each other:
++    the whole model directory is built under ``models/.staging/<id>.<uuid>/`` and promoted with a
++    single ``os.rename`` onto ``models/<id>``; the loser of a concurrent promotion race for the same
++    id discards its staging directory and returns the winner's (already-persisted) manifest if the
++    canonical bytes agree, else raises ``MODEL_ID_COLLISION``.
++
+     ``golden_rows`` sizes the deterministic golden frame; callers with a training population smaller than
+     ``GOLDEN_MIN_ROWS`` (synthetic fixtures) pass the population size -- the manifest records ``n_rows``."""
+     if tier not in TIERS or selection_status not in SELECTION_STATES:
+         raise ModelStoreError(f"MODEL_TIER_OR_STATUS_INVALID: {tier}/{selection_status}")
+     root = model_store_root(model_root)
+-    mdir = root / "models" / model_id
++    models_root = root / "models"
++    mdir = models_root / model_id
+     manifest_path = mdir / "manifest.json"
+     if manifest_path.is_file():
+-        existing = _read(manifest_path)
+-        return existing  # immutable; representations are appended through add_export
+-    auth = family_authority(lineage.family)
+-    if canonical_source_file is not None:
+-        (mdir / "canonical").mkdir(parents=True, exist_ok=True)
+-        dest = mdir / "canonical" / auth["file"]
+-        shutil.copyfile(canonical_source_file, dest)
+-        canonical = {"format": auth["canonical_format"], "archival_safety": auth["archival_safety"], "path": dest.name,
+-                     "byte_sha256": _sha(dest), "logical_sha256": _sha(dest) if auth["archival_safety"] == "portable" else None,
+-                     "library_versions": _library_versions(), "source": str(canonical_source_file)}
+-    else:
+-        canonical = save_canonical(estimator, lineage.family, mdir / "canonical")
+-    manifest: Dict[str, Any] = {
+-        "schema_version": SCHEMA_VERSION, "model_id": model_id, "tier": tier, "selection_status": selection_status,
+-        "scientific_status": scientific_status, "created_at_utc": _now(),
+-        "lineage": {**lineage.__dict__},
+-        "metrics": dict(metrics or {}),
+-        "canonical": canonical,
+-        "golden": None, "exports": [],
+-        "legacy_registry_record": dict(legacy_registry_record) if legacy_registry_record else None,
+-        "score_semantics": "predict_proba_positive",
+-    }
+-    # Golden frame from real TRAIN rows, scored by the canonical representation.
+-    if golden_train_frame is not None:
+-        frame = build_golden_frame(golden_train_frame, lineage.ordered_inputs, model_id, n_rows=int(golden_rows))
+-        (mdir / "golden").mkdir(parents=True, exist_ok=True)
+-        frame.to_parquet(mdir / "golden" / "frame.parquet", index=False)
+-        _json(manifest_path, manifest)  # load_canonical needs the manifest on disk
+-        scorer = load_canonical(manifest, mdir)
+-        expected = scorer.scores(frame)
+-        _json(mdir / "golden" / "expected.json", {"model_id": model_id, "n_rows": int(len(frame)), "expected_scores": [float(v) for v in expected]})
+-        manifest["golden"] = {"frame_path": "golden/frame.parquet", "frame_sha256": _sha(mdir / "golden" / "frame.parquet"),
+-                              "frame_content_sha256": _frame_sha(frame), "n_rows": int(len(frame)),
+-                              "expected_path": "golden/expected.json", "expected_sha256": _sha(mdir / "golden" / "expected.json"),
+-                              "source": "train_rows_deterministic_sample", "seed_source": "sha256(model_id)[:8]"}
+-    _json(manifest_path, manifest)
+-    return manifest
++        return _read(manifest_path)  # immutable; representations are appended through add_export
++
++    staging_root = models_root / ".staging"
++    staging_root.mkdir(parents=True, exist_ok=True)
++    stage_dir = staging_root / f"{model_id}.{uuid.uuid4().hex}"
++    stage_dir.mkdir(parents=True)
++    try:
++        auth = family_authority(lineage.family)
++        stage_manifest_path = stage_dir / "manifest.json"
++        if canonical_source_file is not None:
++            (stage_dir / "canonical").mkdir(parents=True, exist_ok=True)
++            dest = stage_dir / "canonical" / auth["file"]
++            shutil.copyfile(canonical_source_file, dest)
++            canonical = {"format": auth["canonical_format"], "archival_safety": auth["archival_safety"], "path": dest.name,
++                         "byte_sha256": _sha(dest), "logical_sha256": _sha(dest) if auth["archival_safety"] == "portable" else None,
++                         "library_versions": _library_versions(), "source": str(canonical_source_file)}
++        else:
++            canonical = save_canonical(estimator, lineage.family, stage_dir / "canonical")
++        manifest: Dict[str, Any] = {
++            "schema_version": SCHEMA_VERSION, "model_id": model_id, "identity_rule": str(identity_rule), "tier": tier,
++            "selection_status": selection_status, "scientific_status": scientific_status, "created_at_utc": _now(),
++            "lineage": {**lineage.__dict__},
++            "metrics": dict(metrics or {}),
++            "canonical": canonical,
++            "golden": None, "exports": [],
++            "legacy_registry_record": dict(legacy_registry_record) if legacy_registry_record else None,
++            "score_semantics": "predict_proba_positive",
++        }
++        # Golden frame from real TRAIN rows, scored by the canonical representation.
++        if golden_train_frame is not None:
++            frame = build_golden_frame(golden_train_frame, lineage.ordered_inputs, model_id, n_rows=int(golden_rows))
++            (stage_dir / "golden").mkdir(parents=True, exist_ok=True)
++            frame.to_parquet(stage_dir / "golden" / "frame.parquet", index=False)
++            _json(stage_manifest_path, manifest)  # load_canonical needs the manifest on disk
++            scorer = load_canonical(manifest, stage_dir)
++            expected = scorer.scores(frame)
++            _json(stage_dir / "golden" / "expected.json", {"model_id": model_id, "n_rows": int(len(frame)), "expected_scores": [float(v) for v in expected]})
++            manifest["golden"] = {"frame_path": "golden/frame.parquet", "frame_sha256": _sha(stage_dir / "golden" / "frame.parquet"),
++                                  "frame_content_sha256": _frame_sha(frame), "n_rows": int(len(frame)),
++                                  "expected_path": "golden/expected.json", "expected_sha256": _sha(stage_dir / "golden" / "expected.json"),
++                                  "source": "train_rows_deterministic_sample", "seed_source": "sha256(model_id)[:8]"}
++        _json(stage_manifest_path, manifest)
++        try:
++            os.rename(str(stage_dir), str(mdir))
++        except OSError:
++            # a concurrent writer for the same id won the promotion race first.
++            if manifest_path.is_file():
++                existing = _read(manifest_path)
++                if existing.get("canonical", {}).get("byte_sha256") == canonical["byte_sha256"]:
++                    return existing  # idempotent: identical canonical bytes
++                raise ModelStoreError(f"MODEL_ID_COLLISION: {model_id}")
++            raise
++        return manifest
++    finally:
++        if stage_dir.is_dir():
++            shutil.rmtree(stage_dir, ignore_errors=True)
+ 
+ 
+ def validate_golden(model_id: str, model_root: Optional[Path] = None, tolerance: float = 1e-12) -> Dict[str, Any]:
+@@ -350,56 +401,288 @@ def validate_golden(model_id: str, model_root: Optional[Path] = None, tolerance:
+     return {"model_id": model_id, "n_rows": int(len(frame)), "max_abs_diff": diff, "status": "PASS"}
+ 
+ 
++def _recompute_v2_lineage_sha256(manifest: Mapping[str, Any]) -> str:
++    return hashlib.sha256(json.dumps(manifest["lineage"], sort_keys=True, default=str).encode("utf-8")).hexdigest()
++
++
++# Named, recomputable model-identity rules. A manifest's ``identity_rule`` must be a key
++# here for ``authenticate_model`` to independently reproduce the id from the manifest's own
++# recorded lineage; a rule with no recompute authority (e.g. migrated v1 records, whose
++# original hash inputs are not fully preserved) fails closed as MODEL_IDENTITY_UNVERIFIABLE
++# rather than silently trusting the recorded id.
++IDENTITY_RULES: Dict[str, Any] = {
++    "v2_lineage_sha256": _recompute_v2_lineage_sha256,
++}
++
++LEGACY_V1_COMMITTED_REGISTRY_RULE = "legacy_v1_committed_registry"
++LEGACY_V1_TRAIN_FREEZE_RULE = "legacy_v1_train_freeze"
++
++
++def _recompute_legacy_v1_train_freeze_id(study_id: str, arm: str, fit_identity_sha256: str, freeze_sha256: str) -> str:
++    return canonical_sha256({"study_id": study_id, "arm": arm, "fit_identity_sha256": fit_identity_sha256, "freeze_sha256": freeze_sha256})
++
++
++def _verify_legacy_v1_train_freeze(manifest: Mapping[str, Any], model_id: str, repo_root: Path) -> None:
++    """Authenticate a Model-C-shaped legacy parent -- ONE joblib bundle of several arms
++    fit directly by a v1 study, with NO per-model ``studies/model_registry/<model_id>.json``
++    record (``legacy_v1_committed_registry`` grants no authority here) -- against its still
++    git-tracked TRAIN freeze (``studies/<study_id>/artifacts/train_experiment_freeze.json``).
++
++    The freeze is authoritative: it must be committed at git HEAD, its bytes must match the
++    manifest-declared sha256, and its own ``freeze_sha256`` must self-recompute (the same
++    ``canonical_sha256`` formula ``research_workflow.experiment.write_train_freeze`` uses --
++    every field except ``generated_at_utc``/``freeze_sha256``). ``freeze["model_hashes"][arm]``
++    must equal the manifest's own ``lineage.fit_identity_sha256`` (the arm's bundle-recorded
++    fit identity), and ``freeze["feature_sets"][<family>]`` (family = the arm's ``_A``/``_B``/
++    ``_C`` suffix) must equal the manifest's ``lineage.ordered_inputs`` exactly.
++    ``model_id`` is ``canonical_sha256({study_id, arm, fit_identity_sha256, freeze_sha256})`` --
++    distinct from any v2-fit or v1-registry id, so bytes from a different freeze or a
++    different arm can never collide with it.
++    """
++    from research.analysis.identity import canonical_sha256 as _canon
++    from research_workflow.policy import _git_tracked
++
++    lineage = manifest.get("lineage") or {}
++    legacy = manifest.get("legacy_registry_record") or {}
++    study_id = lineage.get("study_id")
++    arm = legacy.get("arm")
++    freeze_rel = legacy.get("train_freeze_path")
++    freeze_sha_declared = legacy.get("train_freeze_sha256")
++    fit_identity = lineage.get("fit_identity_sha256")
++    if not study_id or not arm or not freeze_rel or not freeze_sha_declared or not fit_identity:
++        raise ModelStoreError(
++            "MODEL_IDENTITY_UNVERIFIABLE: legacy_v1_train_freeze manifest missing one of "
++            "study_id/legacy_registry_record.arm/train_freeze_path/train_freeze_sha256/lineage.fit_identity_sha256"
++        )
++    freeze_path = Path(repo_root) / freeze_rel
++    if not freeze_path.is_file() or not _git_tracked(Path(repo_root), freeze_rel):
++        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: TRAIN freeze {freeze_rel} is missing or not committed to git at HEAD")
++    if _sha(freeze_path) != freeze_sha_declared:
++        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: TRAIN freeze bytes sha256 != manifest-declared {freeze_sha_declared!r}")
++    freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
++    recomputed_freeze_sha = _canon({k: v for k, v in freeze.items() if k not in ("generated_at_utc", "freeze_sha256")})
++    if recomputed_freeze_sha != freeze.get("freeze_sha256"):
++        raise ModelStoreError("MODEL_IDENTITY_UNVERIFIABLE: TRAIN freeze freeze_sha256 does not self-recompute")
++    if freeze.get("study_id") != study_id:
++        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: TRAIN freeze study_id {freeze.get('study_id')!r} != manifest lineage.study_id {study_id!r}")
++    if freeze.get("provenance") != "TRAIN_ONLY":
++        raise ModelStoreError("MODEL_IDENTITY_MISMATCH: TRAIN freeze is not TRAIN_ONLY")
++    if freeze.get("model_hashes", {}).get(arm) != fit_identity:
++        raise ModelStoreError(
++            f"MODEL_IDENTITY_MISMATCH: TRAIN freeze model_hashes[{arm!r}]={freeze.get('model_hashes', {}).get(arm)!r} "
++            f"!= manifest lineage.fit_identity_sha256={fit_identity!r}"
++        )
++    family = arm.rsplit("_", 1)[-1] if "_" in arm else arm
++    ordered_inputs = list(lineage.get("ordered_inputs") or [])
++    if list(freeze.get("feature_sets", {}).get(family, ())) != ordered_inputs:
++        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: TRAIN freeze feature_sets[{family!r}] != manifest lineage.ordered_inputs")
++    recomputed_id = _recompute_legacy_v1_train_freeze_id(study_id, arm, fit_identity, freeze.get("freeze_sha256"))
++    if recomputed_id != model_id:
++        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: legacy_v1_train_freeze recomputes {recomputed_id} != requested {model_id}")
++
++
++def _verify_legacy_v1_committed_registry(manifest: Mapping[str, Any], model_id: str, repo_root: Path) -> None:
++    """Authenticate a migrated v1 model against its still-git-tracked v1 registry record.
++
++    The v1 registry record at ``studies/model_registry/<model_id>.json`` is the authoritative
++    source of the legacy identity (it predates and is independent of the v2 store manifest).
++    A record that is missing or not committed at HEAD grants no authority
++    (``MODEL_IDENTITY_UNVERIFIABLE``); any disagreement between the record and the manifest
++    on model_id, study_id, canonical bytes or runtime identity is ``MODEL_IDENTITY_MISMATCH``.
++    """
++    from research_workflow.policy import _git_tracked
++
++    rel = f"studies/model_registry/{model_id}.json"
++    record_path = Path(repo_root) / rel
++    if not record_path.is_file() or not _git_tracked(Path(repo_root), rel):
++        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: legacy registry record {rel} is missing or not committed to git at HEAD")
++    try:
++        record = json.loads(record_path.read_text(encoding="utf-8"))
++    except (OSError, ValueError) as exc:
++        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: legacy registry record {rel} is not valid JSON: {exc}")
++
++    if record.get("model_id") != model_id:
++        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: legacy registry record {rel} records model_id {record.get('model_id')!r} != {model_id!r}")
++
++    lineage = manifest.get("lineage") or {}
++    if record.get("study_id") != lineage.get("study_id"):
++        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: legacy registry study_id {record.get('study_id')!r} != manifest lineage.study_id {lineage.get('study_id')!r}")
++
++    canonical = manifest.get("canonical") or {}
++    fmt = canonical.get("format")
++    expected_sha = record.get("native_booster_sha256") if fmt == "lightgbm_text" else record.get("artifact_sha256")
++    if not expected_sha or canonical.get("byte_sha256") != expected_sha:
++        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: canonical byte_sha256 {canonical.get('byte_sha256')!r} != legacy registry {expected_sha!r} (format {fmt!r})")
++
++    legacy = manifest.get("legacy_registry_record") or {}
++    if legacy.get("runtime_identity_sha256") != record.get("runtime_identity_sha256"):
++        raise ModelStoreError(
++            f"MODEL_IDENTITY_MISMATCH: manifest legacy_registry_record.runtime_identity_sha256 "
++            f"{legacy.get('runtime_identity_sha256')!r} != legacy registry {record.get('runtime_identity_sha256')!r}"
++        )
++
++
++def authenticate_model(model_id: str, *, expect: Optional[Mapping[str, Any]] = None, model_root: Optional[Path] = None,
++                       golden_tolerance: float = 1e-12, repo_root: Optional[Path] = None) -> Dict[str, Any]:
++    """Fail-closed identity/lineage/golden authentication before any ``score()`` call.
++
++    Verifies, in order: (1) the requested ``model_id`` agrees with the directory it was
++    resolved from and with ``manifest["model_id"]``; (2) the manifest's recorded
++    ``identity_rule`` independently RECOMPUTES ``model_id`` from the manifest's own lineage
++    (a rule this store cannot recompute -- e.g. an unverifiable legacy migration -- fails
++    closed as ``MODEL_IDENTITY_UNVERIFIABLE``, it is never treated as trusted); (3) the
++    canonical artifact bytes match their recorded sha256; (4) the feature contract
++    (``ordered_inputs``) reproduces ``feature_contract_sha256``; (5) the preprocessing the
++    manifest declares matches what a v2 study applies (``identity``); (6) any caller-declared
++    ``expect`` (``study_id`` / ``target_arm`` / ``direction`` / ``cell_id``) matches the
++    lineage; (7) the model's tier/selection_status make it reusable
++    (``registry`` + ``selected``/``final_validation``); (8) the golden frame validates.
++
++    Returns an evidence dict; raises ``ModelStoreError`` on the first failed check.
++    """
++    manifest = read_manifest(model_id, model_root)
++    mdir = model_dir(model_id, model_root)
++    recorded_id = manifest.get("model_id")
++    if recorded_id != model_id:
++        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: requested {model_id!r} but the manifest at {mdir} records model_id {recorded_id!r}")
++
++    if repo_root is None:
++        from research_workflow.policy import REPO_ROOT as _repo_root
++        repo_root = _repo_root
++
++    identity_rule = manifest.get("identity_rule")
++    if identity_rule in (None, "legacy_v1_immutable_unrecomputable"):
++        # A manifest predating identity_rule, or an explicitly-unrecomputable legacy
++        # migration: a still-git-tracked v1 registry record is authoritative for legacy
++        # identity if the manifest carries one.
++        if manifest.get("legacy_registry_record"):
++            _verify_legacy_v1_committed_registry(manifest, model_id, repo_root)
++            identity_rule = LEGACY_V1_COMMITTED_REGISTRY_RULE
++        elif identity_rule is None and _recompute_v2_lineage_sha256(manifest) == model_id:
++            # Only an absent (never-recorded) rule infers v2; an EXPLICIT
++            # "legacy_v1_immutable_unrecomputable" tag with no registry record fails closed
++            # unconditionally -- it is never silently treated as a v2-formula model.
++            identity_rule = "v2_lineage_sha256"
++        else:
++            raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {model_id} has no recomputable identity_rule (no committed legacy registry record and does not reproduce v2_lineage_sha256)")
++    elif identity_rule == LEGACY_V1_COMMITTED_REGISTRY_RULE:
++        _verify_legacy_v1_committed_registry(manifest, model_id, repo_root)
++    elif identity_rule == LEGACY_V1_TRAIN_FREEZE_RULE:
++        _verify_legacy_v1_train_freeze(manifest, model_id, repo_root)
++    else:
++        recompute = IDENTITY_RULES.get(identity_rule)
++        if recompute is None:
++            raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: identity_rule {identity_rule!r} has no recompute authority in this store")
++        recomputed_id = recompute(manifest)
++        if recomputed_id != model_id:
++            raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: identity_rule {identity_rule!r} recomputes {recomputed_id} != requested {model_id}")
++
++    # Canonical bytes: load_canonical raises CANONICAL_BYTES_CORRUPT on a sha256 mismatch.
++    load_canonical(manifest, mdir)
++
++    lineage = dict(manifest.get("lineage") or {})
++    ordered_inputs = list(lineage.get("ordered_inputs") or [])
++    declared_feature_contract = lineage.get("feature_contract_sha256")
++    if identity_rule == "v2_lineage_sha256":
++        # v2 fit() computes feature_contract_sha256 == sha256(json.dumps(ordered_inputs));
++        # independently reproduce it.
++        recomputed_feature_contract = hashlib.sha256(json.dumps(ordered_inputs).encode("utf-8")).hexdigest()
++        if declared_feature_contract is None or recomputed_feature_contract != declared_feature_contract:
++            raise ModelStoreError(f"FEATURE_CONTRACT_MISMATCH: recomputed {recomputed_feature_contract} != declared {declared_feature_contract}")
++    else:
++        # A legacy identity rule's feature_contract_sha256 was produced by the v1 contract
++        # formula (research.analysis.identity.canonical_sha256 over a feature_contract dict
++        # this store cannot reconstruct), not the v2 ordered_inputs formula -- it is not
++        # independently recomputable here. Its authenticity for legacy_v1_committed_registry
++        # is instead the committed v1 registry record's authority (already verified above);
++        # this store still fails closed if the field was never declared at all.
++        if not declared_feature_contract:
++            raise ModelStoreError(f"FEATURE_CONTRACT_MISMATCH: {identity_rule!r} manifest declares no feature_contract_sha256")
++        recomputed_feature_contract = declared_feature_contract
++
++    preprocessing = lineage.get("preprocessing_contract_sha256")
++    if preprocessing != "identity":
++        raise ModelStoreError(f"PREPROCESSING_MISMATCH: consuming study applies identity preprocessing but the manifest declares {preprocessing!r}")
++
++    expect_map = {"study_id": "study_id", "target_arm": "target_arm", "direction": "direction", "cell_id": "cell_id",
++                 "label": "target_arm"}
++    for key, value in dict(expect or {}).items():
++        if value is None:
++            continue
++        field = expect_map.get(key, key)
++        if lineage.get(field) != value:
++            raise ModelStoreError(f"MODEL_EXPECTATION_MISMATCH: expected {key}={value!r} but lineage.{field}={lineage.get(field)!r}")
++
++    if manifest.get("tier") != "registry" or manifest.get("selection_status") not in ("selected", "final_validation"):
++        raise ModelStoreError(f"MODEL_TIER_NOT_REUSABLE: tier={manifest.get('tier')!r} selection_status={manifest.get('selection_status')!r}")
++
++    golden = validate_golden(model_id, model_root, tolerance=golden_tolerance)
++
++    return {
++        "model_id": model_id, "identity_rule": identity_rule, "canonical_sha256": manifest["canonical"]["byte_sha256"],
++        "feature_contract_sha256": recomputed_feature_contract, "preprocessing_contract_sha256": preprocessing,
++        "golden": golden, "tier": manifest.get("tier"), "selection_status": manifest.get("selection_status"),
++        "lineage_summary": {k: lineage.get(k) for k in ("study_id", "cell_id", "direction", "target_arm", "fold_id", "config_id", "train_years", "family")},
++        "authenticated_at_utc": _now(),
++    }
++
++
+ def add_export(model_id: str, fmt: str, *, model_root: Optional[Path] = None, exporter_version: Optional[str] = None) -> Dict[str, Any]:
+     """Export the canonical model to ``fmt`` and verify equivalence on the golden frame.
+ 
+     Never raises for an export failure: the manifest records ``status: failed`` with the
+-    error, and the canonical model is untouched.
++    error, and the canonical model is untouched. The manifest read-modify-write (appending
++    this export's record) is serialized against every other writer for this model_id by a
++    bounded-wait per-model lock (``models/<id>/.lock``); a lock that cannot be acquired within
++    30s raises ``MODEL_LOCK_TIMEOUT``.
+     """
+-    manifest = read_manifest(model_id, model_root); mdir = model_dir(model_id, model_root)
+-    existing = [e for e in manifest.get("exports", []) if e.get("format") == fmt and e.get("status") == "verified"]
+-    if existing:
+-        return existing[0]
+-    record: Dict[str, Any] = {"format": fmt, "status": "candidate", "created_at_utc": _now(), "source_model_id": model_id,
+-                              "source_canonical_sha256": manifest["canonical"]["byte_sha256"], "exporter": None, "exporter_version": exporter_version}
+-    (mdir / "exports").mkdir(parents=True, exist_ok=True)
+-    inputs = manifest["lineage"]["ordered_inputs"]
+-    try:
+-        scorer = load_canonical(manifest, mdir)
+-        if fmt == "joblib":
+-            import joblib
+-            path = mdir / "exports" / "model.joblib"
+-            joblib.dump(scorer.obj, path)
+-            record["exporter"] = "joblib"; record["exporter_version"] = exporter_version or joblib.__version__
+-        elif fmt == "onnx":
+-            path = mdir / "exports" / "model.onnx"
+-            _export_onnx(manifest, scorer, path, len(inputs))
+-            import onnxmltools
+-            record["exporter"] = "onnxmltools/skl2onnx"; record["exporter_version"] = exporter_version or onnxmltools.__version__
+-        else:
+-            raise ModelStoreError(f"EXPORT_FORMAT_UNSUPPORTED: {fmt}")
+-        record["path"] = f"exports/{path.name}"; record["byte_sha256"] = _sha(path)
+-        g = manifest.get("golden")
+-        if not g:
+-            record["status"] = "candidate"; record["equivalence"] = {"status": "NO_GOLDEN_FRAME"}
+-        else:
+-            frame = pd.read_parquet(mdir / g["frame_path"])
+-            expected = np.asarray(_read(mdir / g["expected_path"])["expected_scores"], dtype=np.float64)
+-            got = _load_export(fmt, path, inputs).scores(frame)
+-            tol = EXPORT_TOLERANCES.get(fmt, {"abs": 1e-9})
+-            abs_diff = np.abs(got - expected)
+-            rel_diff = abs_diff / np.maximum(np.abs(expected), 1e-12)
+-            ok = len(got) == len(expected) and (bool(np.all(abs_diff <= tol.get("abs", np.inf))) or bool(np.all(rel_diff <= tol.get("rel", -1))))
+-            equivalence = {"status": "PASS" if ok else "FAIL", "n_rows": int(len(frame)), "max_abs_diff": float(abs_diff.max()) if len(got) else 0.0,
+-                           "max_rel_diff": float(rel_diff.max()) if len(got) else 0.0, "tolerance": tol, "golden_frame_sha256": g["frame_sha256"],
+-                           "source_canonical_sha256": manifest["canonical"]["byte_sha256"], "export_sha256": record["byte_sha256"], "checked_at_utc": _now()}
+-            _json(mdir / "equivalence" / f"{fmt}.json", equivalence)
+-            record["equivalence"] = equivalence; record["status"] = "verified" if ok else "failed"
+-    except Exception as exc:  # export failure must not invalidate the canonical model
+-        record["status"] = "failed"; record["error"] = f"{type(exc).__name__}: {exc}"
+-    manifest["exports"] = [e for e in manifest.get("exports", []) if e.get("format") != fmt] + [record]
+-    _json(mdir / "manifest.json", manifest)
+-    return record
++    mdir = model_dir(model_id, model_root)
++    models_root = mdir.parent
++    with _model_lock(models_root, model_id):
++        manifest = read_manifest(model_id, model_root)
++        existing = [e for e in manifest.get("exports", []) if e.get("format") == fmt and e.get("status") == "verified"]
++        if existing:
++            return existing[0]
++        record: Dict[str, Any] = {"format": fmt, "status": "candidate", "created_at_utc": _now(), "source_model_id": model_id,
++                                  "source_canonical_sha256": manifest["canonical"]["byte_sha256"], "exporter": None, "exporter_version": exporter_version}
++        (mdir / "exports").mkdir(parents=True, exist_ok=True)
++        inputs = manifest["lineage"]["ordered_inputs"]
++        try:
++            scorer = load_canonical(manifest, mdir)
++            if fmt == "joblib":
++                import joblib
++                path = mdir / "exports" / "model.joblib"
++                joblib.dump(scorer.obj, path)
++                record["exporter"] = "joblib"; record["exporter_version"] = exporter_version or joblib.__version__
++            elif fmt == "onnx":
++                path = mdir / "exports" / "model.onnx"
++                _export_onnx(manifest, scorer, path, len(inputs))
++                import onnxmltools
++                record["exporter"] = "onnxmltools/skl2onnx"; record["exporter_version"] = exporter_version or onnxmltools.__version__
++            else:
++                raise ModelStoreError(f"EXPORT_FORMAT_UNSUPPORTED: {fmt}")
++            record["path"] = f"exports/{path.name}"; record["byte_sha256"] = _sha(path)
++            g = manifest.get("golden")
++            if not g:
++                record["status"] = "candidate"; record["equivalence"] = {"status": "NO_GOLDEN_FRAME"}
++            else:
++                frame = pd.read_parquet(mdir / g["frame_path"])
++                expected = np.asarray(_read(mdir / g["expected_path"])["expected_scores"], dtype=np.float64)
++                got = _load_export(fmt, path, inputs).scores(frame)
++                tol = EXPORT_TOLERANCES.get(fmt, {"abs": 1e-9})
++                abs_diff = np.abs(got - expected)
++                rel_diff = abs_diff / np.maximum(np.abs(expected), 1e-12)
++                ok = len(got) == len(expected) and (bool(np.all(abs_diff <= tol.get("abs", np.inf))) or bool(np.all(rel_diff <= tol.get("rel", -1))))
++                equivalence = {"status": "PASS" if ok else "FAIL", "n_rows": int(len(frame)), "max_abs_diff": float(abs_diff.max()) if len(got) else 0.0,
++                               "max_rel_diff": float(rel_diff.max()) if len(got) else 0.0, "tolerance": tol, "golden_frame_sha256": g["frame_sha256"],
++                               "source_canonical_sha256": manifest["canonical"]["byte_sha256"], "export_sha256": record["byte_sha256"], "checked_at_utc": _now()}
++                _json(mdir / "equivalence" / f"{fmt}.json", equivalence)
++                record["equivalence"] = equivalence; record["status"] = "verified" if ok else "failed"
++        except Exception as exc:  # export failure must not invalidate the canonical model
++            record["status"] = "failed"; record["error"] = f"{type(exc).__name__}: {exc}"
++        manifest["exports"] = [e for e in manifest.get("exports", []) if e.get("format") != fmt] + [record]
++        _json(mdir / "manifest.json", manifest)
++        return record
+ 
+ 
+ def _export_onnx(manifest: Mapping[str, Any], scorer: _Scorer, path: Path, n_inputs: int) -> None:
+@@ -468,6 +751,8 @@ def list_store(model_root: Optional[Path] = None) -> List[Dict[str, Any]]:
+     root = model_store_root(model_root, create=False)
+     out = []
+     for p in sorted((root / "models").glob("*/manifest.json")) if (root / "models").is_dir() else []:
++        if p.parent.name == ".staging":
++            continue
+         m = _read(p)
+         out.append({"model_id": m["model_id"], "tier": m["tier"], "selection_status": m["selection_status"], "scientific_status": m["scientific_status"],
+                     "family": m["lineage"].get("family"), "study_id": m["lineage"].get("study_id"), "canonical_format": m["canonical"]["format"],
+@@ -476,5 +761,6 @@ def list_store(model_root: Optional[Path] = None) -> List[Dict[str, Any]]:
+ 
+ 
+ __all__ = ["SCHEMA_VERSION", "GOLDEN_MIN_ROWS", "FAMILY_AUTHORITY", "EXPORT_TOLERANCES", "EXPORT_STATES", "SELECTION_STATES", "TIERS",
+-           "ModelStoreError", "ModelLineage", "family_authority", "build_golden_frame", "store_model", "validate_golden", "add_export",
+-           "resolve", "score", "record_fit", "list_store", "read_manifest", "model_dir", "model_store_root", "load_canonical", "save_canonical"]
++           "IDENTITY_RULES", "LEGACY_V1_COMMITTED_REGISTRY_RULE", "LEGACY_V1_TRAIN_FREEZE_RULE", "ModelStoreError", "ModelLineage", "family_authority", "build_golden_frame", "store_model", "validate_golden",
++           "authenticate_model", "add_export", "resolve", "score", "record_fit", "list_store", "read_manifest", "model_dir",
++           "model_store_root", "load_canonical", "save_canonical"]
+diff --git a/research_workflow/policy.py b/research_workflow/policy.py
+index 516171de..3d9f6319 100644
+--- a/research_workflow/policy.py
++++ b/research_workflow/policy.py
+@@ -8,15 +8,34 @@ baseline/2026-09-platform-v2-proven):
+ * historical sealed studies keep their historical execution authority at their own commit;
+ * historical runtime implementations are not deleted and historical seals are never rewritten;
+ * no compatibility migration is required or performed.
++
++Historical execution authority is granted on AUTHENTICATED provenance only (red-team packet
++A3), never on bare marker-file existence: a study directory copied, hand-crafted, or
++untracked can otherwise "borrow" another study's execution authority by planting an empty
++or copied seal file. ``verify_historical_authority`` requires (1) the seal and the frozen
++execution manifest are tracked in git at HEAD -- i.e. genuinely committed history, not a
++disposable/untracked artifact; (2) the seal parses, is non-empty, and its recorded study
++identity equals the directory name; (3) the seal's own ``composite_seal_hash`` is
++self-consistent with its recorded ``file_hashes`` (``seal_body_hash``); (4) that composite
++equals the composite recorded in the committed ``audit/frozen_execution_manifest.json``;
++(5) if a ``study_closure.json`` is present, it must authenticate via
++``research_workflow.study_closure.load_study_closure``.
+ """
+ from __future__ import annotations
+ 
++import json
++import subprocess
+ from pathlib import Path
++from typing import Any, Dict, List, Optional
++
++REPO_ROOT = Path(__file__).resolve().parents[1]
+ 
+ OLD_RUNTIME_POLICY = "LEGACY_ONLY_FOR_NEW_RESEARCH"
+ POLICY_RECORDED_AT = "baseline/2026-09-platform-v2-proven"
+ 
+-# A v1 study with any of these already holds historical execution authority and stays runnable.
++# A v1 study with any of these MAY hold historical execution authority; existence alone is
++# only a signal that authenticity should be checked (see verify_historical_authority), not
++# authority itself.
+ _HISTORICAL_AUTHORITY_MARKERS = (
+     "artifacts/preexec_audit_seal.json",
+     "audit/frozen_execution_manifest.json",
+@@ -24,29 +43,166 @@ _HISTORICAL_AUTHORITY_MARKERS = (
+     "artifacts/train_experiment_freeze.json",
+ )
+ 
++# ZERO_STUDY_PYTHON (red-team packet F2): a normal Platform-V2 study commits no executable
++# Python at all -- the six-kind declarative grammar is the whole surface. Sanctioning an
++# exception is a PLATFORM code change (an entry here), never a study-side declaration;
++# study_id -> reason.
++STUDY_PYTHON_EXCEPTIONS: Dict[str, str] = {}
++
++_STUDY_PYTHON_IGNORED_DIRS = ("_work", "runs")
++
++
++def scan_study_python(study_dir: Path) -> List[str]:
++    """Every ``*.py``/``*.pyw``/``*.ipynb`` (case-insensitive extension) committed or
++    untracked under ``study_dir``, except ``_work/`` and ``runs/``. Returns paths relative
++    to ``study_dir`` as posix strings, sorted."""
++    study_dir = Path(study_dir).resolve()
++    found: set[str] = set()
++    if study_dir.is_dir():
++        for path in study_dir.rglob("*"):
++            if not path.is_file():
++                continue
++            rel = path.relative_to(study_dir)
++            if rel.parts and rel.parts[0] in _STUDY_PYTHON_IGNORED_DIRS:
++                continue
++            if path.suffix.lower() in (".py", ".pyw", ".ipynb"):
++                found.add(rel.as_posix())
++    return sorted(found)
++
+ 
+ class OldRuntimePolicyError(RuntimeError):
+     pass
+ 
+ 
+ def historical_authority(study_dir: Path) -> list[str]:
++    """Marker files present on disk. Existence only -- NOT a grant of authority.
++
++    Kept for reporting/back-compat; ``verify_historical_authority`` is the actual gate.
++    """
+     study_dir = Path(study_dir)
+     return [m for m in _HISTORICAL_AUTHORITY_MARKERS if (study_dir / m).is_file()]
+ 
+ 
+-def assert_old_runtime_allowed(study_dir: Path) -> dict:
+-    """Raise unless ``study_dir`` is a Platform-v2 study or a v1 study with historical authority."""
++def _git_tracked(repo_root: Path, rel_posix_path: str) -> bool:
++    try:
++        r = subprocess.run(
++            ["git", "ls-files", "--error-unmatch", rel_posix_path],
++            cwd=str(repo_root), capture_output=True, text=True,
++        )
++    except OSError:
++        return False
++    return r.returncode == 0 and bool(r.stdout.strip())
++
++
++def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = None) -> Dict[str, Any]:
++    """Authenticate a v1 study's historical execution authority. Raises OldRuntimePolicyError.
++
++    Returns an evidence dict on success:
++    ``{study_id, seal_sha256, seal_composite, manifest_composite, git_tracked, markers}``.
++    """
++    import hashlib
++
++    study_dir = Path(study_dir).resolve()
++    repo_root = Path(repo_root).resolve() if repo_root is not None else REPO_ROOT
++    markers = historical_authority(study_dir)
++
++    seal_path = study_dir / "artifacts" / "preexec_audit_seal.json"
++    manifest_path = study_dir / "audit" / "frozen_execution_manifest.json"
++
++    try:
++        rel_seal = seal_path.relative_to(repo_root).as_posix()
++        rel_manifest = manifest_path.relative_to(repo_root).as_posix()
++    except ValueError:
++        raise OldRuntimePolicyError(
++            f"HISTORICAL_AUTHORITY_UNTRACKED: {study_dir} is not inside repo root {repo_root}"
++        )
++
++    if not seal_path.is_file() or not _git_tracked(repo_root, rel_seal):
++        raise OldRuntimePolicyError(
++            f"HISTORICAL_AUTHORITY_UNTRACKED: {rel_seal} is missing or not committed to git; "
++            f"an untracked/spoofed seal cannot grant historical execution authority"
++        )
++    if not manifest_path.is_file() or not _git_tracked(repo_root, rel_manifest):
++        raise OldRuntimePolicyError(
++            f"HISTORICAL_AUTHORITY_UNTRACKED: {rel_manifest} is missing or not committed to git"
++        )
++
++    try:
++        seal = json.loads(seal_path.read_text(encoding="utf-8"))
++    except (OSError, ValueError) as exc:
++        raise OldRuntimePolicyError(f"HISTORICAL_SEAL_INVALID: cannot parse {rel_seal}: {exc}")
++    if not isinstance(seal, dict) or not seal:
++        raise OldRuntimePolicyError(f"HISTORICAL_SEAL_INVALID: {rel_seal} is empty")
++    study_name = seal.get("study_name") or seal.get("study_id")
++    composite_seal_hash = seal.get("composite_seal_hash")
++    file_hashes = seal.get("file_hashes")
++    if not study_name or not composite_seal_hash or not isinstance(file_hashes, dict) or not file_hashes:
++        raise OldRuntimePolicyError(
++            f"HISTORICAL_SEAL_INVALID: {rel_seal} missing study identity, composite_seal_hash, or file_hashes"
++        )
++    if study_name != study_dir.name:
++        raise OldRuntimePolicyError(
++            f"HISTORICAL_SEAL_STUDY_MISMATCH: seal identity {study_name!r} != directory {study_dir.name!r}"
++        )
++
++    from research_workflow.seal import seal_body_hash
++    recomputed = seal_body_hash(seal)
++    if recomputed != composite_seal_hash:
++        raise OldRuntimePolicyError(
++            f"HISTORICAL_SEAL_INVALID: {rel_seal} composite_seal_hash does not match its own "
++            f"recorded file_hashes (recomputed {recomputed[:12]} != recorded {str(composite_seal_hash)[:12]})"
++        )
++
++    try:
++        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
++    except (OSError, ValueError) as exc:
++        raise OldRuntimePolicyError(f"HISTORICAL_SEAL_INVALID: cannot parse {rel_manifest}: {exc}")
++    manifest_composite = manifest.get("frozen_execution_composite_sha256") if isinstance(manifest, dict) else None
++    if not manifest_composite or manifest_composite != composite_seal_hash:
++        raise OldRuntimePolicyError(
++            f"HISTORICAL_SEAL_STALE: seal composite {str(composite_seal_hash)[:12]} != frozen manifest "
++            f"composite {str(manifest_composite)[:12]} ({rel_manifest})"
++        )
++
++    closure_path = study_dir / "artifacts" / "study_closure.json"
++    if closure_path.is_file():
++        rel_closure = closure_path.relative_to(repo_root).as_posix()
++        if not _git_tracked(repo_root, rel_closure):
++            raise OldRuntimePolicyError(
++                f"HISTORICAL_AUTHORITY_UNTRACKED: {rel_closure} present but not committed to git"
++            )
++        from research_workflow.study_closure import StudyClosureInvalid, load_study_closure
++        try:
++            load_study_closure(study_dir)
++        except StudyClosureInvalid as exc:
++            raise OldRuntimePolicyError(f"HISTORICAL_SEAL_INVALID: study_closure.json failed authentication: {exc}")
++
++    return {
++        "study_id": study_dir.name,
++        "seal_sha256": hashlib.sha256(seal_path.read_bytes()).hexdigest(),
++        "seal_composite": composite_seal_hash,
++        "manifest_composite": manifest_composite,
++        "git_tracked": True,
++        "markers": markers,
++    }
++
++
++def assert_old_runtime_allowed(study_dir: Path, repo_root: Optional[Path] = None) -> dict:
++    """Raise unless ``study_dir`` is a Platform-v2 study or a v1 study with AUTHENTICATED
++    historical execution authority (see ``verify_historical_authority``)."""
+     from research_workflow.lifecycle_v2 import is_v2_study
+     study_dir = Path(study_dir)
+     if is_v2_study(study_dir):
+         return {"platform": "v2", "policy": OLD_RUNTIME_POLICY}
+     markers = historical_authority(study_dir)
+-    if markers:
+-        return {"platform": "v1_historical", "policy": OLD_RUNTIME_POLICY, "authority_markers": markers}
+-    raise OldRuntimePolicyError(
+-        f"OLD_RUNTIME_LEGACY_ONLY: {study_dir.name} is a v1 study without historical execution authority; "
+-        f"policy {OLD_RUNTIME_POLICY} ({POLICY_RECORDED_AT}) -- new research must be a Platform V2 study "
+-        f"(`python scripts/research.py study new <id>`; see WORKFLOW.md)")
++    if not markers:
++        raise OldRuntimePolicyError(
++            f"OLD_RUNTIME_LEGACY_ONLY: {study_dir.name} is a v1 study without historical execution authority; "
++            f"policy {OLD_RUNTIME_POLICY} ({POLICY_RECORDED_AT}) -- new research must be a Platform V2 study "
++            f"(`python scripts/research.py study new <id>`; see WORKFLOW.md)")
++    evidence = verify_historical_authority(study_dir, repo_root)
++    return {"platform": "v1_historical", "policy": OLD_RUNTIME_POLICY, "authority_markers": markers, **evidence}
+ 
+ 
+-__all__ = ["OLD_RUNTIME_POLICY", "POLICY_RECORDED_AT", "OldRuntimePolicyError", "assert_old_runtime_allowed", "historical_authority"]
++__all__ = ["OLD_RUNTIME_POLICY", "POLICY_RECORDED_AT", "OldRuntimePolicyError", "assert_old_runtime_allowed",
++           "historical_authority", "verify_historical_authority", "STUDY_PYTHON_EXCEPTIONS", "scan_study_python"]
+diff --git a/research_workflow/seal.py b/research_workflow/seal.py
+index 3bfcf58b..9dc5fa16 100644
+--- a/research_workflow/seal.py
++++ b/research_workflow/seal.py
+@@ -52,6 +52,34 @@ def compute_execution_files_manifest(
+     return composite_sha, file_hashes
+ 
+ 
++# Keys stamped into ``file_hashes`` AFTER the execution-closure composite is computed
++# (generate_preexec_audit_seal step 3): the audit status JSONs and every audit pass
++# markdown report. These are additive evidence, not part of the composite itself.
++_SEAL_ADDITIVE_EXACT_KEYS = ("study:audit/status.json", "study:audit/contract_status.json")
++
++
++def seal_body_hash(seal: Dict[str, Any]) -> str:
++    """Recompute ``composite_seal_hash`` from a seal's own recorded ``file_hashes``.
++
++    Mirrors ``generate_preexec_audit_seal`` exactly (composite = sha256 of the
++    sorted-key JSON of the execution-closure subset of ``file_hashes``, i.e.
++    ``exec_file_hashes`` before the additive audit-report keys are stamped in) and
++    ``resolve_execution_manifest``'s own ``composite_payload`` construction. This lets a
++    caller authenticate a seal artifact read from disk WITHOUT touching the live
++    filesystem or re-resolving the execution closure -- self-consistency of the seal
++    body itself, independent of whether the referenced source files still exist.
++    """
++    import json as _json
++
++    file_hashes = seal.get("file_hashes") or {}
++    closure_hashes = {
++        k: v for k, v in file_hashes.items()
++        if k not in _SEAL_ADDITIVE_EXACT_KEYS and not (k.startswith("study:audit/") and k.endswith(".md"))
++    }
++    payload = _json.dumps(closure_hashes, sort_keys=True)
++    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
++
++
+ def _find_latest_audit_pass_files(study_dir: Path) -> List[str]:
+     """Finds all existing pass_NN.md and contract_pass_NN.md files in audit directory."""
+     audit_dir = study_dir / "audit"
+diff --git a/research_workflow/tuning.py b/research_workflow/tuning.py
+index ec6241d7..944d1aa7 100644
+--- a/research_workflow/tuning.py
++++ b/research_workflow/tuning.py
+@@ -3,20 +3,57 @@
+ Chronology is structural: folds are walk-forward over ``validation.tuning_years`` only (fit on
+ every earlier tuning year, validate on the next); dev/OOS and prohibited years never enter
+ (the compiler already refuses tuning years outside TRAIN). The search is bounded by
+-``validation.max_trials``; the sampler is ``model_selection.random`` (deterministic from
+-``random_seed``) or ``model_selection.optuna`` (TPE with the same seed, median pruning across
++``validation.max_trials``; the sampler is ``model_selection.random`` (deterministic from the
++sampler seed) or ``model_selection.optuna`` (TPE with the same seed, median pruning across
+ folds, resumable from ``artifacts/tuning_optuna.db``). Every trial is persisted to the ledger
+ ``artifacts/tuning_trials.json`` with the identities the selected configuration is bound to.
++
++Sampler seed: ``validation.random_seed`` governs sampler randomness (the random sampler's RNG
++and the Optuna ``TPESampler`` seed) when present; otherwise the sampler falls back to the
++estimator's own seed (``seed``, popped from ``model.params.random_state``/``seed``). The
++estimator seed used to fit each fold's model is always ``seed`` — ``random_seed`` never changes
++what the model itself does, only how the search explores. The ledger records
++``sampler_seed_source`` as ``"validation.random_seed"`` or ``"model.params.random_state"``.
++
++Winner selection: a trial is eligible only if it is COMPLETE (Optuna: ``TrialState.COMPLETE``;
++random sampler: every fold evaluated) *and* has a fold_scores list of exactly
++``len(folds)`` non-None values. The selected aggregate is always recomputed from those
++per-fold scores (``mean_over_folds``) -- never taken from Optuna's own ``trial.value``, which
++for a PRUNED trial is its last-reported intermediate (partial) value, not the final objective.
++Eligibility is checked state-first: any non-COMPLETE trial (PRUNED / FAIL / RUNNING / WAITING)
++is ineligible with the state itself as ``ineligible_reason`` (e.g. ``"PRUNED"``), regardless of
++what its own possibly-partial fold_scores look like. Only for a COMPLETE trial are the
++fold-score completeness reasons (``NO_FOLD_SCORES`` / ``INCOMPLETE_FOLDS`` / ``NULL_FOLD_SCORE``)
++ever used. Ineligible trials are recorded in the ledger with ``eligible: false`` but can never be
++selected. If no trial is eligible, ``tune`` raises ``TuningError("TUNING_NO_COMPLETE_TRIAL")``.
++
++Intermediate reporting to the Optuna pruner reports the *raw* per-fold score at every step,
++unconditionally (no sign flip for ``brier``). Optuna's ``MedianPruner`` compares intermediate
++values across trials at the same step *in the study's own configured direction*
++(``direction="minimize"`` for brier, ``"maximize"`` otherwise), so pruning stays consistent
++with the objective's polarity without the module manually negating the reported value.
++
++Resume identity: the Optuna study name is derived from a ``tuning_identity`` sha256 computed
++over the full set of fields two tuning runs must agree on to safely share trial history:
++plan/study identity, the frozen execution closure composite, population identity, target and
++feature contracts (including feature order), the preprocessing contract, the tuning chronology
++(years + folds), the objective (metric/aggregate/direction), the search space, the sampler seed
++and its source, and the model family + base params. On top of the name binding, the full
++identity payload is stored as a ``tuning_identity_fields`` study user_attr the first time a
++study is created and compared field-by-field on every subsequent load; a mismatch raises
++``TuningError("TUNING_RESUME_IDENTITY_MISMATCH: <fields>")`` naming the differing fields rather
++than silently resuming (or silently starting over) against incompatible history.
+ """
+ from __future__ import annotations
+ 
++import hashlib
+ import json
+ import math
+ import platform
+ import random
+ from datetime import datetime, timezone
+ from pathlib import Path
+-from typing import Any, Dict, List, Mapping, Optional
++from typing import Any, Dict, List, Mapping, Optional, Tuple
+ 
+ import numpy as np
+ 
+@@ -74,6 +111,42 @@ def _score(metric: str, y_true, y_score) -> Optional[float]:
+     return fn(y_true, y_score).to_dict().get("value")
+ 
+ 
++def _recompute_aggregate(fold_scores: Optional[List[Optional[float]]], n_folds: int) -> Tuple[Optional[float], bool, Optional[str]]:
++    """Recompute the governed objective from recorded per-fold scores. Eligible only when every
++    declared fold reported a non-None score -- never from a sampler's own partial/intermediate value."""
++    if fold_scores is None:
++        return None, False, "NO_FOLD_SCORES"
++    if len(fold_scores) != n_folds:
++        return None, False, "INCOMPLETE_FOLDS"
++    if any(v is None for v in fold_scores):
++        return None, False, "NULL_FOLD_SCORE"
++    return float(np.mean([float(v) for v in fold_scores])), True, None
++
++
++def _tuning_identity(*, study_id: str, identities: Mapping[str, Any], features: List[str], folds: List[Dict[str, Any]],
++                      metric: str, maximize: bool, search_space: Mapping[str, Any], sampler_seed: int, sampler_seed_source: str,
++                      family: str, base_params: Mapping[str, Any]) -> Tuple[str, Dict[str, Any]]:
++    payload = {
++        "study_id": study_id,
++        "plan_sha256": identities.get("plan_sha256"),
++        "execution_closure_composite": identities.get("execution_closure_composite"),
++        "population_identity": identities.get("population_identity"),
++        "target_contract_sha256": identities.get("target_contract_sha256"),
++        "feature_contract_sha256": identities.get("feature_contract_sha256"),
++        "feature_order": list(features),
++        "preprocessing_contract_sha256": identities.get("preprocessing_contract_sha256"),
++        "folds": folds,
++        "objective": {"metric": metric, "aggregate": "mean_over_folds", "maximize": maximize},
++        "search_space": json.loads(json.dumps(search_space, sort_keys=True, default=str)),
++        "sampler_seed": int(sampler_seed),
++        "sampler_seed_source": sampler_seed_source,
++        "family": family,
++        "base_params": json.loads(json.dumps(base_params, sort_keys=True, default=str)),
++    }
++    blob = json.dumps(payload, sort_keys=True, default=str)
++    return hashlib.sha256(blob.encode()).hexdigest(), payload
++
++
+ def tune(*, study_id: str, frame, features: List[str], label: str, family: str, base_params: Mapping[str, Any], seed: int,
+          search_space: Mapping[str, Any], validation: Mapping[str, Any], artifacts_dir: Path, identities: Mapping[str, Any]) -> Dict[str, Any]:
+     from research.analysis.modeling import _build_estimator
+@@ -92,6 +165,14 @@ def tune(*, study_id: str, frame, features: List[str], label: str, family: str,
+         if fit_rows.empty or val_rows[label].nunique() < 2:
+             raise TuningError(f"TUNING_FOLD_DEGENERATE: {f['fold']}")
+ 
++    raw_seed = validation.get("random_seed")
++    if raw_seed is None:
++        sampler_seed = int(seed)
++        sampler_seed_source = "model.params.random_state"
++    else:
++        sampler_seed = int(raw_seed)
++        sampler_seed_source = "validation.random_seed"
++
+     def evaluate(params: Mapping[str, Any], report=None) -> List[Optional[float]]:
+         scores: List[Optional[float]] = []
+         for step, (fit_rows, val_rows) in enumerate(fold_frames):
+@@ -103,13 +184,10 @@ def tune(*, study_id: str, frame, features: List[str], label: str, family: str,
+                 report(scores[-1], step)
+         return scores
+ 
+-    def aggregate(scores: List[Optional[float]]) -> Optional[float]:
+-        vals = [v for v in scores if v is not None]
+-        return float(np.mean(vals)) if vals else None
+-
++    n_folds = len(folds)
+     trials: List[Dict[str, Any]] = []
+     if sampler == "random":
+-        rng = random.Random(int(seed))
++        rng = random.Random(sampler_seed)
+         seen = set()
+         attempts = 0
+         while len(trials) < n_trials and attempts < n_trials * 20:
+@@ -120,29 +198,43 @@ def tune(*, study_id: str, frame, features: List[str], label: str, family: str,
+                 continue
+             seen.add(key)
+             scores = evaluate(params)
+-            trials.append({"number": len(trials), "params": params, "fold_scores": scores, "aggregate": aggregate(scores), "state": "COMPLETE"})
++            agg, eligible, reason = _recompute_aggregate(scores, n_folds)
++            trials.append({"number": len(trials), "params": params, "fold_scores": scores, "aggregate": agg, "state": "COMPLETE",
++                           "eligible": eligible, "ineligible_reason": reason})
+     else:
+         try:
+             import optuna
+         except ImportError as exc:
+             raise TuningError("OPTUNA_NOT_INSTALLED: validation.protocol model_selection.optuna needs the optuna package; use model_selection.random or install optuna") from exc
+         optuna.logging.set_verbosity(optuna.logging.WARNING)
++        tuning_identity, identity_payload = _tuning_identity(study_id=study_id, identities=identities, features=features, folds=folds,
++                                                               metric=metric, maximize=maximize, search_space=search_space,
++                                                               sampler_seed=sampler_seed, sampler_seed_source=sampler_seed_source,
++                                                               family=family, base_params=base_params)
+         storage = f"sqlite:///{(Path(artifacts_dir) / 'tuning_optuna.db').resolve().as_posix()}"
+-        ostudy = optuna.create_study(study_name=f"{study_id}:{identities.get('plan_sha256', '')[:12]}", storage=storage, load_if_exists=True,
+-                                     direction="maximize" if maximize else "minimize", sampler=optuna.samplers.TPESampler(seed=int(seed)),
++        ostudy = optuna.create_study(study_name=f"{study_id}:{tuning_identity[:16]}", storage=storage, load_if_exists=True,
++                                     direction="maximize" if maximize else "minimize", sampler=optuna.samplers.TPESampler(seed=sampler_seed),
+                                      pruner=optuna.pruners.MedianPruner(n_startup_trials=max(3, n_trials // 5)))
++        existing = ostudy.user_attrs.get("tuning_identity_fields")
++        if existing is None:
++            ostudy.set_user_attr("tuning_identity", tuning_identity)
++            ostudy.set_user_attr("tuning_identity_fields", identity_payload)
++        else:
++            diffs = [k for k in identity_payload if json.dumps(identity_payload[k], sort_keys=True, default=str) != json.dumps(existing.get(k), sort_keys=True, default=str)]
++            if diffs:
++                raise TuningError(f"TUNING_RESUME_IDENTITY_MISMATCH: {', '.join(sorted(diffs))}")
+ 
+         def objective(trial):
+             params = _suggest_optuna(trial, search_space)
+             def report(value, step):
+                 if value is not None:
+-                    trial.report(value if maximize else -value, step)
++                    trial.report(value, step)
+                     if trial.should_prune():
+                         raise optuna.TrialPruned()
+             scores = evaluate(params, report)
+             trial.set_user_attr("fold_scores", scores)
+-            agg = aggregate(scores)
+-            if agg is None:
++            agg, eligible, _reason = _recompute_aggregate(scores, n_folds)
++            if not eligible:
+                 raise optuna.TrialPruned()
+             return agg
+ 
+@@ -150,15 +242,28 @@ def tune(*, study_id: str, frame, features: List[str], label: str, family: str,
+         if remaining:
+             ostudy.optimize(objective, n_trials=remaining, n_jobs=1)
+         for t in ostudy.trials:
+-            trials.append({"number": t.number, "params": dict(t.params), "fold_scores": t.user_attrs.get("fold_scores"), "aggregate": (t.value if t.value is not None else None),
+-                           "state": str(t.state.name)})
+-    complete = [t for t in trials if t["aggregate"] is not None]
+-    if not complete:
++            fold_scores = t.user_attrs.get("fold_scores")
++            state = str(t.state.name)
++            # State is checked FIRST: any non-COMPLETE trial (PRUNED/FAIL/RUNNING/WAITING) is
++            # ineligible with the state itself as the reason, regardless of what its (possibly
++            # partial) fold_scores look like. Only a COMPLETE trial's fold-score completeness is
++            # then checked, so a COMPLETE trial can still be ineligible on INCOMPLETE_FOLDS /
++            # NULL_FOLD_SCORE / NO_FOLD_SCORES if its recorded scores are somehow short or null.
++            if state != "COMPLETE":
++                agg, eligible, reason = None, False, state
++            else:
++                agg, eligible, reason = _recompute_aggregate(fold_scores, n_folds)
++            trials.append({"number": t.number, "params": dict(t.params), "fold_scores": fold_scores, "optuna_value": t.value,
++                           "aggregate": agg, "state": state, "eligible": eligible, "ineligible_reason": (None if eligible else reason)})
++    eligible_trials = [t for t in trials if t.get("eligible")]
++    if not eligible_trials:
+         raise TuningError("TUNING_NO_COMPLETE_TRIAL")
+-    selected = (max if maximize else min)(complete, key=lambda t: t["aggregate"])
+-    ledger = {"schema_version": 1, "study_id": study_id, **dict(identities), "feature_order": list(features), "label_column": label, "family": family, "base_params": dict(base_params),
+-              "folds": folds, "sampler": sampler, "sampler_seed": int(seed), "search_space": dict(search_space), "objective": {"metric": metric, "aggregate": "mean_over_folds", "maximize": maximize},
+-              "n_trials": len(trials), "trials": trials, "selected": {"number": selected["number"], "params": selected["params"], "aggregate": selected["aggregate"]},
++    selected = (max if maximize else min)(eligible_trials, key=lambda t: t["aggregate"])
++    ledger = {"schema_version": 2, "study_id": study_id, **dict(identities), "feature_order": list(features), "label_column": label, "family": family, "base_params": dict(base_params),
++              "folds": folds, "sampler": sampler, "sampler_seed": int(sampler_seed), "sampler_seed_source": sampler_seed_source, "search_space": dict(search_space),
++              "objective": {"metric": metric, "aggregate": "mean_over_folds", "maximize": maximize},
++              "n_trials": len(trials), "n_eligible": len(eligible_trials), "trials": trials,
++              "selected": {"number": selected["number"], "params": selected["params"], "aggregate": selected["aggregate"]},
+               "environment": _versions(), "generated_at_utc": datetime.now(timezone.utc).isoformat()}
+     path = Path(artifacts_dir) / "tuning_trials.json"
+     path.parent.mkdir(parents=True, exist_ok=True)
+diff --git a/research_workflow/workspace.py b/research_workflow/workspace.py
+index b69c7765..ca4ceba1 100644
+--- a/research_workflow/workspace.py
++++ b/research_workflow/workspace.py
+@@ -7,15 +7,32 @@
+       the machine-local roots of ``research_workflow.roots``),
+     * allocates the run namespace ``studies/<id>/runs/`` and ``_work/`` (gitignored),
+     * scaffolds ``studies/<id>/{research_decision.yaml,study.yaml,SPEC.md}`` skeletons,
+-    * writes a writer lease ``<leases_dir>/<id>.json`` {study, branch, worktree, pid, owner, created}
+-      and refuses if a live lease already names that worktree.
++    * writes a writer lease ``<leases_dir>/<id>.json`` (schema v2, see below) and refuses if a
++      live lease already names that worktree.
+ 
+ ``ws_list()``
+-    branches, worktrees, owners, leases (live / stale / dead), dirty state -- one JSON card.
++    branches, worktrees, owners, leases (live / stale / dead / released), dirty state -- one JSON card.
+ 
+-Leases are process-local facts, never scientific artifacts. A lease whose PID is dead is
+-``stale`` and may be reclaimed by ``study_new``/``ws_list --reclaim``; a lease is ``dead`` when
+-its worktree no longer exists.
++Leases are process-local facts, never scientific artifacts, but ownership of an active
++workspace must outlive the short-lived ``study new`` CLI process that created it: durability
++comes from a TTL-bounded renewal window, not from the creator's PID alone.
++
++Lease schema v2 (current)::
++
++    {schema_version: 2, study_id, branch, worktree, owner, created_at_utc,
++     holder: {pid, kind: "cli"|"controller", renewed_at_utc}, ttl_seconds, released_at_utc}
++
++States:
++  * ``dead``     -- the lease's worktree no longer exists.
++  * ``released`` -- ``released_at_utc`` is set (``research ws release <study_id>``).
++  * ``live``     -- worktree exists AND (holder pid alive OR now < holder.renewed_at_utc + ttl_seconds).
++  * ``stale``    -- worktree exists, holder pid dead AND the ttl window has expired.
++
++``research_workflow.governed_controller_v2.V2StudyController.run()`` renews the lease (kind
++``controller``) on every run while it owns the worktree, so a long controller run keeps the
++lease ``live`` long after the creating CLI process has exited. Schema-v1 lease files (flat
++``pid`` field, no ``holder``) are still read transparently: normalized in memory to
++``holder={pid, kind:"cli", renewed_at_utc:created_at_utc}``.
+ """
+ from __future__ import annotations
+ 
+@@ -23,17 +40,24 @@ import getpass
+ import json
+ import os
+ import subprocess
+-from datetime import datetime, timezone
++from datetime import datetime, timedelta, timezone
+ from pathlib import Path
+ from typing import Any, Dict, List, Optional
+ 
+ from research_workflow.roots import load_config
+ 
++DEFAULT_LEASE_TTL_SECONDS = 259200   # 72h
++
+ 
+ class WorkspaceError(RuntimeError):
+     pass
+ 
+ 
++def current_owner() -> str:
++    host = os.environ.get("COMPUTERNAME") or (os.uname().nodename if hasattr(os, "uname") else "")
++    return f"{getpass.getuser()}@{host}"
++
++
+ def _git(args: List[str], cwd: Path) -> str:
+     r = subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, encoding="utf-8", errors="replace")
+     if r.returncode != 0:
+@@ -71,6 +95,48 @@ def leases_dir(config=None) -> Path:
+     return Path(cfg.leases_dir)
+ 
+ 
++def _normalize(rec: Dict[str, Any]) -> Dict[str, Any]:
++    """Normalize a lease record (on-disk schema v1 or v2) to an in-memory v2 shape. Never
++    rewrites the file -- callers that mutate call ``_atomic_write`` explicitly."""
++    out = dict(rec)
++    if isinstance(out.get("holder"), dict):
++        out.setdefault("schema_version", 2)
++        out.setdefault("ttl_seconds", DEFAULT_LEASE_TTL_SECONDS)
++        out.setdefault("released_at_utc", None)
++        return out
++    # schema v1: flat {pid, owner, created_at_utc, ...} -- treat pid as the holder, kind "cli"
++    out["schema_version"] = out.get("schema_version", 1)
++    out["holder"] = {"pid": out.get("pid"), "kind": "cli", "renewed_at_utc": out.get("created_at_utc")}
++    out.setdefault("ttl_seconds", DEFAULT_LEASE_TTL_SECONDS)
++    out.setdefault("released_at_utc", None)
++    return out
++
++
++def lease_state(rec: Dict[str, Any]) -> str:
++    """dead (worktree gone) > released (released_at_utc set) > live (holder pid alive, or the
++    ttl-bounded renewal window has not yet expired) > stale (neither)."""
++    wt = Path(str(rec.get("worktree", "")))
++    if not wt.is_dir():
++        return "dead"
++    if rec.get("released_at_utc"):
++        return "released"
++    holder = rec.get("holder") or {}
++    pid = int(holder.get("pid") or 0)
++    alive = _pid_alive(pid) if pid else False
++    if alive:
++        return "live"
++    ttl = int(rec.get("ttl_seconds") or DEFAULT_LEASE_TTL_SECONDS)
++    renewed_raw = holder.get("renewed_at_utc") or rec.get("created_at_utc")
++    try:
++        renewed = datetime.fromisoformat(str(renewed_raw))
++    except (TypeError, ValueError):
++        return "stale"
++    now = datetime.now(timezone.utc)
++    if renewed.tzinfo is None:
++        renewed = renewed.replace(tzinfo=timezone.utc)
++    return "live" if now < renewed + timedelta(seconds=ttl) else "stale"
++
++
+ def read_leases(config=None) -> List[Dict[str, Any]]:
+     d = leases_dir(config)
+     rows = []
+@@ -81,27 +147,82 @@ def read_leases(config=None) -> List[Dict[str, Any]]:
+             rec = json.loads(p.read_text(encoding="utf-8"))
+         except (OSError, ValueError):
+             continue
+-        alive = _pid_alive(int(rec.get("pid", -1)))
+-        wt = Path(str(rec.get("worktree", "")))
+-        rec["state"] = "dead" if not wt.is_dir() else ("live" if alive else "stale")
++        rec = _normalize(rec)
++        rec["state"] = lease_state(rec)
+         rec["lease_path"] = str(p)
+         rows.append(rec)
+     return rows
+ 
+ 
++def _atomic_write(path: Path, payload: Dict[str, Any]) -> None:
++    tmp = path.with_suffix(path.suffix + ".tmp")
++    tmp.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
++    tmp.replace(path)
++
++
+ def _write_lease(study_id: str, branch: str, worktree: Path, config=None, owner: Optional[str] = None) -> Path:
+-    d = leases_dir(config); d.mkdir(parents=True, exist_ok=True)
+-    for lease in read_leases(config):
++    from research_workflow.locks import acquire_exclusive
++    cfg = config if config is not None else load_config()
++    d = leases_dir(cfg); d.mkdir(parents=True, exist_ok=True)
++    for lease in read_leases(cfg):
+         if Path(str(lease.get("worktree", ""))).resolve() == worktree.resolve() and lease["state"] == "live":
+-            raise WorkspaceError(f"WRITER_LEASE_HELD: worktree {worktree} already has a live writer lease ({lease.get('owner')}, pid {lease.get('pid')})")
++            raise WorkspaceError(f"WRITER_LEASE_HELD: worktree {worktree} already has a live writer lease "
++                                  f"({lease.get('owner')}, pid {(lease.get('holder') or {}).get('pid')})")
+     p = d / f"{study_id}.json"
+-    payload = {"schema_version": 1, "study_id": study_id, "branch": branch, "worktree": str(worktree.resolve()), "pid": os.getpid(),
+-               "owner": owner or f"{getpass.getuser()}@{os.environ.get('COMPUTERNAME') or os.uname().nodename if hasattr(os, 'uname') else getpass.getuser()}",
+-               "created_at_utc": datetime.now(timezone.utc).isoformat()}
+-    p.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
++    now = datetime.now(timezone.utc).isoformat()
++    ttl = int(getattr(cfg, "lease_ttl_seconds", DEFAULT_LEASE_TTL_SECONDS) or DEFAULT_LEASE_TTL_SECONDS)
++    payload = {"schema_version": 2, "study_id": study_id, "branch": branch, "worktree": str(worktree.resolve()),
++               "owner": owner or current_owner(), "created_at_utc": now,
++               "holder": {"pid": os.getpid(), "kind": "cli", "renewed_at_utc": now},
++               "ttl_seconds": ttl, "released_at_utc": None}
++    # a leftover lease file for this exact study_id (e.g. a prior failed/reclaimed attempt) is
++    # always safe to overwrite here: uniqueness of the *worktree* was just checked above.
++    result = acquire_exclusive(p, payload, is_stale=lambda existing, mtime: True, max_attempts=1)
++    if not result.acquired:
++        raise WorkspaceError(f"LEASE_FILE_EXISTS: {p}")
+     return p
+ 
+ 
++def renew_lease(worktree: Path, *, owner: str, pid: int, kind: str = "controller", config=None) -> Optional[Dict[str, Any]]:
++    """Refresh ``holder`` + ``renewed_at_utc`` on the lease naming ``worktree``, if any.
++
++    Raises ``WorkspaceError`` if a lease exists for that worktree but is owned by someone else;
++    returns ``None`` if no lease names that worktree (nothing to renew, proceed unchanged)."""
++    cfg = config if config is not None else load_config()
++    worktree = Path(worktree).resolve()
++    for lease in read_leases(cfg):
++        if Path(str(lease.get("worktree", ""))).resolve() != worktree:
++            continue
++        if lease.get("owner") != owner:
++            raise WorkspaceError(f"WRITER_LEASE_HELD_BY_OTHER: {worktree} is leased to {lease.get('owner')}, not {owner}")
++        p = Path(lease["lease_path"])
++        raw = _normalize(json.loads(p.read_text(encoding="utf-8")))
++        raw["schema_version"] = 2
++        raw["holder"] = {"pid": pid, "kind": kind, "renewed_at_utc": datetime.now(timezone.utc).isoformat()}
++        raw["released_at_utc"] = None
++        raw.setdefault("ttl_seconds", int(getattr(cfg, "lease_ttl_seconds", DEFAULT_LEASE_TTL_SECONDS) or DEFAULT_LEASE_TTL_SECONDS))
++        _atomic_write(p, raw)
++        out = dict(raw); out["state"] = lease_state(raw); out["lease_path"] = str(p)
++        return out
++    return None
++
++
++def release_lease(study_id: str, *, owner: str, config=None) -> Dict[str, Any]:
++    """Explicit release (``research ws release <study_id>``): allowed only for the owner."""
++    cfg = config if config is not None else load_config()
++    p = leases_dir(cfg) / f"{study_id}.json"
++    if not p.is_file():
++        raise WorkspaceError(f"LEASE_NOT_FOUND: {study_id}")
++    raw = _normalize(json.loads(p.read_text(encoding="utf-8")))
++    if raw.get("owner") != owner:
++        raise WorkspaceError(f"LEASE_RELEASE_REFUSED: {study_id} is leased to {raw.get('owner')}, not {owner}")
++    raw["schema_version"] = 2
++    raw["released_at_utc"] = datetime.now(timezone.utc).isoformat()
++    _atomic_write(p, raw)
++    out = dict(raw); out["state"] = "released"; out["lease_path"] = str(p)
++    return out
++
++
+ def _skeletons(study_dir: Path, study_id: str, dataset_id: str, question: str) -> List[Path]:
+     study_dir.mkdir(parents=True, exist_ok=True)
+     (study_dir / "runs").mkdir(exist_ok=True); (study_dir / "_work").mkdir(exist_ok=True)
+@@ -207,7 +328,7 @@ def ws_list(*, repo_root: Path, config=None, reclaim: bool = False) -> Dict[str,
+     reclaimed = []
+     if reclaim:
+         for l in leases:
+-            if l["state"] in {"stale", "dead"}:
++            if l["state"] in {"stale", "dead", "released"}:
+                 Path(l["lease_path"]).unlink(missing_ok=True); reclaimed.append(l["study_id"])
+     branches = [b.strip().lstrip("* ").strip() for b in _git(["branch", "--list"], repo_root).splitlines() if b.strip()]
+     return {"repo": str(repo_root), "worktrees": rows, "leases": [{k: l.get(k) for k in ("study_id", "branch", "worktree", "owner", "pid", "state", "created_at_utc")} for l in leases],
+@@ -215,4 +336,4 @@ def ws_list(*, repo_root: Path, config=None, reclaim: bool = False) -> Dict[str,
+             "branches": {"count": len(branches), "study": sorted(b for b in branches if b.startswith("study/")), "other": sorted(b for b in branches if not b.startswith("study/"))}}
+ 
+ 
+-__all__ = ["WorkspaceError", "study_new", "ws_list", "read_leases", "leases_dir"]
++__all__ = ["WorkspaceError", "study_new", "ws_list", "read_leases", "leases_dir", "renew_lease", "release_lease", "current_owner", "lease_state"]
+diff --git a/scripts/research.py b/scripts/research.py
+index eee0671b..2e0c7146 100644
+--- a/scripts/research.py
++++ b/scripts/research.py
+@@ -13,7 +13,8 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
+     research study run --study <dir> --through <stage> ...   the governed controller (v1 or v2 by grammar)
+     research audit ingest --study <dir> --type causal|contract --report <md> [--author <id>]
+     research bench [--series host_c,host_a,golden]           host performance measurement vs bench/baseline_v0.json
+-    research ws list [--reclaim]                             branches, worktrees, owners, leases (live/stale/dead), dirty state
++    research ws list [--reclaim]                             branches, worktrees, owners, leases (live/stale/dead/released), dirty state
++    research ws release <study_id>                            explicitly release a writer lease you own
+ """
+ from __future__ import annotations
+ 
+@@ -158,6 +159,11 @@ def cmd_ws_list(ns: argparse.Namespace) -> int:
+     return _card(ws_list(repo_root=ROOT, reclaim=bool(getattr(ns, "reclaim", False))))
+ 
+ 
++def cmd_ws_release(ns: argparse.Namespace) -> int:
++    from research_workflow.workspace import current_owner, release_lease
++    return _card(release_lease(ns.study_id, owner=current_owner()))
++
++
+ # ---------------------------------------------------------------------------
+ # model store
+ # ---------------------------------------------------------------------------
+@@ -169,9 +175,9 @@ def cmd_model_list(_: argparse.Namespace) -> int:
+ 
+ 
+ def cmd_model_validate(ns: argparse.Namespace) -> int:
+-    from research_workflow.model_store import validate_golden
++    from research_workflow.model_store import authenticate_model
+     try:
+-        return _card(validate_golden(ns.model_id))
++        return _card(authenticate_model(ns.model_id))
+     except Exception as exc:
+         return _card({"model_id": ns.model_id, "error": f"{type(exc).__name__}: {exc}"}, ok=False)
+ 
+@@ -235,8 +241,9 @@ def build_parser() -> argparse.ArgumentParser:
+     mm.add_argument("--train-frame", help="parquet of TRAIN rows for real-row golden frames"); mm.add_argument("--export", action="append"); mm.add_argument("--limit", type=int); mm.set_defaults(fn=cmd_model_migrate)
+ 
+     ws = sub.add_parser("ws").add_subparsers(dest="cmd", required=True)
+-    wl = ws.add_parser("list"); wl.add_argument("--reclaim", action="store_true", help="delete stale (dead pid) and dead (missing worktree) writer leases; live leases are never touched")
++    wl = ws.add_parser("list"); wl.add_argument("--reclaim", action="store_true", help="delete stale/dead/released writer leases; live leases are never touched")
+     wl.set_defaults(fn=cmd_ws_list)
++    wr = ws.add_parser("release"); wr.add_argument("study_id"); wr.set_defaults(fn=cmd_ws_release)
+     return ap
+ 
+ 

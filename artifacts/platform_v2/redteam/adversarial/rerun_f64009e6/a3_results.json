@@ -1,0 +1,70 @@
+{
+ "results": [
+  {
+   "case": "(a) empty seal, git-committed",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_SEAL_INVALID: studies/v1_empty_seal/artifacts/preexec_audit_seal.json is empty",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(b0) legitimate self-consistent committed study (control)",
+   "outcome": "GRANTED {\"platform\": \"v1_historical\", \"policy\": \"LEGACY_ONLY_FOR_NEW_RESEARCH\", \"authority_markers\": [\"artifacts/preexec_audit_seal.json\", \"audit/frozen_execution_manifest.json\"], \"study_id\": \"v1_good\", \"seal",
+   "verdict": "OK"
+  },
+  {
+   "case": "(b) foreign seal copied verbatim into another study dir",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_SEAL_STUDY_MISMATCH: seal identity 'v1_good' != directory 'v1_foreign'",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(c) stale seal (manifest composite mismatch)",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_SEAL_STALE: seal composite 3118feb7f4bc != frozen manifest composite cccccccccccc (studies/v1_stale/audit/frozen_execution_manifest.json)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(d) self-consistent seal, never added to git",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_AUTHORITY_UNTRACKED: studies/v1_untracked/artifacts/preexec_audit_seal.json is missing or not committed to git at HEAD; an untracked/staged-only/deleted-at-HEAD preexec audit seal cannot grant historical execu",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(e) seal composite does not match its own file_hashes",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_SEAL_INVALID: studies/v1_badcomposite/artifacts/preexec_audit_seal.json composite_seal_hash does not match its own recorded file_hashes (recomputed 3118feb7f4bc != recorded dddddddddddd)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(f) seal study_name != directory name",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_SEAL_STUDY_MISMATCH: seal identity 'some_other_study' != directory 'v1_wrongid'",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(g) ADJACENT: fabricated self-consistent seal, `git add` only (never committed)",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_AUTHORITY_UNTRACKED: studies/v1_index_only/artifacts/preexec_audit_seal.json is missing or not committed to git at HEAD; an untracked/staged-only/deleted-at-HEAD preexec audit seal cannot grant historical exec",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(h) ADJACENT: committed study whose seal+manifest were rewritten in the working tree after commit",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_AUTHORITY_MODIFIED_IN_WORKTREE: studies/v1_worktree_swap/artifacts/preexec_audit_seal.json was committed at HEAD but the working-tree bytes of this preexec audit seal differ from that commit; a committed recor",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(i) ADJACENT: seal committed only on a different branch (restored+staged on this one)",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_AUTHORITY_UNTRACKED: studies/v1_branch_only/artifacts/preexec_audit_seal.json is missing or not committed to git at HEAD; an untracked/staged-only/deleted-at-HEAD preexec audit seal cannot grant historical exe",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(j) ADJACENT: junction inside the repo pointing at a study outside it",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_AUTHORITY_UNTRACKED: C:\\Users\\Scott McCarty\\AppData\\Local\\Temp\\tmpmhtrrb1j\\outside\\studies\\v1_real_outside is not inside repo root C:\\Users\\Scott McCarty\\AppData\\Local\\Temp\\tmpmhtrrb1j\\repo",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "(k) ADJACENT: nested studies/outer/studies/v1_good (name collision with a real study)",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_SEAL_STUDY_MISMATCH: seal identity 'outer/studies/v1_good' != directory 'v1_good'",
+   "verdict": "UNEXPECTED_REJECT"
+  },
+  {
+   "case": "(l) ADJACENT: forged study_closure.json alongside a valid seal",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_SEAL_INVALID: study_closure.json failed authentication: STUDY_CLOSURE_MALFORMED: missing required field(s): ['schema_version', 'study_id', 'status', 'terminal_decision']",
+   "verdict": "BLOCKED"
+  }
+ ],
+ "tmp": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmpmhtrrb1j"
+}

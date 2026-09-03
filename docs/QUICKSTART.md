@@ -54,7 +54,9 @@ python scripts/research.py study compile --study studies/my_study
 python scripts/run_governed_study.py --study studies/my_study --through seal --execute-authorized
 ```
 
-Stops at `NEEDS_CAUSAL_AUDIT` with `_work/controller/audit_packet_causal.json`.
+Stops at `NEEDS_CAUSAL_AUDIT` with `_work/controller/audit_packet_causal.json`. `--execute-authorized`
+is the real execution gate: it is required for every stage after `seal` (smoke through close) or the
+run is `BLOCKED` with `EXECUTION_NOT_AUTHORIZED`; it is a no-op for `--through seal` or earlier.
 
 ## 6. Request and ingest the audits
 
@@ -110,7 +112,8 @@ Every study is its own branch and worktree; several run side by side. From the c
 git switch main && git status --short                        # clean main = source of the study
 python scripts/research.py study new <id> --from-question question.md
 cd "../Nautilus Trader-<id>"                                 # the worktree named in the card; all writes happen here
-python scripts/research.py ws list                           # worktrees, owners, lease state (live / stale / dead)
+python scripts/research.py ws list                           # worktrees, owners, lease state (live / stale / dead / released)
+python scripts/research.py ws release <id>                   # explicitly release a lease you own
 ```
 
 Rules and merge-back: `WORKFLOW.md` §M.

@@ -143,6 +143,14 @@ MEANING: Dict[str, Tuple[str, str, str]] = {
     "model.models[].label": ("Outcome label column to evaluate against.", "Must be an outcome column of this study.", "label: target_tp1_sl1_0_label"),
     "model.models[].subset": ("Explicit column == value row filters.", "No hidden direction semantics.", "subset: {regime_direction: 1}"),
     "model.models[].name": ("Display name.", "None.", "name: LONG_SL1_0"),
+    "model.models[].expect": ("Optional identity expectations, authenticated against the model-store lineage before scoring.", "A mismatch refuses the model (MODEL_EXPECTATION_MISMATCH).", "expect: {target_arm: SL1_0}"),
+    "model.models[].expect.study_id": ("Expected lineage.study_id.", "None.", "study_id: parent_study"),
+    "model.models[].expect.target_arm": ("Expected lineage.target_arm.", "None.", "target_arm: SL1_0"),
+    "model.models[].expect.direction": ("Expected lineage.direction.", "None.", "direction: LONG"),
+    "model.models[].expect.cell_id": ("Expected lineage.cell_id.", "None.", "cell_id: LONG_SL1_0"),
+    "model.models[].expect.canonical_sha256": ("Expected manifest canonical.byte_sha256 -- binds to the estimator's actual bytes, not only lineage; catches a substituted estimator that refreshes its own canonical/golden bytes under an unchanged model_id.",
+                                               "A wrong or stale declared value fails closed as CANONICAL_SHA_MISMATCH before score().",
+                                               "canonical_sha256: 3b1c...a2"),
     "model.search_space": ("param -> [choices] | {low, high, log?, int?}; searched by validation.protocol over walk-forward tuning folds.", "TRAIN-only by construction; ledger in artifacts/tuning_trials.json.", "search_space: {n_estimators: [100, 200], learning_rate: {low: 0.01, high: 0.3, log: true}}"),
 }
 
@@ -233,7 +241,9 @@ def render() -> str:
               "* `model: none` is the default; `model.mode: score` needs `model.models`; `model.mode: train` needs `model.family`.",
               "* `outcome.kind: trade` compiles to a typed TradeExecutionContract but has no sink in this phase; use `kind: label`.",
               "* Typed compile failures (`CapabilityGap`): MISSING_CAPABILITY, INVALID_PARAMETERIZATION, AMBIGUOUS_TEMPORAL_SEMANTICS, UNAVAILABLE_STREAM, UNSUPPORTED_COMPOSITION, SEMANTIC_DECISION_REQUIRED.",
-              "* Registry-blind drafts: write `unresolved:<semantic description>` where a capability id would go; the compiler returns MISSING_CAPABILITY with the closest registered ids.", ""]
+              "* Registry-blind drafts: write `unresolved:<semantic description>` where a capability id would go; the compiler returns MISSING_CAPABILITY with the closest registered ids.",
+              "* Outcome resolution precedence at every bar (in-horizon, or the first post-horizon bar under `horizon_end_rule: first_bar_at_or_after`) is fixed and non-configurable: `SESSION_END > GAP > BARRIER_TOUCH > HORIZON_EXPIRY`. A bar past `outcome.session` close is CENSORED `SESSION_END` before gap or touch are ever evaluated; a bar farther than `outcome.max_gap` from the last accepted bar is CENSORED `GAP` before a barrier touch on that bar is accepted; only then is a favorable/adverse touch resolved; only if none of the above applies and the horizon has elapsed does `expiry` (censor vs negative) apply. This holds identically for the kernel (`research_workflow/host/outcomes.py`) and the independent replay oracle (`research_workflow/target_replay_oracle.py`); it is compiled into every outcome contract as `outcome.semantics.resolution_precedence`.",
+              "* DatasetSpec `reference_tables` / `reference_digest` (declared on the dataset YAML under `research/datasets/<id>.yaml`, not on the study grammar): `reference_tables` names which reference tables (sessions, holidays, maintenance, rolls, gaps, out_of_calendar) the dataset carries; `reference_digest` pins their combined content hash. Verification is fail-closed: a hash mismatch at load time refuses the study rather than silently reading a drifted table. A `sessions` table selects the calendar session kind for outcome/population censoring; ETH is `(open, 08:30 CT]` pre-open plus `(15:15 CT or halt end, day close]` post-close -- legacy ETH censoring without a `sessions` reference table is refused (`SEMANTIC_DECISION_REQUIRED`).", ""]
     text = "\n".join(lines)
     if missing:
         raise SystemExit(f"MEANING table is missing entries for: {missing}")

@@ -1,0 +1,60 @@
+{
+ "results": [
+  {
+   "case": "E1 a PRUNED trial holds the best Optuna partial value; winner must still be COMPLETE",
+   "outcome": "selected=#8 state=COMPLETE aggregate=0.701953 ; best PRUNED optuna_value=0.9181908037151095 ; n_pruned=5",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E1b selected aggregate is recomputed from fold_scores (not trial.value)",
+   "outcome": "aggregate=0.7019531409966334 mean(fold_scores)=0.7019531409966334 optuna_value=0.7019531409966334",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E1c no PRUNED trial is eligible",
+   "outcome": "eligible_pruned=[]",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E1d ADJACENT: planted COMPLETE trial with missing fold_scores and value=0.999",
+   "outcome": "planted eligible=False reason='NO_FOLD_SCORES' ; selected=#2 aggregate=0.7001262244744153",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E1d ADJACENT: planted COMPLETE trial with short fold_scores and value=0.999",
+   "outcome": "planted eligible=False reason='INCOMPLETE_FOLDS' ; selected=#2 aggregate=0.7001262244744153",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E1d ADJACENT: planted COMPLETE trial with null fold_scores and value=0.999",
+   "outcome": "planted eligible=False reason='NULL_FOLD_SCORE' ; selected=#2 aggregate=0.7001262244744153",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E2 resume with IDENTICAL identity",
+   "outcome": "resumed without error",
+   "verdict": "OK"
+  },
+  {
+   "case": "E2 resume against an existing db with population_identity changed",
+   "outcome": "no error; n_trials=3 (fresh study under a new name means no cross-identity reuse)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E2 resume against an existing db with feature_contract_sha256 changed",
+   "outcome": "no error; n_trials=3 (fresh study under a new name means no cross-identity reuse)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E2 resume against an existing db with execution_closure_composite changed",
+   "outcome": "no error; n_trials=3 (fresh study under a new name means no cross-identity reuse)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "E2b planted study_name collision with different identity fields",
+   "outcome": "TUNING_RESUME_IDENTITY_MISMATCH: population_identity",
+   "verdict": "BLOCKED"
+  }
+ ],
+ "tmp": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmppuy4atrr"
+}

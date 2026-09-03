@@ -32,6 +32,34 @@ KEY = ("observation_ts", "regime_start_ns", "checkpoint_index")
 PLATFORM_TESTS = ("research_workflow/tests/test_golden_fixture.py", "research_workflow/tests/test_grammar_v2.py",
                   "research_workflow/tests/test_host_core.py")
 
+# Single source of truth for the deliverable each stage writes -- research_workflow.audit_packets_v2
+# builds DELIVERABLES_BY_STAGE from this constant so the audit packet cannot silently name a
+# different filename than the one the lifecycle actually writes (red-team packet F1). Values are
+# paths relative to the study directory; a "<year>" placeholder marks a per-partition path.
+DELIVERABLES = {
+    "compile": ["compiled_plan.json"],
+    "prepare": ["audit/frozen_execution_manifest.json", "artifacts/experiment_authorization.json"],
+    "readiness": ["audit/readiness.json"],
+    "preflight": ["audit/preflight.json"],
+    "tests": ["_work/controller/test_summary.json"],
+    "causal_audit": ["audit/status.json"],
+    "contract_audit": ["audit/contract_status.json"],
+    "seal": ["artifacts/preexec_audit_seal.json"],
+    "smoke": ["artifacts/smoke_acceptance.json"],
+    "collection": ["_work/controller/partitions/train/<year>/{candidates,observations}.parquet"],
+    "reconcile": ["_work/controller/reconcile.json"],
+    "merge": ["_work/controller/merged/{candidates,observations}.parquet", "_work/controller/merged/identity.json"],
+    "fit": ["artifacts/experiment_models.json"],
+    "freeze": ["artifacts/train_experiment_freeze.json"],
+    "oos": ["_work/controller/partitions/oos/<year>/{candidates,observations}.parquet"],
+    "analyze": ["artifacts/experiment_analysis_v2.json"],
+    "close": ["artifacts/study_closure.json"],
+}
+# fit additionally writes artifacts/tuning_trials.json (+ tuning_optuna.db for the optuna sampler)
+# when the plan declares a model.search_space; not a fixed filename, so callers that need it
+# should check plan["model"].get("search_space") and add it themselves (see audit_packets_v2).
+FIT_TUNING_DELIVERABLES = ["artifacts/tuning_trials.json"]
+
 
 class CapabilityGapBlocked(RuntimeError):
     def __init__(self, report: Dict[str, Any]) -> None:
@@ -93,6 +121,85 @@ def load_plan(study: Path) -> Dict[str, Any]:
     return plan
 
 
+def _strict_int_year(y: Any) -> int:
+    """Normalize a requested year to ``int`` without ever truncating a fractional value.
+    ``bool`` is rejected even though it is an ``int`` subclass (``True``/``False`` are not
+    years). An integral float/str (``2023.0`` / ``"2023"``) normalizes to ``int``; a
+    fractional float/str (``2023.5`` / ``"2023.5"``) raises rather than silently truncating."""
+    if isinstance(y, bool):
+        raise ValueError(f"{y!r} is a bool, not a year")
+    if isinstance(y, int):
+        return y
+    if isinstance(y, float):
+        if y.is_integer():
+            return int(y)
+        raise ValueError(f"{y!r} is not an integral year")
+    if isinstance(y, str):
+        try:
+            f = float(y)
+        except ValueError:
+            raise ValueError(f"{y!r} is not a numeric year")
+        if f.is_integer():
+            return int(f)
+        raise ValueError(f"{y!r} is not an integral year")
+    raise ValueError(f"{y!r} is not a year")
+
+
+def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequence[Any]], *,
+                      authorization: Optional[Mapping[str, Any]] = None) -> List[int]:
+    """Resolve the exact years a stage may execute against its authorized chronology role.
+
+    ``period`` is ``"train"`` (collection/reconcile/merge/fit) or ``"oos"``/``"dev"``
+    (oos/analyze; ``"dev"`` is an alias of ``"oos"``). The CLI may only NARROW the role's
+    declared years, never expand them, and a prohibited year is never executable under
+    either role. ``requested=None`` resolves to exactly the role's authorized years; an
+    empty requested list is rejected outright (it is not "everything").
+
+    If ``authorization`` (the parsed ``artifacts/experiment_authorization.json``) is
+    supplied, its recorded train_years/oos_years/prohibited_years for this role must agree
+    with the plan's chronology, or the authorization artifact is stale and the request is
+    rejected -- a plan re-compiled after PREPARE wrote the authorization artifact must not
+    silently execute against the old, unauthorized role years.
+    """
+    if period not in ("train", "oos", "dev"):
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: unknown period {period!r}")
+    role = "train" if period == "train" else "dev"
+    chron = plan.get("chronology") or {}
+    try:
+        role_years = sorted({int(y) for y in (chron.get(role) or [])})
+    except (TypeError, ValueError) as exc:
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: plan.chronology.{role} is malformed: {exc}")
+    prohibited = {int(y) for y in (chron.get("prohibited") or [])}
+
+    if authorization is not None:
+        auth_role_key = "train_years" if role == "train" else "oos_years"
+        auth_years = sorted({int(y) for y in (authorization.get(auth_role_key) or [])})
+        auth_prohibited = {int(y) for y in (authorization.get("prohibited_years") or [])}
+        if auth_years != role_years or auth_prohibited != prohibited:
+            raise LifecycleV2Error(
+                f"YEARS_NOT_AUTHORIZED: period={period} stale experiment_authorization.json "
+                f"(plan.chronology.{role}={role_years}/prohibited={sorted(prohibited)} != "
+                f"authorization.{auth_role_key}={auth_years}/prohibited_years={sorted(auth_prohibited)})")
+
+    if requested is None:
+        overlap = sorted(set(role_years) & prohibited)
+        if overlap:
+            raise LifecycleV2Error(
+                f"YEARS_NOT_AUTHORIZED: role years intersect prohibited (period={period} role={role} "
+                f"years={role_years} prohibited={sorted(prohibited)} overlap={overlap})")
+        return role_years
+    try:
+        req = sorted({_strict_int_year(y) for y in requested})
+    except ValueError as exc:
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} non-integer year: {exc}")
+    if not req:
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} requested=[] authorized={role_years} prohibited={sorted(prohibited)}")
+    if any(y in prohibited for y in req) or any(y not in role_years for y in req):
+        raise LifecycleV2Error(
+            f"YEARS_NOT_AUTHORIZED: period={period} requested={req} authorized={role_years} prohibited={sorted(prohibited)}")
+    return req
+
+
 @dataclass
 class V2Options:
     execute: bool = False
@@ -108,6 +215,11 @@ class V2Options:
     max_runtime: float = 6 * 3600
     progress_every_bars: int = 200_000
     in_process_partitions: bool = False
+    # W-5: when set, every model-store call this lifecycle makes (fit/score/authenticate)
+    # writes to and reads from THIS root instead of the operator's real durable store
+    # (research_workflow.roots.resolve_model_root()). None preserves the configured root --
+    # every non-test caller keeps writing to the real store exactly as before.
+    model_root: Optional[Path] = None
 
 
 class V2Lifecycle:
@@ -147,6 +259,26 @@ class V2Lifecycle:
             "train_freeze": _sha(self.artifacts / "train_experiment_freeze.json"),
         }
 
+    def _authorized_years(self, plan: Dict[str, Any], period: str, requested: Optional[Sequence[Any]] = None) -> List[int]:
+        auth_path = self.artifacts / "experiment_authorization.json"
+        authorization = _read(auth_path) if auth_path.is_file() else None
+        return authorized_years(plan, period, requested, authorization=authorization)
+
+    def _require_execute(self, stage: str) -> None:
+        """Guard so a direct programmatic caller of a post-seal leaf (bypassing
+        V2StudyController.run's EXECUTION_NOT_AUTHORIZED gate) cannot execute without
+        --execute-authorized either."""
+        if not self.opts.execute:
+            raise LifecycleV2Error(f"EXECUTION_NOT_AUTHORIZED: {stage} requires --execute-authorized")
+
+    def _zero_study_python(self) -> tuple[List[str], Optional[str]]:
+        """R10 / ZERO_STUDY_PYTHON: any committed study-local executable Python (or notebook)
+        is a reject unless the study id has a platform-sanctioned exception. Returns
+        (python_files, exception_reason_or_None)."""
+        from research_workflow.policy import STUDY_PYTHON_EXCEPTIONS, scan_study_python
+        py_files = scan_study_python(self.study)
+        return py_files, (STUDY_PYTHON_EXCEPTIONS.get(self.study.name) if py_files else None)
+
     def _seal_identities(self) -> Dict[str, str]:
         seal = _read(self.artifacts / "preexec_audit_seal.json")
         if not seal.get("composite_seal_hash"):
@@ -182,7 +314,7 @@ class V2Lifecycle:
         frozen = {"schema_version": 2, "hash_algorithm": plan["closure"]["hash_algorithm"], "authority": "platform_v2_plan_closure",
                   "plan_sha256": plan["plan_sha256"], "spec_sha256": plan["spec_sha256"],
                   "frozen_execution_composite_sha256": plan["closure"]["composite_sha256"], "files": plan["closure"]["files"],
-                  "file_count": plan["closure"]["file_count"], "generated_at_utc": _now()}
+                  "file_count": plan["closure"]["file_count"], "stages": plan["closure"].get("stages") or {}, "generated_at_utc": _now()}
         path = _write(self.audit / "frozen_execution_manifest.json", frozen)
         return {"status": "PASS", "outputs": [str(path), str(auth_path)]}
 
@@ -209,14 +341,23 @@ class V2Lifecycle:
         unbound = [b for b in plan["binding_proof"] if not b.get("bound")]
         checks.append({"id": "R5_binding_proof", "passed": not unbound, "detail": f"{len(plan['binding_proof'])} primitives bound; unbound={[b['id'] for b in unbound]}"})
         try:
-            from research_workflow.sessions import build_session_table
-            build_session_table(dict(self.opts.session_table_spec or plan["session"]))
-            checks.append({"id": "R3_session_table", "passed": True, "detail": json.dumps(plan["session"])})
+            from research_workflow.sessions import build_session_table, resolve_calendar_session_spec
+            raw_spec = dict(self.opts.session_table_spec or plan["session"])
+            resolved_spec = resolve_calendar_session_spec(raw_spec, self.repo_root)
+            build_session_table(resolved_spec)
+            detail = {"kind": resolved_spec.get("kind"), "session": resolved_spec.get("session"),
+                      "censor_session": resolved_spec.get("censor_session"), "reference_digest": resolved_spec.get("reference_digest"),
+                      "window_count": len(resolved_spec.get("rows") or []) if resolved_spec.get("kind") == "calendar" else None,
+                      "reference_row_counts": resolved_spec.get("reference_row_counts")}
+            checks.append({"id": "R3_session_table", "passed": True, "detail": json.dumps(detail, default=str)})
         except Exception as exc:
-            checks.append({"id": "R3_session_table", "passed": False, "detail": str(exc)})
+            checks.append({"id": "R3_session_table", "passed": False, "detail": f"{type(exc).__name__}: {exc}"})
         current = self.current_composite()
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
         checks.append({"id": "R9_closure_current", "passed": bool(current and current == frozen), "detail": f"current={str(current)[:12]} frozen={str(frozen)[:12]}"})
+        py_files, py_exception = self._zero_study_python()
+        checks.append({"id": "R10_zero_study_python", "passed": not py_files or py_exception is not None,
+                       "detail": json.dumps({"python_files": py_files, "exception": py_exception})})
         overall = all(c["passed"] for c in checks)
         path = _write(self.audit / "readiness.json", {"schema_version": 2, "overall_status": "PASS" if overall else "FAIL", "checks": checks,
                                                        "execution_composite_sha256": frozen, "plan_sha256": plan["plan_sha256"], "generated_at_utc": _now()})
@@ -238,6 +379,8 @@ class V2Lifecycle:
         outcomes["FORWARD_OUTCOME_GUARD"] = "PASSED" if not leaked else "FAILED"
         model = plan.get("model") or {}
         outcomes["CHRONOLOGY_ROLE_TABLE"] = "PASSED" if (not model or (model.get("validation") or {}).get("year_role_table") is not None or model.get("validation") is None) else "FAILED"
+        py_files, py_exception = self._zero_study_python()
+        outcomes["ZERO_STUDY_PYTHON"] = "PASSED" if (not py_files or py_exception is not None) else f"FAILED: {py_files}"
         try:
             from research_workflow.host.predicate_eval import compile_predicate
             ef = {t["id"]: set(t.get("epoch_fields") or ()) for t in plan["trackers"]}
@@ -258,7 +401,8 @@ class V2Lifecycle:
         ready = all(v == "PASSED" for v in outcomes.values())
         path = _write(self.audit / "preflight.json", {"schema_version": 2, "status": "CLEAR" if ready else "BLOCKED", "audit_ready": ready,
                                                        "check_outcomes": outcomes, "required_checks": list(outcomes), "execution_composite_sha256": frozen,
-                                                       "plan_sha256": plan["plan_sha256"], "leaked_outcome_columns": leaked, "generated_at_utc": _now()})
+                                                       "plan_sha256": plan["plan_sha256"], "leaked_outcome_columns": leaked,
+                                                       "study_python": {"python_files": py_files, "exception": py_exception}, "generated_at_utc": _now()})
         if not ready:
             raise LifecycleV2Error("PREFLIGHT_BLOCKED: " + ", ".join(k for k, v in outcomes.items() if v != "PASSED"))
         return {"status": "PASS", "outputs": [str(path)]}
@@ -297,9 +441,9 @@ class V2Lifecycle:
     def _run_window(self, plan: Dict[str, Any], start: str, end: str, primary: tuple, *, progress: Optional[Path], ledger: bool = False) -> Dict[str, Any]:
         if self.opts.bar_source is not None:
             from research_workflow.host_runner import run_plan_on_bars
-            from research_workflow.sessions import build_session_table
+            from research_workflow.sessions import build_session_table, resolve_calendar_session_spec
             bars = self.opts.bar_source(start, end)
-            table = build_session_table(dict(self.opts.session_table_spec or plan["session"]))
+            table = build_session_table(resolve_calendar_session_spec(dict(self.opts.session_table_spec or plan["session"]), self.repo_root))
             ledger_rows: List[Dict[str, Any]] = [] if ledger else None
             run = run_plan_on_bars(plan, bars, session_table=table, primary_interval=primary, ledger=ledger_rows)
             run["dataset"] = {"dataset_id": "synthetic", "logical_digest": None, "bytes_verification": "SYNTHETIC"}
@@ -323,6 +467,7 @@ class V2Lifecycle:
         return manifest
 
     def smoke(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("smoke")
         plan = load_plan(self.study)
         ids = self._seal_identities()
         date = self.opts.smoke_date or ((plan["chronology"].get("authorized_dates") or [None])[0])
@@ -377,7 +522,7 @@ class V2Lifecycle:
     def _collect_period(self, period: str) -> Dict[str, Any]:
         plan = load_plan(self.study)
         ids = self._seal_identities()
-        years = self.opts.years or (plan["chronology"]["train"] if period == "train" else plan["chronology"].get("dev") or [])
+        years = self._authorized_years(plan, period, self.opts.years)
         if not years:
             raise LifecycleV2Error(f"NO_YEARS_FOR_PERIOD: {period}")
         base = self.work / "partitions" / period
@@ -405,13 +550,15 @@ class V2Lifecycle:
         return {"status": "PASS", "outputs": outputs, "partitions": partitions}
 
     def collection(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("collection")
         return self._collect_period("train")
 
     def reconcile(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("reconcile")
         import pandas as pd
         plan = load_plan(self.study)
         base = self.work / "partitions" / "train"
-        years = self.opts.years or plan["chronology"]["train"]
+        years = self._authorized_years(plan, "train", self.opts.years)
         findings: List[str] = []
         schemas, digests, rows = [], set(), 0
         seen_keys = 0
@@ -436,17 +583,19 @@ class V2Lifecycle:
         if len(digests) > 1:
             findings.append(f"partitions read different dataset digests: {sorted(digests)}")
         path = _write(self.work / "reconcile.json", {"passed": not findings, "findings": findings, "years": list(years), "rows": rows,
-                                                    "dataset_digests": sorted(digests), "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
+                                                    "authority": "plan.chronology.train", "dataset_digests": sorted(digests),
+                                                    "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
                                                     "generated_at_utc": _now()})
         if findings:
             raise LifecycleV2Error("RECONCILE_FAILED: " + "; ".join(findings))
         return {"status": "PASS", "outputs": [str(path)]}
 
     def merge(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("merge")
         import pandas as pd
         from research.analysis.modeling import frame_content_identity
         plan = load_plan(self.study)
-        years = self.opts.years or plan["chronology"]["train"]
+        years = self._authorized_years(plan, "train", self.opts.years)
         base = self.work / "partitions" / "train"
         cands = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years], ignore_index=True)
         obs = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True)
@@ -457,7 +606,7 @@ class V2Lifecycle:
         out = self.work / "merged"; out.mkdir(parents=True, exist_ok=True)
         cands.to_parquet(out / "candidates.parquet", index=False); obs.to_parquet(out / "observations.parquet", index=False)
         ident = _write(out / "identity.json", {"candidates_identity": frame_content_identity(cands), "observations_identity": frame_content_identity(obs),
-                                                "rows": int(len(cands)), "years": list(years), "plan_sha256": plan["plan_sha256"],
+                                                "rows": int(len(cands)), "years": list(years), "authority": "plan.chronology.train", "plan_sha256": plan["plan_sha256"],
                                                 "candidates_sha256": _sha(out / "candidates.parquet"), "observations_sha256": _sha(out / "observations.parquet"), "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(out / "candidates.parquet"), str(out / "observations.parquet"), str(ident)]}
 
@@ -472,6 +621,7 @@ class V2Lifecycle:
         return frame, label
 
     def fit(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("fit")
         plan = load_plan(self.study)
         model = plan.get("model")
         if not model:
@@ -513,7 +663,7 @@ class V2Lifecycle:
             from research_workflow.tuning import tune
             tuning_report = tune(study_id=plan["study"]["id"], frame=binary, features=features, label=label, family=family, base_params=params, seed=seed,
                                  search_space=model["search_space"], validation=validation, artifacts_dir=self.artifacts,
-                                 identities={"plan_sha256": plan["plan_sha256"], "population_identity": merge_identity,
+                                 identities={"plan_sha256": plan["plan_sha256"], "population_identity": merge_identity, "execution_closure_composite": closure,
                                              "target_contract_sha256": hashlib.sha256(json.dumps(plan["outcome"], sort_keys=True, default=str).encode()).hexdigest(),
                                              "feature_contract_sha256": hashlib.sha256(json.dumps(features).encode()).hexdigest(), "preprocessing_contract_sha256": "identity"})
             params = dict(tuning_report["selected"]["params"])
@@ -534,7 +684,7 @@ class V2Lifecycle:
         model_id = hashlib.sha256(json.dumps(lineage.__dict__, sort_keys=True, default=str).encode()).hexdigest()
         metrics = {"folds": folds, "final_validation": final_val, "tuning": (None if tuning_report is None else {k: tuning_report[k] for k in ("ledger", "sampler", "n_trials", "selected")})}
         manifest = store_model(model_id=model_id, estimator=final_est, lineage=lineage, tier="registry", selection_status="selected", metrics=metrics,
-                               golden_train_frame=binary[features], golden_rows=min(GOLDEN_MIN_ROWS, int(len(binary))))
+                               golden_train_frame=binary[features], golden_rows=min(GOLDEN_MIN_ROWS, int(len(binary))), model_root=self.opts.model_root)
         path = _write(self.artifacts / "experiment_models.json", {"schema_version": 2, "plan_sha256": plan["plan_sha256"], "family": family, "hyperparameters": params,
                                                                    "features": features, "label_column": label, "rows": {"total": int(len(frame)), "binary": int(len(binary))},
                                                                    "tuning_years": sorted(tuning), "final_train_validation_years": final_years, "metrics": metrics,
@@ -555,16 +705,18 @@ class V2Lifecycle:
         frame["_year"] = pd.to_datetime(frame["observation_ts"], unit="ns", utc=True).dt.year
         return frame
 
-    @staticmethod
-    def _score_models(frame, models: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _score_models(self, frame, models: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Score each frozen model on its declared subset; metrics per year plus a score digest for parity."""
         import hashlib as _h
         import numpy as np
         from research.analysis.metrics import brier, pr_auc, roc_auc
-        from research_workflow.model_store import read_manifest, score
+        from research_workflow.model_store import authenticate_model, read_manifest, score
+        model_root = self.opts.model_root
         out = []
         for m in models:
-            manifest = read_manifest(m["id"])
+            expect = dict(m.get("expect") or {})
+            authentication = authenticate_model(m["id"], expect=expect or None, model_root=model_root)
+            manifest = read_manifest(m["id"], model_root)
             inputs = list(manifest["lineage"]["ordered_inputs"])
             missing = [c for c in inputs if c not in frame.columns]
             if missing:
@@ -581,12 +733,13 @@ class V2Lifecycle:
                 if part[label].nunique() < 2:
                     per_year[int(y)] = {"n": int(len(part)), "roc_auc": None, "pr_auc": None, "brier": None}
                     continue
-                s = score(m["id"], part[inputs])
+                s = score(m["id"], part[inputs], model_root=model_root)
                 per_year[int(y)] = {"n": int(len(part)), "positives": int(part[label].sum()), "roc_auc": roc_auc(part[label], s).to_dict().get("value"),
                                     "pr_auc": pr_auc(part[label], s).to_dict().get("value"), "brier": brier(part[label], s).to_dict().get("value"),
                                     "score_digest": _h.sha256(np.round(np.asarray(s, dtype=float), 10).tobytes()).hexdigest()}
             out.append({**m, "inputs": inputs, "lineage": {k: manifest["lineage"].get(k) for k in ("study_id", "cell_id", "direction", "target_arm", "train_years", "family")},
-                        "rows_scored": int(len(binary)), "metrics_by_year": per_year})
+                        "rows_scored": int(len(binary)), "metrics_by_year": per_year,
+                        "model_authentication": {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}})
         return out
 
     def _fit_score_mode(self, plan: Dict[str, Any], model: Dict[str, Any]) -> Dict[str, Any]:
@@ -599,24 +752,40 @@ class V2Lifecycle:
         path = _write(self.artifacts / "experiment_models.json", {"schema_version": 2, "mode": "score", "plan_sha256": plan["plan_sha256"], "model_id": None,
                                                                    "reused_model_ids": [m["id"] for m in scored], "models": scored, "rows": {"total": int(len(frame))},
                                                                    "features": list(plan["columns"]["features"]), "training_population_identity": merge_identity,
+                                                                   "model_authentication": [m["model_authentication"] for m in scored],
                                                                    "new_models_trained": False, "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(path)]}
 
     def freeze(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("freeze")
         from research_workflow.experiment import write_train_freeze
         plan = load_plan(self.study)
         models = _read(self.artifacts / "experiment_models.json")
         ident = _read(self.work / "merged" / "identity.json")
+        # W-1: bind the frozen record to the model's actual estimator BYTES, not only the
+        # (lineage-derived) model_id -- a substituted estimator that refreshes its own
+        # canonical/golden bytes under the unchanged model_id would otherwise authenticate
+        # identically. model_canonical_sha256 keys by the same name as model_hashes.
+        if models.get("model_id"):
+            from research_workflow.model_store import read_manifest as _read_manifest
+            manifest = _read_manifest(models["model_id"], self.opts.model_root)
+            model_canonical_sha256 = {"primary": manifest.get("canonical", {}).get("byte_sha256")}
+        else:
+            model_canonical_sha256 = {
+                m["name"]: (m.get("model_authentication") or {}).get("canonical_sha256") for m in models.get("models") or []
+            }
         payload = {"partition": "train", "platform": "v2", "plan_sha256": plan["plan_sha256"],
                    "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
                    "feature_sets": {"primary": list(plan["columns"]["features"])}, "preprocessing_hash": "identity",
                    "model_hashes": ({"primary": models["model_id"]} if models.get("model_id") else {m["name"]: m["id"] for m in models.get("models") or []}),
+                   "model_canonical_sha256": model_canonical_sha256,
                    "thresholds": {}, "deciles": {}, "new_models_trained": bool(models.get("model_id")),
                    "merge_identity": ident, "metrics": models.get("metrics"), "label_column": plan["outcome"].get("label_column")}
         path = write_train_freeze(self.study, payload)
         return {"status": "PASS", "outputs": [str(path)]}
 
     def oos(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("oos")
         from research_workflow.experiment import assert_oos_open
         assert_oos_open(self.study)
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
@@ -625,34 +794,59 @@ class V2Lifecycle:
         return self._collect_period("oos")
 
     def analyze(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("analyze")
         import pandas as pd
         from research_workflow.experiment import assert_oos_open
         assert_oos_open(self.study)
         plan = load_plan(self.study)
         label = plan["outcome"].get("label_column") or "target_flip_within_horizon"
         base = self.work / "partitions" / "oos"
-        years = self.opts.years or plan["chronology"].get("dev") or []
+        years = self._authorized_years(plan, "oos", self.opts.years)
         c = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years], ignore_index=True)
         o = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True)
         frame = c.merge(o[list(KEY) + [label, "disposition"]], on=list(KEY), how="inner")
         summary: Dict[str, Any] = {"rows": int(len(frame)), "dispositions": frame["disposition"].value_counts().to_dict()}
         models = _read(self.artifacts / "experiment_models.json")
+        # WARN-1: OOS scoring must be bound to the model bytes the TRAIN freeze committed to,
+        # not merely to the (lineage-derived) model_id -- a post-freeze estimator substitution
+        # that refreshes its own canonical/golden bytes under the unchanged model_id would
+        # otherwise re-authenticate and score silently. Read the freeze's own recorded
+        # canonical shas and pass them as `expect.canonical_sha256`.
+        freeze_path = self.artifacts / "train_experiment_freeze.json"
+        if not freeze_path.is_file():
+            raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: no TRAIN freeze found for study '{plan['study']['id']}'")
+        freeze_canonical = _read(freeze_path).get("model_canonical_sha256") or {}
         if models.get("mode") == "score":
-            summary["frozen_models_oos"] = self._score_models(self._train_frame_all_labels(plan, base, [int(y) for y in years]), models["models"])
+            bound_models = []
+            for m in models["models"]:
+                csha = freeze_canonical.get(m["name"])
+                if not csha:
+                    raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: model '{m['name']}' has no TRAIN freeze canonical sha")
+                expect = dict(m.get("expect") or {})
+                expect["canonical_sha256"] = csha
+                bound_models.append({**m, "expect": expect})
+            summary["frozen_models_oos"] = self._score_models(self._train_frame_all_labels(plan, base, [int(y) for y in years]), bound_models)
             summary["train_metrics"] = [{k: m[k] for k in ("name", "id", "metrics_by_year")} for m in models["models"]]
         elif models.get("model_id"):
             from research.analysis.metrics import brier, pr_auc, roc_auc
-            from research_workflow.model_store import score
+            from research_workflow.model_store import authenticate_model, score
+            csha = freeze_canonical.get("primary")
+            if not csha:
+                raise LifecycleV2Error("FREEZE_CANONICAL_SHA_MISSING: no primary canonical sha in TRAIN freeze")
+            authentication = authenticate_model(models["model_id"], expect={"study_id": plan["study"]["id"], "canonical_sha256": csha}, model_root=self.opts.model_root)
             binary = frame[frame[label].isin([0, 1, 0.0, 1.0])]
-            s = score(models["model_id"], binary[models["features"]])
+            s = score(models["model_id"], binary[models["features"]], model_root=self.opts.model_root)
             summary["oos_metrics"] = {"n": int(len(binary)), "roc_auc": roc_auc(binary[label], s).to_dict().get("value"),
                                       "pr_auc": pr_auc(binary[label], s).to_dict().get("value"), "brier": brier(binary[label], s).to_dict().get("value")}
             summary["train_metrics"] = models.get("metrics")
-        path = _write(self.artifacts / "experiment_analysis_v2.json", {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
-                                                                        "oos_years": list(years), **summary, "generated_at_utc": _now()})
+            summary["model_authentication"] = {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}
+        analyze_name = Path(DELIVERABLES["analyze"][0]).name
+        path = _write(self.artifacts / analyze_name, {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
+                                                                        "oos_years": list(years), "authority": "plan.chronology.dev", **summary, "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(path)]}
 
     def close(self, study: Path | None = None) -> Dict[str, Any]:
+        self._require_execute("close")
         closure = self.opts.closure or {}
         if not closure.get("outcome") or not closure.get("terminal_decision"):
             raise LifecycleV2Error("CLOSURE_DECISION_REQUIRED: --closure-outcome and --closure-decision")

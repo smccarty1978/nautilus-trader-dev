@@ -1,0 +1,433 @@
+diff --git a/research_workflow/audit_packets_v2.py b/research_workflow/audit_packets_v2.py
+index cdead93c..96b77bb0 100644
+--- a/research_workflow/audit_packets_v2.py
++++ b/research_workflow/audit_packets_v2.py
+@@ -24,16 +24,24 @@ SUMMARY_INSTRUCTIONS = ("Write audit/pass_NN.md (causal) or audit/contract_pass_
+                         "<!-- AUDIT_SUMMARY_V2_START --> {json} <!-- AUDIT_SUMMARY_V2_END -->; then run "
+                         "`research audit ingest --study <dir> --type <causal|contract> --report <file> --author <you>`.")
+ 
+-DELIVERABLES_BY_STAGE = {
+-    "compile": ["compiled_plan.json"], "prepare": ["audit/frozen_execution_manifest.json", "artifacts/experiment_authorization.json"],
+-    "readiness": ["audit/readiness.json"], "preflight": ["audit/preflight.json"], "tests": ["_work/controller/test_summary.json"],
+-    "causal_audit": ["audit/status.json"], "contract_audit": ["audit/contract_status.json"], "seal": ["artifacts/preexec_audit_seal.json"],
+-    "smoke": ["artifacts/smoke_acceptance.json"], "collection": ["_work/controller/partitions/train/<year>/{candidates,observations}.parquet"],
+-    "reconcile": ["_work/controller/reconcile.json"], "merge": ["_work/controller/merged/{candidates,observations}.parquet", "_work/controller/merged/identity.json"],
+-    "fit": ["artifacts/experiment_models.json"], "freeze": ["artifacts/train_experiment_freeze.json"],
+-    "oos": ["_work/controller/partitions/oos/<year>/{candidates,observations}.parquet"], "analyze": ["artifacts/experiment_analysis.json"],
+-    "close": ["artifacts/study_closure.json"],
+-}
++# Single source of truth: research_workflow.lifecycle_v2.DELIVERABLES is what the lifecycle
++# actually writes (analyze() derives its output filename from the same constant). This module
++# never hard-codes a second copy of those filenames -- that duplication is what let
++# "artifacts/experiment_analysis.json" (wrong) and "artifacts/experiment_analysis_v2.json"
++# (actual) diverge (red-team packet F1).
++from research_workflow.lifecycle_v2 import DELIVERABLES, FIT_TUNING_DELIVERABLES
++
++DELIVERABLES_BY_STAGE = dict(DELIVERABLES)
++
++
++def deliverables_for_plan(plan: Mapping[str, Any]) -> Dict[str, List[str]]:
++    """DELIVERABLES_BY_STAGE plus any deliverable that is conditional on the plan (e.g. a
++    tuning ledger only exists when model.search_space is declared)."""
++    out = {k: list(v) for k, v in DELIVERABLES_BY_STAGE.items()}
++    model = plan.get("model") or {}
++    if model.get("search_space"):
++        out["fit"] = list(out["fit"]) + list(FIT_TUNING_DELIVERABLES)
++    return out
+ 
+ 
+ def _identity(payload: Mapping[str, Any]) -> str:
+@@ -44,6 +52,53 @@ def _predicate_text(node: Any) -> Any:
+     return node.get("text") if isinstance(node, dict) else node
+ 
+ 
++def _label_columns(outcome: Mapping[str, Any]) -> Dict[str, Any]:
++    """label_column plus every per-arm label column, using the same "<prefix>_label"
++    convention the compiler already applies (research_workflow/grammar/compiler.py
++    _resolve_chronology_and_model) -- echoed here, not re-derived."""
++    cols = {"primary": outcome.get("label_column")}
++    for a in outcome.get("arms") or []:
++        prefix = a.get("prefix")
++        if prefix:
++            cols[prefix] = f"{prefix}_label"
++    return cols
++
++
++def _tuning_objective(validation: Mapping[str, Any]) -> Dict[str, Any]:
++    """metric/aggregate/maximize the same way research_workflow.tuning.tune() derives them
++    (default metric roc_auc, maximize unless brier) -- echoed statically from the declared
++    validation block, not re-run."""
++    metric = str((validation or {}).get("primary_metric") or "roc_auc")
++    return {"metric": metric, "aggregate": "mean_over_folds", "maximize": metric != "brier"}
++
++
++def _sampler_seed_source(validation: Mapping[str, Any]) -> str:
++    return "validation.random_seed" if (validation or {}).get("random_seed") is not None else "model.params.random_state"
++
++
++def _model_summary(model: Mapping[str, Any] | None) -> Dict[str, Any] | None:
++    """The executable model contract an auditor needs without reading lifecycle_v2.py or
++    research_workflow/tuning.py: mode, family/params, the frozen-model list (score mode) with
++    each model's id/name/label/subset/expect, chronology validation, and -- only when the
++    plan declares a search_space -- the tuning objective/max_trials/random_seed/sampler_seed_source
++    a fit run will use."""
++    if not model:
++        return None
++    validation = model.get("validation") or {}
++    out: Dict[str, Any] = {"mode": model.get("mode"), "family": model.get("family"), "params": model.get("params"),
++                           "arms": model.get("arms"), "validation": validation}
++    if model.get("mode") == "score":
++        out["models"] = [{"id": m.get("id"), "name": m.get("name"), "label": m.get("label"), "subset": m.get("subset"),
++                          "expect": m.get("expect")} for m in (model.get("models") or [])]
++    if model.get("search_space"):
++        out["search_space"] = model["search_space"]
++        out["objective"] = _tuning_objective(validation)
++        out["max_trials"] = validation.get("max_trials") or 20
++        out["random_seed"] = validation.get("random_seed")
++        out["sampler_seed_source"] = _sampler_seed_source(validation)
++    return out
++
++
+ def causal_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite: str, dirty_paths: List[str], test_summary: Mapping[str, Any]) -> Dict[str, Any]:
+     trackers = [{"id": t["id"], "capability": t["capability"], "inputs": t.get("inputs"), "subscriptions": [s["from"] + ":" + ",".join(s["events"]) for s in t.get("subscriptions") or []],
+                  "cadence": t.get("cadence"), "warmup_bars": t.get("warmup_bars"), "params": {k: v for k, v in (t.get("params") or {}).items() if k not in ("instances", "routing", "snapshot", "spec")}}
+@@ -57,9 +112,10 @@ def causal_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite
+                          "precedence": trig.get("precedence"), "sub_epochs": trig.get("sub_epochs"), "sub_epoch_sources": trig.get("sub_epoch_sources")})
+     o = plan["outcome"]
+     outcome = {k: o.get(k) for k in ("contract", "kernel", "direction", "relation", "atr", "atr_availability", "entry_reference", "session_end_censoring",
+-                                    "max_gap_ns", "same_bar_rule", "primary_arm", "composition", "label_column")}
++                                    "max_gap_ns", "same_bar_rule", "horizon_end_rule", "resolution_precedence", "primary_arm", "composition", "label_column")}
+     outcome["arms"] = o.get("arms")
+     outcome["flip"] = o.get("flip")
++    outcome["label_columns"] = _label_columns(o)
+     features = plan.get("features") or {}
+     packet = {
+         "packet_version": 2, "audit_type": "causal", "study_id": study_id, "plan_sha256": plan.get("plan_sha256"),
+@@ -68,9 +124,11 @@ def causal_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite
+         "same_timestamp_rule": plan.get("availability", {}).get("same_timestamp_rule"),
+         "session": plan.get("session"), "trackers": trackers,
+         "population": {"cadence": plan["population"].get("cadence"), "qualify": _predicate_text(plan["population"].get("qualify")), "direction": plan["population"].get("direction"), "anchor_identity": plan["population"].get("anchor_identity")},
+-        "triggers": triggers, "outcome": outcome,
++        "triggers": triggers, "outcome": outcome, "chronology": plan.get("chronology"),
++        "model": _model_summary(plan.get("model")),
+         "features": {"host": features.get("implementation"), "aliases": features.get("aliases"), "routing": features.get("routing"), "snapshot": features.get("snapshot"), "required_events": features.get("required_events")},
+         "availability_table": plan.get("availability", {}).get("rows"), "warmup": plan.get("warmup"),
++        "closure": {"stages": plan["closure"].get("stages") or {}, "composite_sha256": plan["closure"].get("composite_sha256")},
+         "invariants": ["completed bars only (ts_init)", "context streams visible strictly before T", "derived buckets complete-only",
+                        "outcome kernel resolves from bars strictly after T", "label contract has no fill semantics", "assert_oos_open is the only OOS door"],
+         "worktree_dirty_paths": dirty_paths, "tests": {k: test_summary.get(k) for k in ("status", "counts", "execution_composite_sha256")},
+@@ -81,19 +139,26 @@ def causal_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite
+ 
+ 
+ def contract_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite: str, dirty_paths: List[str], test_summary: Mapping[str, Any],
+-                    seal: Mapping[str, Any] | None = None) -> Dict[str, Any]:
++                    seal: Mapping[str, Any] | None = None, study_python: Mapping[str, Any] | None = None) -> Dict[str, Any]:
+     model = plan.get("model") or {}
++    outcome = plan["outcome"]
+     packet = {
+         "packet_version": 2, "audit_type": "contract", "study_id": study_id, "plan_sha256": plan.get("plan_sha256"), "spec_sha256": plan.get("spec_sha256"),
+         "identity": {"execution_composite_sha256": execution_composite, "registry_sha256": plan.get("registry_sha256"), "seal": dict(seal or {})},
+         "study": plan.get("study"), "instruments": {k: {kk: v.get(kk) for kk in ("dataset_id", "dataset_digest", "role")} for k, v in plan["instruments"].items()},
++        "session": {"reference_tables": (plan.get("session") or {}).get("reference_tables"), "reference_digest": (plan.get("session") or {}).get("reference_digest")},
+         "chronology": plan.get("chronology"),
+-        "model": {"family": model.get("family"), "params": model.get("params"), "arms": model.get("arms"), "validation": model.get("validation")} if model else None,
++        "model": _model_summary(model),
+         "year_role_table": ((model.get("validation") or {}).get("year_role_table") if model else None),
+-        "columns": plan.get("columns"), "outcome": {k: plan["outcome"].get(k) for k in ("contract", "kernel", "label_column", "arms", "primary_arm")},
+-        "binding_proof": plan.get("binding_proof"), "deliverables_by_stage": DELIVERABLES_BY_STAGE,
++        "columns": plan.get("columns"),
++        "outcome": {**{k: outcome.get(k) for k in ("contract", "kernel", "label_column", "arms", "primary_arm")}, "label_columns": _label_columns(outcome),
++                   "semantics": {k: outcome.get(k) for k in ("horizon_end_rule", "resolution_precedence", "max_gap_ns", "same_bar_rule", "session_end_censoring")}},
++        "binding_proof": plan.get("binding_proof"), "deliverables_by_stage": deliverables_for_plan(plan),
++        "stage_closures": plan["closure"].get("stages") or {},
++        "study_python": dict(study_python) if study_python is not None else None,
+         "invariants": ["every declared primitive maps to exactly one runtime implementation", "TRAIN/tuning/final-validation/OOS years disjoint",
+-                       "no study Python for a tier-2 study", "identity columns observation_ts/regime_start_ns/checkpoint_index on every row",
++                       "no study Python for a tier-2 study unless STUDY_PYTHON_EXCEPTIONS names it (mechanically checked -- see study_python)",
++                       "identity columns observation_ts/regime_start_ns/checkpoint_index on every row",
+                        "outcome columns are labels, never features"],
+         "worktree_dirty_paths": dirty_paths, "tests": {k: test_summary.get(k) for k in ("status", "counts", "execution_composite_sha256")},
+         "required_summary_block": SUMMARY_TEMPLATE, "instructions": SUMMARY_INSTRUCTIONS,
+@@ -102,4 +167,4 @@ def contract_packet(plan: Mapping[str, Any], *, study_id: str, execution_composi
+     return packet
+ 
+ 
+-__all__ = ["causal_packet", "contract_packet", "DELIVERABLES_BY_STAGE", "SUMMARY_TEMPLATE"]
++__all__ = ["causal_packet", "contract_packet", "DELIVERABLES_BY_STAGE", "deliverables_for_plan", "SUMMARY_TEMPLATE"]
+diff --git a/research_workflow/grammar/compiler.py b/research_workflow/grammar/compiler.py
+index 24e11262..cfa1e38c 100644
+--- a/research_workflow/grammar/compiler.py
++++ b/research_workflow/grammar/compiler.py
+@@ -35,11 +35,44 @@ _FEATURE_HOST_ID = "features"
+ _HOST_MODULES = ("research_workflow/host/interfaces.py", "research_workflow/host/mux.py", "research_workflow/host/triggers.py",
+                  "research_workflow/host/outcomes.py", "research_workflow/host/predicate_eval.py", "research_workflow/host/sink.py",
+                  "research_workflow/host/strategy.py", "research_workflow/host_runner.py", "research_workflow/sessions.py",
++                 "research_workflow/dataset_v2.py",
+                  "research_workflow/target_expression.py", "research_workflow/target_replay_oracle.py",
+                  "research_workflow/grammar/compiler.py", "research_workflow/grammar/predicates.py", "research_workflow/grammar/spec.py",
+                  "research_workflow/grammar/expansion.py", "research_workflow/grammar/plan.py", "research_workflow/provider_host.py",
+                  "utils/session_boundaries.py")
+ 
++# Stage-scoped governance closure (red-team packet A / A2): executable code that can change
++# a governed stage's scientific behavior belongs in that stage's closure, so a change to it
++# stales the freeze the same way a collection-host change does. "collection" is the
++# pre-existing accumulated ``ctx.closure_files`` set (host modules + bound provider/tracker/
++# feature modules) and is intentionally left alone here. The four other groups below are
++# ALWAYS included; "modeling" is included only when the plan declares a model.
++STAGE_CLOSURE_MODULES: Dict[str, Tuple[str, ...]] = {
++    "lifecycle": (
++        "research_workflow/lifecycle_v2.py", "research_workflow/governed_controller_v2.py",
++        "research_workflow/governed_controller.py", "research_workflow/controller_contracts.py",
++        "research_workflow/policy.py", "research_workflow/study_closure.py",
++        "research_workflow/closure_hash.py", "research_workflow/roots.py", "research_workflow/locks.py",
++    ),
++    "outcome": (
++        "research_workflow/forward_outcomes/guard.py", "research_workflow/entry_references.py",
++        "research_workflow/target_expression.py", "research_workflow/target_replay_oracle.py",
++    ),
++    "oos": (
++        "research_workflow/experiment.py",
++    ),
++    "audit": (
++        "research_workflow/audit_packets_v2.py",
++    ),
++    "modeling": (
++        "research_workflow/tuning.py", "research_workflow/model_store.py",
++        "research/analysis/modeling.py", "research/analysis/metrics.py", "research/analysis/identity.py",
++    ),
++}
++# score-mode derived inputs (features.derived_inputs kind: frozen_external_model_score) and
++# model.mode == "score" both reuse a frozen model; both pull in the scoring module.
++_MODELING_SCORE_EXTRA_MODULE = "research_workflow/external_model_scoring.py"
++
+ 
+ @dataclass
+ class CompileOutcome:
+@@ -160,7 +193,8 @@ def _resolve_streams(ctx: _Ctx) -> None:
+             ctx.execution_symbol = symbol
+         ctx.instruments[symbol] = {**facts, "symbol": symbol, "dataset_id": s.dataset,
+                                    "dataset_digest": ds.get("logical_digest"), "role": s.role,
+-                                   "calendar_table": bool(ds.get("calendar_table")), "same_ts": s.same_ts}
++                                   "reference_tables": list(ds.get("reference_tables") or []),
++                                   "reference_digest": ds.get("reference_digest"), "same_ts": s.same_ts}
+         declared = ds.get("streams") or {}
+         externals = {tf: st for tf, st in declared.items() if (st or {}).get("source") == "external"}
+         if not externals:
+@@ -197,16 +231,30 @@ def _resolve_streams(ctx: _Ctx) -> None:
+             ctx.streams.append(entry)
+             ctx.stream_by[(symbol, tf)] = key
+     if ctx.execution_symbol:
+-        cal = ctx.instruments[ctx.execution_symbol].get("calendar_table")
++        inst = ctx.instruments[ctx.execution_symbol]
++        reference_tables = inst.get("reference_tables") or []
++        reference_digest = inst.get("reference_digest")
++        has_calendar = "sessions" in reference_tables
+         censor = (ctx.spec.outcome.session or ctx.spec.population.session)
+-        ctx.session = {"kind": "calendar" if cal else "legacy", "session": ctx.spec.population.session,
+-                       "censor_session": censor, "dataset": ctx.instruments[ctx.execution_symbol]["dataset_id"]}
++        ctx.session = {"kind": "calendar" if has_calendar else "legacy", "session": ctx.spec.population.session,
++                       "censor_session": censor, "dataset": inst["dataset_id"],
++                       "reference_tables": list(reference_tables), "reference_digest": reference_digest}
+         for where, name in (("population.session", ctx.spec.population.session), ("outcome.session", censor)):
+             if str(name).upper() not in {"RTH", "ETH", "ALL"}:
+                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"unknown session {name!r}", closest="RTH")
+         if ctx.spec.outcome.session_end == "censor" and str(censor).upper() == "ALL":
+             ctx.gap(GapKind.AMBIGUOUS_TEMPORAL_SEMANTICS, "outcome.session",
+                     "session-end censoring needs a session with a close; declare outcome.session (e.g. RTH) or session_end: ignore")
++        if reference_tables and not has_calendar and ctx.spec.outcome.session_end == "censor":
++            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.session",
++                    "dataset declares reference_tables without a 'sessions' table but the outcome censors on a "
++                    "session close; the runtime cannot silently fall back to the legacy weekday-rule session",
++                    dataset=inst["dataset_id"], reference_tables=list(reference_tables))
++        if (not has_calendar) and str(censor).upper() == "ETH" and ctx.spec.outcome.session_end == "censor":
++            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.session",
++                    "ETH session-end censoring has no defined close on a legacy (non-calendar) dataset; "
++                    "the ETH window is not a single contiguous daily window under the weekday-rule authority",
++                    dataset=inst["dataset_id"])
+ 
+ 
+ # --------------------------------------------------------------------------- #
+@@ -808,6 +856,7 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
+         "contract": o.kind, "kernel": kernel, "direction": direction, "direction_sign": (-1 if o.relation == "fade" else 1),
+         "relation": o.relation, "atr": atr, "atr_availability": (o.atr_availability or "at_decision_delivery"), "entry_reference": o.entry_reference,
+         "session_end_censoring": o.session_end == "censor", "max_gap_ns": max_gap, "same_bar_rule": o.same_bar_rule, "horizon_end_rule": o.horizon_end_rule,
++        "resolution_precedence": ["SESSION_END", "GAP", "BARRIER_TOUCH", "HORIZON_EXPIRY"],
+         "arms": arms, "primary_arm": primary, "flip": flip, "stream": stream, "label_column": o.label_column or "target_flip_within_horizon",
+         "composition": ({"logic": o.composition, "children": [a["id"] for a in arms] + (["event"] if flip else [])} if (arms and flip) else None),
+     }
+@@ -826,6 +875,16 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
+     return contract
+ 
+ 
++# A derived (frozen-model) score column is never assigned the decision epoch's availability
++# blindly: its true availability is max(availability of every input it consumes, the score's
++# own evaluation timestamp). This registry names the rule per derived-input kind so the
++# compiled availability table always carries it, and is the extension point for future
++# derived-score kinds (e.g. ES->NQ or asynchronous multi-stream scoring).
++DERIVED_SCORE_AVAILABILITY_RULES: Dict[str, str] = {
++    "frozen_external_model_score": "max(inputs) ∪ evaluation",
++}
++
++
+ # --------------------------------------------------------------------------- #
+ # stage 6: columns, chronology, model, closure
+ # --------------------------------------------------------------------------- #
+@@ -847,10 +906,14 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
+             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, f"features.derived_inputs.{d.name}", "a frozen external score needs population.direction")
+             continue
+         impl = f"{FrozenExternalScoreBinding.__module__}.{FrozenExternalScoreBinding.__name__}"
++        surfaces = body.get("ordered_feature_surfaces") or {}
++        deps = sorted({c for cols in surfaces.values() for c in (cols or [])})
+         ctx.trackers.append({"id": f"derived.{d.name}", "capability": FrozenExternalScoreBinding.CAPABILITY, "implementation": impl,
+                              "params": {"spec": body, "direction": direction_ref}, "inputs": {}, "subscriptions": [],
+                              "fields": [], "epoch_fields": [], "events": [], "cadence": FrozenExternalScoreBinding.CADENCE,
+-                             "warmup_bars": 0, "instrument": ctx.execution_symbol, "derived_column": d.name})
++                             "warmup_bars": 0, "instrument": ctx.execution_symbol, "derived_column": d.name,
++                             "availability_rule": DERIVED_SCORE_AVAILABILITY_RULES.get(body.get("kind"), "max(inputs) ∪ evaluation"),
++                             "availability_dependencies": deps})
+         ctx.tracker_meta[f"derived.{d.name}"] = FrozenExternalScoreBinding
+         ctx.binding_proof.append({"kind": "derived_input", "id": d.name, "capability": FrozenExternalScoreBinding.CAPABILITY,
+                                   "implementation": impl, "bound": True})
+@@ -888,7 +951,8 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
+                         closest=_closest(m.label, sorted(known_labels)))
+             if not re.fullmatch(r"[0-9a-f]{64}", m.id):
+                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.models[{i}].id", "model id must be a model-store sha256")
+-            scored.append({"id": m.id, "label": m.label, "subset": dict(m.subset), "name": m.name or m.id[:12]})
++            scored.append({"id": m.id, "label": m.label, "subset": dict(m.subset), "name": m.name or m.id[:12],
++                           "expect": (m.expect.model_dump(exclude_none=True) if m.expect else {})})
+     validation = None
+     if model_spec.validation is not None:
+         v = model_spec.validation
+@@ -933,15 +997,38 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
+                         "search_space": search_space}
+ 
+ 
+-def _resolve_closure(ctx: _Ctx) -> Dict[str, Any]:
++def _resolve_closure(ctx: _Ctx, model: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+     from research_workflow.closure_hash import hash_file_v2
++
++    stage_sets: Dict[str, Set[str]] = {"collection": set(ctx.closure_files)}
++    for name in ("lifecycle", "outcome", "oos", "audit"):
++        stage_sets[name] = set(STAGE_CLOSURE_MODULES[name])
++    if model:
++        modeling = set(STAGE_CLOSURE_MODULES["modeling"])
++        if model.get("mode") == "score":
++            modeling.add(_MODELING_SCORE_EXTRA_MODULE)
++        stage_sets["modeling"] = modeling
++
++    all_files: Set[str] = set()
++    for rels in stage_sets.values():
++        all_files |= rels
++
+     files: Dict[str, str] = {}
+-    for rel in sorted(ctx.closure_files):
++    for rel in sorted(all_files):
+         p = ctx.repo_root / rel
+-        if p.is_file():
+-            files[rel] = hash_file_v2(p)
++        if not p.is_file():
++            raise CompileError(f"CLOSURE_FILE_MISSING: {rel} (referenced by the execution closure) does not exist under {ctx.repo_root}")
++        files[rel] = hash_file_v2(p)
++
+     composite = hashlib.sha256(canonical_json([[k, v] for k, v in sorted(files.items())]).encode("utf-8")).hexdigest()
+-    return {"hash_algorithm": "v2", "files": files, "composite_sha256": composite, "file_count": len(files)}
++
++    stages: Dict[str, Any] = {}
++    for name, rels in stage_sets.items():
++        stage_files = {k: files[k] for k in sorted(rels)}
++        stage_composite = hashlib.sha256(canonical_json([[k, v] for k, v in sorted(stage_files.items())]).encode("utf-8")).hexdigest()
++        stages[name] = {"files": sorted(rels), "composite_sha256": stage_composite}
++
++    return {"hash_algorithm": "v2", "files": files, "composite_sha256": composite, "file_count": len(files), "stages": stages}
+ 
+ 
+ def _resolve_warmup_and_availability(ctx: _Ctx) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+@@ -952,12 +1039,25 @@ def _resolve_warmup_and_availability(ctx: _Ctx) -> Tuple[Dict[str, Any], Dict[st
+         if stream:
+             per_stream[stream] = max(per_stream.get(stream, 0), int(t.get("warmup_bars") or 0))
+         info = next((s for s in ctx.streams if s["key"] == stream), None)
+-        rows.append({"id": t["id"], "kind": "tracker", "stream": stream, "cadence": t["cadence"],
+-                     "availability": "completed_bar_ts_init", "visibility": (info or {}).get("visibility", "at_epoch")})
++        if "availability_rule" in t:
++            # A derived (frozen-model) score row: its availability is never the decision
++            # epoch's blanket "completed_bar_ts_init" -- it is max(dependency availability,
++            # score evaluation timestamp), with dependencies always named.
++            rows.append({"id": t["id"], "kind": "derived_score", "stream": stream, "cadence": t["cadence"],
++                         "availability": t["availability_rule"], "availability_rule": t["availability_rule"],
++                         "dependencies": t.get("availability_dependencies") or [],
++                         "visibility": (info or {}).get("visibility", "at_epoch")})
++        else:
++            rows.append({"id": t["id"], "kind": "tracker", "stream": stream, "cadence": t["cadence"],
++                         "availability": "completed_bar_ts_init", "visibility": (info or {}).get("visibility", "at_epoch")})
+     for inst in (ctx.features or {}).get("instances") or []:
+         rows.append({"id": inst["physical_alias"], "kind": "feature", "stream": None,
+                      "required_events": inst["input_requirements"]["required_streams"], "availability": "completed_bar_ts_init",
+                      "visibility": "at_epoch"})
++    for row in rows:
++        if row.get("kind") == "derived_score" and not row.get("availability_rule"):
++            ctx.gap(GapKind.MISSING_CAPABILITY, f"availability.{row['id']}",
++                    "a derived-score availability row must declare availability_rule; blindly stamping the decision epoch is prohibited")
+     warmup = {"per_stream_bars": per_stream, "days_before_partition": ctx.spec.chronology.warmup.days_before_partition,
+               "max_warmup_seconds": max((n * next(s["duration_ns"] for s in ctx.streams if s["key"] == k) // NS for k, n in per_stream.items()), default=0)}
+     return warmup, {"rows": rows, "same_timestamp_rule": "context streams expose events with ts_init < T only"}
+@@ -1003,7 +1103,9 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
+     if not ctx.gaps.ok:
+         return CompileOutcome(None, ctx.gaps)
+     warmup, availability = _resolve_warmup_and_availability(ctx)
+-    closure = _resolve_closure(ctx)
++    if not ctx.gaps.ok:
++        return CompileOutcome(None, ctx.gaps)
++    closure = _resolve_closure(ctx, model)
+     spec_sha = hashlib.sha256(canonical_json(raw).encode("utf-8")).hexdigest()
+     plan = CompiledPlan(
+         study={"id": spec.study.id, "tier": spec.study.tier, "question": spec.study.question, "description": spec.study.description},
+diff --git a/research_workflow/grammar/spec.py b/research_workflow/grammar/spec.py
+index bc7182c4..72de7a22 100644
+--- a/research_workflow/grammar/spec.py
++++ b/research_workflow/grammar/spec.py
+@@ -182,7 +182,10 @@ class OutcomeSpec(_Strict):
+     # strict: no bar closing after the horizon end is ever evaluated (a bar closing exactly at the end is).
+     # first_bar_at_or_after: the first bar closing at or after the horizon end is still evaluated for a
+     # barrier hit before expiry (the sealed regime_transition target authority's realized semantics on
+-    # sparse seconds; identical to strict on dense tapes).
++    # sparse seconds; identical to strict on dense tapes). Resolution precedence at every bar (in-horizon
++    # or the first post-horizon bar under first_bar_at_or_after) is SESSION_END > GAP > BARRIER_TOUCH >
++    # HORIZON_EXPIRY: max_gap is adjudicated before a post-horizon bar's touch is ever accepted, so a
++    # sparse tape cannot resolve a candidate from a bar farther than max_gap from the prior accepted bar.
+     horizon_end_rule: Literal["strict", "first_bar_at_or_after"] = "strict"
+     barrier: Optional[Dict[str, Any]] = None       # {favorable_atr, adverse_atr, horizon?, expiry?, arms?: [...]}
+     event: Optional[str] = None                    # predicate over tracker events (e.g. 'regime_1m.flipped')
+@@ -217,12 +220,21 @@ class ValidationSpec(_Strict):
+     primary_metric: Optional[str] = None
+ 
+ 
++class ScoredModelExpectSpec(_Strict):
++    """Optional identity expectations checked against the model-store lineage before scoring."""
++    study_id: Optional[str] = None
++    target_arm: Optional[str] = None
++    direction: Optional[str] = None
++    cell_id: Optional[str] = None
++
++
+ class ScoredModelSpec(_Strict):
+     """A frozen model reused from the model store: scored, never refit."""
+     id: str                                        # model store id (sha256)
+     label: str                                     # label column the model is evaluated against
+     subset: Dict[str, Any] = Field(default_factory=dict)   # column == value row filters (explicit, no hidden direction semantics)
+     name: Optional[str] = None
++    expect: Optional[ScoredModelExpectSpec] = None  # authenticated against model-store lineage before scoring
+ 
+ 
+ class ModelSpec(_Strict):
+@@ -234,7 +246,10 @@ class ModelSpec(_Strict):
+     models: List[ScoredModelSpec] = Field(default_factory=list)   # required for mode: score
+     # Bounded TRAIN-only hyperparameter search over walk-forward folds of validation.tuning_years.
+     # param -> [choices] | {low, high, log?: bool, int?: bool}; sampler = validation.protocol
+-    # (model_selection.random | model_selection.optuna), trials = validation.max_trials, seed = validation.random_seed.
++    # (model_selection.random | model_selection.optuna), trials = validation.max_trials.
++    # random_seed governs the SAMPLER (random-search RNG / Optuna TPESampler seed) only; when
++    # absent the sampler falls back to model.params.random_state|seed. The estimator fit on
++    # each fold always uses model.params.random_state|seed, never random_seed.
+     search_space: Dict[str, Any] = Field(default_factory=dict)
+ 
+     @model_validator(mode="after")

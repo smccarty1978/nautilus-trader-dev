@@ -56,8 +56,15 @@ def test_controller_runs_a_fresh_v2_study_end_to_end(tmp_path, synthetic_bars, m
     session = {"kind": "calendar", "session": "RTH", "rows": [[a * NS, b * NS] for a, b in expected["sessions"]]}
     opts = V2Options(execute=True, smoke_date="2030-01-01", datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS,
                      bar_source=lambda s, e: bars, session_table_spec=session, in_process_partitions=True,
-                     closure={"outcome": "SYNTHETIC_FLOW_COMPLETE", "terminal_decision": "PLATFORM_V2_FLOW_PROVEN"})
+                     closure={"outcome": "SYNTHETIC_FLOW_COMPLETE", "terminal_decision": "PLATFORM_V2_FLOW_PROVEN"},
+                     model_root=tmp_path / "model_store")   # W-5: never write the real durable model store from a test
     monkeypatch.setattr(V2StudyController, "_worktree", lambda self: {"path": str(ROOT), "branch": "test", "head": "0" * 40, "dirty_paths": [], "unsafe_dirty_paths": []})
+
+    # W-5: this golden run fits and freezes a real model -- it must never land in the
+    # operator's shared durable store. Count the REAL store (read-only, configured root) once
+    # before and once after; it must not move.
+    from research_workflow.model_store import list_store
+    real_store_count_before = len(list_store())
 
     ctl = lambda: V2StudyController(study, options=opts, repo_root=ROOT)
     card = ctl().run(through="tests")
@@ -94,6 +101,10 @@ def test_controller_runs_a_fresh_v2_study_end_to_end(tmp_path, synthetic_bars, m
     assert models["model_id"] and models["rows"]["binary"] > 0
     assert models["metrics"]["tuning"] is None
     assert (study / "artifacts" / "train_experiment_freeze.json").is_file()
+    # W-5: fit() just wrote a model -- confirm it landed under opts.model_root, not the real store.
+    from research_workflow.model_store import model_dir as _model_dir
+    assert _model_dir(models["model_id"], opts.model_root).is_dir()
+    assert len(list_store()) == real_store_count_before, "fit() must never write the real durable model store"
 
     card = ctl().run(through="analyze")
     assert card["STATUS"] == "OK" and card["state"] == "READY_TO_CLOSE", card
@@ -108,6 +119,32 @@ def test_controller_runs_a_fresh_v2_study_end_to_end(tmp_path, synthetic_bars, m
     card = ctl().run(through="close")
     assert card["STATUS"] == "OK" and card["state"] == "STUDY_CLOSED" and not card["actions_executed"]
     assert not list(study.glob("**/*.py")), "a v2 study carries no study Python"
+
+    # F1: every DELIVERABLES_BY_STAGE path the golden run produces actually exists on disk --
+    # deliverables_by_stage is built from research_workflow.lifecycle_v2.DELIVERABLES, the same
+    # constant analyze()/etc use to name their own output, so this cannot silently diverge again.
+    import re as _re
+    from research_workflow.audit_packets_v2 import deliverables_for_plan
+    from research_workflow.lifecycle_v2 import load_plan
+    plan = load_plan(study)
+    deliverables = deliverables_for_plan(plan)
+    years_by_stage = {"collection": (2029, 2030), "oos": (2031,)}
+
+    def _expand_braces(rel: str) -> list[str]:
+        m = _re.search(r"\{([^}]+)\}", rel)
+        if not m:
+            return [rel]
+        return [rel[: m.start()] + opt + rel[m.end() :] for opt in m.group(1).split(",")]
+
+    for stage, paths in deliverables.items():
+        for rel in paths:
+            if "<year>" in rel:
+                for year in years_by_stage[stage]:
+                    for expanded in _expand_braces(rel.replace("<year>", str(year))):
+                        assert (study / expanded).is_file(), f"deliverable missing for stage={stage}: {expanded}"
+            else:
+                for expanded in _expand_braces(rel):
+                    assert (study / expanded).is_file(), f"deliverable missing for stage={stage}: {expanded}"
 
 
 def test_controller_reports_typed_capability_gap(tmp_path, monkeypatch):

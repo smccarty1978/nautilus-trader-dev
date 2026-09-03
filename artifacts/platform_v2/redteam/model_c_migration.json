@@ -1,0 +1,42 @@
+{
+  "study_id": "clean_maturity_flip_model_rolling_productivity",
+  "freeze_path": "studies/clean_maturity_flip_model_rolling_productivity/artifacts/train_experiment_freeze.json",
+  "freeze_sha256": "ef7e83b778362412ed0329fda93b2b183a23a8097637046df579c6e53a77cc3e",
+  "bundle_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_rolling_productivity\\artifacts\\train_fitted_models.joblib",
+  "bundle_sha256": "03f602c5b38915c2a80ef474aba0ca95c6d3fbcb634243c24b8fa0a63a1aaa89",
+  "arms": {
+    "LONG_A": {
+      "model_id": "d22e21b03c74deeb1f1107c0ee56762f84dfb86bbb6c3d20e135bf995aceed2b",
+      "status": "migrated",
+      "tier": "registry"
+    },
+    "LONG_B": {
+      "model_id": "7d1ab65957bb9dc08e23fdace942e039d2ef096c09f6fa0829a00bc900b164e4",
+      "status": "migrated",
+      "tier": "registry"
+    },
+    "LONG_C": {
+      "model_id": "3f7066e5104c5d4016b6d1530b5143a69a4e89387fff12109f0ef11346ccf438",
+      "status": "migrated",
+      "tier": "registry"
+    },
+    "SHORT_A": {
+      "model_id": "4977f242c04aee86fefd4f4880c3f6cb56d79a4859e0f70b64f72ef34d8be19f",
+      "status": "migrated",
+      "tier": "registry"
+    },
+    "SHORT_B": {
+      "model_id": "1c049e73d6a9c6254f0e82b07da5db0cba74d0682f3b61df171290b6c7da2986",
+      "status": "migrated",
+      "tier": "registry"
+    },
+    "SHORT_C": {
+      "model_id": "7e8deb7ccc1a7f471757511e2defc7f3701cf9c9a1c5b7018328be7dc13af008",
+      "status": "migrated",
+      "tier": "registry"
+    }
+  },
+  "migrated": 6,
+  "already_present": 0,
+  "failed": []
+}

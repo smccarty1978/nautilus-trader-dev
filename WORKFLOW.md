@@ -24,6 +24,9 @@ research question
   -> python scripts/research.py study run --study studies/<id> --through <stage> --execute-authorized
        compile -> prepare -> readiness -> preflight -> tests -> causal_audit -> contract_audit -> seal
        -> smoke -> collection -> reconcile -> merge -> fit -> freeze -> oos -> analyze -> close
+       (`--execute-authorized` is a real gate: every stage after `seal` -- smoke through close --
+       is BLOCKED with `EXECUTION_NOT_AUTHORIZED` unless the flag is present; `--through seal` or
+       earlier never needs it, and `--inspect`/`--dry-run` are unaffected)
   -> runtime host (research_workflow/host) replays the plan causally; the sink writes columnar frames
   -> collection frames -> fit / score (model store) -> freeze -> authorized OOS -> analysis
   -> one causal auditor + one contract auditor read compact packets; `research audit ingest` binds their reports
@@ -101,6 +104,14 @@ creates v2 studies; `study compile` and `study run` refuse a new v1 study.
 | Artifacts / checkpoints | Session evidence | `artifacts/platform_v2_do_soon/` (cards, checkpoints, proofs) | NO | YES | `python scripts/platform_v2_cards.py` |
 | Templates | Prompts and skeletons | `research_workflow/templates/`, `docs/templates/`, `docs/examples/*.yaml` | YES | NO | — |
 | Documentation | Authority and manuals | `WORKFLOW.md`, `docs/QUICKSTART.md`, `docs/RESEARCH_YAML_REFERENCE.md`, `docs/RESEARCH_DISCUSSION_TO_YAML.md`, `docs/AI_AGENTS.md`, `docs/RESEARCH_WORKFLOW.md`, `docs/GOVERNED_STUDY_CONTROLLER.md`, `docs/DOCUMENT_MAP.md` | YES | reference yes | `python scripts/gen_yaml_reference.py --check` |
+
+A DatasetSpec (`research/datasets/<id>.yaml`) declares `reference_tables` (which of
+`sessions`/`holidays`/`maintenance`/`rolls`/`gaps`/`out_of_calendar` the dataset carries) and
+`reference_digest` (their combined content hash); verification is fail-closed -- a hash mismatch at
+load refuses the study rather than reading a drifted table. A `sessions` reference table selects the
+calendar session kind used for outcome/population censoring; ETH is `(open, 08:30 CT]` pre-open plus
+`(15:15 CT or halt end, day close]` post-close, and legacy ETH censoring without a declared `sessions`
+table is refused (`SEMANTIC_DECISION_REQUIRED`).
 
 ## D. A normal new study
 
@@ -309,6 +320,13 @@ Declare, explicitly:
 * `entry_reference` (only `next_bar_open` / `next_printed_bar_open` are executable for labels);
 * `relation` (continuation | fade) and `direction`.
 
+Resolution precedence at every bar (in-horizon, or the first post-horizon bar under
+`horizon_end_rule: first_bar_at_or_after`) is fixed: `SESSION_END > GAP > BARRIER_TOUCH > HORIZON_EXPIRY`
+-- a bar past the censoring session close is CENSORED `SESSION_END` before `max_gap`/touch are ever
+evaluated, so `expiry: negative` can never manufacture a directional label out of a session-boundary
+data gap. This is compiled into every outcome contract as `outcome.semantics.resolution_precedence` and
+enforced identically by the kernel and the independent oracle (see `docs/RESEARCH_YAML_REFERENCE.md`).
+
 Shape C lesson: the sealed reference resolved 25 of 453,768 rows one second past the horizon on sparse
 seconds and keyed its model cells by the prevailing regime direction. Both were invisible in a study
 driver and became explicit YAML (`horizon_end_rule`, `model.models[].subset`) with tests and audits.
@@ -424,18 +442,26 @@ This is exactly how the three proof studies absorbed platform fixes.
 
 ### M.4 Lease semantics (as implemented in `research_workflow/workspace.py`)
 
+A lease is durable ownership of a workspace for the duration of actual work, not just for the
+lifetime of the short-lived `study new` CLI process that created it: the lease carries a `holder`
+(pid, kind `cli`|`controller`, `renewed_at_utc`) and a `ttl_seconds` (default 72h). Every governed
+`research study run` on a leased worktree renews the lease (kind `controller`) while it runs, so a
+long controller run keeps the lease `live` long past the creating CLI process's exit.
+
 | state | meaning | writing allowed? |
 |---|---|---|
-| `live` | the lease's worktree exists and the PID that created it is alive | only that writer; `study new` refuses a second live lease on the same worktree (`WRITER_LEASE_HELD`) |
-| `stale` | the worktree exists but the creating PID is dead (session ended, machine restarted) | the worktree is unowned; `research ws list --reclaim` deletes the stale lease, after which one writer may take the worktree |
+| `live` | the lease's worktree exists, not released, and (holder pid alive OR still inside the ttl window since the last renewal) | only that writer; `study new` refuses a second live lease on the same worktree (`WRITER_LEASE_HELD`); a `research study run` on the worktree by a different owner is refused (`WRITER_LEASE_HELD_BY_OTHER`) |
+| `stale` | the worktree exists, the holder pid is dead, and the ttl window has expired | the worktree is unowned; `research ws list --reclaim` deletes the stale lease, after which one writer may take the worktree |
 | `dead` | the lease's worktree no longer exists | nothing to write; `research ws list --reclaim` deletes the record |
+| `released` | the owner ran `research ws release <study_id>` | the worktree is unowned; `research ws list --reclaim` deletes the record |
 
-Ownership is the `owner` (user@host) and `pid` in the lease file, written once by `study new`. Never
-delete or edit lease files by hand and never take over a `live` lease: if two agents must work on the
-same study, the second one waits or takes a different study. `research ws list` shows, per worktree,
-the branch, HEAD, dirty state, owner and lease state; `research ws list --reclaim` is the only sanctioned
-reclaim command and touches only `stale`/`dead` leases. The controller's `run.lock` independently
-prevents two live runs of the same study.
+Ownership is the `owner` (user@host) in the lease file, written once by `study new`. Never delete or
+edit lease files by hand and never take over a `live` lease: if two agents must work on the same
+study, the second one waits or takes a different study, or the owner runs `research ws release
+<study_id>` when done. `research ws list` shows, per worktree, the branch, HEAD, dirty state, owner
+and lease state; `research ws list --reclaim` is the only sanctioned reclaim command and touches only
+`stale`/`dead`/`released` leases, never `live`. The controller's `run.lock` independently prevents two
+live runs of the same study.
 
 ### M.5 Example: three concurrent studies
 

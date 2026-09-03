@@ -1,0 +1,440 @@
+{
+  "audit_type": "contract",
+  "binding_proof": [
+    {
+      "bound": true,
+      "capability": "tracker.synthetic.level_regime",
+      "id": "regime",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticRegimeBinding",
+      "kind": "tracker"
+    },
+    {
+      "bound": true,
+      "capability": "tracker.synthetic.level_regime",
+      "id": "regime_5s",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticRegimeBinding",
+      "kind": "tracker"
+    },
+    {
+      "bound": true,
+      "capability": "tracker.synthetic.level_regime",
+      "id": "regime_5m",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticRegimeBinding",
+      "kind": "tracker"
+    },
+    {
+      "bound": true,
+      "capability": "tracker.synthetic.level_regime",
+      "id": "ctx_regime",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticRegimeBinding",
+      "kind": "tracker"
+    },
+    {
+      "bound": true,
+      "capability": "feature_host.synthetic",
+      "id": "f_close",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticFeatureHost",
+      "kind": "feature"
+    },
+    {
+      "bound": true,
+      "capability": "feature_host.synthetic",
+      "id": "f_dir",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticFeatureHost",
+      "kind": "feature"
+    },
+    {
+      "bound": true,
+      "capability": "feature_host.synthetic",
+      "id": "f_ctx_dir",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticFeatureHost",
+      "kind": "feature"
+    },
+    {
+      "bound": true,
+      "capability": "feature_host.synthetic",
+      "id": "f_5s_dir",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticFeatureHost",
+      "kind": "feature"
+    },
+    {
+      "bound": true,
+      "capability": "feature_host.synthetic",
+      "id": "f_5m_bars",
+      "implementation": "research_workflow.tests.synthetic_primitives.SyntheticFeatureHost",
+      "kind": "feature"
+    }
+  ],
+  "chronology": {
+    "authorized_dates": [],
+    "dev": [
+      2031
+    ],
+    "diagnostic": [],
+    "prohibited": [
+      2032
+    ],
+    "train": [
+      2029,
+      2030
+    ],
+    "warmup": {
+      "candidate_emission": false,
+      "days_before_partition": 5,
+      "target_generation": false
+    }
+  },
+  "columns": {
+    "derived": [],
+    "features": [
+      "f_close",
+      "f_dir",
+      "f_ctx_dir",
+      "f_5s_dir",
+      "f_5m_bars"
+    ],
+    "identity": [
+      "observation_ts",
+      "regime_start_ns",
+      "checkpoint_index"
+    ],
+    "metadata": [],
+    "observation": [
+      "observation_ts",
+      "regime_start_ns",
+      "regime_direction",
+      "checkpoint_index",
+      "flip_ts",
+      "time_to_flip_seconds",
+      "target_flip_within_horizon",
+      "disposition",
+      "censored",
+      "censor_reason",
+      "horizon_end_ts",
+      "session_close_ts",
+      "resolved_at_ts",
+      "arm_a_label",
+      "arm_a_disposition",
+      "arm_a_censor_reason",
+      "arm_a_resolution_seconds",
+      "arm_b_label",
+      "arm_b_disposition",
+      "arm_b_censor_reason",
+      "arm_b_resolution_seconds"
+    ]
+  },
+  "deliverables_by_stage": {
+    "analyze": [
+      "artifacts/experiment_analysis_v2.json"
+    ],
+    "causal_audit": [
+      "audit/status.json"
+    ],
+    "close": [
+      "artifacts/study_closure.json"
+    ],
+    "collection": [
+      "_work/controller/partitions/train/<year>/{candidates,observations}.parquet"
+    ],
+    "compile": [
+      "compiled_plan.json"
+    ],
+    "contract_audit": [
+      "audit/contract_status.json"
+    ],
+    "fit": [
+      "artifacts/experiment_models.json",
+      "artifacts/tuning_trials.json"
+    ],
+    "freeze": [
+      "artifacts/train_experiment_freeze.json"
+    ],
+    "merge": [
+      "_work/controller/merged/{candidates,observations}.parquet",
+      "_work/controller/merged/identity.json"
+    ],
+    "oos": [
+      "_work/controller/partitions/oos/<year>/{candidates,observations}.parquet"
+    ],
+    "preflight": [
+      "audit/preflight.json"
+    ],
+    "prepare": [
+      "audit/frozen_execution_manifest.json",
+      "artifacts/experiment_authorization.json"
+    ],
+    "readiness": [
+      "audit/readiness.json"
+    ],
+    "reconcile": [
+      "_work/controller/reconcile.json"
+    ],
+    "seal": [
+      "artifacts/preexec_audit_seal.json"
+    ],
+    "smoke": [
+      "artifacts/smoke_acceptance.json"
+    ],
+    "tests": [
+      "_work/controller/test_summary.json"
+    ]
+  },
+  "identity": {
+    "execution_composite_sha256": "95695753d5267bf985ff789058fa4ccafea28c00294095780e3720ba3b4208a4",
+    "packet_sha256": "454839254bf142cd97eb277cd8749705428b3c278531e49381b35d7e0662b730",
+    "registry_sha256": "aa723d2be2e2a9eee343ba87ab6d86b87b2b617cb82772e76d9402899bd21873",
+    "seal": {}
+  },
+  "instructions": "Write audit/pass_NN.md (causal) or audit/contract_pass_NN.md (contract) and end it with exactly one block: <!-- AUDIT_SUMMARY_V2_START --> {json} <!-- AUDIT_SUMMARY_V2_END -->; then run `research audit ingest --study <dir> --type <causal|contract> --report <file> --author <you>`.",
+  "instruments": {
+    "SYN_A": {
+      "dataset_digest": "synthetic-golden-fixture-v1",
+      "dataset_id": "SYN_A",
+      "role": "execution"
+    },
+    "SYN_B": {
+      "dataset_digest": "synthetic-golden-fixture-v1",
+      "dataset_id": "SYN_B",
+      "role": "context"
+    }
+  },
+  "invariants": [
+    "every declared primitive maps to exactly one runtime implementation",
+    "TRAIN/tuning/final-validation/OOS years disjoint",
+    "no study Python for a tier-2 study unless STUDY_PYTHON_EXCEPTIONS names it (mechanically checked -- see study_python)",
+    "identity columns observation_ts/regime_start_ns/checkpoint_index on every row",
+    "outcome columns are labels, never features"
+  ],
+  "model": {
+    "arms": [],
+    "family": "model.lightgbm",
+    "max_trials": 8,
+    "mode": "train",
+    "objective": {
+      "aggregate": "mean_over_folds",
+      "maximize": true,
+      "metric": "roc_auc"
+    },
+    "params": {
+      "learning_rate": 0.1,
+      "max_depth": 2,
+      "n_estimators": 20,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "random_seed": 11,
+    "sampler_seed_source": "validation.random_seed",
+    "search_space": {
+      "max_depth": {
+        "high": 4,
+        "int": true,
+        "log": false,
+        "low": 2
+      },
+      "n_estimators": {
+        "choices": [
+          10,
+          20,
+          40
+        ]
+      }
+    },
+    "validation": {
+      "final_train_validation_years": [],
+      "max_trials": 8,
+      "primary_metric": null,
+      "protocol": "validation.model_selection.random",
+      "random_seed": 11,
+      "tuning_years": [
+        2029,
+        2030
+      ],
+      "year_role_table": [
+        {
+          "role": "tuning",
+          "year": 2029
+        },
+        {
+          "role": "tuning",
+          "year": 2030
+        },
+        {
+          "role": "dev_oos",
+          "year": 2031
+        },
+        {
+          "role": "prohibited",
+          "year": 2032
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "arms": [
+      {
+        "adverse_atr": 1.0,
+        "expiry": "censor",
+        "favorable_atr": 1.0,
+        "horizon_ns": 60000000000,
+        "id": "tp1_sl1",
+        "prefix": "arm_a"
+      },
+      {
+        "adverse_atr": 0.5,
+        "expiry": "censor",
+        "favorable_atr": 1.0,
+        "horizon_ns": 60000000000,
+        "id": "tp1_sl05",
+        "prefix": "arm_b"
+      }
+    ],
+    "contract": "label",
+    "kernel": "barrier",
+    "label_column": "target_flip_within_horizon",
+    "label_columns": {
+      "arm_a": "arm_a_label",
+      "arm_b": "arm_b_label",
+      "primary": "target_flip_within_horizon"
+    },
+    "primary_arm": "tp1_sl1",
+    "semantics": {
+      "horizon_end_rule": "strict",
+      "max_gap_ns": null,
+      "resolution_precedence": [
+        "SESSION_END",
+        "GAP",
+        "BARRIER_TOUCH",
+        "HORIZON_EXPIRY"
+      ],
+      "same_bar_rule": "ambiguous_censor",
+      "session_end_censoring": true
+    }
+  },
+  "packet_version": 2,
+  "plan_sha256": "9532e5ea6c7e1bae2aa53bd085659d6801a81dbd1128fb2ae3f38909fe59c1e4",
+  "required_summary_block": {
+    "audit_type": "causal | contract",
+    "audited_execution_composite_sha256": "<copy from packet.identity.execution_composite_sha256>",
+    "auditor": "<distinct identity>",
+    "critical": 0,
+    "note": 0,
+    "study": "<study_id>",
+    "verdict": "CLEAR | BLOCKED",
+    "warning": 0
+  },
+  "session": {
+    "reference_digest": null,
+    "reference_tables": []
+  },
+  "spec_sha256": "2fd1fb0cabf6cbbb4d939b9c85ce246296371c60ecbd0d9bfb28b7eff17ed865",
+  "stage_closures": {
+    "audit": {
+      "composite_sha256": "cb379ab23966122a17566a3798d346bfd767cfec672d7847712ea8179bed77de",
+      "files": [
+        "research_workflow/audit_packets_v2.py"
+      ]
+    },
+    "collection": {
+      "composite_sha256": "f70e3fdf4b6da2eaa349b04cdf0261076fc09fae0abb162a8e661a41581e628a",
+      "files": [
+        "research_workflow/dataset_v2.py",
+        "research_workflow/grammar/compiler.py",
+        "research_workflow/grammar/expansion.py",
+        "research_workflow/grammar/plan.py",
+        "research_workflow/grammar/predicates.py",
+        "research_workflow/grammar/spec.py",
+        "research_workflow/host/interfaces.py",
+        "research_workflow/host/mux.py",
+        "research_workflow/host/outcomes.py",
+        "research_workflow/host/predicate_eval.py",
+        "research_workflow/host/sink.py",
+        "research_workflow/host/strategy.py",
+        "research_workflow/host/triggers.py",
+        "research_workflow/host_runner.py",
+        "research_workflow/provider_host.py",
+        "research_workflow/sessions.py",
+        "research_workflow/target_expression.py",
+        "research_workflow/target_replay_oracle.py",
+        "research_workflow/tests/synthetic_primitives.py",
+        "utils/session_boundaries.py"
+      ]
+    },
+    "lifecycle": {
+      "composite_sha256": "324e4462feaee49169d28621208d2a28cc4119d4b88613a4cb01e8b0925e50d3",
+      "files": [
+        "research_workflow/closure_hash.py",
+        "research_workflow/controller_contracts.py",
+        "research_workflow/governed_controller.py",
+        "research_workflow/governed_controller_v2.py",
+        "research_workflow/lifecycle_v2.py",
+        "research_workflow/locks.py",
+        "research_workflow/policy.py",
+        "research_workflow/roots.py",
+        "research_workflow/study_closure.py"
+      ]
+    },
+    "modeling": {
+      "composite_sha256": "18d210d5fd4c975d1d18a0b4e28cccc5a60736c53bcfb2d6c77cf3552e36ced3",
+      "files": [
+        "research/analysis/identity.py",
+        "research/analysis/metrics.py",
+        "research/analysis/modeling.py",
+        "research_workflow/model_store.py",
+        "research_workflow/tuning.py"
+      ]
+    },
+    "oos": {
+      "composite_sha256": "33c6cd66e080343671805fb1b81c4fee0d4ad779909689807c36e532f7e954df",
+      "files": [
+        "research_workflow/experiment.py"
+      ]
+    },
+    "outcome": {
+      "composite_sha256": "0f75bef9c5a19d91ccae8decc8a138c1b796cd50125203fd59dc562f28ec7c99",
+      "files": [
+        "research_workflow/entry_references.py",
+        "research_workflow/forward_outcomes/guard.py",
+        "research_workflow/target_expression.py",
+        "research_workflow/target_replay_oracle.py"
+      ]
+    }
+  },
+  "study": {
+    "description": null,
+    "id": "golden_barrier_redteam",
+    "question": "Golden fixture: checkpoint grid + two barrier arms on synthetic SYN_A with SYN_B context",
+    "tier": 2
+  },
+  "study_id": "golden_barrier_redteam",
+  "study_python": {
+    "exception": null,
+    "python_files": []
+  },
+  "tests": {
+    "counts": {
+      "failed": 0,
+      "passed": 1
+    },
+    "execution_composite_sha256": "95695753d5267bf985ff789058fa4ccafea28c00294095780e3720ba3b4208a4",
+    "status": "PASS"
+  },
+  "worktree_dirty_paths": [],
+  "year_role_table": [
+    {
+      "role": "tuning",
+      "year": 2029
+    },
+    {
+      "role": "tuning",
+      "year": 2030
+    },
+    {
+      "role": "dev_oos",
+      "year": 2031
+    },
+    {
+      "role": "prohibited",
+      "year": 2032
+    }
+  ]
+}

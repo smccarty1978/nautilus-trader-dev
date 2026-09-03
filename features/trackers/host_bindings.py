@@ -688,7 +688,21 @@ class FrozenExternalScoreBinding(BaseBinding):
         if any(v is None or (isinstance(v, float) and math.isnan(v)) for v in inputs.values()):
             return None
         ts = int(epoch.T)
-        obs = self._scorer.score(inputs, checkpoint_ts=ts, direction=direction, availability_ts={n: ts for n in surf})
+        # RT-B2: `ts` (the completed-bar epoch driving this binding) is both the checkpoint and
+        # the instant the score is actually evaluated at (synchronous, in-process scoring) --
+        # pass it explicitly as `score_evaluation_ts` rather than relying on the scorer's default.
+        # Per-input availability: this binding has no finer-grained per-column availability table
+        # wired to it (the row is already causally gated upstream by Feature System V2 visibility
+        # rules), so `ts` is used as a documented conservative upper bound for every input, and
+        # that provenance is recorded on the observation rather than silently assumed.
+        obs = self._scorer.score(
+            inputs,
+            checkpoint_ts=ts,
+            direction=direction,
+            availability_ts={n: ts for n in surf},
+            score_evaluation_ts=ts,
+            availability_source="checkpoint_ts_upper_bound",
+        )
         return float(obs.score)
 
 

@@ -306,13 +306,20 @@ class LabelOutcomeKernel:
                 p.entry_price = op
                 p.entry_ts = ts - (bar.ts_init - bar.ts_event)
                 p.prev_ts = p.entry_ts
-                d, atr, ep = p.direction, p.atr, op
-                for i, arm in enumerate(self.arms):
-                    p.arm_end[i] = p.entry_ts + arm.horizon_ns
-                    p.arm_good[i] = ep + d * arm.favorable_atr * atr
-                    p.arm_bad[i] = ep - d * arm.adverse_atr * atr
-                    if p.session_close is not None and p.arm_end[i] > p.session_close:
-                        self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+                # N-3: the entry observation is subject to the same gap rule as any other
+                # observation -- an execution reference (next_bar_open) more than max_gap
+                # after the decision epoch T is a stale price, never a valid entry.
+                if max_gap is not None and (p.entry_ts - p.T) > max_gap:
+                    for i in range(self.n_arms):
+                        self._resolve_arm(p, i, CENSORED, p.entry_ts, "GAP")
+                else:
+                    d, atr, ep = p.direction, p.atr, op
+                    for i, arm in enumerate(self.arms):
+                        p.arm_end[i] = p.entry_ts + arm.horizon_ns
+                        p.arm_good[i] = ep + d * arm.favorable_atr * atr
+                        p.arm_bad[i] = ep - d * arm.adverse_atr * atr
+                        if p.session_close is not None and p.arm_end[i] > p.session_close:
+                            self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
             if p.arm_open:
                 gap = bool(max_gap is not None and ts - p.prev_ts > max_gap)
                 for i in range(self.n_arms):
@@ -320,14 +327,34 @@ class LabelOutcomeKernel:
                         continue
                     end = p.arm_end[i]
                     past_end = ts > end
-                    if past_end and self.c.horizon_end_rule == "strict":
-                        self._expire_arm(p, i)
-                        continue
                     if past_end:
-                        # first_bar_at_or_after: this bar is evaluated for a hit, then the arm expires --
-                        # but only inside the arm's own session: a bar from the next session is never a fill
+                        # Precedence at every resolution point is SESSION_END > GAP >
+                        # BARRIER_TOUCH > HORIZON_EXPIRY -- for BOTH `strict` and
+                        # `first_bar_at_or_after`. `strict` must not short-circuit straight
+                        # to the horizon-expiry policy: an unobserved gap spanning the
+                        # horizon end can otherwise manufacture a NEGATIVE/CENSORED-TIMEOUT
+                        # label from zero price observation over the whole interval (C-B).
                         if p.session_close is not None and ts > p.session_close:
-                            self._expire_arm(p, i)
+                            self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+                            continue
+                        if self.c.horizon_end_rule == "strict":
+                            # `strict` never inspects `ts`'s OHLC (no touch is ever evaluated
+                            # post-horizon), so the only gap question that matters is whether
+                            # the horizon boundary itself (`end`) was adequately observed --
+                            # the UNOBSERVED span inside the horizon is `end - prev_ts`, not
+                            # the raw bar-to-bar gap to `ts` (which may run on well past the
+                            # horizon end for reasons irrelevant to this arm).
+                            horizon_gap = bool(max_gap is not None and (end - p.prev_ts) > max_gap)
+                            if horizon_gap:
+                                self._resolve_arm(p, i, CENSORED, ts, "GAP")
+                            else:
+                                self._expire_arm(p, i)
+                            continue
+                        # first_bar_at_or_after: this bar IS the resolution observation, so
+                        # the raw bar-to-bar gap to it is what must be judged reliable before
+                        # it is trusted for a touch.
+                        if gap:
+                            self._resolve_arm(p, i, CENSORED, ts, "GAP")
                             continue
                         d = p.direction
                         good, bad = p.arm_good[i], p.arm_bad[i]

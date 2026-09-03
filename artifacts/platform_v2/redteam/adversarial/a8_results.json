@@ -1,0 +1,74 @@
+{
+ "results": [
+  {
+   "case": "A8a first_bar_at_or_after, post-horizon bar beyond max_gap -> GAP",
+   "outcome": "kernel=CENSORED/GAP oracle=CENSORED/GAP parity=True expected=('CENSORED', 'GAP')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8a' same tape with expiry=negative (must still be GAP, never a manufactured NEGATIVE)",
+   "outcome": "kernel=CENSORED/GAP oracle=CENSORED/GAP parity=True expected=('CENSORED', 'GAP')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8b first_bar_at_or_after + expiry=negative, first post-horizon bar past the session close -> SESSION_END",
+   "outcome": "kernel=CENSORED/SESSION_END oracle=CENSORED/SESSION_END parity=True expected=('CENSORED', 'SESSION_END')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8b' same, expiry=censor",
+   "outcome": "kernel=CENSORED/SESSION_END oracle=CENSORED/SESSION_END parity=True expected=('CENSORED', 'SESSION_END')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8c strict, dense tape, no touch, expiry=censor -> TIMEOUT",
+   "outcome": "kernel=CENSORED/TIMEOUT oracle=CENSORED/TIMEOUT parity=True expected=('CENSORED', 'TIMEOUT')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8c' strict, dense tape, no touch, expiry=negative -> NEGATIVE",
+   "outcome": "kernel=NEGATIVE/None oracle=NEGATIVE/None parity=True expected=('NEGATIVE', None)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8-ADJ1 strict + expiry=negative + a max_gap-exceeding gap straddling the horizon end",
+   "outcome": "kernel=CENSORED/GAP oracle=CENSORED/GAP parity=True expected=('CENSORED', 'GAP')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8-ADJ1' same tape with expiry=censor",
+   "outcome": "kernel=CENSORED/GAP oracle=CENSORED/GAP parity=True expected=('CENSORED', 'GAP')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8-ADJ2 gap exactly == max_gap (30s) is NOT a gap (strict >)",
+   "outcome": "kernel=CENSORED/TIMEOUT oracle=CENSORED/TIMEOUT parity=True expected=('CENSORED', 'TIMEOUT')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8-ADJ2' gap of max_gap+1s IS a gap",
+   "outcome": "kernel=CENSORED/GAP oracle=CENSORED/GAP parity=True expected=('CENSORED', 'GAP')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8-ADJ3 a bar closing EXACTLY at the horizon end is touch-eligible -> POSITIVE",
+   "outcome": "kernel=POSITIVE/None oracle=POSITIVE/None parity=True expected=('POSITIVE', None)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8-ADJ4 the ENTRY bar itself is 500s after T (far beyond max_gap=30s)",
+   "outcome": "kernel=CENSORED/GAP oracle=CENSORED/GAP -- the gap from T to the entry bar is not evaluated by either side",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8-ADJ5 strict, expiry=negative, session close at T0+30s (before the horizon end)",
+   "outcome": "kernel=CENSORED/SESSION_END oracle=CENSORED/SESSION_END parity=True expected=('CENSORED', 'SESSION_END')",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A8-ADJ6 the tape ENDS before the horizon end, expiry=negative (kernel DATA_END vs oracle policy)",
+   "outcome": "kernel=CENSORED/DATA_END oracle=CENSORED/DATA_END",
+   "verdict": "BLOCKED"
+  }
+ ]
+}

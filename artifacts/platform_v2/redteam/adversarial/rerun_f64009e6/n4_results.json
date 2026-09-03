@@ -1,0 +1,50 @@
+{
+ "results": [
+  {
+   "case": "N4-reg NQ_1S_V2: committed reference_digest recomputes under the new full-manifest formula",
+   "outcome": "declared=0db1f14bfe0fc5b6cdf72fc4cdb0de981325c6489c67b2a264465316ade7a80c computed=0db1f14bfe0fc5b6cdf72fc4cdb0de981325c6489c67b2a264465316ade7a80c manifest_tables=['gaps', 'holidays', 'maintenance', 'out_of_calendar', 'rolls', 'sessions'] spec_declares=['gaps', 'holidays', 'maintenance', 'out_of_calendar', 'rolls', 'sessions'] match=True",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N4-reg NQ_1S_V2: load_reference_tables(real catalog, declared, committed digest)",
+   "outcome": "loaded=['gaps', 'holidays', 'maintenance', 'out_of_calendar', 'rolls', 'sessions'] rows={gaps:19174204, holidays:16, maintenance:2008, out_of_calendar:29385, rolls:25, sessions:1637}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N4-reg ES_1S_V2: committed reference_digest recomputes under the new full-manifest formula",
+   "outcome": "declared=52df910ab396eedd687eb89ad01970cef83285538c9f110905df366f9a307ef6 computed=52df910ab396eedd687eb89ad01970cef83285538c9f110905df366f9a307ef6 manifest_tables=['gaps', 'holidays', 'maintenance', 'out_of_calendar', 'rolls', 'sessions'] spec_declares=['gaps', 'holidays', 'maintenance', 'out_of_calendar', 'rolls', 'sessions'] match=True",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N4-reg ES_1S_V2: load_reference_tables(real catalog, declared, committed digest)",
+   "outcome": "loaded=['gaps', 'holidays', 'maintenance', 'out_of_calendar', 'rolls', 'sessions'] rows={gaps:20075208, holidays:16, maintenance:2008, out_of_calendar:24422, rolls:25, sessions:1637}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N4a control: subset declaration + correct full-manifest digest",
+   "outcome": "loaded",
+   "verdict": "OK"
+  },
+  {
+   "case": "N4b manifest gains a phantom table; study still declares only ['sessions'], old digest",
+   "outcome": "DatasetV2Error: REFERENCE_DIGEST_MISMATCH: computed 087925e882bdcfa9b886e6ee1f99f5677c2726c0ec670785835ac2d2534ed92e != declared 0db1f14bfe0fc5b6cdf72fc4cdb0de981325c6489c67b2a264465316ade7a80c",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N4c attacker recomputes the aggregate over the tampered manifest (NOT a bypass: the digest argument comes from the COMMITTED DatasetSpec, which the attacker cannot rewrite without a commit)",
+   "outcome": "LOADED with an attacker-supplied digest - expected; documents where the anchor actually is",
+   "verdict": "OK"
+  },
+  {
+   "case": "N4d declared sessions.parquet bytes swapped + manifest sha refreshed, COMMITTED spec digest",
+   "outcome": "DatasetV2Error: REFERENCE_DIGEST_MISMATCH: computed 82f6858a7d99f4fca74b5352fb58ba034368fcab0a914ba7ab05da12e55c3545 != declared 0db1f14bfe0fc5b6cdf72fc4cdb0de981325c6489c67b2a264465316ade7a80c",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N4e compute_catalog_digest (readiness R1) covers <catalog>/reference and build_manifest.json",
+   "outcome": "scope='data/' only: True; the committed DatasetSpec.reference_digest remains the sole anchor",
+   "verdict": "BYPASSED"
+  }
+ ],
+ "tmp": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmpj0xgytyy"
+}

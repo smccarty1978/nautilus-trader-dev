@@ -32,6 +32,15 @@ class DerivedScoreObservation:
     arm: str
     model_hash: str
     preprocessing_hash: str
+    # RT-B2: the derived score's TRUE causal availability -- max(every input's availability,
+    # the score's own evaluation timestamp) -- never the decision epoch assigned blindly.
+    available_at_ns: int = 0
+    # How ``latest_input_availability_ts`` (per-input) was derived: either the caller's real,
+    # per-column availability (``"per_input_declared"``) or a conservative upper bound equal to
+    # the checkpoint timestamp, used when the caller has no finer-grained availability data
+    # (``"checkpoint_ts_upper_bound"``). Either value is a sound upper bound; the label is
+    # provenance only, never loosens the ``available_at_ns > checkpoint_ts`` refusal above.
+    availability_source: str = "checkpoint_ts_upper_bound"
 
 
 class FrozenExternalModelScorer:
@@ -159,7 +168,16 @@ class FrozenExternalModelScorer:
         checkpoint_ts: int,
         direction: str,
         availability_ts: Mapping[str, int],
+        score_evaluation_ts: int | None = None,
+        availability_source: str = "checkpoint_ts_upper_bound",
     ) -> DerivedScoreObservation:
+        """Score at ``checkpoint_ts``. ``score_evaluation_ts`` is when the score itself was
+        actually produced (defaults to ``checkpoint_ts`` for synchronous, in-process scoring;
+        a future asynchronous/multi-stream scorer passes the real, possibly later, timestamp).
+        The observation's causal availability is ``max(every input's availability_ts,
+        score_evaluation_ts)`` -- it is NEVER assigned ``checkpoint_ts`` blindly. A score whose
+        availability lands after ``checkpoint_ts`` is refused (not exposed re-stamped as if
+        current)."""
         direction = str(direction).upper()
         arm = self._arm_for(direction)
         surfaces = self.spec.ordered_feature_surfaces or {}
@@ -170,10 +188,12 @@ class FrozenExternalModelScorer:
             raise ExternalModelScoringError(
                 f"causal snapshot incomplete: values={missing}, availability={missing_availability}"
             )
-        future = [name for name in features if int(availability_ts[name]) > int(checkpoint_ts)]
-        if future:
+        evaluation_ts = int(checkpoint_ts) if score_evaluation_ts is None else int(score_evaluation_ts)
+        latest_input_availability_ts = max((int(availability_ts[n]) for n in features), default=0)
+        available_at_ns = max(latest_input_availability_ts, evaluation_ts)
+        if available_at_ns > int(checkpoint_ts):
             raise ExternalModelScoringError(
-                f"EXTERNAL_SCORE_INPUT_NOT_AVAILABLE_AT_CHECKPOINT: {future}"
+                f"EXTERNAL_SCORE_INPUT_NOT_AVAILABLE_AT_CHECKPOINT: available_at_ns={available_at_ns} > checkpoint_ts={checkpoint_ts}"
             )
         frame = pd.DataFrame(
             [[causal_snapshot[name] for name in features]], columns=features
@@ -189,11 +209,13 @@ class FrozenExternalModelScorer:
             name=self.spec.name,
             score=score,
             checkpoint_ts=int(checkpoint_ts),
-            latest_input_availability_ts=max(int(availability_ts[n]) for n in features),
+            latest_input_availability_ts=latest_input_availability_ts,
+            available_at_ns=available_at_ns,
             direction=direction,
             arm=arm,
             model_hash=(self.spec.model_hashes or {}).get(arm, rec.get("fit_identity_sha256", "")),
             preprocessing_hash=self.spec.preprocessing_hash or self._recovered.get("preprocessing_identity", ""),
+            availability_source=availability_source,
         )
 
 

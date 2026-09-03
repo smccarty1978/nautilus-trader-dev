@@ -1,0 +1,160 @@
+{
+ "closure": [
+  "research/analysis/identity.py",
+  "research/analysis/metrics.py",
+  "research/analysis/modeling.py",
+  "research_workflow/audit_packets_v2.py",
+  "research_workflow/closure_hash.py",
+  "research_workflow/controller_contracts.py",
+  "research_workflow/dataset_v2.py",
+  "research_workflow/entry_references.py",
+  "research_workflow/experiment.py",
+  "research_workflow/forward_outcomes/guard.py",
+  "research_workflow/governed_controller.py",
+  "research_workflow/governed_controller_v2.py",
+  "research_workflow/grammar/compiler.py",
+  "research_workflow/grammar/expansion.py",
+  "research_workflow/grammar/plan.py",
+  "research_workflow/grammar/predicates.py",
+  "research_workflow/grammar/spec.py",
+  "research_workflow/host/interfaces.py",
+  "research_workflow/host/mux.py",
+  "research_workflow/host/outcomes.py",
+  "research_workflow/host/predicate_eval.py",
+  "research_workflow/host/sink.py",
+  "research_workflow/host/strategy.py",
+  "research_workflow/host/triggers.py",
+  "research_workflow/host_runner.py",
+  "research_workflow/lifecycle_v2.py",
+  "research_workflow/locks.py",
+  "research_workflow/model_store.py",
+  "research_workflow/policy.py",
+  "research_workflow/provider_host.py",
+  "research_workflow/roots.py",
+  "research_workflow/seal.py",
+  "research_workflow/sessions.py",
+  "research_workflow/study_closure.py",
+  "research_workflow/target_expression.py",
+  "research_workflow/target_replay_oracle.py",
+  "research_workflow/tests/synthetic_primitives.py",
+  "research_workflow/tuning.py",
+  "research_workflow/workspace.py",
+  "utils/session_boundaries.py"
+ ],
+ "unhashed_imported": [
+  "features/collector.py",
+  "features/engine.py",
+  "features/library.py",
+  "features/registry.py",
+  "features/trackers/host_bindings.py",
+  "features/trackers/median_center.py",
+  "features/trackers/ohlcv_delta.py",
+  "features/trackers/price_levels.py",
+  "features/trackers/pullback.py",
+  "features/trackers/range_position.py",
+  "features/trackers/rolling_5m_productivity.py",
+  "features/trackers/velocity.py",
+  "features/trackers/volume.py",
+  "features/trackers/wick.py",
+  "research/analysis/errors.py",
+  "research/analysis/loader.py",
+  "research/analysis/spec.py",
+  "research_workflow/capabilities.py",
+  "research_workflow/forward_outcomes/analysis.py",
+  "research_workflow/forward_outcomes/contracts.py",
+  "research_workflow/forward_outcomes/governance.py",
+  "research_workflow/forward_outcomes/partition.py",
+  "research_workflow/forward_outcomes/selection.py",
+  "research_workflow/forward_outcomes/tracker.py",
+  "research_workflow/grammar/gaps.py"
+ ],
+ "perturbation": [
+  {
+   "module": "research_workflow/lifecycle_v2.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "lifecycle"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "research_workflow/governed_controller_v2.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "lifecycle"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "research_workflow/experiment.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "oos"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "research_workflow/tuning.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "modeling"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "research_workflow/model_store.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "modeling"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "research_workflow/audit_packets_v2.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "audit"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "research_workflow/policy.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "lifecycle"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "research_workflow/locks.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "lifecycle"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "research_workflow/dataset_v2.py",
+   "in_closure": true,
+   "composite_moved": true,
+   "stages_moved": [
+    "collection"
+   ],
+   "verdict": "BLOCKED"
+  },
+  {
+   "module": "features/trackers/host_bindings.py",
+   "in_closure": false,
+   "composite_moved": null,
+   "verdict": "NOT_HASHED"
+  }
+ ]
+}

@@ -1,0 +1,105 @@
+{
+ "results": [
+  {
+   "case": "control: freshly stored v2 model authenticates",
+   "outcome": "AUTHENTICATED {\"model_id\": \"31486329ff80f111b6b3f1ab802b0a1de728cd553f950ea64b976ad411935024\", \"identity_rule\": \"v2_lineage_sha256\", \"canonical_sha256\": \"c641322b50bae946eaac",
+   "verdict": "OK"
+  },
+  {
+   "case": "copied model dir under a new id with manifest.model_id edited to match",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_MISMATCH: identity_rule 'v2_lineage_sha256' recomputes 31486329ff80f111b6b3f1ab802b0a1de728cd553f950ea64b976ad411935024 != requested 1111111111111111111111111111111111111111111111111111111111111111",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "corrupted canonical bytes",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_MISMATCH: identity_rule 'v2_lineage_sha256' recomputes 31486329ff80f111b6b3f1ab802b0a1de728cd553f950ea64b976ad411935024 != requested 2222222222222222222222222222222222222222222222222222222222222222",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "tampered golden expected.json",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_MISMATCH: identity_rule 'v2_lineage_sha256' recomputes 31486329ff80f111b6b3f1ab802b0a1de728cd553f950ea64b976ad411935024 != requested 3333333333333333333333333333333333333333333333333333333333333333",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "ordered_inputs reordered in the stored manifest after the id was fixed",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_MISMATCH: identity_rule 'v2_lineage_sha256' recomputes 31486329ff80f111b6b3f1ab802b0a1de728cd553f950ea64b976ad411935024 != requested 21c575346d0b79afc54dae255cbc1b7665969c196990cb7a7cc28549010e327c",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "identity_rule=legacy_v1_immutable_unrecomputable with a fabricated legacy_registry_record",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: HISTORICAL_AUTHORITY_UNTRACKED: studies/model_registry/cda3f9c273b4136e92be3445c7ca2009a897a1fc3c95269338aa476c9ee83147.json is missing or not committed to git at HEAD; an untracked/staged-on",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "identity_rule=legacy_v1_committed_registry with a fabricated legacy_registry_record",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: HISTORICAL_AUTHORITY_UNTRACKED: studies/model_registry/f4435425432f15babb77744904059bd6c6c69f7115a59f6adae08ff503eceb81.json is missing or not committed to git at HEAD; an untracked/staged-on",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "identity_rule=legacy_v1_train_freeze with a fabricated legacy_registry_record",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: legacy_v1_train_freeze manifest missing one of study_id/legacy_registry_record.arm/train_freeze_path/train_freeze_sha256/lineage.fit_identity_sha256",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "identity_rule=totally_made_up_rule with a fabricated legacy_registry_record",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: identity_rule 'totally_made_up_rule' has no recompute authority in this store",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "identity_rule=None with a fabricated legacy_registry_record",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: HISTORICAL_AUTHORITY_UNTRACKED: studies/model_registry/e92876dc71b0f0081c6f8a07535026f007f6b316e5f658076a8ef5ad259f590a.json is missing or not committed to git at HEAD; an untracked/staged-on",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "ledger-tier / candidate model reused for scoring",
+   "outcome": "ModelStoreError: MODEL_TIER_NOT_REUSABLE: tier='ledger' selection_status='candidate'",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "expect study_id mismatch",
+   "outcome": "ModelStoreError: MODEL_EXPECTATION_MISMATCH: expected study_id='some_other' but lineage.study_id='adv_model_study'",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "expect target_arm mismatch",
+   "outcome": "ModelStoreError: MODEL_EXPECTATION_MISMATCH: expected target_arm='tp2_sl2' but lineage.target_arm='tp1_sl1'",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "expect direction mismatch",
+   "outcome": "ModelStoreError: MODEL_EXPECTATION_MISMATCH: expected direction='long' but lineage.direction='both'",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "expect matching (control)",
+   "outcome": "AUTHENTICATED {\"model_id\": \"31486329ff80f111b6b3f1ab802b0a1de728cd553f950ea64b976ad411935024\", \"identity_rule\": \"v2_lineage_sha256\", \"canonical_sha256\": \"c641322b50bae946eaac",
+   "verdict": "OK"
+  },
+  {
+   "case": "manifest declares non-identity preprocessing",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_MISMATCH: identity_rule 'v2_lineage_sha256' recomputes d1b5e68a316b01fd098790f9b4574f9e9550a00a9d4200f9245ef1a1cfc4c59f != requested 4444444444444444444444444444444444444444444444444444444444444444",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "ADJACENT: fabricated but self-consistent TRAIN freeze, NOT in git at all",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: legacy_v1_train_freeze requires an AUTHENTICATED historical seal for study 'totally_fabricated_v1_study' (a freeze with no seal grants no authority): HISTORICAL_AUTHORITY_UNTRACKED: studies/t",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "ADJACENT: same fabricated freeze after `git add` ONLY (never committed)",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: legacy_v1_train_freeze requires an AUTHENTICATED historical seal for study 'totally_fabricated_v1_study' (a freeze with no seal grants no authority): HISTORICAL_AUTHORITY_UNTRACKED: studies/t",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "ADJACENT: committed freeze rewritten in the working tree to vouch for a different fit",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: legacy_v1_train_freeze requires an AUTHENTICATED historical seal for study 'totally_fabricated_v1_study' (a freeze with no seal grants no authority): HISTORICAL_AUTHORITY_UNTRACKED: studies/t",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "ADJACENT: fabricated studies/model_registry record, `git add` only (never committed)",
+   "outcome": "ModelStoreError: MODEL_IDENTITY_UNVERIFIABLE: HISTORICAL_AUTHORITY_UNTRACKED: C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmprg3f7xi3\\fakerepo\\studies\\model_registry\\5555555555555555555555555555555555555555555555555555555555555555.json is not i",
+   "verdict": "BLOCKED"
+  }
+ ],
+ "tmp": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmprg3f7xi3"
+}

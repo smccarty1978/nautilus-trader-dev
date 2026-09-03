@@ -1,0 +1,89 @@
+{
+ "results": [
+  {
+   "case": "C8 RTH window is (08:30 CT, 15:15 CT] on a normal day",
+   "outcome": "(1631712600000000000, 1631736900000000000)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C8 an early close TIGHTENS the RTH window (never widens it)",
+   "outcome": "(1637937000000000000, 1637950500000000000) expected close 12:15 CT",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C8 a holiday (no sessions row) contributes NO window",
+   "outcome": "days with an RTH window: [datetime.date(2020, 6, 10), datetime.date(2021, 3, 15), datetime.date(2021, 9, 15), datetime.date(2021, 11, 8), datetime.date(2021, 11, 26)]",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C8 DST-safe: 08:30 CT maps to 13:30Z in CDT and 14:30Z in CST",
+   "outcome": "2021-03-15 open=13:00Z (CDT) 2021-11-08 open=14:00Z (CST)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C8 ETH post segment starts at the declared halt_end (15:30 CT) on a pre-2021-06-28 day",
+   "outcome": "[(1591821000000000000, 1591822800000000000)] expected start 1591821000000000000",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C8 half-open (open, close] attribution",
+   "outcome": "in(open)=False in(open+1s)=True in(close)=True in(close+1s)=False",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "ETH LegacySessionTable('ETH').session_close fails closed",
+   "outcome": "SESSION_CLOSE_UNDEFINED_FOR_LEGACY_ETH: ETH session-end censoring requires a calendar dataset (explicit per-day windows); the legacy weekday-rule session table has no single ETH cl",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C8 ADJACENT: halt_end (14:30 CT) EARLIER than the 15:15 RTH close",
+   "outcome": "eth=[(1591826400000000000, 1591882200000000000), (1591903800000000000, 1591909200000000000)] rth=[(1591882200000000000, 1591906500000000000)] overlapping_pairs=[((1591903800000000000, 1591909200000000000), (1591882200000000000, 1591906500000000000))] (RTH/ETH tables are validated separately, so no overlap error is raised: False)",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "C8 ADJACENT: sessions row with close_ns < open_ns",
+   "outcome": "RTH windows=[(1631799000000000000, 1631800800000000000)] ETH windows=[] (empty means the inverted row silently yields no window)",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "G1 reference tables load with a correct digest (control)",
+   "outcome": "rows=5",
+   "verdict": "OK"
+  },
+  {
+   "case": "G1 aggregate reference_digest mismatch",
+   "outcome": "DatasetV2Error: REFERENCE_DIGEST_MISMATCH: computed 39fce523d7342af92ddd06a7049ac8c43dd4961eae0811556cfdf0b606e92523 != declared 0000000000000000000000000000000000000000000000000000000000000000",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "G1 sessions.parquet bytes tampered after the manifest was written",
+   "outcome": "DatasetV2Error: REFERENCE_TABLE_CORRUPT: 'sessions' sha256 fefd1c86267cc01b677c2af8bf6b33ef867c63481182ee58cc47b57f8fb97029 != manifest 2e3b73bb0a7ac2f539e3ac61e5db428049e0141db6caa9248e5b54e0488b",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "G1 a declared table that does not exist",
+   "outcome": "DatasetV2Error: REFERENCE_TABLE_MISSING: 'holidays' not found under C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmp67fqge_g\\cat\\reference",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "G1 ADJACENT: declaring a SUBSET of the manifest's tables skips the aggregate-digest check",
+   "outcome": "loaded with the stale single-table aggregate digest 39fce523d734 -- no REFERENCE_DIGEST_MISMATCH",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "C8 compiler refuses ETH session-end censoring on a LEGACY (non-calendar) dataset",
+   "outcome": "compiled=False {\"STATUS\": \"CAPABILITY_GAP\", \"study_id\": \"golden_barrier\", \"kinds\": [\"SEMANTIC_DECISION_REQUIRED\"], \"count\": 1, \"gaps\": [{\"kind\": \"SEMANTIC_DECISION_REQUIRED\", \"where\": \"outcome.session\", \"message\": \"ETH session-end censoring has no defined close on a legacy (non-calendar) dataset; the ETH window is",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C8 compiler refuses reference_tables WITHOUT 'sessions' while the outcome censors on session close",
+   "outcome": "compiled=False {\"STATUS\": \"CAPABILITY_GAP\", \"study_id\": \"golden_barrier\", \"kinds\": [\"SEMANTIC_DECISION_REQUIRED\"], \"count\": 1, \"gaps\": [{\"kind\": \"SEMANTIC_DECISION_REQUIRED\", \"where\": \"outcome.session\", \"message\": \"dataset declares reference_tables without a 'sessions' table but the outcome censors on a session cl",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C8 control: the unchanged golden spec still compiles",
+   "outcome": "compiled=True",
+   "verdict": "OK"
+  }
+ ]
+}

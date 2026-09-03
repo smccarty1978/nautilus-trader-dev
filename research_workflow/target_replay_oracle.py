@@ -88,6 +88,7 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
 
     evs = sorted((dict(e) for e in events), key=lambda x: int(x["ts"]))
     independent = any("open" in e for e in evs)
+    max_gap_ns = max_gap_seconds * NS if max_gap_seconds is not None else None
 
     if independent:
         # Derive the execution reference from the tape, never from a pre-populated field.
@@ -97,6 +98,12 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         entry_price = float(entry_ev["open"])
         entry_ts = int(entry_ev["ts"]) - NS          # next_bar_open instant
         horizon_end_ts = entry_ts + horizon_s * NS
+        # N-3: the entry observation is subject to the same gap rule as any other -- an
+        # execution reference (next_bar_open) more than max_gap after T is a stale price,
+        # never a valid entry. Takes precedence over everything below (mirrors the kernel,
+        # which never computes an arm_end/session check when the entry itself is stale).
+        if max_gap_ns is not None and (entry_ts - T) > max_gap_ns:
+            return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
     else:
         # Legacy fixture: a candidate that already carries its resolved entry.
         entry_price = float(candidate["entry_price"])
@@ -108,17 +115,39 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
 
     good = entry_price + direction * fav * atr
     bad = entry_price - direction * adv * atr
-    max_gap_ns = max_gap_seconds * NS if max_gap_seconds is not None else None
 
     prev_ts = entry_ts
     end_rule = str((barrier or {}).get("horizon_end_rule", candidate.get("horizon_end_rule", "strict")))
+    reached_horizon = False   # W-2: did the tape ever offer an observation at/past horizon_end_ts?
     for e in evs:
         ts = int(e["ts"])
         if ts <= entry_ts:
             continue
         if ts > horizon_end_ts:
-            if end_rule != "first_bar_at_or_after" or (session_close_ts is not None and ts > int(session_close_ts)):
+            reached_horizon = True
+            # Precedence at every resolution point is SESSION_END > GAP > BARRIER_TOUCH >
+            # HORIZON_EXPIRY -- for BOTH `strict` and `first_bar_at_or_after`. `strict` must
+            # not short-circuit straight to the horizon-expiry policy: an unobserved gap
+            # spanning the horizon end can otherwise manufacture a directional label from
+            # zero price observation over the whole interval (C-B).
+            if session_close_ts is not None and ts > int(session_close_ts):
+                return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
+            if end_rule != "first_bar_at_or_after":
+                # `strict` never inspects this bar's OHLC (no touch is ever evaluated
+                # post-horizon), so the only gap question that matters is whether the
+                # horizon boundary itself was adequately observed -- the UNOBSERVED span
+                # inside the horizon is `horizon_end_ts - prev_ts`, not the raw bar-to-bar
+                # gap to `ts` (which may run on well past the horizon end for reasons
+                # irrelevant to this barrier).
+                unobserved = horizon_end_ts - prev_ts
+                if max_gap_ns is not None and unobserved > max_gap_ns:
+                    return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
                 break
+            # first_bar_at_or_after: this bar IS the resolution observation, so the raw
+            # bar-to-bar gap to it is what must be judged reliable before it is trusted for
+            # a touch, then the arm expires.
+            if e.get("gap") or (max_gap_ns is not None and ts - prev_ts > max_gap_ns):
+                return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
             hi, lo = e.get("high"), e.get("low")
             if hi is not None and lo is not None:
                 hit_good = float(hi) >= good if direction > 0 else float(lo) <= good
@@ -130,6 +159,8 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
                 if hit_bad:
                     return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
             break
+        if ts >= horizon_end_ts:
+            reached_horizon = True
         if session_close_ts is not None and ts > int(session_close_ts):
             return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
         if e.get("gap") or (max_gap_ns is not None and ts - prev_ts > max_gap_ns):
@@ -147,6 +178,17 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
             return {"disposition": "POSITIVE", "label": 1, "censor_reason": None}
         if hit_bad:
             return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
+        if ts >= horizon_end_ts:
+            # The bar closing exactly at the horizon end is touch-eligible (checked above)
+            # AND resolves the arm right there if it is not a touch -- mirrors the kernel's
+            # `elif ts >= end: expire_arm`. Waiting for a strictly-later bar before applying
+            # expiry would let an unrelated later session boundary leak into this arm's
+            # resolution reason.
+            break
+    if not reached_horizon:
+        # W-2: the tape ran out before the horizon elapsed -- an unresolved tail must never
+        # manufacture a directional/expiry label; the kernel already censors this DATA_END.
+        return {"disposition": "CENSORED", "label": None, "censor_reason": "DATA_END"}
     policy = str(
         barrier.get("horizon_expiry_policy", candidate.get("horizon_expiry_policy", "censor")) if barrier
         else candidate.get("horizon_expiry_policy", "censor")
@@ -167,7 +209,28 @@ def _find_forward_outcome(contract: Mapping, fo_id) -> dict:
 def _replay_ordered_barrier_condition(
     contract: Mapping, cond: Mapping, candidate: Mapping, events: Iterable[Mapping]
 ) -> dict:
-    """One ordered-barrier condition, evaluated independently off the tape."""
+    """One ordered-barrier condition, evaluated independently off the tape.
+
+    LEGACY V1 COMPOSITE PATH -- strict-horizon only, frozen semantics.
+
+    This function backs the ``conditions``/``ordered_barrier`` composite grammar
+    (``replay_expression`` below), which is the pre-existing V1
+    ``target_expression.py`` / ``generic_collector.py`` / ``target_runtime.py``
+    pipeline. It does NOT read ``horizon_end_rule`` and does not implement the
+    ``first_bar_at_or_after`` extension-bar logic or the SESSION_END-before-
+    HORIZON_EXPIRY gap-precedence fix applied to the V2 kernel/oracle entry point
+    ``replay()`` above. Do not change its semantics here -- V1 studies are frozen
+    against this exact behaviour.
+
+    The V2 grammar compiler (``grammar/compiler.py::_resolve_outcome``, the only
+    compiler that feeds ``research_workflow.host.outcomes.LabelOutcomeKernel`` and
+    this module's ``replay()``) never emits ``conditions``/``required_forward_outcomes``
+    composite expressions -- it emits ``arms``+``flip``. This function is therefore not
+    reachable from the compiled V2 outcome contract that ``research_workflow/host/
+    outcomes.py`` and ``replay()`` serve; it is exercised only by the separate legacy
+    ``target_expression.py`` pipeline. See ``test_redteam_v2_gap_precedence.py`` for a
+    guard asserting the V2 host path never routes here.
+    """
     fo = _find_forward_outcome(contract, cond.get("forward_outcome_id"))
     barrier = next(
         (b for b in (fo.get("ordered_barriers") or []) if b.get("id") == cond.get("barrier_id")),

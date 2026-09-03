@@ -1,0 +1,64 @@
+{
+ "results": [
+  {
+   "case": "C5 8-process race on locks.acquire_exclusive (trial 1)",
+   "outcome": "winners=1 [10516] ; lock payload pid=10516",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C5 8-process race on locks.acquire_exclusive (trial 2)",
+   "outcome": "winners=1 [15756] ; lock payload pid=15756",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "W-modelstore 6-process concurrent store_model on ONE id",
+   "outcome": "results=[{\"ok\": true, \"model_id\": \"9adabd13b0ae6b0921fce05f56f6c65ac93275aaedc61784dc9a2e8072168ee7\", \"byte\": \"171108c5ffb15befa8b5934a36ec46a35d3782af95ca5bc61a7e3b3471317a4d\"}, {\"ok\": true, \"model_id\": \"9adabd13b0ae6b0921fce05f56f6c65ac93275aaedc61784dc9a2e8072168ee7\", \"byte\": \"171108c5ffb15befa8b5934a36e ; model dirs=['9adabd13b0ae6b0921fce05f56f6c65ac93275aaedc61784dc9a2e8072168ee7'] ; leftove",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C6 lease survives creator-pid death within TTL",
+   "outcome": "state=live",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C6 lease goes stale past TTL with a dead pid",
+   "outcome": "state=stale",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C6 a DIFFERENT owner renews the lease",
+   "outcome": "WorkspaceError: WRITER_LEASE_HELD_BY_OTHER: C:\\Users\\Scott McCarty\\AppData\\Local\\Temp\\tmp4zhy9aym\\worktree is leased to owner_a, not owner_b",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C6 the owner renews (control)",
+   "outcome": "state=live holder={'pid': 24152, 'kind': 'controller', 'renewed_at_utc': '2026-09-03T06:58:04.545163+00:00'}",
+   "verdict": "OK"
+  },
+  {
+   "case": "C6 a DIFFERENT owner releases the lease",
+   "outcome": "WorkspaceError: LEASE_RELEASE_REFUSED: adv_study is leased to owner_a, not owner_b",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C6 a second writer takes a lease on a worktree with a LIVE lease",
+   "outcome": "WorkspaceError: WRITER_LEASE_HELD: worktree C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmp4zhy9aym\\worktree already has a live writer lease (owner_a, pid 999999)",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C6 reclaim never touches a LIVE lease",
+   "outcome": "before=live after=['live'] reclaim_result={\"repo\": \"C:\\\\Users\\\\Scott McCarty\\\\Projects\\\\Nautilus Trader-redteam-hardening\", \"worktrees\": [{\"worktree\": \"C:\\\\Users\\\\Scott McCarty\\\\Projects\\\\Nautilus Trader\", \"branch\": \"main\", \"head\": \"c366aac49",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C6 lease is DEAD when its worktree no longer exists",
+   "outcome": "state=dead",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "C6 schema-v1 lease record still readable",
+   "outcome": "state=live holder={'pid': 24152, 'kind': 'cli', 'renewed_at_utc': '2026-09-03T06:58:04.507437+00:00'}",
+   "verdict": "OK"
+  }
+ ]
+}

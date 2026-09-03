@@ -92,6 +92,28 @@ def test_gap_semantic_decision_chronology_double_use():
     assert any(k == GapKind.SEMANTIC_DECISION_REQUIRED for k, _ in _gap_kinds(spec))
 
 
+def test_gap_strict_max_gap_at_or_beyond_horizon_is_semantic_decision_required():
+    # WARN-3: under the default horizon_end_rule ("strict") a max_gap that is not strictly
+    # shorter than the horizon it is meant to guard can never be exceeded -- the horizon-end
+    # unobserved span is bounded by the horizon itself, so a tape with zero interior
+    # observations silently falls through to the expiry policy instead of censoring GAP.
+    spec = _base(); spec["outcome"]["max_gap"] = "200s"  # horizon is 180s
+    assert (GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.max_gap") in _gap_kinds(spec)
+
+
+def test_gap_strict_max_gap_shorter_than_horizon_compiles_clean():
+    # Control: max_gap strictly shorter than the horizon is not flagged.
+    spec = _base(); spec["outcome"]["max_gap"] = "60s"  # horizon is 180s
+    out = compile_study(spec, repo_root=ROOT)
+    assert out.ok, out.card()
+
+
+def test_strict_gap_rule_surfaced_in_compiled_outcome_contract():
+    out = compile_study(load_spec(ROOT / "fixtures" / "parity" / "shape_a" / "study.yaml"), repo_root=ROOT)
+    assert out.ok, out.card()
+    assert "strict_gap_rule" in out.plan.outcome and out.plan.outcome["strict_gap_rule"]
+
+
 def test_gap_ambiguous_temporal_semantics_atr_availability():
     spec = load_spec(ROOT / "fixtures" / "parity" / "shape_c" / "study.yaml")
     spec["outcome"].pop("atr_availability")

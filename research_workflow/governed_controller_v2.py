@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 
 import hashlib
 import json
+import time
 from pathlib import Path
 from typing import Any, Optional
 
@@ -131,35 +132,92 @@ class V2StudyController(GovernedStudyController):
         plan = load_plan(self.study)
         common = {"study_id": self.study.name, "execution_composite": fp.get("execution_composite") or "", "dirty_paths": self._worktree()["dirty_paths"],
                   "test_summary": _read(self.work / "test_summary.json")}
-        packet = causal_packet(plan, **common) if audit_type == "causal" else contract_packet(plan, **common, seal=_read(self.study / "artifacts/preexec_audit_seal.json"))
+        if audit_type == "causal":
+            packet = causal_packet(plan, **common)
+        else:
+            py_files, py_exception = self.lifecycle._zero_study_python()
+            packet = contract_packet(plan, **common, seal=_read(self.study / "artifacts/preexec_audit_seal.json"),
+                                     study_python={"python_files": py_files, "exception": py_exception})
         path = self.work / f"audit_packet_{audit_type}.json"
         _json(path, packet)
         return path
 
-    def _acquire_run_lock(self) -> dict[str, Any] | None:
-        """One live controller per study. A stale lock (dead pid) is replaced; a live one blocks."""
+    def _check_writer_lease(self) -> dict[str, Any] | None:
+        """If the study's worktree carries a writer lease (research_workflow.workspace), a live
+        lease held by a different owner blocks the run; a lease held by the current owner is
+        renewed (kind="controller") so a long controller run keeps the workspace's ownership
+        durable past any short-lived CLI process that created it. A worktree with no lease (the
+        main checkout, an ad-hoc worktree) is unaffected."""
         import os
-        lock = self.work / "run.lock"
-        existing = _read(lock)
-        pid = int(existing.get("pid") or 0)
-        if pid and pid != os.getpid() and _pid_alive(pid):
-            return {"pid": pid, "started_at_utc": existing.get("started_at_utc"), "through": existing.get("through")}
-        _json(lock, {"pid": os.getpid(), "started_at_utc": datetime.now(timezone.utc).isoformat(), "through": self._through})
+        try:
+            from research_workflow import workspace
+        except Exception:
+            return None
+        try:
+            wt_path = Path(self._worktree()["path"]).resolve()
+        except Exception:
+            return None
+        try:
+            leases = workspace.read_leases()
+        except Exception:
+            return None
+        lease = next((l for l in leases if Path(str(l.get("worktree", ""))).resolve() == wt_path), None)
+        if lease is None:
+            return None
+        owner = workspace.current_owner()
+        if lease.get("owner") != owner and lease.get("state") == "live":
+            card = self._card(ControllerState.NEEDS_COMPILE, "worktree", blocker=BlockerType.RUNTIME_FAILURE,
+                              reason=f"WRITER_LEASE_HELD_BY_OTHER: worktree {wt_path} is leased to {lease.get('owner')}", last=None)
+            card["blocker_code"] = "WRITER_LEASE_HELD_BY_OTHER"
+            return card
+        if lease.get("owner") == owner:
+            try:
+                workspace.renew_lease(wt_path, owner=owner, pid=os.getpid(), kind="controller")
+            except Exception:
+                pass
         return None
+
+    def _acquire_run_lock(self) -> dict[str, Any] | None:
+        """One live controller per study. Acquisition is atomic (research_workflow.locks): a
+        stale lock (dead pid, or an unparseable lock older than 60s) is reclaimed; a live one
+        blocks. Returns None on success, or the live holder's info when blocked."""
+        import os
+        from research_workflow.locks import acquire_exclusive
+        lock = self.work / "run.lock"
+        payload = {"pid": os.getpid(), "started_at_utc": datetime.now(timezone.utc).isoformat(),
+                   "through": self._through, "host": os.environ.get("COMPUTERNAME") or ""}
+
+        def is_stale(existing: dict | None, mtime: float) -> bool:
+            if not existing:
+                return (time.time() - mtime) > 60
+            pid = int(existing.get("pid") or 0)
+            return not (pid and pid != os.getpid() and _pid_alive(pid))
+
+        result = acquire_exclusive(lock, payload, is_stale=is_stale, max_attempts=3)
+        if result.acquired:
+            return None
+        existing = result.payload or {}
+        return {"pid": existing.get("pid"), "started_at_utc": existing.get("started_at_utc"), "through": existing.get("through")}
 
     def _release_run_lock(self) -> None:
         import os
+        from research_workflow.locks import release
         lock = self.work / "run.lock"
-        if int(_read(lock).get("pid") or 0) == os.getpid():
-            try:
-                lock.unlink()
-            except OSError:
-                pass
+        release(lock, owns=lambda existing: bool(existing) and int(existing.get("pid") or 0) == os.getpid())
 
     def run(self, *, through: str = "seal", inspect: bool = False, dry_run: bool = False) -> dict[str, Any]:
         if through not in STAGE_ORDER:
             raise ValueError(f"unknown --through {through}")
         self._through = through
+        # --execute-authorized is the real execution gate: every stage after "seal" (smoke..close)
+        # is refused before the lock is even acquired unless options.execute is True. --inspect and
+        # --dry-run are read-only and are never gated.
+        if not (inspect or dry_run) and not self.options.execute and STAGE_ORDER.index(through) > STAGE_ORDER.index("seal"):
+            card = self._card(ControllerState.READY_TO_SEAL if "seal" in STAGE_ORDER else ControllerState.NEEDS_COMPILE, "seal",
+                              blocker=BlockerType.RUNTIME_FAILURE,
+                              reason=f"EXECUTION_NOT_AUTHORIZED: --through {through} runs a post-seal stage but --execute-authorized was not passed", last=None)
+            card["blocker_code"] = "EXECUTION_NOT_AUTHORIZED"
+            return card
         # STUDY_CLOSED is terminal and recognized before anything else: a valid closure is the authority
         try:
             from research_workflow.study_closure import load_study_closure
@@ -171,6 +229,9 @@ class V2StudyController(GovernedStudyController):
             card["closure"] = {k: closure.get(k) for k in ("status", "outcome", "terminal_decision", "closed_at_utc")}
             return card
         if not (inspect or dry_run):
+            lease_block = self._check_writer_lease()
+            if lease_block is not None:
+                return lease_block
             live = self._acquire_run_lock()
             if live:
                 card = self._card(ControllerState.NEEDS_COMPILE, "worktree", blocker=BlockerType.RUNTIME_FAILURE,

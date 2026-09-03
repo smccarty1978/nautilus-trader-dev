@@ -182,7 +182,10 @@ class OutcomeSpec(_Strict):
     # strict: no bar closing after the horizon end is ever evaluated (a bar closing exactly at the end is).
     # first_bar_at_or_after: the first bar closing at or after the horizon end is still evaluated for a
     # barrier hit before expiry (the sealed regime_transition target authority's realized semantics on
-    # sparse seconds; identical to strict on dense tapes).
+    # sparse seconds; identical to strict on dense tapes). Resolution precedence at every bar (in-horizon
+    # or the first post-horizon bar under first_bar_at_or_after) is SESSION_END > GAP > BARRIER_TOUCH >
+    # HORIZON_EXPIRY: max_gap is adjudicated before a post-horizon bar's touch is ever accepted, so a
+    # sparse tape cannot resolve a candidate from a bar farther than max_gap from the prior accepted bar.
     horizon_end_rule: Literal["strict", "first_bar_at_or_after"] = "strict"
     barrier: Optional[Dict[str, Any]] = None       # {favorable_atr, adverse_atr, horizon?, expiry?, arms?: [...]}
     event: Optional[str] = None                    # predicate over tracker events (e.g. 'regime_1m.flipped')
@@ -217,12 +220,25 @@ class ValidationSpec(_Strict):
     primary_metric: Optional[str] = None
 
 
+class ScoredModelExpectSpec(_Strict):
+    """Optional identity expectations checked against the model-store lineage before scoring."""
+    study_id: Optional[str] = None
+    target_arm: Optional[str] = None
+    direction: Optional[str] = None
+    cell_id: Optional[str] = None
+    # W-1: binds to the estimator's actual canonical BYTES (manifest["canonical"]
+    # ["byte_sha256"]), not a lineage field -- catches a substituted estimator that
+    # refreshes its own canonical/golden bytes under the unchanged model_id.
+    canonical_sha256: Optional[str] = None
+
+
 class ScoredModelSpec(_Strict):
     """A frozen model reused from the model store: scored, never refit."""
     id: str                                        # model store id (sha256)
     label: str                                     # label column the model is evaluated against
     subset: Dict[str, Any] = Field(default_factory=dict)   # column == value row filters (explicit, no hidden direction semantics)
     name: Optional[str] = None
+    expect: Optional[ScoredModelExpectSpec] = None  # authenticated against model-store lineage before scoring
 
 
 class ModelSpec(_Strict):
@@ -234,7 +250,10 @@ class ModelSpec(_Strict):
     models: List[ScoredModelSpec] = Field(default_factory=list)   # required for mode: score
     # Bounded TRAIN-only hyperparameter search over walk-forward folds of validation.tuning_years.
     # param -> [choices] | {low, high, log?: bool, int?: bool}; sampler = validation.protocol
-    # (model_selection.random | model_selection.optuna), trials = validation.max_trials, seed = validation.random_seed.
+    # (model_selection.random | model_selection.optuna), trials = validation.max_trials.
+    # random_seed governs the SAMPLER (random-search RNG / Optuna TPESampler seed) only; when
+    # absent the sampler falls back to model.params.random_state|seed. The estimator fit on
+    # each fold always uses model.params.random_state|seed, never random_seed.
     search_space: Dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")

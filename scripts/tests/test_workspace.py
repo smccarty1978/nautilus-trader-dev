@@ -42,7 +42,8 @@ def test_study_new_creates_branch_worktree_scaffold_and_lease(env: Path, tmp_pat
     assert (wt / "studies/demo_alpha/runs").is_dir() and (wt / "studies/demo_alpha/_work").is_dir()
     assert not any(p.is_symlink() for p in wt.rglob("*"))  # no junction/symlink plumbing in the normal path
     lease = json.loads(Path(card["lease"]).read_text())
-    assert lease["study_id"] == "demo_alpha" and lease["pid"] == os.getpid() and Path(lease["worktree"]) == wt.resolve()
+    assert lease["study_id"] == "demo_alpha" and lease["holder"]["pid"] == os.getpid() and Path(lease["worktree"]) == wt.resolve()
+    assert lease["schema_version"] == 2 and lease["holder"]["kind"] == "cli" and lease["released_at_utc"] is None
     branches = subprocess.run(["git", "branch", "--list"], cwd=env, capture_output=True, text=True).stdout
     assert "study/demo_alpha" in branches
     assert card["catalog_resolution"] == "configured_roots"
@@ -72,7 +73,9 @@ def test_ws_list_reports_worktrees_owners_and_lease_states(env: Path, tmp_path: 
     row = next(r for r in listing["worktrees"] if r["branch"] == "study/demo_eps")
     assert row["lease_state"] == "live" and row["owner"] and row["dirty_files"] >= 0
     # kill the lease's pid -> stale; remove the worktree dir -> dead; reclaim removes both
-    lease_path = Path(card["lease"]); rec = json.loads(lease_path.read_text()); rec["pid"] = 999999; lease_path.write_text(json.dumps(rec))
+    lease_path = Path(card["lease"]); rec = json.loads(lease_path.read_text())
+    rec["holder"]["pid"] = 999999; rec["holder"]["renewed_at_utc"] = "2000-01-01T00:00:00+00:00"
+    lease_path.write_text(json.dumps(rec))
     assert next(l for l in ws.ws_list(repo_root=env)["leases"] if l["study_id"] == "demo_eps")["state"] == "stale"
     after = ws.ws_list(repo_root=env, reclaim=True)
     assert "demo_eps" in after["reclaimed"] and not lease_path.exists()
@@ -100,7 +103,9 @@ def test_ws_list_reclaim_clears_only_stale_and_dead_leases(env: Path):
     """`research ws list --reclaim` deletes stale/dead lease records and never a live one."""
     live = ws.study_new("demo_live", repo_root=env)
     stale = ws.study_new("demo_stale", repo_root=env)
-    p = Path(stale["lease"]); rec = json.loads(p.read_text()); rec["pid"] = 999999; p.write_text(json.dumps(rec))
+    p = Path(stale["lease"]); rec = json.loads(p.read_text())
+    rec["holder"]["pid"] = 999999; rec["holder"]["renewed_at_utc"] = "2000-01-01T00:00:00+00:00"
+    p.write_text(json.dumps(rec))
     states = {l["study_id"]: l["state"] for l in ws.ws_list(repo_root=env)["leases"]}
     assert states["demo_live"] == "live" and states["demo_stale"] == "stale"
     after = ws.ws_list(repo_root=env, reclaim=True)

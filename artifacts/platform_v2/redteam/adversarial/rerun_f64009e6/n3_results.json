@@ -1,0 +1,37 @@
+[
+ {
+  "case": "N3a strict, horizon 10s <= max_gap 30s, no observation inside the horizon, expiry=negative",
+  "outcome": "kernel=NEGATIVE/None oracle=NEGATIVE/None parity=True expected=('CENSORED', 'GAP') (unobserved span entry->next bar = 399s; horizon_end - prev_ts = 10s <= max_gap)",
+  "verdict": "BYPASSED"
+ },
+ {
+  "case": "N3a' same tape with expiry=censor (censoring taxonomy: GAP vs TIMEOUT)",
+  "outcome": "kernel=CENSORED/TIMEOUT oracle=CENSORED/TIMEOUT parity=True expected=('CENSORED', 'GAP') ",
+  "verdict": "BYPASSED"
+ },
+ {
+  "case": "N3b first_bar_at_or_after, horizon 10s <= max_gap 30s, same tape, expiry=negative",
+  "outcome": "kernel=CENSORED/GAP oracle=CENSORED/GAP parity=True expected=('CENSORED', 'GAP') ",
+  "verdict": "BLOCKED"
+ },
+ {
+  "case": "N3c control strict, horizon 61s > max_gap 30s, same tape (the C-B case)",
+  "outcome": "kernel=CENSORED/GAP oracle=CENSORED/GAP parity=True expected=('CENSORED', 'GAP') ",
+  "verdict": "BLOCKED"
+ },
+ {
+  "case": "N3d strict, horizon 30s == max_gap 30s, no observation inside the horizon",
+  "outcome": "kernel=NEGATIVE/None oracle=NEGATIVE/None parity=True expected=('CENSORED', 'GAP') ",
+  "verdict": "BYPASSED"
+ },
+ {
+  "case": "N3e strict, horizon 31s = max_gap+1s, no observation inside the horizon",
+  "outcome": "kernel=NEGATIVE/None oracle=NEGATIVE/None parity=True expected=('CENSORED', 'GAP') ",
+  "verdict": "BYPASSED"
+ },
+ {
+  "case": "N3f control: dense 1s tape through a 10s horizon, expiry=negative -> genuine NEGATIVE",
+  "outcome": "kernel=NEGATIVE/None oracle=NEGATIVE/None parity=True expected=('NEGATIVE', None) ",
+  "verdict": "BLOCKED"
+ }
+]

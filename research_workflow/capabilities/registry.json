@@ -1,6 +1,6 @@
 {
-  "content_sha256": "2c8980dbac835f47a51efcdad01a9cf43ac9a5edaeb2047ce6a1a0f8a33b0e31",
-  "generated_at_utc": "2026-09-03T02:34:49.698665+00:00",
+  "content_sha256": "aa723d2be2e2a9eee343ba87ab6d86b87b2b617cb82772e76d9402899bd21873",
+  "generated_at_utc": "2026-09-03T06:37:11.232745+00:00",
   "kinds": {
     "datasets": [
       {
@@ -169,7 +169,9 @@
           "spec",
           "direction"
         ],
-        "required_tests": [],
+        "required_tests": [
+          "research_workflow/tests/test_redteam_v2_model_authority.py"
+        ],
         "status": "verified",
         "subscribes": [],
         "unresolved_dependencies": [],

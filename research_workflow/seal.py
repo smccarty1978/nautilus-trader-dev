@@ -52,6 +52,34 @@ def compute_execution_files_manifest(
     return composite_sha, file_hashes
 
 
+# Keys stamped into ``file_hashes`` AFTER the execution-closure composite is computed
+# (generate_preexec_audit_seal step 3): the audit status JSONs and every audit pass
+# markdown report. These are additive evidence, not part of the composite itself.
+_SEAL_ADDITIVE_EXACT_KEYS = ("study:audit/status.json", "study:audit/contract_status.json")
+
+
+def seal_body_hash(seal: Dict[str, Any]) -> str:
+    """Recompute ``composite_seal_hash`` from a seal's own recorded ``file_hashes``.
+
+    Mirrors ``generate_preexec_audit_seal`` exactly (composite = sha256 of the
+    sorted-key JSON of the execution-closure subset of ``file_hashes``, i.e.
+    ``exec_file_hashes`` before the additive audit-report keys are stamped in) and
+    ``resolve_execution_manifest``'s own ``composite_payload`` construction. This lets a
+    caller authenticate a seal artifact read from disk WITHOUT touching the live
+    filesystem or re-resolving the execution closure -- self-consistency of the seal
+    body itself, independent of whether the referenced source files still exist.
+    """
+    import json as _json
+
+    file_hashes = seal.get("file_hashes") or {}
+    closure_hashes = {
+        k: v for k, v in file_hashes.items()
+        if k not in _SEAL_ADDITIVE_EXACT_KEYS and not (k.startswith("study:audit/") and k.endswith(".md"))
+    }
+    payload = _json.dumps(closure_hashes, sort_keys=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def _find_latest_audit_pass_files(study_dir: Path) -> List[str]:
     """Finds all existing pass_NN.md and contract_pass_NN.md files in audit directory."""
     audit_dir = study_dir / "audit"

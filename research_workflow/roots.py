@@ -74,6 +74,7 @@ class RootConfig:
     model_root: Optional[Path]
     leases_dir: Path
     worktree_root: Optional[Path]
+    lease_ttl_seconds: int = 259200   # 72h: how long a writer lease stays `live` past its holder's last renewal
 
     @property
     def active(self) -> bool:
@@ -86,6 +87,7 @@ class RootConfig:
             "model_root": str(self.model_root) if self.model_root else None,
             "leases_dir": str(self.leases_dir),
             "worktree_root": str(self.worktree_root) if self.worktree_root else None,
+            "lease_ttl_seconds": self.lease_ttl_seconds,
         }
 
 
@@ -121,7 +123,8 @@ def load_config(path: Optional[Path] = None) -> RootConfig:
     model_root = _expand(model_override) if model_override else (_expand(raw["model_root"]) if raw.get("model_root") else None)
     leases = _expand(raw["leases_dir"]) if raw.get("leases_dir") else Path(p).resolve().parent / "leases"
     worktree_root = _expand(raw["worktree_root"]) if raw.get("worktree_root") else None
-    return RootConfig(Path(p).resolve(), roots, model_root, leases, worktree_root)
+    ttl = int(raw["lease_ttl_seconds"]) if raw.get("lease_ttl_seconds") else 259200
+    return RootConfig(Path(p).resolve(), roots, model_root, leases, worktree_root, ttl)
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,45 @@
+{
+ "results": [
+  {
+   "case": "N1-control legitimate committed study on the checked-out branch",
+   "outcome": "GRANTED {\"study_id\": \"v1_ok\", \"seal_sha256\": \"e2a36dad318e5b7d43000a5aad7ac2f43728c44d3a6a51b7ef83529478c11e81\", \"seal_composite\": \"3bc058a7e95c324c613eae789c5301c290239ce7aa8761d7fbc8858b28631848\", \"manifest",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "N1a forged study committed only on branch 'forge'; HEAD on main",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_AUTHORITY_UNTRACKED: studies/v1_forged/artifacts/preexec_audit_seal.json is missing or not committed to git at HEAD; an untracked/staged-only/deleted-at-HEAD preexec audit seal cannot grant historical execution authority",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N1b DETACHED HEAD parked on the forged commit",
+   "outcome": "GRANTED {\"study_id\": \"v1_forged\", \"seal_sha256\": \"25780cc3a8e1eb55029f4c049491b8a79026eb69032c18c8576a9b621d4ec1c7\", \"seal_composite\": \"3bc058a7e95c324c613eae789c5301c290239ce7aa8761d7fbc8858b28631848\", \"mani",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "N1c linked worktree of the same repo checked out at the forged commit (repo_root=worktree)",
+   "outcome": "GRANTED {\"study_id\": \"v1_forged\", \"seal_sha256\": \"25780cc3a8e1eb55029f4c049491b8a79026eb69032c18c8576a9b621d4ec1c7\", \"seal_composite\": \"3bc058a7e95c324c613eae789c5301c290239ce7aa8761d7fbc8858b28631848\", \"mani",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "N1d HEAD points at branch 'attack' whose tip is the forged commit",
+   "outcome": "GRANTED {\"study_id\": \"v1_forged\", \"seal_sha256\": \"25780cc3a8e1eb55029f4c049491b8a79026eb69032c18c8576a9b621d4ec1c7\", \"seal_composite\": \"3bc058a7e95c324c613eae789c5301c290239ce7aa8761d7fbc8858b28631848\", \"mani",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "N1e study path escapes and re-enters repo_root (studies/../studies/v1_ok)",
+   "outcome": "GRANTED {\"study_id\": \"v1_ok\", \"seal_sha256\": \"e2a36dad318e5b7d43000a5aad7ac2f43728c44d3a6a51b7ef83529478c11e81\", \"seal_composite\": \"3bc058a7e95c324c613eae789c5301c290239ce7aa8761d7fbc8858b28631848\", \"manifest",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "N1f repo_root given as the parent dir of the real repo",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_AUTHORITY_UNTRACKED: repo/studies/v1_ok/artifacts/preexec_audit_seal.json is missing or not committed to git at HEAD; an untracked/staged-only/deleted-at-HEAD preexec audit seal cannot grant historical execution authority",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "N1g self-consistent study in a directory that is not a git repo",
+   "outcome": "OldRuntimePolicyError: HISTORICAL_AUTHORITY_UNTRACKED: studies/v1_nogit/artifacts/preexec_audit_seal.json is missing or not committed to git at HEAD; an untracked/staged-only/deleted-at-HEAD preexec audit seal cannot grant historical execution authority",
+   "verdict": "BLOCKED"
+  }
+ ],
+ "tmp": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmpf66bbpvs"
+}
