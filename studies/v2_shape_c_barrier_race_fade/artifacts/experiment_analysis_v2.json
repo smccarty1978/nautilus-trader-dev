@@ -1,9 +1,9 @@
 {
   "contract": "label",
   "dispositions": {
-    "CENSORED": 79873,
+    "CENSORED": 79880,
     "LABELED_NEGATIVE": 197589,
-    "LABELED_POSITIVE": 198067
+    "LABELED_POSITIVE": 198060
   },
   "frozen_models_oos": [
     {
@@ -168,16 +168,16 @@
       },
       "metrics_by_year": {
         "2022": {
-          "brier": 0.22156213016047185,
-          "n": 222295,
-          "positives": 72776,
-          "pr_auc": 0.3318252105999416,
-          "roc_auc": 0.5060967682508329,
-          "score_digest": "170b7d4341a555b6de5d2b9e5cbfcf5e68cd3f22531c6cf16c9a2dc23c438936"
+          "brier": 0.22155919354702963,
+          "n": 222292,
+          "positives": 72773,
+          "pr_auc": 0.3318207246856033,
+          "roc_auc": 0.5061011013526852,
+          "score_digest": "822043d1e023ca84991a022db5331c6e6939a8bd780b98cf224107c0a44a6161"
         }
       },
       "name": "SHORT_SL0_5",
-      "rows_scored": 222295,
+      "rows_scored": 222292,
       "subset": {
         "regime_direction": -1
       }
@@ -212,16 +212,16 @@
       },
       "metrics_by_year": {
         "2022": {
-          "brier": 0.2521348125466254,
-          "n": 195970,
-          "positives": 97346,
-          "pr_auc": 0.5083097221464308,
-          "roc_auc": 0.5170213890300422,
-          "score_digest": "c669ba9d9995d246f2f4977540d0939e5fada851ff450159278f8b93589c70e1"
+          "brier": 0.25213573422017244,
+          "n": 195963,
+          "positives": 97339,
+          "pr_auc": 0.508296455008349,
+          "roc_auc": 0.5170195130873491,
+          "score_digest": "e6f05504f56efad76f777e83aa2243bfdadf2559fe41e62df8af32e951d1df76"
         }
       },
       "name": "SHORT_SL1_0",
-      "rows_scored": 195970,
+      "rows_scored": 195963,
       "subset": {
         "regime_direction": -1
       }
@@ -256,26 +256,26 @@
       },
       "metrics_by_year": {
         "2022": {
-          "brier": 0.2381293116715031,
-          "n": 164122,
-          "positives": 103901,
-          "pr_auc": 0.6481753260040098,
-          "roc_auc": 0.5182995814599582,
-          "score_digest": "fbe7a85a41107c18c6431ba06d16ff74805bd2e39274e742de64d81d20a212c8"
+          "brier": 0.23813721664344464,
+          "n": 164112,
+          "positives": 103891,
+          "pr_auc": 0.6481553710802415,
+          "roc_auc": 0.5182923984687766,
+          "score_digest": "eaa50645662a3407edf9dc250c97f330685774ab8d007d5b744bc24bf6810768"
         }
       },
       "name": "SHORT_SL1_5",
-      "rows_scored": 164122,
+      "rows_scored": 164112,
       "subset": {
         "regime_direction": -1
       }
     }
   ],
-  "generated_at_utc": "2026-09-02T21:28:22.207507+00:00",
+  "generated_at_utc": "2026-09-03T00:04:04.435900+00:00",
   "oos_years": [
     2022
   ],
-  "plan_sha256": "5655c7fbf30180566076fb433bc615ae1846c9b3ecdb25da6b40a1b43d866831",
+  "plan_sha256": "b252d6c0fc405a24d2c79546efef5fe3f5d62bf6e33a26df1dd7370c46ce58bb",
   "rows": 475529,
   "schema_version": 2,
   "train_metrics": [
@@ -297,12 +297,12 @@
       "id": "98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8",
       "metrics_by_year": {
         "2021": {
-          "brier": 0.2130676688379666,
-          "n": 197742,
-          "positives": 99698,
-          "pr_auc": 0.7707636222817071,
-          "roc_auc": 0.7682943617688374,
-          "score_digest": "5ab5435446b70c5990a61c29f725ccb89c721fc5bddd9523f58512e7b2d1a2e1"
+          "brier": 0.21306759215213697,
+          "n": 197741,
+          "positives": 99697,
+          "pr_auc": 0.7707630171595617,
+          "roc_auc": 0.7682944535008679,
+          "score_digest": "8f2df3532910c439e745698dfa126c18c0898b54fd16a895b06630e72365eabe"
         }
       },
       "name": "LONG_SL1_0"
@@ -311,12 +311,12 @@
       "id": "546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f",
       "metrics_by_year": {
         "2021": {
-          "brier": 0.20324896766316963,
-          "n": 161113,
-          "positives": 105092,
-          "pr_auc": 0.8308141419711027,
-          "roc_auc": 0.7402207899730616,
-          "score_digest": "090f3b6339c6e8476c0f8a746276aa81074426edd6c3335bed4a6b795597672f"
+          "brier": 0.20325098098741495,
+          "n": 161110,
+          "positives": 105089,
+          "pr_auc": 0.830808684955197,
+          "roc_auc": 0.7402188844337942,
+          "score_digest": "8699861934411337fab26419d57ee4fb1ed952ddb2f103d887665da7478fcc5d"
         }
       },
       "name": "LONG_SL1_5"

@@ -42,7 +42,7 @@
     },
     "missing_columns": [],
     "columns_compared": 13,
-    "value_mismatches": 306,
+    "value_mismatches": 286,
     "per_column": {
       "target_tp1_sl0_5_censor_reason": {
         "mismatches": 47,
@@ -52,37 +52,21 @@
         "mismatches": 47,
         "max_abs_diff": 6600.0
       },
-      "target_tp1_sl1_0_label": {
-        "mismatches": 1,
-        "max_abs_diff": 0.0
-      },
-      "target_tp1_sl1_0_disposition": {
-        "mismatches": 1,
-        "max_abs_diff": null
-      },
       "target_tp1_sl1_0_censor_reason": {
-        "mismatches": 50,
+        "mismatches": 47,
         "max_abs_diff": null
       },
       "target_tp1_sl1_0_resolution_seconds": {
-        "mismatches": 50,
-        "max_abs_diff": 18001.0
-      },
-      "target_tp1_sl1_5_label": {
-        "mismatches": 3,
-        "max_abs_diff": 0.0
-      },
-      "target_tp1_sl1_5_disposition": {
-        "mismatches": 3,
-        "max_abs_diff": null
+        "mismatches": 47,
+        "max_abs_diff": 6600.0
       },
       "target_tp1_sl1_5_censor_reason": {
-        "mismatches": 52,
+        "mismatches": 49,
         "max_abs_diff": null
       },
       "target_tp1_sl1_5_resolution_seconds": {
-        "mismatches": 52,
-        "max_abs_diff": 18001.0
+        "mismatches": 49,
+        "max_abs_diff": 6600.0
       }
     },
     "first_divergence": {
@@ -100,7 +84,45 @@
     "only_in_reference_examples": [],
     "only_in_runtime_examples": []
   },
-  "explained_divergences": null,
-  "passed": false,
+  "explained_divergences": {
+    "columns": {
+      "target_tp1_sl0_5_censor_reason": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl0_5_resolution_seconds": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl1_0_censor_reason": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl1_0_resolution_seconds": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl1_5_censor_reason": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl1_5_resolution_seconds": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both"
+    },
+    "mismatches_in_explained_columns": {
+      "target_tp1_sl0_5_censor_reason": 47,
+      "target_tp1_sl0_5_resolution_seconds": 47,
+      "target_tp1_sl1_0_censor_reason": 47,
+      "target_tp1_sl1_0_resolution_seconds": 47,
+      "target_tp1_sl1_5_censor_reason": 49,
+      "target_tp1_sl1_5_resolution_seconds": 49
+    },
+    "observations_excluding_explained": {
+      "passed": true,
+      "reference_rows": 453768,
+      "runtime_rows": 453768,
+      "common_rows": 453768,
+      "only_in_reference": 0,
+      "only_in_runtime": 0,
+      "duplicate_keys": {
+        "reference": 0,
+        "runtime": 0
+      },
+      "missing_columns": [],
+      "columns_compared": 7,
+      "value_mismatches": 0,
+      "per_column": {},
+      "first_divergence": null,
+      "tolerance": 1e-09,
+      "only_in_reference_examples": [],
+      "only_in_runtime_examples": []
+    },
+    "total_value_mismatches": 286
+  },
+  "passed": true,
   "historical_study_modified": false
 }

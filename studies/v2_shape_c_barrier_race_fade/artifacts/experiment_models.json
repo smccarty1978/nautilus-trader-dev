@@ -14,7 +14,7 @@
     "arrival_acceleration",
     "ema_slope"
   ],
-  "generated_at_utc": "2026-09-02T20:54:58.865154+00:00",
+  "generated_at_utc": "2026-09-02T23:40:21.204465+00:00",
   "mode": "score",
   "model_id": null,
   "models": [
@@ -92,16 +92,16 @@
       },
       "metrics_by_year": {
         "2021": {
-          "brier": 0.2130676688379666,
-          "n": 197742,
-          "positives": 99698,
-          "pr_auc": 0.7707636222817071,
-          "roc_auc": 0.7682943617688374,
-          "score_digest": "5ab5435446b70c5990a61c29f725ccb89c721fc5bddd9523f58512e7b2d1a2e1"
+          "brier": 0.21306759215213697,
+          "n": 197741,
+          "positives": 99697,
+          "pr_auc": 0.7707630171595617,
+          "roc_auc": 0.7682944535008679,
+          "score_digest": "8f2df3532910c439e745698dfa126c18c0898b54fd16a895b06630e72365eabe"
         }
       },
       "name": "LONG_SL1_0",
-      "rows_scored": 197742,
+      "rows_scored": 197741,
       "subset": {
         "regime_direction": 1
       }
@@ -136,16 +136,16 @@
       },
       "metrics_by_year": {
         "2021": {
-          "brier": 0.20324896766316963,
-          "n": 161113,
-          "positives": 105092,
-          "pr_auc": 0.8308141419711027,
-          "roc_auc": 0.7402207899730616,
-          "score_digest": "090f3b6339c6e8476c0f8a746276aa81074426edd6c3335bed4a6b795597672f"
+          "brier": 0.20325098098741495,
+          "n": 161110,
+          "positives": 105089,
+          "pr_auc": 0.830808684955197,
+          "roc_auc": 0.7402188844337942,
+          "score_digest": "8699861934411337fab26419d57ee4fb1ed952ddb2f103d887665da7478fcc5d"
         }
       },
       "name": "LONG_SL1_5",
-      "rows_scored": 161113,
+      "rows_scored": 161110,
       "subset": {
         "regime_direction": 1
       }
@@ -284,7 +284,7 @@
     }
   ],
   "new_models_trained": false,
-  "plan_sha256": "5655c7fbf30180566076fb433bc615ae1846c9b3ecdb25da6b40a1b43d866831",
+  "plan_sha256": "b252d6c0fc405a24d2c79546efef5fe3f5d62bf6e33a26df1dd7370c46ce58bb",
   "reused_model_ids": [
     "a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1",
     "98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8",

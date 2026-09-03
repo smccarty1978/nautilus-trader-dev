@@ -1,0 +1,15 @@
+{
+  "bound_evidence": {
+    "preexec_seal_artifact_sha256": "ec3cfec514ce5ce5375db7c1040ee11d80e53c65b8b1d00cc51083c66a28f658",
+    "preexec_seal_composite_sha256": "3cef8051f6cf8297985f52224bdf485caf6ca5c277ecb59c09956ff18d33b609",
+    "train_freeze_sha256": "e436d18345877cdf7a33d1447ffbddce5ac94516f0ef8e8a9679b970c1a88149"
+  },
+  "closed_at_utc": "2026-09-03T00:06:06.537359+00:00",
+  "outcome": "PARITY_PASS_WITH_EXPLAINED_DIVERGENCE: 2021 TRAIN 453768/453768 and 2022 OOS 475529/475529 candidates exact (18 cols); labels and dispositions of all three arms exact; only censor-reason vocabulary differs on 143 (2021) and 18 (2022) censored arms at the session close (reference DATA_END/SESSION_END vs host SESSION_END/TIMEOUT); all six frozen 2021 models reproduce the reference fold_2022 n, ROC-AUC and PR-AUC exactly",
+  "plan_sha256": "b252d6c0fc405a24d2c79546efef5fe3f5d62bf6e33a26df1dd7370c46ce58bb",
+  "platform": "v2",
+  "schema_version": 1,
+  "status": "CLOSED",
+  "study_id": "v2_shape_c_barrier_race_fade",
+  "terminal_decision": "PLATFORM_V2_SHAPE_C_PROVEN: multi-arm barrier race with fade relation, through-decision ATR, declared horizon_end_rule and frozen-model score mode, run and closed by the controller with zero study Python and no new models"
+}

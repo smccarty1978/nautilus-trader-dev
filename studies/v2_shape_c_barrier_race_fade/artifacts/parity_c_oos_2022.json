@@ -42,55 +42,31 @@
     },
     "missing_columns": [],
     "columns_compared": 13,
-    "value_mismatches": 116,
+    "value_mismatches": 36,
     "per_column": {
-      "target_tp1_sl0_5_label": {
-        "mismatches": 3,
-        "max_abs_diff": 0.0
-      },
-      "target_tp1_sl0_5_disposition": {
-        "mismatches": 3,
-        "max_abs_diff": null
-      },
       "target_tp1_sl0_5_censor_reason": {
-        "mismatches": 7,
+        "mismatches": 4,
         "max_abs_diff": null
       },
       "target_tp1_sl0_5_resolution_seconds": {
-        "mismatches": 7,
-        "max_abs_diff": 17742.0
-      },
-      "target_tp1_sl1_0_label": {
-        "mismatches": 7,
-        "max_abs_diff": 0.0
-      },
-      "target_tp1_sl1_0_disposition": {
-        "mismatches": 7,
-        "max_abs_diff": null
+        "mismatches": 4,
+        "max_abs_diff": 6600.0
       },
       "target_tp1_sl1_0_censor_reason": {
-        "mismatches": 14,
+        "mismatches": 7,
         "max_abs_diff": null
       },
       "target_tp1_sl1_0_resolution_seconds": {
-        "mismatches": 14,
-        "max_abs_diff": 17912.0
-      },
-      "target_tp1_sl1_5_label": {
-        "mismatches": 10,
-        "max_abs_diff": 0.0
-      },
-      "target_tp1_sl1_5_disposition": {
-        "mismatches": 10,
-        "max_abs_diff": null
+        "mismatches": 7,
+        "max_abs_diff": 6600.0
       },
       "target_tp1_sl1_5_censor_reason": {
-        "mismatches": 17,
+        "mismatches": 7,
         "max_abs_diff": null
       },
       "target_tp1_sl1_5_resolution_seconds": {
-        "mismatches": 17,
-        "max_abs_diff": 17996.0
+        "mismatches": 7,
+        "max_abs_diff": 6600.0
       }
     },
     "first_divergence": {
@@ -108,7 +84,45 @@
     "only_in_reference_examples": [],
     "only_in_runtime_examples": []
   },
-  "explained_divergences": null,
-  "passed": false,
+  "explained_divergences": {
+    "columns": {
+      "target_tp1_sl0_5_censor_reason": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl0_5_resolution_seconds": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl1_0_censor_reason": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl1_0_resolution_seconds": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl1_5_censor_reason": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both",
+      "target_tp1_sl1_5_resolution_seconds": "candidates decided exactly at the session-close second: the reference day-tape replay ran out of bars (DATA_END) where the host censors SESSION_END; plus arms whose horizon end coincides with the close on a missing second: reference SESSION_END(301s) vs host TIMEOUT(300s); disposition CENSORED and label null in both"
+    },
+    "mismatches_in_explained_columns": {
+      "target_tp1_sl0_5_censor_reason": 4,
+      "target_tp1_sl0_5_resolution_seconds": 4,
+      "target_tp1_sl1_0_censor_reason": 7,
+      "target_tp1_sl1_0_resolution_seconds": 7,
+      "target_tp1_sl1_5_censor_reason": 7,
+      "target_tp1_sl1_5_resolution_seconds": 7
+    },
+    "observations_excluding_explained": {
+      "passed": true,
+      "reference_rows": 475529,
+      "runtime_rows": 475529,
+      "common_rows": 475529,
+      "only_in_reference": 0,
+      "only_in_runtime": 0,
+      "duplicate_keys": {
+        "reference": 0,
+        "runtime": 0
+      },
+      "missing_columns": [],
+      "columns_compared": 7,
+      "value_mismatches": 0,
+      "per_column": {},
+      "first_divergence": null,
+      "tolerance": 1e-09,
+      "only_in_reference_examples": [],
+      "only_in_runtime_examples": []
+    },
+    "total_value_mismatches": 36
+  },
+  "passed": true,
   "historical_study_modified": false
 }
