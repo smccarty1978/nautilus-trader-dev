@@ -1,0 +1,27 @@
+{
+  "audit_ready": true,
+  "check_outcomes": {
+    "CAUSAL_INVARIANTS": "PASSED",
+    "CHRONOLOGY_ROLE_TABLE": "PASSED",
+    "ENTRY_REFERENCE_EXECUTABLE": "PASSED",
+    "EXECUTION_MANIFEST": "PASSED",
+    "FORWARD_OUTCOME_GUARD": "PASSED",
+    "PLAN_BOUND_TO_SPEC": "PASSED",
+    "PREDICATES_COMPILE": "PASSED"
+  },
+  "execution_composite_sha256": "0db52eeff6bbe048a4bf6adb8652df4aa94b14915e1f311a851a2b5ebd7fcca0",
+  "generated_at_utc": "2026-09-02T19:19:30.120147+00:00",
+  "leaked_outcome_columns": [],
+  "plan_sha256": "e4d66bedf80ebc239e377dd41994e7ab83c4d8bfd670d7056c3e3ae34595300d",
+  "required_checks": [
+    "PLAN_BOUND_TO_SPEC",
+    "EXECUTION_MANIFEST",
+    "ENTRY_REFERENCE_EXECUTABLE",
+    "FORWARD_OUTCOME_GUARD",
+    "CHRONOLOGY_ROLE_TABLE",
+    "PREDICATES_COMPILE",
+    "CAUSAL_INVARIANTS"
+  ],
+  "schema_version": 2,
+  "status": "CLEAR"
+}

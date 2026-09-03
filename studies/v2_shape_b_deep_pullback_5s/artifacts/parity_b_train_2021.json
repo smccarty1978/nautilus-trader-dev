@@ -1,0 +1,98 @@
+{
+  "study": "v2_shape_b_deep_pullback_5s",
+  "shape": "b",
+  "partition": "train",
+  "year": 2021,
+  "rows": {
+    "runtime_candidates": 18805,
+    "reference_candidates": 18805,
+    "runtime_observations": 18805,
+    "reference_observations": 18805
+  },
+  "candidates": {
+    "passed": true,
+    "reference_rows": 18805,
+    "runtime_rows": 18805,
+    "common_rows": 18805,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 46,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "observations": {
+    "passed": false,
+    "reference_rows": 18805,
+    "runtime_rows": 18805,
+    "common_rows": 18805,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 10,
+    "value_mismatches": 9,
+    "per_column": {
+      "session_close_ts": {
+        "mismatches": 9,
+        "max_abs_diff": 3600000000000.0
+      }
+    },
+    "first_divergence": {
+      "timestamp": 1615767450000000000,
+      "key": [
+        1615767450000000000,
+        1615766760000000000,
+        1
+      ],
+      "column": "session_close_ts",
+      "reference": 1615756500000000000,
+      "runtime": 1615752900000000000
+    },
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "explained_divergences": {
+    "columns": {
+      "session_close_ts": "reference computed the RTH censor close with the wrong UTC offset on the two 2021 DST-transition Sunday evenings (2021-03-14, 2021-11-07): 9 rows, +/-3600s, dispositions and labels identical; runtime gives 15:15 CT"
+    },
+    "mismatches_in_explained_columns": {
+      "session_close_ts": 9
+    },
+    "observations_excluding_explained": {
+      "passed": true,
+      "reference_rows": 18805,
+      "runtime_rows": 18805,
+      "common_rows": 18805,
+      "only_in_reference": 0,
+      "only_in_runtime": 0,
+      "duplicate_keys": {
+        "reference": 0,
+        "runtime": 0
+      },
+      "missing_columns": [],
+      "columns_compared": 9,
+      "value_mismatches": 0,
+      "per_column": {},
+      "first_divergence": null,
+      "tolerance": 1e-09,
+      "only_in_reference_examples": [],
+      "only_in_runtime_examples": []
+    },
+    "total_value_mismatches": 9
+  },
+  "passed": true,
+  "historical_study_modified": false
+}
