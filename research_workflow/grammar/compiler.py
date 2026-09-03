@@ -51,7 +51,7 @@ STAGE_CLOSURE_MODULES: Dict[str, Tuple[str, ...]] = {
         "research_workflow/lifecycle_v2.py", "research_workflow/governed_controller_v2.py",
         "research_workflow/governed_controller.py", "research_workflow/controller_contracts.py",
         "research_workflow/policy.py", "research_workflow/study_closure.py",
-        "research_workflow/closure_hash.py", "research_workflow/roots.py",
+        "research_workflow/closure_hash.py", "research_workflow/roots.py", "research_workflow/locks.py",
     ),
     "outcome": (
         "research_workflow/forward_outcomes/guard.py", "research_workflow/entry_references.py",

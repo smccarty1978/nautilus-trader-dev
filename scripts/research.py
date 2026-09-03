@@ -13,7 +13,8 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
     research study run --study <dir> --through <stage> ...   the governed controller (v1 or v2 by grammar)
     research audit ingest --study <dir> --type causal|contract --report <md> [--author <id>]
     research bench [--series host_c,host_a,golden]           host performance measurement vs bench/baseline_v0.json
-    research ws list [--reclaim]                             branches, worktrees, owners, leases (live/stale/dead), dirty state
+    research ws list [--reclaim]                             branches, worktrees, owners, leases (live/stale/dead/released), dirty state
+    research ws release <study_id>                            explicitly release a writer lease you own
 """
 from __future__ import annotations
 
@@ -158,6 +159,11 @@ def cmd_ws_list(ns: argparse.Namespace) -> int:
     return _card(ws_list(repo_root=ROOT, reclaim=bool(getattr(ns, "reclaim", False))))
 
 
+def cmd_ws_release(ns: argparse.Namespace) -> int:
+    from research_workflow.workspace import current_owner, release_lease
+    return _card(release_lease(ns.study_id, owner=current_owner()))
+
+
 # ---------------------------------------------------------------------------
 # model store
 # ---------------------------------------------------------------------------
@@ -235,8 +241,9 @@ def build_parser() -> argparse.ArgumentParser:
     mm.add_argument("--train-frame", help="parquet of TRAIN rows for real-row golden frames"); mm.add_argument("--export", action="append"); mm.add_argument("--limit", type=int); mm.set_defaults(fn=cmd_model_migrate)
 
     ws = sub.add_parser("ws").add_subparsers(dest="cmd", required=True)
-    wl = ws.add_parser("list"); wl.add_argument("--reclaim", action="store_true", help="delete stale (dead pid) and dead (missing worktree) writer leases; live leases are never touched")
+    wl = ws.add_parser("list"); wl.add_argument("--reclaim", action="store_true", help="delete stale/dead/released writer leases; live leases are never touched")
     wl.set_defaults(fn=cmd_ws_list)
+    wr = ws.add_parser("release"); wr.add_argument("study_id"); wr.set_defaults(fn=cmd_ws_release)
     return ap
 
 

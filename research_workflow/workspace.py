@@ -7,15 +7,32 @@
       the machine-local roots of ``research_workflow.roots``),
     * allocates the run namespace ``studies/<id>/runs/`` and ``_work/`` (gitignored),
     * scaffolds ``studies/<id>/{research_decision.yaml,study.yaml,SPEC.md}`` skeletons,
-    * writes a writer lease ``<leases_dir>/<id>.json`` {study, branch, worktree, pid, owner, created}
-      and refuses if a live lease already names that worktree.
+    * writes a writer lease ``<leases_dir>/<id>.json`` (schema v2, see below) and refuses if a
+      live lease already names that worktree.
 
 ``ws_list()``
-    branches, worktrees, owners, leases (live / stale / dead), dirty state -- one JSON card.
+    branches, worktrees, owners, leases (live / stale / dead / released), dirty state -- one JSON card.
 
-Leases are process-local facts, never scientific artifacts. A lease whose PID is dead is
-``stale`` and may be reclaimed by ``study_new``/``ws_list --reclaim``; a lease is ``dead`` when
-its worktree no longer exists.
+Leases are process-local facts, never scientific artifacts, but ownership of an active
+workspace must outlive the short-lived ``study new`` CLI process that created it: durability
+comes from a TTL-bounded renewal window, not from the creator's PID alone.
+
+Lease schema v2 (current)::
+
+    {schema_version: 2, study_id, branch, worktree, owner, created_at_utc,
+     holder: {pid, kind: "cli"|"controller", renewed_at_utc}, ttl_seconds, released_at_utc}
+
+States:
+  * ``dead``     -- the lease's worktree no longer exists.
+  * ``released`` -- ``released_at_utc`` is set (``research ws release <study_id>``).
+  * ``live``     -- worktree exists AND (holder pid alive OR now < holder.renewed_at_utc + ttl_seconds).
+  * ``stale``    -- worktree exists, holder pid dead AND the ttl window has expired.
+
+``research_workflow.governed_controller_v2.V2StudyController.run()`` renews the lease (kind
+``controller``) on every run while it owns the worktree, so a long controller run keeps the
+lease ``live`` long after the creating CLI process has exited. Schema-v1 lease files (flat
+``pid`` field, no ``holder``) are still read transparently: normalized in memory to
+``holder={pid, kind:"cli", renewed_at_utc:created_at_utc}``.
 """
 from __future__ import annotations
 
@@ -23,15 +40,22 @@ import getpass
 import json
 import os
 import subprocess
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from research_workflow.roots import load_config
 
+DEFAULT_LEASE_TTL_SECONDS = 259200   # 72h
+
 
 class WorkspaceError(RuntimeError):
     pass
+
+
+def current_owner() -> str:
+    host = os.environ.get("COMPUTERNAME") or (os.uname().nodename if hasattr(os, "uname") else "")
+    return f"{getpass.getuser()}@{host}"
 
 
 def _git(args: List[str], cwd: Path) -> str:
@@ -71,6 +95,48 @@ def leases_dir(config=None) -> Path:
     return Path(cfg.leases_dir)
 
 
+def _normalize(rec: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize a lease record (on-disk schema v1 or v2) to an in-memory v2 shape. Never
+    rewrites the file -- callers that mutate call ``_atomic_write`` explicitly."""
+    out = dict(rec)
+    if isinstance(out.get("holder"), dict):
+        out.setdefault("schema_version", 2)
+        out.setdefault("ttl_seconds", DEFAULT_LEASE_TTL_SECONDS)
+        out.setdefault("released_at_utc", None)
+        return out
+    # schema v1: flat {pid, owner, created_at_utc, ...} -- treat pid as the holder, kind "cli"
+    out["schema_version"] = out.get("schema_version", 1)
+    out["holder"] = {"pid": out.get("pid"), "kind": "cli", "renewed_at_utc": out.get("created_at_utc")}
+    out.setdefault("ttl_seconds", DEFAULT_LEASE_TTL_SECONDS)
+    out.setdefault("released_at_utc", None)
+    return out
+
+
+def lease_state(rec: Dict[str, Any]) -> str:
+    """dead (worktree gone) > released (released_at_utc set) > live (holder pid alive, or the
+    ttl-bounded renewal window has not yet expired) > stale (neither)."""
+    wt = Path(str(rec.get("worktree", "")))
+    if not wt.is_dir():
+        return "dead"
+    if rec.get("released_at_utc"):
+        return "released"
+    holder = rec.get("holder") or {}
+    pid = int(holder.get("pid") or 0)
+    alive = _pid_alive(pid) if pid else False
+    if alive:
+        return "live"
+    ttl = int(rec.get("ttl_seconds") or DEFAULT_LEASE_TTL_SECONDS)
+    renewed_raw = holder.get("renewed_at_utc") or rec.get("created_at_utc")
+    try:
+        renewed = datetime.fromisoformat(str(renewed_raw))
+    except (TypeError, ValueError):
+        return "stale"
+    now = datetime.now(timezone.utc)
+    if renewed.tzinfo is None:
+        renewed = renewed.replace(tzinfo=timezone.utc)
+    return "live" if now < renewed + timedelta(seconds=ttl) else "stale"
+
+
 def read_leases(config=None) -> List[Dict[str, Any]]:
     d = leases_dir(config)
     rows = []
@@ -81,25 +147,80 @@ def read_leases(config=None) -> List[Dict[str, Any]]:
             rec = json.loads(p.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        alive = _pid_alive(int(rec.get("pid", -1)))
-        wt = Path(str(rec.get("worktree", "")))
-        rec["state"] = "dead" if not wt.is_dir() else ("live" if alive else "stale")
+        rec = _normalize(rec)
+        rec["state"] = lease_state(rec)
         rec["lease_path"] = str(p)
         rows.append(rec)
     return rows
 
 
+def _atomic_write(path: Path, payload: Dict[str, Any]) -> None:
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
+    tmp.replace(path)
+
+
 def _write_lease(study_id: str, branch: str, worktree: Path, config=None, owner: Optional[str] = None) -> Path:
-    d = leases_dir(config); d.mkdir(parents=True, exist_ok=True)
-    for lease in read_leases(config):
+    from research_workflow.locks import acquire_exclusive
+    cfg = config if config is not None else load_config()
+    d = leases_dir(cfg); d.mkdir(parents=True, exist_ok=True)
+    for lease in read_leases(cfg):
         if Path(str(lease.get("worktree", ""))).resolve() == worktree.resolve() and lease["state"] == "live":
-            raise WorkspaceError(f"WRITER_LEASE_HELD: worktree {worktree} already has a live writer lease ({lease.get('owner')}, pid {lease.get('pid')})")
+            raise WorkspaceError(f"WRITER_LEASE_HELD: worktree {worktree} already has a live writer lease "
+                                  f"({lease.get('owner')}, pid {(lease.get('holder') or {}).get('pid')})")
     p = d / f"{study_id}.json"
-    payload = {"schema_version": 1, "study_id": study_id, "branch": branch, "worktree": str(worktree.resolve()), "pid": os.getpid(),
-               "owner": owner or f"{getpass.getuser()}@{os.environ.get('COMPUTERNAME') or os.uname().nodename if hasattr(os, 'uname') else getpass.getuser()}",
-               "created_at_utc": datetime.now(timezone.utc).isoformat()}
-    p.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    now = datetime.now(timezone.utc).isoformat()
+    ttl = int(getattr(cfg, "lease_ttl_seconds", DEFAULT_LEASE_TTL_SECONDS) or DEFAULT_LEASE_TTL_SECONDS)
+    payload = {"schema_version": 2, "study_id": study_id, "branch": branch, "worktree": str(worktree.resolve()),
+               "owner": owner or current_owner(), "created_at_utc": now,
+               "holder": {"pid": os.getpid(), "kind": "cli", "renewed_at_utc": now},
+               "ttl_seconds": ttl, "released_at_utc": None}
+    # a leftover lease file for this exact study_id (e.g. a prior failed/reclaimed attempt) is
+    # always safe to overwrite here: uniqueness of the *worktree* was just checked above.
+    result = acquire_exclusive(p, payload, is_stale=lambda existing, mtime: True, max_attempts=1)
+    if not result.acquired:
+        raise WorkspaceError(f"LEASE_FILE_EXISTS: {p}")
     return p
+
+
+def renew_lease(worktree: Path, *, owner: str, pid: int, kind: str = "controller", config=None) -> Optional[Dict[str, Any]]:
+    """Refresh ``holder`` + ``renewed_at_utc`` on the lease naming ``worktree``, if any.
+
+    Raises ``WorkspaceError`` if a lease exists for that worktree but is owned by someone else;
+    returns ``None`` if no lease names that worktree (nothing to renew, proceed unchanged)."""
+    cfg = config if config is not None else load_config()
+    worktree = Path(worktree).resolve()
+    for lease in read_leases(cfg):
+        if Path(str(lease.get("worktree", ""))).resolve() != worktree:
+            continue
+        if lease.get("owner") != owner:
+            raise WorkspaceError(f"WRITER_LEASE_HELD_BY_OTHER: {worktree} is leased to {lease.get('owner')}, not {owner}")
+        p = Path(lease["lease_path"])
+        raw = _normalize(json.loads(p.read_text(encoding="utf-8")))
+        raw["schema_version"] = 2
+        raw["holder"] = {"pid": pid, "kind": kind, "renewed_at_utc": datetime.now(timezone.utc).isoformat()}
+        raw["released_at_utc"] = None
+        raw.setdefault("ttl_seconds", int(getattr(cfg, "lease_ttl_seconds", DEFAULT_LEASE_TTL_SECONDS) or DEFAULT_LEASE_TTL_SECONDS))
+        _atomic_write(p, raw)
+        out = dict(raw); out["state"] = lease_state(raw); out["lease_path"] = str(p)
+        return out
+    return None
+
+
+def release_lease(study_id: str, *, owner: str, config=None) -> Dict[str, Any]:
+    """Explicit release (``research ws release <study_id>``): allowed only for the owner."""
+    cfg = config if config is not None else load_config()
+    p = leases_dir(cfg) / f"{study_id}.json"
+    if not p.is_file():
+        raise WorkspaceError(f"LEASE_NOT_FOUND: {study_id}")
+    raw = _normalize(json.loads(p.read_text(encoding="utf-8")))
+    if raw.get("owner") != owner:
+        raise WorkspaceError(f"LEASE_RELEASE_REFUSED: {study_id} is leased to {raw.get('owner')}, not {owner}")
+    raw["schema_version"] = 2
+    raw["released_at_utc"] = datetime.now(timezone.utc).isoformat()
+    _atomic_write(p, raw)
+    out = dict(raw); out["state"] = "released"; out["lease_path"] = str(p)
+    return out
 
 
 def _skeletons(study_dir: Path, study_id: str, dataset_id: str, question: str) -> List[Path]:
@@ -207,7 +328,7 @@ def ws_list(*, repo_root: Path, config=None, reclaim: bool = False) -> Dict[str,
     reclaimed = []
     if reclaim:
         for l in leases:
-            if l["state"] in {"stale", "dead"}:
+            if l["state"] in {"stale", "dead", "released"}:
                 Path(l["lease_path"]).unlink(missing_ok=True); reclaimed.append(l["study_id"])
     branches = [b.strip().lstrip("* ").strip() for b in _git(["branch", "--list"], repo_root).splitlines() if b.strip()]
     return {"repo": str(repo_root), "worktrees": rows, "leases": [{k: l.get(k) for k in ("study_id", "branch", "worktree", "owner", "pid", "state", "created_at_utc")} for l in leases],
@@ -215,4 +336,4 @@ def ws_list(*, repo_root: Path, config=None, reclaim: bool = False) -> Dict[str,
             "branches": {"count": len(branches), "study": sorted(b for b in branches if b.startswith("study/")), "other": sorted(b for b in branches if not b.startswith("study/"))}}
 
 
-__all__ = ["WorkspaceError", "study_new", "ws_list", "read_leases", "leases_dir"]
+__all__ = ["WorkspaceError", "study_new", "ws_list", "read_leases", "leases_dir", "renew_lease", "release_lease", "current_owner", "lease_state"]

@@ -31,7 +31,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
+import time
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -281,57 +284,104 @@ def read_manifest(model_id: str, model_root: Optional[Path] = None) -> Dict[str,
     return _read(p)
 
 
+def _model_lock(mdir_parent_models: Path, model_id: str):
+    """Bounded-wait per-model lock (research_workflow.locks): serializes ``add_export`` /
+    manifest-mutation against the same model_id. Returns a context manager."""
+    from contextlib import contextmanager
+    from research_workflow.locks import acquire_wait, release
+    lock_path = mdir_parent_models / model_id / ".lock"
+
+    @contextmanager
+    def _cm():
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {"pid": os.getpid(), "acquired_at_utc": _now()}
+        result = acquire_wait(lock_path, payload, is_stale=lambda existing, mtime: (time.time() - mtime) > 30, timeout_s=30.0)
+        if not result.acquired:
+            raise ModelStoreError(f"MODEL_LOCK_TIMEOUT: {model_id}")
+        try:
+            yield
+        finally:
+            release(lock_path, owns=lambda existing: bool(existing) and int(existing.get("pid") or 0) == os.getpid())
+    return _cm()
+
+
 def store_model(*, model_id: str, estimator: Any, lineage: ModelLineage, tier: str, selection_status: str,
                 metrics: Mapping[str, Any], golden_train_frame: Optional[pd.DataFrame], model_root: Optional[Path] = None,
                 scientific_status: str = "UNASSESSED", legacy_registry_record: Optional[Mapping[str, Any]] = None,
                 canonical_source_file: Optional[Path] = None, golden_rows: int = GOLDEN_MIN_ROWS) -> Dict[str, Any]:
     """Persist a model into the store (idempotent: identical model_id must reproduce identical canonical bytes).
 
+    Same-ID concurrent writers never see a half-written directory and never lost-update each other:
+    the whole model directory is built under ``models/.staging/<id>.<uuid>/`` and promoted with a
+    single ``os.rename`` onto ``models/<id>``; the loser of a concurrent promotion race for the same
+    id discards its staging directory and returns the winner's (already-persisted) manifest if the
+    canonical bytes agree, else raises ``MODEL_ID_COLLISION``.
+
     ``golden_rows`` sizes the deterministic golden frame; callers with a training population smaller than
     ``GOLDEN_MIN_ROWS`` (synthetic fixtures) pass the population size -- the manifest records ``n_rows``."""
     if tier not in TIERS or selection_status not in SELECTION_STATES:
         raise ModelStoreError(f"MODEL_TIER_OR_STATUS_INVALID: {tier}/{selection_status}")
     root = model_store_root(model_root)
-    mdir = root / "models" / model_id
+    models_root = root / "models"
+    mdir = models_root / model_id
     manifest_path = mdir / "manifest.json"
     if manifest_path.is_file():
-        existing = _read(manifest_path)
-        return existing  # immutable; representations are appended through add_export
-    auth = family_authority(lineage.family)
-    if canonical_source_file is not None:
-        (mdir / "canonical").mkdir(parents=True, exist_ok=True)
-        dest = mdir / "canonical" / auth["file"]
-        shutil.copyfile(canonical_source_file, dest)
-        canonical = {"format": auth["canonical_format"], "archival_safety": auth["archival_safety"], "path": dest.name,
-                     "byte_sha256": _sha(dest), "logical_sha256": _sha(dest) if auth["archival_safety"] == "portable" else None,
-                     "library_versions": _library_versions(), "source": str(canonical_source_file)}
-    else:
-        canonical = save_canonical(estimator, lineage.family, mdir / "canonical")
-    manifest: Dict[str, Any] = {
-        "schema_version": SCHEMA_VERSION, "model_id": model_id, "tier": tier, "selection_status": selection_status,
-        "scientific_status": scientific_status, "created_at_utc": _now(),
-        "lineage": {**lineage.__dict__},
-        "metrics": dict(metrics or {}),
-        "canonical": canonical,
-        "golden": None, "exports": [],
-        "legacy_registry_record": dict(legacy_registry_record) if legacy_registry_record else None,
-        "score_semantics": "predict_proba_positive",
-    }
-    # Golden frame from real TRAIN rows, scored by the canonical representation.
-    if golden_train_frame is not None:
-        frame = build_golden_frame(golden_train_frame, lineage.ordered_inputs, model_id, n_rows=int(golden_rows))
-        (mdir / "golden").mkdir(parents=True, exist_ok=True)
-        frame.to_parquet(mdir / "golden" / "frame.parquet", index=False)
-        _json(manifest_path, manifest)  # load_canonical needs the manifest on disk
-        scorer = load_canonical(manifest, mdir)
-        expected = scorer.scores(frame)
-        _json(mdir / "golden" / "expected.json", {"model_id": model_id, "n_rows": int(len(frame)), "expected_scores": [float(v) for v in expected]})
-        manifest["golden"] = {"frame_path": "golden/frame.parquet", "frame_sha256": _sha(mdir / "golden" / "frame.parquet"),
-                              "frame_content_sha256": _frame_sha(frame), "n_rows": int(len(frame)),
-                              "expected_path": "golden/expected.json", "expected_sha256": _sha(mdir / "golden" / "expected.json"),
-                              "source": "train_rows_deterministic_sample", "seed_source": "sha256(model_id)[:8]"}
-    _json(manifest_path, manifest)
-    return manifest
+        return _read(manifest_path)  # immutable; representations are appended through add_export
+
+    staging_root = models_root / ".staging"
+    staging_root.mkdir(parents=True, exist_ok=True)
+    stage_dir = staging_root / f"{model_id}.{uuid.uuid4().hex}"
+    stage_dir.mkdir(parents=True)
+    try:
+        auth = family_authority(lineage.family)
+        stage_manifest_path = stage_dir / "manifest.json"
+        if canonical_source_file is not None:
+            (stage_dir / "canonical").mkdir(parents=True, exist_ok=True)
+            dest = stage_dir / "canonical" / auth["file"]
+            shutil.copyfile(canonical_source_file, dest)
+            canonical = {"format": auth["canonical_format"], "archival_safety": auth["archival_safety"], "path": dest.name,
+                         "byte_sha256": _sha(dest), "logical_sha256": _sha(dest) if auth["archival_safety"] == "portable" else None,
+                         "library_versions": _library_versions(), "source": str(canonical_source_file)}
+        else:
+            canonical = save_canonical(estimator, lineage.family, stage_dir / "canonical")
+        manifest: Dict[str, Any] = {
+            "schema_version": SCHEMA_VERSION, "model_id": model_id, "tier": tier, "selection_status": selection_status,
+            "scientific_status": scientific_status, "created_at_utc": _now(),
+            "lineage": {**lineage.__dict__},
+            "metrics": dict(metrics or {}),
+            "canonical": canonical,
+            "golden": None, "exports": [],
+            "legacy_registry_record": dict(legacy_registry_record) if legacy_registry_record else None,
+            "score_semantics": "predict_proba_positive",
+        }
+        # Golden frame from real TRAIN rows, scored by the canonical representation.
+        if golden_train_frame is not None:
+            frame = build_golden_frame(golden_train_frame, lineage.ordered_inputs, model_id, n_rows=int(golden_rows))
+            (stage_dir / "golden").mkdir(parents=True, exist_ok=True)
+            frame.to_parquet(stage_dir / "golden" / "frame.parquet", index=False)
+            _json(stage_manifest_path, manifest)  # load_canonical needs the manifest on disk
+            scorer = load_canonical(manifest, stage_dir)
+            expected = scorer.scores(frame)
+            _json(stage_dir / "golden" / "expected.json", {"model_id": model_id, "n_rows": int(len(frame)), "expected_scores": [float(v) for v in expected]})
+            manifest["golden"] = {"frame_path": "golden/frame.parquet", "frame_sha256": _sha(stage_dir / "golden" / "frame.parquet"),
+                                  "frame_content_sha256": _frame_sha(frame), "n_rows": int(len(frame)),
+                                  "expected_path": "golden/expected.json", "expected_sha256": _sha(stage_dir / "golden" / "expected.json"),
+                                  "source": "train_rows_deterministic_sample", "seed_source": "sha256(model_id)[:8]"}
+        _json(stage_manifest_path, manifest)
+        try:
+            os.rename(str(stage_dir), str(mdir))
+        except OSError:
+            # a concurrent writer for the same id won the promotion race first.
+            if manifest_path.is_file():
+                existing = _read(manifest_path)
+                if existing.get("canonical", {}).get("byte_sha256") == canonical["byte_sha256"]:
+                    return existing  # idempotent: identical canonical bytes
+                raise ModelStoreError(f"MODEL_ID_COLLISION: {model_id}")
+            raise
+        return manifest
+    finally:
+        if stage_dir.is_dir():
+            shutil.rmtree(stage_dir, ignore_errors=True)
 
 
 def validate_golden(model_id: str, model_root: Optional[Path] = None, tolerance: float = 1e-12) -> Dict[str, Any]:
@@ -354,52 +404,58 @@ def add_export(model_id: str, fmt: str, *, model_root: Optional[Path] = None, ex
     """Export the canonical model to ``fmt`` and verify equivalence on the golden frame.
 
     Never raises for an export failure: the manifest records ``status: failed`` with the
-    error, and the canonical model is untouched.
+    error, and the canonical model is untouched. The manifest read-modify-write (appending
+    this export's record) is serialized against every other writer for this model_id by a
+    bounded-wait per-model lock (``models/<id>/.lock``); a lock that cannot be acquired within
+    30s raises ``MODEL_LOCK_TIMEOUT``.
     """
-    manifest = read_manifest(model_id, model_root); mdir = model_dir(model_id, model_root)
-    existing = [e for e in manifest.get("exports", []) if e.get("format") == fmt and e.get("status") == "verified"]
-    if existing:
-        return existing[0]
-    record: Dict[str, Any] = {"format": fmt, "status": "candidate", "created_at_utc": _now(), "source_model_id": model_id,
-                              "source_canonical_sha256": manifest["canonical"]["byte_sha256"], "exporter": None, "exporter_version": exporter_version}
-    (mdir / "exports").mkdir(parents=True, exist_ok=True)
-    inputs = manifest["lineage"]["ordered_inputs"]
-    try:
-        scorer = load_canonical(manifest, mdir)
-        if fmt == "joblib":
-            import joblib
-            path = mdir / "exports" / "model.joblib"
-            joblib.dump(scorer.obj, path)
-            record["exporter"] = "joblib"; record["exporter_version"] = exporter_version or joblib.__version__
-        elif fmt == "onnx":
-            path = mdir / "exports" / "model.onnx"
-            _export_onnx(manifest, scorer, path, len(inputs))
-            import onnxmltools
-            record["exporter"] = "onnxmltools/skl2onnx"; record["exporter_version"] = exporter_version or onnxmltools.__version__
-        else:
-            raise ModelStoreError(f"EXPORT_FORMAT_UNSUPPORTED: {fmt}")
-        record["path"] = f"exports/{path.name}"; record["byte_sha256"] = _sha(path)
-        g = manifest.get("golden")
-        if not g:
-            record["status"] = "candidate"; record["equivalence"] = {"status": "NO_GOLDEN_FRAME"}
-        else:
-            frame = pd.read_parquet(mdir / g["frame_path"])
-            expected = np.asarray(_read(mdir / g["expected_path"])["expected_scores"], dtype=np.float64)
-            got = _load_export(fmt, path, inputs).scores(frame)
-            tol = EXPORT_TOLERANCES.get(fmt, {"abs": 1e-9})
-            abs_diff = np.abs(got - expected)
-            rel_diff = abs_diff / np.maximum(np.abs(expected), 1e-12)
-            ok = len(got) == len(expected) and (bool(np.all(abs_diff <= tol.get("abs", np.inf))) or bool(np.all(rel_diff <= tol.get("rel", -1))))
-            equivalence = {"status": "PASS" if ok else "FAIL", "n_rows": int(len(frame)), "max_abs_diff": float(abs_diff.max()) if len(got) else 0.0,
-                           "max_rel_diff": float(rel_diff.max()) if len(got) else 0.0, "tolerance": tol, "golden_frame_sha256": g["frame_sha256"],
-                           "source_canonical_sha256": manifest["canonical"]["byte_sha256"], "export_sha256": record["byte_sha256"], "checked_at_utc": _now()}
-            _json(mdir / "equivalence" / f"{fmt}.json", equivalence)
-            record["equivalence"] = equivalence; record["status"] = "verified" if ok else "failed"
-    except Exception as exc:  # export failure must not invalidate the canonical model
-        record["status"] = "failed"; record["error"] = f"{type(exc).__name__}: {exc}"
-    manifest["exports"] = [e for e in manifest.get("exports", []) if e.get("format") != fmt] + [record]
-    _json(mdir / "manifest.json", manifest)
-    return record
+    mdir = model_dir(model_id, model_root)
+    models_root = mdir.parent
+    with _model_lock(models_root, model_id):
+        manifest = read_manifest(model_id, model_root)
+        existing = [e for e in manifest.get("exports", []) if e.get("format") == fmt and e.get("status") == "verified"]
+        if existing:
+            return existing[0]
+        record: Dict[str, Any] = {"format": fmt, "status": "candidate", "created_at_utc": _now(), "source_model_id": model_id,
+                                  "source_canonical_sha256": manifest["canonical"]["byte_sha256"], "exporter": None, "exporter_version": exporter_version}
+        (mdir / "exports").mkdir(parents=True, exist_ok=True)
+        inputs = manifest["lineage"]["ordered_inputs"]
+        try:
+            scorer = load_canonical(manifest, mdir)
+            if fmt == "joblib":
+                import joblib
+                path = mdir / "exports" / "model.joblib"
+                joblib.dump(scorer.obj, path)
+                record["exporter"] = "joblib"; record["exporter_version"] = exporter_version or joblib.__version__
+            elif fmt == "onnx":
+                path = mdir / "exports" / "model.onnx"
+                _export_onnx(manifest, scorer, path, len(inputs))
+                import onnxmltools
+                record["exporter"] = "onnxmltools/skl2onnx"; record["exporter_version"] = exporter_version or onnxmltools.__version__
+            else:
+                raise ModelStoreError(f"EXPORT_FORMAT_UNSUPPORTED: {fmt}")
+            record["path"] = f"exports/{path.name}"; record["byte_sha256"] = _sha(path)
+            g = manifest.get("golden")
+            if not g:
+                record["status"] = "candidate"; record["equivalence"] = {"status": "NO_GOLDEN_FRAME"}
+            else:
+                frame = pd.read_parquet(mdir / g["frame_path"])
+                expected = np.asarray(_read(mdir / g["expected_path"])["expected_scores"], dtype=np.float64)
+                got = _load_export(fmt, path, inputs).scores(frame)
+                tol = EXPORT_TOLERANCES.get(fmt, {"abs": 1e-9})
+                abs_diff = np.abs(got - expected)
+                rel_diff = abs_diff / np.maximum(np.abs(expected), 1e-12)
+                ok = len(got) == len(expected) and (bool(np.all(abs_diff <= tol.get("abs", np.inf))) or bool(np.all(rel_diff <= tol.get("rel", -1))))
+                equivalence = {"status": "PASS" if ok else "FAIL", "n_rows": int(len(frame)), "max_abs_diff": float(abs_diff.max()) if len(got) else 0.0,
+                               "max_rel_diff": float(rel_diff.max()) if len(got) else 0.0, "tolerance": tol, "golden_frame_sha256": g["frame_sha256"],
+                               "source_canonical_sha256": manifest["canonical"]["byte_sha256"], "export_sha256": record["byte_sha256"], "checked_at_utc": _now()}
+                _json(mdir / "equivalence" / f"{fmt}.json", equivalence)
+                record["equivalence"] = equivalence; record["status"] = "verified" if ok else "failed"
+        except Exception as exc:  # export failure must not invalidate the canonical model
+            record["status"] = "failed"; record["error"] = f"{type(exc).__name__}: {exc}"
+        manifest["exports"] = [e for e in manifest.get("exports", []) if e.get("format") != fmt] + [record]
+        _json(mdir / "manifest.json", manifest)
+        return record
 
 
 def _export_onnx(manifest: Mapping[str, Any], scorer: _Scorer, path: Path, n_inputs: int) -> None:
@@ -468,6 +524,8 @@ def list_store(model_root: Optional[Path] = None) -> List[Dict[str, Any]]:
     root = model_store_root(model_root, create=False)
     out = []
     for p in sorted((root / "models").glob("*/manifest.json")) if (root / "models").is_dir() else []:
+        if p.parent.name == ".staging":
+            continue
         m = _read(p)
         out.append({"model_id": m["model_id"], "tier": m["tier"], "selection_status": m["selection_status"], "scientific_status": m["scientific_status"],
                     "family": m["lineage"].get("family"), "study_id": m["lineage"].get("study_id"), "canonical_format": m["canonical"]["format"],

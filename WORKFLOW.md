@@ -424,18 +424,26 @@ This is exactly how the three proof studies absorbed platform fixes.
 
 ### M.4 Lease semantics (as implemented in `research_workflow/workspace.py`)
 
+A lease is durable ownership of a workspace for the duration of actual work, not just for the
+lifetime of the short-lived `study new` CLI process that created it: the lease carries a `holder`
+(pid, kind `cli`|`controller`, `renewed_at_utc`) and a `ttl_seconds` (default 72h). Every governed
+`research study run` on a leased worktree renews the lease (kind `controller`) while it runs, so a
+long controller run keeps the lease `live` long past the creating CLI process's exit.
+
 | state | meaning | writing allowed? |
 |---|---|---|
-| `live` | the lease's worktree exists and the PID that created it is alive | only that writer; `study new` refuses a second live lease on the same worktree (`WRITER_LEASE_HELD`) |
-| `stale` | the worktree exists but the creating PID is dead (session ended, machine restarted) | the worktree is unowned; `research ws list --reclaim` deletes the stale lease, after which one writer may take the worktree |
+| `live` | the lease's worktree exists, not released, and (holder pid alive OR still inside the ttl window since the last renewal) | only that writer; `study new` refuses a second live lease on the same worktree (`WRITER_LEASE_HELD`); a `research study run` on the worktree by a different owner is refused (`WRITER_LEASE_HELD_BY_OTHER`) |
+| `stale` | the worktree exists, the holder pid is dead, and the ttl window has expired | the worktree is unowned; `research ws list --reclaim` deletes the stale lease, after which one writer may take the worktree |
 | `dead` | the lease's worktree no longer exists | nothing to write; `research ws list --reclaim` deletes the record |
+| `released` | the owner ran `research ws release <study_id>` | the worktree is unowned; `research ws list --reclaim` deletes the record |
 
-Ownership is the `owner` (user@host) and `pid` in the lease file, written once by `study new`. Never
-delete or edit lease files by hand and never take over a `live` lease: if two agents must work on the
-same study, the second one waits or takes a different study. `research ws list` shows, per worktree,
-the branch, HEAD, dirty state, owner and lease state; `research ws list --reclaim` is the only sanctioned
-reclaim command and touches only `stale`/`dead` leases. The controller's `run.lock` independently
-prevents two live runs of the same study.
+Ownership is the `owner` (user@host) in the lease file, written once by `study new`. Never delete or
+edit lease files by hand and never take over a `live` lease: if two agents must work on the same
+study, the second one waits or takes a different study, or the owner runs `research ws release
+<study_id>` when done. `research ws list` shows, per worktree, the branch, HEAD, dirty state, owner
+and lease state; `research ws list --reclaim` is the only sanctioned reclaim command and touches only
+`stale`/`dead`/`released` leases, never `live`. The controller's `run.lock` independently prevents two
+live runs of the same study.
 
 ### M.5 Example: three concurrent studies
 

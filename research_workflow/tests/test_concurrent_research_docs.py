@@ -33,18 +33,20 @@ def test_workflow_has_the_canonical_concurrent_procedure():
                    "NEVER START A NEW RESEARCH STUDY BY EDITING MAIN DIRECTLY", "git switch main", "python scripts/research.py study new",
                    "python scripts/research.py ws list", "ws list --reclaim", "git merge --no-ff study/", "current checkout's HEAD",
                    "### M.2 What is shared and what is isolated", "### M.3 Platform change vs research change", "### M.4 Lease semantics",
-                   "run.lock", "STUDY_RUN_ALREADY_LIVE", "WRITER_LEASE_HELD", "`live`", "`stale`", "`dead`", "chore/<topic>",
+                   "run.lock", "STUDY_RUN_ALREADY_LIVE", "WRITER_LEASE_HELD", "`live`", "`stale`", "`dead`", "`released`", "chore/<topic>",
                    "regime_breakout_context", "pullback_quality_target", "cross_market_context", "### M.6 Closure and merge back"):
         assert phrase in w, phrase
 
 
 def test_lease_states_documented_match_the_implementation():
     src = _t("research_workflow/workspace.py")
-    assert '"dead" if not wt.is_dir() else ("live" if alive else "stale")' in src
-    assert 'if l["state"] in {"stale", "dead"}' in src            # reclaim touches only stale/dead
-    assert "WRITER_LEASE_HELD" in src                              # live lease refused
+    assert "def lease_state(rec: Dict[str, Any]) -> str:" in src
+    assert 'if l["state"] in {"stale", "dead", "released"}' in src   # reclaim touches only stale/dead/released, never live
+    assert "WRITER_LEASE_HELD" in src                                 # live lease refused
+    assert "def renew_lease(" in src and "def release_lease(" in src
     cli = _t("scripts/research.py")
     assert '"--reclaim"' in cli
+    assert 'ws.add_parser("release")' in cli
 
 
 def test_entrypoints_and_quickstart_point_to_the_procedure():
