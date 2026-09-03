@@ -121,3 +121,7 @@ subagents.
 Report `INCOMPLETE` and stop when `deliverables_contract.json` is absent, the frozen composite
 is stale, or a required lifecycle artifact does not exist. Say which. Otherwise the autonomy
 policy in `AGENTS.md` §6 applies.
+
+## Worktree rules
+
+READ-ONLY: this role creates no branch or worktree and mutates no repository file except its own audit report under `studies/<id>/audit/`. It may read any worktree, including one owned by a live writer.

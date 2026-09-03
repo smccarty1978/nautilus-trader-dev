@@ -32,6 +32,22 @@ Rules:
 
 Roles that deliberately do not exist: a "study driver writer", a "collector author", a "manual OOS opener".
 
+## Starting a research project (every primary coding agent)
+
+1. Read `WORKFLOW.md`, then its §M **Concurrent research projects**.
+2. Confirm a clean source `main` on the canonical checkout: `git switch main && git status --short`.
+3. Create the study with the CLI: `python scripts/research.py study new <id>`.
+4. `cd` into the generated worktree named in the card (`../<repo-name>-<id>`).
+5. Do ALL writes there; never write from `main`.
+6. Never share that worktree with another writing agent; never take over a `live` lease.
+7. Execute the study through the controller (`python scripts/run_governed_study.py --study studies/<id> --through <stage> --execute-authorized`), never by hand.
+8. Before taking ownership of an existing study, run `python scripts/research.py ws list` and check its worktree and lease state (`stale`/`dead` leases are cleared with `--reclaim`; `live` means someone else is writing).
+9. Platform modifications belong on a separate `chore/*` worktree, never in the study branch.
+
+**DO NOT manually create a study branch or worktree when the Platform V2 CLI can do it.** The CLI is
+the canonical path because it also establishes the skeleton, the writer lease, the ownership metadata
+and the expected branch naming (`study/<id>`).
+
 ## Claude (Claude Code)
 
 `.claude/agents/` today:

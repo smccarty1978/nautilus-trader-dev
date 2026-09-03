@@ -102,6 +102,19 @@ python scripts/run_governed_study.py --study studies/my_study --through close --
 
 `artifacts/study_closure.json` is terminal; commit the study directory on its branch and merge with `--no-ff`.
 
+## Starting a new concurrent study
+
+Every study is its own branch and worktree; several run side by side. From the canonical checkout:
+
+```bash
+git switch main && git status --short                        # clean main = source of the study
+python scripts/research.py study new <id> --from-question question.md
+cd "../Nautilus Trader-<id>"                                 # the worktree named in the card; all writes happen here
+python scripts/research.py ws list                           # worktrees, owners, lease state (live / stale / dead)
+```
+
+Rules and merge-back: `WORKFLOW.md` §M.
+
 ## If something blocks
 
 Read the card's `blocker_code` and `reason`, then `studies/my_study/_work/controller/logs/<stage>.log`.

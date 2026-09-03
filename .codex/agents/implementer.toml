@@ -88,4 +88,12 @@ output. If you skipped a step, say which.
 
 Stop only for a condition in `AGENTS.md` §6, or a stop-and-escalate condition named in the
 packet. Say which one. Everything else is a defect to fix.
+
+## Worktree rules (write-capable)
+
+- Never write from `main`; a study's writes happen only in its own `study/<id>` worktree.
+- Never share a writer worktree with another writing agent.
+- If initiating a fresh study, use `python scripts/research.py study new <id>` (never a hand-made branch or worktree).
+- If assigned an existing study, verify its worktree and lease first: `python scripts/research.py ws list`; never reclaim or take over a `live` lease.
+- Platform modifications (features, trackers, compiler, host, kernels, controller) belong on a separate `chore/*` worktree, never in the study branch.
 '''

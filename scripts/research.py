@@ -13,7 +13,7 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
     research study run --study <dir> --through <stage> ...   the governed controller (v1 or v2 by grammar)
     research audit ingest --study <dir> --type causal|contract --report <md> [--author <id>]
     research bench [--series host_c,host_a,golden]           host performance measurement vs bench/baseline_v0.json
-    research ws list                                         branches, worktrees, owners, leases, dirty state
+    research ws list [--reclaim]                             branches, worktrees, owners, leases (live/stale/dead), dirty state
 """
 from __future__ import annotations
 
@@ -153,9 +153,9 @@ def cmd_bench(ns: argparse.Namespace) -> int:
     return subprocess.run(cmd, cwd=str(ROOT)).returncode
 
 
-def cmd_ws_list(_: argparse.Namespace) -> int:
+def cmd_ws_list(ns: argparse.Namespace) -> int:
     from research_workflow.workspace import ws_list
-    return _card(ws_list(repo_root=ROOT))
+    return _card(ws_list(repo_root=ROOT, reclaim=bool(getattr(ns, "reclaim", False))))
 
 
 # ---------------------------------------------------------------------------
@@ -235,7 +235,8 @@ def build_parser() -> argparse.ArgumentParser:
     mm.add_argument("--train-frame", help="parquet of TRAIN rows for real-row golden frames"); mm.add_argument("--export", action="append"); mm.add_argument("--limit", type=int); mm.set_defaults(fn=cmd_model_migrate)
 
     ws = sub.add_parser("ws").add_subparsers(dest="cmd", required=True)
-    ws.add_parser("list").set_defaults(fn=cmd_ws_list)
+    wl = ws.add_parser("list"); wl.add_argument("--reclaim", action="store_true", help="delete stale (dead pid) and dead (missing worktree) writer leases; live leases are never touched")
+    wl.set_defaults(fn=cmd_ws_list)
     return ap
 
 

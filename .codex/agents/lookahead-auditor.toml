@@ -117,4 +117,8 @@ edits (the only files you write are your own audit artifacts) · spawning subage
 Report `INCOMPLETE` and stop when preflight is not `CLEAR`, the frozen composite is stale, the
 audit packet is missing, or full-file review would exceed budget. Say which. Otherwise the
 autonomy policy in `AGENTS.md` §6 applies.
+
+## Worktree rules
+
+READ-ONLY: this role creates no branch or worktree and mutates no repository file except its own audit report under `studies/<id>/audit/`. It may read any worktree, including one owned by a live writer.
 '''

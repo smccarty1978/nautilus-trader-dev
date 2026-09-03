@@ -94,3 +94,16 @@ def test_v2_skeleton_compiles_statically_without_study_python(env: Path):
     assert out.ok, out.card()
     assert out.plan.card()["catalog_opened"] is False and all(b["bound"] for b in out.plan.binding_proof)
     assert not list(study.glob("**/*.py"))
+
+
+def test_ws_list_reclaim_clears_only_stale_and_dead_leases(env: Path):
+    """`research ws list --reclaim` deletes stale/dead lease records and never a live one."""
+    live = ws.study_new("demo_live", repo_root=env)
+    stale = ws.study_new("demo_stale", repo_root=env)
+    p = Path(stale["lease"]); rec = json.loads(p.read_text()); rec["pid"] = 999999; p.write_text(json.dumps(rec))
+    states = {l["study_id"]: l["state"] for l in ws.ws_list(repo_root=env)["leases"]}
+    assert states["demo_live"] == "live" and states["demo_stale"] == "stale"
+    after = ws.ws_list(repo_root=env, reclaim=True)
+    assert after["reclaimed"] == ["demo_stale"] and Path(live["lease"]).exists() and not p.exists()
+    with pytest.raises(ws.WorkspaceError, match="WRITER_LEASE_HELD"):
+        ws._write_lease("demo_live", "study/demo_live", Path(live["worktree"]))

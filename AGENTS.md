@@ -5,6 +5,7 @@ This is the **common core** every agent in this repository inherits, regardless 
 - **Read `WORKFLOW.md` first.** It is the current way to work (Platform V2): new studies are declarative
   `study.yaml` files run by the governed controller, with zero study Python; historical studies are
   references, not templates; the old runtime is `LEGACY_ONLY_FOR_NEW_RESEARCH`. Agent roles: `docs/AI_AGENTS.md`.
+- **FOR A NEW RESEARCH PROJECT:** read `WORKFLOW.md` → §M *Concurrent research projects*, then use `python scripts/research.py study new <id>` and work only in the generated worktree. Never start a study by editing `main`.
 
 - **Claude** also reads `CLAUDE.md`.
 - **Codex** also reads `CODEX.md`.

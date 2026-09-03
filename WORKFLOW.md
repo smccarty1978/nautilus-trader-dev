@@ -4,6 +4,7 @@
 the authoritative system description is `docs/RESEARCH_WORKFLOW.md` (§21 for Platform V2).
 Field-by-field YAML: `docs/RESEARCH_YAML_REFERENCE.md`. Ten-minute version: `docs/QUICKSTART.md`.
 Agents: `docs/AI_AGENTS.md`. Turning a chat discussion into a spec: `docs/RESEARCH_DISCUSSION_TO_YAML.md`.
+Running several studies at once: §M **Concurrent research projects**.
 
 Platform authority: tag `baseline/2026-09-platform-v2-proven`.
 
@@ -346,3 +347,125 @@ Composition first; then §E.
 | audit blocked | `audit/status.json` / `audit/contract_status.json`: verdict and `audited_execution_composite_sha256` must equal the frozen manifest composite |
 
 Every failure is a card on stdout; stage logs are in `studies/<id>/_work/controller/logs/<stage>.log`.
+
+## M. Concurrent research projects
+
+**EVERY NEW RESEARCH PROJECT GETS ITS OWN BRANCH + WORKTREE.**
+**ONE WRITING AGENT = ONE WORKTREE.**
+**NEVER START A NEW RESEARCH STUDY BY EDITING MAIN DIRECTLY.**
+
+The mechanism is `research study new`; do not create study branches or worktrees by hand
+(the CLI also writes the skeleton, the writer lease, the ownership metadata and the branch name).
+
+### M.1 Normal start sequence
+
+```bash
+# 1. start from a clean checkout of main (the canonical repo checkout, not a study worktree)
+git switch main
+git status --short                      # must be empty: study new refuses a dirty source tree
+# 2. confirm main is at the intended Platform V2 authority
+git log --oneline -1
+git describe --tags --abbrev=0          # e.g. baseline/2026-09-platform-v2-proven
+# 3. create the study
+python scripts/research.py study new regime_breakout_context --from-question question.md
+# 4. the card names what was created:
+#      branch:    study/regime_breakout_context
+#      worktree:  <worktree_root>/<repo-name>-regime_breakout_context   (default: sibling of the repo, e.g. ../Nautilus Trader-regime_breakout_context)
+#      study dir: studies/regime_breakout_context/   (research_decision.yaml, SPEC.md, study.yaml, runs/, _work/)
+#      lease:     ~/.nt_research/leases/regime_breakout_context.json   {study_id, branch, worktree, pid, owner, created_at_utc}
+# 5. work ONLY in the generated worktree
+cd "../Nautilus Trader-regime_breakout_context"
+# 6. every study write happens there (study.yaml, compiled_plan.json, audit/, artifacts/, runs/, _work/)
+# 7. other studies live in their own branches and worktrees (repeat 1-6 per study)
+# 8. inspect who owns what
+python scripts/research.py ws list
+```
+
+`study new` branches from the **current checkout's HEAD**. That is why step 1 is `git switch main`
+on the canonical checkout: a study created from a stale or experimental worktree is bound to that
+platform state. If you intentionally branch from a platform branch (`chore/*`), say so in
+`research_decision.yaml`, record the source commit (`base_commit` in the `study new` card), and expect
+the study's closure to be bound to that platform state.
+
+### M.2 What is shared and what is isolated
+
+| Shared, machine-local, read-only or governed | Isolated per study (writes) |
+|---|---|
+| configured catalog roots (`~/.nt_research/config.yaml`) and the Dataset V2 catalogs (immutable, digest-verified) | branch `study/<id>` |
+| the durable model store (`~/.nt_research/models`; content-addressed `model_id`s, idempotent writes) | the sibling worktree |
+| the capability registry and platform source at the study's source commit | `studies/<id>/` (spec, plan, `audit/`, `artifacts/`, `runs/`, `_work/`) |
+| the leases directory (`~/.nt_research/leases`, one file per study) | controller receipts, audit packets, run lock (`_work/controller/`) |
+| | the study closure (`artifacts/study_closure.json`) |
+
+Controller isolation: one live controller per study (`_work/controller/run.lock`; a second run returns
+`STUDY_RUN_ALREADY_LIVE`). Writer isolation: one writing agent per worktree. Two studies never write
+into the same worktree or the same `studies/<id>` tree; read-only auditors may read any worktree.
+
+### M.3 Platform change vs research change
+
+| | Research change | Platform change |
+|---|---|---|
+| branch | `study/<id>` | `chore/<topic>` |
+| worktree | the study's sibling worktree | a separate `chore` worktree (`git worktree add "../<repo>-<topic>" -b chore/<topic> main`) |
+| examples | `study.yaml`, the research question, artifacts, model configuration, analysis declarations, closure | a reusable feature or tracker capability, compiler, host, outcome kernel, controller, dataset builder, docs of the platform |
+
+A study agent must not modify shared Platform V2 infrastructure inside its study branch as a
+study-local workaround. When a genuine `CapabilityGap` needs platform work, the sanctioned sequence is:
+
+1. `research cap propose <yaml>` (the proposal records the gap and the closest existing primitives);
+2. create an isolated `chore/<topic>` worktree from `main`;
+3. `research cap scaffold <id>`, implement, synthetic causal test, parity/oracle evidence, `research cap promote <id> --parity <json>`, `research cap generate --check`;
+4. merge the platform change into `main` with `--no-ff`;
+5. in the study worktree: `git merge --no-ff main` (or the chore branch, if the platform change is not yet on main and that is recorded);
+6. re-run `python scripts/run_governed_study.py --study studies/<id> --through tests --execute-authorized`: the closure composite changed, so compile/prepare/readiness/preflight/tests re-execute and
+7. the causal and contract audits are redone as delta passes on the new composite (`research audit ingest`), then reseal.
+
+This is exactly how the three proof studies absorbed platform fixes.
+
+### M.4 Lease semantics (as implemented in `research_workflow/workspace.py`)
+
+| state | meaning | writing allowed? |
+|---|---|---|
+| `live` | the lease's worktree exists and the PID that created it is alive | only that writer; `study new` refuses a second live lease on the same worktree (`WRITER_LEASE_HELD`) |
+| `stale` | the worktree exists but the creating PID is dead (session ended, machine restarted) | the worktree is unowned; `research ws list --reclaim` deletes the stale lease, after which one writer may take the worktree |
+| `dead` | the lease's worktree no longer exists | nothing to write; `research ws list --reclaim` deletes the record |
+
+Ownership is the `owner` (user@host) and `pid` in the lease file, written once by `study new`. Never
+delete or edit lease files by hand and never take over a `live` lease: if two agents must work on the
+same study, the second one waits or takes a different study. `research ws list` shows, per worktree,
+the branch, HEAD, dirty state, owner and lease state; `research ws list --reclaim` is the only sanctioned
+reclaim command and touches only `stale`/`dead` leases. The controller's `run.lock` independently
+prevents two live runs of the same study.
+
+### M.5 Example: three concurrent studies
+
+```bash
+cd "C:/Users/<you>/Projects/Nautilus Trader" && git switch main && git status --short
+python scripts/research.py study new regime_breakout_context   --from-question q_breakout.md
+python scripts/research.py study new pullback_quality_target   --from-question q_pullback.md
+python scripts/research.py study new cross_market_context      --from-question q_cross.md
+python scripts/research.py ws list          # three live leases, three worktrees, three branches
+# agent A
+cd "../Nautilus Trader-regime_breakout_context" && python scripts/research.py study compile --study studies/regime_breakout_context
+# agent B
+cd "../Nautilus Trader-pullback_quality_target" && python scripts/research.py study compile --study studies/pullback_quality_target
+# agent C
+cd "../Nautilus Trader-cross_market_context" && python scripts/research.py study compile --study studies/cross_market_context
+```
+
+They run concurrently because they have separate branches, worktrees, study directories and
+controller locks, while sharing the immutable catalogs, the platform code at their source commits and
+the durable model store (content-addressed; concurrent stores of different models never collide).
+
+### M.6 Closure and merge back
+
+```bash
+python scripts/research.py study status --study studies/<id>         # state STUDY_CLOSED
+git -C "../Nautilus Trader-<id>" status --short                       # clean
+git -C "../Nautilus Trader-<id>" add studies/<id> && git -C "../Nautilus Trader-<id>" commit -m "study(<id>): STUDY_CLOSED ..."
+git switch main && git merge --no-ff study/<id>                        # history preserved; never squash
+python scripts/research.py ws list --reclaim                           # the finished study's lease is stale once its session ended
+```
+
+The merged `studies/<id>/` on `main` is the study's persisted authority (closure, audits, seal, parity).
+

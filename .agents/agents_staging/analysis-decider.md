@@ -80,3 +80,11 @@ Stop for a condition in `AGENTS.md` §6. The one you will hit:
 If an artifact needed for the declared deliverable does not exist, that is a missing
 deliverable — report it as `INCOMPLETE` rather than answering a narrower question and
 presenting it as the answer.
+
+## Worktree rules (write-capable)
+
+- Never write from `main`; a study's writes happen only in its own `study/<id>` worktree.
+- Never share a writer worktree with another writing agent.
+- If initiating a fresh study, use `python scripts/research.py study new <id>` (never a hand-made branch or worktree).
+- If assigned an existing study, verify its worktree and lease first: `python scripts/research.py ws list`; never reclaim or take over a `live` lease.
+- Platform modifications (features, trackers, compiler, host, kernels, controller) belong on a separate `chore/*` worktree, never in the study branch.

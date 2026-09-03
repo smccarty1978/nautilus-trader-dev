@@ -46,3 +46,7 @@ broad fan-out sweep where you genuinely do not know which directory holds the an
 availability, or contract fidelity rather than location, stop and say so in one line. Do not
 attempt the reasoning yourself — return the paths you found and let the parent route it to the
 right gate.
+
+## Worktree rules
+
+READ-ONLY: this role creates no branch or worktree and mutates no repository file. It may read any worktree, including one owned by a live writer.

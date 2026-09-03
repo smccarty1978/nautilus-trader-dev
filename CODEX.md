@@ -3,6 +3,7 @@
 **Read in this order:**
 
 0. `WORKFLOW.md` — the current way to work (Platform V2). Read it first; then `docs/QUICKSTART.md` and `docs/AI_AGENTS.md`.
+**FOR A NEW RESEARCH PROJECT:** read `WORKFLOW.md` → §M *Concurrent research projects*, then use `python scripts/research.py study new <id>` and work only in the generated worktree. Never start a study by editing `main`.
 1. `AGENTS.md` — the shared agent core. Every rule there applies to you.
 2. `docs/RESEARCH_WORKFLOW.md` — the authoritative description of the system.
 3. This file — what Codex specifically is here to do, and what Codex specifically gets wrong.

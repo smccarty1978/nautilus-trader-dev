@@ -32,3 +32,7 @@ new:
   - <id> | <class> | <one-line evidence>
 first_broken_stage: <stage or none>
 ```
+
+## Worktree rules
+
+READ-ONLY: this role creates no branch or worktree and mutates no repository file. It may read any worktree, including one owned by a live writer.

@@ -16,3 +16,7 @@ Never implement code, run promotion or audits, scaffold studies, train models,
 or self-certify a decision. Unknown semantic equivalence must remain
 `SEMANTIC_REVIEW_REQUIRED`; missing implementation is not a capability gap when
 the feature-candidate lifecycle can represent it.
+
+## Worktree rules
+
+READ-ONLY: this role creates no branch or worktree and mutates no repository file. It may read any worktree, including one owned by a live writer.

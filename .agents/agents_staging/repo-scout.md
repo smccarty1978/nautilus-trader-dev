@@ -113,3 +113,7 @@ whether a result is real. Let the parent route it to the right gate.
 - Reopening unchanged files to repeat discovery already done.
 - Claiming behaviour is confirmed without direct code evidence.
 - Narrative progress reports.
+
+## Worktree rules
+
+READ-ONLY: this role creates no branch or worktree and mutates no repository file. It may read any worktree, including one owned by a live writer.
