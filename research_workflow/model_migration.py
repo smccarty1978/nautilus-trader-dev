@@ -150,8 +150,17 @@ def migrate_train_freeze_bundle(*, study_id: str, freeze_path: Path, bundle_path
     bundle_path = Path(bundle_path).resolve()
     repo_root = Path(repo_root).resolve()
     freeze_rel = freeze_path.relative_to(repo_root).as_posix()
-    freeze_sha = ms._sha(freeze_path)
-    freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+    # Authoritative bytes are the git HEAD blob, not the working-tree file: on Windows a
+    # working copy checked out with CRLF line endings hashes differently from the LF blob
+    # git actually committed, which would silently record a sha the verifier (which also
+    # reads the HEAD blob) can never reproduce. `authoritative_freeze_bytes` fails closed
+    # (ModelStoreError) if the freeze is not committed identical.
+    from research_workflow.policy import head_blob_git_sha
+
+    freeze_blob = ms.authoritative_freeze_bytes(repo_root, freeze_path)
+    freeze_sha = hashlib.sha256(freeze_blob).hexdigest()
+    freeze_head_sha = head_blob_git_sha(repo_root, freeze_rel)
+    freeze = json.loads(freeze_blob.decode("utf-8"))
     if freeze.get("study_id") != study_id:
         raise ms.ModelStoreError(f"TRAIN_FREEZE_STUDY_MISMATCH: {freeze.get('study_id')!r} != {study_id!r}")
     bundle = joblib.load(bundle_path)
@@ -160,6 +169,7 @@ def migrate_train_freeze_bundle(*, study_id: str, freeze_path: Path, bundle_path
 
     report: Dict[str, Any] = {
         "study_id": study_id, "freeze_path": freeze_rel, "freeze_sha256": freeze_sha,
+        "freeze_sha256_source": "git_head_blob", "freeze_head_sha": freeze_head_sha,
         "bundle_path": str(bundle_path), "bundle_sha256": ms._sha(bundle_path),
         "arms": {}, "migrated": 0, "already_present": 0, "failed": [],
     }
@@ -185,6 +195,7 @@ def migrate_train_freeze_bundle(*, study_id: str, freeze_path: Path, bundle_path
             )
             legacy_registry_record = {
                 "train_freeze_path": freeze_rel, "train_freeze_sha256": freeze_sha, "arm": arm,
+                "train_freeze_sha256_source": "git_head_blob", "train_freeze_head_sha": freeze_head_sha,
                 "train_freeze_preprocessing_hash": freeze.get("preprocessing_hash"),
                 "train_freeze_provenance": freeze.get("provenance"),
             }

@@ -1,7 +1,9 @@
 {
   "study_id": "clean_maturity_flip_model_rolling_productivity",
   "freeze_path": "studies/clean_maturity_flip_model_rolling_productivity/artifacts/train_experiment_freeze.json",
-  "freeze_sha256": "ef7e83b778362412ed0329fda93b2b183a23a8097637046df579c6e53a77cc3e",
+  "freeze_sha256": "392a75696ba19b8a832937db6fc4150e6b00a7e5652d933f9141624870e8e016",
+  "freeze_sha256_source": "git_head_blob",
+  "freeze_head_sha": "36985f744b3695d039441cffa8d0625e994b1946",
   "bundle_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\clean_maturity_flip_model_rolling_productivity\\artifacts\\train_fitted_models.joblib",
   "bundle_sha256": "03f602c5b38915c2a80ef474aba0ca95c6d3fbcb634243c24b8fa0a63a1aaa89",
   "arms": {
@@ -38,5 +40,7 @@
   },
   "migrated": 6,
   "already_present": 0,
-  "failed": []
+  "failed": [],
+  "removed_test_pollution": null,
+  "note": "The 476 vs 475 discrepancy flagged for investigation was NOT a stray fixture model entry. models/ directory listing included models/.staging (the internal in-progress staging dir used by store_model, promoted-then-removed per model write; empty at time of audit), which is not a registered model and carries no manifest.json. Enumerating only directories with a manifest.json gives exactly 475 before this re-registration step (468 regime_transition_target_before_stop_v1 + 6 clean_maturity_flip_model_rolling_productivity + 1 v2_shape_a_flip_180s), and 475 after removing the 6 stale Model C entries (469) and re-registering 6 fresh ones (475). No entry outside the three known study_ids exists in the store; nothing was deleted under this instruction."
 }

@@ -163,13 +163,14 @@ def test_score_equivalence_store_vs_legacy_bundle(tmp_path: Path, root: Path):
 
 
 def test_untracked_freeze_unverifiable(tmp_path: Path, root: Path):
+    """The migrator now hashes the git HEAD blob (``authoritative_freeze_bytes``), so an
+    uncommitted freeze fails closed AT MIGRATION TIME -- it never reaches the store with a
+    working-tree-derived sha256 that the verifier could later disagree with."""
     repo, freeze_path, bundle_path, freeze = _build_repo(tmp_path, commit_freeze=False)
-    report = migrate_train_freeze_bundle(study_id="redteam_model_c", freeze_path=freeze_path,
-                                         bundle_path=bundle_path, repo_root=repo,
-                                         train_frame=None, model_root=root, golden_rows=64)
-    model_id = report["arms"]["LONG_A"]["model_id"]
     with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_UNVERIFIABLE"):
-        ms.authenticate_model(model_id, model_root=root, repo_root=repo)
+        migrate_train_freeze_bundle(study_id="redteam_model_c", freeze_path=freeze_path,
+                                    bundle_path=bundle_path, repo_root=repo,
+                                    train_frame=None, model_root=root, golden_rows=64)
 
 
 def test_tampered_freeze_bytes_mismatch(tmp_path: Path, root: Path):
@@ -210,6 +211,71 @@ def test_bundle_arm_fit_identity_disagrees_with_freeze_fails_only_that_arm(tmp_p
     assert report["failed"][0]["arm"] == "LONG_A"
     assert "BUNDLE_FREEZE_FIT_IDENTITY_MISMATCH" in report["failed"][0]["error"]
     assert "LONG_B" in report["arms"]
+
+
+def test_train_freeze_sha256_hashes_head_blob_not_working_tree_crlf(tmp_path: Path, root: Path):
+    """Regression for the CRLF/committed-blob divergence: on a checkout with
+    ``core.autocrlf=true`` (Windows default for many installs), the working-tree bytes of a
+    committed text file can be CRLF while the git blob at HEAD is LF. ``git hash-object``
+    (what ``is_committed_identical``/``require_committed_identical`` use) normalizes CRLF to
+    LF before comparing, so the freeze is still ``is_committed_identical`` -- but a naive
+    ``hashlib.sha256`` of the raw working-tree bytes is a DIFFERENT sha256 from the HEAD blob.
+    The migrator and the verifier must agree on which one is authoritative (the HEAD blob) or
+    every migrated model fails ``authenticate_model`` with MODEL_IDENTITY_MISMATCH."""
+    repo, freeze_path, bundle_path, freeze = _build_repo(tmp_path)
+    _git(repo, "config", "core.autocrlf", "true")
+    # The real defect only manifests when the committed blob has embedded newlines (`_build_repo`
+    # commits single-line ``json.dumps`` bytes with none); rewrite+recommit as pretty-printed JSON
+    # with LF newlines so CRLF conversion actually changes bytes, matching the real study's
+    # multi-line freeze file.
+    lf_bytes = (json.dumps(freeze, indent=2) + "\n").encode("utf-8")
+    freeze_path.write_bytes(lf_bytes)
+    _git(repo, "add", "studies/redteam_model_c/artifacts/train_experiment_freeze.json")
+    _git(repo, "commit", "-q", "-m", "reformat freeze with newlines")
+    head_blob = subprocess.run(
+        ["git", "cat-file", "blob", "HEAD:studies/redteam_model_c/artifacts/train_experiment_freeze.json"],
+        cwd=str(repo), capture_output=True, check=True,
+    ).stdout
+    assert head_blob == lf_bytes
+    head_blob_sha256 = hashlib.sha256(head_blob).hexdigest()
+    # Rewrite the working copy with CRLF line endings -- committed-identical under
+    # core.autocrlf normalization (git hash-object normalizes CRLF->LF before comparing), but
+    # byte-different from the HEAD blob under a naive hashlib.sha256 read.
+    crlf_bytes = head_blob.replace(b"\n", b"\r\n")
+    freeze_path.write_bytes(crlf_bytes)
+    working_tree_sha256 = hashlib.sha256(crlf_bytes).hexdigest()
+    assert working_tree_sha256 != head_blob_sha256
+    from research_workflow.policy import is_committed_identical
+    assert is_committed_identical(repo, freeze_path)
+    assert ms.authoritative_freeze_bytes(repo, freeze_path) == head_blob
+
+    train_frame = _train_frame(n=300, seed=1)
+    report = migrate_train_freeze_bundle(study_id="redteam_model_c", freeze_path=freeze_path,
+                                         bundle_path=bundle_path, repo_root=repo,
+                                         train_frame=train_frame, model_root=root, golden_rows=64)
+    assert report["migrated"] == 2 and not report["failed"]
+    assert report["freeze_sha256"] == head_blob_sha256
+    assert report["freeze_sha256_source"] == "git_head_blob"
+
+    for arm in ("LONG_A", "LONG_B"):
+        model_id = report["arms"][arm]["model_id"]
+        manifest = ms.read_manifest(model_id, root)
+        legacy = manifest["legacy_registry_record"]
+        assert legacy["train_freeze_sha256"] == head_blob_sha256
+        assert legacy["train_freeze_sha256"] != working_tree_sha256
+        assert legacy["train_freeze_sha256_source"] == "git_head_blob"
+        evidence = ms.authenticate_model(model_id, model_root=root, repo_root=repo)
+        assert evidence["golden"]["status"] == "PASS"
+        assert evidence["golden"]["max_abs_diff"] == 0.0
+
+    # A manifest that declared the working-tree (CRLF) sha256 instead must fail closed.
+    bad_model_id = report["arms"]["LONG_A"]["model_id"]
+    manifest_path = ms.model_dir(bad_model_id, root) / "manifest.json"
+    bad_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    bad_manifest["legacy_registry_record"]["train_freeze_sha256"] = working_tree_sha256
+    manifest_path.write_text(json.dumps(bad_manifest), encoding="utf-8")
+    with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_MISMATCH"):
+        ms.authenticate_model(bad_model_id, model_root=root, repo_root=repo)
 
 
 def test_model_id_distinct_from_v2_lineage_formula(tmp_path: Path, root: Path):
