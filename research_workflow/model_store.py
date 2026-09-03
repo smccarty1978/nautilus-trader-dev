@@ -415,6 +415,70 @@ IDENTITY_RULES: Dict[str, Any] = {
 }
 
 LEGACY_V1_COMMITTED_REGISTRY_RULE = "legacy_v1_committed_registry"
+LEGACY_V1_TRAIN_FREEZE_RULE = "legacy_v1_train_freeze"
+
+
+def _recompute_legacy_v1_train_freeze_id(study_id: str, arm: str, fit_identity_sha256: str, freeze_sha256: str) -> str:
+    return canonical_sha256({"study_id": study_id, "arm": arm, "fit_identity_sha256": fit_identity_sha256, "freeze_sha256": freeze_sha256})
+
+
+def _verify_legacy_v1_train_freeze(manifest: Mapping[str, Any], model_id: str, repo_root: Path) -> None:
+    """Authenticate a Model-C-shaped legacy parent -- ONE joblib bundle of several arms
+    fit directly by a v1 study, with NO per-model ``studies/model_registry/<model_id>.json``
+    record (``legacy_v1_committed_registry`` grants no authority here) -- against its still
+    git-tracked TRAIN freeze (``studies/<study_id>/artifacts/train_experiment_freeze.json``).
+
+    The freeze is authoritative: it must be committed at git HEAD, its bytes must match the
+    manifest-declared sha256, and its own ``freeze_sha256`` must self-recompute (the same
+    ``canonical_sha256`` formula ``research_workflow.experiment.write_train_freeze`` uses --
+    every field except ``generated_at_utc``/``freeze_sha256``). ``freeze["model_hashes"][arm]``
+    must equal the manifest's own ``lineage.fit_identity_sha256`` (the arm's bundle-recorded
+    fit identity), and ``freeze["feature_sets"][<family>]`` (family = the arm's ``_A``/``_B``/
+    ``_C`` suffix) must equal the manifest's ``lineage.ordered_inputs`` exactly.
+    ``model_id`` is ``canonical_sha256({study_id, arm, fit_identity_sha256, freeze_sha256})`` --
+    distinct from any v2-fit or v1-registry id, so bytes from a different freeze or a
+    different arm can never collide with it.
+    """
+    from research.analysis.identity import canonical_sha256 as _canon
+    from research_workflow.policy import _git_tracked
+
+    lineage = manifest.get("lineage") or {}
+    legacy = manifest.get("legacy_registry_record") or {}
+    study_id = lineage.get("study_id")
+    arm = legacy.get("arm")
+    freeze_rel = legacy.get("train_freeze_path")
+    freeze_sha_declared = legacy.get("train_freeze_sha256")
+    fit_identity = lineage.get("fit_identity_sha256")
+    if not study_id or not arm or not freeze_rel or not freeze_sha_declared or not fit_identity:
+        raise ModelStoreError(
+            "MODEL_IDENTITY_UNVERIFIABLE: legacy_v1_train_freeze manifest missing one of "
+            "study_id/legacy_registry_record.arm/train_freeze_path/train_freeze_sha256/lineage.fit_identity_sha256"
+        )
+    freeze_path = Path(repo_root) / freeze_rel
+    if not freeze_path.is_file() or not _git_tracked(Path(repo_root), freeze_rel):
+        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: TRAIN freeze {freeze_rel} is missing or not committed to git at HEAD")
+    if _sha(freeze_path) != freeze_sha_declared:
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: TRAIN freeze bytes sha256 != manifest-declared {freeze_sha_declared!r}")
+    freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+    recomputed_freeze_sha = _canon({k: v for k, v in freeze.items() if k not in ("generated_at_utc", "freeze_sha256")})
+    if recomputed_freeze_sha != freeze.get("freeze_sha256"):
+        raise ModelStoreError("MODEL_IDENTITY_UNVERIFIABLE: TRAIN freeze freeze_sha256 does not self-recompute")
+    if freeze.get("study_id") != study_id:
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: TRAIN freeze study_id {freeze.get('study_id')!r} != manifest lineage.study_id {study_id!r}")
+    if freeze.get("provenance") != "TRAIN_ONLY":
+        raise ModelStoreError("MODEL_IDENTITY_MISMATCH: TRAIN freeze is not TRAIN_ONLY")
+    if freeze.get("model_hashes", {}).get(arm) != fit_identity:
+        raise ModelStoreError(
+            f"MODEL_IDENTITY_MISMATCH: TRAIN freeze model_hashes[{arm!r}]={freeze.get('model_hashes', {}).get(arm)!r} "
+            f"!= manifest lineage.fit_identity_sha256={fit_identity!r}"
+        )
+    family = arm.rsplit("_", 1)[-1] if "_" in arm else arm
+    ordered_inputs = list(lineage.get("ordered_inputs") or [])
+    if list(freeze.get("feature_sets", {}).get(family, ())) != ordered_inputs:
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: TRAIN freeze feature_sets[{family!r}] != manifest lineage.ordered_inputs")
+    recomputed_id = _recompute_legacy_v1_train_freeze_id(study_id, arm, fit_identity, freeze.get("freeze_sha256"))
+    if recomputed_id != model_id:
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: legacy_v1_train_freeze recomputes {recomputed_id} != requested {model_id}")
 
 
 def _verify_legacy_v1_committed_registry(manifest: Mapping[str, Any], model_id: str, repo_root: Path) -> None:
@@ -503,6 +567,8 @@ def authenticate_model(model_id: str, *, expect: Optional[Mapping[str, Any]] = N
             raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {model_id} has no recomputable identity_rule (no committed legacy registry record and does not reproduce v2_lineage_sha256)")
     elif identity_rule == LEGACY_V1_COMMITTED_REGISTRY_RULE:
         _verify_legacy_v1_committed_registry(manifest, model_id, repo_root)
+    elif identity_rule == LEGACY_V1_TRAIN_FREEZE_RULE:
+        _verify_legacy_v1_train_freeze(manifest, model_id, repo_root)
     else:
         recompute = IDENTITY_RULES.get(identity_rule)
         if recompute is None:
@@ -695,6 +761,6 @@ def list_store(model_root: Optional[Path] = None) -> List[Dict[str, Any]]:
 
 
 __all__ = ["SCHEMA_VERSION", "GOLDEN_MIN_ROWS", "FAMILY_AUTHORITY", "EXPORT_TOLERANCES", "EXPORT_STATES", "SELECTION_STATES", "TIERS",
-           "IDENTITY_RULES", "LEGACY_V1_COMMITTED_REGISTRY_RULE", "ModelStoreError", "ModelLineage", "family_authority", "build_golden_frame", "store_model", "validate_golden",
+           "IDENTITY_RULES", "LEGACY_V1_COMMITTED_REGISTRY_RULE", "LEGACY_V1_TRAIN_FREEZE_RULE", "ModelStoreError", "ModelLineage", "family_authority", "build_golden_frame", "store_model", "validate_golden",
            "authenticate_model", "add_export", "resolve", "score", "record_fit", "list_store", "read_manifest", "model_dir",
            "model_store_root", "load_canonical", "save_canonical"]
