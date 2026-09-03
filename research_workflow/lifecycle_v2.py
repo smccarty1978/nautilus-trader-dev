@@ -575,7 +575,7 @@ class V2Lifecycle:
             from research_workflow.tuning import tune
             tuning_report = tune(study_id=plan["study"]["id"], frame=binary, features=features, label=label, family=family, base_params=params, seed=seed,
                                  search_space=model["search_space"], validation=validation, artifacts_dir=self.artifacts,
-                                 identities={"plan_sha256": plan["plan_sha256"], "population_identity": merge_identity,
+                                 identities={"plan_sha256": plan["plan_sha256"], "population_identity": merge_identity, "execution_closure_composite": closure,
                                              "target_contract_sha256": hashlib.sha256(json.dumps(plan["outcome"], sort_keys=True, default=str).encode()).hexdigest(),
                                              "feature_contract_sha256": hashlib.sha256(json.dumps(features).encode()).hexdigest(), "preprocessing_contract_sha256": "identity"})
             params = dict(tuning_report["selected"]["params"])

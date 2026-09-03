@@ -237,7 +237,10 @@ class ModelSpec(_Strict):
     models: List[ScoredModelSpec] = Field(default_factory=list)   # required for mode: score
     # Bounded TRAIN-only hyperparameter search over walk-forward folds of validation.tuning_years.
     # param -> [choices] | {low, high, log?: bool, int?: bool}; sampler = validation.protocol
-    # (model_selection.random | model_selection.optuna), trials = validation.max_trials, seed = validation.random_seed.
+    # (model_selection.random | model_selection.optuna), trials = validation.max_trials.
+    # random_seed governs the SAMPLER (random-search RNG / Optuna TPESampler seed) only; when
+    # absent the sampler falls back to model.params.random_state|seed. The estimator fit on
+    # each fold always uses model.params.random_state|seed, never random_seed.
     search_space: Dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
