@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -133,6 +134,19 @@ def test_legitimate_historical_study_passes():
     assert evidence["seal_composite"] == evidence["manifest_composite"]
     result = assert_old_runtime_allowed(study_dir, repo_root=REPO_ROOT)
     assert result["platform"] == "v1_historical"
+
+
+def test_evidence_names_the_vouching_commit(tmp_path):
+    """WARN-2: the returned evidence dict names the exact HEAD commit (40-hex sha) and branch
+    it authenticated against, not just that *some* commit vouched."""
+    repo = _init_repo(tmp_path)
+    seal, manifest = _valid_seal_and_manifest("study_head")
+    _write_study(repo, "study_head", seal, manifest, commit=True)
+    evidence = verify_historical_authority(repo / "studies" / "study_head", repo_root=repo)
+    assert re.fullmatch(r"[0-9a-f]{40}", evidence["head_sha"] or "")
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(repo), capture_output=True, text=True, check=True).stdout.strip()
+    assert evidence["head_sha"] == head
+    assert evidence["branch"]
 
 
 # ---------------------------------------------------------------------------

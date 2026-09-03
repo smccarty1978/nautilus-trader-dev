@@ -98,6 +98,27 @@ def _git_tracked(repo_root: Path, rel_posix_path: str) -> bool:
     return r.returncode == 0 and bool(r.stdout.strip())
 
 
+def _head_identity(repo_root: Path) -> Dict[str, Optional[str]]:
+    """The commit and branch a ``committed_blob``/``is_committed_identical`` check just
+    resolved ``HEAD:<path>`` against. WARN-2: the trust boundary of every historical-authority
+    grant in this module is *the checked-out repository history at this HEAD* -- a forged
+    commit reached via detached HEAD, a linked ``git worktree``, or a re-pointed branch tip is
+    indistinguishable from a reviewed commit unless the evidence names which commit vouched;
+    this is recorded for audit, not enforced (a further ancestor-of-upstream check is out of
+    scope here)."""
+    try:
+        rev = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(repo_root), capture_output=True, text=True)
+        head_sha = rev.stdout.strip() if rev.returncode == 0 else None
+    except OSError:
+        head_sha = None
+    try:
+        br = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=str(repo_root), capture_output=True, text=True)
+        branch = br.stdout.strip() if br.returncode == 0 else None
+    except OSError:
+        branch = None
+    return {"head_sha": head_sha or None, "branch": branch or "HEAD"}
+
+
 def committed_blob(repo_root: Path, rel_posix_path: str) -> Optional[bytes]:
     """The bytes of ``rel_posix_path`` as committed at HEAD, or ``None`` if that path does
     not exist at HEAD (untracked, staged-but-uncommitted, deleted, or committed only on a
@@ -187,7 +208,10 @@ def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = Non
     """Authenticate a v1 study's historical execution authority. Raises OldRuntimePolicyError.
 
     Returns an evidence dict on success:
-    ``{study_id, seal_sha256, seal_composite, manifest_composite, git_tracked, markers}``.
+    ``{study_id, seal_sha256, seal_composite, manifest_composite, git_tracked, markers,
+    head_sha, branch}``. Trust boundary (WARN-2): every check in this function resolves
+    ``HEAD:<path>`` in *this checkout's* current history -- ``head_sha``/``branch`` name the
+    exact commit that vouched, so a downstream reviewer can tell which commit granted it.
     """
     import hashlib
 
@@ -265,6 +289,7 @@ def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = Non
         "manifest_composite": manifest_composite,
         "git_tracked": True,
         "markers": markers,
+        **_head_identity(repo_root),
     }
 
 

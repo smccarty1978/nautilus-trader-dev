@@ -861,11 +861,27 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
     if direction is None:
         ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.direction", "the outcome direction reference is not declared")
     max_gap = duration_seconds(o.max_gap) * NS if o.max_gap else None
+    # WARN-3: under horizon_end_rule "strict" the unobserved span is measured as
+    # `horizon_end - prev_ts`, so a max_gap that is not strictly shorter than the horizon
+    # can never be exceeded: a tape with no interior observations resolves through the
+    # expiry policy instead of censoring GAP, and the label then depends on `expiry` rather
+    # than on the declared gap tolerance. Refuse (as a semantic decision, not silently) when
+    # max_gap is at or beyond the smallest horizon it is meant to guard.
+    strict_gap_rule = ("max_gap must be shorter than the horizon under strict, else a horizon with "
+                        "zero interior observations expires instead of censoring GAP")
+    if o.horizon_end_rule == "strict" and max_gap is not None:
+        candidate_horizons = [a["horizon_ns"] for a in arms if a.get("horizon_ns")]
+        if flip and flip.get("horizon_ns"):
+            candidate_horizons.append(flip["horizon_ns"])
+        if candidate_horizons and max_gap >= min(candidate_horizons):
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.max_gap", strict_gap_rule,
+                    max_gap_ns=max_gap, min_horizon_ns=min(candidate_horizons))
     stream = population.get("cadence", {}).get("stream")
     contract: Dict[str, Any] = {
         "contract": o.kind, "kernel": kernel, "direction": direction, "direction_sign": (-1 if o.relation == "fade" else 1),
         "relation": o.relation, "atr": atr, "atr_availability": (o.atr_availability or "at_decision_delivery"), "entry_reference": o.entry_reference,
         "session_end_censoring": o.session_end == "censor", "max_gap_ns": max_gap, "same_bar_rule": o.same_bar_rule, "horizon_end_rule": o.horizon_end_rule,
+        "strict_gap_rule": strict_gap_rule,
         "resolution_precedence": ["SESSION_END", "GAP", "BARRIER_TOUCH", "HORIZON_EXPIRY"],
         "arms": arms, "primary_arm": primary, "flip": flip, "stream": stream, "label_column": o.label_column or "target_flip_within_horizon",
         "composition": ({"logic": o.composition, "children": [a["id"] for a in arms] + (["event"] if flip else [])} if (arms and flip) else None),

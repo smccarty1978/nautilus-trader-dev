@@ -807,13 +807,33 @@ class V2Lifecycle:
         frame = c.merge(o[list(KEY) + [label, "disposition"]], on=list(KEY), how="inner")
         summary: Dict[str, Any] = {"rows": int(len(frame)), "dispositions": frame["disposition"].value_counts().to_dict()}
         models = _read(self.artifacts / "experiment_models.json")
+        # WARN-1: OOS scoring must be bound to the model bytes the TRAIN freeze committed to,
+        # not merely to the (lineage-derived) model_id -- a post-freeze estimator substitution
+        # that refreshes its own canonical/golden bytes under the unchanged model_id would
+        # otherwise re-authenticate and score silently. Read the freeze's own recorded
+        # canonical shas and pass them as `expect.canonical_sha256`.
+        freeze_path = self.artifacts / "train_experiment_freeze.json"
+        if not freeze_path.is_file():
+            raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: no TRAIN freeze found for study '{plan['study']['id']}'")
+        freeze_canonical = _read(freeze_path).get("model_canonical_sha256") or {}
         if models.get("mode") == "score":
-            summary["frozen_models_oos"] = self._score_models(self._train_frame_all_labels(plan, base, [int(y) for y in years]), models["models"])
+            bound_models = []
+            for m in models["models"]:
+                csha = freeze_canonical.get(m["name"])
+                if not csha:
+                    raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: model '{m['name']}' has no TRAIN freeze canonical sha")
+                expect = dict(m.get("expect") or {})
+                expect["canonical_sha256"] = csha
+                bound_models.append({**m, "expect": expect})
+            summary["frozen_models_oos"] = self._score_models(self._train_frame_all_labels(plan, base, [int(y) for y in years]), bound_models)
             summary["train_metrics"] = [{k: m[k] for k in ("name", "id", "metrics_by_year")} for m in models["models"]]
         elif models.get("model_id"):
             from research.analysis.metrics import brier, pr_auc, roc_auc
             from research_workflow.model_store import authenticate_model, score
-            authentication = authenticate_model(models["model_id"], expect={"study_id": plan["study"]["id"]}, model_root=self.opts.model_root)
+            csha = freeze_canonical.get("primary")
+            if not csha:
+                raise LifecycleV2Error("FREEZE_CANONICAL_SHA_MISSING: no primary canonical sha in TRAIN freeze")
+            authentication = authenticate_model(models["model_id"], expect={"study_id": plan["study"]["id"], "canonical_sha256": csha}, model_root=self.opts.model_root)
             binary = frame[frame[label].isin([0, 1, 0.0, 1.0])]
             s = score(models["model_id"], binary[models["features"]], model_root=self.opts.model_root)
             summary["oos_metrics"] = {"n": int(len(binary)), "roc_auc": roc_auc(binary[label], s).to_dict().get("value"),
