@@ -64,7 +64,7 @@ def test_e1a_pruned_trial_with_lucky_partial_value_cannot_be_selected(tmp_path, 
     assert len(pruned) == 1, "attack setup did not produce exactly one PRUNED trial"
     p = pruned[0]
     assert p["eligible"] is False
-    assert p["ineligible_reason"] in ("NO_FOLD_SCORES", "INCOMPLETE_FOLDS", "NULL_FOLD_SCORE")
+    assert p["ineligible_reason"] == "PRUNED"  # state-first: the state itself, not a fold-score reason
 
     complete = [t for t in ledger["trials"] if t["state"] == "COMPLETE"]
     assert complete, "attack setup produced no COMPLETE trial to compare against"

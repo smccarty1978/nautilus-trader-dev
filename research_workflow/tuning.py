@@ -20,10 +20,12 @@ random sampler: every fold evaluated) *and* has a fold_scores list of exactly
 ``len(folds)`` non-None values. The selected aggregate is always recomputed from those
 per-fold scores (``mean_over_folds``) -- never taken from Optuna's own ``trial.value``, which
 for a PRUNED trial is its last-reported intermediate (partial) value, not the final objective.
-PRUNED / FAIL / RUNNING / WAITING trials, and any trial with a short or partially-None
-fold_scores list, are recorded in the ledger with ``eligible: false`` and an
-``ineligible_reason`` but can never be selected. If no trial is eligible, ``tune`` raises
-``TuningError("TUNING_NO_COMPLETE_TRIAL")``.
+Eligibility is checked state-first: any non-COMPLETE trial (PRUNED / FAIL / RUNNING / WAITING)
+is ineligible with the state itself as ``ineligible_reason`` (e.g. ``"PRUNED"``), regardless of
+what its own possibly-partial fold_scores look like. Only for a COMPLETE trial are the
+fold-score completeness reasons (``NO_FOLD_SCORES`` / ``INCOMPLETE_FOLDS`` / ``NULL_FOLD_SCORE``)
+ever used. Ineligible trials are recorded in the ledger with ``eligible: false`` but can never be
+selected. If no trial is eligible, ``tune`` raises ``TuningError("TUNING_NO_COMPLETE_TRIAL")``.
 
 Intermediate reporting to the Optuna pruner reports the *raw* per-fold score at every step,
 unconditionally (no sign flip for ``brier``). Optuna's ``MedianPruner`` compares intermediate
@@ -231,9 +233,8 @@ def tune(*, study_id: str, frame, features: List[str], label: str, family: str, 
                         raise optuna.TrialPruned()
             scores = evaluate(params, report)
             trial.set_user_attr("fold_scores", scores)
-            agg, eligible, reason = _recompute_aggregate(scores, n_folds)
+            agg, eligible, _reason = _recompute_aggregate(scores, n_folds)
             if not eligible:
-                trial.set_user_attr("ineligible_reason", reason)
                 raise optuna.TrialPruned()
             return agg
 
@@ -242,11 +243,16 @@ def tune(*, study_id: str, frame, features: List[str], label: str, family: str, 
             ostudy.optimize(objective, n_trials=remaining, n_jobs=1)
         for t in ostudy.trials:
             fold_scores = t.user_attrs.get("fold_scores")
-            agg, eligible, reason = _recompute_aggregate(fold_scores, n_folds)
             state = str(t.state.name)
+            # State is checked FIRST: any non-COMPLETE trial (PRUNED/FAIL/RUNNING/WAITING) is
+            # ineligible with the state itself as the reason, regardless of what its (possibly
+            # partial) fold_scores look like. Only a COMPLETE trial's fold-score completeness is
+            # then checked, so a COMPLETE trial can still be ineligible on INCOMPLETE_FOLDS /
+            # NULL_FOLD_SCORE / NO_FOLD_SCORES if its recorded scores are somehow short or null.
             if state != "COMPLETE":
-                eligible = False
-                reason = t.user_attrs.get("ineligible_reason") or state
+                agg, eligible, reason = None, False, state
+            else:
+                agg, eligible, reason = _recompute_aggregate(fold_scores, n_folds)
             trials.append({"number": t.number, "params": dict(t.params), "fold_scores": fold_scores, "optuna_value": t.value,
                            "aggregate": agg, "state": state, "eligible": eligible, "ineligible_reason": (None if eligible else reason)})
     eligible_trials = [t for t in trials if t.get("eligible")]
