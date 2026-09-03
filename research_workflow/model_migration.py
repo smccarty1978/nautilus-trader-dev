@@ -106,9 +106,13 @@ def migrate_legacy_records(*, study_id: str, registry_root: Path, bytes_root: Pa
                 family=fam, fit_identity_sha256=None, closure_identities=dict(rec.get("closure_identities") or {}), model_role=rec.get("model_role"))
             existed = (ms.model_dir(mid, model_root) / "manifest.json").is_file()
             legacy = {k: rec.get(k) for k in ("artifact_path", "artifact_sha256", "golden_fixture_path", "golden_fixture_sha256", "native_booster_path", "native_booster_sha256", "scientific_status", "artifact_status", "reuse_status", "runtime_identity_sha256", "schema_version")}
+            # The v1 model_id was canonical_sha256({study_id, arm, fit_identity, closures}); the
+            # migrated manifest does not retain the raw fit_identity input, so this store cannot
+            # independently recompute it. Name the rule so authenticate_model fails closed
+            # (MODEL_IDENTITY_UNVERIFIABLE) rather than silently trusting the copied id.
             manifest = ms.store_model(model_id=mid, estimator=None, lineage=lineage, tier=tier, selection_status=status, metrics={},
                                       golden_train_frame=train_frame, model_root=model_root, scientific_status=rec.get("scientific_status", "UNASSESSED"),
-                                      legacy_registry_record=legacy, canonical_source_file=src)
+                                      legacy_registry_record=legacy, canonical_source_file=src, identity_rule="legacy_v1_immutable_unrecomputable")
             if existed:
                 report["already_present"] += 1
             else:

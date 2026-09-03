@@ -175,9 +175,9 @@ def cmd_model_list(_: argparse.Namespace) -> int:
 
 
 def cmd_model_validate(ns: argparse.Namespace) -> int:
-    from research_workflow.model_store import validate_golden
+    from research_workflow.model_store import authenticate_model
     try:
-        return _card(validate_golden(ns.model_id))
+        return _card(authenticate_model(ns.model_id))
     except Exception as exc:
         return _card({"model_id": ns.model_id, "error": f"{type(exc).__name__}: {exc}"}, ok=False)
 

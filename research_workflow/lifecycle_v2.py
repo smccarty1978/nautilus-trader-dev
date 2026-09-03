@@ -623,9 +623,11 @@ class V2Lifecycle:
         import hashlib as _h
         import numpy as np
         from research.analysis.metrics import brier, pr_auc, roc_auc
-        from research_workflow.model_store import read_manifest, score
+        from research_workflow.model_store import authenticate_model, read_manifest, score
         out = []
         for m in models:
+            expect = dict(m.get("expect") or {})
+            authentication = authenticate_model(m["id"], expect=expect or None)
             manifest = read_manifest(m["id"])
             inputs = list(manifest["lineage"]["ordered_inputs"])
             missing = [c for c in inputs if c not in frame.columns]
@@ -648,7 +650,8 @@ class V2Lifecycle:
                                     "pr_auc": pr_auc(part[label], s).to_dict().get("value"), "brier": brier(part[label], s).to_dict().get("value"),
                                     "score_digest": _h.sha256(np.round(np.asarray(s, dtype=float), 10).tobytes()).hexdigest()}
             out.append({**m, "inputs": inputs, "lineage": {k: manifest["lineage"].get(k) for k in ("study_id", "cell_id", "direction", "target_arm", "train_years", "family")},
-                        "rows_scored": int(len(binary)), "metrics_by_year": per_year})
+                        "rows_scored": int(len(binary)), "metrics_by_year": per_year,
+                        "model_authentication": {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}})
         return out
 
     def _fit_score_mode(self, plan: Dict[str, Any], model: Dict[str, Any]) -> Dict[str, Any]:
@@ -661,6 +664,7 @@ class V2Lifecycle:
         path = _write(self.artifacts / "experiment_models.json", {"schema_version": 2, "mode": "score", "plan_sha256": plan["plan_sha256"], "model_id": None,
                                                                    "reused_model_ids": [m["id"] for m in scored], "models": scored, "rows": {"total": int(len(frame))},
                                                                    "features": list(plan["columns"]["features"]), "training_population_identity": merge_identity,
+                                                                   "model_authentication": [m["model_authentication"] for m in scored],
                                                                    "new_models_trained": False, "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(path)]}
 
@@ -704,12 +708,14 @@ class V2Lifecycle:
             summary["train_metrics"] = [{k: m[k] for k in ("name", "id", "metrics_by_year")} for m in models["models"]]
         elif models.get("model_id"):
             from research.analysis.metrics import brier, pr_auc, roc_auc
-            from research_workflow.model_store import score
+            from research_workflow.model_store import authenticate_model, score
+            authentication = authenticate_model(models["model_id"], expect={"study_id": plan["study"]["id"]})
             binary = frame[frame[label].isin([0, 1, 0.0, 1.0])]
             s = score(models["model_id"], binary[models["features"]])
             summary["oos_metrics"] = {"n": int(len(binary)), "roc_auc": roc_auc(binary[label], s).to_dict().get("value"),
                                       "pr_auc": pr_auc(binary[label], s).to_dict().get("value"), "brier": brier(binary[label], s).to_dict().get("value")}
             summary["train_metrics"] = models.get("metrics")
+            summary["model_authentication"] = {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}
         path = _write(self.artifacts / "experiment_analysis_v2.json", {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
                                                                         "oos_years": list(years), "authority": "plan.chronology.dev", **summary, "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(path)]}

@@ -143,6 +143,11 @@ MEANING: Dict[str, Tuple[str, str, str]] = {
     "model.models[].label": ("Outcome label column to evaluate against.", "Must be an outcome column of this study.", "label: target_tp1_sl1_0_label"),
     "model.models[].subset": ("Explicit column == value row filters.", "No hidden direction semantics.", "subset: {regime_direction: 1}"),
     "model.models[].name": ("Display name.", "None.", "name: LONG_SL1_0"),
+    "model.models[].expect": ("Optional identity expectations, authenticated against the model-store lineage before scoring.", "A mismatch refuses the model (MODEL_EXPECTATION_MISMATCH).", "expect: {target_arm: SL1_0}"),
+    "model.models[].expect.study_id": ("Expected lineage.study_id.", "None.", "study_id: parent_study"),
+    "model.models[].expect.target_arm": ("Expected lineage.target_arm.", "None.", "target_arm: SL1_0"),
+    "model.models[].expect.direction": ("Expected lineage.direction.", "None.", "direction: LONG"),
+    "model.models[].expect.cell_id": ("Expected lineage.cell_id.", "None.", "cell_id: LONG_SL1_0"),
     "model.search_space": ("param -> [choices] | {low, high, log?, int?}; searched by validation.protocol over walk-forward tuning folds.", "TRAIN-only by construction; ledger in artifacts/tuning_trials.json.", "search_space: {n_estimators: [100, 200], learning_rate: {low: 0.01, high: 0.3, log: true}}"),
 }
 

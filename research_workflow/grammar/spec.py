@@ -220,12 +220,21 @@ class ValidationSpec(_Strict):
     primary_metric: Optional[str] = None
 
 
+class ScoredModelExpectSpec(_Strict):
+    """Optional identity expectations checked against the model-store lineage before scoring."""
+    study_id: Optional[str] = None
+    target_arm: Optional[str] = None
+    direction: Optional[str] = None
+    cell_id: Optional[str] = None
+
+
 class ScoredModelSpec(_Strict):
     """A frozen model reused from the model store: scored, never refit."""
     id: str                                        # model store id (sha256)
     label: str                                     # label column the model is evaluated against
     subset: Dict[str, Any] = Field(default_factory=dict)   # column == value row filters (explicit, no hidden direction semantics)
     name: Optional[str] = None
+    expect: Optional[ScoredModelExpectSpec] = None  # authenticated against model-store lineage before scoring
 
 
 class ModelSpec(_Strict):

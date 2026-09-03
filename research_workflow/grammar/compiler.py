@@ -875,6 +875,16 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
     return contract
 
 
+# A derived (frozen-model) score column is never assigned the decision epoch's availability
+# blindly: its true availability is max(availability of every input it consumes, the score's
+# own evaluation timestamp). This registry names the rule per derived-input kind so the
+# compiled availability table always carries it, and is the extension point for future
+# derived-score kinds (e.g. ES->NQ or asynchronous multi-stream scoring).
+DERIVED_SCORE_AVAILABILITY_RULES: Dict[str, str] = {
+    "frozen_external_model_score": "max(inputs) ∪ evaluation",
+}
+
+
 # --------------------------------------------------------------------------- #
 # stage 6: columns, chronology, model, closure
 # --------------------------------------------------------------------------- #
@@ -896,10 +906,14 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, f"features.derived_inputs.{d.name}", "a frozen external score needs population.direction")
             continue
         impl = f"{FrozenExternalScoreBinding.__module__}.{FrozenExternalScoreBinding.__name__}"
+        surfaces = body.get("ordered_feature_surfaces") or {}
+        deps = sorted({c for cols in surfaces.values() for c in (cols or [])})
         ctx.trackers.append({"id": f"derived.{d.name}", "capability": FrozenExternalScoreBinding.CAPABILITY, "implementation": impl,
                              "params": {"spec": body, "direction": direction_ref}, "inputs": {}, "subscriptions": [],
                              "fields": [], "epoch_fields": [], "events": [], "cadence": FrozenExternalScoreBinding.CADENCE,
-                             "warmup_bars": 0, "instrument": ctx.execution_symbol, "derived_column": d.name})
+                             "warmup_bars": 0, "instrument": ctx.execution_symbol, "derived_column": d.name,
+                             "availability_rule": DERIVED_SCORE_AVAILABILITY_RULES.get(body.get("kind"), "max(inputs) ∪ evaluation"),
+                             "availability_dependencies": deps})
         ctx.tracker_meta[f"derived.{d.name}"] = FrozenExternalScoreBinding
         ctx.binding_proof.append({"kind": "derived_input", "id": d.name, "capability": FrozenExternalScoreBinding.CAPABILITY,
                                   "implementation": impl, "bound": True})
@@ -937,7 +951,8 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
                         closest=_closest(m.label, sorted(known_labels)))
             if not re.fullmatch(r"[0-9a-f]{64}", m.id):
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.models[{i}].id", "model id must be a model-store sha256")
-            scored.append({"id": m.id, "label": m.label, "subset": dict(m.subset), "name": m.name or m.id[:12]})
+            scored.append({"id": m.id, "label": m.label, "subset": dict(m.subset), "name": m.name or m.id[:12],
+                           "expect": (m.expect.model_dump(exclude_none=True) if m.expect else {})})
     validation = None
     if model_spec.validation is not None:
         v = model_spec.validation
@@ -1024,12 +1039,25 @@ def _resolve_warmup_and_availability(ctx: _Ctx) -> Tuple[Dict[str, Any], Dict[st
         if stream:
             per_stream[stream] = max(per_stream.get(stream, 0), int(t.get("warmup_bars") or 0))
         info = next((s for s in ctx.streams if s["key"] == stream), None)
-        rows.append({"id": t["id"], "kind": "tracker", "stream": stream, "cadence": t["cadence"],
-                     "availability": "completed_bar_ts_init", "visibility": (info or {}).get("visibility", "at_epoch")})
+        if "availability_rule" in t:
+            # A derived (frozen-model) score row: its availability is never the decision
+            # epoch's blanket "completed_bar_ts_init" -- it is max(dependency availability,
+            # score evaluation timestamp), with dependencies always named.
+            rows.append({"id": t["id"], "kind": "derived_score", "stream": stream, "cadence": t["cadence"],
+                         "availability": t["availability_rule"], "availability_rule": t["availability_rule"],
+                         "dependencies": t.get("availability_dependencies") or [],
+                         "visibility": (info or {}).get("visibility", "at_epoch")})
+        else:
+            rows.append({"id": t["id"], "kind": "tracker", "stream": stream, "cadence": t["cadence"],
+                         "availability": "completed_bar_ts_init", "visibility": (info or {}).get("visibility", "at_epoch")})
     for inst in (ctx.features or {}).get("instances") or []:
         rows.append({"id": inst["physical_alias"], "kind": "feature", "stream": None,
                      "required_events": inst["input_requirements"]["required_streams"], "availability": "completed_bar_ts_init",
                      "visibility": "at_epoch"})
+    for row in rows:
+        if row.get("kind") == "derived_score" and not row.get("availability_rule"):
+            ctx.gap(GapKind.MISSING_CAPABILITY, f"availability.{row['id']}",
+                    "a derived-score availability row must declare availability_rule; blindly stamping the decision epoch is prohibited")
     warmup = {"per_stream_bars": per_stream, "days_before_partition": ctx.spec.chronology.warmup.days_before_partition,
               "max_warmup_seconds": max((n * next(s["duration_ns"] for s in ctx.streams if s["key"] == k) // NS for k, n in per_stream.items()), default=0)}
     return warmup, {"rows": rows, "same_timestamp_rule": "context streams expose events with ts_init < T only"}
@@ -1075,6 +1103,8 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
     warmup, availability = _resolve_warmup_and_availability(ctx)
+    if not ctx.gaps.ok:
+        return CompileOutcome(None, ctx.gaps)
     closure = _resolve_closure(ctx, model)
     spec_sha = hashlib.sha256(canonical_json(raw).encode("utf-8")).hexdigest()
     plan = CompiledPlan(

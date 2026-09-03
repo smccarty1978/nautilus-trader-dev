@@ -308,7 +308,8 @@ def _model_lock(mdir_parent_models: Path, model_id: str):
 def store_model(*, model_id: str, estimator: Any, lineage: ModelLineage, tier: str, selection_status: str,
                 metrics: Mapping[str, Any], golden_train_frame: Optional[pd.DataFrame], model_root: Optional[Path] = None,
                 scientific_status: str = "UNASSESSED", legacy_registry_record: Optional[Mapping[str, Any]] = None,
-                canonical_source_file: Optional[Path] = None, golden_rows: int = GOLDEN_MIN_ROWS) -> Dict[str, Any]:
+                canonical_source_file: Optional[Path] = None, golden_rows: int = GOLDEN_MIN_ROWS,
+                identity_rule: str = "v2_lineage_sha256") -> Dict[str, Any]:
     """Persist a model into the store (idempotent: identical model_id must reproduce identical canonical bytes).
 
     Same-ID concurrent writers never see a half-written directory and never lost-update each other:
@@ -345,8 +346,8 @@ def store_model(*, model_id: str, estimator: Any, lineage: ModelLineage, tier: s
         else:
             canonical = save_canonical(estimator, lineage.family, stage_dir / "canonical")
         manifest: Dict[str, Any] = {
-            "schema_version": SCHEMA_VERSION, "model_id": model_id, "tier": tier, "selection_status": selection_status,
-            "scientific_status": scientific_status, "created_at_utc": _now(),
+            "schema_version": SCHEMA_VERSION, "model_id": model_id, "identity_rule": str(identity_rule), "tier": tier,
+            "selection_status": selection_status, "scientific_status": scientific_status, "created_at_utc": _now(),
             "lineage": {**lineage.__dict__},
             "metrics": dict(metrics or {}),
             "canonical": canonical,
@@ -398,6 +399,95 @@ def validate_golden(model_id: str, model_root: Optional[Path] = None, tolerance:
     if len(got) != len(expected) or diff > tolerance:
         raise ModelStoreError(f"GOLDEN_PREDICTION_MISMATCH: max_abs_diff={diff}")
     return {"model_id": model_id, "n_rows": int(len(frame)), "max_abs_diff": diff, "status": "PASS"}
+
+
+def _recompute_v2_lineage_sha256(manifest: Mapping[str, Any]) -> str:
+    return hashlib.sha256(json.dumps(manifest["lineage"], sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+# Named, recomputable model-identity rules. A manifest's ``identity_rule`` must be a key
+# here for ``authenticate_model`` to independently reproduce the id from the manifest's own
+# recorded lineage; a rule with no recompute authority (e.g. migrated v1 records, whose
+# original hash inputs are not fully preserved) fails closed as MODEL_IDENTITY_UNVERIFIABLE
+# rather than silently trusting the recorded id.
+IDENTITY_RULES: Dict[str, Any] = {
+    "v2_lineage_sha256": _recompute_v2_lineage_sha256,
+}
+
+
+def authenticate_model(model_id: str, *, expect: Optional[Mapping[str, Any]] = None, model_root: Optional[Path] = None,
+                       golden_tolerance: float = 1e-12) -> Dict[str, Any]:
+    """Fail-closed identity/lineage/golden authentication before any ``score()`` call.
+
+    Verifies, in order: (1) the requested ``model_id`` agrees with the directory it was
+    resolved from and with ``manifest["model_id"]``; (2) the manifest's recorded
+    ``identity_rule`` independently RECOMPUTES ``model_id`` from the manifest's own lineage
+    (a rule this store cannot recompute -- e.g. an unverifiable legacy migration -- fails
+    closed as ``MODEL_IDENTITY_UNVERIFIABLE``, it is never treated as trusted); (3) the
+    canonical artifact bytes match their recorded sha256; (4) the feature contract
+    (``ordered_inputs``) reproduces ``feature_contract_sha256``; (5) the preprocessing the
+    manifest declares matches what a v2 study applies (``identity``); (6) any caller-declared
+    ``expect`` (``study_id`` / ``target_arm`` / ``direction`` / ``cell_id``) matches the
+    lineage; (7) the model's tier/selection_status make it reusable
+    (``registry`` + ``selected``/``final_validation``); (8) the golden frame validates.
+
+    Returns an evidence dict; raises ``ModelStoreError`` on the first failed check.
+    """
+    manifest = read_manifest(model_id, model_root)
+    mdir = model_dir(model_id, model_root)
+    recorded_id = manifest.get("model_id")
+    if recorded_id != model_id:
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: requested {model_id!r} but the manifest at {mdir} records model_id {recorded_id!r}")
+
+    identity_rule = manifest.get("identity_rule")
+    if identity_rule is None:
+        # Manifest predates the identity_rule field: infer it, or fail closed.
+        if _recompute_v2_lineage_sha256(manifest) == model_id:
+            identity_rule = "v2_lineage_sha256"
+        else:
+            raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {model_id} has no recorded identity_rule and does not reproduce v2_lineage_sha256")
+    recompute = IDENTITY_RULES.get(identity_rule)
+    if recompute is None:
+        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: identity_rule {identity_rule!r} has no recompute authority in this store")
+    recomputed_id = recompute(manifest)
+    if recomputed_id != model_id:
+        raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: identity_rule {identity_rule!r} recomputes {recomputed_id} != requested {model_id}")
+
+    # Canonical bytes: load_canonical raises CANONICAL_BYTES_CORRUPT on a sha256 mismatch.
+    load_canonical(manifest, mdir)
+
+    lineage = dict(manifest.get("lineage") or {})
+    ordered_inputs = list(lineage.get("ordered_inputs") or [])
+    recomputed_feature_contract = hashlib.sha256(json.dumps(ordered_inputs).encode("utf-8")).hexdigest()
+    declared_feature_contract = lineage.get("feature_contract_sha256")
+    if declared_feature_contract is None or recomputed_feature_contract != declared_feature_contract:
+        raise ModelStoreError(f"FEATURE_CONTRACT_MISMATCH: recomputed {recomputed_feature_contract} != declared {declared_feature_contract}")
+
+    preprocessing = lineage.get("preprocessing_contract_sha256")
+    if preprocessing != "identity":
+        raise ModelStoreError(f"PREPROCESSING_MISMATCH: consuming study applies identity preprocessing but the manifest declares {preprocessing!r}")
+
+    expect_map = {"study_id": "study_id", "target_arm": "target_arm", "direction": "direction", "cell_id": "cell_id",
+                 "label": "target_arm"}
+    for key, value in dict(expect or {}).items():
+        if value is None:
+            continue
+        field = expect_map.get(key, key)
+        if lineage.get(field) != value:
+            raise ModelStoreError(f"MODEL_EXPECTATION_MISMATCH: expected {key}={value!r} but lineage.{field}={lineage.get(field)!r}")
+
+    if manifest.get("tier") != "registry" or manifest.get("selection_status") not in ("selected", "final_validation"):
+        raise ModelStoreError(f"MODEL_TIER_NOT_REUSABLE: tier={manifest.get('tier')!r} selection_status={manifest.get('selection_status')!r}")
+
+    golden = validate_golden(model_id, model_root, tolerance=golden_tolerance)
+
+    return {
+        "model_id": model_id, "identity_rule": identity_rule, "canonical_sha256": manifest["canonical"]["byte_sha256"],
+        "feature_contract_sha256": recomputed_feature_contract, "preprocessing_contract_sha256": preprocessing,
+        "golden": golden, "tier": manifest.get("tier"), "selection_status": manifest.get("selection_status"),
+        "lineage_summary": {k: lineage.get(k) for k in ("study_id", "cell_id", "direction", "target_arm", "fold_id", "config_id", "train_years", "family")},
+        "authenticated_at_utc": _now(),
+    }
 
 
 def add_export(model_id: str, fmt: str, *, model_root: Optional[Path] = None, exporter_version: Optional[str] = None) -> Dict[str, Any]:
@@ -534,5 +624,6 @@ def list_store(model_root: Optional[Path] = None) -> List[Dict[str, Any]]:
 
 
 __all__ = ["SCHEMA_VERSION", "GOLDEN_MIN_ROWS", "FAMILY_AUTHORITY", "EXPORT_TOLERANCES", "EXPORT_STATES", "SELECTION_STATES", "TIERS",
-           "ModelStoreError", "ModelLineage", "family_authority", "build_golden_frame", "store_model", "validate_golden", "add_export",
-           "resolve", "score", "record_fit", "list_store", "read_manifest", "model_dir", "model_store_root", "load_canonical", "save_canonical"]
+           "IDENTITY_RULES", "ModelStoreError", "ModelLineage", "family_authority", "build_golden_frame", "store_model", "validate_golden",
+           "authenticate_model", "add_export", "resolve", "score", "record_fit", "list_store", "read_manifest", "model_dir",
+           "model_store_root", "load_canonical", "save_canonical"]
