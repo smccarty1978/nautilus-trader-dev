@@ -20,6 +20,7 @@ from research_workflow import dataset_v2
 from research_workflow.dataset_v2 import DatasetV2Error, session_table
 from research_workflow.sessions import (
     CalendarSessionTable, LegacySessionTable, SessionCloseUndefinedError,
+    SessionHaltInvalidError, SessionRowInvalidError,
     build_session_table, resolve_calendar_session_spec, session_windows,
 )
 
@@ -121,6 +122,56 @@ def test_halt_day_eth_post_segment_starts_at_halt_end():
     starts = {o for o, _ in rows}
     assert _ns("2021-03-01 15:30:00") in starts        # halt end, not 15:15
     assert _ns("2021-03-01 15:15:00") not in starts
+
+
+# --------------------------------------------------------------------------- #
+# N-2: session_windows fails closed on a malformed sessions reference-table row
+# --------------------------------------------------------------------------- #
+def _synthetic_row(**overrides) -> dict:
+    day = pd.Timestamp("2024-01-03").date()
+    row = {"session_date": day, "open_ns": _ns("2024-01-02 17:00:00"), "close_ns": _ns("2024-01-03 16:00:00"),
+           "early_close": False, "halt_start_ns": None, "halt_end_ns": None}
+    row.update(overrides)
+    return row
+
+
+def test_session_row_close_before_open_rejects():
+    df = pd.DataFrame([_synthetic_row(close_ns=_ns("2024-01-02 17:00:00") - 1)])
+    with pytest.raises(SessionRowInvalidError, match="SESSION_ROW_INVALID"):
+        session_windows(df, "RTH")
+
+
+def test_session_row_close_equal_open_rejects():
+    open_ns = _ns("2024-01-02 17:00:00")
+    df = pd.DataFrame([_synthetic_row(open_ns=open_ns, close_ns=open_ns)])
+    with pytest.raises(SessionRowInvalidError, match="SESSION_ROW_INVALID"):
+        session_windows(df, "RTH")
+
+
+def test_overlapping_consecutive_session_rows_reject():
+    first = _synthetic_row(session_date=pd.Timestamp("2024-01-02").date(),
+                            open_ns=_ns("2024-01-01 17:00:00"), close_ns=_ns("2024-01-03 10:00:00"))
+    second = _synthetic_row(session_date=pd.Timestamp("2024-01-03").date(),
+                             open_ns=_ns("2024-01-02 17:00:00"), close_ns=_ns("2024-01-03 16:00:00"))
+    df = pd.DataFrame([first, second])
+    with pytest.raises(SessionRowInvalidError, match="SESSION_ROW_INVALID"):
+        session_windows(df, "RTH")
+
+
+def test_halt_end_before_halt_start_rejects():
+    halt_end = _ns("2024-01-03 15:30:00")
+    df = pd.DataFrame([_synthetic_row(halt_start_ns=halt_end + 1, halt_end_ns=halt_end)])
+    with pytest.raises(SessionHaltInvalidError, match="SESSION_HALT_INVALID"):
+        session_windows(df, "ETH")
+
+
+def test_halt_end_before_rth_close_it_interrupts_rejects():
+    # RTH close is 15:15:00 CT; a halt ending before that cannot be interrupting it.
+    halt_start = _ns("2024-01-03 15:00:00")
+    halt_end = _ns("2024-01-03 15:10:00")
+    df = pd.DataFrame([_synthetic_row(halt_start_ns=halt_start, halt_end_ns=halt_end)])
+    with pytest.raises(SessionHaltInvalidError, match="SESSION_HALT_INVALID"):
+        session_windows(df, "ETH")
 
 
 # --------------------------------------------------------------------------- #

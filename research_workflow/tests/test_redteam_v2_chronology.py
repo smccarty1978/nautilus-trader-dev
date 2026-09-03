@@ -101,3 +101,43 @@ def test_matching_authorization_artifact_passes():
 def test_unknown_period_rejects():
     with pytest.raises(LifecycleV2Error, match="YEARS_NOT_AUTHORIZED"):
         authorized_years(PLAN, "bogus", None)
+
+
+# ---------------------------------------------------------------------------
+# N-1: defense-in-depth on the requested=None path -- role years intersecting
+# prohibited must never resolve, even though the compiler already blocks it upstream.
+# ---------------------------------------------------------------------------
+
+def test_omitted_years_rejects_when_role_intersects_prohibited():
+    plan = {"chronology": {"train": [2021, 2022, 2025], "dev": [2024], "prohibited": [2025]}}
+    with pytest.raises(LifecycleV2Error, match="YEARS_NOT_AUTHORIZED"):
+        authorized_years(plan, "train", None)
+
+
+def test_omitted_years_rejects_when_oos_role_intersects_prohibited():
+    plan = {"chronology": {"train": [2021], "dev": [2024, 2025], "prohibited": [2025]}}
+    with pytest.raises(LifecycleV2Error, match="YEARS_NOT_AUTHORIZED"):
+        authorized_years(plan, "oos", None)
+
+
+# ---------------------------------------------------------------------------
+# N-1: non-integer requested years must raise, never silently truncate
+# ---------------------------------------------------------------------------
+
+def test_fractional_float_year_rejects_never_truncates():
+    with pytest.raises(LifecycleV2Error, match="YEARS_NOT_AUTHORIZED: .*non-integer year"):
+        authorized_years(PLAN, "train", [2023.5])
+
+
+def test_fractional_string_year_rejects_never_truncates():
+    with pytest.raises(LifecycleV2Error, match="YEARS_NOT_AUTHORIZED: .*non-integer year"):
+        authorized_years(PLAN, "train", ["2023.5"])
+
+
+def test_bool_year_rejects():
+    with pytest.raises(LifecycleV2Error, match="YEARS_NOT_AUTHORIZED: .*non-integer year"):
+        authorized_years(PLAN, "train", [True])
+
+
+def test_integral_float_and_string_years_normalize():
+    assert authorized_years(PLAN, "train", [2023.0, "2021"]) == [2021, 2023]

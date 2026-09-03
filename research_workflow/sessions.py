@@ -13,6 +13,18 @@ from bisect import bisect_right
 from typing import Any, Dict, Mapping, Optional, Sequence, Tuple
 
 
+class SessionRowInvalidError(ValueError):
+    """Raised when a sessions reference-table row is internally inconsistent (e.g.
+    ``close_ns <= open_ns``) or overlaps the immediately preceding row."""
+    pass
+
+
+class SessionHaltInvalidError(ValueError):
+    """Raised when a declared halt window on a sessions reference-table row is internally
+    inconsistent (``halt_end_ns < halt_start_ns``) or ends before the RTH close it interrupts."""
+    pass
+
+
 class SessionCloseUndefinedError(ValueError):
     """Raised when a session's close instant has no defined authority (e.g. ETH on a
     non-calendar/legacy dataset, which has no single contiguous daily window)."""
@@ -155,16 +167,37 @@ def session_windows(sessions_df: Any, session: str, *, holidays_df: Any = None) 
         raise ValueError(f"UNSUPPORTED_CALENDAR_SESSION: {session!r} (only RTH/ETH derive explicit windows)")
     tz = ZoneInfo(_CT)
     out: list = []
+    prev_close_ns: Optional[int] = None
+    prev_day = None
     for _, row in sessions_df.sort_values("open_ns").iterrows():
         open_ns, close_ns = int(row["open_ns"]), int(row["close_ns"])
+        day = row["session_date"]
+        if close_ns <= open_ns:
+            raise SessionRowInvalidError(f"SESSION_ROW_INVALID: session_date={day} close_ns={close_ns} <= open_ns={open_ns}")
+        if prev_close_ns is not None and open_ns < prev_close_ns:
+            raise SessionRowInvalidError(
+                f"SESSION_ROW_INVALID: session_date={day} open_ns={open_ns} overlaps prior row "
+                f"(session_date={prev_day}) close_ns={prev_close_ns}")
+        prev_close_ns, prev_day = close_ns, day
         # Use the row's own session_date label (the trading day), NOT the calendar date the raw
         # tape-open instant falls on -- the overnight tape open (e.g. 17:00 CT the prior evening)
         # belongs to THIS session's date, so deriving the day from open_ns would land RTH open on
         # the wrong calendar day.
-        day = row["session_date"]
         rth_open = int(pd.Timestamp(day.year, day.month, day.day, 8, 30, 0, tz=tz).tz_convert("UTC").value)
         rth_close_wall = int(pd.Timestamp(day.year, day.month, day.day, 15, 15, 0, tz=tz).tz_convert("UTC").value)
         rth_close = min(rth_close_wall, close_ns)
+        halt_start = row.get("halt_start_ns")
+        halt_end = row.get("halt_end_ns")
+        has_halt_start = halt_start is not None and not pd.isna(halt_start)
+        has_halt_end = halt_end is not None and not pd.isna(halt_end)
+        if has_halt_start or has_halt_end:
+            if has_halt_start and has_halt_end and int(halt_end) < int(halt_start):
+                raise SessionHaltInvalidError(
+                    f"SESSION_HALT_INVALID: session_date={day} halt_end_ns={int(halt_end)} < halt_start_ns={int(halt_start)}")
+            if has_halt_end and int(halt_end) < rth_close:
+                raise SessionHaltInvalidError(
+                    f"SESSION_HALT_INVALID: session_date={day} halt_end_ns={int(halt_end)} < rth_close={rth_close} "
+                    "(halt cannot end before the RTH close it interrupts)")
         if key == "RTH":
             if rth_open < rth_close:
                 out.append((rth_open, rth_close))
@@ -208,4 +241,5 @@ def resolve_calendar_session_spec(session_spec: Mapping[str, Any], repo_root: An
 
 
 __all__ = ["AllSessionTable", "LegacySessionTable", "CalendarSessionTable", "SplitSessionTable", "build_session_table",
-           "session_windows", "resolve_calendar_session_spec", "SessionCloseUndefinedError"]
+           "session_windows", "resolve_calendar_session_spec", "SessionCloseUndefinedError",
+           "SessionRowInvalidError", "SessionHaltInvalidError"]

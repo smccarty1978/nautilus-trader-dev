@@ -121,6 +121,30 @@ def load_plan(study: Path) -> Dict[str, Any]:
     return plan
 
 
+def _strict_int_year(y: Any) -> int:
+    """Normalize a requested year to ``int`` without ever truncating a fractional value.
+    ``bool`` is rejected even though it is an ``int`` subclass (``True``/``False`` are not
+    years). An integral float/str (``2023.0`` / ``"2023"``) normalizes to ``int``; a
+    fractional float/str (``2023.5`` / ``"2023.5"``) raises rather than silently truncating."""
+    if isinstance(y, bool):
+        raise ValueError(f"{y!r} is a bool, not a year")
+    if isinstance(y, int):
+        return y
+    if isinstance(y, float):
+        if y.is_integer():
+            return int(y)
+        raise ValueError(f"{y!r} is not an integral year")
+    if isinstance(y, str):
+        try:
+            f = float(y)
+        except ValueError:
+            raise ValueError(f"{y!r} is not a numeric year")
+        if f.is_integer():
+            return int(f)
+        raise ValueError(f"{y!r} is not an integral year")
+    raise ValueError(f"{y!r} is not a year")
+
+
 def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequence[Any]], *,
                       authorization: Optional[Mapping[str, Any]] = None) -> List[int]:
     """Resolve the exact years a stage may execute against its authorized chronology role.
@@ -158,11 +182,16 @@ def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequ
                 f"authorization.{auth_role_key}={auth_years}/prohibited_years={sorted(auth_prohibited)})")
 
     if requested is None:
+        overlap = sorted(set(role_years) & prohibited)
+        if overlap:
+            raise LifecycleV2Error(
+                f"YEARS_NOT_AUTHORIZED: role years intersect prohibited (period={period} role={role} "
+                f"years={role_years} prohibited={sorted(prohibited)} overlap={overlap})")
         return role_years
     try:
-        req = sorted({int(y) for y in requested})
-    except (TypeError, ValueError) as exc:
-        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} requested years malformed: {exc}")
+        req = sorted({_strict_int_year(y) for y in requested})
+    except ValueError as exc:
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} non-integer year: {exc}")
     if not req:
         raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} requested=[] authorized={role_years} prohibited={sorted(prohibited)}")
     if any(y in prohibited for y in req) or any(y not in role_years for y in req):
