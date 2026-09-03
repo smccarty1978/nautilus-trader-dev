@@ -1,0 +1,54 @@
+{
+  "partition": "train",
+  "platform": "v2",
+  "plan_sha256": "b252d6c0fc405a24d2c79546efef5fe3f5d62bf6e33a26df1dd7370c46ce58bb",
+  "execution_composite_sha256": "51bc1054629d2a65b8e00489778bf7143cc00af1c6348f4ccb3e6399230420ce",
+  "feature_sets": {
+    "primary": [
+      "prior_1m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_efficiency",
+      "prior_5m_regime_mfe_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ]
+  },
+  "preprocessing_hash": "identity",
+  "model_hashes": {
+    "LONG_SL0_5": "a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1",
+    "LONG_SL1_0": "98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8",
+    "LONG_SL1_5": "546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f",
+    "SHORT_SL0_5": "1b285fe3e30ba26a6dd44facd79acd2a1ba86699c85253345caa7677fac19909",
+    "SHORT_SL1_0": "45c2c6227edca652e6f5d052aa7476bbdb4e83652ce3aeb3ea202724cd60c80b",
+    "SHORT_SL1_5": "36ba0ed6e64e5a487a519bffa77f77a10ba83100157cbbf0e87cf284387a00b4"
+  },
+  "thresholds": {},
+  "deciles": {},
+  "new_models_trained": false,
+  "merge_identity": {
+    "candidates_identity": "5b3aadb459318262ad472df1eb0a5dd97ced9b564e30b787856171098de565a1",
+    "candidates_sha256": "ed561b9c2fa0710ee838b1a90840cf7d51f363f7302cf907a0dca4c425034b20",
+    "generated_at_utc": "2026-09-02T23:40:04.759150+00:00",
+    "observations_identity": "44e0ffa02889ab7aeea8cf70ed2ff4afacc380cfccccbe0a0bb72452eaba82e1",
+    "observations_sha256": "933f8a6c4e19481a6ce23b2250cfcdbd3270c255279d07a590e35875adfd006c",
+    "plan_sha256": "b252d6c0fc405a24d2c79546efef5fe3f5d62bf6e33a26df1dd7370c46ce58bb",
+    "rows": 453768,
+    "years": [
+      2021
+    ]
+  },
+  "metrics": null,
+  "label_column": "target_flip_within_horizon",
+  "schema_version": 1,
+  "study_id": "v2_shape_c_barrier_race_fade",
+  "authorization_sha256": "005518bfb44a8d0ade4c1ae819b9d38b850059316f191e411f366eb0155d5fa7",
+  "generated_at_utc": "2026-09-02T23:40:21.495097+00:00",
+  "freeze_sha256": "e436d18345877cdf7a33d1447ffbddce5ac94516f0ef8e8a9679b970c1a88149"
+}
