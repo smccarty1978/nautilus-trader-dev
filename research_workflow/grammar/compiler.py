@@ -40,6 +40,38 @@ _HOST_MODULES = ("research_workflow/host/interfaces.py", "research_workflow/host
                  "research_workflow/grammar/expansion.py", "research_workflow/grammar/plan.py", "research_workflow/provider_host.py",
                  "utils/session_boundaries.py")
 
+# Stage-scoped governance closure (red-team packet A / A2): executable code that can change
+# a governed stage's scientific behavior belongs in that stage's closure, so a change to it
+# stales the freeze the same way a collection-host change does. "collection" is the
+# pre-existing accumulated ``ctx.closure_files`` set (host modules + bound provider/tracker/
+# feature modules) and is intentionally left alone here. The four other groups below are
+# ALWAYS included; "modeling" is included only when the plan declares a model.
+STAGE_CLOSURE_MODULES: Dict[str, Tuple[str, ...]] = {
+    "lifecycle": (
+        "research_workflow/lifecycle_v2.py", "research_workflow/governed_controller_v2.py",
+        "research_workflow/governed_controller.py", "research_workflow/controller_contracts.py",
+        "research_workflow/policy.py", "research_workflow/study_closure.py",
+        "research_workflow/closure_hash.py", "research_workflow/roots.py",
+    ),
+    "outcome": (
+        "research_workflow/forward_outcomes/guard.py", "research_workflow/entry_references.py",
+        "research_workflow/target_expression.py", "research_workflow/target_replay_oracle.py",
+    ),
+    "oos": (
+        "research_workflow/experiment.py",
+    ),
+    "audit": (
+        "research_workflow/audit_packets_v2.py",
+    ),
+    "modeling": (
+        "research_workflow/tuning.py", "research_workflow/model_store.py",
+        "research/analysis/modeling.py", "research/analysis/metrics.py", "research/analysis/identity.py",
+    ),
+}
+# score-mode derived inputs (features.derived_inputs kind: frozen_external_model_score) and
+# model.mode == "score" both reuse a frozen model; both pull in the scoring module.
+_MODELING_SCORE_EXTRA_MODULE = "research_workflow/external_model_scoring.py"
+
 
 @dataclass
 class CompileOutcome:
@@ -933,15 +965,38 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
                         "search_space": search_space}
 
 
-def _resolve_closure(ctx: _Ctx) -> Dict[str, Any]:
+def _resolve_closure(ctx: _Ctx, model: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     from research_workflow.closure_hash import hash_file_v2
+
+    stage_sets: Dict[str, Set[str]] = {"collection": set(ctx.closure_files)}
+    for name in ("lifecycle", "outcome", "oos", "audit"):
+        stage_sets[name] = set(STAGE_CLOSURE_MODULES[name])
+    if model:
+        modeling = set(STAGE_CLOSURE_MODULES["modeling"])
+        if model.get("mode") == "score":
+            modeling.add(_MODELING_SCORE_EXTRA_MODULE)
+        stage_sets["modeling"] = modeling
+
+    all_files: Set[str] = set()
+    for rels in stage_sets.values():
+        all_files |= rels
+
     files: Dict[str, str] = {}
-    for rel in sorted(ctx.closure_files):
+    for rel in sorted(all_files):
         p = ctx.repo_root / rel
-        if p.is_file():
-            files[rel] = hash_file_v2(p)
+        if not p.is_file():
+            raise CompileError(f"CLOSURE_FILE_MISSING: {rel} (referenced by the execution closure) does not exist under {ctx.repo_root}")
+        files[rel] = hash_file_v2(p)
+
     composite = hashlib.sha256(canonical_json([[k, v] for k, v in sorted(files.items())]).encode("utf-8")).hexdigest()
-    return {"hash_algorithm": "v2", "files": files, "composite_sha256": composite, "file_count": len(files)}
+
+    stages: Dict[str, Any] = {}
+    for name, rels in stage_sets.items():
+        stage_files = {k: files[k] for k in sorted(rels)}
+        stage_composite = hashlib.sha256(canonical_json([[k, v] for k, v in sorted(stage_files.items())]).encode("utf-8")).hexdigest()
+        stages[name] = {"files": sorted(rels), "composite_sha256": stage_composite}
+
+    return {"hash_algorithm": "v2", "files": files, "composite_sha256": composite, "file_count": len(files), "stages": stages}
 
 
 def _resolve_warmup_and_availability(ctx: _Ctx) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -1003,7 +1058,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
     warmup, availability = _resolve_warmup_and_availability(ctx)
-    closure = _resolve_closure(ctx)
+    closure = _resolve_closure(ctx, model)
     spec_sha = hashlib.sha256(canonical_json(raw).encode("utf-8")).hexdigest()
     plan = CompiledPlan(
         study={"id": spec.study.id, "tier": spec.study.tier, "question": spec.study.question, "description": spec.study.description},

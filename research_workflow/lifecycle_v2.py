@@ -93,6 +93,56 @@ def load_plan(study: Path) -> Dict[str, Any]:
     return plan
 
 
+def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequence[Any]], *,
+                      authorization: Optional[Mapping[str, Any]] = None) -> List[int]:
+    """Resolve the exact years a stage may execute against its authorized chronology role.
+
+    ``period`` is ``"train"`` (collection/reconcile/merge/fit) or ``"oos"``/``"dev"``
+    (oos/analyze; ``"dev"`` is an alias of ``"oos"``). The CLI may only NARROW the role's
+    declared years, never expand them, and a prohibited year is never executable under
+    either role. ``requested=None`` resolves to exactly the role's authorized years; an
+    empty requested list is rejected outright (it is not "everything").
+
+    If ``authorization`` (the parsed ``artifacts/experiment_authorization.json``) is
+    supplied, its recorded train_years/oos_years/prohibited_years for this role must agree
+    with the plan's chronology, or the authorization artifact is stale and the request is
+    rejected -- a plan re-compiled after PREPARE wrote the authorization artifact must not
+    silently execute against the old, unauthorized role years.
+    """
+    if period not in ("train", "oos", "dev"):
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: unknown period {period!r}")
+    role = "train" if period == "train" else "dev"
+    chron = plan.get("chronology") or {}
+    try:
+        role_years = sorted({int(y) for y in (chron.get(role) or [])})
+    except (TypeError, ValueError) as exc:
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: plan.chronology.{role} is malformed: {exc}")
+    prohibited = {int(y) for y in (chron.get("prohibited") or [])}
+
+    if authorization is not None:
+        auth_role_key = "train_years" if role == "train" else "oos_years"
+        auth_years = sorted({int(y) for y in (authorization.get(auth_role_key) or [])})
+        auth_prohibited = {int(y) for y in (authorization.get("prohibited_years") or [])}
+        if auth_years != role_years or auth_prohibited != prohibited:
+            raise LifecycleV2Error(
+                f"YEARS_NOT_AUTHORIZED: period={period} stale experiment_authorization.json "
+                f"(plan.chronology.{role}={role_years}/prohibited={sorted(prohibited)} != "
+                f"authorization.{auth_role_key}={auth_years}/prohibited_years={sorted(auth_prohibited)})")
+
+    if requested is None:
+        return role_years
+    try:
+        req = sorted({int(y) for y in requested})
+    except (TypeError, ValueError) as exc:
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} requested years malformed: {exc}")
+    if not req:
+        raise LifecycleV2Error(f"YEARS_NOT_AUTHORIZED: period={period} requested=[] authorized={role_years} prohibited={sorted(prohibited)}")
+    if any(y in prohibited for y in req) or any(y not in role_years for y in req):
+        raise LifecycleV2Error(
+            f"YEARS_NOT_AUTHORIZED: period={period} requested={req} authorized={role_years} prohibited={sorted(prohibited)}")
+    return req
+
+
 @dataclass
 class V2Options:
     execute: bool = False
@@ -147,6 +197,11 @@ class V2Lifecycle:
             "train_freeze": _sha(self.artifacts / "train_experiment_freeze.json"),
         }
 
+    def _authorized_years(self, plan: Dict[str, Any], period: str, requested: Optional[Sequence[Any]] = None) -> List[int]:
+        auth_path = self.artifacts / "experiment_authorization.json"
+        authorization = _read(auth_path) if auth_path.is_file() else None
+        return authorized_years(plan, period, requested, authorization=authorization)
+
     def _seal_identities(self) -> Dict[str, str]:
         seal = _read(self.artifacts / "preexec_audit_seal.json")
         if not seal.get("composite_seal_hash"):
@@ -182,7 +237,7 @@ class V2Lifecycle:
         frozen = {"schema_version": 2, "hash_algorithm": plan["closure"]["hash_algorithm"], "authority": "platform_v2_plan_closure",
                   "plan_sha256": plan["plan_sha256"], "spec_sha256": plan["spec_sha256"],
                   "frozen_execution_composite_sha256": plan["closure"]["composite_sha256"], "files": plan["closure"]["files"],
-                  "file_count": plan["closure"]["file_count"], "generated_at_utc": _now()}
+                  "file_count": plan["closure"]["file_count"], "stages": plan["closure"].get("stages") or {}, "generated_at_utc": _now()}
         path = _write(self.audit / "frozen_execution_manifest.json", frozen)
         return {"status": "PASS", "outputs": [str(path), str(auth_path)]}
 
@@ -377,7 +432,7 @@ class V2Lifecycle:
     def _collect_period(self, period: str) -> Dict[str, Any]:
         plan = load_plan(self.study)
         ids = self._seal_identities()
-        years = self.opts.years or (plan["chronology"]["train"] if period == "train" else plan["chronology"].get("dev") or [])
+        years = self._authorized_years(plan, period, self.opts.years)
         if not years:
             raise LifecycleV2Error(f"NO_YEARS_FOR_PERIOD: {period}")
         base = self.work / "partitions" / period
@@ -411,7 +466,7 @@ class V2Lifecycle:
         import pandas as pd
         plan = load_plan(self.study)
         base = self.work / "partitions" / "train"
-        years = self.opts.years or plan["chronology"]["train"]
+        years = self._authorized_years(plan, "train", self.opts.years)
         findings: List[str] = []
         schemas, digests, rows = [], set(), 0
         seen_keys = 0
@@ -436,7 +491,8 @@ class V2Lifecycle:
         if len(digests) > 1:
             findings.append(f"partitions read different dataset digests: {sorted(digests)}")
         path = _write(self.work / "reconcile.json", {"passed": not findings, "findings": findings, "years": list(years), "rows": rows,
-                                                    "dataset_digests": sorted(digests), "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
+                                                    "authority": "plan.chronology.train", "dataset_digests": sorted(digests),
+                                                    "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
                                                     "generated_at_utc": _now()})
         if findings:
             raise LifecycleV2Error("RECONCILE_FAILED: " + "; ".join(findings))
@@ -446,7 +502,7 @@ class V2Lifecycle:
         import pandas as pd
         from research.analysis.modeling import frame_content_identity
         plan = load_plan(self.study)
-        years = self.opts.years or plan["chronology"]["train"]
+        years = self._authorized_years(plan, "train", self.opts.years)
         base = self.work / "partitions" / "train"
         cands = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years], ignore_index=True)
         obs = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True)
@@ -457,7 +513,7 @@ class V2Lifecycle:
         out = self.work / "merged"; out.mkdir(parents=True, exist_ok=True)
         cands.to_parquet(out / "candidates.parquet", index=False); obs.to_parquet(out / "observations.parquet", index=False)
         ident = _write(out / "identity.json", {"candidates_identity": frame_content_identity(cands), "observations_identity": frame_content_identity(obs),
-                                                "rows": int(len(cands)), "years": list(years), "plan_sha256": plan["plan_sha256"],
+                                                "rows": int(len(cands)), "years": list(years), "authority": "plan.chronology.train", "plan_sha256": plan["plan_sha256"],
                                                 "candidates_sha256": _sha(out / "candidates.parquet"), "observations_sha256": _sha(out / "observations.parquet"), "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(out / "candidates.parquet"), str(out / "observations.parquet"), str(ident)]}
 
@@ -631,7 +687,7 @@ class V2Lifecycle:
         plan = load_plan(self.study)
         label = plan["outcome"].get("label_column") or "target_flip_within_horizon"
         base = self.work / "partitions" / "oos"
-        years = self.opts.years or plan["chronology"].get("dev") or []
+        years = self._authorized_years(plan, "oos", self.opts.years)
         c = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years], ignore_index=True)
         o = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True)
         frame = c.merge(o[list(KEY) + [label, "disposition"]], on=list(KEY), how="inner")
@@ -649,7 +705,7 @@ class V2Lifecycle:
                                       "pr_auc": pr_auc(binary[label], s).to_dict().get("value"), "brier": brier(binary[label], s).to_dict().get("value")}
             summary["train_metrics"] = models.get("metrics")
         path = _write(self.artifacts / "experiment_analysis_v2.json", {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
-                                                                        "oos_years": list(years), **summary, "generated_at_utc": _now()})
+                                                                        "oos_years": list(years), "authority": "plan.chronology.dev", **summary, "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(path)]}
 
     def close(self, study: Path | None = None) -> Dict[str, Any]:
