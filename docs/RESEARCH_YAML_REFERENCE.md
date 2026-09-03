@@ -129,6 +129,7 @@ Predicate language: comparisons, `and/or/not`, `in [..]`, event tests `x.flipped
 | `model.models[].expect.target_arm` | str | null | no | None |  | Expected lineage.target_arm. | None. | `target_arm: SL1_0` |
 | `model.models[].expect.direction` | str | null | no | None |  | Expected lineage.direction. | None. | `direction: LONG` |
 | `model.models[].expect.cell_id` | str | null | no | None |  | Expected lineage.cell_id. | None. | `cell_id: LONG_SL1_0` |
+| `model.models[].expect.canonical_sha256` | str | null | no | None |  | Expected manifest canonical.byte_sha256 -- binds to the estimator's actual bytes, not only lineage; catches a substituted estimator that refreshes its own canonical/golden bytes under an unchanged model_id. | A wrong or stale declared value fails closed as CANONICAL_SHA_MISMATCH before score(). | `canonical_sha256: 3b1c...a2` |
 | `model.search_space` | map[str -> Any] | no | dict() |  | param -> [choices] | {low, high, log?, int?}; searched by validation.protocol over walk-forward tuning folds. | TRAIN-only by construction; ledger in artifacts/tuning_trials.json. | `search_space: {n_estimators: [100, 200], learning_rate: {low: 0.01, high: 0.3, log: true}}` |
 
 ## Notes

@@ -145,10 +145,21 @@ def load_reference_tables(catalog_path: Path, declared: Sequence[str], reference
     manifest_path = catalog_path / "build_manifest.json"
     if not manifest_path.is_file():
         raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: {manifest_path} not found")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: {manifest_path} is not parseable JSON: {exc}")
+    if not isinstance(manifest, dict):
+        raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: {manifest_path} does not contain a JSON object")
     ref_manifest = manifest.get("reference_tables") or {}
+    if not isinstance(ref_manifest, dict):
+        raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: {manifest_path} reference_tables is malformed")
+    # W-3: declared must be a subset of what the catalog actually built -- a study cannot
+    # declare a table the catalog never produced.
+    undeclared_missing = sorted(set(declared) - set(ref_manifest))
+    if undeclared_missing:
+        raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: declared {undeclared_missing} not present in {manifest_path} reference_tables")
     out: Dict[str, pd.DataFrame] = {}
-    digests: Dict[str, str] = {}
     for name in declared:
         entry = ref_manifest.get(name)
         path = catalog_path / "reference" / f"{name}.parquet"
@@ -157,10 +168,16 @@ def load_reference_tables(catalog_path: Path, declared: Sequence[str], reference
         actual = _sha256(path)
         if actual != entry.get("sha256"):
             raise DatasetV2Error(f"REFERENCE_TABLE_CORRUPT: {name!r} sha256 {actual} != manifest {entry.get('sha256')}")
-        digests[name] = actual
         out[name] = pd.read_parquet(path)
-    if reference_digest is not None and set(declared) >= set(ref_manifest):
-        computed = hashlib.sha256(json.dumps({n: digests[n] for n in sorted(declared)}, sort_keys=True).encode()).hexdigest()
+    if reference_digest is not None:
+        # W-3: the DatasetSpec digest covers the FULL catalog manifest (this is exactly the
+        # formula computed at build time -- see `build_reference_catalog`), never a
+        # declared-subset aggregate. Declaring a strict subset of the catalog's reference
+        # tables must not silently disarm this check: verify unconditionally against every
+        # table the catalog build recorded, not only the ones this study reads.
+        computed = hashlib.sha256(
+            json.dumps({n: (ref_manifest.get(n) or {}).get("sha256") for n in sorted(ref_manifest)}, sort_keys=True).encode()
+        ).hexdigest()
         if computed != reference_digest:
             raise DatasetV2Error(f"REFERENCE_DIGEST_MISMATCH: computed {computed} != declared {reference_digest}")
     return out

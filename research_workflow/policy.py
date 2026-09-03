@@ -84,6 +84,10 @@ def historical_authority(study_dir: Path) -> list[str]:
 
 
 def _git_tracked(repo_root: Path, rel_posix_path: str) -> bool:
+    """Index-membership only (``git ls-files``). NOT a committed-authority check: a file
+    that was ``git add``ed but never committed passes this. Kept only for callers that
+    genuinely want index membership; every authority check in this module uses
+    ``committed_blob``/``is_committed_identical`` instead (red-team finding C-A)."""
     try:
         r = subprocess.run(
             ["git", "ls-files", "--error-unmatch", rel_posix_path],
@@ -92,6 +96,91 @@ def _git_tracked(repo_root: Path, rel_posix_path: str) -> bool:
     except OSError:
         return False
     return r.returncode == 0 and bool(r.stdout.strip())
+
+
+def committed_blob(repo_root: Path, rel_posix_path: str) -> Optional[bytes]:
+    """The bytes of ``rel_posix_path`` as committed at HEAD, or ``None`` if that path does
+    not exist at HEAD (untracked, staged-but-uncommitted, deleted, or committed only on a
+    different branch/ref). Never reads the working tree."""
+    try:
+        r = subprocess.run(
+            ["git", "rev-parse", "--verify", "-q", f"HEAD:{rel_posix_path}"],
+            cwd=str(repo_root), capture_output=True, text=True,
+        )
+    except OSError:
+        return None
+    sha = r.stdout.strip()
+    if r.returncode != 0 or not sha:
+        return None
+    try:
+        r2 = subprocess.run(
+            ["git", "cat-file", "blob", sha],
+            cwd=str(repo_root), capture_output=True,
+        )
+    except OSError:
+        return None
+    if r2.returncode != 0:
+        return None
+    return r2.stdout
+
+
+def is_committed_identical(repo_root: Path, path: Path) -> bool:
+    """True iff ``path`` exists at HEAD in ``repo_root`` AND the current working-tree bytes
+    are byte-identical to that HEAD blob. False for untracked, staged-only, deleted-at-HEAD,
+    or committed-then-rewritten-in-the-worktree paths."""
+    repo_root = Path(repo_root).resolve()
+    path = Path(path)
+    try:
+        rel = path.relative_to(repo_root).as_posix()
+    except ValueError:
+        return False
+    try:
+        head = subprocess.run(
+            ["git", "rev-parse", "--verify", "-q", f"HEAD:{rel}"],
+            cwd=str(repo_root), capture_output=True, text=True,
+        )
+    except OSError:
+        return False
+    head_sha = head.stdout.strip()
+    if head.returncode != 0 or not head_sha:
+        return False
+    if not path.is_file():
+        return False
+    try:
+        wt = subprocess.run(
+            ["git", "hash-object", str(path)],
+            cwd=str(repo_root), capture_output=True, text=True,
+        )
+    except OSError:
+        return False
+    if wt.returncode != 0:
+        return False
+    return wt.stdout.strip() == head_sha
+
+
+def require_committed_identical(repo_root: Path, path: Path, *, kind: str) -> bytes:
+    """Raise ``OldRuntimePolicyError`` unless ``path`` is committed at HEAD *and* the
+    working-tree bytes are unchanged since that commit; on success return the HEAD blob
+    bytes (the authoritative bytes -- callers must parse these, not the working-tree file)."""
+    repo_root = Path(repo_root).resolve()
+    path = Path(path)
+    try:
+        rel = path.relative_to(repo_root).as_posix()
+    except ValueError:
+        raise OldRuntimePolicyError(f"HISTORICAL_AUTHORITY_UNTRACKED: {path} is not inside repo root {repo_root}")
+    blob = committed_blob(repo_root, rel)
+    if blob is None:
+        raise OldRuntimePolicyError(
+            f"HISTORICAL_AUTHORITY_UNTRACKED: {rel} is missing or not committed to git at HEAD; "
+            f"an untracked/staged-only/deleted-at-HEAD {kind} cannot grant historical execution authority"
+        )
+    if not is_committed_identical(repo_root, path):
+        raise OldRuntimePolicyError(
+            f"HISTORICAL_AUTHORITY_MODIFIED_IN_WORKTREE: {rel} was committed at HEAD but the working-tree "
+            f"bytes of this {kind} differ from that commit; a committed record rewritten in the working "
+            f"tree cannot grant historical execution authority"
+        )
+    return blob
 
 
 def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = None) -> Dict[str, Any]:
@@ -117,19 +206,15 @@ def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = Non
             f"HISTORICAL_AUTHORITY_UNTRACKED: {study_dir} is not inside repo root {repo_root}"
         )
 
-    if not seal_path.is_file() or not _git_tracked(repo_root, rel_seal):
-        raise OldRuntimePolicyError(
-            f"HISTORICAL_AUTHORITY_UNTRACKED: {rel_seal} is missing or not committed to git; "
-            f"an untracked/spoofed seal cannot grant historical execution authority"
-        )
-    if not manifest_path.is_file() or not _git_tracked(repo_root, rel_manifest):
-        raise OldRuntimePolicyError(
-            f"HISTORICAL_AUTHORITY_UNTRACKED: {rel_manifest} is missing or not committed to git"
-        )
+    # Authority binds to the HEAD blob, never to the index or the working tree (C-A): a
+    # staged-but-uncommitted seal, or a genuinely committed seal rewritten in the worktree
+    # after the commit, both fail here.
+    seal_blob = require_committed_identical(repo_root, seal_path, kind="preexec audit seal")
+    manifest_blob = require_committed_identical(repo_root, manifest_path, kind="frozen execution manifest")
 
     try:
-        seal = json.loads(seal_path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
+        seal = json.loads(seal_blob.decode("utf-8"))
+    except (OSError, ValueError, UnicodeDecodeError) as exc:
         raise OldRuntimePolicyError(f"HISTORICAL_SEAL_INVALID: cannot parse {rel_seal}: {exc}")
     if not isinstance(seal, dict) or not seal:
         raise OldRuntimePolicyError(f"HISTORICAL_SEAL_INVALID: {rel_seal} is empty")
@@ -154,8 +239,8 @@ def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = Non
         )
 
     try:
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
+        manifest = json.loads(manifest_blob.decode("utf-8"))
+    except (OSError, ValueError, UnicodeDecodeError) as exc:
         raise OldRuntimePolicyError(f"HISTORICAL_SEAL_INVALID: cannot parse {rel_manifest}: {exc}")
     manifest_composite = manifest.get("frozen_execution_composite_sha256") if isinstance(manifest, dict) else None
     if not manifest_composite or manifest_composite != composite_seal_hash:
@@ -166,11 +251,7 @@ def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = Non
 
     closure_path = study_dir / "artifacts" / "study_closure.json"
     if closure_path.is_file():
-        rel_closure = closure_path.relative_to(repo_root).as_posix()
-        if not _git_tracked(repo_root, rel_closure):
-            raise OldRuntimePolicyError(
-                f"HISTORICAL_AUTHORITY_UNTRACKED: {rel_closure} present but not committed to git"
-            )
+        require_committed_identical(repo_root, closure_path, kind="study closure")
         from research_workflow.study_closure import StudyClosureInvalid, load_study_closure
         try:
             load_study_closure(study_dir)
@@ -179,7 +260,7 @@ def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = Non
 
     return {
         "study_id": study_dir.name,
-        "seal_sha256": hashlib.sha256(seal_path.read_bytes()).hexdigest(),
+        "seal_sha256": hashlib.sha256(seal_blob).hexdigest(),
         "seal_composite": composite_seal_hash,
         "manifest_composite": manifest_composite,
         "git_tracked": True,
@@ -205,4 +286,5 @@ def assert_old_runtime_allowed(study_dir: Path, repo_root: Optional[Path] = None
 
 
 __all__ = ["OLD_RUNTIME_POLICY", "POLICY_RECORDED_AT", "OldRuntimePolicyError", "assert_old_runtime_allowed",
-           "historical_authority", "verify_historical_authority", "STUDY_PYTHON_EXCEPTIONS", "scan_study_python"]
+           "historical_authority", "verify_historical_authority", "STUDY_PYTHON_EXCEPTIONS", "scan_study_python",
+           "committed_blob", "is_committed_identical", "require_committed_identical"]

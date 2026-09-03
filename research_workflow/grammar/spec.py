@@ -226,6 +226,10 @@ class ScoredModelExpectSpec(_Strict):
     target_arm: Optional[str] = None
     direction: Optional[str] = None
     cell_id: Optional[str] = None
+    # W-1: binds to the estimator's actual canonical BYTES (manifest["canonical"]
+    # ["byte_sha256"]), not a lineage field -- catches a substituted estimator that
+    # refreshes its own canonical/golden bytes under the unchanged model_id.
+    canonical_sha256: Optional[str] = None
 
 
 class ScoredModelSpec(_Strict):

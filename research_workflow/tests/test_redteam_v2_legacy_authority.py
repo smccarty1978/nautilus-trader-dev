@@ -172,6 +172,105 @@ def test_train_freeze_only_marker_without_seal_rejected(tmp_path):
         verify_historical_authority(study, repo_root=repo)
 
 
+def test_staged_but_uncommitted_seal_rejected(tmp_path):
+    """C-A: `git add` without `git commit` must not grant authority (index != HEAD)."""
+    repo = _init_repo(tmp_path)
+    seal, manifest = _valid_seal_and_manifest("study_i")
+    study = repo / "studies" / "study_i"
+    (study / "artifacts").mkdir(parents=True, exist_ok=True)
+    (study / "audit").mkdir(parents=True, exist_ok=True)
+    (study / "artifacts" / "preexec_audit_seal.json").write_text(json.dumps(seal), encoding="utf-8")
+    (study / "audit" / "frozen_execution_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    _git(repo, "add", "-A")  # staged only, never committed
+    with pytest.raises(OldRuntimePolicyError, match="HISTORICAL_AUTHORITY_UNTRACKED"):
+        verify_historical_authority(study, repo_root=repo)
+
+
+def test_committed_then_rewritten_seal_in_worktree_rejected(tmp_path):
+    """C-A: a genuinely committed seal, self-consistently rewritten in the working tree
+    after the commit, must not grant authority -- the grant must bind to HEAD bytes."""
+    repo = _init_repo(tmp_path)
+    seal, manifest = _valid_seal_and_manifest("study_j")
+    study = _write_study(repo, "study_j", seal, manifest, commit=True)
+    assert verify_historical_authority(study, repo_root=repo)["study_id"] == "study_j"
+
+    # Rewrite self-consistently in the worktree (new file_hashes, recomputed composite,
+    # matching manifest) -- everything about the rewritten pair is internally consistent,
+    # but it was never committed.
+    new_file_hashes = {"repo/some_governed_module.py": "9" * 64}
+    new_composite = seal_body_hash({"file_hashes": new_file_hashes})
+    seal["file_hashes"] = new_file_hashes
+    seal["composite_seal_hash"] = new_composite
+    manifest["frozen_execution_composite_sha256"] = new_composite
+    (study / "artifacts" / "preexec_audit_seal.json").write_text(json.dumps(seal), encoding="utf-8")
+    (study / "audit" / "frozen_execution_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(OldRuntimePolicyError, match="HISTORICAL_AUTHORITY_MODIFIED_IN_WORKTREE"):
+        verify_historical_authority(study, repo_root=repo)
+
+
+def test_committed_identical_seal_passes(tmp_path):
+    """Positive control: committed and untouched since -> authority granted."""
+    repo = _init_repo(tmp_path)
+    seal, manifest = _valid_seal_and_manifest("study_k")
+    study = _write_study(repo, "study_k", seal, manifest, commit=True)
+    evidence = verify_historical_authority(study, repo_root=repo)
+    assert evidence["study_id"] == "study_k"
+
+
+def test_train_freeze_rule_without_authenticated_seal_in_producing_study_rejected(tmp_path):
+    """model_store legacy_v1_train_freeze must additionally require the producing study to
+    pass verify_historical_authority -- a freeze with no authenticated seal grants nothing."""
+    from research_workflow.model_store import _verify_legacy_v1_train_freeze, ModelStoreError
+    from research.analysis.identity import canonical_sha256 as _canon
+
+    repo = _init_repo(tmp_path)
+    study_id = "study_l_no_seal"
+    study = repo / "studies" / study_id
+    (study / "artifacts").mkdir(parents=True, exist_ok=True)
+    freeze = {
+        "study_id": study_id, "provenance": "TRAIN_ONLY",
+        "model_hashes": {"arm_A": "f" * 64},
+        "feature_sets": {"A": ["feat1", "feat2"]},
+    }
+    freeze["freeze_sha256"] = _canon({k: v for k, v in freeze.items() if k not in ("generated_at_utc", "freeze_sha256")})
+    freeze_path = study / "artifacts" / "train_experiment_freeze.json"
+    freeze_path.write_text(json.dumps(freeze), encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "freeze only, no seal")
+    freeze_sha = hashlib.sha256(freeze_path.read_bytes()).hexdigest()
+
+    manifest = {
+        "lineage": {"study_id": study_id, "fit_identity_sha256": "f" * 64, "ordered_inputs": ["feat1", "feat2"]},
+        "legacy_registry_record": {
+            "arm": "arm_A",
+            "train_freeze_path": "studies/study_l_no_seal/artifacts/train_experiment_freeze.json",
+            "train_freeze_sha256": freeze_sha,
+        },
+    }
+    with pytest.raises(ModelStoreError, match="MODEL_IDENTITY_UNVERIFIABLE"):
+        _verify_legacy_v1_train_freeze(manifest, "irrelevant_model_id", repo)
+
+
+def test_committed_on_another_branch_only_rejected(tmp_path):
+    """C-A: committed on a side branch, not on the branch whose HEAD is checked out (or
+    passed as the authority ref) -- must not grant authority."""
+    repo = _init_repo(tmp_path)
+    (repo / "README.md").write_text("root", encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "root")
+    _git(repo, "checkout", "-q", "-b", "side")
+    seal, manifest = _valid_seal_and_manifest("study_m")
+    study = _write_study(repo, "study_m", seal, manifest, commit=True)  # committed on `side`
+    _git(repo, "checkout", "-q", "master" if _has_branch(repo, "master") else "main")
+    with pytest.raises(OldRuntimePolicyError, match="HISTORICAL_AUTHORITY_UNTRACKED"):
+        verify_historical_authority(study, repo_root=repo)
+
+
+def _has_branch(repo: Path, name: str) -> bool:
+    r = subprocess.run(["git", "rev-parse", "--verify", "-q", name], cwd=str(repo), capture_output=True, text=True)
+    return r.returncode == 0
+
+
 def test_assert_old_runtime_allowed_rejects_untracked_via_public_entrypoint(tmp_path):
     repo = _init_repo(tmp_path)
     study = repo / "studies" / "study_h"

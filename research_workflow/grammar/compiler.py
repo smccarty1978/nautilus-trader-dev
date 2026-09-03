@@ -53,6 +53,11 @@ STAGE_CLOSURE_MODULES: Dict[str, Tuple[str, ...]] = {
         "research_workflow/governed_controller.py", "research_workflow/controller_contracts.py",
         "research_workflow/policy.py", "research_workflow/study_closure.py",
         "research_workflow/closure_hash.py", "research_workflow/roots.py", "research_workflow/locks.py",
+        # W-4: policy.verify_historical_authority's legacy-authority hash rule is entirely
+        # defined by seal.seal_body_hash -- redefining it grants/denies historical execution
+        # authority without staling anything. workspace.py is the writer-lease state machine
+        # governed_controller_v2._check_writer_lease consumes for exclusive-write enforcement.
+        "research_workflow/seal.py", "research_workflow/workspace.py",
     ),
     "outcome": (
         "research_workflow/forward_outcomes/guard.py", "research_workflow/entry_references.py",
@@ -428,6 +433,11 @@ def _resolve_features(ctx: _Ctx) -> None:
     from features.registry import (FeatureInstance, FeatureInstanceError, _canonical_bundle, _canonical_definition_by_name,
                                    derive_resolved_input_requirements, generate_physical_alias, resolve_feature_instances,
                                    validate_feature_instance)
+    # W-4: for a real `features.host: features` study, this module decides canonical feature
+    # identity, parameter validation and physical alias generation at compile time -- it must
+    # be inside the closure so redefining it stales the freeze (research_workflow.seal /
+    # policy.verify_historical_authority) the same way a bound provider/tracker module does.
+    ctx.closure_files.add("features/registry.py")
     bundle = _canonical_bundle("active")
     resolved: List[Dict[str, Any]] = []
     ok = True
@@ -918,6 +928,11 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
         ctx.binding_proof.append({"kind": "derived_input", "id": d.name, "capability": FrozenExternalScoreBinding.CAPABILITY,
                                   "implementation": impl, "bound": True})
         ctx.closure_files.add("research_workflow/external_model_scoring.py")
+        # W-4: DerivedCausalInputSpec (parsed at runtime by
+        # features/trackers/host_bindings.py:670-672 on this frozen-external-score path) is
+        # the schema that shapes the derived input's identity; it belongs in the closure
+        # alongside external_model_scoring.py, not only the module that consumes it.
+        ctx.closure_files.add("research/schemas/study_spec.py")
         derived.append(d.name)
     return {"identity": ["observation_ts", "regime_start_ns", "checkpoint_index"], "metadata": metadata,
             "features": list(ctx.feature_aliases), "derived": derived, "observation": list(outcome.get("observation_columns") or [])}

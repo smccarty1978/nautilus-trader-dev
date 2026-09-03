@@ -28,6 +28,7 @@ from lightgbm import LGBMClassifier
 from research.analysis.identity import canonical_sha256
 from research_workflow import model_store as ms
 from research_workflow.model_migration import migrate_train_freeze_bundle
+from research_workflow.seal import seal_body_hash
 
 
 def _git(repo: Path, *args: str) -> None:
@@ -59,14 +60,36 @@ def _fit(cols: list[str], frame: pd.DataFrame):
     return LGBMClassifier(n_estimators=20, max_depth=3, num_leaves=8, verbosity=-1).fit(frame[cols], y)
 
 
+def _seal_and_commit(repo: Path, study_id: str) -> None:
+    """A minimal, internally self-consistent, COMMITTED seal + frozen manifest for
+    study_id -- required by legacy_v1_train_freeze since a freeze alone (no seal) grants
+    no authority (red-team finding C-A)."""
+    file_hashes = {"repo/some_governed_module.py": hashlib.sha256(b"module body").hexdigest()}
+    composite = seal_body_hash({"file_hashes": file_hashes})
+    seal = {
+        "seal_id": f"preexec_seal_{study_id}_{composite[:16]}", "study_name": study_id,
+        "seal_status": "LOCKED", "composite_seal_hash": composite, "file_hashes": file_hashes,
+    }
+    manifest = {"schema_version": 1, "frozen_execution_composite_sha256": composite}
+    artifacts_dir = repo / "studies" / study_id / "artifacts"; artifacts_dir.mkdir(parents=True, exist_ok=True)
+    audit_dir = repo / "studies" / study_id / "audit"; audit_dir.mkdir(parents=True, exist_ok=True)
+    (artifacts_dir / "preexec_audit_seal.json").write_text(json.dumps(seal), encoding="utf-8")
+    (audit_dir / "frozen_execution_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    _git(repo, "add", f"studies/{study_id}/artifacts/preexec_audit_seal.json",
+         f"studies/{study_id}/audit/frozen_execution_manifest.json")
+    _git(repo, "commit", "-q", "-m", f"seal {study_id}")
+
+
 def _build_repo(tmp_path: Path, *, study_id: str = "redteam_model_c",
                 tamper_freeze_bytes: bool = False, commit_freeze: bool = True,
-                arm_fit_identity_override: dict | None = None) -> tuple[Path, Path, Path, dict]:
+                arm_fit_identity_override: dict | None = None, with_seal: bool = True) -> tuple[Path, Path, Path, dict]:
     """A fresh tmp git repo carrying studies/<study_id>/artifacts/train_experiment_freeze.json
     (committed) plus a synthetic two-arm joblib bundle (LONG_A, LONG_B) built OUTSIDE the
     repo -- mirrors Model C's real layout: bundle bytes are gitignored, the freeze is not."""
     repo = tmp_path / "repo"; repo.mkdir(); _git_init(repo)
     study_dir = repo / "studies" / study_id / "artifacts"; study_dir.mkdir(parents=True)
+    if with_seal:
+        _seal_and_commit(repo, study_id)
 
     frame = _train_frame()
     est_a = _fit(FEATS_A, frame)
@@ -157,7 +180,22 @@ def test_tampered_freeze_bytes_mismatch(tmp_path: Path, root: Path):
                                          train_frame=train_frame, model_root=root, golden_rows=64)
     model_id = report["arms"]["LONG_A"]["model_id"]
     freeze_path.write_text(freeze_path.read_text(encoding="utf-8") + "   ", encoding="utf-8")  # tamper after commit
-    with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_MISMATCH"):
+    # A committed freeze rewritten in the working tree is now caught by the HEAD-blob
+    # binding itself (C-A) before the declared-sha256 comparison is even reached.
+    with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_UNVERIFIABLE.*MODIFIED_IN_WORKTREE"):
+        ms.authenticate_model(model_id, model_root=root, repo_root=repo)
+
+
+def test_freeze_without_authenticated_seal_in_study_unverifiable(tmp_path: Path, root: Path):
+    """C-A: a committed freeze in a study with NO authenticated seal must not grant
+    authority -- the freeze alone attests only to itself, never to who executed it."""
+    repo, freeze_path, bundle_path, freeze = _build_repo(tmp_path, with_seal=False)
+    train_frame = _train_frame(n=300, seed=1)
+    report = migrate_train_freeze_bundle(study_id="redteam_model_c", freeze_path=freeze_path,
+                                         bundle_path=bundle_path, repo_root=repo,
+                                         train_frame=train_frame, model_root=root, golden_rows=64)
+    model_id = report["arms"]["LONG_A"]["model_id"]
+    with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_UNVERIFIABLE"):
         ms.authenticate_model(model_id, model_root=root, repo_root=repo)
 
 

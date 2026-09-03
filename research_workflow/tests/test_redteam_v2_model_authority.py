@@ -188,35 +188,44 @@ def _score_frame() -> pd.DataFrame:
     return frame
 
 
-def test_g_score_models_refuses_attacks_and_passes_legit(root: Path, monkeypatch):
+def _lifecycle_for_scoring(tmp_path: Path, model_root: Path | None = None) -> V2Lifecycle:
+    """A V2Lifecycle instance sufficient to call the bound `_score_models` -- no study
+    directory is touched by that method."""
+    from research_workflow.lifecycle_v2 import V2Options
+    return V2Lifecycle(tmp_path / "unused_study", options=V2Options(model_root=model_root))
+
+
+def test_g_score_models_refuses_attacks_and_passes_legit(root: Path, tmp_path: Path, monkeypatch):
     monkeypatch.setattr("research_workflow.roots.resolve_model_root", lambda *a, **k: root)
     model_id, _ = _store(root)
     frame = _score_frame()
+    lc = _lifecycle_for_scoring(tmp_path)  # model_root=None -- exercises the monkeypatched real-root fallback
 
     def _models(mid):
         return [{"id": mid, "label": "y", "subset": {}, "name": "primary"}]
 
-    scored = V2Lifecycle._score_models(frame, _models(model_id))
+    scored = lc._score_models(frame, _models(model_id))
     assert scored[0]["model_authentication"]["golden"]["status"] == "PASS"
 
     bad_id, _ = _store(root, tier="ledger", selection_status="rejected", target_arm="SL2_0")
     with pytest.raises(ms.ModelStoreError, match="MODEL_TIER_NOT_REUSABLE"):
-        V2Lifecycle._score_models(frame, _models(bad_id))
+        lc._score_models(frame, _models(bad_id))
 
     src = ms.model_dir(model_id, root); dst = ms.model_dir("copied-runtime", root)
     import shutil
     shutil.copytree(src, dst)
     with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_MISMATCH"):
-        V2Lifecycle._score_models(frame, _models("copied-runtime"))
+        lc._score_models(frame, _models("copied-runtime"))
 
 
-def test_g_score_models_honors_expect(root: Path, monkeypatch):
+def test_g_score_models_honors_expect(root: Path, tmp_path: Path, monkeypatch):
     monkeypatch.setattr("research_workflow.roots.resolve_model_root", lambda *a, **k: root)
     model_id, _ = _store(root)
     frame = _score_frame()
     models = [{"id": model_id, "label": "y", "subset": {}, "name": "primary", "expect": {"target_arm": "NOT_THIS_ARM"}}]
+    lc = _lifecycle_for_scoring(tmp_path)
     with pytest.raises(ms.ModelStoreError, match="MODEL_EXPECTATION_MISMATCH"):
-        V2Lifecycle._score_models(frame, models)
+        lc._score_models(frame, models)
 
 
 # --------------------------------------------------------------------------- #
@@ -403,3 +412,87 @@ def test_binding_refuses_a_synthetic_availability_later_than_checkpoint(tmp_path
     row = {"a": 1.0, "b": 0.0, "dir": 1}
     with pytest.raises(ExternalModelScoringError, match="NOT_AVAILABLE_AT_CHECKPOINT"):
         binding.derive(row, epoch, lambda ref, ep: row.get(ref))
+
+
+# --------------------------------------------------------------------------- #
+# W-1: canonical_sha256 expectation binds authentication to the estimator's actual bytes.
+# --------------------------------------------------------------------------- #
+
+def test_w1_canonical_sha256_expectation_passes_when_correct(root: Path):
+    model_id, _ = _store(root)
+    manifest = ms.read_manifest(model_id, root)
+    correct = manifest["canonical"]["byte_sha256"]
+    evidence = ms.authenticate_model(model_id, expect={"canonical_sha256": correct}, model_root=root)
+    assert evidence["canonical_sha256"] == correct
+
+
+def test_w1_canonical_sha256_expectation_catches_wrong_declared_bytes(root: Path):
+    """A caller-declared canonical_sha256 that does not match the manifest's actual canonical
+    byte_sha256 is refused CANONICAL_SHA_MISMATCH -- this is what closes the adjacent A4c
+    bypass (a substituted estimator refreshes canonical+golden bytes under the SAME model_id;
+    every OTHER check still passes, but a caller who pinned the original canonical_sha256
+    they saw catches the substitution)."""
+    model_id, _ = _store(root)
+    manifest = ms.read_manifest(model_id, root)
+    correct = manifest["canonical"]["byte_sha256"]
+    wrong = ("0" if correct[0] != "0" else "1") + correct[1:]
+    with pytest.raises(ms.ModelStoreError, match="CANONICAL_SHA_MISMATCH"):
+        ms.authenticate_model(model_id, expect={"canonical_sha256": wrong}, model_root=root)
+
+
+def test_w1_freeze_records_model_canonical_sha256(tmp_path: Path, monkeypatch):
+    """lifecycle_v2.freeze() records model_canonical_sha256 next to model_hashes."""
+    import subprocess
+    import sys
+    from research_workflow.lifecycle_v2 import V2Lifecycle, V2Options
+
+    GOLDEN = ROOT / "fixtures" / "golden"
+    subprocess.run([sys.executable, str(GOLDEN / "build_golden_fixture.py")], check=True, cwd=str(ROOT), capture_output=True)
+    study = tmp_path / "studies" / "w1_freeze_flow"
+    study.mkdir(parents=True)
+    spec = (GOLDEN / "study_barrier.yaml").read_text(encoding="utf-8")
+    spec = spec.replace("id: golden_barrier", "id: w1_freeze_flow").replace(
+        "chronology: {train: [2030], dev: [], prohibited: []}",
+        "chronology: {train: [2029, 2030], dev: [2031], prohibited: [], authorized_dates: ['2030-01-01']}")
+    spec = spec.replace("model: none", "model:\n  family: lightgbm\n  params: {n_estimators: 20, max_depth: 2, num_leaves: 4, learning_rate: 0.1, verbosity: -1}\n"
+                                       "  validation: {protocol: model_selection.random, tuning_years: [2029, 2030], final_train_validation_years: []}")
+    (study / "study.yaml").write_text(spec, encoding="utf-8")
+
+    from research_workflow.governed_controller_v2 import V2StudyController
+    from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
+    bars = [__import__("research_workflow.host.interfaces", fromlist=["BarView"]).BarView(**b)
+            for b in json.loads((GOLDEN / "bars.json").read_text(encoding="utf-8"))]
+    expected = json.loads((GOLDEN / "expected.json").read_text(encoding="utf-8"))
+    session = {"kind": "calendar", "session": "RTH", "rows": [[a * 1_000_000_000, b * 1_000_000_000] for a, b in expected["sessions"]]}
+    opts = V2Options(execute=True, smoke_date="2030-01-01", datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS,
+                     bar_source=lambda s, e: bars, session_table_spec=session, in_process_partitions=True,
+                     closure={"outcome": "SYNTHETIC_FLOW_COMPLETE", "terminal_decision": "PLATFORM_V2_FLOW_PROVEN"},
+                     model_root=tmp_path / "model_store")
+    monkeypatch.setattr(V2StudyController, "_worktree", lambda self: {"path": str(ROOT), "branch": "test", "head": "0" * 40, "dirty_paths": [], "unsafe_dirty_paths": []})
+    ctl = lambda: V2StudyController(study, options=opts, repo_root=ROOT)
+    ctl().run(through="tests")
+
+    def _write_audit(kind: str, auditor: str):
+        from research_workflow.lifecycle_v2 import ingest_audit_report
+        frozen = json.loads((study / "audit" / "frozen_execution_manifest.json").read_text())["frozen_execution_composite_sha256"]
+        name = "pass_01.md" if kind == "causal" else "contract_pass_01.md"
+        block = {"verdict": "CLEAR", "audit_type": kind, "study": study.name, "auditor": auditor, "audited_execution_composite_sha256": frozen, "critical": 0, "warning": 0, "note": 1}
+        p = study / "audit" / name
+        p.write_text(f"# {kind} audit pass 01\n\nReviewed the packet.\n\n<!-- AUDIT_SUMMARY_V2_START -->\n{json.dumps(block)}\n<!-- AUDIT_SUMMARY_V2_END -->\n", encoding="utf-8")
+        return p
+
+    from research_workflow.lifecycle_v2 import ingest_audit_report
+    ctl().run(through="seal")
+    ingest_audit_report(study, "causal", _write_audit("causal", "auditor_a"))
+    ctl().run(through="seal")
+    ingest_audit_report(study, "contract", _write_audit("contract", "auditor_b"))
+    ctl().run(through="seal")
+    ctl().run(through="merge")
+    card = ctl().run(through="freeze")
+    assert card["STATUS"] == "OK", card
+
+    freeze = json.loads((study / "artifacts" / "train_experiment_freeze.json").read_text())
+    models = json.loads((study / "artifacts" / "experiment_models.json").read_text())
+    assert "model_canonical_sha256" in freeze
+    manifest = ms.read_manifest(models["model_id"], opts.model_root)
+    assert freeze["model_canonical_sha256"]["primary"] == manifest["canonical"]["byte_sha256"]

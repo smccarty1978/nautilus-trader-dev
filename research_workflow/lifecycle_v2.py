@@ -186,6 +186,11 @@ class V2Options:
     max_runtime: float = 6 * 3600
     progress_every_bars: int = 200_000
     in_process_partitions: bool = False
+    # W-5: when set, every model-store call this lifecycle makes (fit/score/authenticate)
+    # writes to and reads from THIS root instead of the operator's real durable store
+    # (research_workflow.roots.resolve_model_root()). None preserves the configured root --
+    # every non-test caller keeps writing to the real store exactly as before.
+    model_root: Optional[Path] = None
 
 
 class V2Lifecycle:
@@ -650,7 +655,7 @@ class V2Lifecycle:
         model_id = hashlib.sha256(json.dumps(lineage.__dict__, sort_keys=True, default=str).encode()).hexdigest()
         metrics = {"folds": folds, "final_validation": final_val, "tuning": (None if tuning_report is None else {k: tuning_report[k] for k in ("ledger", "sampler", "n_trials", "selected")})}
         manifest = store_model(model_id=model_id, estimator=final_est, lineage=lineage, tier="registry", selection_status="selected", metrics=metrics,
-                               golden_train_frame=binary[features], golden_rows=min(GOLDEN_MIN_ROWS, int(len(binary))))
+                               golden_train_frame=binary[features], golden_rows=min(GOLDEN_MIN_ROWS, int(len(binary))), model_root=self.opts.model_root)
         path = _write(self.artifacts / "experiment_models.json", {"schema_version": 2, "plan_sha256": plan["plan_sha256"], "family": family, "hyperparameters": params,
                                                                    "features": features, "label_column": label, "rows": {"total": int(len(frame)), "binary": int(len(binary))},
                                                                    "tuning_years": sorted(tuning), "final_train_validation_years": final_years, "metrics": metrics,
@@ -671,18 +676,18 @@ class V2Lifecycle:
         frame["_year"] = pd.to_datetime(frame["observation_ts"], unit="ns", utc=True).dt.year
         return frame
 
-    @staticmethod
-    def _score_models(frame, models: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _score_models(self, frame, models: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Score each frozen model on its declared subset; metrics per year plus a score digest for parity."""
         import hashlib as _h
         import numpy as np
         from research.analysis.metrics import brier, pr_auc, roc_auc
         from research_workflow.model_store import authenticate_model, read_manifest, score
+        model_root = self.opts.model_root
         out = []
         for m in models:
             expect = dict(m.get("expect") or {})
-            authentication = authenticate_model(m["id"], expect=expect or None)
-            manifest = read_manifest(m["id"])
+            authentication = authenticate_model(m["id"], expect=expect or None, model_root=model_root)
+            manifest = read_manifest(m["id"], model_root)
             inputs = list(manifest["lineage"]["ordered_inputs"])
             missing = [c for c in inputs if c not in frame.columns]
             if missing:
@@ -699,7 +704,7 @@ class V2Lifecycle:
                 if part[label].nunique() < 2:
                     per_year[int(y)] = {"n": int(len(part)), "roc_auc": None, "pr_auc": None, "brier": None}
                     continue
-                s = score(m["id"], part[inputs])
+                s = score(m["id"], part[inputs], model_root=model_root)
                 per_year[int(y)] = {"n": int(len(part)), "positives": int(part[label].sum()), "roc_auc": roc_auc(part[label], s).to_dict().get("value"),
                                     "pr_auc": pr_auc(part[label], s).to_dict().get("value"), "brier": brier(part[label], s).to_dict().get("value"),
                                     "score_digest": _h.sha256(np.round(np.asarray(s, dtype=float), 10).tobytes()).hexdigest()}
@@ -728,10 +733,23 @@ class V2Lifecycle:
         plan = load_plan(self.study)
         models = _read(self.artifacts / "experiment_models.json")
         ident = _read(self.work / "merged" / "identity.json")
+        # W-1: bind the frozen record to the model's actual estimator BYTES, not only the
+        # (lineage-derived) model_id -- a substituted estimator that refreshes its own
+        # canonical/golden bytes under the unchanged model_id would otherwise authenticate
+        # identically. model_canonical_sha256 keys by the same name as model_hashes.
+        if models.get("model_id"):
+            from research_workflow.model_store import read_manifest as _read_manifest
+            manifest = _read_manifest(models["model_id"], self.opts.model_root)
+            model_canonical_sha256 = {"primary": manifest.get("canonical", {}).get("byte_sha256")}
+        else:
+            model_canonical_sha256 = {
+                m["name"]: (m.get("model_authentication") or {}).get("canonical_sha256") for m in models.get("models") or []
+            }
         payload = {"partition": "train", "platform": "v2", "plan_sha256": plan["plan_sha256"],
                    "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
                    "feature_sets": {"primary": list(plan["columns"]["features"])}, "preprocessing_hash": "identity",
                    "model_hashes": ({"primary": models["model_id"]} if models.get("model_id") else {m["name"]: m["id"] for m in models.get("models") or []}),
+                   "model_canonical_sha256": model_canonical_sha256,
                    "thresholds": {}, "deciles": {}, "new_models_trained": bool(models.get("model_id")),
                    "merge_identity": ident, "metrics": models.get("metrics"), "label_column": plan["outcome"].get("label_column")}
         path = write_train_freeze(self.study, payload)
@@ -766,9 +784,9 @@ class V2Lifecycle:
         elif models.get("model_id"):
             from research.analysis.metrics import brier, pr_auc, roc_auc
             from research_workflow.model_store import authenticate_model, score
-            authentication = authenticate_model(models["model_id"], expect={"study_id": plan["study"]["id"]})
+            authentication = authenticate_model(models["model_id"], expect={"study_id": plan["study"]["id"]}, model_root=self.opts.model_root)
             binary = frame[frame[label].isin([0, 1, 0.0, 1.0])]
-            s = score(models["model_id"], binary[models["features"]])
+            s = score(models["model_id"], binary[models["features"]], model_root=self.opts.model_root)
             summary["oos_metrics"] = {"n": int(len(binary)), "roc_auc": roc_auc(binary[label], s).to_dict().get("value"),
                                       "pr_auc": pr_auc(binary[label], s).to_dict().get("value"), "brier": brier(binary[label], s).to_dict().get("value")}
             summary["train_metrics"] = models.get("metrics")

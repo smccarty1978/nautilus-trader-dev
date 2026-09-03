@@ -118,3 +118,53 @@ def test_dataset_spec_binds_in_the_static_compiler(tmp_path: Path):
     streams = {s["key"]: s for s in out.plan.streams}
     assert streams["nq_1s"]["source"] == "external" and streams["nq_1m"]["source"] == "external"
     assert streams["nq_1m"]["bar_type"] == m["streams"]["1m"]["bar_type"]
+
+
+# --- W-3 (adversarial pass 02): the reference_digest aggregate must bind over ALL manifest
+# tables (matching the build-time formula), not silently disarm when a study declares only a
+# subset of the catalog's reference tables.
+
+def test_reference_digest_binds_even_when_declaring_a_strict_subset(tmp_path: Path):
+    raw = tmp_path / "raw"; raw.mkdir()
+    _synthetic_raw(raw / "NQ_v0_1s_2021.parquet")
+    m = dv2.build_dataset_v2(symbol="NQ", years=["2021"], raw_dir=raw, catalog_root=tmp_path / "catalog", repo_root=tmp_path, write_spec=False)
+    cat = Path(m["catalog_path"])
+    manifest_path = cat / "build_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert set(manifest["reference_tables"]) > {"sessions"}, "fixture must build more than one reference table"
+
+    # (a) a strict-subset declaration with the correct aggregate digest still passes.
+    tables = dv2.load_reference_tables(cat, ["sessions"], reference_digest=m["reference_digest"])
+    assert "sessions" in tables
+
+    # (b) an undeclared table's manifest-recorded sha256 is tampered -- the study only ever
+    # reads "sessions", but the digest must still catch the corruption of a table it never
+    # loads, because the DatasetSpec digest is defined over the WHOLE catalog build.
+    tampered = json.loads(manifest_path.read_text(encoding="utf-8"))
+    other = next(n for n in tampered["reference_tables"] if n != "sessions")
+    tampered["reference_tables"][other]["sha256"] = "0" * 64
+    manifest_path.write_text(json.dumps(tampered), encoding="utf-8")
+    with pytest.raises(dv2.DatasetV2Error, match="REFERENCE_DIGEST_MISMATCH"):
+        dv2.load_reference_tables(cat, ["sessions"], reference_digest=m["reference_digest"])
+
+
+def test_declared_table_not_in_manifest_rejected(tmp_path: Path):
+    raw = tmp_path / "raw"; raw.mkdir()
+    _synthetic_raw(raw / "NQ_v0_1s_2021.parquet")
+    m = dv2.build_dataset_v2(symbol="NQ", years=["2021"], raw_dir=raw, catalog_root=tmp_path / "catalog", repo_root=tmp_path, write_spec=False)
+    cat = Path(m["catalog_path"])
+    with pytest.raises(dv2.DatasetV2Error, match="REFERENCE_TABLE_MISSING"):
+        dv2.load_reference_tables(cat, ["sessions", "totally_made_up_table"], reference_digest=m["reference_digest"])
+
+
+def test_missing_build_manifest_fails_closed(tmp_path: Path):
+    cat = tmp_path / "empty_catalog"; cat.mkdir()
+    with pytest.raises(dv2.DatasetV2Error, match="REFERENCE_TABLE_MISSING"):
+        dv2.load_reference_tables(cat, ["sessions"], reference_digest="deadbeef" * 8)
+
+
+def test_unparsable_build_manifest_fails_closed(tmp_path: Path):
+    cat = tmp_path / "bad_catalog"; cat.mkdir()
+    (cat / "build_manifest.json").write_text("{not valid json", encoding="utf-8")
+    with pytest.raises(dv2.DatasetV2Error, match="REFERENCE_TABLE_MISSING"):
+        dv2.load_reference_tables(cat, ["sessions"], reference_digest="deadbeef" * 8)

@@ -428,19 +428,24 @@ def _verify_legacy_v1_train_freeze(manifest: Mapping[str, Any], model_id: str, r
     record (``legacy_v1_committed_registry`` grants no authority here) -- against its still
     git-tracked TRAIN freeze (``studies/<study_id>/artifacts/train_experiment_freeze.json``).
 
-    The freeze is authoritative: it must be committed at git HEAD, its bytes must match the
-    manifest-declared sha256, and its own ``freeze_sha256`` must self-recompute (the same
-    ``canonical_sha256`` formula ``research_workflow.experiment.write_train_freeze`` uses --
-    every field except ``generated_at_utc``/``freeze_sha256``). ``freeze["model_hashes"][arm]``
-    must equal the manifest's own ``lineage.fit_identity_sha256`` (the arm's bundle-recorded
-    fit identity), and ``freeze["feature_sets"][<family>]`` (family = the arm's ``_A``/``_B``/
-    ``_C`` suffix) must equal the manifest's ``lineage.ordered_inputs`` exactly.
+    The freeze is authoritative: it must be committed at git HEAD *and* byte-identical in the
+    working tree to that commit (``policy.require_committed_identical`` -- a staged-but-
+    uncommitted freeze, or a committed freeze rewritten in the worktree, grants nothing; see
+    red-team finding C-A), its bytes must match the manifest-declared sha256, and its own
+    ``freeze_sha256`` must self-recompute (the same ``canonical_sha256`` formula
+    ``research_workflow.experiment.write_train_freeze`` uses -- every field except
+    ``generated_at_utc``/``freeze_sha256``). ``freeze["model_hashes"][arm]`` must equal the
+    manifest's own ``lineage.fit_identity_sha256`` (the arm's bundle-recorded fit identity),
+    and ``freeze["feature_sets"][<family>]`` (family = the arm's ``_A``/``_B``/``_C`` suffix)
+    must equal the manifest's ``lineage.ordered_inputs`` exactly. A freeze in a study
+    directory with no AUTHENTICATED seal (``policy.verify_historical_authority``) grants no
+    authority: the freeze alone attests only to itself, never to who executed it.
     ``model_id`` is ``canonical_sha256({study_id, arm, fit_identity_sha256, freeze_sha256})`` --
     distinct from any v2-fit or v1-registry id, so bytes from a different freeze or a
     different arm can never collide with it.
     """
     from research.analysis.identity import canonical_sha256 as _canon
-    from research_workflow.policy import _git_tracked
+    from research_workflow.policy import OldRuntimePolicyError, require_committed_identical, verify_historical_authority
 
     lineage = manifest.get("lineage") or {}
     legacy = manifest.get("legacy_registry_record") or {}
@@ -454,12 +459,22 @@ def _verify_legacy_v1_train_freeze(manifest: Mapping[str, Any], model_id: str, r
             "MODEL_IDENTITY_UNVERIFIABLE: legacy_v1_train_freeze manifest missing one of "
             "study_id/legacy_registry_record.arm/train_freeze_path/train_freeze_sha256/lineage.fit_identity_sha256"
         )
-    freeze_path = Path(repo_root) / freeze_rel
-    if not freeze_path.is_file() or not _git_tracked(Path(repo_root), freeze_rel):
-        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: TRAIN freeze {freeze_rel} is missing or not committed to git at HEAD")
-    if _sha(freeze_path) != freeze_sha_declared:
+    repo_root = Path(repo_root)
+    try:
+        verify_historical_authority(repo_root / "studies" / study_id, repo_root)
+    except OldRuntimePolicyError as exc:
+        raise ModelStoreError(
+            f"MODEL_IDENTITY_UNVERIFIABLE: legacy_v1_train_freeze requires an AUTHENTICATED historical "
+            f"seal for study {study_id!r} (a freeze with no seal grants no authority): {exc}"
+        )
+    freeze_path = repo_root / freeze_rel
+    try:
+        freeze_blob = require_committed_identical(repo_root, freeze_path, kind="TRAIN freeze")
+    except OldRuntimePolicyError as exc:
+        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {exc}")
+    if hashlib.sha256(freeze_blob).hexdigest() != freeze_sha_declared:
         raise ModelStoreError(f"MODEL_IDENTITY_MISMATCH: TRAIN freeze bytes sha256 != manifest-declared {freeze_sha_declared!r}")
-    freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+    freeze = json.loads(freeze_blob.decode("utf-8"))
     recomputed_freeze_sha = _canon({k: v for k, v in freeze.items() if k not in ("generated_at_utc", "freeze_sha256")})
     if recomputed_freeze_sha != freeze.get("freeze_sha256"):
         raise ModelStoreError("MODEL_IDENTITY_UNVERIFIABLE: TRAIN freeze freeze_sha256 does not self-recompute")
@@ -486,19 +501,23 @@ def _verify_legacy_v1_committed_registry(manifest: Mapping[str, Any], model_id: 
 
     The v1 registry record at ``studies/model_registry/<model_id>.json`` is the authoritative
     source of the legacy identity (it predates and is independent of the v2 store manifest).
-    A record that is missing or not committed at HEAD grants no authority
-    (``MODEL_IDENTITY_UNVERIFIABLE``); any disagreement between the record and the manifest
-    on model_id, study_id, canonical bytes or runtime identity is ``MODEL_IDENTITY_MISMATCH``.
+    A record that is missing or not committed at HEAD, or committed and then rewritten in the
+    working tree, grants no authority (``MODEL_IDENTITY_UNVERIFIABLE`` --
+    ``policy.require_committed_identical``, red-team finding C-A); any disagreement between
+    the record and the manifest on model_id, study_id, canonical bytes or runtime identity is
+    ``MODEL_IDENTITY_MISMATCH``.
     """
-    from research_workflow.policy import _git_tracked
+    from research_workflow.policy import OldRuntimePolicyError, require_committed_identical
 
     rel = f"studies/model_registry/{model_id}.json"
     record_path = Path(repo_root) / rel
-    if not record_path.is_file() or not _git_tracked(Path(repo_root), rel):
-        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: legacy registry record {rel} is missing or not committed to git at HEAD")
     try:
-        record = json.loads(record_path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
+        record_blob = require_committed_identical(Path(repo_root), record_path, kind="legacy registry record")
+    except OldRuntimePolicyError as exc:
+        raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: {exc}")
+    try:
+        record = json.loads(record_blob.decode("utf-8"))
+    except (OSError, ValueError, UnicodeDecodeError) as exc:
         raise ModelStoreError(f"MODEL_IDENTITY_UNVERIFIABLE: legacy registry record {rel} is not valid JSON: {exc}")
 
     if record.get("model_id") != model_id:
@@ -606,7 +625,19 @@ def authenticate_model(model_id: str, *, expect: Optional[Mapping[str, Any]] = N
 
     expect_map = {"study_id": "study_id", "target_arm": "target_arm", "direction": "direction", "cell_id": "cell_id",
                  "label": "target_arm"}
-    for key, value in dict(expect or {}).items():
+    expect_dict = dict(expect or {})
+    # W-1: `canonical_sha256` binds to the estimator's actual BYTES (manifest["canonical"]
+    # ["byte_sha256"]), not a lineage field -- a substituted estimator that refreshes its own
+    # canonical/golden bytes under the unchanged model_id would otherwise authenticate
+    # identically against every OTHER `expect` key. Declared optionally; enforced when present.
+    expected_canonical_sha256 = expect_dict.pop("canonical_sha256", None)
+    if expected_canonical_sha256 is not None:
+        actual_canonical_sha256 = manifest.get("canonical", {}).get("byte_sha256")
+        if actual_canonical_sha256 != expected_canonical_sha256:
+            raise ModelStoreError(
+                f"CANONICAL_SHA_MISMATCH: expected canonical_sha256={expected_canonical_sha256!r} "
+                f"but manifest records {actual_canonical_sha256!r}")
+    for key, value in expect_dict.items():
         if value is None:
             continue
         field = expect_map.get(key, key)

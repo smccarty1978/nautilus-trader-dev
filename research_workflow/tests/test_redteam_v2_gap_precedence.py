@@ -216,3 +216,73 @@ def test_v2_host_path_never_routes_to_legacy_composite_replay():
     replay_source = inspect.getsource(oracle_mod.replay)
     assert "_replay_ordered_barrier_condition" not in replay_source
     assert "replay_expression" not in replay_source
+
+
+# --- C-B (adversarial pass 02): `strict` was bypassing GAP/SESSION_END precedence at the
+# horizon end, manufacturing a directional/expiry label from an unobserved gap that straddles
+# the horizon boundary. These extend the D3 fixtures above to the previously-uncovered
+# `strict` branch, plus the oracle DATA_END and entry-gap (N-3) semantics.
+
+def test_strict_gap_straddling_horizon_end_is_censored_gap_expiry_negative():
+    # prev accepted ts = T+1; horizon end = T+10 (unobserved span end-prev_ts=9s > max_gap=5s);
+    # next observed bar is far past (k=16). `strict` never looks at that bar's OHLC, but the
+    # unobserved span itself must still resolve GAP, not a manufactured NEGATIVE.
+    tape = [(1, 100.5, 99.5), (16, 101.5, 99.5)]
+    kc = _run_kernel(_kernel_contract_expiry(max_gap_ns=5 * NS, close=None, horizon_end_rule="strict", expiry="negative"), None, tape)
+    oc = _run_oracle(_oracle_contract_expiry(max_gap_seconds=5, horizon_end_rule="strict", expiry="negative"), None, tape)
+    assert kc == ("CENSORED", "GAP"), kc
+    assert oc == ("CENSORED", "GAP"), oc
+    assert kc == oc
+
+
+def test_strict_gap_straddling_horizon_end_is_censored_gap_not_timeout_expiry_censor():
+    tape = [(1, 100.5, 99.5), (16, 101.5, 99.5)]
+    kc = _run_kernel(_kernel_contract_expiry(max_gap_ns=5 * NS, close=None, horizon_end_rule="strict", expiry="censor"), None, tape)
+    oc = _run_oracle(_oracle_contract_expiry(max_gap_seconds=5, horizon_end_rule="strict", expiry="censor"), None, tape)
+    assert kc == ("CENSORED", "GAP"), kc
+    assert oc == ("CENSORED", "GAP"), oc
+    assert kc != ("CENSORED", "TIMEOUT")
+    assert kc == oc
+
+
+def test_strict_bar_within_max_gap_of_horizon_end_expiry_unchanged():
+    # prev accepted ts = T+8, within max_gap=5s of horizon end T+10 (end-prev_ts=2s); the actual
+    # next observed bar is much later (k=50, ts-prev_ts=42s) -- irrelevant post-horizon gap.
+    # `strict` must judge the horizon-boundary observation, not the raw bar-to-bar distance:
+    # expiry policy (TIMEOUT) applies unchanged, not GAP.
+    tape = [(k, 100.5, 99.5) for k in range(1, 9)] + [(50, 100.5, 99.5)]
+    kc = _run_kernel(_kernel_contract_expiry(max_gap_ns=5 * NS, close=None, horizon_end_rule="strict", expiry="censor"), None, tape)
+    oc = _run_oracle(_oracle_contract_expiry(max_gap_seconds=5, horizon_end_rule="strict", expiry="censor"), None, tape)
+    assert kc == ("CENSORED", "TIMEOUT"), kc
+    assert oc == ("CENSORED", "TIMEOUT"), oc
+    assert kc == oc
+
+
+def test_oracle_data_end_before_horizon_never_manufactures_a_label():
+    # W-2: the tape ends (no event ever reaches horizon_end_ts) -- the oracle must censor
+    # DATA_END, never fall through to horizon_expiry_policy and manufacture NEGATIVE/TIMEOUT.
+    tape = [(k, 100.5, 99.5) for k in range(1, 6)]   # never reaches horizon end (T+10)
+    oc = _run_oracle(_oracle_contract_expiry(max_gap_seconds=None, horizon_end_rule="strict", expiry="negative"), None, tape)
+    assert oc == ("CENSORED", "DATA_END"), oc
+    oc_far = _run_oracle(_oracle_contract_expiry(max_gap_seconds=None, horizon_end_rule="first_bar_at_or_after", expiry="negative"), None, tape)
+    assert oc_far == ("CENSORED", "DATA_END"), oc_far
+
+
+def test_entry_gap_beyond_max_gap_is_censored_gap_not_a_stale_entry():
+    # N-3: the entry observation (next_bar_open) is subject to the same gap rule as any other
+    # -- an execution reference more than max_gap after T is a stale price, never a fill.
+    tape = [(20, 100.5, 99.5)]   # first bar after T arrives 19s late; max_gap=5s
+    kc = _run_kernel(_kernel_contract(max_gap_ns=5 * NS), None, tape)
+    oc = _run_oracle(_oracle_contract(max_gap_seconds=5), None, tape)
+    assert kc == ("CENSORED", "GAP"), kc
+    assert oc == ("CENSORED", "GAP"), oc
+    assert kc == oc
+
+
+def test_entry_gap_exactly_max_gap_is_not_a_gap():
+    # entry_ts - T == max_gap exactly (strict `>`, not `>=`) -- must not be treated as a gap.
+    tape = [(6, 100.5, 99.5)]    # entry_ts = T+5s == max_gap=5s
+    kc = _run_kernel(_kernel_contract(max_gap_ns=5 * NS), None, tape)
+    oc = _run_oracle(_oracle_contract(max_gap_seconds=5), None, tape)
+    assert kc[1] != "GAP", kc
+    assert oc[1] != "GAP", oc
