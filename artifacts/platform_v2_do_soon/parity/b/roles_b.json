@@ -1,0 +1,108 @@
+{
+  "shape": "b",
+  "window": [
+    "2021-01-05",
+    "2021-01-05"
+  ],
+  "plan_sha256": "12669d29981d7494d8f130d76c06ad85ee92a3186e8dec0ac89560f696ca5c3c",
+  "elapsed_s": 18.98,
+  "stats": {
+    "bars": 103305,
+    "bars_by_stream": {
+      "nq_1s": 100515,
+      "nq_5s": 10600,
+      "nq_1m": 2790,
+      "nq_5m": 54
+    },
+    "candidates": 89,
+    "observations": 89,
+    "epochs": 100515,
+    "pending_at_end": 0,
+    "dropped_outside_primary": {
+      "candidates": 73,
+      "observations": 73
+    }
+  },
+  "dataset": {
+    "dataset_id": "NQ_v0_2020_2026",
+    "logical_digest": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+    "bytes_verification": "VERIFIED"
+  },
+  "candidates": {
+    "passed": false,
+    "reference_rows": 89,
+    "runtime_rows": 89,
+    "common_rows": 89,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 46,
+    "value_mismatches": 414,
+    "per_column": {
+      "prior_5m_regime_efficiency": {
+        "mismatches": 51,
+        "max_abs_diff": 0.04692306141783065
+      },
+      "prior_5m_regime_mfe_atr": {
+        "mismatches": 89,
+        "max_abs_diff": 0.02024977304026976
+      },
+      "prior_5m_regime_range_atr": {
+        "mismatches": 89,
+        "max_abs_diff": 0.7341902356488728
+      },
+      "current_5m_regime_mfe_atr": {
+        "mismatches": 89,
+        "max_abs_diff": 0.02024977304026976
+      },
+      "current_5m_regime_range_atr": {
+        "mismatches": 89,
+        "max_abs_diff": 0.020484893772232837
+      },
+      "model_c_score_at_candidate": {
+        "mismatches": 7,
+        "max_abs_diff": 0.007165559101515062
+      }
+    },
+    "first_divergence": {
+      "timestamp": 1609804990000000000,
+      "key": [
+        1609804990000000000,
+        1609804800000000000,
+        0
+      ],
+      "column": "prior_5m_regime_efficiency",
+      "reference": 0.7840579710144927,
+      "runtime": 0.7371349095966621
+    },
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "observations": {
+    "passed": true,
+    "reference_rows": 89,
+    "runtime_rows": 89,
+    "common_rows": 89,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 10,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "passed": false,
+  "events_per_second": 11722.115698851556
+}
