@@ -117,8 +117,16 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         if ts <= entry_ts:
             continue
         if ts > horizon_end_ts:
-            if end_rule != "first_bar_at_or_after" or (session_close_ts is not None and ts > int(session_close_ts)):
+            if end_rule != "first_bar_at_or_after":
                 break
+            # first_bar_at_or_after: the first bar the tape actually offers after the
+            # horizon end is evaluated for a hit before the arm expires -- but if that
+            # bar already lies beyond the session close, no in-session observation was
+            # ever made. Precedence is SESSION_END > GAP > BARRIER_TOUCH > HORIZON_EXPIRY,
+            # so this resolves CENSORED/"SESSION_END" unconditionally, never falling
+            # through to the horizon_expiry_policy (which could manufacture NEGATIVE).
+            if session_close_ts is not None and ts > int(session_close_ts):
+                return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
             if e.get("gap") or (max_gap_ns is not None and ts - prev_ts > max_gap_ns):
                 return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
             hi, lo = e.get("high"), e.get("low")
@@ -169,7 +177,28 @@ def _find_forward_outcome(contract: Mapping, fo_id) -> dict:
 def _replay_ordered_barrier_condition(
     contract: Mapping, cond: Mapping, candidate: Mapping, events: Iterable[Mapping]
 ) -> dict:
-    """One ordered-barrier condition, evaluated independently off the tape."""
+    """One ordered-barrier condition, evaluated independently off the tape.
+
+    LEGACY V1 COMPOSITE PATH -- strict-horizon only, frozen semantics.
+
+    This function backs the ``conditions``/``ordered_barrier`` composite grammar
+    (``replay_expression`` below), which is the pre-existing V1
+    ``target_expression.py`` / ``generic_collector.py`` / ``target_runtime.py``
+    pipeline. It does NOT read ``horizon_end_rule`` and does not implement the
+    ``first_bar_at_or_after`` extension-bar logic or the SESSION_END-before-
+    HORIZON_EXPIRY gap-precedence fix applied to the V2 kernel/oracle entry point
+    ``replay()`` above. Do not change its semantics here -- V1 studies are frozen
+    against this exact behaviour.
+
+    The V2 grammar compiler (``grammar/compiler.py::_resolve_outcome``, the only
+    compiler that feeds ``research_workflow.host.outcomes.LabelOutcomeKernel`` and
+    this module's ``replay()``) never emits ``conditions``/``required_forward_outcomes``
+    composite expressions -- it emits ``arms``+``flip``. This function is therefore not
+    reachable from the compiled V2 outcome contract that ``research_workflow/host/
+    outcomes.py`` and ``replay()`` serve; it is exercised only by the separate legacy
+    ``target_expression.py`` pipeline. See ``test_redteam_v2_gap_precedence.py`` for a
+    guard asserting the V2 host path never routes here.
+    """
     fo = _find_forward_outcome(contract, cond.get("forward_outcome_id"))
     barrier = next(
         (b for b in (fo.get("ordered_barriers") or []) if b.get("id") == cond.get("barrier_id")),

@@ -339,3 +339,67 @@ def test_legacy_committed_registry_runtime_identity_mismatch(root: Path, repo: P
     model_id = _legacy_manifest_and_record(root, repo, legacy_overrides={"runtime_identity_sha256": "different"})
     with pytest.raises(ms.ModelStoreError, match="MODEL_IDENTITY_MISMATCH"):
         ms.authenticate_model(model_id, model_root=root, repo_root=repo)
+
+
+# --------------------------------------------------------------------------- #
+# B2 follow-up: the production binding must pass score_evaluation_ts and must
+# not be able to bypass the causal-availability refusal.
+# --------------------------------------------------------------------------- #
+
+def _binding_fixture(tmp_path):
+    from research_workflow.host.interfaces import EpochView
+    from features.trackers.host_bindings import FrozenExternalScoreBinding
+
+    studies_root = tmp_path
+    parent_dir = studies_root / "parent"
+    parent_dir.mkdir()
+    spec = external_scorer_fixture(parent_dir)
+    binding = FrozenExternalScoreBinding(
+        params={"spec": spec.model_dump(), "direction": "dir", "studies_root": str(studies_root)},
+        inputs={},
+    )
+    return binding, EpochView
+
+
+def test_binding_passes_score_evaluation_ts_explicitly(tmp_path, monkeypatch):
+    binding, EpochView = _binding_fixture(tmp_path)
+    seen = {}
+    real_score = binding._scorer.score
+
+    def _spy(*args, **kwargs):
+        seen.update(kwargs)
+        return real_score(*args, **kwargs)
+
+    monkeypatch.setattr(binding._scorer, "score", _spy)
+    epoch = EpochView(T=100, price=1.0, bar=None, trackers={})
+    row = {"a": 1.0, "b": 0.0, "dir": 1}
+    result = binding.derive(row, epoch, lambda ref, ep: row.get(ref))
+    assert result is not None
+    assert seen.get("score_evaluation_ts") == 100
+    assert seen.get("checkpoint_ts") == 100
+    # not left to the scorer's own default -- explicitly plumbed by the binding
+    assert seen.get("availability_source") == "checkpoint_ts_upper_bound"
+
+
+def test_binding_refuses_a_synthetic_availability_later_than_checkpoint(tmp_path, monkeypatch):
+    """Not only the scorer unit -- routed through the binding's own derive() call, an input
+    whose real availability is after the checkpoint must be refused, never silently re-stamped."""
+    binding, EpochView = _binding_fixture(tmp_path)
+    real_score = binding._scorer.score
+
+    def _late_availability(*args, **kwargs):
+        # simulate a caller/upstream that knows an input's TRUE availability is later than the
+        # checkpoint -- the binding path must still surface the refusal, not swallow it.
+        kwargs = dict(kwargs)
+        avail = dict(kwargs.get("availability_ts") or {})
+        if avail:
+            late_name = next(iter(avail))
+            avail[late_name] = int(kwargs["checkpoint_ts"]) + 1
+        kwargs["availability_ts"] = avail
+        return real_score(*args, **kwargs)
+
+    monkeypatch.setattr(binding._scorer, "score", _late_availability)
+    epoch = EpochView(T=100, price=1.0, bar=None, trackers={})
+    row = {"a": 1.0, "b": 0.0, "dir": 1}
+    with pytest.raises(ExternalModelScoringError, match="NOT_AVAILABLE_AT_CHECKPOINT"):
+        binding.derive(row, epoch, lambda ref, ep: row.get(ref))

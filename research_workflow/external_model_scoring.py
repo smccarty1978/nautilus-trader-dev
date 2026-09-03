@@ -35,6 +35,12 @@ class DerivedScoreObservation:
     # RT-B2: the derived score's TRUE causal availability -- max(every input's availability,
     # the score's own evaluation timestamp) -- never the decision epoch assigned blindly.
     available_at_ns: int = 0
+    # How ``latest_input_availability_ts`` (per-input) was derived: either the caller's real,
+    # per-column availability (``"per_input_declared"``) or a conservative upper bound equal to
+    # the checkpoint timestamp, used when the caller has no finer-grained availability data
+    # (``"checkpoint_ts_upper_bound"``). Either value is a sound upper bound; the label is
+    # provenance only, never loosens the ``available_at_ns > checkpoint_ts`` refusal above.
+    availability_source: str = "checkpoint_ts_upper_bound"
 
 
 class FrozenExternalModelScorer:
@@ -163,6 +169,7 @@ class FrozenExternalModelScorer:
         direction: str,
         availability_ts: Mapping[str, int],
         score_evaluation_ts: int | None = None,
+        availability_source: str = "checkpoint_ts_upper_bound",
     ) -> DerivedScoreObservation:
         """Score at ``checkpoint_ts``. ``score_evaluation_ts`` is when the score itself was
         actually produced (defaults to ``checkpoint_ts`` for synchronous, in-process scoring;
@@ -208,6 +215,7 @@ class FrozenExternalModelScorer:
             arm=arm,
             model_hash=(self.spec.model_hashes or {}).get(arm, rec.get("fit_identity_sha256", "")),
             preprocessing_hash=self.spec.preprocessing_hash or self._recovered.get("preprocessing_identity", ""),
+            availability_source=availability_source,
         )
 
 

@@ -1,0 +1,370 @@
+diff --git a/features/trackers/host_bindings.py b/features/trackers/host_bindings.py
+index ca4257c1..a57f059d 100644
+--- a/features/trackers/host_bindings.py
++++ b/features/trackers/host_bindings.py
+@@ -688,7 +688,21 @@ class FrozenExternalScoreBinding(BaseBinding):
+         if any(v is None or (isinstance(v, float) and math.isnan(v)) for v in inputs.values()):
+             return None
+         ts = int(epoch.T)
+-        obs = self._scorer.score(inputs, checkpoint_ts=ts, direction=direction, availability_ts={n: ts for n in surf})
++        # RT-B2: `ts` (the completed-bar epoch driving this binding) is both the checkpoint and
++        # the instant the score is actually evaluated at (synchronous, in-process scoring) --
++        # pass it explicitly as `score_evaluation_ts` rather than relying on the scorer's default.
++        # Per-input availability: this binding has no finer-grained per-column availability table
++        # wired to it (the row is already causally gated upstream by Feature System V2 visibility
++        # rules), so `ts` is used as a documented conservative upper bound for every input, and
++        # that provenance is recorded on the observation rather than silently assumed.
++        obs = self._scorer.score(
++            inputs,
++            checkpoint_ts=ts,
++            direction=direction,
++            availability_ts={n: ts for n in surf},
++            score_evaluation_ts=ts,
++            availability_source="checkpoint_ts_upper_bound",
++        )
+         return float(obs.score)
+ 
+ 
+diff --git a/research_workflow/dataset_v2.py b/research_workflow/dataset_v2.py
+index db69a705..a6c7ec73 100644
+--- a/research_workflow/dataset_v2.py
++++ b/research_workflow/dataset_v2.py
+@@ -134,6 +134,38 @@ def session_windows(sess: pd.Series) -> List[tuple[int, int]]:
+     return [(int(sess["open_ns"]), end)]
+ 
+ 
++def load_reference_tables(catalog_path: Path, declared: Sequence[str], reference_digest: Optional[str] = None) -> Dict[str, pd.DataFrame]:
++    """Loads and fail-closed-verifies the declared reference tables of a V2 catalog against
++    ``build_manifest.json``: every declared table must exist under ``<catalog>/reference/<name>.parquet``
++    and its bytes must hash to the sha256 recorded in the manifest at build time. When ``reference_digest``
++    is given (the DatasetSpec's aggregate digest) and ``declared`` is the full set the manifest built, the
++    aggregate over the declared tables' sha256s must also match it. Fails closed: a missing file, a byte
++    mismatch, or an aggregate mismatch all raise -- this function never silently returns a partial result."""
++    catalog_path = Path(catalog_path)
++    manifest_path = catalog_path / "build_manifest.json"
++    if not manifest_path.is_file():
++        raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: {manifest_path} not found")
++    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
++    ref_manifest = manifest.get("reference_tables") or {}
++    out: Dict[str, pd.DataFrame] = {}
++    digests: Dict[str, str] = {}
++    for name in declared:
++        entry = ref_manifest.get(name)
++        path = catalog_path / "reference" / f"{name}.parquet"
++        if entry is None or not path.is_file():
++            raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: {name!r} not found under {catalog_path / 'reference'}")
++        actual = _sha256(path)
++        if actual != entry.get("sha256"):
++            raise DatasetV2Error(f"REFERENCE_TABLE_CORRUPT: {name!r} sha256 {actual} != manifest {entry.get('sha256')}")
++        digests[name] = actual
++        out[name] = pd.read_parquet(path)
++    if reference_digest is not None and set(declared) >= set(ref_manifest):
++        computed = hashlib.sha256(json.dumps({n: digests[n] for n in sorted(declared)}, sort_keys=True).encode()).hexdigest()
++        if computed != reference_digest:
++            raise DatasetV2Error(f"REFERENCE_DIGEST_MISMATCH: computed {computed} != declared {reference_digest}")
++    return out
++
++
+ def holiday_table(first_ns: int, last_ns: int, sessions: pd.DataFrame, calendar_name: str = CALENDAR_NAME) -> pd.DataFrame:
+     import pandas_market_calendars as mcal
+     cal = mcal.get_calendar(calendar_name)
+diff --git a/research_workflow/external_model_scoring.py b/research_workflow/external_model_scoring.py
+index 0e1ca1ab..4aaf0194 100644
+--- a/research_workflow/external_model_scoring.py
++++ b/research_workflow/external_model_scoring.py
+@@ -32,6 +32,15 @@ class DerivedScoreObservation:
+     arm: str
+     model_hash: str
+     preprocessing_hash: str
++    # RT-B2: the derived score's TRUE causal availability -- max(every input's availability,
++    # the score's own evaluation timestamp) -- never the decision epoch assigned blindly.
++    available_at_ns: int = 0
++    # How ``latest_input_availability_ts`` (per-input) was derived: either the caller's real,
++    # per-column availability (``"per_input_declared"``) or a conservative upper bound equal to
++    # the checkpoint timestamp, used when the caller has no finer-grained availability data
++    # (``"checkpoint_ts_upper_bound"``). Either value is a sound upper bound; the label is
++    # provenance only, never loosens the ``available_at_ns > checkpoint_ts`` refusal above.
++    availability_source: str = "checkpoint_ts_upper_bound"
+ 
+ 
+ class FrozenExternalModelScorer:
+@@ -159,7 +168,16 @@ class FrozenExternalModelScorer:
+         checkpoint_ts: int,
+         direction: str,
+         availability_ts: Mapping[str, int],
++        score_evaluation_ts: int | None = None,
++        availability_source: str = "checkpoint_ts_upper_bound",
+     ) -> DerivedScoreObservation:
++        """Score at ``checkpoint_ts``. ``score_evaluation_ts`` is when the score itself was
++        actually produced (defaults to ``checkpoint_ts`` for synchronous, in-process scoring;
++        a future asynchronous/multi-stream scorer passes the real, possibly later, timestamp).
++        The observation's causal availability is ``max(every input's availability_ts,
++        score_evaluation_ts)`` -- it is NEVER assigned ``checkpoint_ts`` blindly. A score whose
++        availability lands after ``checkpoint_ts`` is refused (not exposed re-stamped as if
++        current)."""
+         direction = str(direction).upper()
+         arm = self._arm_for(direction)
+         surfaces = self.spec.ordered_feature_surfaces or {}
+@@ -170,10 +188,12 @@ class FrozenExternalModelScorer:
+             raise ExternalModelScoringError(
+                 f"causal snapshot incomplete: values={missing}, availability={missing_availability}"
+             )
+-        future = [name for name in features if int(availability_ts[name]) > int(checkpoint_ts)]
+-        if future:
++        evaluation_ts = int(checkpoint_ts) if score_evaluation_ts is None else int(score_evaluation_ts)
++        latest_input_availability_ts = max((int(availability_ts[n]) for n in features), default=0)
++        available_at_ns = max(latest_input_availability_ts, evaluation_ts)
++        if available_at_ns > int(checkpoint_ts):
+             raise ExternalModelScoringError(
+-                f"EXTERNAL_SCORE_INPUT_NOT_AVAILABLE_AT_CHECKPOINT: {future}"
++                f"EXTERNAL_SCORE_INPUT_NOT_AVAILABLE_AT_CHECKPOINT: available_at_ns={available_at_ns} > checkpoint_ts={checkpoint_ts}"
+             )
+         frame = pd.DataFrame(
+             [[causal_snapshot[name] for name in features]], columns=features
+@@ -189,11 +209,13 @@ class FrozenExternalModelScorer:
+             name=self.spec.name,
+             score=score,
+             checkpoint_ts=int(checkpoint_ts),
+-            latest_input_availability_ts=max(int(availability_ts[n]) for n in features),
++            latest_input_availability_ts=latest_input_availability_ts,
++            available_at_ns=available_at_ns,
+             direction=direction,
+             arm=arm,
+             model_hash=(self.spec.model_hashes or {}).get(arm, rec.get("fit_identity_sha256", "")),
+             preprocessing_hash=self.spec.preprocessing_hash or self._recovered.get("preprocessing_identity", ""),
++            availability_source=availability_source,
+         )
+ 
+ 
+diff --git a/research_workflow/host/outcomes.py b/research_workflow/host/outcomes.py
+index 454389bc..cc3702be 100644
+--- a/research_workflow/host/outcomes.py
++++ b/research_workflow/host/outcomes.py
+@@ -325,9 +325,16 @@ class LabelOutcomeKernel:
+                         continue
+                     if past_end:
+                         # first_bar_at_or_after: this bar is evaluated for a hit, then the arm expires --
+-                        # but only inside the arm's own session: a bar from the next session is never a fill
++                        # but only inside the arm's own session: a bar from the next session is never a fill.
++                        # Precedence is SESSION_END > GAP > BARRIER_TOUCH > HORIZON_EXPIRY: if the first
++                        # post-horizon bar the kernel actually observes already lies beyond the session
++                        # close, that is a session/data-gap condition, not a horizon expiry -- resolve
++                        # CENSORED/"SESSION_END" unconditionally, regardless of the arm's expiry policy.
+                         if p.session_close is not None and ts > p.session_close:
+-                            self._expire_arm(p, i)
++                            self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
++                            continue
++                        if gap:
++                            self._resolve_arm(p, i, CENSORED, ts, "GAP")
+                             continue
+                         d = p.direction
+                         good, bad = p.arm_good[i], p.arm_bad[i]
+diff --git a/research_workflow/host_runner.py b/research_workflow/host_runner.py
+index 75aca31d..1270f640 100644
+--- a/research_workflow/host_runner.py
++++ b/research_workflow/host_runner.py
+@@ -164,7 +164,8 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
+         raise RuntimeError("DATASET_DIGEST_MISMATCH: plan digest != resolved catalog digest")
+     bytes_check = verify_launch_dataset_bytes(data_plan)
+     engine, _instrument = build_engine(data_plan, log_level=log_level)
+-    st_spec = dict(session_table_spec or plan.get("session") or {"kind": "legacy", "session": "RTH"})
++    from research_workflow.sessions import resolve_calendar_session_spec
++    st_spec = resolve_calendar_session_spec(dict(session_table_spec or plan.get("session") or {"kind": "legacy", "session": "RTH"}), repo_root)
+     cfg = GovernedHostStrategyConfig(plan_json=json.dumps(plan, default=str), session_table_json=json.dumps(st_spec),
+                                      primary_start_ts=(primary_interval[0] if primary_interval else None),
+                                      primary_end_ts=(primary_interval[1] if primary_interval else None),
+diff --git a/research_workflow/sessions.py b/research_workflow/sessions.py
+index 8aa97a0d..085c7b60 100644
+--- a/research_workflow/sessions.py
++++ b/research_workflow/sessions.py
+@@ -10,7 +10,13 @@
+ from __future__ import annotations
+ 
+ from bisect import bisect_right
+-from typing import Optional, Sequence, Tuple
++from typing import Any, Dict, Mapping, Optional, Sequence, Tuple
++
++
++class SessionCloseUndefinedError(ValueError):
++    """Raised when a session's close instant has no defined authority (e.g. ETH on a
++    non-calendar/legacy dataset, which has no single contiguous daily window)."""
++    pass
+ 
+ 
+ class AllSessionTable:
+@@ -41,7 +47,16 @@ class LegacySessionTable:
+     def session_close(self, ts_ns: int) -> Optional[int]:
+         if self.name == "ALL":
+             return None
+-        return int(self._close(int(ts_ns), "RTH"))
++        if self.name == "ETH":
++            # ETH is the complement of RTH -- not a single contiguous daily window on the legacy
++            # (weekday-rule) authority, so it has no well-defined close instant. Fail closed rather
++            # than silently inheriting the RTH close.
++            raise SessionCloseUndefinedError(
++                "SESSION_CLOSE_UNDEFINED_FOR_LEGACY_ETH: ETH session-end censoring requires a "
++                "calendar dataset (explicit per-day windows); the legacy weekday-rule session table "
++                "has no single ETH close instant."
++            )
++        return int(self._close(int(ts_ns), self.name))
+ 
+ 
+ class CalendarSessionTable:
+@@ -93,8 +108,14 @@ class SplitSessionTable:
+ def build_session_table(spec: dict) -> object:
+     censor_name = spec.get("censor_session")
+     if censor_name and str(censor_name).upper() != str(spec.get("session", "RTH")).upper():
+-        gate = build_session_table({k: v for k, v in spec.items() if k != "censor_session"})
+-        censor = build_session_table({**{k: v for k, v in spec.items() if k != "censor_session"}, "session": censor_name})
++        base = {k: v for k, v in spec.items() if k not in ("censor_session", "rows", "rows_by_session")}
++        rows_by_session = spec.get("rows_by_session") or {}
++        gate_session = str(spec.get("session", "RTH")).upper()
++        censor_session = str(censor_name).upper()
++        gate_rows = rows_by_session.get(gate_session, spec.get("rows"))
++        censor_rows = rows_by_session.get(censor_session, spec.get("rows"))
++        gate = build_session_table({**base, "session": spec.get("session", "RTH"), **({"rows": gate_rows} if gate_rows is not None else {})})
++        censor = build_session_table({**base, "session": censor_name, **({"rows": censor_rows} if censor_rows is not None else {})})
+         return SplitSessionTable(gate, censor)
+     kind = str(spec.get("kind", "legacy"))
+     if kind == "legacy":
+@@ -106,4 +127,85 @@ def build_session_table(spec: dict) -> object:
+     raise ValueError(f"UNKNOWN_SESSION_TABLE_KIND: {kind!r}")
+ 
+ 
+-__all__ = ["AllSessionTable", "LegacySessionTable", "CalendarSessionTable", "SplitSessionTable", "build_session_table"]
++# ---------------------------------------------------------------------------
++# Calendar window derivation (dataset reference-table contract, platform-v2 packet D).
++# ---------------------------------------------------------------------------
++_CT = "America/Chicago"
++_SECOND_NS = 1_000_000_000
++
++
++def session_windows(sessions_df: Any, session: str, *, holidays_df: Any = None) -> list:
++    """Explicit half-open ``(open_ns, close_ns]`` windows per trading day, derived from a
++    dataset's ``sessions`` reference table (see ``research_workflow.dataset_v2.session_table``
++    for the row schema: ``open_ns``, ``close_ns`` (inclusive close second), ``early_close``,
++    ``halt_start_ns``, ``halt_end_ns``).
++
++    RTH on a session day is ``(08:30:00 CT, min(15:15:00 CT, close_ns)]`` -- an early close
++    tightens the window, it never widens it. ETH is the contiguous complement within that
++    session's tape: the pre-open segment ``(open_ns, 08:30:00 CT]`` and the post-close segment
++    ``(15:15:00 CT [or the pre-2021-06-28 halt end, 15:30 CT], close_ns]``. A day the sessions
++    table has no row for (holiday / non-session day) contributes no window. All wall-clock
++    conversions are DST-safe (``zoneinfo``).
++    """
++    import pandas as pd
++    from zoneinfo import ZoneInfo
++
++    key = str(session).upper()
++    if key not in {"RTH", "ETH"}:
++        raise ValueError(f"UNSUPPORTED_CALENDAR_SESSION: {session!r} (only RTH/ETH derive explicit windows)")
++    tz = ZoneInfo(_CT)
++    out: list = []
++    for _, row in sessions_df.sort_values("open_ns").iterrows():
++        open_ns, close_ns = int(row["open_ns"]), int(row["close_ns"])
++        # Use the row's own session_date label (the trading day), NOT the calendar date the raw
++        # tape-open instant falls on -- the overnight tape open (e.g. 17:00 CT the prior evening)
++        # belongs to THIS session's date, so deriving the day from open_ns would land RTH open on
++        # the wrong calendar day.
++        day = row["session_date"]
++        rth_open = int(pd.Timestamp(day.year, day.month, day.day, 8, 30, 0, tz=tz).tz_convert("UTC").value)
++        rth_close_wall = int(pd.Timestamp(day.year, day.month, day.day, 15, 15, 0, tz=tz).tz_convert("UTC").value)
++        rth_close = min(rth_close_wall, close_ns)
++        if key == "RTH":
++            if rth_open < rth_close:
++                out.append((rth_open, rth_close))
++            continue
++        # ETH
++        pre = (open_ns, rth_open)
++        halt_end = row.get("halt_end_ns")
++        post_start = int(halt_end) if halt_end is not None and not pd.isna(halt_end) else rth_close_wall
++        post = (post_start, close_ns)
++        if pre[0] < pre[1]:
++            out.append(pre)
++        if post[0] < post[1]:
++            out.append(post)
++    return out
++
++
++def resolve_calendar_session_spec(session_spec: Mapping[str, Any], repo_root: Any) -> Dict[str, Any]:
++    """Materializes the ``CalendarSessionTable`` row(s) for a compiled ``kind: calendar`` session
++    spec by resolving the declared dataset, loading its reference tables with fail-closed hash
++    verification (``dataset_v2.load_reference_tables``), and deriving RTH/ETH windows from the
++    ``sessions`` table. ``legacy``/``all`` specs pass through unchanged."""
++    spec: Dict[str, Any] = dict(session_spec)
++    if spec.get("kind") != "calendar" or spec.get("rows") is not None:
++        return spec  # already materialized (test hook) or not a calendar spec
++    from research_workflow import dataset_v2
++    from research_workflow.roots import resolve_dataset
++
++    resolved = resolve_dataset(spec["dataset"], repo_root)
++    declared = list(spec.get("reference_tables") or [])
++    tables = dataset_v2.load_reference_tables(resolved.catalog_path, declared, spec.get("reference_digest"))
++    sessions_df = tables["sessions"]
++    needed = {str(spec.get("session", "RTH")).upper(), str(spec.get("censor_session") or spec.get("session", "RTH")).upper()}
++    rows_by_session: Dict[str, list] = {}
++    for name in sorted(needed):
++        if name in ("RTH", "ETH"):
++            rows_by_session[name] = session_windows(sessions_df, name, holidays_df=tables.get("holidays"))
++    spec["rows_by_session"] = rows_by_session
++    spec["rows"] = rows_by_session.get(str(spec.get("session", "RTH")).upper(), [])
++    spec["reference_row_counts"] = {name: int(len(df)) for name, df in tables.items()}
++    return spec
++
++
++__all__ = ["AllSessionTable", "LegacySessionTable", "CalendarSessionTable", "SplitSessionTable", "build_session_table",
++           "session_windows", "resolve_calendar_session_spec", "SessionCloseUndefinedError"]
+diff --git a/research_workflow/target_replay_oracle.py b/research_workflow/target_replay_oracle.py
+index 59856acf..ea9639b3 100644
+--- a/research_workflow/target_replay_oracle.py
++++ b/research_workflow/target_replay_oracle.py
+@@ -117,8 +117,18 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) ->
+         if ts <= entry_ts:
+             continue
+         if ts > horizon_end_ts:
+-            if end_rule != "first_bar_at_or_after" or (session_close_ts is not None and ts > int(session_close_ts)):
++            if end_rule != "first_bar_at_or_after":
+                 break
++            # first_bar_at_or_after: the first bar the tape actually offers after the
++            # horizon end is evaluated for a hit before the arm expires -- but if that
++            # bar already lies beyond the session close, no in-session observation was
++            # ever made. Precedence is SESSION_END > GAP > BARRIER_TOUCH > HORIZON_EXPIRY,
++            # so this resolves CENSORED/"SESSION_END" unconditionally, never falling
++            # through to the horizon_expiry_policy (which could manufacture NEGATIVE).
++            if session_close_ts is not None and ts > int(session_close_ts):
++                return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
++            if e.get("gap") or (max_gap_ns is not None and ts - prev_ts > max_gap_ns):
++                return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
+             hi, lo = e.get("high"), e.get("low")
+             if hi is not None and lo is not None:
+                 hit_good = float(hi) >= good if direction > 0 else float(lo) <= good
+@@ -167,7 +177,28 @@ def _find_forward_outcome(contract: Mapping, fo_id) -> dict:
+ def _replay_ordered_barrier_condition(
+     contract: Mapping, cond: Mapping, candidate: Mapping, events: Iterable[Mapping]
+ ) -> dict:
+-    """One ordered-barrier condition, evaluated independently off the tape."""
++    """One ordered-barrier condition, evaluated independently off the tape.
++
++    LEGACY V1 COMPOSITE PATH -- strict-horizon only, frozen semantics.
++
++    This function backs the ``conditions``/``ordered_barrier`` composite grammar
++    (``replay_expression`` below), which is the pre-existing V1
++    ``target_expression.py`` / ``generic_collector.py`` / ``target_runtime.py``
++    pipeline. It does NOT read ``horizon_end_rule`` and does not implement the
++    ``first_bar_at_or_after`` extension-bar logic or the SESSION_END-before-
++    HORIZON_EXPIRY gap-precedence fix applied to the V2 kernel/oracle entry point
++    ``replay()`` above. Do not change its semantics here -- V1 studies are frozen
++    against this exact behaviour.
++
++    The V2 grammar compiler (``grammar/compiler.py::_resolve_outcome``, the only
++    compiler that feeds ``research_workflow.host.outcomes.LabelOutcomeKernel`` and
++    this module's ``replay()``) never emits ``conditions``/``required_forward_outcomes``
++    composite expressions -- it emits ``arms``+``flip``. This function is therefore not
++    reachable from the compiled V2 outcome contract that ``research_workflow/host/
++    outcomes.py`` and ``replay()`` serve; it is exercised only by the separate legacy
++    ``target_expression.py`` pipeline. See ``test_redteam_v2_gap_precedence.py`` for a
++    guard asserting the V2 host path never routes here.
++    """
+     fo = _find_forward_outcome(contract, cond.get("forward_outcome_id"))
+     barrier = next(
+         (b for b in (fo.get("ordered_barriers") or []) if b.get("id") == cond.get("barrier_id")),

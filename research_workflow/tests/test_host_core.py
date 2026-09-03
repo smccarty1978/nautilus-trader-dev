@@ -188,8 +188,11 @@ def test_first_bar_at_or_after_never_crosses_the_session_close():
         kernel.on_bar(BarView("s", T + (k - 1) * NS, T + k * NS, 100.0, 100.5, lo, 100.2, 1.0))
     kernel.finalize(T + 20000 * NS)
     row = kernel.drain_rows()[0]
-    assert (row["disposition"], row["censor_reason"]) == ("CENSORED", "TIMEOUT")
+    # The first bar the kernel actually observes after the horizon end (k=18000) already
+    # lies beyond the session close -- SESSION_END takes precedence over HORIZON_EXPIRY;
+    # the arm never resolves via TIMEOUT because no in-session bar was ever evaluated.
+    assert (row["disposition"], row["censor_reason"]) == ("CENSORED", "SESSION_END")
     c = {"primitive": "ordered_barrier", "required_forward_outcomes": [{"id": "fo", "entry_reference": "next_bar_open", "session_end_censoring": True, "max_gap_seconds": None,
                                                                      "ordered_barriers": [{"id": "b", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 10, "horizon_expiry_policy": "censor", "horizon_end_rule": "first_bar_at_or_after"}]}]}
     o = replay(c, {"observation_ts": T, "atr": 1.0, "direction": 1, "session_close_ts": close}, tape)
-    assert (o["disposition"], o["censor_reason"]) == ("CENSORED", "TIMEOUT")
+    assert (o["disposition"], o["censor_reason"]) == ("CENSORED", "SESSION_END")

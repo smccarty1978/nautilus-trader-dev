@@ -1,0 +1,483 @@
+{
+  "audit_type": "causal",
+  "availability_table": [
+    {
+      "availability": "completed_bar_ts_init",
+      "cadence": "per_source_bar",
+      "id": "regime",
+      "kind": "tracker",
+      "stream": "syn_a_1m",
+      "visibility": "strictly_before"
+    },
+    {
+      "availability": "completed_bar_ts_init",
+      "cadence": "per_source_bar",
+      "id": "regime_5s",
+      "kind": "tracker",
+      "stream": "syn_a_5s",
+      "visibility": "at_epoch"
+    },
+    {
+      "availability": "completed_bar_ts_init",
+      "cadence": "per_source_bar",
+      "id": "regime_5m",
+      "kind": "tracker",
+      "stream": "syn_a_5m",
+      "visibility": "at_epoch"
+    },
+    {
+      "availability": "completed_bar_ts_init",
+      "cadence": "per_source_bar",
+      "id": "ctx_regime",
+      "kind": "tracker",
+      "stream": "syn_b_1m",
+      "visibility": "strictly_before"
+    },
+    {
+      "availability": "completed_bar_ts_init",
+      "cadence": "per_candidate",
+      "id": "features",
+      "kind": "tracker",
+      "stream": null,
+      "visibility": "at_epoch"
+    }
+  ],
+  "chronology": {
+    "authorized_dates": [],
+    "dev": [
+      2031
+    ],
+    "diagnostic": [],
+    "prohibited": [
+      2032
+    ],
+    "train": [
+      2029,
+      2030
+    ],
+    "warmup": {
+      "candidate_emission": false,
+      "days_before_partition": 5,
+      "target_generation": false
+    }
+  },
+  "closure": {
+    "composite_sha256": "95695753d5267bf985ff789058fa4ccafea28c00294095780e3720ba3b4208a4",
+    "stages": {
+      "audit": {
+        "composite_sha256": "cb379ab23966122a17566a3798d346bfd767cfec672d7847712ea8179bed77de",
+        "files": [
+          "research_workflow/audit_packets_v2.py"
+        ]
+      },
+      "collection": {
+        "composite_sha256": "f70e3fdf4b6da2eaa349b04cdf0261076fc09fae0abb162a8e661a41581e628a",
+        "files": [
+          "research_workflow/dataset_v2.py",
+          "research_workflow/grammar/compiler.py",
+          "research_workflow/grammar/expansion.py",
+          "research_workflow/grammar/plan.py",
+          "research_workflow/grammar/predicates.py",
+          "research_workflow/grammar/spec.py",
+          "research_workflow/host/interfaces.py",
+          "research_workflow/host/mux.py",
+          "research_workflow/host/outcomes.py",
+          "research_workflow/host/predicate_eval.py",
+          "research_workflow/host/sink.py",
+          "research_workflow/host/strategy.py",
+          "research_workflow/host/triggers.py",
+          "research_workflow/host_runner.py",
+          "research_workflow/provider_host.py",
+          "research_workflow/sessions.py",
+          "research_workflow/target_expression.py",
+          "research_workflow/target_replay_oracle.py",
+          "research_workflow/tests/synthetic_primitives.py",
+          "utils/session_boundaries.py"
+        ]
+      },
+      "lifecycle": {
+        "composite_sha256": "324e4462feaee49169d28621208d2a28cc4119d4b88613a4cb01e8b0925e50d3",
+        "files": [
+          "research_workflow/closure_hash.py",
+          "research_workflow/controller_contracts.py",
+          "research_workflow/governed_controller.py",
+          "research_workflow/governed_controller_v2.py",
+          "research_workflow/lifecycle_v2.py",
+          "research_workflow/locks.py",
+          "research_workflow/policy.py",
+          "research_workflow/roots.py",
+          "research_workflow/study_closure.py"
+        ]
+      },
+      "modeling": {
+        "composite_sha256": "18d210d5fd4c975d1d18a0b4e28cccc5a60736c53bcfb2d6c77cf3552e36ced3",
+        "files": [
+          "research/analysis/identity.py",
+          "research/analysis/metrics.py",
+          "research/analysis/modeling.py",
+          "research_workflow/model_store.py",
+          "research_workflow/tuning.py"
+        ]
+      },
+      "oos": {
+        "composite_sha256": "33c6cd66e080343671805fb1b81c4fee0d4ad779909689807c36e532f7e954df",
+        "files": [
+          "research_workflow/experiment.py"
+        ]
+      },
+      "outcome": {
+        "composite_sha256": "0f75bef9c5a19d91ccae8decc8a138c1b796cd50125203fd59dc562f28ec7c99",
+        "files": [
+          "research_workflow/entry_references.py",
+          "research_workflow/forward_outcomes/guard.py",
+          "research_workflow/target_expression.py",
+          "research_workflow/target_replay_oracle.py"
+        ]
+      }
+    }
+  },
+  "features": {
+    "aliases": [
+      "f_close",
+      "f_dir",
+      "f_ctx_dir",
+      "f_5s_dir",
+      "f_5m_bars"
+    ],
+    "host": "research_workflow.tests.synthetic_primitives.SyntheticFeatureHost",
+    "required_events": [],
+    "routing": {},
+    "snapshot": {}
+  },
+  "identity": {
+    "closure_file_count": 38,
+    "closure_hash_algorithm": "v2",
+    "execution_composite_sha256": "95695753d5267bf985ff789058fa4ccafea28c00294095780e3720ba3b4208a4",
+    "packet_sha256": "b5d98a10cb8f9635daf0ffe283ec8aeb358b6234bd5cbe48cd2adda3aa4c87d3"
+  },
+  "instructions": "Write audit/pass_NN.md (causal) or audit/contract_pass_NN.md (contract) and end it with exactly one block: <!-- AUDIT_SUMMARY_V2_START --> {json} <!-- AUDIT_SUMMARY_V2_END -->; then run `research audit ingest --study <dir> --type <causal|contract> --report <file> --author <you>`.",
+  "invariants": [
+    "completed bars only (ts_init)",
+    "context streams visible strictly before T",
+    "derived buckets complete-only",
+    "outcome kernel resolves from bars strictly after T",
+    "label contract has no fill semantics",
+    "assert_oos_open is the only OOS door"
+  ],
+  "model": {
+    "arms": [],
+    "family": "model.lightgbm",
+    "max_trials": 8,
+    "mode": "train",
+    "objective": {
+      "aggregate": "mean_over_folds",
+      "maximize": true,
+      "metric": "roc_auc"
+    },
+    "params": {
+      "learning_rate": 0.1,
+      "max_depth": 2,
+      "n_estimators": 20,
+      "num_leaves": 4,
+      "verbosity": -1
+    },
+    "random_seed": 11,
+    "sampler_seed_source": "validation.random_seed",
+    "search_space": {
+      "max_depth": {
+        "high": 4,
+        "int": true,
+        "log": false,
+        "low": 2
+      },
+      "n_estimators": {
+        "choices": [
+          10,
+          20,
+          40
+        ]
+      }
+    },
+    "validation": {
+      "final_train_validation_years": [],
+      "max_trials": 8,
+      "primary_metric": null,
+      "protocol": "validation.model_selection.random",
+      "random_seed": 11,
+      "tuning_years": [
+        2029,
+        2030
+      ],
+      "year_role_table": [
+        {
+          "role": "tuning",
+          "year": 2029
+        },
+        {
+          "role": "tuning",
+          "year": 2030
+        },
+        {
+          "role": "dev_oos",
+          "year": 2031
+        },
+        {
+          "role": "prohibited",
+          "year": 2032
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "arms": [
+      {
+        "adverse_atr": 1.0,
+        "expiry": "censor",
+        "favorable_atr": 1.0,
+        "horizon_ns": 60000000000,
+        "id": "tp1_sl1",
+        "prefix": "arm_a"
+      },
+      {
+        "adverse_atr": 0.5,
+        "expiry": "censor",
+        "favorable_atr": 1.0,
+        "horizon_ns": 60000000000,
+        "id": "tp1_sl05",
+        "prefix": "arm_b"
+      }
+    ],
+    "atr": "regime.atr",
+    "atr_availability": "at_decision_delivery",
+    "composition": null,
+    "contract": "label",
+    "direction": "regime.dir",
+    "entry_reference": "next_bar_open",
+    "flip": null,
+    "horizon_end_rule": "strict",
+    "kernel": "barrier",
+    "label_column": "target_flip_within_horizon",
+    "label_columns": {
+      "arm_a": "arm_a_label",
+      "arm_b": "arm_b_label",
+      "primary": "target_flip_within_horizon"
+    },
+    "max_gap_ns": null,
+    "primary_arm": "tp1_sl1",
+    "relation": "continuation",
+    "resolution_precedence": [
+      "SESSION_END",
+      "GAP",
+      "BARRIER_TOUCH",
+      "HORIZON_EXPIRY"
+    ],
+    "same_bar_rule": "ambiguous_censor",
+    "session_end_censoring": true
+  },
+  "packet_version": 2,
+  "plan_sha256": "9532e5ea6c7e1bae2aa53bd085659d6801a81dbd1128fb2ae3f38909fe59c1e4",
+  "population": {
+    "anchor_identity": "regime.start_ns",
+    "cadence": {
+      "anchor": "regime.start_ns",
+      "every_ns": 5000000000,
+      "index_column": "checkpoint_index",
+      "kind": "grid",
+      "max_age_ns": 600000000000,
+      "stream": "syn_a_1s"
+    },
+    "direction": "regime.dir",
+    "qualify": "regime.age_s >= 10s and regime.frozen_atr > 0"
+  },
+  "required_summary_block": {
+    "audit_type": "causal | contract",
+    "audited_execution_composite_sha256": "<copy from packet.identity.execution_composite_sha256>",
+    "auditor": "<distinct identity>",
+    "critical": 0,
+    "note": 0,
+    "study": "<study_id>",
+    "verdict": "CLEAR | BLOCKED",
+    "warning": 0
+  },
+  "same_timestamp_rule": "context streams expose events with ts_init < T only",
+  "session": {
+    "censor_session": "RTH",
+    "dataset": "SYN_A",
+    "kind": "legacy",
+    "reference_digest": null,
+    "reference_tables": [],
+    "session": "RTH"
+  },
+  "streams": [
+    {
+      "aggregation": null,
+      "derived_from": null,
+      "instrument": "SYN_A",
+      "key": "syn_a_1s",
+      "role": "execution",
+      "same_ts": "unavailable",
+      "source": "external",
+      "timeframe": "1s",
+      "visibility": "at_epoch"
+    },
+    {
+      "aggregation": "complete_bucket",
+      "derived_from": "syn_a_1s",
+      "instrument": "SYN_A",
+      "key": "syn_a_5s",
+      "role": "execution",
+      "same_ts": "unavailable",
+      "source": "derived",
+      "timeframe": "5s",
+      "visibility": "at_epoch"
+    },
+    {
+      "aggregation": null,
+      "derived_from": null,
+      "instrument": "SYN_A",
+      "key": "syn_a_1m",
+      "role": "context",
+      "same_ts": "unavailable",
+      "source": "external",
+      "timeframe": "1m",
+      "visibility": "strictly_before"
+    },
+    {
+      "aggregation": "complete_bucket",
+      "derived_from": "syn_a_1s",
+      "instrument": "SYN_A",
+      "key": "syn_a_5m",
+      "role": "execution",
+      "same_ts": "unavailable",
+      "source": "derived",
+      "timeframe": "5m",
+      "visibility": "at_epoch"
+    },
+    {
+      "aggregation": null,
+      "derived_from": null,
+      "instrument": "SYN_B",
+      "key": "syn_b_1m",
+      "role": "context",
+      "same_ts": "unavailable",
+      "source": "external",
+      "timeframe": "1m",
+      "visibility": "strictly_before"
+    }
+  ],
+  "study_id": "golden_barrier_redteam",
+  "tests": {
+    "counts": {
+      "failed": 0,
+      "passed": 1
+    },
+    "execution_composite_sha256": "95695753d5267bf985ff789058fa4ccafea28c00294095780e3720ba3b4208a4",
+    "status": "PASS"
+  },
+  "trackers": [
+    {
+      "cadence": "per_source_bar",
+      "capability": "tracker.synthetic.level_regime",
+      "id": "regime",
+      "inputs": {
+        "bars": {
+          "stream": "syn_a_1m"
+        }
+      },
+      "params": {
+        "atr": 2.0,
+        "instrument": "SYN_A",
+        "level": 100.0,
+        "timeframe": "1m"
+      },
+      "subscriptions": [],
+      "warmup_bars": 0
+    },
+    {
+      "cadence": "per_source_bar",
+      "capability": "tracker.synthetic.level_regime",
+      "id": "regime_5s",
+      "inputs": {
+        "bars": {
+          "stream": "syn_a_5s"
+        }
+      },
+      "params": {
+        "atr": 2.0,
+        "instrument": "SYN_A",
+        "level": 100.5,
+        "timeframe": "5s"
+      },
+      "subscriptions": [],
+      "warmup_bars": 0
+    },
+    {
+      "cadence": "per_source_bar",
+      "capability": "tracker.synthetic.level_regime",
+      "id": "regime_5m",
+      "inputs": {
+        "bars": {
+          "stream": "syn_a_5m"
+        }
+      },
+      "params": {
+        "atr": 2.0,
+        "instrument": "SYN_A",
+        "level": 100.0,
+        "timeframe": "5m"
+      },
+      "subscriptions": [],
+      "warmup_bars": 0
+    },
+    {
+      "cadence": "per_source_bar",
+      "capability": "tracker.synthetic.level_regime",
+      "id": "ctx_regime",
+      "inputs": {
+        "bars": {
+          "stream": "syn_b_1m"
+        }
+      },
+      "params": {
+        "atr": 1.0,
+        "instrument": "SYN_B",
+        "level": 50.0,
+        "timeframe": "1m"
+      },
+      "subscriptions": [],
+      "warmup_bars": 0
+    },
+    {
+      "cadence": "per_candidate",
+      "capability": "feature_host.synthetic",
+      "id": "features",
+      "inputs": {},
+      "params": {
+        "columns": {
+          "f_5m_bars": "regime_5m.bars",
+          "f_5s_dir": "regime_5s.dir",
+          "f_close": "epoch.price",
+          "f_ctx_dir": "ctx_regime.dir",
+          "f_dir": "regime.dir"
+        }
+      },
+      "subscriptions": [],
+      "warmup_bars": 0
+    }
+  ],
+  "triggers": {
+    "kind": "every_candidate"
+  },
+  "warmup": {
+    "days_before_partition": 5,
+    "max_warmup_seconds": 0,
+    "per_stream_bars": {
+      "syn_a_1m": 0,
+      "syn_a_1s": 0,
+      "syn_a_5m": 0,
+      "syn_a_5s": 0,
+      "syn_b_1m": 0
+    }
+  },
+  "worktree_dirty_paths": []
+}

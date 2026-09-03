@@ -325,9 +325,13 @@ class LabelOutcomeKernel:
                         continue
                     if past_end:
                         # first_bar_at_or_after: this bar is evaluated for a hit, then the arm expires --
-                        # but only inside the arm's own session: a bar from the next session is never a fill
+                        # but only inside the arm's own session: a bar from the next session is never a fill.
+                        # Precedence is SESSION_END > GAP > BARRIER_TOUCH > HORIZON_EXPIRY: if the first
+                        # post-horizon bar the kernel actually observes already lies beyond the session
+                        # close, that is a session/data-gap condition, not a horizon expiry -- resolve
+                        # CENSORED/"SESSION_END" unconditionally, regardless of the arm's expiry policy.
                         if p.session_close is not None and ts > p.session_close:
-                            self._expire_arm(p, i)
+                            self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
                             continue
                         if gap:
                             self._resolve_arm(p, i, CENSORED, ts, "GAP")

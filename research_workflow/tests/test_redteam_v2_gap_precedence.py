@@ -95,10 +95,10 @@ def test_strict_rule_unaffected_by_gap_precedence_change():
     assert oc == ("CENSORED", "TIMEOUT"), oc
 
 
-# (d) session_end beats gap when both conditions hold on the same bar: the bar is never evaluated
-# as a GAP resolution (or a barrier touch) once it is past the censoring session's close -- the
-# existing session-close precedence (checked first in the past_end branch) must not regress to a
-# GAP censor now that gap-checking has been added to that branch.
+# (d) session_end beats gap (and beats horizon_expiry) when the first bar the tape offers past
+# the horizon end is already past the censoring session's close: the bar is never evaluated as a
+# GAP resolution (or a barrier touch), and the arm never falls through to its horizon_expiry_policy
+# -- resolution precedence is SESSION_END > GAP > BARRIER_TOUCH > HORIZON_EXPIRY.
 def test_session_end_takes_precedence_over_gap():
     # close is AFTER the horizon end (T+10) so the arm is not resolved SESSION_END at entry; the
     # post-horizon bar at k=16 is both a gap (11s > max_gap=5s) and past session close (close=T+12).
@@ -108,8 +108,8 @@ def test_session_end_takes_precedence_over_gap():
     oc = _run_oracle(_oracle_contract(max_gap_seconds=5), close, tape)
     assert kc[1] != "GAP", kc
     assert oc[1] != "GAP", oc
-    assert kc == ("CENSORED", "TIMEOUT"), kc
-    assert oc == ("CENSORED", "TIMEOUT"), oc
+    assert kc == ("CENSORED", "SESSION_END"), kc
+    assert oc == ("CENSORED", "SESSION_END"), oc
 
 
 # (e) max_gap None -> unchanged behavior (a distant post-horizon bar is still evaluated for a touch).
@@ -135,3 +135,84 @@ def test_adjacent_bypass_strict_greater_than():
     oc_over = _run_oracle(_oracle_contract(max_gap_seconds=5), None, tape_over)
     assert kc_over == ("CENSORED", "GAP"), kc_over
     assert oc_over == ("CENSORED", "GAP"), oc_over
+
+
+# --- C9/G2 regression: expiry:"negative" must never manufacture a directional label out of a
+# session-boundary data gap. Resolution precedence is SESSION_END > GAP > BARRIER_TOUCH >
+# HORIZON_EXPIRY: when the first bar the tape offers after the horizon end is already past the
+# censoring session's close, that is SESSION_END, never a HORIZON_EXPIRY-driven NEGATIVE.
+
+def _kernel_contract_expiry(*, max_gap_ns, close, horizon_end_rule, expiry):
+    return LabelOutcomeContract.from_plan({
+        "contract": "label", "kernel": "barrier", "direction": "d", "atr": "a", "entry_reference": "next_bar_open",
+        "session_end_censoring": close is not None, "max_gap_ns": max_gap_ns, "same_bar_rule": "ambiguous_censor",
+        "horizon_end_rule": horizon_end_rule,
+        "arms": [{"id": "x", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_ns": 10 * NS, "expiry": expiry, "prefix": "x"}],
+        "primary_arm": "x",
+    })
+
+
+def _oracle_contract_expiry(*, max_gap_seconds, horizon_end_rule, expiry):
+    return {"primitive": "ordered_barrier", "required_forward_outcomes": [{
+        "id": "fo", "entry_reference": "next_bar_open", "session_end_censoring": True,
+        "max_gap_seconds": max_gap_seconds,
+        "ordered_barriers": [{"id": "b", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 10,
+                              "horizon_expiry_policy": expiry, "horizon_end_rule": horizon_end_rule}],
+    }]}
+
+
+def test_expiry_negative_first_bar_at_or_after_session_gap_is_censored_not_negative():
+    # horizon end = T+10 = session close; no bar exists between T+10 and the close (the tape has a
+    # gap through T+9, then the next bar is far past both the horizon end AND the session close).
+    # expiry:"negative" must NOT manufacture a NEGATIVE label from zero post-horizon observation --
+    # this is a SESSION_END/data-gap condition, not a HORIZON_EXPIRY.
+    close = T + 10 * NS
+    tape = [(k, 100.5, 99.5) for k in range(1, 10)] + [(18000, 100.5, 99.0)]  # far bar never observed in-session
+    kc = _run_kernel(_kernel_contract_expiry(max_gap_ns=None, close=close, horizon_end_rule="first_bar_at_or_after", expiry="negative"), close, tape)
+    oc = _run_oracle(_oracle_contract_expiry(max_gap_seconds=None, horizon_end_rule="first_bar_at_or_after", expiry="negative"), close, tape)
+    assert kc == ("CENSORED", "SESSION_END"), kc
+    assert oc == ("CENSORED", "SESSION_END"), oc
+    assert kc == oc
+
+
+def test_expiry_negative_strict_rule_horizon_elapsed_in_session_is_still_negative():
+    # Control: strict horizon_end_rule, expiry:"negative", horizon fully elapsed WITH in-session
+    # bars observed and no barrier touched -- this is a genuine HORIZON_EXPIRY and must still
+    # resolve NEGATIVE (the fix must not regress the unambiguous case).
+    close = T + 1000 * NS  # far past the horizon end -- no session boundary involved
+    tape = [(k, 100.5, 99.5) for k in range(1, 12)]  # never touches favorable(101) or adverse(99)
+    kc = _run_kernel(_kernel_contract_expiry(max_gap_ns=None, close=close, horizon_end_rule="strict", expiry="negative"), close, tape)
+    oc = _run_oracle(_oracle_contract_expiry(max_gap_seconds=None, horizon_end_rule="strict", expiry="negative"), close, tape)
+    assert kc == ("NEGATIVE", None), kc
+    assert oc == ("NEGATIVE", None), oc
+    assert kc == oc
+
+
+def test_entry_bar_itself_beyond_session_close_is_censored_session_end():
+    # The very first (entry / next_bar_open) bar already lies beyond the session close -- the arm
+    # must resolve CENSORED/SESSION_END at entry, in both kernel and oracle, never HORIZON_EXPIRY.
+    close = T + 1 * NS  # close is essentially at T; the first bar after T is already past it
+    tape = [(5, 100.5, 99.5)]  # entry bar itself is far past `close`
+    kc = _run_kernel(_kernel_contract_expiry(max_gap_ns=None, close=close, horizon_end_rule="first_bar_at_or_after", expiry="negative"), close, tape)
+    oc = _run_oracle(_oracle_contract_expiry(max_gap_seconds=None, horizon_end_rule="first_bar_at_or_after", expiry="negative"), close, tape)
+    assert kc == ("CENSORED", "SESSION_END"), kc
+    assert oc == ("CENSORED", "SESSION_END"), oc
+    assert kc == oc
+
+
+def test_v2_host_path_never_routes_to_legacy_composite_replay():
+    """Guard: the V2 grammar-compiled outcome contract (arms+flip, served by
+    research_workflow.host.outcomes.LabelOutcomeKernel and target_replay_oracle.replay) must never
+    reach the legacy V1 composite path (_replay_ordered_barrier_condition / replay_expression),
+    which lacks the first_bar_at_or_after / gap-precedence fix and is frozen for V1 studies."""
+    import inspect
+    import research_workflow.host.outcomes as outcomes_mod
+    import research_workflow.target_replay_oracle as oracle_mod
+
+    source = inspect.getsource(outcomes_mod)
+    assert "_replay_ordered_barrier_condition" not in source
+    assert "replay_expression" not in source
+
+    replay_source = inspect.getsource(oracle_mod.replay)
+    assert "_replay_ordered_barrier_condition" not in replay_source
+    assert "replay_expression" not in replay_source

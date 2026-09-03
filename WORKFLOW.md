@@ -105,6 +105,14 @@ creates v2 studies; `study compile` and `study run` refuse a new v1 study.
 | Templates | Prompts and skeletons | `research_workflow/templates/`, `docs/templates/`, `docs/examples/*.yaml` | YES | NO | — |
 | Documentation | Authority and manuals | `WORKFLOW.md`, `docs/QUICKSTART.md`, `docs/RESEARCH_YAML_REFERENCE.md`, `docs/RESEARCH_DISCUSSION_TO_YAML.md`, `docs/AI_AGENTS.md`, `docs/RESEARCH_WORKFLOW.md`, `docs/GOVERNED_STUDY_CONTROLLER.md`, `docs/DOCUMENT_MAP.md` | YES | reference yes | `python scripts/gen_yaml_reference.py --check` |
 
+A DatasetSpec (`research/datasets/<id>.yaml`) declares `reference_tables` (which of
+`sessions`/`holidays`/`maintenance`/`rolls`/`gaps`/`out_of_calendar` the dataset carries) and
+`reference_digest` (their combined content hash); verification is fail-closed -- a hash mismatch at
+load refuses the study rather than reading a drifted table. A `sessions` reference table selects the
+calendar session kind used for outcome/population censoring; ETH is `(open, 08:30 CT]` pre-open plus
+`(15:15 CT or halt end, day close]` post-close, and legacy ETH censoring without a declared `sessions`
+table is refused (`SEMANTIC_DECISION_REQUIRED`).
+
 ## D. A normal new study
 
 ```bash
@@ -311,6 +319,13 @@ Declare, explicitly:
 * precedence and `composition` (AND/OR with monotone censoring) for multi-item outcomes;
 * `entry_reference` (only `next_bar_open` / `next_printed_bar_open` are executable for labels);
 * `relation` (continuation | fade) and `direction`.
+
+Resolution precedence at every bar (in-horizon, or the first post-horizon bar under
+`horizon_end_rule: first_bar_at_or_after`) is fixed: `SESSION_END > GAP > BARRIER_TOUCH > HORIZON_EXPIRY`
+-- a bar past the censoring session close is CENSORED `SESSION_END` before `max_gap`/touch are ever
+evaluated, so `expiry: negative` can never manufacture a directional label out of a session-boundary
+data gap. This is compiled into every outcome contract as `outcome.semantics.resolution_precedence` and
+enforced identically by the kernel and the independent oracle (see `docs/RESEARCH_YAML_REFERENCE.md`).
 
 Shape C lesson: the sealed reference resolved 25 of 453,768 rows one second past the horizon on sparse
 seconds and keyed its model cells by the prevailing regime direction. Both were invisible in a study
