@@ -329,6 +329,9 @@ class LabelOutcomeKernel:
                         if p.session_close is not None and ts > p.session_close:
                             self._expire_arm(p, i)
                             continue
+                        if gap:
+                            self._resolve_arm(p, i, CENSORED, ts, "GAP")
+                            continue
                         d = p.direction
                         good, bad = p.arm_good[i], p.arm_bad[i]
                         hit_good = hi >= good if d > 0 else lo <= good

@@ -264,11 +264,17 @@ class V2Lifecycle:
         unbound = [b for b in plan["binding_proof"] if not b.get("bound")]
         checks.append({"id": "R5_binding_proof", "passed": not unbound, "detail": f"{len(plan['binding_proof'])} primitives bound; unbound={[b['id'] for b in unbound]}"})
         try:
-            from research_workflow.sessions import build_session_table
-            build_session_table(dict(self.opts.session_table_spec or plan["session"]))
-            checks.append({"id": "R3_session_table", "passed": True, "detail": json.dumps(plan["session"])})
+            from research_workflow.sessions import build_session_table, resolve_calendar_session_spec
+            raw_spec = dict(self.opts.session_table_spec or plan["session"])
+            resolved_spec = resolve_calendar_session_spec(raw_spec, self.repo_root)
+            build_session_table(resolved_spec)
+            detail = {"kind": resolved_spec.get("kind"), "session": resolved_spec.get("session"),
+                      "censor_session": resolved_spec.get("censor_session"), "reference_digest": resolved_spec.get("reference_digest"),
+                      "window_count": len(resolved_spec.get("rows") or []) if resolved_spec.get("kind") == "calendar" else None,
+                      "reference_row_counts": resolved_spec.get("reference_row_counts")}
+            checks.append({"id": "R3_session_table", "passed": True, "detail": json.dumps(detail, default=str)})
         except Exception as exc:
-            checks.append({"id": "R3_session_table", "passed": False, "detail": str(exc)})
+            checks.append({"id": "R3_session_table", "passed": False, "detail": f"{type(exc).__name__}: {exc}"})
         current = self.current_composite()
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
         checks.append({"id": "R9_closure_current", "passed": bool(current and current == frozen), "detail": f"current={str(current)[:12]} frozen={str(frozen)[:12]}"})
@@ -352,9 +358,9 @@ class V2Lifecycle:
     def _run_window(self, plan: Dict[str, Any], start: str, end: str, primary: tuple, *, progress: Optional[Path], ledger: bool = False) -> Dict[str, Any]:
         if self.opts.bar_source is not None:
             from research_workflow.host_runner import run_plan_on_bars
-            from research_workflow.sessions import build_session_table
+            from research_workflow.sessions import build_session_table, resolve_calendar_session_spec
             bars = self.opts.bar_source(start, end)
-            table = build_session_table(dict(self.opts.session_table_spec or plan["session"]))
+            table = build_session_table(resolve_calendar_session_spec(dict(self.opts.session_table_spec or plan["session"]), self.repo_root))
             ledger_rows: List[Dict[str, Any]] = [] if ledger else None
             run = run_plan_on_bars(plan, bars, session_table=table, primary_interval=primary, ledger=ledger_rows)
             run["dataset"] = {"dataset_id": "synthetic", "logical_digest": None, "bytes_verification": "SYNTHETIC"}

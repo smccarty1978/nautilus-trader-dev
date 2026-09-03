@@ -182,7 +182,10 @@ class OutcomeSpec(_Strict):
     # strict: no bar closing after the horizon end is ever evaluated (a bar closing exactly at the end is).
     # first_bar_at_or_after: the first bar closing at or after the horizon end is still evaluated for a
     # barrier hit before expiry (the sealed regime_transition target authority's realized semantics on
-    # sparse seconds; identical to strict on dense tapes).
+    # sparse seconds; identical to strict on dense tapes). Resolution precedence at every bar (in-horizon
+    # or the first post-horizon bar under first_bar_at_or_after) is SESSION_END > GAP > BARRIER_TOUCH >
+    # HORIZON_EXPIRY: max_gap is adjudicated before a post-horizon bar's touch is ever accepted, so a
+    # sparse tape cannot resolve a candidate from a bar farther than max_gap from the prior accepted bar.
     horizon_end_rule: Literal["strict", "first_bar_at_or_after"] = "strict"
     barrier: Optional[Dict[str, Any]] = None       # {favorable_atr, adverse_atr, horizon?, expiry?, arms?: [...]}
     event: Optional[str] = None                    # predicate over tracker events (e.g. 'regime_1m.flipped')

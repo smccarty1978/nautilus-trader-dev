@@ -134,6 +134,38 @@ def session_windows(sess: pd.Series) -> List[tuple[int, int]]:
     return [(int(sess["open_ns"]), end)]
 
 
+def load_reference_tables(catalog_path: Path, declared: Sequence[str], reference_digest: Optional[str] = None) -> Dict[str, pd.DataFrame]:
+    """Loads and fail-closed-verifies the declared reference tables of a V2 catalog against
+    ``build_manifest.json``: every declared table must exist under ``<catalog>/reference/<name>.parquet``
+    and its bytes must hash to the sha256 recorded in the manifest at build time. When ``reference_digest``
+    is given (the DatasetSpec's aggregate digest) and ``declared`` is the full set the manifest built, the
+    aggregate over the declared tables' sha256s must also match it. Fails closed: a missing file, a byte
+    mismatch, or an aggregate mismatch all raise -- this function never silently returns a partial result."""
+    catalog_path = Path(catalog_path)
+    manifest_path = catalog_path / "build_manifest.json"
+    if not manifest_path.is_file():
+        raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: {manifest_path} not found")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    ref_manifest = manifest.get("reference_tables") or {}
+    out: Dict[str, pd.DataFrame] = {}
+    digests: Dict[str, str] = {}
+    for name in declared:
+        entry = ref_manifest.get(name)
+        path = catalog_path / "reference" / f"{name}.parquet"
+        if entry is None or not path.is_file():
+            raise DatasetV2Error(f"REFERENCE_TABLE_MISSING: {name!r} not found under {catalog_path / 'reference'}")
+        actual = _sha256(path)
+        if actual != entry.get("sha256"):
+            raise DatasetV2Error(f"REFERENCE_TABLE_CORRUPT: {name!r} sha256 {actual} != manifest {entry.get('sha256')}")
+        digests[name] = actual
+        out[name] = pd.read_parquet(path)
+    if reference_digest is not None and set(declared) >= set(ref_manifest):
+        computed = hashlib.sha256(json.dumps({n: digests[n] for n in sorted(declared)}, sort_keys=True).encode()).hexdigest()
+        if computed != reference_digest:
+            raise DatasetV2Error(f"REFERENCE_DIGEST_MISMATCH: computed {computed} != declared {reference_digest}")
+    return out
+
+
 def holiday_table(first_ns: int, last_ns: int, sessions: pd.DataFrame, calendar_name: str = CALENDAR_NAME) -> pd.DataFrame:
     import pandas_market_calendars as mcal
     cal = mcal.get_calendar(calendar_name)

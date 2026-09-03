@@ -164,7 +164,8 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
         raise RuntimeError("DATASET_DIGEST_MISMATCH: plan digest != resolved catalog digest")
     bytes_check = verify_launch_dataset_bytes(data_plan)
     engine, _instrument = build_engine(data_plan, log_level=log_level)
-    st_spec = dict(session_table_spec or plan.get("session") or {"kind": "legacy", "session": "RTH"})
+    from research_workflow.sessions import resolve_calendar_session_spec
+    st_spec = resolve_calendar_session_spec(dict(session_table_spec or plan.get("session") or {"kind": "legacy", "session": "RTH"}), repo_root)
     cfg = GovernedHostStrategyConfig(plan_json=json.dumps(plan, default=str), session_table_json=json.dumps(st_spec),
                                      primary_start_ts=(primary_interval[0] if primary_interval else None),
                                      primary_end_ts=(primary_interval[1] if primary_interval else None),

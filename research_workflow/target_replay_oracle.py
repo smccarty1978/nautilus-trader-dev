@@ -119,6 +119,8 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         if ts > horizon_end_ts:
             if end_rule != "first_bar_at_or_after" or (session_close_ts is not None and ts > int(session_close_ts)):
                 break
+            if e.get("gap") or (max_gap_ns is not None and ts - prev_ts > max_gap_ns):
+                return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
             hi, lo = e.get("high"), e.get("low")
             if hi is not None and lo is not None:
                 hit_good = float(hi) >= good if direction > 0 else float(lo) <= good

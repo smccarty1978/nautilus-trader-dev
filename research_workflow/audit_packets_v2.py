@@ -57,7 +57,7 @@ def causal_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite
                          "precedence": trig.get("precedence"), "sub_epochs": trig.get("sub_epochs"), "sub_epoch_sources": trig.get("sub_epoch_sources")})
     o = plan["outcome"]
     outcome = {k: o.get(k) for k in ("contract", "kernel", "direction", "relation", "atr", "atr_availability", "entry_reference", "session_end_censoring",
-                                    "max_gap_ns", "same_bar_rule", "primary_arm", "composition", "label_column")}
+                                    "max_gap_ns", "same_bar_rule", "horizon_end_rule", "resolution_precedence", "primary_arm", "composition", "label_column")}
     outcome["arms"] = o.get("arms")
     outcome["flip"] = o.get("flip")
     features = plan.get("features") or {}

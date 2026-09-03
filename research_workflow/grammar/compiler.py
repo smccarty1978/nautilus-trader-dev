@@ -35,6 +35,7 @@ _FEATURE_HOST_ID = "features"
 _HOST_MODULES = ("research_workflow/host/interfaces.py", "research_workflow/host/mux.py", "research_workflow/host/triggers.py",
                  "research_workflow/host/outcomes.py", "research_workflow/host/predicate_eval.py", "research_workflow/host/sink.py",
                  "research_workflow/host/strategy.py", "research_workflow/host_runner.py", "research_workflow/sessions.py",
+                 "research_workflow/dataset_v2.py",
                  "research_workflow/target_expression.py", "research_workflow/target_replay_oracle.py",
                  "research_workflow/grammar/compiler.py", "research_workflow/grammar/predicates.py", "research_workflow/grammar/spec.py",
                  "research_workflow/grammar/expansion.py", "research_workflow/grammar/plan.py", "research_workflow/provider_host.py",
@@ -192,7 +193,8 @@ def _resolve_streams(ctx: _Ctx) -> None:
             ctx.execution_symbol = symbol
         ctx.instruments[symbol] = {**facts, "symbol": symbol, "dataset_id": s.dataset,
                                    "dataset_digest": ds.get("logical_digest"), "role": s.role,
-                                   "calendar_table": bool(ds.get("calendar_table")), "same_ts": s.same_ts}
+                                   "reference_tables": list(ds.get("reference_tables") or []),
+                                   "reference_digest": ds.get("reference_digest"), "same_ts": s.same_ts}
         declared = ds.get("streams") or {}
         externals = {tf: st for tf, st in declared.items() if (st or {}).get("source") == "external"}
         if not externals:
@@ -229,16 +231,30 @@ def _resolve_streams(ctx: _Ctx) -> None:
             ctx.streams.append(entry)
             ctx.stream_by[(symbol, tf)] = key
     if ctx.execution_symbol:
-        cal = ctx.instruments[ctx.execution_symbol].get("calendar_table")
+        inst = ctx.instruments[ctx.execution_symbol]
+        reference_tables = inst.get("reference_tables") or []
+        reference_digest = inst.get("reference_digest")
+        has_calendar = "sessions" in reference_tables
         censor = (ctx.spec.outcome.session or ctx.spec.population.session)
-        ctx.session = {"kind": "calendar" if cal else "legacy", "session": ctx.spec.population.session,
-                       "censor_session": censor, "dataset": ctx.instruments[ctx.execution_symbol]["dataset_id"]}
+        ctx.session = {"kind": "calendar" if has_calendar else "legacy", "session": ctx.spec.population.session,
+                       "censor_session": censor, "dataset": inst["dataset_id"],
+                       "reference_tables": list(reference_tables), "reference_digest": reference_digest}
         for where, name in (("population.session", ctx.spec.population.session), ("outcome.session", censor)):
             if str(name).upper() not in {"RTH", "ETH", "ALL"}:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"unknown session {name!r}", closest="RTH")
         if ctx.spec.outcome.session_end == "censor" and str(censor).upper() == "ALL":
             ctx.gap(GapKind.AMBIGUOUS_TEMPORAL_SEMANTICS, "outcome.session",
                     "session-end censoring needs a session with a close; declare outcome.session (e.g. RTH) or session_end: ignore")
+        if reference_tables and not has_calendar and ctx.spec.outcome.session_end == "censor":
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.session",
+                    "dataset declares reference_tables without a 'sessions' table but the outcome censors on a "
+                    "session close; the runtime cannot silently fall back to the legacy weekday-rule session",
+                    dataset=inst["dataset_id"], reference_tables=list(reference_tables))
+        if (not has_calendar) and str(censor).upper() == "ETH" and ctx.spec.outcome.session_end == "censor":
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.session",
+                    "ETH session-end censoring has no defined close on a legacy (non-calendar) dataset; "
+                    "the ETH window is not a single contiguous daily window under the weekday-rule authority",
+                    dataset=inst["dataset_id"])
 
 
 # --------------------------------------------------------------------------- #
@@ -840,6 +856,7 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
         "contract": o.kind, "kernel": kernel, "direction": direction, "direction_sign": (-1 if o.relation == "fade" else 1),
         "relation": o.relation, "atr": atr, "atr_availability": (o.atr_availability or "at_decision_delivery"), "entry_reference": o.entry_reference,
         "session_end_censoring": o.session_end == "censor", "max_gap_ns": max_gap, "same_bar_rule": o.same_bar_rule, "horizon_end_rule": o.horizon_end_rule,
+        "resolution_precedence": ["SESSION_END", "GAP", "BARRIER_TOUCH", "HORIZON_EXPIRY"],
         "arms": arms, "primary_arm": primary, "flip": flip, "stream": stream, "label_column": o.label_column or "target_flip_within_horizon",
         "composition": ({"logic": o.composition, "children": [a["id"] for a in arms] + (["event"] if flip else [])} if (arms and flip) else None),
     }
