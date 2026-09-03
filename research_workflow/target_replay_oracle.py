@@ -111,11 +111,24 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
     max_gap_ns = max_gap_seconds * NS if max_gap_seconds is not None else None
 
     prev_ts = entry_ts
+    end_rule = str((barrier or {}).get("horizon_end_rule", candidate.get("horizon_end_rule", "strict")))
     for e in evs:
         ts = int(e["ts"])
         if ts <= entry_ts:
             continue
         if ts > horizon_end_ts:
+            if end_rule != "first_bar_at_or_after" or (session_close_ts is not None and ts > int(session_close_ts)):
+                break
+            hi, lo = e.get("high"), e.get("low")
+            if hi is not None and lo is not None:
+                hit_good = float(hi) >= good if direction > 0 else float(lo) <= good
+                hit_bad = float(lo) <= bad if direction > 0 else float(hi) >= bad
+                if hit_good and hit_bad:
+                    return {"disposition": "CENSORED", "label": None, "censor_reason": "AMBIGUOUS_SAME_BAR_TOUCH"}
+                if hit_good:
+                    return {"disposition": "POSITIVE", "label": 1, "censor_reason": None}
+                if hit_bad:
+                    return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
             break
         if session_close_ts is not None and ts > int(session_close_ts):
             return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}

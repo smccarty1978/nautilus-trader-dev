@@ -29,6 +29,9 @@ If another document contradicts this one, this one wins. Classification of every
 | Can a study consume another study's frozen model score? | 20.2 |
 | Can a study declare a machine-enforced pre-freeze gate? | 20.3 |
 | Is hyperparameter search governed the same way as everything else? | 20.4 |
+| How do I create and run a NEW study (declarative, zero study Python)? | 21 |
+| What does a typed CapabilityGap mean and how do I add a primitive? | 21.3, 21.6 |
+| Which dataset should a new study bind to (V2 native 1s)? | 21.7 |
 
 ---
 
@@ -1108,3 +1111,124 @@ with no re-derivation attempted. Every frozen arm's hyperparameters and seed are
 cross-checked against the selection manifest's winner
 (`ModelSelectionBindingMismatch` on any drift) — the freeze refuses a model whose
 family/hyperparameters cannot be traced to the declared selection protocol.
+
+---
+
+## 21. Platform V2 — the declarative research flow
+
+Platform V2 is the research flow for **new** studies. Historical studies are immutable
+reference fixtures: they are never recompiled, resealed, migrated or "modernized", and the new
+runtime imports nothing from any `studies/<id>/implementation`. A normal V2 study contains
+**no Python**: a `study.yaml` composed of registered primitives, the compiled plan the compiler
+writes next to it, and the artifacts the controller produces.
+
+```
+research question -> research study new -> capability resolution (research cap ...)
+  -> study.yaml (six-kind grammar) -> research study compile -> compiled_plan.json | CapabilityGap
+  -> research study run --through <stage>   (controller owns every stage, see docs/GOVERNED_STUDY_CONTROLLER.md)
+  -> audit packets -> research audit ingest -> seal -> smoke -> collection -> reconcile -> merge
+  -> fit | score (frozen models) -> freeze -> oos -> analyze -> close
+```
+
+### 21.1 Six kinds, one grammar
+
+`research_workflow/grammar/spec.py` (`StudySpecV2`) declares exactly six kinds of primitive:
+
+| Kind | Section of `study.yaml` | Registry kind |
+|---|---|---|
+| stream | `streams: [{dataset, timeframes}]` — the first stream carries `role: execution`; derived timeframes (5s, 5m) are host aggregations of the finest external stream | `streams`, `datasets` |
+| feature | `features.instances` (canonical identity + parameters; `over:` set-expansion), `features.metadata`, `features.bindings`, `features.derived_inputs` | `features`, `feature_hosts`, `derived_inputs` |
+| tracker | `context: {name: {tracker: <id>, ...}}` — host-bound stateful trackers (`features/trackers/host_bindings.py`) | `trackers` |
+| trigger graph | `triggers: every_candidate` or `{reset_when, states{enter_when, expire_when, from, chain}, entry{when, reference, max_per_watch, cooldown}, precedence, sub_epochs}` | `trigger_primitives` |
+| outcome | `outcome: {kind: label, event | barrier{arms, primary, expiry} | composition, horizon, horizon_end_rule (strict | first_bar_at_or_after), direction, relation, atr_availability, session_end, session, entry_reference}` | `outcomes` |
+| entry reference | `outcome.entry_reference` / `triggers.entry.reference` from `research_workflow/entry_references.py` (`next_bar_open` is the only executable label reference) | `entry_references` |
+
+Predicates (`population.qualify`, trigger `enter_when`/`expire_when`/`reset_when`/`entry.when`)
+use the tiny language in `research_workflow/grammar/predicates.py`: comparisons, `and/or/not`,
+durations (`120s`), references (`tracker.field`, `state`, `age(STATE)`), event tests
+(`x.flipped(to=-1)`, `x.turned(from=, to=)`, `x.changed`, `x.new_leg`) and `in [..]`. There is
+no arithmetic and no function call beyond those.
+
+`model:` is `none`, a training declaration (`family`, `params`, `validation` with an explicit
+year-role table) or **score mode** (`mode: score`, `models: [{id, label, subset, name}]`) which
+scores frozen models from the model store and trains nothing.
+
+### 21.2 The static compiler
+
+`research_workflow/grammar/compiler.py` → `compile_study(spec, repo_root=...)` returns a
+`CompiledPlan` (`plan_sha256`, `closure` composite over the host modules and every bound
+provider/tracker module, a per-binding proof, the year-role table, warmup and availability
+facts) **or** a typed `CapabilityGap` report. **No catalog is ever opened at compile time**:
+dataset facts come from `research/datasets/<id>.yaml`.
+
+### 21.3 Typed capability gaps
+
+`research_workflow/grammar/gaps.py` — `GapKind`:
+
+| Kind | Meaning | What to do |
+|---|---|---|
+| `MISSING_CAPABILITY` | the primitive does not exist (closest registered id is named) | `research cap propose` → `scaffold` → `promote` (21.6) |
+| `INVALID_PARAMETERIZATION` | the primitive exists but a parameter/label/reference is wrong | fix the spec |
+| `AMBIGUOUS_TEMPORAL_SEMANTICS` | the spec left a timing choice open (e.g. `atr_availability`) | declare it explicitly |
+| `UNAVAILABLE_STREAM` | the dataset or timeframe is not resolvable | pick a registered dataset |
+| `UNSUPPORTED_COMPOSITION` | e.g. an event test inside `population.qualify` | restructure |
+| `SEMANTIC_DECISION_REQUIRED` | a research decision (direction, primary arm, chronology double-use) | decide, then declare |
+
+The controller reports gaps as a `CAPABILITY_BLOCKER` card; they are never runtime failures.
+
+### 21.4 The thin runtime host
+
+`research_workflow/host/` coordinates and never implements science: `StreamMux` (per-stream
+`visible_through_ns`; context streams are visible only *strictly before* an execution epoch;
+derived complete buckets are published before the source bar), `TriggerEngine`
+(OBSERVE→WATCH→ARMED→ENTERED with reset/expire/chain/precedence, edge events consumed once),
+`LabelOutcomeKernel` (barrier / flip / composite label contracts, oracle-tested) versus the
+typed `TradeExecutionContract`, `CollectionSink` (columnar, primary-interval retention).
+`scripts/lint_host.py` keeps numeric literals, pandas and study imports out of the host.
+`research_workflow/host_runner.py` runs a plan on synthetic bars, an existing engine, or the
+governed catalog (`resolve_dataset_plan` for any committed dataset id).
+
+### 21.5 Controller-owned lifecycle
+
+`scripts/research.py study run --study studies/<id> --through <stage> --execute-authorized`
+dispatches a V2 study to `research_workflow/governed_controller_v2.py`. Stages, receipts and
+resume rules are in `docs/GOVERNED_STUDY_CONTROLLER.md` (V2 section). Audits are packet-driven:
+the controller writes `_work/controller/audit_packet_{causal,contract}.json`; one causal auditor
+and one contract auditor each write one report ending in an `AUDIT_SUMMARY_V2` block;
+`research audit ingest --study ... --type causal|contract --report <md>` binds it to the frozen
+execution composite. Long runs are launched detached (`nohup python -u ... & disown`) and
+resumed with the same command: fresh receipts are never re-executed. One live controller per study: a second `study run` on a study whose `_work/controller/run.lock` pid is alive is refused with `STUDY_RUN_ALREADY_LIVE`.
+
+### 21.6 Adding a capability (proposal → scaffold → promotion)
+
+`research cap propose <yaml>` validates a proposal (anti-bloat gates: an existing primitive with
+the same semantics blocks it), `research cap scaffold <id>` writes the tracker/feature module,
+its test and a `candidate` registry seed, `research cap promote <id> --parity <json>` flips it to
+`verified` only with a parity artifact and green tests. `research cap generate --check` must stay
+current; the registry (`research_workflow/capabilities/registry.json`) is generated from
+declarations (host bindings, entry references, feature bundle), never hand-edited.
+
+### 21.7 Dataset V2
+
+`research_workflow/dataset_v2.py` / `scripts/build_dataset_v2.py` build immutable
+`<SYM>_1S_V2` catalogs: native 1-second rows only (never forward-filled), a build-time 1m stream
+aggregated from the same seconds (`closed=left, label=left`, a minute exists iff ≥ 1 native
+second — proven equal to the V0 1m stream and to an independent implementation by
+`scripts/prove_bar_equivalence.py`), no 5m stream (runtime derivation from completed 1m stays),
+and reference tables under `<catalog>/reference/` (sessions with coverage, holidays,
+maintenance windows incl. the pre-2021-06-28 halt, rolls from instrument-id changes, run-length
+gaps, out-of-calendar native rows). Identity is the `logical_digest` in
+`research/datasets/<id>.yaml`; a V2 dataset is never rebuilt in place. New studies bind
+`streams: [{dataset: NQ_1S_V2, ...}]`; V0 catalogs remain for sealed studies only.
+
+### 21.8 Proof studies and the success criterion
+
+Three fresh V2 studies (`v2_shape_a_flip_180s`, `v2_shape_b_deep_pullback_5s`,
+`v2_shape_c_barrier_race_fade`) were created with `research study new`, run by the controller
+with zero study Python, and compared against frozen historical fixtures with
+`scripts/parity/compare_frames.py`. The bar is: a mid-tier owner with a research question, the
+platform status card and registry access can create and run a governed study without reading
+core source. Tests: `research_workflow/tests/test_grammar_v2.py`, `test_host_core.py`,
+`test_golden_fixture.py`, `test_lifecycle_v2.py` (a fresh study compile→close on synthetic
+data), `test_dataset_v2.py`, `scripts/tests/test_workspace.py`.
+

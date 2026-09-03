@@ -116,43 +116,48 @@ terminal_decisions: {{}}
     spec = study_dir / "SPEC.md"
     spec.write_text(f"# {study_id}\n\nDerived from `research_decision.yaml`. Question: {question}\n\n## Population\n\n## Target\n\n## Features\n\n## Chronology\n\n## Deliverables Manifest\n", encoding="utf-8")
     study_yaml = study_dir / "study.yaml"
-    study_yaml.write_text(f"""study:
+    study_yaml.write_text(f"""# Platform-v2 study: a composition of registered primitives (see `research cap list`).
+# Sections: study, streams, population, context, triggers, features, outcome, chronology, model.
+# Compile with `research study compile --study studies/{study_id}`; a typed CapabilityGap names what is missing.
+study:
   id: {study_id}
-  type: flip_prediction
-  risk_tier: 2
-  description: {json.dumps(question)}
-operation:
-  kind: train_evaluate
-  target_metric: roc_auc
-instrument:
-  symbol: NQ
-  venue: XCME
+  tier: 2
+  question: {json.dumps(question)}
+streams:
+  - {{dataset: {dataset_id}, timeframes: [1s, 1m]}}
+context:
+  regime_1m:     {{tracker: regime.dual_ema, timeframe: 1m}}
+  excursion:     {{tracker: regime.excursion, bars: 1s, regime: regime_1m}}
+  regime_bar_5m: {{tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}}
 population:
-  type: regime_state
-  prevailing_regime: both
   session: RTH
-target:
-  type: flip
-  event: prevailing_1m_regime_transition
-  direction: both
-  horizon_seconds: 300
+  cadence: {{every: 5s, anchor: regime_1m.start_ns, max_age: 1800s}}
+  qualify: "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and features.structural_snapshot_ready"
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
 features:
-  source: canonical_verified_definition_universe
-  instances: []
-  timing_contract: verified
-model:
-  mode: training
-  family: lightgbm
+  instances:
+    - {{feature: regime_efficiency, over: {{timeframe: [1m, 5m]}}, context: prior}}
+    - {{feature: rolling_giveback_atr, window: 300s, update_every: 1s}}
+  metadata:
+    regime_age_seconds: regime_1m.age_s
+    triggering_1s_ts_init: epoch.T
+  bindings:
+    completed_5m: {{tracker: regime_bar_5m, ready_gate: false}}
+    snapshot: {{atr: regime_1m.atr, family_a_atr: excursion.frozen_atr, episode_state: {{prevailing_direction: regime_1m.dir}}}}
+outcome:
+  kind: label
+  event: regime_1m.flipped
+  horizon: 300s
+  direction: regime_1m.dir
+  session_end: censor
 chronology:
   train: [2021, 2022, 2023]
   dev: [2024]
   prohibited: [2025, 2026]
-execution:
-  runtime: nautilustrader
-  strategy_class: research_workflow.generic_collector.GenericStudyCollector
-  data_requirements:
-    dataset_id: {dataset_id}
-  bounded: true
+  authorized_dates: []        # smoke day(s), e.g. ['2023-10-02']
+model: none
 """, encoding="utf-8")
     return [decision, spec, study_yaml]
 
@@ -182,7 +187,7 @@ def study_new(study_id: str, *, repo_root: Path, question_file: Optional[str] = 
     return {"study_id": study_id, "branch": branch, "worktree": str(worktree), "base_commit": head, "dataset_id": dataset_id,
             "catalog_resolution": "configured_roots" if cfg.active else "legacy_repo_relative (no ~/.nt_research/config.yaml; a manual junction to data/catalog/<id> is the documented fallback)",
             "model_root": str(cfg.model_root) if cfg.model_root else None, "lease": str(lease), "scaffold": [str(f.relative_to(worktree)).replace("\\", "/") for f in files],
-            "next": f"cd \"{worktree}\" && python scripts/research.py study run --study studies/{study_id} --through compile"}
+            "next": f"cd \"{worktree}\" && python scripts/research.py study compile --study studies/{study_id}"}
 
 
 def ws_list(*, repo_root: Path, config=None, reclaim: bool = False) -> Dict[str, Any]:

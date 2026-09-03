@@ -284,8 +284,11 @@ def read_manifest(model_id: str, model_root: Optional[Path] = None) -> Dict[str,
 def store_model(*, model_id: str, estimator: Any, lineage: ModelLineage, tier: str, selection_status: str,
                 metrics: Mapping[str, Any], golden_train_frame: Optional[pd.DataFrame], model_root: Optional[Path] = None,
                 scientific_status: str = "UNASSESSED", legacy_registry_record: Optional[Mapping[str, Any]] = None,
-                canonical_source_file: Optional[Path] = None) -> Dict[str, Any]:
-    """Persist a model into the store (idempotent: identical model_id must reproduce identical canonical bytes)."""
+                canonical_source_file: Optional[Path] = None, golden_rows: int = GOLDEN_MIN_ROWS) -> Dict[str, Any]:
+    """Persist a model into the store (idempotent: identical model_id must reproduce identical canonical bytes).
+
+    ``golden_rows`` sizes the deterministic golden frame; callers with a training population smaller than
+    ``GOLDEN_MIN_ROWS`` (synthetic fixtures) pass the population size -- the manifest records ``n_rows``."""
     if tier not in TIERS or selection_status not in SELECTION_STATES:
         raise ModelStoreError(f"MODEL_TIER_OR_STATUS_INVALID: {tier}/{selection_status}")
     root = model_store_root(model_root)
@@ -316,7 +319,7 @@ def store_model(*, model_id: str, estimator: Any, lineage: ModelLineage, tier: s
     }
     # Golden frame from real TRAIN rows, scored by the canonical representation.
     if golden_train_frame is not None:
-        frame = build_golden_frame(golden_train_frame, lineage.ordered_inputs, model_id)
+        frame = build_golden_frame(golden_train_frame, lineage.ordered_inputs, model_id, n_rows=int(golden_rows))
         (mdir / "golden").mkdir(parents=True, exist_ok=True)
         frame.to_parquet(mdir / "golden" / "frame.parquet", index=False)
         _json(manifest_path, manifest)  # load_canonical needs the manifest on disk

@@ -1,0 +1,29 @@
+{
+  "checkpoint": "05_closure",
+  "written_at": "2026-09-02",
+  "branch": "chore/platform-v2-do-soon",
+  "proof": {
+    "FLOW_COMPLETE": true,
+    "shape_a": {
+      "head": "b72a9ae8",
+      "parity": "PASS exact"
+    },
+    "shape_b": {
+      "head": "17d9e386",
+      "parity": "PASS_WITH_EXPLAINED_DIVERGENCE (DST session_close_ts)"
+    },
+    "shape_c": {
+      "head": "78e1a978",
+      "parity": "PASS_WITH_EXPLAINED_DIVERGENCE (censor-reason vocabulary at the session close: 143 arms 2021, 18 arms 2022; labels/dispositions exact)",
+      "model_reuse": "all six frozen 2021 cells reproduce reference fold_2022 n / ROC-AUC / PR-AUC exactly"
+    }
+  },
+  "card": "artifacts/platform_v2_do_soon/PLATFORM_V2_DO_SOON_CARD.json",
+  "follow_ups": [
+    "FrozenExternalScoreBinding stamps every input availability_ts as epoch.T (auditor warning, benign for the 13 causal inputs)",
+    "first_bar_at_or_after branch does not apply max_gap_ns to the one extra bar (auditor note; irrelevant for plans with max_gap null)",
+    "migrate Model C into the model store and add a store-backed derived score input so no study reads a parent study's joblib",
+    "old runtime retirement to LEGACY_ONLY is a separate decision; nothing in v2 imports generic_collector",
+    "session close vocabulary: consider a declared censor_reason policy for candidates decided exactly at the close second"
+  ]
+}

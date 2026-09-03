@@ -1,0 +1,77 @@
+# Parity Shape C: multi-arm / competing outcome.
+# Reference: studies/regime_transition_target_before_stop_v1 (three barrier arms; target
+# authority 21d598a823fd6430459380b3c9f6a75f2b90b61048d78cd7ff840b3f54218b0e).  Parity
+# fixture only -- the sealed study, its seal and its target authority are never touched.
+study:
+  id: parity_shape_c_regime_transition_target_before_stop
+  tier: 2
+  question: "Does causal state at T predict +1.00 ATR before -0.50/-1.00/-1.50 ATR within 300s?"
+streams:
+  - {dataset: NQ_v0_2020_2026, timeframes: [1s, 1m]}
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, max_age: 1800s, index_column: checkpoint_index}
+  qualify: >
+    excursion.frozen_atr > 0
+    and regime_1m.age_s >= 120s
+    and excursion.mfe_atr >= 1.0
+    and excursion.progress_windows >= 2
+    and excursion.retained_ratio >= 0.5
+    and features.structural_snapshot_ready
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+features:
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m]}, context: prior}
+    - {feature: regime_mfe_atr,    over: {timeframe: [1m]}, context: prior}
+    - {feature: regime_range_atr,  over: {timeframe: [1m]}, context: prior}
+    - {feature: regime_efficiency, over: {timeframe: [5m]}, context: prior}
+    - {feature: regime_mfe_atr,    over: {timeframe: [5m]}, context: prior}
+    - {feature: regime_range_atr,  over: {timeframe: [5m]}, context: prior}
+    - {feature: rolling_retention_ratio,       window: 300s, update_every: 1s}
+    - {feature: rolling_current_progress_atr,  window: 300s, update_every: 1s}
+    - {feature: rolling_max_progress_atr,      window: 300s, update_every: 1s}
+    - {feature: rolling_giveback_atr,          window: 300s, update_every: 1s}
+    - {feature: arrival_velocity,      input_timeframe: 1s, lookback: 20}
+    - {feature: arrival_acceleration,  input_timeframe: 1s, short_lookback: 20}
+    - {feature: ema_slope, ema_role: short, lookback: 20}
+  metadata:
+    regime_age_seconds: regime_1m.age_s
+    running_mfe_atr: excursion.mfe_atr
+    new_progress_windows: excursion.progress_windows
+    retained_mfe_ratio: excursion.retained_ratio
+    triggering_1s_ts_init: epoch.T
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    regime_transition_1m: {tracker: regime_1m, requires_atr: false}
+    snapshot:
+      atr: regime_1m.atr
+      family_a_atr: excursion.frozen_atr
+      episode_state: {prevailing_direction: regime_1m.dir}
+outcome:
+  kind: label
+  entry_reference: next_bar_open
+  direction: regime_1m.dir
+  relation: fade          # target authority 21d598a8...: barriers race in the trade direction (-prevailing)
+  atr: regime_1m.atr
+  atr_availability: through_decision_ts   # authority 21d598a8...: the 1m bar closing exactly at T is applied before the ATR is frozen
+  horizon: 300s
+  horizon_end_rule: first_bar_at_or_after   # authority 21d598a8...: the first bar at/after the horizon end is still evaluated for a hit
+  session_end: censor
+  barrier:
+    primary: barrier_tp_1_0_sl_1_0
+    expiry: censor
+    arms:
+      - {id: barrier_tp_1_0_sl_0_5, favorable_atr: 1.0, adverse_atr: 0.5, prefix: target_tp1_sl0_5}
+      - {id: barrier_tp_1_0_sl_1_0, favorable_atr: 1.0, adverse_atr: 1.0, prefix: target_tp1_sl1_0}
+      - {id: barrier_tp_1_0_sl_1_5, favorable_atr: 1.0, adverse_atr: 1.5, prefix: target_tp1_sl1_5}
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+model: none

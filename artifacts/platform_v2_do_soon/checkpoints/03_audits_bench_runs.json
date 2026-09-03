@@ -1,0 +1,32 @@
+{
+  "checkpoint": "03_audits_bench_runs",
+  "written_at": "2026-09-02",
+  "branch": "chore/platform-v2-do-soon",
+  "platform_commit": "cab7a57",
+  "audits": {
+    "auditors": {"causal": "lookahead-auditor (one agent, all passes)", "contract": "contract-checker (one agent, all passes)"},
+    "shape_a": {"causal": ["pass_01 CLEAR (1 warning: coarser 1m stream compiled as execution role; strictly-before visibility rested on feed order)", "pass_02 CLEAR on composite 7676acfb (warning FIXED: 1m is a context stream, mux-enforced)"],
+                "contract": ["contract_pass_01 CLEAR (old composite)", "contract_pass_02 CLEAR on 7676acfb"], "sealed": true},
+    "shape_b": {"causal": ["pass_01 CLEAR (1 warning: FrozenExternalScoreBinding stamps every Model C input availability_ts = epoch.T, so the scorer's future-input guard is vacuous; benign because all 13 inputs are independently causal)", "pass_02 CLEAR on composite 0db52eef (mux fix confirmed; the binding warning remains open as a follow-up)"],
+                "contract": ["contract_pass_01 CLEAR on 0db52eef"], "sealed": true},
+    "shape_c": {"causal": ["pass_01 CLEAR (same role warning as A)", "pass_02 CLEAR on 7676acfb (fixed; through_decision_ts ATR semantics re-traced under the new mechanism)"],
+                "contract": ["contract_pass_01 IN PROGRESS"], "sealed": false}
+  },
+  "platform_fixes_from_audit_and_dogfooding": [
+    "9f4af2a compiler: every external timeframe coarser than the execution instrument's finest compiles as role context / visibility strictly_before (mux queue); day parity stays exact for A (1591 rows/18 cols), B (162 rows/46 cols, from partition start), C (1591 rows/13 obs cols)",
+    "05b4d2e controller: a compiled plan is fresh only when its closure composite is current (previously a compiler change did not trigger recompilation; readiness R9 caught it)"
+  ],
+  "performance": {
+    "file": "bench/baseline_v1_host.json", "status": "MEASUREMENT_ONLY_NOT_A_GATE",
+    "baseline_v0_full_events_per_second": 2747.2, "baseline_v0_floor_events_per_second": 57735.5,
+    "host_c_events_per_second": 24379.3, "host_a_events_per_second": 27503.6, "golden_events_per_second": 52491.4,
+    "host_c_vs_v0_full": "8.87x", "outcome_kernel_share_of_replay": "22.7% (was ~92%)",
+    "profile_share": {"epochs": 0.3155, "outcome_kernel": 0.2274, "tracker.features": 0.2292, "feature_snapshot": 0.1534, "tracker.excursion": 0.0377, "tracker.regime_1m": 0.033, "tracker.regime_bar_5m": 0.0039},
+    "peak_rss_mb": 326.6, "replay_seconds_host_c": 8.75, "replay_date": "2023-10-02"
+  },
+  "runs_launched_detached": {
+    "shape_a": {"pid": 273, "command": "run_governed_study.py --through analyze --max-runtime 14400", "log": "studies/v2_shape_a_flip_180s/_work/run_analyze.log"},
+    "shape_b": {"pid": 278, "command": "run_governed_study.py --through analyze --studies-root <main repo>/studies", "log": "studies/v2_shape_b_deep_pullback_5s/_work/run_analyze.log"}
+  },
+  "follow_ups": ["FrozenExternalScoreBinding: stamp per-input availability from the feature host instead of epoch.T", "migrate Model C into the model store and add a store-backed derived score input so no study reads a parent study's joblib"]
+}

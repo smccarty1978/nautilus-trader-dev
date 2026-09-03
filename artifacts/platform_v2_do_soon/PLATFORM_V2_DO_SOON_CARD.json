@@ -1,0 +1,341 @@
+{
+  "PLATFORM_V2_DO_SOON_CARD": {
+    "SOURCE_BASELINE": "baseline/2026-09-platform-v2-do-now-closed (df26b12)",
+    "BRANCH": "chore/platform-v2-do-soon @ a3991bfa",
+    "GRAMMAR": "six-kind StudySpecV2 + tiny predicate language + set-expansion (research_workflow/grammar)",
+    "COMPILER": "static, no catalog opened, typed CapabilityGap (6 kinds), CompiledPlan with closure composite and binding proof",
+    "HOST": "research_workflow/host (mux watermark + context queue, trigger engine, label kernel, columnar sink); lint CLEAR",
+    "GOLDEN_FIXTURE": "fixtures/golden (6 tests, pure-Python == NT engine)",
+    "PARITY_A": "PASS",
+    "PARITY_B": "PASS",
+    "PARITY_C": "PASS",
+    "DATASET_V2": {
+      "NQ": {
+        "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+        "years": [
+          "2020",
+          "2021",
+          "2022",
+          "2023",
+          "2024",
+          "2025",
+          "2026_ytd"
+        ],
+        "forward_fill": false
+      },
+      "ES": {
+        "logical_digest": "9f38a41edca5b72a71866846ec9aa15d4cf205388d22aabe025250eefbf0068a",
+        "years": [
+          "2020",
+          "2021",
+          "2022",
+          "2023",
+          "2024",
+          "2025",
+          "2026_ytd"
+        ],
+        "forward_fill": false
+      }
+    },
+    "1M_5M_EQUIVALENCE": {
+      "NQ": {
+        "1m_equivalence": "PROVABLE",
+        "P1_all_exact": true,
+        "P2_all_exact": true,
+        "5m_runtime_rule_matching_v0": "any_minute",
+        "5m_decision": "runtime derivation from completed 1m retained (V2 ships no 5m stream); an aggregator must use the rule named above to reproduce the historical external 5m stream"
+      },
+      "ES": {
+        "1m_equivalence": "PROVABLE",
+        "P1_all_exact": true,
+        "P2_all_exact": true,
+        "5m_runtime_rule_matching_v0": "any_minute",
+        "5m_decision": "runtime derivation from completed 1m retained (V2 ships no 5m stream); an aggregator must use the rule named above to reproduce the historical external 5m stream"
+      }
+    },
+    "PERFORMANCE": {
+      "file": "bench/baseline_v1_host.json",
+      "status": "MEASUREMENT_ONLY_NOT_A_GATE",
+      "baseline_v0_full_events_per_second": 2747.2,
+      "baseline_v0_floor_events_per_second": 57735.5,
+      "host_c_events_per_second": 24379.3,
+      "host_a_events_per_second": 27503.6,
+      "golden_events_per_second": 52491.4,
+      "host_c_vs_v0_full": "8.87x",
+      "outcome_kernel_share_of_replay": "22.7% (was ~92%)",
+      "profile_share": {
+        "epochs": 0.3155,
+        "outcome_kernel": 0.2274,
+        "tracker.features": 0.2292,
+        "feature_snapshot": 0.1534,
+        "tracker.excursion": 0.0377,
+        "tracker.regime_1m": 0.033,
+        "tracker.regime_bar_5m": 0.0039
+      },
+      "peak_rss_mb": 326.6,
+      "replay_seconds_host_c": 8.75,
+      "replay_date": "2023-10-02"
+    },
+    "OLD_RUNTIME": "RETAINED for sealed historical studies; not required by v2 studies (retirement to LEGACY_ONLY is a separate decision after this card)",
+    "TESTS": {
+      "platform_new": {
+        "test_grammar_v2": 14,
+        "test_host_core": 12,
+        "test_golden_fixture": 6,
+        "test_lifecycle_v2": 2,
+        "test_dataset_v2": 3,
+        "test_workspace": 7,
+        "status": "ALL PASS"
+      },
+      "full_suite_branch": {
+        "failed": 40,
+        "passed": 511
+      },
+      "baseline_same_files_main": {
+        "failed": 35
+      },
+      "branch_only_failures": [
+        "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row",
+        "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_19_historical_closed_artifact_preserved",
+        "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_20_current_180s_study_outputs_unmodified",
+        "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+        "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing"
+      ],
+      "branch_only_failures_cause": "ENVIRONMENTAL: all five need studies/clean_maturity_flip_model_rolling_productivity/artifacts/train_fitted_models.joblib, which is gitignored (*.joblib) and present only in the main repo checkout, not in the fresh worktree. Verified by the error text (model artifact missing / bound model artifact corrupt-missing / DERIVED_INPUT_SCORER_UNBOUND). Not a regression.",
+      "pre_existing_failures": "35 identical at baseline (handoff families: stage3_integration, population_qualification_strictness, modeling_driver_lineage, redteam pass1/pass2, ordered_barrier_entry_reference, diagnostic_followup_collector, target_runtime timeout/gap, stage4_parity, single_primitive regression, composite OR flip, features candidate_authority / feature_system_v2)"
+    },
+    "CAUSAL_AUDIT": {
+      "A": [
+        "contract_pass_01.md",
+        "contract_pass_02.md",
+        "pass_01.md",
+        "pass_02.md"
+      ],
+      "B": [
+        "contract_pass_01.md",
+        "pass_01.md",
+        "pass_02.md"
+      ],
+      "C": [
+        "contract_pass_01.md",
+        "contract_pass_02.md",
+        "contract_pass_03.md",
+        "pass_01.md",
+        "pass_02.md",
+        "pass_03.md",
+        "pass_04.md"
+      ]
+    },
+    "CONTRACT_AUDIT": "one contract auditor; CLEAR on A (pass 02), B, C",
+    "SCIENTIFIC_AUTHORITIES_CHANGED": "NO",
+    "2024_ACCESSED": "NO by any study/proof/human (raw 2024 bytes were materialized into the V2 datasets by the deterministic builder only)",
+    "NEW_MODELS_TRAINED": {
+      "A": true,
+      "B": false,
+      "C": false
+    },
+    "BLOCKERS": [],
+    "READY_FOR_NEXT_PHASE": true
+  },
+  "PLATFORM_V2_PROOF_CARD": {
+    "FLOW_COMPLETE": true,
+    "SHAPE_A": {
+      "fresh_v2_study": "YES",
+      "created_with": "research study new",
+      "historical_study_modified": "NO",
+      "study_python_files": [],
+      "study_python_lines": 0,
+      "controller_state": "STUDY_CLOSED",
+      "smoke": "ACCEPTED",
+      "rows": {
+        "train_2021": {
+          "candidates": 453768,
+          "observations": 453768
+        },
+        "oos_2022": {
+          "candidates": 475529,
+          "observations": 475529
+        }
+      },
+      "audits": [
+        "contract_pass_01.md",
+        "contract_pass_02.md",
+        "pass_01.md",
+        "pass_02.md"
+      ],
+      "closure": "CLOSED",
+      "closure_outcome": "PARITY_PASS: 2021 TRAIN 453768/453768 candidates and observations exact (18+10 cols); 2022 OOS 475529/475529 exact; controller-trained lightgbm OOS ROC-AUC 0.684",
+      "model": {
+        "mode": "train",
+        "model_id": "fad4c0e93766a08af7ea6a489a12e14c7d065206c3986f36f1e8a648ea436c0c",
+        "reused_model_ids": null,
+        "new_models_trained": true
+      },
+      "oos_years": [
+        2022
+      ],
+      "parity": "PASS",
+      "parity_reports": {
+        "parity_a_oos_2022.json": {
+          "passed": true,
+          "rows": {
+            "runtime_candidates": 475529,
+            "reference_candidates": 475529,
+            "runtime_observations": 475529,
+            "reference_observations": 475529
+          }
+        },
+        "parity_a_train_2021.json": {
+          "passed": true,
+          "rows": {
+            "runtime_candidates": 453768,
+            "reference_candidates": 453768,
+            "runtime_observations": 453768,
+            "reference_observations": 453768
+          }
+        }
+      },
+      "branch": "study/v2_shape_a_flip_180s",
+      "head": "b72a9ae8"
+    },
+    "SHAPE_B": {
+      "fresh_v2_study": "YES",
+      "created_with": "research study new",
+      "historical_study_modified": "NO",
+      "study_python_files": [],
+      "study_python_lines": 0,
+      "controller_state": "STUDY_CLOSED",
+      "smoke": "ACCEPTED",
+      "rows": {
+        "train_2021": {
+          "candidates": 18805,
+          "observations": 18805
+        },
+        "oos_2022": {
+          "candidates": 21886,
+          "observations": 21886
+        }
+      },
+      "audits": [
+        "contract_pass_01.md",
+        "pass_01.md",
+        "pass_02.md"
+      ],
+      "closure": "CLOSED",
+      "closure_outcome": "PARITY_PASS_WITH_EXPLAINED_DIVERGENCE: 2021 TRAIN 18805/18805 candidates exact (46 cols), 2022 OOS 21886/21886 exact; 16 session_close_ts rows differ by one DST hour on transition Sundays (reference-side defect, labels identical)",
+      "model": {
+        "mode": null,
+        "model_id": null,
+        "reused_model_ids": null,
+        "new_models_trained": false
+      },
+      "oos_years": [
+        2022
+      ],
+      "parity": "PASS",
+      "parity_reports": {
+        "parity_b_oos_2022.json": {
+          "passed": true,
+          "rows": {
+            "runtime_candidates": 21886,
+            "reference_candidates": 21886,
+            "runtime_observations": 21886,
+            "reference_observations": 21886
+          }
+        },
+        "parity_b_train_2021.json": {
+          "passed": true,
+          "rows": {
+            "runtime_candidates": 18805,
+            "reference_candidates": 18805,
+            "runtime_observations": 18805,
+            "reference_observations": 18805
+          }
+        }
+      },
+      "branch": "study/v2_shape_b_deep_pullback_5s",
+      "head": "17d9e386",
+      "capability_extension_flow_used_if_needed": "NOT_NEEDED (no MISSING_CAPABILITY gap was raised by the three specs)"
+    },
+    "SHAPE_C": {
+      "fresh_v2_study": "YES",
+      "created_with": "research study new",
+      "historical_study_modified": "NO",
+      "study_python_files": [],
+      "study_python_lines": 0,
+      "controller_state": "STUDY_CLOSED",
+      "smoke": "ACCEPTED",
+      "rows": {
+        "train_2021": {
+          "candidates": 453768,
+          "observations": 453768
+        },
+        "oos_2022": {
+          "candidates": 475529,
+          "observations": 475529
+        }
+      },
+      "audits": [
+        "contract_pass_01.md",
+        "contract_pass_02.md",
+        "contract_pass_03.md",
+        "pass_01.md",
+        "pass_02.md",
+        "pass_03.md",
+        "pass_04.md"
+      ],
+      "closure": "CLOSED",
+      "closure_outcome": "PARITY_PASS_WITH_EXPLAINED_DIVERGENCE: 2021 TRAIN 453768/453768 and 2022 OOS 475529/475529 candidates exact (18 cols); labels and dispositions of all three arms exact; only censor-reason vocabulary differs on 143 (2021) and 18 (2022) censored arms at the session close (reference DATA_END/SESSION_END vs host SESSION_END/TIMEOUT); all six frozen 2021 models reproduce the reference fold_2022 n, ROC-AUC and PR-AUC exactly",
+      "model": {
+        "mode": "score",
+        "model_id": null,
+        "reused_model_ids": [
+          "a9878a0315768882e490721dae261b2c5d666ae9f642963b2980630d359058a1",
+          "98ab6190e8dfbf810f3ec6b0b0cfa4d287aeb30816ead39470dd1a6e6e1443a8",
+          "546e1a09704338c87e6fed450bb06bc87d840285bb00a2fbf23bd9b03de6b17f",
+          "1b285fe3e30ba26a6dd44facd79acd2a1ba86699c85253345caa7677fac19909",
+          "45c2c6227edca652e6f5d052aa7476bbdb4e83652ce3aeb3ea202724cd60c80b",
+          "36ba0ed6e64e5a487a519bffa77f77a10ba83100157cbbf0e87cf284387a00b4"
+        ],
+        "new_models_trained": false
+      },
+      "oos_years": [
+        2022
+      ],
+      "parity": "PASS",
+      "parity_reports": {
+        "parity_c_oos_2022.json": {
+          "passed": true,
+          "rows": {
+            "runtime_candidates": 475529,
+            "reference_candidates": 475529,
+            "runtime_observations": 475529,
+            "reference_observations": 475529
+          }
+        },
+        "parity_c_train_2021.json": {
+          "passed": true,
+          "rows": {
+            "runtime_candidates": 453768,
+            "reference_candidates": 453768,
+            "runtime_observations": 453768,
+            "reference_observations": 453768
+          }
+        }
+      },
+      "branch": "study/v2_shape_c_barrier_race_fade",
+      "head": "78e1a978"
+    },
+    "MID_TIER_OPERABILITY": {
+      "can_run_without_core_repo_reading": "YES: research study new -> edit study.yaml from `research cap list` -> research study compile -> research study run --through <stage> -> research audit ingest; every failure is a typed card",
+      "evidence": [
+        "docs/RESEARCH_WORKFLOW.md \u00a721",
+        "docs/GOVERNED_STUDY_CONTROLLER.md Platform V2",
+        "scripts/tests/test_workspace.py::test_v2_skeleton_compiles_statically_without_study_python",
+        "research_workflow/tests/test_lifecycle_v2.py"
+      ]
+    },
+    "OLD_RUNTIME_REQUIRED_FOR_NEW_STUDIES": "NO (research_workflow/host/* + host_runner; generic_collector is not imported by any v2 stage)",
+    "OLD_STUDIES_MIGRATED": "NO (reference fixtures read-only; parity via scripts/parity/compare_study_to_reference.py)"
+  }
+}

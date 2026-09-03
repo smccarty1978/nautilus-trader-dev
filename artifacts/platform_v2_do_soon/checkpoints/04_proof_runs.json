@@ -1,0 +1,85 @@
+{
+  "checkpoint": "04_proof_runs",
+  "written_at": "2026-09-02",
+  "branch": "chore/platform-v2-do-soon",
+  "shape_a": {
+    "study": "v2_shape_a_flip_180s",
+    "branch_head": "b72a9ae8",
+    "state": "STUDY_CLOSED",
+    "train_2021": {
+      "candidates": 453768,
+      "parity": "PASS exact (18 candidate cols, 10 observation cols)"
+    },
+    "oos_2022": {
+      "candidates": 475529,
+      "parity": "PASS exact"
+    },
+    "model": {
+      "mode": "train",
+      "family": "lightgbm",
+      "binary_rows": 451101,
+      "model_id": "fad4c0e93766a08af7ea6a489a12e14c7d065206c3986f36f1e8a648ea436c0c",
+      "oos_roc_auc_2022": 0.684,
+      "new_models_trained": true
+    },
+    "closure_composite": "7676acfb42fa863b"
+  },
+  "shape_b": {
+    "study": "v2_shape_b_deep_pullback_5s",
+    "branch_head": "17d9e386",
+    "state": "STUDY_CLOSED",
+    "train_2021": {
+      "candidates": 18805,
+      "parity": "PASS_WITH_EXPLAINED_DIVERGENCE (46 candidate cols exact; 9 observation rows differ only in session_close_ts)"
+    },
+    "oos_2022": {
+      "candidates": 21886,
+      "parity": "PASS_WITH_EXPLAINED_DIVERGENCE (7 session_close_ts rows)"
+    },
+    "explained_divergence": "reference computed the RTH censor close with the wrong UTC offset on DST-transition Sunday evenings (2021-03-14, 2021-11-07, and 2022 equivalents): +/-3600 s, dispositions and labels identical; runtime gives 15:15 CT",
+    "model": "none",
+    "closure_composite": "0db52eeff6bbe048"
+  },
+  "shape_c": {
+    "study": "v2_shape_c_barrier_race_fade",
+    "branch_head": "a6a88825",
+    "state": "RUN 3 PENDING: resealing under composite 51bc1054 after the session-bound horizon fix (664ccdac); run 2 (composite ecfb1814) completed and is recorded below",
+    "corrections": [
+      "outcome.horizon_end_rule: first_bar_at_or_after -- the sealed authority's replay evaluates the first bar at/after the horizon end for a hit before expiry; strict rule timed out 25 of 453,768 2021 rows (ref resolution 301-303 s on sparse seconds); declared in the grammar, kernel and oracle, sparse-tape test",
+      "model.models[*].subset: LONG cells = regime_direction +1, SHORT = -1 (verified by in-sample scoring: LONG_SL1_0 [2021] model AUC 0.768 on +1 rows vs 0.503 on -1 rows)"
+    ],
+    "first_run_before_corrections": {
+      "train_2021_candidates": 453768,
+      "candidates_parity": "exact (18 cols)",
+      "observations": "414 value mismatches on 25 rows, all horizon-end boundary cases"
+    },
+    "expected_reference_metric": "LONG_SL1_0 config 22 fold_2022 validation ROC-AUC 0.513500980469089 (n 199686) from the reference phase D report; the fresh study's 2022 OOS scoring of the same frozen model on the same rows should reproduce it",
+    "run_2_results": {
+      "train_2021": {
+        "candidates": 453768,
+        "candidates_parity": "exact (18 cols)",
+        "observation_mismatches": 306,
+        "rows_affected": "~56"
+      },
+      "oos_2022": {
+        "candidates": 475529,
+        "candidates_parity": "exact (18 cols)",
+        "observation_mismatches": 116
+      },
+      "model_reuse_parity": "EXACT: LONG_SL1_0 [2021] scored on the fresh 2022 OOS rows gives n=199686, ROC-AUC 0.513501 (reference phase D fold_2022: n=199686, ROC-AUC 0.513500980469089); all six cells score with the corrected prevailing-regime mapping (in-sample 2021 AUC 0.64-0.79)",
+      "mismatch_categories": {
+        "DATA_END_vs_SESSION_END": "47 (2021) + 3 (2022) candidates decided exactly at the session-close second (15:15 CT, or 12:00 CT early close): the reference's day-tape replay ran out of bars (DATA_END), the host censors SESSION_END; disposition CENSORED and label null in both -> vocabulary only",
+        "next_session_bar_evaluated": "4 (2021) + ~20 (2022) arms on early-close days where the first bar at/after the horizon end was the 17:00 CT reopen bar: host defect, fixed in 664ccdac (session-bound rule)",
+        "SESSION_END_vs_TIMEOUT_at_early_close": "2 (2021) + 9 (2022) arms with horizon end exactly at the early close: reference SESSION_END (resolution 301), host TIMEOUT (300) -- residual to re-check after run 3"
+      }
+    }
+  },
+  "tests": "final full suite: 67 failed / 1714 passed / 26 skipped in 1h10m; research_workflow+features failures identical to the classified set (35 pre-existing + 5 environmental joblib); scripts/tests: 25 pre-existing at baseline + 2 branch-only (registry current; candidate status) both fixed (13985e18, 5bf7f7b5)",
+  "next": [
+    "C parity train 2021 + oos 2022",
+    "close C",
+    "python scripts/platform_v2_cards.py",
+    "final DO SOON card + proof card in chat",
+    "memory update"
+  ]
+}

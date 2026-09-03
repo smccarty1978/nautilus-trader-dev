@@ -1,0 +1,88 @@
+{
+  "shape": "b",
+  "window": [
+    "2021-01-01",
+    "2021-12-31"
+  ],
+  "plan_sha256": "8bad9156bc353f05514267147ebd52f8836b88a4790bd2e068bb004f4689681a",
+  "elapsed_s": 912.69,
+  "stats": {
+    "bars": 12392181,
+    "bars_by_stream": {
+      "nq_1s": 12035953,
+      "nq_5s": 1241894,
+      "nq_1m": 356228,
+      "nq_5m": 4551
+    },
+    "candidates": 18805,
+    "observations": 18805,
+    "epochs": 12035953,
+    "pending_at_end": 0,
+    "dropped_outside_primary": {
+      "candidates": 200,
+      "observations": 200
+    }
+  },
+  "dataset": {
+    "dataset_id": "NQ_v0_2020_2026",
+    "logical_digest": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+    "bytes_verification": "VERIFIED"
+  },
+  "candidates": {
+    "passed": true,
+    "reference_rows": 18805,
+    "runtime_rows": 18805,
+    "common_rows": 18805,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 46,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "observations": {
+    "passed": false,
+    "reference_rows": 18805,
+    "runtime_rows": 18805,
+    "common_rows": 18805,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 10,
+    "value_mismatches": 9,
+    "per_column": {
+      "session_close_ts": {
+        "mismatches": 9,
+        "max_abs_diff": 3600000000000.0
+      }
+    },
+    "first_divergence": {
+      "timestamp": 1615767450000000000,
+      "key": [
+        1615767450000000000,
+        1615766760000000000,
+        1
+      ],
+      "column": "session_close_ts",
+      "reference": 1615756500000000000,
+      "runtime": 1615752900000000000
+    },
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "passed": false,
+  "events_per_second": 13794.781847744835
+}

@@ -1,0 +1,42 @@
+{
+  "checkpoint": "00_plan",
+  "phase": "PLATFORM_V2_DO_SOON",
+  "written_utc": "2026-09-02",
+  "source_baseline": {"tag": "baseline/2026-09-platform-v2-do-now-closed", "commit": "df26b12"},
+  "branch": "chore/platform-v2-do-soon",
+  "worktree": "../Nautilus Trader-platform-v2-do-soon",
+  "design_authority": [
+    "https://claude.ai/code/artifact/e88489e9-adc5-461e-a05a-321387de040e",
+    "https://claude.ai/code/artifact/f7ea1309-9f6e-4dd7-b154-0726f27f8444"
+  ],
+  "verified_preconditions": {
+    "main_clean_at": "408205c (df26b12 + handoff doc only)",
+    "worktrees": ["main repo", "Nautilus Trader-regime-transition-target (kept: 468 model byte files)", "Nautilus Trader-platform-v2-do-soon (new)"],
+    "data_roots": "C:/Users/Scott McCarty/Projects/Nautilus Trader/data/catalog (configured root; no junction needed)",
+    "capability_registry": "current (179 entries, 0 broken, sha b751c14d...)"
+  },
+  "discovery_facts_that_shape_the_build": [
+    "Shape C target authority 21d598a8... (phase_c2_reconciled_targets.parquet) was produced by an OFFLINE three-arm replay (generate_phase_c2_train_artifacts.py), not by the collector; the new label kernel must reproduce its edge semantics natively (SESSION_END pre-check before scanning, TIMEOUT resolution_seconds=300, DATA_END when no 1s bar within 350s after T, bar at exactly horizon_end still barrier-eligible).",
+    "Shape A/C features ran the collector COMPACT path (structural 5m regime bars = calendar-boundary accumulation of 1m bars with the 1m regime direction and 1m ATR); Shape B ran the EPISODE path (5m/5s regime bars = complete 1s buckets with their own dual-EMA regime and ATR). The compiled plan must declare that binding explicitly per study.",
+    "Shape A flip labels use the collector's LEGACY flip path (inclusive cand_ts <= flip_ts <= horizon_end, hold-at-equality sweep, clear-all-pending on flip, SESSION_END when horizon_end > session_close).",
+    "ProviderHost adapters already reproduce the B feature surface from normalized events; A/C compact features are the same providers under family_a_atr = regime frozen ATR and the calendar-5m regime-bar semantics.",
+    "Target runtime cost (92% of replay) comes from per-candidate tape retention + full rescans per bar (O(n^2)) and parity-row accumulation; a scalar-state kernel with bounded active sets preserves semantics.",
+    "Persisted references: A = studies/clean_maturity_flip_model_180s_horizon/artifacts/train_{candidates,observations}_merged.parquet (1,387,411 rows, 2021-2023); B = studies/deep_pullback_5s_reacceleration_model/runs/20260828_{144743,150235,152004}_*_full/collection (2021/2022/2023, 18,805 rows in 2021); C = ../Nautilus Trader-regime-transition-target/.../_work/train_merged_collection/{candidates,observations,phase_c2_reconciled_targets}.parquet + 12 registry models in ~/.nt_research/models."
+  ],
+  "deliverable_sequence": [
+    "01 grammar (spec, predicate language, set expansion, typed CapabilityGap) + static compiler -> CompiledPlan",
+    "02 host: mux/watermark, bucket aggregation, trigger engine, label/trade outcome contracts, columnar sink, strategy, lint",
+    "03 golden fixture (synthetic SYN_A/SYN_B, expected rows independently generated) + host tests on synthetic primitives",
+    "04 parity A/C (checkpoint grid + compact features + flip / multi-arm barrier) then B (episode trigger graph)",
+    "05 performance vs bench/baseline_v0.json",
+    "06 dataset V2 (NQ_1S_V2, ES_1S_V2) manifests + reference tables + 1m/5m equivalence proof",
+    "07 causal + contract audits, repairs",
+    "08 retirement wiring (LEGACY_ONLY) + docs + terminal card"
+  ],
+  "operating_rules": [
+    "one implementation owner; deterministic scripts; one causal + one contract auditor only",
+    "never touch studies/regime_transition_target_before_stop_v1 seals, target authority 21d598a8..., or 2024",
+    "git checkout -- studies after test runs; never benchmark while tests run",
+    "classify test failures against the handoff's pre-existing list before treating as new"
+  ]
+}

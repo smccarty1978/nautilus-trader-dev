@@ -1,0 +1,39 @@
+study: {id: golden_watch, tier: 2, question: "Golden fixture: WATCH -> ARMED -> entry trigger graph with two competing armed states"}
+streams:
+  - {dataset: SYN_A, timeframes: [1s, 5s, 1m]}
+context:
+  regime:    {tracker: synthetic.level_regime, timeframe: 1m, level: 100.0, atr: 2.0}
+  regime_5s: {tracker: synthetic.level_regime, timeframe: 5s, level: 100.5, atr: 2.0}
+  pullback:  {tracker: synthetic.pullback, bars: 1s, regime: regime, threshold_atr: 2.5}
+population:
+  session: RTH
+  cadence: completed_1s
+  qualify: "regime.dir != 0"
+  direction: regime.dir
+  anchor_identity: regime.start_ns
+triggers:
+  reset_when: "regime.changed"
+  states:
+    WATCH:   {enter_when: "pullback.depth_atr >= 2.5", expire_when: "age(WATCH) > 60s"}
+    ARMED_A: {enter_when: "state == WATCH and regime_5s.dir == -regime.dir", expire_when: "age(WATCH) > 60s", from: [WATCH], chain: true}
+    ARMED_B: {enter_when: "state == WATCH and regime_5s.dir == -regime.dir", expire_when: "age(WATCH) > 60s", from: [WATCH], chain: true}
+  entry:
+    when: "state in [ARMED_A, ARMED_B] and regime_5s.turned(to=regime.dir) and age(WATCH) > 0"
+    reference: next_bar_open
+    max_per_watch: 1
+  precedence: [WATCH, ARMED_A, ARMED_B]
+  sub_epochs: tracker_events
+features:
+  host: synthetic
+  columns: {f_close: epoch.price, f_depth: pullback.depth_atr}
+  metadata: {checkpoint_index: pullback.arming_cycle_index, arm_ts: pullback.arm_ts}
+outcome:
+  kind: label
+  direction: regime.dir
+  atr: regime.atr
+  atr_availability: at_decision_delivery
+  horizon: 60s
+  session_end: censor
+  barrier: {id: tp1_sl1, favorable_atr: 1.0, adverse_atr: 1.0}
+chronology: {train: [2030], dev: [], prohibited: []}
+model: none

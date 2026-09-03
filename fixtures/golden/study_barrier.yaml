@@ -1,0 +1,33 @@
+study: {id: golden_barrier, tier: 2, question: "Golden fixture: checkpoint grid + two barrier arms on synthetic SYN_A with SYN_B context"}
+streams:
+  - {dataset: SYN_A, timeframes: [1s, 5s, 1m, 5m]}
+  - {dataset: SYN_B, timeframes: [1m], role: context}
+context:
+  regime:     {tracker: synthetic.level_regime, timeframe: 1m, level: 100.0, atr: 2.0}
+  regime_5s:  {tracker: synthetic.level_regime, timeframe: 5s, level: 100.5, atr: 2.0}
+  regime_5m:  {tracker: synthetic.level_regime, timeframe: 5m, level: 100.0, atr: 2.0}
+  ctx_regime: {tracker: synthetic.level_regime, timeframe: 1m, level: 50.0, atr: 1.0, instrument: SYN_B}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime.start_ns, max_age: 600s}
+  qualify: "regime.age_s >= 10s and regime.frozen_atr > 0"
+  direction: regime.dir
+  anchor_identity: regime.start_ns
+triggers: every_candidate
+features:
+  host: synthetic
+  columns: {f_close: epoch.price, f_dir: regime.dir, f_ctx_dir: ctx_regime.dir, f_5s_dir: regime_5s.dir, f_5m_bars: regime_5m.bars}
+outcome:
+  kind: label
+  direction: regime.dir
+  atr: regime.atr
+  atr_availability: at_decision_delivery
+  horizon: 60s
+  session_end: censor
+  barrier:
+    primary: tp1_sl1
+    arms:
+      - {id: tp1_sl1, favorable_atr: 1.0, adverse_atr: 1.0, prefix: arm_a}
+      - {id: tp1_sl05, favorable_atr: 1.0, adverse_atr: 0.5, prefix: arm_b}
+chronology: {train: [2030], dev: [], prohibited: []}
+model: none
