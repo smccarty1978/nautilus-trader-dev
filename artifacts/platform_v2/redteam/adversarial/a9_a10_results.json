@@ -1,0 +1,254 @@
+{
+ "results": [
+  {
+   "case": "A9 scan_study_python catches every planted .py/.PY/.ipynb outside _work/ and runs/",
+   "outcome": "found=['SHOUT.PY', '_work2/hidden.py', 'helpers.py', 'note.ipynb', 'pkg/__init__.py', 'runs_x/sneak.py', 'sub/nested/deep.py'] missed=[]",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 readiness with planted study Python",
+   "outcome": "LifecycleV2Error: READINESS_FAILED: R10_zero_study_python",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 study.yaml self-declared python_exception is honoured",
+   "outcome": "CapabilityGapBlocked: CAPABILITY_GAP: INVALID_PARAMETERIZATION",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=smoke) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=collection) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=reconcile) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=merge) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=fit) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=freeze) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=oos) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=analyze) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 controller run(through=close) WITHOUT --execute-authorized",
+   "outcome": "{\"STATUS\": \"BLOCKED\", \"state\": \"READY_TO_SEAL\", \"blocker_code\": \"EXECUTION_NOT_AUTHORIZED\", \"reason\": \"None\", \"actions\": [], \"lock_exists\": false}",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.smoke() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: smoke requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.collection() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: collection requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.reconcile() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: reconcile requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.merge() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: merge requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.fit() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: fit requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.freeze() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: freeze requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.oos() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: oos requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.analyze() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: analyze requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A9 direct V2Lifecycle.close() WITHOUT execute",
+   "outcome": "LifecycleV2Error: EXECUTION_NOT_AUTHORIZED: close requires --execute-authorized",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "A10 every deliverable path exists after a full golden run",
+   "outcome": "missing=['_work/controller/merged/{candidates,observations}.parquet', '_work/controller/partitions/oos/<year>/{candidates,observations}.parquet', '_work/controller/partitions/train/<year>/{candidates,observations}.parquet']",
+   "verdict": "BYPASSED"
+  }
+ ],
+ "unhashed_imported_full_lifecycle": [
+  "backtests/nt_runtime/compiled_study_loader.py",
+  "backtests/nt_runtime/data_plan.py",
+  "backtests/nt_runtime/engine_builder.py",
+  "backtests/nt_runtime/modes/collect.py",
+  "backtests/nt_runtime/phase0.py",
+  "backtests/nt_runtime/run_plan.py",
+  "backtests/nt_runtime/strategy_binding.py",
+  "backtests/nt_runtime/telemetry.py",
+  "features/collector.py",
+  "features/engine.py",
+  "features/library.py",
+  "features/registry.py",
+  "features/trackers/host_bindings.py",
+  "features/trackers/median_center.py",
+  "features/trackers/ohlcv_delta.py",
+  "features/trackers/price_levels.py",
+  "features/trackers/pullback.py",
+  "features/trackers/range_position.py",
+  "features/trackers/rolling_5m_productivity.py",
+  "features/trackers/velocity.py",
+  "features/trackers/volume.py",
+  "features/trackers/wick.py",
+  "research/analysis/errors.py",
+  "research/analysis/loader.py",
+  "research/analysis/spec.py",
+  "research/engines/baseline_engine.py",
+  "research/engines/deliverables_engine.py",
+  "research/engines/feature_binding_engine.py",
+  "research/engines/lineage_engine.py",
+  "research/engines/population_engine.py",
+  "research/engines/target_engine.py",
+  "research/engines/timestamp_engine.py",
+  "research/schemas/dataset_spec.py",
+  "research/schemas/study_spec.py",
+  "research/study_types/base.py",
+  "research/study_types/bespoke.py",
+  "research/study_types/flip_prediction.py",
+  "research_workflow/capabilities.py",
+  "research_workflow/causal_audit.py",
+  "research_workflow/collection.py",
+  "research_workflow/compiler.py",
+  "research_workflow/contract_audit.py",
+  "research_workflow/forward_outcomes/analysis.py",
+  "research_workflow/forward_outcomes/contracts.py",
+  "research_workflow/forward_outcomes/governance.py",
+  "research_workflow/forward_outcomes/partition.py",
+  "research_workflow/forward_outcomes/selection.py",
+  "research_workflow/forward_outcomes/tracker.py",
+  "research_workflow/grammar/gaps.py",
+  "research_workflow/lifecycle.py",
+  "research_workflow/output_manager.py",
+  "research_workflow/phase0.py",
+  "research_workflow/preflight.py",
+  "research_workflow/prepare.py",
+  "research_workflow/readiness.py",
+  "research_workflow/seal.py",
+  "research_workflow/smoke.py",
+  "research_workflow/study_spec_compiler.py",
+  "research_workflow/workflow_engine.py",
+  "scripts/_legacy_reconcile_study_capabilities.py",
+  "scripts/lint_host.py",
+  "scripts/preexec_audit_seal.py",
+  "scripts/reconcile_study_capabilities.py",
+  "scripts/resolve_execution_manifest.py",
+  "scripts/run_preexec_audits.py",
+  "scripts/scan_alternate_catalog_openers.py",
+  "utils/causal_registration.py",
+  "utils/runner/data.py"
+ ],
+ "deliverables": {
+  "compile": [
+   "compiled_plan.json"
+  ],
+  "prepare": [
+   "audit/frozen_execution_manifest.json",
+   "artifacts/experiment_authorization.json"
+  ],
+  "readiness": [
+   "audit/readiness.json"
+  ],
+  "preflight": [
+   "audit/preflight.json"
+  ],
+  "tests": [
+   "_work/controller/test_summary.json"
+  ],
+  "causal_audit": [
+   "audit/status.json"
+  ],
+  "contract_audit": [
+   "audit/contract_status.json"
+  ],
+  "seal": [
+   "artifacts/preexec_audit_seal.json"
+  ],
+  "smoke": [
+   "artifacts/smoke_acceptance.json"
+  ],
+  "collection": [
+   "_work/controller/partitions/train/<year>/{candidates,observations}.parquet"
+  ],
+  "reconcile": [
+   "_work/controller/reconcile.json"
+  ],
+  "merge": [
+   "_work/controller/merged/{candidates,observations}.parquet",
+   "_work/controller/merged/identity.json"
+  ],
+  "fit": [
+   "artifacts/experiment_models.json"
+  ],
+  "freeze": [
+   "artifacts/train_experiment_freeze.json"
+  ],
+  "oos": [
+   "_work/controller/partitions/oos/<year>/{candidates,observations}.parquet"
+  ],
+  "analyze": [
+   "artifacts/experiment_analysis_v2.json"
+  ],
+  "close": [
+   "artifacts/study_closure.json"
+  ]
+ },
+ "deliverable_paths_missing": [
+  "_work/controller/merged/{candidates,observations}.parquet",
+  "_work/controller/partitions/oos/<year>/{candidates,observations}.parquet",
+  "_work/controller/partitions/train/<year>/{candidates,observations}.parquet"
+ ],
+ "study_tmp": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmpey010y1y",
+ "zero_python_found": [
+  "SHOUT.PY",
+  "_work2/hidden.py",
+  "helpers.py",
+  "note.ipynb",
+  "pkg/__init__.py",
+  "runs_x/sneak.py",
+  "sub/nested/deep.py"
+ ]
+}

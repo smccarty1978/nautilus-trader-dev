@@ -1,0 +1,86 @@
+[
+ {
+  "module": "research_workflow/seal.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "policy.verify_historical_authority (lifecycle stage) calls seal.seal_body_hash to authenticate a v1 study's historical execution authority"
+ },
+ {
+  "module": "research_workflow/workspace.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "writer-lease ownership consumed by governed_controller_v2._check_writer_lease"
+ },
+ {
+  "module": "research_workflow/model_migration.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "mints model-store manifests carrying legacy identity rules"
+ },
+ {
+  "module": "research/analysis/spec.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "module-level import of research/analysis/modeling.py, which IS in the modeling closure"
+ },
+ {
+  "module": "research/analysis/errors.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "InvalidAnalysisSpec raised by _build_estimator, the estimator factory v2 fit() uses"
+ },
+ {
+  "module": "research/analysis/loader.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "analysis-harness partition loader"
+ },
+ {
+  "module": "research_workflow/capabilities.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "resolves the capability registry the compiler binds trackers through"
+ },
+ {
+  "module": "features/registry.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "FeatureInstance resolution for features.host: features"
+ },
+ {
+  "module": "features/engine.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "feature computation engine"
+ },
+ {
+  "module": "utils/runner/data.py",
+  "exists": true,
+  "hashed": false,
+  "composite_moves": false,
+  "why": "CausalDataLoader.load_bars"
+ },
+ {
+  "module": "research_workflow/host/outcomes.py",
+  "exists": true,
+  "hashed": true,
+  "composite_moves": true,
+  "why": "the outcome kernel (control: MUST be hashed)"
+ },
+ {
+  "module": "research_workflow/policy.py",
+  "exists": true,
+  "hashed": true,
+  "composite_moves": true,
+  "why": "control: MUST be hashed"
+ }
+]

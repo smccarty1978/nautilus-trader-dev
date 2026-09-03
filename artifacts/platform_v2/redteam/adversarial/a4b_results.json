@@ -1,0 +1,40 @@
+{
+ "results": [
+  {
+   "case": "control authenticates",
+   "outcome": "AUTHENTICATED {\"model_id\": \"1d83a58e528a4763b6bf2c95f0667d8b56e78da86bbe9d7e40bd580b5e5272e1\", \"identity_rule\": \"v2_lineage_sha256\", \"canonical_sha256\": \"",
+   "verdict": "OK"
+  },
+  {
+   "case": "canonical bytes corrupted in place (model_id untouched)",
+   "outcome": "ModelStoreError: CANONICAL_BYTES_CORRUPT: C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmparf3yuor\\mr\\models\\1b719a78b595b1a642b93b45c0172b98b2cb52929bb8f6652ce6901efbe4a707\\canonical\\model.txt",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "canonical bytes corrupted AND byte_sha256 updated (id no longer recomputes? / golden must catch)",
+   "outcome": "AUTHENTICATED {\"model_id\": \"c060a7cb12251e2c902d1ac0efda11fbc04f542a36bd57738c10625a202a1891\", \"identity_rule\": \"v2_lineage_sha256\", \"canonical_sha256\": \"",
+   "verdict": "BYPASSED"
+  },
+  {
+   "case": "golden expected.json edited in place (model_id untouched)",
+   "outcome": "ModelStoreError: GOLDEN_PREDICTION_MISMATCH: max_abs_diff=0.5",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "golden expected.json edited AND expected_sha256 refreshed",
+   "outcome": "ModelStoreError: GOLDEN_PREDICTION_MISMATCH: max_abs_diff=0.5",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "golden frame.parquet mutated in place",
+   "outcome": "ModelStoreError: GOLDEN_FRAME_CORRUPT",
+   "verdict": "BLOCKED"
+  },
+  {
+   "case": "DIFFERENT model swapped into canonical/ with byte_sha256 refreshed (golden must catch it)",
+   "outcome": "ModelStoreError: GOLDEN_PREDICTION_MISMATCH: max_abs_diff=0.9374919632969413",
+   "verdict": "BLOCKED"
+  }
+ ],
+ "tmp": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\tmparf3yuor"
+}
