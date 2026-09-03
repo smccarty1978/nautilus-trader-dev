@@ -135,3 +135,28 @@ def test_coarser_external_timeframes_are_context_streams():
     assert roles["nq_1s"] == ("execution", "at_epoch", "external")
     assert roles["nq_1m"] == ("context", "strictly_before", "external")
     assert roles["nq_5s"][0] == "execution" and roles["nq_5s"][2] == "derived"
+
+
+def test_search_space_requires_walk_forward_protocol_and_two_tuning_years():
+    spec = _base()
+    spec["model"] = {"family": "lightgbm", "search_space": {"n_estimators": [50, 100]},
+                     "validation": {"protocol": "model_selection.random", "tuning_years": [2021], "final_train_validation_years": []}}
+    assert (GapKind.SEMANTIC_DECISION_REQUIRED, "model.validation.tuning_years") in _gap_kinds(spec)
+    spec["model"]["validation"]["tuning_years"] = [2021, 2022]
+    out = compile_study(spec, repo_root=ROOT)
+    assert out.ok, out.card()
+    assert out.plan.model["search_space"] == {"n_estimators": {"choices": [50, 100]}}
+    spec["model"]["search_space"] = {"max_depth": {"low": 2, "high": 6, "int": True, "bogus": 1}}
+    assert (GapKind.INVALID_PARAMETERIZATION, "model.search_space.max_depth") in _gap_kinds(spec)
+
+
+def test_old_runtime_policy_blocks_new_v1_studies_but_not_historical_ones(tmp_path):
+    from research_workflow.policy import OldRuntimePolicyError, assert_old_runtime_allowed
+    new_v1 = tmp_path / "new_v1"; new_v1.mkdir()
+    (new_v1 / "study.yaml").write_text("study:\n  id: new_v1\n  type: flip_prediction\nexecution:\n  strategy_class: research_workflow.generic_collector.GenericStudyCollector\n", encoding="utf-8")
+    with pytest.raises(OldRuntimePolicyError, match="OLD_RUNTIME_LEGACY_ONLY"):
+        assert_old_runtime_allowed(new_v1)
+    hist = ROOT / "studies" / "regime_transition_target_before_stop_v1"
+    if (hist / "study.yaml").is_file():
+        assert assert_old_runtime_allowed(hist)["platform"] == "v1_historical"
+    assert assert_old_runtime_allowed(ROOT / "studies" / "v2_shape_a_flip_180s")["platform"] == "v2"

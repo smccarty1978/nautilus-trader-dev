@@ -232,6 +232,10 @@ class ModelSpec(_Strict):
     arms: List[str] = Field(default_factory=list)
     validation: Optional[ValidationSpec] = None
     models: List[ScoredModelSpec] = Field(default_factory=list)   # required for mode: score
+    # Bounded TRAIN-only hyperparameter search over walk-forward folds of validation.tuning_years.
+    # param -> [choices] | {low, high, log?: bool, int?: bool}; sampler = validation.protocol
+    # (model_selection.random | model_selection.optuna), trials = validation.max_trials, seed = validation.random_seed.
+    search_space: Dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def _mode(self) -> "ModelSpec":

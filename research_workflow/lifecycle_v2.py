@@ -493,7 +493,6 @@ class V2Lifecycle:
         validation = model.get("validation") or {}
         tuning = [int(y) for y in (validation.get("tuning_years") or plan["chronology"]["train"])]
         final_years = [int(y) for y in (validation.get("final_train_validation_years") or [])]
-        merge_identity = _read(self.work / "merged" / "identity.json").get("candidates_identity")
         closure = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
 
         def _fit(rows):
@@ -508,6 +507,16 @@ class V2Lifecycle:
             return {"n": int(len(rows)), "roc_auc": roc_auc(rows[label], s).to_dict().get("value"), "pr_auc": pr_auc(rows[label], s).to_dict().get("value"),
                     "brier": brier(rows[label], s).to_dict().get("value")}
 
+        merge_identity = _read(self.work / "merged" / "identity.json").get("candidates_identity")
+        tuning_report = None
+        if model.get("search_space"):
+            from research_workflow.tuning import tune
+            tuning_report = tune(study_id=plan["study"]["id"], frame=binary, features=features, label=label, family=family, base_params=params, seed=seed,
+                                 search_space=model["search_space"], validation=validation, artifacts_dir=self.artifacts,
+                                 identities={"plan_sha256": plan["plan_sha256"], "population_identity": merge_identity,
+                                             "target_contract_sha256": hashlib.sha256(json.dumps(plan["outcome"], sort_keys=True, default=str).encode()).hexdigest(),
+                                             "feature_contract_sha256": hashlib.sha256(json.dumps(features).encode()).hexdigest(), "preprocessing_contract_sha256": "identity"})
+            params = dict(tuning_report["selected"]["params"])
         folds = []
         for i, y in enumerate(sorted(tuning)):
             if i == 0:
@@ -523,7 +532,7 @@ class V2Lifecycle:
                                target_frame_identity=merge_identity, training_population_identity=merge_identity, train_years=sorted(tuning), validation_years=final_years,
                                hyperparameters=params, family=family, closure_identities={"plan_closure": closure, "plan_sha256": plan["plan_sha256"]}, model_role="primary")
         model_id = hashlib.sha256(json.dumps(lineage.__dict__, sort_keys=True, default=str).encode()).hexdigest()
-        metrics = {"folds": folds, "final_validation": final_val}
+        metrics = {"folds": folds, "final_validation": final_val, "tuning": (None if tuning_report is None else {k: tuning_report[k] for k in ("ledger", "sampler", "n_trials", "selected")})}
         manifest = store_model(model_id=model_id, estimator=final_est, lineage=lineage, tier="registry", selection_status="selected", metrics=metrics,
                                golden_train_frame=binary[features], golden_rows=min(GOLDEN_MIN_ROWS, int(len(binary))))
         path = _write(self.artifacts / "experiment_models.json", {"schema_version": 2, "plan_sha256": plan["plan_sha256"], "family": family, "hyperparameters": params,

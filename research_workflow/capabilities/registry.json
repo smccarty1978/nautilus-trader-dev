@@ -1,6 +1,6 @@
 {
-  "content_sha256": "0d0098f64d1fac364712ea8ca0fe91502cbbb183895c8092a2e32f977d3bdf28",
-  "generated_at_utc": "2026-09-02T20:49:32.600420+00:00",
+  "content_sha256": "2c8980dbac835f47a51efcdad01a9cf43ac9a5edaeb2047ce6a1a0f8a33b0e31",
+  "generated_at_utc": "2026-09-03T02:34:49.698665+00:00",
   "kinds": {
     "datasets": [
       {
@@ -5976,6 +5976,34 @@
       {
         "cost_class": "offline_only",
         "dependencies": [
+          "model.lightgbm"
+        ],
+        "description": "Bounded TRAIN-only Optuna TPE search over walk-forward tuning-year folds (median pruning, resumable sqlite storage); requires the optional optuna package; identical governance to model_selection.random.",
+        "id": "validation.model_selection.optuna",
+        "implementation": "research_workflow.tuning.tune",
+        "implementation_note": "",
+        "implementation_verified": true,
+        "kind": "validation_protocols",
+        "missing_tests": [],
+        "name": "model_selection.optuna",
+        "parameters": [
+          "max_trials",
+          "random_seed",
+          "tuning_years",
+          "primary_metric",
+          "search_space"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_lifecycle_v2.py"
+        ],
+        "status": "candidate",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [
           "validation.model_selection.grid"
         ],
         "description": "Accept/reject the already-selected winner on final_train_validation_years; never re-selects.",
@@ -6096,7 +6124,7 @@
       "broken": 0,
       "count": 15
     },
-    "total": 202,
+    "total": 203,
     "trackers": {
       "broken": 0,
       "count": 7
@@ -6107,7 +6135,7 @@
     },
     "validation_protocols": {
       "broken": 0,
-      "count": 6
+      "count": 7
     }
   }
 }

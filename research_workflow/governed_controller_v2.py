@@ -160,6 +160,16 @@ class V2StudyController(GovernedStudyController):
         if through not in STAGE_ORDER:
             raise ValueError(f"unknown --through {through}")
         self._through = through
+        # STUDY_CLOSED is terminal and recognized before anything else: a valid closure is the authority
+        try:
+            from research_workflow.study_closure import load_study_closure
+            closure = load_study_closure(self.study)
+        except Exception:
+            closure = None
+        if closure is not None:
+            card = self._card(ControllerState.STUDY_CLOSED, "close", last="close", dry_run=bool(inspect or dry_run))
+            card["closure"] = {k: closure.get(k) for k in ("status", "outcome", "terminal_decision", "closed_at_utc")}
+            return card
         if not (inspect or dry_run):
             live = self._acquire_run_lock()
             if live:

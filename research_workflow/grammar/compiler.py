@@ -912,7 +912,25 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
         validation = {"protocol": pid, "tuning_years": sorted(tuning), "final_train_validation_years": sorted(final),
                       "max_trials": v.max_trials, "random_seed": v.random_seed, "primary_metric": v.primary_metric,
                       "year_role_table": roles + [{"year": y, "role": "dev_oos"} for y in sorted(dev)] + [{"year": y, "role": "prohibited"} for y in sorted(prohibited)]}
-    return chronology, {"mode": model_spec.mode, "family": fam_id, "params": dict(model_spec.params), "arms": list(model_spec.arms), "validation": validation, "models": scored}
+    search_space: Dict[str, Any] = {}
+    if model_spec.search_space:
+        if model_spec.mode != "train":
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "model.search_space", "search_space applies to mode: train only")
+        if validation is None or validation["protocol"] not in ("validation.model_selection.random", "validation.model_selection.optuna"):
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "model.validation.protocol",
+                    "a search_space needs validation.protocol model_selection.random or model_selection.optuna (bounded, TRAIN-only, walk-forward)")
+        elif len(validation["tuning_years"]) < 2:
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "model.validation.tuning_years",
+                    "hyperparameter tuning needs at least two tuning years (walk-forward: fit on earlier years, validate on the next)")
+        for name, dom in model_spec.search_space.items():
+            if isinstance(dom, list) and dom:
+                search_space[name] = {"choices": list(dom)}
+            elif isinstance(dom, dict) and "low" in dom and "high" in dom and set(dom) <= {"low", "high", "log", "int"}:
+                search_space[name] = {"low": dom["low"], "high": dom["high"], "log": bool(dom.get("log", False)), "int": bool(dom.get("int", False))}
+            else:
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.search_space.{name}", "domain must be a non-empty list of choices or {low, high, log?, int?}")
+    return chronology, {"mode": model_spec.mode, "family": fam_id, "params": dict(model_spec.params), "arms": list(model_spec.arms), "validation": validation, "models": scored,
+                        "search_space": search_space}
 
 
 def _resolve_closure(ctx: _Ctx) -> Dict[str, Any]:

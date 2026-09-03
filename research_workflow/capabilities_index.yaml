@@ -178,6 +178,15 @@ validation_protocols:
     dependencies: [model.lightgbm]
     update_cadence: offline_only
     required_tests: [scripts/tests/test_study_spec_extensions.py]
+  - id: validation.model_selection.optuna
+    version: 1
+    description: Bounded TRAIN-only Optuna TPE search over walk-forward tuning-year folds (median pruning, resumable sqlite storage); requires the optional optuna package; identical governance to model_selection.random.
+    implementation: research_workflow.tuning.tune
+    parameters: [max_trials, random_seed, tuning_years, primary_metric, search_space]
+    dependencies: [model.lightgbm]
+    update_cadence: offline_only
+    required_tests: [research_workflow/tests/test_lifecycle_v2.py]
+    status_override: candidate
   - id: validation.final_train_validation.gated
     version: 1
     description: Accept/reject the already-selected winner on final_train_validation_years; never re-selects.

@@ -42,6 +42,14 @@ def main() -> int:
                                      through=ns.through, inspect=ns.inspect, dry_run=ns.dry_run)
         print(compact_card(card, as_json=ns.json))
         return 2 if card["STATUS"] == "BLOCKED" else 0
+    from research_workflow.policy import OldRuntimePolicyError, assert_old_runtime_allowed
+    try:
+        assert_old_runtime_allowed(Path(ns.study))
+    except OldRuntimePolicyError as exc:
+        card = {"STATUS": "BLOCKED", "state": "NEEDS_COMPILE", "stage": "policy", "blocker_code": "OLD_RUNTIME_LEGACY_ONLY", "reason": str(exc),
+                "artifact": None, "sha256": None, "next_state": "NEEDS_COMPILE", "failure_packet": None, "test_counts": {}}
+        print(compact_card(card, as_json=ns.json))
+        return 2
     actions = None
     if ns.execute_authorized:
         from research_workflow.controller_actions import production_actions

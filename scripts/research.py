@@ -108,7 +108,12 @@ def cmd_study_new(ns: argparse.Namespace) -> int:
 
 def cmd_study_compile(ns: argparse.Namespace) -> int:
     from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.lifecycle_v2 import is_v2_study
+    from research_workflow.policy import OLD_RUNTIME_POLICY
     study = Path(ns.study).resolve()
+    if not is_v2_study(study):
+        return _card({"study": str(study), "blocker_code": "OLD_RUNTIME_LEGACY_ONLY", "policy": OLD_RUNTIME_POLICY,
+                      "error": "not a Platform V2 study.yaml (v1 grammar); new research must use the v2 grammar -- see WORKFLOW.md and docs/RESEARCH_YAML_REFERENCE.md"}, ok=False)
     out = compile_study(load_spec(study), repo_root=ROOT)
     if not out.ok:
         return _card({"study": str(study), **out.gaps.to_dict()}, ok=False)

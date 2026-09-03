@@ -92,6 +92,7 @@ def test_controller_runs_a_fresh_v2_study_end_to_end(tmp_path, synthetic_bars, m
     assert card["STATUS"] == "OK" and card["state"] == "READY_TO_OOS", card
     models = json.loads((study / "artifacts" / "experiment_models.json").read_text())
     assert models["model_id"] and models["rows"]["binary"] > 0
+    assert models["metrics"]["tuning"] is None
     assert (study / "artifacts" / "train_experiment_freeze.json").is_file()
 
     card = ctl().run(through="analyze")
@@ -141,3 +142,43 @@ def test_second_controller_on_a_live_study_is_refused(tmp_path, monkeypatch):
     lock.write_text(_json_mod.dumps({"pid": decoy.pid, "started_at_utc": "then", "through": "analyze"}))   # dead pid -> stale lock
     card = V2StudyController(study, options=V2Options(datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS), repo_root=ROOT).run(through="compile")
     assert card["STATUS"] == "OK" and not lock.exists()
+
+
+def test_tuning_adapter_is_bounded_walk_forward_and_persists_a_ledger(tmp_path):
+    """Random sampler: unique bounded trials, folds fit on earlier years only, ledger carries every identity; a
+    single tuning year or a one-class fold is refused; the optuna protocol reports a typed error when absent."""
+    import numpy as np
+    import pandas as pd
+    from research_workflow.tuning import TuningError, tune, walk_forward_folds
+    rng = np.random.default_rng(3)
+    n = 600
+    frame = pd.DataFrame({"f1": rng.normal(size=n), "f2": rng.normal(size=n), "_year": np.repeat([2021, 2022, 2023], n // 3)})
+    frame["y"] = ((frame["f1"] + 0.5 * frame["f2"] + rng.normal(scale=0.8, size=n)) > 0).astype(int)
+    validation = {"protocol": "validation.model_selection.random", "tuning_years": [2021, 2022, 2023], "max_trials": 4, "random_seed": 11, "primary_metric": "roc_auc"}
+    space = {"n_estimators": {"choices": [10, 20, 40]}, "learning_rate": {"low": 0.05, "high": 0.3, "log": True, "int": False}, "max_depth": {"low": 2, "high": 4, "log": False, "int": True}}
+    out = tune(study_id="synthetic", frame=frame, features=["f1", "f2"], label="y", family="lightgbm", base_params={"verbosity": -1, "num_leaves": 7}, seed=11,
+               search_space=space, validation=validation, artifacts_dir=tmp_path, identities={"plan_sha256": "p", "population_identity": "pop", "target_contract_sha256": "t",
+                                                                                              "feature_contract_sha256": "f", "preprocessing_contract_sha256": "identity"})
+    ledger = json.loads((tmp_path / "tuning_trials.json").read_text())
+    assert out["n_trials"] == 4 and ledger["sampler"] == "random" and ledger["sampler_seed"] == 11
+    assert walk_forward_folds([2021, 2022, 2023]) == [{"fold": "fold_2022", "fit_years": [2021], "validation_year": 2022}, {"fold": "fold_2023", "fit_years": [2021, 2022], "validation_year": 2023}]
+    assert ledger["folds"] == walk_forward_folds([2021, 2022, 2023])
+    assert len({json.dumps(t["params"], sort_keys=True) for t in ledger["trials"]}) == 4 and all(len(t["fold_scores"]) == 2 for t in ledger["trials"])
+    assert ledger["selected"]["aggregate"] == max(t["aggregate"] for t in ledger["trials"])
+    assert {"feature_order", "target_contract_sha256", "population_identity", "preprocessing_contract_sha256", "search_space", "objective", "environment"} <= set(ledger)
+    # determinism: same seed -> same trials
+    out2 = tune(study_id="synthetic", frame=frame, features=["f1", "f2"], label="y", family="lightgbm", base_params={"verbosity": -1, "num_leaves": 7}, seed=11,
+                search_space=space, validation=validation, artifacts_dir=tmp_path / "again", identities={"plan_sha256": "p"})
+    assert out2["selected"]["params"] == out["selected"]["params"]
+    with pytest.raises(TuningError, match="TUNING_NEEDS_TWO_TUNING_YEARS"):
+        tune(study_id="s", frame=frame, features=["f1", "f2"], label="y", family="lightgbm", base_params={}, seed=1, search_space=space,
+             validation={**validation, "tuning_years": [2021]}, artifacts_dir=tmp_path / "x", identities={})
+    try:
+        import optuna  # noqa: F401
+        has_optuna = True
+    except ImportError:
+        has_optuna = False
+    if not has_optuna:
+        with pytest.raises(TuningError, match="OPTUNA_NOT_INSTALLED"):
+            tune(study_id="s", frame=frame, features=["f1", "f2"], label="y", family="lightgbm", base_params={}, seed=1, search_space=space,
+                 validation={**validation, "protocol": "validation.model_selection.optuna"}, artifacts_dir=tmp_path / "o", identities={})
