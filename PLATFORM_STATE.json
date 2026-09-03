@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "platform_status": "REDTEAM_CLEARED",
+  "ready_for_real_v2_research": true,
+  "original_criticals": 9,
+  "additional_criticals_found": 2,
+  "remaining_criticals": 0,
+  "remaining_warnings": 1,
+  "second_adversarial_pass": "CLEAR_WITH_WARNINGS",
+  "old_runtime_policy": "LEGACY_ONLY_FOR_NEW_RESEARCH",
+  "authority": {
+    "merged_main_commit": "df56be7b226cbba17ae62b497da69aad5dd2bb17",
+    "tag": "baseline/2026-09-platform-v2-redteam-cleared",
+    "prior_tag": "baseline/2026-09-platform-v2-proven",
+    "remediation_branch": "chore/platform-v2-redteam-hardening",
+    "audits": {
+      "causal": "CLEAR (pass 02 @5ff9bc55)",
+      "contract": "CLEAR (pass 01 @77e94d20)",
+      "adversarial": "CLEAR_WITH_WARNINGS (pass 03 @f64009e6)"
+    },
+    "evidence_dir": "artifacts/platform_v2/redteam/",
+    "model_c_durable_store": "6 arms registered, identity_rule legacy_v1_train_freeze (HEAD-blob), golden PASS"
+  },
+  "remaining_warning": "trust boundary is the checked-out repository history: authority grants require bytes committed at HEAD (identical in the worktree); a forgery committed and checked out is by definition committed; evidence records head_sha/branch",
+  "recorded_at_utc": "2026-09-03T12:51:44.084312+00:00"
+}
