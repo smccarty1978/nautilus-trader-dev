@@ -224,6 +224,12 @@ declarations:
   MODEL_CHANGED: 'NO'
   THRESHOLDS_CHANGED: 'NO'
   NEW_UNTOUCHED_OOS_CLAIM: 'NO'
+  # A departure from a platform default belongs in the declarations block, not only in the
+  # narrative: it governs how a missing INPUT reaches an already-frozen, sha256-bound estimator,
+  # and changes no model byte, threshold, feature order or preprocessing identity.
+  NULL_INPUT_POLICY_CHANGED_TO_MODEL_NATIVE: 'YES'
+  NULL_INPUT_POLICY_EVIDENCE: artifacts/parity/frozen_180s_null_input_policy_evidence.json
+  OUTCOME_SESSION_END_CHANGED_TO_TRUNCATE: 'YES'
 
 deliverables:
   - first_p90_warning_horizon_contract.json
