@@ -292,9 +292,14 @@ class FrozenExternalModelScorer:
             raise ExternalModelScoringError(
                 f"EXTERNAL_SCORE_INPUT_NOT_AVAILABLE_AT_CHECKPOINT: available_at_ns={available_at_ns} > checkpoint_ts={checkpoint_ts}"
             )
+        # float64, not object: a snapshot carrying a Python ``None`` yields an object-dtype column,
+        # and LightGBM refuses those outright ("pandas dtypes must be int, float or bool") -- so a
+        # model_native score over a missing input would raise instead of scoring. Coercing turns
+        # None into NaN, which is what native missing-value handling actually consumes. Nothing is
+        # fabricated: a non-numeric input raises here rather than being silently coerced.
         frame = pd.DataFrame(
             [[causal_snapshot[name] for name in features]], columns=features
-        )
+        ).astype("float64")
         null_inputs = int(frame.isna().to_numpy().sum())
         if null_inputs and self.spec.null_input_policy != "model_native":
             raise ExternalModelScoringError("external score input contains null values")
