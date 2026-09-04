@@ -1334,3 +1334,43 @@ Writing that cross-check surfaced a pre-existing disagreement: the oracle matche
 decision epoch. The oracle now reads the declared `inclusive_start`; a legacy contract that
 declares nothing keeps the exclusive rule. Tests:
 `research_workflow/tests/test_session_end_truncate.py`.
+
+### 21.12 Additive TRAIN provenance repair
+
+`FrozenExternalModelScorer` refuses a legacy artifact binding unless the parent's TRAIN freeze
+declares `provenance: "TRAIN_ONLY"`. Some historical freezes predate that marker
+(`clean_maturity_flip_model_180s_horizon`'s per-direction freezes carry `provenance: None`), and a
+closed study's artifacts are immutable — so the freeze cannot be stamped in place and every child
+study that wants those models is blocked.
+
+The marker is therefore carried by a **separate, additive attestation**, written by
+`scripts/write_train_provenance_attestation.py` to
+`studies/<parent>/artifacts/train_provenance_attestation.json`. Nothing existing is modified.
+
+The tool does not let anyone *assert* TRAIN-only — it **proves** it from the freeze's own contents
+and refuses to write otherwise: `partition == "train"`, every threshold's
+`derivation_population == "train"`, every decile block's `derivation == "TRAIN_ONLY"`, and a parent
+closure that is CLOSED with causal **and** contract audits CLEAR at the same execution composite.
+
+A study consumes it with three declarations alongside the legacy binding
+(`parent_provenance_attestation_path`, `..._sha256`, `parent_provenance_cell_id`). The binder then
+requires, all of them, fail-closed: the attestation lives inside the parent study; its bytes hash
+to the declared sha; kind and assertion are correct; `parent_study_id` matches; the attested
+execution composite equals the spec's and both audits are CLEAR at it; exactly one cell matches the
+declared `cell_id`; and that cell binds this freeze, this model artifact, this arm's fit identity
+and this preprocessing hash.
+
+The freeze is bound by **canonical content identity**, not file bytes: tracked JSON is
+end-of-line-converted on checkout, so a byte hash of the working tree describes the platform that
+checked the repo out as much as the artifact — which is the very failure this section exists to
+repair. There is deliberately **no** "missing provenance means TRAIN" fallback: a freeze with
+neither marker nor attestation is refused exactly as before.
+
+**Related: `.gitattributes`.** Preserved LightGBM native boosters (`*.booster.txt`) are declared
+`-text`. Without that, `core.autocrlf` rewrote them on every Windows checkout, which broke their
+recorded `native_booster_sha256` **and** made them genuinely unparseable — LightGBM's fatal handler
+aborts the process rather than raising, so the corruption was invisible until something loaded one.
+Scope is deliberately narrow: `*.golden.json` and other tracked model-adjacent JSON keep their
+existing behaviour because their recorded hashes were taken from post-checkout bytes.
+
+Tests: `research_workflow/tests/test_train_provenance_attestation.py` (in `PLATFORM_TESTS`).

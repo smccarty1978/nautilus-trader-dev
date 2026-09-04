@@ -35,7 +35,8 @@ KEY = ("observation_ts", "regime_start_ns", "checkpoint_index")
 # (test_lifecycle_v2, test_declarative_analysis) stay repo tests.
 PLATFORM_TESTS = ("research_workflow/tests/test_golden_fixture.py", "research_workflow/tests/test_grammar_v2.py",
                   "research_workflow/tests/test_host_core.py", "research_workflow/tests/test_chronology_windows.py",
-                  "research/analysis/tests/test_diagnostic_ops.py")
+                  "research/analysis/tests/test_diagnostic_ops.py",
+                  "research_workflow/tests/test_train_provenance_attestation.py")
 
 # Single source of truth for the deliverable each stage writes -- research_workflow.audit_packets_v2
 # builds DELIVERABLES_BY_STAGE from this constant so the audit packet cannot silently name a
