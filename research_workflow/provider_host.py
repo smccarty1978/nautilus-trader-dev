@@ -411,33 +411,50 @@ class RollingProductivityAdapter(_BaseAdapter):
         super().__init__(instances)
         from features.trackers.generic_rolling_productivity import GenericRollingProductivityProvider
 
-        windows = {_window_seconds(i.parameters.get("window", "300s")) for i in self.instances}
-        if len(windows) != 1:
-            raise ValueError(f"RollingProductivityAdapter expects one window, got {sorted(windows)}")
-        self._window = next(iter(windows))
-        self._provider = GenericRollingProductivityProvider(window_seconds=self._window)
+        # ONE provider per DISTINCT declared window. The rolling formula is a pure function
+        # of its own window, so N windows are N independent providers fed the identical 1s
+        # stream -- not one provider that would have to pick a window. Declaring 60s, 120s
+        # and 300s in one study previously raised here and surfaced as
+        # MISSING_CAPABILITY ("no runtime adapter renders rolling_<w>s_<metric>") for EVERY
+        # rolling instance including the ones that were fine on their own. Same construction
+        # pattern OHLCVDeltaAdapter already uses for its window set.
+        self._windows: Dict[int, Any] = {}
+        for inst in self.instances:
+            window = _window_seconds(inst.parameters.get("window", "300s"))
+            if window not in self._windows:
+                self._windows[window] = GenericRollingProductivityProvider(window_seconds=window)
+        # alias -> (window, window-agnostic provider key), resolved once at construction so
+        # snapshot never re-parses an alias.
+        self._routes: Dict[str, Tuple[int, str]] = {}
+        for inst in self.instances:
+            window = _window_seconds(inst.parameters.get("window", "300s"))
+            # rolling_300s_retention_ratio -> provider key rolling_retention_ratio
+            self._routes[inst.physical_alias] = (
+                window, inst.physical_alias.replace(f"rolling_{window}s_", "rolling_", 1),
+            )
 
     def required_streams(self) -> frozenset[str]:
         return frozenset({STREAM_COMPLETED_1S})
 
     def on_event(self, event_type: str, event: Mapping[str, Any]) -> None:
         if event_type == STREAM_COMPLETED_1S:
-            self._provider.on_completed_1s(
+            ts, high, low, close = (
                 int(event["ts_init"]), float(event["high"]), float(event["low"]), float(event["close"]),
             )
+            for provider in self._windows.values():
+                provider.on_completed_1s(ts, high, low, close)
 
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
         direction = int(episode_state.get("prevailing_direction", 0) or 0)
         atr = float(episode_state.get("family_a_atr", atr))  # FLAG B: frozen-parent (regime-start) ATR
-        snap = self._provider.snapshot(
-            int(decision_ts), direction, float(atr),
-            episode_state.get("regime_expansion_atr_per_min"),
-        )
+        expansion = episode_state.get("regime_expansion_atr_per_min")
+        snaps = {
+            window: provider.snapshot(int(decision_ts), direction, float(atr), expansion)
+            for window, provider in self._windows.items()
+        }
         out: Dict[str, Any] = {}
-        for inst in self.instances:
-            # rolling_300s_retention_ratio -> provider key rolling_retention_ratio
-            metric = inst.physical_alias.replace(f"rolling_{self._window}s_", "rolling_", 1)
-            out[inst.physical_alias] = snap.get(metric)
+        for alias, (window, metric) in self._routes.items():
+            out[alias] = snaps[window].get(metric)
         return out
 
 
