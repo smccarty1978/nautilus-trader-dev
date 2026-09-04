@@ -192,14 +192,20 @@ analysis:
     - id: first_p90
       op: analysis.anchor.first_threshold_crossing
       params:
+        # The parent's arm names denote the TRADE direction taken on the anticipated flip, NOT the
+        # prevailing regime direction. Verified against the frozen reference, exactly and without
+        # overlap: arm LONG <-> regime_direction -1 (115 fires), arm SHORT <-> +1 (124 fires);
+        # corroborated by the parent's own GATE_3 row counts (LONG 17,029 = my -1,
+        # SHORT 18,843 = my +1). Matching the arms by NAME scores every regime with the wrong
+        # model -- see FIRST_P90_ARM_ORIENTATION.md.
         by: &frozen_thresholds
           column: regime_direction
           cases:
-            1:
+            -1:                                   # bear regime -> the parent's LONG arm
               value: parent_long_score
               threshold: 0.2852887899663343
               levels: {p95: 0.32770330252959395, p97_5: 0.3639796684339806}
-            -1:
+            1:                                    # bull regime -> the parent's SHORT arm
               value: parent_short_score
               threshold: 0.28485631865861344
               levels: {p95: 0.33222113070660036, p97_5: 0.37673375655439945}
@@ -228,11 +234,11 @@ analysis:
         reference_key: [regime_id]
         expected_total: 239
         expected_by:
-          regime_direction: {1: 115, -1: 124}
+          regime_direction: {-1: 115, 1: 124}     # LONG arm = regime -1, SHORT arm = regime +1
         timestamp_column: observation_ts
         reference_timestamp_column: nt_first_P90_ts
         value_map:
-          direction: {LONG: 1, SHORT: -1}
+          direction: {LONG: -1, SHORT: 1}         # the reference speaks in ARM names, not regimes
 
     - id: cumulative_incidence
       op: analysis.incidence.cumulative

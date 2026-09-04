@@ -72,19 +72,19 @@
             "cases": {
               "-1": {
                 "levels": {
-                  "p95": 0.33222113070660036,
-                  "p97_5": 0.37673375655439945
-                },
-                "threshold": 0.28485631865861344,
-                "value": "parent_short_score"
-              },
-              "1": {
-                "levels": {
                   "p95": 0.32770330252959395,
                   "p97_5": 0.3639796684339806
                 },
                 "threshold": 0.2852887899663343,
                 "value": "parent_long_score"
+              },
+              "1": {
+                "levels": {
+                  "p95": 0.33222113070660036,
+                  "p97_5": 0.37673375655439945
+                },
+                "threshold": 0.28485631865861344,
+                "value": "parent_short_score"
               }
             },
             "column": "regime_direction"
@@ -133,8 +133,8 @@
         "params": {
           "expected_by": {
             "regime_direction": {
-              "-1": 124,
-              "1": 115
+              "-1": 115,
+              "1": 124
             }
           },
           "expected_total": 239,
@@ -150,8 +150,8 @@
           "timestamp_column": "observation_ts",
           "value_map": {
             "direction": {
-              "LONG": 1,
-              "SHORT": -1
+              "LONG": -1,
+              "SHORT": 1
             }
           }
         },
@@ -252,19 +252,19 @@
             "cases": {
               "-1": {
                 "levels": {
-                  "p95": 0.33222113070660036,
-                  "p97_5": 0.37673375655439945
-                },
-                "threshold": 0.28485631865861344,
-                "value": "parent_short_score"
-              },
-              "1": {
-                "levels": {
                   "p95": 0.32770330252959395,
                   "p97_5": 0.3639796684339806
                 },
                 "threshold": 0.2852887899663343,
                 "value": "parent_long_score"
+              },
+              "1": {
+                "levels": {
+                  "p95": 0.33222113070660036,
+                  "p97_5": 0.37673375655439945
+                },
+                "threshold": 0.28485631865861344,
+                "value": "parent_short_score"
               }
             },
             "column": "regime_direction"
@@ -343,19 +343,19 @@
             "cases": {
               "-1": {
                 "levels": {
-                  "p95": 0.33222113070660036,
-                  "p97_5": 0.37673375655439945
-                },
-                "threshold": 0.28485631865861344,
-                "value": "parent_short_score"
-              },
-              "1": {
-                "levels": {
                   "p95": 0.32770330252959395,
                   "p97_5": 0.3639796684339806
                 },
                 "threshold": 0.2852887899663343,
                 "value": "parent_long_score"
+              },
+              "1": {
+                "levels": {
+                  "p95": 0.33222113070660036,
+                  "p97_5": 0.37673375655439945
+                },
+                "threshold": 0.28485631865861344,
+                "value": "parent_short_score"
               }
             },
             "column": "regime_direction"
@@ -1457,7 +1457,7 @@
     "stream": "nq_1s",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "b8ed0300fff041af52b21f9830f4542b5fb2a70742c4a1996d5761fdb2cdf32c",
+  "plan_sha256": "e4c2b81bbf9eda0c193c3ed0e75829d3370e6188e9b13751ebeb9b2b1e8a473e",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1534,7 +1534,7 @@
     ],
     "session": "RTH"
   },
-  "spec_sha256": "0a1561759556f6a3a39aa3711a591b1a207c79cb334a4beeef7a01beeb9b078c",
+  "spec_sha256": "03cc8f6086ee0dec4758cc0d50dfed338139ea4982b72eee65b36be26f207fa4",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",

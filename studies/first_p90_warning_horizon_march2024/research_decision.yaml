@@ -63,6 +63,18 @@ parent_dependency:
       p95: 0.33222113070660036
       p97_5: 0.37673375655439945
   preprocessing_hash: 96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8
+  # VERIFIED IDENTITY, not assumed from the arm names. The parent's arms are named by the TRADE
+  # direction taken on the anticipated flip, NOT by the prevailing regime direction:
+  #   arm LONG  <-> prevailing regime_direction -1 (bear)   115 March fires, 17,029 candidates
+  #   arm SHORT <-> prevailing regime_direction +1 (bull)   124 March fires, 18,843 candidates
+  # Established by joining the frozen first_p90_parity.parquet to the collected regime directions
+  # (115/124, no overlap) and corroborated by the parent's own GATE_3 row counts. Matching arms by
+  # NAME scores every regime with the wrong model; the population parity gate caught it before any
+  # statistic was produced. See FIRST_P90_ARM_ORIENTATION.md.
+  arm_orientation:
+    LONG: -1
+    SHORT: 1
+    established_by: [validation_march2024/artifacts/first_p90_parity.parquet, validation_march2024/artifacts/validation_summary.json]
   ordered_feature_surface:
     - arrival_velocity
     - arrival_acceleration

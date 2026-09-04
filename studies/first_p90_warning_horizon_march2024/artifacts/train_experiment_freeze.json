@@ -1,0 +1,48 @@
+{
+  "deciles": {},
+  "execution_composite_sha256": "ac9af444a809134bbea524b04c65d98f5a5f5d69a44871cda275acc820e01e57",
+  "feature_sets": {
+    "primary": [
+      "prior_1m_regime_efficiency",
+      "prior_5m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_5m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ]
+  },
+  "generated_at_utc": "2026-09-04T18:23:15.489475+00:00",
+  "label_column": "target_flip_within_horizon",
+  "merge_identity": {
+    "authority": "plan.chronology.train",
+    "candidates_identity": "fcc2be55a28aca310cd74db50a49f3b90476dc6c2b54d2ec01f8d4f1cce934c5",
+    "candidates_sha256": "077fa0a7dc7c8ae2d6f736df653d01ebe37c9730b853f84a7c05a6ab4dc3af25",
+    "generated_at_utc": "2026-09-04T18:22:02.287358+00:00",
+    "observations_identity": "c73efb1fe7eb8bb6b64869dc5854683a7c93a2644a316483257e245e6b59baf4",
+    "observations_sha256": "82d0f36170d71e24f22cfe5280497460a7790d7c7b7d7f8e3e66ca7b0e8b3ed7",
+    "plan_sha256": "b8ed0300fff041af52b21f9830f4542b5fb2a70742c4a1996d5761fdb2cdf32c",
+    "rows": 79419,
+    "years": [
+      2024
+    ]
+  },
+  "model_canonical_sha256": {},
+  "model_hashes": {},
+  "new_models_trained": false,
+  "partition": "train",
+  "plan_sha256": "b8ed0300fff041af52b21f9830f4542b5fb2a70742c4a1996d5761fdb2cdf32c",
+  "platform": "v2",
+  "preprocessing_hash": "identity",
+  "protected_oos": false,
+  "schema_version": 1,
+  "status": "NO_PROTECTED_OOS",
+  "study_id": "first_p90_warning_horizon_march2024",
+  "thresholds": {}
+}
