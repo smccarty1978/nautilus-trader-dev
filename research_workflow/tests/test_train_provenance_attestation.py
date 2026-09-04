@@ -423,3 +423,29 @@ def test_model_native_on_a_family_without_missing_support_fails_closed(tmp_path)
     with pytest.raises(Exception):
         scorer.score({"a": 1.0, "b": float("nan")}, checkpoint_ts=10, direction="LONG",
                      availability_ts={"a": 9, "b": 9})
+
+
+def test_a_row_with_nothing_observed_never_produces_a_score(tmp_path):
+    """Binding-level guard (causal pass 04, NOTE 2). `model_native` means "missingness is
+    information the model can use", not "score anything". A checkpoint where EVERY input is null
+    has nothing observed at all, and must yield no score under either policy."""
+    from features.trackers.host_bindings import FrozenExternalScoreBinding
+
+    class Epoch:
+        T = 10
+
+    parent, _ = _lgbm_parent(tmp_path)
+    spec = _lgbm_spec(parent, null_input_policy="model_native")
+    binding = FrozenExternalScoreBinding(
+        {"spec": spec.model_dump(), "direction": "r.dir", "studies_root": str(tmp_path / "studies")}, {})
+    resolve = lambda ref, e: 1
+
+    assert binding.derive({"a": None, "b": None}, Epoch(), resolve) is None
+    assert binding.derive({"a": float("nan"), "b": float("nan")}, Epoch(), resolve) is None
+    partial = binding.derive({"a": 0.4, "b": None}, Epoch(), resolve)
+    assert partial is not None and 0.0 <= partial <= 1.0      # one observed input IS information
+
+    refusing = FrozenExternalScoreBinding(
+        {"spec": _lgbm_spec(parent).model_dump(), "direction": "r.dir",
+         "studies_root": str(tmp_path / "studies")}, {})
+    assert refusing.derive({"a": 0.4, "b": None}, Epoch(), resolve) is None   # default unchanged
