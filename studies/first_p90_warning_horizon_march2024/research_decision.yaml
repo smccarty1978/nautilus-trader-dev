@@ -1,0 +1,200 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_plan.json > code)
+study_id: first_p90_warning_horizon_march2024
+status: DRAFT
+dataset_id: NQ_1S_V2_GLOBEX
+decision_type: governed_diagnostic_characterization
+
+research_question: >
+  When a regime produces its first frozen-model P90 warning but does not flip within the frozen
+  180-second label horizon, how often is that warning merely EARLY versus genuinely FALSE?
+
+secondary_questions:
+  - Does first P90 accelerate time-to-next-opposing-flip relative to comparable eligible non-P90 states?
+  - Does the causal score path after first P90 separate fast, late and failed warnings?
+  - Is persistence/rising score after first P90 more informative than the magnitude of the first-fire score?
+
+objective: >
+  Descriptive characterization only. No model development, no strategy optimization, no Stage 2.
+
+# --------------------------------------------------------------------------------------------
+# Platform provenance
+# --------------------------------------------------------------------------------------------
+platform_provenance:
+  branched_from: chore/v2-diagnostic-window-and-analysis
+  base_commit: c9253c20baf247e00586faf7023d2cee274c496b
+  reason: >
+    WORKFLOW.md section M.1 -- this study is bound to a platform state that is not yet on main.
+    Three capabilities it depends on were added on that chore branch because the study could not
+    otherwise be expressed at all:
+      * chronology.windows        -- date-bounded partition execution. Without it a V2 study can
+                                     only run whole calendar years, so running March 2024 would
+                                     have meant streaming April-December 2024, which section 14
+                                     of the authorization prohibits.
+      * analysis:                 -- declarative post-collection analysis over registered
+                                     analysis_ops. Without it the analyze stage emits only
+                                     roc_auc/pr_auc/brier and disposition counts, and none of the
+                                     required statistics could be produced without a study-local
+                                     pandas script (prohibited by CLAUDE.md section 5).
+      * outcome.session_end:      -- truncate. Under censor a flip horizon reaching past the
+                                     session close is CENSORED whether or not the flip happened,
+                                     so "time to the next flip, observed through RTH close" was
+                                     not expressible: every candidate would have been censored.
+  merge_expectation: >
+    The chore branch merges to main with --no-ff; this study's closure is bound to that platform
+    state and its execution composite is recorded in audit/frozen_execution_manifest.json.
+
+# --------------------------------------------------------------------------------------------
+# Frozen parent authority -- verified from artifacts, not assumed
+# --------------------------------------------------------------------------------------------
+parent_dependency:
+  study: clean_maturity_flip_model_180s_horizon
+  stage_1_status: FROZEN
+  models:
+    LONG:
+      model_id: ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c
+      artifact_sha256: c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512
+      p90: 0.2852887899663343
+      p95: 0.32770330252959395
+      p97_5: 0.3639796684339806
+    SHORT:
+      model_id: 209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6
+      artifact_sha256: cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a
+      p90: 0.28485631865861344
+      p95: 0.33222113070660036
+      p97_5: 0.37673375655439945
+  preprocessing_hash: 96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8
+  ordered_feature_surface:
+    - arrival_velocity
+    - arrival_acceleration
+    - ema_slope
+    - prior_1m_regime_efficiency
+    - prior_1m_regime_mfe_atr
+    - prior_1m_regime_range_atr
+    - prior_5m_regime_efficiency
+    - prior_5m_regime_mfe_atr
+    - prior_5m_regime_range_atr
+    - rolling_300s_retention_ratio
+    - rolling_300s_current_progress_atr
+    - rolling_300s_max_progress_atr
+    - rolling_300s_giveback_atr
+  march_2024_reference:
+    first_p90_parity: validation_march2024/artifacts/first_p90_parity.parquet
+    first_p90_parity_sha256: 52437d73c1cf0705001bb2534d1c3a6e8cbe401585f46e3534968c7bb1e22616
+    first_p90_summary_sha256_source: validation_march2024/artifacts/first_p90_summary.json
+    expected_first_fires: {LONG: 115, SHORT: 124, total: 239}
+    expected_180s_flip_rate: {LONG: 0.289474, SHORT: 0.252033}
+    parity_gates_passed: [candidate_population, feature_parity, score_parity, first_p90_parity, outcome_parity]
+
+# --------------------------------------------------------------------------------------------
+# Population identity -- a declared STRICT SUPERSET of the parent's
+# --------------------------------------------------------------------------------------------
+population_identity:
+  relation_to_parent: strict_superset
+  collected: >
+    RTH, 5s checkpoint grid anchored at regime_1m.start_ns, established regime, age >= 120s,
+    frozen ATR > 0, structural snapshot ready. NO maturity gates and NO 1800s age cap.
+  parent_eligibility_reimposed_in_analysis:
+    - [running_mfe_atr, gte, 1.0]
+    - [new_progress_windows, gte, 2]
+    - [retained_mfe_ratio, gte, 0.5]
+    - [regime_age_seconds, lte, 1800]
+  why: >
+    Section 9 of the authorization requires frozen-model scoring to CONTINUE after a checkpoint
+    ceases to satisfy the parent's candidate eligibility. The parent's three maturity gates and
+    its max_age=1800s grid cap both end the checkpoint stream early, so a study restricted to the
+    parent's population cannot observe the anchored score path at all. Verified against the parent:
+    first-fire age ranges 160-1755s, 9.2% of fires have under 600s of grid headroom before the
+    1800s cap and 0.84% have under 120s, so the +120s scheduled score does not exist for them.
+    Carrying the gates as METADATA and re-imposing them in the analysis makes the parent-eligible
+    subset -- and therefore the first-P90 identity -- exactly the parent's, while leaving the rest
+    of the frame available to the score path.
+  population_parity_gate: >
+    STOP GATE. Before any scientific reading, the analysis anchor set must equal the parent's
+    frozen March identity: 239 total, LONG 115, SHORT 124, matched on regime identity, checkpoint
+    identity and timestamp against validation_march2024/artifacts/first_p90_parity.parquet.
+
+# --------------------------------------------------------------------------------------------
+# Chronology and data authorization
+# --------------------------------------------------------------------------------------------
+chronology:
+  train: [2024]              # collection role; NOTHING is fitted (model: none)
+  dev: []
+  diagnostic: [2024]
+  prohibited: [2020, 2021, 2022, 2023, 2025, 2026]
+  windows: ['2024-03-01..2024-03-31']
+  note: >
+    2024 carries the train ROLE only because that is the role the V2 controller executes; the
+    study fits nothing (model: none) and no protected out-of-sample period exists (freeze records
+    NO_PROTECTED_OOS). The window narrows execution to March. March 2024 was already opened and
+    analysed by the parent, so this study makes NO new untouched-OOS claim.
+
+# --------------------------------------------------------------------------------------------
+# Predeclared analysis semantics -- frozen BEFORE execution
+# --------------------------------------------------------------------------------------------
+predeclared_semantics:
+  first_p90_fire: earliest parent-eligible checkpoint in the prevailing regime with score >= frozen P90 (inclusive, one per regime)
+  terminal: min(resolved_at_ts) -- the earliest of the accepted opposing flip and the RTH session close
+  next_flip_horizons: [60, 120, 180, 240, 300, 450, 600]
+  incidence_eligibility: resolved at or before h OR observed for at least h
+  negative_denominator_at: 180
+  score_path_offsets: [15, 30, 60, 90, 120]
+  score_path_cap_seconds: 600
+  subtype_precedence: [SESSION_CENSORED, FAST_RESOLVER, LATE_RESOLVER, SLOW_RESOLVER, FAILED_WARNING_SCORE_COLLAPSE, FAILED_WARNING_PERSISTENT_HIGH]
+
+control_design:
+  stratification: [direction]
+  min_n: 30
+  selection: latest parent-eligible checkpoint below the frozen directional P90 in the cell; strictly before the fire for a regime that fired
+  deviation_from_request:
+    requested: direction x age_bucket x time_of_day (60-minute bins), min_n 30
+    changed_to: direction only
+    decided_before_execution: true
+    reason: >
+      Computed on the parent's OWN frozen 239 March fires before this study was created: the
+      requested stratification occupies 42 cells with a MAXIMUM cell size of 13, so ZERO cells
+      reach the locked n >= 30 rule and the control question would have been unanswerable by
+      construction. Collapsed to direction x age_bucket, 4 of 6 cells clear 30 and both
+      [900,1800) cells land at exactly 29. Direction only (115 / 124) is the only stratification
+      March can actually populate. Age and time-of-day remain DESCRIPTIVE, reported with their
+      cell counts and no reportability claim.
+  age_bucket_note: >
+    The locked >= 1800s age bucket is EMPTY BY CONSTRUCTION under the parent's population: its
+    grid stops at max_age 1800s, so no checkpoint, fire or control can have an age above it
+    (observed first-fire age range 160-1755s). Reported as structurally empty, not as a null result.
+
+# --------------------------------------------------------------------------------------------
+# Prohibitions
+# --------------------------------------------------------------------------------------------
+prohibited_changes:
+  - stage_1_retraining
+  - stage_1_tuning
+  - feature_selection_or_addition
+  - preprocessing_changes
+  - p90_p95_p97_5_recalibration
+  - stage_2_model_fitting
+  - confirmation_delay_optimization
+  - entry_rule_optimization
+  - stop_or_target_optimization
+  - strategy_backtesting
+  - april_to_december_2024_access
+  - 2025_access
+  - 2026_access
+
+declarations:
+  MODEL_CHANGED: 'NO'
+  THRESHOLDS_CHANGED: 'NO'
+  NEW_UNTOUCHED_OOS_CLAIM: 'NO'
+
+deliverables:
+  - first_p90_warning_horizon_contract.json
+  - first_p90_time_to_flip_detail.parquet
+  - first_p90_cumulative_incidence.json
+  - first_p90_negative_decomposition.json
+  - first_p90_control_selection.json
+  - first_p90_control_comparison.json
+  - first_p90_score_evolution.parquet
+  - first_p90_score_path_summary.parquet
+  - first_p90_warning_subtypes.json
+  - FIRST_P90_WARNING_HORIZON_REPORT.md
+
+terminal_decisions: {}

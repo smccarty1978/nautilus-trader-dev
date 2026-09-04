@@ -1,0 +1,237 @@
+# First-P90 warning horizon / late-flip decomposition — March 2024 diagnostic.
+#
+# Stage 1 is FROZEN. This study does not retrain, tune, recalibrate or select anything:
+# `model: none`, and the parent's two frozen estimators enter only as derived causal inputs
+# resolved by immutable model_id through the model registry.
+#
+# Population is a strict SUPERSET of the parent's: the parent's three maturity gates and its
+# 1800s grid cap are dropped from `qualify` and carried as metadata columns instead. That is
+# required by the anchored score path (which must continue after a checkpoint leaves parent
+# eligibility) and it costs nothing scientifically, because the analysis re-imposes the parent's
+# qualification through `eligible_when` — so the first-P90 identity is the parent's, exactly.
+study:
+  id: first_p90_warning_horizon_march2024
+  tier: 2
+  question: >
+    When a regime produces its first frozen-model P90 warning but does not flip within the frozen
+    180-second label horizon, how often is that warning merely early rather than genuinely false?
+  description: >
+    Diagnostic characterization of the frozen Stage-1 first-P90 population in March 2024.
+    No model development, no strategy optimization, no Stage 2.
+
+streams:
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
+
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+
+population:
+  session: RTH
+  # No max_age: the parent capped its grid at 1800s, which would truncate the anchored score
+  # path and empty the >=1800s age bucket by construction. The cap is re-imposed in the
+  # analysis as part of parent eligibility, not here.
+  cadence: {every: 5s, anchor: regime_1m.start_ns, index_column: checkpoint_index}
+  qualify: >
+    excursion.frozen_atr > 0
+    and regime_1m.age_s >= 120s
+    and features.structural_snapshot_ready
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+
+triggers: every_candidate
+
+features:
+  # The parent's ordered 13-column surface, unchanged: feature identity, parameters and order
+  # are the frozen models' contract and may not move.
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: regime_mfe_atr,    over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: regime_range_atr,  over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: rolling_retention_ratio,       window: 300s, update_every: 1s}
+    - {feature: rolling_current_progress_atr,  window: 300s, update_every: 1s}
+    - {feature: rolling_max_progress_atr,      window: 300s, update_every: 1s}
+    - {feature: rolling_giveback_atr,          window: 300s, update_every: 1s}
+    - {feature: arrival_velocity,      input_timeframe: 1s, lookback: 20}
+    - {feature: arrival_acceleration,  input_timeframe: 1s, short_lookback: 20}
+    - {feature: ema_slope, ema_role: short, lookback: 20}
+  metadata:
+    regime_age_seconds:   regime_1m.age_s
+    running_mfe_atr:      excursion.mfe_atr
+    new_progress_windows: excursion.progress_windows
+    retained_mfe_ratio:   excursion.retained_ratio
+    triggering_1s_ts_init: epoch.T
+  derived_inputs:
+    - name: parent_long_score
+      kind: frozen_external_model_score
+      model_id: ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c
+      parent_study_id: clean_maturity_flip_model_180s_horizon
+      availability_reference: decision_ts
+      retrain_prohibited: true
+    - name: parent_short_score
+      kind: frozen_external_model_score
+      model_id: 209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6
+      parent_study_id: clean_maturity_flip_model_180s_horizon
+      availability_reference: decision_ts
+      retrain_prohibited: true
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    regime_transition_1m: {tracker: regime_1m, requires_atr: false}
+    snapshot:
+      atr: regime_1m.atr
+      family_a_atr: excursion.frozen_atr
+      episode_state: {prevailing_direction: regime_1m.dir}
+
+outcome:
+  kind: label
+  event: regime_1m.flipped          # compiles to flip.role: opposite
+  # The horizon is deliberately longer than any RTH session so that the SESSION CLOSE is always
+  # the binding terminal, never an arbitrary cut. Under session_end: truncate the close bounds
+  # the observation window: an opposing flip at or before it resolves at its own instant, and a
+  # candidate that reached the close without one is CENSORED SESSION_END, stamped at the close.
+  horizon: 28800s
+  session: RTH
+  session_end: truncate
+  direction: regime_1m.dir
+
+chronology:
+  train: [2024]
+  dev: []
+  diagnostic: [2024]
+  prohibited: [2020, 2021, 2022, 2023, 2025, 2026]
+  windows: ['2024-03-01..2024-03-31']
+  warmup: {days_before_partition: 5}
+  authorized_dates: ['2024-03-01']
+
+model: none
+
+analysis:
+  source: train
+  steps:
+    # ---- the frozen first-P90 population, reproduced from the parent's own qualification ----
+    - id: first_p90
+      op: analysis.anchor.first_threshold_crossing
+      params:
+        by: &frozen_thresholds
+          column: regime_direction
+          cases:
+            1:
+              value: parent_long_score
+              threshold: 0.2852887899663343
+              levels: {p95: 0.32770330252959395, p97_5: 0.3639796684339806}
+            -1:
+              value: parent_short_score
+              threshold: 0.28485631865861344
+              levels: {p95: 0.33222113070660036, p97_5: 0.37673375655439945}
+        group_by: [regime_start_ns]
+        order_by: observation_ts
+        inclusive: true
+        eligible_when: &parent_eligibility
+          - [running_mfe_atr, gte, 1.0]
+          - [new_progress_windows, gte, 2]
+          - [retained_mfe_ratio, gte, 0.5]
+          - [regime_age_seconds, lte, 1800]
+        terminal: {columns: [resolved_at_ts], reduce: min, unit: ns}
+
+    - id: cumulative_incidence
+      op: analysis.incidence.cumulative
+      rows: first_p90
+      params:
+        horizons: [60, 120, 180, 240, 300, 450, 600]
+        resolved_column: target_flip_within_horizon
+        duration_column: time_to_flip_seconds
+        observed_seconds_column: observed_seconds
+        strata: [regime_direction]
+
+    - id: negative_decomposition
+      op: analysis.decomposition.buckets
+      rows: first_p90
+      params:
+        resolved_column: target_flip_within_horizon
+        duration_column: time_to_flip_seconds
+        observed_seconds_column: observed_seconds
+        negative_after_seconds: 180
+        terminal_column: censor_reason
+        strata: [regime_direction]
+        buckets:
+          - {id: FLIP_LE_180,       gt: 0,   lte: 180}
+          - {id: LATE_181_240,      gt: 180, lte: 240}
+          - {id: LATE_241_300,      gt: 240, lte: 300}
+          - {id: LATE_301_450,      gt: 300, lte: 450}
+          - {id: LATE_451_600,      gt: 450, lte: 600}
+          - {id: FLIP_GT_600,       gt: 600}
+          - {id: PERSISTENT_GT_600, unresolved: true, min_observed_seconds: 600}
+          - {id: NO_FLIP_BEFORE_SESSION_END, unresolved: true, terminal: SESSION_END}
+          - {id: CENSORED,          unresolved: true}
+
+    # ---- predeclared descriptive control (direction-stratified; see research_decision.yaml) ----
+    - id: control_selection
+      op: analysis.control.cell_matched
+      inputs: {anchors: first_p90}
+      params:
+        by: *frozen_thresholds
+        group_by: [regime_start_ns]
+        strata: [regime_direction]
+        order_by: observation_ts
+        min_n: 30
+        eligible_when: *parent_eligibility
+        terminal: {columns: [resolved_at_ts], reduce: min, unit: ns}
+
+    - id: control_incidence
+      op: analysis.incidence.cumulative
+      rows: control_selection
+      params:
+        horizons: [60, 120, 180, 240, 300, 450, 600]
+        resolved_column: target_flip_within_horizon
+        duration_column: time_to_flip_seconds
+        observed_seconds_column: observed_seconds
+        strata: [regime_direction]
+
+    # ---- anchored diagnostic score path: continues past parent eligibility, by design ----
+    - id: score_path
+      op: analysis.path.anchored_offsets
+      inputs: {anchors: first_p90}
+      params:
+        by: *frozen_thresholds
+        group_by: [regime_start_ns]
+        order_by: observation_ts
+        offsets: [15, 30, 60, 90, 120]
+        max_offset_seconds: 600
+        terminal_column: terminal_ts
+        levels: [p95, p97_5]
+        time_unit: ns
+
+    - id: warning_subtypes
+      op: analysis.classify.precedence
+      rows: score_path
+      params:
+        output_column: warning_subtype
+        strata: [regime_direction]
+        # Declaration order IS the precedence, and section 10 requires SESSION_CENSORED to dominate.
+        # Two independent censorings dominate: an incomplete SCORE path, and a MARKET path that
+        # ended before 600s without a flip -- the latter cannot support the statement "no opposing
+        # flip within 600s" that both FAILED_WARNING subtypes rest on.
+        # A flip later than 600s is, by section 10's own definition, "no opposing flip <= 600s" and
+        # is therefore classified by its score path; the >600s flips are counted separately in
+        # first_p90_negative_decomposition.json (bucket FLIP_GT_600) so nothing is hidden.
+        rules:
+          - {label: SESSION_CENSORED, when: [[path_censored, eq, true]]}
+          - {label: SESSION_CENSORED, when: [[target_flip_within_horizon, is_null, true], [observed_seconds, lt, 600]]}
+          - {label: FAST_RESOLVER,    when: [[target_flip_within_horizon, eq, 1], [time_to_flip_seconds, lte, 180]]}
+          - {label: LATE_RESOLVER,    when: [[target_flip_within_horizon, eq, 1], [time_to_flip_seconds, lte, 300]]}
+          - {label: SLOW_RESOLVER,    when: [[target_flip_within_horizon, eq, 1], [time_to_flip_seconds, lte, 600]]}
+          - {label: FAILED_WARNING_SCORE_COLLAPSE,  when: [[fell_below, eq, true]]}
+          - {label: FAILED_WARNING_PERSISTENT_HIGH, when: [[fell_below, eq, false]]}
+          - {label: SESSION_CENSORED, when: []}
+
+  artifacts:
+    - {name: first_p90_warning_horizon_contract.json, source: first_p90,             kind: json}
+    - {name: first_p90_time_to_flip_detail.parquet,   source: first_p90,             kind: frame}
+    - {name: first_p90_cumulative_incidence.json,     source: cumulative_incidence,  kind: json}
+    - {name: first_p90_negative_decomposition.json,   source: negative_decomposition, kind: json}
+    - {name: first_p90_control_selection.json,        source: control_selection,     kind: json}
+    - {name: first_p90_control_comparison.json,       source: control_incidence,     kind: json}
+    - {name: first_p90_score_evolution.parquet,       source: score_path,            kind: observations}
+    - {name: first_p90_score_path_summary.parquet,    source: score_path,            kind: frame}
+    - {name: first_p90_warning_subtypes.json,         source: warning_subtypes,      kind: json}
