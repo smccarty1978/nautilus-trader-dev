@@ -1219,7 +1219,24 @@ and reference tables under `<catalog>/reference/` (sessions with coverage, holid
 maintenance windows incl. the pre-2021-06-28 halt, rolls from instrument-id changes, run-length
 gaps, out-of-calendar native rows). Identity is the `logical_digest` in
 `research/datasets/<id>.yaml`; a V2 dataset is never rebuilt in place. New studies bind
-`streams: [{dataset: NQ_1S_V2, ...}]`; V0 catalogs remain for sealed studies only.
+`streams: [{dataset: NQ_1S_V2_GLOBEX, ...}]` (or `ES_1S_V2_GLOBEX`); V0 catalogs remain for
+sealed studies only.
+
+**Session-calendar authority (NQ/ES are Globex products).** The `sessions` table is the CME
+Globex equity-index product schedule — pandas_market_calendars `"CME Globex Equity"` (12:15 CT
+holiday-eve closes, 12:00 CT holiday sessions, 08:15 CT employment-report Good Fridays) corrected
+by the tape-verified override table `research_workflow/calendars/cme_globex_equity_index_overrides.json`
+(national days of mourning close 08:30 CT; Good Fridays without an employment report are closed).
+That is the PRIMARY authority. The SECONDARY authority is the observed tape: the builder attributes
+every native second to a session and fails (`TAPE_EXCEEDS_DECLARED_CLOSE`) when a session trades
+past its declared close by more than 60 native seconds; the per-session `tape_first_ns`,
+`tape_last_ns`, `tape_past_close_seconds`, `tape_short_of_close_seconds` columns and the manifest's
+`tape_reconciliation` block record the reconciliation. The CME trading-floor close calendar
+(`CME_Equity`, 12:00 CT on holiday eves while the Globex tape prints through 12:14:59 CT) is NOT
+authoritative and is refused (`FLOOR_CALENDAR_NOT_AUTHORITATIVE_FOR_GLOBEX_FUTURES`). The first
+builds, `NQ_1S_V2` / `ES_1S_V2`, were derived from the floor calendar and are superseded; they stay
+on disk only because the three closed proof studies (§21.8) are sealed against their
+`reference_digest`. Regression coverage: `research_workflow/tests/test_globex_calendar_authority.py`.
 
 ### 21.8 Proof studies and the success criterion
 

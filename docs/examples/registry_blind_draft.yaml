@@ -8,7 +8,7 @@ study:
   tier: 2
   question: "Does a volume-imbalance surge at T predict a +1 ATR move before -1 ATR within 120s?"
 streams:
-  - {dataset: NQ_1S_V2, timeframes: [1s, 1m]}
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
 context:
   regime_1m: {tracker: regime.dual_ema, timeframe: 1m}                       # known from the pasted registry excerpt
   imbalance: {tracker: "unresolved: rolling 60s buy/sell volume imbalance from 1s bars", bars: 1s}   # UNRESOLVED binding

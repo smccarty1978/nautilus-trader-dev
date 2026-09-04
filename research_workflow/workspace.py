@@ -283,7 +283,7 @@ model: none
     return [decision, spec, study_yaml]
 
 
-def study_new(study_id: str, *, repo_root: Path, question_file: Optional[str] = None, dataset_id: str = "NQ_v0_2020_2026",
+def study_new(study_id: str, *, repo_root: Path, question_file: Optional[str] = None, dataset_id: str = "NQ_1S_V2_GLOBEX",
               config=None, owner: Optional[str] = None) -> Dict[str, Any]:
     repo_root = Path(repo_root).resolve()
     if not study_id or any(ch in study_id for ch in " /\\:") or study_id.startswith("."):

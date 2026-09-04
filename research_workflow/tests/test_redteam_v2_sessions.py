@@ -87,6 +87,9 @@ def test_early_close_rth_close_is_calendar_close_not_1515():
     s = session_table(first, last)
     early_row = s[(s.session_date == pd.Timestamp("2024-07-03").date())].iloc[0]
     assert bool(early_row["early_close"])
+    # Globex equity-index holiday-eve close is 12:15 CT (the tape prints through 12:14:59); the trading-floor
+    # calendar's 12:00 CT is not the product's matching window
+    assert int(early_row["close_ns"]) == _ns("2024-07-03 12:15:00")
     rows = session_windows(s, "RTH")
     windows = dict(rows)
     early_open = _ns("2024-07-03 08:30:00")

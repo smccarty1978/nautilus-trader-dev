@@ -6,7 +6,7 @@ study:
   tier: 2
   question: "Does the causal state at T predict a prevailing 1m regime flip within 180s?"
 streams:
-  - {dataset: NQ_1S_V2, timeframes: [1s, 1m]}          # 1s = execution stream (epochs); 1m = context stream (strictly before T)
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}          # 1s = execution stream (epochs); 1m = context stream (strictly before T)
 context:
   regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
   excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}

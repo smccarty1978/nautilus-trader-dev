@@ -7,7 +7,7 @@ study:
   tier: 2
   question: "Does causal state at T predict +1.00 ATR before -0.50/-1.00/-1.50 ATR within 300s when fading the prevailing regime?"
 streams:
-  - {dataset: NQ_1S_V2, timeframes: [1s, 1m]}
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
 context:
   regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
   excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}

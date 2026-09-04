@@ -6,7 +6,7 @@ Full manual: `WORKFLOW.md`. Field reference: `docs/RESEARCH_YAML_REFERENCE.md`. 
 
 * `~/.nt_research/config.yaml` with `catalog_roots`, `model_root`, `leases_dir`, `worktree_root`
   (`python scripts/research.py data roots` shows it).
-* `python scripts/research.py data verify NQ_1S_V2` → `STATUS: OK`.
+* `python scripts/research.py data verify NQ_1S_V2_GLOBEX` → `STATUS: OK`.
 * `python scripts/research.py cap generate --check` → `STATUS: OK` (registry current).
 
 ## 1. Discover a capability

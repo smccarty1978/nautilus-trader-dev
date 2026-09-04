@@ -29,7 +29,7 @@ OUT = ROOT / "docs" / "RESEARCH_YAML_REFERENCE.md"
 # (meaning, causal implication, example) per dotted field path. Keep it short; the grammar is the authority.
 MEANING: Dict[str, Tuple[str, str, str]] = {
     "study": ("Identity section.", "None.", "study: {id: my_study, tier: 2, question: \"...\"}"),
-    "streams": ("Datasets and timeframes; the first is the execution stream.", "Only external timeframes declared in the DatasetSpec are read from disk; the rest are host-derived complete buckets.", "streams: [{dataset: NQ_1S_V2, timeframes: [1s, 1m]}]"),
+    "streams": ("Datasets and timeframes; the first is the execution stream.", "Only external timeframes declared in the DatasetSpec are read from disk; the rest are host-derived complete buckets.", "streams: [{dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}]"),
     "population": ("Who is a candidate and when a decision epoch occurs.", "Everything here is evaluated at T from state visible at T.", "population: {session: RTH, cadence: completed_1s, qualify: \"regime_1m.dir != 0\", direction: regime_1m.dir}"),
     "context": ("Named tracker instances (stateful causal state).", "Trackers only see bars closed at or before the epoch.", "context: {regime_1m: {tracker: regime.dual_ema, timeframe: 1m}}"),
     "features": ("Columns snapshotted at the epoch.", "Never an outcome; the forward-outcome guard rejects outcome-like names.", "features: {instances: [...], metadata: {...}}"),
@@ -39,7 +39,7 @@ MEANING: Dict[str, Tuple[str, str, str]] = {
     "study.tier": ("Ceremony tier 1-3 (see CLAUDE.md §7).", "Tier 3 requires repo-scout closure evidence before sealing.", "tier: 2"),
     "study.question": ("The research question in one sentence.", "Audits read it to judge whether the population and outcome answer it.", "question: \"Does causal state at T predict a 1m regime flip within 180s?\""),
     "study.description": ("Free text.", "None.", "description: fresh v2 study"),
-    "streams[].dataset": ("Committed DatasetSpec id (research/datasets/<id>.yaml); never a path.", "The plan binds the dataset logical digest; readiness verifies bytes.", "dataset: NQ_1S_V2"),
+    "streams[].dataset": ("Committed DatasetSpec id (research/datasets/<id>.yaml); never a path.", "The plan binds the dataset logical digest; readiness verifies bytes.", "dataset: NQ_1S_V2_GLOBEX"),
     "streams[].instrument": ("Instrument symbol; defaults to the dataset's instrument.", "None.", "instrument: NQ"),
     "streams[].timeframes": ("Timeframes to deliver ('1s', '5s', '1m', '5m'). Only timeframes declared in the DatasetSpec are external; others are host-derived complete buckets.", "Only the finest external timeframe of the execution instrument carries epochs; every coarser external timeframe is a context stream visible strictly before the epoch.", "timeframes: [1s, 1m]"),
     "streams[].role": ("execution (the first stream by default) or context.", "Context bars are queued until an execution bar with a strictly later ts_init arrives.", "role: context"),

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "product_family": "CME Globex equity index futures (ES, NQ, YM, RTY and their micro contracts)",
+  "authority": {
+    "primary": "CME Globex product-specific trading and holiday schedule as published by CME Group (https://www.cmegroup.com/tools-information/holiday-calendar.html). pandas_market_calendars 'CME Globex Equity' is the machine-readable encoding the builder consumes; the entries below correct that encoding where it disagrees with the published schedule.",
+    "secondary": "Validated observed NQ/ES tape boundaries (databento *.v.0 native 1s rows). Every entry records the tape evidence it was reconciled against.",
+    "not_authoritative": "The CME trading-floor close calendar (pandas_market_calendars 'CME_Equity', 12:00 CT holiday-eve closes) whenever it differs from Globex."
+  },
+  "entry_schema": {
+    "session_date": "trading-day label (YYYY-MM-DD) of the Globex session, i.e. the calendar day the session closes on",
+    "closed": "true when the product did not trade at all that session (no prior-evening open); mutually exclusive with market_close_ct",
+    "market_close_ct": "HH:MM:SS America/Chicago close instant replacing the encoded close",
+    "market_open_ct": "optional HH:MM:SS America/Chicago open instant on the PRIOR calendar day (only needed when adding a session the encoding lacks)",
+    "reason": "the published-schedule fact being restored",
+    "tape": "per-product observed boundary the entry was reconciled against"
+  },
+  "overrides": [
+    {
+      "session_date": "2018-12-05",
+      "market_close_ct": "08:30:00",
+      "reason": "National Day of Mourning (President G. H. W. Bush): CME Group closed equity index products at 08:30 CT. The encoding models a full 16:00 CT session.",
+      "tape": {"NQ": "last native 1s bar stamped 08:29:59 CT (bar closes 08:30:00); no rows until the 17:00 CT reopen", "ES": "last native 1s bar stamped 08:29:59 CT; no rows until the 17:00 CT reopen"}
+    },
+    {
+      "session_date": "2024-03-29",
+      "closed": true,
+      "reason": "Good Friday with no BLS employment-report release: equity index products were closed for the whole session (no Thursday-evening open). The encoding applies an 08:15 CT early close to every Good Friday after 2022; the 08:15 CT session only occurs when the employment report is released that morning (as on 2021-04-02 and 2023-04-07, where the tape confirms it).",
+      "tape": {"NQ": "no native rows between 2024-03-28 17:00 CT and the 2024-03-31 17:00 CT reopen", "ES": "no native rows between 2024-03-28 17:00 CT and the 2024-03-31 17:00 CT reopen"}
+    },
+    {
+      "session_date": "2025-01-09",
+      "market_close_ct": "08:30:00",
+      "reason": "National Day of Mourning (President Carter): CME Group closed equity index products at 08:30 CT. The encoding models a full 16:00 CT session.",
+      "tape": {"NQ": "last native 1s bar stamped 08:29:59 CT (bar closes 08:30:00); no rows until the 17:00 CT reopen", "ES": "last native 1s bar stamped 08:29:59 CT; no rows until the 17:00 CT reopen"}
+    },
+    {
+      "session_date": "2025-04-18",
+      "closed": true,
+      "reason": "Good Friday with no BLS employment-report release: equity index products were closed for the whole session. The encoding applies an 08:15 CT early close to every Good Friday after 2022.",
+      "tape": {"NQ": "no native rows between 2025-04-17 17:00 CT and the 2025-04-20 17:00 CT reopen", "ES": "no native rows between 2025-04-17 17:00 CT and the 2025-04-20 17:00 CT reopen"}
+    }
+  ]
+}

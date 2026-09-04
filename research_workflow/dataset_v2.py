@@ -15,6 +15,11 @@ calendar, holiday, early-close, maintenance, roll and gap reference tables.
 5m is NOT materialized: it stays a runtime derivation from completed 1m bars (the equivalence proof
 records why). V0 catalogs are never touched: the builder refuses any output path registered in
 ``backtests.nt_runtime.data_plan.PRODUCT_CATALOGS`` and refuses to write into an existing directory.
+
+Session calendar authority (NQ/ES are Globex products): the ``sessions`` table is the CME Globex
+equity-index product schedule (``CALENDAR_NAME``, corrected by ``calendars/cme_globex_equity_index_overrides.json``),
+reconciled against the observed tape per session at build time (``reconcile_sessions``). The CME trading-floor
+close calendar (``CME_Equity``: 12:00 CT holiday-eve closes while the Globex tape runs to 12:15 CT) is refused.
 """
 from __future__ import annotations
 
@@ -22,7 +27,7 @@ import hashlib
 import importlib.metadata
 import json
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 from zoneinfo import ZoneInfo
@@ -36,8 +41,23 @@ SECOND_NS = 1_000_000_000
 MINUTE_NS = 60 * SECOND_NS
 CHICAGO = "America/Chicago"
 OLD_BREAK_END = date(2021, 6, 25)          # last session with the 15:15-15:30 CT halt (CME removed it 2021-06-28)
-CALENDAR_NAME = "CME_Equity"
-SCHEMA_VERSION = 2
+HALT_START_CT = time(15, 15, 0)            # pre-2021-06-28 daily equity-index maintenance halt (Globex product rule):
+HALT_END_CT = time(15, 30, 0)              # 15:15:00 CT is the last valid second, matching resumes 15:30:00 CT
+# Session authority for CME Globex equity-index futures (NQ/ES/YM/RTY):
+#   PRIMARY   the CME Globex product-specific trading/holiday schedule. pandas_market_calendars' "CME Globex Equity"
+#             is the machine-readable encoding consumed here (12:15 CT holiday-eve closes, 12:00 CT holiday sessions,
+#             08:15 CT employment-report Good Fridays), corrected by the repo override table below where the encoding
+#             disagrees with the published schedule (each entry carries its tape evidence).
+#   SECONDARY the observed native tape, reconciled per session at build time (``reconcile_sessions``): a tape that
+#             continues past a declared close is proof the calendar is wrong and fails the build.
+#   NOT AUTHORITATIVE  the CME trading-floor close calendar ("CME_Equity": 12:00 CT holiday-eve closes while the
+#             Globex equity-index tape runs to 12:15 CT). Refused for futures datasets.
+CALENDAR_NAME = "CME Globex Equity"
+FLOOR_CALENDARS = frozenset({"CME_Equity", "CMES", "CME_TradeDate"})
+CALENDAR_OVERRIDES_PATH = Path(__file__).resolve().parent / "calendars" / "cme_globex_equity_index_overrides.json"
+TAPE_PAST_CLOSE_TOLERANCE_SECONDS = 60     # native seconds strictly after close_ns a session may carry (stray prints) before the build fails
+TAPE_SHORT_OF_CLOSE_REPORT_SECONDS = 1800  # sessions whose tape ends this far before close_ns are listed (not fatal: thin tape / raw gaps)
+SCHEMA_VERSION = 3
 RAW_COLUMNS = ["ts_event", "open", "high", "low", "close", "volume", "instrument_id", "symbol"]
 
 
@@ -97,33 +117,157 @@ def load_raw_year(path: Path, symbol: str) -> pd.DataFrame:
 # calendar tables
 # ---------------------------------------------------------------------------
 
-def session_table(first_ns: int, last_ns: int, calendar_name: str = CALENDAR_NAME) -> pd.DataFrame:
-    """One row per trading session: open second, last valid close second (inclusive), early-close flag,
-    and the pre-2021-06-28 halt window when the calendar declares one."""
+def load_calendar_overrides(path: Path = CALENDAR_OVERRIDES_PATH) -> Dict[str, Any]:
+    """The repo override table (CME Group published schedule vs. the pandas_market_calendars encoding).
+    Validated on load: unique dates, ``closed`` xor ``market_close_ct``, a reason and tape evidence per entry."""
+    try:
+        doc = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise DatasetV2Error(f"CALENDAR_OVERRIDES_UNREADABLE: {path}: {exc}")
+    entries = doc.get("overrides")
+    if not isinstance(entries, list):
+        raise DatasetV2Error(f"CALENDAR_OVERRIDES_MALFORMED: {path} has no 'overrides' list")
+    seen: set = set()
+    for e in entries:
+        try:
+            day = date.fromisoformat(str(e["session_date"]))
+        except (KeyError, ValueError) as exc:
+            raise DatasetV2Error(f"CALENDAR_OVERRIDES_MALFORMED: bad session_date in {e!r}: {exc}")
+        if day in seen:
+            raise DatasetV2Error(f"CALENDAR_OVERRIDES_MALFORMED: duplicate session_date {day}")
+        seen.add(day)
+        closed = bool(e.get("closed", False))
+        if closed == bool(e.get("market_close_ct")):
+            raise DatasetV2Error(f"CALENDAR_OVERRIDES_MALFORMED: {day} must declare exactly one of closed / market_close_ct")
+        if not str(e.get("reason", "")).strip() or not isinstance(e.get("tape"), dict) or not e["tape"]:
+            raise DatasetV2Error(f"CALENDAR_OVERRIDES_MALFORMED: {day} needs a reason and per-product tape evidence")
+    return doc
+
+
+def _ct_instant_ns(day: date, hms: str) -> int:
+    h, m, s = (int(x) for x in str(hms).split(":"))
+    return int(pd.Timestamp(day.year, day.month, day.day, h, m, s, tz=ZoneInfo(CHICAGO)).tz_convert("UTC").value)
+
+
+def session_table(first_ns: int, last_ns: int, calendar_name: str = CALENDAR_NAME, *,
+                  overrides_path: Optional[Path] = CALENDAR_OVERRIDES_PATH) -> pd.DataFrame:
+    """One row per Globex trading session: open second, last valid close second (inclusive), early-close flag,
+    the pre-2021-06-28 halt window (product rule), and the override that produced the row when one applied.
+
+    The calendar is the CME Globex equity-index product schedule (``CALENDAR_NAME``); trading-floor calendars are
+    refused (``FLOOR_CALENDAR_NOT_AUTHORITATIVE_FOR_GLOBEX_FUTURES``). Overrides from ``overrides_path`` (CME Group
+    published schedule, tape-verified) are applied generically by session date; an override the encoding already
+    agrees with is an error (``CALENDAR_OVERRIDE_REDUNDANT``) so the table cannot silently rot when the upstream
+    package is corrected. Pass ``overrides_path=None`` to build the raw encoding (diagnostics only)."""
     import pandas_market_calendars as mcal
+    if calendar_name in FLOOR_CALENDARS:
+        raise DatasetV2Error(
+            f"FLOOR_CALENDAR_NOT_AUTHORITATIVE_FOR_GLOBEX_FUTURES: {calendar_name!r} is a CME trading-floor / generic "
+            f"calendar; NQ/ES session tables derive from the Globex product schedule ({CALENDAR_NAME!r})")
     tz = ZoneInfo(CHICAGO)
     first_ct = pd.Timestamp(first_ns, tz="UTC").tz_convert(tz)
     last_ct = pd.Timestamp(last_ns, tz="UTC").tz_convert(tz)
     cal = mcal.get_calendar(calendar_name)
     sched = cal.schedule(start_date=(first_ct.date() - timedelta(days=2)).isoformat(), end_date=(last_ct.date() + timedelta(days=2)).isoformat(), market_times="all")
-    rows = []
+    by_day: Dict[date, Dict[str, Any]] = {}
     for session_day, row in sched.iterrows():
-        open_ns = int(row.market_open.value)
-        close_ns = int(row.market_close.value)            # the declared close second is itself a valid bar second
-        close_ct = row.market_close.tz_convert(tz)
-        early = (close_ct.hour, close_ct.minute, close_ct.second) != (16, 0, 0)
-        halt_start = halt_end = None
-        if session_day.date() <= OLD_BREAK_END and "break_start" in sched.columns and pd.notna(row.break_start):
-            bs, be = int(row.break_start.value), int(row.break_end.value)
-            if open_ns < bs < be < close_ns:
-                halt_start, halt_end = bs + SECOND_NS, be          # 15:15:00 is valid; halt is (15:15:00, 15:30:00)
+        d = session_day.date()
+        by_day[d] = {"session_date": d, "open_ns": int(row.market_open.value), "close_ns": int(row.market_close.value), "calendar_override": None}
+    overrides = load_calendar_overrides(overrides_path)["overrides"] if overrides_path is not None else []
+    lo_day, hi_day = first_ct.date() - timedelta(days=2), last_ct.date() + timedelta(days=2)
+    for e in overrides:
+        d = date.fromisoformat(str(e["session_date"]))
+        if not (lo_day <= d <= hi_day):
+            continue
+        if e.get("closed"):
+            if d not in by_day:
+                raise DatasetV2Error(f"CALENDAR_OVERRIDE_REDUNDANT: {d} declared closed but the encoding has no session either")
+            del by_day[d]
+            continue
+        close_ns = _ct_instant_ns(d, e["market_close_ct"])
+        if d in by_day:
+            if by_day[d]["close_ns"] == close_ns:
+                raise DatasetV2Error(f"CALENDAR_OVERRIDE_REDUNDANT: {d} close {e['market_close_ct']} CT already encoded")
+            by_day[d]["close_ns"] = close_ns
+        else:
+            if not e.get("market_open_ct"):
+                raise DatasetV2Error(f"CALENDAR_OVERRIDE_MALFORMED: {d} adds a session the encoding lacks but has no market_open_ct")
+            by_day[d] = {"session_date": d, "open_ns": _ct_instant_ns(d - timedelta(days=1), e["market_open_ct"]), "close_ns": close_ns}
+        by_day[d]["calendar_override"] = str(e["reason"])
+    rows = []
+    for d in sorted(by_day):
+        r = by_day[d]
+        open_ns, close_ns = r["open_ns"], r["close_ns"]                    # the declared close second is itself a valid bar second
         if open_ns % SECOND_NS or close_ns % SECOND_NS:
             raise DatasetV2Error("CALENDAR_TIMESTAMP_NOT_SECOND_ALIGNED")
-        rows.append({"session_date": session_day.date(), "open_ns": open_ns, "close_ns": close_ns, "early_close": bool(early),
-                     "halt_start_ns": halt_start, "halt_end_ns": halt_end})
-    df = pd.DataFrame(rows)
+        if close_ns <= open_ns:
+            raise DatasetV2Error(f"CALENDAR_SESSION_INVALID: {d} close_ns <= open_ns")
+        close_ct = pd.Timestamp(close_ns, tz="UTC").tz_convert(tz)
+        early = (close_ct.hour, close_ct.minute, close_ct.second) != (16, 0, 0)
+        halt_start = halt_end = None
+        if d <= OLD_BREAK_END:
+            hs, he = _ct_instant_ns(d, HALT_START_CT.isoformat()), _ct_instant_ns(d, HALT_END_CT.isoformat())
+            if open_ns < hs < he < close_ns:                                # an early close (12:xx CT) has no halt
+                halt_start, halt_end = hs + SECOND_NS, he                   # 15:15:00 is valid; halt is (15:15:00, 15:30:00)
+        rows.append({"session_date": d, "open_ns": open_ns, "close_ns": close_ns, "early_close": bool(early),
+                     "halt_start_ns": halt_start, "halt_end_ns": halt_end, "calendar_override": r.get("calendar_override")})
+    df = pd.DataFrame(rows, columns=["session_date", "open_ns", "close_ns", "early_close", "halt_start_ns", "halt_end_ns", "calendar_override"])
     df = df[(df["close_ns"] >= first_ns) & (df["open_ns"] <= last_ns)].reset_index(drop=True)
     return df
+
+
+def reconcile_sessions(ts: np.ndarray, sessions: pd.DataFrame, *, tolerance_seconds: int = TAPE_PAST_CLOSE_TOLERANCE_SECONDS,
+                       report_short_seconds: int = TAPE_SHORT_OF_CLOSE_REPORT_SECONDS) -> tuple[pd.DataFrame, Dict[str, Any]]:
+    """SECONDARY authority: per-session observed tape boundaries. Every native second is attributed to the session
+    whose open it follows (``open_ns <= t < next open_ns``). Adds ``tape_first_ns``, ``tape_last_ns``,
+    ``tape_past_close_seconds`` (native seconds strictly after ``close_ns``) and ``tape_short_of_close_seconds``
+    (``close_ns - tape_last_ns``). A session carrying more than ``tolerance_seconds`` native seconds after its declared
+    close is proof the calendar closes too early (the floor-calendar 12:00 vs Globex 12:15 CT defect shows ~700 such
+    seconds per holiday eve) and raises ``TAPE_EXCEEDS_DECLARED_CLOSE``; a tape ending early is only reported."""
+    s = sessions.sort_values("open_ns").reset_index(drop=True)
+    opens = s["open_ns"].to_numpy(dtype=np.int64)
+    closes = s["close_ns"].to_numpy(dtype=np.int64)
+    ts = np.asarray(ts, dtype=np.int64)
+    idx = np.searchsorted(opens, ts, side="right") - 1
+    # integer arithmetic throughout: ns epochs exceed float64's exact range
+    first = np.zeros(len(s), dtype=np.int64)
+    last = np.zeros(len(s), dtype=np.int64)
+    past = np.zeros(len(s), dtype=np.int64)
+    has = np.zeros(len(s), dtype=bool)
+    valid = idx >= 0
+    if valid.any():
+        order = np.flatnonzero(valid)                       # ts is sorted, so sessions form contiguous runs
+        sess_idx = idx[order]
+        bounds = np.flatnonzero(np.diff(sess_idx)) + 1
+        starts = np.concatenate(([0], bounds))
+        ends = np.concatenate((bounds, [len(order)]))
+        for a, b in zip(starts, ends):
+            i = int(sess_idx[a])
+            seg = ts[order[a]:order[b - 1] + 1]
+            first[i], last[i], has[i] = int(seg[0]), int(seg[-1]), True
+            past[i] = int(np.count_nonzero(seg > closes[i]))
+    short = np.where(has, (closes - last) // SECOND_NS, 0)
+    s["tape_first_ns"] = pd.array([int(v) if h else None for v, h in zip(first, has)], dtype="Int64")
+    s["tape_last_ns"] = pd.array([int(v) if h else None for v, h in zip(last, has)], dtype="Int64")
+    s["tape_past_close_seconds"] = past
+    s["tape_short_of_close_seconds"] = pd.array([int(v) if h else None for v, h in zip(short, has)], dtype="Int64")
+
+    def _ct(ns_val: int) -> str:
+        return pd.Timestamp(int(ns_val), tz="UTC").tz_convert(CHICAGO).strftime("%Y-%m-%d %H:%M:%S")
+
+    exceeds = [{"session_date": str(s.loc[i, "session_date"]), "declared_close_ct": _ct(closes[i]), "tape_last_ct": _ct(int(last[i])),
+                "native_seconds_past_close": int(past[i])} for i in range(len(s)) if past[i] > 0]
+    fatal = [e for e in exceeds if e["native_seconds_past_close"] > tolerance_seconds]
+    if fatal:
+        raise DatasetV2Error(f"TAPE_EXCEEDS_DECLARED_CLOSE: {len(fatal)} session(s) trade past the declared close by more than "
+                             f"{tolerance_seconds} native seconds -- the session calendar is not the product's matching window: {fatal[:5]}")
+    short_list = [{"session_date": str(s.loc[i, "session_date"]), "declared_close_ct": _ct(closes[i]), "tape_last_ct": _ct(int(last[i])),
+                   "seconds_short_of_close": int(short[i])} for i in range(len(s)) if has[i] and short[i] > report_short_seconds]
+    no_tape = [str(s.loc[i, "session_date"]) for i in range(len(s)) if not has[i]]
+    summary = {"rule": "every native second is attributed to the session whose open precedes it; seconds strictly after close_ns count as past-close",
+               "past_close_tolerance_native_seconds": int(tolerance_seconds), "short_of_close_report_seconds": int(report_short_seconds),
+               "sessions_with_tape_past_close": exceeds, "sessions_tape_short_of_close": short_list, "sessions_without_tape": no_tape}
+    return s, summary
 
 
 def session_windows(sess: pd.Series) -> List[tuple[int, int]]:
@@ -183,14 +327,21 @@ def load_reference_tables(catalog_path: Path, declared: Sequence[str], reference
     return out
 
 
-def holiday_table(first_ns: int, last_ns: int, sessions: pd.DataFrame, calendar_name: str = CALENDAR_NAME) -> pd.DataFrame:
+def holiday_table(first_ns: int, last_ns: int, sessions: pd.DataFrame, calendar_name: str = CALENDAR_NAME, *,
+                  overrides_path: Optional[Path] = CALENDAR_OVERRIDES_PATH) -> pd.DataFrame:
+    """Full-closure days of the Globex product schedule in range: the encoding's holidays plus override-closed
+    sessions (Good Fridays without an employment-report session), with whether a session row exists anyway."""
     import pandas_market_calendars as mcal
+    if calendar_name in FLOOR_CALENDARS:
+        raise DatasetV2Error(f"FLOOR_CALENDAR_NOT_AUTHORITATIVE_FOR_GLOBEX_FUTURES: {calendar_name!r}")
     cal = mcal.get_calendar(calendar_name)
-    hol = pd.DatetimeIndex(cal.holidays().holidays)
+    hol = {h.date() for h in pd.DatetimeIndex(cal.holidays().holidays)}
+    if overrides_path is not None:
+        hol |= {date.fromisoformat(str(e["session_date"])) for e in load_calendar_overrides(overrides_path)["overrides"] if e.get("closed")}
     lo, hi = pd.Timestamp(first_ns, tz="UTC").date(), pd.Timestamp(last_ns, tz="UTC").date()
-    hol = [h.date() for h in hol if lo <= h.date() <= hi]
+    days = sorted(h for h in hol if lo <= h <= hi)
     have = set(sessions["session_date"])
-    return pd.DataFrame({"date": hol, "weekday": [h.weekday() for h in hol], "session_exists": [h in have for h in hol]})
+    return pd.DataFrame({"date": days, "weekday": [h.weekday() for h in days], "session_exists": [h in have for h in days]})
 
 
 def maintenance_table(sessions: pd.DataFrame) -> pd.DataFrame:
@@ -378,10 +529,15 @@ def build_dataset_v2(*, symbol: str, years: Sequence[str], raw_dir: Path, catalo
         raise DatasetV2Error("CROSS_YEAR_ORDER_VIOLATION")
     log("reference tables")
     sessions = session_table(int(ts[0]), int(ts[-1]), calendar_name)
+    sessions, tape_reconciliation = reconcile_sessions(ts, sessions)        # SECONDARY authority: fails on tape past a declared close
     gaps, ooc, cover = gap_tables(ts, sessions)
     sessions = sessions.merge(cover, on="session_date", how="left")
     tables = {"sessions": sessions, "holidays": holiday_table(int(ts[0]), int(ts[-1]), sessions, calendar_name), "maintenance": maintenance_table(sessions),
               "rolls": roll_table(ts, ids, sessions), "gaps": gaps, "out_of_calendar": ooc}
+    overrides_doc = load_calendar_overrides()
+    applied_overrides = sessions.loc[sessions["calendar_override"].notna(), ["session_date", "calendar_override"]]
+    closed_overrides = [e["session_date"] for e in overrides_doc["overrides"] if e.get("closed")
+                        and pd.Timestamp(ts[0], tz="UTC").date() <= date.fromisoformat(e["session_date"]) <= pd.Timestamp(ts[-1], tz="UTC").date()]
     ref_dir = out_dir / "reference"
     ref_manifest = {name: _write_table(ref_dir / f"{name}.parquet", df) for name, df in tables.items()}
     reference_digest = hashlib.sha256(json.dumps({k: v["sha256"] for k, v in ref_manifest.items()}, sort_keys=True).encode()).hexdigest()
@@ -391,8 +547,19 @@ def build_dataset_v2(*, symbol: str, years: Sequence[str], raw_dir: Path, catalo
         "schema_version": SCHEMA_VERSION, "dataset_id": dataset_id, "symbol": symbol, "instrument_id": str(instrument.id), "years": years,
         "rules": {"forward_fill": False, "native_rows_only": True, "out_of_calendar_native_rows": "kept (native precedence), listed in reference/out_of_calendar.parquet",
                   "1m": "build-time aggregation of the native 1s rows: closed=left, label=left, minute exists iff >= 1 native second; verified against an independent integer-bucket implementation per year",
-                  "5m": "not materialized -- runtime derivation from completed 1m bars", "calendar": {"name": calendar_name, "timezone": CHICAGO,
-                  "package_version": importlib.metadata.version("pandas_market_calendars"), "close_second_inclusive": True, "pre_2021_halt_last_session": OLD_BREAK_END.isoformat()}},
+                  "5m": "not materialized -- runtime derivation from completed 1m bars",
+                  "calendar": {"name": calendar_name, "timezone": CHICAGO,
+                               "authority": {"primary": "CME Globex equity-index product trading/holiday schedule (pandas_market_calendars encoding + repo override table)",
+                                             "secondary": "observed native tape boundaries, reconciled per session (see tape_reconciliation)",
+                                             "not_authoritative": "CME trading-floor close calendar (CME_Equity) -- refused for Globex futures"},
+                               "package_version": importlib.metadata.version("pandas_market_calendars"), "close_second_inclusive": True,
+                               "pre_2021_halt": {"last_session": OLD_BREAK_END.isoformat(), "halt_start_ct": HALT_START_CT.isoformat(), "halt_end_ct": HALT_END_CT.isoformat(),
+                                                 "rule": "product rule on every full session through last_session; not applied on early-close days"},
+                               "overrides": {"path": str(CALENDAR_OVERRIDES_PATH.relative_to(Path(__file__).resolve().parents[1])).replace("\\", "/"),
+                                             "sha256": _sha256(CALENDAR_OVERRIDES_PATH),
+                                             "applied": [{"session_date": str(r.session_date), "reason": r.calendar_override} for r in applied_overrides.itertuples()],
+                                             "closed_sessions_removed": closed_overrides}},
+                  "tape_reconciliation": tape_reconciliation},
         "sources": [{"year": r.year, "path": str(r.path), "sha256": r.sha256, "rows": r.rows, "first_ns": r.first_ns, "last_ns": r.last_ns, "instrument_ids": r.instrument_ids} for r in raw_years],
         "streams": {"1s": {"bar_type": str(bt_1s), "rows": stream_rows["1s"], "ts_init_delta_ns": SECOND_NS, "source": "external"},
                     "1m": {"bar_type": str(bt_1m), "rows": stream_rows["1m"], "ts_init_delta_ns": MINUTE_NS, "source": "external", "derivation": "build_time_from_native_1s"}},
@@ -426,7 +593,9 @@ def write_dataset_spec(repo_root: Path, manifest: Dict[str, Any], facts: Dict[st
         "reference_digest": manifest["reference_digest"],
         "provenance": {"source": "databento *.v.0 raw yearly parquet (native rows, no fill)", "build_manifest": "build_manifest.json",
                        "builder_sha256": manifest["builder"]["sha256"], "sources": [{"year": s["year"], "sha256": s["sha256"], "rows": s["rows"]} for s in manifest["sources"]]},
-        "rules": {"forward_fill": False, "native_rows_only": True},
+        "rules": {"forward_fill": False, "native_rows_only": True,
+                  "session_calendar": {"name": manifest["rules"]["calendar"]["name"], "authority": manifest["rules"]["calendar"]["authority"]["primary"],
+                                       "overrides_sha256": manifest["rules"]["calendar"]["overrides"]["sha256"]}},
         "instrument": {"instrument_id": inst, "venue": facts["venue"], "multiplier": facts["multiplier"], "price_increment": facts["price_increment"]},
         "streams": {
             "1s": {"source": "external", "bar_type": manifest["streams"]["1s"]["bar_type"], "source_timestamp_semantics": "interval_open", "availability_rule": "interval_end", "ts_init_delta_ns": SECOND_NS},

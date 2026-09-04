@@ -111,7 +111,11 @@ A DatasetSpec (`research/datasets/<id>.yaml`) declares `reference_tables` (which
 load refuses the study rather than reading a drifted table. A `sessions` reference table selects the
 calendar session kind used for outcome/population censoring; ETH is `(open, 08:30 CT]` pre-open plus
 `(15:15 CT or halt end, day close]` post-close, and legacy ETH censoring without a declared `sessions`
-table is refused (`SEMANTIC_DECISION_REQUIRED`).
+table is refused (`SEMANTIC_DECISION_REQUIRED`). For NQ/ES the session calendar is the CME Globex
+equity-index product schedule (12:15 CT holiday-eve closes), reconciled against the tape at build time;
+the trading-floor calendar is refused. Bind new studies to `NQ_1S_V2_GLOBEX` / `ES_1S_V2_GLOBEX`
+(`NQ_1S_V2` / `ES_1S_V2` carry floor-calendar sessions and exist only for the closed proof studies) --
+see `docs/RESEARCH_WORKFLOW.md` §21.7.
 
 ## D. A normal new study
 

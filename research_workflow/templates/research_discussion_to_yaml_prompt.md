@@ -50,7 +50,7 @@ Top-level sections: `study`, `streams`, `context`, `population`, `triggers`, `fe
 ```yaml
 study: {id: <snake_case>, tier: 2, question: "<one sentence>"}
 streams:
-  - {dataset: <DatasetSpec id, e.g. NQ_1S_V2>, timeframes: [1s, 1m]}       # first stream = execution; more streams = context
+  - {dataset: <DatasetSpec id, e.g. NQ_1S_V2_GLOBEX>, timeframes: [1s, 1m]}       # first stream = execution; more streams = context
 context:
   <name>: {tracker: <registry id without "tracker.">, <tracker params>}   # e.g. regime.dual_ema, timeframe: 1m
 population:

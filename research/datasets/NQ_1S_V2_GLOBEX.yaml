@@ -1,0 +1,87 @@
+# DatasetSpec authority for the immutable NQ_1S_V2_GLOBEX catalog (Dataset V2).
+# Built by research_workflow.dataset_v2 -- native 1s rows only, never forward-filled; 1m is a build-time
+# aggregation of the same seconds; 5m stays a runtime derivation. Reference tables live under <catalog>/reference/.
+dataset_id: NQ_1S_V2_GLOBEX
+instrument_id: NQ.XCME
+schema_version: 3
+catalog_rel_path: null
+logical_digest: 9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64
+digest_method: sha256(sorted(relpath,size,sha256(bytes)) under <catalog>/data)
+reference_digest: e577a36165abd690f70221041c4e2b6c7302b876b81d63e7a1f4076b46514514
+provenance:
+  source: databento *.v.0 raw yearly parquet (native rows, no fill)
+  build_manifest: build_manifest.json
+  builder_sha256: 37db627736b9e60b24dbdd8950a8d04a9a6aee1100bc63d32602bf1f23c32f06
+  sources:
+  - year: '2020'
+    sha256: cd5d30892770720b392488e4e26b31a02456701a61fdfc6a1917cdda1f0a91e5
+    rows: 12791391
+  - year: '2021'
+    sha256: 8453e7d884d9d51150bf01a72ad2b7e66fe7c56a21fa9d43be00b3ea8e3fcb40
+    rows: 11908368
+  - year: '2022'
+    sha256: 7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4
+    rows: 13312875
+  - year: '2023'
+    sha256: 1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153
+    rows: 12217236
+  - year: '2024'
+    sha256: 387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954
+    rows: 12021665
+  - year: '2025'
+    sha256: c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d
+    rows: 12083801
+  - year: 2026_ytd
+    sha256: 573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89
+    rows: 4255466
+rules:
+  forward_fill: false
+  native_rows_only: true
+  session_calendar:
+    name: CME Globex Equity
+    authority: CME Globex equity-index product trading/holiday schedule (pandas_market_calendars
+      encoding + repo override table)
+    overrides_sha256: d33c53de5956852af87e29e22468f025d4b628172c0b743e819ed641fb5457e3
+instrument:
+  instrument_id: NQ.XCME
+  venue: XCME
+  multiplier: '20.0'
+  price_increment: '0.25'
+streams:
+  1s:
+    source: external
+    bar_type: NQ.XCME-1-SECOND-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 1000000000
+  1m:
+    source: external
+    bar_type: NQ.XCME-1-MINUTE-LAST-EXTERNAL
+    source_timestamp_semantics: interval_open
+    availability_rule: interval_end
+    ts_init_delta_ns: 60000000000
+    derivation: build_time_from_native_1s(closed=left,label=left,minute_exists_iff_native_second)
+    equivalence_proof: artifacts/platform_v2_do_soon/dataset_v2/equivalence_<SYMBOL>.json
+  5m:
+    source: derived
+    external_catalog_stream: false
+    derived_from: 1m
+    aggregator: runtime_complete_calendar_bucket
+reference_tables:
+- gaps
+- holidays
+- maintenance
+- out_of_calendar
+- rolls
+- sessions
+coverage:
+  start: '2020-01-01T23:00:00+00:00'
+  end: '2026-04-29T23:59:59+00:00'
+  years:
+  - '2020'
+  - '2021'
+  - '2022'
+  - '2023'
+  - '2024'
+  - '2025'
+  - 2026_ytd

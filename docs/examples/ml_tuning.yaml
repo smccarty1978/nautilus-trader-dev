@@ -7,7 +7,7 @@ study:
   tier: 2
   question: "Does a tuned LightGBM on the causal surface improve 1m-flip prediction over the baseline configuration?"
 streams:
-  - {dataset: NQ_1S_V2, timeframes: [1s, 1m]}
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
 context:
   regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
   excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}

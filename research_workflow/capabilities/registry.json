@@ -1,6 +1,6 @@
 {
-  "content_sha256": "aa723d2be2e2a9eee343ba87ab6d86b87b2b617cb82772e76d9402899bd21873",
-  "generated_at_utc": "2026-09-03T06:37:11.232745+00:00",
+  "content_sha256": "09e48d98c3d848b28763239733d5cd93a8684bfbd3b1562af87dc902a20a0228",
+  "generated_at_utc": "2026-09-04T14:52:16.679942+00:00",
   "kinds": {
     "datasets": [
       {
@@ -26,6 +26,39 @@
         "kind": "datasets",
         "logical_digest": "9f38a41edca5b72a71866846ec9aa15d4cf205388d22aabe025250eefbf0068a",
         "name": "ES_1S_V2",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_roots.py",
+          "scripts/tests/test_dataset_spec.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": "9f38a41edca5"
+      },
+      {
+        "cost_class": "offline_only",
+        "coverage": {
+          "end": "2026-04-29T23:59:59+00:00",
+          "start": "2020-01-01T23:00:00+00:00",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025",
+            "2026_ytd"
+          ]
+        },
+        "dependencies": [],
+        "description": "ES.XCME catalog ES_1S_V2_GLOBEX",
+        "id": "dataset.ES_1S_V2_GLOBEX",
+        "implementation": "research/datasets/ES_1S_V2_GLOBEX.yaml",
+        "instrument_id": "ES.XCME",
+        "kind": "datasets",
+        "logical_digest": "9f38a41edca5b72a71866846ec9aa15d4cf205388d22aabe025250eefbf0068a",
+        "name": "ES_1S_V2_GLOBEX",
         "parameters": [],
         "required_tests": [
           "scripts/tests/test_roots.py",
@@ -83,6 +116,39 @@
         "kind": "datasets",
         "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
         "name": "NQ_1S_V2",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_roots.py",
+          "scripts/tests/test_dataset_spec.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": "9e7aecb7a291"
+      },
+      {
+        "cost_class": "offline_only",
+        "coverage": {
+          "end": "2026-04-29T23:59:59+00:00",
+          "start": "2020-01-01T23:00:00+00:00",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025",
+            "2026_ytd"
+          ]
+        },
+        "dependencies": [],
+        "description": "NQ.XCME catalog NQ_1S_V2_GLOBEX",
+        "id": "dataset.NQ_1S_V2_GLOBEX",
+        "implementation": "research/datasets/NQ_1S_V2_GLOBEX.yaml",
+        "instrument_id": "NQ.XCME",
+        "kind": "datasets",
+        "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+        "name": "NQ_1S_V2_GLOBEX",
         "parameters": [],
         "required_tests": [
           "scripts/tests/test_roots.py",
@@ -5243,6 +5309,67 @@
         "availability_rule": "interval_end",
         "cost_class": "per_source_event",
         "dependencies": [
+          "dataset.ES_1S_V2_GLOBEX"
+        ],
+        "description": "1s external catalog stream of ES_1S_V2_GLOBEX",
+        "id": "stream.ES_1S_V2_GLOBEX.1s",
+        "implementation": "ES.XCME-1-SECOND-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "ES_1S_V2_GLOBEX:1s",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9f38a41edca5"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.ES_1S_V2_GLOBEX"
+        ],
+        "description": "1m external catalog stream of ES_1S_V2_GLOBEX",
+        "id": "stream.ES_1S_V2_GLOBEX.1m",
+        "implementation": "ES.XCME-1-MINUTE-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "ES_1S_V2_GLOBEX:1m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9f38a41edca5"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.ES_1S_V2_GLOBEX",
+          "stream.ES_1S_V2_GLOBEX.1m"
+        ],
+        "description": "5m derived stream of ES_1S_V2_GLOBEX",
+        "id": "stream.ES_1S_V2_GLOBEX.5m",
+        "implementation": "runtime_complete_calendar_bucket",
+        "kind": "streams",
+        "name": "ES_1S_V2_GLOBEX:5m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9f38a41edca5"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
           "dataset.ES_v0_2020_2026"
         ],
         "description": "1s external catalog stream of ES_v0_2020_2026",
@@ -5352,6 +5479,67 @@
         "implementation": "runtime_complete_calendar_bucket",
         "kind": "streams",
         "name": "NQ_1S_V2:5m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9e7aecb7a291"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_1S_V2_GLOBEX"
+        ],
+        "description": "1s external catalog stream of NQ_1S_V2_GLOBEX",
+        "id": "stream.NQ_1S_V2_GLOBEX.1s",
+        "implementation": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "NQ_1S_V2_GLOBEX:1s",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9e7aecb7a291"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_1S_V2_GLOBEX"
+        ],
+        "description": "1m external catalog stream of NQ_1S_V2_GLOBEX",
+        "id": "stream.NQ_1S_V2_GLOBEX.1m",
+        "implementation": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+        "kind": "streams",
+        "name": "NQ_1S_V2_GLOBEX:1m",
+        "parameters": [],
+        "required_tests": [
+          "scripts/tests/test_readiness.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "per_source_bar",
+        "version": "9e7aecb7a291"
+      },
+      {
+        "availability_rule": "interval_end",
+        "cost_class": "per_source_event",
+        "dependencies": [
+          "dataset.NQ_1S_V2_GLOBEX",
+          "stream.NQ_1S_V2_GLOBEX.1m"
+        ],
+        "description": "5m derived stream of NQ_1S_V2_GLOBEX",
+        "id": "stream.NQ_1S_V2_GLOBEX.5m",
+        "implementation": "runtime_complete_calendar_bucket",
+        "kind": "streams",
+        "name": "NQ_1S_V2_GLOBEX:5m",
         "parameters": [],
         "required_tests": [
           "scripts/tests/test_readiness.py"
@@ -6096,7 +6284,7 @@
   "summary": {
     "datasets": {
       "broken": 0,
-      "count": 5
+      "count": 7
     },
     "derived_inputs": {
       "broken": 0,
@@ -6124,9 +6312,9 @@
     },
     "streams": {
       "broken": 0,
-      "count": 15
+      "count": 21
     },
-    "total": 203,
+    "total": 211,
     "trackers": {
       "broken": 0,
       "count": 7

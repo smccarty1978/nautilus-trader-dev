@@ -222,7 +222,7 @@ def build_parser() -> argparse.ArgumentParser:
     c = cap.add_parser("promote"); c.add_argument("capability_id"); c.add_argument("--parity"); c.add_argument("--no-tests", action="store_true"); c.set_defaults(fn=cmd_cap)
 
     study = sub.add_parser("study").add_subparsers(dest="cmd", required=True)
-    n = study.add_parser("new"); n.add_argument("study_id"); n.add_argument("--from-question"); n.add_argument("--dataset", default="NQ_v0_2020_2026"); n.set_defaults(fn=cmd_study_new)
+    n = study.add_parser("new"); n.add_argument("study_id"); n.add_argument("--from-question"); n.add_argument("--dataset", default="NQ_1S_V2_GLOBEX"); n.set_defaults(fn=cmd_study_new)
     sc = study.add_parser("compile"); sc.add_argument("--study", required=True); sc.add_argument("--dry-run", action="store_true"); sc.set_defaults(fn=cmd_study_compile)
     ss = study.add_parser("status"); ss.add_argument("--study", required=True); ss.set_defaults(fn=cmd_study_status)
     r = study.add_parser("run"); r.set_defaults(fn=cmd_study_run, passthrough=True)

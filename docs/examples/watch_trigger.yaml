@@ -7,7 +7,7 @@ study:
   tier: 2
   question: "After a >= 1 ATR pullback, does a completed 5s re-alignment mark a continuation that reaches +1 ATR before -0.75 ATR within 300s?"
 streams:
-  - {dataset: NQ_1S_V2, timeframes: [1s, 5s, 1m, 5m]}
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 5s, 1m, 5m]}
 context:
   regime_1m: {tracker: regime.dual_ema, timeframe: 1m}
   regime_5s: {tracker: regime.dual_ema, timeframe: 5s}
