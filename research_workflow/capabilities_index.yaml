@@ -268,3 +268,10 @@ analysis_ops:
     parameters: [rules, output_column, strata]
     update_cadence: offline_only
     required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.gate.population_parity
+    version: 1
+    description: STOP GATE - raises unless the population is identical to a frozen reference (declared sha256, total, per-stratum counts, exact key set, per-key instant); aborts the analyze stage before any artifact is written.
+    implementation: research.analysis.diagnostic_ops.population_parity_gate
+    parameters: [reference_path, reference_sha256, key, reference_key, expected_total, expected_by, timestamp_column, reference_timestamp_column, value_map]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
