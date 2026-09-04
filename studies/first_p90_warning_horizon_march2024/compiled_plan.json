@@ -492,7 +492,21 @@
         "availability": "max(inputs) \u222a evaluation",
         "availability_rule": "max(inputs) \u222a evaluation",
         "cadence": "per_candidate",
-        "dependencies": [],
+        "dependencies": [
+          "arrival_acceleration",
+          "arrival_velocity",
+          "ema_slope",
+          "prior_1m_regime_efficiency",
+          "prior_1m_regime_mfe_atr",
+          "prior_1m_regime_range_atr",
+          "prior_5m_regime_efficiency",
+          "prior_5m_regime_mfe_atr",
+          "prior_5m_regime_range_atr",
+          "rolling_300s_current_progress_atr",
+          "rolling_300s_giveback_atr",
+          "rolling_300s_max_progress_atr",
+          "rolling_300s_retention_ratio"
+        ],
         "id": "derived.parent_long_score",
         "kind": "derived_score",
         "stream": null,
@@ -502,7 +516,21 @@
         "availability": "max(inputs) \u222a evaluation",
         "availability_rule": "max(inputs) \u222a evaluation",
         "cadence": "per_candidate",
-        "dependencies": [],
+        "dependencies": [
+          "arrival_acceleration",
+          "arrival_velocity",
+          "ema_slope",
+          "prior_1m_regime_efficiency",
+          "prior_1m_regime_mfe_atr",
+          "prior_1m_regime_range_atr",
+          "prior_5m_regime_efficiency",
+          "prior_5m_regime_mfe_atr",
+          "prior_5m_regime_range_atr",
+          "rolling_300s_current_progress_atr",
+          "rolling_300s_giveback_atr",
+          "rolling_300s_max_progress_atr",
+          "rolling_300s_retention_ratio"
+        ],
         "id": "derived.parent_short_score",
         "kind": "derived_score",
         "stream": null,
@@ -817,7 +845,7 @@
     ]
   },
   "closure": {
-    "composite_sha256": "6e438b9c47c72e2fe0d24c213e5ecfadac4eda76b8e0c8b212c24df707569bc1",
+    "composite_sha256": "89f940ddf8089c88946580006bd6352826f3342f0ec51f1f5d0efe66a043ea70",
     "file_count": 43,
     "files": {
       "features/registry.py": "8eb7202bdb1c0487eca5f2a69aee7c6e3537afd0c1bf79f66bcf3da0e34edf8a",
@@ -827,14 +855,14 @@
       "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
       "features/trackers/host_bindings.py": "cf7428f2b14a6d8b15cefd4f1f883f636a236a58b493ea193b86860e61bd6020",
       "research/analysis/diagnostic_ops.py": "975425379490053482e31a7c9098dbcb8e26577bb2954803c362980f46e46e90",
-      "research/schemas/study_spec.py": "3e7dcb21ed07499d378d0da3b6d6abd408f24f2a57227826775c0ddc6c7f90ba",
+      "research/schemas/study_spec.py": "c1d439c406c530797bf05b1ee57dfd146a964ed039c55472f4a4c8455ccae413",
       "research_workflow/audit_packets_v2.py": "1a1b7f98e3a948db6626c11ad713e30433f4e428febc2344f769ba92b86bbcd0",
       "research_workflow/closure_hash.py": "80225b1ce75d53c5b37120d5f2d6da1cc98f2e124643a1768b05141492866b23",
       "research_workflow/controller_contracts.py": "e57afaeb5afb49ebc995b1d45486d095e24d8c0240148f0f1fafaac6f5cc3bdb",
       "research_workflow/dataset_v2.py": "352461e81424ac959494a4c10d16ff714bb374ce43dfa41b918733e9026d7819",
       "research_workflow/entry_references.py": "78fe9b0f7e8e4aaee69d34a90572ef3e6c7d9f13bc8d70c23f36f30cb416f35b",
       "research_workflow/experiment.py": "064017c10acab0d64379da3cc846c0ae1dfded43454c2f973c81afc54c554c4e",
-      "research_workflow/external_model_scoring.py": "4b0fa83f10349ff24f08b66b964b6b62859364dca4f5e54e587193f2cb9ec548",
+      "research_workflow/external_model_scoring.py": "ff7287021c2848783e8da8286dfb4de5a582ac5dbeac7e6c6f750eb0e7a9e0c1",
       "research_workflow/forward_outcomes/guard.py": "46d73217af1e9c47baddf11efb991209bbd0462ba636a0657c6e8be531090422",
       "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
       "research_workflow/governed_controller_v2.py": "94295dfab2ecbb6865ef5eaf2571f649582d2cbfb87edce426e3c3834102dcaa",
@@ -851,7 +879,7 @@
       "research_workflow/host/strategy.py": "59f4cca85697b4d82296d7a5e440d72353c8af15d3770a68c51c78c99b5eb66e",
       "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
       "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
-      "research_workflow/lifecycle_v2.py": "e5060a15d9e8714c0e8f1b596d89e878c78828f553e3e69867dad72fbee78723",
+      "research_workflow/lifecycle_v2.py": "72b584258d335e369dfe295b68a42b26a020763063620385ea41ebefcbd1dfb5",
       "research_workflow/locks.py": "8acc08e35fb743e2cd2f84d57b7a7e08ef4963a350fefb592377651f722b2258",
       "research_workflow/policy.py": "efe60a8d2ccfa32c97880b6102251f9cf55cc2e5dbc403c3999eca35095517f1",
       "research_workflow/provider_host.py": "6a06b45f61b0507e5f024db3adfd724b5c4f28534631f502b2555f0bb19646e5",
@@ -873,7 +901,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "10881fe4193a606619d2716d93c07776125f051baa9e1c18dfe72758810d35cc",
+        "composite_sha256": "3aeaf60d2187d787be9036ee3e53c06e7b3b7427ae7a52df761c1ff75c86c57c",
         "files": [
           "features/registry.py",
           "features/trackers/generic_arrival.py",
@@ -906,7 +934,7 @@
         ]
       },
       "lifecycle": {
-        "composite_sha256": "ab33938710edb1484db289239bf008d230156f501fdcdde1ebf044b3f7e583e3",
+        "composite_sha256": "8e9c01300ae915ac6695ee2fc39af2e943e4232029aa0bca2f149b051d5f13a9",
         "files": [
           "research_workflow/closure_hash.py",
           "research_workflow/controller_contracts.py",
@@ -1392,7 +1420,7 @@
     "stream": "nq_1s",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "a5843a3699c9ed9d9aed34277a613154631eb58a5e69b22ec1d10ece90e5a4eb",
+  "plan_sha256": "28c15d15e04480326534cb2f88873dba212bd14f2e353deccf9739b2f941de75",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1469,7 +1497,7 @@
     ],
     "session": "RTH"
   },
-  "spec_sha256": "3ceee6f93bee7a03cc874c54dadebd04c98c615829931e8d525396f0d6ddfce1",
+  "spec_sha256": "0494dbc4565c8d16c278fff1dae8e7b4aa2fa5994fbec3f242eb0dbaad61ec00",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
@@ -1968,7 +1996,21 @@
       "warmup_bars": 0
     },
     {
-      "availability_dependencies": [],
+      "availability_dependencies": [
+        "arrival_acceleration",
+        "arrival_velocity",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_giveback_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_retention_ratio"
+      ],
       "availability_rule": "max(inputs) \u222a evaluation",
       "cadence": "per_candidate",
       "capability": "feature.frozen_external_score",
@@ -1984,10 +2026,44 @@
         "direction": "regime_1m.dir",
         "spec": {
           "availability_reference": "decision_ts",
+          "direction_arm_mapping": {
+            "LONG": "C",
+            "SHORT": "C"
+          },
           "kind": "frozen_external_model_score",
-          "model_id": "ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c",
+          "model_artifact_path": "artifacts/models/ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c.joblib",
+          "model_artifact_sha256": "c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512",
+          "model_hashes": {
+            "C": "25737fcd6830a60f8b5cb4a97293ceef8cabcf0efdc1910792a71c7127a9ae60"
+          },
           "name": "parent_long_score",
+          "ordered_feature_surfaces": {
+            "C": [
+              "arrival_velocity",
+              "arrival_acceleration",
+              "ema_slope",
+              "prior_1m_regime_efficiency",
+              "prior_1m_regime_mfe_atr",
+              "prior_1m_regime_range_atr",
+              "prior_5m_regime_efficiency",
+              "prior_5m_regime_mfe_atr",
+              "prior_5m_regime_range_atr",
+              "rolling_300s_retention_ratio",
+              "rolling_300s_current_progress_atr",
+              "rolling_300s_max_progress_atr",
+              "rolling_300s_giveback_atr"
+            ]
+          },
+          "parent_frozen_execution_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+          "parent_provenance_attestation_path": "artifacts/train_provenance_attestation.json",
+          "parent_provenance_attestation_sha256": "61e9e6e0be93596d395250b2f254abf5a1c188bb37e74d322e66a57cc4ef1ca7",
+          "parent_provenance_cell_id": "LONG_C",
           "parent_study_id": "clean_maturity_flip_model_180s_horizon",
+          "parent_train_freeze_artifact": "artifacts/train_experiment_freeze_long.json",
+          "parent_train_freeze_artifact_sha256": "852af589d43f365b0ee24a7fcd82d5ccae75e690aa370ba42cca5cdb8852e95e",
+          "preprocessing_artifact_path": "artifacts/preprocessing_manifest.json",
+          "preprocessing_artifact_sha256": "2657de215096e4bef82663ced0c085b8cdf7b19e87917cf671a34cd446781954",
+          "preprocessing_hash": "96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8",
           "retrain_prohibited": true
         }
       },
@@ -1995,7 +2071,21 @@
       "warmup_bars": 0
     },
     {
-      "availability_dependencies": [],
+      "availability_dependencies": [
+        "arrival_acceleration",
+        "arrival_velocity",
+        "ema_slope",
+        "prior_1m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_efficiency",
+        "prior_5m_regime_mfe_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_giveback_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_retention_ratio"
+      ],
       "availability_rule": "max(inputs) \u222a evaluation",
       "cadence": "per_candidate",
       "capability": "feature.frozen_external_score",
@@ -2011,10 +2101,44 @@
         "direction": "regime_1m.dir",
         "spec": {
           "availability_reference": "decision_ts",
+          "direction_arm_mapping": {
+            "LONG": "C",
+            "SHORT": "C"
+          },
           "kind": "frozen_external_model_score",
-          "model_id": "209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6",
+          "model_artifact_path": "artifacts/models/209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6.joblib",
+          "model_artifact_sha256": "cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a",
+          "model_hashes": {
+            "C": "3c480affc677f64b712540f8e55df67d7f14fe9921ad9baa293b96bf70cdaa6f"
+          },
           "name": "parent_short_score",
+          "ordered_feature_surfaces": {
+            "C": [
+              "arrival_velocity",
+              "arrival_acceleration",
+              "ema_slope",
+              "prior_1m_regime_efficiency",
+              "prior_1m_regime_mfe_atr",
+              "prior_1m_regime_range_atr",
+              "prior_5m_regime_efficiency",
+              "prior_5m_regime_mfe_atr",
+              "prior_5m_regime_range_atr",
+              "rolling_300s_retention_ratio",
+              "rolling_300s_current_progress_atr",
+              "rolling_300s_max_progress_atr",
+              "rolling_300s_giveback_atr"
+            ]
+          },
+          "parent_frozen_execution_composite_sha256": "09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a",
+          "parent_provenance_attestation_path": "artifacts/train_provenance_attestation.json",
+          "parent_provenance_attestation_sha256": "61e9e6e0be93596d395250b2f254abf5a1c188bb37e74d322e66a57cc4ef1ca7",
+          "parent_provenance_cell_id": "SHORT_C",
           "parent_study_id": "clean_maturity_flip_model_180s_horizon",
+          "parent_train_freeze_artifact": "artifacts/train_experiment_freeze_short.json",
+          "parent_train_freeze_artifact_sha256": "55d430213fc4fe44a1e0770dfe64d65102a7b90113ee59b4e4a5a03f859e1f48",
+          "preprocessing_artifact_path": "artifacts/preprocessing_manifest.json",
+          "preprocessing_artifact_sha256": "2657de215096e4bef82663ced0c085b8cdf7b19e87917cf671a34cd446781954",
+          "preprocessing_hash": "96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8",
           "retrain_prohibited": true
         }
       },

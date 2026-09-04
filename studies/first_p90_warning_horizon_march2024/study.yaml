@@ -62,19 +62,84 @@ features:
     new_progress_windows: excursion.progress_windows
     retained_mfe_ratio:   excursion.retained_ratio
     triggering_1s_ts_init: epoch.T
+  # Legacy artifact binding, NOT model_id: the parent's registry record carries a
+  # native_booster_sha256 that matches no byte state that exists, so the model_id path is
+  # (correctly) refused. This binds the intact, hash-verified .joblib estimator bytes plus the
+  # parent's own TRAIN freeze, and the additive provenance attestation that supplies the
+  # TRAIN_ONLY marker the historical freeze was never stamped with. No native booster is read.
   derived_inputs:
-    - name: parent_long_score
-      kind: frozen_external_model_score
-      model_id: ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c
-      parent_study_id: clean_maturity_flip_model_180s_horizon
-      availability_reference: decision_ts
-      retrain_prohibited: true
-    - name: parent_short_score
-      kind: frozen_external_model_score
-      model_id: 209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6
-      parent_study_id: clean_maturity_flip_model_180s_horizon
-      availability_reference: decision_ts
-      retrain_prohibited: true
+  - name: parent_long_score
+    kind: frozen_external_model_score
+    parent_study_id: clean_maturity_flip_model_180s_horizon
+    parent_train_freeze_artifact: artifacts/train_experiment_freeze_long.json
+    parent_train_freeze_artifact_sha256: 852af589d43f365b0ee24a7fcd82d5ccae75e690aa370ba42cca5cdb8852e95e
+    parent_frozen_execution_composite_sha256: 09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a
+    model_hashes:
+      C: 25737fcd6830a60f8b5cb4a97293ceef8cabcf0efdc1910792a71c7127a9ae60
+    preprocessing_hash: 96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8
+    model_artifact_path: artifacts/models/ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c.joblib
+    model_artifact_sha256: c94866bd5894e1f6bdc940fa6dea0feffd8a4b8352340f368817a6629bbce512
+    preprocessing_artifact_path: artifacts/preprocessing_manifest.json
+    preprocessing_artifact_sha256: 2657de215096e4bef82663ced0c085b8cdf7b19e87917cf671a34cd446781954
+    ordered_feature_surfaces:
+      C:
+      - arrival_velocity
+      - arrival_acceleration
+      - ema_slope
+      - prior_1m_regime_efficiency
+      - prior_1m_regime_mfe_atr
+      - prior_1m_regime_range_atr
+      - prior_5m_regime_efficiency
+      - prior_5m_regime_mfe_atr
+      - prior_5m_regime_range_atr
+      - rolling_300s_retention_ratio
+      - rolling_300s_current_progress_atr
+      - rolling_300s_max_progress_atr
+      - rolling_300s_giveback_atr
+    direction_arm_mapping:
+      LONG: C
+      SHORT: C
+    parent_provenance_attestation_path: artifacts/train_provenance_attestation.json
+    parent_provenance_attestation_sha256: 61e9e6e0be93596d395250b2f254abf5a1c188bb37e74d322e66a57cc4ef1ca7
+    parent_provenance_cell_id: LONG_C
+    availability_reference: decision_ts
+    retrain_prohibited: true
+  - name: parent_short_score
+    kind: frozen_external_model_score
+    parent_study_id: clean_maturity_flip_model_180s_horizon
+    parent_train_freeze_artifact: artifacts/train_experiment_freeze_short.json
+    parent_train_freeze_artifact_sha256: 55d430213fc4fe44a1e0770dfe64d65102a7b90113ee59b4e4a5a03f859e1f48
+    parent_frozen_execution_composite_sha256: 09b5c66db8ec72bbf05f539c6a877dc8c9198774f4c4b7117fdea72fd618f48a
+    model_hashes:
+      C: 3c480affc677f64b712540f8e55df67d7f14fe9921ad9baa293b96bf70cdaa6f
+    preprocessing_hash: 96ebac895c3526f56bcdc1f7c635ccc4df52108142e14901c3c4d7dc144c6ee8
+    model_artifact_path: artifacts/models/209da0ff0c922e02ab02f78408d0591bd0b2e762a71ecd3ed010856ca45051e6.joblib
+    model_artifact_sha256: cccc911c93430bc3fe8dbca2ad952ea7aa0cd2e8749317341b1fc6653241f76a
+    preprocessing_artifact_path: artifacts/preprocessing_manifest.json
+    preprocessing_artifact_sha256: 2657de215096e4bef82663ced0c085b8cdf7b19e87917cf671a34cd446781954
+    ordered_feature_surfaces:
+      C:
+      - arrival_velocity
+      - arrival_acceleration
+      - ema_slope
+      - prior_1m_regime_efficiency
+      - prior_1m_regime_mfe_atr
+      - prior_1m_regime_range_atr
+      - prior_5m_regime_efficiency
+      - prior_5m_regime_mfe_atr
+      - prior_5m_regime_range_atr
+      - rolling_300s_retention_ratio
+      - rolling_300s_current_progress_atr
+      - rolling_300s_max_progress_atr
+      - rolling_300s_giveback_atr
+    direction_arm_mapping:
+      LONG: C
+      SHORT: C
+    parent_provenance_attestation_path: artifacts/train_provenance_attestation.json
+    parent_provenance_attestation_sha256: 61e9e6e0be93596d395250b2f254abf5a1c188bb37e74d322e66a57cc4ef1ca7
+    parent_provenance_cell_id: SHORT_C
+    availability_reference: decision_ts
+    retrain_prohibited: true
   bindings:
     completed_5m: {tracker: regime_bar_5m, ready_gate: false}
     regime_transition_1m: {tracker: regime_1m, requires_atr: false}
