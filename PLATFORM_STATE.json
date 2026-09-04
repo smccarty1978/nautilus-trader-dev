@@ -22,5 +22,50 @@
     "model_c_durable_store": "6 arms registered, identity_rule legacy_v1_train_freeze (HEAD-blob), golden PASS"
   },
   "remaining_warning": "trust boundary is the checked-out repository history: authority grants require bytes committed at HEAD (identical in the worktree); a forgery committed and checked out is by definition committed; evidence records head_sha/branch",
-  "recorded_at_utc": "2026-09-03T12:51:44.084312+00:00"
+  "recorded_at_utc": "2026-09-04T15:13:59.694670+00:00",
+  "datasets": {
+    "current": {
+      "NQ": "NQ_1S_V2_GLOBEX",
+      "ES": "ES_1S_V2_GLOBEX"
+    },
+    "NQ_1S_V2_GLOBEX": {
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+      "reference_digest": "e577a36165abd690f70221041c4e2b6c7302b876b81d63e7a1f4076b46514514",
+      "sessions": 1636,
+      "early_close_sessions": 58,
+      "out_of_calendar_rows": 4
+    },
+    "ES_1S_V2_GLOBEX": {
+      "logical_digest": "9f38a41edca5b72a71866846ec9aa15d4cf205388d22aabe025250eefbf0068a",
+      "reference_digest": "e98b75e59469bb889da5e5ae42a39862a90c1f7ec9f6cea956f8710aa24cc968",
+      "sessions": 1636,
+      "early_close_sessions": 58,
+      "out_of_calendar_rows": 7
+    },
+    "legacy_floor_calendar_ids": {
+      "ids": [
+        "NQ_1S_V2",
+        "ES_1S_V2"
+      ],
+      "status": "SUPERSEDED",
+      "retained_for": "sealed historical authority only (closed proof studies v2_shape_a/b/c bind NQ_1S_V2); never rebuilt, never bound by new studies",
+      "bars_identical_to_current": true
+    }
+  },
+  "calendar_authority": {
+    "primary": "CME Globex equity-index product trading/holiday schedule (pandas_market_calendars 'CME Globex Equity' encoding + repo override table)",
+    "secondary": "observed native tape boundaries, reconciled per session at build time",
+    "not_authoritative": "CME trading-floor close calendar (CME_Equity) -- refused for Globex futures",
+    "tape_reconciliation": "enabled (TAPE_EXCEEDS_DECLARED_CLOSE fails a build; per-session tape_* columns and manifest tape_reconciliation block)",
+    "override_table": "research_workflow/calendars/cme_globex_equity_index_overrides.json",
+    "overrides_applied_in_range": [
+      "2025-01-09 close 08:30 CT",
+      "2024-03-29 closed",
+      "2025-04-18 closed"
+    ],
+    "regression_test": "research_workflow/tests/test_globex_calendar_authority.py",
+    "fix_commit": "63aecf79",
+    "tag": "baseline/2026-09-platform-v2-globex-calendar",
+    "calendar_blocker": "none"
+  }
 }
