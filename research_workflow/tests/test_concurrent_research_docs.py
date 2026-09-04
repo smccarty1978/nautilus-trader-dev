@@ -71,6 +71,12 @@ def test_entrypoints_and_quickstart_point_to_the_procedure():
         assert "ws claim" in _t(rel) and "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT" in _t(rel), rel
     for rel in (".claude/AGENT_WORKFLOW.md", ".codex/AGENT_WORKFLOW.md", ".agents/AGENT_WORKFLOW.md"):
         assert "## Writer identity" in _t(rel) and "NT_RESEARCH_AGENT" in _t(rel), rel
+    ag = _t(".agents/AGENT_WORKFLOW.md")
+    for phrase in ("launch_antigravity.cmd -Study", "ws whoami --expect antigravity", "WRITER_IDENTITY_AMBIGUOUS", "ANTIGRAVITY_INSTANCE_ALREADY_RUNNING", "Fail closed"):
+        assert phrase in ag, phrase
+    assert "launch_antigravity.cmd" in _t("GEMINI.md") and "WRITER_IDENTITY_AMBIGUOUS" in _t("GEMINI.md")
+    assert "launch_antigravity.cmd" in a and "WRITER_IDENTITY_AMBIGUOUS" in a
+    assert (ROOT / "scripts" / "launch_antigravity.ps1").is_file() and (ROOT / "scripts" / "launch_antigravity.cmd").is_file()
     assert 'NT_RESEARCH_AGENT = "codex"' in _t(".codex/config.toml")
 
 
@@ -78,7 +84,7 @@ def test_agent_role_files_carry_worktree_rules():
     for name in WRITE_CAPABLE:
         t = _t(f".claude/agents/{name}.md")
         for phrase in ("Never write from `main`", "Never share a writer worktree", "study new <id>", "ws list", "`live` lease", "chore/*",
-                       "ws whoami", "ws claim <id>", "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT", "run lock"):
+                       "ws whoami", "ws claim <id>", "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT", "run lock", "--as <your agent>", "WRITER_IDENTITY_AMBIGUOUS"):
             assert phrase in t, (name, phrase)
     for name in READ_ONLY:
         t = _t(f".claude/agents/{name}.md")

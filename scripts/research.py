@@ -16,7 +16,8 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
     research ws list [--reclaim]                             branches, worktrees, owners, leases (live/stale/dead/released), dirty state
     research ws release <study_id> [--force]                  release a writer lease you hold (--force: same user@host, recorded)
     research ws claim <study_id>                              take writer ownership of an existing study worktree (foreign live writer refused)
-    research ws whoami                                        resolved writer identity (user@host, agent, session id)
+    research ws whoami [--expect <agent>]                     resolved writer identity (user@host, agent, session id); --expect fails closed on mismatch
+    research study new <id> --as <agent> | ws claim <id> --as <agent>   write-capable agents assert their identity; ambiguous/mismatched -> FAIL
 """
 from __future__ import annotations
 
@@ -106,8 +107,12 @@ def cmd_cap(ns: argparse.Namespace) -> int:
 # ---------------------------------------------------------------------------
 
 def cmd_study_new(ns: argparse.Namespace) -> int:
-    from research_workflow.workspace import study_new
-    return _card(study_new(ns.study_id, repo_root=ROOT, question_file=ns.from_question, dataset_id=ns.dataset))
+    from research_workflow.workspace import WorkspaceError, study_new
+    try:
+        return _card(study_new(ns.study_id, repo_root=ROOT, question_file=ns.from_question, dataset_id=ns.dataset,
+                               expect_agent=getattr(ns, "as_agent", None)))
+    except WorkspaceError as exc:
+        return _card({"study_id": ns.study_id, "error": str(exc), "blocker_code": str(exc).split(":", 1)[0].split(" ")[0]}, ok=False)
 
 
 def cmd_study_compile(ns: argparse.Namespace) -> int:
@@ -173,16 +178,24 @@ def cmd_ws_release(ns: argparse.Namespace) -> int:
 def cmd_ws_claim(ns: argparse.Namespace) -> int:
     from research_workflow.workspace import WorkspaceError, claim_worktree
     try:
-        return _card(claim_worktree(ns.study_id, repo_root=ROOT))
+        return _card(claim_worktree(ns.study_id, repo_root=ROOT, expect_agent=getattr(ns, "as_agent", None)))
     except WorkspaceError as exc:
         return _card({"study_id": ns.study_id, "error": str(exc), "blocker_code": str(exc).split(":", 1)[0].split(" ")[0]}, ok=False)
 
 
-def cmd_ws_whoami(_: argparse.Namespace) -> int:
-    from research_workflow.workspace import AGENT_ENV, AGENT_SESSION_ENV, writer_identity
+def cmd_ws_whoami(ns: argparse.Namespace) -> int:
+    from research_workflow.workspace import AGENT_ENV, AGENT_SESSION_ENV, WorkspaceError, require_agent, writer_identity
     ident = writer_identity()
-    return _card({**ident, "env": {AGENT_ENV: os.environ.get(AGENT_ENV), AGENT_SESSION_ENV: os.environ.get(AGENT_SESSION_ENV)},
-                  "note": f"set {AGENT_ENV}=<claude|codex|antigravity> and {AGENT_SESSION_ENV}=<unique per session> in the agent launcher to override inference"})
+    payload = {**ident, "env": {AGENT_ENV: os.environ.get(AGENT_ENV), AGENT_SESSION_ENV: os.environ.get(AGENT_SESSION_ENV)},
+               "note": f"set {AGENT_ENV}=<claude|codex|antigravity> and {AGENT_SESSION_ENV}=<unique per session> in the agent launcher to override inference"}
+    expected = getattr(ns, "expect", None)
+    if expected:
+        try:
+            require_agent(ident, expected)
+            payload["expect"] = {"agent": expected, "ok": True}
+        except WorkspaceError as exc:
+            return _card({**payload, "expect": {"agent": expected, "ok": False}, "error": str(exc), "blocker_code": str(exc).split(":", 1)[0]}, ok=False)
+    return _card(payload)
 
 
 # ---------------------------------------------------------------------------
@@ -243,7 +256,9 @@ def build_parser() -> argparse.ArgumentParser:
     c = cap.add_parser("promote"); c.add_argument("capability_id"); c.add_argument("--parity"); c.add_argument("--no-tests", action="store_true"); c.set_defaults(fn=cmd_cap)
 
     study = sub.add_parser("study").add_subparsers(dest="cmd", required=True)
-    n = study.add_parser("new"); n.add_argument("study_id"); n.add_argument("--from-question"); n.add_argument("--dataset", default="NQ_1S_V2_GLOBEX"); n.set_defaults(fn=cmd_study_new)
+    n = study.add_parser("new"); n.add_argument("study_id"); n.add_argument("--from-question"); n.add_argument("--dataset", default="NQ_1S_V2_GLOBEX")
+    n.add_argument("--as", dest="as_agent", metavar="AGENT", help="fail closed unless this shell's writer identity resolves to AGENT (claude|codex|antigravity); write-capable agents always pass their own name")
+    n.set_defaults(fn=cmd_study_new)
     sc = study.add_parser("compile"); sc.add_argument("--study", required=True); sc.add_argument("--dry-run", action="store_true"); sc.set_defaults(fn=cmd_study_compile)
     ss = study.add_parser("status"); ss.add_argument("--study", required=True); ss.set_defaults(fn=cmd_study_status)
     r = study.add_parser("run"); r.set_defaults(fn=cmd_study_run, passthrough=True)
@@ -267,8 +282,11 @@ def build_parser() -> argparse.ArgumentParser:
     wr = ws.add_parser("release"); wr.add_argument("study_id"); wr.add_argument("--force", action="store_true", help="same user@host may release a lease held by another agent/session (recorded on the lease)")
     wr.set_defaults(fn=cmd_ws_release)
     wc = ws.add_parser("claim", help="take writer ownership of an existing study worktree (idempotent for the same agent/session; a live foreign writer is refused)")
-    wc.add_argument("study_id"); wc.set_defaults(fn=cmd_ws_claim)
-    ww = ws.add_parser("whoami", help="resolved writer identity: user@host, agent, session id and how each was inferred"); ww.set_defaults(fn=cmd_ws_whoami)
+    wc.add_argument("study_id"); wc.add_argument("--as", dest="as_agent", metavar="AGENT", help="fail closed unless this shell's writer identity resolves to AGENT")
+    wc.set_defaults(fn=cmd_ws_claim)
+    ww = ws.add_parser("whoami", help="resolved writer identity: user@host, agent, session id and how each was inferred")
+    ww.add_argument("--expect", metavar="AGENT", help="exit FAIL (WRITER_IDENTITY_AMBIGUOUS / WRITER_IDENTITY_MISMATCH) unless the resolved agent is AGENT")
+    ww.set_defaults(fn=cmd_ws_whoami)
     return ap
 
 

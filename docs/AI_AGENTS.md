@@ -58,12 +58,17 @@ lock** prevents duplicate study execution.
 
 | precedence | source | Claude Code | Codex | Antigravity |
 |---|---|---|---|---|
-| 1 | launcher env `NT_RESEARCH_AGENT`, `NT_RESEARCH_AGENT_SESSION` | optional | `NT_RESEARCH_AGENT=codex` is set by `.codex/config.toml` (`shell_environment_policy`); set `NT_RESEARCH_AGENT_SESSION=<uuid>` per session in the launcher | set both in the Antigravity launcher: `NT_RESEARCH_AGENT=antigravity`, `NT_RESEARCH_AGENT_SESSION=<uuid>` |
-| 2 | harness-native env | inferred automatically: `CLAUDECODE` -> agent `claude`, `CLAUDE_CODE_SESSION_ID` -> session | `CODEX_SANDBOX*` / `CODEX_THREAD_ID` | `ANTIGRAVITY_SESSION_ID` if the harness exports one |
-| 3 | process-tree anchor | the harness process at the top of the shell's ancestry (`name:pid:create_time`) -- stable for one interactive session | same | same |
+| 1 | launcher env `NT_RESEARCH_AGENT`, `NT_RESEARCH_AGENT_SESSION` | optional | `NT_RESEARCH_AGENT=codex` is set by `.codex/config.toml` (`shell_environment_policy`); set `NT_RESEARCH_AGENT_SESSION=<uuid>` per session in the launcher | **`scripts\launch_antigravity.cmd -Study <id>`** sets both with a fresh UUID per launched instance (Antigravity IDE is a VS Code fork with no native agent/session variable and is single-instance; see `.agents/AGENT_WORKFLOW.md`) |
+| 2 | harness-native env | inferred automatically: `CLAUDECODE` -> agent `claude`, `CLAUDE_CODE_SESSION_ID` -> session | `CODEX_SANDBOX*` / `CODEX_THREAD_ID` | none: Antigravity IDE exports only `TERM_PROGRAM=vscode` / `VSCODE_*` |
+| 3 | process-tree anchor | the harness process at the top of the shell's ancestry (`name:pid:create_time`) -- stable for one interactive session | same | agent label `antigravity` is inferred from `antigravity ide.exe` in the ancestry, but all windows of one instance share the anchor -- only the launcher UUID separates sessions |
 
 Values are recorded on the lease as `owner_agent` / `owner_session_id`, shown by `ws list` and
 `ws whoami`. A session id is never a bare PID of the calling shell.
+
+**Fail closed on ambiguous identity.** A write-capable agent asserts who it is: `ws whoami --expect <agent>`,
+`study new <id> --as <agent>`, `ws claim <id> --as <agent>`. If the shell resolves as `human`/unknown the
+command fails with `WRITER_IDENTITY_AMBIGUOUS`; if it resolves as a different agent, `WRITER_IDENTITY_MISMATCH`.
+Neither creates or claims anything. A human researcher at a terminal simply omits `--as`.
 
 **DO NOT manually create a study branch or worktree when the Platform V2 CLI can do it.** The CLI is
 the canonical path because it also establishes the skeleton, the writer lease, the ownership metadata
@@ -103,7 +108,7 @@ role bodies for Antigravity. Gemini should:
 2. use `python scripts/research.py ...` for every platform operation (never reimplement orchestration);
 3. never write study Python; express missing capability as a typed `CapabilityGap` (compile) and, if
    needed, a proposal via `research cap propose`;
-4. work in the study's own worktree (`research study new`);
+4. work in the study's own worktree (`research study new`), launched through `scripts\launch_antigravity.cmd -Study <id>`; before any write run `python scripts/research.py ws whoami --expect antigravity` and stop on anything but `STATUS: OK` (`WRITER_IDENTITY_AMBIGUOUS` / `WRITER_IDENTITY_MISMATCH`); claim with `ws claim <id> --as antigravity`;
 5. request audits by handing the packet paths to the auditor roles and ingest with `research audit ingest`;
 6. return compact cards.
 

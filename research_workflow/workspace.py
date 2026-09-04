@@ -173,6 +173,30 @@ def writer_identity() -> Dict[str, Any]:
             "agent_source": agent_source, "session_source": session_source}
 
 
+AMBIGUOUS_AGENTS = frozenset({"human", "unknown", ""})
+
+
+def require_agent(identity: Dict[str, Any], expected: Optional[str]) -> Dict[str, Any]:
+    """Fail closed when a write-capable agent's identity is not what its instructions require.
+
+    ``expected`` is the agent label the caller claims to be (``--as antigravity``). Raises
+    ``WRITER_IDENTITY_AMBIGUOUS`` when the resolved agent is ``human``/``unknown`` (no launcher env, no
+    harness marker, no recognizable harness process in the ancestry) and ``WRITER_IDENTITY_MISMATCH``
+    when it resolved to a different agent. ``expected=None`` disables the check (humans at a terminal)."""
+    if expected is None:
+        return identity
+    exp = str(expected).strip().lower()
+    got = str(identity.get("agent") or "").lower()
+    if got in AMBIGUOUS_AGENTS:
+        raise WorkspaceError(f"WRITER_IDENTITY_AMBIGUOUS: this shell resolves as agent={got or 'unknown'!r} "
+                              f"(agent_source={identity.get('agent_source')}); a write-capable {exp} session must be launched with "
+                              f"{AGENT_ENV}={exp} (and {AGENT_SESSION_ENV}=<unique per session>) -- see docs/AI_AGENTS.md 'Writer identity'. Not writing.")
+    if got != exp:
+        raise WorkspaceError(f"WRITER_IDENTITY_MISMATCH: this shell resolves as agent={got!r} (agent_source={identity.get('agent_source')}), "
+                              f"not {exp!r}; refusing to write under another agent's identity.")
+    return identity
+
+
 def _identity_from(owner: Optional[str], identity: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """Merge an explicit legacy ``owner`` string (user@host) with a resolved identity."""
     ident = dict(identity or writer_identity())
@@ -408,7 +432,8 @@ def _find_study_worktree(study_id: str, repo_root: Path, cfg) -> Optional[Path]:
     return cand.resolve() if cand.is_dir() else None
 
 
-def claim_worktree(study_id: str, *, repo_root: Path, config=None, identity: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def claim_worktree(study_id: str, *, repo_root: Path, config=None, identity: Optional[Dict[str, Any]] = None,
+                   expect_agent: Optional[str] = None) -> Dict[str, Any]:
     """``research ws claim <study_id>``: take writer ownership of an existing study worktree.
 
     * live lease, same writer identity      -> idempotent (renewed), ``result: "already_owner"``
@@ -420,7 +445,7 @@ def claim_worktree(study_id: str, *, repo_root: Path, config=None, identity: Opt
     claims exactly one wins; the loser re-reads and sees the winner's live lease."""
     from research_workflow.locks import acquire_exclusive
     cfg = config if config is not None else load_config()
-    ident = dict(identity or writer_identity())
+    ident = require_agent(dict(identity or writer_identity()), expect_agent)
     repo_root = Path(repo_root).resolve()
     d = leases_dir(cfg); d.mkdir(parents=True, exist_ok=True)
     lock = d / f"{study_id}.claim"
@@ -552,8 +577,9 @@ model: none
 
 
 def study_new(study_id: str, *, repo_root: Path, question_file: Optional[str] = None, dataset_id: str = "NQ_1S_V2_GLOBEX",
-              config=None, owner: Optional[str] = None) -> Dict[str, Any]:
+              config=None, owner: Optional[str] = None, expect_agent: Optional[str] = None) -> Dict[str, Any]:
     repo_root = Path(repo_root).resolve()
+    require_agent(_identity_from(owner, None), expect_agent)
     if not study_id or any(ch in study_id for ch in " /\\:") or study_id.startswith("."):
         raise WorkspaceError(f"STUDY_ID_INVALID: {study_id!r}")
     cfg = config if config is not None else load_config()
@@ -613,4 +639,4 @@ def ws_list(*, repo_root: Path, config=None, reclaim: bool = False) -> Dict[str,
 
 
 __all__ = ["WorkspaceError", "study_new", "ws_list", "read_leases", "leases_dir", "renew_lease", "release_lease", "current_owner", "lease_state",
-           "writer_identity", "same_writer", "claim_worktree", "check_writer_access", "AGENT_ENV", "AGENT_SESSION_ENV"]
+           "writer_identity", "same_writer", "claim_worktree", "check_writer_access", "require_agent", "AGENT_ENV", "AGENT_SESSION_ENV"]

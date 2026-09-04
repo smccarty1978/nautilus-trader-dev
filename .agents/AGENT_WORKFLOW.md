@@ -57,13 +57,36 @@ generated for all three harnesses.
 ## Writer identity (multi-agent ownership)
 
 The writer lease identifies a writer as `user@host` + agent + session
-(`research_workflow.workspace.writer_identity`). The Antigravity launcher must export
-`NT_RESEARCH_AGENT=antigravity` and `NT_RESEARCH_AGENT_SESSION=<uuid unique to this session>` into
-the shells it spawns (the harness's own `ANTIGRAVITY_SESSION_ID`, if present, is accepted as the
-session; otherwise the process-tree anchor of the Antigravity process is used and the agent name
-is inferred from that process's name). Verify with `python scripts/research.py ws whoami`; claim an
-existing study with `ws claim <id>` before writing. A live lease of another agent refuses with
-`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT` even though the OS user matches.
+(`research_workflow.workspace.writer_identity`). Antigravity IDE is a VS Code fork: its terminals
+export only the generic `vscode` variables (`TERM_PROGRAM=vscode`, `VSCODE_*`), so nothing native names
+the agent or a per-session id, and Antigravity IDE is single-instance (a second launch opens a window
+inside the running instance and inherits its environment). The sanctioned launcher therefore supplies
+the identity -- **one command, no manual UUID**:
+
+```bat
+scripts\launch_antigravity.cmd -Study <study_id>        REM opens that study's worktree in a fresh instance
+scripts\launch_antigravity.cmd -Path <folder>           REM any folder (e.g. a chore worktree)
+```
+
+It generates a fresh UUID per launch and starts `Antigravity IDE.exe` with
+`NT_RESEARCH_AGENT=antigravity` and `NT_RESEARCH_AGENT_SESSION=<uuid>` in its environment; every
+terminal and agent command inside that instance inherits them. If an instance is already running it
+refuses (`ANTIGRAVITY_INSTANCE_ALREADY_RUNNING`): `-Force` opens a window of the running instance
+(shares its session), `-Isolated` starts an independent second instance with its own
+`--user-data-dir` (own UUID; fresh sign-in). The agent label alone is also inferred automatically
+from the process tree (`antigravity ide.exe` in the shell's ancestry) -- the launcher is what makes the
+**session** unique.
+
+**Fail closed.** Before writing, every write-capable Antigravity role runs
+
+```bash
+python scripts/research.py ws whoami --expect antigravity
+```
+
+and continues only on `STATUS: OK`. `WRITER_IDENTITY_AMBIGUOUS` (resolved as `human`/unknown) or
+`WRITER_IDENTITY_MISMATCH` means the session was not launched through the wrapper: stop, do not
+write. `study new <id> --as antigravity` and `ws claim <id> --as antigravity` enforce the same check
+mechanically. Read-only reviewers need no writer ownership and skip all of this.
 
 ---
 
