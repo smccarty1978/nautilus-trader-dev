@@ -27,6 +27,7 @@ outcome columns (that is their job) and must never be used to build a feature.
 """
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 import numpy as np
@@ -37,7 +38,7 @@ NS = 1_000_000_000
 __all__ = [
     "AnalysisOpError", "OPS", "run_op", "eligibility_mask", "resolve_by", "apply_terminal",
     "anchor_first_threshold_crossing", "cumulative_incidence", "bucket_decomposition",
-    "cell_matched_controls", "anchored_path", "precedence_labels",
+    "cell_matched_controls", "anchored_path", "precedence_labels", "population_parity_gate",
 ]
 
 
@@ -541,6 +542,106 @@ def precedence_labels(rows: pd.DataFrame, *, rules: Sequence[Mapping[str, Any]],
 
 
 # --------------------------------------------------------------------------- #
+# A7 -- population parity STOP GATE
+# --------------------------------------------------------------------------- #
+def population_parity_gate(rows: pd.DataFrame, *, reference_path: str, reference_sha256: str,
+                           key: Sequence[str], reference_key: Sequence[str],
+                           expected_total: Optional[int] = None,
+                           expected_by: Optional[Mapping[str, Mapping[str, int]]] = None,
+                           timestamp_column: Optional[str] = None,
+                           reference_timestamp_column: Optional[str] = None,
+                           value_map: Optional[Mapping[str, Mapping[str, Any]]] = None,
+                           context: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
+    """RAISE unless this population is identical to a frozen reference population.
+
+    A parity requirement written only in prose is not a gate: nothing refuses to emit the
+    downstream statistics when the population silently drifts. This is the executable form. It
+    runs as an ordinary pipeline step, so placing it immediately after the step that builds the
+    population means a failure aborts the analyze stage before ANY declared artifact is written.
+
+    Fails closed on: a missing reference; reference bytes that do not match the declared sha256
+    (so the frozen comparison cannot itself drift); a total or per-stratum count differing from
+    the declared expectation; ANY key present on one side only; and, when a timestamp column is
+    declared, any row resolving at a different instant. Missing and extra keys are reported
+    explicitly, not just counted -- "how many" never says which.
+    """
+    import hashlib
+
+    key, reference_key = list(key), list(reference_key)
+    if len(key) != len(reference_key):
+        raise AnalysisOpError("ANALYSIS_PARITY_KEY_ARITY: key and reference_key must line up")
+    root = Path((context or {}).get("studies_root") or ".")
+    path = (root / str(reference_path)).resolve()
+    if not path.is_file():
+        raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_MISSING: " + str(path))
+    actual_sha = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual_sha != reference_sha256:
+        raise AnalysisOpError(
+            "ANALYSIS_PARITY_REFERENCE_SHA_MISMATCH: expected %s, got %s" % (reference_sha256, actual_sha))
+    reference = pd.read_parquet(path)
+    _require(reference, reference_key, "parity.reference_key")
+    _require(rows, key, "parity.key")
+
+    # Translate the reference's own vocabulary into this frame's (e.g. LONG/SHORT -> +1/-1).
+    ref = reference.copy()
+    for column, mapping in (value_map or {}).items():
+        _require(ref, [column], "parity.value_map")
+        table = {_case_key(k): v for k, v in mapping.items()}
+        unknown = sorted(set(ref[column].map(_case_key)) - set(table))
+        if unknown:
+            raise AnalysisOpError("ANALYSIS_PARITY_VALUE_MAP_UNMATCHED: %s values %s" % (column, unknown))
+        ref[column] = [table[_case_key(v)] for v in ref[column]]
+
+    report: Dict[str, Any] = {"schema_version": 1, "reference_path": str(reference_path),
+                              "reference_sha256": actual_sha,
+                              "reference_rows": int(len(ref)), "population_rows": int(len(rows))}
+    failures: List[str] = []
+    if expected_total is not None:
+        report["expected_total"] = int(expected_total)
+        for label, n in (("reference", len(ref)), ("population", len(rows))):
+            if int(n) != int(expected_total):
+                failures.append("%s has %d rows, expected %d" % (label, n, expected_total))
+    if expected_by:
+        report["expected_by"] = {c: dict(m) for c, m in expected_by.items()}
+        report["observed_by"] = {}
+        for column, expectation in expected_by.items():
+            _require(rows, [column], "parity.expected_by")
+            counts = {_case_key(k): int(v) for k, v in rows[column].value_counts().items()}
+            report["observed_by"][column] = counts
+            want = {_case_key(k): int(v) for k, v in expectation.items()}
+            if counts != want:
+                failures.append("%s counts %s != expected %s" % (column, counts, want))
+
+    left = {tuple(r) for r in rows[key].itertuples(index=False, name=None)}
+    right = {tuple(r) for r in ref[reference_key].itertuples(index=False, name=None)}
+    missing, extra = sorted(right - left), sorted(left - right)
+    report["missing_from_population"] = len(missing)
+    report["extra_in_population"] = len(extra)
+    report["missing_examples"] = [list(x) for x in missing[:10]]
+    report["extra_examples"] = [list(x) for x in extra[:10]]
+    if missing or extra:
+        failures.append("%d reference key(s) absent, %d unexpected key(s) present" % (len(missing), len(extra)))
+
+    if timestamp_column and reference_timestamp_column:
+        _require(rows, [timestamp_column], "parity.timestamp_column")
+        _require(ref, [reference_timestamp_column], "parity.reference_timestamp_column")
+        lhs = {tuple(r[:-1]): r[-1] for r in rows[key + [timestamp_column]].itertuples(index=False, name=None)}
+        rhs = {tuple(r[:-1]): r[-1] for r in ref[reference_key + [reference_timestamp_column]].itertuples(index=False, name=None)}
+        drift = [{"key": list(k), "population": int(lhs[k]), "reference": int(rhs[k])}
+                 for k in sorted(set(lhs) & set(rhs)) if int(lhs[k]) != int(rhs[k])]
+        report["timestamp_mismatches"] = len(drift)
+        report["timestamp_mismatch_examples"] = drift[:10]
+        if drift:
+            failures.append("%d key(s) resolve at a different instant than the reference" % len(drift))
+
+    report["failures"] = failures
+    report["status"] = "PASS" if not failures else "FAIL"
+    if failures:
+        raise AnalysisOpError("ANALYSIS_POPULATION_PARITY_FAILED: " + "; ".join(failures))
+    return {"frame": rows, "payload": report}
+
+
+# --------------------------------------------------------------------------- #
 # registry
 # --------------------------------------------------------------------------- #
 OPS = {
@@ -550,6 +651,7 @@ OPS = {
     "analysis.control.cell_matched": cell_matched_controls,
     "analysis.path.anchored_offsets": anchored_path,
     "analysis.classify.precedence": precedence_labels,
+    "analysis.gate.population_parity": population_parity_gate,
 }
 # Which extra frames each op consumes besides its primary ``rows`` input. The compiler reads
 # this to prove a declared step's inputs are bound before the study is ever executed.
@@ -560,14 +662,22 @@ OP_INPUTS = {
     "analysis.control.cell_matched": ("anchors",),
     "analysis.path.anchored_offsets": ("anchors",),
     "analysis.classify.precedence": (),
+    "analysis.gate.population_parity": (),
 }
+
+# Ops needing machine-local resolution context. Never part of the plan identity: where an
+# operator keeps their files is not a scientific fact.
+OP_CONTEXT = frozenset({"analysis.gate.population_parity"})
 
 
 def run_op(op: str, rows: pd.DataFrame, *, inputs: Mapping[str, pd.DataFrame] | None = None,
-           params: Mapping[str, Any] | None = None) -> Dict[str, Any]:
+           params: Mapping[str, Any] | None = None,
+           context: Mapping[str, Any] | None = None) -> Dict[str, Any]:
     if op not in OPS:
         raise AnalysisOpError(f"ANALYSIS_OP_UNKNOWN: {op!r}; known={sorted(OPS)}")
     kwargs = dict(params or {})
+    if op in OP_CONTEXT:
+        kwargs["context"] = dict(context or {})
     for name in OP_INPUTS[op]:
         if name not in (inputs or {}):
             raise AnalysisOpError(f"ANALYSIS_OP_INPUT_MISSING: {op} needs input {name!r}")

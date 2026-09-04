@@ -1,6 +1,6 @@
 {
-  "content_sha256": "e0e8dcdb700b0a3e6652c4df1019d9382b15bf15c802c2c1512975151dc20fca",
-  "generated_at_utc": "2026-09-04T16:40:42.239600+00:00",
+  "content_sha256": "f723f8c4a5d88af0eba05b6641a1ca5275f61904098f19959f3f0f67f459f9b9",
+  "generated_at_utc": "2026-09-04T17:43:29.612969+00:00",
   "kinds": {
     "analysis_ops": [
       {
@@ -162,6 +162,36 @@
           "rules",
           "output_column",
           "strata"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "STOP GATE - raises unless the population is identical to a frozen reference (declared sha256, total, per-stratum counts, exact key set, per-key instant); aborts the analyze stage before any artifact is written.",
+        "id": "analysis.gate.population_parity",
+        "implementation": "research.analysis.diagnostic_ops.population_parity_gate",
+        "implementation_note": "RAISE unless this population is identical to a frozen reference population.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "gate.population_parity",
+        "parameters": [
+          "reference_path",
+          "reference_sha256",
+          "key",
+          "reference_key",
+          "expected_total",
+          "expected_by",
+          "timestamp_column",
+          "reference_timestamp_column",
+          "value_map"
         ],
         "required_tests": [
           "research/analysis/tests/test_diagnostic_ops.py"
@@ -6456,7 +6486,7 @@
   "summary": {
     "analysis_ops": {
       "broken": 0,
-      "count": 6
+      "count": 7
     },
     "datasets": {
       "broken": 0,
@@ -6490,7 +6520,7 @@
       "broken": 0,
       "count": 21
     },
-    "total": 217,
+    "total": 218,
     "trackers": {
       "broken": 0,
       "count": 7

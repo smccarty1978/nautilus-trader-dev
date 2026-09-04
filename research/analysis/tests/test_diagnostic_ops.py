@@ -10,7 +10,7 @@ import pytest
 
 from research.analysis.diagnostic_ops import (AnalysisOpError, anchor_first_threshold_crossing, anchored_path,
                                               bucket_decomposition, cell_matched_controls, cumulative_incidence,
-                                              precedence_labels, resolve_by, run_op)
+                                              population_parity_gate, precedence_labels, resolve_by, run_op)
 
 NS = 1_000_000_000
 BY = {"column": "direction", "cases": {1: {"value": "long_score", "threshold": 0.30, "levels": {"p95": 0.40}},
@@ -283,3 +283,87 @@ def test_eligibility_conditions_fail_closed_on_a_bad_op_or_column():
         with pytest.raises(AnalysisOpError, match=match):
             anchor_first_threshold_crossing(_rows().assign(mfe=1.0), by=BY, group_by=["g"], order_by="t",
                                             eligible_when=gates)
+
+
+# --------------------------------------------------------------------------- A7 (stop gate)
+def _reference(tmp_path):
+    """A frozen reference in its OWN vocabulary: LONG/SHORT, and its own key/timestamp names."""
+    import hashlib
+    ref = pd.DataFrame([{"direction": "LONG", "regime_id": 1, "ref_ts": 100},
+                        {"direction": "SHORT", "regime_id": 2, "ref_ts": 200},
+                        {"direction": "SHORT", "regime_id": 3, "ref_ts": 300}])
+    path = tmp_path / "ref.parquet"
+    ref.to_parquet(path, index=False)
+    return path, hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _population(**over):
+    rows = pd.DataFrame([{"regime_start_ns": 1, "regime_direction": 1, "observation_ts": 100},
+                         {"regime_start_ns": 2, "regime_direction": -1, "observation_ts": 200},
+                         {"regime_start_ns": 3, "regime_direction": -1, "observation_ts": 300}])
+    return rows.assign(**over) if over else rows
+
+
+def _gate(tmp_path, rows, **over):
+    path, sha = _reference(tmp_path)
+    params = {"reference_path": path.name, "reference_sha256": sha,
+              "key": ["regime_start_ns"], "reference_key": ["regime_id"],
+              "expected_total": 3, "expected_by": {"regime_direction": {1: 1, -1: 2}},
+              "timestamp_column": "observation_ts", "reference_timestamp_column": "ref_ts",
+              "value_map": {"direction": {"LONG": 1, "SHORT": -1}},
+              "context": {"studies_root": str(tmp_path)}}
+    params.update(over)
+    return population_parity_gate(rows, **params)
+
+
+def test_a_matching_population_passes_the_gate_and_reports_its_evidence(tmp_path):
+    out = _gate(tmp_path, _population())
+    assert out["payload"]["status"] == "PASS" and out["payload"]["failures"] == []
+    assert out["payload"]["population_rows"] == 3 and out["payload"]["reference_rows"] == 3
+    assert len(out["frame"]) == 3            # the gate passes the population through untouched
+
+
+def test_the_gate_raises_on_a_missing_row_a_extra_row_and_a_moved_timestamp(tmp_path):
+    with pytest.raises(AnalysisOpError, match="reference key\\(s\\) absent"):
+        _gate(tmp_path, _population().iloc[:2])
+    extra = pd.concat([_population(),
+                       pd.DataFrame([{"regime_start_ns": 9, "regime_direction": -1, "observation_ts": 900}])],
+                      ignore_index=True)
+    with pytest.raises(AnalysisOpError, match="unexpected key"):
+        _gate(tmp_path, extra, expected_total=4, expected_by={"regime_direction": {1: 1, -1: 3}})
+    moved = _population()
+    moved.loc[1, "observation_ts"] = 999
+    with pytest.raises(AnalysisOpError, match="different instant"):
+        _gate(tmp_path, moved)
+
+
+def test_the_gate_raises_when_the_declared_counts_do_not_hold(tmp_path):
+    with pytest.raises(AnalysisOpError, match="expected 4"):
+        _gate(tmp_path, _population(), expected_total=4)
+    flipped = _population()
+    flipped.loc[0, "regime_direction"] = -1
+    with pytest.raises(AnalysisOpError, match="counts"):
+        _gate(tmp_path, flipped)
+
+
+def test_the_reference_itself_cannot_drift(tmp_path):
+    """A frozen comparison whose own bytes are unpinned is not frozen."""
+    with pytest.raises(AnalysisOpError, match="REFERENCE_SHA_MISMATCH"):
+        _gate(tmp_path, _population(), reference_sha256="0" * 64)
+    with pytest.raises(AnalysisOpError, match="REFERENCE_MISSING"):
+        _gate(tmp_path, _population(), reference_path="nope.parquet")
+
+
+def test_an_unmapped_reference_value_is_refused_rather_than_dropped(tmp_path):
+    with pytest.raises(AnalysisOpError, match="VALUE_MAP_UNMATCHED"):
+        _gate(tmp_path, _population(), value_map={"direction": {"LONG": 1}})
+
+
+def test_run_op_supplies_the_gate_its_resolution_context(tmp_path):
+    path, sha = _reference(tmp_path)
+    out = run_op("analysis.gate.population_parity", _population(),
+                 params={"reference_path": path.name, "reference_sha256": sha,
+                         "key": ["regime_start_ns"], "reference_key": ["regime_id"],
+                         "expected_total": 3},
+                 context={"studies_root": str(tmp_path)})
+    assert out["payload"]["status"] == "PASS"

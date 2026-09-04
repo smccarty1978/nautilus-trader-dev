@@ -991,7 +991,8 @@ class V2Lifecycle:
         for step in spec["steps"]:
             rows = frames[step["rows"]]
             inputs = {name: frames[ref] for name, ref in (step.get("inputs") or {}).items()}
-            result = run_op(step["op"], rows, inputs=inputs, params=step.get("params") or {})
+            result = run_op(step["op"], rows, inputs=inputs, params=step.get("params") or {},
+                            context={"studies_root": str(self.opts.studies_root or (self.repo_root / "studies"))})
             frames[step["id"]] = result["frame"]
             payloads[step["id"]] = result.get("payload") or {}
             if result.get("observations") is not None:
