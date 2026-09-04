@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 import joblib
+import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 
@@ -335,3 +336,90 @@ def test_real_attestation_is_reproducible_and_binds_the_real_artifacts():
         model = REAL_PARENT / cell["model_artifact_path"]
         if model.is_file():                              # .joblib is machine-local (gitignored)
             assert file_sha(model) == cell["model_artifact_sha256"]
+
+
+# --------------------------------------------------------------------------- #
+# 5. null-input policy: reproducing a frozen model means reproducing how it was USED
+# --------------------------------------------------------------------------- #
+def _lgbm_parent(tmp_path):
+    """A parent whose estimator handles missing values natively, as LightGBM does."""
+    import lightgbm as lgb
+    import numpy as np
+    parent = tmp_path / "studies" / "parent"
+    (parent / "artifacts").mkdir(parents=True)
+    (parent / "audit").mkdir(parents=True)
+    rng = np.random.default_rng(3)
+    X = pd.DataFrame(rng.random((200, 2)), columns=["a", "b"])
+    y = (X["a"] + X["b"] > 1.0).astype(int)
+    est = lgb.LGBMClassifier(n_estimators=8, num_leaves=3, verbosity=-1).fit(X, y)
+    joblib.dump({"C": {"estimator": est, "fit_identity_sha256": "fit-c"}}, parent / "artifacts/models.joblib")
+    (parent / "artifacts/preprocessing.json").write_text('{"identity":"prep"}', encoding="utf-8")
+    freeze = {"study_id": "parent", "partition": "train", "provenance": "TRAIN_ONLY",
+              "model_hashes": {"C": "fit-c"}, "feature_sets": {"C": ["a", "b"]},
+              "preprocessing_hash": "prep-identity",
+              "thresholds": {"C": {"p90": {"threshold": 0.5, "derivation_population": "train"}}},
+              "deciles": {"C": {"derivation": "TRAIN_ONLY"}}}
+    (parent / "artifacts/freeze.json").write_text(json.dumps(freeze, sort_keys=True), encoding="utf-8")
+    return parent, est
+
+
+def _lgbm_spec(parent, **over):
+    body = {"name": "s", "parent_study_id": "parent",
+            "parent_train_freeze_artifact": "artifacts/freeze.json",
+            "parent_train_freeze_artifact_sha256": file_sha(parent / "artifacts/freeze.json"),
+            "parent_frozen_execution_composite_sha256": COMPOSITE,
+            "model_hashes": {"C": "fit-c"}, "preprocessing_hash": "prep-identity",
+            "model_artifact_path": "artifacts/models.joblib",
+            "model_artifact_sha256": file_sha(parent / "artifacts/models.joblib"),
+            "preprocessing_artifact_path": "artifacts/preprocessing.json",
+            "preprocessing_artifact_sha256": file_sha(parent / "artifacts/preprocessing.json"),
+            "ordered_feature_surfaces": {"C": ["a", "b"]},
+            "direction_arm_mapping": {"LONG": "C", "SHORT": "C"}}
+    body.update(over)
+    return DerivedCausalInputSpec.model_validate(body)
+
+
+def test_the_default_null_policy_still_refuses_to_score_a_null_input(tmp_path):
+    """The safe default must not move: a null input yields no score unless a study says otherwise."""
+    parent, _ = _lgbm_parent(tmp_path)
+    spec = _lgbm_spec(parent)
+    assert spec.null_input_policy == "refuse"
+    scorer = FrozenExternalModelScorer.bind(spec, parent_dir=parent)
+    with pytest.raises(ExternalModelScoringError, match="null values"):
+        scorer.score({"a": 1.0, "b": float("nan")}, checkpoint_ts=10, direction="LONG",
+                     availability_ts={"a": 9, "b": 9})
+
+
+def test_model_native_reproduces_the_estimator_on_missing_inputs_exactly(tmp_path):
+    """The reason the policy exists: the frozen 180s models were USED with null rolling features
+    (73% of the parent's own candidates), so refusing them would drop most of the population a
+    child study is trying to reproduce. Passing the null through must equal the estimator."""
+    import numpy as np
+    parent, est = _lgbm_parent(tmp_path)
+    scorer = FrozenExternalModelScorer.bind(_lgbm_spec(parent, null_input_policy="model_native"),
+                                            parent_dir=parent)
+    snap = {"a": 0.4, "b": float("nan")}
+    obs = scorer.score(snap, checkpoint_ts=10, direction="LONG", availability_ts={"a": 9, "b": 9})
+    expected = float(est.predict_proba(pd.DataFrame([[0.4, np.nan]], columns=["a", "b"]))[0][1])
+    assert obs.score == expected
+    assert obs.null_inputs == 1 and obs.null_input_policy == "model_native"
+
+
+def test_a_score_over_missing_inputs_is_never_anonymous(tmp_path):
+    """Provenance: how many inputs were missing, and under which policy, travels with the score."""
+    parent, _ = _lgbm_parent(tmp_path)
+    scorer = FrozenExternalModelScorer.bind(_lgbm_spec(parent, null_input_policy="model_native"),
+                                            parent_dir=parent)
+    clean = scorer.score({"a": 0.4, "b": 0.6}, checkpoint_ts=10, direction="LONG",
+                         availability_ts={"a": 9, "b": 9})
+    assert clean.null_inputs == 0 and clean.null_input_policy == "model_native"
+
+
+def test_model_native_on_a_family_without_missing_support_fails_closed(tmp_path):
+    """It can never silently coerce a null to zero: an estimator that cannot take NaN raises."""
+    parent, _ = _parent(tmp_path, provenance="TRAIN_ONLY")      # sklearn LogisticRegression
+    scorer = FrozenExternalModelScorer.bind(_spec(parent, {}, null_input_policy="model_native"),
+                                            parent_dir=parent)
+    with pytest.raises(Exception):
+        scorer.score({"a": 1.0, "b": float("nan")}, checkpoint_ts=10, direction="LONG",
+                     availability_ts={"a": 9, "b": 9})

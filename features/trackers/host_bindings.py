@@ -685,8 +685,16 @@ class FrozenExternalScoreBinding(BaseBinding):
         if not surf:
             return None
         inputs = {n: row.get(n) for n in surf}
-        if any(v is None or (isinstance(v, float) and math.isnan(v)) for v in inputs.values()):
-            return None
+        # A null input yields a null score UNLESS the declaration says the frozen parent's own
+        # scoring passed missingness to the estimator. Reproducing a frozen model means
+        # reproducing how it was USED: for the 180s flip models, 73% of the parent's own
+        # candidates carried null rolling_300s_* features and were scored natively by LightGBM.
+        # Refusing them here would silently drop most of the population being reproduced.
+        if getattr(self._scorer.spec, "null_input_policy", "refuse") != "model_native":
+            if any(v is None or (isinstance(v, float) and math.isnan(v)) for v in inputs.values()):
+                return None
+        elif all(v is None or (isinstance(v, float) and math.isnan(v)) for v in inputs.values()):
+            return None                     # nothing observed at all is still not a score
         ts = int(epoch.T)
         # RT-B2: `ts` (the completed-bar epoch driving this binding) is both the checkpoint and
         # the instant the score is actually evaluated at (synchronous, in-process scoring) --

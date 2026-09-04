@@ -549,6 +549,15 @@ class DerivedCausalInputSpec(BaseModel):
         "predict_proba_positive",
         exclude_if=lambda value: value == "predict_proba_positive",
     )
+    # How a null model input is treated. THIS IS A SCIENTIFIC DECISION, so it is declared, never
+    # inferred (WORKFLOW.md golden rule 14).
+    #   "refuse"       -- a null input yields a null score. The safe default: never fabricate a
+    #                     value for a model that may not handle missingness.
+    #   "model_native" -- pass the null to the estimator and let the family handle it. Correct
+    #                     ONLY when the frozen model was actually USED that way, and the study is
+    #                     reproducing that use. A family without native missing-value support
+    #                     raises, so this can never silently coerce a null to zero.
+    null_input_policy: Literal["refuse", "model_native"] = "refuse"
     availability_reference: Literal["decision_ts", "entry_ts", "confirmation_ts"] = "decision_ts"
     retrain_prohibited: bool = Field(
         True, description="Must be True for this kind -- the child study may never retrain the upstream model"
