@@ -121,6 +121,39 @@ population_identity:
     this requirement was declared here and wired to nothing.
 
 # --------------------------------------------------------------------------------------------
+# Declared semantic decisions (golden rule 14: declared, never inferred)
+# --------------------------------------------------------------------------------------------
+semantic_decisions:
+  null_input_policy:
+    declared: model_native
+    where: study.yaml features.derived_inputs[].null_input_policy
+    platform_default: refuse
+    decision: >
+      Pass a null model input to the frozen estimator instead of refusing to score, because that
+      is how the frozen models were ACTUALLY USED. This changes no model byte, no threshold, no
+      ordered feature surface and no preprocessing identity -- only this study's declared handling
+      of a missing INPUT, so that the population reproduced is the parent's.
+    evidence:
+      artifact: artifacts/parity/frozen_180s_null_input_policy_evidence.json
+      march_candidates_scored_by_parent: 35872 of 35872
+      march_candidates_with_null_rolling_300s: 26018
+      frozen_first_p90_fires_on_a_null_rolling_row: 181 of 239
+      end_to_end_binding_check: >
+        The real host binding, driven over the parent's own March feature rows for all 239 frozen
+        fires, scored 239/239 with max|binding - parent_recorded| = 0.000e+00 in both directions.
+    counterfactual: >
+      Under the platform default the smoke day left 1,242 of 1,791 parent-eligible checkpoints
+      (69%) unscored and 76% of the frozen fires unreachable -- a different population, not a
+      more conservative one.
+  outcome_session_end:
+    declared: truncate
+    where: study.yaml outcome.session_end
+    decision: >
+      The RTH close BOUNDS the observation window rather than voiding it. Under the platform
+      default (censor) a horizon long enough to reach the close censors EVERY candidate, so
+      time-to-next-flip through session end could not be measured at all.
+
+# --------------------------------------------------------------------------------------------
 # Chronology and data authorization
 # --------------------------------------------------------------------------------------------
 chronology:
