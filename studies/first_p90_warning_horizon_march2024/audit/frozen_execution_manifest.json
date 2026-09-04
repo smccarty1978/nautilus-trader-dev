@@ -1,0 +1,127 @@
+{
+  "authority": "platform_v2_plan_closure",
+  "file_count": 43,
+  "files": {
+    "features/registry.py": "8eb7202bdb1c0487eca5f2a69aee7c6e3537afd0c1bf79f66bcf3da0e34edf8a",
+    "features/trackers/generic_arrival.py": "29201991c71821f27e014238338eb1d0d5910c4e2b2f5984d09e1a47f5703e75",
+    "features/trackers/generic_context.py": "79aff92632cd29a2494ed52c021940efc79d9827dd11570e4e609f7463e782de",
+    "features/trackers/generic_rolling_productivity.py": "d0dcaa18e56debf27178e1e4c071f173f41988e5df57be8ee215303673f8e4a4",
+    "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
+    "features/trackers/host_bindings.py": "cf7428f2b14a6d8b15cefd4f1f883f636a236a58b493ea193b86860e61bd6020",
+    "research/analysis/diagnostic_ops.py": "975425379490053482e31a7c9098dbcb8e26577bb2954803c362980f46e46e90",
+    "research/schemas/study_spec.py": "3e7dcb21ed07499d378d0da3b6d6abd408f24f2a57227826775c0ddc6c7f90ba",
+    "research_workflow/audit_packets_v2.py": "1a1b7f98e3a948db6626c11ad713e30433f4e428febc2344f769ba92b86bbcd0",
+    "research_workflow/closure_hash.py": "80225b1ce75d53c5b37120d5f2d6da1cc98f2e124643a1768b05141492866b23",
+    "research_workflow/controller_contracts.py": "e57afaeb5afb49ebc995b1d45486d095e24d8c0240148f0f1fafaac6f5cc3bdb",
+    "research_workflow/dataset_v2.py": "352461e81424ac959494a4c10d16ff714bb374ce43dfa41b918733e9026d7819",
+    "research_workflow/entry_references.py": "78fe9b0f7e8e4aaee69d34a90572ef3e6c7d9f13bc8d70c23f36f30cb416f35b",
+    "research_workflow/experiment.py": "064017c10acab0d64379da3cc846c0ae1dfded43454c2f973c81afc54c554c4e",
+    "research_workflow/external_model_scoring.py": "4b0fa83f10349ff24f08b66b964b6b62859364dca4f5e54e587193f2cb9ec548",
+    "research_workflow/forward_outcomes/guard.py": "46d73217af1e9c47baddf11efb991209bbd0462ba636a0657c6e8be531090422",
+    "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
+    "research_workflow/governed_controller_v2.py": "94295dfab2ecbb6865ef5eaf2571f649582d2cbfb87edce426e3c3834102dcaa",
+    "research_workflow/grammar/compiler.py": "d99c1e94ab7d862cbe5e5cdd689ae7c19fe162e9de6e8f0170b361016f4fc163",
+    "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
+    "research_workflow/grammar/plan.py": "dcf5e954609ec129695574797e9a5c0efe5ac653abf5fcb7bf2bc9bc37a01dd1",
+    "research_workflow/grammar/predicates.py": "7b0fa449a526e3f0d9a7eca1444b5e35f381426517172716651a28042831c417",
+    "research_workflow/grammar/spec.py": "c9d6dc64d19c6e4c57591ebf890ff58644f552ffc89309deb7efd72ccb3bdfd6",
+    "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
+    "research_workflow/host/mux.py": "63f4b606895181ead566de12b10f783d380ed9c0bf0bd650ac43b76588e1708d",
+    "research_workflow/host/outcomes.py": "eddca7812228324d239a58657f6f734da41a7da651ccb2c2895901ff9c0ce18a",
+    "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
+    "research_workflow/host/sink.py": "c0e353d2cd2f23f4c4142927b9e06a90b52ff70ff365a8dd188fb43ec0e0959f",
+    "research_workflow/host/strategy.py": "59f4cca85697b4d82296d7a5e440d72353c8af15d3770a68c51c78c99b5eb66e",
+    "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
+    "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
+    "research_workflow/lifecycle_v2.py": "e5060a15d9e8714c0e8f1b596d89e878c78828f553e3e69867dad72fbee78723",
+    "research_workflow/locks.py": "8acc08e35fb743e2cd2f84d57b7a7e08ef4963a350fefb592377651f722b2258",
+    "research_workflow/policy.py": "efe60a8d2ccfa32c97880b6102251f9cf55cc2e5dbc403c3999eca35095517f1",
+    "research_workflow/provider_host.py": "6a06b45f61b0507e5f024db3adfd724b5c4f28534631f502b2555f0bb19646e5",
+    "research_workflow/roots.py": "157bd2694acf85ab46cd993de1fbc10af09967575f2d1c3911a057186ae4e695",
+    "research_workflow/seal.py": "95cdb55586214e62766f92544cd4d03dc47e7aae57b3a90388e12edf5b92597b",
+    "research_workflow/sessions.py": "ac26ab1b4b19be2950ee849a7c4671f624d08a7df7be27c39480a69883edcc8a",
+    "research_workflow/study_closure.py": "a45a593c5adf948e705d3a022426f2f268d12abda0dd1e9abf08bc7d87fc532b",
+    "research_workflow/target_expression.py": "cb2980ed3b1563ce2eee981896ab04ef101179a569dffdc975bbfb5bddd40045",
+    "research_workflow/target_replay_oracle.py": "e11cabdbb923764b9a4fc54ed86272d08583bedacd714ee4120e854a7b74fe64",
+    "research_workflow/workspace.py": "09a81e6d8013f352b1267095becfeab5d30d239c188c79379060a7544cab395a",
+    "utils/session_boundaries.py": "15bbb046337a9fd2ed119e64fb79de5dab5d37608a0f6b9a7d1b9a73a20d5b0f"
+  },
+  "frozen_execution_composite_sha256": "6e438b9c47c72e2fe0d24c213e5ecfadac4eda76b8e0c8b212c24df707569bc1",
+  "generated_at_utc": "2026-09-04T16:52:31.357917+00:00",
+  "hash_algorithm": "v2",
+  "plan_sha256": "a5843a3699c9ed9d9aed34277a613154631eb58a5e69b22ec1d10ece90e5a4eb",
+  "schema_version": 2,
+  "spec_sha256": "3ceee6f93bee7a03cc874c54dadebd04c98c615829931e8d525396f0d6ddfce1",
+  "stages": {
+    "audit": {
+      "composite_sha256": "cb379ab23966122a17566a3798d346bfd767cfec672d7847712ea8179bed77de",
+      "files": [
+        "research_workflow/audit_packets_v2.py"
+      ]
+    },
+    "collection": {
+      "composite_sha256": "10881fe4193a606619d2716d93c07776125f051baa9e1c18dfe72758810d35cc",
+      "files": [
+        "features/registry.py",
+        "features/trackers/generic_arrival.py",
+        "features/trackers/generic_context.py",
+        "features/trackers/generic_rolling_productivity.py",
+        "features/trackers/generic_structural_geometry.py",
+        "features/trackers/host_bindings.py",
+        "research/analysis/diagnostic_ops.py",
+        "research/schemas/study_spec.py",
+        "research_workflow/dataset_v2.py",
+        "research_workflow/external_model_scoring.py",
+        "research_workflow/grammar/compiler.py",
+        "research_workflow/grammar/expansion.py",
+        "research_workflow/grammar/plan.py",
+        "research_workflow/grammar/predicates.py",
+        "research_workflow/grammar/spec.py",
+        "research_workflow/host/interfaces.py",
+        "research_workflow/host/mux.py",
+        "research_workflow/host/outcomes.py",
+        "research_workflow/host/predicate_eval.py",
+        "research_workflow/host/sink.py",
+        "research_workflow/host/strategy.py",
+        "research_workflow/host/triggers.py",
+        "research_workflow/host_runner.py",
+        "research_workflow/provider_host.py",
+        "research_workflow/sessions.py",
+        "research_workflow/target_expression.py",
+        "research_workflow/target_replay_oracle.py",
+        "utils/session_boundaries.py"
+      ]
+    },
+    "lifecycle": {
+      "composite_sha256": "ab33938710edb1484db289239bf008d230156f501fdcdde1ebf044b3f7e583e3",
+      "files": [
+        "research_workflow/closure_hash.py",
+        "research_workflow/controller_contracts.py",
+        "research_workflow/governed_controller.py",
+        "research_workflow/governed_controller_v2.py",
+        "research_workflow/lifecycle_v2.py",
+        "research_workflow/locks.py",
+        "research_workflow/policy.py",
+        "research_workflow/roots.py",
+        "research_workflow/seal.py",
+        "research_workflow/study_closure.py",
+        "research_workflow/workspace.py"
+      ]
+    },
+    "oos": {
+      "composite_sha256": "33c6cd66e080343671805fb1b81c4fee0d4ad779909689807c36e532f7e954df",
+      "files": [
+        "research_workflow/experiment.py"
+      ]
+    },
+    "outcome": {
+      "composite_sha256": "34cda7cf9c805caa2c77aa46a555cb1d13e2f5fddf84f78e00a77d72d1cc2638",
+      "files": [
+        "research_workflow/entry_references.py",
+        "research_workflow/forward_outcomes/guard.py",
+        "research_workflow/target_expression.py",
+        "research_workflow/target_replay_oracle.py"
+      ]
+    }
+  }
+}

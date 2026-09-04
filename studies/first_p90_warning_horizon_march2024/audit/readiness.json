@@ -1,0 +1,39 @@
+{
+  "checks": [
+    {
+      "detail": "NQ_1S_V2_GLOBEX resolved via configured_root; digest 9e7aecb7a291 bytes verified",
+      "id": "R1_NQ",
+      "passed": true
+    },
+    {
+      "detail": "0 findings",
+      "id": "R8_host_boundary_lint",
+      "passed": true
+    },
+    {
+      "detail": "18 primitives bound; unbound=[]",
+      "id": "R5_binding_proof",
+      "passed": true
+    },
+    {
+      "detail": "{\"kind\": \"calendar\", \"session\": \"RTH\", \"censor_session\": \"RTH\", \"reference_digest\": \"e577a36165abd690f70221041c4e2b6c7302b876b81d63e7a1f4076b46514514\", \"window_count\": 1632, \"reference_row_counts\": {\"gaps\": 19186323, \"holidays\": 17, \"maintenance\": 2007, \"out_of_calendar\": 4, \"rolls\": 25, \"sessions\": 1636}}",
+      "id": "R3_session_table",
+      "passed": true
+    },
+    {
+      "detail": "current=6e438b9c47c7 frozen=6e438b9c47c7",
+      "id": "R9_closure_current",
+      "passed": true
+    },
+    {
+      "detail": "{\"python_files\": [], \"exception\": null}",
+      "id": "R10_zero_study_python",
+      "passed": true
+    }
+  ],
+  "execution_composite_sha256": "6e438b9c47c72e2fe0d24c213e5ecfadac4eda76b8e0c8b212c24df707569bc1",
+  "generated_at_utc": "2026-09-04T16:52:34.895863+00:00",
+  "overall_status": "PASS",
+  "plan_sha256": "a5843a3699c9ed9d9aed34277a613154631eb58a5e69b22ec1d10ece90e5a4eb",
+  "schema_version": 2
+}
