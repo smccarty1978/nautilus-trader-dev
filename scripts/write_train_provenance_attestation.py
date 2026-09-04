@@ -136,19 +136,27 @@ def _cell(study: Path, direction: str, freeze_rel: str, model_rel: str, arm: str
     if not surface or not fit_identity:
         raise AttestationError(f"ATTESTATION_FREEZE_ARM_INCOMPLETE: {arm!r}")
 
+    # Two clearly separated groups. Everything at the top level is BINDING: the consuming binder
+    # checks each one and refuses on any mismatch. Everything under `descriptive_only` is context
+    # for a human reader and is NOT verified by anything -- kept in its own object so the artifact
+    # cannot create the impression that it was.
     return {
         "direction": direction, "arm": arm, "cell_id": f"{direction}_{arm}",
         "original_freeze_path": freeze_rel,
-        "original_freeze_file_sha256": _sha(freeze_path),
         "original_freeze_canonical_sha256": canonical_sha256(freeze),
-        "freeze_declared_freeze_sha256": freeze.get("freeze_sha256"),
-        "freeze_authorization_sha256": freeze.get("authorization_sha256"),
         "model_artifact_path": model_rel,
         "model_artifact_sha256": _sha(model_path),
         "fit_identity_sha256": fit_identity,
         "preprocessing_hash": freeze.get("preprocessing_hash"),
-        "ordered_feature_surface": surface,
-        "thresholds": {k: v.get("threshold") for k, v in thresholds.items()},
+        "descriptive_only": {
+            "_note": "context for readers; NOT verified by the binder. Only top-level fields bind.",
+            "original_freeze_file_sha256_at_attestation_time": _sha(freeze_path),
+            "original_freeze_file_sha256_is_checkout_dependent": True,
+            "freeze_declared_freeze_sha256": freeze.get("freeze_sha256"),
+            "freeze_authorization_sha256": freeze.get("authorization_sha256"),
+            "ordered_feature_surface": surface,
+            "thresholds": {k: v.get("threshold") for k, v in thresholds.items()},
+        },
         "train_only_evidence": {
             "partition": freeze.get("partition"),
             "threshold_derivation_population": {k: v.get("derivation_population") for k, v in thresholds.items()},
