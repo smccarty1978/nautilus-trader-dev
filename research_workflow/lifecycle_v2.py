@@ -180,6 +180,15 @@ def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequ
                 f"YEARS_NOT_AUTHORIZED: period={period} stale experiment_authorization.json "
                 f"(plan.chronology.{role}={role_years}/prohibited={sorted(prohibited)} != "
                 f"authorization.{auth_role_key}={auth_years}/prohibited_years={sorted(auth_prohibited)})")
+        # A window narrows an authorized year to explicit dates. If the plan's windows and the
+        # recorded authorization's windows disagree, the authorization artifact is stale against
+        # a re-compiled plan and the run is refused rather than executed against the old dates.
+        plan_windows = windows_identity((chron.get("windows") or []))
+        auth_windows = sorted(str(w) for w in (authorization.get("partition_windows") or []))
+        if auth_windows != plan_windows:
+            raise LifecycleV2Error(
+                f"WINDOWS_NOT_AUTHORIZED: stale experiment_authorization.json "
+                f"(plan.chronology.windows={plan_windows} != authorization.partition_windows={auth_windows})")
 
     if requested is None:
         overlap = sorted(set(role_years) & prohibited)
@@ -200,11 +209,58 @@ def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequ
     return req
 
 
+def _merge_window_stats(stats: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
+    """Aggregate per-window run stats into one partition-level record.
+
+    Numeric counters sum; anything structured (nested per-stream dicts, strings) is kept as the
+    ordered per-window list so a merged partition never fabricates a single value for something
+    that was actually measured once per window.
+    """
+    merged: Dict[str, Any] = {}
+    for key in sorted({k for s in stats for k in s}):
+        values = [s.get(key) for s in stats]
+        if all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in values if v is not None):
+            merged[key] = sum(v for v in values if v is not None)
+        else:
+            merged[key] = values
+    return merged
+
+
+def partition_windows(plan: Dict[str, Any], year: int) -> List[Dict[str, Any]]:
+    """The declared date-bounded windows for one role year, or [] when the year runs whole.
+
+    ``chronology.windows`` narrows an already-authorized role year to explicit inclusive date
+    ranges; a year with no declared window keeps whole-year behaviour.
+    """
+    return [w for w in ((plan.get("chronology") or {}).get("windows") or []) if int(w["year"]) == int(year)]
+
+
+def authorized_windows(plan: Dict[str, Any], requested: Optional[Sequence[str]] = None) -> List[Dict[str, Any]]:
+    """Resolve the windows a run may execute. ``requested`` (CLI ``--windows``) may only NARROW
+    the declared set: an unknown window id is refused rather than executed."""
+    declared = list((plan.get("chronology") or {}).get("windows") or [])
+    if requested is None:
+        return declared
+    wanted = {str(w).strip().replace("..", "_") for w in requested}
+    if not wanted:
+        raise LifecycleV2Error("WINDOWS_NOT_AUTHORIZED: requested=[] is not 'everything'")
+    known = {w["id"] for w in declared}
+    unknown = sorted(wanted - known)
+    if unknown:
+        raise LifecycleV2Error(f"WINDOWS_NOT_AUTHORIZED: requested={unknown} declared={sorted(known)}")
+    return [w for w in declared if w["id"] in wanted]
+
+
+def windows_identity(windows: Sequence[Mapping[str, Any]]) -> List[str]:
+    return sorted(f"{w['year']}:{w['start']}..{w['end']}" for w in windows)
+
+
 @dataclass
 class V2Options:
     execute: bool = False
     smoke_date: Optional[str] = None
     years: Optional[List[int]] = None
+    windows: Optional[List[str]] = None
     closure: Optional[Dict[str, str]] = None
     studies_root: Optional[Path] = None
     datasets_dir: Optional[Path] = None
@@ -310,6 +366,13 @@ class V2Lifecycle:
                     "train_years": list(chron["train"]), "oos_years": [], "prohibited_years": list(chron.get("prohibited") or []),
                     "generated_at_utc": _now()}
             body["authorization_sha256"] = canonical_sha256({k: v for k, v in body.items() if k != "generated_at_utc"})
+            _write(auth_path, body)
+        # Date-bounded authorization is recorded next to the year roles for BOTH branches, so a
+        # stale authorization (a plan re-compiled with different windows after PREPARE) is caught
+        # by authorized_years() before any partition streams a bar.
+        if chron.get("windows"):
+            body = _read(auth_path)
+            body["partition_windows"] = windows_identity(chron["windows"])
             _write(auth_path, body)
         frozen = {"schema_version": 2, "hash_algorithm": plan["closure"]["hash_algorithm"], "authority": "platform_v2_plan_closure",
                   "plan_sha256": plan["plan_sha256"], "spec_sha256": plan["spec_sha256"],
@@ -496,6 +559,7 @@ class V2Lifecycle:
         return {"status": "PASS", "outputs": [str(path), str(run_dir / "collection" / "candidates.parquet"), str(run_dir / "collection" / "observations.parquet")]}
 
     def _partition_bounds(self, plan: Dict[str, Any], year: int, period: str) -> Dict[str, Any]:
+        """Whole-year bounds for one role year, with the outcome lookahead tail."""
         import pandas as pd
         years = set(plan["chronology"]["train"]) | set(plan["chronology"].get("dev") or [])
         horizon_ns = max([a["horizon_ns"] for a in plan["outcome"].get("arms") or []] + [((plan["outcome"].get("flip") or {}).get("horizon_ns") or 0)])
@@ -506,6 +570,22 @@ class V2Lifecycle:
         e = int((pd.Timestamp(primary_end, tz="UTC") + pd.Timedelta(days=1) - pd.Timedelta(nanoseconds=1)).value)
         return {"id": f"{period}-{year}", "year": year, "period": period, "primary_start": primary_start, "primary_end": primary_end, "run_end": run_end, "primary_ns": (s, e)}
 
+    def _window_bounds(self, plan: Dict[str, Any], window: Mapping[str, Any], period: str) -> Dict[str, Any]:
+        """Bounds for one declared date window.
+
+        The window is a HARD data boundary: unlike a whole-year partition there is no forward
+        lookahead tail, because a tail would stream bars the study never authorized. Any candidate
+        whose outcome cannot resolve inside the window is left pending, and ``run_partition``
+        refuses the partition rather than silently censoring it -- an unresolved row is proof the
+        declared window is too narrow for the declared outcome, which is a spec defect, not data.
+        """
+        import pandas as pd
+        start, end = str(window["start"]), str(window["end"])
+        s = int(pd.Timestamp(start, tz="UTC").value)
+        e = int((pd.Timestamp(end, tz="UTC") + pd.Timedelta(days=1) - pd.Timedelta(nanoseconds=1)).value)
+        return {"id": f"{period}-{window['id']}", "year": int(window["year"]), "period": period, "window_id": str(window["id"]),
+                "primary_start": start, "primary_end": end, "run_end": end, "primary_ns": (s, e)}
+
     def _partition_valid(self, out_dir: Path, plan_sha: str, seal: str) -> bool:
         m = _read(out_dir / "manifest.json")
         if not m or m.get("status") != "PASS" or m.get("plan_sha256") != plan_sha or m.get("composite_seal_hash") != seal:
@@ -513,11 +593,49 @@ class V2Lifecycle:
         return _sha(out_dir / "candidates.parquet") == m.get("candidates_sha256") and _sha(out_dir / "observations.parquet") == m.get("observations_sha256")
 
     def run_partition(self, year: int, period: str, out_dir: Path, *, progress: Optional[Path] = None) -> Dict[str, Any]:
+        """One partition for one role year.
+
+        A year with declared ``chronology.windows`` runs one bounded sub-run per window and
+        concatenates them into the single per-year partition every downstream stage already
+        reads; a year with no window keeps the whole-year path unchanged.
+        """
+        import pandas as pd
         plan = load_plan(self.study)
         ids = self._seal_identities()
-        b = self._partition_bounds(plan, year, period)
-        run = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
-        return self._persist(run, out_dir, {"kind": "partition", **{k: v for k, v in b.items() if k != "primary_ns"}, "plan_sha256": plan["plan_sha256"], **ids})
+        windows = [w for w in authorized_windows(plan, self.opts.windows) if int(w["year"]) == int(year)]
+        declared_for_year = partition_windows(plan, year)
+        if declared_for_year and not windows:
+            raise LifecycleV2Error(f"WINDOWS_NOT_AUTHORIZED: {period}-{year} declares windows but none were selected")
+        if not declared_for_year:
+            b = self._partition_bounds(plan, year, period)
+            run = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
+            return self._persist(run, out_dir, {"kind": "partition", **{k: v for k, v in b.items() if k != "primary_ns"},
+                                                "windows": [], "plan_sha256": plan["plan_sha256"], **ids})
+        runs, bounds = [], []
+        for w in windows:
+            b = self._window_bounds(plan, w, period)
+            r = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
+            pending = int((r.get("stats") or {}).get("pending_at_end") or 0)
+            if pending:
+                raise LifecycleV2Error(
+                    f"WINDOW_OUTCOME_UNRESOLVED: {b['id']} left {pending} candidate(s) unresolved at the window "
+                    f"boundary; the declared window cannot resolve the declared outcome")
+            runs.append(r); bounds.append({k: v for k, v in b.items() if k != "primary_ns"})
+        merged = {"candidates": pd.concat([r["candidates"] for r in runs], ignore_index=True),
+                  "observations": pd.concat([r["observations"] for r in runs], ignore_index=True),
+                  "stats": _merge_window_stats([r.get("stats") or {} for r in runs]),
+                  "elapsed_s": sum(float(r.get("elapsed_s") or 0.0) for r in runs),
+                  "dataset": runs[0].get("dataset")}
+        digests = {json.dumps(r.get("dataset") or {}, sort_keys=True) for r in runs}
+        if len(digests) > 1:
+            raise LifecycleV2Error(f"WINDOW_DATASET_MISMATCH: {period}-{year} windows read different datasets")
+        return self._persist(merged, out_dir, {
+            "kind": "partition", "id": f"{period}-{year}", "year": int(year), "period": period,
+            "primary_start": bounds[0]["primary_start"], "primary_end": bounds[-1]["primary_end"],
+            "run_end": bounds[-1]["run_end"], "date_bounded": True,
+            "windows": [{k: b[k] for k in ("id", "window_id", "primary_start", "primary_end")} for b in bounds],
+            "window_rows": [int(len(r["candidates"])) for r in runs],
+            "plan_sha256": plan["plan_sha256"], **ids})
 
     def _collect_period(self, period: str) -> Dict[str, Any]:
         plan = load_plan(self.study)
@@ -538,6 +656,8 @@ class V2Lifecycle:
                            "--year", str(year), "--out-dir", str(out_dir), "--progress", str(progress), "--repo-root", str(self.repo_root)]
                     if self.opts.studies_root:
                         cmd += ["--studies-root", str(self.opts.studies_root)]
+                    if self.opts.windows:
+                        cmd += ["--windows", ",".join(self.opts.windows)]
                     out_dir.mkdir(parents=True, exist_ok=True)
                     with open(out_dir / "child.log", "w", encoding="utf-8") as log:
                         r = subprocess.run(cmd, cwd=str(self.repo_root), stdout=log, stderr=subprocess.STDOUT, timeout=self.opts.max_runtime)
@@ -577,13 +697,31 @@ class V2Lifecycle:
                 findings.append(f"partition {y}: duplicate candidate keys")
             if len(c) and not pd.to_datetime(c["observation_ts"], unit="ns", utc=True).dt.year.eq(int(y)).all():
                 findings.append(f"partition {y}: rows outside the primary year")
+            # A date-bounded year is only reconciled against its DECLARED windows: proving rows sit
+            # inside the calendar year would not detect a partition that streamed unauthorized dates.
+            declared = partition_windows(plan, int(y))
+            if declared and len(c):
+                ts = pd.to_datetime(c["observation_ts"], unit="ns", utc=True)
+                inside = False
+                for w in declared:
+                    lo = pd.Timestamp(w["start"], tz="UTC")
+                    hi = pd.Timestamp(w["end"], tz="UTC") + pd.Timedelta(days=1) - pd.Timedelta(nanoseconds=1)
+                    inside = ((ts >= lo) & (ts <= hi)) if inside is False else (inside | ((ts >= lo) & (ts <= hi)))
+                outside = int((~inside).sum())
+                if outside:
+                    findings.append(f"partition {y}: {outside} row(s) outside the declared windows "
+                                    f"{[w['id'] for w in declared]}")
+                if [str(x) for x in (m.get("windows") or [])] == []:
+                    findings.append(f"partition {y}: manifest records no windows for a date-bounded year")
             rows += len(c); seen_keys += len(c)
         if len(set(schemas)) > 1:
             findings.append("partition output schema mismatch")
         if len(digests) > 1:
             findings.append(f"partitions read different dataset digests: {sorted(digests)}")
         path = _write(self.work / "reconcile.json", {"passed": not findings, "findings": findings, "years": list(years), "rows": rows,
-                                                    "authority": "plan.chronology.train", "dataset_digests": sorted(digests),
+                                                    "authority": "plan.chronology.train",
+                                                    "partition_windows": windows_identity((plan.get("chronology") or {}).get("windows") or []),
+                                                    "dataset_digests": sorted(digests),
                                                     "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
                                                     "generated_at_utc": _now()})
         if findings:
@@ -905,9 +1043,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     p = sub.add_parser("partition")
     p.add_argument("--study", required=True); p.add_argument("--period", required=True); p.add_argument("--year", type=int, required=True)
     p.add_argument("--out-dir", required=True); p.add_argument("--progress"); p.add_argument("--repo-root"); p.add_argument("--studies-root")
+    p.add_argument("--windows", help="comma-separated declared window ids/ranges this child may execute")
     ns = ap.parse_args(argv)
     if ns.cmd == "partition":
-        opts = V2Options(studies_root=Path(ns.studies_root) if ns.studies_root else None)
+        opts = V2Options(studies_root=Path(ns.studies_root) if ns.studies_root else None,
+                         windows=[w for w in (ns.windows or "").split(",") if w.strip()] or None)
         lc = V2Lifecycle(Path(ns.study), repo_root=Path(ns.repo_root) if ns.repo_root else REPO_ROOT, options=opts)
         manifest = lc.run_partition(ns.year, ns.period, Path(ns.out_dir), progress=Path(ns.progress) if ns.progress else None)
         print(json.dumps({"STATUS": "OK", "partition": manifest.get("id"), "rows": manifest.get("rows")}))

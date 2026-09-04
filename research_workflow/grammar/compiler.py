@@ -954,6 +954,61 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
             "features": list(ctx.feature_aliases), "derived": derived, "observation": list(outcome.get("observation_columns") or [])}
 
 
+def _resolve_partition_windows(ctx: _Ctx, ch, train: set, dev: set, prohibited: set) -> List[Dict[str, Any]]:
+    """Compile ``chronology.windows`` into ordered, validated, date-bounded partition windows.
+
+    A window NARROWS an already-authorized role year to an explicit inclusive date range; it can
+    never open a year the role declarations did not already authorize, and never crosses a year
+    boundary (a window is executed as one partition of exactly one role year). Every declared
+    window must land in a train or dev year, so a diagnostic-only or prohibited year stays
+    unexecutable by construction.
+    """
+    import datetime as _dt
+    resolved: List[Dict[str, Any]] = []
+    seen_ids: set = set()
+    for i, raw in enumerate(ch.windows or []):
+        where = f"chronology.windows[{i}]"
+        text = str(raw).strip()
+        if ".." not in text:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"{text!r} is not 'YYYY-MM-DD..YYYY-MM-DD'")
+            continue
+        start_s, _, end_s = text.partition("..")
+        try:
+            start = _dt.date.fromisoformat(start_s.strip())
+            end = _dt.date.fromisoformat(end_s.strip())
+        except ValueError:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"{text!r} carries a non-ISO date")
+            continue
+        if end < start:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"{text!r} ends before it starts")
+            continue
+        if start.year != end.year:
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, where,
+                    f"{text!r} crosses a year boundary; declare one window per chronology year")
+            continue
+        year = start.year
+        if year in prohibited:
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, where, f"{year} is a prohibited year")
+            continue
+        if year not in train and year not in dev:
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, where,
+                    f"{year} is not a declared train or dev year; a window narrows an authorized role year, it never opens one")
+            continue
+        wid = f"{start.isoformat()}_{end.isoformat()}"
+        if wid in seen_ids:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"duplicate window {text!r}")
+            continue
+        seen_ids.add(wid)
+        resolved.append({"id": wid, "year": year, "start": start.isoformat(), "end": end.isoformat(),
+                         "role": "train" if year in train else "dev"})
+    resolved.sort(key=lambda w: (w["year"], w["start"], w["end"]))
+    for a, b in zip(resolved, resolved[1:]):
+        if a["year"] == b["year"] and b["start"] <= a["end"]:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "chronology.windows",
+                    f"windows {a['id']} and {b['id']} overlap")
+    return resolved
+
+
 def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
     ch = ctx.spec.chronology
     train, dev, prohibited, diag = set(ch.train), set(ch.dev), set(ch.prohibited), set(ch.diagnostic)
@@ -961,7 +1016,8 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
         if a & b:
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "chronology", f"years {sorted(a & b)} appear in both {na} and {nb}")
     chronology = {"train": sorted(train), "dev": sorted(dev), "prohibited": sorted(prohibited), "diagnostic": sorted(diag),
-                  "warmup": ch.warmup.model_dump(), "authorized_dates": list(ch.authorized_dates)}
+                  "warmup": ch.warmup.model_dump(), "authorized_dates": list(ch.authorized_dates),
+                  "windows": _resolve_partition_windows(ctx, ch, train, dev, prohibited)}
     model_spec = ctx.spec.model
     if model_spec == "none":
         return chronology, None

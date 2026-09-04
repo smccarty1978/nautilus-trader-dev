@@ -209,6 +209,12 @@ class ChronologySpec(_Strict):
     diagnostic: List[int] = Field(default_factory=list)
     warmup: WarmupSpec = Field(default_factory=WarmupSpec)
     authorized_dates: List[str] = Field(default_factory=list)
+    # Date-bounded partition execution. Each entry is 'YYYY-MM-DD..YYYY-MM-DD' (inclusive) and
+    # must lie inside one calendar year that is already a declared train or dev year. A role
+    # year that carries one or more windows streams and emits ONLY those windows -- windows
+    # NARROW an authorized year, they can never open a year the roles did not already authorize.
+    # A role year with no window keeps whole-year behaviour.
+    windows: List[str] = Field(default_factory=list)
 
 
 class ValidationSpec(_Strict):

@@ -28,6 +28,7 @@ def main() -> int:
     ap.add_argument("--closure-outcome"); ap.add_argument("--closure-decision")
     ap.add_argument("--smoke-date", help="v2: bounded smoke day (YYYY-MM-DD)")
     ap.add_argument("--years", help="v2: comma-separated subset of partition years")
+    ap.add_argument("--windows", help="v2: comma-separated subset of declared chronology.windows (narrow only)")
     ap.add_argument("--studies-root", help="v2: machine-local root holding parent studies for frozen external scores")
     ns = ap.parse_args()
     from research_workflow.lifecycle_v2 import is_v2_study
@@ -36,6 +37,7 @@ def main() -> int:
         from research_workflow.lifecycle_v2 import V2Options
         closure = {"outcome": ns.closure_outcome, "terminal_decision": ns.closure_decision} if (ns.closure_outcome or ns.closure_decision) else None
         opts = V2Options(execute=ns.execute_authorized, smoke_date=ns.smoke_date, years=[int(y) for y in ns.years.split(",")] if ns.years else None,
+                         windows=[w.strip() for w in ns.windows.split(",") if w.strip()] if ns.windows else None,
                          closure=closure, studies_root=Path(ns.studies_root) if ns.studies_root else None, max_runtime=ns.max_runtime)
         card = V2StudyController(ns.study, options=opts, owned_paths=tuple(ns.owned_path), max_runtime=ns.max_runtime,
                                  stale_progress_timeout=ns.stale_progress_timeout, rss_limit_mb=ns.rss_limit_mb).run(
