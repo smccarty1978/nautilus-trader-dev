@@ -1,0 +1,51 @@
+{
+  "cells": [
+    {
+      "anchor_n": 115,
+      "cell": "-1",
+      "control_n": 154,
+      "status": "OK"
+    },
+    {
+      "anchor_n": 124,
+      "cell": "1",
+      "control_n": 158,
+      "status": "OK"
+    }
+  ],
+  "controls": 312,
+  "controls_by_kind": {
+    "never_anchored": 73,
+    "pre_anchor": 239
+  },
+  "eligible_column": null,
+  "eligible_when": [
+    [
+      "running_mfe_atr",
+      "gte",
+      1.0
+    ],
+    [
+      "new_progress_windows",
+      "gte",
+      2
+    ],
+    [
+      "retained_mfe_ratio",
+      "gte",
+      0.5
+    ],
+    [
+      "regime_age_seconds",
+      "lte",
+      1800
+    ]
+  ],
+  "min_n": 30,
+  "reportable_cells": 2,
+  "schema_version": 1,
+  "selection_rule": "latest eligible row below threshold in the cell; strictly before the anchor for a group that anchored",
+  "strata": [
+    "regime_direction"
+  ]
+}
