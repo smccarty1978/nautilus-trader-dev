@@ -109,9 +109,16 @@ population_identity:
     subset -- and therefore the first-P90 identity -- exactly the parent's, while leaving the rest
     of the frame available to the score path.
   population_parity_gate: >
-    STOP GATE. Before any scientific reading, the analysis anchor set must equal the parent's
-    frozen March identity: 239 total, LONG 115, SHORT 124, matched on regime identity, checkpoint
-    identity and timestamp against validation_march2024/artifacts/first_p90_parity.parquet.
+    STOP GATE, EXECUTABLE. Declared as analysis step `population_parity_gate`
+    (op analysis.gate.population_parity) immediately after the anchors and before every
+    statistic, so a drifted population aborts the analyze stage with NO artifact written.
+    It requires: reference bytes sha256 52437d73c1cf0705001bb2534d1c3a6e8cbe401585f46e3534968c7bb1e22616
+    (validation_march2024/artifacts/first_p90_parity.parquet); 239 anchors total;
+    LONG 115 / SHORT 124; the anchor regime_start_ns set EXACTLY equal to the reference
+    regime_id set, no key on one side only; and every anchor's observation_ts equal to the
+    reference nt_first_P90_ts. Evidence artifact: first_p90_population_parity.json.
+    Prose alone is not a gate -- the first contract audit BLOCKED this study precisely because
+    this requirement was declared here and wired to nothing.
 
 # --------------------------------------------------------------------------------------------
 # Chronology and data authorization
@@ -187,6 +194,7 @@ declarations:
 
 deliverables:
   - first_p90_warning_horizon_contract.json
+  - first_p90_population_parity.json
   - first_p90_time_to_flip_detail.parquet
   - first_p90_cumulative_incidence.json
   - first_p90_negative_decomposition.json

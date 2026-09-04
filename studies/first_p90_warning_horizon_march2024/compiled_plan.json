@@ -7,6 +7,11 @@
         "source": "first_p90"
       },
       {
+        "kind": "json",
+        "name": "first_p90_population_parity.json",
+        "source": "population_parity_gate"
+      },
+      {
         "kind": "frame",
         "name": "first_p90_time_to_flip_detail.parquet",
         "source": "first_p90"
@@ -52,6 +57,7 @@
       "analysis.classify.precedence",
       "analysis.control.cell_matched",
       "analysis.decomposition.buckets",
+      "analysis.gate.population_parity",
       "analysis.incidence.cumulative",
       "analysis.path.anchored_offsets"
     ],
@@ -119,6 +125,37 @@
           }
         },
         "rows": "frame"
+      },
+      {
+        "id": "population_parity_gate",
+        "inputs": {},
+        "op": "analysis.gate.population_parity",
+        "params": {
+          "expected_by": {
+            "regime_direction": {
+              "-1": 124,
+              "1": 115
+            }
+          },
+          "expected_total": 239,
+          "key": [
+            "regime_start_ns"
+          ],
+          "reference_key": [
+            "regime_id"
+          ],
+          "reference_path": "clean_maturity_flip_model_180s_horizon/validation_march2024/artifacts/first_p90_parity.parquet",
+          "reference_sha256": "52437d73c1cf0705001bb2534d1c3a6e8cbe401585f46e3534968c7bb1e22616",
+          "reference_timestamp_column": "nt_first_P90_ts",
+          "timestamp_column": "observation_ts",
+          "value_map": {
+            "direction": {
+              "LONG": 1,
+              "SHORT": -1
+            }
+          }
+        },
+        "rows": "first_p90"
       },
       {
         "id": "cumulative_incidence",
@@ -845,7 +882,7 @@
     ]
   },
   "closure": {
-    "composite_sha256": "89f940ddf8089c88946580006bd6352826f3342f0ec51f1f5d0efe66a043ea70",
+    "composite_sha256": "76945644f68d00e3ff19db8399ac951eefdf4bbcdb1e2eee69d8f52ea3cf9d0c",
     "file_count": 43,
     "files": {
       "features/registry.py": "8eb7202bdb1c0487eca5f2a69aee7c6e3537afd0c1bf79f66bcf3da0e34edf8a",
@@ -854,7 +891,7 @@
       "features/trackers/generic_rolling_productivity.py": "d0dcaa18e56debf27178e1e4c071f173f41988e5df57be8ee215303673f8e4a4",
       "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
       "features/trackers/host_bindings.py": "cf7428f2b14a6d8b15cefd4f1f883f636a236a58b493ea193b86860e61bd6020",
-      "research/analysis/diagnostic_ops.py": "975425379490053482e31a7c9098dbcb8e26577bb2954803c362980f46e46e90",
+      "research/analysis/diagnostic_ops.py": "73f9060f174a30117a4e2646f8f892e7ce906e9f43d8023e0c79dc3b8087f881",
       "research/schemas/study_spec.py": "c1d439c406c530797bf05b1ee57dfd146a964ed039c55472f4a4c8455ccae413",
       "research_workflow/audit_packets_v2.py": "1a1b7f98e3a948db6626c11ad713e30433f4e428febc2344f769ba92b86bbcd0",
       "research_workflow/closure_hash.py": "80225b1ce75d53c5b37120d5f2d6da1cc98f2e124643a1768b05141492866b23",
@@ -879,7 +916,7 @@
       "research_workflow/host/strategy.py": "59f4cca85697b4d82296d7a5e440d72353c8af15d3770a68c51c78c99b5eb66e",
       "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
       "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
-      "research_workflow/lifecycle_v2.py": "72b584258d335e369dfe295b68a42b26a020763063620385ea41ebefcbd1dfb5",
+      "research_workflow/lifecycle_v2.py": "0136df1c64e3e889c06f6e8354dd3cd618f455d638caf76e67bce2bf08653d32",
       "research_workflow/locks.py": "8acc08e35fb743e2cd2f84d57b7a7e08ef4963a350fefb592377651f722b2258",
       "research_workflow/policy.py": "efe60a8d2ccfa32c97880b6102251f9cf55cc2e5dbc403c3999eca35095517f1",
       "research_workflow/provider_host.py": "6a06b45f61b0507e5f024db3adfd724b5c4f28534631f502b2555f0bb19646e5",
@@ -901,7 +938,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "3aeaf60d2187d787be9036ee3e53c06e7b3b7427ae7a52df761c1ff75c86c57c",
+        "composite_sha256": "c9b3cb182b5550df20281b016a47436bd726560a83d71b764f055220db2f4279",
         "files": [
           "features/registry.py",
           "features/trackers/generic_arrival.py",
@@ -934,7 +971,7 @@
         ]
       },
       "lifecycle": {
-        "composite_sha256": "8e9c01300ae915ac6695ee2fc39af2e943e4232029aa0bca2f149b051d5f13a9",
+        "composite_sha256": "7f12657ec8b23ebfc6e571a0fa19832d536b84d96d269aaa3238824c2f216702",
         "files": [
           "research_workflow/closure_hash.py",
           "research_workflow/controller_contracts.py",
@@ -1420,7 +1457,7 @@
     "stream": "nq_1s",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "1824b032509fb33ab548f591f592cd79c6a745189c64253eda1f5dca62b93bfd",
+  "plan_sha256": "cd67791fd6da5177fa1e405db79961ff0fa864bf8457135c790dda0ed571932a",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1481,7 +1518,7 @@
     },
     "session": "RTH"
   },
-  "registry_sha256": "e0e8dcdb700b0a3e6652c4df1019d9382b15bf15c802c2c1512975151dc20fca",
+  "registry_sha256": "f723f8c4a5d88af0eba05b6641a1ca5275f61904098f19959f3f0f67f459f9b9",
   "session": {
     "censor_session": "RTH",
     "dataset": "NQ_1S_V2_GLOBEX",
@@ -1497,7 +1534,7 @@
     ],
     "session": "RTH"
   },
-  "spec_sha256": "47bd83ae521923e2a8251e067d655d688a0b9e445747e94d24e0ad541034dcf0",
+  "spec_sha256": "c02870822cc587291ae1fb4b9fb2c9301263387c9478805c36dd933d9234d440",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",

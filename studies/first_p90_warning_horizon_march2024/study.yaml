@@ -199,6 +199,27 @@ analysis:
           - [regime_age_seconds, lte, 1800]
         terminal: {columns: [resolved_at_ts], reduce: min, unit: ns}
 
+    # ---- STOP GATE: the anchor set must BE the parent's frozen March population ----------
+    # Declared immediately after the anchors and before every statistic, so a drifted
+    # population aborts the analyze stage with NO artifact written, rather than producing
+    # plausible numbers about the wrong rows. The reference is pinned by sha256 so the frozen
+    # comparison cannot itself drift.
+    - id: population_parity_gate
+      op: analysis.gate.population_parity
+      rows: first_p90
+      params:
+        reference_path: clean_maturity_flip_model_180s_horizon/validation_march2024/artifacts/first_p90_parity.parquet
+        reference_sha256: 52437d73c1cf0705001bb2534d1c3a6e8cbe401585f46e3534968c7bb1e22616
+        key: [regime_start_ns]
+        reference_key: [regime_id]
+        expected_total: 239
+        expected_by:
+          regime_direction: {1: 115, -1: 124}
+        timestamp_column: observation_ts
+        reference_timestamp_column: nt_first_P90_ts
+        value_map:
+          direction: {LONG: 1, SHORT: -1}
+
     - id: cumulative_incidence
       op: analysis.incidence.cumulative
       rows: first_p90
@@ -292,6 +313,7 @@ analysis:
 
   artifacts:
     - {name: first_p90_warning_horizon_contract.json, source: first_p90,             kind: json}
+    - {name: first_p90_population_parity.json,        source: population_parity_gate, kind: json}
     - {name: first_p90_time_to_flip_detail.parquet,   source: first_p90,             kind: frame}
     - {name: first_p90_cumulative_incidence.json,     source: cumulative_incidence,  kind: json}
     - {name: first_p90_negative_decomposition.json,   source: negative_decomposition, kind: json}
