@@ -396,18 +396,63 @@ def test_rt2_18_stale_or_tampered_terminal_evidence_prevents_study_closed(tmp_pa
         load_study_closure(s)
 
 
+_CLOSED_180S = REPO_ROOT / "studies/clean_maturity_flip_model_180s_horizon"
+
+
+def _require_bound_model_artifacts(study: Path) -> None:
+    """Skip when a closed study's bound model artifacts are not in this checkout.
+
+    ``classify_oos_analysis`` verifies every bound model's ``artifact_path`` (the ``.joblib``)
+    byte for byte, and the joblibs are NOT git-tracked -- only ``.booster.txt`` and
+    ``.golden.json`` are. A fresh worktree therefore has no way to evaluate closure freshness,
+    and reporting that as a closure defect would be a false accusation against the study.
+    """
+    registry = REPO_ROOT / "studies" / "model_registry"
+    if not registry.is_dir():
+        return
+    for record_path in sorted(registry.glob("*.json")):
+        try:
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if record.get("study_id") != study.name:
+            continue
+        rel = record.get("artifact_path")
+        if rel and not (REPO_ROOT / "studies" / rel).is_file():
+            pytest.skip(f"bound model artifact not in this checkout (untracked): {rel}")
+
+
 # 19. historical closed artifact remains preserved
 def test_rt2_19_historical_closed_artifact_preserved():
-    path_180s = REPO_ROOT / "studies/clean_maturity_flip_model_180s_horizon/artifacts/study_closure.json"
+    path_180s = _CLOSED_180S / "artifacts/study_closure.json"
     if path_180s.is_file():
+        _require_bound_model_artifacts(_CLOSED_180S)
         assert load_study_closure(path_180s.parent.parent)["status"] == "CLOSED"
 
 
 # 20. current 180s closed study's existing scientific outputs are not modified by this remediation
-def test_rt2_20_current_180s_study_outputs_unmodified():
-    s = REPO_ROOT / "studies/clean_maturity_flip_model_180s_horizon"
-    if s.is_dir():
-        from research_workflow.workflow_engine import WorkflowEngine
-        res = WorkflowEngine(s).advance()
-        assert res["terminal_state"] == "STUDY_CLOSED"
-        assert res["authorization_state"] == "STUDY_CLOSED"
+def test_rt2_20_current_180s_study_outputs_unmodified(tmp_path):
+    """Runs against a COPY of the study, never the real one.
+
+    ``WorkflowEngine.advance()`` WRITES ``workflow_state.json``. Pointing it at the real
+    closed study meant that merely running the test suite rewrote a closed study's governance
+    state -- 30 insertions / 24 deletions every invocation, in every checkout -- which is the
+    exact thing WORKFLOW.md golden rule 11 forbids and the exact thing this test claims to be
+    checking. It also made the test self-defeating: the file it disturbed is the one test 19
+    then reads. The study is ~2 MB, so copying it is cheap.
+    """
+    if not _CLOSED_180S.is_dir():
+        pytest.skip("the 180s study is not in this checkout")
+    _require_bound_model_artifacts(_CLOSED_180S)
+    import shutil
+
+    from research_workflow.workflow_engine import WorkflowEngine
+
+    before = (_CLOSED_180S / "workflow_state.json").read_bytes()
+    copy = tmp_path / _CLOSED_180S.name
+    shutil.copytree(_CLOSED_180S, copy)
+    res = WorkflowEngine(copy).advance()
+    assert res["terminal_state"] == "STUDY_CLOSED"
+    assert res["authorization_state"] == "STUDY_CLOSED"
+    assert (_CLOSED_180S / "workflow_state.json").read_bytes() == before, \
+        "the real closed study was modified by this test"
