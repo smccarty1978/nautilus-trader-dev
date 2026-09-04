@@ -287,7 +287,8 @@ TargetConditionSpec = Annotated[
     ],
     Field(discriminator="kind"),
 ]
-class OrderedBarrierRequirementSpec(BaseModel):
+
+class OrderedBarrierRequirementSpec(BaseModel):
     """Schema-layer declaration compiled to the runtime OrderedBarrierSpec."""
 
     model_config = ConfigDict(extra="forbid")
@@ -513,6 +514,23 @@ class DerivedCausalInputSpec(BaseModel):
     )
     model_hashes: Dict[str, str] = Field(default_factory=dict, description="Per-arm fit_identity_sha256 values, must match the parent freeze")
     preprocessing_hash: Optional[str] = Field(None)
+    # Additive TRAIN provenance repair. A historical freeze written before the provenance marker
+    # existed cannot be edited (closed-study artifacts are immutable), so the marker is carried by
+    # a separate attestation that binds the freeze bytes, the model bytes and the parent's audited
+    # authority by exact hash. Only meaningful on the legacy artifact binding; never a fallback --
+    # a freeze without TRAIN_ONLY and without an attestation is still refused.
+    parent_provenance_attestation_path: Optional[str] = Field(
+        None, exclude_if=lambda value: value is None,
+        description="Path, relative to the parent study, of an additive TRAIN provenance attestation",
+    )
+    parent_provenance_attestation_sha256: Optional[str] = Field(
+        None, exclude_if=lambda value: value is None,
+        description="sha256 of the exact attestation file bytes",
+    )
+    parent_provenance_cell_id: Optional[str] = Field(
+        None, exclude_if=lambda value: value is None,
+        description="Which attested cell this input binds (e.g. LONG_C); must be unambiguous",
+    )
     score_artifact_path: Optional[str] = Field(
         None, description="A materialized score table, if consumed instead of the raw model artifact"
     )
@@ -558,10 +576,19 @@ class DerivedCausalInputSpec(BaseModel):
                   self.model_hashes, self.preprocessing_hash)
         complete_legacy = all(legacy)
         any_legacy = any(legacy)
-        if self.model_id and any_legacy:
+        # The attestation repairs a LEGACY freeze binding; it is meaningless (and must not look
+        # like an escape hatch) on a model_id binding, which never reads a freeze at all.
+        attestation = (self.parent_provenance_attestation_path,
+                       self.parent_provenance_attestation_sha256,
+                       self.parent_provenance_cell_id)
+        if self.model_id and (any_legacy or any(attestation)):
             raise ValueError("DERIVED_INPUT_BINDING_XOR: model_id binding may not include legacy binding fields")
         if not self.model_id and not complete_legacy:
             raise ValueError("DERIVED_INPUT_BINDING_XOR: declare model_id or a complete legacy binding")
+        if any(attestation) and not all(attestation):
+            raise ValueError(
+                "DERIVED_INPUT_ATTESTATION_INCOMPLETE: parent_provenance_attestation_path, "
+                "parent_provenance_attestation_sha256 and parent_provenance_cell_id are declared together")
         return self
 
 
