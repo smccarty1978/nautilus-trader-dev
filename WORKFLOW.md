@@ -401,7 +401,17 @@ cd "../Nautilus Trader-regime_breakout_context"
 # 7. other studies live in their own branches and worktrees (repeat 1-6 per study)
 # 8. inspect who owns what
 python scripts/research.py ws list
+# 9. resuming an EXISTING study in a later session: claim it before writing (idempotent for the same
+#    agent/session; a live lease held by another agent is refused -- same OS user or not)
+python scripts/research.py ws whoami                       # the identity this shell writes as (user@host, agent, session)
+python scripts/research.py ws claim regime_breakout_context
 ```
+
+Writer identity is `user@host` + `owner_agent` + `owner_session_id`. Every coding agent on this
+machine (Claude, Codex, Antigravity) runs as the same OS user, so the agent and per-session id are
+what tell writers apart. `study new` records the identity of the initiating agent/session on the
+lease; the launcher supplies it through `NT_RESEARCH_AGENT` / `NT_RESEARCH_AGENT_SESSION` (or the
+harness's own variables -- see `docs/AI_AGENTS.md` *Writer identity*).
 
 `study new` branches from the **current checkout's HEAD**. That is why step 1 is `git switch main`
 on the canonical checkout: a study created from a stale or experimental worktree is bound to that
@@ -446,26 +456,54 @@ This is exactly how the three proof studies absorbed platform fixes.
 
 ### M.4 Lease semantics (as implemented in `research_workflow/workspace.py`)
 
-A lease is durable ownership of a workspace for the duration of actual work, not just for the
-lifetime of the short-lived `study new` CLI process that created it: the lease carries a `holder`
-(pid, kind `cli`|`controller`, `renewed_at_utc`) and a `ttl_seconds` (default 72h). Every governed
-`research study run` on a leased worktree renews the lease (kind `controller`) while it runs, so a
-long controller run keeps the lease `live` long past the creating CLI process's exit.
+Three independent mechanisms keep concurrent studies safe, and all three must pass:
+
+| Mechanism | Prevents | Where |
+|---|---|---|
+| **branch + worktree isolation** | cross-study file conflicts (two studies never write the same tree) | `study/<id>` + `<worktree_root>/<repo>-<id>` |
+| **WRITER LEASE** | cross-agent ownership conflicts: who may edit this study worktree | `~/.nt_research/leases/<id>.json` |
+| **CONTROLLER RUN LOCK** | duplicate study execution: is a run of this study already live | `studies/<id>/_work/controller/run.lock` (`STUDY_RUN_ALREADY_LIVE`) |
+
+A lease is durable ownership of a workspace by one **writer identity** for the duration of actual
+work, not just for the lifetime of the short-lived `study new` CLI process that created it. Lease
+schema v3:
+
+| field | meaning |
+|---|---|
+| `study_id`, `branch`, `worktree` | the study and its sibling worktree |
+| `owner` (`owner_user@owner_host`), `owner_user`, `owner_host` | the OS user -- **not sufficient for ownership** |
+| `owner_agent` | `claude` / `codex` / `antigravity` / `gemini` / `human` |
+| `owner_session_id` | unique per active coding-agent session (never a bare PID) |
+| `created_at_utc`, `renewed_at_utc`, `holder {pid, kind: cli|controller, renewed_at_utc}`, `ttl_seconds` (default 72h) | renewal window; every governed `research study run` renews the lease while it runs |
+| `released_at_utc`, `reclaimed_from`, `forced_release_by` | audit trail of release / reclaim |
 
 | state | meaning | writing allowed? |
 |---|---|---|
-| `live` | the lease's worktree exists, not released, and (holder pid alive OR still inside the ttl window since the last renewal) | only that writer; `study new` refuses a second live lease on the same worktree (`WRITER_LEASE_HELD`); a `research study run` on the worktree by a different owner is refused (`WRITER_LEASE_HELD_BY_OTHER`) |
-| `stale` | the worktree exists, the holder pid is dead, and the ttl window has expired | the worktree is unowned; `research ws list --reclaim` deletes the stale lease, after which one writer may take the worktree |
-| `dead` | the lease's worktree no longer exists | nothing to write; `research ws list --reclaim` deletes the record |
-| `released` | the owner ran `research ws release <study_id>` | the worktree is unowned; `research ws list --reclaim` deletes the record |
+| `live` | worktree exists, not released, and (holder pid alive OR still inside the ttl window since the last renewal) | only the writer identity on the lease. A different agent or session -- **even under the same `user@host`** -- is refused: `study new` on the same worktree (`WRITER_LEASE_HELD`), `ws claim`, `research study run` and any lease renewal (`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT`). The same identity re-entering is idempotent |
+| `stale` | worktree exists, holder pid dead, ttl window expired | unowned; `ws claim <id>` takes it (records `reclaimed_from`), or `ws list --reclaim` deletes the record |
+| `dead` | the lease's worktree no longer exists | nothing to write; `ws list --reclaim` deletes the record |
+| `released` | the owner ran `ws release <id>` | unowned; `ws claim <id>` takes it |
 
-Ownership is the `owner` (user@host) in the lease file, written once by `study new`. Never delete or
-edit lease files by hand and never take over a `live` lease: if two agents must work on the same
-study, the second one waits or takes a different study, or the owner runs `research ws release
-<study_id>` when done. `research ws list` shows, per worktree, the branch, HEAD, dirty state, owner
-and lease state; `research ws list --reclaim` is the only sanctioned reclaim command and touches only
-`stale`/`dead`/`released` leases, never `live`. The controller's `run.lock` independently prevents two
-live runs of the same study.
+Claim rule, applied before any WRITE-capable operation on an existing study worktree (`ws claim`,
+the controller's writer gate, lease renewal): verify the lease, the `study_id`, the `owner_agent`
+and the `owner_session_id`. Live foreign writer -> fail closed. Stale/dead/released -> sanctioned
+claim. Same identity -> idempotent. Claims are serialized per study by an O_EXCL claim lock, so two
+simultaneous claims have exactly one winner (the loser sees `STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT`
+or `STUDY_CLAIM_IN_PROGRESS`). Legacy schema-1/2 leases carry no agent/session and are never "the
+same writer": clear them with `ws release <id> --force` (same `user@host`, recorded on the lease) or
+`ws list --reclaim` once stale/dead/released.
+
+```bash
+python scripts/research.py ws whoami                 # user@host, agent, session id, and how each was inferred
+python scripts/research.py ws claim <study_id>       # take / re-enter ownership of an existing study worktree
+python scripts/research.py ws release <study_id>     # release a lease you hold (--force: same user@host, e.g. a dead session)
+python scripts/research.py ws list --reclaim         # per worktree: branch, HEAD, dirty, owner, agent, session, state; --reclaim clears stale/dead/released
+```
+
+Never delete or edit lease files by hand and never take over a `live` lease: if two agents must
+work on the same study, the second one waits or takes a different study, or the owner releases.
+Read-only agents (auditors, scouts, triagers) need no writer claim: they inspect source, artifacts,
+audit packets and results in any worktree and mutate nothing but their own audit report.
 
 ### M.5 Example: three concurrent studies
 

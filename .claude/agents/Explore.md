@@ -49,4 +49,4 @@ right gate.
 
 ## Worktree rules
 
-READ-ONLY: this role creates no branch or worktree and mutates no repository file. It may read any worktree, including one owned by a live writer.
+READ-ONLY: this role creates no branch or worktree and mutates no repository file. It may read any worktree, including one owned by a live writer. It needs NO writer claim (`ws claim` is for write-capable roles only) and never claims, renews, releases or edits a writer lease.

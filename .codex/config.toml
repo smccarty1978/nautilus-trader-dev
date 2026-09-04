@@ -2,3 +2,9 @@
 enabled = true
 max_concurrent_threads_per_session = 4
 interrupt_message = false
+
+# Writer identity for the Platform V2 writer lease (research_workflow.workspace.writer_identity):
+# every Codex shell identifies as agent "codex". Export NT_RESEARCH_AGENT_SESSION=<uuid> per session
+# from the launcher for an explicit session id; otherwise the process-tree anchor is used.
+[shell_environment_policy]
+set = { NT_RESEARCH_AGENT = "codex" }

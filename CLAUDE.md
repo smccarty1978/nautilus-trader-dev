@@ -5,6 +5,7 @@
 0. `WORKFLOW.md` — the current way to work (Platform V2). Read it first; `docs/QUICKSTART.md`,
    `docs/RESEARCH_YAML_REFERENCE.md`, `docs/RESEARCH_DISCUSSION_TO_YAML.md` and `docs/AI_AGENTS.md` hang off it.
 **FOR A NEW RESEARCH PROJECT:** read `WORKFLOW.md` → §M *Concurrent research projects*, then use `python scripts/research.py study new <id>` and work only in the generated worktree. Never start a study by editing `main`.
+**BEFORE WRITING IN A STUDY WORKTREE:** `python scripts/research.py ws whoami` (agent `claude` and the session id are inferred from `CLAUDECODE` / `CLAUDE_CODE_SESSION_ID`) then `ws claim <id>`; a live lease of another agent is refused (`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT`) -- same OS user or not. Read-only roles skip the claim.
 1. `AGENTS.md` — the shared agent core. Every rule there applies to you.
 2. `docs/RESEARCH_WORKFLOW.md` — the authoritative description of the system.
 3. This file — what Claude specifically is here to do, and what Claude specifically gets

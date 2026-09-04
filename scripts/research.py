@@ -14,13 +14,16 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
     research audit ingest --study <dir> --type causal|contract --report <md> [--author <id>]
     research bench [--series host_c,host_a,golden]           host performance measurement vs bench/baseline_v0.json
     research ws list [--reclaim]                             branches, worktrees, owners, leases (live/stale/dead/released), dirty state
-    research ws release <study_id>                            explicitly release a writer lease you own
+    research ws release <study_id> [--force]                  release a writer lease you hold (--force: same user@host, recorded)
+    research ws claim <study_id>                              take writer ownership of an existing study worktree (foreign live writer refused)
+    research ws whoami                                        resolved writer identity (user@host, agent, session id)
 """
 from __future__ import annotations
 
 import argparse
 import json
 import subprocess
+import os
 import sys
 from pathlib import Path
 
@@ -160,8 +163,26 @@ def cmd_ws_list(ns: argparse.Namespace) -> int:
 
 
 def cmd_ws_release(ns: argparse.Namespace) -> int:
-    from research_workflow.workspace import current_owner, release_lease
-    return _card(release_lease(ns.study_id, owner=current_owner()))
+    from research_workflow.workspace import WorkspaceError, release_lease, writer_identity
+    try:
+        return _card(release_lease(ns.study_id, owner=writer_identity()["owner"], force=bool(getattr(ns, "force", False))))
+    except WorkspaceError as exc:
+        return _card({"study_id": ns.study_id, "error": str(exc), "blocker_code": str(exc).split(":", 1)[0]}, ok=False)
+
+
+def cmd_ws_claim(ns: argparse.Namespace) -> int:
+    from research_workflow.workspace import WorkspaceError, claim_worktree
+    try:
+        return _card(claim_worktree(ns.study_id, repo_root=ROOT))
+    except WorkspaceError as exc:
+        return _card({"study_id": ns.study_id, "error": str(exc), "blocker_code": str(exc).split(":", 1)[0].split(" ")[0]}, ok=False)
+
+
+def cmd_ws_whoami(_: argparse.Namespace) -> int:
+    from research_workflow.workspace import AGENT_ENV, AGENT_SESSION_ENV, writer_identity
+    ident = writer_identity()
+    return _card({**ident, "env": {AGENT_ENV: os.environ.get(AGENT_ENV), AGENT_SESSION_ENV: os.environ.get(AGENT_SESSION_ENV)},
+                  "note": f"set {AGENT_ENV}=<claude|codex|antigravity> and {AGENT_SESSION_ENV}=<unique per session> in the agent launcher to override inference"})
 
 
 # ---------------------------------------------------------------------------
@@ -243,7 +264,11 @@ def build_parser() -> argparse.ArgumentParser:
     ws = sub.add_parser("ws").add_subparsers(dest="cmd", required=True)
     wl = ws.add_parser("list"); wl.add_argument("--reclaim", action="store_true", help="delete stale/dead/released writer leases; live leases are never touched")
     wl.set_defaults(fn=cmd_ws_list)
-    wr = ws.add_parser("release"); wr.add_argument("study_id"); wr.set_defaults(fn=cmd_ws_release)
+    wr = ws.add_parser("release"); wr.add_argument("study_id"); wr.add_argument("--force", action="store_true", help="same user@host may release a lease held by another agent/session (recorded on the lease)")
+    wr.set_defaults(fn=cmd_ws_release)
+    wc = ws.add_parser("claim", help="take writer ownership of an existing study worktree (idempotent for the same agent/session; a live foreign writer is refused)")
+    wc.add_argument("study_id"); wc.set_defaults(fn=cmd_ws_claim)
+    ww = ws.add_parser("whoami", help="resolved writer identity: user@host, agent, session id and how each was inferred"); ww.set_defaults(fn=cmd_ws_whoami)
     return ap
 
 

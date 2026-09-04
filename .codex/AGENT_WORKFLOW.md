@@ -63,6 +63,20 @@ retired in the 2026-08 redesign and replaced by the generated `implementer`.
 
 ---
 
+## Writer identity (multi-agent ownership)
+
+The writer lease identifies a writer as `user@host` + agent + session
+(`research_workflow.workspace.writer_identity`). `.codex/config.toml` sets
+`NT_RESEARCH_AGENT = "codex"` for every Codex shell (`[shell_environment_policy]`). The session id
+comes from `NT_RESEARCH_AGENT_SESSION` when the launcher exports one (recommended: a uuid per Codex
+session), else from `CODEX_THREAD_ID` / `CODEX_SESSION_ID` if the harness exports them, else from the
+process-tree anchor (the Codex process at the top of the shell's ancestry -- stable for one
+session). Verify with `python scripts/research.py ws whoami`; claim an existing study with
+`ws claim <id>` before writing. A live lease of another agent refuses with
+`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT` even though the OS user matches.
+
+---
+
 ## Required delegation packet
 
 Every subagent prompt must be self-contained — children do not inherit the parent

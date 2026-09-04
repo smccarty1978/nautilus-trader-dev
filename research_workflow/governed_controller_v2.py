@@ -164,17 +164,18 @@ class V2StudyController(GovernedStudyController):
         lease = next((l for l in leases if Path(str(l.get("worktree", ""))).resolve() == wt_path), None)
         if lease is None:
             return None
-        owner = workspace.current_owner()
-        if lease.get("owner") != owner and lease.get("state") == "live":
+        # Writer identity = user@host + agent + session (research_workflow.workspace.writer_identity):
+        # a live lease held by another agent/session blocks the run even under the same OS user.
+        # This is the WRITER LEASE gate; the CONTROLLER RUN LOCK (_acquire_run_lock) is independent.
+        try:
+            workspace.check_writer_access(wt_path, pid=os.getpid(), kind="controller")
+        except workspace.WorkspaceError as exc:
             card = self._card(ControllerState.NEEDS_COMPILE, "worktree", blocker=BlockerType.RUNTIME_FAILURE,
-                              reason=f"WRITER_LEASE_HELD_BY_OTHER: worktree {wt_path} is leased to {lease.get('owner')}", last=None)
-            card["blocker_code"] = "WRITER_LEASE_HELD_BY_OTHER"
+                              reason=str(exc), last=None)
+            card["blocker_code"] = "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT"
             return card
-        if lease.get("owner") == owner:
-            try:
-                workspace.renew_lease(wt_path, owner=owner, pid=os.getpid(), kind="controller")
-            except Exception:
-                pass
+        except Exception:
+            pass
         return None
 
     def _acquire_run_lock(self) -> dict[str, Any] | None:

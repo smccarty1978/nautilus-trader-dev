@@ -43,7 +43,8 @@ def test_study_new_creates_branch_worktree_scaffold_and_lease(env: Path, tmp_pat
     assert not any(p.is_symlink() for p in wt.rglob("*"))  # no junction/symlink plumbing in the normal path
     lease = json.loads(Path(card["lease"]).read_text())
     assert lease["study_id"] == "demo_alpha" and lease["holder"]["pid"] == os.getpid() and Path(lease["worktree"]) == wt.resolve()
-    assert lease["schema_version"] == 2 and lease["holder"]["kind"] == "cli" and lease["released_at_utc"] is None
+    assert lease["schema_version"] == 3 and lease["holder"]["kind"] == "cli" and lease["released_at_utc"] is None
+    assert lease["owner_agent"] and lease["owner_session_id"] and lease["owner_user"] and card["writer"]["agent"] == lease["owner_agent"]
     branches = subprocess.run(["git", "branch", "--list"], cwd=env, capture_output=True, text=True).stdout
     assert "study/demo_alpha" in branches
     assert card["catalog_resolution"] == "configured_roots"
@@ -110,5 +111,9 @@ def test_ws_list_reclaim_clears_only_stale_and_dead_leases(env: Path):
     assert states["demo_live"] == "live" and states["demo_stale"] == "stale"
     after = ws.ws_list(repo_root=env, reclaim=True)
     assert after["reclaimed"] == ["demo_stale"] and Path(live["lease"]).exists() and not p.exists()
+    # a live lease is never overwritten by another writer (same user@host, different agent/session)
+    other = {**ws.writer_identity(), "agent": "codex", "session_id": "other-session"}
     with pytest.raises(ws.WorkspaceError, match="WRITER_LEASE_HELD"):
-        ws._write_lease("demo_live", "study/demo_live", Path(live["worktree"]))
+        ws._write_lease("demo_live", "study/demo_live", Path(live["worktree"]), identity=other)
+    # the same writer re-entering its own study is idempotent
+    assert ws._write_lease("demo_live", "study/demo_live", Path(live["worktree"])) == Path(live["lease"])

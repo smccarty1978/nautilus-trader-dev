@@ -54,6 +54,19 @@ generated for all three harnesses.
 
 ---
 
+## Writer identity (multi-agent ownership)
+
+The writer lease identifies a writer as `user@host` + agent + session
+(`research_workflow.workspace.writer_identity`). The Antigravity launcher must export
+`NT_RESEARCH_AGENT=antigravity` and `NT_RESEARCH_AGENT_SESSION=<uuid unique to this session>` into
+the shells it spawns (the harness's own `ANTIGRAVITY_SESSION_ID`, if present, is accepted as the
+session; otherwise the process-tree anchor of the Antigravity process is used and the agent name
+is inferred from that process's name). Verify with `python scripts/research.py ws whoami`; claim an
+existing study with `ws claim <id>` before writing. A live lease of another agent refuses with
+`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT` even though the OS user matches.
+
+---
+
 ## Required delegation packet
 
 Every subagent prompt must be self-contained — children do not inherit the parent

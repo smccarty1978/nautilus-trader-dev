@@ -83,6 +83,18 @@ Every agent is generated for every harness. `implementation-worker` was retired 
 
 ---
 
+## Writer identity (multi-agent ownership)
+
+The writer lease identifies a writer as `user@host` + agent + session
+(`research_workflow.workspace.writer_identity`). Claude Code needs no configuration: agent `claude`
+is inferred from `CLAUDECODE` and the session id from `CLAUDE_CODE_SESSION_ID`, both exported to
+every shell the harness spawns. To override, the launcher may set `NT_RESEARCH_AGENT` and
+`NT_RESEARCH_AGENT_SESSION`. Verify with `python scripts/research.py ws whoami`; claim an existing
+study with `ws claim <id>` before writing. A live lease of another agent refuses with
+`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT` even though the OS user matches.
+
+---
+
 ## Required delegation packet
 
 Every subagent prompt must be self-contained — children do not inherit the parent

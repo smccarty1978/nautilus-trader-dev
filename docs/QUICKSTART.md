@@ -112,9 +112,15 @@ Every study is its own branch and worktree; several run side by side. From the c
 git switch main && git status --short                        # clean main = source of the study
 python scripts/research.py study new <id> --from-question question.md
 cd "../Nautilus Trader-<id>"                                 # the worktree named in the card; all writes happen here
-python scripts/research.py ws list                           # worktrees, owners, lease state (live / stale / dead / released)
-python scripts/research.py ws release <id>                   # explicitly release a lease you own
+python scripts/research.py ws list                           # worktrees, owners, agents, lease state (live / stale / dead / released)
+python scripts/research.py ws whoami                         # the writer identity this shell uses (user@host, agent, session)
+python scripts/research.py ws claim <id>                     # resume an existing study: idempotent for you, refused if another agent's lease is live
+python scripts/research.py ws release <id>                   # explicitly release a lease you hold
 ```
+
+Several coding agents (Claude, Codex, Antigravity) share one OS user here, so ownership is
+`user@host` + agent + session: a live lease held by another agent is refused
+(`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT`) even though the user matches.
 
 Rules and merge-back: `WORKFLOW.md` §M.
 
