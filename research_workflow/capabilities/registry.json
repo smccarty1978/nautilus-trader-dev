@@ -1,6 +1,6 @@
 {
-  "content_sha256": "09e48d98c3d848b28763239733d5cd93a8684bfbd3b1562af87dc902a20a0228",
-  "generated_at_utc": "2026-09-04T14:52:16.679942+00:00",
+  "content_sha256": "4e12232684f703775e7a5bae47f2c30a847c7aa3e0f2c5d4ad0b3ba46a19e99e",
+  "generated_at_utc": "2026-09-04T17:12:01.049391+00:00",
   "kinds": {
     "datasets": [
       {
@@ -483,7 +483,8 @@
           "context"
         ],
         "required_tests": [
-          "research_workflow/tests/test_audit_execution_api.py"
+          "research_workflow/tests/test_audit_execution_api.py",
+          "research_workflow/tests/test_ohlcv_window_features.py"
         ],
         "reset_policies": [
           "session_boundary"
@@ -574,6 +575,7 @@
         ],
         "parameters": [],
         "required_tests": [
+          "research_workflow/tests/test_ohlcv_window_features.py",
           "research_workflow/tests/test_population_runtime.py"
         ],
         "reset_policies": [
@@ -1946,7 +1948,9 @@
           "context",
           "timeframe"
         ],
-        "required_tests": [],
+        "required_tests": [
+          "research_workflow/tests/test_ohlcv_window_features.py"
+        ],
         "reset_policies": [
           "event_start",
           "none"
@@ -2038,7 +2042,9 @@
           "context",
           "timeframe"
         ],
-        "required_tests": [],
+        "required_tests": [
+          "research_workflow/tests/test_ohlcv_window_features.py"
+        ],
         "reset_policies": [
           "event_start",
           "none"
@@ -2070,7 +2076,9 @@
           "timeframe",
           "timeframe_2"
         ],
-        "required_tests": [],
+        "required_tests": [
+          "research_workflow/tests/test_ohlcv_window_features.py"
+        ],
         "reset_policies": [
           "none"
         ],
@@ -3068,7 +3076,8 @@
           "timeframe"
         ],
         "required_tests": [
-          "features/tests/test_generic_provider_parameterization.py"
+          "features/tests/test_generic_provider_parameterization.py",
+          "research_workflow/tests/test_ohlcv_window_features.py"
         ],
         "reset_policies": [
           "event_start",
@@ -3465,6 +3474,7 @@
           "context"
         ],
         "required_tests": [
+          "research_workflow/tests/test_multi_window_features.py",
           "research_workflow/tests/test_provider_host.py",
           "research_workflow/tests/test_provider_host_audit.py"
         ],
@@ -4464,6 +4474,7 @@
         ],
         "required_tests": [
           "features/tests/test_generic_episode_geometry.py",
+          "research_workflow/tests/test_ohlcv_window_features.py",
           "research_workflow/tests/test_stage3_integration.py",
           "scripts/tests/test_feature_binding_identity.py"
         ],
@@ -4622,7 +4633,9 @@
           "timeframe",
           "timeframe_2"
         ],
-        "required_tests": [],
+        "required_tests": [
+          "research_workflow/tests/test_ohlcv_window_features.py"
+        ],
         "reset_policies": [
           "none"
         ],
@@ -4653,7 +4666,9 @@
           "timeframe",
           "timeframe_2"
         ],
-        "required_tests": [],
+        "required_tests": [
+          "research_workflow/tests/test_ohlcv_window_features.py"
+        ],
         "reset_policies": [
           "none"
         ],
@@ -4684,7 +4699,9 @@
           "context",
           "timeframe"
         ],
-        "required_tests": [],
+        "required_tests": [
+          "research_workflow/tests/test_ohlcv_window_features.py"
+        ],
         "reset_policies": [
           "event_start",
           "none"
@@ -4716,7 +4733,9 @@
           "timeframe",
           "timeframe_2"
         ],
-        "required_tests": [],
+        "required_tests": [
+          "research_workflow/tests/test_ohlcv_window_features.py"
+        ],
         "reset_policies": [
           "none"
         ],

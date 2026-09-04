@@ -866,22 +866,42 @@ for _name in ('recovery_from_counter_regime_extreme_atr', 'fraction_of_counter_r
     )
 
 _DELTA_IMPL = 'features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider'
+# Window support is a declaration, not an implementation limit: GenericOHLCVDeltaProvider
+# builds whatever trailing windows its instances ask for, and OHLCVDeltaAdapter derives that
+# set from the compiled instances. 30s was simply never declared, so a study asking for it
+# got INVALID_PARAMETERIZATION for a window the runtime could always have produced.
+#
+# `short_window` (acceleration) additionally implies 2*short_window, which the adapter adds
+# to the provider's window set; that is why its supported values are a subset of `window`.
+_DELTA_PARAM_VALUES = {
+    'window': ('5s', '30s', '60s', '300s'),
+    'numerator_window': ('5s', '30s', '60s'),
+    'denominator_window': ('300s',),
+    'short_window': ('5s', '30s', '60s'),
+    'update_every': ('1s',),
+    'direction_reference': ('prevailing_1m',),
+}
 for _name, _params, _required in (
     ('trend_normalized_est_delta_sum', ('window', 'update_every', 'direction_reference'),
      ('window', 'update_every', 'direction_reference')),
     ('trend_normalized_est_delta_sum_ratio',
      ('numerator_window', 'denominator_window', 'update_every', 'direction_reference'),
      ('numerator_window', 'denominator_window', 'update_every', 'direction_reference')),
+    # Directional pressure over [T-w, T] MINUS directional pressure over [T-2w, T-w]:
+    # is pressure along the prevailing regime building or fading versus the immediately
+    # preceding equal-length window? Distinct from est_delta_sum_minus_scaled, which is
+    # D(a) - D(b) for a fixed unequal (a, b) -- see features/trackers/ohlcv_delta.py.
+    ('trend_normalized_est_delta_acceleration',
+     ('short_window', 'update_every', 'direction_reference'),
+     ('short_window', 'update_every', 'direction_reference')),
 ):
     CANONICAL_FEATURE_DEFINITIONS[_name] = _canonical_definition(
         _name, family='direction_normalized_ohlcv_est_delta', implementation=_DELTA_IMPL,
         tests=_EPISODE_TESTS, parameters=_params, source_timeframe='1s',
         update_anchor='completed_1s_at_checkpoint', normalizer='study_contract',
         window_unit='seconds', reset_policy='none', null_policy='allow',
-        supported_update_every=('1s',), supported_parameter_values={
-            'window': ('5s','60s','300s'), 'numerator_window': ('5s','60s'), 'denominator_window': ('300s',),
-            'update_every': ('1s',), 'direction_reference': ('prevailing_1m',),
-        }, required_parameters=_required,
+        supported_update_every=('1s',), supported_parameter_values=dict(_DELTA_PARAM_VALUES),
+        required_parameters=_required,
     )
 
 CANONICAL_FEATURE_DEFINITIONS['regime_direction'] = _canonical_definition(
@@ -1120,6 +1140,48 @@ def validate_feature_instance(instance: FeatureInstance) -> Dict[str, Any]:
     return params
 
 
+# The ohlcv_est_delta family renders its window into the alias. Two-window comparisons
+# each have their own historical spelling, so the template is keyed by canonical name;
+# everything else in the family is "<name>_<window>". These templates are not invented --
+# test_ohlcv_alias_parity asserts they reproduce every committed legacy alias of the
+# family byte for byte, which is what makes it safe to extend them to new windows.
+_OHLCV_PAIR_ALIAS_TEMPLATES: Dict[str, str] = {
+    "vol_sum_vs_ratio": "vol_sum_{a}_vs_{b}_ratio",
+    "est_delta_sum_minus_scaled": "est_delta_sum_{a}_minus_{b}_scaled",
+    "est_delta_ratio_minus": "est_delta_ratio_{a}_minus_{b}",
+}
+_OHLCV_CONTEXT_PREFIX: Dict[str, str] = {"regime": "regime_", "RTH": "rth_", "bar": ""}
+
+
+def _ohlcv_family_alias(name: str, params: Mapping[str, Any]) -> Optional[str]:
+    """Render an ``ohlcv_est_delta`` instance, or None if this is not one of its shapes.
+
+    The window IS part of this family's physical identity (``vol_sum_5s`` and
+    ``vol_sum_300s`` are different columns), but it was previously dropped: every window
+    of ``vol_sum`` rendered as the bare ``vol_sum``, so declaring more than one collapsed
+    them into DUPLICATE_PHYSICAL_ALIAS and the family was undeclarable at more than one
+    window. Gated on ``context`` so the ``pullback_1s`` spelling of ``range_atr``
+    (``{scope: trailing, timeframe: 30s}`` -> ``range_30s_atr``) is untouched.
+    """
+    context = params.get("context")
+    if context is None:
+        return None
+    if context in _OHLCV_CONTEXT_PREFIX:
+        return f"{_OHLCV_CONTEXT_PREFIX[context]}{name}"
+    if context != "rolling":
+        return None
+    timeframe, timeframe_2 = params.get("timeframe"), params.get("timeframe_2")
+    if timeframe is None:
+        return None
+    if timeframe_2 is None:
+        return f"{name}_{timeframe}"
+    template = _OHLCV_PAIR_ALIAS_TEMPLATES.get(name)
+    if template is not None:
+        return template.format(a=timeframe, b=timeframe_2)
+    # vol_mean / vol_max: "<name>_<bar granularity>_<window>" (vol_mean_1s_300s).
+    return f"{name}_{timeframe}_{timeframe_2}"
+
+
 def generate_physical_alias(instance: FeatureInstance) -> str:
     """Deterministically render a V2 instance, retaining explicit legacy aliases."""
     params = validate_feature_instance(instance)
@@ -1138,6 +1200,11 @@ def generate_physical_alias(instance: FeatureInstance) -> str:
             f"trend_normalized_est_delta_sum_ratio_{params['numerator_window']}"
             f"_vs_{params['denominator_window']}"
         )
+    if name == "trend_normalized_est_delta_acceleration" and "short_window" in params:
+        return f"trend_normalized_est_delta_acceleration_{params['short_window']}"
+    ohlcv = _ohlcv_family_alias(name, params)
+    if ohlcv is not None:
+        return ohlcv
     if name.startswith("distance_to_completed_range_"):
         return f"distance_to_completed_{params['reference_timeframe']}_{name[len('distance_to_completed_range_'):]}"
     if name == "move_outside_completed_range":

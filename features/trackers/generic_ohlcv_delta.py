@@ -16,13 +16,20 @@ from features.trackers.ohlcv_delta import OHLCVDeltaTracker
 class GenericOHLCVDeltaProvider:
     """One estimator with parameterized rolling windows and contexts."""
 
-    def __init__(self, *, windows_seconds: Iterable[int], maxlen: int | None = None) -> None:
+    def __init__(self, *, windows_seconds: Iterable[int], maxlen: int | None = None,
+                 window_pairs: Mapping[str, Iterable[tuple[int, int]]] | None = None) -> None:
         windows = tuple(sorted({int(window) for window in windows_seconds}))
         if not windows or any(window <= 0 for window in windows):
             raise ValueError("window must be a positive completed-bar duration")
         retained = maxlen if maxlen is not None else max(1900, max(windows))
-        self._tracker = OHLCVDeltaTracker(maxlen=retained, windows_seconds=windows)
+        self._tracker = OHLCVDeltaTracker(maxlen=retained, windows_seconds=windows,
+                                          window_pairs=window_pairs)
+        self._windows = windows
         self._last_completed_ts: int | None = None
+
+    @property
+    def windows_seconds(self) -> tuple[int, ...]:
+        return self._windows
 
     def update_completed_bar(self, *, close_ts: int, open_px: float, high: float,
                              low: float, close: float, volume: float) -> Mapping[str, object]:
@@ -94,3 +101,39 @@ class GenericOHLCVDeltaProvider:
         if numerator is None or denominator is None or float(denominator) == 0.0:
             return None
         return numerator / abs(float(denominator))
+
+    def trend_normalized_est_delta_acceleration(
+        self, *, short_window: str, prevailing_direction: int, atr: float,
+    ) -> float | None:
+        """Directional pressure in the last ``w`` seconds MINUS the directional pressure
+        in the ``w`` seconds immediately before that.
+
+        With ``D(x)`` the estimated delta accumulated over the trailing ``x`` seconds, the
+        immediately preceding comparable window is ``[t-2w, t-w]``, whose delta is
+        ``D(2w) - D(w)`` exactly (the windows are contiguous and disjoint and the
+        underlying quantity is a plain sum over completed bars). So
+
+            value = dir * ( D(w) - (D(2w) - D(w)) ) = dir * ( 2*D(w) - D(2w) )
+
+        Positive means directional pressure ALONG the prevailing regime is stronger now
+        than it was over the preceding equal-length window; negative means it is fading.
+        Both ``w`` and ``2w`` must be constructed windows of this provider -- the caller
+        (the runtime adapter) derives that from the declared instances.
+
+        This is the quantity ``est_delta_sum_minus_scaled`` is often mistaken for. That
+        historical feature is ``D(a) - D(b)`` for a fixed (a, b), which is minus the delta
+        over ``[t-b, t-a]``, not a comparison of two equal-length adjacent windows.
+        """
+        if prevailing_direction not in (-1, 1):
+            raise ValueError("prevailing_direction must be -1 or +1")
+        short_s = int(str(short_window).strip().lower().removesuffix("s"))
+        long_s = 2 * short_s
+        if short_s not in self._windows or long_s not in self._windows:
+            raise ValueError(
+                f"trend_normalized_est_delta_acceleration({short_window}) needs windows "
+                f"{short_s}s and {long_s}s; provider has {list(self._windows)}")
+        near = self.metric(name="est_delta_sum", window=f"{short_s}s", atr=atr)
+        far = self.metric(name="est_delta_sum", window=f"{long_s}s", atr=atr)
+        if near is None or far is None:
+            return None
+        return prevailing_direction * (2.0 * float(near) - float(far))

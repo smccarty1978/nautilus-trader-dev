@@ -19,13 +19,39 @@ enough completed history exists to cover it fully.
 from __future__ import annotations
 
 from collections import deque
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Mapping, Optional, Tuple
 
 import numpy as np
 
 EPS = 1e-9
 NS = 1_000_000_000
 WINDOWS_S: Tuple[int, ...] = (5, 15, 30, 60, 120, 300, 900, 1800)
+
+# A3 two-window comparisons. Each kind fixes the output spelling, the window value it
+# reads and how the two are combined; the (short, long) pairs themselves are an input
+# contract (see OHLCVDeltaTracker.__init__), exactly like windows_seconds.
+#
+# NOTE on `est_delta_sum_minus_scaled`: the historical name says "scaled" but the value
+# is and always has been a plain difference `delta(a) - delta(b)`, i.e. MINUS the delta
+# accumulated over [t-b, t-a]. It is not a rescaled short-vs-long comparison and it is
+# not a rate of change. The value is preserved exactly here -- silently redefining a
+# registered feature would break parity for anything already fit on it -- and the
+# genuinely-intended "this window versus the immediately preceding window" quantity is a
+# separate, correctly-named feature (trend_normalized_est_delta_acceleration).
+PAIR_KINDS: Dict[str, Tuple[str, str, str]] = {
+    # kind -> (window value read, output name template, combine)
+    "est_delta_sum_minus_scaled": ("est_delta_sum", "est_delta_sum_{a}s_minus_{b}s_scaled", "difference"),
+    "est_delta_ratio_minus": ("est_delta_ratio", "est_delta_ratio_{a}s_minus_{b}s", "difference"),
+    "vol_sum_vs_ratio": ("vol_sum", "vol_sum_{a}s_vs_{b}s_ratio", "ratio"),
+}
+
+# The pairs the historical aliases carry. Passing no `window_pairs` reproduces these,
+# so every existing caller keeps its exact output key set.
+DEFAULT_WINDOW_PAIRS: Dict[str, Tuple[Tuple[int, int], ...]] = {
+    "est_delta_sum_minus_scaled": ((15, 60), (30, 120), (60, 300)),
+    "est_delta_ratio_minus": ((15, 60), (30, 120), (60, 300)),
+    "vol_sum_vs_ratio": ((30, 300), (60, 900)),
+}
 
 
 def bar_estimates(open_px: float, high: float, low: float, close: float,
@@ -56,7 +82,8 @@ def bar_estimates(open_px: float, high: float, low: float, close: float,
 class OHLCVDeltaTracker:
     """Stateful tracker over completed 1s bars. See module docstring."""
 
-    def __init__(self, maxlen: int = 1900, windows_seconds: Optional[Iterable[int]] = None):
+    def __init__(self, maxlen: int = 1900, windows_seconds: Optional[Iterable[int]] = None,
+                 window_pairs: Optional[Mapping[str, Iterable[Tuple[int, int]]]] = None):
         """Create a completed-bar delta provider.
 
         ``windows_seconds`` is deliberately an input contract, not a feature
@@ -65,6 +92,14 @@ class OHLCVDeltaTracker:
         completed-bar history.  A custom duration shares the identical
         trailing-window calculation and availability rule -- it is not a
         second provider or a new registry definition.
+
+        ``window_pairs`` is the same kind of input contract for the two-window
+        comparisons (A3).  It maps a pair KIND (``PAIR_KINDS``) to the (short,
+        long) second-durations that kind should emit.  The default reproduces
+        the historical pairs exactly.  A requested pair whose two windows are
+        not both in ``windows_seconds`` is a caller error, not a null: the
+        constructor refuses it rather than emitting a silent None the study
+        would carry as a real feature column.
         """
         requested = WINDOWS_S if windows_seconds is None else tuple(int(value) for value in windows_seconds)
         if not requested or any(value <= 0 for value in requested):
@@ -73,6 +108,27 @@ class OHLCVDeltaTracker:
             raise ValueError("maxlen must retain every requested completed-bar window")
         self.maxlen = maxlen
         self.windows_seconds = tuple(sorted(set(requested)))
+        # Defaults are the historical pairs RESTRICTED to the windows actually constructed:
+        # with the default window set every historical pair is present, so the historical
+        # output is reproduced exactly; a caller that narrows windows_seconds simply does not
+        # get the pairs it did not retain the history for. An EXPLICITLY requested pair is
+        # different -- naming a pair whose windows are absent is a caller error and fails
+        # closed, rather than emitting a None the study would carry as a real feature column.
+        available = set(self.windows_seconds)
+        explicit = window_pairs is not None
+        pairs = DEFAULT_WINDOW_PAIRS if window_pairs is None else window_pairs
+        resolved: Dict[str, Tuple[Tuple[int, int], ...]] = {}
+        for kind, items in pairs.items():
+            if kind not in PAIR_KINDS:
+                raise ValueError(f"unknown window pair kind {kind!r}; known={sorted(PAIR_KINDS)}")
+            entries = tuple(sorted({(int(a), int(b)) for a, b in items}))
+            missing = sorted({w for a, b in entries for w in (a, b)} - available)
+            if missing and explicit:
+                raise ValueError(
+                    f"window pair kind {kind!r} needs windows {missing} that are not in "
+                    f"windows_seconds={list(self.windows_seconds)}")
+            resolved[kind] = tuple(p for p in entries if p[0] in available and p[1] in available)
+        self.window_pairs: Dict[str, Tuple[Tuple[int, int], ...]] = resolved
         self.ts: deque = deque(maxlen=maxlen)
         self.opens: deque = deque(maxlen=maxlen)
         self.highs: deque = deque(maxlen=maxlen)
@@ -287,25 +343,20 @@ class OHLCVDeltaTracker:
             for key, val in vals.items():
                 out[f"{key}_{suffix}"] = val
 
-        # A3: short-vs-long pressure comparison
-        def _pair(a: int, b: int, key: str, name: str) -> None:
-            va, vb = window_vals.get(a), window_vals.get(b)
-            if va is None or vb is None:
-                out[name] = None
-            else:
-                out[name] = va[key] - vb[key]
-
-        _pair(15, 60, "est_delta_sum", "est_delta_sum_15s_minus_60s_scaled")
-        _pair(30, 120, "est_delta_sum", "est_delta_sum_30s_minus_120s_scaled")
-        _pair(60, 300, "est_delta_sum", "est_delta_sum_60s_minus_300s_scaled")
-        _pair(15, 60, "est_delta_ratio", "est_delta_ratio_15s_minus_60s")
-        _pair(30, 120, "est_delta_ratio", "est_delta_ratio_30s_minus_120s")
-        _pair(60, 300, "est_delta_ratio", "est_delta_ratio_60s_minus_300s")
-
-        for a, b, name in ((30, 300, "vol_sum_30s_vs_300s_ratio"),
-                          (60, 900, "vol_sum_60s_vs_900s_ratio")):
-            va, vb = window_vals.get(a), window_vals.get(b)
-            out[name] = (va["vol_sum"] / max(vb["vol_sum"], EPS)) if (va and vb) else None
+        # A3: short-vs-long comparison, over the declared window pairs. A pair whose
+        # windows were not both available in this snapshot is None -- the same
+        # unavailability semantic the single-window keys use above.
+        for kind, entries in self.window_pairs.items():
+            value_key, template, combine = PAIR_KINDS[kind]
+            for a, b in entries:
+                va, vb = window_vals.get(a), window_vals.get(b)
+                name = template.format(a=a, b=b)
+                if va is None or vb is None:
+                    out[name] = None
+                elif combine == "difference":
+                    out[name] = va[value_key] - vb[value_key]
+                else:  # ratio
+                    out[name] = va[value_key] / max(vb[value_key], EPS)
 
         # A4: regime-relative volume/delta
         out.update(self._regime_features(obs_ts, closes[-1], atr_safe))

@@ -683,28 +683,112 @@ class CompletedRegimeGeometryAdapter(_BaseAdapter):
 
 
 class OHLCVDeltaAdapter(_BaseAdapter):
-    """``GenericOHLCVDeltaProvider`` -- direction-normalized estimated-delta pressure."""
+    """``GenericOHLCVDeltaProvider`` -- estimated volume/delta over completed 1s bars.
+
+    Three groups of instances, all served by ONE provider:
+
+    * **direction-normalized** (``trend_normalized_est_delta_sum``, ``..._sum_ratio``,
+      ``..._acceleration``): signed so positive means pressure ALONG the prevailing 1m
+      regime. These need ``episode_state.prevailing_direction``.
+    * **rolling window / two-window pair** (``vol_sum`` at 5s, ``vol_sum_vs_ratio`` at
+      30s vs 300s, ``est_delta_sum``, ...): unsigned participation and pressure levels,
+      ``{context: rolling, timeframe: W}`` or ``{..., timeframe_2: W2}``. The physical
+      alias IS the provider's own snapshot key for this family, so routing is a lookup.
+    * **per-bar** (``bar_volume``, ``bar_est_delta``, ...): ``{context: bar}``.
+
+    The ``{context: regime}`` and ``{context: RTH}`` spellings of the same family are
+    deliberately NOT emitted: their values depend on ``reset_regime`` / ``reset_rth``
+    lifecycle calls this adapter is not wired to receive, so binding them would produce a
+    plausible number computed from the wrong accumulation window. They stay a clean
+    MISSING_CAPABILITY rather than a silent wrong value.
+
+    Volume and delta here are ESTIMATED from bar geometry (the ``(close-low)/range``
+    bull/bear split in ``features/trackers/ohlcv_delta.py``), never true aggressor-side
+    order flow. Every emitted name carries ``est_`` where that matters.
+    """
 
     canonical_provider = "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider"
-    _CANONICAL = frozenset({"trend_normalized_est_delta_sum", "trend_normalized_est_delta_sum_ratio"})
+
+    _DIRECTION_NORMALIZED = frozenset({
+        "trend_normalized_est_delta_sum", "trend_normalized_est_delta_sum_ratio",
+        "trend_normalized_est_delta_acceleration",
+    })
+    # Canonical names the provider renders per rolling window. Mirrors the `vals` keys of
+    # OHLCVDeltaTracker.calculate; test_ohlcv_family_binding asserts the two agree, so a
+    # tracker key added or removed cannot drift away from this declaration unnoticed.
+    _WINDOWED = frozenset({
+        "vol_sum", "vol_mean", "vol_max", "est_bull_vol_sum", "est_bear_vol_sum",
+        "est_delta_sum", "est_abs_delta_sum", "est_delta_ratio", "est_delta_pos_sum",
+        "est_delta_neg_sum", "upbar_vol_sum", "downbar_vol_sum", "up_down_vol_ratio",
+        "price_change_points", "price_change_atr", "range_points", "range_atr",
+        "volume_per_point_moved", "volume_per_atr_moved", "abs_delta_per_point_moved",
+        "abs_delta_per_atr_moved", "window_available",
+    })
+    # Two-window comparisons -> the tracker pair kind that computes them.
+    _PAIRED = {
+        "vol_sum_vs_ratio": "vol_sum_vs_ratio",
+        "est_delta_sum_minus_scaled": "est_delta_sum_minus_scaled",
+        "est_delta_ratio_minus": "est_delta_ratio_minus",
+    }
+    _BAR = frozenset({
+        "bar_volume", "bar_est_delta", "bar_est_delta_ratio", "bar_est_bull_volume",
+        "bar_est_bear_volume", "bar_zero_range",
+    })
 
     @classmethod
     def can_emit(cls, spec: "InstanceSpec") -> bool:
-        if spec.canonical_name not in cls._CANONICAL:
-            return False
-        return str(spec.parameters.get("direction_reference", "prevailing_1m")) == "prevailing_1m"
+        name, params = spec.canonical_name, spec.parameters
+        if name in cls._DIRECTION_NORMALIZED:
+            return str(params.get("direction_reference", "prevailing_1m")) == "prevailing_1m"
+        context = str(params.get("context", ""))
+        if context == "bar":
+            return name in cls._BAR
+        if context != "rolling":
+            return False           # regime / RTH: see the class docstring
+        if name in cls._PAIRED:
+            return "timeframe" in params and "timeframe_2" in params
+        if name in ("vol_mean", "vol_max"):
+            return "timeframe" in params and "timeframe_2" in params
+        return name in cls._WINDOWED and "timeframe" in params
 
     def __init__(self, instances: Sequence[InstanceSpec]) -> None:
         super().__init__(instances)
         from features.trackers.generic_ohlcv_delta import GenericOHLCVDeltaProvider
 
         windows: set[int] = set()
+        pairs: Dict[str, set] = {}
         for inst in self.instances:
-            p = inst.parameters
+            p, name = inst.parameters, inst.canonical_name
             for key in ("window", "numerator_window", "denominator_window"):
                 if key in p:
                     windows.add(_window_seconds(p[key]))
-        self._provider = GenericOHLCVDeltaProvider(windows_seconds=sorted(windows or {5, 60, 300}))
+            # An acceleration at w compares [t-w, t] against [t-2w, t-w], so the provider
+            # must retain 2w as well -- derived here, never asked of the study author.
+            if name == "trend_normalized_est_delta_acceleration":
+                short = _window_seconds(p["short_window"])
+                windows.update({short, 2 * short})
+            if str(p.get("context", "")) == "rolling":
+                # vol_mean / vol_max spell the BAR granularity in `timeframe` and the
+                # window in `timeframe_2`; every other rolling instance uses `timeframe`.
+                if name in ("vol_mean", "vol_max"):
+                    windows.add(_window_seconds(p["timeframe_2"]))
+                elif name in self._PAIRED:
+                    a, b = _window_seconds(p["timeframe"]), _window_seconds(p["timeframe_2"])
+                    windows.update({a, b})
+                    pairs.setdefault(self._PAIRED[name], set()).add((a, b))
+                elif "timeframe" in p:
+                    windows.add(_window_seconds(p["timeframe"]))
+        self._provider = GenericOHLCVDeltaProvider(
+            windows_seconds=sorted(windows or {5, 60, 300}),
+            window_pairs={k: sorted(v) for k, v in pairs.items()} or None,
+        )
+        # Instances whose physical alias is literally a provider snapshot key.
+        self._passthrough = tuple(
+            i for i in self.instances if i.canonical_name not in self._DIRECTION_NORMALIZED
+        )
+        self._directional = tuple(
+            i for i in self.instances if i.canonical_name in self._DIRECTION_NORMALIZED
+        )
 
     def required_streams(self) -> frozenset[str]:
         return frozenset({STREAM_COMPLETED_1S})
@@ -720,9 +804,17 @@ class OHLCVDeltaAdapter(_BaseAdapter):
     def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
         direction = int(episode_state.get("prevailing_direction", 0) or 0)
         out: Dict[str, Any] = {}
+        if self._passthrough:
+            snap = self._provider.snapshot(atr=float(atr))
+            for inst in self._passthrough:
+                out[inst.physical_alias] = snap.get(inst.physical_alias)
+        if not self._directional:
+            return out
         if direction not in (-1, 1):
-            return {i.physical_alias: None for i in self.instances}
-        for inst in self.instances:
+            # No prevailing direction: a direction-normalized value has no sign to carry.
+            out.update({i.physical_alias: None for i in self._directional})
+            return out
+        for inst in self._directional:
             p = inst.parameters
             if inst.canonical_name == "trend_normalized_est_delta_sum":
                 out[inst.physical_alias] = self._provider.trend_normalized_est_delta_sum(
@@ -733,6 +825,11 @@ class OHLCVDeltaAdapter(_BaseAdapter):
                     numerator_window=str(p["numerator_window"]),
                     denominator_window=str(p["denominator_window"]),
                     prevailing_direction=direction, atr=float(atr),
+                )
+            else:
+                out[inst.physical_alias] = self._provider.trend_normalized_est_delta_acceleration(
+                    short_window=str(p["short_window"]), prevailing_direction=direction,
+                    atr=float(atr),
                 )
         return out
 
