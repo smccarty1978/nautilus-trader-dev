@@ -205,6 +205,8 @@ def test_a_freeze_that_declares_train_only_needs_no_attestation(tmp_path):
      "FREEZE_MISMATCH"),
     (lambda b: b.__setitem__("cells", [{**b["cells"][0], "original_freeze_canonical_sha256": "0" * 64}]),
      "FREEZE_MISMATCH"),
+    # a descriptive field is NOT a binding, and the artifact must not pretend otherwise
+    (lambda b: b["cells"][0]["descriptive_only"].__setitem__("freeze_declared_freeze_sha256", "0" * 64), None),
     (lambda b: b["cells"][0].pop("original_freeze_canonical_sha256"), "MALFORMED"),
     (lambda b: b.__setitem__("cells", [{**b["cells"][0], "model_artifact_sha256": "0" * 64}]),
      "MODEL_ARTIFACT_MISMATCH"),
@@ -223,13 +225,20 @@ def test_a_freeze_that_declares_train_only_needs_no_attestation(tmp_path):
     (lambda b: b.__setitem__("kind", "not_an_attestation"), "MALFORMED"),
 ])
 def test_every_broken_binding_fails_closed(tmp_path, mutate, match):
+    """`match=None` marks a field the attestation carries but does NOT bind: changing it must
+    be harmless, which is the whole point of keeping it under `descriptive_only`."""
     parent, freeze = _parent(tmp_path)
     att = _write_attestation(parent)
     body = json.loads(att.read_text(encoding="utf-8"))
     mutate(body)
-    att.write_text(json.dumps(body, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    att.write_text(json.dumps(body, indent=2, sort_keys=True) + chr(10), encoding="utf-8")
+    spec = _spec(parent, freeze, **_attested(parent, att))
+    if match is None:
+        bound = FrozenExternalModelScorer.bind(spec, parent_dir=parent)
+        assert bound.train_provenance["source"] == "additive_provenance_attestation"
+        return
     with pytest.raises(ExternalModelScoringError, match=match):
-        FrozenExternalModelScorer.bind(_spec(parent, freeze, **_attested(parent, att)), parent_dir=parent)
+        FrozenExternalModelScorer.bind(spec, parent_dir=parent)
 
 
 def test_a_tampered_or_foreign_attestation_fails_closed(tmp_path):
@@ -320,6 +329,9 @@ def test_real_attestation_is_reproducible_and_binds_the_real_artifacts():
     for cell in att["cells"]:
         freeze = REAL_PARENT / cell["original_freeze_path"]
         assert canonical_sha256(json.loads(freeze.read_text(encoding="utf-8"))) == cell["original_freeze_canonical_sha256"]
+        # unverified context must be quarantined where a reader cannot mistake it for a binding
+        assert "descriptive_only" in cell
+        assert "freeze_authorization_sha256" not in cell
         model = REAL_PARENT / cell["model_artifact_path"]
         if model.is_file():                              # .joblib is machine-local (gitignored)
             assert file_sha(model) == cell["model_artifact_sha256"]
