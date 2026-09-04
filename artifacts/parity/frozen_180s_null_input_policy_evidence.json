@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "question": "Did the frozen 180s parent score checkpoints whose rolling_300s_* inputs were NULL?",
+  "why_it_matters": "The derived-input binding refuses to score a null input by default. If the frozen parent scored such rows, that default reproduces a DIFFERENT population than the one being reproduced, and the first-P90 identity silently shrinks.",
+  "parent_study_id": "clean_maturity_flip_model_180s_horizon",
+  "evidence": {
+    "march_candidates_total": 35872,
+    "march_candidates_scored_by_parent": 35872,
+    "march_candidates_with_null_rolling_300s": 26018,
+    "frozen_first_p90_fires_total": 239,
+    "frozen_first_p90_fires_on_a_null_rolling_row": 181,
+    "rescored_with_nan_passed_to_lightgbm": {
+      "LONG": {"fires": 115, "null_rolling": 90, "max_abs_delta_vs_parent_recorded": 0.0},
+      "SHORT": {"fires": 124, "null_rolling": 91, "max_abs_delta_vs_parent_recorded": 0.0}
+    }
+  },
+  "sources": [
+    "validation_march2024/artifacts/score_parity_detail.parquet (35872 rows, 0 null scores)",
+    "validation_march2024/artifacts/feature_parity_detail.parquet (rolling_300s_retention_ratio both_null=26018)",
+    "validation_march2024/artifacts/first_fire_diagnostics.parquet",
+    "artifacts/oos_candidates_merged.parquet"
+  ],
+  "determination": "The frozen models were USED with native LightGBM missing-value handling. A study reproducing that population must declare null_input_policy: model_native; the platform default remains refuse.",
+  "declared_by": "studies/first_p90_warning_horizon_march2024/study.yaml features.derived_inputs[].null_input_policy"
+}

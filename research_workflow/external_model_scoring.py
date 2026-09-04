@@ -33,6 +33,10 @@ class DerivedScoreObservation:
     arm: str
     model_hash: str
     preprocessing_hash: str
+    # How many of the ordered inputs were null at this checkpoint, and under which policy the
+    # score was produced. Recorded so a score derived over missing inputs is never anonymous.
+    null_inputs: int = 0
+    null_input_policy: str = "refuse"
     # RT-B2: the derived score's TRUE causal availability -- max(every input's availability,
     # the score's own evaluation timestamp) -- never the decision epoch assigned blindly.
     available_at_ns: int = 0
@@ -291,7 +295,8 @@ class FrozenExternalModelScorer:
         frame = pd.DataFrame(
             [[causal_snapshot[name] for name in features]], columns=features
         )
-        if frame.isna().any(axis=None):
+        null_inputs = int(frame.isna().to_numpy().sum())
+        if null_inputs and self.spec.null_input_policy != "model_native":
             raise ExternalModelScoringError("external score input contains null values")
         rec = self._bundle[arm]
         estimator = rec.get("estimator") if isinstance(rec, Mapping) else rec
@@ -309,6 +314,7 @@ class FrozenExternalModelScorer:
             model_hash=(self.spec.model_hashes or {}).get(arm, rec.get("fit_identity_sha256", "")),
             preprocessing_hash=self.spec.preprocessing_hash or self._recovered.get("preprocessing_identity", ""),
             availability_source=availability_source,
+            null_inputs=null_inputs, null_input_policy=self.spec.null_input_policy,
         )
 
 
