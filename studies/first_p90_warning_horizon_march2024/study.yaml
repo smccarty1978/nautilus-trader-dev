@@ -104,6 +104,13 @@ features:
     parent_provenance_cell_id: LONG_C
     availability_reference: decision_ts
     retrain_prohibited: true
+    # The frozen parent scored 35,872 of 35,872 March candidates; 26,018 (73%) had NULL
+    # rolling_300s_* inputs, and 181 of the 239 frozen first-P90 fires sit on such a row.
+    # Re-scoring those with NaN passed to LightGBM reproduces the parent's own recorded
+    # scores exactly (delta 0.0). Refusing nulls here would drop 76% of the population
+    # this study exists to characterise.
+    # Evidence: artifacts/parity/frozen_180s_null_input_policy_evidence.json
+    null_input_policy: model_native
   - name: parent_short_score
     kind: frozen_external_model_score
     parent_study_id: clean_maturity_flip_model_180s_horizon
@@ -140,6 +147,13 @@ features:
     parent_provenance_cell_id: SHORT_C
     availability_reference: decision_ts
     retrain_prohibited: true
+    # The frozen parent scored 35,872 of 35,872 March candidates; 26,018 (73%) had NULL
+    # rolling_300s_* inputs, and 181 of the 239 frozen first-P90 fires sit on such a row.
+    # Re-scoring those with NaN passed to LightGBM reproduces the parent's own recorded
+    # scores exactly (delta 0.0). Refusing nulls here would drop 76% of the population
+    # this study exists to characterise.
+    # Evidence: artifacts/parity/frozen_180s_null_input_policy_evidence.json
+    null_input_policy: model_native
   bindings:
     completed_5m: {tracker: regime_bar_5m, ready_gate: false}
     regime_transition_1m: {tracker: regime_1m, requires_atr: false}

@@ -882,7 +882,7 @@
     ]
   },
   "closure": {
-    "composite_sha256": "76945644f68d00e3ff19db8399ac951eefdf4bbcdb1e2eee69d8f52ea3cf9d0c",
+    "composite_sha256": "350361b45120e08c50eb352f510fb134741209926e27ae76446090e21d8cf058",
     "file_count": 43,
     "files": {
       "features/registry.py": "8eb7202bdb1c0487eca5f2a69aee7c6e3537afd0c1bf79f66bcf3da0e34edf8a",
@@ -890,16 +890,16 @@
       "features/trackers/generic_context.py": "79aff92632cd29a2494ed52c021940efc79d9827dd11570e4e609f7463e782de",
       "features/trackers/generic_rolling_productivity.py": "d0dcaa18e56debf27178e1e4c071f173f41988e5df57be8ee215303673f8e4a4",
       "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
-      "features/trackers/host_bindings.py": "cf7428f2b14a6d8b15cefd4f1f883f636a236a58b493ea193b86860e61bd6020",
+      "features/trackers/host_bindings.py": "c68046762fca481612cc100710e74b4d3c63cefd26fa89f3860356c61a100f48",
       "research/analysis/diagnostic_ops.py": "73f9060f174a30117a4e2646f8f892e7ce906e9f43d8023e0c79dc3b8087f881",
-      "research/schemas/study_spec.py": "c1d439c406c530797bf05b1ee57dfd146a964ed039c55472f4a4c8455ccae413",
+      "research/schemas/study_spec.py": "e72f7a26b139e455b060e91e937a2cafa3a32ca431950dfaef6a668e37b6bfed",
       "research_workflow/audit_packets_v2.py": "1a1b7f98e3a948db6626c11ad713e30433f4e428febc2344f769ba92b86bbcd0",
       "research_workflow/closure_hash.py": "80225b1ce75d53c5b37120d5f2d6da1cc98f2e124643a1768b05141492866b23",
       "research_workflow/controller_contracts.py": "e57afaeb5afb49ebc995b1d45486d095e24d8c0240148f0f1fafaac6f5cc3bdb",
       "research_workflow/dataset_v2.py": "352461e81424ac959494a4c10d16ff714bb374ce43dfa41b918733e9026d7819",
       "research_workflow/entry_references.py": "78fe9b0f7e8e4aaee69d34a90572ef3e6c7d9f13bc8d70c23f36f30cb416f35b",
       "research_workflow/experiment.py": "064017c10acab0d64379da3cc846c0ae1dfded43454c2f973c81afc54c554c4e",
-      "research_workflow/external_model_scoring.py": "ff7287021c2848783e8da8286dfb4de5a582ac5dbeac7e6c6f750eb0e7a9e0c1",
+      "research_workflow/external_model_scoring.py": "e824db91e2f61c614434db57e2ca8a53ab93157755de30005eb85b2fb41baa6a",
       "research_workflow/forward_outcomes/guard.py": "46d73217af1e9c47baddf11efb991209bbd0462ba636a0657c6e8be531090422",
       "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
       "research_workflow/governed_controller_v2.py": "94295dfab2ecbb6865ef5eaf2571f649582d2cbfb87edce426e3c3834102dcaa",
@@ -938,7 +938,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "c9b3cb182b5550df20281b016a47436bd726560a83d71b764f055220db2f4279",
+        "composite_sha256": "e6657708ea9cd802b034aa7c528a07a5d407135a32b1d2e7c2d8de72d94dde0d",
         "files": [
           "features/registry.py",
           "features/trackers/generic_arrival.py",
@@ -1457,7 +1457,7 @@
     "stream": "nq_1s",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "cd67791fd6da5177fa1e405db79961ff0fa864bf8457135c790dda0ed571932a",
+  "plan_sha256": "70cb773d2d8e96ea6522604348a6862a4225f2fb7cee6ef263e3e4b7e8577db1",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1534,7 +1534,7 @@
     ],
     "session": "RTH"
   },
-  "spec_sha256": "c02870822cc587291ae1fb4b9fb2c9301263387c9478805c36dd933d9234d440",
+  "spec_sha256": "0a1561759556f6a3a39aa3711a591b1a207c79cb334a4beeef7a01beeb9b078c",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
@@ -2074,6 +2074,7 @@
             "C": "25737fcd6830a60f8b5cb4a97293ceef8cabcf0efdc1910792a71c7127a9ae60"
           },
           "name": "parent_long_score",
+          "null_input_policy": "model_native",
           "ordered_feature_surfaces": {
             "C": [
               "arrival_velocity",
@@ -2149,6 +2150,7 @@
             "C": "3c480affc677f64b712540f8e55df67d7f14fe9921ad9baa293b96bf70cdaa6f"
           },
           "name": "parent_short_score",
+          "null_input_policy": "model_native",
           "ordered_feature_surfaces": {
             "C": [
               "arrival_velocity",

@@ -1,0 +1,55 @@
+{
+  "candidates_count_total": 4168,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true
+  },
+  "date": "2024-03-01",
+  "execution_manifest_composite_sha256": "76945644f68d00e3ff19db8399ac951eefdf4bbcdb1e2eee69d8f52ea3cf9d0c",
+  "generated_at_utc": "2026-09-04T17:56:49.105917+00:00",
+  "manifest": {
+    "candidates_sha256": "2a22b059bf46abc2e3a38c103a0be0598625e48a079bd38c8dd2ffeee408341a",
+    "composite_seal_hash": "fc0d21ca1d1f96884e15bd79c4e6a3b13ea28c379d7d5b2b56e04037da005c8a",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2_GLOBEX",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2024-03-01",
+    "elapsed_s": 57.69987040001433,
+    "execution_manifest_sha256": "76945644f68d00e3ff19db8399ac951eefdf4bbcdb1e2eee69d8f52ea3cf9d0c",
+    "kind": "smoke",
+    "observations_sha256": "5f4151f079503f99b5edbd676284fb0d3d46886107d9935b4e77a4b5e46d5bc1",
+    "plan_sha256": "cd67791fd6da5177fa1e405db79961ff0fa864bf8457135c790dda0ed571932a",
+    "rows": {
+      "candidates": 4168,
+      "observations": 4168
+    },
+    "stats": {
+      "bars": 247330,
+      "bars_by_stream": {
+        "nq_1m": 6900,
+        "nq_1s": 240430
+      },
+      "candidates": 4168,
+      "dropped_outside_primary": {
+        "candidates": 16465,
+        "observations": 16465
+      },
+      "epochs": 47192,
+      "observations": 4168,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-04T17:56:49.088099+00:00"
+  },
+  "observations_count_total": 4168,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-v2-diagnostic-first_p90_warning_horizon_march2024\\studies\\first_p90_warning_horizon_march2024\\runs\\20260904_175540_first_p90_warning_horizon_march2024_smoke",
+  "sealed_composite_sha256": "fc0d21ca1d1f96884e15bd79c4e6a3b13ea28c379d7d5b2b56e04037da005c8a",
+  "status": "ACCEPTED",
+  "study_name": "first_p90_warning_horizon_march2024",
+  "validator": "research_workflow.lifecycle_v2"
+}
