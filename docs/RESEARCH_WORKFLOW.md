@@ -1249,3 +1249,88 @@ core source. Tests: `research_workflow/tests/test_grammar_v2.py`, `test_host_cor
 `test_golden_fixture.py`, `test_lifecycle_v2.py` (a fresh study compile→close on synthetic
 data), `test_dataset_v2.py`, `scripts/tests/test_workspace.py`.
 
+
+### 21.9 Date-bounded partitions (`chronology.windows`)
+
+A V2 partition ran a whole calendar year: `authorized_years()` accepted only the `train` and
+`dev` roles, `_partition_bounds()` always spanned Jan 1 – Dec 31, and `chronology.diagnostic`
+was compiled into the plan and then read by no stage at all. A study authorized for one month
+therefore had no governed way to run — declaring the year in a role would have streamed all
+twelve months.
+
+`chronology.windows` declares inclusive `'YYYY-MM-DD..YYYY-MM-DD'` ranges. A window **narrows**
+an already-authorized `train` or `dev` year; it can never open a year the roles did not
+authorize (a window on a prohibited, diagnostic-only or undeclared year is a typed
+`SEMANTIC_DECISION_REQUIRED` gap) and never crosses a year boundary. A role year with no window
+keeps whole-year behaviour, so every existing study is bit-identical.
+
+The declaration is enforced at five points: the compiler (format, ordering, same-year,
+non-overlap, role membership — and the windows land in `spec_sha256` → `plan_sha256` → the frozen
+execution manifest → the seal, and in both audit packets); `prepare` (records `partition_windows`
+in `experiment_authorization.json`); `authorized_years()` (refuses a stale authorization whose
+windows disagree with the plan, before a bar is streamed); the partition itself (one bounded
+sub-run per window, concatenated into the single per-year partition every downstream stage
+already reads); and `reconcile` (rows are proven inside the *declared windows*, not merely inside
+the calendar year). The window is a **hard data boundary with no forward lookahead tail** — a
+candidate whose outcome cannot resolve inside it fails the partition
+(`WINDOW_OUTCOME_UNRESOLVED`) rather than censoring silently, because an unresolved row means the
+declared window is too narrow for the declared outcome, which is a spec defect, not data.
+`--windows` may only narrow the declared set. Tests:
+`research_workflow/tests/test_chronology_windows.py`.
+
+### 21.10 Declarative analysis (`analysis:`)
+
+The `analyze` stage emitted only row counts, disposition counts and per-year
+`roc_auc`/`pr_auc`/`brier`. Any other statistic meant a study-local pandas script, which
+`CLAUDE.md` §5 prohibits — so the honest response to a study needing one was
+`ANALYSIS_HARNESS_GAP` and no result.
+
+A study now declares its analysis as a pipeline of registered `analysis_ops`
+(`research/analysis/diagnostic_ops.py`, `research cap list analysis_ops`) over its own collected
+frame. Six operations, all study-agnostic — the science lives in the declared parameters:
+
+| op | what it computes |
+|---|---|
+| `analysis.anchor.first_threshold_crossing` | the first row per group whose declared per-arm value reaches its per-arm threshold, restricted to a declared eligibility subset; at most one anchor per group. `terminal` reduces several terminal timestamps to one `observed_seconds` every later step reuses. |
+| `analysis.incidence.cumulative` | right-censoring-aware cumulative **and** incremental incidence over declared horizons. Eligible at `h` = resolved at or before `h` **or** observed for at least `h` — requiring only the latter silently drops fast resolvers from every longer denominator. |
+| `analysis.decomposition.buckets` | a declaration-ordered, mutually exclusive partition of a censored duration, against both an all-rows and a negative-at-N denominator; anything unmatched is reported as `UNCLASSIFIED`, never hidden. |
+| `analysis.control.cell_matched` | at most one control row per (group × stratum cell), chosen without reading any outcome: the latest below-threshold eligible row, strictly before the anchor where one exists. Min-n reportability gate; no matching, no weighting, no pooling. |
+| `analysis.path.anchored_offsets` | the value path at declared offsets after an anchor, bounded by its terminal, with delta, maximum, time-to-level, collapse and recross. A missing *required* offset censors that path and is never imputed. |
+| `analysis.classify.precedence` | ordered, first-match-wins labelling; declaration order **is** the precedence, so a dominating category is expressed by declaring it first. |
+
+The compiler proves before execution that every op is registered, that the pipeline is a DAG in
+declaration order (a step may read only the study frame or an earlier step), and that every
+declared artifact names a declared step — so a study cannot reach execution with an analysis that
+fails half-way and leaves a partial artifact set behind. An analysis that declares no artifact is
+refused: it could not be audited. `analysis.source` decides whether the protected-OOS gate
+applies (`oos` calls `assert_oos_open` and needs `chronology.dev` years; `train` never opens one).
+
+A study with no dev years has no protected period: `freeze` records `NO_PROTECTED_OOS` rather
+than writing a gate that vouches for nothing, and `oos` writes a receipt saying nothing was
+authorized to open — neither is a silent skip. Tests:
+`research/analysis/tests/test_diagnostic_ops.py`,
+`research_workflow/tests/test_declarative_analysis.py`.
+
+### 21.11 `outcome.session_end: truncate`
+
+`censor` is the right rule for a fixed-horizon label: a window that does not fit inside the
+session was not fully observed, so it is CENSORED `SESSION_END` — *whether or not the event
+happened*. The consequence is that a horizon longer than a session censors every candidate, and
+the question "how long until the next event, watching until the close?" could not be asked at
+all.
+
+`truncate` makes the session close **bound** the observation window instead of voiding it: an
+event at or before the close resolves the candidate POSITIVE at its own instant, and only a
+candidate that reached the close without one is CENSORED `SESSION_END`, stamped at the close
+(never at the run's last bar). It is additive — a horizon that fits inside the session resolves
+identically under both rules — and it is the rule to use whenever the terminal boundary is the
+session, not an arbitrary horizon.
+
+Implemented in the kernel (`research_workflow/host/outcomes.py`: `on_flip`, `_sweep_flip`,
+`finalize`) and, independently, in the replay oracle (`research_workflow/target_replay_oracle.py`).
+Writing that cross-check surfaced a pre-existing disagreement: the oracle matched flips with
+`T < ts` unconditionally while the kernel's window is inclusive at `T` when
+`flip.inclusive_start` (the grammar default), so the two differed on a flip landing exactly at the
+decision epoch. The oracle now reads the declared `inclusive_start`; a legacy contract that
+declares nothing keeps the exclusive rule. Tests:
+`research_workflow/tests/test_session_end_truncate.py`.

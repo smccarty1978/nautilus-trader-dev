@@ -32,7 +32,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = Path(__file__).resolve().parent / "capabilities_index.yaml"
 REGISTRY_PATH = Path(__file__).resolve().parent / "capabilities" / "registry.json"
 KINDS = ("streams", "features", "trackers", "trigger_primitives", "outcomes", "entry_references", "model_drivers", "validation_protocols", "datasets",
-         "feature_hosts", "derived_inputs")
+         "feature_hosts", "derived_inputs", "analysis_ops")
 
 COST_CLASS_BY_CADENCE = {
     "per_1s": "per_1s", "per_source_bar": "per_source_event", "per_source_event": "per_source_event",
@@ -200,7 +200,7 @@ def build_registry(repo_root: Path = REPO_ROOT) -> Dict[str, Any]:
     reg["kinds"]["streams"] = streams
     reg["kinds"]["features"] = _features(repo_root)
     hosted = _host_bindings(repo_root)
-    for kind in ("trackers", "trigger_primitives", "outcomes", "entry_references", "model_drivers", "validation_protocols", "feature_hosts", "derived_inputs"):
+    for kind in ("trackers", "trigger_primitives", "outcomes", "entry_references", "model_drivers", "validation_protocols", "feature_hosts", "derived_inputs", "analysis_ops"):
         rows = list(seeded.get(kind, []))
         have = {r["id"]: r for r in rows}
         for r in hosted.get(kind, []):

@@ -322,18 +322,33 @@ def _replay_flip_condition(
     horizon_s = int(horizon)
     end = T + horizon_s * NS
     session_censoring = cond.get("session_end_censoring", contract.get("session_end_censoring", True))
-    session_close_ts = candidate.get("session_close_ts") if session_censoring else None
+    session_rule = str(cond.get("session_end_rule", contract.get("session_end_rule", "censor" if session_censoring else "ignore")))
+    session_close_ts = candidate.get("session_close_ts") if session_rule != "ignore" else None
+    truncated = False
     if session_close_ts is not None and end > int(session_close_ts):
-        return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
+        if session_rule != "truncate":
+            return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
+        # truncate: the close bounds the observation window instead of voiding it. A flip at or
+        # before the close still resolves the candidate; reaching the close without one is what
+        # SESSION_END means here.
+        end, truncated = int(session_close_ts), True
 
     role = str(cond.get("direction") or contract.get("direction") or "opposite")
     prevailing = int(candidate.get("regime_direction", candidate.get("direction", 0)) or 0)
     target = {"opposite": -prevailing, "same": prevailing}.get(role, 0)
 
+    # The kernel's window is inclusive at T by default (LabelOutcomeKernel.on_flip uses
+    # ``p.T <= flip_ts`` when ``flip.inclusive_start``). The oracle used ``T < ts``
+    # unconditionally, so the two disagreed on a flip landing exactly at the decision epoch --
+    # invisible until a flip contract was actually cross-checked against the oracle. Read the
+    # declared value; a legacy contract that declares nothing keeps the exclusive rule.
+    inclusive_start = bool(cond.get("inclusive_start", contract.get(
+        "inclusive_start", (contract.get("flip") or {}).get("inclusive_start", False))))
     first_flip_ts = None
     for fe in sorted((dict(f) for f in flip_events), key=lambda x: int(x["ts"])):
         ts = int(fe["ts"])
-        if T < ts <= end and (target == 0 or int(fe.get("direction", 0)) == target):
+        started = T <= ts if inclusive_start else T < ts
+        if started and ts <= end and (target == 0 or int(fe.get("direction", 0)) == target):
             first_flip_ts = ts
             break
 
@@ -357,6 +372,8 @@ def _replay_flip_condition(
         return {"disposition": "POSITIVE", "label": 1, "censor_reason": None}
     if first_gap_ts is not None:
         return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
+    if truncated:
+        return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
 
     last_tape_ts = max((int(e["ts"]) for e in events), default=T)
     if last_tape_ts >= end:

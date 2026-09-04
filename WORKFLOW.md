@@ -52,6 +52,7 @@ creates v2 studies; `study compile` and `study run` refuse a new v1 study.
 2. `ts_init` (bar close / availability) controls visibility; `ts_event` (bar open) never does.
 3. No look-ahead: a coarser bar closing exactly at the epoch is a context stream, visible strictly before the next epoch.
 4. No protected OOS until authorized: dev years open only through the `oos` stage after the TRAIN freeze; prohibited years never open.
+4a. `chronology.windows` NARROWS an authorized train/dev year to explicit dates; it never opens a year the roles did not authorize.
 5. One writing agent per git worktree; `study new` gives every study its own branch and sibling worktree.
 6. Canonical sparse 1s data is never forward-filled (Dataset V2 is native rows only).
 7. No custom study event loops, collectors, drivers or merge scripts for normal studies.
@@ -90,6 +91,7 @@ creates v2 studies; `study compile` and `study run` refuse a new v1 study.
 | Dataset definitions | DatasetSpec authority | `research/datasets/<id>.yaml` | only via builder | builder writes | `research data verify <id>` |
 | Dataset V2 manifests | Immutable identity | `<catalog>/dataset_manifest.json`, `<catalog>/build_manifest.json` (catalog root from `~/.nt_research/config.yaml`) | NO | YES | `research data manifest/verify` |
 | Calendar / roll / gap tables | Reference tables | `<catalog>/reference/{sessions,holidays,maintenance,rolls,gaps,out_of_calendar}.parquet` | NO | YES | `python scripts/build_dataset_v2.py` |
+| Analysis operations | Declarative post-collection statistics | `research/analysis/diagnostic_ops.py` | via capability flow | NO | `research cap list analysis_ops` |
 | Study YAML / specs | One study = one spec | `studies/<id>/study.yaml` (+ `compiled_plan.json`) | YES | plan yes | `research study compile` |
 | Study workspaces | Branch + worktree + lease | `../<repo>-<id>/` (worktree), `~/.nt_research/leases/` | via CLI | YES | `research study new`, `research ws list` |
 | Scripts | Deterministic operators | `scripts/research.py`, `scripts/run_governed_study.py`, `scripts/build_dataset_v2.py`, `scripts/prove_bar_equivalence.py`, `scripts/bench_host.py`, `scripts/lint_host.py`, `scripts/platform_v2_cards.py`, `scripts/gen_yaml_reference.py` | NO | NO | see each `--help` |
@@ -233,7 +235,7 @@ Examples:
 | outcome / label | resolved from the future path | `outcome` (§J) |
 | diagnostic / modeling metric | computed after prediction for evaluation | `research/analysis/metrics.py`; consumed by the fit/analyze stages |
 | economic metric | computed from trades | `outcome.kind: trade` (typed only today) / `research_workflow/forward_outcomes/` |
-| analysis metric | report aggregation only | `research/analysis/` reporting; never a runtime primitive |
+| analysis metric | report aggregation only | a declared `analysis:` step composing registered `analysis_ops` (§F.1); never a runtime primitive, never a study-local script |
 
 Rules that keep future information out of features: a feature may only read the tracker/bar state
 delivered at or before the epoch; anything that needs the path after T is an outcome; anything computed
@@ -241,6 +243,34 @@ from outcome columns is analysis. `research_workflow/forward_outcomes/guard.py` 
 column names in the feature surface at preflight and fit. Example: "time since the pullback started" is
 a feature (`pullback_elapsed_seconds`); "did price recover to the pre-pullback extreme within 300 s" is an
 outcome (barrier/event); "recovery rate by regime age decile" is analysis.
+
+### F.1 Declarative analysis (`analysis:`)
+
+Anything past `roc_auc` / `pr_auc` / `brier` and disposition counts is declared, not scripted. A
+study's `analysis:` section composes registered `analysis_ops` over its OWN collected frame:
+
+```yaml
+analysis:
+  source: train                     # or oos (opens the protected period through assert_oos_open)
+  steps:
+    - {id: anchors,   op: analysis.anchor.first_threshold_crossing, params: {...}}
+    - {id: incidence, op: analysis.incidence.cumulative, rows: anchors, params: {...}}
+    - {id: controls,  op: analysis.control.cell_matched, inputs: {anchors: anchors}, params: {...}}
+  artifacts:
+    - {name: cumulative_incidence.json, source: incidence, kind: json}
+    - {name: anchors.parquet,           source: anchors,   kind: frame}
+```
+
+Six operations today (`research cap list analysis_ops`): `anchor.first_threshold_crossing`,
+`incidence.cumulative`, `decomposition.buckets`, `control.cell_matched`, `path.anchored_offsets`,
+`classify.precedence`. They are study-agnostic -- the science is in the declared parameters -- and
+the compiler proves, before execution, that every op is registered, that the pipeline is a DAG in
+declaration order, and that every declared artifact names a declared step. Steps run after
+collection and may read outcome columns; they are never a feature surface.
+
+If a required statistic cannot be expressed, that is an `ANALYSIS_HARNESS_GAP`: name the missing
+operation and add it through the capability flow (§E). Never write a study-local authoritative
+pandas script.
 
 ## G. Adding a new ML model family
 

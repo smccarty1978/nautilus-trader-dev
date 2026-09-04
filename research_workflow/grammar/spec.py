@@ -175,7 +175,7 @@ class OutcomeSpec(_Strict):
     # through_decision_ts = after every bar with ts_init == T has been applied.
     atr_availability: Optional[Literal["at_decision_delivery", "through_decision_ts"]] = None
     horizon: Optional[str] = None                  # default horizon for items without their own
-    session_end: Literal["censor", "ignore"] = "censor"
+    session_end: Literal["censor", "ignore", "truncate"] = "censor"
     session: Optional[str] = None                  # censoring session (default: population.session)
     max_gap: Optional[str] = None
     same_bar_rule: Literal["ambiguous_censor", "adverse_first"] = "ambiguous_censor"
@@ -271,6 +271,28 @@ class ModelSpec(_Strict):
         return self
 
 
+class AnalysisStepSpec(_Strict):
+    """One registered analysis operation over the study's own collected frame."""
+    id: str
+    op: str                                                # registered analysis_ops capability id
+    rows: str = "frame"                                    # 'frame' (the collected study frame) or a prior step id
+    inputs: Dict[str, str] = Field(default_factory=dict)   # extra frame inputs -> prior step id
+    params: Dict[str, Any] = Field(default_factory=dict)
+
+
+class AnalysisArtifactSpec(_Strict):
+    name: str                                              # file written under studies/<id>/artifacts
+    source: str                                            # step id
+    kind: Literal["json", "frame", "observations"] = "json"
+
+
+class AnalysisSpec(_Strict):
+    """Declarative post-collection analysis: composed registered operations, zero study Python."""
+    source: Literal["train", "oos"] = "train"              # which collected partition set the frame comes from
+    steps: List[AnalysisStepSpec] = Field(default_factory=list)
+    artifacts: List[AnalysisArtifactSpec] = Field(default_factory=list)
+
+
 class StudySpecV2(_Strict):
     study: StudySection
     streams: List[StreamSpec] = Field(..., min_length=1)
@@ -281,6 +303,7 @@ class StudySpecV2(_Strict):
     outcome: OutcomeSpec
     chronology: ChronologySpec
     model: Union[Literal["none"], ModelSpec] = "none"
+    analysis: Optional[AnalysisSpec] = None
 
     @model_validator(mode="after")
     def _roles(self) -> "StudySpecV2":

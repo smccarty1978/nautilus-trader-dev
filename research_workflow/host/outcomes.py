@@ -83,8 +83,16 @@ class LabelOutcomeContract:
     atr_ref: Optional[str]
     entry_reference: str
     session_end_censoring: bool
+    # "censor"   -- a horizon reaching past the session close is CENSORED SESSION_END, whether or
+    #               not the event happened (a fixed-horizon label must observe its whole window).
+    # "truncate" -- the session close TRUNCATES the horizon: an event at or before the close is
+    #               POSITIVE at its own timestamp, and only a candidate that reached the close
+    #               without one is CENSORED SESSION_END, at the close. This is what "observe until
+    #               the session ends" means, and a fixed horizon cannot express it.
+    # "ignore"   -- no session boundary at all.
     max_gap_ns: Optional[int]
     same_bar_rule: str
+    session_end_rule: str = "censor"
     horizon_end_rule: str = "strict"
     arms: Tuple[BarrierArm, ...] = ()
     flip: Optional[FlipItem] = None
@@ -104,7 +112,9 @@ class LabelOutcomeContract:
         flip = spec.get("flip")
         return cls(kernel=str(spec["kernel"]), direction_ref=str(spec["direction"]), atr_ref=spec.get("atr"),
                    entry_reference=str(spec.get("entry_reference", "next_bar_open")),
-                   session_end_censoring=bool(spec.get("session_end_censoring", True)), horizon_end_rule=str(spec.get("horizon_end_rule", "strict")),
+                   session_end_censoring=bool(spec.get("session_end_censoring", True)),
+                   session_end_rule=str(spec.get("session_end_rule", "censor" if spec.get("session_end_censoring", True) else "ignore")),
+                   horizon_end_rule=str(spec.get("horizon_end_rule", "strict")),
                    max_gap_ns=(int(spec["max_gap_ns"]) if spec.get("max_gap_ns") is not None else None),
                    same_bar_rule=str(spec.get("same_bar_rule", "ambiguous_censor")), arms=arms,
                    flip=(FlipItem(int(flip["horizon_ns"]), str(flip["source"]), str(flip.get("role", "opposite")),
@@ -253,9 +263,20 @@ class LabelOutcomeKernel:
                 if target != 0 and new_direction != target:
                     keep.append(p)
                     continue
-                if p.session_close is not None and p.flip_end > p.session_close:
+                started = p.T <= flip_ts if self.c.flip.inclusive_start else p.T < flip_ts
+                if self.c.session_end_rule == "truncate":
+                    # The close truncates the window: a flip at or before it resolves the
+                    # candidate at its own instant; a flip after it never reaches this candidate,
+                    # which is censored at the close it did not survive.
+                    if p.session_close is not None and flip_ts > p.session_close:
+                        self._finish_flip(p, CENSORED, p.session_close, "SESSION_END", None)
+                    elif started and flip_ts <= p.flip_end:
+                        self._finish_flip(p, POSITIVE, flip_ts, None, flip_ts)
+                    else:
+                        self._finish_flip(p, NEGATIVE, p.flip_end, None, None)
+                elif p.session_close is not None and p.flip_end > p.session_close:
                     self._finish_flip(p, CENSORED, flip_ts, "SESSION_END", None)
-                elif (p.T <= flip_ts if self.c.flip.inclusive_start else p.T < flip_ts) and flip_ts <= p.flip_end:
+                elif started and flip_ts <= p.flip_end:
                     self._finish_flip(p, POSITIVE, flip_ts, None, flip_ts)
                 else:
                     self._finish_flip(p, NEGATIVE, p.flip_end, None, None)
@@ -430,14 +451,30 @@ class LabelOutcomeKernel:
         return True
 
     def _sweep_flip(self, now_ts: int, *, final: bool) -> None:
+        """Retire pending flip candidates that can no longer resolve.
+
+        The queue is ordered by ``flip_end = T + horizon`` and therefore also by ``T`` and by
+        ``session_close`` (candidates open in time order and a session's close is constant), so
+        front-popping is correct for BOTH terminal conditions -- the horizon under ``censor``,
+        and the horizon or the session close under ``truncate``.
+        """
+        truncate = self.c.session_end_rule == "truncate"
         q = self._flip_queue
         while q:
             p = q[0]
             end = p.flip_end
-            if end > now_ts or (end == now_ts and not final):
+            horizon_due = end < now_ts or (end == now_ts and final)
+            session_due = truncate and p.session_close is not None and (
+                p.session_close < now_ts or (p.session_close == now_ts and final))
+            if not (horizon_due or session_due):
                 break
             q.popleft()
-            if p.session_close is not None and end > p.session_close:
+            if truncate:
+                if p.session_close is not None and end > p.session_close:
+                    self._finish_flip(p, CENSORED, p.session_close, "SESSION_END", None)
+                else:
+                    self._finish_flip(p, NEGATIVE, end, None, None)
+            elif p.session_close is not None and end > p.session_close:
                 self._finish_flip(p, CENSORED, now_ts, "SESSION_END", None)
             else:
                 self._finish_flip(p, NEGATIVE, end, None, None)
@@ -450,9 +487,10 @@ class LabelOutcomeKernel:
             now = 0
         if self.c.kernel == "flip":
             self._sweep_flip(now, final=True)
+            truncate = self.c.session_end_rule == "truncate"
             for p in list(self.pending):
                 if p.session_close is not None and p.flip_end > p.session_close:
-                    self._finish_flip(p, CENSORED, now, "SESSION_END", None)
+                    self._finish_flip(p, CENSORED, (p.session_close if truncate else now), "SESSION_END", None)
                 else:
                     self._finish_flip(p, CENSORED, now, "DATA_END", None)
             self.pending = []

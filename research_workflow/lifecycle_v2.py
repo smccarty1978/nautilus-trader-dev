@@ -29,8 +29,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 NS = 1_000_000_000
 PLAN_NAME = "compiled_plan.json"
 KEY = ("observation_ts", "regime_start_ns", "checkpoint_index")
+# Run by the `tests` stage before a study may seal. Kept to fast, capability-level guarantees:
+# the golden host fixture, the grammar/compiler, the host core, date-bounded partition
+# authorization, and the analysis operations. The slower end-to-end controller runs
+# (test_lifecycle_v2, test_declarative_analysis) stay repo tests.
 PLATFORM_TESTS = ("research_workflow/tests/test_golden_fixture.py", "research_workflow/tests/test_grammar_v2.py",
-                  "research_workflow/tests/test_host_core.py")
+                  "research_workflow/tests/test_host_core.py", "research_workflow/tests/test_chronology_windows.py",
+                  "research/analysis/tests/test_diagnostic_ops.py")
 
 # Single source of truth for the deliverable each stage writes -- research_workflow.audit_packets_v2
 # builds DELIVERABLES_BY_STAGE from this constant so the audit packet cannot silently name a
@@ -898,6 +903,21 @@ class V2Lifecycle:
         self._require_execute("freeze")
         from research_workflow.experiment import write_train_freeze
         plan = load_plan(self.study)
+        # A study with no dev years has no protected OOS: there is no later stage whose access
+        # this freeze would gate. Writing a normal TRAIN freeze would be a gate that vouches for
+        # nothing, so the freeze records explicitly that no protected period exists. The stage
+        # still produces its declared deliverable, so the deliverables contract is unchanged.
+        if not (plan["chronology"].get("dev") or []):
+            path = _write(self.artifacts / "train_experiment_freeze.json", {
+                "schema_version": 1, "partition": "train", "platform": "v2",
+                "status": "NO_PROTECTED_OOS", "protected_oos": False,
+                "study_id": plan["study"]["id"], "plan_sha256": plan["plan_sha256"],
+                "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
+                "feature_sets": {"primary": list(plan["columns"]["features"])}, "preprocessing_hash": "identity",
+                "model_hashes": {}, "model_canonical_sha256": {}, "thresholds": {}, "deciles": {},
+                "new_models_trained": False, "merge_identity": _read(self.work / "merged" / "identity.json"),
+                "label_column": plan["outcome"].get("label_column"), "generated_at_utc": _now()})
+            return {"status": "PASS", "outputs": [str(path)]}
         models = _read(self.artifacts / "experiment_models.json")
         ident = _read(self.work / "merged" / "identity.json")
         # W-1: bind the frozen record to the model's actual estimator BYTES, not only the
@@ -924,6 +944,17 @@ class V2Lifecycle:
 
     def oos(self, study: Path | None = None) -> Dict[str, Any]:
         self._require_execute("oos")
+        plan = load_plan(self.study)
+        # Nothing to open: a study that declared no dev years never had a protected period.
+        # This is a receipt that the stage ran and found nothing authorized -- not a silent skip.
+        if not (plan["chronology"].get("dev") or []):
+            path = _write(self.work / "oos_no_protected_period.json", {
+                "status": "NO_PROTECTED_OOS", "dev_years": [], "plan_sha256": plan["plan_sha256"],
+                "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
+                "detail": "chronology.dev is empty; no protected out-of-sample period exists to open",
+                "generated_at_utc": _now()})
+            return {"status": "PASS", "outputs": [str(path)],
+                    "partitions": [{"id": "oos-none", "status": "PASS", "rows": {"candidates": 0, "observations": 0}}]}
         from research_workflow.experiment import assert_oos_open
         assert_oos_open(self.study)
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
@@ -931,12 +962,77 @@ class V2Lifecycle:
             raise LifecycleV2Error("TRAIN_CLOSURE_STALE: the plan closure changed after the TRAIN freeze")
         return self._collect_period("oos")
 
+    def _declared_analysis(self, plan: Dict[str, Any]) -> Dict[str, Any]:
+        """Run the study's declared ``analysis:`` pipeline over its own collected frame.
+
+        Steps run in declaration order (the compiler already proved the pipeline is a DAG and
+        that every op is registered), each producing a frame that later steps may consume and a
+        JSON-able payload. Only the artifacts the study DECLARED are written, so the analyze
+        stage's deliverable set is knowable before execution and auditable after it.
+        """
+        import pandas as pd
+        from research.analysis.diagnostic_ops import run_op
+        from research.analysis.identity import canonical_sha256
+        spec = plan["analysis"]
+        if spec["source"] == "oos":
+            from research_workflow.experiment import assert_oos_open
+            assert_oos_open(self.study)
+            base = self.work / "partitions" / "oos"
+            years = [int(y) for y in self._authorized_years(plan, "oos", self.opts.years)]
+            frame = self._train_frame_all_labels(plan, base, years)
+        else:
+            years = [int(y) for y in self._authorized_years(plan, "train", self.opts.years)]
+            frame = self._train_frame_all_labels(plan)
+        frames: Dict[str, Any] = {"frame": frame}
+        extras: Dict[str, Any] = {}
+        payloads: Dict[str, Any] = {}
+        steps: List[Dict[str, Any]] = []
+        for step in spec["steps"]:
+            rows = frames[step["rows"]]
+            inputs = {name: frames[ref] for name, ref in (step.get("inputs") or {}).items()}
+            result = run_op(step["op"], rows, inputs=inputs, params=step.get("params") or {})
+            frames[step["id"]] = result["frame"]
+            payloads[step["id"]] = result.get("payload") or {}
+            if result.get("observations") is not None:
+                extras[step["id"]] = result["observations"]
+            steps.append({"id": step["id"], "op": step["op"], "rows_in": int(len(rows)), "rows_out": int(len(result["frame"]))})
+        written = []
+        for art in spec["artifacts"]:
+            path = self.artifacts / art["name"]
+            if art["kind"] == "json":
+                _write(path, payloads.get(art["source"]) or {})
+            elif art["kind"] == "frame":
+                frames[art["source"]].to_parquet(path, index=False)
+            else:
+                if art["source"] not in extras:
+                    raise LifecycleV2Error(f"ANALYSIS_ARTIFACT_UNAVAILABLE: step {art['source']!r} produced no observations frame")
+                extras[art["source"]].to_parquet(path, index=False)
+            written.append({"name": art["name"], "kind": art["kind"], "source": art["source"], "sha256": _sha(path)})
+        lineage = {"source": spec["source"], "years": years, "rows": int(len(frame)),
+                   "partition_windows": windows_identity((plan.get("chronology") or {}).get("windows") or []),
+                   "plan_sha256": plan["plan_sha256"],
+                   "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
+                   "ops": list(spec["ops"]), "steps": steps, "artifacts": written}
+        lineage["analysis_identity_sha256"] = canonical_sha256(lineage)
+        return {"declared_analysis": lineage, "payloads": payloads}
+
     def analyze(self, study: Path | None = None) -> Dict[str, Any]:
         self._require_execute("analyze")
         import pandas as pd
+        plan = load_plan(self.study)
+        # A study that declares an `analysis:` pipeline is analysed by it. Its own declared
+        # source decides whether the protected OOS gate applies: a train-source diagnostic
+        # never opens a dev year, so demanding assert_oos_open of it would be a gate that
+        # cannot vouch for anything it actually did.
+        if plan.get("analysis"):
+            declared = self._declared_analysis(plan)
+            analyze_name = Path(DELIVERABLES["analyze"][0]).name
+            path = _write(self.artifacts / analyze_name, {"schema_version": 2, "contract": plan["outcome"]["contract"],
+                                                          "plan_sha256": plan["plan_sha256"], "authority": f"plan.analysis.source={plan['analysis']['source']}",
+                                                          **declared, "generated_at_utc": _now()})
+            return {"status": "PASS", "outputs": [str(path)] + [str(self.artifacts / a["name"]) for a in plan["analysis"]["artifacts"]]}
         from research_workflow.experiment import assert_oos_open
         assert_oos_open(self.study)
-        plan = load_plan(self.study)
         label = plan["outcome"].get("label_column") or "target_flip_within_horizon"
         base = self.work / "partitions" / "oos"
         years = self._authorized_years(plan, "oos", self.opts.years)
