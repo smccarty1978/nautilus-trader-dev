@@ -3,9 +3,16 @@ study_id: supv1_shape_a_flip_180s
 research_question: "Supervisor V1 validation rerun of the closed reference study v2_shape_a_flip_180s.\nThis is an infrastructure audit, not new research. Design worker instructions:\n1. Copy studies/v2_shape_a_flip_180s/study.yaml from this worktree VERBATIM into\n   studies/supv1_shape_a_flip_180s/study.yaml, changing ONLY `id:` to supv1_shape_a_flip_180s.\n   Do not add, remove, reorder or re-parameterize any feature, tracker, chronology or model field.\n2. In research_decision.yaml keep status DRAFT, set dataset_id NQ_1S_V2, research_question to this text,\n   terminal_decisions: {reference_study: v2_shape_a_flip_180s, purpose: supervisor_v1_validation},\n   and keep the default autonomy_decisions. Do NOT add platform_merge or closed_study_merge.\n3. Run `python scripts/research.py study compile --study studies/supv1_shape_a_flip_180s` and commit\n   study.yaml, research_decision.yaml and compiled_plan.json on the study branch. If compile returns any\n   CapabilityGap, do NOT resolve it: commit the handoff and stop BLOCKED (that is an audit finding)."
 status: DRAFT
 dataset_id: NQ_1S_V2
-terminal_decisions:
+# Supervisor V1 validation metadata (NOT a terminal-decision vocabulary; see the correction below)
+validation:
   reference_study: v2_shape_a_flip_180s
   purpose: supervisor_v1_validation
+# terminal_decisions is the DECLARED VOCABULARY the closure's terminal_decision must come from (research_workflow.study_closure).
+# Correction 2026-09-05: the original contract mis-used this block for metadata, so the first close was rejected
+# (STUDY_CLOSURE_TERMINAL_DECISION_UNDECLARED) after the analysis worker chose SUPERVISOR_V1_VALIDATED_END_TO_END.
+terminal_decisions:
+  SUPERVISOR_V1_VALIDATED_END_TO_END: the supervisor drove the full lifecycle and the rerun reconciles with the reference within explained platform drift
+  SUPERVISOR_V1_NOT_VALIDATED: the supervisor or the rerun failed a control-plane or research-plane gate
 # Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
 # semantic choice with no policy here is still a SEMANTIC_DECISION_REQUIRED question.
 autonomy_decisions:
