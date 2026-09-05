@@ -809,7 +809,9 @@ STUDY worktree (`<worktree>/scripts/run_governed_study.py`), never from the cano
 is treated as stale as soon as the platform in the study worktree compiles the study to a different execution composite
 (so a merged platform change forces recompile/reseal before any auditor is launched); the read-only worker allowlist covers
 both the Bash and the PowerShell tools; `supervise stop` ends only the loop process -- a detached controller job or worker it
-spawned keeps running and is consumed on `resume`.
+spawned keeps running and is consumed on `resume`; a `study_closure.json` counts as terminal only when
+`research_workflow.study_closure.load_study_closure` accepts it, the analysis worker is told the declared `terminal_decisions`
+vocabulary, and an undeclared decision raises `RESEARCH_CONTRACT_CONFLICT` instead of a close.
 
 **Providers**: `supervise providers` probes each installed CLI (`--version`, `--help`) and records AVAILABLE /
 HEADLESS_SUPPORTED / WRITE_SUPPORTED / READ_ONLY_SUPPORTED / CLI_VERSION / probe sha256; only flags the installed

@@ -301,8 +301,34 @@ class Supervisor:
         if code == "READY_FOR_ANALYSIS":
             return self._launch_analysis(d)
         if code == "ANALYSIS_DECIDED":
+            chk = d["evidence"].get("decision_check") or {}
+            if not chk.get("ok", True):
+                return self._user_decision("RESEARCH_CONTRACT_CONFLICT",
+                                           f"artifacts/analysis_decision.json names terminal_decision {d['evidence'].get('terminal_decision')!r}, which research_decision.yaml "
+                                           f"does not declare (declared: {chk.get('declared')}); {chk.get('error')}. Declare it (a fresh analysis or contract edit on the "
+                                           f"study branch) -- the supervisor never closes a study on an undeclared decision", d)
             return self._launch_job("close", heavy=False, closure=d["evidence"])
+        if code == "CLOSURE_INVALID":
+            return self._recover_invalid_closure(d)
         return self._escalate(f"UNROUTED_STATE: {code}", d)
+
+    def _recover_invalid_closure(self, d: Dict[str, Any]) -> Dict[str, Any]:
+        """A close job persisted a closure the platform rejects (DEV-08). If the analysis decision is now admissible the
+        invalid artifact is removed (recorded) and close is re-run once; otherwise the user decides."""
+        ev = d["evidence"]; chk = ev.get("decision_check") or {}
+        closure = Path(ev["closure"])
+        if chk.get("ok") and self._attempts("CLOSURE_RECOVERY") < MAX_ATTEMPTS:
+            self._attempts("CLOSURE_RECOVERY", bump=True)
+            try:
+                sha = P.sha256_file(closure); closure.unlink()
+            except OSError as exc:
+                return self._escalate(f"invalid closure could not be removed: {exc}", d)
+            S.append_event(self.study_id, "INVALID_CLOSURE_REMOVED", path=str(closure), sha256=sha, error=ev.get("error"))
+            return self._launch_job("close", heavy=False, closure={"outcome": ev.get("outcome"), "terminal_decision": ev.get("terminal_decision")})
+        return self._user_decision("RESEARCH_CONTRACT_CONFLICT",
+                                   f"artifacts/study_closure.json is INVALID ({ev.get('error')}) and the analysis decision {ev.get('terminal_decision')!r} is not "
+                                   f"admissible under research_decision.yaml terminal_decisions {chk.get('declared')}. Fix the contract or the decision on the study "
+                                   f"branch; the supervisor never treats an invalid closure as terminal", d)
 
     def _plan_only(self, d: Dict[str, Any]) -> str:
         code = d["code"]
@@ -311,6 +337,7 @@ class Supervisor:
                  "DETERMINISTIC_BLOCKER": "launch DETERMINISTIC_REPAIR", "AUDIT_BLOCKER": "launch DETERMINISTIC_REPAIR", "EXECUTION_BLOCKER": "launch EXECUTION_TRIAGE",
                  "READY_TO_EXECUTE": "controller --through analyze (detached)", "EXECUTION_NOT_AUTHORIZED": "USER_DECISION AUTHORIZATION_AMBIGUITY",
                  "READY_FOR_ANALYSIS": "launch ANALYSIS_DECISION", "ANALYSIS_DECIDED": "controller --through close", "STUDY_CLOSED": "terminal",
+                 "CLOSURE_INVALID": "remove the invalid closure and re-run close (if the decision is declared) else RESEARCH_CONTRACT_CONFLICT",
                  "WAIT_STUDY_LEASE": "WAIT_STUDY_LEASE", "RUNNING": "wait", "SEMANTIC_BLOCKER": "USER_DECISION"}
         return table.get(code, code)
 
@@ -589,9 +616,13 @@ class Supervisor:
         key = "ANALYSIS_DECISION:default"
         if self._attempts(key) >= MAX_ATTEMPTS:
             return self._escalate("analysis worker failed twice", d)
+        declared = D.terminal_decision_declared(self.study_dir, "__probe__").get("declared") or []
+        vocab = (f"terminal_decision MUST be one of the declared research_decision.yaml terminal_decisions {declared} (an exact key, its value, or KEY_VALUE); "
+                 f"if none fits, do NOT invent one: exit BLOCKED with blocker_code RESEARCH_CONTRACT_CONFLICT and say which decision the evidence supports. "
+                 if declared else "research_decision.yaml declares no terminal_decisions, so any short non-empty label is admissible. ")
         task = (f"PHASE D ANALYSIS_DECISION. Read the generated artifacts under studies/{self.study_id}/artifacts/ (experiment_analysis_v2.json, models, freeze) per your role file; "
                 f"never fit, tune or re-run. Decide what they mean and write studies/{self.study_id}/artifacts/analysis_decision.json "
-                f"{{\"outcome\": <short label>, \"terminal_decision\": <short label>, \"rationale\": ..., \"evidence\": [...]}} plus analysis_decision.md. "
+                f"{{\"outcome\": <short label>, \"terminal_decision\": <declared label>, \"rationale\": ..., \"evidence\": [...]}} plus analysis_decision.md. {vocab}"
                 f"Commit them on the study branch. The supervisor closes the study with those two labels.")
         return self._launch_worker("ANALYSIS_DECISION", task=task, attempt_key=key, stop=["analysis_decision.json written and committed (DONE)"], extra={})
 
