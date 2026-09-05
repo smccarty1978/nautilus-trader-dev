@@ -1,0 +1,55 @@
+{
+  "candidates_count_total": 1591,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true
+  },
+  "date": "2021-01-05",
+  "execution_manifest_composite_sha256": "34a0dab471d851d916b1d973dd986b48cd462c472709017a9ef110717cd58ac5",
+  "generated_at_utc": "2026-09-05T18:14:15.433204+00:00",
+  "manifest": {
+    "candidates_sha256": "aa8119aa4223ef9c2f3082fac5323aaf11bf448d0c525ad7c6f5b0213fa57227",
+    "composite_seal_hash": "8bfc08a39c8cad80ed2c5b911a09e50b2b86891ec9e926e20a90aacc7a62c061",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2021-01-05",
+    "elapsed_s": 3.8361259000375867,
+    "execution_manifest_sha256": "34a0dab471d851d916b1d973dd986b48cd462c472709017a9ef110717cd58ac5",
+    "kind": "smoke",
+    "observations_sha256": "4fb07ad7c0419bb880db09365c7a604676f3e2ade05108c9111a0c93140767a0",
+    "plan_sha256": "1c61753e6e00703732dbfee5963ac9870fe4246b1140b51e2d4c6456cf4804d4",
+    "rows": {
+      "candidates": 1591,
+      "observations": 1591
+    },
+    "stats": {
+      "bars": 103305,
+      "bars_by_stream": {
+        "nq_1m": 2790,
+        "nq_1s": 100515
+      },
+      "candidates": 1591,
+      "dropped_outside_primary": {
+        "candidates": 1469,
+        "observations": 1469
+      },
+      "epochs": 16836,
+      "observations": 1591,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-05T18:14:15.417313+00:00"
+  },
+  "observations_count_total": 1591,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supv1_shape_a_flip_180s\\studies\\supv1_shape_a_flip_180s\\runs\\20260905_181407_supv1_shape_a_flip_180s_smoke",
+  "sealed_composite_sha256": "8bfc08a39c8cad80ed2c5b911a09e50b2b86891ec9e926e20a90aacc7a62c061",
+  "status": "ACCEPTED",
+  "study_name": "supv1_shape_a_flip_180s",
+  "validator": "research_workflow.lifecycle_v2"
+}

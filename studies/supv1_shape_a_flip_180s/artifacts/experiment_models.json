@@ -1,0 +1,96 @@
+{
+  "family": "lightgbm",
+  "features": [
+    "prior_1m_regime_efficiency",
+    "prior_5m_regime_efficiency",
+    "prior_1m_regime_mfe_atr",
+    "prior_5m_regime_mfe_atr",
+    "prior_1m_regime_range_atr",
+    "prior_5m_regime_range_atr",
+    "rolling_300s_retention_ratio",
+    "rolling_300s_current_progress_atr",
+    "rolling_300s_max_progress_atr",
+    "rolling_300s_giveback_atr",
+    "arrival_velocity",
+    "arrival_acceleration",
+    "ema_slope"
+  ],
+  "final_train_validation_years": [],
+  "fold_protocol": "expanding_years",
+  "generated_at_utc": "2026-09-05T18:37:14.511321+00:00",
+  "hyperparameters": {
+    "deterministic": true,
+    "learning_rate": 0.03,
+    "max_depth": 3,
+    "min_data_in_leaf": 100,
+    "n_estimators": 200,
+    "n_jobs": 1,
+    "num_leaves": 7,
+    "verbosity": -1
+  },
+  "label_column": "target_flip_within_horizon",
+  "metrics": {
+    "final_validation": null,
+    "folds": [],
+    "tuning": null
+  },
+  "model_id": "9c470bd8bb5178cc86504ab763e612188fde28714340525057e042415d4fa2c4",
+  "model_store_tier": "registry",
+  "models": [
+    {
+      "arm": "primary",
+      "baseline_arm": true,
+      "cell": "all",
+      "direction": "both",
+      "features": [
+        "prior_1m_regime_efficiency",
+        "prior_5m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_5m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "final_fit_rows": 451089,
+      "final_fit_unique_regimes": 3883,
+      "hyperparameters": {
+        "deterministic": true,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_data_in_leaf": 100,
+        "n_estimators": 200,
+        "n_jobs": 1,
+        "num_leaves": 7,
+        "verbosity": -1
+      },
+      "metrics": {
+        "final_validation": null,
+        "folds": [],
+        "tuning": null
+      },
+      "model_id": "9c470bd8bb5178cc86504ab763e612188fde28714340525057e042415d4fa2c4",
+      "model_store_tier": "registry",
+      "n_features": 13
+    }
+  ],
+  "month_folds": [],
+  "new_models_trained": true,
+  "paired_deltas_vs_baseline_arm": {},
+  "plan_sha256": "1c61753e6e00703732dbfee5963ac9870fe4246b1140b51e2d4c6456cf4804d4",
+  "reference_models": [],
+  "rows": {
+    "binary": 451089,
+    "total": 453768
+  },
+  "schema_version": 3,
+  "training_population_identity": "0d2166efae01b530aaa78b52d9a21e828ccf1a6104786844d90eb3bb01b73e1a",
+  "tuning_years": [
+    2021
+  ]
+}

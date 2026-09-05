@@ -1,0 +1,98 @@
+{
+  "study": "supv1_shape_a_flip_180s",
+  "shape": "a",
+  "partition": "train",
+  "year": 2021,
+  "rows": {
+    "runtime_candidates": 453768,
+    "reference_candidates": 453768,
+    "runtime_observations": 453768,
+    "reference_observations": 453768
+  },
+  "candidates": {
+    "passed": true,
+    "reference_rows": 453768,
+    "runtime_rows": 453768,
+    "common_rows": 453768,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 18,
+    "value_mismatches": 0,
+    "per_column": {},
+    "first_divergence": null,
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "observations": {
+    "passed": false,
+    "reference_rows": 453768,
+    "runtime_rows": 453768,
+    "common_rows": 453768,
+    "only_in_reference": 0,
+    "only_in_runtime": 0,
+    "duplicate_keys": {
+      "reference": 0,
+      "runtime": 0
+    },
+    "missing_columns": [],
+    "columns_compared": 10,
+    "value_mismatches": 3084,
+    "per_column": {
+      "flip_ts": {
+        "mismatches": 4,
+        "max_abs_diff": 0.0
+      },
+      "time_to_flip_seconds": {
+        "mismatches": 4,
+        "max_abs_diff": 0.0
+      },
+      "target_flip_within_horizon": {
+        "mismatches": 12,
+        "max_abs_diff": 0.0
+      },
+      "disposition": {
+        "mismatches": 12,
+        "max_abs_diff": null
+      },
+      "censored": {
+        "mismatches": 12,
+        "max_abs_diff": 1.0
+      },
+      "censor_reason": {
+        "mismatches": 12,
+        "max_abs_diff": null
+      },
+      "session_close_ts": {
+        "mismatches": 3020,
+        "max_abs_diff": 11700000000000.0
+      },
+      "resolved_at_ts": {
+        "mismatches": 8,
+        "max_abs_diff": 17991000000000.0
+      }
+    },
+    "first_divergence": {
+      "timestamp": 1610980255000000000,
+      "key": [
+        1610980255000000000,
+        1610979780000000000,
+        94
+      ],
+      "column": "session_close_ts",
+      "reference": 1611004500000000000,
+      "runtime": 1610992800000000000
+    },
+    "tolerance": 1e-09,
+    "only_in_reference_examples": [],
+    "only_in_runtime_examples": []
+  },
+  "explained_divergences": null,
+  "passed": false,
+  "historical_study_modified": false
+}
