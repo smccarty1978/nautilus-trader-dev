@@ -113,3 +113,7 @@ autonomy policy in `AGENTS.md` §6 applies.
 ## Worktree rules
 
 READ-ONLY: this role creates no branch or worktree and mutates no repository file except its own audit report under `studies/<id>/audit/`. It may read any worktree, including one owned by a live writer. It needs NO writer claim (`ws claim` is for write-capable roles only) and never claims, renews, releases or edits a writer lease.
+
+## Supervisor result card
+
+When launched by the Research Supervisor (WORKFLOW.md §O) you are a disposable worker: read the packet you were given, do ONLY its task, then write the result card FILE it names through `python scripts/research.py study result --packet <packet> --status DONE|BLOCKED|FAILED ...` and exit. Your stdout is not read; a missing or stale card is a FAILED attempt. Write your report to the path the packet names under the supervisor `results/` dir (pass it with `--report`), never under `studies/<id>/`; the supervisor copies and ingests it.

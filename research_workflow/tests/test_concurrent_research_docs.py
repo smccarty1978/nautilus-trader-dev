@@ -137,3 +137,29 @@ def test_mechanism_tests_exist():
                  "test_05_three_agents_three_studies_concurrently", "test_06_stale_lease_can_be_claimed_by_another_agent", "test_07_released_lease_can_be_claimed",
                  "test_08_read_only_auditor_inspects_without_writer_claim", "test_09_controller_run_lock_is_independent", "test_10_simultaneous_claims_have_exactly_one_winner"):
         assert f"def {name}(" in race, name
+
+
+def test_supervised_research_is_documented_and_wired():
+    """WORKFLOW.md section O is the default way to run a study; the CLI, QUICKSTART, AI_AGENTS and the role files agree."""
+    w = _t("WORKFLOW.md")
+    for phrase in ("## O. Supervised research (default)", "supervise start --question", "supervise status", "supervise decide", "supervise adopt",
+                   "supervise providers", "derive, do not invent", "STALE_WORKER_RESULT", "PROVIDER_CAPABILITY_UNAVAILABLE", "WAIT_STUDY_LEASE",
+                   "main_merge.lock", "locks/slots", "platform_merge: auto_if_green", "DESTRUCTIVE_ACTION_REQUIRES_APPROVAL",
+                   "SUPERVISOR_ESCALATION_REQUIRED", "SCIENTIFIC_SEMANTIC_DECISION_REQUIRED", "AUTHORIZATION_AMBIGUITY", "study result --packet",
+                   "Manual / debug path", "research_workflow/supervisor/", "scripts/tests/test_supervisor_blackbox.py"):
+        assert phrase in w, phrase
+    q = _t("docs/QUICKSTART.md")
+    assert "supervise start --question" in q and "supervise status" in q and "manual / debug path" in q
+    a = _t("docs/AI_AGENTS.md")
+    assert "## Supervisor workers (result-card contract)" in a and "study result --packet" in a and "STALE_WORKER_RESULT" in a
+    for name in ("lookahead-auditor", "contract-checker", "results-triager", "analysis-decider", "implementer"):
+        assert "## Supervisor result card" in _t(f".claude/agents/{name}.md"), name
+        assert "Supervisor result card" in _t(f".agents/agents_staging/{name}.md") and "Supervisor result card" in _t(f".codex/agents/{name}.toml"), name
+    cli = _t("scripts/research.py")
+    assert "add_supervise_parser(sub, ROOT)" in cli and "add_study_result_parser(study)" in cli
+    for rel in ("research_workflow/supervisor/core.py", "research_workflow/supervisor/derive.py", "research_workflow/supervisor/packets.py",
+                "research_workflow/supervisor/providers.py", "research_workflow/supervisor/resources.py", "scripts/research_supervisor.py"):
+        assert (ROOT / rel).is_file(), rel
+    core = _t("research_workflow/supervisor/core.py")
+    assert "governed_controller_v2" not in core.replace("never replaces or wraps", "")   # the supervisor launches the controller as a process, never imports it
+    assert "MainMergeLock" in core and "acquire_slot" in core and "validate_result" in core
