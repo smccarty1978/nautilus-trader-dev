@@ -1,6 +1,6 @@
 {
-  "content_sha256": "10865bc615b8257bfc5150dbb11529a395ea0e1276ae756dd49dda5764b1a314",
-  "generated_at_utc": "2026-09-05T00:17:59.737705+00:00",
+  "content_sha256": "0fc9abf597a8936b8d1c4d3d9e73ea7553c73b569efd8d5055d24151ac155d0c",
+  "generated_at_utc": "2026-09-05T00:27:39.033691+00:00",
   "kinds": {
     "analysis_ops": [
       {
@@ -1047,6 +1047,7 @@
         "required_tests": [
           "features/tests/test_feature_ctl_request_resolution.py",
           "research_workflow/tests/test_forward_outcomes.py",
+          "research_workflow/tests/test_multi_arm_modeling.py",
           "research_workflow/tests/test_provider_host.py",
           "research_workflow/tests/test_provider_host_audit.py",
           "research_workflow/tests/test_stage3_integration.py",
@@ -1931,6 +1932,7 @@
         "required_tests": [
           "features/tests/test_generic_provider_parameterization.py",
           "research_workflow/tests/test_forward_outcomes.py",
+          "research_workflow/tests/test_multi_arm_modeling.py",
           "research_workflow/tests/test_provider_host.py",
           "research_workflow/tests/test_provider_host_audit.py",
           "research_workflow/tests/test_stage3_integration.py",
@@ -3517,6 +3519,7 @@
           "research_workflow/tests/test_declarative_analysis.py",
           "research_workflow/tests/test_golden_fixture.py",
           "research_workflow/tests/test_grammar_v2.py",
+          "research_workflow/tests/test_multi_arm_modeling.py",
           "research_workflow/tests/test_multiple_derived_inputs.py",
           "research_workflow/tests/test_oos_analysis_lineage.py",
           "research_workflow/tests/test_ordered_barrier_entry_reference.py",
@@ -6416,6 +6419,33 @@
       {
         "cost_class": "offline_only",
         "dependencies": [
+          "model.lightgbm"
+        ],
+        "description": "Fixed-width rolling calendar-month walk-forward inside ONE declared TRAIN year. The year-fold builder is expanding (fit on every earlier tuning year, validate on the next), so a single-year development period yields zero folds and a fixed-width window is inexpressible. Folds are derived at COMPILE time and frozen into the plan, so every fold's fit window provably precedes its validation window before any row is read.",
+        "id": "validation.walk_forward_months",
+        "implementation": "research_workflow.lifecycle_v2.V2Lifecycle",
+        "implementation_note": "",
+        "implementation_verified": true,
+        "kind": "validation_protocols",
+        "missing_tests": [],
+        "name": "walk_forward_months",
+        "parameters": [
+          "fold_months_year",
+          "train_months",
+          "validate_months",
+          "step_months"
+        ],
+        "required_tests": [
+          "research_workflow/tests/test_multi_arm_modeling.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [
           "validation.model_selection.grid"
         ],
         "description": "Accept/reject the already-selected winner on final_train_validation_years; never re-selects.",
@@ -6540,7 +6570,7 @@
       "broken": 0,
       "count": 21
     },
-    "total": 218,
+    "total": 219,
     "trackers": {
       "broken": 0,
       "count": 7
@@ -6551,7 +6581,7 @@
     },
     "validation_protocols": {
       "broken": 0,
-      "count": 7
+      "count": 8
     }
   }
 }

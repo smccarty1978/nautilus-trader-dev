@@ -224,6 +224,30 @@ class ValidationSpec(_Strict):
     max_trials: Optional[int] = None
     random_seed: Optional[int] = None
     primary_metric: Optional[str] = None
+    # ---- rolling calendar-month walk-forward (protocol: validation.walk_forward_months) ----
+    # The year-fold builder is EXPANDING (fit on every earlier tuning year, validate on the
+    # next), so a single-year development period yields ZERO folds and a fixed-width rolling
+    # window cannot be expressed at all. These declare a fixed-width rolling protocol over
+    # calendar months instead. Folds are derived deterministically and recorded in full on the
+    # fit artifact, so the protocol that RAN is auditable rather than inferred.
+    fold_months_year: Optional[int] = None         # the calendar year the folds walk across
+    train_months: Optional[int] = Field(default=None, gt=0)     # width of the fit window
+    validate_months: Optional[int] = Field(default=None, gt=0)  # width of the validation window
+    step_months: int = Field(default=1, gt=0)      # how far the window advances per fold
+
+    @model_validator(mode="after")
+    def _months(self) -> "ValidationSpec":
+        monthly = self.protocol.split(".")[-1] == "walk_forward_months"
+        declared = [self.fold_months_year, self.train_months, self.validate_months]
+        if monthly and any(v is None for v in declared):
+            raise ValueError(
+                "validation.protocol walk_forward_months requires fold_months_year, "
+                "train_months and validate_months")
+        if not monthly and any(v is not None for v in declared):
+            raise ValueError(
+                "fold_months_year/train_months/validate_months are only meaningful for "
+                "validation.protocol: validation.walk_forward_months")
+        return self
 
 
 class ScoredModelExpectSpec(_Strict):
@@ -247,13 +271,49 @@ class ScoredModelSpec(_Strict):
     expect: Optional[ScoredModelExpectSpec] = None  # authenticated against model-store lineage before scoring
 
 
+class ArmSpec(_Strict):
+    """One PREDECLARED feature architecture, fit independently.
+
+    ``features`` is the arm's own subset of the study's declared feature surface; an empty
+    list means the full surface. Arms exist so a study can compare architectures on one
+    collected population -- the union surface is collected once and each arm trains on its
+    own columns.
+    """
+    id: str
+    features: List[str] = Field(default_factory=list)
+    params: Dict[str, Any] = Field(default_factory=dict)   # arm-level hyperparameter override
+    baseline: bool = False                                 # the control every other arm is compared against
+
+
+class CellSpec(_Strict):
+    """One population cell fit independently (typically a direction).
+
+    ``subset`` is an explicit ``column == value`` row filter with no hidden semantics -- the
+    same shape ``model.models[].subset`` already uses in score mode. ``params`` carries the
+    cell's own fixed hyperparameters, which is what makes a genuinely direction-specific
+    configuration declarable.
+    """
+    id: str
+    subset: Dict[str, Any] = Field(default_factory=dict)
+    params: Dict[str, Any] = Field(default_factory=dict)
+
+
 class ModelSpec(_Strict):
     mode: Literal["train", "score"] = "train"
     family: Optional[str] = None                   # required for mode: train
     params: Dict[str, Any] = Field(default_factory=dict)
-    arms: List[str] = Field(default_factory=list)
+    # A BARE list of names is informational and always was: nothing consumed it, so a study
+    # declaring `arms: [A, B, C]` silently trained ONE model on the union surface. Declaring
+    # ArmSpec entries makes arms real; the compiler REFUSES a bare list in train mode rather
+    # than letting that silence continue (see compiler._resolve_chronology_and_model).
+    arms: List[Union[str, ArmSpec]] = Field(default_factory=list)
+    cells: List[CellSpec] = Field(default_factory=list)
     validation: Optional[ValidationSpec] = None
     models: List[ScoredModelSpec] = Field(default_factory=list)   # required for mode: score
+    # Frozen models scored ALONGSIDE the arms this study trains, on the identical population.
+    # `mode` stays train; these are never refit. Without this a descriptive reference model
+    # needs its own study, and then it is not the same rows.
+    reference_models: List[ScoredModelSpec] = Field(default_factory=list)
     # Bounded TRAIN-only hyperparameter search over walk-forward folds of validation.tuning_years.
     # param -> [choices] | {low, high, log?: bool, int?: bool}; sampler = validation.protocol
     # (model_selection.random | model_selection.optuna), trials = validation.max_trials.
@@ -268,6 +328,20 @@ class ModelSpec(_Strict):
             raise ValueError("model.family is required for mode: train")
         if self.mode == "score" and not self.models:
             raise ValueError("model.models must list at least one frozen model for mode: score")
+        if self.mode == "score" and (self.arms or self.cells or self.reference_models):
+            raise ValueError("model.arms/cells/reference_models are train-mode declarations; mode: score trains nothing")
+        specs = [a for a in self.arms if isinstance(a, ArmSpec)]
+        if specs and len(specs) != len(self.arms):
+            raise ValueError("model.arms must be either all names or all arm declarations, not a mix")
+        for label, ids in (("arms", [a.id for a in specs]), ("cells", [c.id for c in self.cells])):
+            dupes = sorted({i for i in ids if ids.count(i) > 1})
+            if dupes:
+                raise ValueError(f"model.{label} ids must be unique; duplicated {dupes}")
+        baselines = [a.id for a in specs if a.baseline]
+        if len(baselines) > 1:
+            raise ValueError(f"exactly one arm may be baseline: true; got {baselines}")
+        if specs and not baselines:
+            raise ValueError("one arm must declare baseline: true -- a paired comparison needs a named control")
         return self
 
 

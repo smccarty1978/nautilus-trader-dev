@@ -187,6 +187,19 @@ validation_protocols:
     update_cadence: offline_only
     required_tests: [research_workflow/tests/test_lifecycle_v2.py]
     status_override: candidate
+  - id: validation.walk_forward_months
+    version: 1
+    description: >-
+      Fixed-width rolling calendar-month walk-forward inside ONE declared TRAIN year. The
+      year-fold builder is expanding (fit on every earlier tuning year, validate on the next),
+      so a single-year development period yields zero folds and a fixed-width window is
+      inexpressible. Folds are derived at COMPILE time and frozen into the plan, so every
+      fold's fit window provably precedes its validation window before any row is read.
+    implementation: research_workflow.lifecycle_v2.V2Lifecycle
+    parameters: [fold_months_year, train_months, validate_months, step_months]
+    dependencies: [model.lightgbm]
+    update_cadence: offline_only
+    required_tests: [research_workflow/tests/test_multi_arm_modeling.py]
   - id: validation.final_train_validation.gated
     version: 1
     description: Accept/reject the already-selected winner on final_train_validation_years; never re-selects.
