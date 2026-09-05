@@ -75,7 +75,7 @@
     "fix": "research_workflow/grammar/compiler.py transitive_closure_files: static AST import walk over repo-local modules (lazy and relative imports included), tests excluded; reference spec closure 45 -> 90 files",
     "regression_test": "research_workflow/tests/test_closure_transitive_imports.py",
     "historical_seals": "closed studies keep their historical manifests (never resealed); every in-flight freeze stales when main is merged into its worktree",
-    "fix_commit": null
+    "fix_commit": "0baeb4ef"
   },
   "known_warnings": [
     {
