@@ -565,7 +565,9 @@
     },
     "MAIN_SAFETY_PROVEN": {
       "value": "TRUE",
-      "evidence": "main HEAD still a33b1460, `git status --porcelain --untracked-files=no` empty; both study commits confined to studies/supv1_shape_a_flip_180s/; the 26 hashed reference artifacts and both sealed V2 frames re-hash unchanged; the reference worktree is clean at b72a9ae8; the controlled_feature_family_180s lease was never touched; no main_merge.lock, no slot files"
+      "scope": "this audit session's own actions",
+      "evidence": "main stayed at a33b1460 with a clean tracked worktree for the entire audit window; both study commits confined to studies/supv1_shape_a_flip_180s/; the 26 hashed reference artifacts and both sealed V2 frames re-hash unchanged (verified twice, once inside the window and once after main moved); the reference worktree is clean at b72a9ae8; the controlled_feature_family_180s lease was never touched; no main_merge.lock, no slot files; this session never ran git switch/merge/reset/checkout on the canonical checkout",
+      "caveat": "main has since been advanced by a different concurrent session -- see post_audit_main_movement. That movement is not attributable to this audit and did not alter any reference artifact."
     },
     "UNATTENDED_PRODUCTION_READY": {
       "value": "FALSE",
@@ -579,5 +581,30 @@
     "the ANALYSIS_DECISION worker, --through close, STUDY_CLOSED and the phase-D SESSION_HANDOFF",
     "every research-plane number: smoke 1591/1591, TRAIN 2021 453768, OOS 2022 475529, dispositions, model_id, roc_auc/pr_auc/brier",
     "whether the Globex-vs-legacy calendar change actually confines its effect to early-close sessions"
-  ]
+  ],
+  "post_audit_main_movement": {
+    "observed_at_utc": "2026-09-05T18:2x (after every evidence check and after the audit report was delivered)",
+    "main_head_during_the_entire_audit": "a33b1460692f07f5631cb9efe911f009e34f52ab",
+    "main_head_now": "66578afa793f94057cfa88a846d44865df517bdb",
+    "moved_by": "a DIFFERENT concurrent Claude session, agent session id fe888623-041c-4084-a30a-93c4d405a6a0, not this audit session (1f2249bd-6fe4-48fe-b67f-c744a95e9ed3)",
+    "moved_at_local": [
+      "2026-09-05 12:43:47 -0500 merge chore/supervisor-v1-hardening-01",
+      "2026-09-05 12:54:04 -0500 merge chore/restore-historical-artifacts-after-testrun",
+      "2026-09-05 12:54:45 -0500 merge chore/restore-historical-artifacts-after-testrun",
+      "2026-09-05 12:54:56 -0500 merge chore/v2-closure-transitive-imports"
+    ],
+    "audit_evidence_window_utc": "15:03:35 (supervise start) to ~16:20 (final re-hash and lease release) -- entirely before the first of those merges at 17:43 UTC",
+    "this_audit_session_never_ran": [
+      "git switch",
+      "git merge",
+      "git reset",
+      "git checkout"
+    ],
+    "consequences": {
+      "DEV-01_fix_now_on_main": "commit 13d88591 (this audit's chore/supervisor-v1-fix-detached-loop-argv) was merged to main by the other session inside chore/supervisor-v1-hardening-01, together with 10686913 'hardening-01 from the first real validation -- loop liveness, PowerShell allowlist, study-worktree controller, platform-stale cards', which addresses DEV-01, DEV-04 and DEV-05",
+      "DEV-03_fix_now_on_main": "merge chore/v2-closure-transitive-imports 'frozen closure covers transitive repo imports (DEV-03 from the Supervisor V1 validation)'",
+      "reference_immutability": "still intact: all 26 hashed reference artifacts and both sealed V2 frames re-hash unchanged after the merges, and `git log a33b1460..HEAD -- studies/v2_shape_a_flip_180s studies/clean_maturity_flip_model_180s_horizon` is empty",
+      "for_a_later_reader": "the frozen baseline premise of this card no longer holds at main's tip. Every finding, hash and verdict in this card is scoped to a33b1460. A re-run against the current main would be a DIFFERENT test and would need its own card."
+    }
+  }
 }
