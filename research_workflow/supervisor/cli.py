@@ -28,7 +28,7 @@ def _options(ns: argparse.Namespace) -> Dict[str, Any]:
 def _detach_loop(repo_root: Path, study_id: str) -> Dict[str, Any]:
     from research_workflow.supervisor.procs import spawn_detached
     log = S.study_state_dir(study_id) / "logs" / "supervisor.log"
-    cmd = [sys.executable, str(repo_root / "scripts" / "research_supervisor.py"), "loop", "--study", study_id]
+    cmd = [sys.executable, str(repo_root / "scripts" / "research_supervisor.py"), "supervise", "loop", "--study", study_id]
     pid = spawn_detached(cmd, cwd=repo_root, log_path=log)
     (S.study_state_dir(study_id) / "pid").write_text(str(pid), encoding="utf-8")
     return {"loop_pid": pid, "log": str(log)}
