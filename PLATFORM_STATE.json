@@ -5,7 +5,7 @@
   "original_criticals": 9,
   "additional_criticals_found": 2,
   "remaining_criticals": 0,
-  "remaining_warnings": 1,
+  "remaining_warnings": 2,
   "second_adversarial_pass": "CLEAR_WITH_WARNINGS",
   "old_runtime_policy": "LEGACY_ONLY_FOR_NEW_RESEARCH",
   "authority": {
@@ -67,5 +67,22 @@
     "fix_commit": "63aecf79",
     "tag": "baseline/2026-09-platform-v2-globex-calendar",
     "calendar_blocker": "none"
-  }
+  },
+  "closure_resolution": {
+    "transitive_repo_imports": true,
+    "found_by": "supv1_shape_a_flip_180s contract audit C-1 (Supervisor V1 first real validation, 2026-09-05)",
+    "defect": "the collection closure froze the tracker binding shims but not the modules they import (features/trackers/regime_dual_ema.py = the label event, rolling_5m_productivity.py, structural_regime_geometry.py); editing them left R9_closure_current, preflight EXECUTION_MANIFEST, the freeze and every seal passing",
+    "fix": "research_workflow/grammar/compiler.py transitive_closure_files: static AST import walk over repo-local modules (lazy and relative imports included), tests excluded; reference spec closure 45 -> 90 files",
+    "regression_test": "research_workflow/tests/test_closure_transitive_imports.py",
+    "historical_seals": "closed studies keep their historical manifests (never resealed); every in-flight freeze stales when main is merged into its worktree",
+    "fix_commit": "0baeb4ef"
+  },
+  "known_warnings": [
+    {
+      "id": "W-1-superseded-dataset-id",
+      "text": "a new study may still bind the SUPERSEDED ids NQ_1S_V2 / ES_1S_V2 (no compile gate refuses them); bars are byte-identical to the *_GLOBEX ids, only the session reference table differs",
+      "found_by": "supv1_shape_a_flip_180s repair worker, 2026-09-05",
+      "status": "open"
+    }
+  ]
 }

@@ -16,7 +16,7 @@ import importlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple, Iterable
 
 import yaml
 
@@ -1232,10 +1232,90 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
             "ops": sorted({s["op"] for s in steps})}
 
 
+# --------------------------------------------------------------------------- #
+# closure: transitive repo-local imports (DEV-03, found by the supv1_shape_a_flip_180s contract audit 2026-09-05)
+# --------------------------------------------------------------------------- #
+_CLOSURE_IMPORT_ROOTS = ("features", "research_workflow", "research", "utils", "indicators", "backtests")
+
+
+def _module_file(mod: str, repo_root: Path) -> Optional[str]:
+    """Repo-relative file of a dotted module name, or None when it is not a repo-local module."""
+    parts = mod.split(".")
+    if not parts or parts[0] not in _CLOSURE_IMPORT_ROOTS:
+        return None
+    base = repo_root.joinpath(*parts)
+    for cand in (base.with_suffix(".py"), base / "__init__.py"):
+        if cand.is_file():
+            return cand.resolve().relative_to(repo_root.resolve()).as_posix()
+    return None
+
+
+def _static_imports(rel: str, repo_root: Path) -> Set[str]:
+    """Every module a repo file imports, anywhere in the file (module level, inside functions/classes, guarded),
+    resolved to repo-relative files. Relative imports resolve against the file's package."""
+    import ast
+    path = repo_root / rel
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    except (OSError, SyntaxError):
+        return set()
+    pkg_parts = list(Path(rel).with_suffix("").parts)
+    if pkg_parts and pkg_parts[-1] == "__init__":
+        pkg_parts = pkg_parts[:-1]
+    else:
+        pkg_parts = pkg_parts[:-1]
+    out: Set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                f = _module_file(alias.name, repo_root)
+                if f:
+                    out.add(f)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                base = pkg_parts[: len(pkg_parts) - (node.level - 1)] if node.level - 1 else list(pkg_parts)
+                mod = ".".join(base + ([node.module] if node.module else []))
+            else:
+                mod = node.module or ""
+            f = _module_file(mod, repo_root)
+            if f:
+                out.add(f)
+            for alias in node.names:            # ``from pkg import submodule``
+                sub = _module_file(f"{mod}.{alias.name}", repo_root) if mod else None
+                if sub:
+                    out.add(sub)
+    return out
+
+
+def transitive_closure_files(seeds: Iterable[str], repo_root: Path) -> Set[str]:
+    """The seeds plus every repo-local file reachable through import statements (tests excluded from the walk but a seed
+    is always kept). Deterministic, side-effect free: nothing is imported or executed."""
+    repo_root = Path(repo_root)
+    seen: Set[str] = set()
+    stack = [s for s in seeds]
+    while stack:
+        rel = stack.pop()
+        if rel in seen:
+            continue
+        seen.add(rel)
+        for dep in _static_imports(rel, repo_root):
+            if dep in seen:
+                continue
+            parts = Path(dep).parts
+            if "tests" in parts or "__pycache__" in parts:
+                continue
+            stack.append(dep)
+    return seen
+
+
 def _resolve_closure(ctx: _Ctx, model: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     from research_workflow.closure_hash import hash_file_v2
 
-    stage_sets: Dict[str, Set[str]] = {"collection": set(ctx.closure_files)}
+    # DEV-03: the collection closure is the bound modules PLUS everything they import from the repo. Before this the
+    # tracker binding shims were frozen but not the modules that define the label event and the features
+    # (features/trackers/regime_dual_ema.py, rolling_5m_productivity.py, structural_regime_geometry.py), so editing them
+    # left R9_closure_current, preflight EXECUTION_MANIFEST and every seal passing.
+    stage_sets: Dict[str, Set[str]] = {"collection": transitive_closure_files(ctx.closure_files, ctx.repo_root)}
     for name in ("lifecycle", "outcome", "oos", "audit"):
         stage_sets[name] = set(STAGE_CLOSURE_MODULES[name])
     if model:
