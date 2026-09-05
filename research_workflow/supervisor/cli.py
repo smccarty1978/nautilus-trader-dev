@@ -25,13 +25,32 @@ def _options(ns: argparse.Namespace) -> Dict[str, Any]:
     return out
 
 
-def _detach_loop(repo_root: Path, study_id: str) -> Dict[str, Any]:
-    from research_workflow.supervisor.procs import spawn_detached
+LOOP_LIVENESS_GRACE_S = 2.0
+
+
+def _detach_loop(repo_root: Path, study_id: str, *, command: Optional[List[str]] = None, grace_s: float = LOOP_LIVENESS_GRACE_S) -> Dict[str, Any]:
+    """Spawn the persistent loop detached and PROVE it survived its first seconds (DEV-01b): a loop that dies at
+    startup (bad argv, import error) is reported as ``LOOP_DIED`` with the log tail instead of a dead ``loop_pid``."""
+    import time
+    from research_workflow.supervisor.procs import pid_alive, spawn_detached
     log = S.study_state_dir(study_id) / "logs" / "supervisor.log"
-    cmd = [sys.executable, str(repo_root / "scripts" / "research_supervisor.py"), "supervise", "loop", "--study", study_id]
+    cmd = list(command) if command else [sys.executable, str(repo_root / "scripts" / "research_supervisor.py"), "supervise", "loop", "--study", study_id]
     pid = spawn_detached(cmd, cwd=repo_root, log_path=log)
     (S.study_state_dir(study_id) / "pid").write_text(str(pid), encoding="utf-8")
-    return {"loop_pid": pid, "log": str(log)}
+    deadline = time.monotonic() + max(0.0, float(grace_s))
+    alive = pid_alive(pid)
+    while alive and time.monotonic() < deadline:
+        time.sleep(0.1)
+        alive = pid_alive(pid)
+    out: Dict[str, Any] = {"loop_pid": pid, "log": str(log), "loop_alive": alive, "command": cmd}
+    if not alive:
+        tail = ""
+        try:
+            tail = log.read_text(encoding="utf-8", errors="replace")[-1200:]
+        except OSError:
+            pass
+        out.update({"blocker_code": "LOOP_DIED", "error": f"LOOP_DIED: the detached supervisor loop (pid {pid}) exited within {grace_s}s; see {log}", "log_tail": tail})
+    return out
 
 
 def cmd_supervise(ns: argparse.Namespace, repo_root: Path) -> int:
@@ -49,13 +68,13 @@ def cmd_supervise(ns: argparse.Namespace, repo_root: Path) -> int:
             else:
                 payload.update(_detach_loop(repo_root, sup.study_id))
             payload["next"] = f"python scripts/research.py supervise status {sup.study_id}"
-            return _card(payload)
+            return _card(payload, ok=payload.get("loop_alive", True))
         if ns.cmd == "adopt":
             sup = Supervisor.adopt(study_dir=Path(ns.study), repo_root=repo_root, provider=ns.provider, execute_authorized=bool(ns.execute_authorized), options=_options(ns))
             payload = {"study_id": sup.study_id, "derived_state": sup.state["derived_state"], "next_action": sup.state["next_action"], "state_dir": str(sup.dir)}
             if not ns.no_detach:
                 payload.update(_detach_loop(repo_root, sup.study_id))
-            return _card(payload)
+            return _card(payload, ok=payload.get("loop_alive", True))
         if ns.cmd == "resume":
             sup = Supervisor(ns.study_id)
             sup.state["stopped"] = False; S.save_state(sup.state); S.append_event(sup.study_id, "RESUME")
@@ -64,7 +83,7 @@ def cmd_supervise(ns: argparse.Namespace, repo_root: Path) -> int:
                 payload["tick"] = sup.tick()
             else:
                 payload.update(_detach_loop(repo_root, sup.study_id))
-            return _card(payload)
+            return _card(payload, ok=payload.get("loop_alive", True))
         if ns.cmd == "status":
             return _card(Supervisor(ns.study_id).status())
         if ns.cmd == "list":
