@@ -653,7 +653,9 @@ class Supervisor:
         if tmpl:
             cmd = [str(t).replace("{study}", str(self.study_dir)).replace("{through}", through) for t in tmpl]
         else:
-            cmd = [sys.executable, str(self.repo_root / "scripts" / "run_governed_study.py"), "--study", str(self.study_dir), "--through", through, "--json",
+            # DEV-05: the study worktree carries the platform the study is bound to (possibly merged platform work);
+            # the canonical checkout must never be the platform a study executes on
+            cmd = [sys.executable, str(self.worktree / "scripts" / "run_governed_study.py"), "--study", str(self.study_dir), "--through", through, "--json",
                    "--max-runtime", str(int(self.options.get("job_timeout_s") or DEFAULT_JOB_TIMEOUT_S))]
         if self.state.get("execute_authorized"):
             cmd.append("--execute-authorized")

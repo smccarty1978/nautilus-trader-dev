@@ -159,7 +159,10 @@ def build_command(provider: str, *, packet_path: Path, worktree: Path, read_only
             cmd += ["--add-dir", str(results_dir)]
         if read_only:
             if flags.get("--allowedTools"):
-                cmd += ["--allowedTools", "Read", "Grep", "Glob", "Write", "Bash(python scripts/research.py:*)", "Bash(git status:*)", "Bash(git log:*)", "Bash(git diff:*)"]
+                # both shell tools: Claude Code on Windows routes commands through its PowerShell tool (DEV-04)
+                cmd += ["--allowedTools", "Read", "Grep", "Glob", "Write",
+                        "Bash(python scripts/research.py:*)", "Bash(git status:*)", "Bash(git log:*)", "Bash(git diff:*)",
+                        "PowerShell(python scripts/research.py:*)", "PowerShell(git status:*)", "PowerShell(git log:*)", "PowerShell(git diff:*)"]
             if flags.get("--disallowedTools"):
                 cmd += ["--disallowedTools", "Edit", "NotebookEdit"]
         else:
