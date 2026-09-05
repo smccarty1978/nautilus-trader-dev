@@ -146,4 +146,6 @@ def test_derive_walks_the_artifact_precedence(tmp_path, monkeypatch):
     st["user_decision"] = {"code": "AUTHORIZATION_AMBIGUITY", "answered": False}
     assert D.derive(st, supervisor_identity=ident)["code"] == "USER_DECISION_REQUIRED"
     (study / "artifacts" / "study_closure.json").write_text("{}", encoding="utf-8")
+    assert D.derive(st, supervisor_identity=ident)["code"] == "CLOSURE_INVALID"        # DEV-09: a closure the platform rejects is not terminal
+    monkeypatch.setattr(D, "closure_validity", lambda s: {"present": True, "valid": True, "error": None})
     assert D.derive(st, supervisor_identity=ident)["code"] == "STUDY_CLOSED"

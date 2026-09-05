@@ -27,7 +27,7 @@ STAGE_ORDER = ("compile", "prepare", "readiness", "preflight", "tests", "causal_
 USER_INTERVENTION_CODES = ("SCIENTIFIC_SEMANTIC_DECISION_REQUIRED", "AUTHORIZATION_AMBIGUITY", "PROTECTED_OOS_AUTHORIZATION_REQUIRED",
                            "DATA_SAFETY_RISK", "CAUSAL_DEFINITION_AMBIGUOUS", "RESEARCH_CONTRACT_CONFLICT", "DESTRUCTIVE_ACTION_REQUIRES_APPROVAL",
                            "SUPERVISOR_ESCALATION_REQUIRED")
-PHASE_OF = {"NO_SPEC": "A", "CAPABILITY_GAP": "A", "COMPILED": "B", "CONTROLLER_STEP": "B", "NEEDS_CAUSAL_AUDIT": "B", "NEEDS_CONTRACT_AUDIT": "B",
+PHASE_OF = {"CLOSURE_INVALID": "D", "NO_SPEC": "A", "CAPABILITY_GAP": "A", "COMPILED": "B", "CONTROLLER_STEP": "B", "NEEDS_CAUSAL_AUDIT": "B", "NEEDS_CONTRACT_AUDIT": "B",
             "DETERMINISTIC_BLOCKER": "B", "AUDIT_BLOCKER": "B", "SEMANTIC_BLOCKER": "A", "READY_TO_EXECUTE": "C", "EXECUTION_NOT_AUTHORIZED": "C",
             "EXECUTION_BLOCKER": "C", "RUNNING": "C", "READY_FOR_ANALYSIS": "D", "ANALYSIS_DECIDED": "D", "STUDY_CLOSED": "D"}
 
@@ -36,6 +36,38 @@ def study_dir_of(state: Dict[str, Any]) -> Path:
     if state.get("study_dir"):
         return Path(state["study_dir"])
     return Path(state["study_worktree"]) / "studies" / state["study_id"]
+
+
+def closure_validity(study: Path) -> Dict[str, Any]:
+    """{'present', 'valid', 'error'} for artifacts/study_closure.json, judged by research_workflow.study_closure
+    (the same validator the controller uses). DEV-09: the supervisor must never treat a closure the controller rejects
+    as the study's terminal authority."""
+    p = Path(study) / "artifacts" / "study_closure.json"
+    if not p.is_file():
+        return {"present": False, "valid": False, "error": None}
+    try:
+        from research_workflow.study_closure import load_study_closure
+        return {"present": True, "valid": load_study_closure(study) is not None, "error": None}
+    except Exception as exc:
+        return {"present": True, "valid": False, "error": f"{type(exc).__name__}: {str(exc)[:300]}"}
+
+
+def terminal_decision_declared(study: Path, terminal_decision: Optional[str]) -> Dict[str, Any]:
+    """Whether ``terminal_decision`` is admissible under research_decision.yaml ``terminal_decisions`` (empty = anything)."""
+    if not terminal_decision:
+        return {"ok": False, "declared": [], "error": "terminal_decision missing"}
+    try:
+        from research_workflow.study_closure import _validate_terminal_decision
+        _validate_terminal_decision(Path(study), str(terminal_decision))
+        ok, err = True, None
+    except Exception as exc:
+        ok, err = False, f"{type(exc).__name__}: {str(exc)[:300]}"
+    try:
+        import yaml
+        declared = (yaml.safe_load((Path(study) / "research_decision.yaml").read_text(encoding="utf-8")) or {}).get("terminal_decisions") or {}
+    except Exception:
+        declared = {}
+    return {"ok": ok, "declared": sorted(declared.keys()) if isinstance(declared, dict) else [], "error": err}
 
 
 def _current_platform_composite(study: Path, worktree: Path) -> Optional[str]:
@@ -93,7 +125,14 @@ def derive(state: Dict[str, Any], *, supervisor_identity: Dict[str, Any]) -> Dic
 
     closure = study / "artifacts" / "study_closure.json"
     if note(closure):
-        return done("STUDY_CLOSED", closure=str(closure))
+        cv = closure_validity(study)
+        if cv["valid"]:
+            return done("STUDY_CLOSED", closure=str(closure))
+        # an invalid closure is a failed close, never terminal authority (DEV-09; the controller rejects it too)
+        out["blocker_code"] = "STUDY_CLOSURE_INVALID"
+        dec = read_json(study / "artifacts" / "analysis_decision.json")
+        return done("CLOSURE_INVALID", closure=str(closure), error=cv["error"], outcome=dec.get("outcome"), terminal_decision=dec.get("terminal_decision"),
+                    decision_check=terminal_decision_declared(study, dec.get("terminal_decision")))
     ud = state.get("user_decision") or {}
     if ud and not ud.get("answered"):
         out["blocker_code"] = ud.get("code")
@@ -194,11 +233,12 @@ def derive(state: Dict[str, Any], *, supervisor_identity: Dict[str, Any]) -> Dic
         d = read_json(dec) if note(dec) else {}
         if d.get("outcome") and d.get("terminal_decision"):
             out["through"] = "close"
-            return done("ANALYSIS_DECIDED", outcome=d.get("outcome"), terminal_decision=d.get("terminal_decision"))
+            return done("ANALYSIS_DECIDED", outcome=d.get("outcome"), terminal_decision=d.get("terminal_decision"),
+                        decision_check=terminal_decision_declared(study, d.get("terminal_decision")))
         return done("READY_FOR_ANALYSIS")
     out["through"] = "seal"
     return done("CONTROLLER_STEP", unknown_controller_state=cstate)
 
 
-__all__ = ["derive", "decision_resolves", "study_dir_of", "PLATFORM_GAP_KINDS", "STUDY_SIDE_GAP_KINDS", "SEMANTIC_GAP_KINDS", "USER_INTERVENTION_CODES",
+__all__ = ["derive", "decision_resolves", "study_dir_of", "closure_validity", "terminal_decision_declared", "PLATFORM_GAP_KINDS", "STUDY_SIDE_GAP_KINDS", "SEMANTIC_GAP_KINDS", "USER_INTERVENTION_CODES",
            "PRE_SEAL_STATES", "EXEC_STATES", "STAGE_ORDER", "PHASE_OF"]
