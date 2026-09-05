@@ -551,6 +551,8 @@ def population_parity_gate(rows: pd.DataFrame, *, reference_path: str, reference
                            timestamp_column: Optional[str] = None,
                            reference_timestamp_column: Optional[str] = None,
                            value_map: Optional[Mapping[str, Mapping[str, Any]]] = None,
+                           excluded_session_dates: Optional[Sequence[Mapping[str, str]]] = None,
+                           exclusion_timezone: str = "UTC",
                            context: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
     """RAISE unless this population is identical to a frozen reference population.
 
@@ -592,9 +594,53 @@ def population_parity_gate(rows: pd.DataFrame, *, reference_path: str, reference
             raise AnalysisOpError("ANALYSIS_PARITY_VALUE_MAP_UNMATCHED: %s values %s" % (column, unknown))
         ref[column] = [table[_case_key(v)] for v in ref[column]]
 
+    # PREDECLARED exceptions. Each entry is {date, reason} and is applied SYMMETRICALLY to both
+    # sides before any comparison, so an exception can never hide a difference on a day that is
+    # still being compared. Two properties make this a narrow escape hatch rather than a hole:
+    #   * it removes whole session dates from BOTH frames, never individual keys, so it cannot
+    #     be tuned to make a specific disagreement disappear;
+    #   * an exception that removes nothing from EITHER side is itself a failure -- a stale
+    #     declaration is a defect, not a harmless leftover.
+    exclusions = [dict(e) for e in (excluded_session_dates or [])]
+    removed: List[Dict[str, Any]] = []
+    if exclusions:
+        if not (timestamp_column and reference_timestamp_column):
+            raise AnalysisOpError(
+                "ANALYSIS_PARITY_EXCLUSION_NEEDS_TIMESTAMPS: excluded_session_dates requires "
+                "timestamp_column and reference_timestamp_column to derive a session date")
+        missing_reason = [e for e in exclusions if not e.get("date") or not e.get("reason")]
+        if missing_reason:
+            raise AnalysisOpError(
+                "ANALYSIS_PARITY_EXCLUSION_UNREASONED: every excluded_session_dates entry needs "
+                "a date and a reason: %s" % missing_reason)
+        _require(rows, [timestamp_column], "parity.timestamp_column")
+        _require(ref, [reference_timestamp_column], "parity.reference_timestamp_column")
+
+        def _dates(frame, column):
+            return pd.to_datetime(frame[column], unit="ns", utc=True).dt.tz_convert(exclusion_timezone).dt.date
+
+        lhs_dates, rhs_dates = _dates(rows, timestamp_column), _dates(ref, reference_timestamp_column)
+        keep_l = pd.Series(True, index=rows.index)
+        keep_r = pd.Series(True, index=ref.index)
+        for e in exclusions:
+            day = pd.Timestamp(str(e["date"])).date()
+            dl, dr = int((lhs_dates == day).sum()), int((rhs_dates == day).sum())
+            removed.append({"date": str(e["date"]), "reason": str(e["reason"]),
+                            "removed_from_population": dl, "removed_from_reference": dr})
+            keep_l &= lhs_dates != day
+            keep_r &= rhs_dates != day
+        dead = [r for r in removed if r["removed_from_population"] == 0 and r["removed_from_reference"] == 0]
+        if dead:
+            raise AnalysisOpError(
+                "ANALYSIS_PARITY_EXCLUSION_DEAD: declared exception(s) removed nothing from "
+                "either side, so the declaration is stale: %s" % [d["date"] for d in dead])
+        rows, ref = rows[keep_l], ref[keep_r]
+
     report: Dict[str, Any] = {"schema_version": 1, "reference_path": str(reference_path),
                               "reference_sha256": actual_sha,
-                              "reference_rows": int(len(ref)), "population_rows": int(len(rows))}
+                              "reference_rows": int(len(ref)), "population_rows": int(len(rows)),
+                              "excluded_session_dates": removed,
+                              "compared_after_exclusions": {"population": int(len(rows)), "reference": int(len(ref))}}
     failures: List[str] = []
     if expected_total is not None:
         report["expected_total"] = int(expected_total)

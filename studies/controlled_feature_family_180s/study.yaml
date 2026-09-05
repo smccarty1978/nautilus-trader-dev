@@ -210,3 +210,53 @@ model:
       expect:
         study_id: clean_maturity_flip_model_180s_horizon
         canonical_sha256: 8dab82c25ddc0ebccd6620b660ab4179fea28d1d4021bfdbed47538239b5ba2d
+
+# EXECUTABLE population-parity stop gate. Section 2 of the research contract requires that
+# unexplained drift from the parent's population BLOCK the scientific reading. Prose cannot do
+# that: nothing refuses to emit the downstream statistics when the population silently drifts.
+# This is the executable form -- declared FIRST, so a failure aborts the analyze stage before
+# any declared artifact is written.
+analysis:
+  source: train                     # the 2024 development population
+  steps:
+    - id: population_parity_vs_parent
+      op: analysis.gate.population_parity
+      rows: frame
+      params:
+        # The parent's own 2024 population, byte-pinned. A frozen comparison whose bytes are
+        # unpinned is not frozen.
+        reference_path: clean_maturity_flip_model_180s_horizon/artifacts/oos_candidates_merged.parquet
+        reference_sha256: 6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56
+        # Candidate identity: the regime it belongs to and its checkpoint within that regime.
+        key: [regime_start_ns, checkpoint_index]
+        reference_key: [regime_start_ns, checkpoint_index]
+        expected_total: 450973
+        # Retiming check: a candidate resolving at a different instant is drift even when its
+        # identity matches.
+        timestamp_column: observation_ts
+        reference_timestamp_column: observation_ts
+        # PREDECLARED exceptions -- the ONLY permitted differences, enumerated before the
+        # comparison runs and derived from evidence rather than assumed:
+        #
+        #   Comparing the parent's realized 2024 population against the Globex session table:
+        #     * every parent candidate falls INSIDE a Globex session (0 outside);
+        #     * every parent session day IS a Globex session day (0 days parent-only);
+        #     * exactly one Globex 2024 session day carries no parent candidate: 2024-12-31.
+        #
+        #   2024-12-31 is a source-coverage gap, not a population-rule difference: the parent's
+        #   catalog (NQ_v0_2020_2026) contains NO 1s bars for that session date -- its 1s data
+        #   jumps 2024-12-30 -> 2025-01-01. Verified by reading the catalog's own row groups.
+        #
+        #   Good Friday 2024-03-29 is NOT an exception: it is absent from BOTH sides.
+        #   The 12:00 vs 12:15 CT holiday-eve closes are NOT exceptions either: on 2024-07-03,
+        #   2024-11-29 and 2024-12-24 the parent's own last candidates run to 12:11/12:12/12:15
+        #   CT, i.e. the parent already behaves like the Globex close on those days.
+        excluded_session_dates:
+          - date: '2024-12-31'
+            reason: >-
+              parent source catalog NQ_v0_2020_2026 contains no 1s bars for this session date
+              (its 1s coverage jumps 2024-12-30 -> 2025-01-01), so the parent has no candidates
+              to compare against; verified from the catalog's own parquet row-group statistics
+        exclusion_timezone: America/Chicago
+  artifacts:
+    - {name: population_parity_vs_parent.json, source: population_parity_vs_parent, kind: json}

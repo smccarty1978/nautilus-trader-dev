@@ -1,5 +1,47 @@
 {
-  "analysis": null,
+  "analysis": {
+    "artifacts": [
+      {
+        "kind": "json",
+        "name": "population_parity_vs_parent.json",
+        "source": "population_parity_vs_parent"
+      }
+    ],
+    "ops": [
+      "analysis.gate.population_parity"
+    ],
+    "source": "train",
+    "steps": [
+      {
+        "id": "population_parity_vs_parent",
+        "inputs": {},
+        "op": "analysis.gate.population_parity",
+        "params": {
+          "excluded_session_dates": [
+            {
+              "date": "2024-12-31",
+              "reason": "parent source catalog NQ_v0_2020_2026 contains no 1s bars for this session date (its 1s coverage jumps 2024-12-30 -> 2025-01-01), so the parent has no candidates to compare against; verified from the catalog's own parquet row-group statistics"
+            }
+          ],
+          "exclusion_timezone": "America/Chicago",
+          "expected_total": 450973,
+          "key": [
+            "regime_start_ns",
+            "checkpoint_index"
+          ],
+          "reference_key": [
+            "regime_start_ns",
+            "checkpoint_index"
+          ],
+          "reference_path": "clean_maturity_flip_model_180s_horizon/artifacts/oos_candidates_merged.parquet",
+          "reference_sha256": "6c35c786a7b91c8accf18693b83215803f47cc5e1b8176190f74b82e9a81aa56",
+          "reference_timestamp_column": "observation_ts",
+          "timestamp_column": "observation_ts"
+        },
+        "rows": "frame"
+      }
+    ]
+  },
   "availability": {
     "rows": [
       {
@@ -723,8 +765,8 @@
     ]
   },
   "closure": {
-    "composite_sha256": "854737fbf15f6b1424ed4ac651e5708269b02002b41e255b3de463ca9a02c7b6",
-    "file_count": 46,
+    "composite_sha256": "54f954f87892f187a51a283babcb48298b409a49fa9a37bdfd1d0568d8d79f02",
+    "file_count": 47,
     "files": {
       "features/registry.py": "99ab16809d6cee33c1766af02f973b37a381ef6f0ee55507969d14a3ace0f4aa",
       "features/trackers/generic_arrival.py": "29201991c71821f27e014238338eb1d0d5910c4e2b2f5984d09e1a47f5703e75",
@@ -733,6 +775,7 @@
       "features/trackers/generic_rolling_productivity.py": "d0dcaa18e56debf27178e1e4c071f173f41988e5df57be8ee215303673f8e4a4",
       "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
       "features/trackers/host_bindings.py": "c68046762fca481612cc100710e74b4d3c63cefd26fa89f3860356c61a100f48",
+      "research/analysis/diagnostic_ops.py": "3567f19f2bd55e9363b2202ff3253200042b6c6138566c0ca515757b114b5f81",
       "research/analysis/identity.py": "a5cf93fd6539093e974862d2fe4e839e7897fde2d760fcd4afc99ec3f42be5ae",
       "research/analysis/metrics.py": "b3c18f8e68467c7483e923a7a1bd147095b224c9eedb27795de0ba3e37c90b12",
       "research/analysis/modeling.py": "cbd8bdee4d2c87efd7ac53f377e138c8103202bf0f6547c38517d4eb92567725",
@@ -782,7 +825,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "044bbf1ab9d14d7c02ba324165d169bf791be6b10340bd877c9437569d895f45",
+        "composite_sha256": "8ef8e6a9121fa3077fa8a670197b569c00f0c9dcb29ee1f3246b76d42975b1ec",
         "files": [
           "features/registry.py",
           "features/trackers/generic_arrival.py",
@@ -791,6 +834,7 @@
           "features/trackers/generic_rolling_productivity.py",
           "features/trackers/generic_structural_geometry.py",
           "features/trackers/host_bindings.py",
+          "research/analysis/diagnostic_ops.py",
           "research_workflow/dataset_v2.py",
           "research_workflow/grammar/compiler.py",
           "research_workflow/grammar/expansion.py",
@@ -2109,7 +2153,7 @@
     "stream": "nq_1s",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "60968edaea4e2e4b41a613f2904237eadb18a3411a5dfd444397d5f7f95a5457",
+  "plan_sha256": "8ab9b509a793a860969dc89b589f0803b2073eb53990dc36ff2df1ae3581485d",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -2231,7 +2275,7 @@
     ],
     "session": "RTH"
   },
-  "spec_sha256": "3016fa6f715a472afc4f7ce929a8fb8ff5b8d59dff847e3f266de6cf6bf4a77c",
+  "spec_sha256": "e483ea7a53e9711ebe71062cfffd421e6ded4b2ad31fb3e4c48635c170e6fc60",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
