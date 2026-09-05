@@ -25,7 +25,7 @@ from research_workflow.supervisor import packets as P
 from research_workflow.supervisor import providers as PR
 from research_workflow.supervisor import resources as R
 from research_workflow.supervisor import state as S
-from research_workflow.supervisor.procs import kill_tree, pid_alive, spawn_detached
+from research_workflow.supervisor.procs import kill_pid, kill_tree, pid_alive, spawn_detached
 
 MAX_ATTEMPTS = 2
 DEFAULT_WORKER_TIMEOUT_S = 3600.0
@@ -183,10 +183,15 @@ class Supervisor:
     def stop(self) -> Dict[str, Any]:
         self.state["stopped"] = True
         pid = self._loop_pid()
-        killed = kill_tree(pid) if pid and pid != os.getpid() else False
-        S.save_state(self.state); S.append_event(self.study_id, "STOP", loop_pid=pid, loop_killed=killed)
+        # DEV-07: the loop is the parent of the detached job/worker it spawned; killing its TREE killed a 70-minute
+        # controller job during the first real validation. Only the loop process itself is stopped.
+        killed = kill_pid(pid) if pid and pid != os.getpid() else False
+        job = self.state.get("active_job") or {}; aw = self.state.get("active_worker") or {}
+        S.save_state(self.state); S.append_event(self.study_id, "STOP", loop_pid=pid, loop_killed=killed, job_pid=job.get("pid"), job_alive=pid_alive(int(job.get("pid") or 0)),
+                                                 worker_pid=aw.get("pid"), worker_alive=pid_alive(int(aw.get("pid") or 0)))
         return {"study_id": self.study_id, "stopped": True, "loop_pid": pid, "loop_killed": killed,
-                "note": "active worker/job processes are left to finish; their cards are consumed on resume"}
+                "job_pid": job.get("pid"), "job_alive": pid_alive(int(job.get("pid") or 0)), "worker_pid": aw.get("pid"), "worker_alive": pid_alive(int(aw.get("pid") or 0)),
+                "note": "the detached controller job / worker keep running; their results are consumed on resume"}
 
     def resume(self) -> Dict[str, Any]:
         self.state["stopped"] = False
