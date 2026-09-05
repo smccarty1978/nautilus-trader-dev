@@ -1,0 +1,212 @@
+# Controlled feature-family additions to the frozen 180s flip model.
+#
+# Four PREDECLARED feature architectures on ONE collected population, each fit independently
+# and compared pairwise against the 13-feature control. The union surface (35 features) is
+# collected once; every arm trains on its own columns, so A/B/C/D see the identical rows and a
+# delta between them is a comparison rather than a coincidence.
+#
+# Population, target, confirmation, cadence, session and qualification are INHERITED from
+# studies/clean_maturity_flip_model_180s_horizon and are NOT research variables here. The
+# surface below is byte-for-byte the surface the Platform V2 proof study
+# (studies/v2_shape_a_flip_180s) already validated against that parent.
+study:
+  id: controlled_feature_family_180s
+  tier: 2
+  question: >-
+    Do volume/activity, directional estimated-delta, or shorter-horizon productivity features
+    add stable forward classification information beyond the frozen 13-feature 180-second
+    regime-flip baseline?
+
+streams:
+  # Globex product schedule (12:15 CT holiday-eve closes). The parent ran on NQ_v0_2020_2026,
+  # which carries the trading-floor calendar; that dataset is refused for new work, so exact
+  # population parity with the parent is impossible BY CONSTRUCTION on holiday-eve sessions.
+  # Parity is therefore defined as: exact outside the enumerated calendar-difference days.
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
+
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, max_age: 1800s, index_column: checkpoint_index}
+  qualify: >
+    excursion.frozen_atr > 0
+    and regime_1m.age_s >= 120s
+    and excursion.mfe_atr >= 1.0
+    and excursion.progress_windows >= 2
+    and excursion.retained_ratio >= 0.5
+    and features.structural_snapshot_ready
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+
+triggers: every_candidate
+
+features:
+  instances:
+    # ---- ARM A: the frozen 13-feature baseline surface (the CONTROL) -----------------------
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: regime_mfe_atr,    over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: regime_range_atr,  over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: rolling_retention_ratio,      window: 300s, update_every: 1s}
+    - {feature: rolling_current_progress_atr, window: 300s, update_every: 1s}
+    - {feature: rolling_max_progress_atr,     window: 300s, update_every: 1s}
+    - {feature: rolling_giveback_atr,         window: 300s, update_every: 1s}
+    - {feature: arrival_velocity,     input_timeframe: 1s, lookback: 20}
+    - {feature: arrival_acceleration, input_timeframe: 1s, short_lookback: 20}
+    - {feature: ema_slope, ema_role: short, lookback: 20}
+
+    # ---- ARM B additions: participation only -----------------------------------------------
+    # Intensity of participation and its short-vs-long share. NOT volatility, NOT price, NOT
+    # direction: this arm tests whether HOW MUCH is trading adds information beyond price-state
+    # exhaustion. The ratios are genuine ratios, not two levels a tree would have to combine
+    # itself (axis-aligned splits cannot form one).
+    - {feature: vol_sum, over: {timeframe: [5s, 30s, 60s, 300s]}, context: rolling}
+    - {feature: vol_sum_vs_ratio, over: {timeframe: [5s, 30s, 60s]}, timeframe_2: 300s, context: rolling}
+
+    # ---- ARM C additions: directional participation only -----------------------------------
+    # ESTIMATED delta, derived from bar geometry ((close-low)/range bull/bear split in
+    # features/trackers/ohlcv_delta.py) -- NOT true aggressor-side order flow. Sign is
+    # normalized so positive means pressure ALONG the prevailing 1m regime.
+    - {feature: trend_normalized_est_delta_sum, over: {window: [5s, 30s, 60s, 300s]},
+       update_every: 1s, direction_reference: prevailing_1m}
+    - {feature: trend_normalized_est_delta_sum_ratio, over: {numerator_window: [5s, 30s, 60s]},
+       denominator_window: 300s, update_every: 1s, direction_reference: prevailing_1m}
+
+    # ---- ARM D additions: the SAME productivity primitives at shorter windows ---------------
+    # Parameterizations of the identical canonical features Arm A carries at 300s -- not new
+    # feature identities. Tests whether recent 1-2 minute deterioration carries timing
+    # information that is diluted inside the 300s window.
+    - {feature: rolling_retention_ratio,      over: {window: [60s, 120s]}, update_every: 1s}
+    - {feature: rolling_current_progress_atr, over: {window: [60s, 120s]}, update_every: 1s}
+    - {feature: rolling_max_progress_atr,     over: {window: [60s, 120s]}, update_every: 1s}
+    - {feature: rolling_giveback_atr,         over: {window: [60s, 120s]}, update_every: 1s}
+
+  metadata:
+    regime_age_seconds:   regime_1m.age_s
+    running_mfe_atr:      excursion.mfe_atr
+    new_progress_windows: excursion.progress_windows
+    retained_mfe_ratio:   excursion.retained_ratio
+    triggering_1s_ts_init: epoch.T
+    # The cell key. Direction is an explicit emitted column, never inferred inside the model
+    # layer -- model.cells filters on it by value.
+    regime_direction:     regime_1m.dir
+
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    regime_transition_1m: {tracker: regime_1m, requires_atr: false}
+    snapshot:
+      atr: regime_1m.atr
+      family_a_atr: excursion.frozen_atr
+      episode_state: {prevailing_direction: regime_1m.dir}
+
+outcome:
+  kind: label
+  event: regime_1m.flipped        # 1 if the prevailing 1m regime flips within the horizon
+  horizon: 180s
+  session_end: censor             # a horizon past the RTH close is CENSORED, as in the parent
+  direction: regime_1m.dir
+  # NOTE: outcome.max_gap is deliberately absent. It is consulted only by the BARRIER kernel
+  # and is inert on a flip label -- declaring it would be a guarantee that does not exist.
+
+chronology:
+  train: [2024]                       # the development period of THIS study
+  dev: [2025]                         # narrowed to Q1 by chronology.windows below
+  prohibited: [2021, 2022, 2023, 2026]
+  authorized_dates: ['2024-03-01']    # smoke day
+  # Date-bounded OOS. Without this, dev: [2025] would collect and OPEN ALL OF 2025.
+  # A window NARROWS an authorized role year and can never open one.
+  windows: ['2025-01-01..2025-03-31']
+
+model:
+  family: lightgbm
+  # Shared, fixed. The scientific variable is FEATURE INFORMATION, not hyperparameters:
+  # no search_space is declared, so no tuning can occur.
+  params: {n_jobs: 1, deterministic: true, verbosity: -1, random_state: 42}
+
+  arms:
+    - id: A_BASELINE_13
+      baseline: true
+      features: [arrival_velocity, arrival_acceleration, ema_slope,
+                 prior_1m_regime_efficiency, prior_1m_regime_mfe_atr, prior_1m_regime_range_atr,
+                 prior_5m_regime_efficiency, prior_5m_regime_mfe_atr, prior_5m_regime_range_atr,
+                 rolling_300s_retention_ratio, rolling_300s_current_progress_atr,
+                 rolling_300s_max_progress_atr, rolling_300s_giveback_atr]
+    - id: B_PLUS_VOLUME
+      features: [arrival_velocity, arrival_acceleration, ema_slope,
+                 prior_1m_regime_efficiency, prior_1m_regime_mfe_atr, prior_1m_regime_range_atr,
+                 prior_5m_regime_efficiency, prior_5m_regime_mfe_atr, prior_5m_regime_range_atr,
+                 rolling_300s_retention_ratio, rolling_300s_current_progress_atr,
+                 rolling_300s_max_progress_atr, rolling_300s_giveback_atr,
+                 vol_sum_5s, vol_sum_30s, vol_sum_60s, vol_sum_300s,
+                 vol_sum_5s_vs_300s_ratio, vol_sum_30s_vs_300s_ratio, vol_sum_60s_vs_300s_ratio]
+    - id: C_PLUS_DELTA
+      features: [arrival_velocity, arrival_acceleration, ema_slope,
+                 prior_1m_regime_efficiency, prior_1m_regime_mfe_atr, prior_1m_regime_range_atr,
+                 prior_5m_regime_efficiency, prior_5m_regime_mfe_atr, prior_5m_regime_range_atr,
+                 rolling_300s_retention_ratio, rolling_300s_current_progress_atr,
+                 rolling_300s_max_progress_atr, rolling_300s_giveback_atr,
+                 trend_normalized_est_delta_sum_5s, trend_normalized_est_delta_sum_30s,
+                 trend_normalized_est_delta_sum_60s, trend_normalized_est_delta_sum_300s,
+                 trend_normalized_est_delta_sum_ratio_5s_vs_300s,
+                 trend_normalized_est_delta_sum_ratio_30s_vs_300s,
+                 trend_normalized_est_delta_sum_ratio_60s_vs_300s]
+    - id: D_PLUS_SHORT_PRODUCTIVITY
+      features: [arrival_velocity, arrival_acceleration, ema_slope,
+                 prior_1m_regime_efficiency, prior_1m_regime_mfe_atr, prior_1m_regime_range_atr,
+                 prior_5m_regime_efficiency, prior_5m_regime_mfe_atr, prior_5m_regime_range_atr,
+                 rolling_300s_retention_ratio, rolling_300s_current_progress_atr,
+                 rolling_300s_max_progress_atr, rolling_300s_giveback_atr,
+                 rolling_60s_retention_ratio, rolling_60s_current_progress_atr,
+                 rolling_60s_max_progress_atr, rolling_60s_giveback_atr,
+                 rolling_120s_retention_ratio, rolling_120s_current_progress_atr,
+                 rolling_120s_max_progress_atr, rolling_120s_giveback_atr]
+
+  # Direction cells with the parent's FROZEN per-direction hyperparameters, verified against
+  # studies/clean_maturity_flip_model_180s_horizon/artifacts/two_phase_selection_report.json
+  # and experiment_models_{long,short}.json. Every arm is fit under these; they are not tuned.
+  cells:
+    - id: LONG
+      subset: {regime_direction: 1}
+      params: {learning_rate: 0.039440343780424526, max_depth: 5, n_estimators: 100, num_leaves: 4}
+    - id: SHORT
+      subset: {regime_direction: -1}
+      params: {learning_rate: 0.028861842631876633, max_depth: 5, n_estimators: 200, num_leaves: 4}
+
+  # Nine rolling 3-month folds across 2024: TRAIN Jan-Mar -> VALIDATE Apr, ... TRAIN Sep-Nov ->
+  # VALIDATE Dec. Derived at COMPILE time and frozen into the plan, so "no future month in a
+  # fold's training set" is a checkable property of the plan rather than a promise in prose.
+  validation:
+    protocol: walk_forward_months
+    fold_months_year: 2024
+    train_months: 3
+    validate_months: 1
+    step_months: 1
+
+  # DESCRIPTIVE reference only, never refit, never the formal control. Scored on the identical
+  # population as the trained arms. Separates the recency/training-window effect (old A trained
+  # 2021-2023 vs new A trained 2024) from the feature-family effect (B/C/D vs new A).
+  #
+  # The registry's direction_routing reads {"BOTH": "C"} and carries NO direction: LONG/SHORT
+  # are recoverable only by matching each joblib bundle's fit_identity_sha256 against the
+  # parent's train_experiment_freeze.json model_hashes --
+  #   LONG_C  = 25737fcd... -> ccd587df... (100 trees, matches n_estimators 100)
+  #   SHORT_C = 3c480aff... -> 4d62250a... (200 trees, matches n_estimators 200)
+  # canonical_sha256 pins the estimator BYTES, so a substituted model cannot authenticate.
+  reference_models:
+    - id: ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c
+      name: PARENT_FROZEN_LONG_2021_2023
+      label: target_flip_within_horizon
+      subset: {regime_direction: 1}
+      expect:
+        study_id: clean_maturity_flip_model_180s_horizon
+        canonical_sha256: f969037b2b4fa588341ba34ffbf9856e4eff4b7eacd11bbf6fe642a5d9d421bd
+    - id: 4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4
+      name: PARENT_FROZEN_SHORT_2021_2023
+      label: target_flip_within_horizon
+      subset: {regime_direction: -1}
+      expect:
+        study_id: clean_maturity_flip_model_180s_horizon
+        canonical_sha256: 8dab82c25ddc0ebccd6620b660ab4179fea28d1d4021bfdbed47538239b5ba2d

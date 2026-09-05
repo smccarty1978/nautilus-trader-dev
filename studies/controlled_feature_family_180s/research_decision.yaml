@@ -1,0 +1,6 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
+study_id: controlled_feature_family_180s
+research_question: "# Controlled feature-family additions to the frozen 180s flip model\n\nDo volume/activity, directional delta/order-flow, or shorter-horizon productivity features add\nstable forward classification information beyond the existing 13-feature 180-second regime-flip\nbaseline?\n\nFour PREDECLARED arms on one collected population, compared pairwise against the 13-feature\ncontrol: A (baseline 13), B (+volume/activity), C (+direction-normalized estimated delta),\nD (+60s/120s rolling productivity). No combined arm. No tuning. No feature selection."
+status: DRAFT
+dataset_id: NQ_1S_V2_GLOBEX
+terminal_decisions: {}
