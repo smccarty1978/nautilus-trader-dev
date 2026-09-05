@@ -20,6 +20,9 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
     research ws claim <study_id>                              take writer ownership of an existing study worktree (foreign live writer refused)
     research ws whoami [--expect <agent>]                     resolved writer identity (user@host, agent, session id); --expect fails closed on mismatch
     research study new <id> --as <agent> | ws claim <id> --as <agent>   write-capable agents assert their identity; ambiguous/mismatched -> FAIL
+    research supervise start --question q.md [--study-id <id>] [--provider <p>] [--execute-authorized]   Research Supervisor V1 (WORKFLOW.md §O): detached loop
+    research supervise status <id> | list | resume <id> | stop <id> | tick [<id>] | decide <id> --answer <file> | adopt --study <dir> | providers
+    research study result --packet <packet.md> --status DONE|BLOCKED|FAILED ...   a supervisor worker writes its result card (never by hand)
 """
 from __future__ import annotations
 
@@ -301,6 +304,9 @@ def build_parser() -> argparse.ArgumentParser:
     sh.add_argument("--study", required=True); sh.add_argument("--phase", required=True, choices=["A", "B", "C", "D"]); sh.add_argument("--note")
     sh.set_defaults(fn=cmd_study_handoff)
     r = study.add_parser("run"); r.set_defaults(fn=cmd_study_run, passthrough=True)
+    from research_workflow.supervisor.cli import add_study_result_parser, add_supervise_parser
+    add_study_result_parser(study)
+    add_supervise_parser(sub, ROOT)
 
     audit = sub.add_parser("audit").add_subparsers(dest="cmd", required=True)
     ai = audit.add_parser("ingest"); ai.add_argument("--study", required=True); ai.add_argument("--type", required=True, choices=["causal", "contract"])
