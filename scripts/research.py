@@ -10,6 +10,8 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
     research study new <id> [--from-question <file>]         branch + sibling worktree + lease + v2 skeleton
     research study compile --study <dir>                     static compile -> compiled_plan.json | typed CapabilityGap
     research study status --study <dir>                      non-mutating controller state card
+    research study handoff --study <dir> --phase A|B|C|D      phase-boundary SESSION_HANDOFF card; then END the session (WORKFLOW.md §N)
+    research ws chore claim|release|list                      platform-surface ownership for chore worktrees (overlap -> typed refusal)
     research study run --study <dir> --through <stage> ...   the governed controller (v1 or v2 by grammar)
     research audit ingest --study <dir> --type causal|contract --report <md> [--author <id>]
     research bench [--series host_c,host_a,golden]           host performance measurement vs bench/baseline_v0.json
@@ -125,10 +127,31 @@ def cmd_study_compile(ns: argparse.Namespace) -> int:
                       "error": "not a Platform V2 study.yaml (v1 grammar); new research must use the v2 grammar -- see WORKFLOW.md and docs/RESEARCH_YAML_REFERENCE.md"}, ok=False)
     out = compile_study(load_spec(study), repo_root=ROOT)
     if not out.ok:
-        return _card({"study": str(study), **out.gaps.to_dict()}, ok=False)
+        gap_card = out.gaps.to_dict()
+        # STOP-AT-CAPABILITY-GAP (WORKFLOW.md §N): the study owner stops here; a fresh capability session takes the handoff.
+        handoff = None
+        if not ns.dry_run:
+            from research_workflow.handoff import write_capability_gap_handoff
+            write_capability_gap_handoff(study, gap_card, repo_root=ROOT)
+            handoff = str((study / "CAPABILITY_GAP_HANDOFF.json").relative_to(ROOT)) if str(study).startswith(str(ROOT)) else str(study / "CAPABILITY_GAP_HANDOFF.json")
+        return _card({"study": str(study), **gap_card, "handoff": handoff,
+                      "next": "STOP: commit study.yaml + research_decision.yaml + CAPABILITY_GAP_HANDOFF.* on the study branch and END THE SESSION. "
+                              "A fresh capability session implements the gap on chore/<topic> (see the handoff); a fresh study session merges main and recompiles."}, ok=False)
     if not ns.dry_run:
         out.plan.write(study / "compiled_plan.json")
     return _card({"study": str(study), **out.plan.card(), "written": not ns.dry_run})
+
+
+def cmd_study_handoff(ns: argparse.Namespace) -> int:
+    from research_workflow.handoff import write_session_handoff
+    study = Path(ns.study).resolve()
+    try:
+        doc = write_session_handoff(study, ns.phase, repo_root=ROOT, note=ns.note)
+    except ValueError as exc:
+        return _card({"study": str(study), "error": str(exc)}, ok=False)
+    return _card({"study": str(study), "phase": doc["phase"], "handoff": str(study / "_work" / "handoff" / "SESSION_HANDOFF.json"),
+                  "controller_status": doc["controller_status"], "next_command": doc["next_command"],
+                  "next": "END THE SESSION; the next owner session reads the handoff card first"})
 
 
 def cmd_study_status(ns: argparse.Namespace) -> int:
@@ -181,6 +204,19 @@ def cmd_ws_claim(ns: argparse.Namespace) -> int:
         return _card(claim_worktree(ns.study_id, repo_root=ROOT, expect_agent=getattr(ns, "as_agent", None)))
     except WorkspaceError as exc:
         return _card({"study_id": ns.study_id, "error": str(exc), "blocker_code": str(exc).split(":", 1)[0].split(" ")[0]}, ok=False)
+
+
+def cmd_ws_chore(ns: argparse.Namespace) -> int:
+    from research_workflow.workspace import WorkspaceError, claim_chore, list_chores, release_chore
+    try:
+        if ns.cmd == "claim":
+            return _card(claim_chore(ns.topic, repo_root=ROOT, write_paths=ns.paths, capability_ids=ns.capabilities or [],
+                                     semantic_surface=ns.surface, branch=ns.branch, worktree=ns.worktree, expect_agent=getattr(ns, "as_agent", None)))
+        if ns.cmd == "release":
+            return _card(release_chore(ns.topic, force=bool(ns.force)))
+        return _card(list_chores(reclaim=bool(getattr(ns, "reclaim", False))))
+    except WorkspaceError as exc:
+        return _card({"topic": getattr(ns, "topic", None), "error": str(exc), "blocker_code": str(exc).split(":", 1)[0].split(" ")[0]}, ok=False)
 
 
 def cmd_ws_whoami(ns: argparse.Namespace) -> int:
@@ -261,6 +297,9 @@ def build_parser() -> argparse.ArgumentParser:
     n.set_defaults(fn=cmd_study_new)
     sc = study.add_parser("compile"); sc.add_argument("--study", required=True); sc.add_argument("--dry-run", action="store_true"); sc.set_defaults(fn=cmd_study_compile)
     ss = study.add_parser("status"); ss.add_argument("--study", required=True); ss.set_defaults(fn=cmd_study_status)
+    sh = study.add_parser("handoff", help="write the phase-boundary SESSION_HANDOFF card (WORKFLOW.md §N) and end the session")
+    sh.add_argument("--study", required=True); sh.add_argument("--phase", required=True, choices=["A", "B", "C", "D"]); sh.add_argument("--note")
+    sh.set_defaults(fn=cmd_study_handoff)
     r = study.add_parser("run"); r.set_defaults(fn=cmd_study_run, passthrough=True)
 
     audit = sub.add_parser("audit").add_subparsers(dest="cmd", required=True)
@@ -287,6 +326,13 @@ def build_parser() -> argparse.ArgumentParser:
     ww = ws.add_parser("whoami", help="resolved writer identity: user@host, agent, session id and how each was inferred")
     ww.add_argument("--expect", metavar="AGENT", help="exit FAIL (WRITER_IDENTITY_AMBIGUOUS / WRITER_IDENTITY_MISMATCH) unless the resolved agent is AGENT")
     ww.set_defaults(fn=cmd_ws_whoami)
+    chore = ws.add_parser("chore", help="platform/chore worktree ownership: claim a write surface before platform work; overlapping live claims are refused").add_subparsers(dest="cmd", required=True)
+    cc = chore.add_parser("claim"); cc.add_argument("topic"); cc.add_argument("--paths", nargs="+", required=True, help="modules/files/dirs this chore will write (repo-relative prefixes or globs)")
+    cc.add_argument("--capabilities", nargs="*", help="capability ids / topics"); cc.add_argument("--surface", required=True, help="one-line semantic surface")
+    cc.add_argument("--branch", help="default chore/<topic>"); cc.add_argument("--worktree", help="default <worktree_root>/<repo>-<topic>")
+    cc.add_argument("--as", dest="as_agent", metavar="AGENT"); cc.set_defaults(fn=cmd_ws_chore)
+    cr = chore.add_parser("release"); cr.add_argument("topic"); cr.add_argument("--force", action="store_true"); cr.set_defaults(fn=cmd_ws_chore)
+    cl = chore.add_parser("list"); cl.add_argument("--reclaim", action="store_true"); cl.set_defaults(fn=cmd_ws_chore)
     return ap
 
 

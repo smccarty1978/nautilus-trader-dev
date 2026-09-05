@@ -5,6 +5,7 @@
 0. `WORKFLOW.md` — the current way to work (Platform V2). Read it first; then `docs/QUICKSTART.md` and `docs/AI_AGENTS.md`.
 **FOR A NEW RESEARCH PROJECT:** read `WORKFLOW.md` → §M *Concurrent research projects*, then use `python scripts/research.py study new <id>` and work only in the generated worktree. Never start a study by editing `main`.
 **BEFORE WRITING IN A STUDY WORKTREE:** `python scripts/research.py ws whoami` (agent = `codex`, a session id) then `ws claim <id>`; a live lease of another agent is refused (`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT`) -- same OS user or not. Read-only roles skip the claim.
+**SESSION DISCIPLINE (`WORKFLOW.md` §N):** one lifecycle phase per session, end with `python scripts/research.py study handoff --study studies/<id> --phase <A|B|C|D>`; on a CapabilityGap that needs platform work STOP (the CLI wrote `CAPABILITY_GAP_HANDOFF.json`), commit, end the session -- never build the capability in the study session; classify tests with `python scripts/test_delta.py <scope>`; never poll long jobs. Context target <= ~50k tokens, hand off before ~100k.
 1. `AGENTS.md` — the shared agent core. Every rule there applies to you.
 2. `docs/RESEARCH_WORKFLOW.md` — the authoritative description of the system.
 3. This file — what Codex specifically is here to do, and what Codex specifically gets wrong.

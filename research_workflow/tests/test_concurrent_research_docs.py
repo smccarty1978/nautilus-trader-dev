@@ -37,7 +37,14 @@ def test_workflow_has_the_canonical_concurrent_procedure():
                    "regime_breakout_context", "pullback_quality_target", "cross_market_context", "### M.6 Closure and merge back",
                    # multi-agent writer ownership: user@host + agent + session; three independent mechanisms
                    "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT", "owner_agent", "owner_session_id", "ws claim", "ws whoami",
-                   "WRITER LEASE", "CONTROLLER RUN LOCK", "branch + worktree isolation", "NT_RESEARCH_AGENT"):
+                   "WRITER LEASE", "CONTROLLER RUN LOCK", "branch + worktree isolation", "NT_RESEARCH_AGENT",
+                   # session efficiency (§N)
+                   "## N. Study session budget, phases and handoffs", "### N.1 STOP-AT-CAPABILITY-GAP", "CAPABILITY_GAP_HANDOFF.json",
+                   "### N.2 One lifecycle phase per owner session", "study handoff --study studies/<id> --phase", "SESSION_HANDOFF.json",
+                   "### N.3 Committed test-failure baseline", "scripts/test_delta.py", "config/test_failure_baseline.json", "NEW_FAILURE",
+                   "### N.4 Predeclared fork policy", "autonomy_decisions", "on_capability_gap", "### N.5 Long-run policy",
+                   "### N.6 Chore-worktree ownership", "ws chore claim", "PLATFORM_SURFACE_OWNED_BY_ANOTHER_AGENT",
+                   "### N.7 STUDY SESSION BUDGET", "<= ~50k tokens", "### L.1 Reference parity semantics", "common eligible calendar interval"):
         assert phrase in w, phrase
 
 
@@ -78,13 +85,22 @@ def test_entrypoints_and_quickstart_point_to_the_procedure():
     assert "launch_antigravity.cmd" in a and "WRITER_IDENTITY_AMBIGUOUS" in a
     assert (ROOT / "scripts" / "launch_antigravity.ps1").is_file() and (ROOT / "scripts" / "launch_antigravity.cmd").is_file()
     assert 'NT_RESEARCH_AGENT = "codex"' in _t(".codex/config.toml")
+    for phrase in ("STOP-AT-CAPABILITY-GAP", "One lifecycle phase per session", "study handoff", "test_delta.py", "autonomy_decisions", "Study session budget"):
+        assert phrase in a, phrase
+    for rel in ENTRYPOINTS:
+        assert "SESSION DISCIPLINE" in _t(rel) and "CAPABILITY_GAP_HANDOFF" in _t(rel), rel
+    for rel in ("docs/RESEARCH_DISCUSSION_TO_YAML.md", "research_workflow/templates/research_discussion_to_yaml_prompt.md"):
+        assert "## AUTONOMY_DECISIONS" in _t(rel) and "on_capability_gap: stop_and_handoff" in _t(rel), rel
+    assert 'study.add_parser("handoff"' in _t("scripts/research.py") and 'add_parser("chore"' in _t("scripts/research.py")
+    assert (ROOT / "scripts" / "test_delta.py").is_file() and (ROOT / "research_workflow" / "handoff.py").is_file()
 
 
 def test_agent_role_files_carry_worktree_rules():
     for name in WRITE_CAPABLE:
         t = _t(f".claude/agents/{name}.md")
         for phrase in ("Never write from `main`", "Never share a writer worktree", "study new <id>", "ws list", "`live` lease", "chore/*",
-                       "ws whoami", "ws claim <id>", "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT", "run lock", "--as <your agent>", "WRITER_IDENTITY_AMBIGUOUS"):
+                       "ws whoami", "ws claim <id>", "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT", "run lock", "--as <your agent>", "WRITER_IDENTITY_AMBIGUOUS",
+                       "study handoff", "CAPABILITY_GAP_HANDOFF", "ws chore claim", "test_delta.py"):
             assert phrase in t, (name, phrase)
     for name in READ_ONLY:
         t = _t(f".claude/agents/{name}.md")

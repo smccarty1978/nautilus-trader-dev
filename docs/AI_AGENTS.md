@@ -47,6 +47,17 @@ Roles that deliberately do not exist: a "study driver writer", a "collector auth
 9. Execute the study through the controller (`python scripts/run_governed_study.py --study studies/<id> --through <stage> --execute-authorized`), never by hand. The controller re-checks the writer lease (who may edit) and then its own run lock (is a run already live); both must pass.
 10. Platform modifications belong on a separate `chore/*` worktree, never in the study branch.
 11. **Read-only roles** (repo-scout, lookahead-auditor, contract-checker, results-triager, capability-router, Explore) skip steps 2-8: they need no writer claim, may inspect source, artifacts, audit packets and results in any worktree, and mutate nothing but their own audit report.
+12. **STOP-AT-CAPABILITY-GAP** (`WORKFLOW.md` §N.1): when compile returns a gap that needs shared platform work, the CLI has already written `studies/<id>/CAPABILITY_GAP_HANDOFF.json`. Commit `study.yaml`, `research_decision.yaml` and the handoff, then END THE SESSION. Do not touch `research_workflow/`, the grammar/compiler or `features/`; do not build the capability; do not keep working. A fresh capability session (`ws chore claim` -> `chore/<topic>` -> implement -> merge -> `CAPABILITY_COMPLETE`) and a fresh study session (merge `main`, `ws claim`, recompile) follow.
+13. **One lifecycle phase per session** (`WORKFLOW.md` §N.2: A design/compile, B prepare/seal, C execution, D analysis/closure). End every session with `python scripts/research.py study handoff --study studies/<id> --phase <A|B|C|D>`; start every session by reading `_work/handoff/SESSION_HANDOFF.md` and `research study status`, never by re-discovering the repository.
+14. **Tests**: `python scripts/test_delta.py <scope>` (§N.3). Act only on `NEW_FAILURE`; never re-run branch-vs-main suites to classify pre-existing failures.
+15. **Fork policy**: follow `autonomy_decisions` in `research_decision.yaml` (§N.4) instead of asking; ask only for a genuine semantic choice no policy covers.
+16. **Long jobs**: launch detached through the controller, persist the status card, end the session (§N.5). Never poll or tail logs.
+
+### Study session budget (WORKFLOW.md §N.7)
+
+Owner context target **<= ~50k tokens, hand off before ~100k**; one bounded objective per session; no
+repeated repository discovery; no repeated baseline test classification; no platform implementation
+inside a study session after a CapabilityGap; no long-job polling. Policy for agents, not runtime limits.
 
 Three mechanisms, all independent, all required: **branch/worktree isolation** prevents cross-study
 file conflicts; the **writer lease** prevents cross-agent ownership conflicts; the **controller run

@@ -4,7 +4,7 @@
 the authoritative system description is `docs/RESEARCH_WORKFLOW.md` (§21 for Platform V2).
 Field-by-field YAML: `docs/RESEARCH_YAML_REFERENCE.md`. Ten-minute version: `docs/QUICKSTART.md`.
 Agents: `docs/AI_AGENTS.md`. Turning a chat discussion into a spec: `docs/RESEARCH_DISCUSSION_TO_YAML.md`.
-Running several studies at once: §M **Concurrent research projects**.
+Running several studies at once: §M **Concurrent research projects**. Keeping sessions short and cheap: §N **Study session budget, phases and handoffs**.
 
 Platform authority: tag `baseline/2026-09-platform-v2-proven`.
 
@@ -174,7 +174,9 @@ feature count and streams. Commit `study.yaml` + `compiled_plan.json` on the stu
 | UNSUPPORTED_COMPOSITION | e.g. an event test inside `population.qualify` | restructure (events belong in triggers/outcome) |
 | SEMANTIC_DECISION_REQUIRED | a scientific decision (direction, primary arm, year double-use, tuning folds) | decide and declare |
 
-Never patch around a gap with study Python.
+Never patch around a gap with study Python. A gap that needs shared platform work ends the study
+session: the CLI writes `CAPABILITY_GAP_HANDOFF.json` and a fresh capability session takes it (§N.1).
+End every session with `python scripts/research.py study handoff --study studies/<id> --phase <A|B|C|D>` (§N.2).
 
 ## E. Adding a new feature
 
@@ -400,6 +402,24 @@ Composition first; then §E.
 
 Every failure is a card on stdout; stage logs are in `studies/<id>/_work/controller/logs/<stage>.log`.
 
+### L.1 Reference parity semantics (fresh V2 population vs. a historical parent)
+
+When a study's scientific experiment is a comparison of arms on ONE fresh Platform V2 population and a
+historical study is named as the reference, the parent is a **reference-integrity diagnostic**, not the
+population authority:
+
+- require an **exact match over the common eligible calendar interval** where the two contracts are
+  semantically identical;
+- enumerate separately the **valid Globex-only candidates** that exist solely because the corrected
+  product calendar (`NQ_1S_V2_GLOBEX`: 12:15 CT holiday-eve closes, mourning days, Good Fridays without a
+  session) contains rows a floor-calendar parent could never emit -- descriptive, never blocking;
+- BLOCK only for unexplained candidate differences inside the common interval, key/identity
+  inconsistencies, or population-contract violations;
+- never weaken the fresh V2 population contract to reproduce the parent.
+
+`autonomy_decisions.calendar_reference_parity: common_interval_exact` declares this policy; a study whose
+declared question makes the parent the population authority must say so explicitly instead.
+
 ## M. Concurrent research projects
 
 **EVERY NEW RESEARCH PROJECT GETS ITS OWN BRANCH + WORKTREE.**
@@ -472,7 +492,9 @@ into the same worktree or the same `studies/<id>` tree; read-only auditors may r
 | examples | `study.yaml`, the research question, artifacts, model configuration, analysis declarations, closure | a reusable feature or tracker capability, compiler, host, outcome kernel, controller, dataset builder, docs of the platform |
 
 A study agent must not modify shared Platform V2 infrastructure inside its study branch as a
-study-local workaround. When a genuine `CapabilityGap` needs platform work, the sanctioned sequence is:
+study-local workaround. When a genuine `CapabilityGap` needs platform work the study session STOPS and
+hands off (§N.1 STOP-AT-CAPABILITY-GAP: `CAPABILITY_GAP_HANDOFF.json`, a fresh capability session, a fresh
+study session). The sanctioned platform sequence is:
 
 1. `research cap propose <yaml>` (the proposal records the gap and the closest existing primitives);
 2. create an isolated `chore/<topic>` worktree from `main`;
@@ -567,3 +589,122 @@ python scripts/research.py ws list --reclaim                           # the fin
 
 The merged `studies/<id>/` on `main` is the study's persisted authority (closure, audits, seal, parity).
 
+## N. Study session budget, phases and handoffs
+
+Two measured study sessions (2026-09-04) ran 4.5 h and 11 h, 735 and 773 assistant messages, and re-read
+~390 M and ~356 M cached input tokens: each session accumulated ~500k tokens of context and re-read it on
+every one of hundreds of small tool calls. The rules below make sessions short, resumable and cheap.
+They are agent operating policy, not runtime enforcement, except where a CLI verb is named.
+
+### N.1 STOP-AT-CAPABILITY-GAP
+
+When `research study compile` returns a typed CapabilityGap that needs shared Platform V2 work
+(MISSING_CAPABILITY, UNSUPPORTED_COMPOSITION, an UNAVAILABLE_STREAM that needs a dataset build, ...),
+the **study owner stops implementation work**. The CLI writes
+`studies/<id>/CAPABILITY_GAP_HANDOFF.json` + `.md` (`research_workflow/handoff.py`) with: study id,
+source platform commit, research question, exact gap kind/where/message, requested semantics (the YAML
+at each gap), compiler evidence, affected YAML fields, nearest existing capabilities, scientific
+decisions already resolved, prohibited changes, suggested platform files, study branch/worktree and the
+next action. The owner commits `study.yaml` + `research_decision.yaml` + the handoff and **ends the
+session**. It must NOT modify `research_workflow/`, the grammar/compiler or `features/`, build the
+capability itself, patch around the gap with study Python, or keep accumulating context.
+
+A **new short capability session** (fresh context) then:
+
+1. `python scripts/research.py ws chore claim <topic> --paths <modules> --surface "<one line>" --as <agent>` (§N.6)
+2. creates `chore/<topic>` from `main` in its own worktree, implements ONLY that capability, targeted tests,
+   `research cap generate --check`, audit/promotion when the capability flow requires it
+3. merges to `main` with `--no-ff`, writes a `CAPABILITY_COMPLETE` note
+   (`research study handoff --study studies/<id> --phase A --note CAPABILITY_COMPLETE:<topic>`), releases the chore claim, ends.
+
+A **new study session** merges `main` into the study worktree, `ws claim`s the study, recompiles and resumes.
+
+INVALID_PARAMETERIZATION, AMBIGUOUS_TEMPORAL_SEMANTICS and SEMANTIC_DECISION_REQUIRED are study-side:
+fix or declare in the YAML / decision contract and recompile; no handoff needed.
+
+### N.2 One lifecycle phase per owner session
+
+| session | does | ends when | handoff |
+|---|---|---|---|
+| **A — design / compile** | intake, capability discovery (`cap search/describe`), `research_decision.yaml`, `study.yaml`, compile | `compiled_plan.json` written, or `CAPABILITY_GAP_HANDOFF` emitted | `research study handoff --study studies/<id> --phase A` |
+| **B — prepare / seal** | readiness, preflight, tests, causal audit, contract audit, seal | `READY_TO_SMOKE` | `--phase B` |
+| **C — execution** | smoke, authorized collection, reconcile, merge, pre-fit gates, fit/score, freeze, OOS only if authorized | deterministic execution artifacts exist | `--phase C` |
+| **D — analysis / decision** | analysis, scientific interpretation, study report, closure | `STUDY_CLOSED` | `--phase D`, then merge (§M.6) |
+
+A trivially short adjacent phase may be finished in the same session; these are the default handoff
+boundaries, not prohibitions. Every phase ends by writing `studies/<id>/_work/handoff/SESSION_HANDOFF.json`
++ `.md` (branch, head, dirty count, controller status card, artifacts and audits present, decisions,
+the exact next command). The next owner session reads that card first and does not re-discover the
+repository.
+
+### N.3 Committed test-failure baseline
+
+`config/test_failure_baseline.json` records, per exact pytest node id, the failures that pre-exist on
+`main` (platform commit, classification `pre_existing` / `environmental` / `expected_change`, reason,
+scopes, environment requirements). Never re-derive it by running the suite on the branch and on clean
+`main`. Instead:
+
+```bash
+python scripts/test_delta.py scripts/tests/test_workspace.py            # targeted, during implementation
+python scripts/test_delta.py research_workflow/tests scripts/tests      # ONE broad relevant run before commit
+python scripts/test_delta.py <scopes> --update-baseline --reason "..."  # explicit, reviewed change of the baseline
+```
+
+The card shows `NEW_FAILURE` prominently and classifies the rest as `KNOWN_BASELINE_FAILURE`,
+`BASELINE_FAILURE_NOW_FIXED` (update the baseline when you commit the fix) or
+`ENVIRONMENTAL_MISSING_ARTIFACT`. A failure outside every baselined scope is
+`NEW_FAILURE_OUTSIDE_BASELINE_SCOPE`, never silently allowed. Agents act only on NEW failures.
+`@pytest.mark.slow` tests (real data replay; `scripts/tests` carries several that run for tens of minutes)
+are excluded by default so one broad run stays in minutes; `--include-slow` lifts the filter.
+
+### N.4 Predeclared fork policy (`autonomy_decisions`)
+
+`research_decision.yaml` carries an optional `autonomy_decisions:` block (the skeleton written by
+`study new` declares the defaults). Agents follow it instead of asking again:
+
+| key | values | meaning |
+|---|---|---|
+| `on_capability_gap` | `stop_and_handoff` | §N.1 |
+| `platform_change_required` | `chore_branch_and_fresh_session` | never in the study branch or session |
+| `deterministic_defect` | `auto_fix` | fix, add a targeted test, re-run the bounded check |
+| `calendar_reference_parity` | `common_interval_exact` (+ `known_globex_extension_descriptive`) | §L.1 |
+| `frozen_parent_model` | `rescore_if_authenticated`, `never_retrain` | a frozen parent is re-scored, never retrained |
+| `protected_period` | `never_expand_authority` | OOS/prohibited years never widen |
+
+A genuine semantic choice that no declared policy resolves is still a `SEMANTIC_DECISION_REQUIRED`
+question -- scientific defaults are never taken silently.
+
+### N.5 Long-run policy
+
+The owner model never babysits deterministic jobs. Long stages are launched detached through the
+canonical controller (§D step 6), the controller persists its status card, and the owner **ends the
+session** when no reasoning remains. A later fresh session reads `research study status` and the
+handoff card. No foreground waits of minutes, no repeated polling, no tailing raw logs.
+
+### N.6 Chore-worktree ownership
+
+Platform work registers its write surface before it starts:
+
+```bash
+python scripts/research.py ws chore claim <topic> --paths research_workflow/grammar/ features/trackers/host_bindings.py --surface "<one line>" --capabilities <ids> --as <agent>
+python scripts/research.py ws chore list
+python scripts/research.py ws chore release <topic>
+```
+
+The claim (`~/.nt_research/leases/chore/<topic>.json`) records chore branch, owner agent/session,
+capability ids, expected write paths, semantic surface and status. A second writer whose paths overlap a
+live claim (directory containment or glob match) is refused with
+`PLATFORM_SURFACE_OWNED_BY_ANOTHER_AGENT` before it implements anything; disjoint surfaces proceed
+concurrently. It is a claim registry, not a scheduler.
+
+### N.7 STUDY SESSION BUDGET
+
+- owner context target: **<= ~50k tokens preferred; hand off before ~100k**
+- one bounded objective per session (one phase, one capability, one repair packet)
+- no repeated repository discovery: read the handoff card and `research study status`, not the tree
+- no repeated baseline test classification: `scripts/test_delta.py`
+- no platform implementation inside a study session after a CapabilityGap (§N.1)
+- no long-job polling (§N.5)
+- targeted tests while implementing; one broad relevant run before commit
+
+These are recommended limits for agents; the runtime enforces none of them.

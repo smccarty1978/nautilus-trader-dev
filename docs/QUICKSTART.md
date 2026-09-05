@@ -122,7 +122,8 @@ Several coding agents (Claude, Codex, Antigravity) share one OS user here, so ow
 `user@host` + agent + session: a live lease held by another agent is refused
 (`STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT`) even though the user matches.
 
-Rules and merge-back: `WORKFLOW.md` §M.
+Rules and merge-back: `WORKFLOW.md` §M. Session discipline (one phase per session, `study handoff`, STOP-AT-CAPABILITY-GAP,
+`scripts/test_delta.py`, context budget): `WORKFLOW.md` §N.
 
 ## If something blocks
 
