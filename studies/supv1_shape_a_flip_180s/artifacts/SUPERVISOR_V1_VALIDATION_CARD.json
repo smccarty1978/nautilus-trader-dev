@@ -1,0 +1,583 @@
+{
+  "card_version": 1,
+  "generated_at_utc": "2026-09-05T16:19:38.776678+00:00",
+  "audit": "Research Supervisor V1 end-to-end validation against the closed reference study v2_shape_a_flip_180s",
+  "outcome_summary": "STOPPED at SUPERVISOR_ESCALATION_REQUIRED before any execution stage ran. The control plane is audited on the segment that ran; the research plane was NOT EXERCISED.",
+  "baseline": {
+    "main_head": "a33b1460692f07f5631cb9efe911f009e34f52ab",
+    "main_branch": "main",
+    "a33b1460_is_ancestor": true,
+    "main_clean_tracked": true,
+    "branches_containing_a33b1460": [
+      "main",
+      "chore/supervisor-v1-fix-detached-loop-argv",
+      "study/supv1_shape_a_flip_180s"
+    ]
+  },
+  "study": {
+    "id": "supv1_shape_a_flip_180s",
+    "branch": "study/supv1_shape_a_flip_180s",
+    "head": "5f810cc41680e1d0806d5d45e0799866bec8040e",
+    "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supv1_shape_a_flip_180s",
+    "state_dir": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\supv1_shape_a_flip_180s",
+    "merged_to_main": false,
+    "study_yaml_diff_vs_reference": "one line: study.id (v2_shape_a_flip_180s -> supv1_shape_a_flip_180s)",
+    "compiled_plan_nonclosure_differing_leaves": 28,
+    "compiled_plan_spec_surface_differences": 0,
+    "platform_drift_observed": [
+      "session.kind legacy -> calendar (+6 reference tables, reference_digest 0db1f14b...)",
+      "outcome gains horizon_end_rule/session_end_rule/resolution_precedence/strict_gap_rule",
+      "closure.file_count 23 -> 45",
+      "new top-level analysis key"
+    ]
+  },
+  "timeline": [
+    {
+      "ts_utc": "2026-09-05T15:03:35.077782+00:00",
+      "kind": "START"
+    },
+    {
+      "ts_utc": "2026-09-05T15:04:23.963349+00:00",
+      "kind": "DERIVED",
+      "code": "NO_SPEC",
+      "blocker_code": null
+    },
+    {
+      "ts_utc": "2026-09-05T15:04:24.055954+00:00",
+      "kind": "WORKER_LAUNCHED",
+      "session_type": "STUDY_DESIGN_COMPILE",
+      "task_id": "001_study_design_compile_1cccb016"
+    },
+    {
+      "ts_utc": "2026-09-05T15:08:57.480793+00:00",
+      "kind": "RESUME"
+    },
+    {
+      "ts_utc": "2026-09-05T15:08:58.233387+00:00",
+      "kind": "WORKER_FINISHED",
+      "session_type": "STUDY_DESIGN_COMPILE",
+      "task_id": "001_study_design_compile_1cccb016"
+    },
+    {
+      "ts_utc": "2026-09-05T15:08:58.245274+00:00",
+      "kind": "DERIVED",
+      "code": "COMPILED",
+      "blocker_code": null
+    },
+    {
+      "ts_utc": "2026-09-05T15:08:58.254717+00:00",
+      "kind": "JOB_LAUNCHED",
+      "through": "seal"
+    },
+    {
+      "ts_utc": "2026-09-05T15:10:00.287524+00:00",
+      "kind": "JOB_FINISHED",
+      "blocker_code": null,
+      "through": "seal"
+    },
+    {
+      "ts_utc": "2026-09-05T15:10:00.582475+00:00",
+      "kind": "DERIVED",
+      "code": "NEEDS_CAUSAL_AUDIT",
+      "blocker_code": null
+    },
+    {
+      "ts_utc": "2026-09-05T15:10:01.211596+00:00",
+      "kind": "WORKER_LAUNCHED",
+      "session_type": "CAUSAL_AUDIT",
+      "task_id": "002_causal_audit_6b6cdc45"
+    },
+    {
+      "ts_utc": "2026-09-05T15:21:03.836261+00:00",
+      "kind": "AUDIT_INGESTED"
+    },
+    {
+      "ts_utc": "2026-09-05T15:21:03.836860+00:00",
+      "kind": "WORKER_FINISHED",
+      "session_type": "CAUSAL_AUDIT",
+      "task_id": "002_causal_audit_6b6cdc45"
+    },
+    {
+      "ts_utc": "2026-09-05T15:21:03.859257+00:00",
+      "kind": "DERIVED",
+      "code": "CONTROLLER_STEP",
+      "blocker_code": null
+    },
+    {
+      "ts_utc": "2026-09-05T15:21:03.862538+00:00",
+      "kind": "JOB_LAUNCHED",
+      "through": "seal"
+    },
+    {
+      "ts_utc": "2026-09-05T15:21:17.900798+00:00",
+      "kind": "JOB_FINISHED",
+      "blocker_code": null,
+      "through": "seal"
+    },
+    {
+      "ts_utc": "2026-09-05T15:21:17.917998+00:00",
+      "kind": "DERIVED",
+      "code": "NEEDS_CONTRACT_AUDIT",
+      "blocker_code": null
+    },
+    {
+      "ts_utc": "2026-09-05T15:21:18.501597+00:00",
+      "kind": "WORKER_LAUNCHED",
+      "session_type": "CONTRACT_AUDIT",
+      "task_id": "003_contract_audit_182864f7"
+    },
+    {
+      "ts_utc": "2026-09-05T15:28:21.006782+00:00",
+      "kind": "AUDIT_INGESTED"
+    },
+    {
+      "ts_utc": "2026-09-05T15:28:21.007849+00:00",
+      "kind": "WORKER_FINISHED",
+      "session_type": "CONTRACT_AUDIT",
+      "task_id": "003_contract_audit_182864f7"
+    },
+    {
+      "ts_utc": "2026-09-05T15:28:21.032486+00:00",
+      "kind": "DERIVED",
+      "code": "AUDIT_BLOCKER",
+      "blocker_code": "CONTRACT_BLOCKER"
+    },
+    {
+      "ts_utc": "2026-09-05T15:28:21.465270+00:00",
+      "kind": "WORKER_LAUNCHED",
+      "session_type": "DETERMINISTIC_REPAIR",
+      "task_id": "004_deterministic_repair_bc1f5061"
+    },
+    {
+      "ts_utc": "2026-09-05T15:31:23.668989+00:00",
+      "kind": "WORKER_FINISHED",
+      "session_type": "DETERMINISTIC_REPAIR",
+      "task_id": "004_deterministic_repair_bc1f5061"
+    },
+    {
+      "ts_utc": "2026-09-05T15:31:23.670496+00:00",
+      "kind": "USER_DECISION_REQUIRED",
+      "code": "SUPERVISOR_ESCALATION_REQUIRED"
+    },
+    {
+      "ts_utc": "2026-09-05T15:31:23.684604+00:00",
+      "kind": "DERIVED",
+      "code": "USER_DECISION_REQUIRED",
+      "blocker_code": "SUPERVISOR_ESCALATION_REQUIRED"
+    }
+  ],
+  "workers": [
+    {
+      "task_id": "001_study_design_compile_1cccb016",
+      "session_type": "STUDY_DESIGN_COMPILE",
+      "session_id": "94e73ffb-4fec-4c07-ba5d-bcb06413c9e9",
+      "read_only": false,
+      "role": "primary-owner",
+      "packet_bytes": 6614,
+      "source_commit": "a33b1460692f07f5631cb9efe911f009e34f52ab",
+      "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supv1_shape_a_flip_180s",
+      "started_at_utc": "2026-09-05T15:04:24.055954+00:00",
+      "finished_at_utc": "2026-09-05T15:08:58.233387+00:00",
+      "status": "DONE",
+      "reason": null,
+      "commits": [
+        "c49d8140ea82f3d76be678e75e9c15ed4b5f3574"
+      ],
+      "permission_denials": 0
+    },
+    {
+      "task_id": "002_causal_audit_6b6cdc45",
+      "session_type": "CAUSAL_AUDIT",
+      "session_id": "87df3093-d56e-482e-a9e6-1dd1eddf9890",
+      "read_only": true,
+      "role": "lookahead-auditor",
+      "packet_bytes": 7429,
+      "source_commit": "c49d8140ea82f3d76be678e75e9c15ed4b5f3574",
+      "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supv1_shape_a_flip_180s",
+      "started_at_utc": "2026-09-05T15:10:01.211596+00:00",
+      "finished_at_utc": "2026-09-05T15:21:03.836860+00:00",
+      "status": "DONE",
+      "reason": null,
+      "commits": [],
+      "permission_denials": 6
+    },
+    {
+      "task_id": "003_contract_audit_182864f7",
+      "session_type": "CONTRACT_AUDIT",
+      "session_id": "48f32a6e-6044-43b4-8986-8a1140bcf156",
+      "read_only": true,
+      "role": "contract-checker",
+      "packet_bytes": 7449,
+      "source_commit": "c49d8140ea82f3d76be678e75e9c15ed4b5f3574",
+      "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supv1_shape_a_flip_180s",
+      "started_at_utc": "2026-09-05T15:21:18.501597+00:00",
+      "finished_at_utc": "2026-09-05T15:28:21.007849+00:00",
+      "status": "DONE",
+      "reason": null,
+      "commits": [],
+      "permission_denials": 1
+    },
+    {
+      "task_id": "004_deterministic_repair_bc1f5061",
+      "session_type": "DETERMINISTIC_REPAIR",
+      "session_id": "2eb27f65-1ffe-4791-b4d7-0d201f0b8d52",
+      "read_only": false,
+      "role": "implementer",
+      "packet_bytes": 6593,
+      "source_commit": "c49d8140ea82f3d76be678e75e9c15ed4b5f3574",
+      "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supv1_shape_a_flip_180s",
+      "started_at_utc": "2026-09-05T15:28:21.465270+00:00",
+      "finished_at_utc": "2026-09-05T15:31:23.668989+00:00",
+      "status": "BLOCKED",
+      "reason": "PLATFORM_DEFECT",
+      "commits": [
+        "5f810cc41680e1d0806d5d45e0799866bec8040e"
+      ],
+      "permission_denials": 0
+    }
+  ],
+  "jobs": [
+    {
+      "through": "seal",
+      "pid": 16868,
+      "heavy": false,
+      "started": "2026-09-05T15:08:58.254717+00:00",
+      "finished": "2026-09-05T15:10:00.287524+00:00",
+      "blocker_code": null
+    },
+    {
+      "through": "seal",
+      "pid": 8140,
+      "heavy": false,
+      "started": "2026-09-05T15:21:03.862538+00:00",
+      "finished": "2026-09-05T15:21:17.900798+00:00",
+      "blocker_code": null
+    }
+  ],
+  "commit_surfaces": {
+    "c49d8140": {
+      "files": [
+        "studies/supv1_shape_a_flip_180s/SPEC.md",
+        "studies/supv1_shape_a_flip_180s/compiled_plan.json",
+        "studies/supv1_shape_a_flip_180s/research_decision.yaml",
+        "studies/supv1_shape_a_flip_180s/study.yaml"
+      ],
+      "confined_to_study": true
+    },
+    "5f810cc4": {
+      "files": [
+        "studies/supv1_shape_a_flip_180s/artifacts/experiment_authorization.json",
+        "studies/supv1_shape_a_flip_180s/audit/contract_pass_01.md",
+        "studies/supv1_shape_a_flip_180s/audit/contract_status.json",
+        "studies/supv1_shape_a_flip_180s/audit/frozen_execution_manifest.json",
+        "studies/supv1_shape_a_flip_180s/audit/pass_01.md",
+        "studies/supv1_shape_a_flip_180s/audit/preflight.json",
+        "studies/supv1_shape_a_flip_180s/audit/readiness.json",
+        "studies/supv1_shape_a_flip_180s/audit/status.json"
+      ],
+      "confined_to_study": true
+    }
+  },
+  "user_decisions": [
+    {
+      "code": "SUPERVISOR_ESCALATION_REQUIRED",
+      "raised_at_utc": "2026-09-05T15:31:23.669202+00:00",
+      "answered": false,
+      "card_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\supv1_shape_a_flip_180s\\results\\USER_DECISION_01.json",
+      "expected": "AUTHORIZATION_AMBIGUITY",
+      "actual": "SUPERVISOR_ESCALATION_REQUIRED",
+      "answered_by_this_audit": false,
+      "why_not": "the audit brief instructs stopping and reporting on any card other than AUTHORIZATION_AMBIGUITY"
+    }
+  ],
+  "retries": {
+    "attempts": {
+      "CAUSAL_AUDIT:a563bbf1bf954c6836e6af03b60afbfbebc1d150d84cab051930fe6ea747387a": 1,
+      "CONTRACT_AUDIT:a563bbf1bf954c6836e6af03b60afbfbebc1d150d84cab051930fe6ea747387a": 1,
+      "DETERMINISTIC_REPAIR:CONTRACT_BLOCKER:contract_audit": 1,
+      "JOB:seal": 0,
+      "STUDY_DESIGN_COMPILE:default": 1
+    },
+    "all_within_max_2": true,
+    "blocker_streak": 0,
+    "escalation_is_by_design": "research_workflow/supervisor/core.py:776-779 routes a BLOCKED/PLATFORM_DEFECT worker result straight to _escalate"
+  },
+  "counters": {
+    "jobs_launched": 2,
+    "max_packet_bytes": 7449,
+    "ticks": 43,
+    "user_interventions": 1,
+    "workers_launched": 4
+  },
+  "counters_vs_expected": {
+    "expected": {
+      "user_interventions": 1,
+      "workers_launched": 4,
+      "jobs_launched": 5
+    },
+    "actual": {
+      "user_interventions": 1,
+      "workers_launched": 4,
+      "jobs_launched": 2
+    },
+    "note": "worker 4 is a DETERMINISTIC_REPAIR, not the expected ANALYSIS_DECISION; the single user intervention is the escalation, not the authorization card; only 2 of the 5 expected jobs ran (seal, seal)"
+  },
+  "tests": {
+    "ran_from": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supv1_shape_a_flip_180s",
+    "scopes": [
+      "research_workflow/tests",
+      "scripts/tests"
+    ],
+    "ran": 2011,
+    "passed": 1942,
+    "failed": 69,
+    "status": "NEW_FAILURES",
+    "KNOWN_BASELINE": 57,
+    "ENVIRONMENTAL": 7,
+    "ENVIRONMENTAL_nodes": [
+      "research_workflow/tests/test_declarative_analysis.py::test_a_train_only_diagnostic_runs_compile_to_close_and_writes_its_declared_artifacts",
+      "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row",
+      "research_workflow/tests/test_redteam_packet_f.py::test_direct_lifecycle_collection_without_execute_raises",
+      "research_workflow/tests/test_redteam_packet_f.py::test_through_collection_without_the_flag_is_blocked",
+      "research_workflow/tests/test_redteam_packet_f.py::test_through_seal_without_the_flag_proceeds",
+      "research_workflow/tests/test_redteam_packet_f.py::test_through_smoke_with_the_flag_runs",
+      "research_workflow/tests/test_redteam_v2_model_authority.py::test_w1_freeze_records_model_canonical_sha256"
+    ],
+    "WORKTREE_DEPENDENCY": [
+      "research_workflow/tests/test_lifecycle_v2.py::test_controller_reports_typed_capability_gap",
+      "research_workflow/tests/test_lifecycle_v2.py::test_controller_runs_a_fresh_v2_study_end_to_end",
+      "research_workflow/tests/test_lifecycle_v2.py::test_second_controller_on_a_live_study_is_refused",
+      "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+      "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing"
+    ],
+    "WORKTREE_DEPENDENCY_proof": "all 5 pass when re-run once in the canonical checkout (5 passed in 97.33s)",
+    "WORKTREE_DEPENDENCY_note": "the 3 test_lifecycle_v2 nodes fail with STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT because the suite was run from inside a study worktree holding a live writer lease -- the lease system working, not a regression; the other 2 are the pair named in the audit brief",
+    "NEW_REGRESSION": [],
+    "UNCLASSIFIED": [],
+    "raw": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\supv1_audit\\test_delta.json"
+  },
+  "research": {
+    "exercised": false,
+    "reason": "the run never passed the pre-execution seal; no smoke, no partitions, no fit, no OOS scoring",
+    "smoke": null,
+    "train_2021": null,
+    "oos_2022": null,
+    "fit": null,
+    "metrics": null,
+    "frame_reconciliation": {
+      "missing": null,
+      "extra": null,
+      "duplicate": null,
+      "retimed": null,
+      "score_mismatch": null,
+      "label_mismatch": null
+    },
+    "explained_divergences": [],
+    "predicted_divergence_axis_not_tested": "the rerun compiles on session.kind=calendar (Globex authority) while the reference ran on session.kind=legacy; early-close sessions were the expected explained divergence"
+  },
+  "immutability": {
+    "files_rehashed": 26,
+    "changed_or_missing": 0,
+    "reference_worktree_head": "b72a9ae8c132befae35203a6dbbcb50e9d9d3086",
+    "reference_worktree_dirty": false,
+    "hashes_file": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\supv1_audit\\reference_hashes.json"
+  },
+  "deviations": [
+    {
+      "id": "DEV-01",
+      "what": "Supervisor V1 as landed at a33b1460 has no working autonomous loop: `_detach_loop` spawns `python scripts/research_supervisor.py loop --study <id>`, but every verb of that entrypoint is nested under the `supervise` argv group, so the detached process dies immediately with `argument group: invalid choice: 'loop' (choose from supervise)` (SystemExit 2). `supervise start` nonetheless returns STATUS OK with a `loop_pid`, so the supervisor reports healthy while never ticking.",
+      "where_observed": [
+        "research_workflow/supervisor/cli.py:31 (_detach_loop)",
+        "scripts/research_supervisor.py main() -- add_subparsers(dest='group'), only choice 'supervise'",
+        "affects supervise start, supervise resume and supervise decide (cli.py:50, :57, :66)"
+      ],
+      "evidence": {
+        "supervisor_log": "C:/Users/Scott McCarty/.nt_research/supervisor/supv1_shape_a_flip_180s/logs/supervisor.log",
+        "supervisor_log_content": "usage: research_supervisor [-h] {supervise} ...\nresearch_supervisor: error: argument group: invalid choice: 'loop' (choose from supervise)",
+        "state_after_start": "counters.ticks 0, workers_launched 0, derived_state null, 45s after start",
+        "events_after_start": "only kind=START",
+        "reproduction": "python scripts/research_supervisor.py loop --study supv1_shape_a_flip_180s --once -> same argparse error; python scripts/research_supervisor.py supervise loop --study supv1_shape_a_flip_180s --once -> STATUS OK, ticks 1, WORKER_LAUNCHED"
+      },
+      "severity": "CRITICAL_BLOCKING_AUTONOMY",
+      "class": "control_plane",
+      "fix_branch": "chore/supervisor-v1-fix-detached-loop-argv",
+      "fix_commit": "13d88591",
+      "fix_worktree": "C:/Users/Scott McCarty/Projects/Nautilus Trader-supervisor-v1-fix-detached-loop-argv",
+      "fix_scope": "one argv token in research_workflow/supervisor/cli.py:_detach_loop + research_workflow/tests/test_supervisor_detached_loop_argv.py (new regression test, passes on the fix, SystemExit 2 without it)",
+      "merged_to_main": false,
+      "chore_claim": "supervisor-v1-fix-detached-loop-argv (claude, session 1f2249bd-6fe4-48fe-b67f-c744a95e9ed3)",
+      "run_segment_boundary": {
+        "before_fix": [
+          "supervise start (detached loop died instantly; 0 ticks)",
+          "tick 1 driven MANUALLY in the foreground from the canonical checkout: `python scripts/research_supervisor.py supervise loop --study supv1_shape_a_flip_180s --once` -> DERIVED NO_SPEC -> WORKER_LAUNCHED 001_study_design_compile_1cccb016 (design worker, pid 18512, packet 6614 bytes)"
+        ],
+        "after_fix": "every subsequent tick is driven by the DETACHED loop process spawned from the chore worktree (fixed cli.py); all study/controller/git operations still use state.repo_root = the canonical checkout at a33b1460, so the platform code under test is unchanged apart from this one argv token"
+      }
+    },
+    {
+      "id": "DEV-02",
+      "class": "path_deviation",
+      "severity": "BLOCKING_THE_RUN",
+      "what": "The run never reached the expected AUTHORIZATION_AMBIGUITY card. The contract audit returned BLOCKED (critical 1) instead of CLEAR, the supervisor launched a bounded DETERMINISTIC_REPAIR worker, that worker correctly refused to make a platform change inside the study branch and exited BLOCKED/PLATFORM_DEFECT, and the supervisor raised SUPERVISOR_ESCALATION_REQUIRED. Per the audit brief ('raises a card other than the expected AUTHORIZATION_AMBIGUITY -> stop and report'), progression was stopped there; the escalation was NOT answered.",
+      "where_observed": "~/.nt_research/supervisor/supv1_shape_a_flip_180s/events.jsonl 15:28:21; results/USER_DECISION_01.json",
+      "evidence": {
+        "events_tail": "15:28:21 WORKER_FINISHED CONTRACT_AUDIT DONE -> 15:28:21 DERIVED AUDIT_BLOCKER/CONTRACT_BLOCKER -> 15:28:21 WORKER_LAUNCHED DETERMINISTIC_REPAIR -> 15:31:23 USER_DECISION_REQUIRED SUPERVISOR_ESCALATION_REQUIRED",
+        "logs": [
+          "~/.nt_research/supervisor/supv1_shape_a_flip_180s/logs/003_contract_audit_182864f7.log",
+          "~/.nt_research/supervisor/supv1_shape_a_flip_180s/logs/004_deterministic_repair_bc1f5061.log"
+        ],
+        "decision_card": "~/.nt_research/supervisor/supv1_shape_a_flip_180s/results/USER_DECISION_01.json"
+      },
+      "supervisor_behaviour_assessment": "CORRECT. research_workflow/supervisor/core.py:776-779 routes a BLOCKED/PLATFORM_DEFECT worker result straight to _escalate, and the repair packet (core.py:566-572) explicitly instructs the worker not to fix shared platform code in the study branch. Escalating after one repair attempt is the designed behaviour for this blocker class, not a retry-accounting bug. attempts values are all <= 2.",
+      "root_cause": "DEV-03",
+      "fix_branch": null
+    },
+    {
+      "id": "DEV-03",
+      "class": "platform_defect_inherited",
+      "severity": "CRITICAL_RESEARCH_INTEGRITY",
+      "what": "The frozen execution closure freezes the tracker binding shims but not the implementation modules they import, so the modules that define this study's LABEL EVENT and all 13 declared features are outside the freeze. Editing them changes every label and every feature while R9_closure_current, preflight EXECUTION_MANIFEST, the freeze and any seal written against it all still pass.",
+      "modules_omitted": [
+        "features/trackers/regime_dual_ema.py (DualEmaRegimeTracker; imported at features/trackers/host_bindings.py:104; defines regime_1m, hence the population anchor, the direction and the flip label event)",
+        "features/trackers/rolling_5m_productivity.py (imported at features/trackers/generic_rolling_productivity.py:9; all four rolling_300s_* features)",
+        "features/trackers/structural_regime_geometry.py (imported at features/trackers/generic_structural_geometry.py:12; all six prior_{1m,5m}_regime_* features)"
+      ],
+      "first_broken_stage": "compile / closure resolution, not contract_audit",
+      "code_evidence": [
+        "research_workflow/grammar/compiler.py:386 and :494 add only cls.__module__ / the canonical provider's module to ctx.closure_files",
+        "research_workflow/grammar/compiler.py:1235-1266 (_resolve_closure) hashes exactly stage_sets with no transitive first-party import walk"
+      ],
+      "independently_verified_by_auditor": true,
+      "verification_by_this_session": {
+        "new_study_manifest_hits_for_the_three_modules": 0,
+        "reference_study_manifest_hits_for_the_three_modules": 0,
+        "reference_manifest_file_count": 23,
+        "new_manifest_file_count": 45,
+        "imports_confirmed": "grep of host_bindings.py:104, generic_rolling_productivity.py:9, generic_structural_geometry.py:12"
+      },
+      "pre_existing": true,
+      "affects_the_sealed_reference": "YES. studies/v2_shape_a_flip_180s/audit/frozen_execution_manifest.json also omits all three modules, and that study's contract audit recorded verdict CLEAR with critical 0 -- i.e. the reference's own contract audit missed this. The reference's parity numbers are not invalidated by it; its FREEZE GUARANTEE is.",
+      "fix_branch": null,
+      "note": "Out of scope for this audit to fix: it is shared Platform V2 work needing its own chore/ branch and a fresh session (WORKFLOW.md M.3 / N.1). Recorded for the human."
+    },
+    {
+      "id": "DEV-04",
+      "class": "control_plane_friction",
+      "severity": "MINOR_BUT_TIMEOUT_RISK",
+      "what": "The read-only worker tool allowlist does not include the PowerShell tool, and its Bash entries are prefix-scoped, so a read-only auditor's attempts to run the MANDATED result-card command were denied. The causal auditor recorded 6 permission denials (5 of them the `python scripts/research.py study result ...` command issued through the PowerShell tool) before it got the card written; the contract auditor recorded 1 (a compound `cd ... && echo ...` Bash command).",
+      "where_observed": "research_workflow/supervisor/providers.py build_command, read_only branch: --allowedTools Read Grep Glob Write 'Bash(python scripts/research.py:*)' 'Bash(git status:*)' 'Bash(git log:*)' 'Bash(git diff:*)'; --disallowedTools Edit NotebookEdit",
+      "evidence": "permission_denials arrays in logs/002_causal_audit_6b6cdc45.log (6) and logs/003_contract_audit_182864f7.log (1); 0 in both write-capable workers' logs",
+      "impact": "Both auditors recovered and wrote DONE cards, so nothing failed. But on Windows the harness's primary shell tool is PowerShell, and the packet mandates a CLI call, so every read-only worker burns turns rediscovering that it must use Bash. A worker close to its wall-clock cap could hit WORKER_TIMEOUT for this reason alone.",
+      "side_effect_positive": "This is also the strongest available proof for evidence item (h): the auditors demonstrably ran under a restricted tool set and NOT under --dangerously-skip-permissions, while the design and repair workers ran with 0 denials.",
+      "fix_branch": null
+    },
+    {
+      "id": "DEV-05",
+      "class": "control_plane_design",
+      "severity": "MEDIUM_LATENT",
+      "what": "The supervisor launches the controller as `sys.executable <canonical repo>/scripts/run_governed_study.py --study <study worktree>/studies/<id>` with cwd = the study worktree. Because run_governed_study.py puts ITS OWN root (the canonical checkout) on sys.path, the platform modules that are loaded, executed and hashed into the execution closure come from `main`, while the study contract lives on the study branch in a different checkout. Nothing records or enforces that the two agree.",
+      "where_observed": "research_workflow/supervisor/core.py:656 (script path = self.repo_root) and :681 (cwd = self.worktree)",
+      "evidence": "The contract auditor read _work/controller/status.json while it recorded worktree {branch: main, head: a33b1460, path: <canonical>}; test_summary.json file paths were all under the canonical checkout. Independently confirmed in source. (The status.json now on disk records the study worktree because the repair worker re-ran the bounded check by hand from inside it.)",
+      "impact_this_run": "BENIGN. git diff a33b1460..c49d8140 touches only studies/supv1_shape_a_flip_180s/, so every closure file is byte-identical in both checkouts and composite a563bbf1... is valid for this study at this commit.",
+      "impact_general": "A study worktree that carried merged platform work main lacked would have current_composite() resolved from main's bytes and compared against a freeze also written from main's bytes: R9 and EXECUTION_MANIFEST would agree with each other and both would be wrong for the study. Remediation suggested by the contract auditor: record the resolving checkout's head in frozen_execution_manifest.json and fail readiness when it differs from the study worktree head.",
+      "fix_branch": null
+    }
+  ],
+  "leases_locks_final": {
+    "supv1_lease": "released (force-released by this audit session 1f2249bd-...; the holder was the supervisor's own session 311d415c-... whose loop process had exited)",
+    "supv1_lease_force_release_reason": "the supervisor loop that held it is dead and the study is parked on an unanswered escalation; releasing leaves the worktree claimable by whoever resumes",
+    "chore_claim": "supervisor-v1-fix-detached-loop-argv released",
+    "other_leases": [
+      {
+        "study_id": "controlled_feature_family_180s",
+        "state": "live",
+        "touched_by_this_audit": false
+      }
+    ],
+    "main_merge_lock": "absent",
+    "slot_files": "none under ~/.nt_research/locks/slots/*/",
+    "worktrees_left_in_place": [
+      "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supv1_shape_a_flip_180s",
+      "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-supervisor-v1-fix-detached-loop-argv"
+    ]
+  },
+  "evidence_checks": {
+    "a_study_yaml_verbatim": {
+      "result": "PASS",
+      "evidence": "diff vs studies/v2_shape_a_flip_180s/study.yaml -> line 5 only (study.id)"
+    },
+    "b_compile_surface": {
+      "result": "PASS",
+      "evidence": "compiled_plan.json: 7 feature instances / 13 declared feature columns, outcome contract=label kernel=flip, streams [nq_1s, nq_1m]; 0 differing leaves across features/trackers/chronology/model/population/columns/warmup/streams/triggers"
+    },
+    "c_workers_and_packets": {
+      "result": "PASS",
+      "evidence": "4 packets, max 7449 bytes (<12000), 4 distinct session ids, all bound to the study worktree; read_only true for both auditors and false for design+repair"
+    },
+    "d_lease_handoff": {
+      "result": "PASS",
+      "evidence": "during task 004 the lease owner_session_id was the worker session 2eb27f65-... with lease_handoff {from: 311d415c-... (supervisor), to: worker} and reclaimed_from the supervisor; after the worker finished the lease was back on 311d415c-..."
+    },
+    "e_read_only_enforcement": {
+      "result": "PASS",
+      "evidence": "audit/pass_01.md and audit/contract_pass_01.md are sha256-identical to results/002_*.report.md and results/003_*.report.md; no *.result.json anywhere under the study; auditor strings lookahead-auditor:002_... and contract-checker:003_...; audit_report_path recorded relative to the study"
+    },
+    "f_packet_binding": {
+      "result": "PASS",
+      "evidence": "validate_result(card, packet) -> (True, 'OK', None); with an in-memory source_commit mutation -> (False, 'STALE_WORKER_RESULT: source_commit mismatch ...', 'source_commit')"
+    },
+    "g_no_post_seal_artifacts": {
+      "result": "PASS (vacuously - the seal never completed)",
+      "evidence": "artifacts/ holds only experiment_authorization.json; no smoke_acceptance.json, no _work/controller/partitions/, no preexec_audit_seal.json; state.execute_authorized false; controller status.json STATUS=BLOCKED blocker_code=CONTRACT_BLOCKER"
+    },
+    "h_tool_permission_separation": {
+      "result": "PASS (stronger evidence than expected)",
+      "evidence": "all 4 logs are claude print-mode result JSON (type=result, subtype=success, is_error=false). permission_denials: causal auditor 6, contract auditor 1, design worker 0, repair worker 0 -- so the read-only workers demonstrably ran under a restricted tool set and NOT under --dangerously-skip-permissions, and the write-capable workers ran unrestricted.",
+      "static_corroboration": "providers.py build_command: read_only adds --allowedTools Read/Grep/Glob/Write/Bash(scoped) and --disallowedTools Edit,NotebookEdit; the write branch adds --dangerously-skip-permissions",
+      "stated_limitation": "the launch command itself is NOT persisted (LaunchHandle.command is dropped before state.json; active_worker carries no command key), so the flags cannot be read back from state - the permission_denials asymmetry is the behavioural substitute",
+      "see_also": "DEV-04"
+    }
+  },
+  "verdicts": {
+    "CONTROL_PLANE": "FAIL",
+    "CONTROL_PLANE_evidence": "DEV-01: the detached loop argv omits the 'supervise' group token, so the loop process of every start/resume/decide dies at argparse; counters.ticks stayed 0 after `supervise start`. Supervisor V1 at a33b1460 cannot run unattended at all on this machine. Everything downstream of that one token behaved correctly.",
+    "RESEARCH_PLANE": "FAIL",
+    "RESEARCH_PLANE_evidence": "NOT EXERCISED - the run stopped at SUPERVISOR_ESCALATION_REQUIRED before smoke, so no candidates, observations, fit or OOS scores exist to reconcile against studies/v2_shape_a_flip_180s. No reconciliation was performed and none is claimed.",
+    "SUPERVISOR_INFRA_READY": {
+      "value": "FALSE",
+      "evidence": "DEV-01 (loop cannot start); see logs/supervisor.log"
+    },
+    "REAL_WRITE_WORKER_PROVEN": {
+      "value": "TRUE",
+      "evidence": "workers 001 (STUDY_DESIGN_COMPILE) and 004 (DETERMINISTIC_REPAIR) were real headless claude processes that read a packet, wrote files, committed c49d8140 / 5f810cc4 confined to the study dir, and wrote result cards through `research study result`"
+    },
+    "REAL_CONTROLLER_PATH_PROVEN": {
+      "value": "PARTIAL",
+      "evidence": "2 detached run_governed_study.py jobs reached the pre-execution seal (JOB_LAUNCHED/JOB_FINISHED through=seal, heavy=false); no heavy --through analyze job ever launched, so the heavy-slot path and the real NT BacktestEngine collection path are unproven"
+    },
+    "RESTART_RESUME_PROVEN": {
+      "value": "PARTIAL",
+      "evidence": "`supervise resume` re-attached to worker 001, which had been launched by a different (foreground) process, polled it by pid + result-card presence and ingested its card correctly; the planned stop-during-heavy-job / controller-survives-loop-death test never ran because no heavy job launched"
+    },
+    "REFERENCE_STUDY_RECONCILED": {
+      "value": "FALSE",
+      "evidence": "no execution artifacts were produced; parity tools were never run"
+    },
+    "MAIN_SAFETY_PROVEN": {
+      "value": "TRUE",
+      "evidence": "main HEAD still a33b1460, `git status --porcelain --untracked-files=no` empty; both study commits confined to studies/supv1_shape_a_flip_180s/; the 26 hashed reference artifacts and both sealed V2 frames re-hash unchanged; the reference worktree is clean at b72a9ae8; the controlled_feature_family_180s lease was never touched; no main_merge.lock, no slot files"
+    },
+    "UNATTENDED_PRODUCTION_READY": {
+      "value": "FALSE",
+      "evidence": "fails on every clause: SUPERVISOR_INFRA_READY is FALSE, the single user intervention was an escalation rather than the intended authorization card, and deviations is non-empty (DEV-01 critical, DEV-03 critical platform)"
+    }
+  },
+  "what_remains_unproven": [
+    "the heavy-job path: --through analyze, the machine-wide heavy slot, and collection through host_runner.py / the NT BacktestEngine",
+    "stop/resume during a live controller job (loop dies, controller survives, no re-launch, counters.jobs_launched unchanged)",
+    "the AUTHORIZATION_AMBIGUITY card and `supervise decide --answer {execute_authorized: true}`",
+    "the ANALYSIS_DECISION worker, --through close, STUDY_CLOSED and the phase-D SESSION_HANDOFF",
+    "every research-plane number: smoke 1591/1591, TRAIN 2021 453768, OOS 2022 475529, dispositions, model_id, roc_auc/pr_auc/brier",
+    "whether the Globex-vs-legacy calendar change actually confines its effect to early-close sessions"
+  ]
+}
