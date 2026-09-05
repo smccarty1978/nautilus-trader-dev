@@ -119,7 +119,13 @@ the trading-floor calendar is refused. Bind new studies to `NQ_1S_V2_GLOBEX` / `
 (`NQ_1S_V2` / `ES_1S_V2` carry floor-calendar sessions and exist only for the closed proof studies) --
 see `docs/RESEARCH_WORKFLOW.md` §21.7.
 
+Research Supervisor (§O): `research_workflow/supervisor/` (state, derive, packets, providers, resources, core, cli),
+`scripts/research_supervisor.py` (thin entrypoint), `scripts/tests/test_supervisor_blackbox.py` (proof).
+
 ## D. A normal new study
+
+> Manual / debug path. The default way to run a study is the Research Supervisor (§O); use this section
+> when you drive the controller by hand or debug one stage.
 
 ```bash
 # 1. question -> workspace (branch study/<id>, worktree ../<repo>-<id>, lease, v2 skeleton)
@@ -591,6 +597,9 @@ The merged `studies/<id>/` on `main` is the study's persisted authority (closure
 
 ## N. Study session budget, phases and handoffs
 
+> These are the rules a human-driven or attended session follows. The Research Supervisor (§O) enforces
+> them mechanically: one fresh worker process per phase, no long-job polling, handoffs written by the loop.
+
 Two measured study sessions (2026-09-04) ran 4.5 h and 11 h, 735 and 773 assistant messages, and re-read
 ~390 M and ~356 M cached input tokens: each session accumulated ~500k tokens of context and re-read it on
 every one of hundreds of small tool calls. The rules below make sessions short, resumable and cheap.
@@ -708,3 +717,97 @@ concurrently. It is a claim registry, not a scheduler.
 - targeted tests while implementing; one broad relevant run before commit
 
 These are recommended limits for agents; the runtime enforces none of them.
+
+## O. Supervised research (default)
+
+The **Research Supervisor** (`research_workflow/supervisor/`, `python scripts/research.py supervise ...`) turns one
+research question into a chain of short, disposable AI worker sessions plus detached deterministic controller jobs.
+It is a thin, deterministic, file-state loop above the governed controller (§A): it never runs a lifecycle stage
+itself, never replaces or wraps `governed_controller_v2`, and holds no scientific state of its own.
+
+```bash
+python scripts/research.py supervise start --question question.md --study-id my_study --provider claude --execute-authorized
+python scripts/research.py supervise status my_study
+python scripts/research.py supervise list
+python scripts/research.py supervise providers
+python scripts/research.py supervise resume my_study
+python scripts/research.py supervise stop my_study
+python scripts/research.py supervise tick my_study
+python scripts/research.py supervise decide my_study --answer answer.json
+python scripts/research.py supervise adopt --study studies/my_study --execute-authorized
+```
+
+`start` runs `study new` under the supervisor's own writer identity (`<provider>` + a fresh session id), persists
+state under `~/.nt_research/supervisor/<id>/` (`state.json`, `events.jsonl`, `packets/`, `results/`, `logs/`, `pid`)
+and DETACHES the loop; the terminal returns at once. `--execute-authorized` is the only way post-seal stages ever run
+(forwarded to the controller, persisted per study); without it the supervisor stops at `READY_TO_SMOKE` with an
+`AUTHORIZATION_AMBIGUITY` card. `--provider` defaults to the shell's writer identity; ONE provider per supervisor run.
+`adopt` supervises an EXISTING study: its position is derived from artifacts, nothing is recreated or re-run, and a
+live writer lease held by another session makes it wait (`WAIT_STUDY_LEASE`) rather than take over.
+
+**State principle: derive, do not invent.** Every tick recomputes the study's position from artifacts -- closure,
+`CAPABILITY_GAP_HANDOFF.json`, `compiled_plan.json`, the controller's `_work/controller/status.json` (honoured only
+while its fingerprints still match `study.yaml` / `compiled_plan.json`), `run.lock`, `audit/*status.json` vs the frozen
+composite, `artifacts/analysis_decision.json`, the writer lease and git. The state file persists only attempt
+counters, active worker/job identity, task ids, timestamps and user-decision cards.
+
+| derived state | action (exactly one per tick) |
+|---|---|
+| `NO_SPEC` | fresh `STUDY_DESIGN_COMPILE` worker (phase A) |
+| `CAPABILITY_GAP` MISSING_CAPABILITY / UNSUPPORTED_COMPOSITION / UNAVAILABLE_STREAM | capability flow (below) |
+| `CAPABILITY_GAP` INVALID_PARAMETERIZATION | fresh design worker |
+| `CAPABILITY_GAP` AMBIGUOUS_TEMPORAL_SEMANTICS / SEMANTIC_DECISION_REQUIRED | design worker if `research_decision.yaml` names the decision, else a `SCIENTIFIC_SEMANTIC_DECISION_REQUIRED` card |
+| `COMPILED` / `CONTROLLER_STEP` | detached `run_governed_study.py --through seal` (no AI alive) |
+| `NEEDS_CAUSAL_AUDIT` / `NEEDS_CONTRACT_AUDIT` | fresh read-only auditor; its report is copied into `audit/pass_NN.md` / `contract_pass_NN.md` and ingested by the supervisor |
+| `DETERMINISTIC_BLOCKER` / `AUDIT_BLOCKER` | bounded `DETERMINISTIC_REPAIR` worker (2 attempts per blocker code) |
+| `READY_TO_EXECUTE` (sealed, authorized) | detached `--through analyze` job holding a heavy-job slot; no AI alive while it runs |
+| `EXECUTION_BLOCKER` | read-only `EXECUTION_TRIAGE` worker |
+| `READY_FOR_ANALYSIS` | fresh `ANALYSIS_DECISION` worker -> `artifacts/analysis_decision.json` -> detached `--through close` |
+| `STUDY_CLOSED` | terminal: phase-D `SESSION_HANDOFF`; merge to `main` per §M.6 (automatic only with `autonomy_decisions.closed_study_merge: auto_if_clean`) |
+| `RUNNING` / `WAIT_STUDY_LEASE` / `WAIT_CHORE` / `WAIT_MERGE_LOCK` / `WAIT_RESOURCE` | wait on a backoff; nothing is launched |
+
+**Workers** are fresh processes with a small pointer packet (`packets/<task_id>.md`: role, task, files to read,
+allowed write surface, stop conditions, result-card path, identity) -- never a conversation replay. Session types
+map to the canonical roles in `docs/AI_AGENTS.md` (`implementer`, `lookahead-auditor`, `contract-checker`,
+`analysis-decider`, `results-triager`, the primary-owner rules). Each write-capable worker gets its own
+`NT_RESEARCH_AGENT_SESSION`; the supervisor hands it the study's writer lease for the duration of the task and takes it
+back afterwards. Read-only auditors write nothing inside `studies/<id>/` (their report goes to the supervisor's
+`results/` dir and is copied in on ingest) and any mutation of the study worktree fails the worker. A worker MUST write
+`results/<task_id>.result.json` through `research study result --packet <packet> --status DONE|BLOCKED|FAILED ...`;
+its stdout is never parsed. Every packet carries `task_id, packet_sha256, study_id, study_contract_sha256,
+compiled_plan_sha256, source_commit, platform_commit, expected_branch, expected_worktree`; the card repeats them and any
+mismatch is `STALE_WORKER_RESULT` (never ingested; counts as a failed attempt). A worker past its wall-clock cap is
+killed (`WORKER_TIMEOUT`).
+
+**Capability flow** (the only place shared platform code is written): the design worker's compile writes the
+handoff and exits -> the supervisor runs `ws chore claim <topic>` (an overlapping live claim -> `WAIT_CHORE`, never a
+competitor) -> creates `chore/<topic>` from `main` -> launches a `CAPABILITY_IMPLEMENTATION` worker whose write surface
+is the claimed paths -> **merge gate**: result `DONE`, diff confined to the claimed surface, `test_delta` new
+failures 0, `cap generate --check` clean, chore worktree clean; merged `--no-ff` only if the study declares
+`autonomy_decisions.platform_merge: auto_if_green`, otherwise a `DESTRUCTIVE_ACTION_REQUIRES_APPROVAL` card
+(answer file `{"approve": true}`) -> release the claim, `git merge --no-ff main` into the study worktree,
+`CAPABILITY_COMPLETE` handoff, fresh design worker. A capability merged by hand while the supervisor was offline is
+detected from git. Every read-then-mutate of `main` holds `~/.nt_research/locks/main_merge.lock`.
+
+**Retry / escalation**: two attempts per repair, capability or worker task; a worker timeout gets one retry; the same
+blocker code after an independent repair, or any second failure of the same task, raises
+`SUPERVISOR_ESCALATION_REQUIRED` (answer `{"retry": true}` to reset the counters). User intervention exists ONLY for
+the typed codes `SCIENTIFIC_SEMANTIC_DECISION_REQUIRED`, `AUTHORIZATION_AMBIGUITY`, `PROTECTED_OOS_AUTHORIZATION_REQUIRED`,
+`DATA_SAFETY_RISK`, `CAUSAL_DEFINITION_AMBIGUOUS`, `RESEARCH_CONTRACT_CONFLICT`, `DESTRUCTIVE_ACTION_REQUIRES_APPROVAL`,
+`SUPERVISOR_ESCALATION_REQUIRED`; a scientific answer is stored in the study (`_work/handoff/USER_DECISION_NN.json`),
+never only in supervisor state. Deterministic bugs, test failures, stale freezes, audit regeneration, merges and
+long-job completion are never asked.
+
+**Multi-study and resources**: the loop ticks every study under `~/.nt_research/supervisor/`; a study waiting on a
+decision stops, the others continue. `max_workers` and `max_heavy_jobs` (default 2 each) are machine-wide O_EXCL slot
+files under `~/.nt_research/locks/slots/`; a dead holder's slot is reclaimable. A study worktree whose live lease
+belongs to another writer is never touched (`WAIT_STUDY_LEASE`). Decisions raise a Windows toast plus the status card.
+
+**Providers**: `supervise providers` probes each installed CLI (`--version`, `--help`) and records AVAILABLE /
+HEADLESS_SUPPORTED / WRITE_SUPPORTED / READ_ONLY_SUPPORTED / CLI_VERSION / probe sha256; only flags the installed
+binary prints are ever used, and a worker whose required capability is absent fails before launch with
+`PROVIDER_CAPABILITY_UNAVAILABLE`. `claude` (print mode), `codex` (`codex exec`) and `gemini` run headless;
+`antigravity` and `human` are ATTENDED: the supervisor writes `packets/<task_id>.INSTRUCTIONS.md`, prints it and waits
+for the result card. A human-attended session of any provider can act as a worker by following the same packet.
+The `scripted` provider exists for tests only (`research_workflow/tests/supervisor_support.py`;
+`scripts/tests/test_supervisor_blackbox.py` is the black-box proof).

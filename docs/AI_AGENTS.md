@@ -34,6 +34,24 @@ Rules:
 
 Roles that deliberately do not exist: a "study driver writer", a "collector author", a "manual OOS opener".
 
+## Supervisor workers (result-card contract)
+
+Under the Research Supervisor (`WORKFLOW.md` §O) every role above runs as a **fresh worker process** launched with a
+small pointer packet (`~/.nt_research/supervisor/<id>/packets/<task_id>.md`): exact role, task, files to read, allowed
+write surface, stop conditions, identity (`NT_RESEARCH_AGENT` / `NT_RESEARCH_AGENT_SESSION` are set per worker) and
+the result-card path. The worker does that one task and EXITS; it never continues into another role. It MUST write its
+result card through the CLI -- prose in stdout is never read:
+
+```bash
+python scripts/research.py study result --packet packet.md --status DONE --report report.md
+```
+
+Read-only auditors write their report to the path the packet names under the supervisor's `results/` dir, never under
+`studies/<id>/`; the supervisor copies it to `audit/pass_NN.md` / `contract_pass_NN.md` and ingests it. The packet and
+the card share binding fields (task id, packet hash, study contract hash, compiled-plan hash, source and platform
+commits, branch, worktree); a mismatch is `STALE_WORKER_RESULT`. A human-attended session of ANY provider (Claude,
+Codex, Gemini, Antigravity) can act as a worker by following the same packet and writing the same card.
+
 ## Starting a research project (every primary coding agent)
 
 1. Read `WORKFLOW.md`, then its §M **Concurrent research projects**.

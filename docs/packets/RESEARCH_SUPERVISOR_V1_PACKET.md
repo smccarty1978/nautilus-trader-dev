@@ -1,3 +1,6 @@
+> **[HISTORICAL]** Implemented on `chore/research-supervisor` (2026-09-05). The authoritative description is `WORKFLOW.md` §O;
+> this packet is kept as the design record and the FINAL CARD template.
+
 # RESEARCH SUPERVISOR V1 — implementation packet
 
 > Task packet for a fresh implementing session (any provider: Claude, Codex, Gemini, Antigravity).

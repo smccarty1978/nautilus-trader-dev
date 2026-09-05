@@ -2,7 +2,21 @@
 
 Full manual: `WORKFLOW.md`. Field reference: `docs/RESEARCH_YAML_REFERENCE.md`. Examples: `docs/examples/`.
 
-## 0. Prerequisites
+## 0. The normal flow: supervised (one prompt, no babysitting)
+
+```bash
+python scripts/research.py ws whoami --expect claude
+python scripts/research.py supervise start --question question.md --study-id my_study --execute-authorized
+python scripts/research.py supervise status my_study
+python scripts/research.py supervise decide my_study --answer answer.json
+```
+
+The supervisor (WORKFLOW.md §O) creates the study workspace, detaches its loop, and drives design -> compile ->
+capability chores -> audits -> sealed execution -> analysis -> closure with a fresh worker process per phase and
+NO AI session alive while a deterministic job runs. `decide` is needed only when `status` says
+`USER_DECISION_REQUIRED`. Steps 1-10 below are the manual / debug path.
+
+## 0b. Prerequisites
 
 * `~/.nt_research/config.yaml` with `catalog_roots`, `model_root`, `leases_dir`, `worktree_root`
   (`python scripts/research.py data roots` shows it).
