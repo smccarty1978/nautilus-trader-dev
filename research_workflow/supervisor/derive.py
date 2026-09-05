@@ -38,6 +38,16 @@ def study_dir_of(state: Dict[str, Any]) -> Path:
     return Path(state["study_worktree"]) / "studies" / state["study_id"]
 
 
+def _current_platform_composite(study: Path, worktree: Path) -> Optional[str]:
+    """The execution composite the CURRENT platform in ``worktree`` compiles the study to (None when it cannot compile,
+    e.g. a synthetic study without its bindings)."""
+    try:
+        from research_workflow.lifecycle_v2 import V2Lifecycle
+        return V2Lifecycle(study, repo_root=worktree).current_composite()
+    except Exception:
+        return None
+
+
 def _lease_for(worktree: Path) -> Optional[Dict[str, Any]]:
     try:
         from research_workflow.workspace import read_leases
@@ -130,6 +140,13 @@ def derive(state: Dict[str, Any], *, supervisor_identity: Dict[str, Any]) -> Dic
     if card.get("dry_run") or (spec_now and fp.get("study_spec") != spec_now) or fp.get("compiled_plan") != p_sha:
         out["through"] = "seal"
         return done("COMPILED", card_stale=True)
+    # DEV-06: after a platform merge into the study worktree the card's composite no longer matches what the platform
+    # compiles now; the controller must recompile/reseal (its stale-freeze path) before any audit or job is routed
+    platform_now = _current_platform_composite(study, wt)
+    recorded = fp.get("current_execution_composite")
+    if platform_now and recorded and platform_now != recorded:
+        out["through"] = "seal"
+        return done("COMPILED", card_stale=True, platform_changed={"recorded": recorded, "current": platform_now})
     cstate = str(card.get("state") or ""); blocked = card.get("STATUS") == "BLOCKED"; bc = str(card.get("blocker_code") or "")
     stage = str(card.get("stage") or "")
     if cstate == "STUDY_CLOSED":

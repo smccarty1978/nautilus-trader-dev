@@ -803,6 +803,13 @@ decision stops, the others continue. `max_workers` and `max_heavy_jobs` (default
 files under `~/.nt_research/locks/slots/`; a dead holder's slot is reclaimable. A study worktree whose live lease
 belongs to another writer is never touched (`WAIT_STUDY_LEASE`). Decisions raise a Windows toast plus the status card.
 
+**Hardening after the first real validation (2026-09-05)**: `start` / `resume` / `adopt` fail with `LOOP_DIED` (log tail
+included) when the detached loop does not survive its first seconds; the controller script always executes from the
+STUDY worktree (`<worktree>/scripts/run_governed_study.py`), never from the canonical checkout; a persisted controller card
+is treated as stale as soon as the platform in the study worktree compiles the study to a different execution composite
+(so a merged platform change forces recompile/reseal before any auditor is launched); the read-only worker allowlist covers
+both the Bash and the PowerShell tools.
+
 **Providers**: `supervise providers` probes each installed CLI (`--version`, `--help`) and records AVAILABLE /
 HEADLESS_SUPPORTED / WRITE_SUPPORTED / READ_ONLY_SUPPORTED / CLI_VERSION / probe sha256; only flags the installed
 binary prints are ever used, and a worker whose required capability is absent fails before launch with
