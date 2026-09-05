@@ -1,0 +1,98 @@
+{
+  "by_stratum": {
+    "regime_direction": {
+      "-1": {
+        "FAILED_WARNING_SCORE_COLLAPSE": 36,
+        "FAST_RESOLVER": 29,
+        "LATE_RESOLVER": 14,
+        "SESSION_CENSORED": 12,
+        "SLOW_RESOLVER": 24
+      },
+      "1": {
+        "FAILED_WARNING_SCORE_COLLAPSE": 45,
+        "FAST_RESOLVER": 27,
+        "LATE_RESOLVER": 16,
+        "SESSION_CENSORED": 17,
+        "SLOW_RESOLVER": 19
+      }
+    }
+  },
+  "counts": {
+    "FAILED_WARNING_SCORE_COLLAPSE": 81,
+    "FAST_RESOLVER": 56,
+    "LATE_RESOLVER": 30,
+    "SESSION_CENSORED": 29,
+    "SLOW_RESOLVER": 43
+  },
+  "n": 239,
+  "output_column": "warning_subtype",
+  "percent": {
+    "FAILED_WARNING_SCORE_COLLAPSE": 0.3389121338912134,
+    "FAST_RESOLVER": 0.23430962343096234,
+    "LATE_RESOLVER": 0.12552301255230125,
+    "SESSION_CENSORED": 0.12133891213389121,
+    "SLOW_RESOLVER": 0.1799163179916318
+  },
+  "precedence": [
+    "SESSION_CENSORED",
+    "SESSION_CENSORED",
+    "FAST_RESOLVER",
+    "LATE_RESOLVER",
+    "SLOW_RESOLVER",
+    "FAILED_WARNING_SCORE_COLLAPSE",
+    "FAILED_WARNING_PERSISTENT_HIGH",
+    "SESSION_CENSORED"
+  ],
+  "rule_matches": [
+    {
+      "label": "SESSION_CENSORED",
+      "matched": 28,
+      "rule_index": 0,
+      "would_have_matched": 28
+    },
+    {
+      "label": "SESSION_CENSORED",
+      "matched": 1,
+      "rule_index": 1,
+      "would_have_matched": 3
+    },
+    {
+      "label": "FAST_RESOLVER",
+      "matched": 56,
+      "rule_index": 2,
+      "would_have_matched": 64
+    },
+    {
+      "label": "LATE_RESOLVER",
+      "matched": 30,
+      "rule_index": 3,
+      "would_have_matched": 98
+    },
+    {
+      "label": "SLOW_RESOLVER",
+      "matched": 43,
+      "rule_index": 4,
+      "would_have_matched": 148
+    },
+    {
+      "label": "FAILED_WARNING_SCORE_COLLAPSE",
+      "matched": 81,
+      "rule_index": 5,
+      "would_have_matched": 233
+    },
+    {
+      "label": "FAILED_WARNING_PERSISTENT_HIGH",
+      "matched": 0,
+      "rule_index": 6,
+      "would_have_matched": 6
+    },
+    {
+      "label": "SESSION_CENSORED",
+      "matched": 0,
+      "rule_index": 7,
+      "would_have_matched": 239
+    }
+  ],
+  "schema_version": 1,
+  "unclassified": 0
+}

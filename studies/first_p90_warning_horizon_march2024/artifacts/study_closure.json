@@ -1,0 +1,15 @@
+{
+  "bound_evidence": {
+    "preexec_seal_artifact_sha256": "da1001532ac4c81d31be418cedf7600d8efc40ae1d577f617c294d606da248b7",
+    "preexec_seal_composite_sha256": "90e931a8f78f8ad56553f0ee8a59f7e4a877a1aac2224e5de266e0c093be2711",
+    "train_freeze_sha256": "3adc3be65555e9cf070019f0ea1a53710785e999aa5fc42e4b80061c365aec08"
+  },
+  "closed_at_utc": "2026-09-04T18:31:43.260162+00:00",
+  "outcome": "FIRST_P90_IS_AN_EARLY_WARNING_ZONE_NOT_AN_ENTRY_TRIGGER: 96.6% of the 175 warnings negative at the frozen 180s horizon flip before the RTH close (8.0% by 240s, 19.4% by 300s, 48.0% by 600s); only 3.4% never flip. But first P90 does not accelerate the flip -- against the like-for-like pre-anchor control the rates are indistinguishable (0.2700 vs 0.2658 at 180s), the pooled control result being a selection artifact of the predeclared latest-checkpoint rule. First-fire score magnitude carries no information (median 0.3023-0.3083 across all five subtypes); only the post-fire decay slope separates fast from slow resolvers, and true persistence occurs in 2.1% of warnings.",
+  "plan_sha256": "e4c2b81bbf9eda0c193c3ed0e75829d3370e6188e9b13751ebeb9b2b1e8a473e",
+  "platform": "v2",
+  "schema_version": 1,
+  "status": "CLOSED",
+  "study_id": "first_p90_warning_horizon_march2024",
+  "terminal_decision": "STUDY_CLOSED as a descriptive characterization. MODEL_CHANGED=NO, THRESHOLDS_CHANGED=NO, NEW_UNTOUCHED_OOS_CLAIM=NO, no Stage 2 built. The 180s label separates FAST flips from SLOW ones rather than true warnings from false ones, so a Stage-2 framed as 'classify P90 warning resolution quality' is NOT supported: 97.5% of warnings resolve, leaving almost no negative class, and the warning does not select regimes that turn sooner than comparable non-P90 states. The supported next question is a TIMING one -- given that a flip is coming, what predicts 3 minutes versus 17 -- with the first-120s decay slope as the one measured axis that separates them. That requires separate authorization."
+}
