@@ -219,3 +219,59 @@ validation_protocols:
     dependencies: [outcome.composite]
     update_cadence: offline_only
     required_tests: [research_workflow/tests/test_bare_flip_independent_parity.py]
+
+analysis_ops:
+  # Generic, study-agnostic post-collection operations consumed by the declarative
+  # `analysis:` section of study.yaml and executed by the v2 `analyze` stage. They read
+  # named columns off a study's own collected frame and take their science from declared
+  # parameters -- none of them knows what any particular study is about. They run AFTER
+  # collection and may read outcome columns; they are never a feature surface.
+  - id: analysis.anchor.first_threshold_crossing
+    version: 1
+    description: The first row per group whose declared per-arm value reaches its declared per-arm threshold, optionally restricted to an eligibility subset; at most one anchor per group.
+    implementation: research.analysis.diagnostic_ops.anchor_first_threshold_crossing
+    parameters: [by, group_by, order_by, eligible_column, eligible_when, inclusive, terminal]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.incidence.cumulative
+    version: 1
+    description: Right-censoring-aware cumulative and incremental event incidence over declared horizons, with an explicit per-horizon eligible-n and optional strata.
+    implementation: research.analysis.diagnostic_ops.cumulative_incidence
+    parameters: [horizons, resolved_column, duration_column, observed_seconds_column, strata, duration_unit, observed_unit]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.decomposition.buckets
+    version: 1
+    description: Mutually exclusive, declaration-ordered partition of a censored duration into declared buckets, reported against both an all-rows and a negative-at-N denominator.
+    implementation: research.analysis.diagnostic_ops.bucket_decomposition
+    parameters: [buckets, resolved_column, duration_column, observed_seconds_column, negative_after_seconds, terminal_column, strata]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.control.cell_matched
+    version: 1
+    description: Deterministic predeclared control selection -- at most one below-threshold row per group and stratum cell, strictly before the anchor where one exists; min-n reportability gate, no matching or weighting.
+    implementation: research.analysis.diagnostic_ops.cell_matched_controls
+    parameters: [anchors, by, group_by, strata, order_by, min_n, eligible_column, eligible_when, terminal]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.path.anchored_offsets
+    version: 1
+    description: The value path at declared offsets after an anchor bounded by its terminal, with delta, maximum, time-to-level, collapse and recross summaries; a missing required offset censors the path rather than being imputed.
+    implementation: research.analysis.diagnostic_ops.anchored_path
+    parameters: [anchors, by, group_by, order_by, offsets, max_offset_seconds, terminal_column, levels, time_unit]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.classify.precedence
+    version: 1
+    description: Ordered first-match-wins categorical labelling; declaration order is the precedence, so a dominating category is expressed by declaring it first.
+    implementation: research.analysis.diagnostic_ops.precedence_labels
+    parameters: [rules, output_column, strata]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.gate.population_parity
+    version: 1
+    description: STOP GATE - raises unless the population is identical to a frozen reference (declared sha256, total, per-stratum counts, exact key set, per-key instant); aborts the analyze stage before any artifact is written.
+    implementation: research.analysis.diagnostic_ops.population_parity_gate
+    parameters: [reference_path, reference_sha256, key, reference_key, expected_total, expected_by, timestamp_column, reference_timestamp_column, value_map]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]

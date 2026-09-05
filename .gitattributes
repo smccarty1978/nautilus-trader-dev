@@ -1,0 +1,15 @@
+# Preserved native model representations are byte-identity artifacts, not source text.
+#
+# LightGBM's native model format is line-oriented text. With no rule here, `core.autocrlf`
+# rewrites these files to CRLF on every Windows checkout, which (a) changes their bytes and so
+# breaks the recorded `native_booster_sha256` integrity check, and (b) makes them genuinely
+# UNPARSEABLE -- LightGBM reports "Model format error, expect a tree here" and its fatal handler
+# aborts the process rather than raising, so the corruption is invisible until something tries
+# to load one. `-text` disables end-of-line conversion entirely: the working tree gets exactly
+# the committed bytes.
+#
+# Scope is deliberately narrow. `*.golden.json` and other tracked model-adjacent JSON are NOT
+# listed: their recorded hashes were taken from their post-checkout bytes and verify correctly
+# today, so a rule here would break them. Only add a path below when its recorded hash is of the
+# committed bytes.
+*.booster.txt -text

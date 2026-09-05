@@ -1,7 +1,207 @@
 {
-  "content_sha256": "4e12232684f703775e7a5bae47f2c30a847c7aa3e0f2c5d4ad0b3ba46a19e99e",
-  "generated_at_utc": "2026-09-04T17:12:01.049391+00:00",
+  "content_sha256": "10865bc615b8257bfc5150dbb11529a395ea0e1276ae756dd49dda5764b1a314",
+  "generated_at_utc": "2026-09-05T00:17:59.737705+00:00",
   "kinds": {
+    "analysis_ops": [
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "The first row per group whose declared per-arm value reaches its declared per-arm threshold, optionally restricted to an eligibility subset; at most one anchor per group.",
+        "id": "analysis.anchor.first_threshold_crossing",
+        "implementation": "research.analysis.diagnostic_ops.anchor_first_threshold_crossing",
+        "implementation_note": "The FIRST row per group whose per-arm value reaches its per-arm threshold.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "anchor.first_threshold_crossing",
+        "parameters": [
+          "by",
+          "group_by",
+          "order_by",
+          "eligible_column",
+          "eligible_when",
+          "inclusive",
+          "terminal"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "Right-censoring-aware cumulative and incremental event incidence over declared horizons, with an explicit per-horizon eligible-n and optional strata.",
+        "id": "analysis.incidence.cumulative",
+        "implementation": "research.analysis.diagnostic_ops.cumulative_incidence",
+        "implementation_note": "Cumulative and incremental event incidence over declared horizons, censoring-aware.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "incidence.cumulative",
+        "parameters": [
+          "horizons",
+          "resolved_column",
+          "duration_column",
+          "observed_seconds_column",
+          "strata",
+          "duration_unit",
+          "observed_unit"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "Mutually exclusive, declaration-ordered partition of a censored duration into declared buckets, reported against both an all-rows and a negative-at-N denominator.",
+        "id": "analysis.decomposition.buckets",
+        "implementation": "research.analysis.diagnostic_ops.bucket_decomposition",
+        "implementation_note": "Partition a censored duration into declared, mutually exclusive buckets.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "decomposition.buckets",
+        "parameters": [
+          "buckets",
+          "resolved_column",
+          "duration_column",
+          "observed_seconds_column",
+          "negative_after_seconds",
+          "terminal_column",
+          "strata"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "Deterministic predeclared control selection -- at most one below-threshold row per group and stratum cell, strictly before the anchor where one exists; min-n reportability gate, no matching or weighting.",
+        "id": "analysis.control.cell_matched",
+        "implementation": "research.analysis.diagnostic_ops.cell_matched_controls",
+        "implementation_note": "At most one control row per (group x stratum cell), chosen without looking at outcomes.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "control.cell_matched",
+        "parameters": [
+          "anchors",
+          "by",
+          "group_by",
+          "strata",
+          "order_by",
+          "min_n",
+          "eligible_column",
+          "eligible_when",
+          "terminal"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "The value path at declared offsets after an anchor bounded by its terminal, with delta, maximum, time-to-level, collapse and recross summaries; a missing required offset censors the path rather than being imputed.",
+        "id": "analysis.path.anchored_offsets",
+        "implementation": "research.analysis.diagnostic_ops.anchored_path",
+        "implementation_note": "The value path at declared offsets after each anchor, bounded by the anchor's terminal.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "path.anchored_offsets",
+        "parameters": [
+          "anchors",
+          "by",
+          "group_by",
+          "order_by",
+          "offsets",
+          "max_offset_seconds",
+          "terminal_column",
+          "levels",
+          "time_unit"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "Ordered first-match-wins categorical labelling; declaration order is the precedence, so a dominating category is expressed by declaring it first.",
+        "id": "analysis.classify.precedence",
+        "implementation": "research.analysis.diagnostic_ops.precedence_labels",
+        "implementation_note": "Ordered, first-match-wins labelling. Declaration order IS the precedence.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "classify.precedence",
+        "parameters": [
+          "rules",
+          "output_column",
+          "strata"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "STOP GATE - raises unless the population is identical to a frozen reference (declared sha256, total, per-stratum counts, exact key set, per-key instant); aborts the analyze stage before any artifact is written.",
+        "id": "analysis.gate.population_parity",
+        "implementation": "research.analysis.diagnostic_ops.population_parity_gate",
+        "implementation_note": "RAISE unless this population is identical to a frozen reference population.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "gate.population_parity",
+        "parameters": [
+          "reference_path",
+          "reference_sha256",
+          "key",
+          "reference_key",
+          "expected_total",
+          "expected_by",
+          "timestamp_column",
+          "reference_timestamp_column",
+          "value_map"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      }
+    ],
     "datasets": [
       {
         "cost_class": "offline_only",
@@ -236,7 +436,8 @@
           "direction"
         ],
         "required_tests": [
-          "research_workflow/tests/test_redteam_v2_model_authority.py"
+          "research_workflow/tests/test_redteam_v2_model_authority.py",
+          "research_workflow/tests/test_train_provenance_attestation.py"
         ],
         "status": "verified",
         "subscribes": [],
@@ -3313,6 +3514,7 @@
           "features/tests/test_regime_dual_ema_parity.py",
           "research_workflow/tests/test_bare_flip_independent_parity.py",
           "research_workflow/tests/test_composite_target_expression.py",
+          "research_workflow/tests/test_declarative_analysis.py",
           "research_workflow/tests/test_golden_fixture.py",
           "research_workflow/tests/test_grammar_v2.py",
           "research_workflow/tests/test_multiple_derived_inputs.py",
@@ -3322,6 +3524,7 @@
           "research_workflow/tests/test_redteam_pass1_acceptance.py",
           "research_workflow/tests/test_redteam_pass2_acceptance.py",
           "research_workflow/tests/test_redteam_pass2_target_semantics.py",
+          "research_workflow/tests/test_session_end_truncate.py",
           "research_workflow/tests/test_single_primitive_ordered_barrier_regression.py",
           "research_workflow/tests/test_stage3_integration.py",
           "research_workflow/tests/test_target_runtime.py",
@@ -6301,6 +6504,10 @@
   },
   "schema_version": 1,
   "summary": {
+    "analysis_ops": {
+      "broken": 0,
+      "count": 7
+    },
     "datasets": {
       "broken": 0,
       "count": 7
@@ -6333,7 +6540,7 @@
       "broken": 0,
       "count": 21
     },
-    "total": 211,
+    "total": 218,
     "trackers": {
       "broken": 0,
       "count": 7

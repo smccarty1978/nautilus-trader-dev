@@ -40,6 +40,7 @@ class CompiledPlan:
     spec_sha256: str = ""
     registry_sha256: str = ""
     features: Optional[Dict[str, Any]] = None
+    analysis: Optional[Dict[str, Any]] = None
     notes: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
