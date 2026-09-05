@@ -1,0 +1,53 @@
+{
+  "anchors": 239,
+  "anchors_by_case": {
+    "-1": 115,
+    "1": 124
+  },
+  "eligibility_restricted": true,
+  "eligible_column": null,
+  "eligible_when": [
+    [
+      "running_mfe_atr",
+      "gte",
+      1.0
+    ],
+    [
+      "new_progress_windows",
+      "gte",
+      2
+    ],
+    [
+      "retained_mfe_ratio",
+      "gte",
+      0.5
+    ],
+    [
+      "regime_age_seconds",
+      "lte",
+      1800
+    ]
+  ],
+  "groups_eligible": 312,
+  "groups_total": 632,
+  "inclusive": true,
+  "observed_seconds": {
+    "max": 5420.0,
+    "median": 415.0,
+    "min": 15.0
+  },
+  "rows_eligible": 35872,
+  "rows_total": 79419,
+  "schema_version": 1,
+  "terminal": {
+    "columns": [
+      "resolved_at_ts"
+    ],
+    "reduce": "min",
+    "unit": "ns"
+  },
+  "thresholds_by_case": {
+    "-1": 0.2852887899663343,
+    "1": 0.28485631865861344
+  }
+}

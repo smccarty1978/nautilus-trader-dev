@@ -1,0 +1,33 @@
+{
+  "audit_ready": true,
+  "check_outcomes": {
+    "CAUSAL_INVARIANTS": "PASSED",
+    "CHRONOLOGY_ROLE_TABLE": "PASSED",
+    "ENTRY_REFERENCE_EXECUTABLE": "PASSED",
+    "EXECUTION_MANIFEST": "PASSED",
+    "FORWARD_OUTCOME_GUARD": "PASSED",
+    "PLAN_BOUND_TO_SPEC": "PASSED",
+    "PREDICATES_COMPILE": "PASSED",
+    "ZERO_STUDY_PYTHON": "PASSED"
+  },
+  "execution_composite_sha256": "ac9af444a809134bbea524b04c65d98f5a5f5d69a44871cda275acc820e01e57",
+  "generated_at_utc": "2026-09-04T18:06:40.434805+00:00",
+  "leaked_outcome_columns": [],
+  "plan_sha256": "b8ed0300fff041af52b21f9830f4542b5fb2a70742c4a1996d5761fdb2cdf32c",
+  "required_checks": [
+    "PLAN_BOUND_TO_SPEC",
+    "EXECUTION_MANIFEST",
+    "ENTRY_REFERENCE_EXECUTABLE",
+    "FORWARD_OUTCOME_GUARD",
+    "CHRONOLOGY_ROLE_TABLE",
+    "ZERO_STUDY_PYTHON",
+    "PREDICATES_COMPILE",
+    "CAUSAL_INVARIANTS"
+  ],
+  "schema_version": 2,
+  "status": "CLEAR",
+  "study_python": {
+    "exception": null,
+    "python_files": []
+  }
+}
