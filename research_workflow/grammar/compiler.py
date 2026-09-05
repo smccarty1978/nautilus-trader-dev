@@ -1009,7 +1009,8 @@ def _resolve_partition_windows(ctx: _Ctx, ch, train: set, dev: set, prohibited: 
     return resolved
 
 
-def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
+def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str, Any]] = None,
+                                  columns: Optional[Mapping[str, Any]] = None) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
     ch = ctx.spec.chronology
     train, dev, prohibited, diag = set(ch.train), set(ch.dev), set(ch.prohibited), set(ch.diagnostic)
     for a, b, na, nb in ((train, dev, "train", "dev"), (train, prohibited, "train", "prohibited"), (dev, prohibited, "dev", "prohibited")):
@@ -1040,6 +1041,56 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.models[{i}].id", "model id must be a model-store sha256")
             scored.append({"id": m.id, "label": m.label, "subset": dict(m.subset), "name": m.name or m.id[:12],
                            "expect": (m.expect.model_dump(exclude_none=True) if m.expect else {})})
+    # ---- arms / cells / reference models (train mode) ------------------------------------
+    arms: List[Dict[str, Any]] = []
+    cells: List[Dict[str, Any]] = []
+    references: List[Dict[str, Any]] = []
+    if model_spec.mode == "train":
+        from research_workflow.grammar.spec import ArmSpec as _ArmSpec
+
+        cols = columns or {}
+        declared_columns = set(cols.get("features") or ctx.feature_aliases) | set(cols.get("derived") or [])
+        bare = [a for a in model_spec.arms if not isinstance(a, _ArmSpec)]
+        if bare:
+            # The trap this refusal exists to close: `arms: [A, B, C]` was accepted, consumed
+            # by nothing, and silently trained ONE model on the union surface -- a wrong
+            # experiment that looked like the declared one. Never infer a surface for a named
+            # arm; make the author state it.
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "model.arms",
+                    f"arms {bare!r} are bare names. A bare arm list is informational and trains ONE model on the "
+                    f"whole feature surface. Declare each arm as {{id, features: [...], baseline: bool}}.")
+        for i, arm in enumerate(a for a in model_spec.arms if isinstance(a, _ArmSpec)):
+            unknown = [f for f in arm.features if f not in declared_columns]
+            if unknown:
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.arms[{i}].features",
+                        f"arm {arm.id!r} names features that are not in the study's declared surface: {unknown}",
+                        closest=_closest(unknown[0], sorted(declared_columns)))
+            arms.append({"id": arm.id, "features": list(arm.features), "params": dict(arm.params),
+                         "baseline": bool(arm.baseline)})
+        # columns["metadata"] entries are {"column", "ref"} records, not bare names.
+        meta_columns = ({m["column"] for m in (cols.get("metadata") or []) if isinstance(m, Mapping)}
+                        | {m for m in (cols.get("metadata") or []) if isinstance(m, str)}
+                        | set(cols.get("identity") or []) | declared_columns)
+        for i, cell in enumerate(model_spec.cells):
+            for col in cell.subset:
+                if col not in meta_columns:
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.cells[{i}].subset",
+                            f"cell {cell.id!r} filters on {col!r}, which the study does not emit",
+                            closest=_closest(col, sorted(meta_columns)))
+            cells.append({"id": cell.id, "subset": dict(cell.subset), "params": dict(cell.params)})
+        outcome = outcome_resolved or {}
+        known_labels = {outcome.get("label_column")} | {f"{a.get('prefix')}_label" for a in (outcome.get("arms") or [])}
+        known_labels.discard(None)
+        for i, m in enumerate(model_spec.reference_models):
+            if m.label not in known_labels:
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.reference_models[{i}].label",
+                        f"label {m.label!r} is not an outcome column of this study",
+                        closest=_closest(m.label, sorted(known_labels)))
+            if not re.fullmatch(r"[0-9a-f]{64}", m.id):
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.reference_models[{i}].id", "model id must be a model-store sha256")
+            references.append({"id": m.id, "label": m.label, "subset": dict(m.subset), "name": m.name or m.id[:12],
+                               "expect": (m.expect.model_dump(exclude_none=True) if m.expect else {})})
+
     validation = None
     if model_spec.validation is not None:
         v = model_spec.validation
@@ -1063,6 +1114,31 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
         validation = {"protocol": pid, "tuning_years": sorted(tuning), "final_train_validation_years": sorted(final),
                       "max_trials": v.max_trials, "random_seed": v.random_seed, "primary_metric": v.primary_metric,
                       "year_role_table": roles + [{"year": y, "role": "dev_oos"} for y in sorted(dev)] + [{"year": y, "role": "prohibited"} for y in sorted(prohibited)]}
+        if pid == "validation.walk_forward_months":
+            # The fold table is DERIVED AT COMPILE TIME and frozen into the plan, so the
+            # protocol that will run is auditable before a single row is read -- rather than
+            # emerging from a loop at fit time. Every fold's fit window strictly precedes its
+            # validation window, which is what makes "no future month in a fold's training
+            # set" a checkable property of the plan instead of a promise in prose.
+            year = int(v.fold_months_year)
+            if year not in train:
+                ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "model.validation.fold_months_year",
+                        f"{year} is not a declared TRAIN year; monthly folds may not walk across a dev or prohibited year")
+            months = [(year, m) for m in range(1, 13)]
+            folds, start = [], 0
+            while start + v.train_months + v.validate_months <= len(months):
+                fit_m = months[start:start + v.train_months]
+                val_m = months[start + v.train_months:start + v.train_months + v.validate_months]
+                folds.append({"fold": f"{year}-{val_m[0][1]:02d}",
+                              "fit_months": [f"{y}-{m:02d}" for y, m in fit_m],
+                              "validation_months": [f"{y}-{m:02d}" for y, m in val_m]})
+                start += v.step_months
+            if not folds:
+                ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "model.validation",
+                        f"train_months={v.train_months} + validate_months={v.validate_months} does not fit in one calendar year")
+            validation.update({"fold_months_year": year, "train_months": v.train_months,
+                               "validate_months": v.validate_months, "step_months": v.step_months,
+                               "month_folds": folds})
     search_space: Dict[str, Any] = {}
     if model_spec.search_space:
         if model_spec.mode != "train":
@@ -1080,8 +1156,10 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
                 search_space[name] = {"low": dom["low"], "high": dom["high"], "log": bool(dom.get("log", False)), "int": bool(dom.get("int", False))}
             else:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.search_space.{name}", "domain must be a non-empty list of choices or {low, high, log?, int?}")
-    return chronology, {"mode": model_spec.mode, "family": fam_id, "params": dict(model_spec.params), "arms": list(model_spec.arms), "validation": validation, "models": scored,
-                        "search_space": search_space}
+    return chronology, {"mode": model_spec.mode, "family": fam_id, "params": dict(model_spec.params),
+                        "arms": arms if arms else [a for a in model_spec.arms if isinstance(a, str)],
+                        "cells": cells, "reference_models": references,
+                        "validation": validation, "models": scored, "search_space": search_space}
 
 
 _SAFE_ARTIFACT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.(json|parquet|md)$")
@@ -1256,7 +1334,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
     triggers = _resolve_triggers(ctx)
     outcome = _resolve_outcome(ctx, population)
     columns = _resolve_columns(ctx, population, outcome)
-    chronology, model = _resolve_chronology_and_model(ctx, outcome)
+    chronology, model = _resolve_chronology_and_model(ctx, outcome, columns)
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
     warmup, availability = _resolve_warmup_and_availability(ctx)

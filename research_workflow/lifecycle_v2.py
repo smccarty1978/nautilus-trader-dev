@@ -773,6 +773,9 @@ class V2Lifecycle:
             return {"status": "PASS", "outputs": [str(path)]}
         if model.get("mode") == "score":
             return self._fit_score_mode(plan, model)
+        import numpy as np
+        import pandas as pd
+
         from research.analysis.metrics import brier, pr_auc, roc_auc
         from research.analysis.modeling import _build_estimator, frame_content_identity
         from research_workflow.forward_outcomes.guard import assert_causal_feature_surface
@@ -811,29 +814,196 @@ class V2Lifecycle:
                                              "target_contract_sha256": hashlib.sha256(json.dumps(plan["outcome"], sort_keys=True, default=str).encode()).hexdigest(),
                                              "feature_contract_sha256": hashlib.sha256(json.dumps(features).encode()).hexdigest(), "preprocessing_contract_sha256": "identity"})
             params = dict(tuning_report["selected"]["params"])
-        folds = []
-        for i, y in enumerate(sorted(tuning)):
-            if i == 0:
-                continue
-            fit_years = [t for t in sorted(tuning) if t < y]
-            est = _fit(binary[binary["_year"].isin(fit_years)])
-            folds.append({"fold": f"fold_{y}", "fit_years": fit_years, "validation_year": y, "metrics": _metrics(est, binary[binary["_year"] == y])})
-        final_est = _fit(binary[binary["_year"].isin(tuning)])
-        final_val = _metrics(final_est, binary[binary["_year"].isin(final_years)]) if final_years else None
-        lineage = ModelLineage(study_id=plan["study"]["id"], cell_id="primary", direction="both", target_arm=plan["outcome"].get("primary_arm") or plan["outcome"]["kernel"],
-                               fold_id="final", config_id="C00", seed=seed, ordered_inputs=features, feature_contract_sha256=hashlib.sha256(json.dumps(features).encode()).hexdigest(),
-                               preprocessing_contract_sha256="identity", target_contract_sha256=hashlib.sha256(json.dumps(plan["outcome"], sort_keys=True, default=str).encode()).hexdigest(),
-                               target_frame_identity=merge_identity, training_population_identity=merge_identity, train_years=sorted(tuning), validation_years=final_years,
-                               hyperparameters=params, family=family, closure_identities={"plan_closure": closure, "plan_sha256": plan["plan_sha256"]}, model_role="primary")
-        model_id = hashlib.sha256(json.dumps(lineage.__dict__, sort_keys=True, default=str).encode()).hexdigest()
-        metrics = {"folds": folds, "final_validation": final_val, "tuning": (None if tuning_report is None else {k: tuning_report[k] for k in ("ledger", "sampler", "n_trials", "selected")})}
-        manifest = store_model(model_id=model_id, estimator=final_est, lineage=lineage, tier="registry", selection_status="selected", metrics=metrics,
-                               golden_train_frame=binary[features], golden_rows=min(GOLDEN_MIN_ROWS, int(len(binary))), model_root=self.opts.model_root)
-        path = _write(self.artifacts / "experiment_models.json", {"schema_version": 2, "plan_sha256": plan["plan_sha256"], "family": family, "hyperparameters": params,
-                                                                   "features": features, "label_column": label, "rows": {"total": int(len(frame)), "binary": int(len(binary))},
-                                                                   "tuning_years": sorted(tuning), "final_train_validation_years": final_years, "metrics": metrics,
-                                                                   "model_id": model_id, "model_store_tier": manifest.get("tier"), "training_population_identity": merge_identity, "generated_at_utc": _now()})
+        # ---- arms x cells ---------------------------------------------------------------
+        # An arm is a feature architecture; a cell is a population slice with its own fixed
+        # hyperparameters. Each (arm, cell) is fit INDEPENDENTLY on the identical collected
+        # population, which is what makes the comparison paired. A study that declares neither
+        # keeps the historical single-model behaviour exactly.
+        arms = [a for a in (model.get("arms") or []) if isinstance(a, dict)] or [
+            {"id": "primary", "features": [], "params": {}, "baseline": True}]
+        cells = list(model.get("cells") or []) or [{"id": "all", "subset": {}, "params": {}}]
+        month_folds = list((validation or {}).get("month_folds") or [])
+        if month_folds:
+            ts = pd.to_datetime(binary["observation_ts"], unit="ns", utc=True)
+            binary["_month"] = ts.dt.year.astype(str) + "-" + ts.dt.month.map("{:02d}".format)
+
+        def _rows_for(cell):
+            rows = binary
+            for col, val in (cell.get("subset") or {}).items():
+                if col not in rows.columns:
+                    raise LifecycleV2Error(f"CELL_SUBSET_COLUMN_MISSING: cell {cell['id']!r} filters on {col!r}")
+                rows = rows[rows[col] == val]
+            return rows
+
+        def _fit_cfg(rows, cols, cfg):
+            est = _build_estimator(family, seed, cfg)
+            est.fit(rows[cols], rows[label].astype(int))
+            return est
+
+        def _metrics_cfg(est, rows, cols):
+            if rows.empty or rows[label].nunique() < 2:
+                return {"n": int(len(rows)), "positives": int(rows[label].sum()) if len(rows) else 0,
+                        "base_rate": None, "roc_auc": None, "pr_auc": None, "brier": None}
+            s = est.predict_proba(rows[cols])[:, 1]
+            base = float(rows[label].mean())
+            pr = pr_auc(rows[label], s).to_dict().get("value")
+            return {"n": int(len(rows)), "positives": int(rows[label].sum()), "base_rate": base,
+                    "roc_auc": roc_auc(rows[label], s).to_dict().get("value"), "pr_auc": pr,
+                    "pr_auc_over_base_rate": (pr / base if pr is not None and base else None),
+                    "brier": brier(rows[label], s).to_dict().get("value"),
+                    "unique_regimes": int(rows["regime_start_ns"].nunique()) if "regime_start_ns" in rows.columns else None}
+
+        trained: List[Dict[str, Any]] = []
+        for arm in arms:
+            arm_cols = [f for f in (arm.get("features") or features)]
+            missing = [c for c in arm_cols if c not in binary.columns]
+            if missing:
+                raise LifecycleV2Error(f"ARM_FEATURES_UNBOUND: arm {arm['id']!r} needs {missing}")
+            assert_causal_feature_surface(arm_cols, context=f"v2 fit arm {arm['id']}")
+            for cell in cells:
+                cfg = {**params, **(cell.get("params") or {}), **(arm.get("params") or {})}
+                cell_rows = _rows_for(cell)
+                folds: List[Dict[str, Any]] = []
+                if month_folds:
+                    for f in month_folds:
+                        fit_rows = cell_rows[cell_rows["_month"].isin(f["fit_months"])]
+                        val_rows = cell_rows[cell_rows["_month"].isin(f["validation_months"])]
+                        if fit_rows.empty or fit_rows[label].nunique() < 2:
+                            folds.append({"fold": f["fold"], **{k: f[k] for k in ("fit_months", "validation_months")},
+                                          "status": "SKIPPED_DEGENERATE_FIT_WINDOW", "metrics": None,
+                                          "train_rows": int(len(fit_rows)),
+                                          "train_unique_regimes": int(fit_rows["regime_start_ns"].nunique()) if "regime_start_ns" in fit_rows.columns else None})
+                            continue
+                        est = _fit_cfg(fit_rows, arm_cols, cfg)
+                        # TRAIN-derived thresholds: quantiles of the FIT window's own score
+                        # distribution, applied UNCHANGED to the validation window. Deriving
+                        # them from the validation rows would be the leak this exists to avoid.
+                        fit_scores = est.predict_proba(fit_rows[arm_cols])[:, 1]
+                        thresholds = {q: float(np.quantile(fit_scores, p)) for q, p in (("p90", 0.90), ("p95", 0.95))}
+                        m = _metrics_cfg(est, val_rows, arm_cols)
+                        diag = {}
+                        if not val_rows.empty:
+                            vs = est.predict_proba(val_rows[arm_cols])[:, 1]
+                            base = float(val_rows[label].mean()) if len(val_rows) else None
+                            for q, thr in thresholds.items():
+                                keep = vs >= thr
+                                sel = val_rows[keep]
+                                prec = float(sel[label].mean()) if len(sel) else None
+                                diag[q] = {"threshold": thr, "retained_fraction": float(keep.mean()),
+                                           "retained_n": int(keep.sum()), "precision": prec,
+                                           "precision_lift_vs_base_rate": (prec / base if prec is not None and base else None)}
+                        folds.append({"fold": f["fold"], **{k: f[k] for k in ("fit_months", "validation_months")},
+                                      "status": "OK", "train_rows": int(len(fit_rows)),
+                                      "train_unique_regimes": int(fit_rows["regime_start_ns"].nunique()) if "regime_start_ns" in fit_rows.columns else None,
+                                      "metrics": m, "train_derived_thresholds": diag})
+                else:
+                    for i, y in enumerate(sorted(tuning)):
+                        if i == 0:
+                            continue
+                        fit_years = [t for t in sorted(tuning) if t < y]
+                        est = _fit_cfg(cell_rows[cell_rows["_year"].isin(fit_years)], arm_cols, cfg)
+                        folds.append({"fold": f"fold_{y}", "fit_years": fit_years, "validation_year": y,
+                                      "status": "OK", "metrics": _metrics_cfg(est, cell_rows[cell_rows["_year"] == y], arm_cols)})
+                final_rows = cell_rows[cell_rows["_year"].isin(tuning)]
+                if final_rows.empty or final_rows[label].nunique() < 2:
+                    raise LifecycleV2Error(f"CELL_FINAL_FIT_DEGENERATE: arm {arm['id']!r} cell {cell['id']!r} has no fittable rows")
+                final_est = _fit_cfg(final_rows, arm_cols, cfg)
+                final_val = _metrics_cfg(final_est, cell_rows[cell_rows["_year"].isin(final_years)], arm_cols) if final_years else None
+                direction = next((str(v) for k, v in (cell.get("subset") or {}).items() if "direction" in k), "both")
+                lineage = ModelLineage(study_id=plan["study"]["id"], cell_id=cell["id"], direction=direction,
+                                       target_arm=arm["id"], fold_id="final", config_id="C00", seed=seed, ordered_inputs=arm_cols,
+                                       feature_contract_sha256=hashlib.sha256(json.dumps(arm_cols).encode()).hexdigest(),
+                                       preprocessing_contract_sha256="identity",
+                                       target_contract_sha256=hashlib.sha256(json.dumps(plan["outcome"], sort_keys=True, default=str).encode()).hexdigest(),
+                                       target_frame_identity=merge_identity, training_population_identity=merge_identity,
+                                       train_years=sorted(tuning), validation_years=final_years, hyperparameters=cfg, family=family,
+                                       closure_identities={"plan_closure": closure, "plan_sha256": plan["plan_sha256"]},
+                                       model_role=f"{arm['id']}:{cell['id']}")
+                mid = hashlib.sha256(json.dumps(lineage.__dict__, sort_keys=True, default=str).encode()).hexdigest()
+                cell_metrics = {"folds": folds, "final_validation": final_val,
+                                "tuning": (None if tuning_report is None else {k: tuning_report[k] for k in ("ledger", "sampler", "n_trials", "selected")})}
+                manifest = store_model(model_id=mid, estimator=final_est, lineage=lineage, tier="registry", selection_status="selected",
+                                       metrics=cell_metrics, golden_train_frame=final_rows[arm_cols],
+                                       golden_rows=min(GOLDEN_MIN_ROWS, int(len(final_rows))), model_root=self.opts.model_root)
+                trained.append({"arm": arm["id"], "cell": cell["id"], "baseline_arm": bool(arm.get("baseline")),
+                                "model_id": mid, "features": arm_cols, "n_features": len(arm_cols),
+                                "hyperparameters": cfg, "direction": direction,
+                                "final_fit_rows": int(len(final_rows)),
+                                "final_fit_unique_regimes": int(final_rows["regime_start_ns"].nunique()) if "regime_start_ns" in final_rows.columns else None,
+                                "model_store_tier": manifest.get("tier"), "metrics": cell_metrics})
+
+        paired = self._paired_arm_deltas(trained)
+        references = self._score_models(self._train_frame_all_labels(plan), model.get("reference_models") or []) if model.get("reference_models") else []
+        for r in references:
+            assert_causal_feature_surface(r["inputs"], context=f"reference model {r['name']} inputs")
+        single = trained[0] if len(trained) == 1 else None
+        body = {"schema_version": 3, "plan_sha256": plan["plan_sha256"], "family": family, "label_column": label,
+                "rows": {"total": int(len(frame)), "binary": int(len(binary))},
+                "tuning_years": sorted(tuning), "final_train_validation_years": final_years,
+                "fold_protocol": ("walk_forward_months" if month_folds else "expanding_years"),
+                "month_folds": month_folds, "models": trained, "paired_deltas_vs_baseline_arm": paired,
+                "reference_models": references, "new_models_trained": True,
+                "training_population_identity": merge_identity, "generated_at_utc": _now()}
+        if single is not None:
+            # One arm, one cell: keep the schema-2 keys the freeze/analyze stages already read.
+            body.update({"model_id": single["model_id"], "features": single["features"],
+                         "hyperparameters": single["hyperparameters"], "metrics": single["metrics"],
+                         "model_store_tier": single["model_store_tier"]})
+        path = _write(self.artifacts / "experiment_models.json", body)
         return {"status": "PASS", "outputs": [str(path)]}
+
+    @staticmethod
+    def _paired_arm_deltas(trained: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Per-cell, per-fold metric deltas of every arm against the baseline arm.
+
+        Paired on the IDENTICAL validation rows: same cell, same fold, same population. A
+        pooled comparison would let one strong fold carry an arm; these are reported fold by
+        fold with the sign counts, so a single-fold win is visible as one.
+        """
+        out: Dict[str, Any] = {}
+        by_cell: Dict[str, List[Dict[str, Any]]] = {}
+        for t in trained:
+            by_cell.setdefault(t["cell"], []).append(t)
+        for cell, entries in by_cell.items():
+            base = next((e for e in entries if e["baseline_arm"]), None)
+            if base is None or len(entries) < 2:
+                continue
+            base_folds = {f["fold"]: f for f in base["metrics"]["folds"]}
+            cell_out: Dict[str, Any] = {"baseline_arm": base["arm"], "arms": {}}
+            for e in entries:
+                if e["arm"] == base["arm"]:
+                    continue
+                rows, deltas = [], {k: [] for k in ("roc_auc", "pr_auc_over_base_rate", "brier")}
+                for f in e["metrics"]["folds"]:
+                    b = base_folds.get(f["fold"])
+                    if not b or not f.get("metrics") or not b.get("metrics"):
+                        continue
+                    if f["metrics"]["n"] != b["metrics"]["n"]:
+                        # Not paired: a delta over different rows is not a comparison.
+                        rows.append({"fold": f["fold"], "status": "UNPAIRED_ROW_COUNT_MISMATCH",
+                                     "arm_n": f["metrics"]["n"], "baseline_n": b["metrics"]["n"]})
+                        continue
+                    d = {}
+                    for k in deltas:
+                        av, bv = f["metrics"].get(k), b["metrics"].get(k)
+                        d[k] = (av - bv) if (av is not None and bv is not None) else None
+                        if d[k] is not None:
+                            deltas[k].append(d[k])
+                    rows.append({"fold": f["fold"], "status": "OK", "n": f["metrics"]["n"], "delta": d})
+                summary = {}
+                for k, vals in deltas.items():
+                    if not vals:
+                        summary[k] = None
+                        continue
+                    s = sorted(vals)
+                    n = len(s)
+                    summary[k] = {"n_folds": n, "mean": sum(s) / n, "median": s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2,
+                                  "p25": s[max(0, int(0.25 * (n - 1)))], "p75": s[min(n - 1, int(0.75 * (n - 1)))],
+                                  "best": s[-1], "worst": s[0],
+                                  "folds_positive": sum(1 for v in s if v > 0), "folds_negative": sum(1 for v in s if v < 0)}
+                cell_out["arms"][e["arm"]] = {"per_fold": rows, "summary": summary}
+            out[cell] = cell_out
+        return out
 
     def _train_frame_all_labels(self, plan: Dict[str, Any], base: Path | None = None, years: List[int] | None = None):
         """Candidates joined with every observation column (all arms), for frozen-model scoring."""
