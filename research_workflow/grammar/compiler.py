@@ -1209,8 +1209,16 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
         for name in sorted(required - set((step.inputs or {}))):
             ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs", f"{step.op} needs input {name!r}")
         seen.append(step.id)
+        if step.gate and step.rows != "frame":
+            # A gate runs before merge, on the reconciled candidate population itself. It
+            # cannot consume a prior step's output, because no prior step has run yet.
+            ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"analysis.steps[{step.id}].rows",
+                    f"a gate step reads the collected population directly; rows must be 'frame', not {step.rows!r}")
+        if step.gate and step.inputs:
+            ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"analysis.steps[{step.id}].inputs",
+                    "a gate step runs before any other analysis step and can have no step inputs")
         steps.append({"id": step.id, "op": step.op, "rows": step.rows, "inputs": dict(step.inputs or {}),
-                      "params": dict(step.params or {})})
+                      "params": dict(step.params or {}), "gate": bool(step.gate)})
     artifacts: List[Dict[str, Any]] = []
     names: Set[str] = set()
     for i, art in enumerate(spec.artifacts):

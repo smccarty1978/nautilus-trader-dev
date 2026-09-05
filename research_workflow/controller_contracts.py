@@ -19,6 +19,9 @@ class ControllerState(str, Enum):
     READY_TO_COLLECT = "READY_TO_COLLECT"
     COLLECTION_RUNNING = "COLLECTION_RUNNING"
     READY_TO_RECONCILE = "READY_TO_RECONCILE"
+    # Population parity is a PRE-FIT gate: it runs on the reconciled candidate population,
+    # before merge/fit, so a drifted population never reaches model fitting at all.
+    READY_TO_POPULATION_PARITY = "READY_TO_POPULATION_PARITY"
     READY_TO_MERGE = "READY_TO_MERGE"
     READY_TO_FIT = "READY_TO_FIT"
     READY_TO_FREEZE = "READY_TO_FREEZE"

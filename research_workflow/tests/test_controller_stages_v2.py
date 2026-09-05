@@ -41,7 +41,7 @@ def _controller(tmp_path: Path, *, closure_outcome: str | None = None):
         _write(s / "artifacts/study_closure.json", {"schema_version": 1, "study_id": s.name, "status": "CLOSED", "outcome": closure_outcome or "DIAGNOSTIC_NEGATIVE", "terminal_decision": "P5_NO_MEANINGFUL_SIGNAL"})
         return {"status": "PASS", "output_artifacts": [s / "artifacts/study_closure.json"]}
     actions = ControllerActions(compile=compile, prepare=prepare, readiness=readiness, tests=tests, preflight=preflight, seal=seal,
-                                smoke=mk("smoke"), collection=mk("collection"), reconcile=mk("reconcile"), merge=mk("merge"), fit=mk("fit"),
+                                smoke=mk("smoke"), collection=mk("collection"), reconcile=mk("reconcile"), population_parity=mk("population_parity"), merge=mk("merge"), fit=mk("fit"),
                                 freeze=mk("freeze"), oos=mk("oos"), analyze=mk("analyze"), close=close)
     actions.synthetic_test = True
     c = GovernedStudyController(study, actions=actions)
@@ -58,9 +58,11 @@ def _clear_audits(study: Path, composite: str):
 
 
 def test_stage_order_covers_the_whole_lifecycle():
+    # population_parity sits between reconcile and merge: a drifted population must not reach
+    # model fitting at all, so the gate runs before the merged frame is ever built.
     assert STAGE_ORDER == ("compile", "prepare", "readiness", "preflight", "tests", "causal_audit", "contract_audit", "seal",
-                           "smoke", "collection", "reconcile", "merge", "fit", "freeze", "oos", "analyze", "close")
-    assert set(RECEIPT_STAGES) == {"smoke", "collection", "reconcile", "merge", "fit", "freeze", "oos", "analyze", "close"}
+                           "smoke", "collection", "reconcile", "population_parity", "merge", "fit", "freeze", "oos", "analyze", "close")
+    assert set(RECEIPT_STAGES) == {"smoke", "collection", "reconcile", "population_parity", "merge", "fit", "freeze", "oos", "analyze", "close"}
 
 
 def test_all_late_stages_run_in_order_with_receipts_and_resume(tmp_path: Path):
@@ -69,8 +71,8 @@ def test_all_late_stages_run_in_order_with_receipts_and_resume(tmp_path: Path):
     calls.clear()
     card = c.run(through="analyze")
     assert card["state"] == ControllerState.READY_TO_CLOSE.value
-    assert calls == ["smoke", "collection", "reconcile", "merge", "fit", "freeze", "oos", "analyze"]
-    for stage in ("smoke", "collection", "reconcile", "merge", "fit", "freeze", "oos", "analyze"):
+    assert calls == ["smoke", "collection", "reconcile", "population_parity", "merge", "fit", "freeze", "oos", "analyze"]
+    for stage in ("smoke", "collection", "reconcile", "population_parity", "merge", "fit", "freeze", "oos", "analyze"):
         receipt = json.loads((study / "_work/controller/receipts" / f"{stage}.json").read_text())
         assert receipt["status"] == "PASS" and receipt["execution_composite_sha256"] == composite
     calls.clear(); c.run(through="analyze")
@@ -80,7 +82,8 @@ def test_all_late_stages_run_in_order_with_receipts_and_resume(tmp_path: Path):
 def test_stage_by_stage_states(tmp_path: Path):
     study, c, calls, composite = _controller(tmp_path)
     c.run(through="seal"); _clear_audits(study, composite); c.run(through="seal")
-    expect = {"smoke": ControllerState.READY_TO_COLLECT, "collection": ControllerState.READY_TO_RECONCILE, "reconcile": ControllerState.READY_TO_MERGE,
+    expect = {"smoke": ControllerState.READY_TO_COLLECT, "collection": ControllerState.READY_TO_RECONCILE, "reconcile": ControllerState.READY_TO_POPULATION_PARITY,
+              "population_parity": ControllerState.READY_TO_MERGE,
               "merge": ControllerState.READY_TO_FIT, "fit": ControllerState.READY_TO_FREEZE, "freeze": ControllerState.READY_TO_OOS,
               "oos": ControllerState.READY_TO_ANALYZE, "analyze": ControllerState.READY_TO_CLOSE, "close": ControllerState.STUDY_CLOSED}
     for stage, state in expect.items():

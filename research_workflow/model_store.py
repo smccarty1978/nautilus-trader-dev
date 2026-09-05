@@ -178,7 +178,22 @@ def load_canonical(manifest: Mapping[str, Any], model_dir: Path) -> _Scorer:
         m = CatBoostClassifier(); m.load_model(str(path))
         return _Scorer("sklearn", m, inputs)
     import joblib
-    return _Scorer("sklearn", joblib.load(path), inputs)
+    payload = joblib.load(path)
+    # A legacy joblib representation may be an ARM BUNDLE -- {arm: {estimator, ...}} -- rather
+    # than a bare estimator. Unwrapping here (instead of re-pickling the inner estimator at
+    # migration time) is what lets the stored canonical bytes stay BYTE-IDENTICAL to the bytes
+    # the committed legacy record hashes, which is the whole basis of its authentication.
+    # The arm is never guessed: it is recorded on the manifest at migration time.
+    arm = ((manifest.get("legacy_registry_record") or {}).get("canonical_bundle_arm")
+           or manifest["lineage"].get("target_arm"))
+    if isinstance(payload, Mapping):
+        if arm not in payload:
+            raise ModelStoreError(
+                f"CANONICAL_BUNDLE_ARM_ABSENT: canonical joblib is an arm bundle with keys "
+                f"{sorted(payload)} but the manifest names arm {arm!r}")
+        cell = payload[arm]
+        payload = cell["estimator"] if isinstance(cell, Mapping) and "estimator" in cell else cell
+    return _Scorer("sklearn", payload, inputs)
 
 
 def _load_export(fmt: str, path: Path, inputs: Sequence[str]) -> _Scorer:
@@ -309,7 +324,8 @@ def store_model(*, model_id: str, estimator: Any, lineage: ModelLineage, tier: s
                 metrics: Mapping[str, Any], golden_train_frame: Optional[pd.DataFrame], model_root: Optional[Path] = None,
                 scientific_status: str = "UNASSESSED", legacy_registry_record: Optional[Mapping[str, Any]] = None,
                 canonical_source_file: Optional[Path] = None, golden_rows: int = GOLDEN_MIN_ROWS,
-                identity_rule: str = "v2_lineage_sha256") -> Dict[str, Any]:
+                identity_rule: str = "v2_lineage_sha256",
+                canonical_format: Optional[str] = None) -> Dict[str, Any]:
     """Persist a model into the store (idempotent: identical model_id must reproduce identical canonical bytes).
 
     Same-ID concurrent writers never see a half-written directory and never lost-update each other:
@@ -337,11 +353,20 @@ def store_model(*, model_id: str, estimator: Any, lineage: ModelLineage, tier: s
         auth = family_authority(lineage.family)
         stage_manifest_path = stage_dir / "manifest.json"
         if canonical_source_file is not None:
+            # `canonical_format` exists because the family's DEFAULT representation is not
+            # always the one being persisted: a legacy record may name several representations
+            # and only some of them authenticate. Labelling a joblib as `lightgbm_text` because
+            # the family is lightgbm would make load_canonical parse it as a booster and make
+            # the legacy verifier compare it against the wrong recorded hash.
+            fmt = str(canonical_format or auth["canonical_format"])
+            spec = next((a for a in FAMILY_AUTHORITY.values() if a["canonical_format"] == fmt), None)
+            if spec is None:
+                raise ModelStoreError(f"CANONICAL_FORMAT_UNKNOWN: {fmt!r}")
             (stage_dir / "canonical").mkdir(parents=True, exist_ok=True)
-            dest = stage_dir / "canonical" / auth["file"]
+            dest = stage_dir / "canonical" / spec["file"]
             shutil.copyfile(canonical_source_file, dest)
-            canonical = {"format": auth["canonical_format"], "archival_safety": auth["archival_safety"], "path": dest.name,
-                         "byte_sha256": _sha(dest), "logical_sha256": _sha(dest) if auth["archival_safety"] == "portable" else None,
+            canonical = {"format": fmt, "archival_safety": spec["archival_safety"], "path": dest.name,
+                         "byte_sha256": _sha(dest), "logical_sha256": _sha(dest) if spec["archival_safety"] == "portable" else None,
                          "library_versions": _library_versions(), "source": str(canonical_source_file)}
         else:
             canonical = save_canonical(estimator, lineage.family, stage_dir / "canonical")

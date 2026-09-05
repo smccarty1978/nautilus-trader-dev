@@ -51,7 +51,7 @@ class V2StudyController(GovernedStudyController):
         self.lifecycle = lc
         actions = ControllerActions(
             compile=lc.compile, prepare=lc.prepare, readiness=lc.readiness, preflight=lc.preflight, tests=lc.tests, seal=lc.seal,
-            smoke=lc.smoke, collection=lc.collection, reconcile=lc.reconcile, merge=lc.merge, fit=lc.fit, freeze=lc.freeze,
+            smoke=lc.smoke, collection=lc.collection, reconcile=lc.reconcile, population_parity=lc.population_parity, merge=lc.merge, fit=lc.fit, freeze=lc.freeze,
             oos=lc.oos, analyze=lc.analyze, close=lc.close)
         # A v2 study owns its own directory: the CLI scaffolds it untracked and the lifecycle writes
         # compiled_plan.json / audit / artifacts / runs / _work under it. Everything else stays governed.

@@ -62,6 +62,63 @@ def _tier_for(record: Mapping[str, Any], selected: Mapping[str, int]) -> tuple[s
     return "ledger", "rejected"
 
 
+# A committed v1 registry record may name SEVERAL representations of the same estimator, each
+# with its own recorded hash. They do not necessarily all still verify: the 180s parent's native
+# boosters were re-exported after its records were written, so `native_booster_sha256` matches no
+# byte state that exists while `artifact_sha256` still matches the joblib exactly.
+#
+# Preference order is native-first (portable, archival) then the environment-bound pickle, but
+# preference is NOT authority: each representation is authenticated INDEPENDENTLY and the first
+# one that actually verifies is accepted. Forcing the preferred representation to be authoritative
+# even when its own recorded hash fails would either refuse a perfectly sound model or -- far
+# worse -- invite someone to "repair" the hash inside a closed study.
+_REPRESENTATIONS = (
+    ("native_booster", "native_booster_path", "native_booster_sha256", None),
+    ("joblib_artifact", "artifact_path", "artifact_sha256", "sklearn_pickle"),
+)
+
+
+def _select_verified_representation(rec: Mapping[str, Any], bytes_root: Path):
+    """Return (path, canonical_format, evidence) for the first representation that verifies.
+
+    Raises if a record names none, or if none of the ones it names authenticate. The evidence
+    records what was accepted AND what was rejected with expected-vs-observed hashes, so a
+    rejected representation is visible in the store rather than silently skipped.
+    """
+    considered: List[Dict[str, Any]] = []
+    accepted = None
+    for name, path_key, sha_key, fmt in _REPRESENTATIONS:
+        rel, declared = rec.get(path_key), rec.get(sha_key)
+        if not rel:
+            continue
+        path = Path(bytes_root) / rel
+        observed = ms._sha(path) if path.is_file() else None
+        entry = {"representation": name, "path": str(rel), "expected_sha256": declared,
+                 "observed_sha256": observed}
+        if observed is None:
+            entry.update(verified=False, reason="BYTES_MISSING")
+        elif not declared:
+            entry.update(verified=False, reason="NO_RECORDED_HASH")
+        elif observed != declared:
+            entry.update(verified=False, reason="RECORDED_HASH_MISMATCH")
+        else:
+            entry.update(verified=True, reason=None)
+        considered.append(entry)
+        if entry["verified"] and accepted is None:
+            accepted = (path, fmt, name)
+    if not considered:
+        raise ms.ModelStoreError("LEGACY_RECORD_NAMES_NO_REPRESENTATION")
+    if accepted is None:
+        detail = "; ".join(f"{c['representation']}={c['reason']}" for c in considered)
+        raise ms.ModelStoreError(f"LEGACY_NO_REPRESENTATION_VERIFIES: {detail}")
+    path, fmt, name = accepted
+    evidence = {"accepted_representation": name, "accepted_path": str(path.name),
+                "accepted_sha256": ms._sha(path), "accepted_canonical_format": fmt,
+                "representations_considered": considered,
+                "rejected": [c for c in considered if not c["verified"]]}
+    return path, fmt, evidence
+
+
 def migrate_legacy_records(*, study_id: str, registry_root: Path, bytes_root: Path, train_frame: Optional[pd.DataFrame],
                            model_root: Optional[Path] = None, selected: Optional[Mapping[str, int]] = None,
                            selected_ids: Iterable[str] = (), exports: Iterable[str] = ("joblib",), limit: Optional[int] = None) -> Dict[str, Any]:
@@ -79,18 +136,8 @@ def migrate_legacy_records(*, study_id: str, registry_root: Path, bytes_root: Pa
     for rec in records:
         mid = rec["model_id"]
         try:
-            native_rel = rec.get("native_booster_path")
-            joblib_rel = rec.get("artifact_path")
             fam = rec.get("model_family") or "lightgbm"
-            if native_rel:
-                src = bytes_root / native_rel
-                if not src.is_file() or ms._sha(src) != rec.get("native_booster_sha256"):
-                    raise ms.ModelStoreError("LEGACY_NATIVE_BYTES_MISSING_OR_CORRUPT")
-            else:
-                src = bytes_root / joblib_rel
-                if not src.is_file() or ms._sha(src) != rec.get("artifact_sha256"):
-                    raise ms.ModelStoreError("LEGACY_ARTIFACT_BYTES_MISSING_OR_CORRUPT")
-                fam = "sklearn" if fam not in ms.FAMILY_AUTHORITY else fam
+            src, canonical_format, authentication = _select_verified_representation(rec, bytes_root)
             tier, status = _tier_for(rec, selected)
             if mid in selected_ids:
                 tier, status = "registry", "selected"
@@ -107,13 +154,20 @@ def migrate_legacy_records(*, study_id: str, registry_root: Path, bytes_root: Pa
                 family=fam, fit_identity_sha256=None, closure_identities=dict(rec.get("closure_identities") or {}), model_role=rec.get("model_role"))
             existed = (ms.model_dir(mid, model_root) / "manifest.json").is_file()
             legacy = {k: rec.get(k) for k in ("artifact_path", "artifact_sha256", "golden_fixture_path", "golden_fixture_sha256", "native_booster_path", "native_booster_sha256", "scientific_status", "artifact_status", "reuse_status", "runtime_identity_sha256", "schema_version")}
+            # Which representation was accepted, and which were rejected and why. Persisted so
+            # a rejected representation is visible in the store instead of silently skipped.
+            legacy["representation_authentication"] = authentication
+            if authentication["accepted_representation"] == "joblib_artifact":
+                # The legacy joblib is an arm bundle; name the arm so load_canonical never guesses.
+                legacy["canonical_bundle_arm"] = parsed["arm"] or rec.get("model_role")
             # The v1 model_id was canonical_sha256({study_id, arm, fit_identity, closures}); the
             # migrated manifest does not retain the raw fit_identity input, so this store cannot
             # independently recompute it. Name the rule so authenticate_model fails closed
             # (MODEL_IDENTITY_UNVERIFIABLE) rather than silently trusting the copied id.
             manifest = ms.store_model(model_id=mid, estimator=None, lineage=lineage, tier=tier, selection_status=status, metrics={},
                                       golden_train_frame=train_frame, model_root=model_root, scientific_status=rec.get("scientific_status", "UNASSESSED"),
-                                      legacy_registry_record=legacy, canonical_source_file=src, identity_rule="legacy_v1_immutable_unrecomputable")
+                                      legacy_registry_record=legacy, canonical_source_file=src, identity_rule="legacy_v1_immutable_unrecomputable",
+                                      canonical_format=canonical_format)
             if existed:
                 report["already_present"] += 1
             else:

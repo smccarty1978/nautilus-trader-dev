@@ -349,6 +349,11 @@ class AnalysisStepSpec(_Strict):
     """One registered analysis operation over the study's own collected frame."""
     id: str
     op: str                                                # registered analysis_ops capability id
+    # A gate step runs at the PRE-FIT `population_parity` stage, on the reconciled candidate
+    # population, instead of at `analyze`. A parity requirement that only runs at analyze
+    # protects the final report but still lets a drifted population reach model fitting; a
+    # gate step stops the run before merge, so no model artifact is ever fit from it.
+    gate: bool = False
     rows: str = "frame"                                    # 'frame' (the collected study frame) or a prior step id
     inputs: Dict[str, str] = Field(default_factory=dict)   # extra frame inputs -> prior step id
     params: Dict[str, Any] = Field(default_factory=dict)

@@ -54,6 +54,7 @@ DELIVERABLES = {
     "smoke": ["artifacts/smoke_acceptance.json"],
     "collection": ["_work/controller/partitions/train/<year>/{candidates,observations}.parquet"],
     "reconcile": ["_work/controller/reconcile.json"],
+    "population_parity": ["_work/controller/population_parity.json"],
     "merge": ["_work/controller/merged/{candidates,observations}.parquet", "_work/controller/merged/identity.json"],
     "fit": ["artifacts/experiment_models.json"],
     "freeze": ["artifacts/train_experiment_freeze.json"],
@@ -732,6 +733,54 @@ class V2Lifecycle:
                                                     "generated_at_utc": _now()})
         if findings:
             raise LifecycleV2Error("RECONCILE_FAILED: " + "; ".join(findings))
+        return {"status": "PASS", "outputs": [str(path)]}
+
+    def population_parity(self, study: Path | None = None) -> Dict[str, Any]:
+        """PRE-FIT gate: run the study's gate-flagged analysis steps on the reconciled population.
+
+        Ordering is the point. Running a parity check at `analyze` protects the final report but
+        still lets a drifted population be collected, merged, fit, frozen and scored against OOS
+        first -- wasted compute, and model artifacts produced from the wrong rows. Here the gate
+        sits between `reconcile` and `merge`, so a parity failure means no merged frame, no fit,
+        no freeze and no OOS work happens at all.
+
+        Same engine as the declared `analysis:` pipeline (``research.analysis.diagnostic_ops``);
+        there is deliberately no second parity implementation to drift from the first.
+        """
+        self._require_execute("population_parity")
+        import pandas as pd
+
+        from research.analysis.diagnostic_ops import OP_CONTEXT, run_op
+        plan = load_plan(self.study)
+        gates = [s for s in ((plan.get("analysis") or {}).get("steps") or []) if s.get("gate")]
+        out = self.work / "population_parity.json"
+        if not gates:
+            return {"status": "PASS", "outputs": [str(_write(out, {
+                "status": "NO_GATE_DECLARED", "plan_sha256": plan["plan_sha256"], "generated_at_utc": _now()}))]}
+
+        years = self._authorized_years(plan, "train", self.opts.years)
+        base = self.work / "partitions" / "train"
+        frame = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years],
+                          ignore_index=True)
+        results = []
+        for step in gates:
+            context = {"studies_root": str(self.opts.studies_root or self.study.parent)} if step["op"] in OP_CONTEXT else None
+            try:
+                res = run_op(step["op"], frame, inputs={}, params=dict(step.get("params") or {}), context=context)
+            except Exception as exc:
+                payload = {"status": "FAIL", "step": step["id"], "op": step["op"],
+                           "error": f"{type(exc).__name__}: {exc}", "years": list(years),
+                           "population_rows": int(len(frame)), "plan_sha256": plan["plan_sha256"],
+                           "generated_at_utc": _now()}
+                _write(out, {"status": "BLOCKED", "gates": results + [payload], "plan_sha256": plan["plan_sha256"],
+                             "generated_at_utc": _now()})
+                raise LifecycleV2Error(
+                    f"POPULATION_PARITY_GATE_FAILED: {step['id']} ({step['op']}): {exc}") from exc
+            results.append({"status": "PASS", "step": step["id"], "op": step["op"], "payload": res["payload"]})
+        path = _write(out, {"status": "PASS", "gates": results, "years": list(years),
+                            "population_rows": int(len(frame)), "plan_sha256": plan["plan_sha256"],
+                            "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
+                            "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(path)]}
 
     def merge(self, study: Path | None = None) -> Dict[str, Any]:

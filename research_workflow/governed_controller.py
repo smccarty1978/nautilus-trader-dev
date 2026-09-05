@@ -19,20 +19,21 @@ from research_workflow.workflow_engine import WorkflowActions, WorkflowEngine, _
 
 
 STAGE_ORDER = ("compile", "prepare", "readiness", "preflight", "tests", "causal_audit", "contract_audit", "seal",
-               "smoke", "collection", "reconcile", "merge", "fit", "freeze", "oos", "analyze", "close")
+               "smoke", "collection", "reconcile", "population_parity", "merge", "fit", "freeze", "oos", "analyze", "close")
 # Stages whose freshness is a hash-bound receipt under _work/controller/receipts/<stage>.json.
-RECEIPT_STAGES = ("smoke", "collection", "reconcile", "merge", "fit", "freeze", "oos", "analyze", "close")
+RECEIPT_STAGES = ("smoke", "collection", "reconcile", "population_parity", "merge", "fit", "freeze", "oos", "analyze", "close")
 _STAGE_STATE = {"compile": ControllerState.NEEDS_COMPILE, "prepare": ControllerState.NEEDS_PREPARE,
                 "readiness": ControllerState.NEEDS_READINESS, "preflight": ControllerState.NEEDS_PREFLIGHT,
                 "tests": ControllerState.NEEDS_TESTS,
                 "causal_audit": ControllerState.NEEDS_CAUSAL_AUDIT, "contract_audit": ControllerState.NEEDS_CONTRACT_AUDIT,
                 "seal": ControllerState.READY_TO_SEAL, "smoke": ControllerState.READY_TO_SMOKE, "collection": ControllerState.READY_TO_COLLECT,
-                "reconcile": ControllerState.READY_TO_RECONCILE, "merge": ControllerState.READY_TO_MERGE, "fit": ControllerState.READY_TO_FIT,
+                "reconcile": ControllerState.READY_TO_RECONCILE, "population_parity": ControllerState.READY_TO_POPULATION_PARITY,
+                "merge": ControllerState.READY_TO_MERGE, "fit": ControllerState.READY_TO_FIT,
                 "freeze": ControllerState.READY_TO_FREEZE, "oos": ControllerState.READY_TO_OOS, "analyze": ControllerState.READY_TO_ANALYZE,
                 "close": ControllerState.READY_TO_CLOSE}
 # The state a fully fresh --through=<stage> run reports.
 _DONE_STATE = {"seal": ControllerState.READY_TO_SMOKE, "smoke": ControllerState.READY_TO_COLLECT, "collection": ControllerState.READY_TO_RECONCILE,
-               "reconcile": ControllerState.READY_TO_MERGE, "merge": ControllerState.READY_TO_FIT, "fit": ControllerState.READY_TO_FREEZE,
+               "reconcile": ControllerState.READY_TO_POPULATION_PARITY, "population_parity": ControllerState.READY_TO_MERGE, "merge": ControllerState.READY_TO_FIT, "fit": ControllerState.READY_TO_FREEZE,
                "freeze": ControllerState.READY_TO_OOS, "oos": ControllerState.READY_TO_ANALYZE, "analyze": ControllerState.READY_TO_CLOSE,
                "close": ControllerState.STUDY_CLOSED}
 
@@ -56,6 +57,7 @@ class ControllerActions:
     smoke: Callable[[Path], Any] | None = None
     collection: Callable[[Path], Any] | None = None
     reconcile: Callable[[Path], Any] | None = None
+    population_parity: Callable[[Path], Any] | None = None
     merge: Callable[[Path], Any] | None = None
     fit: Callable[[Path], Any] | None = None
     freeze: Callable[[Path], Any] | None = None
