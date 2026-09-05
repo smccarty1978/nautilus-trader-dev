@@ -65,6 +65,29 @@ def spawn_detached(command: List[str], *, cwd: Path, log_path: Path, env: Option
     return int(proc.pid)
 
 
+def kill_pid(pid: int) -> bool:
+    """Kill exactly ONE process (DEV-07): `supervise stop` ends the loop and must leave the detached controller job and
+    any worker -- which the loop spawned and which are therefore its children -- running to completion."""
+    if not pid_alive(pid):
+        return False
+    try:
+        import psutil  # type: ignore
+        p = psutil.Process(pid)
+        p.kill()
+        p.wait(timeout=5)
+        return True
+    except Exception:
+        pass
+    try:
+        if sys.platform.startswith("win"):
+            subprocess.run(["taskkill", "/PID", str(pid), "/F"], capture_output=True)   # no /T: never the tree
+        else:
+            os.kill(pid, 9)
+        return True
+    except Exception:
+        return False
+
+
 def kill_tree(pid: int) -> bool:
     """Kill ``pid`` and its descendants (WORKER_TIMEOUT / stop). Returns whether anything was signalled."""
     if not pid_alive(pid):
@@ -92,4 +115,4 @@ def kill_tree(pid: int) -> bool:
         return False
 
 
-__all__ = ["pid_alive", "spawn_detached", "kill_tree"]
+__all__ = ["pid_alive", "spawn_detached", "kill_tree", "kill_pid"]
