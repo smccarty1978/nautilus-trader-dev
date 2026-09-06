@@ -101,6 +101,29 @@ def _write(path: Path, data: Mapping[str, Any]) -> Path:
     return path
 
 
+def _model_record_name(m: Mapping[str, Any]) -> str:
+    """Stable key for one model record, across both shapes it is written in.
+
+    Score mode writes ``name``; a multi-arm/multi-cell TRAIN fit writes ``arm``/``cell`` and no
+    ``name`` (the model's own lineage calls that pair ``model_role``). freeze and oos key
+    ``model_hashes`` / ``model_canonical_sha256`` by this name, so the two stages MUST derive it
+    the same way or the freeze's canonical sha is unfindable at OOS.
+    """
+    if m.get("name"):
+        return str(m["name"])
+    if m.get("arm") or m.get("cell"):
+        return f"{m.get('arm') or 'primary'}:{m.get('cell') or 'all'}"
+    raise LifecycleV2Error(f"MODEL_RECORD_UNNAMED: model record has neither 'name' nor 'arm'/'cell': {sorted(m)}")
+
+
+def _model_record_id(m: Mapping[str, Any]) -> str:
+    """The model-store id of one record: score mode writes ``id``, a TRAIN fit writes ``model_id``."""
+    mid = m.get("id") or m.get("model_id")
+    if not mid:
+        raise LifecycleV2Error(f"MODEL_RECORD_UNIDENTIFIED: model record has neither 'id' nor 'model_id': {sorted(m)}")
+    return str(mid)
+
+
 def spec_sha256(study: Path) -> Optional[str]:
     p = Path(study) / "study.yaml"
     if not p.is_file():
@@ -927,6 +950,10 @@ class V2Lifecycle:
                                        golden_rows=min(GOLDEN_MIN_ROWS, int(len(final_rows))), model_root=self.opts.model_root)
                 trained.append({"arm": arm["id"], "cell": cell["id"], "baseline_arm": bool(arm.get("baseline")),
                                 "model_id": mid, "features": arm_cols, "n_features": len(arm_cols),
+                                # The cell's own population filter travels WITH the record: OOS must score
+                                # each frozen cell on the identical slice it was fit on, and re-deriving that
+                                # from the plan at OOS time would let a recompiled plan silently re-slice it.
+                                "subset": dict(cell.get("subset") or {}),
                                 "hyperparameters": cfg, "direction": direction,
                                 "final_fit_rows": int(len(final_rows)),
                                 "final_fit_unique_regimes": int(final_rows["regime_start_ns"].nunique()) if "regime_start_ns" in final_rows.columns else None,
@@ -1099,14 +1126,28 @@ class V2Lifecycle:
             from research_workflow.model_store import read_manifest as _read_manifest
             manifest = _read_manifest(models["model_id"], self.opts.model_root)
             model_canonical_sha256 = {"primary": manifest.get("canonical", {}).get("byte_sha256")}
-        else:
+        elif models.get("mode") == "score":
             model_canonical_sha256 = {
                 m["name"]: (m.get("model_authentication") or {}).get("canonical_sha256") for m in models.get("models") or []
             }
+        else:
+            # A multi-arm/multi-cell TRAIN fit: every (arm, cell) is its own stored model with its own
+            # id, and the record carries no inline authentication block. Bind to the model store's
+            # canonical BYTES exactly as the single-model branch does. Writing a null sha here instead
+            # would leave a freeze that authenticates nothing while still reading as PASS.
+            from research_workflow.model_store import read_manifest as _read_manifest
+            model_canonical_sha256 = {}
+            for m in models.get("models") or []:
+                csha = (_read_manifest(_model_record_id(m), self.opts.model_root).get("canonical") or {}).get("byte_sha256")
+                if not csha:
+                    raise LifecycleV2Error(
+                        f"FREEZE_CANONICAL_SHA_MISSING: model '{_model_record_name(m)}' has no canonical byte sha in the model store")
+                model_canonical_sha256[_model_record_name(m)] = csha
         payload = {"partition": "train", "platform": "v2", "plan_sha256": plan["plan_sha256"],
                    "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
                    "feature_sets": {"primary": list(plan["columns"]["features"])}, "preprocessing_hash": "identity",
-                   "model_hashes": ({"primary": models["model_id"]} if models.get("model_id") else {m["name"]: m["id"] for m in models.get("models") or []}),
+                   "model_hashes": ({"primary": models["model_id"]} if models.get("model_id")
+                                    else {_model_record_name(m): _model_record_id(m) for m in models.get("models") or []}),
                    "model_canonical_sha256": model_canonical_sha256,
                    "thresholds": {}, "deciles": {}, "new_models_trained": bool(models.get("model_id")),
                    "merge_identity": ident, "metrics": models.get("metrics"), "label_column": plan["outcome"].get("label_column")}
@@ -1252,6 +1293,29 @@ class V2Lifecycle:
                                       "pr_auc": pr_auc(binary[label], s).to_dict().get("value"), "brier": brier(binary[label], s).to_dict().get("value")}
             summary["train_metrics"] = models.get("metrics")
             summary["model_authentication"] = {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}
+        elif models.get("models"):
+            # A multi-arm/multi-cell frozen fit. Score every trained cell on its OWN declared subset,
+            # each bound to the canonical bytes the TRAIN freeze committed to (WARN-1), so a post-freeze
+            # estimator substitution cannot re-authenticate under the unchanged model_id. Without this
+            # branch the stage fell through every case and wrote an analysis carrying no OOS metric at
+            # all -- a deliverable that reads as PASS while vouching for nothing.
+            bound_models = []
+            for m in models["models"]:
+                nm = _model_record_name(m)
+                csha = freeze_canonical.get(nm)
+                if not csha:
+                    raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: model '{nm}' has no TRAIN freeze canonical sha")
+                bound_models.append({"name": nm, "id": _model_record_id(m), "subset": dict(m.get("subset") or {}),
+                                     "label": label, "expect": {"study_id": plan["study"]["id"], "canonical_sha256": csha}})
+            summary["frozen_models_oos"] = self._score_models(self._train_frame_all_labels(plan, base, [int(y) for y in years]), bound_models)
+            summary["train_metrics"] = [{"name": _model_record_name(m), "id": _model_record_id(m),
+                                         "direction": m.get("direction"), "subset": dict(m.get("subset") or {}),
+                                         "metrics": m.get("metrics")} for m in models["models"]]
+        elif models:
+            # An experiment_models.json that exists but matches no scorable shape must fail loudly:
+            # falling through silently is what produced an OOS deliverable with no metrics.
+            raise LifecycleV2Error(
+                f"OOS_MODEL_RECORDS_UNRECOGNISED: experiment_models.json (mode={models.get('mode')!r}) carries no scorable models")
         analyze_name = Path(DELIVERABLES["analyze"][0]).name
         path = _write(self.artifacts / analyze_name, {"schema_version": 2, "contract": plan["outcome"]["contract"], "plan_sha256": plan["plan_sha256"],
                                                                         "oos_years": list(years), "authority": "plan.chronology.dev", **summary, "generated_at_utc": _now()})
