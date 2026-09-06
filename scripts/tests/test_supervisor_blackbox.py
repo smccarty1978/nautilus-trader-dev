@@ -55,9 +55,10 @@ def _wait_pid(pid: int, timeout_s: float) -> None:
         time.sleep(0.2)
 
 
-def drive(study_id: str, *, max_ticks: int = 200, timeout_s: float = 900.0, restart_each_tick: bool = False, stop_when=None):
+def drive(study_id: str, *, max_ticks: int = 200, timeout_s: float = 900.0, restart_each_tick: bool = False, stop_when=None, stop_before_wait=None):
     """Tick until terminal / user decision; between ticks wait for the active process (a test must never poll an AI, but
-    it may wait on a pid). Records the invariant 'no AI alive while a deterministic job runs'."""
+    it may wait on a pid). Records the invariant 'no AI alive while a deterministic job runs'. ``stop_before_wait`` is
+    evaluated right after the tick, BEFORE waiting on the launched process (to interpose while a job/worker is live)."""
     from research_workflow.supervisor.core import Supervisor
     stats = {"ai_alive_during_job": 0, "ticks": 0, "actions": []}
     sup = Supervisor(study_id)
@@ -67,6 +68,8 @@ def drive(study_id: str, *, max_ticks: int = 200, timeout_s: float = 900.0, rest
             sup = Supervisor(study_id)   # a fresh process would do exactly this: reload state, re-derive
         card = sup.tick(); stats["ticks"] += 1; stats["actions"].append(card["action"])
         st = sup.state
+        if stop_before_wait and stop_before_wait(sup):
+            break
         if st.get("active_job"):
             if st.get("active_worker"):
                 stats["ai_alive_during_job"] += 1
@@ -321,3 +324,176 @@ def test_resource_slots_are_machine_wide_and_dead_pid_slots_are_reclaimed(sandbo
 def _events(sid: str):
     from research_workflow.supervisor.state import read_events
     return read_events(sid)
+
+
+def _job_launches(sid: str, through: str) -> int:
+    return sum(1 for e in _events(sid) if e["kind"] == "JOB_LAUNCHED" and e.get("through") == through)
+
+
+# ---------------------------------------------------------------------------- the defects the first real validation found (2026-09-05)
+def _detach_real_loop(sid: str):
+    """The REAL detached loop (`scripts/research_supervisor.py supervise loop --study <id>`, DEV-01 argv) from this repository,
+    ticking the sandbox study through the machine-local home the fixture exported."""
+    from research_workflow.supervisor.cli import _detach_loop
+    out = _detach_loop(ROOT, sid, grace_s=3.0)
+    assert out["loop_alive"] is True and "blocker_code" not in out, out
+    assert out["command"][2:4] == ["supervise", "loop"], out["command"]
+    return int(out["loop_pid"])
+
+
+def _wait_until(pred, timeout_s: float, what: str) -> None:
+    t0 = time.time()
+    while not pred():
+        if time.time() - t0 > timeout_s:
+            raise AssertionError(f"timed out waiting for {what}")
+        time.sleep(0.25)
+
+
+def test_detached_loop_argv_ticks_and_stop_kills_only_the_loop(sandbox):
+    """DEV-01 / DEV-01b / DEV-07 black-box: the argv `supervise start` detaches parses and the loop TICKS (a dead loop with
+    STATUS OK was the first defect); `supervise stop` ends the loop process only -- the worker it spawned survives and its
+    card is consumed on resume without a relaunch."""
+    from research_workflow.supervisor.core import Supervisor
+    from research_workflow.supervisor.procs import pid_alive
+    sup = _start(sandbox, plan={"worker_sleep_s": 6.0}, study_id="sup_loop")
+    sid = sup.study_id
+    loop_pid = _detach_real_loop(sid)
+    try:
+        _wait_until(lambda: (Supervisor(sid).state.get("active_worker") or {}).get("pid"), 60, "the detached loop to launch the design worker")
+        st = Supervisor(sid).state
+        assert st["counters"]["ticks"] >= 1 and st["counters"]["workers_launched"] == 1
+        worker_pid = int(st["active_worker"]["pid"])
+        assert pid_alive(worker_pid), "the scripted worker (sleeping 6s) must still be running"
+        out = Supervisor(sid).stop()
+        assert out["loop_killed"] is True and out["worker_pid"] == worker_pid and out["worker_alive"] is True
+        _wait_until(lambda: not pid_alive(loop_pid), 10, "the loop process to die")
+        assert pid_alive(worker_pid), "`supervise stop` must not kill the worker the loop spawned (DEV-07)"
+        _wait_pid(worker_pid, 120)                                # the worker completes its card while no supervisor is alive
+        s2 = Supervisor(sid); card = s2.resume()                  # resume = reconcile: the completed card is consumed, nothing relaunched
+        hist = s2.state["worker_history"]
+        assert hist[-1]["task_id"] == st["active_worker"]["task_id"] and hist[-1]["status"] == "DONE"
+        assert s2.state["counters"]["workers_launched"] == 1 and card["action"] == "JOB_LAUNCHED" and card["through"] == "seal"
+        _wait_pid(int(s2.state["active_job"]["pid"]), 600)
+    finally:
+        from research_workflow.supervisor.procs import kill_pid
+        kill_pid(loop_pid)
+
+
+def test_stop_during_analyze_job_survives_and_resume_reconciles_without_rerun(sandbox):
+    """DEV-07 + resume reconciliation black-box on the REAL detached loop and the REAL controller: the loop launches the
+    heavy analyze job; `supervise stop` kills the loop only; the job runs to completion with no supervisor alive; a fresh
+    loop reconciles the completed card and never launches analyze again; the study closes."""
+    from research_workflow.supervisor.core import Supervisor
+    from research_workflow.supervisor.procs import pid_alive
+    sup = _start(sandbox, plan={}, study_id="sup_stopjob")
+    sid = sup.study_id
+    # drive in-process to the sealed, authorized state; stop right after the analyze job is launched (do not wait on it)
+    sup, stats = drive(sid, stop_before_wait=lambda s: (s.state.get("active_job") or {}).get("through") == "analyze")
+    job = sup.state["active_job"]; assert job and job["through"] == "analyze" and job["heavy"] is True
+    job_pid = int(job["pid"]); assert pid_alive(job_pid)
+    ticks_before = int(sup.state["counters"]["ticks"])
+    loop_pid = _detach_real_loop(sid)                            # a real loop now babysits the job (WAITING_JOB ticks)
+    try:
+        _wait_until(lambda: int(Supervisor(sid).state["counters"]["ticks"]) > ticks_before, 60, "the detached loop to tick")
+        out = Supervisor(sid).stop()
+        assert out["loop_killed"] is True and out["job_pid"] == job_pid and out["job_alive"] is True
+        _wait_until(lambda: not pid_alive(loop_pid), 10, "the loop to die")
+        assert pid_alive(job_pid), "the detached analyze job must survive `supervise stop` (DEV-07)"
+        assert Supervisor(sid).state["stopped"] is True and Supervisor(sid).tick()["action"] == "STOPPED"   # a stopped supervisor launches nothing
+        _wait_pid(job_pid, 900)                                   # the controller finishes with NO supervisor and NO AI alive
+        launches_before = _job_launches(sid, "analyze")
+        s2 = Supervisor(sid); card = s2.resume()                  # what the CLI's `supervise resume` loop does on its first tick
+        fin = [e for e in _events(sid) if e["kind"] == "JOB_FINISHED" and e.get("through") == "analyze"]
+        assert fin and fin[-1]["fresh_card"] is True and fin[-1]["state"] == "READY_TO_CLOSE", fin
+        assert _job_launches(sid, "analyze") == launches_before == 1, "resume must reconcile the completed job, never relaunch it"
+        assert card["action"] == "WORKER_LAUNCHED" and card["session_type"] == "ANALYSIS_DECISION"
+    finally:
+        from research_workflow.supervisor.procs import kill_pid
+        kill_pid(loop_pid)
+    sup, stats2 = drive(sid)
+    assert sup.state["terminal"] and sup.state["derived_state"] == "STUDY_CLOSED"
+    assert _job_launches(sid, "analyze") == 1 and _job_launches(sid, "close") == 1
+    assert stats["ai_alive_during_job"] == 0 and stats2["ai_alive_during_job"] == 0
+
+
+def test_rejected_closure_is_never_terminal_and_close_validates_before_persisting(sandbox):
+    """DEV-08 / DEV-09 black-box on the real controller: an analysis decision outside the declared vocabulary never reaches
+    close (RESEARCH_CONTRACT_CONFLICT); the controller's close REFUSES to persist an undeclared closure; a stray invalid
+    closure on disk is never terminal and is recovered once the decision is admissible."""
+    from research_workflow.supervisor.core import Supervisor
+    from research_workflow.study_closure import load_study_closure
+    sup = _start(sandbox, plan={"declare_vocab": True, "undeclared_decision": True}, study_id="sup_closure")
+    sid = sup.study_id
+    sup, _ = drive(sid)
+    st = sup.state
+    study = Path(st["study_worktree"]) / "studies" / sid
+    assert "PLATFORM_V2_FLOW_PROVEN" in (study / "research_decision.yaml").read_text(encoding="utf-8")
+    assert st["user_intervention_required"] and st["user_decision"]["code"] == "RESEARCH_CONTRACT_CONFLICT", (st["derived_state"], st.get("user_decision"))
+    assert _job_launches(sid, "close") == 0 and not (study / "artifacts" / "study_closure.json").exists() and not st.get("terminal")
+    # the controller itself validates BEFORE persisting: an undeclared decision leaves no closure behind (DEV-08)
+    cmd = [str(t).replace("{study}", str(study)).replace("{through}", "close") for t in SUP.controller_command()]
+    r = subprocess.run([*cmd, "--execute-authorized", "--closure-outcome", "X", "--closure-decision", "NOT_IN_THE_DECLARED_VOCABULARY"],
+                       cwd=str(st["study_worktree"]), capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+    last = json.loads(r.stdout.strip().splitlines()[-1])
+    assert last["STATUS"] == "BLOCKED" and not (study / "artifacts" / "study_closure.json").exists(), (last, r.stderr[-800:])
+    # a stray INVALID closure (what a pre-DEV-08 close left behind) is never terminal
+    (study / "artifacts" / "study_closure.json").write_text(json.dumps({"schema_version": 1, "study_id": sid, "status": "CLOSED", "outcome": "X",
+                                                                        "terminal_decision": "NOT_IN_THE_DECLARED_VOCABULARY", "platform": "v2", "plan_sha256": "p",
+                                                                        "closed_at_utc": "t", "bound_evidence": {}}), encoding="utf-8")
+    Supervisor(sid).decide({"acknowledged": True})
+    s2 = Supervisor(sid); card = s2.tick()
+    assert s2.state["derived_state"] == "CLOSURE_INVALID" and card["action"] == "USER_DECISION_REQUIRED" and s2.state["user_decision"]["code"] == "RESEARCH_CONTRACT_CONFLICT"
+    assert not s2.state.get("terminal") and (study / "artifacts" / "study_closure.json").exists()
+    # the decision is corrected on the study branch (declared label); the supervisor removes the rejected closure and re-runs close ONCE
+    dec_path = study / "artifacts" / "analysis_decision.json"
+    dec = json.loads(dec_path.read_text(encoding="utf-8")); dec["terminal_decision"] = "PLATFORM_V2_FLOW_PROVEN"
+    dec_path.write_text(json.dumps(dec, indent=2) + "\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=str(st["study_worktree"]), check=True); subprocess.run(["git", "commit", "-q", "-m", "fix decision"], cwd=str(st["study_worktree"]), check=True)
+    Supervisor(sid).decide({"acknowledged": True})
+    sup, _ = drive(sid)
+    assert sup.state["terminal"] and sup.state["derived_state"] == "STUDY_CLOSED"
+    assert any(e["kind"] == "INVALID_CLOSURE_REMOVED" for e in _events(sid)) and _job_launches(sid, "close") == 1
+    assert load_study_closure(study)["terminal_decision"] == "PLATFORM_V2_FLOW_PROVEN"
+
+
+@pytest.mark.parametrize("mode", ["spec", "platform"])
+def test_stale_controller_card_forces_reseal_never_an_audit(sandbox, monkeypatch, mode):
+    """DEV-06 black-box: a controller card whose fingerprints no longer match the study spec (`spec`) or whose recorded
+    execution composite differs from what the platform compiles now (`platform`) is stale -- the supervisor re-runs the
+    controller to seal and never launches an auditor against it."""
+    from research_workflow.supervisor import derive as D
+    from research_workflow.supervisor.core import Supervisor
+    from research_workflow.supervisor.procs import kill_tree
+    sup = _start(sandbox, plan={"worker_sleep_s": 30.0}, study_id=f"sup_stale_{mode}")
+    sid = sup.study_id
+    sup, _ = drive(sid, stop_before_wait=lambda s: (s.state.get("active_worker") or {}).get("session_type") == "CAUSAL_AUDIT")
+    aw = sup.state["active_worker"]; assert aw and aw["session_type"] == "CAUSAL_AUDIT"
+    study = Path(sup.state["study_worktree"]) / "studies" / sid
+    card_before = json.loads((study / "_work" / "controller" / "status.json").read_text(encoding="utf-8"))
+    assert card_before["state"] == "NEEDS_CAUSAL_AUDIT"
+    kill_tree(int(aw["pid"]))                                     # the auditor dies before its card (a crash); the card now goes stale underneath it
+    Path(aw["result_path"]).unlink(missing_ok=True)
+    if mode == "spec":
+        spec = study / "study.yaml"                                 # a REAL spec change (a comment alone does not move the normalized spec hash)
+        text = spec.read_text(encoding="utf-8"); assert "n_estimators: 20" in text
+        spec.write_text(text.replace("n_estimators: 20", "n_estimators: 21"), encoding="utf-8")
+        subprocess.run(["git", "commit", "-q", "-am", "edit spec after seal"], cwd=str(sup.state["study_worktree"]), check=True)
+    else:
+        monkeypatch.setattr(D, "_current_platform_composite", lambda study, wt: "platform-moved-" + str(card_before["fingerprints"].get("current_execution_composite"))[:8])
+    s2 = Supervisor(sid); card = s2.tick()
+    assert s2.state["worker_history"][-1]["status"] == "FAILED" and s2.state["worker_history"][-1]["reason"] == "RESULT_CARD_MISSING"
+    assert s2.state["derived_state"] == "COMPILED" and card["action"] == "JOB_LAUNCHED" and card["through"] == "seal", (s2.state["derived_state"], card)
+    assert s2.state["derived_from"] and s2.state["active_worker"] is None
+    ev = [e for e in _events(sid) if e["kind"] == "DERIVED"][-1]
+    assert ev["code"] == "COMPILED"
+    audits = [e for e in _events(sid) if e["kind"] == "WORKER_LAUNCHED" and e["session_type"] == "CAUSAL_AUDIT"]
+    assert len(audits) == 1, "no auditor may be launched against a stale card"
+    _wait_pid(int(s2.state["active_job"]["pid"]), 600)
+    if mode == "platform":
+        monkeypatch.setattr(D, "_current_platform_composite", lambda study, wt: None)   # the platform is consistent again after the reseal
+    s3 = Supervisor(sid); card = s3.tick()
+    fresh = json.loads((study / "_work" / "controller" / "status.json").read_text(encoding="utf-8"))
+    assert fresh["state"] == "NEEDS_CAUSAL_AUDIT" and card["action"] == "WORKER_LAUNCHED" and card["session_type"] == "CAUSAL_AUDIT"
+    if mode == "spec":
+        assert fresh["fingerprints"]["study_spec"] != card_before["fingerprints"]["study_spec"]
+    kill_tree(int(s3.state["active_worker"]["pid"]))

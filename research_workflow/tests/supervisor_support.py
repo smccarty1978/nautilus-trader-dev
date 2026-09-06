@@ -12,7 +12,9 @@
 
 Scenario knobs come from ``NT_SUP_TEST_PLAN`` (JSON): ``gap_first`` (first design run emits a MISSING_CAPABILITY handoff),
 ``semantic_first`` (first design run stops with SCIENTIFIC_SEMANTIC_DECISION_REQUIRED until a USER_DECISION answer exists),
-``auto_merge`` (declare autonomy_decisions.platform_merge: auto_if_green), ``worker_sleep_s`` (delay before acting).
+``auto_merge`` (declare autonomy_decisions.platform_merge: auto_if_green), ``worker_sleep_s`` (delay before acting),
+``declare_vocab`` (the design worker declares ``terminal_decisions: {PLATFORM_V2_FLOW_PROVEN: ...}`` so the closure vocabulary is
+enforced), ``undeclared_decision`` (the analysis worker names a terminal_decision outside that vocabulary).
 """
 from __future__ import annotations
 
@@ -97,6 +99,12 @@ def cmd_worker(ns: argparse.Namespace) -> int:
             text = dec.read_text(encoding="utf-8")
             if "platform_merge:" not in text:
                 dec.write_text(text.rstrip("\n") + "\n  platform_merge: auto_if_green\n", encoding="utf-8")
+        if plan.get("declare_vocab"):
+            dec = study_dir / "research_decision.yaml"
+            text = dec.read_text(encoding="utf-8")
+            if "terminal_decisions: {}" in text:
+                dec.write_text(text.replace("terminal_decisions: {}", "terminal_decisions:\n  PLATFORM_V2_FLOW_PROVEN: the synthetic flow completed end to end\n"
+                                            "  PLATFORM_V2_FLOW_BROKEN: a synthetic stage failed"), encoding="utf-8")
         capability_present = (wt / CAPABILITY_MARKER).is_file()
         if plan.get("gap_first") and not capability_present:
             (study_dir / "study.yaml").write_text(gap_spec(sid), encoding="utf-8")
@@ -135,7 +143,8 @@ def cmd_worker(ns: argparse.Namespace) -> int:
         return 0
     if stype == "ANALYSIS_DECISION":
         art = study_dir / "artifacts"; art.mkdir(parents=True, exist_ok=True)
-        dec = {"outcome": "SYNTHETIC_FLOW_COMPLETE", "terminal_decision": "PLATFORM_V2_FLOW_PROVEN", "rationale": "scripted analysis worker", "evidence": ["artifacts/experiment_analysis_v2.json"]}
+        decision = "NOT_IN_THE_DECLARED_VOCABULARY" if plan.get("undeclared_decision") else "PLATFORM_V2_FLOW_PROVEN"
+        dec = {"outcome": "SYNTHETIC_FLOW_COMPLETE", "terminal_decision": decision, "rationale": "scripted analysis worker", "evidence": ["artifacts/experiment_analysis_v2.json"]}
         (art / "analysis_decision.json").write_text(json.dumps(dec, indent=2) + "\n", encoding="utf-8")
         (art / "analysis_decision.md").write_text("# analysis decision (scripted)\n", encoding="utf-8")
         head = _commit_all(wt, f"study({sid}): analysis decision")
