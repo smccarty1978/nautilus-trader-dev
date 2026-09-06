@@ -671,7 +671,9 @@ The card shows `NEW_FAILURE` prominently and classifies the rest as `KNOWN_BASEL
 `ENVIRONMENTAL_MISSING_ARTIFACT`. A failure outside every baselined scope is
 `NEW_FAILURE_OUTSIDE_BASELINE_SCOPE`, never silently allowed. Agents act only on NEW failures.
 `@pytest.mark.slow` tests (real data replay; `scripts/tests` carries several that run for tens of minutes)
-are excluded by default so one broad run stays in minutes; `--include-slow` lifts the filter.
+are excluded by default; `--include-slow` lifts the filter. Even without them the broad `research_workflow/tests scripts/tests`
+scope is HOURS, not minutes (2026-09-06: 2129 tests, >2.5 h wall on the dev box -- the red-team closure suites hash the
+repository per test and the supervisor black-box proof runs the real controller ~15 times). Launch it detached and once.
 
 ### N.4 Predeclared fork policy (`autonomy_decisions`)
 
