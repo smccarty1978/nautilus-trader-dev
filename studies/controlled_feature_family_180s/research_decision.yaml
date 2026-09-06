@@ -65,3 +65,27 @@ pass_scope:
     populated, has variance and is actually used by the fitted model. A null result is
     reportable as a 2024 result. A positive result is a CANDIDATE for a later OOS pass, never
     a confirmation.
+
+# ---------------------------------------------------------------------------------------
+# SCOPE AMENDMENT 2026-09-06 -- the two frozen parent reference models are WITHDRAWN.
+# Researcher's decision, taken after fit raised MODEL_NOT_IN_STORE and no sanctioned path to
+# register them was found (the full reasoning, with file:line, is in study.yaml at the point
+# where reference_models used to be declared).
+withdrawn_reference_models:
+  models: [PARENT_FROZEN_LONG_2021_2023, PARENT_FROZEN_SHORT_2021_2023]
+  reason: >-
+    reference_models resolves only through the v2 durable store; these two legacy models cannot
+    be registered there because their v1 record's native_booster_sha256 is deliberately preserved
+    at a stale value (test_train_provenance_attestation.py:75), and the identity rule requires
+    canonical bytes to equal it. The sanctioned reuse path (frozen_external_model_score
+    attestation) binds a model as an input column, not as an alongside-scored reference.
+  what_is_lost: >-
+    ONLY the descriptive contrast that separates a recency/training-window effect (parent A
+    trained 2021-2023) from the feature-family effect. A/B/C/D are fit on identical 2024 rows,
+    so every pairwise delta this study measures is unaffected.
+  prohibited_claims:
+    - "any statement comparing this study's arms to the 2021-2023 parent model on this pass"
+    - "any attribution of an arm delta to feature information RATHER THAN recency, since the control that would separate them is not present"
+  next_research_step: >-
+    platform capability: reference_models backed by a frozen_external_model_score attestation,
+    then re-run this comparison with the parent contrast restored.

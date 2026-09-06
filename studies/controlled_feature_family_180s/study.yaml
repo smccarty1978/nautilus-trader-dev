@@ -185,31 +185,35 @@ model:
     validate_months: 1
     step_months: 1
 
-  # DESCRIPTIVE reference only, never refit, never the formal control. Scored on the identical
-  # population as the trained arms. Separates the recency/training-window effect (old A trained
-  # 2021-2023 vs new A trained 2024) from the feature-family effect (B/C/D vs new A).
+  # NO reference_models. The two frozen parent models (PARENT_FROZEN_LONG_2021_2023
+  # ccd587df / PARENT_FROZEN_SHORT_2021_2023 4d62250a) were declared here as a DESCRIPTIVE
+  # contrast -- never refit, never the formal control -- to separate a recency/training-window
+  # effect (parent A trained 2021-2023) from the feature-family effect (B/C/D vs the 2024 A).
+  # They are WITHDRAWN, on the researcher's decision of 2026-09-06, because they cannot be
+  # resolved by any sanctioned path:
   #
-  # The registry's direction_routing reads {"BOTH": "C"} and carries NO direction: LONG/SHORT
-  # are recoverable only by matching each joblib bundle's fit_identity_sha256 against the
-  # parent's train_experiment_freeze.json model_hashes --
-  #   LONG_C  = 25737fcd... -> ccd587df... (100 trees, matches n_estimators 100)
-  #   SHORT_C = 3c480aff... -> 4d62250a... (200 trees, matches n_estimators 200)
-  # canonical_sha256 pins the estimator BYTES, so a substituted model cannot authenticate.
-  reference_models:
-    - id: ccd587dfed77d1c87029bcd779abb1f6b70fa63beab5c99f5439653746963b0c
-      name: PARENT_FROZEN_LONG_2021_2023
-      label: target_flip_within_horizon
-      subset: {regime_direction: 1}
-      expect:
-        study_id: clean_maturity_flip_model_180s_horizon
-        canonical_sha256: f969037b2b4fa588341ba34ffbf9856e4eff4b7eacd11bbf6fe642a5d9d421bd
-    - id: 4d62250a6b8af62aac86de4a92e0924704ff3e774670e208de3af285472a1cb4
-      name: PARENT_FROZEN_SHORT_2021_2023
-      label: target_flip_within_horizon
-      subset: {regime_direction: -1}
-      expect:
-        study_id: clean_maturity_flip_model_180s_horizon
-        canonical_sha256: 8dab82c25ddc0ebccd6620b660ab4179fea28d1d4021bfdbed47538239b5ba2d
+  #   * `model.reference_models` resolves through the v2 durable store
+  #     (research_workflow/lifecycle_v2.py:992,1088 -> model_store.authenticate_model). Neither
+  #     model is registered there; fit raised MODEL_NOT_IN_STORE.
+  #   * They cannot be registered. `migrate_legacy_records` cross-checks the v1 record's
+  #     `native_booster_sha256` (research_workflow/model_migration.py:87) and the
+  #     `legacy_v1_committed_registry` identity rule requires canonical bytes to equal that same
+  #     field (model_store.py:546). Both record the pre-re-export hash 3686a5d2/dc134a9a, while
+  #     the bytes on disk are f969037b/8dab82c2.
+  #   * That stale field is preserved DELIBERATELY, not by accident:
+  #     research_workflow/tests/test_train_provenance_attestation.py:75 asserts it is
+  #     "preserved not rewritten" because "re-recording it would erase the evidence that it ever"
+  #     failed, and :91 asserts the byte check was never relaxed to unblock a child study.
+  #   * The sanctioned reuse path is the additive attestation
+  #     (`derived_inputs: frozen_external_model_score`, which reads the joblib and no booster --
+  #     studies/first_p90_warning_horizon_march2024/study.yaml:70-84 uses exactly these models
+  #     that way). It is not available to `reference_models`, and it binds a model as an INPUT
+  #     COLUMN, which is a different scientific object from an alongside-scored reference.
+  #
+  # Withdrawing them costs the recency-vs-family contrast and NOTHING ELSE: A/B/C/D are all fit
+  # on the identical 2024 rows, so every pairwise delta this study exists to measure is
+  # unaffected. Restoring the contrast needs a platform capability -- `reference_models` backed
+  # by a frozen_external_model_score attestation -- which is the declared next research step.
 
 # EXECUTABLE population-parity stop gate. Section 2 of the research contract requires that
 # unexplained drift from the parent's population BLOCK the scientific reading. Prose cannot do
