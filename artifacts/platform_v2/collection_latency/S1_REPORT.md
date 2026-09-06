@@ -29,10 +29,12 @@ child directly rather than trust either figure).
 Shape: **monotonic decay, 6.4x from the first million bars to the last** (23.7 k to 3.7 k bars/s), with
 epochs/s and candidates/s decaying by the same factor while RSS grows only 9 %. Cost per epoch grows with
 the number of candidates already emitted (31 k to 450 k), i.e. something on the per-epoch path scans or
-copies accumulated state. Suspected owner: the host's accumulated candidate/observation store and the
-pending-outcome resolution path (`research_workflow/host/sink.py`, `host/outcomes.py`, `host/strategy.py`
-`_epochs`); the one-month profile (W0) could not show it because at 42 k candidates the effect is small.
-**Not fixed here; it is its own packet.** Consequences stated plainly:
+copies accumulated state. Located by the follow-up static diagnostic (same day): `research_workflow/provider_host.py:259/273/287`
+— the frozen-parent `ema_slope` adapter appends every completed 1m midpoint to an unbounded list and
+copies the whole list (`values=list(self._midpoints)`) on every candidate snapshot, although the consumer
+reads only the last six values. Sink, outcome kernel, mux and every other tracker are bounded. Smallest fix:
+`deque(maxlen=FROZEN_FAMILY_A_EMA_SLOPE_STEPS + 1)`, output byte-identical. **Not fixed here; it is its own
+packet**, confirmed by one single-year replay. Consequences stated plainly:
 
 - the W0 month benchmark (23.4 k bars/s) is NOT representative of a year (8.8 k bars/s cumulative);
 - S2's ~1,500 s projection for a 4-year TRAIN (max single year at today's rate) is the honest bound for
