@@ -50,6 +50,7 @@ some are cited from git history and audit trails. **They are never a source of i
 | `docs/TEMPLATES.md` | SPEC templates, Deliverables Manifest |
 | `docs/ANALYSIS_REPORTING.md` | NT reports, tearsheets |
 | `docs/PERFORMANCE.md` | Profiling, ONNX inference |
+| `docs/NT_COLLECTION_PERFORMANCE.md` | NautilusTrader replay throughput: the flat-throughput invariant, the diagnostic order for a decaying replay (`add_data()` call count first), collection-host engine config, sanctioned parallelism, sticky-tracker warmup before sub-year shards, and the decay-ratio acceptance test |
 | `docs/ERROR_REGISTRY.md` | Error code registry |
 | `docs/DOCUMENT_MAP.md` | This file |
 | `docs/RESEARCH_STUDY_BLUEPRINT.md` | Researcher-facing implementation map of the lifecycle in §1 of `docs/RESEARCH_WORKFLOW.md` — exact paths/functions, a worked study example, agent-role and CLI entry-point maps, StudySpec schema-gap inventory, and the novelty routing matrix. Defers to `docs/RESEARCH_WORKFLOW.md` on any conflict |
