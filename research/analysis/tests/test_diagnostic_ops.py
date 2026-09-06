@@ -367,3 +367,86 @@ def test_run_op_supplies_the_gate_its_resolution_context(tmp_path):
                          "expected_total": 3},
                  context={"studies_root": str(tmp_path)})
     assert out["payload"]["status"] == "PASS"
+
+
+# --------------------------------------------------- A7b: predeclared parity exceptions
+# A parity gate with no escape hatch is unusable across a dataset migration: the reference
+# and the population can differ for a reason that is KNOWN and is not drift (a source catalog
+# with no bars for a session date, a calendar that genuinely differs). The escape hatch has to
+# be narrow enough that it cannot become a way to make an inconvenient disagreement disappear.
+NS = 10 ** 9
+_D1 = int(pd.Timestamp("2024-01-02", tz="UTC").value)
+_D2 = int(pd.Timestamp("2024-12-31", tz="UTC").value)
+
+
+def _dated_reference(tmp_path):
+    import hashlib
+    ref = pd.DataFrame([{"regime_id": 1, "ref_ts": _D1}, {"regime_id": 2, "ref_ts": _D1 + NS}])
+    path = tmp_path / "dated_ref.parquet"
+    ref.to_parquet(path, index=False)
+    return path, hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _dated_gate(tmp_path, rows, **over):
+    path, sha = _dated_reference(tmp_path)
+    params = {"reference_path": path.name, "reference_sha256": sha,
+              "key": ["regime_start_ns"], "reference_key": ["regime_id"],
+              "timestamp_column": "observation_ts", "reference_timestamp_column": "ref_ts",
+              "context": {"studies_root": str(tmp_path)}}
+    params.update(over)
+    return population_parity_gate(rows, **params)
+
+
+def _dated_population(extra_on_excepted_day=0, drop_compared=0):
+    rows = [{"regime_start_ns": 1, "observation_ts": _D1},
+            {"regime_start_ns": 2, "observation_ts": _D1 + NS}]
+    rows = rows[: len(rows) - drop_compared] if drop_compared else rows
+    rows += [{"regime_start_ns": 100 + i, "observation_ts": _D2 + i * NS}
+             for i in range(extra_on_excepted_day)]
+    return pd.DataFrame(rows)
+
+
+_EXCEPT = [{"date": "2024-12-31", "reason": "parent source catalog carries no 1s bars for this session"}]
+
+
+def test_an_undeclared_extra_session_day_blocks(tmp_path):
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_POPULATION_PARITY_FAILED"):
+        _dated_gate(tmp_path, _dated_population(extra_on_excepted_day=2))
+
+
+def test_a_declared_session_date_exception_is_allowed_and_reported(tmp_path):
+    out = _dated_gate(tmp_path, _dated_population(extra_on_excepted_day=2),
+                      excluded_session_dates=_EXCEPT)
+    p = out["payload"]
+    assert p["status"] == "PASS"
+    assert p["excluded_session_dates"] == [
+        {"date": "2024-12-31", "reason": _EXCEPT[0]["reason"],
+         "removed_from_population": 2, "removed_from_reference": 0}]
+    assert p["compared_after_exclusions"] == {"population": 2, "reference": 2}
+
+
+def test_an_exception_cannot_mask_a_difference_on_a_COMPARED_day(tmp_path):
+    """The property that makes the hatch narrow: excluding 2024-12-31 must not excuse a row
+    missing on 2024-01-02. Exclusions remove whole session dates, never individual keys."""
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_POPULATION_PARITY_FAILED"):
+        _dated_gate(tmp_path, _dated_population(extra_on_excepted_day=2, drop_compared=1),
+                    excluded_session_dates=_EXCEPT)
+
+
+def test_a_stale_exception_that_removes_nothing_fails_closed(tmp_path):
+    """A declaration that no longer describes reality is a defect, not a harmless leftover."""
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_PARITY_EXCLUSION_DEAD"):
+        _dated_gate(tmp_path, _dated_population(), excluded_session_dates=_EXCEPT)
+
+
+def test_an_exception_without_a_reason_is_refused(tmp_path):
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_PARITY_EXCLUSION_UNREASONED"):
+        _dated_gate(tmp_path, _dated_population(extra_on_excepted_day=1),
+                    excluded_session_dates=[{"date": "2024-12-31"}])
+
+
+def test_exceptions_require_timestamp_columns_to_derive_a_session_date(tmp_path):
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_PARITY_EXCLUSION_NEEDS_TIMESTAMPS"):
+        _dated_gate(tmp_path, _dated_population(extra_on_excepted_day=1),
+                    timestamp_column=None, reference_timestamp_column=None,
+                    excluded_session_dates=_EXCEPT)
