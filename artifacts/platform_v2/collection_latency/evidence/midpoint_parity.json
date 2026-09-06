@@ -1,0 +1,39 @@
+{
+ "midpoint_history": 64,
+ "wall_total_s": 421.7021515999222,
+ "engine_run_s": 408.00939290004317,
+ "stats": {
+  "bars": 12392181,
+  "bars_by_stream": {
+   "nq_1s": 12035953,
+   "nq_1m": 356228
+  },
+  "candidates": 453768,
+  "observations": 453768,
+  "epochs": 2197932,
+  "pending_at_end": 0,
+  "dropped_outside_primary": {
+   "candidates": 5278,
+   "observations": 5278
+  }
+ },
+ "rows": {
+  "candidates": 453768,
+  "observations": 453768
+ },
+ "sealed": {
+  "candidates_sha256": "fa67317ab8424ae2a9e9c5a5b7e1b9e13cb5608553c48041c48ba51721118abc",
+  "observations_sha256": "136855e9bd0aba6ac1d32b6c60aa5ef7c79db5f138411d3d8f778472e0d6ee6c",
+  "rows": {
+   "candidates": 453768,
+   "observations": 453768
+  },
+  "elapsed_s": 1183.7681114999577,
+  "plan_sha256": "19a4543583eb584f8b53f3f2d2aa5866e0a8de670f92938a9b8783710f61ea2b"
+ },
+ "replayed": {
+  "candidates_sha256": "fa67317ab8424ae2a9e9c5a5b7e1b9e13cb5608553c48041c48ba51721118abc",
+  "observations_sha256": "136855e9bd0aba6ac1d32b6c60aa5ef7c79db5f138411d3d8f778472e0d6ee6c"
+ },
+ "byte_identical": true
+}
