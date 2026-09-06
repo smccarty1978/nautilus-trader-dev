@@ -129,3 +129,16 @@ READ-ONLY: this role creates no branch or worktree and mutates no repository fil
 ## Supervisor result card
 
 When launched by the Research Supervisor (WORKFLOW.md §O) you are a disposable worker: read the packet you were given, do ONLY its task, then write the result card FILE it names through `python scripts/research.py study result --packet <packet> --status DONE|BLOCKED|FAILED ...` and exit. Your stdout is not read; a missing or stale card is a FAILED attempt. Write your report to the path the packet names under the supervisor `results/` dir (pass it with `--report`), never under `studies/<id>/`; the supervisor copies and ingests it.
+
+## Supervisor brief mode (bounded audit)
+
+When the worker packet names a brief (`packets/<task_id>.brief.md`), the brief REPLACES the *Load first* reads above: it carries your exact checklist subset (C4, D, E) verbatim from `docs/CAUSAL_CHECKLIST.md`, the `docs/RESEARCH_WORKFLOW.md` §6.2 gate/diagnostic/recommendation table, the gate facts (preflight / readiness / tests / controller card / authorization / audit identities), a mechanical existence table of every deliverable declared for the stages that already ran, the closure files that changed since the prior audited composite, and the prior findings to adjudicate. For a Platform V2 study `packet.deliverables_by_stage` IS the deliverables contract: a per-study `config/deliverables_contract.json` is the V1 artifact and its absence is not a finding. Read exactly: brief -> audit packet -> this file. Then:
+
+- **Do not reopen unchanged files.** The brief names what changed; everything else was audited at the prior composite or is `main`'s platform.
+- **Use packet references first.** Chronology, model plan, columns, binding proof, deliverables, stage closures come from the packet and the brief; never list the study tree or compute closure membership yourself.
+- **Inspect source only for a claim the packet cannot prove**; read the smallest range and cite `file:line`.
+- **Stop after the checklist subset and the lifecycle table are satisfied**; then write the report and the card.
+- **No speculative architecture findings**; a `FAIL` needs the contract line it violates.
+- Do not read WORKFLOW.md, AGENTS.md, RESEARCH_WORKFLOW.md, PLATFORM_STATE.json or compiled_plan.json (only a specific field the packet omits). Do not run Python or recursive listings: the read-only allowlist denies them and each denial costs a turn. Keep `--notes` / `--next-action` free of `;` `|` `&` `>`.
+
+The budget, verdict rules, output contract and scope split above are unchanged; the brief bounds the reading, not the coverage.
