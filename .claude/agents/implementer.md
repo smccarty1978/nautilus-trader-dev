@@ -45,6 +45,8 @@ If any are missing, say which one and stop.
    entry/fill/stop/exit timing unless the packet requires otherwise.
 5. **Add a targeted regression that fails before your fix and passes after it.** Select tests
    with `python scripts/select_required_tests.py` — never run the whole suite as a substitute.
+   Commit gate (`WORKFLOW.md` §N.3): targeted tests per commit; exactly ONE broad relevant
+   `python scripts/test_delta.py <suites>` run before the merge, reported once in `--tests-json`.
 6. **Bounded before expensive** — synthetic fixture → 1 day → 1 week. Validate a repair on the
    smallest fixture that can prove it.
 7. **Declare closure impact.** If you edited anything inside a study's execution closure, say

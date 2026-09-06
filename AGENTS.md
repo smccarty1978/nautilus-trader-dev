@@ -7,6 +7,7 @@ This is the **common core** every agent in this repository inherits, regardless 
   references, not templates; the old runtime is `LEGACY_ONLY_FOR_NEW_RESEARCH`. Agent roles: `docs/AI_AGENTS.md`.
 - **FOR A NEW RESEARCH PROJECT:** read `WORKFLOW.md` → §M *Concurrent research projects*, then use `python scripts/research.py study new <id>` and work only in the generated worktree. Never start a study by editing `main`.
 - **SESSION DISCIPLINE:** `WORKFLOW.md` §N -- one lifecycle phase per session with a `study handoff` card; STOP-AT-CAPABILITY-GAP (`CAPABILITY_GAP_HANDOFF.json`, fresh capability session on `chore/<topic>` after `ws chore claim`, fresh study session); `scripts/test_delta.py` instead of branch-vs-main suites; detached long jobs, no polling; context target <= ~50k tokens.
+- **COMMIT GATE (supervisor / platform chores, `WORKFLOW.md` §N.3):** targeted tests only per commit; exactly ONE broad relevant `test_delta` run before merge to `main`. Never a broad suite before every commit.
 - **WRITER OWNERSHIP:** one writing agent = one study worktree, enforced by the writer lease (`user@host` + agent + session). Before writing in an existing study worktree run `python scripts/research.py ws claim <id>`; `STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT` means another agent (Claude / Codex / Antigravity) holds it -- take another study, never edit lease files. Read-only roles need no claim. Details: `WORKFLOW.md` §M.4, `docs/AI_AGENTS.md` *Writer identity*.
 
 - **Claude** also reads `CLAUDE.md`.
@@ -138,7 +139,8 @@ A canonical feature names a formula, a provider, and causal/reset/null semantics
 
 Autonomously, without asking: diagnose the deterministic defect, fix it at the owning layer,
 add or update a targeted test, re-run the affected bounded check, regenerate stale
-deterministic artifacts, and resume from the correct lifecycle stage.
+deterministic artifacts, and resume from the correct lifecycle stage. Run the targeted test per
+commit; the one broad `test_delta` run belongs before the merge (`WORKFLOW.md` §N.3 commit gate).
 
 **Terminal stop only for:** genuine semantic ambiguity · data safety risk · authorization
 ambiguity · inability to preserve causality or TRAIN/OOS correctness · a real capability gap

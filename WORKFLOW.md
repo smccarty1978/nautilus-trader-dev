@@ -654,10 +654,17 @@ scopes, environment requirements). Never re-derive it by running the suite on th
 `main`. Instead:
 
 ```bash
-python scripts/test_delta.py scripts/tests/test_workspace.py            # targeted, during implementation
-python scripts/test_delta.py research_workflow/tests scripts/tests      # ONE broad relevant run before commit
+python scripts/test_delta.py scripts/tests/test_workspace.py            # targeted, per commit
+python scripts/test_delta.py research_workflow/tests scripts/tests      # ONE broad relevant run before MERGE (not per commit)
 python scripts/test_delta.py <scopes> --update-baseline --reason "..."  # explicit, reviewed change of the baseline
 ```
+
+**Commit gate (supervisor / platform chores).** Per commit: the targeted tests for the files you changed (the test
+file next to the module, the black-box scenario you extended). Before merge to `main`: exactly ONE broad relevant
+`test_delta` run over the affected suites (`research_workflow/tests scripts/tests` for supervisor work). Never run a
+broad suite before every commit -- the 2026-09-05 supervisor hardening ran `research_workflow/tests scripts/tests`
+(minutes each, with the black-box proof tens of minutes) before each of five one-file commits; the merge gate is
+the only place a broad run changes a decision. A worker's result card reports the broad run once, in `--tests-json`.
 
 The card shows `NEW_FAILURE` prominently and classifies the rest as `KNOWN_BASELINE_FAILURE`,
 `BASELINE_FAILURE_NOW_FIXED` (update the baseline when you commit the fix) or
@@ -714,7 +721,7 @@ concurrently. It is a claim registry, not a scheduler.
 - no repeated baseline test classification: `scripts/test_delta.py`
 - no platform implementation inside a study session after a CapabilityGap (§N.1)
 - no long-job polling (§N.5)
-- targeted tests while implementing; one broad relevant run before commit
+- targeted tests per commit; one broad relevant `test_delta` run before merge only (§N.3 commit gate)
 
 These are recommended limits for agents; the runtime enforces none of them.
 
@@ -783,7 +790,8 @@ killed (`WORKER_TIMEOUT`).
 handoff and exits -> the supervisor runs `ws chore claim <topic>` (an overlapping live claim -> `WAIT_CHORE`, never a
 competitor) -> creates `chore/<topic>` from `main` -> launches a `CAPABILITY_IMPLEMENTATION` worker whose write surface
 is the claimed paths -> **merge gate**: result `DONE`, diff confined to the claimed surface, `test_delta` new
-failures 0, `cap generate --check` clean, chore worktree clean; merged `--no-ff` only if the study declares
+failures 0 (the ONE broad run of §N.3's commit gate; the worker runs only targeted tests per commit before it),
+`cap generate --check` clean, chore worktree clean; merged `--no-ff` only if the study declares
 `autonomy_decisions.platform_merge: auto_if_green`, otherwise a `DESTRUCTIVE_ACTION_REQUIRES_APPROVAL` card
 (answer file `{"approve": true}`) -> release the claim, `git merge --no-ff main` into the study worktree,
 `CAPABILITY_COMPLETE` handoff, fresh design worker. A capability merged by hand while the supervisor was offline is
@@ -812,6 +820,22 @@ both the Bash and the PowerShell tools; `supervise stop` ends only the loop proc
 spawned keeps running and is consumed on `resume`; a `study_closure.json` counts as terminal only when
 `research_workflow.study_closure.load_study_closure` accepts it, the analysis worker is told the declared `terminal_decisions`
 vocabulary, and an undeclared decision raises `RESEARCH_CONTRACT_CONFLICT` instead of a close.
+
+**Bounded auditor briefs (efficiency closeout, 2026-09-06)**: the first validation's read-only auditors spent 68 / 54
+(causal) and 48 / 42 (contract) turns re-discovering the repository (WORKFLOW.md, AGENTS.md, RESEARCH_WORKFLOW.md,
+compiled_plan.json, every closure file, denied `python -c` attempts to compute closure membership). Each audit launch now
+writes `packets/<task_id>.brief.md` (`research_workflow/supervisor/audit_brief.py`): the gate facts (preflight,
+readiness, tests, controller card), the audit packet reference, the closure files that CHANGED since the prior audited
+composite (per-file hash diff of the frozen manifest snapshot taken at the prior launch) and against `main`, the prior
+pass's findings to adjudicate first, the auditor's EXACT checklist subset extracted verbatim from
+`docs/CAUSAL_CHECKLIST.md`, the runtime-guarantee excerpt, and the bounded procedure (no unchanged-file re-reads, packet
+references first, source only for claims the packet cannot prove, stop when the subset is satisfied, no speculative
+architecture findings). The auditor's read list is brief -> packet -> role file, nothing else. Coverage is unchanged:
+the rules are the checklist's own bytes and any closure file may still be opened for a claim the packet cannot prove.
+Every finished `claude` worker's turns / cost / tokens / permission denials are parsed from its JSON result line into
+`worker_history[].metrics` and summed in `counters.worker_turns` / `worker_cost_usd` / `worker_permission_denials`;
+`options.worker_max_budget_usd` applies `--max-budget-usd` when the installed CLI prints that flag. `supervise resume`
+never spawns a second loop while one is alive (`LOOP_ALREADY_ALIVE`).
 
 **Providers**: `supervise providers` probes each installed CLI (`--version`, `--help`) and records AVAILABLE /
 HEADLESS_SUPPORTED / WRITE_SUPPORTED / READ_ONLY_SUPPORTED / CLI_VERSION / probe sha256; only flags the installed
