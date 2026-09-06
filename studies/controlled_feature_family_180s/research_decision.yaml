@@ -13,3 +13,55 @@ terminal_decisions: {}
 autonomy_decisions:
   platform_merge: auto_if_green        # a gated capability chore merges to main without a prompt
   closed_study_merge: auto_if_clean    # a STUDY_CLOSED study merges to main when the tree is clean
+
+# ---------------------------------------------------------------------------------------
+# SCOPE DISCLOSURE -- raised as WARNING 1 by contract audit pass 02
+# (audit/contract_pass_02.md, contract-checker:009_contract_audit_d40607ee) at execution
+# composite 14b13abb23e5, and adjudicated HERE rather than by redesign.
+#
+# study.yaml declares `analysis.source: train`. research_workflow/lifecycle_v2.py:1205-1211
+# analyses any plan that declares an `analysis:` pipeline with that pipeline and RETURNS --
+# before assert_oos_open (:1212-1213) and before the entire OOS scoring block (:1214-1257:
+# freeze-canonical binding, authenticate_model, oos_metrics). On this study's compiled path
+# 2025 is therefore COLLECTED AND READ BY NO STAGE, and both declared stop gates
+# (population_parity_vs_parent, arm_delta_integrity) vouch for the 2024 TRAIN population only.
+#
+# That is the INTENDED scope of this pass. It is declared here so that no worker can present
+# a TRAIN-fitted arm delta as forward evidence.
+#
+# `analysis.source: oos` is NOT the alternative. The declared-analysis path returns before the
+# scoring block whatever its source, so it would not restore OOS model scoring or model
+# authentication; and it would point population_parity_vs_parent -- whose reference is the
+# parent's byte-pinned 2024 population (expected_total 450973) -- at a 2025 frame it cannot
+# match, converting a stop gate into a guaranteed abort. Opening 2025 is a SEPARATE, LATER
+# pass with its own gates, not a one-line change to this one.
+pass_scope:
+  id: TRAIN_ONLY_CONTROLLED_SCREEN
+  opens_dev_oos: false
+  analysis_population: "2024 TRAIN (chronology.train), read through the plan's declared analysis: pipeline"
+  # Call-by-call year roles for THIS pass. One row per authorized year; no year appears twice.
+  year_roles:
+    - {year: 2024, role: train,      use: "the ONLY population collected, fit, validated and analysed in this pass"}
+    - {year: 2025, role: dev_oos,    use: "collected over the 2025-01-01..2025-03-31 window and read by NO stage in this pass; stays UNOPENED"}
+    - {year: 2021, role: prohibited, use: "never touched"}
+    - {year: 2022, role: prohibited, use: "never touched"}
+    - {year: 2023, role: prohibited, use: "never touched"}
+    - {year: 2026, role: prohibited, use: "never touched"}
+  # The only out-of-time evidence this pass can produce.
+  forward_evidence_available: >-
+    ONLY the nine walk-forward month folds inside 2024 (fit 3 months -> validate the next,
+    disjoint, fold thresholds taken from the fit window). Every arm delta B/C/D vs
+    A_BASELINE_13 is an IN-SAMPLE-YEAR screen under out-of-time month folds, not a
+    held-out-year result.
+  prohibited_claims:
+    - "any claim that an arm adds stable FORWARD classification information, in the sense of the research_question, on evidence from this pass alone"
+    - "any statement that an arm was validated, confirmed or scored on 2025"
+    - "any reading of population_parity_vs_parent or arm_delta_integrity as vouching for anything outside 2024"
+  # What this pass CAN terminally answer.
+  admissible_conclusion_scope: >-
+    Whether each added feature family (B volume/activity, C direction-normalized estimated
+    delta, D 60s/120s productivity) changes classification performance against the 13-feature
+    control on the 2024 development population, under gates that prove each added block is
+    populated, has variance and is actually used by the fitted model. A null result is
+    reportable as a 2024 result. A positive result is a CANDIDATE for a later OOS pass, never
+    a confirmation.
