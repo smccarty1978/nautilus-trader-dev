@@ -67,7 +67,7 @@ import subprocess
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 from research_workflow.roots import load_config
 
@@ -526,6 +526,15 @@ research_question: {json.dumps(question)}
 status: DRAFT
 dataset_id: {dataset_id}
 terminal_decisions: {{}}
+# Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
+# semantic choice with no policy here is still a SEMANTIC_DECISION_REQUIRED question.
+autonomy_decisions:
+  on_capability_gap: stop_and_handoff                # write CAPABILITY_GAP_HANDOFF, end the session; never build it here
+  platform_change_required: chore_branch_and_fresh_session
+  deterministic_defect: auto_fix                     # fix, add a targeted test, re-run the bounded check
+  calendar_reference_parity: common_interval_exact   # exact on the common calendar interval; Globex-only rows enumerated, descriptive
+  frozen_parent_model: rescore_if_authenticated      # never retrain a frozen parent
+  protected_period: never_expand_authority
 """, encoding="utf-8")
     spec = study_dir / "SPEC.md"
     spec.write_text(f"# {study_id}\n\nDerived from `research_decision.yaml`. Question: {question}\n\n## Population\n\n## Target\n\n## Features\n\n## Chronology\n\n## Deliverables Manifest\n", encoding="utf-8")
@@ -638,5 +647,134 @@ def ws_list(*, repo_root: Path, config=None, reclaim: bool = False) -> Dict[str,
             "branches": {"count": len(branches), "study": sorted(b for b in branches if b.startswith("study/")), "other": sorted(b for b in branches if not b.startswith("study/"))}}
 
 
+# ---------------------------------------------------------------------------
+# chore (platform) worktree ownership: a lightweight atomic claim registry over write surfaces
+# ---------------------------------------------------------------------------
+def _chores_dir(cfg) -> Path:
+    return leases_dir(cfg) / "chore"
+
+
+def _norm_path(p: str) -> str:
+    return str(p).replace("\\", "/").strip().lstrip("./").rstrip("/")
+
+
+def _paths_overlap(a: str, b: str) -> bool:
+    """Two write surfaces overlap when one is a prefix of the other (directory containment) or either glob
+    matches the other. ``research_workflow/grammar/`` overlaps ``research_workflow/grammar/compiler.py``;
+    ``features/library.py`` and ``research_workflow/host/`` are disjoint."""
+    import fnmatch
+    a, b = _norm_path(a), _norm_path(b)
+    if not a or not b:
+        return False
+    if a == b or a.startswith(b + "/") or b.startswith(a + "/"):
+        return True
+    return fnmatch.fnmatch(a, b) or fnmatch.fnmatch(b, a) or fnmatch.fnmatch(a, b + "/*") or fnmatch.fnmatch(b, a + "/*")
+
+
+def read_chores(config=None) -> List[Dict[str, Any]]:
+    cfg = config if config is not None else load_config()
+    d = _chores_dir(cfg)
+    rows: List[Dict[str, Any]] = []
+    if not d.is_dir():
+        return rows
+    for p in sorted(d.glob("*.json")):
+        try:
+            rec = _normalize(json.loads(p.read_text(encoding="utf-8")))
+        except (OSError, ValueError):
+            continue
+        rec["state"] = lease_state(rec) if rec.get("worktree") else ("released" if rec.get("released_at_utc") else "live")
+        rec["lease_path"] = str(p)
+        rows.append(rec)
+    return rows
+
+
+def claim_chore(topic: str, *, repo_root: Path, write_paths: Sequence[str], semantic_surface: str, capability_ids: Sequence[str] = (),
+                branch: Optional[str] = None, worktree: Optional[Path] = None, config=None, identity: Optional[Dict[str, Any]] = None,
+                expect_agent: Optional[str] = None) -> Dict[str, Any]:
+    """``research ws chore claim <topic> --paths ... --surface ...``: register platform-write ownership BEFORE
+    implementation. A live claim by another writer whose ``write_paths`` overlap raises
+    ``PLATFORM_SURFACE_OWNED_BY_ANOTHER_AGENT``; disjoint surfaces proceed concurrently; the same writer
+    re-claiming its topic is idempotent (paths/surface updated). Atomic per topic via an O_EXCL claim lock."""
+    from research_workflow.locks import acquire_exclusive
+    cfg = config if config is not None else load_config()
+    ident = require_agent(dict(identity or writer_identity()), expect_agent)
+    topic = str(topic).strip()
+    if not topic or any(ch in topic for ch in " /\\:"):
+        raise WorkspaceError(f"CHORE_TOPIC_INVALID: {topic!r}")
+    paths = sorted({_norm_path(p) for p in write_paths if _norm_path(p)})
+    if not paths:
+        raise WorkspaceError("CHORE_WRITE_PATHS_REQUIRED: name the modules/files this chore will write")
+    if not str(semantic_surface or "").strip():
+        raise WorkspaceError("CHORE_SURFACE_REQUIRED: one line describing the semantic surface")
+    repo_root = Path(repo_root).resolve()
+    branch = branch or f"chore/{topic}"
+    wt_root = Path(cfg.worktree_root) if getattr(cfg, "worktree_root", None) else repo_root.parent
+    wt = Path(worktree).resolve() if worktree else (wt_root / f"{repo_root.name}-{topic}").resolve()
+    d = _chores_dir(cfg); d.mkdir(parents=True, exist_ok=True)
+    lock = d / f"{topic}.claim"
+    got = acquire_exclusive(lock, {"pid": os.getpid(), "agent": ident["agent"], "session_id": ident["session_id"]},
+                            is_stale=lambda ex, mt: (time.time() - mt) > 30 or not (int((ex or {}).get("pid") or 0) and _pid_alive(int(ex["pid"]))), max_attempts=2)
+    if not got.acquired:
+        raise WorkspaceError(f"CHORE_CLAIM_IN_PROGRESS: {topic}; retry")
+    try:
+        existing = {c["topic"]: c for c in read_chores(cfg) if c.get("topic")}
+        mine = existing.get(topic)
+        if mine is not None and mine["state"] == "live" and not same_writer(mine, ident):
+            raise WorkspaceError(f"PLATFORM_SURFACE_OWNED_BY_ANOTHER_AGENT: chore {topic!r} is live under {_writer_label(mine)}")
+        for other in existing.values():
+            if other.get("topic") == topic or other["state"] != "live" or same_writer(other, ident):
+                continue
+            clashes = [(a, b) for a in paths for b in (other.get("write_paths") or []) if _paths_overlap(a, b)]
+            if clashes:
+                raise WorkspaceError(f"PLATFORM_SURFACE_OWNED_BY_ANOTHER_AGENT: write surface overlaps live chore {other['topic']!r} "
+                                      f"({_writer_label(other)}; branch {other.get('branch')}): {clashes[:4]}. Wait, split the surface, or coordinate.")
+        now = datetime.now(timezone.utc).isoformat()
+        ttl = int(getattr(cfg, "lease_ttl_seconds", DEFAULT_LEASE_TTL_SECONDS) or DEFAULT_LEASE_TTL_SECONDS)
+        rec = {"schema_version": 3, "kind": "chore", "topic": topic, "branch": branch, "worktree": str(wt) if wt.is_dir() else None,
+               "worktree_expected": str(wt), "write_paths": paths, "capability_ids": sorted({str(c) for c in capability_ids}),
+               "semantic_surface": str(semantic_surface).strip(), "status": "claimed",
+               "owner": ident["owner"], "owner_user": ident["user"], "owner_host": ident["host"], "owner_agent": ident["agent"], "owner_session_id": ident["session_id"],
+               "created_at_utc": (mine or {}).get("created_at_utc") or now, "renewed_at_utc": now,
+               "holder": {"pid": os.getpid(), "kind": "cli", "renewed_at_utc": now}, "ttl_seconds": ttl, "released_at_utc": None}
+        _atomic_write(d / f"{topic}.json", rec)
+        out = dict(rec); out["state"] = "live"; out["result"] = "already_owner" if (mine is not None and mine["state"] == "live") else "claimed"
+        return out
+    finally:
+        try:
+            lock.unlink()
+        except OSError:
+            pass
+
+
+def release_chore(topic: str, *, config=None, identity: Optional[Dict[str, Any]] = None, force: bool = False) -> Dict[str, Any]:
+    cfg = config if config is not None else load_config()
+    ident = dict(identity or writer_identity())
+    p = _chores_dir(cfg) / f"{topic}.json"
+    if not p.is_file():
+        raise WorkspaceError(f"CHORE_NOT_FOUND: {topic}")
+    raw = _normalize(json.loads(p.read_text(encoding="utf-8")))
+    if not same_writer(raw, ident):
+        if not force or str(raw.get("owner_user")) != str(ident["user"]):
+            raise WorkspaceError(f"CHORE_RELEASE_REFUSED: {topic} is held by {_writer_label(raw)} (same OS user may pass --force)")
+        raw["forced_release_by"] = {"owner": ident["owner"], "agent": ident["agent"], "session_id": ident["session_id"]}
+    raw["released_at_utc"] = datetime.now(timezone.utc).isoformat(); raw["status"] = "released"
+    _atomic_write(p, raw)
+    out = dict(raw); out["state"] = "released"
+    return out
+
+
+def list_chores(*, config=None, reclaim: bool = False) -> Dict[str, Any]:
+    cfg = config if config is not None else load_config()
+    rows = read_chores(cfg)
+    reclaimed = []
+    if reclaim:
+        for c in rows:
+            if c["state"] in {"stale", "dead", "released"}:
+                Path(c["lease_path"]).unlink(missing_ok=True); reclaimed.append(c["topic"])
+    keep = ("topic", "branch", "worktree", "write_paths", "capability_ids", "semantic_surface", "status", "state", "owner_agent", "owner_session_id", "renewed_at_utc")
+    return {"chores": [{k: c.get(k) for k in keep} for c in rows], "reclaimed": reclaimed}
+
+
 __all__ = ["WorkspaceError", "study_new", "ws_list", "read_leases", "leases_dir", "renew_lease", "release_lease", "current_owner", "lease_state",
+           "claim_chore", "release_chore", "list_chores", "read_chores",
            "writer_identity", "same_writer", "claim_worktree", "check_writer_access", "require_agent", "AGENT_ENV", "AGENT_SESSION_ENV"]

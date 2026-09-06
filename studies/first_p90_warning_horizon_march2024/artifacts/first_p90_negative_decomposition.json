@@ -1,0 +1,225 @@
+{
+  "mutually_exclusive": true,
+  "n": 239,
+  "negative_after_seconds": 180.0,
+  "negative_denominator": 175,
+  "populations": {
+    "pooled": [
+      {
+        "bucket": "FLIP_LE_180",
+        "n": 64,
+        "n_within_negative": 0,
+        "percent_of_all": 0.26778242677824265,
+        "percent_of_negative": 0.0
+      },
+      {
+        "bucket": "LATE_181_240",
+        "n": 14,
+        "n_within_negative": 14,
+        "percent_of_all": 0.058577405857740586,
+        "percent_of_negative": 0.08
+      },
+      {
+        "bucket": "LATE_241_300",
+        "n": 20,
+        "n_within_negative": 20,
+        "percent_of_all": 0.08368200836820083,
+        "percent_of_negative": 0.11428571428571428
+      },
+      {
+        "bucket": "LATE_301_450",
+        "n": 24,
+        "n_within_negative": 24,
+        "percent_of_all": 0.100418410041841,
+        "percent_of_negative": 0.13714285714285715
+      },
+      {
+        "bucket": "LATE_451_600",
+        "n": 26,
+        "n_within_negative": 26,
+        "percent_of_all": 0.1087866108786611,
+        "percent_of_negative": 0.14857142857142858
+      },
+      {
+        "bucket": "FLIP_GT_600",
+        "n": 85,
+        "n_within_negative": 85,
+        "percent_of_all": 0.35564853556485354,
+        "percent_of_negative": 0.4857142857142857
+      },
+      {
+        "bucket": "PERSISTENT_GT_600",
+        "n": 3,
+        "n_within_negative": 3,
+        "percent_of_all": 0.012552301255230125,
+        "percent_of_negative": 0.017142857142857144
+      },
+      {
+        "bucket": "NO_FLIP_BEFORE_SESSION_END",
+        "n": 3,
+        "n_within_negative": 3,
+        "percent_of_all": 0.012552301255230125,
+        "percent_of_negative": 0.017142857142857144
+      },
+      {
+        "bucket": "CENSORED",
+        "n": 0,
+        "n_within_negative": 0,
+        "percent_of_all": 0.0,
+        "percent_of_negative": 0.0
+      },
+      {
+        "bucket": "UNCLASSIFIED",
+        "n": 0,
+        "n_within_negative": 0,
+        "percent_of_all": 0.0,
+        "percent_of_negative": 0.0
+      }
+    ],
+    "regime_direction=-1": [
+      {
+        "bucket": "FLIP_LE_180",
+        "n": 33,
+        "n_within_negative": 0,
+        "percent_of_all": 0.28695652173913044,
+        "percent_of_negative": 0.0
+      },
+      {
+        "bucket": "LATE_181_240",
+        "n": 5,
+        "n_within_negative": 5,
+        "percent_of_all": 0.043478260869565216,
+        "percent_of_negative": 0.06097560975609756
+      },
+      {
+        "bucket": "LATE_241_300",
+        "n": 12,
+        "n_within_negative": 12,
+        "percent_of_all": 0.10434782608695652,
+        "percent_of_negative": 0.14634146341463414
+      },
+      {
+        "bucket": "LATE_301_450",
+        "n": 12,
+        "n_within_negative": 12,
+        "percent_of_all": 0.10434782608695652,
+        "percent_of_negative": 0.14634146341463414
+      },
+      {
+        "bucket": "LATE_451_600",
+        "n": 14,
+        "n_within_negative": 14,
+        "percent_of_all": 0.12173913043478261,
+        "percent_of_negative": 0.17073170731707318
+      },
+      {
+        "bucket": "FLIP_GT_600",
+        "n": 37,
+        "n_within_negative": 37,
+        "percent_of_all": 0.3217391304347826,
+        "percent_of_negative": 0.45121951219512196
+      },
+      {
+        "bucket": "PERSISTENT_GT_600",
+        "n": 1,
+        "n_within_negative": 1,
+        "percent_of_all": 0.008695652173913044,
+        "percent_of_negative": 0.012195121951219513
+      },
+      {
+        "bucket": "NO_FLIP_BEFORE_SESSION_END",
+        "n": 1,
+        "n_within_negative": 1,
+        "percent_of_all": 0.008695652173913044,
+        "percent_of_negative": 0.012195121951219513
+      },
+      {
+        "bucket": "CENSORED",
+        "n": 0,
+        "n_within_negative": 0,
+        "percent_of_all": 0.0,
+        "percent_of_negative": 0.0
+      },
+      {
+        "bucket": "UNCLASSIFIED",
+        "n": 0,
+        "n_within_negative": 0,
+        "percent_of_all": 0.0,
+        "percent_of_negative": 0.0
+      }
+    ],
+    "regime_direction=1": [
+      {
+        "bucket": "FLIP_LE_180",
+        "n": 31,
+        "n_within_negative": 0,
+        "percent_of_all": 0.25,
+        "percent_of_negative": 0.0
+      },
+      {
+        "bucket": "LATE_181_240",
+        "n": 9,
+        "n_within_negative": 9,
+        "percent_of_all": 0.07258064516129033,
+        "percent_of_negative": 0.0967741935483871
+      },
+      {
+        "bucket": "LATE_241_300",
+        "n": 8,
+        "n_within_negative": 8,
+        "percent_of_all": 0.06451612903225806,
+        "percent_of_negative": 0.08602150537634409
+      },
+      {
+        "bucket": "LATE_301_450",
+        "n": 12,
+        "n_within_negative": 12,
+        "percent_of_all": 0.0967741935483871,
+        "percent_of_negative": 0.12903225806451613
+      },
+      {
+        "bucket": "LATE_451_600",
+        "n": 12,
+        "n_within_negative": 12,
+        "percent_of_all": 0.0967741935483871,
+        "percent_of_negative": 0.12903225806451613
+      },
+      {
+        "bucket": "FLIP_GT_600",
+        "n": 48,
+        "n_within_negative": 48,
+        "percent_of_all": 0.3870967741935484,
+        "percent_of_negative": 0.5161290322580645
+      },
+      {
+        "bucket": "PERSISTENT_GT_600",
+        "n": 2,
+        "n_within_negative": 2,
+        "percent_of_all": 0.016129032258064516,
+        "percent_of_negative": 0.021505376344086023
+      },
+      {
+        "bucket": "NO_FLIP_BEFORE_SESSION_END",
+        "n": 2,
+        "n_within_negative": 2,
+        "percent_of_all": 0.016129032258064516,
+        "percent_of_negative": 0.021505376344086023
+      },
+      {
+        "bucket": "CENSORED",
+        "n": 0,
+        "n_within_negative": 0,
+        "percent_of_all": 0.0,
+        "percent_of_negative": 0.0
+      },
+      {
+        "bucket": "UNCLASSIFIED",
+        "n": 0,
+        "n_within_negative": 0,
+        "percent_of_all": 0.0,
+        "percent_of_negative": 0.0
+      }
+    ]
+  },
+  "schema_version": 1
+}

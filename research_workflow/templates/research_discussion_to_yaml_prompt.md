@@ -98,6 +98,25 @@ Predicate language: comparisons, `and` / `or` / `not`, durations like `120s`, re
 `age(STATE)`, `state`, event tests `x.flipped(to=-1)`, `x.changed`, `x.turned(from=, to=)`, `x.new_leg`,
 `x.terminated`, membership `x in [A, B]`. No arithmetic, no function calls beyond these.
 
+## AUTONOMY_DECISIONS (optional, predeclared fork policy)
+
+Record, next to the research question, the decisions the study owner may take WITHOUT asking (they land in
+`research_decision.yaml: autonomy_decisions`, `WORKFLOW.md` §N.4):
+
+```yaml
+autonomy_decisions:
+  on_capability_gap: stop_and_handoff                 # CAPABILITY_GAP_HANDOFF, end the session; never build it in the study
+  platform_change_required: chore_branch_and_fresh_session
+  deterministic_defect: auto_fix
+  calendar_reference_parity: common_interval_exact    # + known_globex_extension_descriptive (WORKFLOW.md §L.1)
+  frozen_parent_model: rescore_if_authenticated       # never_retrain
+  protected_period: never_expand_authority
+```
+
+Agents do not ask again when a declared policy resolves the fork. A genuine semantic choice with no
+policy (direction, primary arm, year double-use, tuning folds) is still asked as SEMANTIC_DECISION_REQUIRED;
+scientific defaults are never taken silently.
+
 ## Binding rules
 
 * MODE A (I pasted registry information): use those exact ids and parameters; nothing else.

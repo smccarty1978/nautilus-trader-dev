@@ -34,6 +34,24 @@ Rules:
 
 Roles that deliberately do not exist: a "study driver writer", a "collector author", a "manual OOS opener".
 
+## Supervisor workers (result-card contract)
+
+Under the Research Supervisor (`WORKFLOW.md` §O) every role above runs as a **fresh worker process** launched with a
+small pointer packet (`~/.nt_research/supervisor/<id>/packets/<task_id>.md`): exact role, task, files to read, allowed
+write surface, stop conditions, identity (`NT_RESEARCH_AGENT` / `NT_RESEARCH_AGENT_SESSION` are set per worker) and
+the result-card path. The worker does that one task and EXITS; it never continues into another role. It MUST write its
+result card through the CLI -- prose in stdout is never read:
+
+```bash
+python scripts/research.py study result --packet packet.md --status DONE --report report.md
+```
+
+Read-only auditors write their report to the path the packet names under the supervisor's `results/` dir, never under
+`studies/<id>/`; the supervisor copies it to `audit/pass_NN.md` / `contract_pass_NN.md` and ingests it. The packet and
+the card share binding fields (task id, packet hash, study contract hash, compiled-plan hash, source and platform
+commits, branch, worktree); a mismatch is `STALE_WORKER_RESULT`. A human-attended session of ANY provider (Claude,
+Codex, Gemini, Antigravity) can act as a worker by following the same packet and writing the same card.
+
 ## Starting a research project (every primary coding agent)
 
 1. Read `WORKFLOW.md`, then its §M **Concurrent research projects**.
@@ -47,6 +65,17 @@ Roles that deliberately do not exist: a "study driver writer", a "collector auth
 9. Execute the study through the controller (`python scripts/run_governed_study.py --study studies/<id> --through <stage> --execute-authorized`), never by hand. The controller re-checks the writer lease (who may edit) and then its own run lock (is a run already live); both must pass.
 10. Platform modifications belong on a separate `chore/*` worktree, never in the study branch.
 11. **Read-only roles** (repo-scout, lookahead-auditor, contract-checker, results-triager, capability-router, Explore) skip steps 2-8: they need no writer claim, may inspect source, artifacts, audit packets and results in any worktree, and mutate nothing but their own audit report.
+12. **STOP-AT-CAPABILITY-GAP** (`WORKFLOW.md` §N.1): when compile returns a gap that needs shared platform work, the CLI has already written `studies/<id>/CAPABILITY_GAP_HANDOFF.json`. Commit `study.yaml`, `research_decision.yaml` and the handoff, then END THE SESSION. Do not touch `research_workflow/`, the grammar/compiler or `features/`; do not build the capability; do not keep working. A fresh capability session (`ws chore claim` -> `chore/<topic>` -> implement -> merge -> `CAPABILITY_COMPLETE`) and a fresh study session (merge `main`, `ws claim`, recompile) follow.
+13. **One lifecycle phase per session** (`WORKFLOW.md` §N.2: A design/compile, B prepare/seal, C execution, D analysis/closure). End every session with `python scripts/research.py study handoff --study studies/<id> --phase <A|B|C|D>`; start every session by reading `_work/handoff/SESSION_HANDOFF.md` and `research study status`, never by re-discovering the repository.
+14. **Tests**: `python scripts/test_delta.py <scope>` (§N.3). Act only on `NEW_FAILURE`; never re-run branch-vs-main suites to classify pre-existing failures. Commit gate for chores: targeted tests per commit, ONE broad relevant `test_delta` run before merge only.
+15. **Fork policy**: follow `autonomy_decisions` in `research_decision.yaml` (§N.4) instead of asking; ask only for a genuine semantic choice no policy covers.
+16. **Long jobs**: launch detached through the controller, persist the status card, end the session (§N.5). Never poll or tail logs.
+
+### Study session budget (WORKFLOW.md §N.7)
+
+Owner context target **<= ~50k tokens, hand off before ~100k**; one bounded objective per session; no
+repeated repository discovery; no repeated baseline test classification; no platform implementation
+inside a study session after a CapabilityGap; no long-job polling. Policy for agents, not runtime limits.
 
 Three mechanisms, all independent, all required: **branch/worktree isolation** prevents cross-study
 file conflicts; the **writer lease** prevents cross-agent ownership conflicts; the **controller run

@@ -125,3 +125,5 @@ into `docs/WORKFLOW_REFERENCE_FACTS.md` → "Known defects".
 2. If it is a point-in-time report, name it as one and expect it to become HISTORICAL.
 3. Do not create a second workflow manual. That is what produced this table.
 4. Add new documents to this map in the same change.
+
+- `docs/packets/RESEARCH_SUPERVISOR_V1_PACKET.md` -- `[HISTORICAL]` implementation packet for the Research Supervisor V1; the current description is `WORKFLOW.md` §O.

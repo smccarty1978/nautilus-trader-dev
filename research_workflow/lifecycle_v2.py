@@ -1264,9 +1264,20 @@ class V2Lifecycle:
             bound["train_freeze_sha256"] = _read(freeze).get("freeze_sha256") or _sha(freeze)
         body = {"schema_version": 1, "study_id": self.study.name, "status": "CLOSED", "outcome": str(closure["outcome"]), "terminal_decision": str(closure["terminal_decision"]),
                 "platform": "v2", "plan_sha256": load_plan(self.study).get("plan_sha256"), "closed_at_utc": _now(), "bound_evidence": bound}
-        path = _write(self.artifacts / "study_closure.json", body)
-        from research_workflow.study_closure import load_study_closure
-        load_study_closure(self.study)
+        # DEV-08: validate BEFORE the closure persists, and never leave a rejected closure on disk -- a rejected
+        # closure that remained was later honoured as the study's terminal authority.
+        from research_workflow.study_closure import _validate_terminal_decision, load_study_closure
+        _validate_terminal_decision(self.study, body["terminal_decision"])
+        target = self.artifacts / "study_closure.json"
+        path = _write(target, body)
+        try:
+            load_study_closure(self.study)
+        except Exception:
+            try:
+                target.unlink()
+            except OSError:
+                pass
+            raise
         return {"status": "PASS", "outputs": [str(path)]}
 
 

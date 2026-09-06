@@ -1,0 +1,526 @@
+{
+  "schema_version": 1,
+  "platform_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+  "platform_tag": "baseline/2026-09-platform-v2-globex-calendar",
+  "generated_at_utc": "2026-09-05T05:06:52.270597+00:00",
+  "python": "3.13.7",
+  "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+  "marker_filter": "not slow (default; --include-slow lifts it)",
+  "scopes": [
+    "features/tests",
+    "research_workflow/tests",
+    "scripts/tests",
+    "tests"
+  ],
+  "environment_requirements": [
+    "~/.nt_research/config.yaml with catalog_roots (Dataset V2 catalogs), model_root, leases_dir, worktree_root",
+    "psutil, pandas_market_calendars, nautilus_trader installed",
+    "Windows paths (some tests are Windows-specific)"
+  ],
+  "expected_failures": [
+    {
+      "node_id": "features/tests/test_candidate_authority.py::test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "features/tests/test_feature_system_v2.py::test_explicit_instances_and_collection_universe_share_canonical_status",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_composite_target_expression.py::test_runtime_OR_flip_only_is_positive",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_diagnostic_followup_collector.py::test_inclusive_first_fire_continues_after_eligibility_and_finishes_on_canonical_flip",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_diagnostic_followup_collector.py::test_missing_score_censors_only_score_path_and_deadline_resolves_market",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_diagnostic_followup_collector.py::test_on_stop_market_censors_unterminated_anchor",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[clean_maturity_flip_model_180s_horizon]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[deep_pullback_5s_reacceleration_model]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[es_wick_imbalance_acceptance_v2]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[workflow_canary_ordered_barrier_v1]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[ym_prev5_range_position]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_10b_touch_one_second_past_the_horizon_does_not_count",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_8_timeout_when_neither_barrier_is_touched",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_9b_horizon_that_fits_before_close_is_labeled_not_censored",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[clean_maturity_flip_model_180s_horizon]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[clean_maturity_flip_model_rolling_productivity]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[deep_pullback_5s_reacceleration_model]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[reconstructed_long_rth_strict_retrain]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[workflow_canary_ordered_barrier_v1]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_pass1_acceptance.py::test_acc12_canaries_green",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_02_mixed_child_gap_thresholds_execute_independently",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity[AND]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity[OR]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_runtime_bindings.py::test_existing_non_episode_studies_are_not_regressed",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_single_primitive_ordered_barrier_regression.py::test_primitive_timeout_is_negative_not_censored",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_A_no_population_event_means_no_feature_row",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_B_no_duplicate_row_and_no_checkpoint_grid_row",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_C_atr_arm_and_atr_t_are_resolved_independently",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_F_short_prevailing_regime_routes_to_short_c",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_G_second_episode_same_prevailing_regime_is_a_distinct_capped_candidate",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_stage3_candidate_row_passes_output_manager_schema_contract",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_stage3_end_to_end_one_governed_candidate_row",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_stage3_no_checkpoint_grid_rows_in_episode_mode",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage4_parity.py::test_flag_b_family_a_runtime_parity_with_frozen_model_c_parent",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "research_workflow/tests/test_target_runtime.py::test_ordered_barrier_timeout_gap_ambiguous_and_exact_boundary",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "scripts/tests/test_analysis_loader.py::test_real_fixture_b_is_the_stale_compiled_study_case",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: assert False"
+    },
+    {
+      "node_id": "scripts/tests/test_direction_qualified_freeze_binding.py::test_aggregate_freeze_opens_the_real_oos_gate",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "research_workflow.experiment.ExperimentAuthorizationError: STUDY_CLOSED: closure is terminal and non-destructive"
+    },
+    {
+      "node_id": "scripts/tests/test_generic_contract_audit.py::test_no_hardcoded_feature_count_in_generic_workflow",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: generic research_workflow code compares a length against a magic number; derive it from the study contract instead: ['research_workflow/first_p90_gate.py:38', 'research_workflow/first_"
+    },
+    {
+      "node_id": "scripts/tests/test_generic_contract_audit.py::test_no_study_id_hardcoded_in_generic_workflow",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: generic research_workflow code references a specific study: ['research_workflow/provider_host.py -> clean_maturity_flip_model_rolling_productivity']"
+    },
+    {
+      "node_id": "scripts/tests/test_guardrail_mutations.py::test_authorized_domain_symmetry_passes_clean_code",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_guardrail_mutations.py::test_partial_authorized_domain_guard_mutation_blocked",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_instrument_evidence_and_session.py::test_collector_contains_no_inline_session_boundary",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: the collector must consult the canonical boundary module"
+    },
+    {
+      "node_id": "scripts/tests/test_nt_runner_backtest.py::test_running_w4_under_the_sealed_study_is_blocked_end_to_end",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_nt_runner_backtest.py::test_sealed_study_accepts_its_own_declared_strategy",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_nt_runner_backtest.py::test_sealed_study_strategy_override_is_blocked",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_nt_runner_backtest.py::test_study_bound_plan_allows_authorized_year_and_matches_generic_geometry",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_nt_runner_backtest.py::test_study_bound_plan_still_blocks_locked_dev_year",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_nt_runner_backtest.py::test_study_bound_plan_still_blocks_prohibited_years",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_registry_universe_output_contract.py::test_exact_formerly_rejected_aliases_are_in_the_single_canonical_universe",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: assert 36 == 35"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_blockers.py::test_rt1_seal_refuses_incomplete_preflight",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: seal must consult preflight evidence"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_rt1b1_real_code_edit_makes_existing_evidence_stale",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "Failed: DID NOT RAISE <class 'research_workflow.preflight.PreflightEvidenceError'>"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/check_feature_promotion.py]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: editing scripts/check_feature_promotion.py did not move the composite"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/select_required_tests.py]",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: editing scripts/select_required_tests.py did not move the composite"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_rt2b2_every_subprocess_invoked_gate_is_inside_the_governance_closure",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: no subprocess-invoked gates discovered; the extractor is broken"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_wb_preflight_uses_the_budget_constant_not_a_literal",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "assert 'timeout=CAUSAL_INVARIANTS_BUDGET_SECONDS' in '\"\"\"Deprecated shim; use :mod:`research_workflow.preflight`.\"\"\"\\nimport sys\\nfrom pathlib import Path\\n\\n_ROOT = Path(...1,F403\\n\\nif __name__ == \""
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_wb_timeout_still_blocks",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: assert 'FAILED' == 'TIMEOUT'"
+    },
+    {
+      "node_id": "scripts/tests/test_spec_fidelity_and_oos_lock.py::test_oos_lock_blocks_2024_access_without_token",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "backtests.nt_runtime.compiled_study_loader.StaleCompiledStudyError: STALE_COMPILED_STUDY: study.yaml has been modified since compilation."
+    },
+    {
+      "node_id": "scripts/tests/test_study_spec_extensions.py::test_asymmetric_ordered_barrier_target_compiles_to_runtime_contract",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "AssertionError: assert {'adverse_atr...ds': 300, ...} == {'adverse_atr...d': 'primary'}"
+    },
+    {
+      "node_id": "scripts/tests/test_study_spec_extensions.py::test_k_every_existing_study_yaml_still_validates_and_recompiles",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "pydantic_core._pydantic_core.ValidationError: 19 validation errors for StudySpec"
+    },
+    {
+      "node_id": "scripts/tests/test_study_test_inclusion.py::test_research_preflight_passes_study_flag_to_selector",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline (scripts/tests, not slow): pre-existing failures at main 3cbc8d06 (2026-09-05)",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "assert ('\"--study\"' in '\"\"\"Deprecated shim; use :mod:`research_workflow.preflight`.\"\"\"\\nimport sys\\nfrom pathlib import Path\\n\\n_ROOT = Path(...1,F403\\n\\nif __name__ == \"__main__\":\\n    from research_"
+    },
+    {
+      "node_id": "tests/test_feature_library.py::test_feature_collector_composition",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": "As..."
+    },
+    {
+      "node_id": "tests/test_feature_library.py::test_feature_engine_snapshot_immutability",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    },
+    {
+      "node_id": "tests/test_median_center.py::test_feature_engine_snapshot_integration",
+      "classification": "pre_existing",
+      "reason": "initial classified baseline: pre-existing failures at main e461ea37 (2026-09-05), reproduced at clean HEAD in a detached worktree",
+      "first_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "last_seen_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+      "message": ""
+    }
+  ]
+}

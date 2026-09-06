@@ -37,7 +37,14 @@ def test_workflow_has_the_canonical_concurrent_procedure():
                    "regime_breakout_context", "pullback_quality_target", "cross_market_context", "### M.6 Closure and merge back",
                    # multi-agent writer ownership: user@host + agent + session; three independent mechanisms
                    "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT", "owner_agent", "owner_session_id", "ws claim", "ws whoami",
-                   "WRITER LEASE", "CONTROLLER RUN LOCK", "branch + worktree isolation", "NT_RESEARCH_AGENT"):
+                   "WRITER LEASE", "CONTROLLER RUN LOCK", "branch + worktree isolation", "NT_RESEARCH_AGENT",
+                   # session efficiency (§N)
+                   "## N. Study session budget, phases and handoffs", "### N.1 STOP-AT-CAPABILITY-GAP", "CAPABILITY_GAP_HANDOFF.json",
+                   "### N.2 One lifecycle phase per owner session", "study handoff --study studies/<id> --phase", "SESSION_HANDOFF.json",
+                   "### N.3 Committed test-failure baseline", "scripts/test_delta.py", "config/test_failure_baseline.json", "NEW_FAILURE",
+                   "### N.4 Predeclared fork policy", "autonomy_decisions", "on_capability_gap", "### N.5 Long-run policy",
+                   "### N.6 Chore-worktree ownership", "ws chore claim", "PLATFORM_SURFACE_OWNED_BY_ANOTHER_AGENT",
+                   "### N.7 STUDY SESSION BUDGET", "<= ~50k tokens", "### L.1 Reference parity semantics", "common eligible calendar interval"):
         assert phrase in w, phrase
 
 
@@ -78,13 +85,22 @@ def test_entrypoints_and_quickstart_point_to_the_procedure():
     assert "launch_antigravity.cmd" in a and "WRITER_IDENTITY_AMBIGUOUS" in a
     assert (ROOT / "scripts" / "launch_antigravity.ps1").is_file() and (ROOT / "scripts" / "launch_antigravity.cmd").is_file()
     assert 'NT_RESEARCH_AGENT = "codex"' in _t(".codex/config.toml")
+    for phrase in ("STOP-AT-CAPABILITY-GAP", "One lifecycle phase per session", "study handoff", "test_delta.py", "autonomy_decisions", "Study session budget"):
+        assert phrase in a, phrase
+    for rel in ENTRYPOINTS:
+        assert "SESSION DISCIPLINE" in _t(rel) and "CAPABILITY_GAP_HANDOFF" in _t(rel), rel
+    for rel in ("docs/RESEARCH_DISCUSSION_TO_YAML.md", "research_workflow/templates/research_discussion_to_yaml_prompt.md"):
+        assert "## AUTONOMY_DECISIONS" in _t(rel) and "on_capability_gap: stop_and_handoff" in _t(rel), rel
+    assert 'study.add_parser("handoff"' in _t("scripts/research.py") and 'add_parser("chore"' in _t("scripts/research.py")
+    assert (ROOT / "scripts" / "test_delta.py").is_file() and (ROOT / "research_workflow" / "handoff.py").is_file()
 
 
 def test_agent_role_files_carry_worktree_rules():
     for name in WRITE_CAPABLE:
         t = _t(f".claude/agents/{name}.md")
         for phrase in ("Never write from `main`", "Never share a writer worktree", "study new <id>", "ws list", "`live` lease", "chore/*",
-                       "ws whoami", "ws claim <id>", "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT", "run lock", "--as <your agent>", "WRITER_IDENTITY_AMBIGUOUS"):
+                       "ws whoami", "ws claim <id>", "STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT", "run lock", "--as <your agent>", "WRITER_IDENTITY_AMBIGUOUS",
+                       "study handoff", "CAPABILITY_GAP_HANDOFF", "ws chore claim", "test_delta.py"):
             assert phrase in t, (name, phrase)
     for name in READ_ONLY:
         t = _t(f".claude/agents/{name}.md")
@@ -121,3 +137,29 @@ def test_mechanism_tests_exist():
                  "test_05_three_agents_three_studies_concurrently", "test_06_stale_lease_can_be_claimed_by_another_agent", "test_07_released_lease_can_be_claimed",
                  "test_08_read_only_auditor_inspects_without_writer_claim", "test_09_controller_run_lock_is_independent", "test_10_simultaneous_claims_have_exactly_one_winner"):
         assert f"def {name}(" in race, name
+
+
+def test_supervised_research_is_documented_and_wired():
+    """WORKFLOW.md section O is the default way to run a study; the CLI, QUICKSTART, AI_AGENTS and the role files agree."""
+    w = _t("WORKFLOW.md")
+    for phrase in ("## O. Supervised research (default)", "supervise start --question", "supervise status", "supervise decide", "supervise adopt",
+                   "supervise providers", "derive, do not invent", "STALE_WORKER_RESULT", "PROVIDER_CAPABILITY_UNAVAILABLE", "WAIT_STUDY_LEASE",
+                   "main_merge.lock", "locks/slots", "platform_merge: auto_if_green", "DESTRUCTIVE_ACTION_REQUIRES_APPROVAL",
+                   "SUPERVISOR_ESCALATION_REQUIRED", "SCIENTIFIC_SEMANTIC_DECISION_REQUIRED", "AUTHORIZATION_AMBIGUITY", "study result --packet",
+                   "Manual / debug path", "research_workflow/supervisor/", "scripts/tests/test_supervisor_blackbox.py"):
+        assert phrase in w, phrase
+    q = _t("docs/QUICKSTART.md")
+    assert "supervise start --question" in q and "supervise status" in q and "manual / debug path" in q
+    a = _t("docs/AI_AGENTS.md")
+    assert "## Supervisor workers (result-card contract)" in a and "study result --packet" in a and "STALE_WORKER_RESULT" in a
+    for name in ("lookahead-auditor", "contract-checker", "results-triager", "analysis-decider", "implementer"):
+        assert "## Supervisor result card" in _t(f".claude/agents/{name}.md"), name
+        assert "Supervisor result card" in _t(f".agents/agents_staging/{name}.md") and "Supervisor result card" in _t(f".codex/agents/{name}.toml"), name
+    cli = _t("scripts/research.py")
+    assert "add_supervise_parser(sub, ROOT)" in cli and "add_study_result_parser(study)" in cli
+    for rel in ("research_workflow/supervisor/core.py", "research_workflow/supervisor/derive.py", "research_workflow/supervisor/packets.py",
+                "research_workflow/supervisor/providers.py", "research_workflow/supervisor/resources.py", "scripts/research_supervisor.py"):
+        assert (ROOT / rel).is_file(), rel
+    core = _t("research_workflow/supervisor/core.py")
+    assert "governed_controller_v2" not in core.replace("never replaces or wraps", "")   # the supervisor launches the controller as a process, never imports it
+    assert "MainMergeLock" in core and "acquire_slot" in core and "validate_result" in core
