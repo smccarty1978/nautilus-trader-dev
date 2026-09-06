@@ -1,0 +1,19 @@
+{
+ "audit_report_path": "audit\\contract_pass_02.md",
+ "audit_report_sha256": "ae6a1c58f153743947fb91ba19750ca4b39a3645b5f482970a560da10f096577",
+ "audit_type": "contract",
+ "audited_execution_composite_sha256": "14b13abb23e53f3d415ecd1a54726baa03381e5772ef5c85fe1c7bc65c51ce2d",
+ "auditor": "contract-checker:009_contract_audit_d40607ee",
+ "critical": 0,
+ "derived_by_parser": "research_workflow.lifecycle_v2.ingest_audit_report",
+ "issued_at_utc": "2026-09-06T15:19:00.428050+00:00",
+ "note": 4,
+ "platform": "v2",
+ "verdict": "BLOCKED",
+ "warning": 1,
+ "retired_by": {
+  "who": "owner session a3e85351",
+  "why": "pass 02's WARNING 1 was remediated study-side by commit 99f06ed2 (research_decision.yaml pass_scope: TRAIN_ONLY_CONTROLLED_SCREEN). A study-contract disclosure does not change the execution closure, so the composite stays 14b13abb and derive.py -- which leaves AUDIT_BLOCKER only on a composite change -- can never clear the verdict. The BLOCKED status is retired so an INDEPENDENT pass 03 adjudicates the remediation; contract_pass_02.md is kept unchanged as the record.",
+  "at_utc": "2026-09-06T15:30:00+00:00"
+ }
+}
