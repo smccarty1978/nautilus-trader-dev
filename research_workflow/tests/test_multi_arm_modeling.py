@@ -428,6 +428,11 @@ def test_freeze_records_every_cell_by_name_and_binds_its_canonical_bytes(tmp_pat
         expected = ms.read_manifest(by_cell[cell]["model_id"], tmp_path / "store")["canonical"]["byte_sha256"]
         assert freeze["model_canonical_sha256"][key] == expected, "canonical sha must be the stored bytes, never null"
 
+    # provenance is a fact of the fit, not of whether it mirrored a single model to the top level
+    assert freeze["new_models_trained"] is True, "a natively trained multi-cell study must not claim otherwise"
+    assert set(freeze["metrics"]) == {"primary:LONG", "primary:SHORT"}
+    assert freeze["metrics"]["primary:LONG"]["final_validation"] is not None or freeze["metrics"]["primary:LONG"]["folds"] is not None
+
 
 def test_analyze_scores_every_frozen_cell_on_its_own_subset(tmp_path):
     """The OOS deliverable must carry a metric per cell, each scored on its own direction slice."""
@@ -468,3 +473,20 @@ def test_fit_records_carry_the_cell_subset(tmp_path):
     by_cell = {m["cell"]: m for m in body["models"]}
     assert by_cell["LONG"]["subset"] == {"regime_direction": 1}
     assert by_cell["SHORT"]["subset"] == {"regime_direction": -1}
+
+
+
+def test_a_cell_record_without_a_subset_is_refused(tmp_path):
+    """A pre-fix record carries no `subset`. Reading that as "no filter" would score the LONG and
+    SHORT models over the identical undirected population and report two plausible, wrong metric
+    sets -- so it must raise, exactly as an unnamed or unidentified record does."""
+    study, lc = _fit_then_open_dev(tmp_path, "cell_nosubset_probe")
+    lc.freeze()
+    _write_oos_partition(study, 2022)
+    path = study / "artifacts" / "experiment_models.json"
+    body = json.loads(path.read_text(encoding="utf-8"))
+    for m in body["models"]:
+        m.pop("subset", None)
+    path.write_text(json.dumps(body), encoding="utf-8")
+    with pytest.raises(LifecycleV2Error, match="MODEL_RECORD_SUBSET_MISSING"):
+        lc.analyze()
