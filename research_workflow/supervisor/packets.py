@@ -129,7 +129,9 @@ def render_packet(body: Dict[str, Any], path: Path) -> Path:
              "## Result card (MANDATORY; your stdout is not read)", "",
              f"Write `{body['result_path']}` through the CLI (it copies the binding fields from this packet):", "",
              "```", body["result_command"].replace("<this packet path>", str(path)), "```", "",
-             "A missing or invalid card means FAILED. `protected_data_accessed` must stay false unless the packet's stage authorizes it.", "",
+             "A missing or invalid card means FAILED. `protected_data_accessed` must stay false unless the packet's stage authorizes it.",
+             "Keep `--notes` / `--next-action` free of `;` `|` `&` `>` characters and under 300 characters: the read-only allowlist refuses compound",
+             "commands and every refused attempt costs a turn. Run the command exactly once, as a plain single command (no variable assignments).", "",
              _BODY_START, json.dumps(body, indent=2, sort_keys=True, default=str), _BODY_END, ""]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), encoding="utf-8")

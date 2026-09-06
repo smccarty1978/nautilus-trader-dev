@@ -11,6 +11,7 @@ a required flag that is absent fails BEFORE launch with ``PROVIDER_CAPABILITY_UN
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -96,7 +97,7 @@ def probe_provider(provider: str) -> Dict[str, Any]:
     if provider == "claude":
         flags = {f: _flag_present(help_text, f) for f in ("-p", "--print", "--output-format", "--permission-mode", "--dangerously-skip-permissions",
                                                             "--allowedTools", "--disallowedTools", "--add-dir", "--session-id", "--max-turns",
-                                                            "--no-session-persistence", "--tools", "--bare")}
+                                                            "--no-session-persistence", "--tools", "--bare", "--max-budget-usd")}
         rec["flags"] = flags
         rec["HEADLESS_SUPPORTED"] = bool(flags["-p"] or flags["--print"])
         rec["WRITE_SUPPORTED"] = rec["HEADLESS_SUPPORTED"] and bool(flags["--dangerously-skip-permissions"] or flags["--permission-mode"])
@@ -130,7 +131,7 @@ def _prompt(packet_path: Path, read_only: bool) -> str:
 
 
 def build_command(provider: str, *, packet_path: Path, worktree: Path, read_only: bool, results_dir: Path, session_id: str,
-                  probe: Optional[Dict[str, Any]] = None, scripted_command: Optional[List[str]] = None) -> List[str]:
+                  probe: Optional[Dict[str, Any]] = None, scripted_command: Optional[List[str]] = None, max_budget_usd: Optional[float] = None) -> List[str]:
     """The launch command, using only flags the installed binary printed in --help."""
     if provider == "scripted":
         if not scripted_command:
@@ -157,6 +158,8 @@ def build_command(provider: str, *, packet_path: Path, worktree: Path, read_only
             cmd += ["--no-session-persistence"]
         if flags.get("--add-dir"):
             cmd += ["--add-dir", str(results_dir)]
+        if max_budget_usd and flags.get("--max-budget-usd"):
+            cmd += ["--max-budget-usd", str(float(max_budget_usd))]   # a hard spend cap per worker (options.worker_max_budget_usd); off by default
         if read_only:
             if flags.get("--allowedTools"):
                 # both shell tools: Claude Code on Windows routes commands through its PowerShell tool (DEV-04)
@@ -200,7 +203,7 @@ def build_command(provider: str, *, packet_path: Path, worktree: Path, read_only
 
 def launch_worker(provider: str, *, role: str, worktree: Path, packet_path: Path, identity: Dict[str, Any], result_path: Path,
                   read_only: bool, timeout_s: float, log_path: Path, results_dir: Path, task_id: str,
-                  probe: Optional[Dict[str, Any]] = None, scripted_command: Optional[List[str]] = None) -> LaunchHandle:
+                  probe: Optional[Dict[str, Any]] = None, scripted_command: Optional[List[str]] = None, max_budget_usd: Optional[float] = None) -> LaunchHandle:
     """Start ONE fresh worker process (or prepare an attended packet). ``identity['session_id']`` is a fresh uuid per worker
     so the v3 writer lease is per worker; read-only auditors get the identity but never claim."""
     session_id = str(identity.get("session_id") or uuid.uuid4())
@@ -224,10 +227,45 @@ def launch_worker(provider: str, *, role: str, worktree: Path, packet_path: Path
         return LaunchHandle(task_id, provider, None, started.isoformat(), deadline, str(result_path), str(packet_path), attended=True, command=[],
                             log_path=str(log_path), session_id=session_id)
     cmd = build_command(provider, packet_path=packet_path, worktree=worktree, read_only=read_only, results_dir=results_dir, session_id=session_id,
-                        probe=probe, scripted_command=scripted_command)
+                        probe=probe, scripted_command=scripted_command, max_budget_usd=max_budget_usd)
     pid = spawn_detached(cmd, cwd=worktree, log_path=log_path, env=env)
     return LaunchHandle(task_id, provider, pid, started.isoformat(), deadline, str(result_path), str(packet_path), attended=False, command=cmd,
                         log_path=str(log_path), session_id=session_id)
+
+
+METRIC_KEYS = ("num_turns", "total_cost_usd", "duration_ms", "duration_api_ms", "is_error", "subtype", "stop_reason")
+
+
+def worker_metrics(handle: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Turns / cost / tokens / permission denials of a finished ``claude`` worker, parsed from the ``--output-format json``
+    result line in its log (the last line that is a JSON object carrying ``num_turns``). None for other providers or when the
+    log carries no result object (a killed worker). Efficiency bookkeeping only; never used for routing."""
+    if str(handle.get("provider")) != "claude" or not handle.get("log_path"):
+        return None
+    try:
+        text = Path(str(handle["log_path"])).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    obj: Optional[Dict[str, Any]] = None
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("{") and '"num_turns"' in s:
+            try:
+                cand = json.loads(s)
+            except ValueError:
+                continue
+            if isinstance(cand, dict):
+                obj = cand
+    if not obj:
+        return None
+    usage = obj.get("usage") or {}
+    out: Dict[str, Any] = {k: obj.get(k) for k in METRIC_KEYS}
+    out.update({"input_tokens": usage.get("input_tokens"), "cache_read_input_tokens": usage.get("cache_read_input_tokens"),
+                "cache_creation_input_tokens": usage.get("cache_creation_input_tokens"), "output_tokens": usage.get("output_tokens"),
+                "permission_denials": len(obj.get("permission_denials") or []),
+                "denied_commands": [str((d.get("tool_input") or {}).get("command") or d.get("tool_name"))[:160] for d in (obj.get("permission_denials") or [])][:10],
+                "models": sorted((obj.get("modelUsage") or {}).keys())})
+    return out
 
 
 def poll(handle: Dict[str, Any]) -> str:
@@ -245,4 +283,4 @@ def kill(handle: Dict[str, Any]) -> bool:
 
 
 __all__ = ["PROVIDERS", "ATTENDED_PROVIDERS", "ProviderError", "LaunchHandle", "probe_provider", "probe_all", "build_command", "launch_worker",
-           "poll", "kill"]
+           "poll", "kill", "worker_metrics"]

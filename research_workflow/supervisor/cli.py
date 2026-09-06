@@ -76,7 +76,13 @@ def cmd_supervise(ns: argparse.Namespace, repo_root: Path) -> int:
                 payload.update(_detach_loop(repo_root, sup.study_id))
             return _card(payload, ok=payload.get("loop_alive", True))
         if ns.cmd == "resume":
+            from research_workflow.supervisor.procs import pid_alive
             sup = Supervisor(ns.study_id)
+            live = sup._loop_pid() if hasattr(sup, "_loop_pid") else None
+            if not ns.no_detach and live and pid_alive(live):
+                # one loop per study: a second loop would tick the same state and could launch a stage twice
+                sup.state["stopped"] = False; S.save_state(sup.state); S.append_event(sup.study_id, "RESUME", loop_already_alive=live)
+                return _card({"study_id": sup.study_id, "loop_pid": live, "loop_alive": True, "note": "LOOP_ALREADY_ALIVE: the detached loop is running; not re-spawned"})
             sup.state["stopped"] = False; S.save_state(sup.state); S.append_event(sup.study_id, "RESUME")
             payload = {"study_id": sup.study_id}
             if ns.no_detach:

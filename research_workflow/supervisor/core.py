@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
+from research_workflow.supervisor import audit_brief as AB
 from research_workflow.supervisor import derive as D
 from research_workflow.supervisor import packets as P
 from research_workflow.supervisor import providers as PR
@@ -581,14 +582,44 @@ class Supervisor:
         task_id = self._new_task_id(session_type)
         report = self.dir / "results" / f"{task_id}.report.md"
         auditor = f"{P.ROLES[session_type]['role']}:{task_id}"
-        task = (f"PHASE B {kind.upper()} AUDIT, READ-ONLY. Read the compact packet {d['evidence'].get('packet')} (never the whole repository) and audit it per your role file. "
-                f"Write your report to {report} (NOT under studies/). End it with the AUDIT_SUMMARY_V2 block: "
+        packet_path = d["evidence"].get("packet")
+        # the bounded brief: gate facts, the changed closure files since the prior audited composite, prior findings, the
+        # auditor's exact checklist subset. The auditor reads brief -> packet -> role file, nothing else by default.
+        prior = self._prior_audit(session_type)
+        brief = AB.build_audit_brief(kind=kind, study_id=self.study_id, study_dir=self.study_dir, worktree=self.worktree, task_id=task_id,
+                                     audit_packet=Path(packet_path) if packet_path else None, report_path=report, auditor=auditor,
+                                     frozen_composite=d["evidence"].get("frozen_composite"), out_path=self.dir / "packets" / f"{task_id}.brief.md",
+                                     manifest_snapshot=self.dir / "packets" / f"{task_id}.manifest.json",
+                                     prior_manifest=Path(prior["manifest"]) if prior and prior.get("manifest") else None,
+                                     prior_source_commit=(prior or {}).get("source_commit"))
+        S.append_event(self.study_id, "AUDIT_BRIEF_WRITTEN", task_id=task_id, **{k: brief[k] for k in ("brief_bytes", "audit_packet_bytes", "pass", "closure_changed",
+                                                                                                          "closure_added", "closure_removed", "closure_changed_vs_main")})
+        task = (f"PHASE B {kind.upper()} AUDIT, READ-ONLY, BOUNDED. Read the brief {brief['brief_path']} FIRST: it carries the gate facts, the changed closure files, "
+                f"the prior findings to adjudicate and your exact checklist subset. Then read the compact packet {packet_path} (never the whole repository) and "
+                f"audit it per your role file's supervisor-brief mode. Write your report to {report} (NOT under studies/). End it with the AUDIT_SUMMARY_V2 block: "
                 f"{{\"verdict\": CLEAR|BLOCKED, \"audit_type\": \"{kind}\", \"study\": \"{self.study_id}\", \"auditor\": \"{auditor}\", "
                 f"\"audited_execution_composite_sha256\": \"{d['evidence'].get('frozen_composite')}\", \"critical\": n, \"warning\": n, \"note\": n}} between "
                 f"<!-- AUDIT_SUMMARY_V2_START --> and <!-- AUDIT_SUMMARY_V2_END -->. Then write the result card with --report {report}. Mutate nothing in the study worktree.")
+        role_file = P.ROLES[session_type]["role_file"]
         return self._launch_worker(session_type, task=task, attempt_key=key, task_id=task_id, auditor=auditor,
                                    stop=["report written with a verdict (DONE)", "packet unreadable/incomplete (FAILED)"],
-                                   extra={"audit_packet": d["evidence"].get("packet"), "report_path": str(report), "frozen_composite": d["evidence"].get("frozen_composite")})
+                                   extra={"audit_packet": packet_path, "report_path": str(report), "frozen_composite": d["evidence"].get("frozen_composite"),
+                                          "brief_path": brief["brief_path"], "brief_bytes": brief["brief_bytes"], "audit_pass": brief["pass"]},
+                                   read_files=[str(brief["brief_path"]), str(packet_path), *([role_file] if role_file else [])], brief=brief)
+
+    def _prior_audit(self, session_type: str) -> Optional[Dict[str, Any]]:
+        """The last DONE worker of the same audit kind: its frozen-manifest snapshot and the source commit it audited."""
+        for h in reversed(self.state.get("worker_history") or []):
+            if h.get("session_type") == session_type and h.get("status") == "DONE":
+                snap = self.dir / "packets" / f"{h['task_id']}.manifest.json"
+                packet = self.dir / "packets" / f"{h['task_id']}.md"
+                src = None
+                try:
+                    src = P.read_packet(packet).get("source_commit") if packet.is_file() else None
+                except ValueError:
+                    src = None
+                return {"task_id": h["task_id"], "manifest": str(snap) if snap.is_file() else None, "source_commit": src}
+        return None
 
     def _launch_repair(self, d: Dict[str, Any]) -> Dict[str, Any]:
         bc = d.get("blocker_code") or "DETERMINISTIC"
@@ -627,7 +658,8 @@ class Supervisor:
         return self._launch_worker("ANALYSIS_DECISION", task=task, attempt_key=key, stop=["analysis_decision.json written and committed (DONE)"], extra={})
 
     def _launch_worker(self, session_type: str, *, task: str, attempt_key: str, stop: List[str], extra: Dict[str, Any], task_id: Optional[str] = None,
-                       worktree_override: Optional[Path] = None, auditor: Optional[str] = None, on_launch=None) -> Dict[str, Any]:
+                       worktree_override: Optional[Path] = None, auditor: Optional[str] = None, on_launch=None, read_files: Optional[List[str]] = None,
+                       brief: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         st = self.state
         if st.get("active_worker"):
             return self._card("WAITING_WORKER", "wait")
@@ -650,8 +682,8 @@ class Supervisor:
         packet_path = self.dir / "packets" / f"{task_id}.md"
         body = P.build_packet(task_id=task_id, session_type=session_type, study_id=self.study_id, study_dir=self.study_dir, study_worktree=self.worktree,
                               repo_root=self.repo_root, provider=provider, identity=worker_identity, result_path=result_path, results_dir=results_dir, task=task,
-                              read_files=self._common_reads() + ([role["role_file"]] if role["role_file"] else []), stop_conditions=stop, extra=extra,
-                              worktree_override=worktree_override, auditor=auditor)
+                              read_files=list(read_files) if read_files is not None else self._common_reads() + ([role["role_file"]] if role["role_file"] else []),
+                              stop_conditions=stop, extra=extra, worktree_override=worktree_override, auditor=auditor)
         P.render_packet(body, packet_path)
         size = packet_path.stat().st_size
         st["counters"]["max_packet_bytes"] = max(int(st["counters"].get("max_packet_bytes") or 0), size)
@@ -663,7 +695,7 @@ class Supervisor:
             handle = PR.launch_worker(provider, role=role["role"], worktree=wt, packet_path=packet_path, identity=worker_identity, result_path=result_path,
                                       read_only=bool(role["read_only"]), timeout_s=float(self.options.get("worker_timeout_s") or DEFAULT_WORKER_TIMEOUT_S),
                                       log_path=self.dir / "logs" / f"{task_id}.log", results_dir=results_dir, task_id=task_id, probe=probe,
-                                      scripted_command=self.options.get("scripted_worker"))
+                                      scripted_command=self.options.get("scripted_worker"), max_budget_usd=self.options.get("worker_max_budget_usd"))
         except PR.ProviderError as exc:
             R.release_slot(slot)
             if lease_handoff:
@@ -673,7 +705,8 @@ class Supervisor:
         aw = {"role": role["role"], "session_type": session_type, "task_id": task_id, "provider": provider, "session_id": worker_identity["session_id"],
               "pid": handle.pid, "started_at_utc": handle.started_at_utc, "packet_path": str(packet_path), "result_path": str(result_path),
               "deadline_utc": handle.deadline_utc, "attended": handle.attended, "attempt_key": attempt_key, "slot": str(slot), "read_only": bool(role["read_only"]),
-              "worktree": str(wt), "worktree_status_before": wt_status, "lease_handoff": lease_handoff, "packet_bytes": size, "log_path": handle.log_path}
+              "worktree": str(wt), "worktree_status_before": wt_status, "lease_handoff": lease_handoff, "packet_bytes": size, "log_path": handle.log_path,
+              "brief_bytes": (brief or {}).get("brief_bytes"), "audit_packet_bytes": (brief or {}).get("audit_packet_bytes")}
         st["active_worker"] = aw
         st["counters"]["workers_launched"] = int(st["counters"].get("workers_launched") or 0) + 1
         st["current_phase"] = role["phase"]
@@ -822,10 +855,22 @@ class Supervisor:
         R.release_slot(Path(aw["slot"]) if aw.get("slot") else None)
         if aw.get("lease_handoff"):
             self._take_lease_back(_identity(aw["provider"], aw["session_id"]))
+        metrics = PR.worker_metrics(aw)
+        finished = S.now_utc()
+        try:
+            wall_s = (datetime.fromisoformat(finished) - datetime.fromisoformat(str(aw.get("started_at_utc")))).total_seconds()
+        except (TypeError, ValueError):
+            wall_s = None
         rec = {"task_id": aw["task_id"], "session_type": aw["session_type"], "session_id": aw["session_id"], "status": status, "reason": reason, "field": field,
-               "result_path": aw["result_path"] if card else None, "packet_bytes": aw.get("packet_bytes"), "started_at_utc": aw.get("started_at_utc"), "finished_at_utc": S.now_utc(),
-               "commits": (card or {}).get("commits"), "changed_files": (card or {}).get("changed_files")}
+               "result_path": aw["result_path"] if card else None, "packet_bytes": aw.get("packet_bytes"), "brief_bytes": aw.get("brief_bytes"),
+               "audit_packet_bytes": aw.get("audit_packet_bytes"), "started_at_utc": aw.get("started_at_utc"), "finished_at_utc": finished, "wall_s": wall_s,
+               "commits": (card or {}).get("commits"), "changed_files": (card or {}).get("changed_files"), "metrics": metrics}
         st.setdefault("worker_history", []).append(rec)
+        if metrics:
+            c = st["counters"]
+            c["worker_turns"] = int(c.get("worker_turns") or 0) + int(metrics.get("num_turns") or 0)
+            c["worker_cost_usd"] = round(float(c.get("worker_cost_usd") or 0.0) + float(metrics.get("total_cost_usd") or 0.0), 6)
+            c["worker_permission_denials"] = int(c.get("worker_permission_denials") or 0) + int(metrics.get("permission_denials") or 0)
         if card:
             st.setdefault("consumed_results", []).append(aw["result_path"])
         st["active_worker"] = None
