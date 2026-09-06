@@ -134,6 +134,15 @@ features and Model-C was fit expecting it (LightGBM native NaN, no complete-case
 Recorded here only so a future study does not mistake the null rate for a wiring bug
 (`studies/deep_pullback_5s_reacceleration_model/artifacts/rolling_300s_parent_parity_audit.json`).
 
+**`scripts/benchmark_historical_same_harness.py` cannot run on the current tree** (found by the
+2026-09-06 collection-latency measurement, `artifacts/platform_v2/collection_latency/W0_REPORT.md`).
+It hard-codes the historical study `clean_maturity_flip_model_rolling_productivity`, whose compiled
+artifact is stale (`STALE_COMPILED_STUDY`), and recompiling a historical study is prohibited; it also
+drives the V1 `compiled_study_loader` / `MinimalCheckpointCollector` path rather than the V2 host, so
+the telemetry figures above are not reproducible through it. Same-harness V2 throughput is measured
+instead through `research_workflow.host_runner.run_plan_on_catalog` on a closed study's compiled plan
+(read-only): 23.4 k bars/s on one month, 10.5 k bars/s on a full year, 13-instance surface, 2026-09-06.
+
 `scripts/tests/test_round2_invariants.py:317` hashes with `read_bytes()` instead of
 `canonical_file_sha256` — see the Hashing convention section above.
 

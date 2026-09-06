@@ -1018,7 +1018,9 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "chronology", f"years {sorted(a & b)} appear in both {na} and {nb}")
     chronology = {"train": sorted(train), "dev": sorted(dev), "prohibited": sorted(prohibited), "diagnostic": sorted(diag),
                   "warmup": ch.warmup.model_dump(), "authorized_dates": list(ch.authorized_dates),
-                  "windows": _resolve_partition_windows(ctx, ch, train, dev, prohibited)}
+                  "windows": _resolve_partition_windows(ctx, ch, train, dev, prohibited),
+                  # Reuse policy only: never read by the replay (research_workflow.replay_closure excludes it from the key).
+                  "partition_reuse": {"mode": ch.partition_reuse, "shadow": ch.partition_reuse_shadow}}
     model_spec = ctx.spec.model
     if model_spec == "none":
         return chronology, None
@@ -1293,12 +1295,26 @@ def transitive_closure_files(seeds: Iterable[str], repo_root: Path) -> Set[str]:
     repo_root = Path(repo_root)
     seen: Set[str] = set()
     stack = [s for s in seeds]
+
+    def package_inits(rel: str) -> List[str]:
+        # Importing ``a.b.c`` executes ``a/__init__.py`` and ``a/b/__init__.py`` first: those package
+        # modules are on the replay path and belong in the closure (found empirically by the smoke
+        # import trace, 2026-09-06: backtests/nt_runtime/__init__.py re-exports the study loader and
+        # was in neither the collection closure nor the frozen manifest).
+        parts = Path(rel).parts[:-1]
+        out = []
+        for i in range(1, len(parts) + 1):
+            init = "/".join(parts[:i]) + "/__init__.py"
+            if (repo_root / init).is_file():
+                out.append(init)
+        return out
+
     while stack:
         rel = stack.pop()
         if rel in seen:
             continue
         seen.add(rel)
-        for dep in _static_imports(rel, repo_root):
+        for dep in list(_static_imports(rel, repo_root)) + package_inits(rel):
             if dep in seen:
                 continue
             parts = Path(dep).parts

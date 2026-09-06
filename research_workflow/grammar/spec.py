@@ -215,6 +215,18 @@ class ChronologySpec(_Strict):
     # NARROW an authorized year, they can never open a year the roles did not already authorize.
     # A role year with no window keeps whole-year behaviour.
     windows: List[str] = Field(default_factory=list)
+    # Partition reuse (opt-in). ``replay_closure`` lets `collection` serve an existing partition whose
+    # recorded replay-closure key (collection-stage closure composite + replay-affecting plan subset +
+    # dataset digest + partition interval + authorization) equals the key derived from the CURRENT
+    # plan, instead of re-replaying it; `reconcile` re-attests every reuse from the artifact and the
+    # contract audit sees the reuse decision. ``off`` (default) keeps whole-plan/seal matching, so every
+    # existing study is bit-identical. The seal and the frozen execution manifest are never consulted
+    # less than before: reuse is a second, narrower identity, not a bypass.
+    partition_reuse: Literal["off", "replay_closure"] = "off"
+    # Shadow verification of reuse: ``every_run`` recomputes one reused partition per collection run and
+    # requires byte-identity (bake-in default); ``sampled`` recomputes on one run in four. A mismatch is
+    # terminal (PARTITION_REUSE_SHADOW_MISMATCH): the key is unsound and every reuse since is suspect.
+    partition_reuse_shadow: Literal["every_run", "sampled"] = "every_run"
 
 
 class ValidationSpec(_Strict):

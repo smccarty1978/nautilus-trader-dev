@@ -139,10 +139,15 @@ def causal_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite
 
 
 def contract_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite: str, dirty_paths: List[str], test_summary: Mapping[str, Any],
-                    seal: Mapping[str, Any] | None = None, study_python: Mapping[str, Any] | None = None) -> Dict[str, Any]:
+                    seal: Mapping[str, Any] | None = None, study_python: Mapping[str, Any] | None = None,
+                    partition_reuse: Mapping[str, Any] | None = None) -> Dict[str, Any]:
     model = plan.get("model") or {}
     outcome = plan["outcome"]
     packet = {
+        # Partition reuse (chronology.partition_reuse): the declared policy and, per existing TRAIN partition, whether
+        # `collection` would serve it under the current plan instead of re-replaying it. The auditor audits the
+        # reuse DECISION and its receipt; the data itself is re-attested deterministically by `reconcile`.
+        "partition_reuse": dict(partition_reuse) if partition_reuse is not None else {"declared": ((plan.get("chronology") or {}).get("partition_reuse") or {"mode": "off"}), "partitions": []},
         "packet_version": 2, "audit_type": "contract", "study_id": study_id, "plan_sha256": plan.get("plan_sha256"), "spec_sha256": plan.get("spec_sha256"),
         "identity": {"execution_composite_sha256": execution_composite, "registry_sha256": plan.get("registry_sha256"), "seal": dict(seal or {})},
         "study": plan.get("study"), "instruments": {k: {kk: v.get(kk) for kk in ("dataset_id", "dataset_digest", "role")} for k, v in plan["instruments"].items()},

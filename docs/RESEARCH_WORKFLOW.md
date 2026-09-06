@@ -1374,3 +1374,59 @@ Scope is deliberately narrow: `*.golden.json` and other tracked model-adjacent J
 existing behaviour because their recorded hashes were taken from post-checkout bytes.
 
 Tests: `research_workflow/tests/test_train_provenance_attestation.py` (in `PLATFORM_TESTS`).
+
+### 21.13 Partition reuse under the replay-closure key (`chronology.partition_reuse`)
+
+Every post-collection re-collection observed in the 2026-09-06 latency measurement
+(`artifacts/platform_v2/collection_latency/W0_REPORT.md`) replayed a byte-identical replay closure:
+the trigger was an analysis-only spec edit or a fit/freeze-stage platform fix, and
+`_partition_valid()` keyed partition reuse on `plan_sha256` **and** `composite_seal_hash`, so any
+re-seal invalidated every partition. The seal and the 90-file frozen execution manifest are correct
+and unchanged; what was missing is a *second, narrower* identity for "what a partition is a
+function of", used only as a reuse key.
+
+`research_workflow/replay_closure.py` **derives** it (never enumerates it):
+
+```
+replay_closure_sha256 = H( plan.closure.stages.collection.composite_sha256   # bound host/provider/tracker modules + transitive imports
+                         + replay-affecting plan subset                      # plan minus analysis/model/study/notes and the identity fields
+                         + dataset {dataset_id, logical_digest}
+                         + partition interval {period, year, primary, run_end, warmup_days, windows}
+                         + experiment authorization_sha256 )
+```
+
+Fail-closed: anything not provably consumed after collection stays in the key; a module first
+imported during the **smoke** replay that is outside the collection-stage closure is a hard failure
+(`REPLAY_CLOSURE_ESCAPE`, smoke `REJECTED`, `artifacts/replay_closure_trace.json`) and never an
+automatic widening; `replay_closure ⊆ manifest` is tested. Opt-in, TRAIN only, default `off` (every
+existing study is bit-identical):
+
+```yaml
+chronology:
+  partition_reuse: replay_closure      # off (default) | replay_closure
+  partition_reuse_shadow: every_run    # every_run (default, bake-in) | sampled (one run in four)
+```
+
+Mechanics, in lifecycle order. Every partition manifest now records its binding
+(`manifest.replay_closure`). The **contract audit packet** carries `partition_reuse`: the declared
+policy and, per existing partition, whether `collection` would serve it under the current plan and
+why (`partition_reuse_preview`) — the auditor audits the reuse *decision*. `collection` serves a
+partition only if the recorded key equals the key derived from the current plan, the recorded
+components re-hash to the recorded key, and the parquet bytes hash to the manifest; it writes
+`_work/controller/train_partition_reuse.json` (reused / recomputed / refused with reasons) and runs a
+**shadow verification**: one reused partition, chosen uniformly with the seal as seed, is recomputed
+into `partitions_shadow/` and must be byte-identical; a mismatch is
+`PARTITION_REUSE_SHADOW_MISMATCH`, terminal — halt, never retry, never widen the key. `sampled` may be
+declared only after five consecutive studies have cleared shadow verification. `reconcile`
+**re-attests** every partition whose manifest plan differs from the current plan: receipt present,
+key re-derived from the current plan, bytes re-hashed, shadow IDENTICAL (or skipped by a declared
+sampled policy); anything else is a reconcile finding, and a foreign-plan partition under `off` is a
+finding too.
+
+Known limit (escalated 2026-09-06, not decided here): the compiler's collection-stage closure is
+85 of the 90 manifest files because `research_workflow/grammar/compiler.py` is a closure seed and
+statically imports `research/analysis/diagnostic_ops.py` → `model_store.py` → `policy.py` →
+`lifecycle_v2.py` → …. A change to the controller or the analysis modules therefore still refuses
+reuse (correctly, under the strict key). Both live 2026-09-06 cases changed exactly those two files.
+
+Tests: `research_workflow/tests/test_replay_closure.py`.
