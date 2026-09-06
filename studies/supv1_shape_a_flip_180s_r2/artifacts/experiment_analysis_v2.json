@@ -1,0 +1,41 @@
+{
+  "authority": "plan.chronology.dev",
+  "contract": "label",
+  "dispositions": {
+    "CENSORED": 3072,
+    "LABELED_NEGATIVE": 396149,
+    "LABELED_POSITIVE": 76263
+  },
+  "generated_at_utc": "2026-09-06T06:47:26.983900+00:00",
+  "model_authentication": {
+    "canonical_sha256": "1fcba0d0af4d197aa1f55561d4786b52fbd59a81c050418bca3d4e27caf6400f",
+    "feature_contract_sha256": "c60e2838a747f1ddd884fa3931187b6ba394fef617c03dda1fb9336167828e03",
+    "golden": {
+      "max_abs_diff": 0.0,
+      "model_id": "1bc300d1bd4db7c355b7211dc7f2132328984d296d7c966f7c64a39b52c0130b",
+      "n_rows": 256,
+      "status": "PASS"
+    },
+    "identity_rule": "v2_lineage_sha256",
+    "model_id": "1bc300d1bd4db7c355b7211dc7f2132328984d296d7c966f7c64a39b52c0130b",
+    "selection_status": "selected",
+    "tier": "registry"
+  },
+  "oos_metrics": {
+    "brier": 0.12747480848769988,
+    "n": 472412,
+    "pr_auc": 0.2833249768282369,
+    "roc_auc": 0.6839063744812204
+  },
+  "oos_years": [
+    2022
+  ],
+  "plan_sha256": "19a4543583eb584f8b53f3f2d2aa5866e0a8de670f92938a9b8783710f61ea2b",
+  "rows": 475484,
+  "schema_version": 2,
+  "train_metrics": {
+    "final_validation": null,
+    "folds": [],
+    "tuning": null
+  }
+}

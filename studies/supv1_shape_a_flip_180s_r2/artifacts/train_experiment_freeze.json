@@ -1,0 +1,57 @@
+{
+  "partition": "train",
+  "platform": "v2",
+  "plan_sha256": "19a4543583eb584f8b53f3f2d2aa5866e0a8de670f92938a9b8783710f61ea2b",
+  "execution_composite_sha256": "ee051527aa24c26591c0ef9f22316e4d2015ce6d752cdd8d8b66ea3356997984",
+  "feature_sets": {
+    "primary": [
+      "prior_1m_regime_efficiency",
+      "prior_5m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_5m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ]
+  },
+  "preprocessing_hash": "identity",
+  "model_hashes": {
+    "primary": "1bc300d1bd4db7c355b7211dc7f2132328984d296d7c966f7c64a39b52c0130b"
+  },
+  "model_canonical_sha256": {
+    "primary": "1fcba0d0af4d197aa1f55561d4786b52fbd59a81c050418bca3d4e27caf6400f"
+  },
+  "thresholds": {},
+  "deciles": {},
+  "new_models_trained": true,
+  "merge_identity": {
+    "authority": "plan.chronology.train",
+    "candidates_identity": "0d2166efae01b530aaa78b52d9a21e828ccf1a6104786844d90eb3bb01b73e1a",
+    "candidates_sha256": "fa67317ab8424ae2a9e9c5a5b7e1b9e13cb5608553c48041c48ba51721118abc",
+    "generated_at_utc": "2026-09-06T06:24:38.492465+00:00",
+    "observations_identity": "f26fa5f0b6c8c706182b4a1bbb2e177a97cd0751a1585ac9e68394b3c3f8ffe3",
+    "observations_sha256": "136855e9bd0aba6ac1d32b6c60aa5ef7c79db5f138411d3d8f778472e0d6ee6c",
+    "plan_sha256": "19a4543583eb584f8b53f3f2d2aa5866e0a8de670f92938a9b8783710f61ea2b",
+    "rows": 453768,
+    "years": [
+      2021
+    ]
+  },
+  "metrics": {
+    "final_validation": null,
+    "folds": [],
+    "tuning": null
+  },
+  "label_column": "target_flip_within_horizon",
+  "schema_version": 1,
+  "study_id": "supv1_shape_a_flip_180s_r2",
+  "authorization_sha256": "6381990dc94ffd450b4184de21d61f4622287dd083a5239ce24116451d67a80b",
+  "generated_at_utc": "2026-09-06T06:24:52.915140+00:00",
+  "freeze_sha256": "546ee11a9dc40042eb7163cd129e8ca5815579bb6b1665fb4b2dab28a157e5e7"
+}
