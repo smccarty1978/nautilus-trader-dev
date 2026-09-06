@@ -1,0 +1,106 @@
+# ES 180s Model C portability -- Platform V2 study, composed only of REGISTERED primitives.
+# Every semantic below is resolved from a governed authority, not inferred:
+#   * feature surface / target / population : studies/clean_maturity_flip_model_180s_horizon
+#     (artifacts/frozen_feature_manifest.json, study.yaml population+target blocks) -- a frozen
+#     REFERENCE, never recompiled, never retrained.
+#   * fixed direction hyperparameters        : that study's artifacts/model_selection_manifest_{long,short}.json `winner.C`.
+#   * dataset                                : research/datasets/ES_1S_V2_GLOBEX.yaml (PLATFORM_STATE.json datasets.current.ES).
+# The scientific decisions are declared in research_decision.yaml; SPEC.md carries the full contract.
+study:
+  id: es_180s_model_c_portability
+  tier: 2
+  question: "Does the frozen NQ 13-feature 180s Model C architecture, trained natively on ES 2020-2023, show meaningful forward discrimination for a prevailing 1m regime flip within 180s on untouched ES 2024?"
+  description: >
+    Cross-instrument portability. Fixed architecture, fixed 13-feature surface, fixed
+    direction-specific hyperparameters carried over from the NQ parent; only the instrument
+    and the fitting rows change. No feature discovery, no tuning, no economics.
+
+# ES only. No NQ row may enter ES model fitting (the study binds exactly one dataset).
+streams:
+  - {dataset: ES_1S_V2_GLOBEX, timeframes: [1s, 1m]}
+
+context:
+  # EMA(3)/EMA(9) prevailing 1m regime with ATR(14) -- the canonical dual-EMA tracker defaults,
+  # identical to the NQ parent's regime authority. 5m regime/context is host-derived at runtime.
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m, progress_gap: 120s}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+
+# Parent population, field for field (study.yaml population.qualification):
+#   age_gate_seconds 120, running_mfe_atr_gte 1.0, new_progress_windows_gte 2,
+#   retained_mfe_ratio_gte 0.5, cadence_seconds 5, session RTH, prevailing_regime both.
+# NO max_age: the parent caps no maturity, and the >=1800s maturity bucket must stay reachable.
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, index_column: checkpoint_index}
+  qualify: >
+    excursion.frozen_atr > 0
+    and regime_1m.age_s >= 120s
+    and excursion.mfe_atr >= 1.0
+    and excursion.progress_windows >= 2
+    and excursion.retained_ratio >= 0.5
+    and features.structural_snapshot_ready
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+
+# The exact 13 semantic features of the repaired NQ Model C
+# (artifacts/frozen_feature_manifest.json feature_sets.LONG_C == SHORT_C). Parameters are the
+# parent's, verbatim. Physical aliases are compiler-generated.
+features:
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
+    - {feature: regime_mfe_atr,    over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
+    - {feature: regime_range_atr,  over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
+    - {feature: rolling_retention_ratio,       window: 300s, update_every: 1s}
+    - {feature: rolling_current_progress_atr,  window: 300s, update_every: 1s}
+    - {feature: rolling_max_progress_atr,      window: 300s, update_every: 1s}
+    - {feature: rolling_giveback_atr,          window: 300s, update_every: 1s}
+    - {feature: arrival_velocity,      input_timeframe: 1s, lookback: 20,       bar_state: completed}
+    - {feature: arrival_acceleration,  input_timeframe: 1s, short_lookback: 20, bar_state: completed}
+    - {feature: ema_slope, ema_role: short, lookback: 20}
+  # Diagnostic columns only -- never model inputs. regime_age_seconds carries the maturity
+  # buckets of the contract; the qualification metrics let the audit re-derive the population.
+  metadata:
+    regime_direction: regime_1m.dir
+    regime_age_seconds: regime_1m.age_s
+    running_mfe_atr: excursion.mfe_atr
+    new_progress_windows: excursion.progress_windows
+    retained_mfe_ratio: excursion.retained_ratio
+    triggering_1s_ts_init: epoch.T
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    regime_transition_1m: {tracker: regime_1m, requires_atr: false}
+    snapshot:
+      atr: regime_1m.atr
+      family_a_atr: excursion.frozen_atr
+      episode_state: {prevailing_direction: regime_1m.dir}
+
+# Parent target semantics: prevailing 1m regime flip within (T, T+180s], confirmed on the
+# completed 1m bar (the dual-EMA tracker's own flip event), session-end censored.
+outcome:
+  kind: label
+  event: regime_1m.flipped
+  horizon: 180s
+  direction: regime_1m.dir
+  session_end: censor
+  horizon_end_rule: strict
+
+chronology:
+  train: [2020, 2021, 2022, 2023]
+  dev: [2024]                       # protected; opened ONLY by the governed oos stage after the TRAIN freeze
+  prohibited: [2025, 2026]
+  authorized_dates: ['2021-01-05']  # smoke day, inside TRAIN
+
+# Fixed-architecture portability. Two CELLS (LONG / SHORT) fit INDEPENDENTLY on the identical
+# collected ES population, each carrying the NQ parent's own frozen direction-specific
+# hyperparameters. No arms, no search_space, no validation/selection protocol -- so the final
+# fit uses chronology.train (2020-2023) and nothing adaptive ever runs.
+# random_state lives ONLY here: _build_estimator constructs LGBMClassifier(random_state=seed,
+# **cfg), so a cell-level random_state would be a duplicate-kwarg crash.
+model:
+  family: lightgbm
+  params: {max_depth: 5, num_leaves: 4, verbosity: -1, random_state: 42}
+  cells:
+    - {id: LONG,  subset: {regime_direction: 1},  params: {learning_rate: 0.039440343780424526, n_estimators: 100}}
+    - {id: SHORT, subset: {regime_direction: -1}, params: {learning_rate: 0.028861842631876633, n_estimators: 200}}

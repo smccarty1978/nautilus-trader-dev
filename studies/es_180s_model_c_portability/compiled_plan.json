@@ -1,0 +1,1681 @@
+{
+  "analysis": null,
+  "availability": {
+    "rows": [
+      {
+        "availability": "completed_bar_ts_init",
+        "cadence": "per_source_bar",
+        "id": "regime_1m",
+        "kind": "tracker",
+        "stream": "es_1m",
+        "visibility": "strictly_before"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "cadence": "per_source_bar",
+        "id": "excursion",
+        "kind": "tracker",
+        "stream": "es_1s",
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "cadence": "per_source_bar",
+        "id": "regime_bar_5m",
+        "kind": "tracker",
+        "stream": "es_1m",
+        "visibility": "strictly_before"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "cadence": "per_source_event",
+        "id": "features",
+        "kind": "tracker",
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "prior_1m_regime_efficiency",
+        "kind": "feature",
+        "required_events": [
+          "completed_1m"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "prior_5m_regime_efficiency",
+        "kind": "feature",
+        "required_events": [
+          "completed_5m"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "prior_1m_regime_mfe_atr",
+        "kind": "feature",
+        "required_events": [
+          "completed_1m"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "prior_5m_regime_mfe_atr",
+        "kind": "feature",
+        "required_events": [
+          "completed_5m"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "prior_1m_regime_range_atr",
+        "kind": "feature",
+        "required_events": [
+          "completed_1m"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "prior_5m_regime_range_atr",
+        "kind": "feature",
+        "required_events": [
+          "completed_5m"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "rolling_300s_retention_ratio",
+        "kind": "feature",
+        "required_events": [
+          "completed_1s"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "rolling_300s_current_progress_atr",
+        "kind": "feature",
+        "required_events": [
+          "completed_1s"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "rolling_300s_max_progress_atr",
+        "kind": "feature",
+        "required_events": [
+          "completed_1s"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "rolling_300s_giveback_atr",
+        "kind": "feature",
+        "required_events": [
+          "completed_1s"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "arrival_velocity",
+        "kind": "feature",
+        "required_events": [
+          "completed_1s"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "arrival_acceleration",
+        "kind": "feature",
+        "required_events": [
+          "completed_1s"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      },
+      {
+        "availability": "completed_bar_ts_init",
+        "id": "ema_slope",
+        "kind": "feature",
+        "required_events": [
+          "completed_1m"
+        ],
+        "stream": null,
+        "visibility": "at_epoch"
+      }
+    ],
+    "same_timestamp_rule": "context streams expose events with ts_init < T only"
+  },
+  "binding_proof": [
+    {
+      "bound": true,
+      "capability": "tracker.regime.dual_ema",
+      "id": "regime_1m",
+      "implementation": "features.trackers.host_bindings.DualEmaRegimeBinding",
+      "kind": "tracker"
+    },
+    {
+      "bound": true,
+      "capability": "tracker.regime.excursion",
+      "id": "excursion",
+      "implementation": "features.trackers.host_bindings.RegimeExcursionBinding",
+      "kind": "tracker"
+    },
+    {
+      "bound": true,
+      "capability": "tracker.regime_bar.calendar_bucket",
+      "id": "regime_bar_5m",
+      "implementation": "features.trackers.host_bindings.CalendarRegimeBarBinding",
+      "kind": "tracker"
+    },
+    {
+      "adapter": "StructuralGeometryAdapter",
+      "bound": true,
+      "capability": "feature.regime_efficiency",
+      "id": "prior_1m_regime_efficiency",
+      "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "StructuralGeometryAdapter",
+      "bound": true,
+      "capability": "feature.regime_efficiency",
+      "id": "prior_5m_regime_efficiency",
+      "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "StructuralGeometryAdapter",
+      "bound": true,
+      "capability": "feature.regime_mfe_atr",
+      "id": "prior_1m_regime_mfe_atr",
+      "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "StructuralGeometryAdapter",
+      "bound": true,
+      "capability": "feature.regime_mfe_atr",
+      "id": "prior_5m_regime_mfe_atr",
+      "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "StructuralGeometryAdapter",
+      "bound": true,
+      "capability": "feature.regime_range_atr",
+      "id": "prior_1m_regime_range_atr",
+      "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "StructuralGeometryAdapter",
+      "bound": true,
+      "capability": "feature.regime_range_atr",
+      "id": "prior_5m_regime_range_atr",
+      "implementation": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "RollingProductivityAdapter",
+      "bound": true,
+      "capability": "feature.rolling_retention_ratio",
+      "id": "rolling_300s_retention_ratio",
+      "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "RollingProductivityAdapter",
+      "bound": true,
+      "capability": "feature.rolling_current_progress_atr",
+      "id": "rolling_300s_current_progress_atr",
+      "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "RollingProductivityAdapter",
+      "bound": true,
+      "capability": "feature.rolling_max_progress_atr",
+      "id": "rolling_300s_max_progress_atr",
+      "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "RollingProductivityAdapter",
+      "bound": true,
+      "capability": "feature.rolling_giveback_atr",
+      "id": "rolling_300s_giveback_atr",
+      "implementation": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "ArrivalVelocityAdapter",
+      "bound": true,
+      "capability": "feature.arrival_velocity",
+      "id": "arrival_velocity",
+      "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "ArrivalVelocityAdapter",
+      "bound": true,
+      "capability": "feature.arrival_acceleration",
+      "id": "arrival_acceleration",
+      "implementation": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+      "kind": "feature"
+    },
+    {
+      "adapter": "ContextAdapter",
+      "bound": true,
+      "capability": "feature.ema_slope",
+      "id": "ema_slope",
+      "implementation": "features.trackers.generic_context.GenericContextProvider",
+      "kind": "feature"
+    }
+  ],
+  "chronology": {
+    "authorized_dates": [
+      "2021-01-05"
+    ],
+    "dev": [
+      2024
+    ],
+    "diagnostic": [],
+    "prohibited": [
+      2025,
+      2026
+    ],
+    "train": [
+      2020,
+      2021,
+      2022,
+      2023
+    ],
+    "warmup": {
+      "candidate_emission": false,
+      "days_before_partition": 5,
+      "target_generation": false
+    },
+    "windows": []
+  },
+  "closure": {
+    "composite_sha256": "da3d3ab4ee9bcd7e8c5987763e603ce89d8fb984252ebca9f3fccb6876325540",
+    "file_count": 90,
+    "files": {
+      "backtests/nt_runtime/compiled_study_loader.py": "37cf10d33f4565f5b16778277837d6b148a12199690281c93b74fbbd23f4554e",
+      "backtests/nt_runtime/data_plan.py": "f88998b18e570b7513c7214e36f79b532b4e1d18f21daaf67dc6e0878e440280",
+      "backtests/nt_runtime/engine_builder.py": "504581b01815f8d6f416701263867c408867cffba9d90509ddec85afc0ec1a3e",
+      "backtests/nt_runtime/modes/collect.py": "52503768b8f1e3ec7a4189ede1e38326b606247b929cb12a14cb038b13c24d68",
+      "backtests/nt_runtime/run_plan.py": "9112b35a336dbaddc8636d6fdef277aae7a7ca5ff0f26e42221be850470ebd55",
+      "backtests/nt_runtime/strategy_binding.py": "d3a1f419a2af904131f785c78f335bb23c4d308e46a6a73d6b283c13718bee1a",
+      "backtests/nt_runtime/telemetry.py": "772d77d4c6e2b8d374069066387f6614dca5387073d3d3bbb7d4f1d6fc7c9f55",
+      "features/candidate_authority.py": "8a84660c034e9076fa8da3be8037ce2b0b73a3dc5300e1a41a24611c4ff06915",
+      "features/registry.py": "99ab16809d6cee33c1766af02f973b37a381ef6f0ee55507969d14a3ace0f4aa",
+      "features/trackers/generic_arrival.py": "29201991c71821f27e014238338eb1d0d5910c4e2b2f5984d09e1a47f5703e75",
+      "features/trackers/generic_context.py": "79aff92632cd29a2494ed52c021940efc79d9827dd11570e4e609f7463e782de",
+      "features/trackers/generic_episode_geometry.py": "008cb21f56b8279544dc829625e6bae39dc92c51d3a535132c6e5759c534aec6",
+      "features/trackers/generic_ohlcv_delta.py": "6587044712abb4675fed6b462a7f5d963509831578ba2c6d3d14f1ce076487dd",
+      "features/trackers/generic_regime_geometry.py": "6cabe36025b7e4c721ccde2bdc3a5b5164208db453d0348f07300e9e9e529a89",
+      "features/trackers/generic_rolling_productivity.py": "d0dcaa18e56debf27178e1e4c071f173f41988e5df57be8ee215303673f8e4a4",
+      "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
+      "features/trackers/host_bindings.py": "c68046762fca481612cc100710e74b4d3c63cefd26fa89f3860356c61a100f48",
+      "features/trackers/ohlcv_delta.py": "4db29ec9f6337729cf140840c7eaa80201550a4874643ea64fe2c4e334532423",
+      "features/trackers/regime_dual_ema.py": "79d9777db4279914b6f138ce9541c151ba7120b03c82300d6f8e0a31ca2d7081",
+      "features/trackers/rolling_5m_productivity.py": "666be87d2234a3e8896bb08c6901e3303bf799273de37c0abc69f33af7e94077",
+      "features/trackers/structural_regime_geometry.py": "83ad179b02a35391d277d41cbcf6fd2556eb09ca23eeb705ab48c71fc9007f27",
+      "research/analysis/diagnostic_ops.py": "3567f19f2bd55e9363b2202ff3253200042b6c6138566c0ca515757b114b5f81",
+      "research/analysis/errors.py": "0360870a6a601eb1055ddea586385f4773fbcd3ed91e96c21596e6e78762a691",
+      "research/analysis/identity.py": "a5cf93fd6539093e974862d2fe4e839e7897fde2d760fcd4afc99ec3f42be5ae",
+      "research/analysis/metrics.py": "b3c18f8e68467c7483e923a7a1bd147095b224c9eedb27795de0ba3e37c90b12",
+      "research/analysis/modeling.py": "cbd8bdee4d2c87efd7ac53f377e138c8103202bf0f6547c38517d4eb92567725",
+      "research/analysis/spec.py": "f5ca0167a9945ecb4b8a75f9525e1f09acbdb32e12d731b26e309460641383c3",
+      "research/schemas/dataset_spec.py": "e2fff83322597874b035cb573ece383b4b6b1dfe83ab6d76b053ab7f648c3a7c",
+      "research/schemas/study_spec.py": "e72f7a26b139e455b060e91e937a2cafa3a32ca431950dfaef6a668e37b6bfed",
+      "research_workflow/__init__.py": "68c5b3821a1449860b8d1bd26548a37287c4342ce6f7694c3053620b5ac6d126",
+      "research_workflow/audit_packets_v2.py": "1a1b7f98e3a948db6626c11ad713e30433f4e428febc2344f769ba92b86bbcd0",
+      "research_workflow/capabilities.py": "1c782769f6378bbd87bf09d110938004207659ffa345b467d643c05341f142d5",
+      "research_workflow/closure_hash.py": "80225b1ce75d53c5b37120d5f2d6da1cc98f2e124643a1768b05141492866b23",
+      "research_workflow/collection.py": "978ec49babcd9cbbb5d41c3e09914a260982803716076aabab485e7547dac121",
+      "research_workflow/completed_regime_state.py": "8400ee2aecf537be1128a42e19519c83e3fd158f28f22460e0816f2fb2ceac19",
+      "research_workflow/controller_contracts.py": "e57afaeb5afb49ebc995b1d45486d095e24d8c0240148f0f1fafaac6f5cc3bdb",
+      "research_workflow/dataset_v2.py": "352461e81424ac959494a4c10d16ff714bb374ce43dfa41b918733e9026d7819",
+      "research_workflow/entry_references.py": "78fe9b0f7e8e4aaee69d34a90572ef3e6c7d9f13bc8d70c23f36f30cb416f35b",
+      "research_workflow/episode_population.py": "d39c008d5563b0cc5766adecc62bb5051664ce5ff2e663e07e0347ade1d719df",
+      "research_workflow/experiment.py": "064017c10acab0d64379da3cc846c0ae1dfded43454c2f973c81afc54c554c4e",
+      "research_workflow/external_model_scoring.py": "2f0a442ee00eee9f56f3726a98a72cc22a25dd85fd0cbb93b8a153a418471b20",
+      "research_workflow/first_p90_gate.py": "31611fb14d862022638648efb1787848922214ccd5b9daecff795fa766873b0f",
+      "research_workflow/first_p90_warning.py": "9a5f1b1f04b25ddc055121f1b610b25b83dc4db6155c3adda06399b30079390d",
+      "research_workflow/forward_outcomes/contracts.py": "e2439334b6c765f9a8efa1cd3f80cacf0686bbc288fb388bdac86687c2a209e4",
+      "research_workflow/forward_outcomes/guard.py": "46d73217af1e9c47baddf11efb991209bbd0462ba636a0657c6e8be531090422",
+      "research_workflow/gates.py": "465127281aa5cf66d3264aba9e1a1e6cd36930f6210cc9d0adf248d22fa32ac8",
+      "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
+      "research_workflow/governed_controller_v2.py": "0936bb90979b64af71eb67e9283d51d950e6b6990209333add11e9e371fabe37",
+      "research_workflow/grammar/__init__.py": "5ffe54a8671d8023785dcb7b2df3006a7bc44c1cff010cd53170a3f97936a48b",
+      "research_workflow/grammar/compiler.py": "1abdd49d4e96fa920f76aa44cf16a29e0189024e478b8a0ff155e5d1a078afb8",
+      "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
+      "research_workflow/grammar/gaps.py": "9e3341d65135484e56e868bbe9fbb2f13637d133156ce17bdffee988c0d46b48",
+      "research_workflow/grammar/plan.py": "dcf5e954609ec129695574797e9a5c0efe5ac653abf5fcb7bf2bc9bc37a01dd1",
+      "research_workflow/grammar/predicates.py": "7b0fa449a526e3f0d9a7eca1444b5e35f381426517172716651a28042831c417",
+      "research_workflow/grammar/spec.py": "2ed4e4f8b87ec1934d3406d4b7714d176674a9f9bfe14a279542b033d8685835",
+      "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
+      "research_workflow/host/mux.py": "63f4b606895181ead566de12b10f783d380ed9c0bf0bd650ac43b76588e1708d",
+      "research_workflow/host/outcomes.py": "eddca7812228324d239a58657f6f734da41a7da651ccb2c2895901ff9c0ce18a",
+      "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
+      "research_workflow/host/sink.py": "c0e353d2cd2f23f4c4142927b9e06a90b52ff70ff365a8dd188fb43ec0e0959f",
+      "research_workflow/host/strategy.py": "59f4cca85697b4d82296d7a5e440d72353c8af15d3770a68c51c78c99b5eb66e",
+      "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
+      "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
+      "research_workflow/lifecycle_v2.py": "e1fc67f65b2035e7b306e891013e43a00dddee6606c4f9501356a6b971fe65a0",
+      "research_workflow/locks.py": "8acc08e35fb743e2cd2f84d57b7a7e08ef4963a350fefb592377651f722b2258",
+      "research_workflow/model_artifacts.py": "fb3ab0198d96e2531b4782ef0b341e7087406bbd5db3c3f20049af1d6de8cd49",
+      "research_workflow/model_store.py": "5755d5e16509990e570dab3712ffc17cacc54280a563aefb9f30cf36a5fb9d80",
+      "research_workflow/modeling_closure.py": "7a8b5ee264d0bb4b3449078d339a7ac7752ffca5e78406317e3397d8523d2f93",
+      "research_workflow/modeling_drivers.py": "a9680556ecef12d6c904dd16ff39e34e03a595e526bb49e222bbffb6e54242c6",
+      "research_workflow/oos_analysis_lineage.py": "36df6738672674d9688d602b05bdab3313ee62e6daece2ac2d5da938b6a761b2",
+      "research_workflow/output_manager.py": "6903ec334ed2bd96450082aeef34c70e4c895b00cece63b5ecee592361707deb",
+      "research_workflow/partitioning.py": "b7a6cc36cefe38091a1fa1dab9b950aee8f1524ab316b0ec3a0803159ff170c5",
+      "research_workflow/policy.py": "efe60a8d2ccfa32c97880b6102251f9cf55cc2e5dbc403c3999eca35095517f1",
+      "research_workflow/population_runtime.py": "fa71048c04e9d3192a5898df38d3b0caf9c7a60a112ba8c215965a374476da64",
+      "research_workflow/preflight.py": "308574543516a14addcccdbc71cd7639ddb7b3a821ce9dccde4e862aecf9702c",
+      "research_workflow/provider_host.py": "d356a78cb787ed7b474548dd6ebcc9803f14369c297182f788d2a78ebfa38291",
+      "research_workflow/roots.py": "157bd2694acf85ab46cd993de1fbc10af09967575f2d1c3911a057186ae4e695",
+      "research_workflow/runtime_bindings.py": "7e8a028532ad02e15a48a8463250b1afd73e5691897bdd86c8b8b2eff51dd0bd",
+      "research_workflow/seal.py": "95cdb55586214e62766f92544cd4d03dc47e7aae57b3a90388e12edf5b92597b",
+      "research_workflow/sessions.py": "ac26ab1b4b19be2950ee849a7c4671f624d08a7df7be27c39480a69883edcc8a",
+      "research_workflow/study_closure.py": "a45a593c5adf948e705d3a022426f2f268d12abda0dd1e9abf08bc7d87fc532b",
+      "research_workflow/target_expression.py": "cb2980ed3b1563ce2eee981896ab04ef101179a569dffdc975bbfb5bddd40045",
+      "research_workflow/target_replay_oracle.py": "e11cabdbb923764b9a4fc54ed86272d08583bedacd714ee4120e854a7b74fe64",
+      "research_workflow/target_runtime.py": "34da6cb81d122c3471422f97c88a87578dc04c0b37a290f5e7c9e67a74262e68",
+      "research_workflow/test_selection.py": "f6dc5f8bcf5c3c912c4f85c1d7c7b0b5846b2fc1f90d89b4d7998e08de3e11e7",
+      "research_workflow/tuning.py": "ff91174b717caacb51e5966d235787547bd8c5e2cc3d9f24800d8bada1ab99db",
+      "research_workflow/workspace.py": "43dbf8bcd4618ea1c9e73ef889d96d4e737f0fbdb352a414df5ff5648849d095",
+      "utils/causal_registration.py": "9d85417d6a7be40823679fe6357565da9491f948f007f9ec7bcf5f156f36bb5c",
+      "utils/runner/data.py": "92fa0e2f9193336faa6f9e06825dd425c8f2682062cedc44ad26edbc1a121c46",
+      "utils/session_boundaries.py": "15bbb046337a9fd2ed119e64fb79de5dab5d37608a0f6b9a7d1b9a73a20d5b0f"
+    },
+    "hash_algorithm": "v2",
+    "stages": {
+      "audit": {
+        "composite_sha256": "cb379ab23966122a17566a3798d346bfd767cfec672d7847712ea8179bed77de",
+        "files": [
+          "research_workflow/audit_packets_v2.py"
+        ]
+      },
+      "collection": {
+        "composite_sha256": "cf6ec72acb3ab06b4f61d32538422c96d8da8d498db3202bda50c9000b1c1da1",
+        "files": [
+          "backtests/nt_runtime/compiled_study_loader.py",
+          "backtests/nt_runtime/data_plan.py",
+          "backtests/nt_runtime/engine_builder.py",
+          "backtests/nt_runtime/modes/collect.py",
+          "backtests/nt_runtime/run_plan.py",
+          "backtests/nt_runtime/strategy_binding.py",
+          "backtests/nt_runtime/telemetry.py",
+          "features/candidate_authority.py",
+          "features/registry.py",
+          "features/trackers/generic_arrival.py",
+          "features/trackers/generic_context.py",
+          "features/trackers/generic_episode_geometry.py",
+          "features/trackers/generic_ohlcv_delta.py",
+          "features/trackers/generic_regime_geometry.py",
+          "features/trackers/generic_rolling_productivity.py",
+          "features/trackers/generic_structural_geometry.py",
+          "features/trackers/host_bindings.py",
+          "features/trackers/ohlcv_delta.py",
+          "features/trackers/regime_dual_ema.py",
+          "features/trackers/rolling_5m_productivity.py",
+          "features/trackers/structural_regime_geometry.py",
+          "research/analysis/diagnostic_ops.py",
+          "research/analysis/errors.py",
+          "research/analysis/identity.py",
+          "research/analysis/metrics.py",
+          "research/analysis/modeling.py",
+          "research/analysis/spec.py",
+          "research/schemas/dataset_spec.py",
+          "research/schemas/study_spec.py",
+          "research_workflow/__init__.py",
+          "research_workflow/capabilities.py",
+          "research_workflow/closure_hash.py",
+          "research_workflow/collection.py",
+          "research_workflow/completed_regime_state.py",
+          "research_workflow/dataset_v2.py",
+          "research_workflow/entry_references.py",
+          "research_workflow/episode_population.py",
+          "research_workflow/experiment.py",
+          "research_workflow/external_model_scoring.py",
+          "research_workflow/first_p90_gate.py",
+          "research_workflow/first_p90_warning.py",
+          "research_workflow/forward_outcomes/contracts.py",
+          "research_workflow/forward_outcomes/guard.py",
+          "research_workflow/gates.py",
+          "research_workflow/grammar/__init__.py",
+          "research_workflow/grammar/compiler.py",
+          "research_workflow/grammar/expansion.py",
+          "research_workflow/grammar/gaps.py",
+          "research_workflow/grammar/plan.py",
+          "research_workflow/grammar/predicates.py",
+          "research_workflow/grammar/spec.py",
+          "research_workflow/host/interfaces.py",
+          "research_workflow/host/mux.py",
+          "research_workflow/host/outcomes.py",
+          "research_workflow/host/predicate_eval.py",
+          "research_workflow/host/sink.py",
+          "research_workflow/host/strategy.py",
+          "research_workflow/host/triggers.py",
+          "research_workflow/host_runner.py",
+          "research_workflow/lifecycle_v2.py",
+          "research_workflow/locks.py",
+          "research_workflow/model_artifacts.py",
+          "research_workflow/model_store.py",
+          "research_workflow/modeling_closure.py",
+          "research_workflow/modeling_drivers.py",
+          "research_workflow/oos_analysis_lineage.py",
+          "research_workflow/output_manager.py",
+          "research_workflow/partitioning.py",
+          "research_workflow/policy.py",
+          "research_workflow/population_runtime.py",
+          "research_workflow/preflight.py",
+          "research_workflow/provider_host.py",
+          "research_workflow/roots.py",
+          "research_workflow/runtime_bindings.py",
+          "research_workflow/seal.py",
+          "research_workflow/sessions.py",
+          "research_workflow/study_closure.py",
+          "research_workflow/target_expression.py",
+          "research_workflow/target_replay_oracle.py",
+          "research_workflow/target_runtime.py",
+          "research_workflow/test_selection.py",
+          "research_workflow/tuning.py",
+          "utils/causal_registration.py",
+          "utils/runner/data.py",
+          "utils/session_boundaries.py"
+        ]
+      },
+      "lifecycle": {
+        "composite_sha256": "abe9b99c99a9ba0baa1d6e7be34a6d9727666e7a49f655f4c7e90459627cab59",
+        "files": [
+          "research_workflow/closure_hash.py",
+          "research_workflow/controller_contracts.py",
+          "research_workflow/governed_controller.py",
+          "research_workflow/governed_controller_v2.py",
+          "research_workflow/lifecycle_v2.py",
+          "research_workflow/locks.py",
+          "research_workflow/policy.py",
+          "research_workflow/roots.py",
+          "research_workflow/seal.py",
+          "research_workflow/study_closure.py",
+          "research_workflow/workspace.py"
+        ]
+      },
+      "modeling": {
+        "composite_sha256": "13277060e6afd94573b80082f2c04b2a816b9455ac5195f66abe0ea733a5b0e1",
+        "files": [
+          "research/analysis/identity.py",
+          "research/analysis/metrics.py",
+          "research/analysis/modeling.py",
+          "research_workflow/model_store.py",
+          "research_workflow/tuning.py"
+        ]
+      },
+      "oos": {
+        "composite_sha256": "33c6cd66e080343671805fb1b81c4fee0d4ad779909689807c36e532f7e954df",
+        "files": [
+          "research_workflow/experiment.py"
+        ]
+      },
+      "outcome": {
+        "composite_sha256": "34cda7cf9c805caa2c77aa46a555cb1d13e2f5fddf84f78e00a77d72d1cc2638",
+        "files": [
+          "research_workflow/entry_references.py",
+          "research_workflow/forward_outcomes/guard.py",
+          "research_workflow/target_expression.py",
+          "research_workflow/target_replay_oracle.py"
+        ]
+      }
+    }
+  },
+  "columns": {
+    "derived": [],
+    "features": [
+      "prior_1m_regime_efficiency",
+      "prior_5m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_5m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "identity": [
+      "observation_ts",
+      "regime_start_ns",
+      "checkpoint_index"
+    ],
+    "metadata": [
+      {
+        "column": "regime_direction",
+        "ref": "regime_1m.dir"
+      },
+      {
+        "column": "regime_age_seconds",
+        "ref": "regime_1m.age_s"
+      },
+      {
+        "column": "running_mfe_atr",
+        "ref": "excursion.mfe_atr"
+      },
+      {
+        "column": "new_progress_windows",
+        "ref": "excursion.progress_windows"
+      },
+      {
+        "column": "retained_mfe_ratio",
+        "ref": "excursion.retained_ratio"
+      },
+      {
+        "column": "triggering_1s_ts_init",
+        "ref": "epoch.T"
+      }
+    ],
+    "observation": [
+      "observation_ts",
+      "regime_start_ns",
+      "regime_direction",
+      "checkpoint_index",
+      "flip_ts",
+      "time_to_flip_seconds",
+      "target_flip_within_horizon",
+      "disposition",
+      "censored",
+      "censor_reason",
+      "horizon_end_ts",
+      "session_close_ts",
+      "resolved_at_ts"
+    ]
+  },
+  "features": {
+    "aliases": [
+      "prior_1m_regime_efficiency",
+      "prior_5m_regime_efficiency",
+      "prior_1m_regime_mfe_atr",
+      "prior_5m_regime_mfe_atr",
+      "prior_1m_regime_range_atr",
+      "prior_5m_regime_range_atr",
+      "rolling_300s_retention_ratio",
+      "rolling_300s_current_progress_atr",
+      "rolling_300s_max_progress_atr",
+      "rolling_300s_giveback_atr",
+      "arrival_velocity",
+      "arrival_acceleration",
+      "ema_slope"
+    ],
+    "host_id": "features",
+    "implementation": "features.trackers.host_bindings.FeatureHostBinding",
+    "instances": [
+      {
+        "canonical_name": "regime_efficiency",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "regime_efficiency",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        },
+        "parameters": {
+          "bar_state": "completed",
+          "context": "prior",
+          "timeframe": "1m"
+        },
+        "physical_alias": "prior_1m_regime_efficiency",
+        "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "requested": "regime_efficiency",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "regime_efficiency",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "regime_efficiency",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        },
+        "parameters": {
+          "bar_state": "completed",
+          "context": "prior",
+          "timeframe": "5m"
+        },
+        "physical_alias": "prior_5m_regime_efficiency",
+        "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "requested": "regime_efficiency",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "regime_mfe_atr",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "regime_mfe_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        },
+        "parameters": {
+          "bar_state": "completed",
+          "context": "prior",
+          "timeframe": "1m"
+        },
+        "physical_alias": "prior_1m_regime_mfe_atr",
+        "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "requested": "regime_mfe_atr",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "regime_mfe_atr",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "regime_mfe_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        },
+        "parameters": {
+          "bar_state": "completed",
+          "context": "prior",
+          "timeframe": "5m"
+        },
+        "physical_alias": "prior_5m_regime_mfe_atr",
+        "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "requested": "regime_mfe_atr",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "regime_range_atr",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "regime_range_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        },
+        "parameters": {
+          "bar_state": "completed",
+          "context": "prior",
+          "timeframe": "1m"
+        },
+        "physical_alias": "prior_1m_regime_range_atr",
+        "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "requested": "regime_range_atr",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "regime_range_atr",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "regime_range_atr",
+          "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+          "required_streams": [
+            "completed_5m"
+          ]
+        },
+        "parameters": {
+          "bar_state": "completed",
+          "context": "prior",
+          "timeframe": "5m"
+        },
+        "physical_alias": "prior_5m_regime_range_atr",
+        "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+        "requested": "regime_range_atr",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "rolling_retention_ratio",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "rolling_retention_ratio",
+          "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        },
+        "parameters": {
+          "update_every": "1s",
+          "window": "300s"
+        },
+        "physical_alias": "rolling_300s_retention_ratio",
+        "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "requested": "rolling_retention_ratio",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "rolling_current_progress_atr",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "rolling_current_progress_atr",
+          "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        },
+        "parameters": {
+          "update_every": "1s",
+          "window": "300s"
+        },
+        "physical_alias": "rolling_300s_current_progress_atr",
+        "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "requested": "rolling_current_progress_atr",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "rolling_max_progress_atr",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "rolling_max_progress_atr",
+          "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        },
+        "parameters": {
+          "update_every": "1s",
+          "window": "300s"
+        },
+        "physical_alias": "rolling_300s_max_progress_atr",
+        "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "requested": "rolling_max_progress_atr",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "rolling_giveback_atr",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "rolling_giveback_atr",
+          "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        },
+        "parameters": {
+          "update_every": "1s",
+          "window": "300s"
+        },
+        "physical_alias": "rolling_300s_giveback_atr",
+        "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+        "requested": "rolling_giveback_atr",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "arrival_velocity",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "arrival_velocity",
+          "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        },
+        "parameters": {
+          "bar_state": "completed",
+          "input_timeframe": "1s",
+          "lookback": 20
+        },
+        "physical_alias": "arrival_velocity",
+        "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "requested": "arrival_velocity",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "arrival_acceleration",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "arrival_acceleration",
+          "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+          "required_streams": [
+            "completed_1s"
+          ]
+        },
+        "parameters": {
+          "bar_state": "completed",
+          "input_timeframe": "1s",
+          "short_lookback": 20
+        },
+        "physical_alias": "arrival_acceleration",
+        "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+        "requested": "arrival_acceleration",
+        "status": "verified"
+      },
+      {
+        "canonical_name": "ema_slope",
+        "dtype": "float64",
+        "family": [],
+        "input_requirements": {
+          "canonical_name": "ema_slope",
+          "provider": "features.trackers.generic_context.GenericContextProvider",
+          "required_streams": [
+            "completed_1m"
+          ]
+        },
+        "parameters": {
+          "ema_role": "short",
+          "lookback": 20
+        },
+        "physical_alias": "ema_slope",
+        "provider": "features.trackers.generic_context.GenericContextProvider",
+        "requested": "ema_slope",
+        "status": "verified"
+      }
+    ],
+    "required_events": [
+      "completed_1m",
+      "completed_1s",
+      "completed_5m"
+    ],
+    "routing": {
+      "completed_1m": {
+        "regime": "regime_1m",
+        "stream": "es_1m"
+      },
+      "completed_1s": {
+        "stream": "es_1s"
+      },
+      "completed_5m": {
+        "ready_gate": false,
+        "tracker": "regime_bar_5m"
+      },
+      "regime_transition_1m": {
+        "requires_atr": false,
+        "tracker": "regime_1m"
+      }
+    },
+    "snapshot": {
+      "atr": "regime_1m.atr",
+      "episode_state": {
+        "prevailing_direction": "regime_1m.dir"
+      },
+      "family_a_atr": "excursion.frozen_atr"
+    }
+  },
+  "instruments": {
+    "ES": {
+      "dataset_digest": "9f38a41edca5b72a71866846ec9aa15d4cf205388d22aabe025250eefbf0068a",
+      "dataset_id": "ES_1S_V2_GLOBEX",
+      "instrument_id": "ES.XCME",
+      "multiplier": "50.0",
+      "price_increment": "0.25",
+      "reference_digest": "e98b75e59469bb889da5e5ae42a39862a90c1f7ec9f6cea956f8710aa24cc968",
+      "reference_tables": [
+        "gaps",
+        "holidays",
+        "maintenance",
+        "out_of_calendar",
+        "rolls",
+        "sessions"
+      ],
+      "role": "execution",
+      "same_ts": "unavailable",
+      "symbol": "ES",
+      "venue": "XCME"
+    }
+  },
+  "model": {
+    "arms": [],
+    "cells": [
+      {
+        "id": "LONG",
+        "params": {
+          "learning_rate": 0.039440343780424526,
+          "n_estimators": 100
+        },
+        "subset": {
+          "regime_direction": 1
+        }
+      },
+      {
+        "id": "SHORT",
+        "params": {
+          "learning_rate": 0.028861842631876633,
+          "n_estimators": 200
+        },
+        "subset": {
+          "regime_direction": -1
+        }
+      }
+    ],
+    "family": "model.lightgbm",
+    "mode": "train",
+    "models": [],
+    "params": {
+      "max_depth": 5,
+      "num_leaves": 4,
+      "random_state": 42,
+      "verbosity": -1
+    },
+    "reference_models": [],
+    "search_space": {},
+    "validation": null
+  },
+  "notes": [],
+  "outcome": {
+    "arms": [],
+    "atr": null,
+    "atr_availability": "at_decision_delivery",
+    "composition": null,
+    "contract": "label",
+    "direction": "regime_1m.dir",
+    "direction_sign": 1,
+    "entry_reference": "next_bar_open",
+    "flip": {
+      "horizon_ns": 180000000000,
+      "inclusive_start": true,
+      "role": "opposite",
+      "source": "regime_1m",
+      "target_direction": 0
+    },
+    "horizon_end_rule": "strict",
+    "kernel": "flip",
+    "label_column": "target_flip_within_horizon",
+    "max_gap_ns": null,
+    "observation_columns": [
+      "observation_ts",
+      "regime_start_ns",
+      "regime_direction",
+      "checkpoint_index",
+      "flip_ts",
+      "time_to_flip_seconds",
+      "target_flip_within_horizon",
+      "disposition",
+      "censored",
+      "censor_reason",
+      "horizon_end_ts",
+      "session_close_ts",
+      "resolved_at_ts"
+    ],
+    "primary_arm": null,
+    "relation": "continuation",
+    "resolution_precedence": [
+      "SESSION_END",
+      "GAP",
+      "BARRIER_TOUCH",
+      "HORIZON_EXPIRY"
+    ],
+    "same_bar_rule": "ambiguous_censor",
+    "session_end_censoring": true,
+    "session_end_rule": "censor",
+    "stream": "es_1s",
+    "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
+  },
+  "plan_sha256": "e9faf3b0e1eb89d13eb5281bbde239d24ffb9e22962553fb57a30e9b02230eba",
+  "plan_version": 1,
+  "population": {
+    "anchor_identity": "regime_1m.start_ns",
+    "cadence": {
+      "anchor": "regime_1m.start_ns",
+      "every_ns": 5000000000,
+      "index_column": "checkpoint_index",
+      "kind": "grid",
+      "max_age_ns": null,
+      "stream": "es_1s"
+    },
+    "direction": "regime_1m.dir",
+    "qualify": {
+      "ast": {
+        "args": [
+          {
+            "cmp": ">",
+            "left": {
+              "op": "ref",
+              "path": [
+                "excursion",
+                "frozen_atr"
+              ]
+            },
+            "op": "cmp",
+            "right": {
+              "op": "const",
+              "value": 0
+            }
+          },
+          {
+            "cmp": ">=",
+            "left": {
+              "op": "ref",
+              "path": [
+                "regime_1m",
+                "age_s"
+              ]
+            },
+            "op": "cmp",
+            "right": {
+              "op": "const",
+              "unit": "seconds",
+              "value": 120.0
+            }
+          },
+          {
+            "cmp": ">=",
+            "left": {
+              "op": "ref",
+              "path": [
+                "excursion",
+                "mfe_atr"
+              ]
+            },
+            "op": "cmp",
+            "right": {
+              "op": "const",
+              "value": 1.0
+            }
+          },
+          {
+            "cmp": ">=",
+            "left": {
+              "op": "ref",
+              "path": [
+                "excursion",
+                "progress_windows"
+              ]
+            },
+            "op": "cmp",
+            "right": {
+              "op": "const",
+              "value": 2
+            }
+          },
+          {
+            "cmp": ">=",
+            "left": {
+              "op": "ref",
+              "path": [
+                "excursion",
+                "retained_ratio"
+              ]
+            },
+            "op": "cmp",
+            "right": {
+              "op": "const",
+              "value": 0.5
+            }
+          },
+          {
+            "op": "ref",
+            "path": [
+              "features",
+              "structural_snapshot_ready"
+            ]
+          }
+        ],
+        "op": "and"
+      },
+      "text": "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and excursion.progress_windows >= 2 and excursion.retained_ratio >= 0.5 and features.structural_snapshot_ready"
+    },
+    "session": "RTH"
+  },
+  "registry_sha256": "0fc9abf597a8936b8d1c4d3d9e73ea7553c73b569efd8d5055d24151ac155d0c",
+  "session": {
+    "censor_session": "RTH",
+    "dataset": "ES_1S_V2_GLOBEX",
+    "kind": "calendar",
+    "reference_digest": "e98b75e59469bb889da5e5ae42a39862a90c1f7ec9f6cea956f8710aa24cc968",
+    "reference_tables": [
+      "gaps",
+      "holidays",
+      "maintenance",
+      "out_of_calendar",
+      "rolls",
+      "sessions"
+    ],
+    "session": "RTH"
+  },
+  "spec_sha256": "0e1f78fe1fc90955b3902febecb37e6d64a42168e1ba3290cf1b4e6f84585a3a",
+  "streams": [
+    {
+      "bar_type": "ES.XCME-1-SECOND-LAST-EXTERNAL",
+      "duration_ns": 1000000000,
+      "instrument": "ES",
+      "key": "es_1s",
+      "role": "execution",
+      "same_ts": "unavailable",
+      "source": "external",
+      "timeframe": "1s",
+      "ts_init_delta_ns": 1000000000,
+      "visibility": "at_epoch"
+    },
+    {
+      "bar_type": "ES.XCME-1-MINUTE-LAST-EXTERNAL",
+      "duration_ns": 60000000000,
+      "instrument": "ES",
+      "key": "es_1m",
+      "role": "context",
+      "same_ts": "unavailable",
+      "source": "external",
+      "timeframe": "1m",
+      "ts_init_delta_ns": 60000000000,
+      "visibility": "strictly_before"
+    }
+  ],
+  "study": {
+    "description": "Cross-instrument portability. Fixed architecture, fixed 13-feature surface, fixed direction-specific hyperparameters carried over from the NQ parent; only the instrument and the fitting rows change. No feature discovery, no tuning, no economics.\n",
+    "id": "es_180s_model_c_portability",
+    "question": "Does the frozen NQ 13-feature 180s Model C architecture, trained natively on ES 2020-2023, show meaningful forward discrimination for a prevailing 1m regime flip within 180s on untouched ES 2024?",
+    "tier": 2
+  },
+  "trackers": [
+    {
+      "cadence": "per_source_bar",
+      "capability": "tracker.regime.dual_ema",
+      "epoch_fields": [
+        "age_s"
+      ],
+      "events": [
+        "regime_bar",
+        "changed",
+        "flipped"
+      ],
+      "fields": [
+        "dir",
+        "prev_dir",
+        "dir_pre_bar_or_current",
+        "atr",
+        "start_ns",
+        "start_price",
+        "frozen_atr",
+        "changed",
+        "flipped",
+        "changed_seq",
+        "flipped_seq",
+        "bars_in_regime",
+        "last_bar_close_ts",
+        "last_bar_close",
+        "last_reference_close",
+        "prev_bar_close_ts"
+      ],
+      "id": "regime_1m",
+      "implementation": "features.trackers.host_bindings.DualEmaRegimeBinding",
+      "inputs": {
+        "bars": {
+          "stream": "es_1m"
+        },
+        "reference": {
+          "stream": "es_1s"
+        }
+      },
+      "instrument": "ES",
+      "params": {
+        "atr_period": 14,
+        "instrument": "ES",
+        "long_period": 9,
+        "short_period": 3,
+        "timeframe": "1m"
+      },
+      "subscriptions": [],
+      "warmup_bars": 14
+    },
+    {
+      "cadence": "per_source_bar",
+      "capability": "tracker.regime.excursion",
+      "epoch_fields": [],
+      "events": [],
+      "fields": [
+        "dir",
+        "frozen_atr",
+        "atr",
+        "mfe_atr",
+        "mae_atr",
+        "pnl_atr",
+        "retained_ratio",
+        "progress_windows",
+        "start_price",
+        "highest_high",
+        "lowest_low",
+        "last_close",
+        "last_ts"
+      ],
+      "id": "excursion",
+      "implementation": "features.trackers.host_bindings.RegimeExcursionBinding",
+      "inputs": {
+        "bars": {
+          "stream": "es_1s"
+        },
+        "regime": {
+          "tracker": "regime_1m"
+        }
+      },
+      "instrument": "ES",
+      "params": {
+        "progress_gap": "120s"
+      },
+      "subscriptions": [
+        {
+          "events": [
+            "changed"
+          ],
+          "from": "regime_1m",
+          "input": "regime"
+        }
+      ],
+      "warmup_bars": 0
+    },
+    {
+      "cadence": "per_source_bar",
+      "capability": "tracker.regime_bar.calendar_bucket",
+      "epoch_fields": [],
+      "events": [
+        "regime_bar"
+      ],
+      "fields": [
+        "last_close_ts"
+      ],
+      "id": "regime_bar_5m",
+      "implementation": "features.trackers.host_bindings.CalendarRegimeBarBinding",
+      "inputs": {
+        "bars": {
+          "stream": "es_1m"
+        },
+        "regime": {
+          "tracker": "regime_1m"
+        }
+      },
+      "instrument": "ES",
+      "params": {
+        "bucket": "5m"
+      },
+      "subscriptions": [],
+      "warmup_bars": 0
+    },
+    {
+      "cadence": "per_source_event",
+      "capability": "feature_host.provider_host",
+      "epoch_fields": [],
+      "events": [],
+      "fields": [
+        "aliases"
+      ],
+      "id": "features",
+      "implementation": "features.trackers.host_bindings.FeatureHostBinding",
+      "inputs": {
+        "completed_1m": {
+          "stream": "es_1m"
+        },
+        "completed_1m_regime": {
+          "tracker": "regime_1m"
+        },
+        "completed_1s": {
+          "stream": "es_1s"
+        },
+        "completed_5m": {
+          "tracker": "regime_bar_5m"
+        },
+        "regime_transition_1m": {
+          "tracker": "regime_1m"
+        }
+      },
+      "instrument": "ES",
+      "params": {
+        "instances": [
+          {
+            "canonical_name": "regime_efficiency",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "regime_efficiency",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            },
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_efficiency",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "requested": "regime_efficiency",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "regime_efficiency",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "regime_efficiency",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            },
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_efficiency",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "requested": "regime_efficiency",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "regime_mfe_atr",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "regime_mfe_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            },
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_mfe_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "requested": "regime_mfe_atr",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "regime_mfe_atr",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "regime_mfe_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            },
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_mfe_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "requested": "regime_mfe_atr",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "regime_range_atr",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "regime_range_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            },
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "1m"
+            },
+            "physical_alias": "prior_1m_regime_range_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "requested": "regime_range_atr",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "regime_range_atr",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "regime_range_atr",
+              "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+              "required_streams": [
+                "completed_5m"
+              ]
+            },
+            "parameters": {
+              "bar_state": "completed",
+              "context": "prior",
+              "timeframe": "5m"
+            },
+            "physical_alias": "prior_5m_regime_range_atr",
+            "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+            "requested": "regime_range_atr",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "rolling_retention_ratio",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "rolling_retention_ratio",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            },
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_300s_retention_ratio",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "requested": "rolling_retention_ratio",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "rolling_current_progress_atr",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "rolling_current_progress_atr",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            },
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_300s_current_progress_atr",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "requested": "rolling_current_progress_atr",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "rolling_max_progress_atr",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "rolling_max_progress_atr",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            },
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_300s_max_progress_atr",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "requested": "rolling_max_progress_atr",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "rolling_giveback_atr",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "rolling_giveback_atr",
+              "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            },
+            "parameters": {
+              "update_every": "1s",
+              "window": "300s"
+            },
+            "physical_alias": "rolling_300s_giveback_atr",
+            "provider": "features.trackers.generic_rolling_productivity.GenericRollingProductivityProvider",
+            "requested": "rolling_giveback_atr",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "arrival_velocity",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "arrival_velocity",
+              "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            },
+            "parameters": {
+              "bar_state": "completed",
+              "input_timeframe": "1s",
+              "lookback": 20
+            },
+            "physical_alias": "arrival_velocity",
+            "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+            "requested": "arrival_velocity",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "arrival_acceleration",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "arrival_acceleration",
+              "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+              "required_streams": [
+                "completed_1s"
+              ]
+            },
+            "parameters": {
+              "bar_state": "completed",
+              "input_timeframe": "1s",
+              "short_lookback": 20
+            },
+            "physical_alias": "arrival_acceleration",
+            "provider": "features.trackers.generic_arrival.GenericArrivalVelocityProvider",
+            "requested": "arrival_acceleration",
+            "status": "verified"
+          },
+          {
+            "canonical_name": "ema_slope",
+            "dtype": "float64",
+            "family": [],
+            "input_requirements": {
+              "canonical_name": "ema_slope",
+              "provider": "features.trackers.generic_context.GenericContextProvider",
+              "required_streams": [
+                "completed_1m"
+              ]
+            },
+            "parameters": {
+              "ema_role": "short",
+              "lookback": 20
+            },
+            "physical_alias": "ema_slope",
+            "provider": "features.trackers.generic_context.GenericContextProvider",
+            "requested": "ema_slope",
+            "status": "verified"
+          }
+        ],
+        "routing": {
+          "completed_1m": {
+            "regime": "regime_1m",
+            "stream": "es_1m"
+          },
+          "completed_1s": {
+            "stream": "es_1s"
+          },
+          "completed_5m": {
+            "ready_gate": false,
+            "tracker": "regime_bar_5m"
+          },
+          "regime_transition_1m": {
+            "requires_atr": false,
+            "tracker": "regime_1m"
+          }
+        },
+        "snapshot": {
+          "atr": "regime_1m.atr",
+          "episode_state": {
+            "prevailing_direction": "regime_1m.dir"
+          },
+          "family_a_atr": "excursion.frozen_atr"
+        }
+      },
+      "subscriptions": [
+        {
+          "events": [
+            "regime_bar"
+          ],
+          "from": "regime_bar_5m",
+          "input": "completed_5m"
+        },
+        {
+          "events": [
+            "changed"
+          ],
+          "from": "regime_1m",
+          "input": "regime_transition_1m"
+        }
+      ],
+      "warmup_bars": 0
+    }
+  ],
+  "triggers": {
+    "kind": "every_candidate"
+  },
+  "warmup": {
+    "days_before_partition": 5,
+    "max_warmup_seconds": 840,
+    "per_stream_bars": {
+      "es_1m": 14,
+      "es_1s": 0
+    }
+  }
+}

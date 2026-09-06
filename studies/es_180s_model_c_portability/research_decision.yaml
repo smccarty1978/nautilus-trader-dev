@@ -1,0 +1,404 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_plan.json > code)
+#
+# ES 180s Model C portability. Every scientific decision below is either (a) stated by the
+# research contract embedded in `research_question`, or (b) resolved from a governed authority
+# named there. Nothing here was inferred from prose where an authority exists.
+#
+# Governed authorities actually read while writing this contract:
+#   * studies/clean_maturity_flip_model_180s_horizon/artifacts/frozen_feature_manifest.json
+#       -> feature_sets.LONG_C == SHORT_C, the exact 13 semantic features (identical lists).
+#   * studies/clean_maturity_flip_model_180s_horizon/study.yaml
+#       -> population.qualification, target (flip / 180s / completed_1m_bar confirmation),
+#          and the parent's own feature parameters (bar_state, lookbacks, windows).
+#   * studies/clean_maturity_flip_model_180s_horizon/artifacts/model_selection_manifest_long.json
+#     and .../model_selection_manifest_short.json  -> winner.C.hyperparameters (verified below).
+#   * research/datasets/ES_1S_V2_GLOBEX.yaml + PLATFORM_STATE.json datasets.current.ES.
+#   * capability registry (`research cap describe`) for every primitive id used in study.yaml.
+study_id: es_180s_model_c_portability
+research_question: "# ES 180s MODEL C PORTABILITY STUDY — SUPERVISED PLATFORM V2 RESEARCH CONTRACT\n\n\
+  ## 0. DESIGN-WORKER BINDING NOTES (read before writing study.yaml)\n\nThis document is the RESEARCH\
+  \ CONTRACT. It is authoritative for every semantic decision it\nresolves. Where it points at a governed\
+  \ authority instead of stating a value, resolve the value\nfrom that authority — do not infer it from\
+  \ prose here.\n\nGoverned authorities to resolve from:\n\n* Parent NQ study (historical, v1 runtime\
+  \ — a REFERENCE, never a template, never recompiled):\n  `studies/clean_maturity_flip_model_180s_horizon`\n\
+  \  Relevant artifacts include `artifacts/frozen_feature_manifest.json`,\n  `artifacts/preprocessing_manifest.json`,\
+  \ `artifacts/model_manifest.json`,\n  `artifacts/train_experiment_freeze_long.json`, `artifacts/train_experiment_freeze_short.json`,\n\
+  \  `artifacts/180S_HORIZON_TRAIN_CARD.json`, `artifacts/2024_OOS_CARD.json`,\n  `artifacts/study_closure.json`,\
+  \ `SPEC.md`, `research_decision.yaml`.\n* Dataset: `research/datasets/ES_1S_V2_GLOBEX.yaml` (verify\
+  \ via `research data verify ES_1S_V2_GLOBEX`).\n* Capability registry: `research cap search` / `research\
+  \ cap describe` — never guess capability ids.\n\nKnown-available capabilities relevant to this study\
+  \ (verified on `main` at intake):\n`feature.rolling_retention_ratio`, `feature.rolling_current_progress_atr`,\n\
+  `feature.rolling_max_progress_atr`, `feature.rolling_giveback_atr` — all take a `window`\nparameter\
+  \ (bind `window: 300s`). Direction-specific FIXED hyperparameters are expressible\nthrough modeling\
+  \ **cells** (`research_workflow/grammar/spec.py` — a cell carries its own fixed\n`params`). Use cells;\
+  \ do NOT emit a bare arm list, and do NOT introduce a tuning search.\n\n**`research_decision.yaml` MUST\
+  \ declare** (the supervisor reads these; without them it will stop\nand raise decision cards this contract\
+  \ has already answered):\n\n```yaml\nautonomy_decisions:\n  platform_merge: auto_if_green\n  closed_study_merge:\
+  \ auto_if_clean\n  deterministic_defect: auto_fix\n  audit_fixable_defect: auto_fix\n  frozen_parent_evidence:\
+  \ authenticate_and_reuse_never_retrain\n  protected_data: never_broaden_chronology_authority\n  long_jobs:\
+  \ detached_no_polling\nterminal_decisions:\n  # closure vocabulary — the analysis worker may close ONLY\
+  \ with one of these\n  STRONG_PORTABILITY: ...\n  PARTIAL_PORTABILITY: ...\n  NO_MEANINGFUL_PORTABILITY:\
+  \ ...\n```\n\nAlso declare, in `research_decision.yaml`, the semantic decisions this contract resolves\n\
+  (horizon boundary, decision epoch, session censoring, population predicates, direction split,\nthreshold\
+  \ derivation population) so a `SEMANTIC_DECISION_REQUIRED` gap routes to the design\nworker rather than\
+  \ to the user.\n\n---\n\n============================================================\n1. RESEARCH QUESTION\n\
+  ============================================================\n\nPRIMARY\n\nDoes the validated NQ 180-second\
+  \ Model C architecture transfer to ES?\n\nSpecifically:\n\n    Train the same 13-feature Model C architecture\
+  \ natively on ES\n    using 2020-2023 TRAIN data.\n\n    Freeze the resulting ES LONG and SHORT models\
+  \ and all TRAIN-derived\n    thresholds.\n\n    Then evaluate once on untouched ES 2024 OOS.\n\nQuestion:\n\
+  \n    Does ES show meaningful forward discrimination for an imminent\n    prevailing 1m regime flip\
+  \ within 180 seconds?\n\nSECONDARY\n\nDoes ES independently learn a similar dominant feature structure\
+  \ to NQ,\nespecially around:\n\n    ema_slope\n    arrival_velocity\n    rolling retention\n    rolling\
+  \ giveback\n    rolling current progress\n\nThis is a CROSS-INSTRUMENT PORTABILITY study.\n\nIt is NOT:\n\
+  \n    a combined NQ+ES model\n    a feature-discovery study\n    a hyperparameter-tuning study\n   \
+  \ a strategy/economics study\n    a Stage-2 trade-quality study\n\n============================================================\n\
+  2. SCIENTIFIC AUTHORITIES TO RESOLVE\n============================================================\n\
+  \nBefore final study compilation, resolve from governed repository authority:\n\nPARENT NQ STUDY\n\n\
+  \    studies/clean_maturity_flip_model_180s_horizon\n\nResolve and bind:\n\n    exact repaired Model\
+  \ C 13-feature semantic surface\n    accepted 180s target semantics\n    accepted established-regime\
+  \ population semantics\n    accepted decision timestamp semantics\n    accepted session/censor semantics\n\
+  \    accepted horizon boundary semantics\n    accepted preprocessing semantics\n    frozen direction-specific\
+  \ LightGBM hyperparameters\n\nDo not infer these from this question if authoritative parent artifacts\n\
+  specify them more precisely.\n\nES DATASET\n\nExpected:\n\n    ES_1S_V2_GLOBEX\n\nVerify through DatasetSpec/registry.\n\
+  \nDo not substitute:\n    ES V0\n    NQ data\n    legacy catalogs\n\nunless a governed authority explicitly\
+  \ requires a historical fixture,\nwhich should not be necessary for this study.\n\n============================================================\n\
+  3. INSTRUMENT / STREAMS\n============================================================\n\nExecution instrument:\n\
+  \n    ES\n\nGoverned dataset:\n\n    ES_1S_V2_GLOBEX\n\nExpected streams/state:\n\n    native 1s execution\
+  \ stream\n    completed 1m regime/context\n    governed host-derived 5s / 5m state where required by\
+  \ canonical features\n\nPreserve Platform V2:\n    completed-bar semantics\n    ts_init availability\n\
+  \    same-timestamp rules\n    Globex session authority\n\nNo NQ rows may enter ES model fitting.\n\n\
+  ============================================================\n4. TARGET\n============================================================\n\
+  \nUse the SAME SCIENTIFIC TARGET as the accepted NQ 180s Model C parent:\n\n    prevailing 1m regime\
+  \ flip within (T, T+180s]\n\nDirection:\n\n    both populations\n    separate LONG and SHORT models\n\
+  \nResolve exact parent semantics for:\n\n    prevailing regime definition\n    decision epoch T\n  \
+  \  inclusive/exclusive horizon boundary\n    session censoring\n    confirmation/event semantics\n \
+  \   horizon_end_rule\n    entry/reference semantics if applicable\n\nDo not reinterpret or approximate\
+  \ any of these.\n\n============================================================\n5. POPULATION\n============================================================\n\
+  \nUse the SAME established-regime population semantics as the NQ parent.\n\nExpected constraints include:\n\
+  \n    regime age >= 120s\n    running MFE >= 1.0 ATR\n    >= 2 new-progress windows\n    retained MFE\
+  \ ratio >= 0.50\n    5-second candidate/scoring cadence\n    RTH candidate emission\n    both prevailing\
+  \ regime directions\n\nResolve the exact canonical tracker fields and predicates from parent authority.\n\
+  \nThese thresholds are FIXED.\n\nDo not optimize them for ES.\n\n============================================================\n\
+  6. EXACT 13-FEATURE MODEL C SURFACE\n============================================================\n\n\
+  Use exactly the same semantic feature surface as repaired NQ Model C:\n\n1. arrival_velocity\n2. arrival_acceleration\n\
+  3. ema_slope\n\n4. prior completed 1m regime efficiency\n5. prior completed 1m regime MFE ATR\n6. prior\
+  \ completed 1m regime range ATR\n\n7. prior completed 5m regime efficiency\n8. prior completed 5m regime\
+  \ MFE ATR\n9. prior completed 5m regime range ATR\n\n10. rolling retention ratio — 300s\n11. rolling\
+  \ current progress ATR — 300s\n12. rolling max progress ATR — 300s\n13. rolling giveback ATR — 300s\n\
+  \nResolve these through canonical Platform V2 FeatureInstance identities\nand parameters.\n\nDo NOT:\n\
+  \n    add ES-specific features\n    add volume\n    add delta\n    remove features\n    perform feature\
+  \ selection\n    substitute approximate aliases\n    change timing/reset/null semantics\n\nPhysical\
+  \ output aliases may be compiler-generated.\n\n============================================================\n\
+  7. MODEL ARCHITECTURE\n============================================================\n\nModel family:\n\
+  \n    LightGBM\n\nTrain independent:\n\n    LONG\n    SHORT\n\nThis is FIXED-ARCHITECTURE PORTABILITY.\n\
+  \nNO hyperparameter tuning.\n\nVerify the frozen NQ parent parameter authority before binding.\n\nExpected\
+  \ reference parameters:\n\nLONG\n\n    learning_rate = 0.039440343780424526\n    max_depth = 5\n   \
+  \ n_estimators = 100\n    num_leaves = 4\n    random_seed = 42\n    verbosity = -1\n\nSHORT\n\n    learning_rate\
+  \ = 0.028861842631876633\n    max_depth = 5\n    n_estimators = 200\n    num_leaves = 4\n    random_seed\
+  \ = 42\n    verbosity = -1\n\nIf authoritative parent representation normalizes parameter names,\nuse\
+  \ the governed equivalent without changing values/semantics.\n\nScientific purpose:\n\n    isolate architecture/feature\
+  \ portability\n\nTherefore DO NOT:\n\n    Optuna\n    random search\n    grid search\n    ES-specific\
+  \ architecture selection\n    calibration unless parent Model C explicitly requires it\n\nIf fixed direction-specific\
+  \ model parameterization is not expressible,\nallow the supervisor to route the resulting typed Platform\
+  \ V2 capability gap.\n\nDo not ask the user unless the missing capability requires a genuine\nscientific\
+  \ decision.\n\n============================================================\n8. CHRONOLOGY\n============================================================\n\
+  \nTRAIN:\n\n    2020\n    2021\n    2022\n    2023\n\nTRUE OOS:\n\n    2024\n\nPROHIBITED:\n\n    2025\n\
+  \    2026\n\nHard chronology invariant:\n\n2024 must not influence:\n\n    feature definition\n    feature\
+  \ selection\n    preprocessing\n    fitting\n    calibration\n    model selection\n    architecture\n\
+  \    hyperparameters\n    threshold derivation\n\n2024 opens only after:\n\n    LONG model frozen\n\
+  \    SHORT model frozen\n    preprocessing frozen\n    feature order frozen\n    TRAIN thresholds frozen\n\
+  \    lineage/freeze checks passed\n\n2025 and 2026 must remain untouched.\n\n============================================================\n\
+  9. TRAINING PROTOCOL\n============================================================\n\nFit:\n\n    LONG:\n\
+  \        ES 2020-2023 eligible LONG rows\n\n    SHORT:\n        ES 2020-2023 eligible SHORT rows\n\n\
+  Use fixed architecture only.\n\nFreeze before OOS:\n\n    estimator/model bytes\n    model_id\n    canonical\
+  \ artifact hashes\n    feature order/hash\n    preprocessing identity/hash\n    fixed hyperparameters\n\
+  \    random seed\n    TRAIN threshold artifacts\n    golden score fixture\n    stage-scoped execution\
+  \ lineage\n\nNo retraining after OOS opens.\n\n============================================================\n\
+  10. TRAIN-DERIVED SCORE THRESHOLDS\n============================================================\n\n\
+  Derive separately by direction from ES TRAIN scores only:\n\n    P90\n    P95\n    P97.5\n\nTransfer\
+  \ the percentile DEFINITIONS from NQ.\n\nDo NOT transfer NQ numerical score thresholds.\n\nEach ES threshold\
+  \ must prove:\n\n    derivation_population = TRAIN\n\nApply these frozen ES thresholds unchanged to\
+  \ 2024.\n\n============================================================\n11. TRAIN DIAGNOSTICS\n============================================================\n\
+  \nReport separately LONG / SHORT:\n\nPopulation:\n\n    checkpoint/candidate rows\n    unique regimes\n\
+  \    target base rate\n\nClassification:\n\n    ROC-AUC\n    PR-AUC\n    PR-AUC / base-rate lift\n \
+  \   Brier\n    supported calibration diagnostics\n\nAt TRAIN-derived:\n\n    P90\n    P95\n    P97.5\n\
+  \nreport:\n\n    retained fraction\n    flip-within-180s rate\n    precision lift versus TRAIN base\
+  \ rate\n    median seconds-to-flip\n\nMaturity buckets where populated:\n\n    0-300s\n    300-600s\n\
+  \    600-900s\n    900-1800s\n    >=1800s\n\nKeep checkpoint counts and unique-regime counts distinct.\n\
+  \n============================================================\n12. FEATURE IMPORTANCE\n============================================================\n\
+  \nAfter TRAIN freeze, report native LightGBM importance separately LONG / SHORT.\n\nFor all 13 features:\n\
+  \n    gain\n    gain %\n    split count\n    split %\n\nAlso report:\n\n    top-3 cumulative gain %\n\
+  \    top-5 cumulative gain %\n    zero-gain features\n\nNQ DESCRIPTIVE REFERENCE ONLY:\n\n    ema_slope\n\
+  \    arrival_velocity\n    rolling retention ratio\n    rolling giveback ATR\n    rolling current progress\
+  \ ATR\n\nDo not impose this ranking on ES.\n\nReport the ES ranking actually learned.\n\n============================================================\n\
+  13. OOS 2024\n============================================================\n\nOnly after the TRAIN freeze:\n\
+  \n    authorize/open ES 2024\n    collect/score through governed Platform V2\n\nNO:\n\n    refit\n \
+  \   recalibration\n    threshold changes\n    architecture changes\n\nReport separately LONG / SHORT:\n\
+  \n    rows\n    unique regimes\n    base rate\n\n    ROC-AUC\n    PR-AUC\n    PR-AUC / base-rate lift\n\
+  \    Brier\n    expected calibration error where supported\n\nTRAIN -> OOS:\n\n    ROC change / retention\n\
+  \    PR-AUC change\n    PR/base-rate lift retention\n    calibration change\n\nAt frozen ES TRAIN thresholds:\n\
+  \n    P90\n    P95\n    P97.5\n\nreport:\n\n    retained fraction\n    flip-within-180s probability\n\
+  \    lift versus 2024 base rate\n    median seconds-to-flip\n\n============================================================\n\
+  14. FIRST-P90 DIAGNOSTIC\n============================================================\n\nIf current\
+  \ Platform V2 already provides the generic governed first-fire analysis:\n\nUse:\n\n    first eligible\
+  \ checkpoint with score >= frozen ES TRAIN P90\n    inclusive threshold\n    no below->above crossing\
+  \ requirement\n    one first fire per regime\n\nReport separately LONG / SHORT:\n\n    eligible regimes\n\
+  \    regimes with first P90 fire\n    % regimes firing\n    first-fire signals\n    signals per RTH\
+  \ day\n    flip-within-180s rate\n    median seconds-to-flip\n\nThis is descriptive.\n\nDo not optimize\
+  \ the threshold.\n\nIf the required generic analysis capability is absent:\n\n    route typed ANALYSIS_HARNESS_GAP\
+  \ / capability gap through supervisor\n\nDo not create study-local analysis Python.\n\n============================================================\n\
+  15. ES VS NQ PORTABILITY COMPARISON\n============================================================\n\n\
+  After ES 2024 is complete, compare descriptively against already-frozen NQ 180s evidence.\n\nDo NOT\
+  \ retrain or recollect NQ.\n\nCompare:\n\n    OOS ROC-AUC behavior\n    PR/base-rate lift\n    calibration\n\
+  \    P90/P95/P97.5 tail behavior\n    median seconds-to-flip\n    maturity-bucket behavior\n    first-fire\
+  \ behavior where available\n    feature-importance ranking/concentration\n\nInterpretation categories:\n\
+  \n    STRONG_PORTABILITY\n    PARTIAL_PORTABILITY\n    NO_MEANINGFUL_PORTABILITY\n\nDo NOT define success\
+  \ as identical NQ/ES numerical AUC.\n\nJudge whether the same frozen architecture yields, on ES:\n\n\
+  \    genuine forward discrimination\n    stable tail lift\n    reasonable calibration\n    useful timing\
+  \ discrimination\n    and/or comparable learned feature structure\n\n============================================================\n\
+  16. NO ECONOMIC WORK\n============================================================\n\nDo NOT:\n\n  \
+  \  simulate entries\n    submit orders\n    optimize SL/PT\n    model fills/slippage\n    create Stage\
+  \ 2\n    train combined NQ+ES models\n\nThis study ends at predictive portability.\n\n============================================================\n\
+  17. INTEGRITY REQUIREMENTS\n============================================================\n\nRequire:\n\
+  \n    exact parent semantic reconciliation\n    exact 13-feature contract\n    no all-null feature columns\n\
+  \    canonical null-contract compliance\n    feature variance checks\n    unique-regime counts\n   \
+  \ direction/model binding\n    golden-score validation\n    target-runtime parity/evidence\n    chronology\
+  \ proof\n    2024 unopened before freeze\n    2025/2026 untouched\n\nIf ES legitimately exposes a feature-availability\
+  \ difference:\n\n    report it\n    fail/route according to canonical null semantics\n\nDo not silently\
+  \ impute or alter feature semantics.\n\n============================================================\n\
+  18. REQUIRED OUTPUTS\n============================================================\n\nUse governed Platform\
+  \ V2 artifacts.\n\nRequired logical outputs:\n\n    resolved ES Model C feature contract\n    TRAIN\
+  \ population summary\n    frozen LONG model\n    frozen SHORT model\n    frozen ES TRAIN P90/P95/P97.5\
+  \ thresholds\n    TRAIN classification summary\n    feature importance table\n    2024 OOS classification\
+  \ summary\n    2024 score-tail summary\n    maturity-bucket summary\n    first-P90 summary if supported\n\
+  \    ES-vs-NQ portability comparison\n    final study report\n    study closure card\n\nNo authoritative\
+  \ scratch analysis pipeline.\n\nIf a required statistic is unsupported:\n\n    route the typed analysis\
+  \ capability gap.\n\n============================================================\n19. AUTONOMY DECISIONS\n\
+  ============================================================\n\non_capability_gap:\n\n    MISSING_CAPABILITY\
+  \ / UNSUPPORTED_COMPOSITION\n        -> supervisor launches fresh capability worker\n        -> generic\
+  \ chore branch/worktree\n        -> targeted tests\n        -> governed promotion/merge\n        ->\
+  \ merge current main into study\n        -> recompile/reseal/resume\n\n    INVALID_PARAMETERIZATION\n\
+  \        -> fresh study-design worker repairs declarative spec\n\n    semantic ambiguity already resolved\
+  \ by this contract\n        -> use this contract\n        -> do not ask again\n\ndeterministic_defect:\n\
+  \n    auto-repair through bounded supervisor repair flow\n\naudit_fixable_defect:\n\n    auto-repair\n\
+  \    regenerate affected packet\n    bounded re-audit\n\nplatform_merge:\n\n    auto_if_green\n\n  \
+  \  Requirements:\n        claimed write surface\n        targeted tests green\n        required promotion\
+  \ green\n        one required pre-merge broad regression gate under current policy\n        no new attributable\
+  \ regressions\n\nfrozen_parent_evidence:\n\n    authenticate/reuse\n    NEVER retrain NQ\n\nprotected_data:\n\
+  \n    never broaden chronology authority\n\nlong_jobs:\n\n    detached\n    no AI worker waiting/polling\n\
+  \n============================================================\n20. USER INTERVENTION CONDITIONS\n============================================================\n\
+  \nDo NOT ask the user about:\n\n    deterministic implementation defects\n    capability implementation\
+  \ details\n    test failures\n    stale seals\n    audit regeneration\n    ordinary merge/recompile\
+  \ decisions\n    long-job completion\n    already-resolved parent semantics\n\nAsk only if there is\
+  \ a genuine unresolved:\n\n    SCIENTIFIC_SEMANTIC_DECISION_REQUIRED\n    AUTHORIZATION_AMBIGUITY\n\
+  \    PROTECTED_OOS_AUTHORIZATION_REQUIRED beyond this contract\n    DATA_SAFETY_RISK\n    CAUSAL_DEFINITION_AMBIGUOUS\n\
+  \    RESEARCH_CONTRACT_CONFLICT\n    DESTRUCTIVE_ACTION_REQUIRES_APPROVAL not covered by auto_if_green\n\
+  \    repeated supervisor escalation after bounded repairs\n\nNOTE ON OOS AUTHORIZATION: this contract\
+  \ IS the authorization for ES 2024 to open\nafter the TRAIN freeze, through the governed `oos` stage.\
+  \ It is NOT authorization for\n2025 or 2026, which must remain untouched.\n\n============================================================\n\
+  21. SUPERVISOR EXECUTION\n============================================================\n\nThis is a\
+  \ SUPERVISED Platform V2 study.\n\nThe owner session should NOT manually carry the study through every\
+  \ phase.\n\nUse the canonical Research Supervisor.\n\nExpected user experience:\n\n    one intake\n\
+  \    -> disposable design worker\n    -> disposable capability workers only if required\n    -> disposable\
+  \ auditors\n    -> detached deterministic collection/fit/OOS jobs\n    -> disposable analysis worker\n\
+  \    -> STUDY_CLOSED\n\nNo AI worker should remain alive during long deterministic jobs.\n\nPersist\
+  \ all decisions/results in governed artifacts/cards.\n\n============================================================\n\
+  22. FINAL CARD\n============================================================\n\nWrite `artifacts/ES_180S_MODEL_C_PORTABILITY_CARD.json`\
+  \ with this shape:\n\nES_180S_MODEL_C_PORTABILITY_CARD\n\nAUTHORITY:\n    dataset:\n    dataset_digest:\n\
+  \    parent_nq_authority:\n    target:\n    population:\n    feature_surface_hash:\n    model_family:\n\
+  \    fixed_hyperparameters_verified:\n\nTRAIN_2020_2023:\n\n    LONG:\n        rows:\n        regimes:\n\
+  \        base_rate:\n        ROC_AUC:\n        PR_AUC:\n        PR_base_lift:\n        Brier:\n\n  \
+  \  SHORT:\n        rows:\n        regimes:\n        base_rate:\n        ROC_AUC:\n        PR_AUC:\n\
+  \        PR_base_lift:\n        Brier:\n\nES_TRAIN_THRESHOLDS:\n\n    LONG:\n        P90:\n        P95:\n\
+  \        P97_5:\n\n    SHORT:\n        P90:\n        P95:\n        P97_5:\n\nFEATURE_IMPORTANCE:\n\n\
+  \    LONG:\n        top_5:\n        top_3_gain_pct:\n        top_5_gain_pct:\n        zero_gain_features:\n\
+  \n    SHORT:\n        top_5:\n        top_3_gain_pct:\n        top_5_gain_pct:\n        zero_gain_features:\n\
+  \nOOS_2024:\n\n    LONG:\n        rows:\n        regimes:\n        base_rate:\n        ROC_AUC:\n  \
+  \      PR_AUC:\n        PR_base_lift:\n        Brier:\n        calibration:\n        P90_flip_rate:\n\
+  \        P90_lift:\n        P95_flip_rate:\n        P95_lift:\n        P97_5_flip_rate:\n        P97_5_lift:\n\
+  \n    SHORT:\n        (same fields)\n\nTRAIN_TO_OOS:\n\n    LONG:\n        ROC_retention:\n        PR_lift_retention:\n\
+  \        calibration_change:\n\n    SHORT:\n        (same fields)\n\nFIRST_P90:\n\n    LONG:\n     \
+  \   signals:\n        signals_per_day:\n        flip_180_rate:\n        median_seconds_to_flip:\n\n\
+  \    SHORT:\n        (same fields)\n\nES_VS_NQ:\n\n    ROC_behavior:\n    score_tail_behavior:\n   \
+  \ maturity_behavior:\n    feature_importance_similarity:\n    first_fire_behavior:\n\nPORTABILITY_VERDICT:\n\
+  \n    STRONG_PORTABILITY /\n    PARTIAL_PORTABILITY /\n    NO_MEANINGFUL_PORTABILITY\n\nMODEL_TUNED:\n\
+  \    NO\n\nFEATURES_CHANGED:\n    NO\n\n2025_2026_ACCESSED:\n    NO\n\nSUPERVISOR:\n    capability_gaps_encountered:\n\
+  \    platform_changes_merged:\n    unexpected_user_interventions:\n    worker_count:\n    ai_alive_during_long_jobs:\n\
+  \    wall_time:\n    worker_cost:\n\nNEXT_RECOMMENDED_STUDY:\n    only if evidence warrants ES-specific\
+  \ tuning or broader cross-instrument testing"
+status: DESIGN_COMPILED
+dataset_id: ES_1S_V2_GLOBEX
+terminal_decisions:
+  STRONG_PORTABILITY: 'ES 2024 OOS shows genuine forward discrimination that survives the TRAIN->OOS transfer
+    on BOTH directions: ROC-AUC and PR-AUC/base-rate lift retained at a level comparable to the frozen
+    NQ 180s parent, stable lift at the frozen ES TRAIN P90/P95/P97.5 thresholds, reasonable calibration,
+    and a learned feature structure of the same character as NQ.'
+  PARTIAL_PORTABILITY: ES 2024 OOS shows real but materially weaker or one-sided transfer -- e.g. discrimination
+    and tail lift hold for one direction only, or lift survives while calibration or timing discrimination
+    degrades, or the learned feature ranking diverges substantially from NQ.
+  NO_MEANINGFUL_PORTABILITY: 'ES 2024 OOS shows no useful forward discrimination: ROC-AUC at or near chance,
+    PR-AUC not meaningfully above the ES 2024 base rate, and no stable lift at the frozen ES TRAIN thresholds.'
+autonomy_decisions:
+  platform_merge: auto_if_green
+  closed_study_merge: auto_if_clean
+  deterministic_defect: auto_fix
+  audit_fixable_defect: auto_fix
+  frozen_parent_evidence: authenticate_and_reuse_never_retrain
+  protected_data: never_broaden_chronology_authority
+  long_jobs: detached_no_polling
+  on_capability_gap: stop_and_handoff
+  platform_change_required: chore_branch_and_fresh_session
+  calendar_reference_parity: common_interval_exact
+  frozen_parent_model: rescore_if_authenticated
+  protected_period: never_expand_authority
+  horizon: 'flip_within_180s: the interval is (T, T+180s] -- exclusive at the decision epoch T, inclusive
+    at the boundary. Parent semantics, unchanged.'
+  horizon_end_rule: strict -- no bar closing after the horizon end is evaluated; a bar closing exactly
+    at the end is.
+  decision_epoch: T is the 5s grid checkpoint anchored on regime_1m.start_ns, read from completed-bar
+    state only (features.metadata.triggering_1s_ts_init = epoch.T records it per row).
+  session_end: censor -- a candidate whose 180s horizon crosses the RTH session close is censored, never
+    labelled 0.
+  direction: population.direction = regime_1m.dir, the PREVAILING 1m regime direction read at T. Both
+    directions are collected in one population.
+  qualify: 'the parent''s established-regime predicates, FIXED, never tuned for ES: regime age >= 120s,
+    running MFE >= 1.0 frozen ATR, >= 2 new-progress windows (progress_gap 120s), retained MFE ratio >=
+    0.50, 5s candidate cadence, RTH, both prevailing directions, frozen ATR > 0. No max_age cap -- the
+    parent caps none, and the >=1800s maturity bucket must stay reachable.'
+  cells: the LONG/SHORT split is a modeling CELL partition on regime_direction (+1 / -1), each cell fit
+    independently on the identical collected population with the NQ parent's own frozen direction-specific
+    hyperparameters. Not arms, not a tuning search.
+  thresholds: P90/P95/P97.5 are quantiles of the ES TRAIN score distribution, derived per direction from
+    ES TRAIN scores ONLY (derivation_population = train). The percentile DEFINITIONS transfer from NQ;
+    the NQ numerical thresholds do NOT.
+  analysis_source: no declarative `analysis:` block is declared. Under research_workflow/lifecycle_v2.py
+    the analyze stage runs the declared pipeline INSTEAD OF the governed OOS classification path, so declaring
+    one would trade the mandatory section-13 OOS metrics for the conditional section-14 first-P90 diagnostic.
+    Section 14 is explicitly conditional ("if supported"); section 13 is not.
+resolved_from_parent_authority:
+  parent_study: studies/clean_maturity_flip_model_180s_horizon
+  parent_is: frozen historical v1 REFERENCE -- never recompiled, never retrained, never recollected
+  feature_surface:
+    source_artifact: artifacts/frozen_feature_manifest.json
+    feature_list_sha256: 38c0201fe2b0fec3070b7a226353d7782778aa82bace3b6070de8844d9d04d32
+    long_c_equals_short_c: true
+    features:
+    - arrival_velocity
+    - arrival_acceleration
+    - ema_slope
+    - prior_1m_regime_efficiency
+    - prior_1m_regime_mfe_atr
+    - prior_1m_regime_range_atr
+    - prior_5m_regime_efficiency
+    - prior_5m_regime_mfe_atr
+    - prior_5m_regime_range_atr
+    - rolling_300s_retention_ratio
+    - rolling_300s_current_progress_atr
+    - rolling_300s_max_progress_atr
+    - rolling_300s_giveback_atr
+    compiled_plan_features_match: compiled_plan.json columns.features is exactly this set (13/13)
+    parameters_carried_verbatim: 'prior 1m/5m regime geometry: context prior, bar_state completed. rolling
+      family: window 300s, update_every 1s. arrival_velocity: input_timeframe 1s, lookback 20, bar_state
+      completed. arrival_acceleration: input_timeframe 1s, short_lookback 20, bar_state completed. ema_slope:
+      ema_role short, lookback 20.'
+  fixed_hyperparameters_verified:
+    source_artifacts:
+    - artifacts/model_selection_manifest_long.json  winner.C.hyperparameters
+    - artifacts/model_selection_manifest_short.json winner.C.hyperparameters
+    LONG:
+      learning_rate: 0.039440343780424526
+      max_depth: 5
+      n_estimators: 100
+      num_leaves: 4
+      verbosity: -1
+    SHORT:
+      learning_rate: 0.028861842631876633
+      max_depth: 5
+      n_estimators: 200
+      num_leaves: 4
+      verbosity: -1
+    seed: 42
+    matches_contract_section_7: true
+    random_state_placement: random_state lives ONLY in model.params. research.analysis.modeling._build_estimator
+      builds LGBMClassifier(random_state=seed, **cfg); a cell-level random_state would raise "got multiple
+      values for keyword argument". The NQ parent recorded the identical hazard in its own study.yaml
+      comment.
+    no_execution_only_overrides: 'n_jobs / deterministic are deliberately NOT declared: the parent did
+      not declare them, and this study changes nothing about the architecture it is testing.'
+  population_semantics_source: parent study.yaml population.qualification (age_gate_seconds 120, running_mfe_atr_gte
+    1.0, new_progress_windows_gte 2, retained_mfe_ratio_gte 0.5, cadence_seconds 5, session RTH, prevailing_regime
+    both)
+  target_semantics_source: parent study.yaml target (type flip, event prevailing_1m_regime_transition,
+    horizon_seconds 180, confirmation completed_1m_bar / 1 bar, decision_reference decision_ts, direction
+    both)
+  regime_authority: tracker.regime.dual_ema defaults short_period 3 / long_period 9 / atr_period 14 --
+    the canonical dual-EMA regime, same as the parent.
+chronology:
+  train:
+  - 2020
+  - 2021
+  - 2022
+  - 2023
+  dev:
+  - 2024
+  prohibited:
+  - 2025
+  - 2026
+  oos_authorization: the embedded research contract IS the authorization for ES 2024 to open through the
+    governed `oos` stage AFTER the TRAIN freeze. It is NOT authorization for 2025 or 2026.
+  no_selection_protocol: model.validation is deliberately absent. research_workflow/lifecycle_v2.py fit()
+    falls back to tuning = chronology.train, final_train_validation_years = []. No search_space is declared,
+    so research_workflow.tuning.tune is never invoked. Nothing adaptive ever runs, and 2024 can enter
+    no fitting, selection, calibration or threshold decision by construction.
+  note_train_differs_from_parent: the NQ parent trained on 2021-2023. This contract declares ES TRAIN
+    2020-2023 explicitly (section 8); that is a contract decision, not an inference.
+prohibited_changes:
+- add_or_remove_features
+- feature_selection
+- substitute_approximate_feature_aliases
+- change_feature_timing_reset_or_null_semantics
+- add_volume_or_delta_features
+- hyperparameter_tuning_of_any_kind
+- optuna_random_or_grid_search
+- es_specific_architecture_selection
+- combined_nq_plus_es_model
+- retrain_or_recollect_the_nq_parent
+- transfer_nq_numerical_score_thresholds_to_es
+- optimize_population_thresholds_for_es
+- use_2024_for_any_design_or_fitting_decision
+- touch_2025_or_2026
+- entry_simulation_or_any_economic_work
+- study_local_analysis_python
+- bespoke_collector_or_wrapped_runner
+known_platform_risks_for_later_phases:
+  note: Found by reading the runtime while composing this spec; NOT raised by `study compile`, so they
+    are recorded here rather than as a CapabilityGap. Phase B/C/D should expect them.
+  multi_cell_freeze: research_workflow/lifecycle_v2.py freeze() builds model_canonical_sha256 keyed by
+    m["name"] over models["models"]. With more than one (arm x cell) the fit stage writes entries keyed
+    arm/cell/model_id with NO "name" key, and `single` is None so no top-level model_id exists -> KeyError
+    at freeze. Deterministic defect; autonomy_decisions.deterministic_defect = auto_fix.
+  multi_cell_oos_analyze: analyze() reports OOS classification only when models["mode"] == "score" or
+    models["model_id"] exists. A multi-cell TRAIN study satisfies neither, so contract section 13 (per-direction
+    OOS ROC/PR/Brier/calibration) has no producer today.
+  feature_importance: 'contract section 12 (native LightGBM gain/split importance per direction) has no
+    producer: no "importance" symbol exists anywhere under research_workflow/ or research/analysis/.'
+  train_threshold_artifact: 'contract section 10 P90/P95/P97.5: research_workflow/modeling.py:321-323
+    computes exactly these three with derivation_population "train", but that is the v1 path. lifecycle_v2
+    freeze() writes thresholds: {} and the fold-level train_derived_thresholds exist only under walk_forward_months
+    (and only p90/p95).'
+  first_p90_diagnostic: analysis.anchor.first_threshold_crossing requires LITERAL per-case thresholds
+    (research/analysis/diagnostic_ops.py resolve_by), which a TRAIN-derived quantile is not at design
+    time; and the analyze stage would displace the section-13 OOS path. Section 14 is conditional -- route
+    ANALYSIS_HARNESS_GAP if it is wanted.
+deliverables:
+- compiled feature contract (compiled_plan.json columns.features, 13 entries)
+- artifacts/experiment_models.json -- per-cell TRAIN population + classification summary
+- artifacts/train_experiment_freeze.json -- frozen LONG + SHORT model bytes, canonical shas, feature order
+- ES TRAIN P90/P95/P97.5 per direction, derivation_population = train
+- feature importance table per direction
+- artifacts/experiment_analysis_v2.json -- 2024 OOS classification + score-tail summary
+- maturity-bucket summary (regime_age_seconds metadata column)
+- first-P90 summary if supported
+- ES-vs-NQ portability comparison (descriptive, against already-frozen NQ evidence)
+- artifacts/ES_180S_MODEL_C_PORTABILITY_CARD.json (shape in the embedded contract, section 22)
+- artifacts/study_closure.json with a terminal_decisions key above
