@@ -1,6 +1,6 @@
 {
-  "content_sha256": "0fc9abf597a8936b8d1c4d3d9e73ea7553c73b569efd8d5055d24151ac155d0c",
-  "generated_at_utc": "2026-09-05T00:27:39.033691+00:00",
+  "content_sha256": "fcc616809185483f4525c48ac0a5437189ca440a9ff54625e637d19088787228",
+  "generated_at_utc": "2026-09-06T14:23:23.557369+00:00",
   "kinds": {
     "analysis_ops": [
       {
@@ -192,6 +192,36 @@
           "timestamp_column",
           "reference_timestamp_column",
           "value_map"
+        ],
+        "required_tests": [
+          "research/analysis/tests/test_diagnostic_ops.py"
+        ],
+        "status": "verified",
+        "unresolved_dependencies": [],
+        "update_cadence": "offline_only",
+        "version": 1
+      },
+      {
+        "cost_class": "offline_only",
+        "dependencies": [],
+        "description": "STOP GATE - raises unless every non-baseline arm's ADDED feature block is populated and varying on the rebuilt fitted population and produced a model whose fit identity and predictions differ from the baseline arm's, per declared cell; aborts the analyze stage before any arm delta is written.",
+        "id": "analysis.gate.arm_delta_integrity",
+        "implementation": "research.analysis.diagnostic_ops.arm_delta_integrity_gate",
+        "implementation_note": "RAISE unless every non-baseline arm's ADDED feature block is alive and actually changed the fit.",
+        "implementation_verified": true,
+        "kind": "analysis_ops",
+        "missing_tests": [],
+        "name": "gate.arm_delta_integrity",
+        "parameters": [
+          "baseline_arm",
+          "scope",
+          "min_non_null_rate",
+          "require_positive_variance",
+          "require_distinct_fit_identity",
+          "require_distinct_predictions",
+          "min_prediction_divergence",
+          "models_manifest",
+          "study_id"
         ],
         "required_tests": [
           "research/analysis/tests/test_diagnostic_ops.py"
@@ -6536,7 +6566,7 @@
   "summary": {
     "analysis_ops": {
       "broken": 0,
-      "count": 7
+      "count": 8
     },
     "datasets": {
       "broken": 0,
@@ -6570,7 +6600,7 @@
       "broken": 0,
       "count": 21
     },
-    "total": 219,
+    "total": 220,
     "trackers": {
       "broken": 0,
       "count": 7

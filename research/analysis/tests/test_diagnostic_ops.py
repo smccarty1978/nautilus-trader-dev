@@ -9,8 +9,9 @@ import pandas as pd
 import pytest
 
 from research.analysis.diagnostic_ops import (AnalysisOpError, anchor_first_threshold_crossing, anchored_path,
-                                              bucket_decomposition, cell_matched_controls, cumulative_incidence,
-                                              population_parity_gate, precedence_labels, resolve_by, run_op)
+                                              arm_delta_integrity_gate, bucket_decomposition, cell_matched_controls,
+                                              cumulative_incidence, population_parity_gate, precedence_labels,
+                                              resolve_by, run_op)
 
 NS = 1_000_000_000
 BY = {"column": "direction", "cases": {1: {"value": "long_score", "threshold": 0.30, "levels": {"p95": 0.40}},
@@ -450,3 +451,215 @@ def test_exceptions_require_timestamp_columns_to_derive_a_session_date(tmp_path)
         _dated_gate(tmp_path, _dated_population(extra_on_excepted_day=1),
                     timestamp_column=None, reference_timestamp_column=None,
                     excluded_session_dates=_EXCEPT)
+
+
+# --------------------------------------------------------------- arm-delta integrity gate
+# The gate exists to make one specific negative result trustworthy: "the added family carries
+# no information". A degenerate added block produces the SAME reading, so each test below pins
+# one way the block can be dead while the arm still looks like a legitimate comparison.
+
+class _WeightedProba:
+    """Deterministic, picklable stand-in for a fitted estimator.
+
+    A fixed linear score over declared columns with declared weights, so a test decides exactly
+    whether an added column changes the model's predictions -- a real fit would only make that
+    approximately true.
+    """
+
+    def __init__(self, weights):
+        self.weights = dict(weights)
+
+    def predict_proba(self, X):
+        import numpy as np
+        z = np.zeros(len(X), dtype=float)
+        for column, w in self.weights.items():
+            z = z + float(w) * pd.to_numeric(X[column], errors="coerce").fillna(0.0).to_numpy(dtype=float)
+        p = 1.0 / (1.0 + np.exp(-z))
+        return np.column_stack([1.0 - p, p])
+
+
+_TS = pd.Timestamp("2024-06-03T14:30:00Z").value
+
+
+def _arm_frame(**over) -> pd.DataFrame:
+    """4 LONG + 4 SHORT binary rows in 2024, plus one censored (label 2) row per direction."""
+    rows = []
+    for i, direction in enumerate([1] * 5 + [-1] * 5):
+        k = i % 5
+        rows.append({"observation_ts": _TS + i * NS, "direction": direction,
+                     "y": 2 if k == 4 else k % 2, "f1": 0.1 * (i + 1), "f2": 1.0 - 0.05 * i,
+                     "f3": 0.5 + 0.25 * k})
+    return pd.DataFrame(rows).assign(**over) if over else pd.DataFrame(rows)
+
+
+def _store(tmp_path, model_id: str, weights, inputs):
+    from research_workflow.model_store import ModelLineage, store_model
+    lineage = ModelLineage(study_id="s1", cell_id=None, direction=None, target_arm=None, fold_id="final",
+                           config_id="C00", seed=42, ordered_inputs=list(inputs), feature_contract_sha256=None,
+                           preprocessing_contract_sha256="identity", target_contract_sha256=None,
+                           target_frame_identity=None, training_population_identity=None, family="sklearn")
+    store_model(model_id=model_id, estimator=_WeightedProba(weights), lineage=lineage, tier="registry",
+                selection_status="selected", metrics={}, golden_train_frame=None,
+                model_root=tmp_path / "models")
+
+
+def _fitted_study(tmp_path, arms, *, cells=(("LONG", 1), ("SHORT", -1)), final_fit_rows=4, write_manifest=True):
+    """A study directory whose fit stage has already run: compiled plan + fitted arms + model store.
+
+    ``arms`` is ``[(arm_id, is_baseline, features, weights)]``, fit once per cell.
+    """
+    import json
+    study = tmp_path / "studies" / "s1"
+    (study / "artifacts").mkdir(parents=True, exist_ok=True)
+    (study / "compiled_plan.json").write_text(json.dumps({
+        "model": {"cells": [{"id": cid, "subset": {"direction": value}} for cid, value in cells]},
+        "outcome": {"label_column": "y"}}), encoding="utf-8")
+    models = []
+    for cell_id, _ in cells:
+        for arm, baseline, features, weights in arms:
+            model_id = f"m_{arm}_{cell_id}"
+            _store(tmp_path, model_id, weights, features)
+            models.append({"arm": arm, "cell": cell_id, "baseline_arm": baseline, "model_id": model_id,
+                           "features": list(features), "n_features": len(features),
+                           "final_fit_rows": final_fit_rows, "direction": cell_id.lower()})
+    if write_manifest:
+        (study / "artifacts" / "experiment_models.json").write_text(json.dumps({
+            "schema_version": 3, "label_column": "y", "tuning_years": [2024], "models": models}), encoding="utf-8")
+    return study
+
+
+_LIVE = [("A", True, ["f1", "f2"], {"f1": 1.0, "f2": -1.0}),
+         ("B", False, ["f1", "f2", "f3"], {"f1": 1.0, "f2": -1.0, "f3": 0.75})]
+
+
+def _integrity(tmp_path, rows, arms=None, *, study=None, **over):
+    study = study or _fitted_study(tmp_path, arms if arms is not None else _LIVE)
+    params = {"baseline_arm": "A", "scope": "per_cell", "min_non_null_rate": 0.95,
+              "require_positive_variance": True, "require_distinct_fit_identity": True,
+              "require_distinct_predictions": True,
+              "context": {"studies_root": str(tmp_path / "studies"), "study_dir": str(study),
+                          "model_root": str(tmp_path / "models")}}
+    params.update(over)
+    return arm_delta_integrity_gate(rows, **params)
+
+
+def test_a_live_added_block_passes_the_gate_and_reports_its_evidence(tmp_path):
+    out = _integrity(tmp_path, _arm_frame())
+    payload = out["payload"]
+    assert payload["status"] == "PASS" and payload["failures"] == []
+    assert len(out["frame"]) == 10                       # a gate passes its population through untouched
+    assert payload["population"]["binary_rows_in_tuning_years"] == 8    # the label-2 rows are not fitted rows
+    assert [c["cell"] for c in payload["cells"]] == ["LONG", "SHORT"]
+    assert all(c["rebuilt_fitted_rows"] == 4 and c["population_reconciled"] for c in payload["cells"])
+    arms = {(a["arm"], a["cell"]): a for a in payload["arms"]}
+    assert set(arms) == {("B", "LONG"), ("B", "SHORT")}   # the baseline arm is never checked against itself
+    assert arms[("B", "LONG")]["added_block"] == ["f3"] and arms[("B", "LONG")]["removed_from_baseline"] == []
+    assert arms[("B", "LONG")]["fit_identity_distinct"] and arms[("B", "LONG")]["predictions"]["distinct"]
+    assert arms[("B", "LONG")]["columns"][0]["non_null_rate"] == 1.0
+
+
+def test_a_mostly_null_added_block_is_refused(tmp_path):
+    rows = _arm_frame()
+    rows.loc[rows.index[:3], "f3"] = None                # 1 of the 4 fitted LONG rows still carries a value
+    with pytest.raises(AnalysisOpError, match="added column 'f3' is populated on"):
+        _integrity(tmp_path, rows)
+
+
+def test_a_constant_added_block_is_refused(tmp_path):
+    """An all-null column is what check_feature_surface refuses; a CONSTANT one it accepts."""
+    with pytest.raises(AnalysisOpError, match="added column 'f3' is CONSTANT"):
+        _integrity(tmp_path, _arm_frame(f3=0.5))
+
+
+def test_a_block_that_is_dead_in_one_cell_only_is_refused_for_that_cell(tmp_path):
+    """LONG and SHORT are fit separately, so a per-cell gate is the only one that can see this."""
+    rows = _arm_frame()
+    rows.loc[rows["direction"] == -1, "f3"] = 0.5
+    with pytest.raises(AnalysisOpError, match="arm 'B' cell 'SHORT': added column 'f3' is CONSTANT"):
+        _integrity(tmp_path, rows)
+
+
+def test_an_added_block_the_fitted_model_ignored_is_refused(tmp_path):
+    """The block is present and varying; the model simply never used it. Only predictions show this."""
+    arms = [("A", True, ["f1", "f2"], {"f1": 1.0, "f2": -1.0}),
+            ("B", False, ["f1", "f2", "f3"], {"f1": 1.0, "f2": -1.0, "f3": 0.0})]
+    with pytest.raises(AnalysisOpError, match="predictions on the fitted population do not diverge"):
+        _integrity(tmp_path, _arm_frame(), arms)
+
+
+def test_predictions_that_barely_diverge_are_refused_when_a_minimum_is_declared(tmp_path):
+    arms = [("A", True, ["f1", "f2"], {"f1": 1.0, "f2": -1.0}),
+            ("B", False, ["f1", "f2", "f3"], {"f1": 1.0, "f2": -1.0, "f3": 1e-9})]
+    assert _integrity(tmp_path, _arm_frame(), arms)["payload"]["status"] == "PASS"
+    with pytest.raises(AnalysisOpError, match="do not diverge"):
+        _integrity(tmp_path, _arm_frame(), arms, min_prediction_divergence=1e-3)
+
+
+def test_an_empty_added_block_is_refused(tmp_path):
+    """An arm whose columns are the baseline's is the baseline; there is no delta to vouch for."""
+    arms = [("A", True, ["f1", "f2"], {"f1": 1.0, "f2": -1.0}),
+            ("B", False, ["f1", "f2"], {"f1": 2.0, "f2": -1.0})]
+    with pytest.raises(AnalysisOpError, match="the added block is EMPTY"):
+        _integrity(tmp_path, _arm_frame(), arms)
+
+
+def test_a_missing_baseline_arm_is_refused(tmp_path):
+    with pytest.raises(AnalysisOpError, match="no model for the declared baseline arm 'A_MISSING'"):
+        _integrity(tmp_path, _arm_frame(), baseline_arm="A_MISSING")
+
+
+def test_the_gate_refuses_a_population_it_cannot_reproduce(tmp_path):
+    """A gate that derives its own scope cannot detect scope loss: reconcile against the fit stage."""
+    study = _fitted_study(tmp_path, _LIVE, final_fit_rows=99)
+    with pytest.raises(AnalysisOpError, match="cannot vouch for a population it cannot reproduce"):
+        _integrity(tmp_path, _arm_frame(), study=study)
+
+
+def test_the_gate_refuses_an_empty_fitted_population(tmp_path):
+    rows = _arm_frame()
+    rows["y"] = 2                                        # every row censored: nothing was fitted
+    with pytest.raises(AnalysisOpError, match="rebuilds an EMPTY fitted population"):
+        _integrity(tmp_path, rows)
+
+
+def test_the_gate_fails_closed_when_the_fit_stage_left_no_manifest(tmp_path):
+    study = _fitted_study(tmp_path, _LIVE, write_manifest=False)
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_ARM_INTEGRITY_MODELS_MISSING"):
+        _integrity(tmp_path, _arm_frame(), study=study)
+
+
+def test_the_gate_fails_closed_when_it_cannot_resolve_its_own_study(tmp_path):
+    _fitted_study(tmp_path, _LIVE)
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_ARM_INTEGRITY_STUDY_UNRESOLVED"):
+        arm_delta_integrity_gate(_arm_frame(), baseline_arm="A", context={"studies_root": str(tmp_path / "studies")})
+
+
+def test_a_declared_manifest_path_resolves_against_studies_root(tmp_path):
+    """The escape hatch for an execution context that carries no study_dir."""
+    study = _fitted_study(tmp_path, _LIVE)
+    out = _integrity(tmp_path, _arm_frame(), study=study, models_manifest="s1/artifacts/experiment_models.json",
+                     context={"studies_root": str(tmp_path / "studies"), "model_root": str(tmp_path / "models")})
+    assert out["payload"]["status"] == "PASS"
+
+
+def test_an_unknown_scope_is_refused(tmp_path):
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_ARM_INTEGRITY_SCOPE_UNKNOWN"):
+        _integrity(tmp_path, _arm_frame(), scope="per_arm")
+
+
+def test_a_disabled_property_is_measured_and_reported_but_not_enforced(tmp_path):
+    """Every property is reported whether or not it is enforced -- a study states what it verified."""
+    out = _integrity(tmp_path, _arm_frame(f3=0.5), require_positive_variance=False)
+    column = out["payload"]["arms"][0]["columns"][0]
+    assert out["payload"]["status"] == "PASS"
+    assert column["populated"] and not column["has_variance"] and column["n_unique"] == 1
+    assert out["payload"]["thresholds"]["require_positive_variance"] is False
+
+
+def test_run_op_dispatches_the_gate_with_its_execution_context(tmp_path):
+    study = _fitted_study(tmp_path, _LIVE)
+    out = run_op("analysis.gate.arm_delta_integrity", _arm_frame(),
+                 params={"baseline_arm": "A"},
+                 context={"studies_root": str(tmp_path / "studies"), "study_dir": str(study),
+                          "model_root": str(tmp_path / "models")})
+    assert out["payload"]["status"] == "PASS" and out["payload"]["baseline_arm"] == "A"

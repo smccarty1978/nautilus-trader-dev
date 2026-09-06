@@ -1161,8 +1161,14 @@ class V2Lifecycle:
         for step in spec["steps"]:
             rows = frames[step["rows"]]
             inputs = {name: frames[ref] for name, ref in (step.get("inputs") or {}).items()}
+            # Machine-local resolution only -- never part of the plan identity: where an operator
+            # keeps their files is not a scientific fact. `study_dir`/`model_root` let a gate read
+            # THIS study's own execution artifacts (e.g. the fitted arms of `fit`, which precedes
+            # `analyze`) without the study having to declare a path to itself.
             result = run_op(step["op"], rows, inputs=inputs, params=step.get("params") or {},
-                            context={"studies_root": str(self.opts.studies_root or (self.repo_root / "studies"))})
+                            context={"studies_root": str(self.opts.studies_root or (self.repo_root / "studies")),
+                                     "study_dir": str(self.study), "artifacts_dir": str(self.artifacts),
+                                     "model_root": (str(self.opts.model_root) if self.opts.model_root else None)})
             frames[step["id"]] = result["frame"]
             payloads[step["id"]] = result.get("payload") or {}
             if result.get("observations") is not None:

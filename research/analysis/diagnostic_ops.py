@@ -22,6 +22,12 @@ express at all (it emitted only row counts, disposition counts and roc_auc/pr_au
   with time-to-level, collapse and recross summaries.
 * ``classify.precedence``             -- ordered, first-match-wins categorical labelling.
 
+Plus two STOP GATES, which add no column and exist only to REFUSE:
+
+* ``gate.population_parity``          -- the population is identical to a frozen reference.
+* ``gate.arm_delta_integrity``        -- every non-baseline arm's added feature block is
+  populated and varying on the fitted population, and actually changed the fitted model.
+
 Causality: these run AFTER collection on already-materialized frames. They may read
 outcome columns (that is their job) and must never be used to build a feature.
 """
@@ -39,6 +45,7 @@ __all__ = [
     "AnalysisOpError", "OPS", "run_op", "eligibility_mask", "resolve_by", "apply_terminal",
     "anchor_first_threshold_crossing", "cumulative_incidence", "bucket_decomposition",
     "cell_matched_controls", "anchored_path", "precedence_labels", "population_parity_gate",
+    "arm_delta_integrity_gate",
 ]
 
 
@@ -688,6 +695,238 @@ def population_parity_gate(rows: pd.DataFrame, *, reference_path: str, reference
 
 
 # --------------------------------------------------------------------------- #
+# A8 -- arm-delta integrity STOP GATE
+# --------------------------------------------------------------------------- #
+def _read_json(path: Path, what: str) -> Dict[str, Any]:
+    import json
+    if not path.is_file():
+        raise AnalysisOpError(f"ANALYSIS_ARM_INTEGRITY_{what}_MISSING: {path}")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _fit_identity(manifest: Mapping[str, Any]) -> tuple:
+    """The identity of the FIT, resolved from what the store actually recorded.
+
+    Preference order matters: an explicitly recorded ``fit_identity_sha256`` is the fit; the
+    canonical artifact's bytes are the next best evidence of it; ``model_id`` is last because it
+    is DERIVED from the declaration (lineage, which contains ``ordered_inputs``), so two arms
+    with different feature lists differ there by construction. The source is reported so a reader
+    can see which of the three actually carried the check.
+    """
+    lineage = manifest.get("lineage") or {}
+    if lineage.get("fit_identity_sha256"):
+        return str(lineage["fit_identity_sha256"]), "lineage.fit_identity_sha256"
+    canonical = (manifest.get("canonical") or {}).get("byte_sha256")
+    if canonical:
+        return str(canonical), "canonical.byte_sha256"
+    return str(manifest.get("model_id")), "model_id"
+
+
+def _block_population(rows: pd.DataFrame, column: str, min_non_null_rate: float) -> Dict[str, Any]:
+    """Population and variance of ONE added column on the fitted population."""
+    series = rows[column]
+    n = int(len(series))
+    n_non_null = int(series.notna().sum())
+    rate = (n_non_null / n) if n else 0.0
+    numeric = series if pd.api.types.is_numeric_dtype(series) else pd.to_numeric(series, errors="coerce")
+    std = float(numeric.std(ddof=0)) if n_non_null else None
+    if std is not None and not np.isfinite(std):
+        std = None
+    n_unique = int(series.nunique(dropna=True))
+    return {"column": column, "n": n, "n_non_null": n_non_null, "non_null_rate": rate,
+            "n_unique": n_unique, "std": std,
+            "populated": bool(rate >= float(min_non_null_rate)),
+            "has_variance": bool(n_unique > 1 and (std is None or std > 0.0))}
+
+
+def arm_delta_integrity_gate(rows: pd.DataFrame, *, baseline_arm: str, scope: str = "per_cell",
+                             min_non_null_rate: float = 0.95, require_positive_variance: bool = True,
+                             require_distinct_fit_identity: bool = True, require_distinct_predictions: bool = True,
+                             min_prediction_divergence: float = 0.0,
+                             models_manifest: Optional[str] = None, study_id: Optional[str] = None,
+                             context: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
+    """RAISE unless every non-baseline arm's ADDED feature block is alive and actually changed the fit.
+
+    A controlled feature-family study reports the delta between an arm and a baseline arm that
+    differ only by an added block of columns. If that block is degenerate on the FITTED
+    population -- mostly-null without being all-null, or constant -- a boosted tree never splits
+    on it, the arm collapses onto the baseline, and the paired delta is ~0 with balanced fold
+    signs. That is indistinguishable from the genuine negative result "this family carries no
+    information", which is the result such a study is most likely to report. An all-null column
+    check (``check_feature_surface.py``) establishes neither variance nor distinctness.
+
+    Four properties, each independently switchable and each REPORTED whether or not it is
+    enforced, per non-baseline arm and per declared cell (LONG and SHORT are fit separately, so a
+    block can be dead in one cell only):
+
+    (a) ``min_non_null_rate``             -- the added block is POPULATED on the fitted population;
+    (b) ``require_positive_variance``     -- and is not constant;
+    (c) ``require_distinct_fit_identity`` -- and produced a model whose fit identity differs from
+        the baseline arm's model in the same cell. See ``_fit_identity``: this is a
+        DECLARATION-level check. It catches an arm whose feature list resolved to the baseline's
+        and a reused stored model; it does NOT catch a model that ignored a block it was given.
+    (d) ``require_distinct_predictions``  -- and predictions on the fitted population that are not
+        identical to the baseline's. This is the BEHAVIOURAL check -- the one that fails when the
+        block was present, varying and still never used. ``min_prediction_divergence`` raises the
+        bar above exact identity (default 0.0 = only byte-identical scores fail).
+
+    The gate refuses to vouch for a population it cannot reproduce: it rebuilds each cell's fitted
+    population from the frame (binary-label rows, the fit stage's tuning years, the cell's declared
+    subset) and RAISES when the count disagrees with the ``final_fit_rows`` the fit stage recorded.
+    A check that derives its own scope cannot detect scope loss.
+
+    It runs as an ordinary pipeline step, so a failure aborts the analyze stage before ANY declared
+    artifact is written. Fails closed on: a missing models manifest or compiled plan; a missing
+    baseline-arm model; an EMPTY added block (an arm whose columns are the baseline's is not an
+    arm); an empty fitted population; and any model whose canonical bytes no longer hash to what
+    the store recorded (``score`` verifies that before predicting).
+    """
+    from research_workflow.model_store import read_manifest, score
+
+    ctx = dict(context or {})
+    if scope not in ("per_cell", "pooled"):
+        raise AnalysisOpError(f"ANALYSIS_ARM_INTEGRITY_SCOPE_UNKNOWN: {scope!r}; known=['per_cell', 'pooled']")
+    studies_root = Path(ctx.get("studies_root") or ".")
+    # An explicit declaration wins over the execution context: the context is the normal path
+    # (the lifecycle knows which study it is analysing), the parameters are the escape hatch.
+    if models_manifest:
+        manifest_path = Path(str(models_manifest))
+        if not manifest_path.is_absolute():
+            manifest_path = studies_root / manifest_path
+    elif study_id:
+        manifest_path = studies_root / str(study_id) / "artifacts" / "experiment_models.json"
+    elif ctx.get("study_dir"):
+        manifest_path = Path(str(ctx["study_dir"])) / "artifacts" / "experiment_models.json"
+    else:
+        raise AnalysisOpError(
+            "ANALYSIS_ARM_INTEGRITY_STUDY_UNRESOLVED: this gate reads the fitted arms of its own "
+            "study; the execution context carries no 'study_dir' and the step declares neither "
+            "'models_manifest' nor 'study_id'")
+    manifest_path = manifest_path.resolve()
+    models_doc = _read_json(manifest_path, "MODELS")
+    plan = _read_json(manifest_path.parent.parent / "compiled_plan.json", "PLAN")
+    model_root = ctx.get("model_root")
+    model_root = Path(str(model_root)) if model_root else None
+
+    trained = [m for m in (models_doc.get("models") or []) if isinstance(m, Mapping)]
+    if not trained:
+        raise AnalysisOpError(f"ANALYSIS_ARM_INTEGRITY_NO_ARMS: {manifest_path} records no fitted models")
+    label = str(models_doc.get("label_column") or (plan.get("outcome") or {}).get("label_column") or "")
+    if not label:
+        raise AnalysisOpError("ANALYSIS_ARM_INTEGRITY_LABEL_UNKNOWN: neither the models manifest nor the "
+                              "compiled plan names a label column")
+    tuning_years = [int(y) for y in (models_doc.get("tuning_years") or [])]
+    cells = {str(c["id"]): dict(c.get("subset") or {}) for c in ((plan.get("model") or {}).get("cells") or [])}
+    if not cells:
+        cells = {"all": {}}
+
+    _require(rows, [label], "arm_delta_integrity.label")
+    frame = rows
+    if "_year" not in frame.columns:
+        _require(frame, ["observation_ts"], "arm_delta_integrity.year")
+        frame = frame.assign(_year=pd.to_datetime(frame["observation_ts"], unit="ns", utc=True).dt.year)
+    # The fit stage's own population rule, mirrored exactly (lifecycle_v2 fit): binary label
+    # rows, restricted to the tuning years the manifest recorded, then the cell's subset.
+    binary = frame[frame[label].isin([0, 1, 0.0, 1.0])]
+    if tuning_years:
+        binary = binary[binary["_year"].isin(tuning_years)]
+
+    failures: List[str] = []
+    cell_report: List[Dict[str, Any]] = []
+    populations: Dict[str, pd.DataFrame] = {}
+    for cell_id, subset in cells.items():
+        pop = binary
+        for column, value in subset.items():
+            _require(pop, [column], f"arm_delta_integrity.cell[{cell_id}].subset")
+            pop = pop[pop[column] == value]
+        populations[cell_id] = pop
+        recorded = sorted({int(m["final_fit_rows"]) for m in trained
+                           if str(m.get("cell")) == cell_id and m.get("final_fit_rows") is not None})
+        cell_report.append({"cell": cell_id, "subset": {k: str(v) for k, v in subset.items()},
+                            "rebuilt_fitted_rows": int(len(pop)), "recorded_final_fit_rows": recorded,
+                            "population_reconciled": bool(recorded == [int(len(pop))])})
+        if not len(pop):
+            failures.append(f"cell {cell_id!r} rebuilds an EMPTY fitted population; the gate can establish nothing on it")
+        elif recorded and recorded != [int(len(pop))]:
+            failures.append(f"cell {cell_id!r} rebuilt {len(pop)} fitted rows but the fit stage recorded {recorded}; "
+                            "the gate cannot vouch for a population it cannot reproduce")
+
+    arm_report: List[Dict[str, Any]] = []
+    for cell_id in cells:
+        in_cell = [m for m in trained if str(m.get("cell")) == cell_id]
+        base = [m for m in in_cell if str(m.get("arm")) == str(baseline_arm)]
+        if not base:
+            failures.append(f"cell {cell_id!r} has no model for the declared baseline arm {baseline_arm!r}")
+            continue
+        base_rec = base[0]
+        base_cols = list(base_rec.get("features") or [])
+        base_identity, base_identity_source = _fit_identity(read_manifest(str(base_rec["model_id"]), model_root))
+        for rec in in_cell:
+            arm = str(rec.get("arm"))
+            if arm == str(baseline_arm):
+                continue
+            arm_cols = list(rec.get("features") or [])
+            added = [c for c in arm_cols if c not in base_cols]
+            arm_failures: List[str] = []
+            report: Dict[str, Any] = {"arm": arm, "cell": cell_id, "model_id": rec.get("model_id"),
+                                      "baseline_model_id": base_rec.get("model_id"), "added_block": added,
+                                      "removed_from_baseline": [c for c in base_cols if c not in arm_cols],
+                                      "columns": [], "failures": arm_failures}
+            arm_report.append(report)
+            if not added:
+                arm_failures.append(f"arm {arm!r} cell {cell_id!r}: the added block is EMPTY -- its columns are the "
+                                    "baseline arm's, so there is no delta for this gate to vouch for")
+                failures.extend(arm_failures)
+                continue
+            measured = populations[cell_id] if scope == "per_cell" else binary
+            _require(measured, added, f"arm_delta_integrity.added_block[{arm}/{cell_id}]")
+            for column in added:
+                stat = _block_population(measured, column, min_non_null_rate)
+                report["columns"].append(stat)
+                if not stat["populated"]:
+                    arm_failures.append(f"arm {arm!r} cell {cell_id!r}: added column {column!r} is populated on "
+                                        f"{stat['non_null_rate']:.4f} of the fitted population, below {min_non_null_rate}")
+                if require_positive_variance and not stat["has_variance"]:
+                    arm_failures.append(f"arm {arm!r} cell {cell_id!r}: added column {column!r} is CONSTANT on the "
+                                        f"fitted population (n_unique={stat['n_unique']}, std={stat['std']})")
+            identity, identity_source = _fit_identity(read_manifest(str(rec["model_id"]), model_root))
+            report.update({"fit_identity": identity, "fit_identity_source": identity_source,
+                           "baseline_fit_identity": base_identity, "baseline_fit_identity_source": base_identity_source,
+                           "fit_identity_distinct": bool(identity != base_identity)})
+            if require_distinct_fit_identity and identity == base_identity:
+                arm_failures.append(f"arm {arm!r} cell {cell_id!r}: fit identity is IDENTICAL to the baseline arm's "
+                                    f"({identity_source}={identity})")
+            pop = populations[cell_id]
+            if len(pop):
+                diff = np.abs(np.asarray(score(str(rec["model_id"]), pop, model_root=model_root), dtype=float)
+                              - np.asarray(score(str(base_rec["model_id"]), pop, model_root=model_root), dtype=float))
+                identical = int((diff == 0.0).sum())
+                prediction = {"n": int(len(pop)), "max_abs_diff": float(diff.max()), "mean_abs_diff": float(diff.mean()),
+                              "identical_rows": identical, "identical_fraction": float(identical / len(pop)),
+                              "distinct": bool(float(diff.max()) > float(min_prediction_divergence))}
+                report["predictions"] = prediction
+                if require_distinct_predictions and not prediction["distinct"]:
+                    arm_failures.append(f"arm {arm!r} cell {cell_id!r}: predictions on the fitted population do not "
+                                        f"diverge from the baseline arm's (max_abs_diff={prediction['max_abs_diff']:.3e} "
+                                        f"<= {min_prediction_divergence}); the added block did not change the model")
+            failures.extend(arm_failures)
+
+    payload = {"schema_version": 1, "baseline_arm": str(baseline_arm), "scope": scope,
+               "thresholds": {"min_non_null_rate": float(min_non_null_rate),
+                              "require_positive_variance": bool(require_positive_variance),
+                              "require_distinct_fit_identity": bool(require_distinct_fit_identity),
+                              "require_distinct_predictions": bool(require_distinct_predictions),
+                              "min_prediction_divergence": float(min_prediction_divergence)},
+               "models_manifest": str(manifest_path), "label_column": label, "tuning_years": tuning_years,
+               "population": {"rows_in": int(len(rows)), "binary_rows_in_tuning_years": int(len(binary))},
+               "cells": cell_report, "arms": arm_report, "failures": failures,
+               "status": "PASS" if not failures else "FAIL"}
+    if failures:
+        raise AnalysisOpError("ANALYSIS_ARM_DELTA_INTEGRITY_FAILED: " + "; ".join(failures))
+    return {"frame": rows, "payload": payload}
+
+
+# --------------------------------------------------------------------------- #
 # registry
 # --------------------------------------------------------------------------- #
 OPS = {
@@ -698,6 +937,7 @@ OPS = {
     "analysis.path.anchored_offsets": anchored_path,
     "analysis.classify.precedence": precedence_labels,
     "analysis.gate.population_parity": population_parity_gate,
+    "analysis.gate.arm_delta_integrity": arm_delta_integrity_gate,
 }
 # Which extra frames each op consumes besides its primary ``rows`` input. The compiler reads
 # this to prove a declared step's inputs are bound before the study is ever executed.
@@ -709,11 +949,12 @@ OP_INPUTS = {
     "analysis.path.anchored_offsets": ("anchors",),
     "analysis.classify.precedence": (),
     "analysis.gate.population_parity": (),
+    "analysis.gate.arm_delta_integrity": (),
 }
 
 # Ops needing machine-local resolution context. Never part of the plan identity: where an
 # operator keeps their files is not a scientific fact.
-OP_CONTEXT = frozenset({"analysis.gate.population_parity"})
+OP_CONTEXT = frozenset({"analysis.gate.population_parity", "analysis.gate.arm_delta_integrity"})
 
 
 def run_op(op: str, rows: pd.DataFrame, *, inputs: Mapping[str, pd.DataFrame] | None = None,
