@@ -288,3 +288,10 @@ analysis_ops:
     parameters: [reference_path, reference_sha256, key, reference_key, expected_total, expected_by, timestamp_column, reference_timestamp_column, value_map]
     update_cadence: offline_only
     required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.gate.arm_delta_integrity
+    version: 1
+    description: STOP GATE - raises unless every non-baseline arm's ADDED feature block is populated and varying on the rebuilt fitted population and produced a model whose fit identity and predictions differ from the baseline arm's, per declared cell; aborts the analyze stage before any arm delta is written.
+    implementation: research.analysis.diagnostic_ops.arm_delta_integrity_gate
+    parameters: [baseline_arm, scope, min_non_null_rate, require_positive_variance, require_distinct_fit_identity, require_distinct_predictions, min_prediction_divergence, models_manifest, study_id]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
