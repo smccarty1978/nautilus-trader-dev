@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "study_id": "supv1_shape_a_flip_180s_r2",
+  "role": "analysis-decider",
+  "task_id": "004_analysis_decision_f5693305",
+  "outcome": "REPRODUCED_BIT_IDENTICAL_CLEAN_RUN",
+  "terminal_decision": "SUPERVISOR_V1_VALIDATED_END_TO_END",
+  "question": "Supervisor V1 final clean validation: a rerun of the closed reference study v2_shape_a_flip_180s. Infrastructure audit, not new research. Does the Research Supervisor drive a Shape-A study from design through OOS scoring with disposable workers only, and does the rerun reconcile with the reference within explained platform drift?",
+  "rationale": "Both planes pass. CONTROL PLANE: the supervisor drove the whole lifecycle with four disposable workers (design/compile, causal audit, contract audit, this analysis) plus one detached controller job chain, one attempt each (no entry in the attempts map exceeds 1), zero user interventions, zero worker permission denials, blocker_streak 0, 56 worker turns and $4.84 across 100 ticks in about 63 minutes wall (supervisor state created 05:44:34Z, analyze receipt 06:47:30Z). The controller executed smoke, collection, reconcile, merge, fit, freeze, oos and analyze and stopped at READY_TO_CLOSE with 110 passed / 0 failed tests and unsafe_dirty_paths []. Both pre-execution audits are CLEAR with 0 critical AND 0 warning (3 notes each) at audited_execution_composite ee051527aa24, the same composite carried by the seal, the smoke acceptance, the reconcile receipt and the train freeze; smoke was ACCEPTED with all five checks true, 1591/1591 candidates/observations and pending_at_end 0. The first validation's contract-audit finding C-1 (the collection closure froze tracker binding shims but not the modules they import) is closed at the root: this run's frozen execution manifest carries 90 closure files and the contract audit raised no critical and no warning. RESEARCH PLANE: the rerun is not merely close to the previous supervised rerun (studies/supv1_shape_a_flip_180s), it is bit-identical to it -- same 2021 candidates_sha256 fa67317ab842 and observations_sha256 136855e9bd0a, same canonical booster bytes 1fcba0d0af4d, and the same IEEE-754 OOS 2022 values 0.6839063744812204 ROC-AUC / 0.2833249768282369 PR-AUC / 0.12747480848769988 Brier on n=472412, with all three dispositions equal. That reproduction survived a platform change: r2 ran at composite ee051527 against the previous run's 34a0dab4, and those two closures differ in exactly one file (research_workflow/lifecycle_v2.py, the supervisor efficiency closeout merged at 59c53310), so that merge is demonstrably research-plane inert. Against the pre-supervisor reference the residual drift is the same bounded, one-directional, already-explained calendar drift: ROC-AUC -1.1202e-04 (-0.0164%), PR-AUC -0.1475%, Brier +0.0274%, population -45 rows (-0.0095%), with LABELED_POSITIVE exactly conserved at 76263 and 69 rows moving LABELED_NEGATIVE -> CENSORED. The compiled plan differs from the reference in 22 non-hash leaves, of which 21 are platform additions (session.kind legacy->calendar plus 6 session and 6 instrument reference tables; outcome gaining session_end_rule=censor, horizon_end_rule=strict, strict_gap_rule and resolution_precedence [SESSION_END, GAP, BARRIER_TOUCH, HORIZON_EXPIRY]) and 1 is study.id; against the previous rerun it differs in study.id and the hashes that id induces, nothing else. study.yaml is the reference verbatim except study.id. The model was refit, not inherited (new_models_trained true, reference_models [], model_id 1bc300d1 != previous 9c470bd8 != reference fad4c0e9, because the lineage id binds plan_sha256) and authenticates against its own lineage (golden PASS, max_abs_diff 0.0 on 256 rows, identity_rule v2_lineage_sha256, tier registry). Only authorized years were touched: train [2021], oos [2022], prohibited [2023, 2024, 2025, 2026], authorization_sha256 6381990dc94f bound into the freeze. Supervisor V1 is validated end to end on the Shape-A path.",
+  "verdict_scope": "This is evidence about the supervisor and the platform, not new evidence about the research question. Whether the 13-feature causal surface at T predicts a prevailing 1m regime flip within 180s remains the reference study's conclusion; this rerun only shows the machinery reproduces it -- now twice, and the second time bit-identically.",
+  "evidence": [
+    {
+      "claim": "The study spec is the reference verbatim except the id, and identical to the previous supervised rerun except the id",
+      "metric": "study.yaml diff vs studies/v2_shape_a_flip_180s = 1 line (study.id); diff vs studies/supv1_shape_a_flip_180s (line endings normalised) = 1 line (study.id)",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/study.yaml"
+    },
+    {
+      "claim": "The compiled plan differs from the previous supervised rerun only in the study id and the hashes that id induces",
+      "metric": "7 differing leaves total: study.id, plan_sha256, spec_sha256, closure.composite_sha256, closure.stages.collection and .lifecycle composites, and exactly one closure file hash (research_workflow/lifecycle_v2.py)",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/compiled_plan.json vs study/supv1_shape_a_flip_180s:studies/supv1_shape_a_flip_180s/compiled_plan.json"
+    },
+    {
+      "claim": "Compiled-plan differences vs the reference are platform-version additions only; no population, feature, chronology, model or outcome-kernel field moved",
+      "metric": "218 differing leaves; 22 outside hash/timestamp/closure fields; of those 21 are platform additions (session.kind legacy->calendar, 6 session + 6 instrument reference_tables, outcome.session_end_rule / horizon_end_rule / strict_gap_rule / resolution_precedence[4]) and 1 is study.id",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/compiled_plan.json vs studies/v2_shape_a_flip_180s/compiled_plan.json"
+    },
+    {
+      "claim": "The supervisor drove every lifecycle stage to READY_TO_CLOSE with disposable workers and no human input",
+      "metric": "actions_executed [smoke, collection, reconcile, merge, fit, freeze, oos, analyze]; state READY_TO_CLOSE; tests 110 passed / 0 failed; unsafe_dirty_paths []; workers_launched 4, jobs_launched 4, user_interventions 0, worker_permission_denials 0, blocker_streak 0, worker_turns 56, worker_cost_usd 4.835764, ticks 100; every attempts entry is 0 or 1 (no retry)",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/_work/controller/status.json and ~/.nt_research/supervisor/supv1_shape_a_flip_180s_r2/state.json"
+    },
+    {
+      "claim": "The 2021 TRAIN candidate population is byte-identical to both the reference and the previous supervised rerun",
+      "metric": "candidates_sha256 fa67317ab8424ae2a9e9c5a5b7e1b9e13cb5608553c48041c48ba51721118abc and candidates_identity 0d2166efae01b530 identical across all three; merged rows 453768 in all three; reconcile passed with findings []",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/train_experiment_freeze.json, _work/controller/merged/identity.json, _work/controller/reconcile.json"
+    },
+    {
+      "claim": "The 2021 TRAIN observations reproduce the previous supervised rerun exactly and differ from the reference only in the labeled/censored split",
+      "metric": "observations_sha256 136855e9bd0aba6a == previous rerun, != reference cc3dc51b566275b9; binary fit rows 451089 (r2 and previous rerun) vs 451101 reference = 12 rows (0.0027% of 453768) no longer binary-labeled; rows.total identical at 453768",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/train_experiment_freeze.json, artifacts/experiment_models.json"
+    },
+    {
+      "claim": "OOS 2022 scoring is bit-identical to the previous supervised rerun",
+      "metric": "ROC-AUC 0.6839063744812204, PR-AUC 0.2833249768282369, Brier 0.12747480848769988, n 472412, rows 475484 and all three dispositions compare equal to the previous rerun's parsed values",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_analysis_v2.json vs study/supv1_shape_a_flip_180s:studies/supv1_shape_a_flip_180s/artifacts/experiment_analysis_v2.json"
+    },
+    {
+      "claim": "The trained booster bytes are identical to the previous supervised rerun, so the platform change between the two runs is research-plane inert",
+      "metric": "model_canonical_sha256.primary 1fcba0d0af4d197aa1f55561d4786b52fbd59a81c050418bca3d4e27caf6400f in both, produced at different execution composites ee051527aa24 (r2) and 34a0dab471d8 (previous) whose only differing closure file is research_workflow/lifecycle_v2.py",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/train_experiment_freeze.json, audit/frozen_execution_manifest.json"
+    },
+    {
+      "claim": "OOS 2022 metrics reproduce the pre-supervisor reference to four decimal places",
+      "metric": "ROC-AUC 0.6839063744812204 vs 0.6840183909705739 (-1.1202e-04, -0.0164%); PR-AUC 0.2833249768282369 vs 0.2837433596501728 (-4.1838e-04, -0.1475%); Brier 0.12747480848769988 vs 0.12743993396360057 (+3.4875e-05, +0.0274%); n 472412 vs 472526",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_analysis_v2.json vs studies/v2_shape_a_flip_180s/artifacts/experiment_analysis_v2.json"
+    },
+    {
+      "claim": "The label kernel is untouched: every OOS disposition delta vs the reference sits at the session boundary, and the positive class is exactly conserved",
+      "metric": "LABELED_POSITIVE 76263 vs 76263 (delta 0); CENSORED 3072 vs 3003 (+69); LABELED_NEGATIVE 396149 vs 396263 (-114); rows 475484 vs 475529 (-45 = 0.0095%). 69 negatives became censored and 45 candidates left the population, consistent with SESSION_END now outranking a calendar-derived close",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_analysis_v2.json"
+    },
+    {
+      "claim": "Censoring and base rate reported; the populations are near-matched",
+      "metric": "unresolved (CENSORED) fraction 0.6461% vs reference 0.6315%; OOS positive rate among labeled rows 16.1433% vs reference 16.1394%",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_analysis_v2.json"
+    },
+    {
+      "claim": "The model was genuinely refit by this run, not inherited",
+      "metric": "new_models_trained true; reference_models []; model_id 1bc300d1bd4db7c355b7211dc7f2132328984d296d7c966f7c64a39b52c0130b != previous rerun 9c470bd8bb5178cc != reference fad4c0e93766a08a; 13 features, feature list and hyperparameters identical to the reference; final_fit_rows 451089 over 3883 unique regimes",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_models.json"
+    },
+    {
+      "claim": "The scored model authenticates against its own lineage",
+      "metric": "golden status PASS, max_abs_diff 0.0 over 256 rows; identity_rule v2_lineage_sha256; canonical_sha256 1fcba0d0af4d; feature_contract_sha256 c60e2838a747; selection_status selected; tier registry",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_analysis_v2.json (model_authentication)"
+    },
+    {
+      "claim": "Both pre-execution audits are CLEAR with zero criticals AND zero warnings, and are sealed at the composite the smoke and the run executed under",
+      "metric": "causal CLEAR 0 critical / 0 warning / 3 note; contract CLEAR 0 critical / 0 warning / 3 note; both audited_execution_composite_sha256 = ee051527aa24c26591c0ef9f22316e4d2015ce6d752cdd8d8b66ea3356997984 = the freeze's execution_composite_sha256 and the controller's execution_composite == current_execution_composite == plan_closure_composite; composite_seal_hash aea27545b472 matches smoke_acceptance.sealed_composite_sha256; smoke ACCEPTED, 5/5 checks true, 1591/1591 rows, pending_at_end 0, dataset bytes_verification VERIFIED",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/audit/status.json, audit/contract_status.json, artifacts/preexec_audit_seal.json, artifacts/smoke_acceptance.json"
+    },
+    {
+      "claim": "The platform defect the first validation found is closed at the root in this run",
+      "metric": "frozen execution manifest file_count 90 (transitive AST import walk; the pre-fix reference closure was 45) and the contract audit raised 0 critical / 0 warning; PLATFORM_STATE.closure_resolution records fix commit 0baeb4ef and regression test research_workflow/tests/test_closure_transitive_imports.py",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/audit/frozen_execution_manifest.json, audit/contract_status.json, PLATFORM_STATE.json"
+    },
+    {
+      "claim": "Only authorized years were touched",
+      "metric": "train [2021], oos [2022], prohibited [2023, 2024, 2025, 2026]; train collection completed [train-2021], oos collection completed [oos-2022]; analysis authority plan.chronology.dev; authorization_sha256 6381990dc94ffd45 bound into the train freeze",
+      "artifact": "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_authorization.json, artifacts/train_experiment_freeze.json, _work/controller/train_collection_progress.json, _work/controller/oos_collection_progress.json"
+    }
+  ],
+  "integrity_checks_performed": [
+    {
+      "check": "arm-delta integrity (identical fit_identity / prediction_identity would mean a dead feature block)",
+      "result": "NOT APPLICABLE, and no arm delta is claimed: experiment_models.models has exactly one entry (arm primary, cell all, direction both, baseline_arm true), paired_deltas_vs_baseline_arm {}, month_folds []"
+    },
+    {
+      "check": "refit vs reuse of a frozen parent",
+      "result": "PASS -- new_models_trained true, reference_models [], model_id differs from both the reference and the previous rerun"
+    },
+    {
+      "check": "model authentication against its own lineage",
+      "result": "PASS -- golden max_abs_diff 0.0 on 256 rows, identity_rule v2_lineage_sha256, selection_status selected"
+    },
+    {
+      "check": "seal freshness -- audits, smoke, reconcile, freeze and controller all at one execution composite",
+      "result": "PASS -- ee051527aa24c26591c0ef9f22316e4d2015ce6d752cdd8d8b66ea3356997984 appears in audit/status.json, audit/contract_status.json, preexec_audit_seal.json, smoke_acceptance.json, _work/controller/reconcile.json, train_experiment_freeze.json and the controller status card"
+    },
+    {
+      "check": "population identity across runs (matched comparison, not an unmatched one)",
+      "result": "PASS -- candidates_sha256 and candidates_identity identical across reference, previous rerun and r2; observations identical between the two supervised runs"
+    },
+    {
+      "check": "censoring respected and reported",
+      "result": "PASS -- CENSORED is counted separately and never treated as resolved; unresolved fraction 0.6461% reported; the positive rate is quoted over labeled rows only"
+    },
+    {
+      "check": "TRAIN/OOS separation and protected years",
+      "result": "PASS -- authorization train [2021] / oos [2022] / prohibited [2023-2026]; the contract audit's year-role call table is PASS; only train-2021 and oos-2022 collections ran"
+    },
+    {
+      "check": "worktree hygiene during execution",
+      "result": "PASS -- controller unsafe_dirty_paths []; dirty paths limited to the study's own artifacts/ and audit/ directories"
+    }
+  ],
+  "caveats": [
+    "Nothing was tuned. Contract NOTE 1: validation.model_selection.random is declared with no search_space and no production caller, so the fit used model.params verbatim; train_metrics.folds / tuning / final_validation are all null and no artifacts/tuning_trials.json exists. No downstream text may describe these hyperparameters as tuned or validated.",
+    "2022 is simultaneously the dev year and the OOS year, with final_train_validation_years [] (contract NOTE 2). This run reads it once, which is legitimate, but the study holds no spare out-of-sample year.",
+    "The study binds dataset_id NQ_1S_V2, the SUPERSEDED pre-Globex reference build, deliberately: SPEC.md requires copying the reference study unchanged and research_decision.yaml sets calendar_reference_parity common_interval_exact, so parity against the reference is the point (causal NOTE F1/F4, explicitly adjudicated). The underlying tape bytes are identical to NQ_1S_V2_GLOBEX (logical_digest 9e7aecb7). PLATFORM_STATE known warning W-1 -- no compile gate refuses a superseded dataset id -- remains open, and is a platform finding rather than a supervisor failure.",
+    "Causal NOTE C2: outcome.flip.inclusive_start true admits zero-lead positives the feature snapshot cannot see. The asymmetry runs the safe way (it dilutes the positive class) and is a documented, tested convention, not a leak.",
+    "Causal NOTE F2/G2: GAP sits in resolution_precedence but max_gap_ns is null, so an intra-RTH halt inside a 180s horizon resolves on post-halt regime state. Hygiene only, and largely moot because SESSION_END outranks it.",
+    "This validates one study shape (Shape A, checkpoint / classification), one dataset, one instrument, two partition years, and a ~63 minute run in which nothing failed. It is not a proof of unattended readiness under adversarial or failing conditions: the first validation needed a repair worker, this one needed none, and no failure was injected."
+  ],
+  "what_would_change_the_verdict": [
+    "Any critical finding in either pre-execution audit, or an audited composite that differs from the executed one.",
+    "OOS metrics diverging from the previous supervised rerun at all, or from the reference by more than the calendar-drift envelope, without a named platform change that accounts for it.",
+    "A disposition delta touching LABELED_POSITIVE, or a population change away from the session boundary -- that would mean the label kernel moved, not the calendar.",
+    "Evidence that a model was reused rather than refit (reference_models non-empty, or a model_id equal to the reference's), or a golden authentication other than PASS.",
+    "Any collection touching a prohibited year, or a worker writing outside its declared surface."
+  ],
+  "next_decision": [
+    "Supervisor V1 reproduces a Shape-A study deterministically when nothing goes wrong. The open question is failure behaviour: does it recover correctly from an injected worker BLOCKED, a stale seal and a killed controller, without human input and without widening a worker's write surface?",
+    "Does the same end-to-end reproduction hold for Shape B (deep pullback 5s) and Shape C (barrier race fade), or is this validation Shape-A specific?",
+    "Should the platform refuse a superseded dataset id at compile time (PLATFORM_STATE W-1), given that a study can still silently bind the pre-Globex session table?"
+  ],
+  "artifacts_read": [
+    "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_analysis_v2.json",
+    "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_models.json",
+    "studies/supv1_shape_a_flip_180s_r2/artifacts/train_experiment_freeze.json",
+    "studies/supv1_shape_a_flip_180s_r2/artifacts/experiment_authorization.json",
+    "studies/supv1_shape_a_flip_180s_r2/artifacts/preexec_audit_seal.json",
+    "studies/supv1_shape_a_flip_180s_r2/artifacts/smoke_acceptance.json",
+    "studies/supv1_shape_a_flip_180s_r2/audit/status.json",
+    "studies/supv1_shape_a_flip_180s_r2/audit/contract_status.json",
+    "studies/supv1_shape_a_flip_180s_r2/audit/pass_01.md",
+    "studies/supv1_shape_a_flip_180s_r2/audit/contract_pass_01.md",
+    "studies/supv1_shape_a_flip_180s_r2/audit/frozen_execution_manifest.json",
+    "studies/supv1_shape_a_flip_180s_r2/_work/controller/status.json",
+    "studies/supv1_shape_a_flip_180s_r2/_work/controller/reconcile.json",
+    "studies/supv1_shape_a_flip_180s_r2/_work/controller/merged/identity.json",
+    "studies/supv1_shape_a_flip_180s_r2/_work/controller/test_summary.json",
+    "studies/supv1_shape_a_flip_180s_r2/compiled_plan.json",
+    "studies/supv1_shape_a_flip_180s_r2/study.yaml",
+    "studies/supv1_shape_a_flip_180s_r2/research_decision.yaml",
+    "studies/v2_shape_a_flip_180s/artifacts/experiment_analysis_v2.json",
+    "studies/v2_shape_a_flip_180s/artifacts/experiment_models.json",
+    "studies/v2_shape_a_flip_180s/artifacts/train_experiment_freeze.json",
+    "studies/v2_shape_a_flip_180s/compiled_plan.json",
+    "study/supv1_shape_a_flip_180s:studies/supv1_shape_a_flip_180s/artifacts/experiment_analysis_v2.json",
+    "study/supv1_shape_a_flip_180s:studies/supv1_shape_a_flip_180s/artifacts/analysis_decision.json",
+    "study/supv1_shape_a_flip_180s:studies/supv1_shape_a_flip_180s/artifacts/train_experiment_freeze.json",
+    "study/supv1_shape_a_flip_180s:studies/supv1_shape_a_flip_180s/compiled_plan.json",
+    "study/supv1_shape_a_flip_180s:studies/supv1_shape_a_flip_180s/study.yaml",
+    "study/supv1_shape_a_flip_180s:studies/supv1_shape_a_flip_180s/audit/frozen_execution_manifest.json",
+    "PLATFORM_STATE.json",
+    "~/.nt_research/supervisor/supv1_shape_a_flip_180s_r2/state.json plus results cards 001-003"
+  ],
+  "generated_at_utc": "2026-09-06T06:56:00Z"
+}
