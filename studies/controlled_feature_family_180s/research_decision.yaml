@@ -4,3 +4,12 @@ research_question: "# Controlled feature-family additions to the frozen 180s fli
 status: DRAFT
 dataset_id: NQ_1S_V2_GLOBEX
 terminal_decisions: {}
+
+# Autonomy granted for the supervised resume of 2026-09-06. These are OPERATIONAL policies
+# only -- they change nothing about the question, the arms, the chronology or the terminal
+# vocabulary. `terminal_decisions` stays empty on purpose: the four-arm comparison's outcome
+# label is not predeclared, so any short non-empty label the analysis worker justifies from
+# the artifacts is admissible (research_workflow/study_closure.py).
+autonomy_decisions:
+  platform_merge: auto_if_green        # a gated capability chore merges to main without a prompt
+  closed_study_merge: auto_if_clean    # a STUDY_CLOSED study merges to main when the tree is clean
