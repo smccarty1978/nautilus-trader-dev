@@ -258,5 +258,40 @@ analysis:
               (its 1s coverage jumps 2024-12-30 -> 2025-01-01), so the parent has no candidates
               to compare against; verified from the catalog's own parquet row-group statistics
         exclusion_timezone: America/Chicago
+
+    # EXECUTABLE arm-delta integrity stop gate. Raised by the contract audit of 2026-09-06
+    # (results/002_contract_audit_e9107ca6.report.md, W1) and required by
+    # docs/RESEARCH_WORKFLOW.md 6.2: "A study reporting an arm delta must state which of these
+    # it verified."
+    #
+    # Arms B/C/D differ from A_BASELINE_13 ONLY by their added block. If an added block is
+    # degenerate on the fitted population -- near-constant, or mostly-null without being
+    # all-null -- LightGBM at num_leaves 4 / max_depth 5 simply ignores it, the arm collapses
+    # onto the baseline, and the paired delta is ~0 with balanced fold signs. That is
+    # INDISTINGUISHABLE from the genuine negative result "this family carries no information",
+    # which is this study's most likely headline. check_feature_surface.py refuses only an
+    # ALL-NULL column; it establishes neither variance nor prediction distinctness.
+    #
+    # This is declared as a GATE and not as a SPEC sentence for the same reason the parity
+    # requirement above is: prose does not refuse to emit the downstream statistics. A null
+    # delta is reportable as a result only if this gate passed.
+    - id: arm_delta_integrity
+      op: analysis.gate.arm_delta_integrity
+      rows: frame
+      params:
+        baseline_arm: A_BASELINE_13
+        # Evaluated per direction cell (LONG / SHORT), because an added block can be alive in
+        # one cell and dead in the other, and the arms are fit per cell.
+        scope: per_cell
+        # (a) the added block is actually POPULATED on the fitted population
+        min_non_null_rate: 0.95
+        # (b) and carries information: a constant column is a dead column
+        require_positive_variance: true
+        # (c) and the fitted model actually used it: identical fit identity or byte-identical
+        #     predictions vs the baseline arm mean the block is inert
+        require_distinct_fit_identity: true
+        require_distinct_predictions: true
+      # A violation ABORTS the analyze stage before any arm delta is written.
   artifacts:
     - {name: population_parity_vs_parent.json, source: population_parity_vs_parent, kind: json}
+    - {name: arm_delta_integrity.json, source: arm_delta_integrity, kind: json}
