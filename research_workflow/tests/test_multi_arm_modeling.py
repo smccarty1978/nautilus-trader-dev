@@ -341,3 +341,130 @@ def test_deltas_are_kept_separate_per_cell():
     out = V2Lifecycle._paired_arm_deltas(trained)
     assert out["LONG"]["arms"]["B"]["summary"]["roc_auc"]["folds_positive"] == 1
     assert out["SHORT"]["arms"]["B"]["summary"]["roc_auc"]["folds_negative"] == 1
+
+
+# --------------------------------------------------------------------------- #
+# freeze / analyze must CONSUME the multi-cell fit records they produce.
+#
+# The fit stage writes one record per (arm, cell) keyed `arm`/`cell`/`model_id`, and no
+# top-level `model_id`. freeze() and analyze() both branched only on `model_id` and otherwise
+# fell into score-mode code that reads `name`/`id`/`model_authentication`. So a study that
+# declared direction cells -- the only way to declare a genuinely direction-specific fixed
+# configuration -- died at freeze with `KeyError: 'name'`, and analyze() matched no branch at
+# all and wrote an OOS deliverable carrying NO metric while still reporting PASS.
+# --------------------------------------------------------------------------- #
+_CELL_MODEL = {
+    "mode": "train", "family": "model.lightgbm", "params": _PARAMS,
+    "validation": {"protocol": "validation.walk_forward_months", "tuning_years": [2021],
+                   "final_train_validation_years": [], "month_folds": []},
+    "arms": [], "cells": [{"id": "LONG", "subset": {"regime_direction": 1}, "params": {"n_estimators": 40}},
+                          {"id": "SHORT", "subset": {"regime_direction": -1}, "params": {"n_estimators": 20}}],
+    "reference_models": [], "models": [], "search_space": {},
+}
+
+
+def yaml_dump_study(name: str, dev_year: int) -> str:
+    return json.dumps({"study": {"id": name},
+                       "chronology": {"train": [2021], "dev": [dev_year], "prohibited": []}})
+
+
+def _fit_then_open_dev(tmp_path: Path, name: str, dev_year: int = 2022):
+    """Fit the two cells, then declare a dev year so freeze/analyze take their real paths."""
+    study = tmp_path / "studies" / name
+    study.mkdir(parents=True, exist_ok=True)
+    _fabricate(study, model=_CELL_MODEL)
+    lc = V2Lifecycle(study, options=V2Options(execute=True, model_root=tmp_path / "store"))
+    lc.fit()
+    plan = json.loads((study / "compiled_plan.json").read_text(encoding="utf-8"))
+    plan["chronology"] = {"train": [2021], "dev": [dev_year], "prohibited": []}
+    (study / "compiled_plan.json").write_text(json.dumps(plan), encoding="utf-8")
+    # the year authority the freeze binds itself to is read from study.yaml, not the plan
+    (study / "study.yaml").write_text(
+        yaml_dump_study(name, dev_year), encoding="utf-8")
+    return study, lc
+
+
+def _write_oos_partition(study: Path, year: int, n: int = 900) -> None:
+    """An OOS year in the per-year partition layout analyze() reads."""
+    rng = np.random.default_rng(11)
+    ts = pd.date_range(f"{year}-01-01", f"{year}-12-31 23:00", periods=n, tz="UTC")
+    direction = rng.choice([1, -1], size=n)
+    x = rng.normal(size=(n, len(FEATURES)))
+    logit = 0.2 * x[:, 0] + np.where(direction == 1, 1.6 * x[:, 2], 0.0)
+    y = (rng.uniform(size=n) < 1 / (1 + np.exp(-logit))).astype(int)
+    cand = pd.DataFrame({"observation_ts": ts.astype("int64"),
+                         "regime_start_ns": (ts.astype("int64") // (3600 * NS)) * 3600 * NS,
+                         "checkpoint_index": np.arange(n) % 7,
+                         "regime_direction": direction})
+    for i, f in enumerate(FEATURES):
+        cand[f] = x[:, i]
+    obs = cand[list(KEY)].copy()
+    obs["target_flip_within_horizon"] = y
+    obs["disposition"] = "LABELED"
+    part = study / "_work" / "controller" / "partitions" / "oos" / str(year)
+    part.mkdir(parents=True, exist_ok=True)
+    cand.to_parquet(part / "candidates.parquet", index=False)
+    obs.to_parquet(part / "observations.parquet", index=False)
+
+
+def test_freeze_records_every_cell_by_name_and_binds_its_canonical_bytes(tmp_path):
+    """freeze() must key each cell and bind the model store's REAL canonical bytes.
+
+    Keying is what makes the sha findable again at OOS; the bytes are the W-1 binding. A freeze
+    that wrote a null sha here would authenticate nothing while still reading as PASS.
+    """
+    from research_workflow import model_store as ms
+    study, lc = _fit_then_open_dev(tmp_path, "cell_freeze_probe")
+    lc.freeze()
+
+    freeze = json.loads((study / "artifacts" / "train_experiment_freeze.json").read_text(encoding="utf-8"))
+    models = json.loads((study / "artifacts" / "experiment_models.json").read_text(encoding="utf-8"))
+    assert set(freeze["model_hashes"]) == {"primary:LONG", "primary:SHORT"}
+    assert set(freeze["model_canonical_sha256"]) == {"primary:LONG", "primary:SHORT"}
+    by_cell = {m["cell"]: m for m in models["models"]}
+    for cell in ("LONG", "SHORT"):
+        key = f"primary:{cell}"
+        assert freeze["model_hashes"][key] == by_cell[cell]["model_id"]
+        expected = ms.read_manifest(by_cell[cell]["model_id"], tmp_path / "store")["canonical"]["byte_sha256"]
+        assert freeze["model_canonical_sha256"][key] == expected, "canonical sha must be the stored bytes, never null"
+
+
+def test_analyze_scores_every_frozen_cell_on_its_own_subset(tmp_path):
+    """The OOS deliverable must carry a metric per cell, each scored on its own direction slice."""
+    study, lc = _fit_then_open_dev(tmp_path, "cell_analyze_probe")
+    lc.freeze()
+    _write_oos_partition(study, 2022)
+    lc.analyze()
+
+    out = json.loads((study / "artifacts" / "experiment_analysis_v2.json").read_text(encoding="utf-8"))
+    scored = {m["name"]: m for m in out["frozen_models_oos"]}
+    assert set(scored) == {"primary:LONG", "primary:SHORT"}
+    for name, m in scored.items():
+        assert m["rows_scored"] > 0, f"{name} scored no OOS rows"
+        assert m["metrics_by_year"][str(2022)]["roc_auc"] is not None or m["metrics_by_year"][2022]["roc_auc"] is not None
+    # each cell saw only its own direction, so the two slices partition the scored population
+    assert scored["primary:LONG"]["subset"] == {"regime_direction": 1}
+    assert scored["primary:SHORT"]["subset"] == {"regime_direction": -1}
+    assert scored["primary:LONG"]["rows_scored"] + scored["primary:SHORT"]["rows_scored"] == out["rows"]
+    assert {t["name"] for t in out["train_metrics"]} == {"primary:LONG", "primary:SHORT"}
+
+
+def test_analyze_refuses_a_models_artifact_it_cannot_score(tmp_path):
+    """An unrecognised experiment_models.json must fail loudly rather than fall through every
+    branch and write an OOS deliverable with no metric in it."""
+    study, lc = _fit_then_open_dev(tmp_path, "cell_unknown_probe")
+    lc.freeze()
+    _write_oos_partition(study, 2022)
+    (study / "artifacts" / "experiment_models.json").write_text(
+        json.dumps({"schema_version": 3, "mode": "train", "models": [], "rows": {}}), encoding="utf-8")
+    with pytest.raises(LifecycleV2Error, match="OOS_MODEL_RECORDS_UNRECOGNISED"):
+        lc.analyze()
+
+
+def test_fit_records_carry_the_cell_subset(tmp_path):
+    """The cell's population filter must travel with the record: OOS scores the frozen model on
+    the slice it was FIT on, and re-deriving that from a recompiled plan could silently re-slice it."""
+    body = _fit(tmp_path, _CELL_MODEL, name="cell_subset_probe")
+    by_cell = {m["cell"]: m for m in body["models"]}
+    assert by_cell["LONG"]["subset"] == {"regime_direction": 1}
+    assert by_cell["SHORT"]["subset"] == {"regime_direction": -1}
