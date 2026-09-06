@@ -1,0 +1,22 @@
+{
+  "audits": {
+    "causal": {
+      "auditor": "lookahead-auditor:001_causal_audit_2e1d03e5",
+      "report_sha256": "22b8bf6bdde5e3a99d4a44dd4d93197422e9a6f74017f071a6eea2f5fb4a6627",
+      "status_sha256": "7856c9b903774b896fa78b4c21a2427a5c561dfcf3a233b9a9f8940376676bb0"
+    },
+    "contract": {
+      "auditor": "contract-checker:003_contract_audit_179cb047",
+      "report_sha256": "8f6f2a15c7d07d1f385d87523440f654b33ee2329d0b3a3486f057a277cb5a5e",
+      "status_sha256": "527b62fcb291c832d173f5a8c4c48e3bdd44c648530c386ffa369eb187c84884"
+    }
+  },
+  "composite_seal_hash": "8c2554073c59ac2e5b2fc4372a4a8150126adb5f4e36f736a854c9e3833e1fb4",
+  "execution_manifest_composite_sha256": "da3d3ab4ee9bcd7e8c5987763e603ce89d8fb984252ebca9f3fccb6876325540",
+  "plan_sha256": "a1552a5b7ebe8c1e92b098644cf90a1f415a535d3a23b287338b9dc74fd068ce",
+  "platform": "v2",
+  "registry_sha256": "0fc9abf597a8936b8d1c4d3d9e73ea7553c73b569efd8d5055d24151ac155d0c",
+  "schema_version": 2,
+  "sealed_at_utc": "2026-09-06T12:40:22.097951+00:00",
+  "study_id": "controlled_feature_family_180s"
+}

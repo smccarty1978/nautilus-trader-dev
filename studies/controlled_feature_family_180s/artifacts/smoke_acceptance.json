@@ -1,0 +1,55 @@
+{
+  "candidates_count_total": 1791,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true
+  },
+  "date": "2024-03-01",
+  "execution_manifest_composite_sha256": "da3d3ab4ee9bcd7e8c5987763e603ce89d8fb984252ebca9f3fccb6876325540",
+  "generated_at_utc": "2026-09-06T12:42:04.066371+00:00",
+  "manifest": {
+    "candidates_sha256": "ae2160a18c9184b0cebe14b72df0ac49f604f0c040a09fea149462b2a7813706",
+    "composite_seal_hash": "8c2554073c59ac2e5b2fc4372a4a8150126adb5f4e36f736a854c9e3833e1fb4",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2_GLOBEX",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2024-03-01",
+    "elapsed_s": 66.31398650002666,
+    "execution_manifest_sha256": "da3d3ab4ee9bcd7e8c5987763e603ce89d8fb984252ebca9f3fccb6876325540",
+    "kind": "smoke",
+    "observations_sha256": "c27f87a1a8c2287a08008b7f7856c625f7730ca1fea9f976b0d61478e361a057",
+    "plan_sha256": "a1552a5b7ebe8c1e92b098644cf90a1f415a535d3a23b287338b9dc74fd068ce",
+    "rows": {
+      "candidates": 1791,
+      "observations": 1791
+    },
+    "stats": {
+      "bars": 247330,
+      "bars_by_stream": {
+        "nq_1m": 6900,
+        "nq_1s": 240430
+      },
+      "candidates": 1791,
+      "dropped_outside_primary": {
+        "candidates": 6840,
+        "observations": 6840
+      },
+      "epochs": 42171,
+      "observations": 1791,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-06T12:42:04.051301+00:00"
+  },
+  "observations_count_total": 1791,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-controlled_feature_family_180s\\studies\\controlled_feature_family_180s\\runs\\20260906_124054_controlled_feature_family_180s_smoke",
+  "sealed_composite_sha256": "8c2554073c59ac2e5b2fc4372a4a8150126adb5f4e36f736a854c9e3833e1fb4",
+  "status": "ACCEPTED",
+  "study_name": "controlled_feature_family_180s",
+  "validator": "research_workflow.lifecycle_v2"
+}
