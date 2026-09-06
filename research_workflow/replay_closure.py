@@ -65,12 +65,37 @@ class ReplayClosureEscape(ReplayClosureError):
 
 # -- key derivation ---------------------------------------------------------------------------------
 def collection_closure(plan: Mapping[str, Any]) -> Dict[str, Any]:
+    """The module set the reuse key binds: the compiler's ``replay`` stage (seeded at the host and the
+    bound provider/tracker modules, stopping before the compiler -- Reading 2), falling back to the
+    ``collection`` stage for plans compiled before the replay stage existed (strictly larger: fail-closed)."""
     stages = ((plan.get("closure") or {}).get("stages") or {})
-    col = stages.get("collection") or {}
-    if not col.get("composite_sha256") or not col.get("files"):
-        raise ReplayClosureError("REPLAY_CLOSURE_UNDERIVABLE: compiled plan carries no collection-stage closure")
-    return {"composite_sha256": col["composite_sha256"], "files": list(col["files"]),
-            "hash_algorithm": (plan.get("closure") or {}).get("hash_algorithm")}
+    for stage in ("replay", "collection"):
+        col = stages.get(stage) or {}
+        if col.get("composite_sha256") and col.get("files"):
+            return {"composite_sha256": col["composite_sha256"], "files": list(col["files"]), "stage": stage,
+                    "hash_algorithm": (plan.get("closure") or {}).get("hash_algorithm")}
+    raise ReplayClosureError("REPLAY_CLOSURE_UNDERIVABLE: compiled plan carries no replay/collection-stage closure")
+
+
+def merge_trace_union(path: Path, entry: Mapping[str, Any]) -> Dict[str, Any]:
+    """Persist one traced run (smoke or partition) into the study's cumulative trace artifact and
+    return the updated document: ``runs`` (every recorded run), ``union`` (every repo file ever traced
+    on this study's replay path) and the latest run's summary fields at the top level."""
+    doc: Dict[str, Any] = {}
+    if Path(path).is_file():
+        try:
+            doc = json.loads(Path(path).read_text(encoding="utf-8")) or {}
+        except (OSError, ValueError):
+            doc = {}
+    runs = list(doc.get("runs") or [])
+    runs.append(dict(entry))
+    union = sorted(set(doc.get("union") or []) | set(entry.get("traced_repo_files") or []))
+    doc = {**{k: v for k, v in doc.items() if k not in ("runs", "union")}, **dict(entry), "runs": runs, "union": union,
+           "policy": "every smoke and every partition run traces its imports; a repo file first imported during the replay "
+                     "that is outside the plan's replay-stage closure halts the run (REPLAY_CLOSURE_ESCAPE); the key is never widened by a trace"}
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(doc, indent=1, sort_keys=True), encoding="utf-8")
+    return doc
 
 
 def replay_plan_subset(plan: Mapping[str, Any]) -> Dict[str, Any]:
@@ -90,19 +115,37 @@ def binding_sha256(components: Mapping[str, Any]) -> str:
     return hashlib.sha256(canonical_json(dict(components)).encode("utf-8")).hexdigest()
 
 
+# Non-Python inputs read on the replay path (P3, 2026-09-06): the feature-definition promotion records are
+# read by features.registry.canonical_definition_status when provider_host resolves the feature instances
+# at replay (provider_host.py:981 -> registry.resolve_feature_instances). The frozen manifest hashes .py
+# files only, so the reuse key binds this file's bytes explicitly. Any other replay-time read is either
+# hashed through the plan (dataset digest, session reference digest, model ids) or verified at launch
+# (catalog bytes against the dataset digest).
+REPLAY_DATA_FILES: Tuple[str, ...] = ("features/feature_definition_promotions.json",)
+
+
+def replay_data_file_hashes(repo_root: Optional[Path]) -> Dict[str, Optional[str]]:
+    if repo_root is None:
+        return {}
+    return {rel: _sha(Path(repo_root) / rel) for rel in REPLAY_DATA_FILES}
+
+
 def replay_closure_binding(plan: Mapping[str, Any], *, dataset: Mapping[str, Any] | None, partition: Mapping[str, Any],
-                           authorization_sha256: Optional[str], warmup_days: int) -> Dict[str, Any]:
+                           authorization_sha256: Optional[str], warmup_days: int, repo_root: Optional[Path] = None) -> Dict[str, Any]:
     """The reuse key for ONE partition of ONE compiled plan.
 
     ``partition`` carries period/year/primary_start/primary_end/run_end and the declared windows
     (``[{id, primary_start, primary_end}]`` or ``[]``). ``dataset`` is the resolved dataset record
-    the replay actually read (``{dataset_id, logical_digest}``).
+    the replay actually read (``{dataset_id, logical_digest}``). ``repo_root`` binds the replay-time
+    data files (REPLAY_DATA_FILES); the lifecycle always passes it.
     """
     col = collection_closure(plan)
     components = {
         "schema_version": REPLAY_CLOSURE_SCHEMA_VERSION,
-        "collection_closure_composite_sha256": col["composite_sha256"],
-        "collection_closure_file_count": len(col["files"]),
+        "replay_data_files": replay_data_file_hashes(repo_root),
+        "replay_closure_composite_sha256": col["composite_sha256"],
+        "replay_closure_stage": col["stage"],
+        "replay_closure_file_count": len(col["files"]),
         "hash_algorithm": col["hash_algorithm"],
         "replay_plan_sha256": replay_plan_sha256(plan),
         "dataset": {"dataset_id": (dataset or {}).get("dataset_id"), "logical_digest": (dataset or {}).get("logical_digest")},
@@ -224,4 +267,4 @@ __all__ = ["REPLAY_PLAN_EXCLUDED_KEYS", "REPLAY_CHRONOLOGY_EXCLUDED_KEYS", "REUS
            "SHADOW_EVERY_RUN", "SHADOW_SAMPLED", "SHADOW_SAMPLED_ONE_IN", "SHADOW_BAKE_IN_CLEAN_STUDIES",
            "ReplayClosureError", "ReplayClosureEscape", "collection_closure", "replay_plan_subset", "replay_plan_sha256",
            "binding_sha256", "replay_closure_binding", "reuse_policy", "verify_reusable", "select_shadow",
-           "ImportTrace", "repo_files_for_modules", "assert_within_closure"]
+           "ImportTrace", "repo_files_for_modules", "assert_within_closure", "merge_trace_union"]

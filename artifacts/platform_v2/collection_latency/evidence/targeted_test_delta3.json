@@ -1,0 +1,86 @@
+{
+  "STATUS": "NEW_FAILURES",
+  "baseline": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-collection_latency\\config\\test_failure_baseline.json",
+  "baseline_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f",
+  "head": "30cc28c6",
+  "ran": 866,
+  "passed": 825,
+  "failed": 41,
+  "counts": {
+    "NEW_FAILURE": 7,
+    "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+    "KNOWN_BASELINE_FAILURE": 33,
+    "BASELINE_FAILURE_NOW_FIXED": 0,
+    "ENVIRONMENTAL_MISSING_ARTIFACT": 1
+  },
+  "NEW_FAILURE": [
+    {
+      "node_id": "research_workflow/tests/test_lifecycle_v2.py::test_controller_runs_a_fresh_v2_study_end_to_end",
+      "message": "assert (32727 < 20000)"
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_v2_closure.py::test_each_governance_module_perturbation_moves_its_stage_and_the_composite_but_not_unrelated_stages[audit]",
+      "message": "AssertionError: perturbing research_workflow/audit_packets_v2.py (stage=audit) moved unrelated stage lifecycle"
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_v2_closure.py::test_each_governance_module_perturbation_moves_its_stage_and_the_composite_but_not_unrelated_stages[lifecycle]",
+      "message": "AssertionError: perturbing research_workflow/lifecycle_v2.py (stage=lifecycle) moved unrelated stage audit"
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_v2_closure.py::test_each_governance_module_perturbation_moves_its_stage_and_the_composite_but_not_unrelated_stages[oos]",
+      "message": "AssertionError: perturbing research_workflow/experiment.py (stage=oos) moved unrelated stage lifecycle"
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_v2_closure.py::test_each_governance_module_perturbation_moves_its_stage_and_the_composite_but_not_unrelated_stages[outcome]",
+      "message": "AssertionError: perturbing research_workflow/forward_outcomes/guard.py (stage=outcome) moved unrelated stage lifecycle"
+    },
+    {
+      "node_id": "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+      "message": "assert False"
+    },
+    {
+      "node_id": "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing",
+      "message": "research_workflow.external_model_scoring.ExternalModelScoringError: model artifact missing: C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-collection_latency\\studies\\clean_maturity_flip_model_rolling_productivity\\artifacts\\train_fitted_models.joblib"
+    }
+  ],
+  "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": [],
+  "BASELINE_FAILURE_NOW_FIXED": [],
+  "ENVIRONMENTAL_MISSING_ARTIFACT": [
+    "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row"
+  ],
+  "KNOWN_BASELINE_FAILURE": [
+    "research_workflow/tests/test_composite_target_expression.py::test_runtime_OR_flip_only_is_positive",
+    "research_workflow/tests/test_diagnostic_followup_collector.py::test_inclusive_first_fire_continues_after_eligibility_and_finishes_on_canonical_flip",
+    "research_workflow/tests/test_diagnostic_followup_collector.py::test_missing_score_censors_only_score_path_and_deadline_resolves_market",
+    "research_workflow/tests/test_diagnostic_followup_collector.py::test_on_stop_market_censors_unterminated_anchor",
+    "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[clean_maturity_flip_model_180s_horizon]",
+    "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[deep_pullback_5s_reacceleration_model]",
+    "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[es_wick_imbalance_acceptance_v2]",
+    "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[workflow_canary_ordered_barrier_v1]",
+    "research_workflow/tests/test_modeling_driver_lineage.py::test_absent_field_keeps_existing_spec_hash_byte_identical[ym_prev5_range_position]",
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_10b_touch_one_second_past_the_horizon_does_not_count",
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_8_timeout_when_neither_barrier_is_touched",
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_9b_horizon_that_fits_before_close_is_labeled_not_censored",
+    "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[clean_maturity_flip_model_180s_horizon]",
+    "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[clean_maturity_flip_model_rolling_productivity]",
+    "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[deep_pullback_5s_reacceleration_model]",
+    "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[reconstructed_long_rth_strict_retrain]",
+    "research_workflow/tests/test_population_qualification_strictness.py::test_existing_study_spec_hash_unchanged[workflow_canary_ordered_barrier_v1]",
+    "research_workflow/tests/test_redteam_pass1_acceptance.py::test_acc12_canaries_green",
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_02_mixed_child_gap_thresholds_execute_independently",
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity[AND]",
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity[OR]",
+    "research_workflow/tests/test_runtime_bindings.py::test_existing_non_episode_studies_are_not_regressed",
+    "research_workflow/tests/test_single_primitive_ordered_barrier_regression.py::test_primitive_timeout_is_negative_not_censored",
+    "research_workflow/tests/test_stage3_integration.py::test_A_no_population_event_means_no_feature_row",
+    "research_workflow/tests/test_stage3_integration.py::test_B_no_duplicate_row_and_no_checkpoint_grid_row",
+    "research_workflow/tests/test_stage3_integration.py::test_C_atr_arm_and_atr_t_are_resolved_independently",
+    "research_workflow/tests/test_stage3_integration.py::test_F_short_prevailing_regime_routes_to_short_c",
+    "research_workflow/tests/test_stage3_integration.py::test_G_second_episode_same_prevailing_regime_is_a_distinct_capped_candidate",
+    "research_workflow/tests/test_stage3_integration.py::test_stage3_candidate_row_passes_output_manager_schema_contract",
+    "research_workflow/tests/test_stage3_integration.py::test_stage3_end_to_end_one_governed_candidate_row",
+    "research_workflow/tests/test_stage3_integration.py::test_stage3_no_checkpoint_grid_rows_in_episode_mode",
+    "research_workflow/tests/test_stage4_parity.py::test_flag_b_family_a_runtime_parity_with_frozen_model_c_parent",
+    "research_workflow/tests/test_target_runtime.py::test_ordered_barrier_timeout_gap_ambiguous_and_exact_boundary"
+  ]
+}

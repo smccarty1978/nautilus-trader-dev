@@ -75,7 +75,7 @@ def _result(packet_path: Path, cwd: Path, *args: str) -> None:
 
 
 def _compile(study_dir: Path):
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
     return compile_study(load_spec(study_dir), repo_root=ROOT, datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS)
 

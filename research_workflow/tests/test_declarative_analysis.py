@@ -160,7 +160,7 @@ def test_a_train_only_diagnostic_runs_compile_to_close_and_writes_its_declared_a
 ])
 def test_a_malformed_pipeline_is_a_typed_gap_at_compile_time(tmp_path, mutate, where):
     import copy
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
     analysis = copy.deepcopy(ANALYSIS)
     mutate(analysis)

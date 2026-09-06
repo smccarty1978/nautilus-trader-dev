@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from research_workflow.grammar import compile_study, load_spec
+from research_workflow.grammar.compiler import compile_study, load_spec
 from research_workflow.grammar.compiler import STAGE_CLOSURE_MODULES
 from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
 

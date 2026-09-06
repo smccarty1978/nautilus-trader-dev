@@ -48,7 +48,7 @@ def test_static_walk_follows_lazy_relative_and_package_imports_but_not_tests(tmp
 
 
 def test_reference_study_closure_now_freezes_the_label_and_feature_modules():
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     out = compile_study(load_spec(ROOT / "studies" / "v2_shape_a_flip_180s"), repo_root=ROOT)
     assert out.ok, out.gaps.to_dict()
     files = set(out.plan.closure["files"])
@@ -65,7 +65,7 @@ def test_reference_study_closure_now_freezes_the_label_and_feature_modules():
 def test_editing_a_previously_unfrozen_module_now_changes_the_composite(tmp_path, monkeypatch):
     """The gate must cover the deliverable it vouches for: a byte change in regime_dual_ema.py changes the closure composite."""
     from research_workflow.grammar import compiler as C
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     spec = load_spec(ROOT / "studies" / "v2_shape_a_flip_180s")
     before = compile_study(spec, repo_root=ROOT).plan.closure["composite_sha256"]
     real = C.hash_file_v2 if hasattr(C, "hash_file_v2") else None

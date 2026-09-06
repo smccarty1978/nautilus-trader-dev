@@ -134,6 +134,40 @@ features and Model-C was fit expecting it (LightGBM native NaN, no complete-case
 Recorded here only so a future study does not mistake the null rate for a wiring bug
 (`studies/deep_pullback_5s_reacceleration_model/artifacts/rolling_300s_parent_parity_audit.json`).
 
+**Execution-closure hole (found 2026-09-06 by the replay import trace; a governance finding, not a
+performance note).** Package `__init__.py` modules that Python executes on the replay path
+(`backtests/nt_runtime/__init__.py`, `backtests/nt_runtime/modes/__init__.py`, `features/__init__.py`,
+`research/__init__.py`, `research/analysis/__init__.py`, `research/schemas/__init__.py`,
+`research_workflow/forward_outcomes/__init__.py`, `research_workflow/host/__init__.py`, `utils/__init__.py`)
+were in neither the collection closure nor the 90-file frozen manifest, because the static import walk
+resolved `a.b.c` to `a/b/c.py` only. `STALE_FREEZE` could therefore never fire on a change to them.
+Retrospective (`git log` of those nine files against every sealed study's seal-to-closure window, main
+2026-09-06): **every closed V2 study is retrospectively sound**: `v2_shape_a_flip_180s`,
+`v2_shape_b_deep_pullback_5s`, `v2_shape_c_barrier_race_fade`, `first_p90_warning_horizon_march2024`,
+`clean_maturity_flip_model_180s_horizon`, `deep_pullback_5s_reacceleration_model`,
+`workflow_canary_ordered_barrier_v1` have zero such commits inside their seal windows. **Ten still-open
+sealed studies have such commits inside their open-ended windows**:
+`Codex_clean_maturity_flip_rolling_5m_productivity`, `Gemini_clean_maturity_flip_rolling_5m_productivity`,
+`clean_maturity_flip_model_rolling_productivity`, `clean_tradable_reversal`, `es_wick_imbalance_acceptance_v2`,
+`es_wick_imbalance_exploratory`, `regime_transition_target_before_stop_v1`, `test_level_break_collector`,
+`test_minimal_checkpoint_collector`, `ym_prev5_range_position` (commits 97b97dba, e020bc94, dce66d49,
+fb58531b, b939b471, 019221e0, cc23a48c, cd407353). Their results were produced under a manifest that
+would have flagged stale had it been complete. Recorded here; not recompiled or resealed. Fixed in
+`research_workflow/grammar/compiler.py::transitive_closure_files` (every ancestor package init is closed
+over) and every governed stage set is now transitively closed; manifest 90 to 145 files, collection stage
+101, replay stage (the partition-reuse key) 95 for a 13-instance study.
+
+**Replay import-trace policy.** Every smoke and every partition run records the repository modules first
+imported during its replay (`artifacts/replay_closure_trace.json`, cumulative across runs). A module outside
+the plan's replay stage halts the run (`REPLAY_CLOSURE_ESCAPE`); the key is never widened by a trace.
+
+**NautilusTrader pin: 1.230.0.** The host uses the low-level `BacktestEngine` with two `add_data()` batches
+per partition (1s then 1m, `utils/causal_registration.py`), a whole year resident; it does not use
+`BacktestNode` / `DataBackendSession` chunked streaming, so the `DataBackendSession` memory-leak fix (#3889)
+does not apply. That note becomes load-bearing the day the host moves to `BacktestNode` for chunking.
+The replay throughput decay across a year (6.4x, 2026-09-06) is a host defect
+(`research_workflow/provider_host.py:259/287`, an unbounded midpoint list copied per snapshot), not NT.
+
 **`scripts/benchmark_historical_same_harness.py` cannot run on the current tree** (found by the
 2026-09-06 collection-latency measurement, `artifacts/platform_v2/collection_latency/W0_REPORT.md`).
 It hard-codes the historical study `clean_maturity_flip_model_rolling_productivity`, whose compiled

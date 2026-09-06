@@ -132,15 +132,7 @@ def spec_sha256(study: Path) -> Optional[str]:
     return hashlib.sha256(canonical_json(yaml.safe_load(p.read_text(encoding="utf-8")) or {}).encode("utf-8")).hexdigest()
 
 
-def is_v2_study(study: Path) -> bool:
-    p = Path(study) / "study.yaml"
-    if not p.is_file():
-        return False
-    try:
-        data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
-    except Exception:
-        return False
-    return isinstance(data, dict) and "streams" in data and not (isinstance(data.get("study"), dict) and data["study"].get("type"))
+from research_workflow.study_kind import is_v2_study  # noqa: E402  (leaf predicate; re-exported for existing callers)
 
 
 def load_plan(study: Path) -> Dict[str, Any]:
@@ -318,7 +310,7 @@ class V2Lifecycle:
 
     # -- identities ---------------------------------------------------------------
     def compile_outcome(self):
-        from research_workflow.grammar import compile_study, load_spec
+        from research_workflow.grammar.compiler import compile_study, load_spec
         return compile_study(load_spec(self.study), repo_root=self.repo_root, datasets_dir=self.opts.datasets_dir,
                              extra_bindings=self.opts.extra_bindings)
 
@@ -571,23 +563,21 @@ class V2Lifecycle:
         # Empirical replay-closure membership proof: every repository module imported while the smoke
         # replay runs must be inside the compiled plan's collection-stage closure (the partition-reuse
         # key). An escape is a hard failure, never an automatic widening.
-        from research_workflow.replay_closure import ImportTrace, ReplayClosureEscape, assert_within_closure, collection_closure, repo_files_for_modules
+        from research_workflow.replay_closure import ImportTrace, collection_closure, merge_trace_union, repo_files_for_modules
         preloaded = repo_files_for_modules(list(sys.modules), self.repo_root)
         with ImportTrace() as trace:
             run = self._run_window(plan, date, date, (s, e), progress=self.work / "smoke.progress.json")
         traced = repo_files_for_modules(trace.names, self.repo_root)
-        closure_files = collection_closure(plan)["files"]
-        try:
-            assert_within_closure(traced, closure_files)
-            escapes: List[str] = []
-        except ReplayClosureEscape as exc:
-            escapes = sorted(set(traced) - set(closure_files))
-        _write(self.artifacts / "replay_closure_trace.json", {
-            "plan_sha256": plan["plan_sha256"], "date": date, "collection_closure_composite_sha256": collection_closure(plan)["composite_sha256"],
+        closure = collection_closure(plan)
+        escapes = sorted(set(traced) - set(closure["files"]))
+        merge_trace_union(self.artifacts / "replay_closure_trace.json", {
+            "kind": "smoke", "plan_sha256": plan["plan_sha256"], "date": date, "closure_stage": closure["stage"],
+            "replay_closure_composite_sha256": closure["composite_sha256"], "replay_closure_file_count": len(closure["files"]),
             "traced_repo_files": traced, "escapes": escapes, "verdict": "WITHIN_CLOSURE" if not escapes else "REPLAY_CLOSURE_ESCAPE",
-            "preloaded_repo_files_outside_closure": sorted(set(preloaded) - set(closure_files)),
+            "preloaded_repo_files_outside_closure": sorted(set(preloaded) - set(closure["files"])),
             "note": "traced = repo modules first imported during the replay; preloaded = repo modules already imported by the "
-                    "controller process before the replay (reported, not asserted)", "generated_at_utc": _now()})
+                    "controller process before the replay (reported, not asserted); partition children start from a bare "
+                    "interpreter, so their traces are complete", "generated_at_utc": _now()})
         manifest = self._persist(run, run_dir / "collection", {"kind": "smoke", "date": date, "plan_sha256": plan["plan_sha256"], **ids})
         cands, obs = run["candidates"], run["observations"]
         keys_c = set(map(tuple, cands[list(KEY)].itertuples(index=False, name=None))) if len(cands) else set()
@@ -654,7 +644,8 @@ class V2Lifecycle:
     def _replay_binding(self, plan: Dict[str, Any], partition: Mapping[str, Any]) -> Dict[str, Any]:
         from research_workflow.replay_closure import replay_closure_binding
         return replay_closure_binding(plan, dataset=self._plan_dataset(plan), partition=partition,
-                                      authorization_sha256=self._authorization_sha256(), warmup_days=self.opts.warmup_days)
+                                      authorization_sha256=self._authorization_sha256(), warmup_days=self.opts.warmup_days,
+                                      repo_root=self.repo_root)
 
     def _expected_partition(self, plan: Dict[str, Any], year: int, period: str) -> Dict[str, Any]:
         """The interval component of the reuse key for one role year, derived exactly as run_partition
@@ -678,6 +669,13 @@ class V2Lifecycle:
         seen_digest = ((m.get("dataset") or {}).get("logical_digest") if m else None)
         if ok and declared_digest and seen_digest and declared_digest != seen_digest:
             ok, reason = False, "DATASET_DIGEST_MISMATCH"
+        # Smoke seeds the key: a partition is served only after THIS plan's smoke replay traced its imports
+        # inside the replay-stage closure. No clean smoke trace for the current plan -> no reuse.
+        if ok:
+            trace = _read(self.artifacts / "replay_closure_trace.json")
+            smokes = [r for r in (trace.get("runs") or []) if r.get("kind") == "smoke" and r.get("plan_sha256") == plan["plan_sha256"]]
+            if not smokes or smokes[-1].get("verdict") != "WITHIN_CLOSURE":
+                ok, reason = False, "NO_CLEAN_SMOKE_TRACE_FOR_PLAN"
         return {"id": f"{period}-{year}", "year": int(year), "reusable": bool(ok), "reason": reason,
                 "expected_replay_closure_sha256": expected["replay_closure_sha256"],
                 "recorded_replay_closure_sha256": ((m.get("replay_closure") or {}).get("replay_closure_sha256") if m else None),
@@ -753,6 +751,11 @@ class V2Lifecycle:
                 raise LifecycleV2Error(f"PARTITION_FAILED: {period}-{year} (see {out_dir / 'child.log'})")
         if not self._partition_valid(out_dir, plan["plan_sha256"], ids["composite_seal_hash"]):
             raise LifecycleV2Error(f"PARTITION_FAILED: {period}-{year} (see {out_dir / 'child.log'})")
+        # Persist the child's replay trace into the study's cumulative trace (union across runs).
+        from research_workflow.replay_closure import merge_trace_union
+        entry = _read(out_dir / "replay_trace.json")
+        if entry:
+            merge_trace_union(self.artifacts / "replay_closure_trace.json", entry)
 
     def _reattest_partition_reuse(self, plan: Dict[str, Any], base: Path, years: Sequence[int], findings: List[str]) -> Dict[str, Any]:
         """Deterministic re-attestation of every reused partition (reconcile owns this, not the audit).
@@ -810,42 +813,60 @@ class V2Lifecycle:
         declared_for_year = partition_windows(plan, year)
         if declared_for_year and not windows:
             raise LifecycleV2Error(f"WINDOWS_NOT_AUTHORIZED: {period}-{year} declares windows but none were selected")
+        # The reuse binding is derived BEFORE the replay so that its own (shell) imports never enter the
+        # replay import trace below.
+        from research_workflow.replay_closure import ImportTrace, collection_closure, repo_files_for_modules
         if not declared_for_year:
             b = self._partition_bounds(plan, year, period)
-            run = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
             bare = {k: v for k, v in b.items() if k != "primary_ns"}
-            return self._persist(run, out_dir, {"kind": "partition", **bare,
-                                                "windows": [], "plan_sha256": plan["plan_sha256"], **ids,
-                                                "replay_closure": self._replay_binding(plan, {**bare, "windows": []})})
-        runs, bounds = [], []
-        for w in windows:
-            b = self._window_bounds(plan, w, period)
-            r = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
-            pending = int((r.get("stats") or {}).get("pending_at_end") or 0)
-            if pending:
-                raise LifecycleV2Error(
-                    f"WINDOW_OUTCOME_UNRESOLVED: {b['id']} left {pending} candidate(s) unresolved at the window "
-                    f"boundary; the declared window cannot resolve the declared outcome")
-            runs.append(r); bounds.append({k: v for k, v in b.items() if k != "primary_ns"})
-        merged = {"candidates": pd.concat([r["candidates"] for r in runs], ignore_index=True),
-                  "observations": pd.concat([r["observations"] for r in runs], ignore_index=True),
-                  "stats": _merge_window_stats([r.get("stats") or {} for r in runs]),
-                  "elapsed_s": sum(float(r.get("elapsed_s") or 0.0) for r in runs),
-                  "dataset": runs[0].get("dataset")}
-        digests = {json.dumps(r.get("dataset") or {}, sort_keys=True) for r in runs}
-        if len(digests) > 1:
-            raise LifecycleV2Error(f"WINDOW_DATASET_MISMATCH: {period}-{year} windows read different datasets")
-        interval = {"id": f"{period}-{year}", "year": int(year), "period": period,
-                    "primary_start": bounds[0]["primary_start"], "primary_end": bounds[-1]["primary_end"], "run_end": bounds[-1]["run_end"],
-                    "windows": [{"id": b["id"], "primary_start": b["primary_start"], "primary_end": b["primary_end"]} for b in bounds]}
-        return self._persist(merged, out_dir, {
-            "kind": "partition", "id": f"{period}-{year}", "year": int(year), "period": period,
-            "primary_start": bounds[0]["primary_start"], "primary_end": bounds[-1]["primary_end"],
-            "run_end": bounds[-1]["run_end"], "date_bounded": True,
-            "windows": [{k: b[k] for k in ("id", "window_id", "primary_start", "primary_end")} for b in bounds],
-            "window_rows": [int(len(r["candidates"])) for r in runs],
-            "plan_sha256": plan["plan_sha256"], **ids,
-            "replay_closure": self._replay_binding(plan, interval)})
+            extra = {"kind": "partition", **bare, "windows": [], "plan_sha256": plan["plan_sha256"], **ids,
+                     "replay_closure": self._replay_binding(plan, {**bare, "windows": []})}
+            with ImportTrace() as trace:
+                run = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
+        else:
+            bounds = [{k: v for k, v in self._window_bounds(plan, w, period).items()} for w in windows]
+            interval = {"id": f"{period}-{year}", "year": int(year), "period": period,
+                        "primary_start": bounds[0]["primary_start"], "primary_end": bounds[-1]["primary_end"], "run_end": bounds[-1]["run_end"],
+                        "windows": [{"id": b["id"], "primary_start": b["primary_start"], "primary_end": b["primary_end"]} for b in bounds]}
+            extra = {"kind": "partition", "id": f"{period}-{year}", "year": int(year), "period": period,
+                     "primary_start": bounds[0]["primary_start"], "primary_end": bounds[-1]["primary_end"],
+                     "run_end": bounds[-1]["run_end"], "date_bounded": True,
+                     "windows": [{k: b[k] for k in ("id", "window_id", "primary_start", "primary_end")} for b in bounds],
+                     "plan_sha256": plan["plan_sha256"], **ids, "replay_closure": self._replay_binding(plan, interval)}
+            runs = []
+            with ImportTrace() as trace:
+                for b in bounds:
+                    r = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
+                    pending = int((r.get("stats") or {}).get("pending_at_end") or 0)
+                    if pending:
+                        raise LifecycleV2Error(
+                            f"WINDOW_OUTCOME_UNRESOLVED: {b['id']} left {pending} candidate(s) unresolved at the window "
+                            f"boundary; the declared window cannot resolve the declared outcome")
+                    runs.append(r)
+            run = {"candidates": pd.concat([r["candidates"] for r in runs], ignore_index=True),
+                   "observations": pd.concat([r["observations"] for r in runs], ignore_index=True),
+                   "stats": _merge_window_stats([r.get("stats") or {} for r in runs]),
+                   "elapsed_s": sum(float(r.get("elapsed_s") or 0.0) for r in runs),
+                   "dataset": runs[0].get("dataset")}
+            digests = {json.dumps(r.get("dataset") or {}, sort_keys=True) for r in runs}
+            if len(digests) > 1:
+                raise LifecycleV2Error(f"WINDOW_DATASET_MISMATCH: {period}-{year} windows read different datasets")
+            extra["window_rows"] = [int(len(r["candidates"])) for r in runs]
+        # Cumulative replay trace (Reading 2, §3.2): every partition run records the repo modules first
+        # imported during its replay; any module outside the plan's replay-stage closure is a HALT --
+        # the partition is not persisted and the key is never widened.
+        closure = collection_closure(plan)
+        traced = repo_files_for_modules(trace.names, self.repo_root)
+        escapes = sorted(set(traced) - set(closure["files"]))
+        out_dir.mkdir(parents=True, exist_ok=True)
+        _write(out_dir / "replay_trace.json", {"kind": "partition", "id": f"{period}-{year}", "plan_sha256": plan["plan_sha256"],
+                                                "closure_stage": closure["stage"], "replay_closure_composite_sha256": closure["composite_sha256"],
+                                                "traced_repo_files": traced, "escapes": escapes,
+                                                "verdict": "WITHIN_CLOSURE" if not escapes else "REPLAY_CLOSURE_ESCAPE", "generated_at_utc": _now()})
+        if escapes:
+            raise LifecycleV2Error(f"REPLAY_CLOSURE_ESCAPE: {period}-{year} imported {escapes} during replay, outside the "
+                                   f"{closure['stage']}-stage closure; the reuse key is wrong -- halt, every reuse since is suspect")
+        return self._persist(run, out_dir, extra)
 
     def _collect_period(self, period: str) -> Dict[str, Any]:
         plan = load_plan(self.study)

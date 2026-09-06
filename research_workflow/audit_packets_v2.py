@@ -99,6 +99,20 @@ def _model_summary(model: Mapping[str, Any] | None) -> Dict[str, Any] | None:
     return out
 
 
+def stage_closures_for_packet(plan: Mapping[str, Any]) -> Dict[str, Any]:
+    """Stage closures as the auditors see them. The ``replay`` stage (the partition-reuse key) is a subset of
+    ``collection``, so it is rendered as its composite, its size and the collection modules it EXCLUDES --
+    the decision the auditor needs -- instead of repeating the file list (audit briefs stay bounded)."""
+    stages = dict((plan.get("closure") or {}).get("stages") or {})
+    rep = stages.get("replay")
+    if rep:
+        col = set((stages.get("collection") or {}).get("files") or [])
+        stages["replay"] = {"composite_sha256": rep.get("composite_sha256"), "file_count": len(rep.get("files") or []),
+                            "excluded_from_collection": sorted(col - set(rep.get("files") or [])),
+                            "note": "partition-reuse key; every file is also in the collection stage"}
+    return stages
+
+
 def causal_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite: str, dirty_paths: List[str], test_summary: Mapping[str, Any]) -> Dict[str, Any]:
     trackers = [{"id": t["id"], "capability": t["capability"], "inputs": t.get("inputs"), "subscriptions": [s["from"] + ":" + ",".join(s["events"]) for s in t.get("subscriptions") or []],
                  "cadence": t.get("cadence"), "warmup_bars": t.get("warmup_bars"), "params": {k: v for k, v in (t.get("params") or {}).items() if k not in ("instances", "routing", "snapshot", "spec")}}
@@ -128,7 +142,7 @@ def causal_packet(plan: Mapping[str, Any], *, study_id: str, execution_composite
         "model": _model_summary(plan.get("model")),
         "features": {"host": features.get("implementation"), "aliases": features.get("aliases"), "routing": features.get("routing"), "snapshot": features.get("snapshot"), "required_events": features.get("required_events")},
         "availability_table": plan.get("availability", {}).get("rows"), "warmup": plan.get("warmup"),
-        "closure": {"stages": plan["closure"].get("stages") or {}, "composite_sha256": plan["closure"].get("composite_sha256")},
+        "closure": {"stages": stage_closures_for_packet(plan), "composite_sha256": plan["closure"].get("composite_sha256")},
         "invariants": ["completed bars only (ts_init)", "context streams visible strictly before T", "derived buckets complete-only",
                        "outcome kernel resolves from bars strictly after T", "label contract has no fill semantics", "assert_oos_open is the only OOS door"],
         "worktree_dirty_paths": dirty_paths, "tests": {k: test_summary.get(k) for k in ("status", "counts", "execution_composite_sha256")},
@@ -159,7 +173,7 @@ def contract_packet(plan: Mapping[str, Any], *, study_id: str, execution_composi
         "outcome": {**{k: outcome.get(k) for k in ("contract", "kernel", "label_column", "arms", "primary_arm")}, "label_columns": _label_columns(outcome),
                    "semantics": {k: outcome.get(k) for k in ("horizon_end_rule", "resolution_precedence", "max_gap_ns", "same_bar_rule", "session_end_censoring")}},
         "binding_proof": plan.get("binding_proof"), "deliverables_by_stage": deliverables_for_plan(plan),
-        "stage_closures": plan["closure"].get("stages") or {},
+        "stage_closures": stage_closures_for_packet(plan),
         "study_python": dict(study_python) if study_python is not None else None,
         "invariants": ["every declared primitive maps to exactly one runtime implementation", "TRAIN/tuning/final-validation/OOS years disjoint",
                        "no study Python for a tier-2 study unless STUDY_PYTHON_EXCEPTIONS names it (mechanically checked -- see study_python)",

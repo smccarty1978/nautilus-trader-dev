@@ -40,6 +40,12 @@ _HOST_MODULES = ("research_workflow/host/interfaces.py", "research_workflow/host
                  "research_workflow/grammar/compiler.py", "research_workflow/grammar/predicates.py", "research_workflow/grammar/spec.py",
                  "research_workflow/grammar/expansion.py", "research_workflow/grammar/plan.py", "research_workflow/provider_host.py",
                  "utils/session_boundaries.py")
+# Compile-time seeds. They stay in the collection-stage closure and the frozen manifest; they are removed
+# from the seed set of the "replay" stage (the partition-reuse key). Any of them that the host actually
+# imports at replay re-enters the replay stage through the transitive walk from the host modules.
+_COMPILER_MODULES = ("research_workflow/grammar/compiler.py", "research_workflow/grammar/expansion.py",
+                     "research_workflow/grammar/plan.py", "research_workflow/grammar/gaps.py",
+                     "research_workflow/grammar/spec.py", "research_workflow/grammar/predicates.py")
 
 # Stage-scoped governance closure (red-team packet A / A2): executable code that can change
 # a governed stage's scientific behavior belongs in that stage's closure, so a change to it
@@ -65,6 +71,12 @@ STAGE_CLOSURE_MODULES: Dict[str, Tuple[str, ...]] = {
     ),
     "oos": (
         "research_workflow/experiment.py",
+        # experiment.py's own lazy imports (authorize_first_p90_diagnostic_period -> first_p90_gate ->
+        # first_p90_warning; collect_period -> collection -> partitioning, modes/collect). Until 2026-09-06
+        # these reached the manifest only through a policy -> lifecycle_v2 layering inversion inside the
+        # collection walk; they are declared here so the frozen manifest never shrank when that edge went.
+        "research_workflow/first_p90_gate.py", "research_workflow/first_p90_warning.py",
+        "research_workflow/collection.py", "research_workflow/partitioning.py", "backtests/nt_runtime/modes/collect.py",
     ),
     "audit": (
         "research_workflow/audit_packets_v2.py",
@@ -164,6 +176,9 @@ class _Ctx:
         self.feature_aliases: List[str] = []
         self.binding_proof: List[Dict[str, Any]] = []
         self.closure_files: Set[str] = set(_HOST_MODULES)
+        # Files added to the closure for a NON-replay reason (an analysis declaration, ...). They stay in the
+        # collection stage and the frozen manifest; they do not seed the "replay" stage (the reuse key).
+        self.replay_excluded: Set[str] = set()
 
     def gap(self, kind: GapKind, where: str, message: str, **detail: Any) -> None:
         self.gaps.add(kind, where, message, **detail)
@@ -1230,6 +1245,7 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
         ctx.gap(GapKind.INVALID_PARAMETERIZATION, "analysis.artifacts",
                 "declare the artifacts this analysis produces; an analysis that writes nothing cannot be audited")
     ctx.closure_files.add("research/analysis/diagnostic_ops.py")
+    ctx.replay_excluded.add("research/analysis/diagnostic_ops.py")   # analysis stage: never executes during replay
     return {"source": spec.source, "steps": steps, "artifacts": artifacts,
             "ops": sorted({s["op"] for s in steps})}
 
@@ -1332,6 +1348,20 @@ def _resolve_closure(ctx: _Ctx, model: Optional[Dict[str, Any]] = None) -> Dict[
     # (features/trackers/regime_dual_ema.py, rolling_5m_productivity.py, structural_regime_geometry.py), so editing them
     # left R9_closure_current, preflight EXECUTION_MANIFEST and every seal passing.
     stage_sets: Dict[str, Set[str]] = {"collection": transitive_closure_files(ctx.closure_files, ctx.repo_root)}
+    # "replay" (chore/collection_latency, Reading 2): the partition-REUSE key is seeded at what executes
+    # during a replay -- the host and the bound provider/tracker modules -- and stops before the compiler.
+    # The compiler runs before replay and its whole influence on replay is the compiled plan, which the
+    # reuse key hashes separately (replay_plan_sha256); keeping it as a seed only dragged the analysis and
+    # controller modules it imports into the key. grammar.spec / grammar.predicates / grammar.gaps /
+    # grammar.plan re-enter through the host's own imports when the host uses them; nothing is enumerated.
+    # replay ⊆ collection always, so the frozen manifest (the union below) is unchanged by this stage.
+    # The smoke and every partition run trace their imports against this set and HALT on an escape.
+    stage_sets["replay"] = transitive_closure_files(set(ctx.closure_files) - set(_COMPILER_MODULES) - set(ctx.replay_excluded), ctx.repo_root)
+    # The governance stage sets stay the declared lists (red-team packet A/A2: a perturbation moves its own
+    # stage and the composite, never an unrelated stage). Only "collection" and "replay" are transitively
+    # walked. Note (2026-09-06): removing the policy -> lifecycle_v2 layering inversion (see
+    # research_workflow/study_kind.py) means five modules that the collection walk used to reach only through
+    # that lazy import are now declared on the "oos" list (experiment.py's own imports) instead.
     for name in ("lifecycle", "outcome", "oos", "audit"):
         stage_sets[name] = set(STAGE_CLOSURE_MODULES[name])
     if model:

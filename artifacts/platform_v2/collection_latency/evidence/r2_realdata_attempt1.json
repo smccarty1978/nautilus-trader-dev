@@ -1,0 +1,79 @@
+{
+ "phases": [
+  {
+   "phase": "cff_A_baseline",
+   "plan": "d099dbc696bc977672dff17f79920ad077a8f90e804693b221cb3cfc7af504d9",
+   "replay_stage_files": 95,
+   "manifest_files": 145,
+   "collection_wall_s": 368.6408578000264,
+   "rows": {
+    "candidates": 35872,
+    "observations": 35872
+   },
+   "candidates_sha": "43dd411a1c42922412f9631a6dae91dafbbd58b58bacd89872de9e46c6d22d41",
+   "observations_sha": "61064315aa657be5ed179f5970cc91223afa6b4c9661b9cfe6c68cd390f983c4",
+   "result": {
+    "reused": [],
+    "recomputed": [
+     "train-2024"
+    ]
+   },
+   "smoke_verdict": "WITHIN_CLOSURE",
+   "partition_trace_files": [
+    "backtests/nt_runtime/__init__.py",
+    "backtests/nt_runtime/compiled_study_loader.py",
+    "backtests/nt_runtime/data_plan.py",
+    "backtests/nt_runtime/engine_builder.py",
+    "backtests/nt_runtime/run_plan.py",
+    "backtests/nt_runtime/strategy_binding.py",
+    "backtests/nt_runtime/telemetry.py",
+    "features/__init__.py",
+    "features/collector.py",
+    "features/engine.py",
+    "features/library.py",
+    "features/registry.py",
+    "features/trackers/generic_arrival.py",
+    "features/trackers/generic_context.py",
+    "features/trackers/generic_ohlcv_delta.py",
+    "features/trackers/generic_rolling_productivity.py",
+    "features/trackers/generic_structural_geometry.py",
+    "features/trackers/host_bindings.py",
+    "features/trackers/median_center.py",
+    "features/trackers/ohlcv_delta.py",
+    "features/trackers/price_levels.py",
+    "features/trackers/pullback.py",
+    "features/trackers/range_position.py",
+    "features/trackers/regime_dual_ema.py",
+    "features/trackers/rolling_5m_productivity.py",
+    "features/trackers/structural_regime_geometry.py",
+    "features/trackers/velocity.py",
+    "features/trackers/volume.py",
+    "features/trackers/wick.py",
+    "research/__init__.py",
+    "research/schemas/__init__.py",
+    "research/schemas/dataset_spec.py",
+    "research/schemas/study_spec.py",
+    "research_workflow/dataset_v2.py",
+    "research_workflow/grammar/spec.py",
+    "research_workflow/host/__init__.py",
+    "research_workflow/host/interfaces.py",
+    "research_workflow/host/mux.py",
+    "research_workflow/host/outcomes.py",
+    "research_workflow/host/predicate_eval.py",
+    "research_workflow/host/sink.py",
+    "research_workflow/host/strategy.py",
+    "research_workflow/host/triggers.py",
+    "research_workflow/host_runner.py",
+    "research_workflow/output_manager.py",
+    "research_workflow/provider_host.py",
+    "research_workflow/roots.py",
+    "research_workflow/sessions.py",
+    "utils/__init__.py",
+    "utils/causal_registration.py",
+    "utils/runner/data.py",
+    "utils/session_boundaries.py"
+   ]
+  }
+ ],
+ "started_utc": "2026-09-06T20:12:23Z"
+}

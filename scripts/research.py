@@ -121,7 +121,7 @@ def cmd_study_new(ns: argparse.Namespace) -> int:
 
 
 def cmd_study_compile(ns: argparse.Namespace) -> int:
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.lifecycle_v2 import is_v2_study
     from research_workflow.policy import OLD_RUNTIME_POLICY
     study = Path(ns.study).resolve()

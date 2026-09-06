@@ -89,7 +89,7 @@ def test_invalid_study_id(env: Path):
 
 def test_v2_skeleton_compiles_statically_without_study_python(env: Path):
     """`research study new` yields a grammar-v2 study.yaml that the static compiler binds with no gaps."""
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.lifecycle_v2 import is_v2_study
     card = ws.study_new("demo_zeta", repo_root=env)
     study = Path(card["worktree"]) / "studies" / "demo_zeta"

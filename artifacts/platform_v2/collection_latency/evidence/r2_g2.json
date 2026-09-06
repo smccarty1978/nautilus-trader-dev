@@ -1,0 +1,12 @@
+{
+ "audit_packets_in_replay_stage": false,
+ "smoke": {
+  "ok": false,
+  "error": "SMOKE_REJECTED: replay_imports_within_collection_closure"
+ },
+ "trace_verdict": "REPLAY_CLOSURE_ESCAPE",
+ "escapes": [
+  "research_workflow/audit_packets_v2.py"
+ ],
+ "status": "DONE"
+}

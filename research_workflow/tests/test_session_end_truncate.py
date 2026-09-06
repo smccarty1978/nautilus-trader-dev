@@ -41,7 +41,7 @@ def golden():
 
 
 def _run(tmp_path: Path, bars, session_spec, *, session_end: str, horizon: str):
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.host_runner import run_plan_on_bars
     from research_workflow.sessions import build_session_table
     from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS

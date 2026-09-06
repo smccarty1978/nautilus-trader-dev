@@ -291,7 +291,7 @@ def _dataset_with_reference_tables(tmp_path: Path, ref_tables) -> Path:
 
 
 def test_compiler_reads_reference_tables_not_calendar_table_flag(tmp_path):
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
     spec = load_spec(ROOT / "fixtures" / "golden" / "study_barrier.yaml")
     datasets_dir = _dataset_with_reference_tables(tmp_path, ["sessions", "holidays"])
@@ -302,7 +302,7 @@ def test_compiler_reads_reference_tables_not_calendar_table_flag(tmp_path):
 
 
 def test_dataset_declares_reference_tables_without_sessions_is_a_typed_gap(tmp_path):
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.grammar.gaps import GapKind
     from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
     spec = load_spec(ROOT / "fixtures" / "golden" / "study_barrier.yaml")
@@ -313,7 +313,7 @@ def test_dataset_declares_reference_tables_without_sessions_is_a_typed_gap(tmp_p
 
 
 def test_compiler_refuses_eth_censoring_on_a_non_calendar_dataset(tmp_path):
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.grammar.gaps import GapKind
     from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
     spec = load_spec(ROOT / "fixtures" / "golden" / "study_barrier.yaml")
@@ -325,7 +325,7 @@ def test_compiler_refuses_eth_censoring_on_a_non_calendar_dataset(tmp_path):
 
 
 def test_legacy_dataset_still_compiles_as_legacy_kind_no_gap(tmp_path):
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
     spec = load_spec(ROOT / "fixtures" / "golden" / "study_barrier.yaml")
     datasets_dir = _dataset_with_reference_tables(tmp_path, None)

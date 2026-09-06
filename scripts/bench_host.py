@@ -38,7 +38,7 @@ SPECS = {"host_c": ROOT / "fixtures/parity/shape_c/study.yaml", "host_a": ROOT /
 
 def _child(cfg: str, out_path: Path, profile: bool) -> None:
     import psutil
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     proc = psutil.Process()
     rss_start = proc.memory_info().rss
     if cfg == "golden":
