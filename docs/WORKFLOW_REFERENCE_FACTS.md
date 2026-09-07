@@ -139,7 +139,7 @@ performance note).** Package `__init__.py` modules that Python executes on the r
 (`backtests/nt_runtime/__init__.py`, `backtests/nt_runtime/modes/__init__.py`, `features/__init__.py`,
 `research/__init__.py`, `research/analysis/__init__.py`, `research/schemas/__init__.py`,
 `research_workflow/forward_outcomes/__init__.py`, `research_workflow/host/__init__.py`, `utils/__init__.py`)
-were in neither the collection closure nor the 90-file frozen manifest, because the static import walk
+were in neither the collection closure nor the 90-file frozen manifest (`main` be66e8de), because the static import walk
 resolved `a.b.c` to `a/b/c.py` only. `STALE_FREEZE` could therefore never fire on a change to them.
 Retrospective (`git log` of those nine files against every sealed study's seal-to-closure window, main
 2026-09-06): **every closed V2 study is retrospectively sound**: `v2_shape_a_flip_180s`,
@@ -157,8 +157,20 @@ would have flagged stale had it been complete. Recorded here; not recompiled or 
 over). The governance stage sets stay declared lists (red-team invariant: a perturbation moves its own stage
 and the composite, never an unrelated stage); the five modules the collection walk used to reach only
 through the removed `policy -> lifecycle_v2` import are declared on the `oos` list where `experiment.py`
-lazily imports them. Manifest 90 to 115 files (a strict superset of the 90), collection stage 101, replay
-stage (the partition-reuse key) 95 for a 13-instance study.
+lazily imports them. Closure sizes, each labelled by the set it counts (they are different sets and are
+expected to differ), measured on the 13-instance `es_180s_model_c_portability` plan:
+
+| set | what it is | files | at commit |
+|---|---|---:|---|
+| frozen execution manifest | union of every stage closure; what the seal covers | 90 | `main` be66e8de (before this chore) |
+| frozen execution manifest | same, after the package-`__init__` hole fix | 116 | 08ba4123 (S1, chore/collection_latency) |
+| frozen execution manifest | same, after the layering fixes and the `oos` list | **115** (strict superset of the 90) | 943442d4 (Reading 2) |
+| collection stage | transitive import closure from the host + compiler seeds | 85 → 111 → **101** | be66e8de → 08ba4123 → 943442d4 |
+| replay stage | the partition-reuse key: host + bound provider/tracker seeds, compiler and analysis modules removed | **95** | 943442d4 |
+
+Read cold: "manifest 115, replay 95" is the current state; a manifest number and a replay number are never
+supposed to match, because the replay stage is a subset of the collection stage, which is a subset of the
+manifest.
 
 **Replay import-trace policy.** Every smoke and every partition run records the repository modules first
 imported during its replay (`artifacts/replay_closure_trace.json`, cumulative across runs). A module outside

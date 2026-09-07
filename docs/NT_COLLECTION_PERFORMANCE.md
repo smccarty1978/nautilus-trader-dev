@@ -216,3 +216,11 @@ TRAIN 2021 partition, same harness: byte-identical rows; first-decile 30,395 bar
 30,284 bars/s, **decay ratio 1.00** (was 6.4); engine time 408 s (was 1,437 s). A single year is ~7 minutes,
 so §3 (parallelism) is optional and §4 (warmup before sub-year shards) is not yet needed. Figures live in
 `WORKFLOW_REFERENCE_FACTS.md`; the run is `artifacts/platform_v2/collection_latency/MIDPOINT_FIX_REPORT.md`.
+
+**The §5 decay test is NOT wired into anything (as of 2026-09-06).** No test, no controller stage and no
+receipt computes a decay ratio; the partition child's `progress.json` heartbeat carries cumulative bars and
+elapsed seconds only, and `stats()` records no per-decile rate. The single measurement above was taken by
+hand with `artifacts/platform_v2/collection_latency/evidence/midpoint_parity.py` (sampling `progress.json`
+every 10 s). Until a gate exists, treat §1 and §5 as a procedure a person runs after changing the collection
+host, not as something the platform enforces. Wiring it (a decile rate in the heartbeat, a ratio in the
+partition manifest, a reconcile finding above 1.2) is its own packet.
