@@ -1,0 +1,44 @@
+[
+  {
+    "label": "F1",
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-m",
+      "pytest",
+      "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+      "-q",
+      "-rA",
+      "--tb=short",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "returncode": 0,
+    "seconds": 4.417346699978225,
+    "log": "F1_after.log"
+  },
+  {
+    "label": "F2",
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-m",
+      "pytest",
+      "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing",
+      "-q",
+      "-rA",
+      "--tb=short",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "returncode": 0,
+    "seconds": 5.329240899998695,
+    "log": "F2_after.log"
+  },
+  {
+    "label": "F3_suite",
+    "command": "python -m pytest research_workflow/tests/test_redteam_v2_model_authority.py -q -rA --tb=short -p no:cacheprovider",
+    "returncode": null,
+    "status": "TIMEOUT",
+    "timeout_seconds": 240,
+    "validation": "Unconfirmed. No fourth invocation permitted by packet."
+  }
+]

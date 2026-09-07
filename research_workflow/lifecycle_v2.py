@@ -38,33 +38,9 @@ PLATFORM_TESTS = ("research_workflow/tests/test_golden_fixture.py", "research_wo
                   "research/analysis/tests/test_diagnostic_ops.py",
                   "research_workflow/tests/test_train_provenance_attestation.py")
 
-# Single source of truth for the deliverable each stage writes -- research_workflow.audit_packets_v2
-# builds DELIVERABLES_BY_STAGE from this constant so the audit packet cannot silently name a
-# different filename than the one the lifecycle actually writes (red-team packet F1). Values are
-# paths relative to the study directory; a "<year>" placeholder marks a per-partition path.
-DELIVERABLES = {
-    "compile": ["compiled_plan.json"],
-    "prepare": ["audit/frozen_execution_manifest.json", "artifacts/experiment_authorization.json"],
-    "readiness": ["audit/readiness.json"],
-    "preflight": ["audit/preflight.json"],
-    "tests": ["_work/controller/test_summary.json"],
-    "causal_audit": ["audit/status.json"],
-    "contract_audit": ["audit/contract_status.json"],
-    "seal": ["artifacts/preexec_audit_seal.json"],
-    "smoke": ["artifacts/smoke_acceptance.json"],
-    "collection": ["_work/controller/partitions/train/<year>/{candidates,observations}.parquet"],
-    "reconcile": ["_work/controller/reconcile.json"],
-    "merge": ["_work/controller/merged/{candidates,observations}.parquet", "_work/controller/merged/identity.json"],
-    "fit": ["artifacts/experiment_models.json"],
-    "freeze": ["artifacts/train_experiment_freeze.json"],
-    "oos": ["_work/controller/partitions/oos/<year>/{candidates,observations}.parquet"],
-    "analyze": ["artifacts/experiment_analysis_v2.json"],
-    "close": ["artifacts/study_closure.json"],
-}
-# fit additionally writes artifacts/tuning_trials.json (+ tuning_optuna.db for the optuna sampler)
-# when the plan declares a model.search_space; not a fixed filename, so callers that need it
-# should check plan["model"].get("search_space") and add it themselves (see audit_packets_v2).
-FIT_TUNING_DELIVERABLES = ["artifacts/tuning_trials.json"]
+# Re-exported for audit_packets_v2 and existing callers; one producer declaration.
+from research_workflow.grammar.deliverables import DELIVERABLES, FIT_TUNING_DELIVERABLES
+
 
 
 class CapabilityGapBlocked(RuntimeError):
@@ -158,7 +134,8 @@ def spec_sha256(study: Path) -> Optional[str]:
     if not p.is_file():
         return None
     from research_workflow.grammar.plan import canonical_json
-    return hashlib.sha256(canonical_json(yaml.safe_load(p.read_text(encoding="utf-8")) or {}).encode("utf-8")).hexdigest()
+    from research_workflow.grammar.compiler import load_spec
+    return hashlib.sha256(canonical_json(load_spec(p)).encode("utf-8")).hexdigest()
 
 
 from research_workflow.study_kind import is_v2_study  # noqa: E402  (leaf predicate; re-exported for existing callers)
@@ -1584,6 +1561,11 @@ class V2Lifecycle:
         freeze = self.artifacts / "train_experiment_freeze.json"
         if freeze.is_file():
             bound["train_freeze_sha256"] = _read(freeze).get("freeze_sha256") or _sha(freeze)
+        from research_workflow.study_closure import V2_FINAL_EVIDENCE
+        for key, rel in V2_FINAL_EVIDENCE.items():
+            evidence = self.study / rel
+            if evidence.is_file():
+                bound[key] = {"path": rel, "artifact_file_sha256": _sha(evidence)}
         body = {"schema_version": 1, "study_id": self.study.name, "status": "CLOSED", "outcome": str(closure["outcome"]), "terminal_decision": str(closure["terminal_decision"]),
                 "platform": "v2", "plan_sha256": load_plan(self.study).get("plan_sha256"), "closed_at_utc": _now(), "bound_evidence": bound}
         # DEV-08: validate BEFORE the closure persists, and never leave a rejected closure on disk -- a rejected

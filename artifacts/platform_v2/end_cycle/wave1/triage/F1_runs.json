@@ -1,0 +1,40 @@
+[
+  {
+    "failure": "F1",
+    "checkout": "branch",
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-m",
+      "pytest",
+      "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+      "-q",
+      "-rA",
+      "--tb=long",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "cwd": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-end_cycle_wave1",
+    "returncode": 1,
+    "seconds": 30.559289400000125,
+    "log": "F1_branch.log"
+  },
+  {
+    "failure": "F1",
+    "checkout": "main",
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-m",
+      "pytest",
+      "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+      "-q",
+      "-rA",
+      "--tb=long",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "cwd": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader",
+    "returncode": 0,
+    "seconds": 5.331779700005427,
+    "log": "F1_main.log"
+  }
+]

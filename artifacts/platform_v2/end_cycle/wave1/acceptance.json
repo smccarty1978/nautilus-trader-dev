@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "base_commit": "8b3d3d2f390f3535b6f9176090115c92b52f41cf",
+  "es_compile": {
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "scripts/research.py",
+      "study",
+      "compile",
+      "--study",
+      "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-end_cycle_wave1\\artifacts\\platform_v2\\end_cycle\\wave1\\es_intake_replay\\es_180s_model_c_portability"
+    ],
+    "exit_code": 2,
+    "gap_count": 11,
+    "gap_report": "es_compile_stdout.json",
+    "catalog_opened": false
+  },
+  "closure": {
+    "source_study": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-end_cycle_wave1\\studies\\es_180s_model_c_portability",
+    "source_artifacts_unchanged": true,
+    "scratch_only_rebinding_not_historical_attestation": true,
+    "bound_source_sha256": {
+      "research_decision.yaml": "c8f4c38f5134a144b8db85e32be96ad18945d412171982d504b534ebd744da4a",
+      "compiled_plan.json": "3554e91aad151a40e754dd0390550fce349d9735117d3f0339032286aeb43e8d",
+      "artifacts/preexec_audit_seal.json": "bbe653f028e0cf7528c6b0487ea403edc2b37879d79bcd31eb9ae5dd3718c3fe",
+      "artifacts/train_experiment_freeze.json": "d0d56bfe9c35fb1e0dd46a6d1dda1112d795057977ec66fdc5e334b84baea788",
+      "artifacts/experiment_analysis_v2.json": "8918e9d84acd10d281b0921d9ecbc5f8d8e73ce17ab734d1babf6d0d8589c4d6",
+      "artifacts/analysis_decision.json": "6a7ed98e5ea1599f1b8cb7d12edee15486ae204a5b1a8212f3ebe80c0bd987ac"
+    },
+    "scratch_closure_sha256": "298660739a6ed1e8a690706d23b17714e69be5c4c75368a4345fc23245611cc7",
+    "tamper_validation": "STUDY_CLOSURE_EVIDENCE_MISMATCH: artifacts/analysis_decision.json"
+  },
+  "manifest": {
+    "target": "research_workflow/workflow_engine.py",
+    "changed_stages": [
+      "lifecycle"
+    ],
+    "before_composite": "818b3bfc59fb245f0f16e2fd5ced7d5408fd0c045e8407fbfa1d253c5ac32b0a",
+    "after_composite": "6e911a95c2cb86b166e2d795906973099454359527669ab46165ef9a9b78f4dd",
+    "stages_before": {
+      "collection": "a57cf29b94287818f030e01f477430aa1cb911dd5357b0e98a589b0812128d28",
+      "replay": "759e556dc683531c2f2ca2823f0bae548f5a631293f713fb05eb4cf4e344072f",
+      "lifecycle": "c602b661b0104e9d2d4e8d635e7d1c9d1dc62bb61c5861745922ab6f7a05133a",
+      "outcome": "34cda7cf9c805caa2c77aa46a555cb1d13e2f5fddf84f78e00a77d72d1cc2638",
+      "oos": "8223680b4c9f597fc4f85b6e1f5c84197cbe5a04116a3e7e1dc39df5e78e68b2",
+      "audit": "fd1273c5f3707bcca3caec902f9ad50e9c26e03461ff0a5b6995340af49877c8"
+    },
+    "stages_after": {
+      "collection": "a57cf29b94287818f030e01f477430aa1cb911dd5357b0e98a589b0812128d28",
+      "replay": "759e556dc683531c2f2ca2823f0bae548f5a631293f713fb05eb4cf4e344072f",
+      "lifecycle": "f22cf4ee5dbcdb9497e1346811dd50bebd2980c6577d712d4b4cf69e220808b2",
+      "outcome": "34cda7cf9c805caa2c77aa46a555cb1d13e2f5fddf84f78e00a77d72d1cc2638",
+      "oos": "8223680b4c9f597fc4f85b6e1f5c84197cbe5a04116a3e7e1dc39df5e78e68b2",
+      "audit": "fd1273c5f3707bcca3caec902f9ad50e9c26e03461ff0a5b6995340af49877c8"
+    }
+  },
+  "regression_before": {
+    "failed": 19,
+    "duration_seconds": 47.47
+  },
+  "regression_after_initial_fix": {
+    "passed": 19,
+    "duration_seconds": 17.64
+  },
+  "targeted_compatibility": {
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "scripts/test_delta.py",
+      "research_workflow/tests/test_end_cycle_wave1.py",
+      "research_workflow/tests/test_grammar_v2.py",
+      "research_workflow/tests/test_closure_validate_before_write.py",
+      "research_workflow/tests/test_study_closed_state.py",
+      "--json"
+    ],
+    "passed": 62,
+    "failed": 0,
+    "environmental_failures": 0,
+    "known_failures": 0
+  },
+  "skipped": [
+    "broad merge test_delta (not a per-commit test)",
+    "real-data collection, fit, OOS (not needed or authorized for this wave)",
+    "study audits and resealing (no study execution)"
+  ],
+  "proof_harness_correction": "First CLI assertion expected exit 1; canonical _card returns 2 for typed gaps. The saved CLI output demonstrated the intended failure; no implementation change was needed."
+}

@@ -1,0 +1,36 @@
+{
+  "passed": false,
+  "missing": [
+    {
+      "primitive": "derived_input:model_c_score_at_candidate",
+      "declared": "frozen_external_model_score",
+      "required_binding": "research_workflow.external_model_scoring.FrozenExternalModelScorer",
+      "collector": "research_workflow.generic_collector.FlipPredictionCollector",
+      "reason": "ExternalModelScoringError: model artifact missing: C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-end_cycle_wave1\\studies\\clean_maturity_flip_model_rolling_productivity\\artifacts\\train_fitted_models.joblib"
+    },
+    {
+      "primitive": "derived_inputs.scorer_coverage",
+      "declared": [
+        "model_c_score_at_candidate"
+      ],
+      "required_binding": "exactly one bound scorer per declared derived input",
+      "collector": "research_workflow.generic_collector.FlipPredictionCollector",
+      "reason": "DERIVED_INPUT_SCORER_UNBOUND: declared ['model_c_score_at_candidate'], bound []"
+    }
+  ],
+  "checked": {
+    "strategy_class": "research_workflow.generic_collector.FlipPredictionCollector",
+    "supports_episode_lifecycle": true,
+    "episode_lifecycle_declared": true,
+    "runtime_feature_mode": "provider_host",
+    "provider_host_bindings": {
+      "required": 34,
+      "bound": 34
+    },
+    "derived_scorer_bound": false,
+    "diagnostic_followup_bound": null,
+    "output_row_persistence_declared": true,
+    "target_runtime": null,
+    "modeling_execution_closure_sha256": null
+  }
+}

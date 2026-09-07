@@ -672,8 +672,11 @@ The card shows `NEW_FAILURE` prominently and classifies the rest as `KNOWN_BASEL
 `NEW_FAILURE_OUTSIDE_BASELINE_SCOPE`, never silently allowed. Agents act only on NEW failures.
 `@pytest.mark.slow` tests (real data replay; `scripts/tests` carries several that run for tens of minutes)
 are excluded by default; `--include-slow` lifts the filter. Even without them the broad `research_workflow/tests scripts/tests`
-scope is HOURS, not minutes (2026-09-06: 2129 tests, >2.5 h wall on the dev box -- the red-team closure suites hash the
-repository per test and the supervisor black-box proof runs the real controller ~15 times). Launch it detached and once.
+scope took **74m41s** in the completed timed Wave 1 run on 2026-09-07 (commit `5d3aad6a`):
+2,088 tests, with 2,027 passed / 57 known failures / 1 environmental / 3 new. This replaces the
+unverified 2,129-tests / >2.5-hour estimate. See `docs/WORKFLOW_REFERENCE_FACTS.md` for the command
+and persisted timing evidence. Launch a required broad gate detached and once; triage its failures
+with targeted checks rather than rerunning the broad suite.
 
 ### N.4 Predeclared fork policy (`autonomy_decisions`)
 

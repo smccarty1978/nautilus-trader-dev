@@ -1,0 +1,90 @@
+{
+  "program": "END THE CYCLE",
+  "wave": 1,
+  "status": "IMPLEMENTED_NOT_COMMITTED_OR_MERGED",
+  "session_id": "01a07bc8-0f33-7230-ae81-351df5ca3291",
+  "created_at_utc": "2026-09-07T12:36:02.552600+00:00",
+  "branch": "chore/end_cycle_wave1",
+  "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-end_cycle_wave1",
+  "base_commit": "8b3d3d2f390f3535b6f9176090115c92b52f41cf",
+  "precondition": {
+    "collection_latency_merge": "8b3d3d2f390f3535b6f9176090115c92b52f41cf",
+    "lease_released_at_utc": "2026-09-07T04:29:21.457329+00:00"
+  },
+  "acceptance_artifact": "acceptance.json",
+  "acceptance_sha256": "f1a0ef7061b6fb098a69a37befe26edd57909b03edac76eb178e54569593e93c",
+  "changed_files_sha256": {
+    "docs/RESEARCH_WORKFLOW.md": "1e797f66ff6a64177d233ab69077dda8481396b3145f1dc58de0ece10ec5899b",
+    "docs/RESEARCH_YAML_REFERENCE.md": "6a6e87ed66663c0078ad444e8438741ff1f67d5367fd8752315c60345e1fbb05",
+    "research_workflow/grammar/compiler.py": "102f1a33d167393d9ef7f4f3a28200d52ee538aac744a8ef48c05006ae8f4694",
+    "research_workflow/grammar/plan.py": "64325ae3e34d8f70c96062c0727888d450cacba53fa2661daab6f9e8c3b4f484",
+    "research_workflow/grammar/spec.py": "c28bb389a3ab7ccc7239efd13af146323ec51cd7e9d68012a9469021c4cd7611",
+    "research_workflow/lifecycle_v2.py": "908bc4f844728e1cf2c850bec2f796785323a8f8173e7f1192820793cecafb28",
+    "research_workflow/study_closure.py": "fbf46b6e6f2a50c01eab9dc1923f578f61c0da5fffaa63e4e0528c0ccb028bff",
+    "scripts/gen_yaml_reference.py": "fbb345a94d5ac683ff877aaf32a69b442efefb16866ec9abdc051bf3277a9771",
+    "research_workflow/grammar/deliverables.py": "f24ffaf63eb270d39529e77ed9979517fd9f20f3c48352ac04ed68cb949640ab",
+    "research_workflow/tests/test_end_cycle_wave1.py": "95a1435727500992e6d3c53626028e40f002a20149887c1cb3367ed792128177"
+  },
+  "targeted_tests": {
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "scripts/test_delta.py",
+      "research_workflow/tests/test_end_cycle_wave1.py",
+      "research_workflow/tests/test_grammar_v2.py",
+      "research_workflow/tests/test_closure_validate_before_write.py",
+      "research_workflow/tests/test_study_closed_state.py",
+      "--json"
+    ],
+    "passed": 62,
+    "failed": 0,
+    "environmental_failures": 0,
+    "known_failures": 0
+  },
+  "remaining_wave1": [
+    "Commit only when authorized; no commit, push or merge performed in this session.",
+    "Exactly one broad relevant test_delta before merge; no broad run has been started.",
+    "Merge Wave 1 before opening Wave 2."
+  ],
+  "program_constraints": [
+    "One wave per session; never two waves in flight.",
+    "No study work while a wave is open.",
+    "Wave 3 closes platform work until three studies complete end to end. Only wrong scientific results permit a platform repair during that freeze. Findings otherwise wait in a list."
+  ],
+  "next_wave": {
+    "number": 2,
+    "scope": [
+      "W2.1 sampled shadow policy with cited bake-in evidence",
+      "W2.2 correct test_delta permissiveness before tested scope mapping; time broad run and per-test durations",
+      "W2.3 separate causal relevance surface; unproven non-impact still audits",
+      "W2.4 declared exception for short adjacent phases; preserve handoffs",
+      "W2.5 optional adjacent controller trips only if W2.1-W2.4 land cleanly and session is short"
+    ]
+  },
+  "wave3": [
+    "Real completed cycle decomposition and measured broad duration in WORKFLOW_REFERENCE_FACTS.md",
+    "Shadow evidence, ten sealed-study init omissions, and narrowed coverage ledger",
+    "Record deferred audit-configuration experiment across N future studies; do not run it now",
+    "Document import-observer proof limits; do not deepen trace work",
+    "Declare three-complete-studies platform freeze"
+  ],
+  "limits": [
+    "Free-text deliverables fail closed: ES replay emits 11 gaps, including the two required named missing producers.",
+    "Compiler proves output production route, not scientific numerical validity or semantic equivalence to arbitrary prose.",
+    "Historical closures are not migrated; pre-fix V2 closures lacking these evidence bindings fail current validation. Their sealed runtime authority is unchanged.",
+    "Active studies adopting this execution closure must refresh freeze/audits before execution.",
+    "Scratch proof rebinds copied artifacts only; it is not an attestation or reopening of the closed ES study."
+  ],
+  "out_of_scope": [
+    "S2 bounded concurrency",
+    "sub-year sharding",
+    "W3 frame reuse",
+    "warmup convergence",
+    "C6 engine config",
+    "midpoint assertion (file not touched)",
+    "blanket re-attestation",
+    "deeper trace completeness",
+    "deferred audit experiment execution"
+  ],
+  "supplementary_checks": "supplementary_checks.json",
+  "targeted_tests_total_passed": 64
+}

@@ -28,6 +28,9 @@ OUT = ROOT / "docs" / "RESEARCH_YAML_REFERENCE.md"
 
 # (meaning, causal implication, example) per dotted field path. Keep it short; the grammar is the authority.
 MEANING: Dict[str, Tuple[str, str, str]] = {
+    "deliverables": ("Required artifact producer bindings; combined with research_decision.yaml deliverables.", "An unresolved producer is MISSING_CAPABILITY before execution; no free-text equivalence is inferred.", "deliverables: [compiled_plan.json]"),
+    "deliverables[].artifact": ("Exact study-relative output path.", "Must be emitted by an active compiled stage or a declared analysis step.", "artifact: artifacts/incidence.json"),
+    "deliverables[].producer": ("Exact stage:<stage> or analysis:<step_id> producer.", "A registered capability alone is insufficient; this plan must produce the requested artifact.", "producer: analysis:incidence"),
     "study": ("Identity section.", "None.", "study: {id: my_study, tier: 2, question: \"...\"}"),
     "streams": ("Datasets and timeframes; the first is the execution stream.", "Only external timeframes declared in the DatasetSpec are read from disk; the rest are host-derived complete buckets.", "streams: [{dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}]"),
     "population": ("Who is a candidate and when a decision epoch occurs.", "Everything here is evaluated at T from state visible at T.", "population: {session: RTH, cadence: completed_1s, qualify: \"regime_1m.dir != 0\", direction: regime_1m.dir}"),

@@ -1,0 +1,40 @@
+[
+  {
+    "failure": "F3",
+    "checkout": "branch",
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-m",
+      "pytest",
+      "research_workflow/tests/test_redteam_v2_model_authority.py::test_iv_compiled_availability_table_names_the_rule_and_dependencies",
+      "-q",
+      "-rA",
+      "--tb=long",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "cwd": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-end_cycle_wave1",
+    "returncode": 1,
+    "seconds": 10.428644599975087,
+    "log": "F3_branch.log"
+  },
+  {
+    "failure": "F3",
+    "checkout": "main",
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-m",
+      "pytest",
+      "research_workflow/tests/test_redteam_v2_model_authority.py::test_iv_compiled_availability_table_names_the_rule_and_dependencies",
+      "-q",
+      "-rA",
+      "--tb=long",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "cwd": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader",
+    "returncode": 0,
+    "seconds": 9.79017809999641,
+    "log": "F3_main.log"
+  }
+]
