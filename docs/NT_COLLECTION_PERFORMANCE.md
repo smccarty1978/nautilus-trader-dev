@@ -196,3 +196,23 @@ rescheduled the cost.
 - Do not raise cache capacities to satisfy a feature lookback.
 - Do not conclude the governance chain is the cost. Measured here: replay 58–82%
   of an iteration, audits 11–19%.
+
+## 7. MEASURED OUTCOME (2026-09-06, chore/collection_latency)
+
+The diagnostic order above was run statically against the host (no replays started). Verdicts:
+
+| check | finding | verdict |
+|---|---|---|
+| 2.1 `add_data()` calls | two per partition, one batch per stream (`utils/causal_registration.py:56-57`), default sort | CLEAR |
+| 2.2 NT version | 1.230.0; `DataBackendSession` (#3889) not on our path | CLEAR |
+| 2.3 API level | low-level `BacktestEngine`, whole year resident (~4 GB), no chunking | CLEAR (memory, not decay) |
+| 2.4 engine config | defaults; `log_level=ERROR` only | CLEAR (C6 wins are a separate commit) |
+| 2.5 cache | bounded defaults | CLEAR |
+| 2.6 telemetry | `NT_TELEMETRY_TRACEMALLOC` unset | CLEAR |
+| host per-snapshot path | `research_workflow/provider_host.py` `ContextAdapter._midpoints`: unbounded list of every completed 1m midpoint, copied whole on every candidate snapshot although `ema_slope` reads only `[-1]` and `[-6]` | **CAUSE** |
+
+Fix: `deque(maxlen=64)` (commit 3e441fcc). Decay test (§5) on the sealed `supv1_shape_a_flip_180s_r2`
+TRAIN 2021 partition, same harness: byte-identical rows; first-decile 30,395 bars/s, final-decile
+30,284 bars/s, **decay ratio 1.00** (was 6.4); engine time 408 s (was 1,437 s). A single year is ~7 minutes,
+so §3 (parallelism) is optional and §4 (warmup before sub-year shards) is not yet needed. Figures live in
+`WORKFLOW_REFERENCE_FACTS.md`; the run is `artifacts/platform_v2/collection_latency/MIDPOINT_FIX_REPORT.md`.
