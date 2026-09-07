@@ -129,6 +129,20 @@ MEANING: Dict[str, Tuple[str, str, str]] = {
     "chronology.windows": ("Date-bounded partition execution: 'YYYY-MM-DD..YYYY-MM-DD' (inclusive), one calendar year per window.",
                            "A window NARROWS an already-authorized train/dev year to explicit dates -- it never opens a year the roles did not authorize, and a year that carries windows streams and emits ONLY those dates. The window is a hard data boundary with no forward lookahead tail: a candidate whose outcome cannot resolve inside it fails the partition (WINDOW_OUTCOME_UNRESOLVED) rather than censoring silently.",
                            "windows: ['2024-03-01..2024-03-31']"),
+    "chronology.partition_reuse": ("Opt-in partition reuse: 'off' (default) or 'replay_closure'.",
+                                   "Under 'replay_closure', `collection` serves an existing TRAIN partition whose recorded replay-closure key "
+                                   "(collection-stage closure composite + replay-affecting plan subset + dataset digest + partition interval + "
+                                   "authorization) equals the key derived from the CURRENT plan, instead of re-replaying it; every reuse is recorded "
+                                   "in a receipt, shown to the contract audit, and re-attested by `reconcile` from the artifact. The seal and the "
+                                   "frozen execution manifest are unchanged: a change to any replay module still refuses reuse. 'off' keeps "
+                                   "whole-plan/seal matching, so every existing study is bit-identical.",
+                                   "partition_reuse: replay_closure"),
+    "chronology.partition_reuse_shadow": ("Shadow verification of reuse: 'every_run' (default) or 'sampled'.",
+                                          "'every_run' recomputes one reused partition per collection run and requires byte-identity with the served "
+                                          "one; 'sampled' recomputes on one run in four and may be declared only after the reuse path has cleared "
+                                          "five consecutive studies. A mismatch is terminal (PARTITION_REUSE_SHADOW_MISMATCH): halt, never retry, "
+                                          "never widen the key silently.",
+                                          "partition_reuse_shadow: every_run"),
     "analysis": ("Declarative post-collection analysis: registered operations composed over the study's own collected frame.",
                  "Runs AFTER collection and may read outcome columns; it is never a feature surface. Its declared source decides whether the protected-OOS gate applies.",
                  "analysis: {source: train, steps: [...], artifacts: [...]}"),

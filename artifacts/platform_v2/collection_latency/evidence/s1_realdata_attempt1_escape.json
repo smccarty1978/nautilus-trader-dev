@@ -1,0 +1,7 @@
+{
+ "phases": [],
+ "started_utc": "2026-09-06T18:31:00Z",
+ "status": "FAILED",
+ "error": "Traceback (most recent call last):\n  File \"C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\c15e87fe-0a12-4f13-b4f8-b76a8289f455\\scratchpad\\s1_realdata.py\", line 59, in <module>\n    sm, t_smoke = timed(l.smoke)\n                  ~~~~~^^^^^^^^^\n  File \"C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\c15e87fe-0a12-4f13-b4f8-b76a8289f455\\scratchpad\\s1_realdata.py\", line 44, in timed\n    t0 = time.perf_counter(); r = fn(); return r, time.perf_counter() - t0\n                                  ~~^^\n  File \"C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-collection_latency\\research_workflow\\lifecycle_v2.py\", line 607, in smoke\n    raise LifecycleV2Error(\"SMOKE_REJECTED: \" + \", \".join(k for k, v in checks.items() if not v))\nresearch_workflow.lifecycle_v2.LifecycleV2Error: SMOKE_REJECTED: replay_imports_within_collection_closure\n",
+ "finished_utc": "2026-09-06T18:31:12Z"
+}

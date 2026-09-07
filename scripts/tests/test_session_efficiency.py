@@ -18,7 +18,7 @@ import pytest
 import yaml
 
 from research_workflow import workspace as ws
-from research_workflow.grammar import compile_study, load_spec
+from research_workflow.grammar.compiler import compile_study, load_spec
 from research_workflow.handoff import PHASES, PROHIBITED_FOR_STUDY_OWNER, write_capability_gap_handoff, write_session_handoff
 from research_workflow.roots import CONFIG_ENV
 

@@ -86,7 +86,7 @@ def test_documented_run_governed_study_flags_exist():
 
 
 def test_examples_compile_and_registry_blind_draft_returns_typed_gaps():
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.grammar.gaps import GapKind
     for name in EXAMPLES:
         out = compile_study(load_spec(ROOT / "docs" / "examples" / f"{name}.yaml"), repo_root=ROOT)

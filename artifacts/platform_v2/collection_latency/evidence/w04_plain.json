@@ -1,0 +1,42 @@
+{
+ "plan_sha256": "19a4543583eb584f8b53f3f2d2aa5866e0a8de670f92938a9b8783710f61ea2b",
+ "study": "supv1_shape_a_flip_180s_r2 (read-only plan)",
+ "window": [
+  "2021-03-01",
+  "2021-03-31"
+ ],
+ "note": "host contended: one V2 partition child + one broad pytest run active during measurement",
+ "runs": [
+  {
+   "profile": false,
+   "wall_total_s": 66.10764450009447,
+   "engine_run_s": 61.253216100041755,
+   "stats": {
+    "bars": 1435601,
+    "bars_by_stream": {
+     "nq_1s": 1400060,
+     "nq_1m": 35541
+    },
+    "candidates": 41971,
+    "observations": 41971,
+    "epochs": 254405,
+    "pending_at_end": 0,
+    "dropped_outside_primary": {
+     "candidates": 6628,
+     "observations": 6628
+    }
+   },
+   "rows": {
+    "candidates": 41971,
+    "observations": 41971
+   },
+   "bars_per_s": 23437.153041161237,
+   "epochs_per_s": 4153.332938216555,
+   "dataset": {
+    "dataset_id": "NQ_1S_V2",
+    "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+    "bytes_verification": "VERIFIED"
+   }
+  }
+ ]
+}

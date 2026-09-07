@@ -25,7 +25,7 @@ from sklearn.linear_model import LogisticRegression
 
 from research_workflow import model_store as ms
 from research_workflow.external_model_scoring import ExternalModelScoringError, FrozenExternalModelScorer
-from research_workflow.grammar import compile_study, load_spec
+from research_workflow.grammar.compiler import compile_study, load_spec
 from research_workflow.lifecycle_v2 import V2Lifecycle
 from research_workflow.tests.test_external_model_scoring import fixture as external_scorer_fixture
 

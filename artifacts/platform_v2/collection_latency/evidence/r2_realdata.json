@@ -1,0 +1,297 @@
+{
+ "phases": [
+  {
+   "phase": "cff_A_baseline",
+   "plan": "f90db23d3ffc37289cd56b9f4cc7b4b1c8df79ff5c1862eba38682d191523d8b",
+   "replay_stage_files": 95,
+   "manifest_files": 115,
+   "collection_wall_s": 306.51706420001574,
+   "rows": {
+    "candidates": 35872,
+    "observations": 35872
+   },
+   "candidates_sha": "43dd411a1c42922412f9631a6dae91dafbbd58b58bacd89872de9e46c6d22d41",
+   "observations_sha": "61064315aa657be5ed179f5970cc91223afa6b4c9661b9cfe6c68cd390f983c4",
+   "result": {
+    "reused": [],
+    "recomputed": [
+     "train-2024"
+    ]
+   },
+   "smoke_verdict": "WITHIN_CLOSURE",
+   "partition_trace_files": [
+    "backtests/nt_runtime/__init__.py",
+    "backtests/nt_runtime/compiled_study_loader.py",
+    "backtests/nt_runtime/data_plan.py",
+    "backtests/nt_runtime/engine_builder.py",
+    "backtests/nt_runtime/run_plan.py",
+    "backtests/nt_runtime/strategy_binding.py",
+    "backtests/nt_runtime/telemetry.py",
+    "features/__init__.py",
+    "features/collector.py",
+    "features/engine.py",
+    "features/library.py",
+    "features/registry.py",
+    "features/trackers/generic_arrival.py",
+    "features/trackers/generic_context.py",
+    "features/trackers/generic_ohlcv_delta.py",
+    "features/trackers/generic_rolling_productivity.py",
+    "features/trackers/generic_structural_geometry.py",
+    "features/trackers/host_bindings.py",
+    "features/trackers/median_center.py",
+    "features/trackers/ohlcv_delta.py",
+    "features/trackers/price_levels.py",
+    "features/trackers/pullback.py",
+    "features/trackers/range_position.py",
+    "features/trackers/regime_dual_ema.py",
+    "features/trackers/rolling_5m_productivity.py",
+    "features/trackers/structural_regime_geometry.py",
+    "features/trackers/velocity.py",
+    "features/trackers/volume.py",
+    "features/trackers/wick.py",
+    "research/__init__.py",
+    "research/schemas/__init__.py",
+    "research/schemas/dataset_spec.py",
+    "research/schemas/study_spec.py",
+    "research_workflow/dataset_v2.py",
+    "research_workflow/grammar/spec.py",
+    "research_workflow/host/__init__.py",
+    "research_workflow/host/interfaces.py",
+    "research_workflow/host/mux.py",
+    "research_workflow/host/outcomes.py",
+    "research_workflow/host/predicate_eval.py",
+    "research_workflow/host/sink.py",
+    "research_workflow/host/strategy.py",
+    "research_workflow/host/triggers.py",
+    "research_workflow/host_runner.py",
+    "research_workflow/output_manager.py",
+    "research_workflow/provider_host.py",
+    "research_workflow/roots.py",
+    "research_workflow/sessions.py",
+    "utils/__init__.py",
+    "utils/causal_registration.py",
+    "utils/runner/data.py",
+    "utils/session_boundaries.py"
+   ]
+  },
+  {
+   "phase": "cff_B_live_case_shape_V3",
+   "plan": "e9588628032e050070b8ab3139f65d85870c05ce8d93d2cf889963ca1ae2d66f",
+   "plan_changed": true,
+   "manifest_changed": true,
+   "replay_stage_same": true,
+   "would_reuse": [
+    "train-2024"
+   ],
+   "reasons": [
+    [
+     "train-2024",
+     "REUSABLE"
+    ]
+   ],
+   "collection_wall_s": 312.0354095000075,
+   "result": {
+    "reused": [
+     "train-2024"
+    ],
+    "recomputed": []
+   },
+   "served_identical": true,
+   "shadow": {
+    "selected": "train-2024",
+    "status": "IDENTICAL",
+    "shadow_elapsed_s": 306.8253021000419,
+    "comparison": {
+     "candidates": {
+      "served": "43dd411a1c42922412f9631a6dae91dafbbd58b58bacd89872de9e46c6d22d41",
+      "shadow": "43dd411a1c42922412f9631a6dae91dafbbd58b58bacd89872de9e46c6d22d41"
+     },
+     "observations": {
+      "served": "61064315aa657be5ed179f5970cc91223afa6b4c9661b9cfe6c68cd390f983c4",
+      "shadow": "61064315aa657be5ed179f5970cc91223afa6b4c9661b9cfe6c68cd390f983c4"
+     }
+    }
+   },
+   "reconcile": "PASS"
+  },
+  {
+   "phase": "cff_D_replay_module_V1r",
+   "replay_stage_changed": true,
+   "would_reuse": [],
+   "reasons": [
+    [
+     "train-2024",
+     "REPLAY_CLOSURE_CHANGED:replay_closure_composite_sha256"
+    ]
+   ]
+  },
+  {
+   "phase": "cff_F_compiler_only_V7a",
+   "manifest_changed": true,
+   "replay_stage_same": true,
+   "would_reuse": [
+    "train-2024"
+   ],
+   "reasons": [
+    [
+     "train-2024",
+     "REUSABLE"
+    ]
+   ]
+  },
+  {
+   "phase": "cff_G_trace_halt_V8",
+   "smoke_result": {
+    "ok": true,
+    "result": {
+     "status": "PASS",
+     "outputs": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\c15e87fe-0a12-4f13-b4f8-b76a8289f455\\scratchpad\\r2_studies\\studies\\controlled_feature_family_180s\\artifacts\\smoke_acceptance.json",
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\c15e87fe-0a12-4f13-b4f8-b76a8289f455\\scratchpad\\r2_studies\\studies\\controlled_feature_family_180s\\runs\\20260906_212904_controlled_feature_family_180s_smoke\\collection\\candidates.parquet",
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\c15e87fe-0a12-4f13-b4f8-b76a8289f455\\scratchpad\\r2_studies\\studies\\controlled_feature_family_180s\\runs\\20260906_212904_controlled_feature_family_180s_smoke\\collection\\observations.parquet"
+     ]
+    }
+   },
+   "trace_verdict": "WITHIN_CLOSURE",
+   "escapes": []
+  },
+  {
+   "phase": "es_V4r_P2",
+   "collection_wall_s": 2371.3247098999564,
+   "replay_stage_files": 95,
+   "manifest_files": 115,
+   "years": {
+    "2020": {
+     "identical_to_live_sealed": true,
+     "elapsed_s": 1199.4491333999904,
+     "rows": {
+      "candidates": 494455,
+      "observations": 494455
+     },
+     "child_trace_verdict": "WITHIN_CLOSURE",
+     "child_traced_files": [
+      "backtests/nt_runtime/__init__.py",
+      "backtests/nt_runtime/compiled_study_loader.py",
+      "backtests/nt_runtime/data_plan.py",
+      "backtests/nt_runtime/engine_builder.py",
+      "backtests/nt_runtime/run_plan.py",
+      "backtests/nt_runtime/strategy_binding.py",
+      "backtests/nt_runtime/telemetry.py",
+      "features/__init__.py",
+      "features/collector.py",
+      "features/engine.py",
+      "features/library.py",
+      "features/registry.py",
+      "features/trackers/generic_arrival.py",
+      "features/trackers/generic_context.py",
+      "features/trackers/generic_rolling_productivity.py",
+      "features/trackers/generic_structural_geometry.py",
+      "features/trackers/host_bindings.py",
+      "features/trackers/median_center.py",
+      "features/trackers/ohlcv_delta.py",
+      "features/trackers/price_levels.py",
+      "features/trackers/pullback.py",
+      "features/trackers/range_position.py",
+      "features/trackers/regime_dual_ema.py",
+      "features/trackers/rolling_5m_productivity.py",
+      "features/trackers/structural_regime_geometry.py",
+      "features/trackers/velocity.py",
+      "features/trackers/volume.py",
+      "features/trackers/wick.py",
+      "research/__init__.py",
+      "research/schemas/__init__.py",
+      "research/schemas/dataset_spec.py",
+      "research/schemas/study_spec.py",
+      "research_workflow/dataset_v2.py",
+      "research_workflow/grammar/spec.py",
+      "research_workflow/host/__init__.py",
+      "research_workflow/host/interfaces.py",
+      "research_workflow/host/mux.py",
+      "research_workflow/host/outcomes.py",
+      "research_workflow/host/predicate_eval.py",
+      "research_workflow/host/sink.py",
+      "research_workflow/host/strategy.py",
+      "research_workflow/host/triggers.py",
+      "research_workflow/host_runner.py",
+      "research_workflow/output_manager.py",
+      "research_workflow/provider_host.py",
+      "research_workflow/roots.py",
+      "research_workflow/sessions.py",
+      "utils/__init__.py",
+      "utils/causal_registration.py",
+      "utils/runner/data.py",
+      "utils/session_boundaries.py"
+     ],
+     "compiler_modules_traced": []
+    },
+    "2021": {
+     "identical_to_live_sealed": true,
+     "elapsed_s": 1141.6389052999439,
+     "rows": {
+      "candidates": 478407,
+      "observations": 478407
+     },
+     "child_trace_verdict": "WITHIN_CLOSURE",
+     "child_traced_files": [
+      "backtests/nt_runtime/__init__.py",
+      "backtests/nt_runtime/compiled_study_loader.py",
+      "backtests/nt_runtime/data_plan.py",
+      "backtests/nt_runtime/engine_builder.py",
+      "backtests/nt_runtime/run_plan.py",
+      "backtests/nt_runtime/strategy_binding.py",
+      "backtests/nt_runtime/telemetry.py",
+      "features/__init__.py",
+      "features/collector.py",
+      "features/engine.py",
+      "features/library.py",
+      "features/registry.py",
+      "features/trackers/generic_arrival.py",
+      "features/trackers/generic_context.py",
+      "features/trackers/generic_rolling_productivity.py",
+      "features/trackers/generic_structural_geometry.py",
+      "features/trackers/host_bindings.py",
+      "features/trackers/median_center.py",
+      "features/trackers/ohlcv_delta.py",
+      "features/trackers/price_levels.py",
+      "features/trackers/pullback.py",
+      "features/trackers/range_position.py",
+      "features/trackers/regime_dual_ema.py",
+      "features/trackers/rolling_5m_productivity.py",
+      "features/trackers/structural_regime_geometry.py",
+      "features/trackers/velocity.py",
+      "features/trackers/volume.py",
+      "features/trackers/wick.py",
+      "research/__init__.py",
+      "research/schemas/__init__.py",
+      "research/schemas/dataset_spec.py",
+      "research/schemas/study_spec.py",
+      "research_workflow/dataset_v2.py",
+      "research_workflow/grammar/spec.py",
+      "research_workflow/host/__init__.py",
+      "research_workflow/host/interfaces.py",
+      "research_workflow/host/mux.py",
+      "research_workflow/host/outcomes.py",
+      "research_workflow/host/predicate_eval.py",
+      "research_workflow/host/sink.py",
+      "research_workflow/host/strategy.py",
+      "research_workflow/host/triggers.py",
+      "research_workflow/host_runner.py",
+      "research_workflow/output_manager.py",
+      "research_workflow/provider_host.py",
+      "research_workflow/roots.py",
+      "research_workflow/sessions.py",
+      "utils/__init__.py",
+      "utils/causal_registration.py",
+      "utils/runner/data.py",
+      "utils/session_boundaries.py"
+     ],
+     "compiler_modules_traced": []
+    }
+   },
+   "union_size": 51
+  }
+ ],
+ "started_utc": "2026-09-06T21:14:15Z",
+ "status": "DONE",
+ "finished_utc": "2026-09-06T22:09:49Z"
+}

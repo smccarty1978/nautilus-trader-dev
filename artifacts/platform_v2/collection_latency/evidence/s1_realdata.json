@@ -1,0 +1,190 @@
+{
+ "phases": [
+  {
+   "phase": "A_baseline",
+   "plan_sha256": "68cca8a7a3a29339a80a587160a790a4d3012f04892accf94f8548831cb2a50b",
+   "collection_closure": "2360047d39993410038538d1b3e17db31bb8d5450cd9d6a8378879a474d7df94",
+   "smoke_s": 8.090711600030772,
+   "smoke_trace_verdict": "WITHIN_CLOSURE",
+   "smoke_traced_files": 18,
+   "preloaded_outside": [],
+   "collection_wall_s": 3032.4160893999506,
+   "result": {
+    "reused": [],
+    "recomputed": [
+     "train-2020",
+     "train-2021"
+    ]
+   },
+   "shas": {
+    "2020": {
+     "candidates": "970834a53733f05d4d1b5d005afc55525877c6c22b8c6ea80e421d7b38d240c2",
+     "observations": "0eb4550f6dbbdbe965f5a9ae37cf56cc32c97f5c71b8b1c566312918655be9f0",
+     "plan": "68cca8a7a3a29339a80a587160a790a4d3012f04892accf94f8548831cb2a50b",
+     "elapsed_s": 1561.3434339000378,
+     "rows": {
+      "candidates": 494455,
+      "observations": 494455
+     }
+    },
+    "2021": {
+     "candidates": "6db21030c1896936035bf0087c51ee74ccb522b7860102b0d0f695d28f7fb3aa",
+     "observations": "1132ca54e6c91a8f1924b3192aa9df4fab518dc9c97c30789d12a1ffeb143fd5",
+     "plan": "68cca8a7a3a29339a80a587160a790a4d3012f04892accf94f8548831cb2a50b",
+     "elapsed_s": 1427.793413400068,
+     "rows": {
+      "candidates": 478407,
+      "observations": 478407
+     }
+    }
+   },
+   "reconcile_s": 0.3781720999395475,
+   "receipt": {
+    "composite_seal_hash": "scratch-seal-a",
+    "effective": "replay_closure",
+    "generated_at_utc": "2026-09-06T19:26:26.717453+00:00",
+    "period": "train",
+    "plan_sha256": "68cca8a7a3a29339a80a587160a790a4d3012f04892accf94f8548831cb2a50b",
+    "policy": {
+     "mode": "replay_closure",
+     "shadow": "every_run"
+    },
+    "recomputed": [
+     "train-2020",
+     "train-2021"
+    ],
+    "refused": [],
+    "reused": []
+   }
+  },
+  {
+   "phase": "B_analysis_only_every_run",
+   "plan_sha256": "e805293eba19e111fb515058bf7dc500497eadc952ca45749174ce021a0c7b5f",
+   "plan_changed": true,
+   "collection_closure_same": true,
+   "would_reuse": [
+    "train-2020",
+    "train-2021"
+   ],
+   "collection_wall_s": 1422.413448599982,
+   "result": {
+    "reused": [
+     "train-2020",
+     "train-2021"
+    ],
+    "recomputed": []
+   },
+   "served_bytes_identical": true,
+   "shadow": {
+    "selected": "train-2021",
+    "status": "IDENTICAL",
+    "shadow_elapsed_s": 1406.941840399988,
+    "comparison": {
+     "candidates": {
+      "served": "6db21030c1896936035bf0087c51ee74ccb522b7860102b0d0f695d28f7fb3aa",
+      "shadow": "6db21030c1896936035bf0087c51ee74ccb522b7860102b0d0f695d28f7fb3aa"
+     },
+     "observations": {
+      "served": "1132ca54e6c91a8f1924b3192aa9df4fab518dc9c97c30789d12a1ffeb143fd5",
+      "shadow": "1132ca54e6c91a8f1924b3192aa9df4fab518dc9c97c30789d12a1ffeb143fd5"
+     }
+    }
+   },
+   "reconcile_s": 0.40826009993907064,
+   "reconcile_passed": true,
+   "reattested": {
+    "policy": {
+     "mode": "replay_closure",
+     "shadow": "every_run"
+    },
+    "reattested": [
+     {
+      "candidates_sha256": "970834a53733f05d4d1b5d005afc55525877c6c22b8c6ea80e421d7b38d240c2",
+      "expected_replay_closure_sha256": "1ec74f1704c05c3162380b7c61535be0b8919e4e185e6c374e6addf3427e1f6c",
+      "id": "train-2020",
+      "manifest_plan_sha256": "68cca8a7a3a29339a80a587160a790a4d3012f04892accf94f8548831cb2a50b",
+      "manifest_seal": "scratch-seal-a",
+      "observations_sha256": "0eb4550f6dbbdbe965f5a9ae37cf56cc32c97f5c71b8b1c566312918655be9f0",
+      "reason": "REUSABLE",
+      "receipt_recorded": true,
+      "recorded_replay_closure_sha256": "1ec74f1704c05c3162380b7c61535be0b8919e4e185e6c374e6addf3427e1f6c",
+      "reusable": true,
+      "year": 2020
+     },
+     {
+      "candidates_sha256": "6db21030c1896936035bf0087c51ee74ccb522b7860102b0d0f695d28f7fb3aa",
+      "expected_replay_closure_sha256": "f409cb198cce8221154a3045bcf7140ca8a176657b3ecb4dfdca2b4ad43c726a",
+      "id": "train-2021",
+      "manifest_plan_sha256": "68cca8a7a3a29339a80a587160a790a4d3012f04892accf94f8548831cb2a50b",
+      "manifest_seal": "scratch-seal-a",
+      "observations_sha256": "1132ca54e6c91a8f1924b3192aa9df4fab518dc9c97c30789d12a1ffeb143fd5",
+      "reason": "REUSABLE",
+      "receipt_recorded": true,
+      "recorded_replay_closure_sha256": "f409cb198cce8221154a3045bcf7140ca8a176657b3ecb4dfdca2b4ad43c726a",
+      "reusable": true,
+      "year": 2021
+     }
+    ],
+    "shadow": {
+     "policy": "every_run",
+     "selected": "train-2021",
+     "status": "IDENTICAL"
+    }
+   }
+  },
+  {
+   "phase": "C_analysis_only_sampled",
+   "plan_sha256": "68fc03bec757c479ddcdce7d786c822e60b01217a0ed8bd4e9293414205dc13e",
+   "collection_wall_s": 0.0743261999450624,
+   "result": {
+    "reused": [
+     "train-2020",
+     "train-2021"
+    ],
+    "recomputed": []
+   },
+   "served_bytes_identical": true,
+   "shadow": {
+    "selected": null,
+    "status": "SKIPPED_BY_POLICY",
+    "shadow_elapsed_s": null
+   },
+   "reconcile_s": 0.3634358999552205
+  },
+  {
+   "phase": "D_replay_module_perturbed",
+   "file": "features/trackers/generic_arrival.py",
+   "collection_closure_changed": true,
+   "would_reuse": [],
+   "reasons": [
+    [
+     "train-2020",
+     "REPLAY_CLOSURE_CHANGED:collection_closure_composite_sha256"
+    ],
+    [
+     "train-2021",
+     "REPLAY_CLOSURE_CHANGED:collection_closure_composite_sha256"
+    ]
+   ]
+  },
+  {
+   "phase": "E_live_case_shape_diagnostic_ops",
+   "file": "research/analysis/diagnostic_ops.py",
+   "collection_closure_changed": true,
+   "would_reuse": [],
+   "reasons": [
+    [
+     "train-2020",
+     "REPLAY_CLOSURE_CHANGED:collection_closure_composite_sha256"
+    ],
+    [
+     "train-2021",
+     "REPLAY_CLOSURE_CHANGED:collection_closure_composite_sha256"
+    ]
+   ]
+  }
+ ],
+ "started_utc": "2026-09-06T18:35:42Z",
+ "status": "DONE",
+ "finished_utc": "2026-09-06T19:50:18Z"
+}

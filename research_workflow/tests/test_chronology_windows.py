@@ -18,7 +18,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from research_workflow.grammar import compile_study, load_spec
+from research_workflow.grammar.compiler import compile_study, load_spec
 from research_workflow.grammar.gaps import GapKind
 from research_workflow.lifecycle_v2 import (LifecycleV2Error, authorized_windows, authorized_years,
                                             partition_windows, windows_identity)

@@ -38,7 +38,8 @@ from __future__ import annotations
 import importlib
 import math
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Mapping, Optional, Protocol, Sequence, Tuple
+from collections import deque
+from typing import Any, Callable, Deque, Dict, List, Mapping, Optional, Protocol, Sequence, Tuple
 
 NS = 1_000_000_000
 
@@ -248,6 +249,8 @@ class ContextAdapter(_BaseAdapter):
     ALPHA3 = 0.5
     # The frozen Model C parent's realized ema_slope step count (see class docstring).
     FROZEN_FAMILY_A_EMA_SLOPE_STEPS = 5
+    # Deepest read is [-(FROZEN_FAMILY_A_EMA_SLOPE_STEPS + 1)] = [-6]; the pre-0fcce218 form read [-21]. 64 = margin.
+    MIDPOINT_HISTORY = 64
 
     def __init__(self, instances: Sequence[InstanceSpec]) -> None:
         super().__init__(instances)
@@ -256,7 +259,14 @@ class ContextAdapter(_BaseAdapter):
         self._provider = GenericContextProvider()
         self._ema_h: Optional[float] = None
         self._ema_l: Optional[float] = None
-        self._midpoints: List[float] = []
+        # Bounded history (chore/collection_latency, 2026-09-06). ``ema_slope`` reads only ``values[-1]`` and
+        # ``values[-(lookback + 1)]`` with lookback frozen at FROZEN_FAMILY_A_EMA_SLOPE_STEPS (= 5, so [-6]);
+        # the adapter's earlier form (before 0fcce218) read the instance's nominal lookback of 20 (= [-21]).
+        # An unbounded list here, copied whole on every candidate snapshot, was the 6.4x replay throughput
+        # decay across a year (S1.0 probe). 64 covers every read this adapter has ever made with a 3x margin
+        # over the legacy nominal; ``ema_slope``'s warmup rule (0.0 below lookback + 1 values) is unchanged
+        # because a deque and a list have identical length until the bound is reached.
+        self._midpoints: Deque[float] = deque(maxlen=self.MIDPOINT_HISTORY)
 
     def required_streams(self) -> frozenset[str]:
         return frozenset({STREAM_COMPLETED_1M})

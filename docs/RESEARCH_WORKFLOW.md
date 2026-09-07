@@ -1374,3 +1374,75 @@ Scope is deliberately narrow: `*.golden.json` and other tracked model-adjacent J
 existing behaviour because their recorded hashes were taken from post-checkout bytes.
 
 Tests: `research_workflow/tests/test_train_provenance_attestation.py` (in `PLATFORM_TESTS`).
+
+### 21.13 Partition reuse under the replay-closure key (`chronology.partition_reuse`)
+
+Every post-collection re-collection observed in the 2026-09-06 latency measurement
+(`artifacts/platform_v2/collection_latency/W0_REPORT.md`) replayed a byte-identical replay closure:
+the trigger was an analysis-only spec edit or a fit/freeze-stage platform fix, and
+`_partition_valid()` keyed partition reuse on `plan_sha256` **and** `composite_seal_hash`, so any
+re-seal invalidated every partition. The seal and the frozen execution manifest are correct
+and unchanged; what was missing is a *second, narrower* identity for "what a partition is a
+function of", used only as a reuse key.
+
+`research_workflow/replay_closure.py` **derives** it (never enumerates it):
+
+```
+replay_closure_sha256 = H( plan.closure.stages.replay.composite_sha256   # host + bound provider/tracker modules + what THEY import
+                         + replay-affecting plan subset                  # plan minus analysis/model/study/notes and the identity fields
+                         + dataset {dataset_id, logical_digest}
+                         + partition interval {period, year, primary, run_end, warmup_days, windows}
+                         + experiment authorization_sha256 )
+```
+
+**The replay stage (Reading 2, 2026-09-06).** The compiler produces `closure.stages.replay`: the transitive
+repo-import closure seeded at the host modules and the bound provider/tracker modules, with the compiler
+modules and any file added to the closure for a non-replay reason (the analysis ops module) removed from
+the seed set. The compiler runs before replay and its whole influence on replay is `compiled_plan.json`,
+which the key hashes separately, so keeping it as a seed was redundant and it dragged the analysis and
+controller modules it imports into the key. Two layering inversions had to go for the derivation to stop
+where intended: `research_workflow.grammar.__init__` no longer re-exports the compiler (import it from
+`research_workflow.grammar.compiler`), and `policy.assert_old_runtime_allowed` takes `is_v2_study` from
+the leaf module `research_workflow/study_kind.py` instead of the controller. `replay` is within
+`collection` is within the manifest, always; every governed stage set is now closed over its transitive
+imports, so the manifest only grew (90 to 145 files for a 13-instance study; replay stage 95, collection 101).
+
+Fail-closed, empirically: **every smoke and every partition run traces the repository modules first
+imported during its replay** (`artifacts/replay_closure_trace.json`: `runs`, cumulative `union`, latest
+verdict; each partition also writes `replay_trace.json` next to its manifest). A traced module outside the
+replay stage is `REPLAY_CLOSURE_ESCAPE`: smoke is REJECTED, a partition is not persisted, and the key is
+never widened by a trace. The first real-data smoke trace found nine package `__init__` modules on the
+replay path that were in neither the closure nor the frozen manifest; `transitive_closure_files` now
+closes over every ancestor package `__init__.py`. Partition children start from a bare interpreter, so
+their traces are complete; the controller-process smoke trace additionally reports pre-imported modules.
+A partition is served only after the current plan's smoke traced clean (`NO_CLEAN_SMOKE_TRACE_FOR_PLAN`
+otherwise). Non-Python replay inputs: the key also binds the bytes of
+`features/feature_definition_promotions.json` (`replay_closure.REPLAY_DATA_FILES`), which
+`features.registry.canonical_definition_status` reads when the provider host resolves feature instances at
+replay and which the Python-only frozen manifest does not hash; every other replay-time read is covered by
+a digest in the plan or verified at launch. In both audit packets the replay stage is rendered as its
+composite, its size and the collection modules it excludes (`stage_closures_for_packet`), so briefs stay
+bounded. Opt-in, TRAIN only, default `off` (every existing study is bit-identical):
+
+```yaml
+chronology:
+  partition_reuse: replay_closure      # off (default) | replay_closure
+  partition_reuse_shadow: every_run    # every_run (default, bake-in) | sampled (one run in four)
+```
+
+Mechanics, in lifecycle order. Every partition manifest records its binding (`manifest.replay_closure`).
+The **contract audit packet** carries `partition_reuse`: the declared policy and, per existing partition,
+whether `collection` would serve it under the current plan and why (`partition_reuse_preview`); the
+auditor audits the reuse *decision*. `collection` serves a partition only if the recorded key equals the
+key derived from the current plan, the recorded components re-hash to the recorded key, and the parquet
+bytes hash to the manifest; it writes `_work/controller/train_partition_reuse.json` (reused / recomputed /
+refused with reasons) and runs a **shadow verification**: one reused partition, chosen uniformly with the
+seal as seed, is recomputed into `partitions_shadow/` and must be byte-identical; a mismatch is
+`PARTITION_REUSE_SHADOW_MISMATCH`, terminal: halt, never retry, never widen the key. `sampled` may be
+declared only after five consecutive studies have cleared shadow verification. `reconcile` **re-attests**
+every partition whose manifest plan differs from the current plan: receipt present, key re-derived from
+the current plan, bytes re-hashed, shadow IDENTICAL (or skipped by a declared sampled policy); anything
+else is a reconcile finding, and a foreign-plan partition under `off` is a finding too.
+
+Tests: `research_workflow/tests/test_replay_closure.py`. Reports:
+`artifacts/platform_v2/collection_latency/{W0,S1,R2}_REPORT.md`.

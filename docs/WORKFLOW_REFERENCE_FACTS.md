@@ -134,6 +134,70 @@ features and Model-C was fit expecting it (LightGBM native NaN, no complete-case
 Recorded here only so a future study does not mistake the null rate for a wiring bug
 (`studies/deep_pullback_5s_reacceleration_model/artifacts/rolling_300s_parent_parity_audit.json`).
 
+**Execution-closure hole (found 2026-09-06 by the replay import trace; a governance finding, not a
+performance note).** Package `__init__.py` modules that Python executes on the replay path
+(`backtests/nt_runtime/__init__.py`, `backtests/nt_runtime/modes/__init__.py`, `features/__init__.py`,
+`research/__init__.py`, `research/analysis/__init__.py`, `research/schemas/__init__.py`,
+`research_workflow/forward_outcomes/__init__.py`, `research_workflow/host/__init__.py`, `utils/__init__.py`)
+were in neither the collection closure nor the 90-file frozen manifest (`main` be66e8de), because the static import walk
+resolved `a.b.c` to `a/b/c.py` only. `STALE_FREEZE` could therefore never fire on a change to them.
+Retrospective (`git log` of those nine files against every sealed study's seal-to-closure window, main
+2026-09-06): **every closed V2 study is retrospectively sound**: `v2_shape_a_flip_180s`,
+`v2_shape_b_deep_pullback_5s`, `v2_shape_c_barrier_race_fade`, `first_p90_warning_horizon_march2024`,
+`clean_maturity_flip_model_180s_horizon`, `deep_pullback_5s_reacceleration_model`,
+`workflow_canary_ordered_barrier_v1` have zero such commits inside their seal windows. **Ten still-open
+sealed studies have such commits inside their open-ended windows**:
+`Codex_clean_maturity_flip_rolling_5m_productivity`, `Gemini_clean_maturity_flip_rolling_5m_productivity`,
+`clean_maturity_flip_model_rolling_productivity`, `clean_tradable_reversal`, `es_wick_imbalance_acceptance_v2`,
+`es_wick_imbalance_exploratory`, `regime_transition_target_before_stop_v1`, `test_level_break_collector`,
+`test_minimal_checkpoint_collector`, `ym_prev5_range_position` (commits 97b97dba, e020bc94, dce66d49,
+fb58531b, b939b471, 019221e0, cc23a48c, cd407353). Their results were produced under a manifest that
+would have flagged stale had it been complete. Recorded here; not recompiled or resealed. Fixed in
+`research_workflow/grammar/compiler.py::transitive_closure_files` (every ancestor package init is closed
+over). The governance stage sets stay declared lists (red-team invariant: a perturbation moves its own stage
+and the composite, never an unrelated stage); the five modules the collection walk used to reach only
+through the removed `policy -> lifecycle_v2` import are declared on the `oos` list where `experiment.py`
+lazily imports them. Closure sizes, each labelled by the set it counts (they are different sets and are
+expected to differ), measured on the 13-instance `es_180s_model_c_portability` plan:
+
+| set | what it is | files | at commit |
+|---|---|---:|---|
+| frozen execution manifest | union of every stage closure; what the seal covers | 90 | `main` be66e8de (before this chore) |
+| frozen execution manifest | same, after the package-`__init__` hole fix | 116 | 08ba4123 (S1, chore/collection_latency) |
+| frozen execution manifest | same, after the layering fixes and the `oos` list | **115** (strict superset of the 90) | 943442d4 (Reading 2) |
+| collection stage | transitive import closure from the host + compiler seeds | 85 → 111 → **101** | be66e8de → 08ba4123 → 943442d4 |
+| replay stage | the partition-reuse key: host + bound provider/tracker seeds, compiler and analysis modules removed | **95** | 943442d4 |
+
+Read cold: "manifest 115, replay 95" is the current state; a manifest number and a replay number are never
+supposed to match, because the replay stage is a subset of the collection stage, which is a subset of the
+manifest.
+
+**Replay import-trace policy.** Every smoke and every partition run records the repository modules first
+imported during its replay (`artifacts/replay_closure_trace.json`, cumulative across runs). A module outside
+the plan's replay stage halts the run (`REPLAY_CLOSURE_ESCAPE`); the key is never widened by a trace.
+
+**NautilusTrader pin: 1.230.0.** The host uses the low-level `BacktestEngine` with two `add_data()` batches
+per partition (1s then 1m, `utils/causal_registration.py`), a whole year resident; it does not use
+`BacktestNode` / `DataBackendSession` chunked streaming, so the `DataBackendSession` memory-leak fix (#3889)
+does not apply. That note becomes load-bearing the day the host moves to `BacktestNode` for chunking.
+The replay throughput decay across a year (6.4x, 2026-09-06) was a host defect, not NT:
+`research_workflow/provider_host.py` `ContextAdapter._midpoints` was an unbounded list of every completed 1m
+midpoint, copied whole on every candidate snapshot although `ema_slope` reads only `[-1]` and `[-6]`.
+**FIXED 2026-09-06 (chore/collection_latency 3e441fcc): `deque(maxlen=64)`.** Parity: the sealed
+`supv1_shape_a_flip_180s_r2` TRAIN 2021 partition replays byte-identical; same run 408 s engine time vs
+1,437 s before, first/final-decile 30.4k / 30.3k bars/s (decay ratio 1.00). A single year is ~7 minutes.
+Report: `artifacts/platform_v2/collection_latency/MIDPOINT_FIX_REPORT.md`.
+
+**`scripts/benchmark_historical_same_harness.py` cannot run on the current tree** (found by the
+2026-09-06 collection-latency measurement, `artifacts/platform_v2/collection_latency/W0_REPORT.md`).
+It hard-codes the historical study `clean_maturity_flip_model_rolling_productivity`, whose compiled
+artifact is stale (`STALE_COMPILED_STUDY`), and recompiling a historical study is prohibited; it also
+drives the V1 `compiled_study_loader` / `MinimalCheckpointCollector` path rather than the V2 host, so
+the telemetry figures above are not reproducible through it. Same-harness V2 throughput is measured
+instead through `research_workflow.host_runner.run_plan_on_catalog` on a closed study's compiled plan
+(read-only): 23.4 k bars/s on one month, 10.5 k bars/s on a full year, 13-instance surface, 2026-09-06 --
+before the midpoint-buffer fix; 30.5 k bars/s flat across the full year after it (same harness, same plan).
+
 `scripts/tests/test_round2_invariants.py:317` hashes with `read_bytes()` instead of
 `canonical_file_sha256` — see the Hashing convention section above.
 

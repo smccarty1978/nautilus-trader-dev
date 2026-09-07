@@ -83,7 +83,7 @@ def main() -> int:
     ap.add_argument("--save-frames", action="store_true")
     a = ap.parse_args()
 
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.host_runner import run_plan_on_catalog
 
     outcome = compile_study(load_spec(SHAPES[a.shape]["spec"]), repo_root=ROOT)

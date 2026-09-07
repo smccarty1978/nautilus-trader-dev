@@ -311,7 +311,7 @@ def verify_historical_authority(study_dir: Path, repo_root: Optional[Path] = Non
 def assert_old_runtime_allowed(study_dir: Path, repo_root: Optional[Path] = None) -> dict:
     """Raise unless ``study_dir`` is a Platform-v2 study or a v1 study with AUTHENTICATED
     historical execution authority (see ``verify_historical_authority``)."""
-    from research_workflow.lifecycle_v2 import is_v2_study
+    from research_workflow.study_kind import is_v2_study   # leaf module: never import the controller from policy
     study_dir = Path(study_dir)
     if is_v2_study(study_dir):
         return {"platform": "v2", "policy": OLD_RUNTIME_POLICY}

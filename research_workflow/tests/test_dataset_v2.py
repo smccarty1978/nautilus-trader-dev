@@ -108,7 +108,7 @@ def test_dataset_spec_binds_in_the_static_compiler(tmp_path: Path):
     m = dv2.build_dataset_v2(symbol="NQ", years=["2021"], raw_dir=raw, catalog_root=tmp_path / "catalog", repo_root=tmp_path, write_spec=True)
     spec_path = Path(m["spec_path"])
     assert spec_path.name == "NQ_1S_V2.yaml"
-    from research_workflow.grammar import compile_study, load_spec
+    from research_workflow.grammar.compiler import compile_study, load_spec
     study = load_spec(ROOT / "fixtures" / "parity" / "shape_a" / "study.yaml")
     study["streams"][0]["dataset"] = "NQ_1S_V2"
     out = compile_study(study, repo_root=ROOT, datasets_dir=spec_path.parent)

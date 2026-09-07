@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 GOLDEN = ROOT / "fixtures" / "golden"
 NS = 1_000_000_000
 
-from research_workflow.grammar import compile_study, load_spec  # noqa: E402
+from research_workflow.grammar.compiler import compile_study, load_spec  # noqa: E402
 from research_workflow.host.interfaces import BarView  # noqa: E402
 from research_workflow.host_runner import run_plan_on_bars, run_plan_with_engine  # noqa: E402
 from research_workflow.sessions import build_session_table  # noqa: E402

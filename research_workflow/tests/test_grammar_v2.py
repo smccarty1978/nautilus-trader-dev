@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from research_workflow.grammar import compile_study, load_spec
+from research_workflow.grammar.compiler import compile_study, load_spec
 from research_workflow.grammar.expansion import expand_instances
 from research_workflow.grammar.gaps import GapKind
 from research_workflow.grammar.predicates import PredicateSyntaxError, parse_predicate, referenced_roots, render

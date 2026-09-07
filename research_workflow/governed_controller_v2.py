@@ -137,7 +137,8 @@ class V2StudyController(GovernedStudyController):
         else:
             py_files, py_exception = self.lifecycle._zero_study_python()
             packet = contract_packet(plan, **common, seal=_read(self.study / "artifacts/preexec_audit_seal.json"),
-                                     study_python={"python_files": py_files, "exception": py_exception})
+                                     study_python={"python_files": py_files, "exception": py_exception},
+                                     partition_reuse=self.lifecycle.partition_reuse_preview("train"))
         path = self.work / f"audit_packet_{audit_type}.json"
         _json(path, packet)
         return path
