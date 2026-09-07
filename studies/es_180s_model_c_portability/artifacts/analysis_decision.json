@@ -1,0 +1,177 @@
+{
+  "capability_gap_routed": {
+    "code": "ANALYSIS_HARNESS_GAP",
+    "missing": [
+      "freeze-time TRAIN percentile threshold derivation persisted in train_experiment_freeze.json and applied unchanged at OOS",
+      "native model feature-importance extraction as a governed analysis op"
+    ],
+    "note": "Both are platform capability, not study design. Any repair changes the execution closure and therefore forces recollection, refit, reseal and both audits again (~2h unattended)."
+  },
+  "chronology_proof": {
+    "model_canonical_sha256": {
+      "primary:LONG": "167f9b5d3ead1c41ce547cb7f3197c9bcb0675391cc9f663c3b01509b596f275",
+      "primary:SHORT": "230b745ea965e93f080dd3aeea72c1c91d183c74d72f66dc773f5a4c8b414077"
+    },
+    "model_hashes": {
+      "primary:LONG": "6514583fd181758710092d8fe41e803808e537633965c969602a4de28e88e2bd",
+      "primary:SHORT": "8ebbb08b2e4dc7f3b0f791b1a2fd6589a88ccc4b2b92911b83bc29230eda49e1"
+    },
+    "new_models_trained": true,
+    "oos_years": [
+      2024
+    ],
+    "prohibited_years_accessed": [],
+    "train_years": [
+      2020,
+      2021,
+      2022,
+      2023
+    ]
+  },
+  "decided_at_utc": "2026-09-06T20:45:00+00:00",
+  "decided_by": "primary-owner session (analysis worker declined: no declared label fit the evidence)",
+  "evidence": [
+    {
+      "path": "artifacts/experiment_analysis_v2.json",
+      "sha256": "8918e9d84acd10d281b0921d9ecbc5f8d8e73ce17ab734d1babf6d0d8589c4d6"
+    },
+    {
+      "path": "artifacts/train_experiment_freeze.json",
+      "sha256": "d0d56bfe9c35fb1e0dd46a6d1dda1112d795057977ec66fdc5e334b84baea788"
+    },
+    {
+      "path": "artifacts/experiment_models.json",
+      "sha256": "e2c9ec3b146f4c9ec599a2ba3a40190eb4bcd0c3ac4168faaa4a5458c2976b52"
+    }
+  ],
+  "features_changed": false,
+  "model_tuned": false,
+  "not_established": [
+    "Stable lift at frozen ES TRAIN P90/P95/P97.5 thresholds (contract sec.10, sec.13) -- freeze() writes thresholds: {} unconditionally; the fit stage derives p90/p95 only on the month_folds path, per fold, applied to that fold's own validation window, which is not the frozen-and-applied-to-OOS semantics the contract requires.",
+    "Native LightGBM feature importance, gain/split, LONG vs SHORT (contract sec.12) -- no implementation exists in the analysis harness. This leaves the SECONDARY question (does ES independently learn NQ's structure around ema_slope, arrival_velocity, rolling retention/giveback/current progress) entirely unanswered.",
+    "Maturity-bucket behaviour (contract sec.11, sec.13) -- expressible via analysis.decomposition.buckets but the compiled plan declared analysis: null.",
+    "First-P90 diagnostic (contract sec.14) -- analysis.anchor.first_threshold_crossing exists but needs both a declared analysis: block and a frozen threshold that was never derived.",
+    "Expected calibration error (contract sec.13) -- only Brier was produced.",
+    "Quantitative ES-vs-NQ comparison (contract sec.15) beyond the descriptive retention statement above."
+  ],
+  "oos_2024": {
+    "primary:LONG": {
+      "base_rate": 0.156901,
+      "brier": 0.125844,
+      "canonical_sha256": "167f9b5d3ead1c41ce547cb7f3197c9bcb0675391cc9f663c3b01509b596f275",
+      "positives": 45072,
+      "pr_auc": 0.274162,
+      "pr_auc_over_base_rate": 1.7474,
+      "roc_auc": 0.668657,
+      "rows": 287264,
+      "score_digest": "3b045d7dbd28cc7ec6c0f3a505386f1ee1378404099a068f4127042e1b2e699e",
+      "subset": {
+        "regime_direction": 1
+      }
+    },
+    "primary:SHORT": {
+      "base_rate": 0.176141,
+      "brier": 0.136722,
+      "canonical_sha256": "230b745ea965e93f080dd3aeea72c1c91d183c74d72f66dc773f5a4c8b414077",
+      "positives": 39836,
+      "pr_auc": 0.302954,
+      "pr_auc_over_base_rate": 1.72,
+      "roc_auc": 0.676425,
+      "rows": 226160,
+      "score_digest": "7417dc2a17844d382fad203c0ce181ddd1f8ce44b76d01441932d74d4fed4036",
+      "subset": {
+        "regime_direction": -1
+      }
+    }
+  },
+  "outcome": "ES_PORTABILITY_CONFIRMED_TWO_SIDED",
+  "rationale": "The frozen 13-feature Model C architecture, trained natively on ES 2020-2023 with the NQ parent's own direction-specific hyperparameters and no tuning, discriminates an imminent prevailing 1m regime flip within 180s on untouched ES 2024, in BOTH directions. LONG ROC-AUC 0.6687 / PR-lift 1.75 on 287,264 rows; SHORT ROC-AUC 0.6764 / PR-lift 1.72 on 226,160 rows. Against the TRAIN expanding-year folds this is ~97-98% ROC retention and ~96-97% PR-lift retention, with SHORT holding marginally better than LONG. NO_MEANINGFUL_PORTABILITY is excluded outright. PARTIAL_PORTABILITY is contradicted by its own declared text: the transfer is neither materially weaker nor one-sided. STRONG_PORTABILITY is a conjunction whose third and fourth conjuncts were never produced, so it cannot be asserted without overclaiming.",
+  "schema_version": 1,
+  "study_id": "es_180s_model_c_portability",
+  "terminal_decision": "PORTABILITY_CONFIRMED_TAIL_AND_STRUCTURE_UNPROVEN",
+  "train_2020_2023": {
+    "primary:LONG": {
+      "expanding_year_folds": [
+        {
+          "base_rate": 0.169703,
+          "fold": "fold_2021",
+          "pr_auc_over_base_rate": 1.8165,
+          "roc_auc": 0.685413,
+          "validation_year": 2021
+        },
+        {
+          "base_rate": 0.173657,
+          "fold": "fold_2022",
+          "pr_auc_over_base_rate": 1.8401,
+          "roc_auc": 0.694485,
+          "validation_year": 2022
+        },
+        {
+          "base_rate": 0.170471,
+          "fold": "fold_2023",
+          "pr_auc_over_base_rate": 1.7521,
+          "roc_auc": 0.677764,
+          "validation_year": 2023
+        }
+      ],
+      "final_fit_rows": 1100284,
+      "final_fit_unique_regimes": 8223,
+      "hyperparameters": {
+        "learning_rate": 0.039440343780424526,
+        "max_depth": 5,
+        "n_estimators": 100,
+        "num_leaves": 4,
+        "verbosity": -1
+      },
+      "mean_fold_pr_lift": 1.8029,
+      "mean_fold_roc_auc": 0.685887
+    },
+    "primary:SHORT": {
+      "expanding_year_folds": [
+        {
+          "base_rate": 0.192862,
+          "fold": "fold_2021",
+          "pr_auc_over_base_rate": 1.7559,
+          "roc_auc": 0.684017,
+          "validation_year": 2021
+        },
+        {
+          "base_rate": 0.172475,
+          "fold": "fold_2022",
+          "pr_auc_over_base_rate": 1.8959,
+          "roc_auc": 0.708505,
+          "validation_year": 2022
+        },
+        {
+          "base_rate": 0.18455,
+          "fold": "fold_2023",
+          "pr_auc_over_base_rate": 1.7898,
+          "roc_auc": 0.690591,
+          "validation_year": 2023
+        }
+      ],
+      "final_fit_rows": 936756,
+      "final_fit_unique_regimes": 7613,
+      "hyperparameters": {
+        "learning_rate": 0.028861842631876633,
+        "max_depth": 5,
+        "n_estimators": 200,
+        "num_leaves": 4,
+        "verbosity": -1
+      },
+      "mean_fold_pr_lift": 1.8139,
+      "mean_fold_roc_auc": 0.694371
+    }
+  },
+  "train_to_oos_retention": {
+    "primary:LONG": {
+      "pr_lift_retention": 0.9692,
+      "roc_auc_retention": 0.9749
+    },
+    "primary:SHORT": {
+      "pr_lift_retention": 0.9482,
+      "roc_auc_retention": 0.9742
+    }
+  },
+  "years_2025_2026_accessed": false
+}
