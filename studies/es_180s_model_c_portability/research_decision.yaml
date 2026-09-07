@@ -238,6 +238,18 @@ terminal_decisions:
     degrades, or the learned feature ranking diverges substantially from NQ.
   NO_MEANINGFUL_PORTABILITY: 'ES 2024 OOS shows no useful forward discrimination: ROC-AUC at or near chance,
     PR-AUC not meaningfully above the ES 2024 base rate, and no stable lift at the frozen ES TRAIN thresholds.'
+  PORTABILITY_CONFIRMED_TAIL_AND_STRUCTURE_UNPROVEN: 'ES 2024 OOS shows genuine two-sided forward discrimination
+    that survives the TRAIN->OOS transfer at a level comparable to the frozen NQ 180s parent, so
+    NO_MEANINGFUL_PORTABILITY is excluded and PARTIAL_PORTABILITY is contradicted (the transfer is neither
+    materially weaker nor one-sided). STRONG_PORTABILITY is a conjunction that cannot be evaluated: two of its
+    conjuncts -- stable lift at the frozen ES TRAIN P90/P95/P97.5 thresholds, and a learned feature structure of
+    the same character as NQ -- were never produced, because Platform V2 cannot express freeze-time TRAIN
+    percentile thresholds (the fit stage derives p90/p95 only on the month_folds path, per fold, and freeze()
+    writes thresholds: {} unconditionally) or native feature importance. Added to the vocabulary at close time,
+    on the researcher''s decision of 2026-09-06, to record the evidential state accurately rather than misfile a
+    two-sided transfer under a label asserting it was weak or one-sided. This decision asserts the primary
+    portability finding ONLY; it makes no claim about tail behaviour, timing discrimination or feature structure.
+    Superseded if the routed ANALYSIS_HARNESS_GAP is built and the study is re-run.'
 autonomy_decisions:
   platform_merge: auto_if_green
   closed_study_merge: auto_if_clean
