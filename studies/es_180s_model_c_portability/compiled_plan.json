@@ -320,7 +320,7 @@
     "windows": []
   },
   "closure": {
-    "composite_sha256": "da3d3ab4ee9bcd7e8c5987763e603ce89d8fb984252ebca9f3fccb6876325540",
+    "composite_sha256": "6d44da61d0649a99f3491ee413ae449c71de8dd1aaf793b64aa8ddadc0bf0222",
     "file_count": 90,
     "files": {
       "backtests/nt_runtime/compiled_study_loader.py": "37cf10d33f4565f5b16778277837d6b148a12199690281c93b74fbbd23f4554e",
@@ -344,7 +344,7 @@
       "features/trackers/regime_dual_ema.py": "79d9777db4279914b6f138ce9541c151ba7120b03c82300d6f8e0a31ca2d7081",
       "features/trackers/rolling_5m_productivity.py": "666be87d2234a3e8896bb08c6901e3303bf799273de37c0abc69f33af7e94077",
       "features/trackers/structural_regime_geometry.py": "83ad179b02a35391d277d41cbcf6fd2556eb09ca23eeb705ab48c71fc9007f27",
-      "research/analysis/diagnostic_ops.py": "3567f19f2bd55e9363b2202ff3253200042b6c6138566c0ca515757b114b5f81",
+      "research/analysis/diagnostic_ops.py": "87a13de52bbd39638230202042ed77309212c063a3f3912b09f0639cf8ce6a37",
       "research/analysis/errors.py": "0360870a6a601eb1055ddea586385f4773fbcd3ed91e96c21596e6e78762a691",
       "research/analysis/identity.py": "a5cf93fd6539093e974862d2fe4e839e7897fde2d760fcd4afc99ec3f42be5ae",
       "research/analysis/metrics.py": "b3c18f8e68467c7483e923a7a1bd147095b224c9eedb27795de0ba3e37c90b12",
@@ -386,7 +386,7 @@
       "research_workflow/host/strategy.py": "59f4cca85697b4d82296d7a5e440d72353c8af15d3770a68c51c78c99b5eb66e",
       "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
       "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
-      "research_workflow/lifecycle_v2.py": "e1fc67f65b2035e7b306e891013e43a00dddee6606c4f9501356a6b971fe65a0",
+      "research_workflow/lifecycle_v2.py": "4afdce38d4fc8c8f928581ef685909f8fb050be1d8094f8e26eed782ce8181f5",
       "research_workflow/locks.py": "8acc08e35fb743e2cd2f84d57b7a7e08ef4963a350fefb592377651f722b2258",
       "research_workflow/model_artifacts.py": "fb3ab0198d96e2531b4782ef0b341e7087406bbd5db3c3f20049af1d6de8cd49",
       "research_workflow/model_store.py": "5755d5e16509990e570dab3712ffc17cacc54280a563aefb9f30cf36a5fb9d80",
@@ -423,7 +423,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "cf6ec72acb3ab06b4f61d32538422c96d8da8d498db3202bda50c9000b1c1da1",
+        "composite_sha256": "d6a1942dd9ebda4af486811efe1938ac3446d8ef287ac68c5c97ace62881df4b",
         "files": [
           "backtests/nt_runtime/compiled_study_loader.py",
           "backtests/nt_runtime/data_plan.py",
@@ -513,7 +513,7 @@
         ]
       },
       "lifecycle": {
-        "composite_sha256": "abe9b99c99a9ba0baa1d6e7be34a6d9727666e7a49f655f4c7e90459627cab59",
+        "composite_sha256": "afad37997b95addd54da245846fb16be2a095b78fa437d8304e6d754bd2519f4",
         "files": [
           "research_workflow/closure_hash.py",
           "research_workflow/controller_contracts.py",
@@ -1046,7 +1046,7 @@
     "stream": "es_1s",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "e9faf3b0e1eb89d13eb5281bbde239d24ffb9e22962553fb57a30e9b02230eba",
+  "plan_sha256": "e1f5dfb86789741516379416b7d646fc6e2cc6688464f0f457dd02dfdd9d22e5",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1152,7 +1152,7 @@
     },
     "session": "RTH"
   },
-  "registry_sha256": "0fc9abf597a8936b8d1c4d3d9e73ea7553c73b569efd8d5055d24151ac155d0c",
+  "registry_sha256": "fcc616809185483f4525c48ac0a5437189ca440a9ff54625e637d19088787228",
   "session": {
     "censor_session": "RTH",
     "dataset": "ES_1S_V2_GLOBEX",
