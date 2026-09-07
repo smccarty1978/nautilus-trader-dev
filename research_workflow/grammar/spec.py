@@ -379,6 +379,12 @@ class AnalysisSpec(_Strict):
     artifacts: List[AnalysisArtifactSpec] = Field(default_factory=list)
 
 
+class DeliverableSpec(_Strict):
+    """An artifact and the exact compiled producer that writes it."""
+    artifact: str = Field(..., min_length=1)
+    producer: str = Field(..., min_length=1)
+
+
 class StudySpecV2(_Strict):
     study: StudySection
     streams: List[StreamSpec] = Field(..., min_length=1)
@@ -390,6 +396,7 @@ class StudySpecV2(_Strict):
     chronology: ChronologySpec
     model: Union[Literal["none"], ModelSpec] = "none"
     analysis: Optional[AnalysisSpec] = None
+    deliverables: List[Union[str, DeliverableSpec]] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _roles(self) -> "StudySpecV2":

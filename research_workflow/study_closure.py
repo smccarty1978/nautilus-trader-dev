@@ -17,6 +17,10 @@ from typing import Any, Dict, Optional
 
 CLOSURE_RELPATH = "artifacts/study_closure.json"
 SUPPORTED_SCHEMA_VERSIONS = (1,)
+V2_FINAL_EVIDENCE = {
+    "v2_analysis": "artifacts/experiment_analysis_v2.json",
+    "v2_decision": "artifacts/analysis_decision.json",
+}
 _REQUIRED_FIELDS = ("schema_version", "study_id", "status", "outcome", "terminal_decision")
 
 
@@ -78,6 +82,11 @@ def _require_mandatory_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> 
     ``STUDY_CLOSURE_INVALID`` (never a reopen: the workflow engine surfaces it as a
     terminal blocked state).
     """
+    bound = data.get("bound_evidence")
+    bound = bound if isinstance(bound, dict) else {}
+    for key, rel in V2_FINAL_EVIDENCE.items():
+        if (study_dir / rel).is_file() and key not in bound:
+            raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISSING: closure omits {rel}")
     art = study_dir / "artifacts"
     reached_train = (art / "train_experiment_freeze.json").is_file()
     reached_s16 = (art / "experiment_analysis.json").is_file()
@@ -121,6 +130,23 @@ def _authenticate_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> None:
         return
 
     import hashlib
+
+    # V2 terminal evidence: exact paths and mandatory raw-byte hashes. A missing,
+    # malformed or redirected binding must never authenticate an unrelated file.
+    for key, rel in V2_FINAL_EVIDENCE.items():
+        if key not in bound:
+            continue
+        evidence = bound[key]
+        if not isinstance(evidence, dict) or evidence.get("path") != rel:
+            raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MALFORMED: {key} must bind {rel}")
+        expected = evidence.get("artifact_file_sha256")
+        if not isinstance(expected, str) or len(expected) != 64 or any(c not in "0123456789abcdef" for c in expected):
+            raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MALFORMED: {key} requires a SHA-256")
+        path = study_dir / rel
+        if not path.is_file():
+            raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISSING: {rel}")
+        if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISMATCH: {rel}")
 
     # 1. Preexec audit seal
     if "preexec_seal_artifact_sha256" in bound:

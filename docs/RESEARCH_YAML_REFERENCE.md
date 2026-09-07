@@ -169,6 +169,9 @@ Predicate language: comparisons, `and/or/not`, `in [..]`, event tests `x.flipped
 | `analysis.artifacts[].name` | str | yes |  |  | Plain .json / .parquet / .md file name. | None. | `name: first_p90_cumulative_incidence.json` |
 | `analysis.artifacts[].source` | str | yes |  |  | The step whose output is written. | None. | `source: incidence` |
 | `analysis.artifacts[].kind` | enum | no | json | 'json', 'frame', 'observations' | json (the step payload), frame (its output frame), or observations (its long-form observation frame). | None. | `kind: frame` |
+| `deliverables` | list[str | object (DeliverableSpec)] | no | list() |  | Required artifact producer bindings; combined with research_decision.yaml deliverables. | An unresolved producer is MISSING_CAPABILITY before execution; no free-text equivalence is inferred. | `deliverables: [compiled_plan.json]` |
+| `deliverables[].artifact` | str | yes |  |  | Exact study-relative output path. | Must be emitted by an active compiled stage or a declared analysis step. | `artifact: artifacts/incidence.json` |
+| `deliverables[].producer` | str | yes |  |  | Exact stage:<stage> or analysis:<step_id> producer. | A registered capability alone is insufficient; this plan must produce the requested artifact. | `producer: analysis:incidence` |
 
 ## Notes
 

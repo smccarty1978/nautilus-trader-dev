@@ -287,6 +287,15 @@ A study is closed by writing a valid `artifacts/study_closure.json`:
 `research_decision.yaml` declares `terminal_decisions` — the decision must be one of them,
 as a key, a value, or the `KEY_VALUE` concatenation).
 
+V2 close binds present `artifacts/experiment_analysis_v2.json` and
+`artifacts/analysis_decision.json` under `bound_evidence.v2_analysis` / `v2_decision`, with
+exact relative paths and raw-file SHA-256 hashes. Validation rejects an omitted, malformed,
+redirected, deleted, or changed binding. A closure made before these stages has no evidence
+from them to bind. Pre-fix closures with these files but no binding fail current validation;
+the change never rewrites historical closures, invents a fresh attestation, or reopens a study.
+Historical validation remains at the study's sealed platform commit.
+
+
 `WorkflowEngine.advance()` recognizes it **first**, before any deterministic leaf and before
 stages 9/10/14/15 (TRAIN authorization, TRAIN execution, OOS open, OOS). It returns
 `terminal_state = STUDY_CLOSED`, `next_deterministic_action = null`, and surfaces the closure
@@ -1160,6 +1169,32 @@ scores frozen models from the model store and trains nothing.
 provider/tracker module, a per-binding proof, the year-role table, warmup and availability
 facts) **or** a typed `CapabilityGap` report. **No catalog is ever opened at compile time**:
 dataset facts come from `research/datasets/<id>.yaml`.
+
+**Deliverable-producer gate (END THE CYCLE, Wave 1).** `load_spec` includes the structured
+`deliverables` lists from both `study.yaml` and adjacent `research_decision.yaml`. The
+higher authority's obligations cannot be erased by a shorter study list. Every entry must
+resolve to an active compiled producer or compile returns `MISSING_CAPABILITY`, naming
+that entry. An exact artifact string can resolve directly; explicit bindings use:
+
+```yaml
+deliverables:
+  - artifact: compiled_plan.json
+    producer: stage:compile
+  - artifact: artifacts/incidence.json
+    producer: analysis:incidence  # must be an actual declared step AND output artifact
+```
+
+The lifecycle and compiler share `grammar/deliverables.py`'s stage output declarations.
+Conditional outputs require the corresponding plan configuration: a model for model
+artifacts, search space for tuning trials, declared TRAIN/dev years for partition outputs,
+and an analysis pipeline or dev years for analysis. Compiled `deliverables` records the
+bindings in the plan identity; controller spec freshness includes decision deliverables.
+Unknown prose, even with a known filename embedded in it, fails closed: filename matching
+cannot prove additional requested contents. Normalize the declaration explicitly at intake;
+never silently waive a deliverable or treat a known-risk note as a producer. This gate
+proves an artifact production route, not numerical correctness or equivalence to arbitrary
+prose in the research question. Historical study authorities are not rewritten or recompiled.
+
 
 ### 21.3 Typed capability gaps
 

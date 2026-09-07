@@ -1,0 +1,13 @@
+{
+  "STATUS": "OK",
+  "passed": 2,
+  "failed": 0,
+  "command": [
+    "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "scripts/test_delta.py",
+    "research_workflow/tests/test_docs_v2.py::test_generated_reference_and_registry_are_current",
+    "research_workflow/tests/test_redteam_v2_closure.py::test_every_declared_governance_module_is_in_plan_closure_files",
+    "--json"
+  ],
+  "git_diff_check": "PASS"
+}

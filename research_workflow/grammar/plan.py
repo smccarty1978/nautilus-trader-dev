@@ -41,6 +41,7 @@ class CompiledPlan:
     registry_sha256: str = ""
     features: Optional[Dict[str, Any]] = None
     analysis: Optional[Dict[str, Any]] = None
+    deliverables: List[Dict[str, str]] = field(default_factory=list)
     notes: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:

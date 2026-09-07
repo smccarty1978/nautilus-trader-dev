@@ -2,7 +2,8 @@
 
 Everything here is resolved from committed text (dataset YAML, the generated capability
 registry, the feature bundle, binding class declarations).  No catalog is opened, no
-provider is fed a bar, no study directory is read.  Binding proof is a compiler output:
+provider is fed a bar. load_spec reads the study and its decision deliverables.
+Binding proof is a compiler output:
 every declared primitive maps to exactly one runtime implementation, or the compile
 returns a typed gap.
 """
@@ -57,6 +58,7 @@ STAGE_CLOSURE_MODULES: Dict[str, Tuple[str, ...]] = {
     "lifecycle": (
         "research_workflow/lifecycle_v2.py", "research_workflow/governed_controller_v2.py",
         "research_workflow/governed_controller.py", "research_workflow/controller_contracts.py",
+        "research_workflow/workflow_engine.py",  # imported evidence-freshness helpers: lifecycle only
         "research_workflow/policy.py", "research_workflow/study_closure.py",
         "research_workflow/closure_hash.py", "research_workflow/roots.py", "research_workflow/locks.py",
         # W-4: policy.verify_historical_authority's legacy-authority hash rule is entirely
@@ -111,6 +113,18 @@ def load_spec(path: Path) -> Dict[str, Any]:
     data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
     if not isinstance(data, dict):
         raise CompileError(f"SPEC_NOT_A_MAPPING: {p}")
+    # The decision contract is higher authority. Append its obligations: an empty or
+    # weaker study.yaml list cannot erase them. No prose or known-risk note is a waiver.
+    decision_path = p.parent / "research_decision.yaml"
+    if decision_path.is_file():
+        decision = yaml.safe_load(decision_path.read_text(encoding="utf-8")) or {}
+        if not isinstance(decision, dict):
+            raise CompileError(f"DECISION_NOT_A_MAPPING: {decision_path}")
+        if "deliverables" in decision:
+            declared = decision["deliverables"]
+            if not isinstance(declared, list) or not isinstance(data.get("deliverables", []), list):
+                raise CompileError("INVALID_PARAMETERIZATION: deliverables must be lists")
+            data["deliverables"] = list(data.get("deliverables", [])) + declared
     return data
 
 
@@ -922,7 +936,7 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
 # compiled availability table always carries it, and is the extension point for future
 # derived-score kinds (e.g. ES->NQ or asynchronous multi-stream scoring).
 DERIVED_SCORE_AVAILABILITY_RULES: Dict[str, str] = {
-    "frozen_external_model_score": "max(inputs) ∪ evaluation",
+    "frozen_external_model_score": "max(inputs) âˆª evaluation",
 }
 
 
@@ -953,7 +967,7 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
                              "params": {"spec": body, "direction": direction_ref}, "inputs": {}, "subscriptions": [],
                              "fields": [], "epoch_fields": [], "events": [], "cadence": FrozenExternalScoreBinding.CADENCE,
                              "warmup_bars": 0, "instrument": ctx.execution_symbol, "derived_column": d.name,
-                             "availability_rule": DERIVED_SCORE_AVAILABILITY_RULES.get(body.get("kind"), "max(inputs) ∪ evaluation"),
+                             "availability_rule": DERIVED_SCORE_AVAILABILITY_RULES.get(body.get("kind"), "max(inputs) âˆª evaluation"),
                              "availability_dependencies": deps})
         ctx.tracker_meta[f"derived.{d.name}"] = FrozenExternalScoreBinding
         ctx.binding_proof.append({"kind": "derived_input", "id": d.name, "capability": FrozenExternalScoreBinding.CAPABILITY,
@@ -1354,7 +1368,7 @@ def _resolve_closure(ctx: _Ctx, model: Optional[Dict[str, Any]] = None) -> Dict[
     # reuse key hashes separately (replay_plan_sha256); keeping it as a seed only dragged the analysis and
     # controller modules it imports into the key. grammar.spec / grammar.predicates / grammar.gaps /
     # grammar.plan re-enter through the host's own imports when the host uses them; nothing is enumerated.
-    # replay ⊆ collection always, so the frozen manifest (the union below) is unchanged by this stage.
+    # replay âŠ† collection always, so the frozen manifest (the union below) is unchanged by this stage.
     # The smoke and every partition run trace their imports against this set and HALT on an escape.
     stage_sets["replay"] = transitive_closure_files(set(ctx.closure_files) - set(_COMPILER_MODULES) - set(ctx.replay_excluded), ctx.repo_root)
     # The governance stage sets stay the declared lists (red-team packet A/A2: a perturbation moves its own
@@ -1427,6 +1441,61 @@ def _resolve_warmup_and_availability(ctx: _Ctx) -> Tuple[Dict[str, Any], Dict[st
 # --------------------------------------------------------------------------- #
 # entry point
 # --------------------------------------------------------------------------- #
+def _resolve_deliverables(ctx: _Ctx, model: Optional[Dict[str, Any]],
+                          analysis: Optional[Dict[str, Any]]) -> List[Dict[str, str]]:
+    """Bind every obligation to an active producer; unknown prose never becomes proof.
+
+    Lifecycle filenames come from the SAME declarations the writer/audit packets use.
+    Analysis artifacts bind the specific compiled step, not a generic analysis capability.
+    This proves production, not numerical correctness or free-text semantic equivalence.
+    """
+    from research_workflow.grammar.deliverables import DELIVERABLES, FIT_TUNING_DELIVERABLES
+    producers = {}
+    for stage, paths in DELIVERABLES.items():
+        # Exclude inactive paths: static stage membership alone is not production.
+        if stage == "oos" and not ctx.spec.chronology.dev:
+            continue
+        if stage == "fit" and not model:
+            continue
+        if stage == "analyze" and not analysis and not ctx.spec.chronology.dev:
+            continue
+        for path in paths:
+            # Expand only the writer's declared templates, using authorized plan years.
+            concrete = [path]
+            if "{candidates,observations}" in path:
+                concrete = [path.replace("{candidates,observations}", name)
+                            for name in ("candidates", "observations")]
+            if "<year>" in path:
+                years = ctx.spec.chronology.dev if stage == "oos" else ctx.spec.chronology.train
+                concrete = [item.replace("<year>", str(year)) for item in concrete for year in years]
+            for item in concrete:
+                producers[item] = f"stage:{stage}"
+    if not model:
+        producers["artifacts/fit_summary.json"] = "stage:fit"
+    if model and model.get("search_space"):
+        for path in FIT_TUNING_DELIVERABLES:
+            producers[path] = "stage:fit"
+    for artifact in (analysis or {}).get("artifacts", []):
+        producers[f"artifacts/{artifact['name']}"] = f"analysis:{artifact['source']}"
+    bindings = []
+    for i, declaration in enumerate(ctx.spec.deliverables):
+        if isinstance(declaration, str):
+            artifact, requested = declaration, None
+        else:
+            artifact, requested = declaration.artifact, declaration.producer
+        producer = producers.get(artifact)
+        if producer is None or (requested is not None and requested != producer):
+            ctx.gap(GapKind.MISSING_CAPABILITY, f"deliverables[{i}]",
+                    f"No compiled producer for declared deliverable {artifact!r}"
+                    + (f" from {requested!r}" if requested else "")
+                    + "; declare an exact produced artifact and producer; unresolved prose is not a binding")
+            continue
+        binding = {"artifact": artifact, "producer": producer}
+        if binding not in bindings:
+            bindings.append(binding)
+    return bindings
+
+
 def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Optional[Mapping[str, Any]] = None,
                   datasets_dir: Optional[Path] = None, extra_bindings: Optional[Mapping[str, Any]] = None) -> CompileOutcome:
     repo_root = Path(repo_root)
@@ -1465,6 +1534,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
         return CompileOutcome(None, ctx.gaps)
     warmup, availability = _resolve_warmup_and_availability(ctx)
     analysis = _resolve_analysis(ctx, chronology)
+    deliverables = _resolve_deliverables(ctx, model, analysis)
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
     closure = _resolve_closure(ctx, model)
@@ -1475,7 +1545,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
         triggers=triggers, outcome=outcome, columns=columns, chronology=chronology, model=model, closure=closure,
         binding_proof=ctx.binding_proof, warmup=warmup, availability=availability, features=ctx.features,
         spec_sha256=spec_sha, registry_sha256=str(registry.get("content_sha256", "")), notes=list(ctx.notes),
-        analysis=analysis,
+        analysis=analysis, deliverables=deliverables,
     ).seal()
     return CompileOutcome(plan, None)
 
