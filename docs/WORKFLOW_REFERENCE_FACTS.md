@@ -8,6 +8,29 @@ on a number here** — do not quote these figures into a study report.
 
 ---
 
+## Measured Wave 1 broad merge gate (2026-09-07)
+
+`python scripts/test_delta.py research_workflow/tests scripts/tests --json`
+completed in **74m41s** (4481.273 seconds wall time), measured around the subprocess
+on commit `5d3aad6a7c529677f8066e34d63be64ac4d0b730`, Python 3.13.7, Windows.
+The default `not slow` filter was active. The result card counted **2,088 tests**:
+**2,027 passed / 57 known failures / 1 environmental failure / 3 newly classified failures**.
+The gate refused the merge; registry validation and host lint passed afterward.
+
+Evidence: `artifacts/platform_v2/end_cycle/wave1/triage/broad_measurement.json`.
+The command above re-derives the test result; wrap it with PowerShell
+`Measure-Command { python scripts/test_delta.py research_workflow/tests scripts/tests --json }`
+to re-derive wall time. This is a reproducibility command, not an instruction to rerun
+it during triage. The earlier assertion of 2,129 tests and more than 2.5 hours is not
+the measured result for this scope and commit; the script help's claim of minutes is
+also not a reliable estimate. This is the first completed timed broad run recorded here.
+
+Wave 2 constraint: this expensive and permissive gate still detected three actionable
+findings. Narrow scope and repair classification without discarding the checks that
+caught them; do not assume its work was pure overhead.
+
+---
+
 ## Feature authority bundle
 
 | Fact | Value as of 2026-08-25 | Re-derive with |

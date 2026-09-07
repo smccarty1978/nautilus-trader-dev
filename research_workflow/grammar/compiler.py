@@ -936,7 +936,7 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
 # compiled availability table always carries it, and is the extension point for future
 # derived-score kinds (e.g. ES->NQ or asynchronous multi-stream scoring).
 DERIVED_SCORE_AVAILABILITY_RULES: Dict[str, str] = {
-    "frozen_external_model_score": "max(inputs) âˆª evaluation",
+    "frozen_external_model_score": "max(inputs) ∪ evaluation",
 }
 
 
@@ -967,7 +967,7 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
                              "params": {"spec": body, "direction": direction_ref}, "inputs": {}, "subscriptions": [],
                              "fields": [], "epoch_fields": [], "events": [], "cadence": FrozenExternalScoreBinding.CADENCE,
                              "warmup_bars": 0, "instrument": ctx.execution_symbol, "derived_column": d.name,
-                             "availability_rule": DERIVED_SCORE_AVAILABILITY_RULES.get(body.get("kind"), "max(inputs) âˆª evaluation"),
+                             "availability_rule": DERIVED_SCORE_AVAILABILITY_RULES.get(body.get("kind"), "max(inputs) ∪ evaluation"),
                              "availability_dependencies": deps})
         ctx.tracker_meta[f"derived.{d.name}"] = FrozenExternalScoreBinding
         ctx.binding_proof.append({"kind": "derived_input", "id": d.name, "capability": FrozenExternalScoreBinding.CAPABILITY,
@@ -1368,7 +1368,7 @@ def _resolve_closure(ctx: _Ctx, model: Optional[Dict[str, Any]] = None) -> Dict[
     # reuse key hashes separately (replay_plan_sha256); keeping it as a seed only dragged the analysis and
     # controller modules it imports into the key. grammar.spec / grammar.predicates / grammar.gaps /
     # grammar.plan re-enter through the host's own imports when the host uses them; nothing is enumerated.
-    # replay âŠ† collection always, so the frozen manifest (the union below) is unchanged by this stage.
+    # replay ⊆ collection always, so the frozen manifest (the union below) is unchanged by this stage.
     # The smoke and every partition run trace their imports against this set and HALT on an escape.
     stage_sets["replay"] = transitive_closure_files(set(ctx.closure_files) - set(_COMPILER_MODULES) - set(ctx.replay_excluded), ctx.repo_root)
     # The governance stage sets stay the declared lists (red-team packet A/A2: a perturbation moves its own

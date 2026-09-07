@@ -1,0 +1,40 @@
+[
+  {
+    "failure": "F2",
+    "checkout": "branch",
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-m",
+      "pytest",
+      "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing",
+      "-q",
+      "-rA",
+      "--tb=long",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "cwd": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-end_cycle_wave1",
+    "returncode": 1,
+    "seconds": 2.4250819999724627,
+    "log": "F2_branch.log"
+  },
+  {
+    "failure": "F2",
+    "checkout": "main",
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-m",
+      "pytest",
+      "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing",
+      "-q",
+      "-rA",
+      "--tb=long",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "cwd": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader",
+    "returncode": 0,
+    "seconds": 5.434975199983455,
+    "log": "F2_main.log"
+  }
+]

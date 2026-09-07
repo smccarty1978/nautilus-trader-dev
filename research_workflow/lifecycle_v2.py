@@ -858,7 +858,7 @@ class V2Lifecycle:
             if len(digests) > 1:
                 raise LifecycleV2Error(f"WINDOW_DATASET_MISMATCH: {period}-{year} windows read different datasets")
             extra["window_rows"] = [int(len(r["candidates"])) for r in runs]
-        # Cumulative replay trace (Reading 2, Â§3.2): every partition run records the repo modules first
+        # Cumulative replay trace (Reading 2, §3.2): every partition run records the repo modules first
         # imported during its replay; any module outside the plan's replay-stage closure is a HALT --
         # the partition is not persisted and the key is never widened.
         closure = collection_closure(plan)
