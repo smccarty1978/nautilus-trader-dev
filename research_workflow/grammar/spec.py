@@ -224,9 +224,9 @@ class ChronologySpec(_Strict):
     # less than before: reuse is a second, narrower identity, not a bypass.
     partition_reuse: Literal["off", "replay_closure"] = "off"
     # Shadow verification of reuse: ``every_run`` recomputes one reused partition per collection run and
-    # requires byte-identity (bake-in default); ``sampled`` recomputes on one run in four. A mismatch is
+    # requires byte-identity; ``sampled`` recomputes on one run in four. A mismatch is
     # terminal (PARTITION_REUSE_SHADOW_MISMATCH): the key is unsound and every reuse since is suspect.
-    partition_reuse_shadow: Literal["every_run", "sampled"] = "every_run"
+    partition_reuse_shadow: Literal["every_run", "sampled"] = "sampled"
 
 
 class ValidationSpec(_Strict):

@@ -631,6 +631,8 @@ A **new study session** merges `main` into the study worktree, `ws claim`s the s
 INVALID_PARAMETERIZATION, AMBIGUOUS_TEMPORAL_SEMANTICS and SEMANTIC_DECISION_REQUIRED are study-side:
 fix or declare in the YAML / decision contract and recompile; no handoff needed.
 
+Any script reading or writing repository text files specifies `encoding='utf-8'` explicitly.
+
 ### N.2 One lifecycle phase per owner session
 
 | session | does | ends when | handoff |
