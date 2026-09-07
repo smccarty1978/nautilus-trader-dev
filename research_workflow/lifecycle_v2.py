@@ -124,6 +124,35 @@ def _model_record_id(m: Mapping[str, Any]) -> str:
     return str(mid)
 
 
+def _model_record_subset(m: Mapping[str, Any]) -> Dict[str, Any]:
+    """The population slice a model record was fit on.
+
+    Absent on a record written before the subset travelled with the record. Defaulting that to
+    "no filter" is the dangerous reading: a direction-specific cell would then be scored over the
+    whole undirected population and report a plausible, wrong number. Refuse instead -- the
+    remedy is a refit under the current platform, which the composite change already forces.
+    """
+    if "subset" in m:
+        return dict(m.get("subset") or {})
+    if m.get("arm") or m.get("cell"):
+        raise LifecycleV2Error(
+            f"MODEL_RECORD_SUBSET_MISSING: record {_model_record_name(m)!r} carries no 'subset'; refit under the current platform")
+    return {}
+
+
+def _model_record_metrics(models: Mapping[str, Any]) -> Any:
+    """TRAIN metrics for the freeze record.
+
+    A single-arm/single-cell fit mirrors its metrics to the top level; a multi-cell fit keeps them
+    per record. Reading only the top level makes the freeze of a multi-cell study carry no TRAIN
+    metrics at all.
+    """
+    if models.get("metrics") is not None:
+        return models["metrics"]
+    records = models.get("models") or []
+    return {_model_record_name(m): m.get("metrics") for m in records} or None
+
+
 def spec_sha256(study: Path) -> Optional[str]:
     p = Path(study) / "study.yaml"
     if not p.is_file():
@@ -1367,8 +1396,13 @@ class V2Lifecycle:
                    "model_hashes": ({"primary": models["model_id"]} if models.get("model_id")
                                     else {_model_record_name(m): _model_record_id(m) for m in models.get("models") or []}),
                    "model_canonical_sha256": model_canonical_sha256,
-                   "thresholds": {}, "deciles": {}, "new_models_trained": bool(models.get("model_id")),
-                   "merge_identity": ident, "metrics": models.get("metrics"), "label_column": plan["outcome"].get("label_column")}
+                   "thresholds": {}, "deciles": {},
+                   # Provenance is a fact of the FIT, not of whether that fit happened to mirror a
+                   # single model to the top level. Keying either field on `model_id` made a
+                   # multi-cell study's freeze declare that it trained no models and carry no TRAIN
+                   # metrics -- a false record, in the artifact reuse paths and the platform cards read.
+                   "new_models_trained": bool(models.get("new_models_trained") or models.get("model_id")),
+                   "merge_identity": ident, "metrics": _model_record_metrics(models), "label_column": plan["outcome"].get("label_column")}
         path = write_train_freeze(self.study, payload)
         return {"status": "PASS", "outputs": [str(path)]}
 
@@ -1523,11 +1557,11 @@ class V2Lifecycle:
                 csha = freeze_canonical.get(nm)
                 if not csha:
                     raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: model '{nm}' has no TRAIN freeze canonical sha")
-                bound_models.append({"name": nm, "id": _model_record_id(m), "subset": dict(m.get("subset") or {}),
+                bound_models.append({"name": nm, "id": _model_record_id(m), "subset": _model_record_subset(m),
                                      "label": label, "expect": {"study_id": plan["study"]["id"], "canonical_sha256": csha}})
             summary["frozen_models_oos"] = self._score_models(self._train_frame_all_labels(plan, base, [int(y) for y in years]), bound_models)
             summary["train_metrics"] = [{"name": _model_record_name(m), "id": _model_record_id(m),
-                                         "direction": m.get("direction"), "subset": dict(m.get("subset") or {}),
+                                         "direction": m.get("direction"), "subset": _model_record_subset(m),
                                          "metrics": m.get("metrics")} for m in models["models"]]
         elif models:
             # An experiment_models.json that exists but matches no scorable shape must fail loudly:

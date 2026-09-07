@@ -1,0 +1,22 @@
+{
+  "audits": {
+    "causal": {
+      "auditor": "lookahead-auditor:008_causal_audit_0e982346",
+      "report_sha256": "be92afa1992f19a2f4134006f0018ded9c800fd7bc063e5abc4caf2800a82c2b",
+      "status_sha256": "c88985c84a25a5c744bea622c42ac5346a1455b71f5eeb6097af37a96ef6cffb"
+    },
+    "contract": {
+      "auditor": "contract-checker:009_contract_audit_9d99d5bb",
+      "report_sha256": "4c045599bea34ace06585969f8ca8c712fba6520fd75d745394cd8e5969dba6e",
+      "status_sha256": "39114c027dd1e3058733e9f501451dda607b1039cd549af23623c869d96b090c"
+    }
+  },
+  "composite_seal_hash": "f75b827efbbf6471664fa0c41484648fc822e7df9749e03d0cc2c3a35aa9d65b",
+  "execution_manifest_composite_sha256": "6d44da61d0649a99f3491ee413ae449c71de8dd1aaf793b64aa8ddadc0bf0222",
+  "plan_sha256": "e1f5dfb86789741516379416b7d646fc6e2cc6688464f0f457dd02dfdd9d22e5",
+  "platform": "v2",
+  "registry_sha256": "fcc616809185483f4525c48ac0a5437189ca440a9ff54625e637d19088787228",
+  "schema_version": 2,
+  "sealed_at_utc": "2026-09-06T18:22:25.606022+00:00",
+  "study_id": "es_180s_model_c_portability"
+}

@@ -1,0 +1,55 @@
+{
+  "candidates_count_total": 2314,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true
+  },
+  "date": "2021-01-05",
+  "execution_manifest_composite_sha256": "6d44da61d0649a99f3491ee413ae449c71de8dd1aaf793b64aa8ddadc0bf0222",
+  "generated_at_utc": "2026-09-06T18:23:37.255904+00:00",
+  "manifest": {
+    "candidates_sha256": "ba7e40b5ea5476f5ba6e94cb4e7f4f35072861977aa7f066fa0be5dd49af3408",
+    "composite_seal_hash": "f75b827efbbf6471664fa0c41484648fc822e7df9749e03d0cc2c3a35aa9d65b",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "ES_1S_V2_GLOBEX",
+      "logical_digest": "9f38a41edca5b72a71866846ec9aa15d4cf205388d22aabe025250eefbf0068a"
+    },
+    "date": "2021-01-05",
+    "elapsed_s": 3.6850456999382004,
+    "execution_manifest_sha256": "6d44da61d0649a99f3491ee413ae449c71de8dd1aaf793b64aa8ddadc0bf0222",
+    "kind": "smoke",
+    "observations_sha256": "2c3cae8f086fc35d11ca063de39db642d534b2b964f41c39fa76ff404bb0d693",
+    "plan_sha256": "e1f5dfb86789741516379416b7d646fc6e2cc6688464f0f457dd02dfdd9d22e5",
+    "rows": {
+      "candidates": 2314,
+      "observations": 2314
+    },
+    "stats": {
+      "bars": 93720,
+      "bars_by_stream": {
+        "es_1m": 2789,
+        "es_1s": 90931
+      },
+      "candidates": 2314,
+      "dropped_outside_primary": {
+        "candidates": 2702,
+        "observations": 2702
+      },
+      "epochs": 17844,
+      "observations": 2314,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-06T18:23:37.239191+00:00"
+  },
+  "observations_count_total": 2314,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-es_180s_model_c_portability\\studies\\es_180s_model_c_portability\\runs\\20260906_182330_es_180s_model_c_portability_smoke",
+  "sealed_composite_sha256": "f75b827efbbf6471664fa0c41484648fc822e7df9749e03d0cc2c3a35aa9d65b",
+  "status": "ACCEPTED",
+  "study_name": "es_180s_model_c_portability",
+  "validator": "research_workflow.lifecycle_v2"
+}

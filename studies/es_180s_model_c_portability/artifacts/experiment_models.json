@@ -1,0 +1,224 @@
+{
+  "family": "lightgbm",
+  "final_train_validation_years": [],
+  "fold_protocol": "expanding_years",
+  "generated_at_utc": "2026-09-06T20:09:19.496216+00:00",
+  "label_column": "target_flip_within_horizon",
+  "models": [
+    {
+      "arm": "primary",
+      "baseline_arm": true,
+      "cell": "LONG",
+      "direction": "1",
+      "features": [
+        "prior_1m_regime_efficiency",
+        "prior_5m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_5m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "final_fit_rows": 1100284,
+      "final_fit_unique_regimes": 8223,
+      "hyperparameters": {
+        "learning_rate": 0.039440343780424526,
+        "max_depth": 5,
+        "n_estimators": 100,
+        "num_leaves": 4,
+        "verbosity": -1
+      },
+      "metrics": {
+        "final_validation": null,
+        "folds": [
+          {
+            "fit_years": [
+              2020
+            ],
+            "fold": "fold_2021",
+            "metrics": {
+              "base_rate": 0.16970300264816623,
+              "brier": 0.1316587483418107,
+              "n": 263201,
+              "positives": 44666,
+              "pr_auc": 0.30826794141006175,
+              "pr_auc_over_base_rate": 1.8165143609696337,
+              "roc_auc": 0.6854130661637529,
+              "unique_regimes": 2059
+            },
+            "status": "OK",
+            "validation_year": 2021
+          },
+          {
+            "fit_years": [
+              2020,
+              2021
+            ],
+            "fold": "fold_2022",
+            "metrics": {
+              "base_rate": 0.17365653729290093,
+              "brier": 0.13332063878044206,
+              "n": 282051,
+              "positives": 48980,
+              "pr_auc": 0.3195476468616135,
+              "pr_auc_over_base_rate": 1.8401129715182718,
+              "roc_auc": 0.6944845459329773,
+              "unique_regimes": 2007
+            },
+            "status": "OK",
+            "validation_year": 2022
+          },
+          {
+            "fit_years": [
+              2020,
+              2021,
+              2022
+            ],
+            "fold": "fold_2023",
+            "metrics": {
+              "base_rate": 0.17047143618363855,
+              "brier": 0.1330803831099037,
+              "n": 285256,
+              "positives": 48628,
+              "pr_auc": 0.29869075457170036,
+              "pr_auc_over_base_rate": 1.7521454694025038,
+              "roc_auc": 0.6777639617437144,
+              "unique_regimes": 2098
+            },
+            "status": "OK",
+            "validation_year": 2023
+          }
+        ],
+        "tuning": null
+      },
+      "model_id": "6514583fd181758710092d8fe41e803808e537633965c969602a4de28e88e2bd",
+      "model_store_tier": "registry",
+      "n_features": 13,
+      "subset": {
+        "regime_direction": 1
+      }
+    },
+    {
+      "arm": "primary",
+      "baseline_arm": true,
+      "cell": "SHORT",
+      "direction": "-1",
+      "features": [
+        "prior_1m_regime_efficiency",
+        "prior_5m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_5m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "final_fit_rows": 936756,
+      "final_fit_unique_regimes": 7613,
+      "hyperparameters": {
+        "learning_rate": 0.028861842631876633,
+        "max_depth": 5,
+        "n_estimators": 200,
+        "num_leaves": 4,
+        "verbosity": -1
+      },
+      "metrics": {
+        "final_validation": null,
+        "folds": [
+          {
+            "fit_years": [
+              2020
+            ],
+            "fold": "fold_2021",
+            "metrics": {
+              "base_rate": 0.19286189943184234,
+              "brier": 0.14488615232925614,
+              "n": 211737,
+              "positives": 40836,
+              "pr_auc": 0.3386502384399405,
+              "pr_auc_over_base_rate": 1.7559208917758273,
+              "roc_auc": 0.6840168862360105,
+              "unique_regimes": 1891
+            },
+            "status": "OK",
+            "validation_year": 2021
+          },
+          {
+            "fit_years": [
+              2020,
+              2021
+            ],
+            "fold": "fold_2022",
+            "metrics": {
+              "base_rate": 0.1724749267369264,
+              "brier": 0.13200768755517345,
+              "n": 274695,
+              "positives": 47378,
+              "pr_auc": 0.32699974754850725,
+              "pr_auc_over_base_rate": 1.8959262875772975,
+              "roc_auc": 0.7085053648299702,
+              "unique_regimes": 1936
+            },
+            "status": "OK",
+            "validation_year": 2022
+          },
+          {
+            "fit_years": [
+              2020,
+              2021,
+              2022
+            ],
+            "fold": "fold_2023",
+            "metrics": {
+              "base_rate": 0.1845497671584628,
+              "brier": 0.1398816963913378,
+              "n": 229770,
+              "positives": 42404,
+              "pr_auc": 0.3303041465544051,
+              "pr_auc_over_base_rate": 1.7897835995143303,
+              "roc_auc": 0.6905910805823672,
+              "unique_regimes": 1864
+            },
+            "status": "OK",
+            "validation_year": 2023
+          }
+        ],
+        "tuning": null
+      },
+      "model_id": "8ebbb08b2e4dc7f3b0f791b1a2fd6589a88ccc4b2b92911b83bc29230eda49e1",
+      "model_store_tier": "registry",
+      "n_features": 13,
+      "subset": {
+        "regime_direction": -1
+      }
+    }
+  ],
+  "month_folds": [],
+  "new_models_trained": true,
+  "paired_deltas_vs_baseline_arm": {},
+  "plan_sha256": "e1f5dfb86789741516379416b7d646fc6e2cc6688464f0f457dd02dfdd9d22e5",
+  "reference_models": [],
+  "rows": {
+    "binary": 2037040,
+    "total": 2051318
+  },
+  "schema_version": 3,
+  "training_population_identity": "b1b0e2dda74715b580ee61c456c0fdf74b16f8c5df805328773eb5cca6629968",
+  "tuning_years": [
+    2020,
+    2021,
+    2022,
+    2023
+  ]
+}

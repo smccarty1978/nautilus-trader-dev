@@ -1,0 +1,292 @@
+{
+  "authority": "plan.chronology.dev",
+  "contract": "label",
+  "dispositions": {
+    "CENSORED": 3185,
+    "LABELED_NEGATIVE": 428516,
+    "LABELED_POSITIVE": 84908
+  },
+  "frozen_models_oos": [
+    {
+      "expect": {
+        "canonical_sha256": "167f9b5d3ead1c41ce547cb7f3197c9bcb0675391cc9f663c3b01509b596f275",
+        "study_id": "es_180s_model_c_portability"
+      },
+      "id": "6514583fd181758710092d8fe41e803808e537633965c969602a4de28e88e2bd",
+      "inputs": [
+        "prior_1m_regime_efficiency",
+        "prior_5m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_5m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "label": "target_flip_within_horizon",
+      "lineage": {
+        "cell_id": "LONG",
+        "direction": "1",
+        "family": "lightgbm",
+        "study_id": "es_180s_model_c_portability",
+        "target_arm": "primary",
+        "train_years": [
+          2020,
+          2021,
+          2022,
+          2023
+        ]
+      },
+      "metrics_by_year": {
+        "2024": {
+          "brier": 0.12584354936957293,
+          "n": 287264,
+          "positives": 45072,
+          "pr_auc": 0.2741623977175075,
+          "roc_auc": 0.6686569160355594,
+          "score_digest": "3b045d7dbd28cc7ec6c0f3a505386f1ee1378404099a068f4127042e1b2e699e"
+        }
+      },
+      "model_authentication": {
+        "canonical_sha256": "167f9b5d3ead1c41ce547cb7f3197c9bcb0675391cc9f663c3b01509b596f275",
+        "feature_contract_sha256": "c60e2838a747f1ddd884fa3931187b6ba394fef617c03dda1fb9336167828e03",
+        "golden": {
+          "max_abs_diff": 0.0,
+          "model_id": "6514583fd181758710092d8fe41e803808e537633965c969602a4de28e88e2bd",
+          "n_rows": 256,
+          "status": "PASS"
+        },
+        "identity_rule": "v2_lineage_sha256",
+        "model_id": "6514583fd181758710092d8fe41e803808e537633965c969602a4de28e88e2bd",
+        "selection_status": "selected",
+        "tier": "registry"
+      },
+      "name": "primary:LONG",
+      "rows_scored": 287264,
+      "subset": {
+        "regime_direction": 1
+      }
+    },
+    {
+      "expect": {
+        "canonical_sha256": "230b745ea965e93f080dd3aeea72c1c91d183c74d72f66dc773f5a4c8b414077",
+        "study_id": "es_180s_model_c_portability"
+      },
+      "id": "8ebbb08b2e4dc7f3b0f791b1a2fd6589a88ccc4b2b92911b83bc29230eda49e1",
+      "inputs": [
+        "prior_1m_regime_efficiency",
+        "prior_5m_regime_efficiency",
+        "prior_1m_regime_mfe_atr",
+        "prior_5m_regime_mfe_atr",
+        "prior_1m_regime_range_atr",
+        "prior_5m_regime_range_atr",
+        "rolling_300s_retention_ratio",
+        "rolling_300s_current_progress_atr",
+        "rolling_300s_max_progress_atr",
+        "rolling_300s_giveback_atr",
+        "arrival_velocity",
+        "arrival_acceleration",
+        "ema_slope"
+      ],
+      "label": "target_flip_within_horizon",
+      "lineage": {
+        "cell_id": "SHORT",
+        "direction": "-1",
+        "family": "lightgbm",
+        "study_id": "es_180s_model_c_portability",
+        "target_arm": "primary",
+        "train_years": [
+          2020,
+          2021,
+          2022,
+          2023
+        ]
+      },
+      "metrics_by_year": {
+        "2024": {
+          "brier": 0.13672201619931482,
+          "n": 226160,
+          "positives": 39836,
+          "pr_auc": 0.30295374930971,
+          "roc_auc": 0.6764254001020766,
+          "score_digest": "7417dc2a17844d382fad203c0ce181ddd1f8ce44b76d01441932d74d4fed4036"
+        }
+      },
+      "model_authentication": {
+        "canonical_sha256": "230b745ea965e93f080dd3aeea72c1c91d183c74d72f66dc773f5a4c8b414077",
+        "feature_contract_sha256": "c60e2838a747f1ddd884fa3931187b6ba394fef617c03dda1fb9336167828e03",
+        "golden": {
+          "max_abs_diff": 0.0,
+          "model_id": "8ebbb08b2e4dc7f3b0f791b1a2fd6589a88ccc4b2b92911b83bc29230eda49e1",
+          "n_rows": 256,
+          "status": "PASS"
+        },
+        "identity_rule": "v2_lineage_sha256",
+        "model_id": "8ebbb08b2e4dc7f3b0f791b1a2fd6589a88ccc4b2b92911b83bc29230eda49e1",
+        "selection_status": "selected",
+        "tier": "registry"
+      },
+      "name": "primary:SHORT",
+      "rows_scored": 226160,
+      "subset": {
+        "regime_direction": -1
+      }
+    }
+  ],
+  "generated_at_utc": "2026-09-06T20:31:25.226179+00:00",
+  "oos_years": [
+    2024
+  ],
+  "plan_sha256": "e1f5dfb86789741516379416b7d646fc6e2cc6688464f0f457dd02dfdd9d22e5",
+  "rows": 516609,
+  "schema_version": 2,
+  "train_metrics": [
+    {
+      "direction": "1",
+      "id": "6514583fd181758710092d8fe41e803808e537633965c969602a4de28e88e2bd",
+      "metrics": {
+        "final_validation": null,
+        "folds": [
+          {
+            "fit_years": [
+              2020
+            ],
+            "fold": "fold_2021",
+            "metrics": {
+              "base_rate": 0.16970300264816623,
+              "brier": 0.1316587483418107,
+              "n": 263201,
+              "positives": 44666,
+              "pr_auc": 0.30826794141006175,
+              "pr_auc_over_base_rate": 1.8165143609696337,
+              "roc_auc": 0.6854130661637529,
+              "unique_regimes": 2059
+            },
+            "status": "OK",
+            "validation_year": 2021
+          },
+          {
+            "fit_years": [
+              2020,
+              2021
+            ],
+            "fold": "fold_2022",
+            "metrics": {
+              "base_rate": 0.17365653729290093,
+              "brier": 0.13332063878044206,
+              "n": 282051,
+              "positives": 48980,
+              "pr_auc": 0.3195476468616135,
+              "pr_auc_over_base_rate": 1.8401129715182718,
+              "roc_auc": 0.6944845459329773,
+              "unique_regimes": 2007
+            },
+            "status": "OK",
+            "validation_year": 2022
+          },
+          {
+            "fit_years": [
+              2020,
+              2021,
+              2022
+            ],
+            "fold": "fold_2023",
+            "metrics": {
+              "base_rate": 0.17047143618363855,
+              "brier": 0.1330803831099037,
+              "n": 285256,
+              "positives": 48628,
+              "pr_auc": 0.29869075457170036,
+              "pr_auc_over_base_rate": 1.7521454694025038,
+              "roc_auc": 0.6777639617437144,
+              "unique_regimes": 2098
+            },
+            "status": "OK",
+            "validation_year": 2023
+          }
+        ],
+        "tuning": null
+      },
+      "name": "primary:LONG",
+      "subset": {
+        "regime_direction": 1
+      }
+    },
+    {
+      "direction": "-1",
+      "id": "8ebbb08b2e4dc7f3b0f791b1a2fd6589a88ccc4b2b92911b83bc29230eda49e1",
+      "metrics": {
+        "final_validation": null,
+        "folds": [
+          {
+            "fit_years": [
+              2020
+            ],
+            "fold": "fold_2021",
+            "metrics": {
+              "base_rate": 0.19286189943184234,
+              "brier": 0.14488615232925614,
+              "n": 211737,
+              "positives": 40836,
+              "pr_auc": 0.3386502384399405,
+              "pr_auc_over_base_rate": 1.7559208917758273,
+              "roc_auc": 0.6840168862360105,
+              "unique_regimes": 1891
+            },
+            "status": "OK",
+            "validation_year": 2021
+          },
+          {
+            "fit_years": [
+              2020,
+              2021
+            ],
+            "fold": "fold_2022",
+            "metrics": {
+              "base_rate": 0.1724749267369264,
+              "brier": 0.13200768755517345,
+              "n": 274695,
+              "positives": 47378,
+              "pr_auc": 0.32699974754850725,
+              "pr_auc_over_base_rate": 1.8959262875772975,
+              "roc_auc": 0.7085053648299702,
+              "unique_regimes": 1936
+            },
+            "status": "OK",
+            "validation_year": 2022
+          },
+          {
+            "fit_years": [
+              2020,
+              2021,
+              2022
+            ],
+            "fold": "fold_2023",
+            "metrics": {
+              "base_rate": 0.1845497671584628,
+              "brier": 0.1398816963913378,
+              "n": 229770,
+              "positives": 42404,
+              "pr_auc": 0.3303041465544051,
+              "pr_auc_over_base_rate": 1.7897835995143303,
+              "roc_auc": 0.6905910805823672,
+              "unique_regimes": 1864
+            },
+            "status": "OK",
+            "validation_year": 2023
+          }
+        ],
+        "tuning": null
+      },
+      "name": "primary:SHORT",
+      "subset": {
+        "regime_direction": -1
+      }
+    }
+  ]
+}
