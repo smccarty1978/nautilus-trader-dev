@@ -1416,7 +1416,13 @@ replay path that were in neither the closure nor the frozen manifest; `transitiv
 closes over every ancestor package `__init__.py`. Partition children start from a bare interpreter, so
 their traces are complete; the controller-process smoke trace additionally reports pre-imported modules.
 A partition is served only after the current plan's smoke traced clean (`NO_CLEAN_SMOKE_TRACE_FOR_PLAN`
-otherwise). Opt-in, TRAIN only, default `off` (every existing study is bit-identical):
+otherwise). Non-Python replay inputs: the key also binds the bytes of
+`features/feature_definition_promotions.json` (`replay_closure.REPLAY_DATA_FILES`), which
+`features.registry.canonical_definition_status` reads when the provider host resolves feature instances at
+replay and which the Python-only frozen manifest does not hash; every other replay-time read is covered by
+a digest in the plan or verified at launch. In both audit packets the replay stage is rendered as its
+composite, its size and the collection modules it excludes (`stage_closures_for_packet`), so briefs stay
+bounded. Opt-in, TRAIN only, default `off` (every existing study is bit-identical):
 
 ```yaml
 chronology:

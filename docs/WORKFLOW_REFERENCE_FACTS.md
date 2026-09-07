@@ -154,8 +154,11 @@ sealed studies have such commits inside their open-ended windows**:
 fb58531b, b939b471, 019221e0, cc23a48c, cd407353). Their results were produced under a manifest that
 would have flagged stale had it been complete. Recorded here; not recompiled or resealed. Fixed in
 `research_workflow/grammar/compiler.py::transitive_closure_files` (every ancestor package init is closed
-over) and every governed stage set is now transitively closed; manifest 90 to 145 files, collection stage
-101, replay stage (the partition-reuse key) 95 for a 13-instance study.
+over). The governance stage sets stay declared lists (red-team invariant: a perturbation moves its own stage
+and the composite, never an unrelated stage); the five modules the collection walk used to reach only
+through the removed `policy -> lifecycle_v2` import are declared on the `oos` list where `experiment.py`
+lazily imports them. Manifest 90 to 115 files (a strict superset of the 90), collection stage 101, replay
+stage (the partition-reuse key) 95 for a 13-instance study.
 
 **Replay import-trace policy.** Every smoke and every partition run records the repository modules first
 imported during its replay (`artifacts/replay_closure_trace.json`, cumulative across runs). A module outside
@@ -165,8 +168,13 @@ the plan's replay stage halts the run (`REPLAY_CLOSURE_ESCAPE`); the key is neve
 per partition (1s then 1m, `utils/causal_registration.py`), a whole year resident; it does not use
 `BacktestNode` / `DataBackendSession` chunked streaming, so the `DataBackendSession` memory-leak fix (#3889)
 does not apply. That note becomes load-bearing the day the host moves to `BacktestNode` for chunking.
-The replay throughput decay across a year (6.4x, 2026-09-06) is a host defect
-(`research_workflow/provider_host.py:259/287`, an unbounded midpoint list copied per snapshot), not NT.
+The replay throughput decay across a year (6.4x, 2026-09-06) was a host defect, not NT:
+`research_workflow/provider_host.py` `ContextAdapter._midpoints` was an unbounded list of every completed 1m
+midpoint, copied whole on every candidate snapshot although `ema_slope` reads only `[-1]` and `[-6]`.
+**FIXED 2026-09-06 (chore/collection_latency 3e441fcc): `deque(maxlen=64)`.** Parity: the sealed
+`supv1_shape_a_flip_180s_r2` TRAIN 2021 partition replays byte-identical; same run 408 s engine time vs
+1,437 s before, first/final-decile 30.4k / 30.3k bars/s (decay ratio 1.00). A single year is ~7 minutes.
+Report: `artifacts/platform_v2/collection_latency/MIDPOINT_FIX_REPORT.md`.
 
 **`scripts/benchmark_historical_same_harness.py` cannot run on the current tree** (found by the
 2026-09-06 collection-latency measurement, `artifacts/platform_v2/collection_latency/W0_REPORT.md`).
@@ -175,7 +183,8 @@ artifact is stale (`STALE_COMPILED_STUDY`), and recompiling a historical study i
 drives the V1 `compiled_study_loader` / `MinimalCheckpointCollector` path rather than the V2 host, so
 the telemetry figures above are not reproducible through it. Same-harness V2 throughput is measured
 instead through `research_workflow.host_runner.run_plan_on_catalog` on a closed study's compiled plan
-(read-only): 23.4 k bars/s on one month, 10.5 k bars/s on a full year, 13-instance surface, 2026-09-06.
+(read-only): 23.4 k bars/s on one month, 10.5 k bars/s on a full year, 13-instance surface, 2026-09-06 --
+before the midpoint-buffer fix; 30.5 k bars/s flat across the full year after it (same harness, same plan).
 
 `scripts/tests/test_round2_invariants.py:317` hashes with `read_bytes()` instead of
 `canonical_file_sha256` — see the Hashing convention section above.
