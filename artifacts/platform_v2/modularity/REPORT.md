@@ -175,3 +175,12 @@ baseline was recorded in cannot be green on those nodes regardless of the code. 
 exact; under that rule this run has 24 fewer NEW and 8 remain (3 run-varying, 1 line shift, 4
 provisioning); (b) per-entry `signature: node_only` for the handful of run-varying messages; (c) gates run
 only in the canonical checkout (fixes the path class only). Merge of this branch waits on that decision.
+
+**Decision and merge (owner, 2026-09-08):** option (a) taken. `test_delta` now compares portable signatures
+(`dbb2dd3f`, merged `418202eb`). Offline re-classification of the saved card under the merged rule
+(`python scripts/test_delta.py` classify over the 32 recorded messages): **24 KNOWN, 8 NEW** — the three
+run-varying messages (`test_acc12_canaries_green` timing; `test_rt2b2_…moves_the_composite[…]` ×2 tree
+composite), the one line shift (`test_no_hardcoded_feature_count…`, `compiler.py:853→868` from B1), and the four
+worktree-provisioning nodes. None is a behaviour change of this branch. Merged into `main` on that
+assessment; the run-varying/line-shift signatures are listed for a follow-up decision (per-entry
+`node_only` signature or normalising `in <n>s` / composite hashes — not taken here).
