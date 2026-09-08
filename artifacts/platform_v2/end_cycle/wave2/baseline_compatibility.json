@@ -1,0 +1,41 @@
+[
+  {
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "scripts/test_delta.py",
+      "research_workflow/tests",
+      "scripts/tests",
+      "--check-baseline"
+    ],
+    "returncode": 2,
+    "card": {
+      "STATUS": "BASELINE_INCOMPATIBLE",
+      "issues": [
+        "BASELINE_SCHEMA_REQUIRES_EXPLICIT_MIGRATION",
+        "BASELINE_COMMIT_MISMATCH",
+        "BASELINE_ENVIRONMENT_MISMATCH"
+      ],
+      "reference_commit": "474cd65010a74228dc7ed6ae71cf6a5658bc7f5f"
+    }
+  },
+  {
+    "command": [
+      "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "scripts/test_delta.py",
+      "research_workflow/tests",
+      "scripts/tests",
+      "--check-baseline",
+      "--baseline-reference",
+      "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f"
+    ],
+    "returncode": 2,
+    "card": {
+      "STATUS": "BASELINE_INCOMPATIBLE",
+      "issues": [
+        "BASELINE_SCHEMA_REQUIRES_EXPLICIT_MIGRATION",
+        "BASELINE_ENVIRONMENT_MISMATCH"
+      ],
+      "reference_commit": "3cbc8d06e30155cd11d6ba6a0ddf6e4dc711856f"
+    }
+  }
+]
