@@ -1,0 +1,21 @@
+kind: tracker
+name: tracker.synth.bar_count
+semantics: |
+  Synthetic fixture for the tiered-gate proof: counts completed source bars since the last regime flip.
+availability_rule: value at T reflects bars with ts_init <= T only
+parameters:
+  window: 20
+serves_studies: [synth_study_one, synth_study_two]
+closest_existing:
+  id: tracker.regime.excursion
+  why_not: it tracks price excursion, not a bar count
+composition_attempted:
+  spec_fragment: "features: [{feature: bar_count, window: 20}]"
+  compiler_gap: "MISSING_CAPABILITY: no feature identity bar_count"
+reset_policy: event_start
+null_policy: allow
+gap_policy: carry
+inputs: {bars: stream}
+fields: [count]
+events: []
+update_cadence: per_source_bar
