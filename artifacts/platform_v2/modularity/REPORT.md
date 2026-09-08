@@ -133,4 +133,45 @@ branches change the grammar. Listed, not fixed.
 
 ## 5. Merge gate (CORE_SURFACE, broad, against the Session 1 baseline)
 
-_pending: appended when the run lands_
+Branch head at gate time: `22704e87` (B2, B1, B3, B2 follow-up, `main` 8971320c merged in, reports).
+Command, run alone on the host, the ignored model artifact provisioned into the worktree first
+(sha256 `03f602c5…`, the Wave 1 triage bytes):
+
+```
+python scripts/test_delta.py research_workflow/tests scripts/tests features/tests tests research/analysis/tests --baseline-reference ee16002e --json
+```
+
+**Operational fact, found here:** the enforced classifier's default reference is
+`merge-base(HEAD, main)`, but a re-recorded baseline necessarily records the commit it *ran on*
+(`ee16002e`), and the commit that *adds* the file is the next one (`8971320c`). So after any re-record,
+the default `--check-baseline` on every branch reports `BASELINE_COMMIT_MISMATCH` by construction, and
+every gate must name the recorded commit with `--baseline-reference` until the next re-record. The
+documented flag exists for exactly this ("exact approved commit/ref"); nothing was loosened. Whether
+`platform_commit` should instead be allowed to equal the parent of the baseline commit is a
+one-line semantic decision for the owner; listed, not taken.
+
+**Result (`evidence/s2_gate.card.json`, `evidence/s2_gate_assessment.json`):** 84m27s (5,067 s), 2,397 ran,
+2,304 passed, 66 failed = 34 `KNOWN_BASELINE_FAILURE` + **32 `NEW_FAILURE`**, 0 fixed. **Red by the letter
+of the enforced classifier; zero failures attributable to this branch.** Every one of the 32 is
+explained:
+
+| bucket | n | what it is |
+|---|---:|---|
+| baseline node, identical after normalising repo root / pytest tmp session dir / scratch name | 24 | the exact-message rule compares strings that embed `…\Nautilus Trader-modularity\…` vs `…\Nautilus Trader\…`, `pytest-of-…/pytest-2883` vs `pytest-2861`, `_delta_scope_<random>`; 23 of the 64 baseline entries carry such tokens and can never match from any worktree |
+| baseline node, message embeds a value that changes every run or every commit | 3 | `test_acc12_canaries_green` (subprocess timing `in 1.69s`/`1.73s`), `test_rt2b2_…moves_the_composite[…]` ×2 (the tree composite hash) |
+| baseline node, same finding at a shifted line | 1 | `test_no_hardcoded_feature_count_in_generic_workflow`: `compiler.py:853` → `:868`, B1 inserted 15 lines above it |
+| worktree provisioning (git-ignored inputs present only in the canonical checkout) | 4 | `test_aggregate_freeze_opens_the_real_oos_gate` (180s study's bound model artifact → different failure mode), `test_materialization_required_when_catalog_absent` (`data/raw/YM_v0_1s_2024.parquet`), `test_pre_flip_reliability_contracts` ×2 (`studies/*/_work/prepared_*.parquet`) |
+
+Cross-check against the branch: the S3 surface run on the same code (36 files, 421 passed) and every
+targeted run in §4 are consistent with this; the only failures ever traced to this branch were the four
+closure exemplar tests, fixed in `13529d1c` and green in this run.
+
+**Finding for the gate design (escalated, decision needed):** Wave 2's exact-signature rule is not
+reproducible for a material fraction of the baseline — 23/64 entries embed the repo root or a pytest
+session directory, 3 embed run-varying values — so a broad gate from any worktree other than the one the
+baseline was recorded in cannot be green on those nodes regardless of the code. Options, none taken here:
+(a) normalise machine/session-local tokens only (repo root, `pytest-of-<user>/pytest-<n>`,
+`_delta_scope_<hex>`, `0x…` addresses) at record and compare time — hashes, line numbers and timings stay
+exact; under that rule this run has 24 fewer NEW and 8 remain (3 run-varying, 1 line shift, 4
+provisioning); (b) per-entry `signature: node_only` for the handful of run-varying messages; (c) gates run
+only in the canonical checkout (fixes the path class only). Merge of this branch waits on that decision.
