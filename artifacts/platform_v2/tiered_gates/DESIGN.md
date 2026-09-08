@@ -21,7 +21,7 @@
 3. **The owner's headline example is not cheap by import reachability.** A new feature definition
    (`_add(...)` in `features/registry.py`) is reachable from 139 of 178 test files because
    `features/__init__.py` imports the registry. Its derived surface is 81 % of the suite by count. Whether that
-   is minutes or an hour is a measured question, answered in §5. Tracker, provider-adapter and analysis-op
+   is minutes or an hour is a measured question, left open in §5 by owner decision. Tracker, provider-adapter and analysis-op
    additions derive to 35 / 34 files (15 – 16 % of tests) and are the cases where the tiering pays.
 4. **The one real defect (F3) is caught in seconds by a mechanical diff-hygiene check** (UTF-8 decode plus a
    mojibake detector): 4 of 4 corrupted lines flagged at the gate commit `5d3aad6a`, **0 false positives**
@@ -35,7 +35,7 @@
 Recommendation: implement the tiering for **ADDITIVE tracker / provider-adapter / analysis-op** changes and
 for **MODIFIED_CAPABILITY**, with the batch queue and the diff-hygiene check, after the baseline migration and
 the `TRACKER_BINDINGS` fix. Do **not** promise "minutes" for feature-definition additions until the
-`features/__init__.py` coupling is removed or §5 shows the reachable set is fast.
+`features/__init__.py` coupling is removed or the first real additive merge under the tiering shows the reachable set is fast (§5).
 
 ## 1. Change classes — mechanical rules
 
