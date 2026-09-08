@@ -624,6 +624,12 @@ def resolve_execution_file_paths(
         # 3. Runtime Execution Graph Seeds
         runtime_seeds = ([repo_root / "features/registry.py", repo_root / "features/candidate_authority.py"]
                          if candidate_authority else [repo_root / "backtests/run_nt_study.py", repo_root / "backtests/nt_runtime/modes/collect.py", strategy_file])
+        # features/registry.py is a registration boundary: it resolves its definition catalogues
+        # from the capability index by dotted path, so this AST walk cannot reach them. Seed them
+        # so the manifest keeps covering exactly the files it covered when the definitions lived
+        # inside the resolver. See docs/RESEARCH_WORKFLOW.md §21.11.
+        from features.registry import definition_files as _feature_definition_files
+        runtime_seeds += [repo_root / rel for rel in _feature_definition_files()]
         runtime_closure_set, runtime_unres = compute_ast_closure(runtime_seeds, repo_root)
         all_unresolved.extend(runtime_unres)
 

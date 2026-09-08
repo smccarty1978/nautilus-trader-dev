@@ -36,8 +36,11 @@ from typing import Any, Dict, Iterable, List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = Path(__file__).resolve().parent / "capabilities_index.yaml"
+# Kinds that have their own registration boundary keep their own index file, so that editing one
+# kind is attributable to the boundary that reads it (docs/RESEARCH_WORKFLOW.md §21.14).
+INDEX_DIR = Path(__file__).resolve().parent / "capabilities_index.d"
 REGISTRY_PATH = Path(__file__).resolve().parent / "capabilities" / "registry.json"
-KINDS = ("streams", "features", "trackers", "trigger_primitives", "outcomes", "entry_references", "model_drivers", "validation_protocols", "datasets",
+KINDS = ("streams", "features", "feature_definitions", "trackers", "trigger_primitives", "outcomes", "entry_references", "model_drivers", "validation_protocols", "datasets",
          "feature_hosts", "derived_inputs", "analysis_ops")
 
 COST_CLASS_BY_CADENCE = {
@@ -73,6 +76,16 @@ def _tests_naming(name: str, roots: Iterable[Path]) -> List[str]:
 
 
 def _verify_implementation(dotted: str) -> tuple[bool, str]:
+    # A capability's implementation is normally ``module.attr``; a feature-definition
+    # catalogue names a whole module, so try the plain module import first.
+    try:
+        whole = importlib.import_module(dotted)
+    except ImportError:
+        whole = None
+    except Exception as exc:
+        return False, f"module import failed: {type(exc).__name__}: {exc}"
+    if whole is not None:
+        return True, ((whole.__doc__ or "").strip().splitlines() or [""])[0]
     module, _, attr = dotted.rpartition(".")
     try:
         mod = importlib.import_module(module)
@@ -175,9 +188,24 @@ def _host_bindings(repo_root: Path) -> Dict[str, List[Dict[str, Any]]]:
     return out
 
 
-def _seeded(repo_root: Path) -> Dict[str, List[Dict[str, Any]]]:
+def read_seed_index() -> Dict[str, List[Dict[str, Any]]]:
+    """The declared seed: the aggregate index plus every per-boundary file in ``capabilities_index.d``.
+
+    Fail-closed on a kind declared in two files -- one registration point per kind, or the
+    boundary that reads its own file would silently disagree with the generated registry.
+    """
     import yaml
-    index = yaml.safe_load(INDEX_PATH.read_text(encoding="utf-8")) or {}
+    index: Dict[str, List[Dict[str, Any]]] = yaml.safe_load(INDEX_PATH.read_text(encoding="utf-8")) or {}
+    for path in sorted(INDEX_DIR.glob("*.yaml")) if INDEX_DIR.is_dir() else []:
+        for kind, entries in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).items():
+            if kind in index:
+                raise RuntimeError(f"CAPABILITY_KIND_DECLARED_TWICE: {kind!r} in both {INDEX_PATH.name} and {path.name}")
+            index[kind] = entries
+    return index
+
+
+def _seeded(repo_root: Path) -> Dict[str, List[Dict[str, Any]]]:
+    index = read_seed_index()
     out: Dict[str, List[Dict[str, Any]]] = {}
     for kind, entries in index.items():
         rows = []
@@ -194,7 +222,12 @@ def _seeded(repo_root: Path) -> Dict[str, List[Dict[str, Any]]]:
                          "dependencies": list(e.get("dependencies") or []), "update_cadence": cadence,
                          "cost_class": COST_CLASS_BY_CADENCE.get(cadence, "per_source_event"), "status": status,
                          "implementation": e["implementation"], "implementation_verified": ok, "implementation_note": note,
-                         "required_tests": tests, "missing_tests": missing_tests})
+                         "required_tests": tests, "missing_tests": missing_tests,
+                         # Declared at the registration boundary rather than in a hand-maintained table:
+                         # `inputs` are the extra frames an analysis op consumes, `needs_context` whether it
+                         # receives machine-local resolution context. A hosted kind's binding overwrites
+                         # `inputs` below, exactly as before.
+                         "inputs": list(e.get("inputs") or []), "needs_context": bool(e.get("needs_context") or False)})
         out[kind] = rows
     return out
 
@@ -206,7 +239,7 @@ def build_registry(repo_root: Path = REPO_ROOT) -> Dict[str, Any]:
     reg["kinds"]["streams"] = streams
     reg["kinds"]["features"] = _features(repo_root)
     hosted = _host_bindings(repo_root)
-    for kind in ("trackers", "trigger_primitives", "outcomes", "entry_references", "model_drivers", "validation_protocols", "feature_hosts", "derived_inputs", "analysis_ops"):
+    for kind in ("trackers", "trigger_primitives", "outcomes", "entry_references", "model_drivers", "validation_protocols", "feature_hosts", "derived_inputs", "analysis_ops", "feature_definitions"):
         rows = list(seeded.get(kind, []))
         have = {r["id"]: r for r in rows}
         for r in hosted.get(kind, []):
@@ -233,7 +266,8 @@ def build_registry(repo_root: Path = REPO_ROOT) -> Dict[str, Any]:
     return reg
 
 
-_INPUT_GLOBS = ("research_workflow/capabilities_index.yaml", "features/authority/**/*.json", "research/datasets/*.yaml",
+_INPUT_GLOBS = ("research_workflow/capabilities_index.yaml", "research_workflow/capabilities_index.d/*.yaml",
+                "features/authority/**/*.json", "research/datasets/*.yaml",
                 "features/trackers/*.py", "research_workflow/host/*.py", "research_workflow/entry_references.py",
                 "research_workflow/capabilities.py")
 
