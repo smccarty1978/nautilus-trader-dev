@@ -80,3 +80,33 @@ def test_real_collection_error_is_not_a_passing_result(tmp_path, monkeypatch):
 
 def test_invalid_explicit_reference_cannot_fall_back(baseline):
     assert 'BASELINE_COMMIT_MISMATCH' in d.baseline_issues(baseline, '')
+
+
+def test_subprocess_env_has_no_empty_pythonpath_entry(monkeypatch, tmp_path):
+    """An empty PYTHONPATH element resolves to the CWD; for a test that then spawns `python scripts/<x>.py`
+    this puts scripts/ ahead of the repo root and scripts/research.py shadows the `research` package."""
+    import os
+    import subprocess
+    seen = {}
+
+    def fake_run(cmd, **kw):
+        seen['env'] = kw['env']
+        Path(kw['env']['TEST_DELTA_REPORT']).write_text('{}', encoding='utf-8')
+
+        class R:
+            returncode = 0
+            stdout = ''
+            stderr = ''
+        return R()
+
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    for prior in (None, '', 'C:\\somewhere' if os.name == 'nt' else '/somewhere'):
+        if prior is None:
+            monkeypatch.delenv('PYTHONPATH', raising=False)
+        else:
+            monkeypatch.setenv('PYTHONPATH', prior)
+        d.run_pytest(['x'], [])
+        entries = seen['env']['PYTHONPATH'].split(os.pathsep)
+        assert all(entries), (prior, entries)
+        if prior:
+            assert prior in entries
