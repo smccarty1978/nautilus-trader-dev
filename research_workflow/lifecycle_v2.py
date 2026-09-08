@@ -1412,7 +1412,7 @@ class V2Lifecycle:
         stage's deliverable set is knowable before execution and auditable after it.
         """
         import pandas as pd
-        from research.analysis.diagnostic_ops import run_op
+        from research.analysis.ops import run_op
         from research.analysis.identity import canonical_sha256
         spec = plan["analysis"]
         if spec["source"] == "oos":
