@@ -140,10 +140,10 @@ MEANING: Dict[str, Tuple[str, str, str]] = {
                                    "frozen execution manifest are unchanged: a change to any replay module still refuses reuse. 'off' keeps "
                                    "whole-plan/seal matching, so every existing study is bit-identical.",
                                    "partition_reuse: replay_closure"),
-    "chronology.partition_reuse_shadow": ("Shadow verification of reuse: 'every_run' (default) or 'sampled'.",
+    "chronology.partition_reuse_shadow": ("Shadow verification of reuse: 'sampled' (default) or 'every_run'.",
                                           "'every_run' recomputes one reused partition per collection run and requires byte-identity with the served "
-                                          "one; 'sampled' recomputes on one run in four and may be declared only after the reuse path has cleared "
-                                          "five consecutive studies. A mismatch is terminal (PARTITION_REUSE_SHADOW_MISMATCH): halt, never retry, "
+                                          "one; 'sampled' recomputes for one in four seal-derived seeds after the authorized bake-in acceptance. "
+                                          "See WORKFLOW_REFERENCE_FACTS.md for evidence. A mismatch is terminal (PARTITION_REUSE_SHADOW_MISMATCH): halt, never retry, "
                                           "never widen the key silently.",
                                           "partition_reuse_shadow: every_run"),
     "analysis": ("Declarative post-collection analysis: registered operations composed over the study's own collected frame.",

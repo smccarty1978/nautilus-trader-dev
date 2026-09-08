@@ -234,3 +234,15 @@ before the midpoint-buffer fix; 30.5 k bars/s flat across the full year after it
 | One study ran **18 audit passes** and produced a 1,240-line append-only report | `studies/codex_5.6_short_rth_enriched_volume_level_retrain/` |
 | The Codex auditor silently missed 14 checklist rules including C4 and D4 | why `scripts/sync_agents.py` exists |
 | A cleanup followed a Windows junction out of a disposable worktree and destroyed 179 GB | why `scripts/safe_cleanup.py` fails closed |
+
+## Wave 2 sampled shadow decision (2026-09-07)
+
+The program owner declares bake-in acceptance met and authorizes `chronology.partition_reuse_shadow: sampled` as the default for newly compiled declarations. Reuse itself remains opt-in. Explicit every_run declarations and older compiled plans retain their policies; missing policy in legacy plans remains every_run. Sampling selects one reused partition on 1 in 4 seal-derived seeds (25%); repeated runs with the same seal make the same deterministic choice, not independent draws.
+
+Evidence: `artifacts/platform_v2/collection_latency/R2_REPORT.md` gates V1-r, V2-r, V3, V4-r, V7, V8; `S1_REPORT.md` gates V5/V6. CFF March 2024 (35,872 candidates) reused byte-identically against forced shadow recompute; ES TRAIN 2020/2021 reproduced 494,455/478,407 rows byte-identically; V5 shadowed the full 2021 TRAIN year (11.0M bars). V1-r real provider perturbation refused reuse; V2-r text perturbation is included in real V3; V7 combines a real compiler-only probe with a synthetic plan-altering refusal; V8 dynamic out-of-key import halted on real data. These are acceptance probes, not evidence of five distinct consecutive completed studies: the owner's explicit program decision closes that proposed threshold. V6 measured every_run 1,422s versus a sampled seed that skipped shadow at 0.07s; this is not the average sampled runtime.
+
+## Wave 2 classifier validation (2026-09-07)
+
+Before W2.2a, 10 new regression cases failed and 1 control passed; after correction and capture-fixture checks, 14 passed through `python scripts/test_delta.py scripts/tests/test_test_delta.py --json` in 3.993s process wall time. `artifacts/platform_v2/end_cycle/wave2/w22a_test_delta.json` contains per-test setup/call/teardown timings. This is a bounded classifier check, not a measured replacement for the old 74m41s broad scope; no broad-to-narrow speedup is claimed.
+
+The corrected classifier requires nonempty exact full failure text/outcome and per-entry scope, plus exact baseline reference commit and environment equality. It never automatically exempts a missing import/path/file and enforces pytest return codes even with reports. The existing baseline remains unchanged: schema1, 63 entries, 37 empty messages, no structured environment snapshot. Its old known-failure exemptions are not admissible under the corrected matching rules. Migration requires actual evidence, not stamping current metadata onto old entries.

@@ -36,7 +36,7 @@ def _spec_path(tmp_path: Path, *, study_id: str = "reuse_probe", chronology: dic
     body["study"]["id"] = study_id
     if question:
         body["study"]["question"] = question
-    body["chronology"] = chronology or {"train": [2029, 2030], "dev": [], "prohibited": [], "partition_reuse": "replay_closure"}
+    body["chronology"] = chronology or {"train": [2029, 2030], "dev": [], "prohibited": [], "partition_reuse": "replay_closure", "partition_reuse_shadow": "every_run"}
     study = tmp_path / "studies" / study_id
     study.mkdir(parents=True, exist_ok=True)
     (study / "study.yaml").write_text(yaml.safe_dump(body, sort_keys=False), encoding="utf-8")
@@ -143,7 +143,7 @@ def test_key_ignores_post_collection_declarations_and_binds_replay_ones(tmp_path
 def test_off_by_default_and_same_bytes_as_reuse_mode(tmp_path, synthetic_bars):
     off = _spec_path(tmp_path, study_id="off_probe", chronology={"train": [2029, 2030], "dev": [], "prohibited": []})
     lc_off = _lifecycle(off, synthetic_bars); plan_off = _prepare_and_seal(lc_off, "a")
-    assert plan_off["chronology"]["partition_reuse"] == {"mode": "off", "shadow": "every_run"}
+    assert plan_off["chronology"]["partition_reuse"] == {"mode": "off", "shadow": "sampled"}
     r = lc_off.collection()
     assert r["status"] == "PASS" and "partition_reuse" not in r
     assert not (off / "_work" / "controller" / "train_partition_reuse.json").exists()
@@ -396,7 +396,7 @@ def test_compiler_change_reuses_unless_it_alters_the_plan(tmp_path, synthetic_ba
 
 # -- Reading 2: V8 trace halt on a partition run ---------------------------------------------------------------
 def test_partition_run_halts_on_a_replay_module_outside_the_key(tmp_path, synthetic_bars, monkeypatch):
-    study = _spec_path(tmp_path, chronology={"train": [2030], "dev": [], "prohibited": [], "partition_reuse": "replay_closure"})
+    study = _spec_path(tmp_path, chronology={"train": [2030], "dev": [], "prohibited": [], "partition_reuse": "replay_closure", "partition_reuse_shadow": "every_run"})
     lc = _lifecycle(study, synthetic_bars); plan = _prepare_and_seal(lc, "a")
     outside = "research_workflow.audit_packets_v2"
     assert "research_workflow/audit_packets_v2.py" not in set(plan["closure"]["stages"]["replay"]["files"])
