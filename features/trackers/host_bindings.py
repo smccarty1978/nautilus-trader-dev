@@ -5,7 +5,10 @@ rewrites -- the accepted implementation (``DualEmaRegimeTracker``, the generic f
 providers behind ``ProviderHost``, ``GenericEpisodeGeometryProvider``) and declares, at
 class level, everything the static compiler needs: parameters, inputs, readable fields,
 emitted/consumed events, warmup and cadence.  The host never imports this module by
-name; it loads the ``implementation`` path the compiled plan carries.
+name; it loads the ``implementation`` path the compiled plan carries. The compiler and the registry
+generator read ``TRACKER_BINDINGS``: the built-ins declared here plus every binding seeded in
+``research_workflow/capabilities_index.yaml`` (resolved by import path), so adding a tracker never
+edits this module.
 
 Scientific semantics live HERE (or in the provider a binding wraps), not in the host:
 the regime formula, the excursion/progress-window rule, the pullback arming rule, the
@@ -14,11 +17,13 @@ calendar 5m regime-bar convention, the feature snapshot ATR conventions.
 from __future__ import annotations
 
 import math
+from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from research_workflow.host.interfaces import REQUIRED, BarView, EmittedEvent, EpochView
 
 NS = 1_000_000_000
+_INDEX_PATH = Path(__file__).resolve().parents[2] / "research_workflow" / "capabilities_index.yaml"
 
 
 def _finite_pos(x: Any) -> bool:
@@ -28,50 +33,8 @@ def _finite_pos(x: Any) -> bool:
         return False
 
 
-class BaseBinding:
-    CAPABILITY = ""
-    PARAMS: Mapping[str, Any] = {}
-    INPUTS: Mapping[str, str] = {}
-    FIELDS: tuple = ()
-    EPOCH_FIELDS: tuple = ()
-    EVENTS: tuple = ()
-    SUBSCRIBES: tuple = ()
-    WARMUP_BARS = 0
-    CADENCE = "per_source_bar"
+from features.trackers.base import BaseBinding  # noqa: E402  (re-exported; subclasses import it from features.trackers.base)
 
-    def __init__(self, params: Mapping[str, Any], inputs: Mapping[str, Any]) -> None:
-        self.params = dict(params)
-        self.inputs = dict(inputs)
-        self._events: List[EmittedEvent] = []
-        for name, default in self.PARAMS.items():
-            if name not in self.params:
-                if default is REQUIRED:
-                    raise ValueError(f"{self.CAPABILITY}: parameter {name!r} is required")
-                self.params[name] = default
-
-    def emit(self, name: str, payload: Mapping[str, Any]) -> None:
-        self._events.append(EmittedEvent(name, payload))
-
-    def drain_events(self) -> List[EmittedEvent]:
-        out, self._events = self._events, []
-        return out
-
-    def on_bar(self, input_key: str, bar: BarView) -> None:  # pragma: no cover - overridden
-        return None
-
-    def on_event(self, input_key: str, event: EmittedEvent) -> None:
-        return None
-
-    def epoch_value(self, name: str, epoch: EpochView) -> Any:
-        raise KeyError(name)
-
-    def on_trigger_transition(self, state: str, kind: str, ts: int, epoch: EpochView) -> None:
-        return None
-
-
-# --------------------------------------------------------------------------- #
-# tracker.regime.dual_ema
-# --------------------------------------------------------------------------- #
 class DualEmaRegimeBinding(BaseBinding):
     """Completed-bar dual-EMA regime with Wilder ATR (``features.trackers.regime_dual_ema``).
 
@@ -714,7 +677,7 @@ class FrozenExternalScoreBinding(BaseBinding):
         return float(obs.score)
 
 
-TRACKER_BINDINGS: Dict[str, type] = {
+BUILTIN_BINDINGS: Dict[str, type] = {
     DualEmaRegimeBinding.CAPABILITY: DualEmaRegimeBinding,
     RegimeExcursionBinding.CAPABILITY: RegimeExcursionBinding,
     CalendarRegimeBarBinding.CAPABILITY: CalendarRegimeBarBinding,
@@ -723,10 +686,72 @@ TRACKER_BINDINGS: Dict[str, type] = {
     FrozenExternalScoreBinding.CAPABILITY: FrozenExternalScoreBinding,
 }
 
+_SEEDED_KINDS = ("trackers", "feature_hosts", "derived_inputs")
+
+
+def _seeded_bindings(index_path: Optional[Path] = None) -> Dict[str, type]:
+    """Bindings declared in ``research_workflow/capabilities_index.yaml`` (the seed ``cap scaffold`` writes):
+    an entry of a hosted kind whose ``host_binding`` or ``implementation`` names a ``BaseBinding`` subclass.
+    Resolved by import path, never by a hand-maintained table. An entry that does not resolve is skipped here
+    and reported as ``status: broken`` by ``research cap generate``."""
+    import importlib
+    import yaml
+    path = Path(index_path) if index_path is not None else _INDEX_PATH
+    try:
+        seed = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError):
+        return {}
+    out: Dict[str, type] = {}
+    for kind in _SEEDED_KINDS:
+        for entry in seed.get(kind) or []:
+            cap = str(entry.get("id") or "")
+            if not cap or cap in BUILTIN_BINDINGS:
+                continue
+            for dotted in (entry.get("host_binding"), entry.get("implementation")):
+                if not dotted:
+                    continue
+                module, _, attr = str(dotted).rpartition(".")
+                try:
+                    obj = getattr(importlib.import_module(module), attr)
+                except Exception:
+                    continue
+                if isinstance(obj, type) and issubclass(obj, BaseBinding) and getattr(obj, "CAPABILITY", "") == cap:
+                    out[cap] = obj
+                    break
+    return out
+
+
+def tracker_bindings(index_path: Optional[Path] = None) -> Dict[str, type]:
+    """capability id -> binding class: the built-ins above plus every seeded binding (resolved on each call)."""
+    table = dict(BUILTIN_BINDINGS)
+    table.update(_seeded_bindings(index_path))
+    return table
+
+
+class _LazyBindings(Mapping[str, type]):
+    """``TRACKER_BINDINGS`` compatibility view: resolves seeded bindings on access, after every module involved
+    is fully initialised, so importing a binding module before this one is never a circular import."""
+
+    def __getitem__(self, key: str) -> type:
+        return tracker_bindings()[key]
+
+    def __iter__(self):
+        return iter(tracker_bindings())
+
+    def __len__(self) -> int:
+        return len(tracker_bindings())
+
+    def __contains__(self, key: object) -> bool:
+        return key in tracker_bindings()
+
+
+TRACKER_BINDINGS: Mapping[str, type] = _LazyBindings()
+
 
 def implementation_path(cls: type) -> str:
     return f"{cls.__module__}.{cls.__name__}"
 
 
 __all__ = ["BaseBinding", "DualEmaRegimeBinding", "RegimeExcursionBinding", "CalendarRegimeBarBinding",
-           "PullbackEpisodeBinding", "FeatureHostBinding", "FrozenExternalScoreBinding", "TRACKER_BINDINGS", "implementation_path"]
+           "PullbackEpisodeBinding", "FeatureHostBinding", "FrozenExternalScoreBinding", "TRACKER_BINDINGS", "BUILTIN_BINDINGS",
+           "tracker_bindings", "implementation_path"]
