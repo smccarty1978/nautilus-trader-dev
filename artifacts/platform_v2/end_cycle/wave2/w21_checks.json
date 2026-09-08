@@ -1,0 +1,21 @@
+{
+  "commit": "f7e2606bb5f60773f5c746d627b37fb32abbe1f0",
+  "tests": [
+    {
+      "command": "python -m pytest research_workflow/tests/test_wave2_shadow_default.py -q",
+      "passed": 1,
+      "pytest_seconds": 0.2
+    },
+    {
+      "command": "python -m pytest research_workflow/tests/test_replay_closure.py::test_collection_stage_closure_is_a_subset_of_the_frozen_manifest research_workflow/tests/test_replay_closure.py::test_select_shadow_is_uniform_seeded_and_sampled_policy_skips -q",
+      "passed": 2,
+      "pytest_seconds": 14.17
+    },
+    {
+      "command": "python -m pytest research_workflow/tests/test_replay_closure.py::test_off_by_default_and_same_bytes_as_reuse_mode -q",
+      "passed": 1,
+      "pytest_seconds": 27.66
+    }
+  ],
+  "generated_yaml_reference": "regenerated"
+}

@@ -670,7 +670,13 @@ the only place a broad run changes a decision. A worker's result card reports th
 
 The card shows `NEW_FAILURE` prominently and classifies the rest as `KNOWN_BASELINE_FAILURE`,
 `BASELINE_FAILURE_NOW_FIXED` (update the baseline when you commit the fix) or
-`ENVIRONMENTAL_MISSING_ARTIFACT`. A failure outside every baselined scope is
+`ENVIRONMENTAL_MISSING_ARTIFACT` (reserved legacy category; no automatic missing-file/import exemption).
+Known failures require schema-v2 evidence: exact nonempty full failure text and outcome, per-entry scope,
+exact recorded reference commit (default `git merge-base HEAD main`, or explicit `--baseline-reference`),
+and identical recorded Python/platform/dependency environment. Missing or changed evidence fails toward NEW.
+`--check-baseline` checks compatibility without running pytest. Existing schema-v1 baseline entries are
+not silently migrated or re-attested. All-pass runs can pass without consuming baseline evidence.
+A failure outside every baselined scope is
 `NEW_FAILURE_OUTSIDE_BASELINE_SCOPE`, never silently allowed. Agents act only on NEW failures.
 `@pytest.mark.slow` tests (real data replay; `scripts/tests` carries several that run for tens of minutes)
 are excluded by default; `--include-slow` lifts the filter. Even without them the broad `research_workflow/tests scripts/tests`
