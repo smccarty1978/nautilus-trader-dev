@@ -174,9 +174,9 @@ def discover_subprocess_gate_scripts(
 def ancestor_package_inits(module_path: Path, repo_root: Path) -> List[Path]:
     """Returns every package ``__init__.py`` Python executes to reach ``module_path``.
 
-    Importing ``features.trackers.wick`` executes ``features/__init__.py`` first, and
-    ``features/__init__.py`` may import further modules — as it does here, pulling in
-    ``features/engine.py``, ``features/library.py`` and ``features/collector.py``. A
+    Importing ``features.trackers.wick`` executes ``features/__init__.py`` first, and a
+    package ``__init__`` may import further modules — ``features/__init__.py`` did until
+    2026-09-08 (B2), pulling in ``features/engine.py``, ``library.py`` and ``collector.py``. A
     closure that records only the leaf module therefore omits code that provably runs,
     and the omission is invisible: the seal still reports 100% coverage.
 

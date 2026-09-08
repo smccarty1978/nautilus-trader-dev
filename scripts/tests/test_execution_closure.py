@@ -132,13 +132,18 @@ def test_features_engine_and_package_init_are_in_the_real_closure():
     """A1.3 -- the exact files the Red Team found missing must now be sealed."""
     _sha, _fh, md = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
     combined = set(md["combined_files"])
+    # B2 (chore/capability-modularity, 2026-09-08): ``features/__init__.py`` is docstring-only now, so
+    # ``features/engine.py``, ``library.py``, ``collector.py`` and ``trackers/median_center.py`` no longer
+    # execute at collect time (nothing on the collect path imports them; they ran only as a side effect of
+    # the package init) and are correctly OUTSIDE the closure. The mechanism the Red Team required --
+    # every package __init__ on the import path is walked and its imports followed -- is pinned on the
+    # files that do execute.
     for required in (
         "repo:features/__init__.py",
-        "repo:features/engine.py",
-        "repo:features/library.py",
-        "repo:features/collector.py",
+        "repo:features/registry.py",
         "repo:features/trackers/wick.py",
-        "repo:features/trackers/median_center.py",
+        "repo:features/trackers/generic_median_center.py",
+        "repo:backtests/nt_runtime/__init__.py",
     ):
         assert required in combined, f"{required} executes at collect time but is not sealed"
 
@@ -147,10 +152,11 @@ def test_features_engine_and_package_init_are_in_the_real_closure():
 def test_changing_an_execution_affecting_file_changes_the_composite(tmp_path: Path):
     """A1.4 -- editing any included file must move the composite.
 
-    ``features/engine.py`` is the specific file that used to be invisible: before the
-    fix, mutating it left the composite -- and therefore the seal -- unchanged.
+    ``features/trackers/wick.py`` stands in for the file that used to be invisible
+    (``features/engine.py`` left the collect path with B2, 2026-09-08): mutating an executed
+    dependency must move the composite -- and therefore the seal.
     """
-    target = REPO_ROOT / "features" / "engine.py"
+    target = REPO_ROOT / "features" / "trackers" / "wick.py"
     original = target.read_bytes()
     before, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
     try:
@@ -160,7 +166,7 @@ def test_changing_an_execution_affecting_file_changes_the_composite(tmp_path: Pa
         after, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
     finally:
         target.write_bytes(original)
-    assert before != after, "a change to features/engine.py did not move the composite"
+    assert before != after, "a change to features/trackers/wick.py did not move the composite"
 
     restored, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT)
     assert restored == before, "composite is not a pure function of file content"
@@ -170,7 +176,7 @@ def test_documentation_only_edit_does_not_move_a_v2_composite_but_moves_v1(tmp_p
     """Item 09: docstring/comment/__all__-only edits to an executed dependency leave the v2
     composite unchanged; the same edit still moves the historical v1 composite, so sealed
     v1 studies keep their exact authority."""
-    target = REPO_ROOT / "features" / "engine.py"
+    target = REPO_ROOT / "features" / "trackers" / "wick.py"
     original = target.read_bytes()
     before_v2, hashes_v2, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT, hash_algorithm="v2")
     before_v1, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT, hash_algorithm="v1")
@@ -180,7 +186,7 @@ def test_documentation_only_edit_does_not_move_a_v2_composite_but_moves_v1(tmp_p
         after_v1, _, _ = resolve_execution_manifest(ES_STUDY, REPO_ROOT, hash_algorithm="v1")
     finally:
         target.write_bytes(original)
-    assert "repo:features/engine.py" in hashes_v2
+    assert "repo:features/trackers/wick.py" in hashes_v2
     assert after_v2 == before_v2, "a comment-only edit moved the v2 composite"
     assert after_v1 != before_v1, "v1 must still bind bytes"
 
@@ -221,7 +227,7 @@ def test_coverage_cannot_report_100_when_a_dependency_is_unresolved(tmp_path: Pa
     """
     from scripts.resolve_execution_manifest import UnresolvedDependencyError
 
-    target = REPO_ROOT / "features" / "engine.py"
+    target = REPO_ROOT / "features" / "trackers" / "wick.py"
     original = target.read_bytes()
     try:
         target.write_bytes(b"from features.no_such_module import Missing\n" + original)
