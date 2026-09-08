@@ -107,8 +107,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from features.trackers.host_bindings import BaseBinding
-from research_workflow.host.interfaces import REQUIRED, BarView, EmittedEvent, EpochView
+from features.trackers.base import REQUIRED, BarView, BaseBinding, EmittedEvent, EpochView
 
 
 class {class_name}(BaseBinding):
@@ -200,7 +199,7 @@ def scaffold(name: str) -> Dict[str, Any]:
     p["status"] = "scaffolded"; p["scaffold"] = {"module": str(module_path.relative_to(REPO_ROOT)).replace("\\", "/"), "test": str(test_path.relative_to(REPO_ROOT)).replace("\\", "/"), "class": class_name}
     src.write_text(yaml.safe_dump(p, sort_keys=False), encoding="utf-8")
     return {"STATUS": "SCAFFOLDED", "id": name, "module": p["scaffold"]["module"], "test": p["scaffold"]["test"], "class": class_name,
-            "next": ["implement the binding", "make the test real", f"python scripts/research.py cap promote {name} --parity <artifact.json>"]}
+            "next": ["implement the binding (already bindable: the compiler resolves it from the capabilities_index seed)", "make the test real", f"python scripts/research.py cap promote {name} --parity <artifact.json>"]}
 
 
 def promote(name: str, *, parity_artifact: Optional[Path] = None, run_tests: bool = True) -> Dict[str, Any]:

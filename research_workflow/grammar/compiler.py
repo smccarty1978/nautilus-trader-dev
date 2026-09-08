@@ -311,6 +311,14 @@ def _resolve_stream_ref(ctx: _Ctx, value: Any, symbol: str) -> Optional[str]:
     return ctx.stream_by.get((symbol, v))
 
 
+def _registry_status(ctx: _Ctx, cap: str) -> Optional[str]:
+    for kind in ("trackers", "feature_hosts", "derived_inputs"):
+        for e in (ctx.registry.get("kinds", {}) or {}).get(kind, []) or []:
+            if e.get("id") == cap:
+                return e.get("status")
+    return None
+
+
 def _resolve_trackers(ctx: _Ctx) -> None:
     table = _binding_table(ctx.extra_bindings)
     from research_workflow.host.interfaces import REQUIRED
@@ -343,6 +351,13 @@ def _resolve_trackers(ctx: _Ctx) -> None:
         if cls is None:
             ctx.gap(GapKind.MISSING_CAPABILITY, where, f"no registered tracker {cap!r}",
                     capability=cap, closest=_closest(cap, list(table)))
+            continue
+        status = _registry_status(ctx, cap)
+        if status in ("candidate", "broken"):
+            # seeded by `cap scaffold` (resolved through the capabilities_index seed) but not promoted / not
+            # verifiable: bindable for its own tests, never silently for a governed study
+            ctx.gap(GapKind.MISSING_CAPABILITY, where, f"tracker {cap!r} is registered with status {status!r}; "
+                    f"promote it (research cap promote {cap} --parity <json>) before a study binds it", capability=cap, status=status)
             continue
         extra = dict(ct.model_extra or {})
         symbol = (ct.instrument or ctx.execution_symbol).upper()

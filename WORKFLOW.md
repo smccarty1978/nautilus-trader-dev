@@ -73,7 +73,7 @@ creates v2 studies; `study compile` and `study run` refuse a new v1 study.
 | Compiler | Static compile, typed gaps, closure | `research_workflow/grammar/compiler.py`, `plan.py`, `gaps.py`, `expansion.py` | NO | NO | `research study compile` |
 | Predicates | Tiny predicate language | `research_workflow/grammar/predicates.py`, `research_workflow/host/predicate_eval.py` | NO | NO | — |
 | Capability registry (seeds) | Hand-maintained seed entries | `research_workflow/capabilities_index.yaml`, `research_workflow/capabilities.py` | via `cap propose/scaffold/promote` | NO | `research cap list/search/describe` |
-| Generated capability registry | Introspected registry | `research_workflow/capabilities/registry.json` | NO | YES | `research cap generate [--check]` |
+| Generated capability registry | Introspected registry (untracked on-demand cache: `load_registry()` rebuilds it when its inputs change; never merged) | `research_workflow/capabilities/registry.json` | NO | YES | `research cap generate [--check]` |
 | Feature implementations | Provider code | `features/library.py`, `features/library_mtf.py`, `features/trackers/generic_*.py` | via capability flow | NO | `research cap list features` |
 | Feature metadata / definitions | Canonical identities | `features/registry.py` (`FeatureDefinition`), `features/CANONICAL_FEATURE_REFERENCE.yaml` | NO | YAML yes (`scripts/generate_canonical_feature_reference.py`) | `research cap describe <feature>` |
 | Trackers (host bindings) | Stateful causal state | `features/trackers/host_bindings.py` (+ `features/trackers/*.py` engines) | via capability flow | NO | `research cap list trackers` |

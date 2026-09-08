@@ -101,7 +101,8 @@ def test_examples_compile_and_registry_blind_draft_returns_typed_gaps():
 
 def test_example_capability_ids_are_registered():
     import yaml
-    reg = json.loads(_text("research_workflow/capabilities/registry.json"))
+    from research_workflow.capabilities import load_registry
+    reg = load_registry()   # untracked on-demand cache (B3): built here when absent or stale
     trackers = {e["id"] for e in reg["kinds"]["trackers"]}
     features = {e["id"] for e in reg["kinds"]["features"]} | {a for e in reg["kinds"]["features"] for a in (e.get("aliases") or [])}
     feature_names = {i.split(".", 1)[-1] for i in features} | features

@@ -1241,7 +1241,9 @@ the same semantics blocks it), `research cap scaffold <id>` writes the tracker/f
 its test and a `candidate` registry seed, `research cap promote <id> --parity <json>` flips it to
 `verified` only with a parity artifact and green tests. `research cap generate --check` must stay
 current; the registry (`research_workflow/capabilities/registry.json`) is generated from
-declarations (host bindings, entry references, feature bundle), never hand-edited.
+declarations (host bindings, entry references, feature bundle), never hand-edited, and since
+2026-09-08 not tracked either: it is an on-demand cache that `load_registry()` rebuilds whenever the
+digest of its inputs changes, so a capability branch never merges a generated file (B3).
 
 ### 21.7 Dataset V2
 
