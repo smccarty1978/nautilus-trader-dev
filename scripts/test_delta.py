@@ -37,6 +37,23 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def portable_signature(message: str) -> str:
+    """The comparison form of a failure message. Only machine- and session-local tokens are normalised:
+    the repo root (this checkout or any sibling worktree ``<name>-<topic>``, in native, doubled-backslash
+    or forward-slash spelling), pytest's per-session tmp dir, test_delta's own scratch scope names and
+    object addresses. Hashes, line numbers, timings and every other byte stay exact, so a genuinely
+    changed failure is still NEW. Idempotent. Found 2026-09-08: 23 of 64 baseline entries embedded the
+    canonical checkout path or a pytest session number and could never match from a worktree."""
+    m = message or ""
+    parent, base = str(ROOT.parent), ROOT.name.split("-")[0]
+    for pv, sep in ((parent, "\\"), (parent.replace("\\", "\\\\"), "\\\\"), (parent.replace("\\", "/"), "/")):
+        m = re.sub(re.escape(pv + sep + base) + r"(?:-[\w.\-]+)?", "<ROOT>", m, flags=re.IGNORECASE)
+    m = re.sub(r"pytest-of-[^\\/'\"]+[\\/]{1,2}pytest-\d+", "<PYTEST_TMP>", m)
+    m = re.sub(r"_delta_scope_[0-9a-f]+", "_delta_scope_<TMP>", m)
+    m = re.sub(r"0x[0-9A-Fa-f]{6,}", "<ADDR>", m)
+    return m
 DEFAULT_BASELINE = ROOT / "config" / "test_failure_baseline.json"
 SUMMARY_RE = re.compile(r"^(PASSED|FAILED|ERROR|SKIPPED|XFAIL|XPASS)\s+(\S+?)(?:\s+-\s+(.*))?$")
 # Missing imports, paths and artifacts are never automatically environmental.
@@ -154,7 +171,7 @@ def classify(results: Dict[str, Tuple[str, str]], baseline: Dict[str, Any], scop
         if outcome in ('FAILED', 'ERROR'):
             if entry and not covered:
                 category, reason = 'NEW_FAILURE_OUTSIDE_BASELINE_SCOPE', 'ENTRY_SCOPE_MISMATCH_OR_MISSING'
-            elif not issues and covered and entry.get('message') and msg == entry['message'] and outcome == entry.get('outcome', 'FAILED'):
+            elif not issues and covered and entry.get('message') and portable_signature(msg) == portable_signature(entry['message']) and outcome == entry.get('outcome', 'FAILED'):
                 out['KNOWN_BASELINE_FAILURE'].append({'node_id': node, 'classification': entry.get('classification'), 'reason': entry.get('reason')})
                 continue
             else:
@@ -184,7 +201,7 @@ def update_baseline(path: Path, results: Dict[str, Tuple[str, str]], scope: List
             cls = "environmental" if ENV_PATTERNS.search(msg or "") else "pre_existing"
             entries.append({"node_id": node, "classification": (old or {}).get("classification") or cls,
                             "reason": (old or {}).get("reason") or reason, "first_seen_commit": (old or {}).get("first_seen_commit") or head,
-                            "last_seen_commit": head, "message": msg or "", "outcome": outcome, "scopes": scopes_norm})
+                            "last_seen_commit": head, "message": portable_signature(msg or ""), "outcome": outcome, "scopes": scopes_norm})
     doc = {"schema_version": 2, "environment": environment_identity(), "platform_commit": head, "platform_tag": _git(["describe", "--tags", "--abbrev=0"]) or None,
            "generated_at_utc": now, "python": sys.version.split()[0], "reason": reason,
            "marker_filter": "not slow (default; --include-slow lifts it)",

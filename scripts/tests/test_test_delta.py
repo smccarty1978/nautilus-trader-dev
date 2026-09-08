@@ -110,3 +110,35 @@ def test_subprocess_env_has_no_empty_pythonpath_entry(monkeypatch, tmp_path):
         assert all(entries), (prior, entries)
         if prior:
             assert prior in entries
+
+
+def test_portable_signature_normalises_only_machine_local_tokens():
+    root = str(d.ROOT)
+    sibling = root + "-some-topic"
+    m = ("E  StaleCompiledStudyError: run compile --study " + sibling + "\\studies\\x | tmp_path = WindowsPath("
+         "'C:/Users/Some One/AppData/Local/Temp/pytest-of-Some One/pytest-2883/test_x0') scratch/_delta_scope_3e06fffc/f.py at 0x1515AD43AC0 "
+         "compiler.py:868 sha d2f026775d832ae9d290d15db79e8086d38b92dffed25820a17d8fed9f934286 in 1.69s")
+    n = d.portable_signature(m)
+    assert sibling not in n and "<ROOT>\\studies\\x" in n
+    assert "pytest-2883" not in n and "<PYTEST_TMP>" in n
+    assert "_delta_scope_3e06fffc" not in n and "_delta_scope_<TMP>" in n
+    assert "0x1515AD43AC0" not in n and "<ADDR>" in n
+    for exact in ("compiler.py:868", "d2f026775d832ae9d290d15db79e8086d38b92dffed25820a17d8fed9f934286", "in 1.69s"):
+        assert exact in n
+    assert d.portable_signature(n) == n
+    assert d.portable_signature(m.replace(sibling, root).replace("pytest-2883", "pytest-2861")) == n
+    doubled = "path " + root.replace("\\", "\\\\") + "\\\\features\\\\engine.py"
+    assert d.portable_signature(doubled) == "path <ROOT>\\\\features\\\\engine.py"
+
+
+def test_known_failure_matches_across_worktrees_but_a_changed_hash_or_line_is_still_new(baseline):
+    entry = baseline['expected_failures'][0]
+    node, scopes, ref = entry['node_id'], baseline['scopes'], baseline['platform_commit']
+    canon = "E  boom at " + str(d.ROOT) + "\\studies\\s line compiler.py:853 hash " + "a" * 64
+    entry['message'] = canon; entry['outcome'] = 'FAILED'
+    from_worktree = canon.replace(str(d.ROOT), str(d.ROOT) + "-topic")
+    rep = d.classify({node: ('FAILED', from_worktree)}, baseline, scopes, ref)
+    assert rep['counts']['KNOWN_BASELINE_FAILURE'] == 1 and rep['counts']['NEW_FAILURE'] == 0
+    for changed in (canon.replace(":853", ":868"), canon.replace("a" * 64, "b" * 64)):
+        rep = d.classify({node: ('FAILED', changed)}, baseline, scopes, ref)
+        assert rep['counts']['NEW_FAILURE'] == 1 and rep['NEW_FAILURE'][0]['reason'] == 'FAILURE_SIGNATURE_CHANGED_OR_MISSING'
