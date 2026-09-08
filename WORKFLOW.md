@@ -668,6 +668,9 @@ broad suite before every commit -- the 2026-09-05 supervisor hardening ran `rese
 (minutes each, with the black-box proof tens of minutes) before each of five one-file commits; the merge gate is
 the only place a broad run changes a decision. A worker's result card reports the broad run once, in `--tests-json`.
 
+A known failure matches by exact node id, outcome, per-entry scope and its **portable signature**: the full failure
+text with only machine/session-local tokens normalised (repo root or sibling worktree, pytest's per-session tmp dir,
+`_delta_scope_<hex>`, `0x…` addresses); hashes, line numbers and timings stay exact, so a changed failure is NEW.
 The card shows `NEW_FAILURE` prominently and classifies the rest as `KNOWN_BASELINE_FAILURE`,
 `BASELINE_FAILURE_NOW_FIXED` (update the baseline when you commit the fix) or
 `ENVIRONMENTAL_MISSING_ARTIFACT` (reserved legacy category; no automatic missing-file/import exemption).
