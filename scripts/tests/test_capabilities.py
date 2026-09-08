@@ -90,3 +90,26 @@ def test_cli_list_describe_search(capsys):
     assert cap.cli(SimpleNamespace(cmd="describe", capability_id="feature.regime_efficiency")) == 0
     assert cap.cli(SimpleNamespace(cmd="search", text="regime")) == 0
     assert cap.cli(SimpleNamespace(cmd="list", kind="bogus", status=None)) == 2
+
+
+def test_load_registry_builds_on_demand_and_refreshes_when_inputs_change(tmp_path: Path, monkeypatch):
+    path = tmp_path / "registry.json"
+    assert not path.exists()
+    reg = cap.load_registry(path)                      # missing cache -> built, written
+    assert path.is_file() and reg["inputs_sha256"] == cap._inputs_sha256()
+    assert json.loads(path.read_text())["inputs_sha256"] == reg["inputs_sha256"]
+    # a matching digest is served from the cache without a rebuild
+    calls = []
+    real_build = cap.build_registry
+    monkeypatch.setattr(cap, "build_registry", lambda *a, **k: calls.append(1) or real_build(*a, **k))
+    assert cap.load_registry(path)["content_sha256"] == reg["content_sha256"] and calls == []
+    # a changed input digest triggers a rebuild and re-keys the cache
+    monkeypatch.setattr(cap, "_inputs_sha256", lambda *a, **k: "f" * 64)
+    assert cap.load_registry(path)["inputs_sha256"] == "f" * 64 and calls == [1]
+    assert json.loads(path.read_text())["inputs_sha256"] == "f" * 64
+
+
+def test_generate_check_builds_a_missing_cache_instead_of_failing(tmp_path: Path):
+    path = tmp_path / "registry.json"
+    reg = cap.generate(check=True, path=path)
+    assert path.is_file() and json.loads(path.read_text())["content_sha256"] == reg["content_sha256"]

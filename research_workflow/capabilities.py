@@ -15,8 +15,14 @@ Each entry exposes: identity, version, parameters, dependencies, update_cadence,
 cost_class, status, implementation path, required tests. No benchmark fields: measured
 provider cost belongs in ``bench/*.json`` (see ``scripts/bench_baseline.py``).
 
-Output: ``research_workflow/capabilities/registry.json`` (committed, so agents read it for
-zero tokens). ``generate(check=True)`` fails when the committed file is stale.
+Output: ``research_workflow/capabilities/registry.json`` -- an UNTRACKED on-demand cache (git-ignored
+since chore/capability-modularity, 2026-09-08). ``load_registry()`` rebuilds it whenever the digest of
+its inputs (the seed index, the feature authority bundle, dataset specs, tracker and host modules)
+differs from the one recorded in the file, so a fresh worktree builds it once (about 10 s) and a
+branch that adds a capability never has to merge a generated file. ``generate(check=True)`` rebuilds
+and fails with CAPABILITY_REGISTRY_STALE when an existing cache disagrees (inputs outside the digest,
+e.g. the tests a primitive names, changed); the registry stays verifiable because the build is a
+deterministic function of the tree and every compiled plan records ``registry_sha256``.
 """
 from __future__ import annotations
 
@@ -227,24 +233,53 @@ def build_registry(repo_root: Path = REPO_ROOT) -> Dict[str, Any]:
     return reg
 
 
-def generate(*, check: bool = False, repo_root: Path = REPO_ROOT, path: Path = REGISTRY_PATH) -> Dict[str, Any]:
-    reg = build_registry(repo_root)
-    if check:
-        if not path.is_file():
-            raise RuntimeError("CAPABILITY_REGISTRY_MISSING: run 'research cap generate'")
-        current = json.loads(path.read_text(encoding="utf-8"))
-        if current.get("content_sha256") != reg["content_sha256"]:
-            raise RuntimeError("CAPABILITY_REGISTRY_STALE: run 'research cap generate' and commit")
-        return current
+_INPUT_GLOBS = ("research_workflow/capabilities_index.yaml", "features/authority/**/*.json", "research/datasets/*.yaml",
+                "features/trackers/*.py", "research_workflow/host/*.py", "research_workflow/entry_references.py",
+                "research_workflow/capabilities.py")
+
+
+def _inputs_sha256(repo_root: Path = REPO_ROOT) -> str:
+    """Digest of everything the registry is built from that lives in the tree (cheap: a few hundred KB).
+    Test-file contents (``required_tests`` discovery) are deliberately outside it; ``generate(check=True)``
+    covers that drift at the merge gate."""
+    h = hashlib.sha256()
+    for pattern in _INPUT_GLOBS:
+        for p in sorted(Path(repo_root).glob(pattern)):
+            if p.is_file() and "__pycache__" not in p.parts:
+                h.update(p.relative_to(repo_root).as_posix().encode("utf-8")); h.update(b"\0"); h.update(p.read_bytes()); h.update(b"\0")
+    return h.hexdigest()
+
+
+def _write(reg: Dict[str, Any], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(reg, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+
+
+def generate(*, check: bool = False, repo_root: Path = REPO_ROOT, path: Path = REGISTRY_PATH) -> Dict[str, Any]:
+    reg = build_registry(repo_root)
+    reg["inputs_sha256"] = _inputs_sha256(repo_root)   # outside content_sha256 (like generated_at_utc): cache key only
+    if check:
+        if path.is_file():
+            current = json.loads(path.read_text(encoding="utf-8"))
+            if current.get("content_sha256") != reg["content_sha256"]:
+                raise RuntimeError("CAPABILITY_REGISTRY_STALE: run 'research cap generate' (the local cache disagrees with the tree)")
+            return current
+        _write(reg, path)   # nothing is committed any more: a missing cache is built, not an error
+        return reg
+    _write(reg, path)
     return reg
 
 
-def load_registry(path: Path = REGISTRY_PATH) -> Dict[str, Any]:
-    if not path.is_file():
-        raise RuntimeError("CAPABILITY_REGISTRY_MISSING: run 'research cap generate'")
-    return json.loads(path.read_text(encoding="utf-8"))
+def load_registry(path: Path = REGISTRY_PATH, repo_root: Path = REPO_ROOT) -> Dict[str, Any]:
+    """The registry for this tree: the cache when its recorded inputs digest matches, else a fresh build."""
+    if path.is_file():
+        try:
+            current = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            current = None
+        if current and current.get("inputs_sha256") == _inputs_sha256(repo_root):
+            return current
+    return generate(repo_root=repo_root, path=path)
 
 
 def entries(reg: Dict[str, Any], kind: Optional[str] = None) -> List[Dict[str, Any]]:
