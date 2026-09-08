@@ -31,6 +31,30 @@ caught them; do not assume its work was pure overhead.
 
 ---
 
+## Baseline re-record under the enforced classifier (2026-09-08)
+
+`python scripts/test_delta.py research_workflow/tests scripts/tests features/tests tests research/analysis/tests --update-baseline --reason "..." --json`
+on clean `main` `ee16002ea0879989fa385a97e4e1c9d1924ab656`, serial (no other test process on the host),
+Python 3.13.7, Windows: **83m14s** (4,994 s wall, process start to card), **2,389 tests**, **64 known
+failures** recorded as schema 2 (exact node, full message, outcome, per-entry scope, environment
+snapshot). Against the committed 63-entry schema-1 baseline: **one added**
+(`scripts/tests/test_session_efficiency.py::test_test_delta_classifies_against_committed_baseline`, which
+expects the auto-environmental class Wave 2 removed; it fails on clean main), **zero removed**. The
+fresh-worktree missing-model failures (`test_stage3_model_c_long_short_routing`,
+`test_episode_study_is_provider_host_mode_and_all_features_bind`) are NOT in the baseline: the canonical
+checkout holds the ignored artifact, so they pass there and are `NEW_FAILURE` in any worktree without it.
+Five scopes, not the two of the 74m41s figure above; the two figures are not comparable.
+
+Two earlier attempts the same day were discarded: the first ran alongside other test processes and
+recorded 45 spurious entries, all traced to a `test_delta` defect (a trailing empty `PYTHONPATH` element
+made `scripts/research.py` shadow the `research` package in every script-spawning test; fixed in
+`7072c00b`, merged `ee16002e`); the second was killed once that was known. Evidence:
+`artifacts/platform_v2/modularity/S1_REPORT.md` and `evidence/` on `chore/capability-modularity`.
+`test_delta --check-baseline <scope>` re-derives compatibility; re-run the command above to re-derive the
+duration.
+
+---
+
 ## Feature authority bundle
 
 | Fact | Value as of 2026-08-25 | Re-derive with |
