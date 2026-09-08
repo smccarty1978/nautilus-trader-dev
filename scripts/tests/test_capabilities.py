@@ -113,3 +113,16 @@ def test_generate_check_builds_a_missing_cache_instead_of_failing(tmp_path: Path
     path = tmp_path / "registry.json"
     reg = cap.generate(check=True, path=path)
     assert path.is_file() and json.loads(path.read_text())["content_sha256"] == reg["content_sha256"]
+
+
+def test_generate_check_refreshes_an_outdated_cache_but_still_fails_on_drift(tmp_path: Path, monkeypatch):
+    path = tmp_path / "registry.json"
+    reg = cap.generate(path=path)
+    outdated = json.loads(path.read_text()); outdated["inputs_sha256"] = "0" * 64; outdated["content_sha256"] = "1" * 64
+    path.write_text(json.dumps(outdated))
+    assert cap.generate(check=True, path=path)["content_sha256"] == reg["content_sha256"]   # inputs changed -> rebuilt, written
+    assert json.loads(path.read_text())["inputs_sha256"] == reg["inputs_sha256"]
+    drifted = json.loads(path.read_text()); drifted["content_sha256"] = "1" * 64            # same inputs, different content -> drift
+    path.write_text(json.dumps(drifted))
+    with pytest.raises(RuntimeError, match="CAPABILITY_REGISTRY_STALE"):
+        cap.generate(check=True, path=path)
