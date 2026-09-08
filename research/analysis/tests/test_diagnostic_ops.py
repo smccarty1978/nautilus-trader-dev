@@ -11,7 +11,7 @@ import pytest
 from research.analysis.diagnostic_ops import (AnalysisOpError, anchor_first_threshold_crossing, anchored_path,
                                               arm_delta_integrity_gate, bucket_decomposition, cell_matched_controls,
                                               cumulative_incidence, population_parity_gate, precedence_labels,
-                                              resolve_by, run_op)
+                                              resolve_by, run_op, tail_lift)
 
 NS = 1_000_000_000
 BY = {"column": "direction", "cases": {1: {"value": "long_score", "threshold": 0.30, "levels": {"p95": 0.40}},
@@ -663,3 +663,69 @@ def test_run_op_dispatches_the_gate_with_its_execution_context(tmp_path):
                  context={"studies_root": str(tmp_path / "studies"), "study_dir": str(study),
                           "model_root": str(tmp_path / "models")})
     assert out["payload"]["status"] == "PASS" and out["payload"]["baseline_arm"] == "A"
+
+
+# --------------------------------------------------------------------------- tail_lift
+def _scored(n: int, seed: int, *, direction: int = 1, hit_above: float = 0.7) -> pd.DataFrame:
+    import random
+    rng = random.Random(seed)
+    rows = []
+    for i in range(n):
+        sc = rng.random()
+        rows.append({"direction": direction, "score": sc, "hit": 1 if (sc > hit_above and rng.random() < 0.8) or rng.random() < 0.1 else 0})
+    return pd.DataFrame(rows)
+
+
+def test_tail_lift_thresholds_come_from_the_reference_not_the_evaluated_rows():
+    ref = pd.DataFrame({"score": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "hit": 0})
+    rows = pd.DataFrame({"score": [0.05, 0.06, 0.07, 0.08, 0.95, 0.96], "hit": [0, 0, 0, 1, 1, 1]})
+    out = tail_lift(rows, reference=ref, score="score", label="hit", quantiles=[0.9])
+    cell = out["payload"]["cells"][0]
+    assert cell["threshold"] == 1.0                      # 90th percentile of the REFERENCE with interpolation=higher
+    assert cell["n_tail"] == 0 and cell["lift"] is None  # none of the rows reach it; an in-sample threshold would have
+    in_sample = tail_lift(rows, reference=rows, score="score", label="hit", quantiles=[0.9])["payload"]["cells"][0]
+    assert in_sample["threshold"] == 0.96 and in_sample["n_tail"] == 1
+
+
+def test_tail_lift_arithmetic_and_interpolation_pin():
+    ref = pd.DataFrame({"score": [i / 100 for i in range(100)]})
+    rows = pd.DataFrame({"score": [0.10, 0.50, 0.91, 0.92, 0.95, 0.99], "hit": [0, 0, 1, 0, 1, 1]})
+    out = tail_lift(rows, reference=ref, score="score", label="hit", quantiles=[0.9, 0.95])
+    c90, c95 = out["payload"]["cells"]
+    assert c90["threshold"] == 0.90 and c90["n_tail"] == 4 and c90["tail_rate"] == 0.75 and c90["base_rate"] == 0.5 and c90["lift"] == 1.5
+    assert c95["threshold"] == 0.95 and c95["n_tail"] == 2 and c95["tail_rate"] == 1.0 and c95["lift"] == 2.0
+    assert c90["tail_share"] <= 0.1 + 1e-9 or c90["n_rows"] < 10   # 'higher' never over-fills the tail on the reference itself
+    ref_self = tail_lift(ref.assign(hit=0), reference=ref, score="score", label="hit", quantiles=[0.9])["payload"]["cells"][0]
+    assert ref_self["tail_share"] <= 0.10 + 1e-9
+    assert list(out["frame"].columns) == ["group", "quantile", "threshold", "n_reference", "n_rows", "n_tail", "tail_share", "base_rate", "tail_rate", "lift"]
+
+
+def test_tail_lift_excludes_and_counts_null_scores_and_censored_labels():
+    ref = pd.DataFrame({"score": [0.1, 0.5, None, 0.9]})
+    rows = pd.DataFrame({"score": [0.95, None, 0.96, 0.2], "hit": [1, 1, None, 0]})
+    out = tail_lift(rows, reference=ref, score="score", label="hit", quantiles=[0.5])
+    assert out["payload"]["excluded"] == {"rows_null_score": 1, "rows_non_binary_label": 1, "reference_null_score": 1}
+    assert out["payload"]["cells"][0]["n_rows"] == 2 and out["payload"]["cells"][0]["n_reference"] == 3
+
+
+def test_tail_lift_groups_use_their_own_reference_and_refuse_a_missing_group():
+    ref = pd.concat([pd.DataFrame({"direction": 1, "score": [0.1, 0.2, 0.3, 0.4]}), pd.DataFrame({"direction": -1, "score": [0.6, 0.7, 0.8, 0.9]})])
+    rows = pd.DataFrame({"direction": [1, 1, -1, -1], "score": [0.35, 0.05, 0.85, 0.65], "hit": [1, 0, 1, 0]})
+    out = tail_lift(rows, reference=ref, score="score", label="hit", quantiles=[0.5], group_by="direction")
+    by_group = {c["group"]: c for c in out["payload"]["cells"]}
+    assert by_group[1]["threshold"] == 0.3 and by_group[-1]["threshold"] == 0.8
+    assert by_group[1]["n_tail"] == 1 and by_group[-1]["n_tail"] == 1
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_TAIL_LIFT_REFERENCE_EMPTY"):
+        tail_lift(rows.assign(direction=[1, 1, 2, 2]), reference=ref, score="score", label="hit", quantiles=[0.5], group_by="direction")
+
+
+def test_tail_lift_is_registered_requires_its_reference_input_and_is_order_independent():
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_OP_INPUT_MISSING"):
+        run_op("analysis.metric.tail_lift", _scored(50, 1), params={"score": "score", "label": "hit"})
+    ref, rows = _scored(400, 7), _scored(300, 11)
+    a = run_op("analysis.metric.tail_lift", rows, inputs={"reference": ref}, params={"score": "score", "label": "hit"})["payload"]
+    b = run_op("analysis.metric.tail_lift", rows.sample(frac=1.0, random_state=3), inputs={"reference": ref.sample(frac=1.0, random_state=5)},
+               params={"score": "score", "label": "hit"})["payload"]
+    assert a == b and [c["quantile"] for c in a["cells"]] == [0.9, 0.95, 0.975]
+    with pytest.raises(AnalysisOpError, match="ANALYSIS_TAIL_LIFT_QUANTILES_INVALID"):
+        tail_lift(rows, reference=ref, score="score", label="hit", quantiles=[1.0])

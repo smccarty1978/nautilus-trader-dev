@@ -926,6 +926,64 @@ def arm_delta_integrity_gate(rows: pd.DataFrame, *, baseline_arm: str, scope: st
     return {"frame": rows, "payload": payload}
 
 
+
+def tail_lift(rows: pd.DataFrame, *, reference: pd.DataFrame, score: str, label: str,
+              quantiles: Sequence[float] = (0.90, 0.95, 0.975), group_by: Optional[str] = None,
+              interpolation: str = "higher") -> Dict[str, Any]:
+    """Label-rate lift inside the score tail, at thresholds FROZEN from a reference frame.
+
+    The threshold for each quantile is the quantile of ``score`` on ``reference`` (per ``group_by`` value
+    when given), never on ``rows`` themselves: a tail evaluated at its own in-sample quantile is a
+    description, not a test. Declare ``inputs: {reference: <train step>}`` and point ``rows`` at the
+    evaluation frame. ``lift = tail label rate / base label rate`` where base is the label rate of every
+    evaluated row of the group. Rows with a null score or a non-binary label (censored) are excluded and
+    counted in the payload; a group with no reference rows is an error, not a silent skip.
+
+    Named as ANALYSIS_HARNESS_GAP by es_180s_model_c_portability (2026-09-06): frozen TRAIN P90/P95/P97.5
+    tail lift applied to OOS was one of three required outputs the platform could not express.
+    """
+    cols = [score, label] + ([group_by] if group_by else [])
+    _require(rows, cols, "tail_lift.rows")
+    _require(reference, [score] + ([group_by] if group_by else []), "tail_lift.reference")
+    qs = sorted({float(q) for q in quantiles})
+    if not qs or any(not (0.0 < q < 1.0) for q in qs):
+        raise AnalysisOpError(f"ANALYSIS_TAIL_LIFT_QUANTILES_INVALID: {list(quantiles)!r} (each must satisfy 0 < q < 1)")
+    if interpolation not in ("higher", "lower", "nearest", "linear", "midpoint"):
+        raise AnalysisOpError(f"ANALYSIS_TAIL_LIFT_INTERPOLATION_INVALID: {interpolation!r}")
+    binary = {0, 1, 0.0, 1.0, True, False}
+    ev0 = rows[rows[score].notna()]
+    ev = ev0[ev0[label].isin(binary)]
+    ref = reference[reference[score].notna()]
+    excluded = {"rows_null_score": int(len(rows) - len(ev0)), "rows_non_binary_label": int(len(ev0) - len(ev)),
+                "reference_null_score": int(len(reference) - len(ref))}
+    if group_by is None:
+        groups: List[Any] = [None]
+    else:
+        groups = sorted(ev[group_by].dropna().unique().tolist(), key=lambda v: (str(type(v)), str(v)))
+    cells: List[Dict[str, Any]] = []
+    for g in groups:
+        e = ev if g is None else ev[ev[group_by] == g]
+        r = ref if g is None else ref[ref[group_by] == g]
+        if len(r) == 0:
+            raise AnalysisOpError(f"ANALYSIS_TAIL_LIFT_REFERENCE_EMPTY: group {g!r} has no reference rows with a score")
+        if len(e) == 0:
+            raise AnalysisOpError(f"ANALYSIS_TAIL_LIFT_ROWS_EMPTY: group {g!r} has no evaluable rows")
+        base = float(e[label].astype(float).mean())
+        for q in qs:
+            thr = float(r[score].astype(float).quantile(q, interpolation=interpolation))
+            tail = e[e[score].astype(float) >= thr]
+            n_tail = int(len(tail))
+            tail_rate = float(tail[label].astype(float).mean()) if n_tail else None
+            lift = (tail_rate / base) if (n_tail and base > 0.0) else None
+            cells.append({"group": g, "quantile": q, "threshold": thr, "n_reference": int(len(r)), "n_rows": int(len(e)),
+                          "n_tail": n_tail, "tail_share": n_tail / len(e), "base_rate": base, "tail_rate": tail_rate, "lift": lift})
+    frame = pd.DataFrame(cells, columns=["group", "quantile", "threshold", "n_reference", "n_rows", "n_tail", "tail_share",
+                                         "base_rate", "tail_rate", "lift"])
+    payload = {"score": score, "label": label, "group_by": group_by, "quantiles": qs, "interpolation": interpolation,
+               "excluded": excluded, "cells": cells}
+    return {"frame": frame, "payload": payload}
+
+
 # --------------------------------------------------------------------------- #
 # registry
 # --------------------------------------------------------------------------- #
@@ -938,6 +996,7 @@ OPS = {
     "analysis.classify.precedence": precedence_labels,
     "analysis.gate.population_parity": population_parity_gate,
     "analysis.gate.arm_delta_integrity": arm_delta_integrity_gate,
+    "analysis.metric.tail_lift": tail_lift,
 }
 # Which extra frames each op consumes besides its primary ``rows`` input. The compiler reads
 # this to prove a declared step's inputs are bound before the study is ever executed.
@@ -950,6 +1009,7 @@ OP_INPUTS = {
     "analysis.classify.precedence": (),
     "analysis.gate.population_parity": (),
     "analysis.gate.arm_delta_integrity": (),
+    "analysis.metric.tail_lift": ("reference",),
 }
 
 # Ops needing machine-local resolution context. Never part of the plan identity: where an

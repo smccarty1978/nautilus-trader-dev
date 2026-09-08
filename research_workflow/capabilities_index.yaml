@@ -295,3 +295,10 @@ analysis_ops:
     parameters: [baseline_arm, scope, min_non_null_rate, require_positive_variance, require_distinct_fit_identity, require_distinct_predictions, min_prediction_divergence, models_manifest, study_id]
     update_cadence: offline_only
     required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.metric.tail_lift
+    version: 1
+    description: Label-rate lift inside the score tail at thresholds frozen from a declared reference frame (per-group quantiles applied to the evaluation rows; censored rows excluded and counted).
+    implementation: research.analysis.diagnostic_ops.tail_lift
+    parameters: [score, label, quantiles, group_by, interpolation]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_diagnostic_ops.py]
