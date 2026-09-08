@@ -42,15 +42,16 @@ import pandas as pd
 NS = 1_000_000_000
 
 __all__ = [
-    "AnalysisOpError", "OPS", "run_op", "eligibility_mask", "resolve_by", "apply_terminal",
+    "AnalysisOpError", "eligibility_mask", "resolve_by", "apply_terminal",
     "anchor_first_threshold_crossing", "cumulative_incidence", "bucket_decomposition",
     "cell_matched_controls", "anchored_path", "precedence_labels", "population_parity_gate",
     "arm_delta_integrity_gate",
 ]
 
 
-class AnalysisOpError(RuntimeError):
-    pass
+# Raised by every operation here and by the resolver; defined at the boundary so a consumer
+# can catch it without importing an implementation module.
+from research.analysis.ops import AnalysisOpError  # noqa: E402,F401  (re-exported)
 
 
 # --------------------------------------------------------------------------- #
@@ -985,48 +986,10 @@ def tail_lift(rows: pd.DataFrame, *, reference: pd.DataFrame, score: str, label:
 
 
 # --------------------------------------------------------------------------- #
-# registry
+# registration
 # --------------------------------------------------------------------------- #
-OPS = {
-    "analysis.anchor.first_threshold_crossing": anchor_first_threshold_crossing,
-    "analysis.incidence.cumulative": cumulative_incidence,
-    "analysis.decomposition.buckets": bucket_decomposition,
-    "analysis.control.cell_matched": cell_matched_controls,
-    "analysis.path.anchored_offsets": anchored_path,
-    "analysis.classify.precedence": precedence_labels,
-    "analysis.gate.population_parity": population_parity_gate,
-    "analysis.gate.arm_delta_integrity": arm_delta_integrity_gate,
-    "analysis.metric.tail_lift": tail_lift,
-}
-# Which extra frames each op consumes besides its primary ``rows`` input. The compiler reads
-# this to prove a declared step's inputs are bound before the study is ever executed.
-OP_INPUTS = {
-    "analysis.anchor.first_threshold_crossing": (),
-    "analysis.incidence.cumulative": (),
-    "analysis.decomposition.buckets": (),
-    "analysis.control.cell_matched": ("anchors",),
-    "analysis.path.anchored_offsets": ("anchors",),
-    "analysis.classify.precedence": (),
-    "analysis.gate.population_parity": (),
-    "analysis.gate.arm_delta_integrity": (),
-    "analysis.metric.tail_lift": ("reference",),
-}
-
-# Ops needing machine-local resolution context. Never part of the plan identity: where an
-# operator keeps their files is not a scientific fact.
-OP_CONTEXT = frozenset({"analysis.gate.population_parity", "analysis.gate.arm_delta_integrity"})
-
-
-def run_op(op: str, rows: pd.DataFrame, *, inputs: Mapping[str, pd.DataFrame] | None = None,
-           params: Mapping[str, Any] | None = None,
-           context: Mapping[str, Any] | None = None) -> Dict[str, Any]:
-    if op not in OPS:
-        raise AnalysisOpError(f"ANALYSIS_OP_UNKNOWN: {op!r}; known={sorted(OPS)}")
-    kwargs = dict(params or {})
-    if op in OP_CONTEXT:
-        kwargs["context"] = dict(context or {})
-    for name in OP_INPUTS[op]:
-        if name not in (inputs or {}):
-            raise AnalysisOpError(f"ANALYSIS_OP_INPUT_MISSING: {op} needs input {name!r}")
-        kwargs[name] = (inputs or {})[name]
-    return OPS[op](rows, **kwargs)
+# There is deliberately no OPS / OP_INPUTS / OP_CONTEXT table here. Each operation above is
+# registered by one entry in ``research_workflow/capabilities_index.d/analysis_ops.yaml`` (id, implementation,
+# inputs, needs_context) and resolved by ``research.analysis.ops`` -- the registration boundary
+# the compiler and the analyze stage import. Adding an operation is a function here plus a seed
+# entry, and touches no consumer. See ``docs/RESEARCH_WORKFLOW.md`` §21.14.

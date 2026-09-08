@@ -1,0 +1,89 @@
+{
+ "tree": "chore/registration_boundaries @ 291feeaa",
+ "test_files_total": 183,
+ "reverse": {
+  "features/registry.py": {
+   "test_files": 138,
+   "heavy_end_to_end": [
+    "test_lifecycle_v2.py",
+    "test_redteam_packet_f.py",
+    "test_redteam_v2_model_authority.py",
+    "test_supervisor_blackbox.py"
+   ]
+  },
+  "features/feature_types.py": {
+   "test_files": 138,
+   "heavy_end_to_end": [
+    "test_lifecycle_v2.py",
+    "test_redteam_packet_f.py",
+    "test_redteam_v2_model_authority.py",
+    "test_supervisor_blackbox.py"
+   ]
+  },
+  "features/definitions/physical_catalogue.py": {
+   "test_files": 1,
+   "heavy_end_to_end": []
+  },
+  "features/definitions/canonical.py": {
+   "test_files": 1,
+   "heavy_end_to_end": []
+  },
+  "features/definitions/legacy_instances.py": {
+   "test_files": 1,
+   "heavy_end_to_end": []
+  },
+  "features/definitions/providers.py": {
+   "test_files": 1,
+   "heavy_end_to_end": []
+  },
+  "research/analysis/diagnostic_ops.py": {
+   "test_files": 3,
+   "heavy_end_to_end": []
+  },
+  "research/analysis/ops.py": {
+   "test_files": 34,
+   "heavy_end_to_end": [
+    "test_lifecycle_v2.py",
+    "test_redteam_packet_f.py",
+    "test_redteam_v2_model_authority.py",
+    "test_supervisor_blackbox.py"
+   ]
+  },
+  "research_workflow/grammar/compiler.py": {
+   "test_files": 33,
+   "heavy_end_to_end": [
+    "test_lifecycle_v2.py",
+    "test_redteam_packet_f.py",
+    "test_redteam_v2_model_authority.py",
+    "test_supervisor_blackbox.py"
+   ]
+  },
+  "research_workflow/lifecycle_v2.py": {
+   "test_files": 24,
+   "heavy_end_to_end": [
+    "test_lifecycle_v2.py",
+    "test_redteam_packet_f.py",
+    "test_redteam_v2_model_authority.py",
+    "test_supervisor_blackbox.py"
+   ]
+  },
+  "research_workflow/capabilities.py": {
+   "test_files": 34,
+   "heavy_end_to_end": [
+    "test_lifecycle_v2.py",
+    "test_redteam_packet_f.py",
+    "test_redteam_v2_model_authority.py",
+    "test_supervisor_blackbox.py"
+   ]
+  },
+  "features/trackers/host_bindings.py": {
+   "test_files": 35,
+   "heavy_end_to_end": [
+    "test_lifecycle_v2.py",
+    "test_redteam_packet_f.py",
+    "test_redteam_v2_model_authority.py",
+    "test_supervisor_blackbox.py"
+   ]
+  }
+ }
+}

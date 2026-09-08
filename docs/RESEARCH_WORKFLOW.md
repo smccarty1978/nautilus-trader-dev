@@ -1483,3 +1483,84 @@ else is a reconcile finding, and a foreign-plan partition under `off` is a findi
 
 Tests: `research_workflow/tests/test_replay_closure.py`. Reports:
 `artifacts/platform_v2/collection_latency/{W0,S1,R2}_REPORT.md`.
+
+### 21.14 Registration boundaries
+
+A platform change is gated by its **blast radius**: which tests could possibly observe it. That
+radius is derived, not declared — from static import reachability (`transitive_closure_files` /
+`_static_imports` in `research_workflow/grammar/compiler.py`, which the execution closure, the
+frozen manifest and the tiered-gate surface derivation all reuse). Reachability is sound but it
+over-approximates at exactly one kind of module: a **registration or resolution point**, where the
+catalogue of what exists sits in the same module as the API that resolves it. Adding an entry then
+edits a module every consumer imports, and the derivation charges the addition with everything
+those consumers can reach — even though no consumer depends on *which* entries are registered,
+only on the resolver's interface.
+
+A **registration boundary** is a module that
+
+1. exposes a stable resolution API that consumers import, and
+2. discovers registered capabilities through the **declared capability index**, never by
+   statically importing them.
+
+The second condition is load-bearing. A resolver that statically imports its implementations
+leaves reachability unchanged and has gained nothing; the boundary would be an assertion. And a
+boundary is only real once its **golden-resolution fixture** exists: an exhaustive, committed
+snapshot of what every registered name resolves to, generated before the change and compared
+after. Without one, "consumers cannot be affected" is a claim. With one, it is a proof.
+
+Derived-surface reachability stops at a proven boundary: an addition on the catalogue side of one
+is attributable to that catalogue and to the governance floor, not to the boundary's consumers.
+
+**Boundaries today**
+
+| Boundary | Catalogue side | Index | Golden fixture |
+|---|---|---|---|
+| `features/trackers/host_bindings.py` (trackers, feature hosts, derived inputs) | `features/trackers/*.py` | `research_workflow/capabilities_index.yaml` | `research_workflow/tests/test_capability_modularity.py` |
+| `features/registry.py` (feature definitions) | `features/definitions/*.py` | `research_workflow/capabilities_index.d/feature_definitions.yaml` | `features/tests/test_feature_definition_boundary.py` |
+| `research/analysis/ops.py` (analysis operations) | `research/analysis/diagnostic_ops.py` | `research_workflow/capabilities_index.d/analysis_ops.yaml` | `research/analysis/tests/test_analysis_op_boundary.py` |
+
+A new capability kind follows the pattern rather than rediscovering it: resolution API in its own
+module, catalogue in modules the index names, dotted-path import at resolution time, exhaustive
+golden fixture, and an import-graph test that fails if the boundary is ever short-circuited.
+
+**Two obligations a boundary creates.**
+
+*The closure must be seeded explicitly.* A dynamically resolved module is invisible to the import
+walk, so the compiler adds it by name — `features.registry.definition_files()` and
+`research.analysis.ops.implementation_files()` at `_resolve_features` / `_resolve_analysis`, and
+the same seeding in `scripts/resolve_execution_manifest.py` for the V1 manifest. Editing a feature
+definition or an analysis op stales a study's freeze exactly as it did before the split; nothing
+about the seal, the manifest or the reuse key is weakened by a boundary, and the file set the
+closure covers is unchanged.
+
+*A boundary reads its own index file.* Kinds with a boundary live in
+`research_workflow/capabilities_index.d/<kind>.yaml`; `research cap generate` merges the directory
+into the one registry and refuses a kind declared in two files
+(`CAPABILITY_KIND_DECLARED_TWICE`). The aggregate `capabilities_index.yaml` holds the kinds whose
+only reader is the generic one, and stays the file `cap propose/scaffold/promote` writes. This is
+not cosmetic: a boundary that read the shared index would make *every other kind's* edit look like
+a change to everything that boundary serves — measured at 138 test files for a one-line analysis-op
+addition, against 37 once the kinds were separated.
+
+**What a boundary does and does not buy.** It bounds the blast radius of a capability's
+*implementation*, not of the resolver's *interface*, and not of the index the compiler validates
+registrations against. Measured on this tree (183 test files):
+
+| | before | after |
+|---|---:|---:|
+| tests reaching `features/registry.py` | 132 | 138 (it is the resolver; unchanged by design) |
+| tests reaching a feature-definition catalogue | 132 | **1** |
+| tests reaching `research/analysis/diagnostic_ops.py` | 32 | **3** |
+| derived surface, one feature definition added | 133 files / 1,848 tests | **10 files / 121 tests** |
+| derived surface, one analysis op added | 36 files / 415 tests | 37 files / 428 tests |
+
+A feature definition collapses completely because it needs no index edit at all — the catalogue
+module is already registered. An analysis operation does not, because its *registration* is an
+index entry, the compiler validates declared op ids against the index, and
+`research_workflow/grammar/compiler.py` alone is reachable from all four end-to-end proofs
+(`test_supervisor_blackbox`, `test_redteam_packet_f`, `test_lifecycle_v2`,
+`test_redteam_v2_model_authority` — 83 % of that tier's wall time). The same is true of the
+already-merged tracker boundary. Shrinking that tier further is a question about how the surface
+derivation treats a compiler edit, not about the architecture — and it is not answered by
+excluding those proofs by name, which is the hand-maintained coupling this whole design exists to
+remove.

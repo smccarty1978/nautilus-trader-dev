@@ -1,0 +1,30 @@
+# Registration index for the `feature_definitions` capability kind.
+#
+# It has its own file because it has its own registration boundary (features/registry.py), and a
+# boundary that reads the shared index makes every other kind's edit look like a change to
+# everything that boundary serves. `research cap generate` merges every file in this
+# directory into the one registry; `research cap list/search/describe` are unchanged.
+# See docs/RESEARCH_WORKFLOW.md §21.14.
+feature_definitions:
+  # Feature-definition catalogues, discovered by `features.registry` through this index and
+  # imported by dotted path -- never statically imported by the resolver or by any consumer.
+  # Adding a definition edits one of these modules and nothing else; adding a new catalogue
+  # module adds one entry here. Declaration order is the merge order.
+  - id: feature_definitions.physical_catalogue
+    version: 1
+    description: Historical physical output-alias catalogue (the compatibility registry of FEATURE_REGISTRY entries).
+    implementation: features.definitions.physical_catalogue
+    update_cadence: offline_only
+    required_tests: [features/tests/test_feature_definition_boundary.py]
+  - id: feature_definitions.canonical
+    version: 1
+    description: Canonical V2 feature definitions -- the lifecycle/promotion authority behind the activated bundle.
+    implementation: features.definitions.canonical
+    update_cadence: offline_only
+    required_tests: [features/tests/test_feature_definition_boundary.py]
+  - id: feature_definitions.legacy_instances
+    version: 1
+    description: Legacy physical instance aliases -- historical spellings of canonical instances, preserved for parquet/model contracts.
+    implementation: features.definitions.legacy_instances
+    update_cadence: offline_only
+    required_tests: [features/tests/test_feature_definition_boundary.py]

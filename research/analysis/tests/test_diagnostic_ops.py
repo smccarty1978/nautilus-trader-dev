@@ -11,7 +11,8 @@ import pytest
 from research.analysis.diagnostic_ops import (AnalysisOpError, anchor_first_threshold_crossing, anchored_path,
                                               arm_delta_integrity_gate, bucket_decomposition, cell_matched_controls,
                                               cumulative_incidence, population_parity_gate, precedence_labels,
-                                              resolve_by, run_op, tail_lift)
+                                              resolve_by, tail_lift)
+from research.analysis.ops import run_op
 
 NS = 1_000_000_000
 BY = {"column": "direction", "cases": {1: {"value": "long_score", "threshold": 0.30, "levels": {"p95": 0.40}},

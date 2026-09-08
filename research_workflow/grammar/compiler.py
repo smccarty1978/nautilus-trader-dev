@@ -475,13 +475,19 @@ def _resolve_features(ctx: _Ctx) -> None:
         ctx.features = None
         return
     from features.registry import (FeatureInstance, FeatureInstanceError, _canonical_bundle, _canonical_definition_by_name,
-                                   derive_resolved_input_requirements, generate_physical_alias, resolve_feature_instances,
-                                   validate_feature_instance)
+                                   definition_files, derive_resolved_input_requirements, generate_physical_alias,
+                                   resolve_feature_instances, validate_feature_instance)
     # W-4: for a real `features.host: features` study, this module decides canonical feature
     # identity, parameter validation and physical alias generation at compile time -- it must
     # be inside the closure so redefining it stales the freeze (research_workflow.seal /
     # policy.verify_historical_authority) the same way a bound provider/tracker module does.
     ctx.closure_files.add("features/registry.py")
+    # The definition catalogues it resolves against are declared in the capability index and
+    # imported by dotted path, so the closure's import walk cannot reach them: seed them here.
+    # Redefining a feature stales the freeze exactly as it did when the definitions lived
+    # inside features/registry.py.
+    for rel in definition_files():
+        ctx.closure_files.add(rel)
     bundle = _canonical_bundle("active")
     resolved: List[Dict[str, Any]] = []
     ok = True
@@ -1223,7 +1229,7 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
     spec = getattr(ctx.spec, "analysis", None)
     if spec is None:
         return None
-    from research.analysis.diagnostic_ops import OP_INPUTS
+    from research.analysis.ops import implementation_files, op_inputs
     registered = {e["id"] for e in ctx.registry.get("kinds", {}).get("analysis_ops", [])}
     if spec.source == "oos" and not (chronology.get("dev") or []):
         ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "analysis.source",
@@ -1244,7 +1250,7 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
         if step.rows != "frame" and step.rows not in seen:
             ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.rows",
                     f"{step.rows!r} is neither 'frame' nor an earlier step; an analysis pipeline runs in declaration order")
-        required = set(OP_INPUTS.get(step.op, ()))
+        required = set(op_inputs(step.op))
         for name, ref in (step.inputs or {}).items():
             if name not in required:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs.{name}",
@@ -1273,8 +1279,12 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
     if not artifacts:
         ctx.gap(GapKind.INVALID_PARAMETERIZATION, "analysis.artifacts",
                 "declare the artifacts this analysis produces; an analysis that writes nothing cannot be audited")
-    ctx.closure_files.add("research/analysis/diagnostic_ops.py")
-    ctx.replay_excluded.add("research/analysis/diagnostic_ops.py")   # analysis stage: never executes during replay
+    # The analysis ops are resolved from the capability index, so the closure's import walk cannot
+    # see them: seed the modules that actually implement the declared steps, plus the boundary that
+    # binds an id to one of them. Editing either stales the freeze, exactly as before.
+    for rel in ("research/analysis/ops.py",) + implementation_files(s["op"] for s in steps):
+        ctx.closure_files.add(rel)
+        ctx.replay_excluded.add(rel)   # analysis stage: never executes during replay
     return {"source": spec.source, "steps": steps, "artifacts": artifacts,
             "ops": sorted({s["op"] for s in steps})}
 
