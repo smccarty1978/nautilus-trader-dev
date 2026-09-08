@@ -1,8 +1,8 @@
 # Session 3 — prove it with a real addition (chore/analysis-tail-lift)
 
     packet:   RESTORE THE GATE, THEN UNBLOCK MODULARITY — Session 3
-    branch:   chore/analysis-tail-lift, stacked on chore/capability-modularity 3adcb9b0 (B1+B2+B3)
-    commit:   017eac8f  feat(analysis): analysis.metric.tail_lift
+    branch:   chore/analysis-tail-lift, rebased onto main 36dfde6a (Session 2 merged)
+    commit:   194d7372  feat(analysis): analysis.metric.tail_lift  (first written as 017eac8f on the Session 2 branch)
     capability: `analysis.metric.tail_lift` — label-rate lift inside the score tail at P90/P95/P97.5
               thresholds frozen from a declared reference frame and applied to the evaluation rows.
               Not a fixture: it is the `ANALYSIS_HARNESS_GAP` that `es_180s_model_c_portability` closed
@@ -91,3 +91,26 @@ visible to declared analysis is not.** One concrete case, as the packet asked.
 
 Classifies additive under the mechanical rule, derives to 36 files, no host or lifecycle edit, two
 insertion-only hand edits in the op registry. Whether "minutes" holds is the measured line above.
+
+## The additive tier, run as a gate (after Session 2 merged)
+
+Re-classified against `main` 36dfde6a: **ADDITIVE_CAPABILITY**, same three votes, 36 files / 415 tests.
+Quick checks of the tier, all green in seconds: `cap generate --check` OK (analysis_ops 9, `verified`),
+`python scripts/lint_host.py` CLEAR (8 files), diff hygiene OK (6 files, no non-UTF-8, no mojibake).
+Derived surface run **through `test_delta`** against the Session 1 baseline (`--baseline-reference ee16002e`),
+alone on the host, ignored model artifact provisioned:
+
+**Stopped by owner decision at 13:1x, 10 minutes in**, and merged on the evidence already in hand: the identical
+36-file surface had already been run once on the same op (58m50s contended; 421 passed, 7 failed, every
+failure traced — two baseline / provisioning nodes, one pre-existing `test_session_efficiency` node, four
+`test_execution_closure` nodes fixed in `13529d1c` and green in the Session 2 broad gate), the diff is three
+files and classifies additive, and the quick checks are green in seconds. Re-running the same hour to
+produce a card was measurement for its own sake.
+
+**The number that matters:** the additive tier as derived by import reachability is ~59 minutes, not
+minutes, because `lifecycle_v2` imports the analysis-op module and the supervisor / lifecycle end-to-end
+files ride along (`test_supervisor_blackbox` 30 min, `test_redteam_packet_f` 10 min, `test_lifecycle_v2`
+5 min = 83 % of the time). Without those three files the same surface is about **14 minutes**. Getting
+there is one rule (exclude the black-box supervisor proofs from the additive tier — they exercise the
+supervisor, not the op) or one platform change (lazy-import the analysis ops in `lifecycle_v2` so the
+reachability edge disappears). That is the next decision; no further measurement is needed.
