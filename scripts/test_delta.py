@@ -96,7 +96,11 @@ def pytest_sessionfinish(session, exitstatus):
         (d / 'test_delta_capture.py').write_text(plugin, encoding='utf-8')
         report_path = d / 'reports.json'
         env = {**os.environ, 'PYTHONIOENCODING': 'utf-8', 'PYTHONDONTWRITEBYTECODE': '1', 'TEST_DELTA_REPORT': str(report_path),
-               'PYTHONPATH': td + os.pathsep + os.environ.get('PYTHONPATH', '')}
+               # never a trailing empty entry: CPython resolves an empty PYTHONPATH element to the CWD, and a
+               # test that then spawns `python scripts/<x>.py` sees scripts/ ahead of the repo root, where
+               # scripts/research.py shadows the `research` package (found by the 2026-09-08 baseline re-record:
+               # 45 spurious failures, every test that launches a script)
+               'PYTHONPATH': os.pathsep.join([td] + [v for v in os.environ.get('PYTHONPATH', '').split(os.pathsep) if v])}
         cmd = [sys.executable, '-m', 'pytest', *scope, '-q', '-rA', '-p', 'no:cacheprovider',
                '-p', 'test_delta_capture', *extra]
         r = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, encoding='utf-8', errors='replace', env=env)
