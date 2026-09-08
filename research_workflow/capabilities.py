@@ -261,10 +261,13 @@ def generate(*, check: bool = False, repo_root: Path = REPO_ROOT, path: Path = R
     if check:
         if path.is_file():
             current = json.loads(path.read_text(encoding="utf-8"))
-            if current.get("content_sha256") != reg["content_sha256"]:
+            if current.get("inputs_sha256") == reg["inputs_sha256"] and current.get("content_sha256") != reg["content_sha256"]:
+                # the inputs the digest covers are unchanged yet the build differs: something outside the digest
+                # (e.g. the test files a primitive names) drifted -- that is the drift the gate must surface
                 raise RuntimeError("CAPABILITY_REGISTRY_STALE: run 'research cap generate' (the local cache disagrees with the tree)")
-            return current
-        _write(reg, path)   # nothing is committed any more: a missing cache is built, not an error
+            if current.get("inputs_sha256") == reg["inputs_sha256"]:
+                return current
+        _write(reg, path)   # missing or merely outdated cache (inputs changed, e.g. after a merge): built, not an error
         return reg
     _write(reg, path)
     return reg
