@@ -34,10 +34,26 @@ class AnalysisOpError(RuntimeError):
     pass
 
 
+_SEED_CACHE: Dict[Any, Dict[str, Dict[str, Any]]] = {}
+
+
 def _seed(index_path: Optional[Path] = None) -> Dict[str, Dict[str, Any]]:
-    """Declared analysis operations, keyed by capability id, straight from the index."""
+    """Declared analysis operations, keyed by capability id, straight from the index.
+
+    Memoised on (path, mtime, size): the compiler asks per declared step and ``run_op`` asks
+    three times per call, and re-parsing the index each time is pure waste. An edited index
+    re-keys, so a test that rewrites one is never served a stale answer.
+    """
     import yaml
     path = Path(index_path) if index_path is not None else _INDEX_PATH
+    try:
+        stat = path.stat()
+        key = (str(path), stat.st_mtime_ns, stat.st_size)
+    except OSError as exc:
+        raise AnalysisOpError(f"ANALYSIS_OP_INDEX_UNREADABLE: {path}: {exc}") from exc
+    cached = _SEED_CACHE.get(key)
+    if cached is not None:
+        return cached
     try:
         seed = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     except (OSError, yaml.YAMLError) as exc:
@@ -49,6 +65,7 @@ def _seed(index_path: Optional[Path] = None) -> Dict[str, Dict[str, Any]]:
             out[op] = entry
     if not out:
         raise AnalysisOpError(f"ANALYSIS_OP_INDEX_EMPTY: {path} declares no {_KIND}")
+    _SEED_CACHE[key] = out
     return out
 
 

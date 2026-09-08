@@ -1,0 +1,57 @@
+{
+ "class": "ADDITIVE_CAPABILITY",
+ "rows": [
+  {
+   "status": "M",
+   "path": "features/definitions/physical_catalogue.py",
+   "class": "ADDITIVE_CAPABILITY",
+   "reason": "registration file: insertion-only"
+  }
+ ],
+ "surface_files": 10,
+ "surface_tests": 121,
+ "surface": [
+  "features/tests/test_feature_definition_boundary.py",
+  "research_workflow/tests/test_closure_transitive_imports.py",
+  "research_workflow/tests/test_docs_v2.py",
+  "research_workflow/tests/test_golden_fixture.py",
+  "research_workflow/tests/test_grammar_v2.py",
+  "research_workflow/tests/test_redteam_v2_closure.py",
+  "research_workflow/tests/test_replay_closure.py",
+  "research_workflow/tests/test_runtime_bindings.py",
+  "scripts/tests/test_capabilities.py",
+  "scripts/tests/test_execution_closure.py"
+ ],
+ "why": {
+  "features/tests/test_feature_definition_boundary.py": [
+   "imports features/definitions/physical_catalogue.py"
+  ],
+  "research_workflow/tests/test_closure_transitive_imports.py": [
+   "fixed governance floor"
+  ],
+  "research_workflow/tests/test_redteam_v2_closure.py": [
+   "fixed governance floor"
+  ],
+  "research_workflow/tests/test_replay_closure.py": [
+   "fixed governance floor"
+  ],
+  "scripts/tests/test_execution_closure.py": [
+   "fixed governance floor"
+  ],
+  "scripts/tests/test_capabilities.py": [
+   "fixed governance floor"
+  ],
+  "research_workflow/tests/test_grammar_v2.py": [
+   "fixed governance floor"
+  ],
+  "research_workflow/tests/test_golden_fixture.py": [
+   "fixed governance floor"
+  ],
+  "research_workflow/tests/test_runtime_bindings.py": [
+   "fixed governance floor"
+  ],
+  "research_workflow/tests/test_docs_v2.py": [
+   "fixed governance floor"
+  ]
+ }
+}
