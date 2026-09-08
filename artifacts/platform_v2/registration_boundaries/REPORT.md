@@ -252,3 +252,37 @@ python scripts/test_delta.py research_workflow/tests scripts/tests features/test
 ```
 
 Result: see §8.1 below.
+
+### 8.1 Broad gate result
+
+Run alone on the host at `eb831c9f` (an earlier launch was discarded: the tree was edited
+mid-run, which is not a gate). Card: `evidence/broad_gate.card.json`.
+
+| | |
+|---|---:|
+| wall | **86m 34s** (5,194 s) |
+| ran / passed / failed | 2,437 / 2,366 / **64** |
+| `KNOWN_BASELINE_FAILURE` | 59 |
+| **`NEW_FAILURE`** | **5** |
+| `NEW_FAILURE_OUTSIDE_BASELINE_SCOPE` | 0 |
+| `BASELINE_FAILURE_NOW_FIXED` | 0 |
+| `baseline_issues` | 0 |
+
+**Red by the letter of the enforced classifier; zero behaviour changes attributable to this
+branch.** All five are baseline entries reported `FAILURE_SIGNATURE_CHANGED_OR_MISSING` — the
+node is recorded, the message text moved. Each was diffed against its recorded message:
+
+| node | differing lines | what moved | cause |
+|---|---:|---|---|
+| `test_feature_system_v2::test_explicit_instances_and_collection_universe_share_canonical_status` | 2 | `DID NOT RAISE <class 'features.registry.FeatureInstanceError'>` → `'features.feature_types.FeatureInstanceError'` | **this branch** — the exception class moved module; same assertion, same line, same cause |
+| `test_generic_contract_audit::test_no_hardcoded_feature_count_in_generic_workflow` | 4 | `grammar/compiler.py:853` → `:874` | **this branch** — 21 lines inserted above it. Offender **file set identical** (5 files), every other line number unchanged |
+| `test_redteam_pass1_acceptance::test_acc12_canaries_green` | 4 | `5 failed, 74 passed in 1.69s` → `in 1.76s`, plus a truncated `CompletedProcess` repr | run-varying. The **same 5 inner nodes** fail, same counts |
+| `test_rt_final_blockers::test_rt2b2_…[scripts/check_feature_promotion.py]` | 4 | `pytest-2861` → `pytest-2924` session dir; tree composite `d2f02677…` → `94bcd63c…` | session-local + the composite moving, which is what a CORE_SURFACE change does. Assertion identical (`x != x`) |
+| `test_rt_final_blockers::test_rt2b2_…[scripts/select_required_tests.py]` | 4 | same two | same |
+
+Three of the five are the run-varying / session-local / line-shift classes Session 2 already
+escalated and left for a follow-up decision; two are line-and-class-path shifts caused here.
+No finding changed in any of them. The baseline was **not** edited — it changes only through
+`--update-baseline --reason`, and normalising these signatures is the open decision from
+Session 2 (per-entry `node_only`, or normalising `in <n>s`, composite hashes and class module
+paths), not something to take inside this packet.
