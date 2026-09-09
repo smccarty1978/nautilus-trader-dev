@@ -1,0 +1,59 @@
+# S1.2 platform gate (disposable): does the declared analysis frame carry THIS study's own
+# fitted-model scores, so analysis.metric.tail_lift can freeze thresholds on TRAIN scores and
+# evaluate OOS rows -- on real NQ data, end to end? Not research: three TRAIN days, three OOS days.
+# Branched from chore/analysis-own-model-scores c545e596 (see research_decision.yaml).
+study:
+  id: s12_own_scores_gate
+  tier: 2
+  question: "Platform gate: tail_lift against the study's own fitted model, TRAIN-frozen thresholds applied to OOS rows, on real NQ data end to end"
+streams:
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, max_age: 1800s}
+  qualify: "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and features.structural_snapshot_ready"
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+features:
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: rolling_giveback_atr, window: 300s, update_every: 1s}
+  metadata:
+    regime_age_seconds: regime_1m.age_s
+    triggering_1s_ts_init: epoch.T
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    snapshot: {atr: regime_1m.atr, family_a_atr: excursion.frozen_atr, episode_state: {prevailing_direction: regime_1m.dir}}
+outcome:
+  kind: label
+  event: regime_1m.flipped
+  horizon: 300s
+  direction: regime_1m.dir
+  session_end: censor
+chronology:
+  train: [2023]
+  dev: [2024]
+  prohibited: [2021, 2022, 2025, 2026]
+  windows: ['2023-03-01..2023-03-03', '2024-03-04..2024-03-06']
+  authorized_dates: ['2023-03-01']
+model:
+  family: lightgbm
+  params: {max_depth: 3, num_leaves: 7, learning_rate: 0.05, min_data_in_leaf: 50, n_estimators: 100, n_jobs: 1, deterministic: true, verbosity: -1, random_state: 42}
+  validation: {protocol: model_selection.random, tuning_years: [2023], final_train_validation_years: []}
+analysis:
+  source: oos
+  model_scores: true
+  steps:
+    - id: tail
+      op: analysis.metric.tail_lift
+      rows: frame
+      inputs: {reference: train_frame}
+      params: {score: score__primary, label: target_flip_within_horizon, quantiles: [0.9, 0.95, 0.975]}
+  artifacts:
+    - {name: tail_lift.json, source: tail, kind: json}
+    - {name: tail_lift.parquet, source: tail, kind: frame}
