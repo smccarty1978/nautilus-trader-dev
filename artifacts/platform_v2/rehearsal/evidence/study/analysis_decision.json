@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "study_id": "rehearsal_checkpoint_norm",
+  "phase": "D",
+  "decided_at_utc": "2026-09-09T14:32:00Z",
+  "decided_by": {
+    "agent": "claude",
+    "role": "analysis-decider",
+    "session_id": "7a062aee-5f16-4899-92a9-842e6c0bace4",
+    "task_id": "007_analysis_decision_a1f72277"
+  },
+  "outcome": "LIFECYCLE_CLOSED_SINGLE_ARM_OOS_TAIL_LIFT_PRESENT",
+  "terminal_decision": "REHEARSAL_COMPLETE",
+  "rationale": "All three REHEARSAL_COMPLETE conditions are satisfied and no REHEARSAL_INCOMPLETE condition applies. (1) The lifecycle ran end to end on full-year TRAIN 2023 / OOS 2024: the controller card records actions smoke, collection, reconcile, merge, fit, freeze, oos, analyze with STATUS OK, state READY_TO_CLOSE, 137 tests passed / 0 failed; the seal binds a CLEAR causal audit and a CLEAR contract audit (pass 02, 0 critical / 0 warning) to execution composite 73db2ed0f213, and every downstream artifact carries that same composite and plan_sha256 9eb2ff0d6e63. (2) The fitted feature surface is EXACTLY the three ratified single-arm instances, expanded to four physical columns (prior_1m_regime_efficiency, prior_5m_regime_efficiency, rolling_300s_giveback_atr, structural_max_expansion_atr) -- identical in compiled_plan.json, experiment_models.json, train_experiment_freeze.json and the scored-frame model_scores inputs; the withdrawn structural_max_expansion_checkpoint_atr appears nowhere in the compiled plan, and nothing was renamed, substituted or re-parameterized. (3) tail_lift.json exists, is computed on the study's OWN fitted model d3cfd7621897 (golden authentication PASS, max_abs_diff 0.0), with thresholds taken as quantiles of the TRAIN reference frame (n_reference = 877040 rows, years [2023]) and applied to OOS 2024 rows (n_rows = 859153 of 867422 scored), per the tail_lift op contract. Scientifically the single arm shows OOS tail lift over base rate 0.3271: 1.531 at the TRAIN P90 threshold, 1.701 at P95, 1.977 at P97.5. This decision claims NO comparison between the checkpoint-epoch and frozen-ATR normalizations; that question has no comparator frame in this study and remains open.",
+  "evidence": [
+    {
+      "claim": "all eight lifecycle stages executed; terminal state READY_TO_CLOSE; 137 tests passed, 0 failed",
+      "path": "studies/rehearsal_checkpoint_norm/_work/controller/status.json",
+      "detail": "actions_executed=[smoke,collection,reconcile,merge,fit,freeze,oos,analyze]; STATUS=OK; blocker_code=null"
+    },
+    {
+      "claim": "pre-execution seal binds CLEAR causal + CLEAR contract audits to execution composite 73db2ed0f213",
+      "path": "studies/rehearsal_checkpoint_norm/artifacts/preexec_audit_seal.json",
+      "sha256": "e3cb980533d565617a34b0f2d03c8dc85a352a6febd80e8955bbd1971136f88f",
+      "detail": "causal lookahead-auditor:004_causal_audit_300a825d CLEAR (0 critical / 0 warning, audit/status.json); contract contract-checker:owner-pass02-20f45ea6 CLEAR (0 critical / 0 warning, audit/contract_status.json); seal sha equals the controller fingerprint 'seal'"
+    },
+    {
+      "claim": "smoke ACCEPTED on the authorized date 2023-03-01, all six acceptance checks true, 3866 candidates = 3866 observations, pending_at_end 0",
+      "path": "studies/rehearsal_checkpoint_norm/artifacts/smoke_acceptance.json",
+      "sha256": "974370e17e8f005d90056c49a3a14c96cd65a548f3cfb48c3eb22cba22e4d813"
+    },
+    {
+      "claim": "chronology authority honoured: TRAIN [2023], OOS [2024], prohibited [2020,2021,2022,2025,2026]; no prohibited year touched by any artifact",
+      "path": "studies/rehearsal_checkpoint_norm/artifacts/experiment_authorization.json",
+      "sha256": "a392081a14666665b1d04ee7c9a3aeac6423ab3d782527327fa6a6220b7e5cb5"
+    },
+    {
+      "claim": "TRAIN merge reconciled: passed=true, 0 findings, 877040 rows, years [2023], dataset digest 9e7aecb7a291 (NQ_1S_V2_GLOBEX)",
+      "path": "studies/rehearsal_checkpoint_norm/_work/controller/reconcile.json"
+    },
+    {
+      "claim": "TRAIN freeze written before OOS was opened; feature_sets.primary is the four ratified columns; model canonical sha 27bc73fb54a9",
+      "path": "studies/rehearsal_checkpoint_norm/artifacts/train_experiment_freeze.json",
+      "sha256": "3e06c161b5df972e0b0012a2bd4e44b4eb9042fed2d7f1895bcb2ba36ddb56fe",
+      "detail": "freeze sha equals the controller fingerprint 'train_freeze'; generated_at 14:19:30Z, before the OOS partition manifest and the analyze stage at 14:27Z"
+    },
+    {
+      "claim": "single arm 'primary', 869286 binary TRAIN rows over 6919 unique regimes, features = the four ratified columns, no second arm and no paired delta",
+      "path": "studies/rehearsal_checkpoint_norm/artifacts/experiment_models.json",
+      "sha256": "7d9a000f1428e7b780927f35fe4bf34f9e23bbb17818bec445ad7f3ae213a1df",
+      "detail": "models[] has one entry (arm=primary, baseline_arm=true, cell=all, direction=both); paired_deltas_vs_baseline_arm={}"
+    },
+    {
+      "claim": "declared analysis ran on source=oos years [2024] with reference train_frame years [2023]; both frames scored by the study's own model with golden PASS max_abs_diff 0.0",
+      "path": "studies/rehearsal_checkpoint_norm/artifacts/experiment_analysis_v2.json",
+      "sha256": "5534e5118192f7ab79592ed955bde14617775672f36da2fb0150c4f681a6b04f",
+      "detail": "model_scores.frame rows_scored 867422 (OOS), model_scores.train_frame rows_scored 877040 (TRAIN); distinct score digests 45c12c98 vs ac8613cc; identity_rule v2_lineage_sha256, selection_status selected"
+    },
+    {
+      "claim": "OOS tail lift on TRAIN-frozen thresholds: base_rate 0.32711 (n=859153); P90 thr 0.43142 lift 1.5312 (n_tail 83748, tail_share 0.0975); P95 thr 0.49536 lift 1.7009 (n_tail 40656, tail_share 0.0473); P97.5 thr 0.57294 lift 1.9766 (n_tail 19582, tail_share 0.0228)",
+      "path": "studies/rehearsal_checkpoint_norm/artifacts/tail_lift.json",
+      "sha256": "9e0eb6a5ec02d940cb38df666308da99474735f463aa12280f9492c7c31ba350",
+      "detail": "sha equals the digest declared in experiment_analysis_v2.json declared_analysis.artifacts"
+    },
+    {
+      "claim": "thresholds are frozen on the reference (TRAIN) frame by construction, not on the evaluated rows",
+      "path": "research/analysis/diagnostic_ops.py:931",
+      "detail": "tail_lift(): thr = reference[score].quantile(q); base = evaluated rows' label mean; rows with a null score or a non-binary label are excluded and counted"
+    },
+    {
+      "claim": "all four fitted columns are populated and carry variance in BOTH partitions (NON-AUTHORITATIVE read of the partition candidate frames)",
+      "path": "studies/rehearsal_checkpoint_norm/_work/controller/partitions/{train/2023,oos/2024}/candidates.parquet",
+      "detail": "TRAIN non-null/nunique -- prior_1m_regime_efficiency 877040/3801 (sd 0.235), prior_5m_regime_efficiency 877040/4129 (sd 0.256), rolling_300s_giveback_atr 241450/164959 (sd 0.946), structural_max_expansion_atr 877040/67319 (sd 2.502); OOS -- 867422/4122, 867422/4437, 213318/153923, 867422/64506. No column is dead or constant."
+    },
+    {
+      "claim": "censoring reported, not silently resolved: session_end censoring leaves 0.95% of OOS rows and 0.88% of TRAIN rows with a non-binary label; these are excluded from tail lift and from the fit, never counted as negatives",
+      "path": "studies/rehearsal_checkpoint_norm/artifacts/tail_lift.json",
+      "detail": "tail_lift excluded.rows_non_binary_label = 8269 of 867422 OOS (0.953%); experiment_models.json rows total 877040 vs binary 869286 = 7754 TRAIN (0.884%); observations frame OOS target_flip_within_horizon {0:578113, 1:281040, nan:8269}"
+    },
+    {
+      "claim": "the withdrawn checkpoint-epoch instance is absent from the compiled execution surface",
+      "path": "studies/rehearsal_checkpoint_norm/compiled_plan.json",
+      "sha256": "b79a1d8820822aaf604df896b02d771ab12411ced92dd3876093624efa9c39ec",
+      "detail": "features.instances has 4 entries (regime_efficiency@1m prior, regime_efficiency@5m prior, rolling_giveback_atr window 300s, structural_max_expansion_atr context current), all status=verified; the string 'checkpoint_atr' does not occur anywhere in the plan"
+    }
+  ],
+  "integrity_checks": [
+    {
+      "check": "model authentication / golden replay",
+      "result": "PASS",
+      "detail": "model_id d3cfd7621897, canonical 27bc73fb54a9, golden max_abs_diff 0.0 over 256 rows, on both the OOS frame and the train_frame"
+    },
+    {
+      "check": "arm-delta integrity (identical fit or prediction identity)",
+      "result": "NOT_APPLICABLE",
+      "detail": "single ratified arm; no delta is reported and none may be derived from this study"
+    },
+    {
+      "check": "added-feature populated and has variance",
+      "result": "PASS (NON-AUTHORITATIVE frame read)",
+      "detail": "all four columns non-constant in TRAIN and OOS; rolling_300s_giveback_atr is null on ~72.5% TRAIN / ~75.4% OOS rows by construction (no giveback in the trailing 300s window) -- a caveat, not a dead column"
+    },
+    {
+      "check": "TRAIN/OOS separation and threshold freezing",
+      "result": "PASS",
+      "detail": "freeze written 14:19:30Z before the OOS partition ran; tail-lift thresholds are TRAIN-frame quantiles applied to OOS rows; OOS tail_share 0.0975/0.0473/0.0228 against nominal 0.10/0.05/0.025 shows only mild score-distribution drift"
+    },
+    {
+      "check": "protected-period authority",
+      "result": "PASS",
+      "detail": "only 2023 (train) and 2024 (oos) partitions exist; no prohibited year appears in any manifest"
+    },
+    {
+      "check": "censoring respected (worst-status semantics, unresolved fraction reported)",
+      "result": "PASS",
+      "detail": "0.953% OOS / 0.884% TRAIN unresolved, excluded rather than coerced to 0"
+    },
+    {
+      "check": "signal rate reported alongside effect",
+      "result": "PASS",
+      "detail": "the rule fires on 9.75% / 4.73% / 2.28% of evaluable OOS rows"
+    },
+    {
+      "check": "declared deliverables present and digest-matched",
+      "result": "PASS",
+      "detail": "tail_lift.json 9e0eb6a5 and tail_lift.parquet f00fd887 on disk equal the digests declared inside experiment_analysis_v2.json"
+    },
+    {
+      "check": "execution-composite consistency across seal, freeze, partitions and analysis",
+      "result": "PASS",
+      "detail": "73db2ed0f21316e4c0a5b04790a37910824f37dc67d964a30d020c39dc6b75f7 appears in preexec_audit_seal, smoke_acceptance, train_experiment_freeze, the OOS partition manifest, experiment_analysis_v2 and the controller card; plan_sha256 9eb2ff0d6e63 likewise"
+    },
+    {
+      "check": "replay closure escapes",
+      "result": "PASS",
+      "detail": "replay_closure_trace.json escapes=[] for oos-2024; 92 closure files"
+    }
+  ],
+  "caveats": [
+    "SINGLE ARM. The checkpoint-epoch normalization was withdrawn (unregistered capability, capability flow ended in SUPERVISOR_ESCALATION_REQUIRED, owner intervention). Nothing here compares the two normalizations; the original question remains OPEN.",
+    "Row-level, not episode-level. 859153 evaluable OOS rows come from 6680 regime episodes (~130 five-second checkpoints each), so the effective independent sample is thousands of episodes, not hundreds of thousands of rows. No confidence interval is declared or claimed, and no entity-level metric was declared.",
+    "Pooled across direction and maturity. The declared analysis has group_by=null, so long/short and young/mature regimes are pooled. Re-slicing after seeing OOS is prohibited, so an inverted slice would be invisible here.",
+    "rolling_300s_giveback_atr is null on roughly three quarters of rows; LightGBM routes NaN natively, so the column contributes mainly through its non-null quarter.",
+    "The label is a 300s forward flip of the same regime tracker that defines the population, evaluated on a 5s cadence, so adjacent rows share overlapping horizons. That is by design for the rehearsal but makes a row-level lift optimistic as a test statistic.",
+    "experiment_models.json echoes the hyperparameters without random_state, which compiled_plan.json model.params does declare (42). Determinism is additionally pinned by deterministic:true and n_jobs:1, and the golden replay reproduces scores exactly.",
+    "At decision time studies/rehearsal_checkpoint_norm/artifacts/ is still untracked in git. This worker's write surface is analysis_decision.json/.md only, so the evidence files are pinned here by sha256 instead; the closing session should commit them.",
+    "No economic result is claimed. Tail lift is a classification-tail statistic, not a tradeable edge; nothing here has been through fills, costs or a live-style NT run."
+  ],
+  "what_would_change_the_verdict": [
+    "A declared deliverable missing, or its on-disk digest disagreeing with experiment_analysis_v2.json",
+    "The fitted feature surface differing from the four ratified columns (an instance dropped, renamed, substituted or re-parameterized)",
+    "Any claim of the checkpoint-vs-frozen normalization contrast appearing in the study record",
+    "A stage or gate found to have been skipped, or an audit verdict other than CLEAR at the sealed composite"
+  ],
+  "next_decision": "Does the checkpoint-epoch normalization (structural_max_expansion_checkpoint_atr) add OOS tail lift over the frozen-ATR normalization? That needs the capability registered first, then a genuinely two-armed study with an episode-level metric and direction/maturity slices declared up front -- not a revision of this one."
+}

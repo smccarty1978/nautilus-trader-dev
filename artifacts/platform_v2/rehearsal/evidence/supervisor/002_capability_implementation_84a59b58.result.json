@@ -1,0 +1,43 @@
+{
+  "artifacts": [],
+  "blocker_code": "FEATURE_AUTHORITY_PROMOTION_PATH_ABSENT",
+  "branch": "chore/rehearsal_checkpoint_norm-missing_capability",
+  "changed_files": [
+    "features/definitions/canonical.py",
+    "features/tests/test_structural_max_expansion_checkpoint_atr.py",
+    "features/tests/golden/feature_resolution.json",
+    "features/tests/test_feature_definition_boundary.py"
+  ],
+  "commits": [
+    "c94bfb3c"
+  ],
+  "compiled_plan_sha256": null,
+  "expected_branch": "chore/rehearsal_checkpoint_norm-missing_capability",
+  "expected_worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm-missing_capability",
+  "extra": {},
+  "head_commit": "c94bfb3c4051a4ff659585d799849b84d11889b5",
+  "next_exact_action": "Owner picks one of the three routes in the report, then a fresh capability session appends the verified bundle entry",
+  "next_state": "OWNER_DECISION_REQUIRED",
+  "notes": "Canonical definition committed with 8 targeted tests. It does NOT unblock compile: the compiler binds through the active feature authority bundle and needs status verified there, and no chore-session path writes it. Both test_delta NEW failures reproduce at HEAD unchanged. See report.",
+  "packet_sha256": "96e24d57f5e686c5b3faba3322de27e4c36a7686bb7104e883054d041dc1dcad",
+  "platform_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "protected_data_accessed": false,
+  "provider": "claude",
+  "report": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\002_capability_implementation_84a59b58.report.md",
+  "schema_version": 1,
+  "scientific_decisions_changed": [],
+  "session_id": "aaa79c62-2993-4684-8760-f78820a678e4",
+  "session_type": "CAPABILITY_IMPLEMENTATION",
+  "source_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "status": "BLOCKED",
+  "study_contract_sha256": "133d2d6dfe27ef3f68eaee8ff9c2e15eed106e2fcb7d20b9d686e85e16070be2",
+  "study_id": "rehearsal_checkpoint_norm",
+  "task_id": "002_capability_implementation_84a59b58",
+  "tests": {
+    "command": "python scripts/test_delta.py features/tests",
+    "fixed": 0,
+    "known": 0,
+    "new_failures": 2
+  },
+  "worker_role": "implementer"
+}

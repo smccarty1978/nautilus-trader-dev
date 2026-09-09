@@ -1,0 +1,29 @@
+{
+  "answer_with": "python scripts/research.py supervise decide rehearsal_checkpoint_norm --answer <json file>",
+  "code": "SUPERVISOR_ESCALATION_REQUIRED",
+  "derived": {
+    "code": "CAPABILITY_GAP",
+    "evidence": {
+      "handoff": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\CAPABILITY_GAP_HANDOFF.json",
+      "suggested_files": [
+        "features/library.py",
+        "features/library_mtf.py",
+        "features/registry.py",
+        "features/trackers/host_bindings.py",
+        "research_workflow/grammar/compiler.py",
+        "research_workflow/grammar/predicates.py",
+        "research_workflow/host/predicate_eval.py",
+        "research_workflow/provider_host.py"
+      ],
+      "topic": "rehearsal_checkpoint_norm-missing_capability"
+    },
+    "gap_kinds": [
+      "MISSING_CAPABILITY",
+      "UNSUPPORTED_COMPOSITION"
+    ]
+  },
+  "kind": "USER_DECISION_REQUIRED",
+  "question": "capability rehearsal_checkpoint_norm-missing_capability is not mergeable: [\"diff outside the claimed write surface: ['features/definitions/canonical.py', 'features/tests/golden/feature_resolution.json', 'features/tests/test_structural_expansion_normalizer_parameter.py']\", 'test_delta new_failures=2 (must be 0)'] -- answer {\"retry\": true} to reset the attempt counters, anything else to stop",
+  "raised_at_utc": "2026-09-09T12:55:10.253583+00:00",
+  "study_id": "rehearsal_checkpoint_norm"
+}

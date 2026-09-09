@@ -1,0 +1,56 @@
+{
+  "candidates_count_total": 3866,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true,
+    "replay_imports_within_collection_closure": true
+  },
+  "date": "2023-03-01",
+  "execution_manifest_composite_sha256": "73db2ed0f21316e4c0a5b04790a37910824f37dc67d964a30d020c39dc6b75f7",
+  "generated_at_utc": "2026-09-09T14:11:27.129066+00:00",
+  "manifest": {
+    "candidates_sha256": "861c8eefd264eeb973cdb8722c707a3c4cfdef9d44c087c646f96b55f171ac00",
+    "composite_seal_hash": "e33311e592b9f846476f25036151eeb9c8a87e3d181064a40d6a4dda390c7c2b",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2_GLOBEX",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2023-03-01",
+    "elapsed_s": 7.084952799952589,
+    "execution_manifest_sha256": "73db2ed0f21316e4c0a5b04790a37910824f37dc67d964a30d020c39dc6b75f7",
+    "kind": "smoke",
+    "observations_sha256": "1361c8e42e421914186b4994ce303bc9c0d9fb1e4e0c659758e8219fe0dab3ea",
+    "plan_sha256": "9eb2ff0d6e63a72a48a48342d6b7d72cadb371e7528626ead3261eb0944570e6",
+    "rows": {
+      "candidates": 3866,
+      "observations": 3866
+    },
+    "stats": {
+      "bars": 201910,
+      "bars_by_stream": {
+        "nq_1m": 5519,
+        "nq_1s": 196391
+      },
+      "candidates": 3866,
+      "dropped_outside_primary": {
+        "candidates": 11049,
+        "observations": 11049
+      },
+      "epochs": 36152,
+      "observations": 3866,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-09T14:11:27.120208+00:00"
+  },
+  "observations_count_total": 3866,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\runs\\20260909_141116_rehearsal_checkpoint_norm_smoke",
+  "sealed_composite_sha256": "e33311e592b9f846476f25036151eeb9c8a87e3d181064a40d6a4dda390c7c2b",
+  "status": "ACCEPTED",
+  "study_name": "rehearsal_checkpoint_norm",
+  "validator": "research_workflow.lifecycle_v2"
+}

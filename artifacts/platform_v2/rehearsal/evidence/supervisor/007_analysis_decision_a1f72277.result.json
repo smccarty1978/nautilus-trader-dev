@@ -1,0 +1,44 @@
+{
+  "artifacts": [
+    "studies/rehearsal_checkpoint_norm/artifacts/analysis_decision.json",
+    "studies/rehearsal_checkpoint_norm/artifacts/analysis_decision.md"
+  ],
+  "blocker_code": null,
+  "branch": "study/rehearsal_checkpoint_norm",
+  "changed_files": [
+    "studies/rehearsal_checkpoint_norm/artifacts/analysis_decision.json",
+    "studies/rehearsal_checkpoint_norm/artifacts/analysis_decision.md"
+  ],
+  "commits": [
+    "d1ac6777"
+  ],
+  "compiled_plan_sha256": "b79a1d8820822aaf604df896b02d771ab12411ced92dd3876093624efa9c39ec",
+  "expected_branch": "study/rehearsal_checkpoint_norm",
+  "expected_worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm",
+  "extra": {},
+  "head_commit": "d1ac67777b8b97b972671fb9e36f61223f251815",
+  "next_exact_action": "close the study with terminal_decision REHEARSAL_COMPLETE and outcome LIFECYCLE_CLOSED_SINGLE_ARM_OOS_TAIL_LIFT_PRESENT, then commit the remaining untracked artifacts directory",
+  "next_state": "READY_TO_CLOSE",
+  "notes": "REHEARSAL_COMPLETE. 8 of 8 stages, seal CLEAR causal plus CLEAR contract at composite 73db2ed0f213, feature surface exactly the 3 ratified instances, tail_lift on own model d3cfd7621897 with TRAIN-frozen thresholds, OOS lift 1.531 1.701 1.977 over base 0.3271. No normalization contrast claimed.",
+  "packet_sha256": "88b80fe16df7a35ed4bcc61ff20bc4d1a6c83246556ea04cd81ec612abb7aee7",
+  "platform_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "protected_data_accessed": false,
+  "provider": "claude",
+  "report": null,
+  "schema_version": 1,
+  "scientific_decisions_changed": [],
+  "session_id": "7a062aee-5f16-4899-92a9-842e6c0bace4",
+  "session_type": "ANALYSIS_DECISION",
+  "source_commit": "54eba1f307ffcfa3076280bc4d1dcc14fc2227f9",
+  "status": "DONE",
+  "study_contract_sha256": "4c97493d60cd85b9758b85c0dcf0a7d4a0cf49bebf920e1328ac344a74b3778f",
+  "study_id": "rehearsal_checkpoint_norm",
+  "task_id": "007_analysis_decision_a1f72277",
+  "tests": {
+    "command": null,
+    "fixed": null,
+    "known": null,
+    "new_failures": null
+  },
+  "worker_role": "analysis-decider"
+}

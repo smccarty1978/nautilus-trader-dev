@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "kind": "CAPABILITY_GAP_HANDOFF",
+  "generated_at_utc": "2026-09-09T12:18:28.279759+00:00",
+  "study_id": "rehearsal_checkpoint_norm",
+  "study_branch": "study/rehearsal_checkpoint_norm",
+  "study_worktree": "C:/Users/Scott McCarty/Projects/Nautilus Trader-rehearsal_checkpoint_norm",
+  "source_platform_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "research_question": "Does the maximum structural expansion of the current 1m regime, normalized by the ATR at the decision epoch (`structural_max_expansion_checkpoint_atr`), add out-of-sample tail lift to a regime-flip classifier that already sees the same quantity normalized by the regime-start frozen ATR (`structural_max_expansion_atr`)? Instrument NQ, one full TRAIN year (2023), one full OOS year (2024). Tail lift is measured on the study's OWN fitted-model scores with thresholds frozen on TRAIN and applied to OOS rows.",
+  "gap_kinds": [
+    "MISSING_CAPABILITY",
+    "UNSUPPORTED_COMPOSITION"
+  ],
+  "gaps": [
+    {
+      "kind": "MISSING_CAPABILITY",
+      "where": "features.instances[4]",
+      "message": "UNKNOWN_CANONICAL_FEATURE: 'structural_max_expansion_checkpoint_atr'",
+      "detail": {
+        "feature": "structural_max_expansion_checkpoint_atr",
+        "parameters": {
+          "context": "current"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "UNSUPPORTED_COMPOSITION",
+      "where": "population.qualify",
+      "message": "predicate references unknown context tracker 'features'",
+      "detail": {
+        "predicate": "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and features.structural_snapshot_ready"
+      },
+      "closest": null
+    }
+  ],
+  "requested_semantics": [
+    {
+      "where": "features.instances[4]",
+      "kind": "MISSING_CAPABILITY",
+      "requested": "UNKNOWN_CANONICAL_FEATURE: 'structural_max_expansion_checkpoint_atr'",
+      "message": "UNKNOWN_CANONICAL_FEATURE: 'structural_max_expansion_checkpoint_atr'",
+      "detail": {
+        "feature": "structural_max_expansion_checkpoint_atr",
+        "parameters": {
+          "context": "current"
+        }
+      }
+    },
+    {
+      "where": "population.qualify",
+      "kind": "UNSUPPORTED_COMPOSITION",
+      "requested": "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and features.structural_snapshot_ready",
+      "message": "predicate references unknown context tracker 'features'",
+      "detail": {
+        "predicate": "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and features.structural_snapshot_ready"
+      }
+    }
+  ],
+  "compiler_evidence": {
+    "STATUS": "CAPABILITY_GAP",
+    "study_id": "rehearsal_checkpoint_norm",
+    "kinds": [
+      "MISSING_CAPABILITY",
+      "UNSUPPORTED_COMPOSITION"
+    ],
+    "count": 2
+  },
+  "affected_yaml_fields": [
+    "features.instances[4]",
+    "population.qualify"
+  ],
+  "existing_nearest_capabilities": [],
+  "capability_lookup": "python scripts/research.py cap search <term>; python scripts/research.py cap describe <id>",
+  "scientific_decisions_already_resolved": {
+    "terminal_decisions": {
+      "REHEARSAL_COMPLETE": "the lifecycle ran to closure on full-year TRAIN 2023 / OOS 2024 and tail_lift.json exists for the study's own fitted-model scores with TRAIN-frozen thresholds",
+      "REHEARSAL_INCOMPLETE": "a lifecycle stage, gate or deliverable is missing or invalid at the time of the analysis decision"
+    },
+    "autonomy_decisions": {
+      "on_capability_gap": "stop_and_handoff",
+      "platform_change_required": "chore_branch_and_fresh_session",
+      "deterministic_defect": "auto_fix",
+      "calendar_reference_parity": "common_interval_exact",
+      "frozen_parent_model": "rescore_if_authenticated",
+      "protected_period": "never_expand_authority",
+      "platform_merge": "approval_required"
+    }
+  },
+  "prohibited_changes": [
+    "modifying research_workflow/ (grammar, compiler, host, controller, outcomes, provider bindings)",
+    "modifying features/ or the capability registry seeds from the study branch",
+    "building the missing capability inside the study session",
+    "patching around the gap with study Python",
+    "continuing to accumulate context after this handoff: END THE SESSION"
+  ],
+  "suggested_platform_files": [
+    "features/library.py",
+    "features/library_mtf.py",
+    "features/registry.py",
+    "features/trackers/host_bindings.py",
+    "research_workflow/grammar/compiler.py",
+    "research_workflow/grammar/predicates.py",
+    "research_workflow/host/predicate_eval.py",
+    "research_workflow/provider_host.py"
+  ],
+  "proposed_chore_topic": "rehearsal_checkpoint_norm-missing_capability",
+  "written_by": {
+    "owner": "Scott McCarty@NUCBOX_K10",
+    "agent": "claude",
+    "session_id": "766fd46d-4731-40cf-a62a-e1421d5bdede"
+  },
+  "next_action": {
+    "study_owner": "END THIS SESSION. Do not implement. Commit study.yaml + research_decision.yaml + this handoff on the study branch first.",
+    "capability_session": [
+      "python scripts/research.py ws chore claim rehearsal_checkpoint_norm-missing_capability --paths features/library.py features/library_mtf.py features/registry.py --surface \"<one line>\" --as <agent>",
+      "git worktree add \"../<repo>-rehearsal_checkpoint_norm-missing_capability\" -b chore/rehearsal_checkpoint_norm-missing_capability main",
+      "implement ONLY the capability named above; targeted tests; research cap generate --check; audit/promotion if the capability flow requires it",
+      "git switch main && git merge --no-ff chore/<topic>; write CAPABILITY_COMPLETE card (research study handoff --study <study> --phase A --note CAPABILITY_COMPLETE:<topic>)",
+      "python scripts/research.py ws chore release rehearsal_checkpoint_norm-missing_capability"
+    ],
+    "resume_session": [
+      "git -C <study worktree> merge --no-ff main",
+      "python scripts/research.py ws claim rehearsal_checkpoint_norm --as <agent>",
+      "python scripts/research.py study compile --study studies/rehearsal_checkpoint_norm"
+    ]
+  }
+}
