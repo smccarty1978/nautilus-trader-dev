@@ -1,0 +1,17 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
+study_id: s12_own_scores_gate
+research_question: "Platform gate (disposable, not research): analysis.metric.tail_lift against the study OWN fitted model -- thresholds frozen on TRAIN scores (train_frame), applied to OOS rows -- on real NQ data end to end. Three TRAIN days (2023-03-01..03), three OOS days (2024-03-04..06)."
+platform_branch: "chore/analysis-own-model-scores"   # intentionally branched from a platform branch, base_commit c545e596 (WORKFLOW.md M.1); closure bound to that state
+disposable: true                                     # delete the study, branch and worktree after the gate result is recorded
+status: DRAFT
+dataset_id: NQ_1S_V2_GLOBEX
+terminal_decisions: {}
+# Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
+# semantic choice with no policy here is still a SEMANTIC_DECISION_REQUIRED question.
+autonomy_decisions:
+  on_capability_gap: stop_and_handoff                # write CAPABILITY_GAP_HANDOFF, end the session; never build it here
+  platform_change_required: chore_branch_and_fresh_session
+  deterministic_defect: auto_fix                     # fix, add a targeted test, re-run the bounded check
+  calendar_reference_parity: common_interval_exact   # exact on the common calendar interval; Globex-only rows enumerated, descriptive
+  frozen_parent_model: rescore_if_authenticated      # never retrain a frozen parent
+  protected_period: never_expand_authority

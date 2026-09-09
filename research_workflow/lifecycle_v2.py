@@ -1307,6 +1307,82 @@ class V2Lifecycle:
                         "model_authentication": {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256", "feature_contract_sha256", "golden", "tier", "selection_status")}})
         return out
 
+    def _freeze_bound_fitted_models(self, plan: Dict[str, Any], models: Mapping[str, Any], label: str) -> List[Dict[str, Any]]:
+        """This study's own fitted model records, each bound to the canonical bytes its TRAIN freeze committed to.
+
+        WARN-1: a post-freeze estimator substitution that refreshes its own canonical/golden bytes
+        under the unchanged model_id would otherwise re-authenticate silently, so every record
+        carries ``expect.canonical_sha256`` read from the freeze. One producer for the two consumers
+        that score the study's own model after the freeze (OOS analysis, declared analysis with
+        ``model_scores``), keyed exactly as the freeze keys ``model_canonical_sha256``.
+        """
+        freeze_path = self.artifacts / "train_experiment_freeze.json"
+        if not freeze_path.is_file():
+            raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: no TRAIN freeze found for study '{plan['study']['id']}'")
+        freeze_canonical = _read(freeze_path).get("model_canonical_sha256") or {}
+        if models.get("mode") == "score":
+            raise LifecycleV2Error("OWN_MODEL_SCORES_UNAVAILABLE: experiment_models.json is mode=score; a frozen external "
+                                   "model's scores are a derived input, not the study's own fitted model")
+        if models.get("model_id"):
+            csha = freeze_canonical.get("primary")
+            if not csha:
+                raise LifecycleV2Error("FREEZE_CANONICAL_SHA_MISSING: no primary canonical sha in TRAIN freeze")
+            return [{"name": "primary", "id": str(models["model_id"]), "subset": {}, "label": label,
+                     "expect": {"study_id": plan["study"]["id"], "canonical_sha256": csha}}]
+        if models.get("models"):
+            bound = []
+            for m in models["models"]:
+                nm = _model_record_name(m)
+                csha = freeze_canonical.get(nm)
+                if not csha:
+                    raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: model '{nm}' has no TRAIN freeze canonical sha")
+                bound.append({"name": nm, "id": _model_record_id(m), "subset": _model_record_subset(m),
+                              "label": label, "expect": {"study_id": plan["study"]["id"], "canonical_sha256": csha}})
+            return bound
+        raise LifecycleV2Error(
+            f"OOS_MODEL_RECORDS_UNRECOGNISED: experiment_models.json (mode={models.get('mode')!r}) carries no scorable models")
+
+    def _join_own_model_scores(self, frame, bound: List[Dict[str, Any]]):
+        """Score every freeze-bound fitted record on its own subset of ``frame`` into ``score__<name>``.
+
+        Every subset row is scored, censored ones included: a candidate's score does not depend on
+        its label, and an op that needs binary labels excludes and counts those rows itself
+        (tail_lift reports ``rows_non_binary_label`` separately from ``rows_null_score``). Rows
+        outside a record's subset stay null in that record's column. Returns the widened frame and
+        one lineage record per model (rows scored, score digest for parity, authentication).
+        """
+        import numpy as np
+        import pandas as pd
+        from research_workflow.model_store import authenticate_model, read_manifest, score
+        model_root = self.opts.model_root
+        out = frame.copy()
+        records: List[Dict[str, Any]] = []
+        for m in bound:
+            authentication = authenticate_model(m["id"], expect=m["expect"], model_root=model_root)
+            inputs = list(read_manifest(m["id"], model_root)["lineage"]["ordered_inputs"])
+            missing = [c for c in inputs if c not in out.columns]
+            if missing:
+                raise LifecycleV2Error(f"MODEL_INPUTS_UNBOUND: {m['name']} needs {missing}")
+            mask = pd.Series(True, index=out.index)
+            for col, val in (m.get("subset") or {}).items():
+                if col not in out.columns:
+                    raise LifecycleV2Error(f"MODEL_SUBSET_COLUMN_MISSING: {col}")
+                mask &= out[col] == val
+            column = f"score__{m['name']}"
+            if column in out.columns:
+                raise LifecycleV2Error(f"OWN_MODEL_SCORE_COLUMN_COLLIDES: {column!r} already exists in the analysis frame")
+            out[column] = np.nan
+            digest = None
+            if bool(mask.any()):
+                s = np.asarray(score(m["id"], out.loc[mask, inputs], model_root=model_root), dtype=float)
+                out.loc[mask, column] = s
+                digest = hashlib.sha256(np.round(s, 10).tobytes()).hexdigest()
+            records.append({"name": m["name"], "id": m["id"], "column": column, "subset": dict(m.get("subset") or {}),
+                            "inputs": inputs, "rows_scored": int(mask.sum()), "score_digest": digest,
+                            "model_authentication": {k: authentication[k] for k in ("model_id", "identity_rule", "canonical_sha256",
+                                                                                     "feature_contract_sha256", "golden", "tier", "selection_status")}})
+        return out, records
+
     def _fit_score_mode(self, plan: Dict[str, Any], model: Dict[str, Any]) -> Dict[str, Any]:
         from research_workflow.forward_outcomes.guard import assert_causal_feature_surface
         frame = self._train_frame_all_labels(plan)
@@ -1425,6 +1501,21 @@ class V2Lifecycle:
             years = [int(y) for y in self._authorized_years(plan, "train", self.opts.years)]
             frame = self._train_frame_all_labels(plan)
         frames: Dict[str, Any] = {"frame": frame}
+        refs = {s["rows"] for s in spec["steps"]} | {r for s in spec["steps"] for r in (s.get("inputs") or {}).values()}
+        if "train_frame" in refs:
+            # The compiler admits `train_frame` only under source: oos, where it is the TRAIN
+            # partition beside the OOS frame (a threshold frozen on TRAIN, applied to OOS).
+            frames["train_frame"] = self._train_frame_all_labels(plan)
+        own_scores: Optional[Dict[str, Any]] = None
+        if spec.get("model_scores"):
+            label = plan["outcome"].get("label_column") or "target_flip_within_horizon"
+            models_path = self.artifacts / "experiment_models.json"
+            if not models_path.is_file():
+                raise LifecycleV2Error("OWN_MODEL_SCORES_UNAVAILABLE: analysis.model_scores needs the fit stage's experiment_models.json")
+            bound = self._freeze_bound_fitted_models(plan, _read(models_path), label)
+            own_scores = {}
+            for name in list(frames):
+                frames[name], own_scores[name] = self._join_own_model_scores(frames[name], bound)
         extras: Dict[str, Any] = {}
         payloads: Dict[str, Any] = {}
         steps: List[Dict[str, Any]] = []
@@ -1461,6 +1552,13 @@ class V2Lifecycle:
                    "plan_sha256": plan["plan_sha256"],
                    "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
                    "ops": list(spec["ops"]), "steps": steps, "artifacts": written}
+        if "train_frame" in frames:
+            lineage["train_frame"] = {"years": [int(y) for y in self._authorized_years(plan, "train", self.opts.years)],
+                                      "rows": int(len(frames["train_frame"]))}
+        if own_scores is not None:
+            # Keyed only when declared, so a study that never asked for its own scores keeps the
+            # lineage (and analysis identity) it had before this key existed.
+            lineage["model_scores"] = own_scores
         lineage["analysis_identity_sha256"] = canonical_sha256(lineage)
         return {"declared_analysis": lineage, "payloads": payloads}
 
@@ -1528,14 +1626,7 @@ class V2Lifecycle:
             # estimator substitution cannot re-authenticate under the unchanged model_id. Without this
             # branch the stage fell through every case and wrote an analysis carrying no OOS metric at
             # all -- a deliverable that reads as PASS while vouching for nothing.
-            bound_models = []
-            for m in models["models"]:
-                nm = _model_record_name(m)
-                csha = freeze_canonical.get(nm)
-                if not csha:
-                    raise LifecycleV2Error(f"FREEZE_CANONICAL_SHA_MISSING: model '{nm}' has no TRAIN freeze canonical sha")
-                bound_models.append({"name": nm, "id": _model_record_id(m), "subset": _model_record_subset(m),
-                                     "label": label, "expect": {"study_id": plan["study"]["id"], "canonical_sha256": csha}})
+            bound_models = self._freeze_bound_fitted_models(plan, models, label)
             summary["frozen_models_oos"] = self._score_models(self._train_frame_all_labels(plan, base, [int(y) for y in years]), bound_models)
             summary["train_metrics"] = [{"name": _model_record_name(m), "id": _model_record_id(m),
                                          "direction": m.get("direction"), "subset": _model_record_subset(m),

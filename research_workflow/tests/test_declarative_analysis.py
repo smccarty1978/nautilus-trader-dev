@@ -157,6 +157,8 @@ def test_a_train_only_diagnostic_runs_compile_to_close_and_writes_its_declared_a
     (lambda a: a["artifacts"][0].__setitem__("name", "../escape.json"), "analysis.artifacts[0].name"),
     (lambda a: a.__setitem__("artifacts", []), "analysis.artifacts"),
     (lambda a: a.__setitem__("source", "oos"), "analysis.source"),                            # no dev years declared
+    (lambda a: a.__setitem__("model_scores", True), "analysis.model_scores"),                 # the study fits no model
+    (lambda a: a["steps"][3].__setitem__("inputs", {"anchors": "train_frame"}), "analysis.steps[3].inputs.anchors"),  # train_frame under source: train
 ])
 def test_a_malformed_pipeline_is_a_typed_gap_at_compile_time(tmp_path, mutate, where):
     import copy
@@ -168,3 +170,100 @@ def test_a_malformed_pipeline_is_a_typed_gap_at_compile_time(tmp_path, mutate, w
                         datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS)
     assert not out.ok
     assert where in {g["where"] for g in out.gaps.to_dict()["gaps"]}, out.card()
+
+
+# ----------------------------------------------------------------------------------------------- #
+# The study's OWN fitted model, scored into the declared analysis. tail_lift freezes its thresholds
+# on the TRAIN scores (`train_frame`) and evaluates the OOS rows (`frame`): the exact output the
+# es_180s_model_c_portability study named as ANALYSIS_HARNESS_GAP -- the op existed, but the frame
+# never carried the study's own scores.
+# ----------------------------------------------------------------------------------------------- #
+TAIL_LIFT = {
+    "source": "oos",
+    "model_scores": True,
+    "steps": [
+        {"id": "tail", "op": "analysis.metric.tail_lift", "rows": "frame", "inputs": {"reference": "train_frame"},
+         "params": {"score": "score__primary", "label": "target_flip_within_horizon", "quantiles": [0.5, 0.9]}},
+    ],
+    "artifacts": [{"name": "probe_tail_lift.json", "source": "tail", "kind": "json"},
+                  {"name": "probe_tail_lift.parquet", "source": "tail", "kind": "frame"}],
+}
+
+
+def _model_study(tmp_path: Path, analysis) -> Path:
+    body = yaml.safe_load((GOLDEN / "study_barrier.yaml").read_text(encoding="utf-8"))
+    body["study"]["id"] = "declarative_tail_lift_probe"
+    body["chronology"] = {"train": [2029, 2030], "dev": [2031], "prohibited": [], "authorized_dates": ["2030-01-01"]}
+    body["model"] = {"family": "lightgbm",
+                     "params": {"n_estimators": 20, "max_depth": 2, "num_leaves": 4, "learning_rate": 0.1, "verbosity": -1},
+                     "validation": {"protocol": "model_selection.random", "tuning_years": [2029, 2030], "final_train_validation_years": []}}
+    body["analysis"] = analysis
+    study = tmp_path / "studies" / "declarative_tail_lift_probe"
+    study.mkdir(parents=True, exist_ok=True)
+    (study / "study.yaml").write_text(yaml.safe_dump(body, sort_keys=False), encoding="utf-8")
+    return study
+
+
+def test_tail_lift_runs_against_the_study_own_fitted_model_train_reference_oos_rows(tmp_path, synthetic_bars, monkeypatch):
+    import math
+    import pandas as pd
+    from research_workflow.governed_controller_v2 import V2StudyController
+    from research_workflow.lifecycle_v2 import V2Options, ingest_audit_report
+    from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
+    from research_workflow.host.interfaces import BarView
+    bars, expected = synthetic_bars
+    # The golden fixture holds one full 2029-12-31 session and a ten-minute 2030-01-01 session whose
+    # every row is censored, so it has no OOS year with a resolvable label. Replay the full session
+    # 366 days later (2031-01-01) as the protected OOS year: the platform proof needs OOS rows the
+    # model can score and the op can evaluate, not a second scientific dataset.
+    shift_s = 366 * 86_400
+    oos_bars = [BarView(**{**b.__dict__, "ts_event": int(b.ts_event) + shift_s * NS, "ts_init": int(b.ts_init) + shift_s * NS})
+                for b in bars if int(b.ts_event) < expected["sessions"][1][0] * NS]
+    all_bars = sorted(bars + oos_bars, key=lambda b: (int(b.ts_init), int(b.ts_event)))
+    a0, b0 = expected["sessions"][0]
+    session = {"kind": "calendar", "session": "RTH",
+               "rows": [[a * NS, b * NS] for a, b in expected["sessions"]] + [[(a0 + shift_s) * NS, (b0 + shift_s) * NS]]}
+    study = _model_study(tmp_path, TAIL_LIFT)
+    opts = V2Options(execute=True, smoke_date="2030-01-01", datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS,
+                     bar_source=lambda s, e: all_bars, session_table_spec=session, in_process_partitions=True,
+                     closure={"outcome": "OWN_MODEL_TAIL_LIFT_PROVEN", "terminal_decision": "PLATFORM_PROBE"},
+                     model_root=tmp_path / "model_store")   # never the operator's durable store
+    monkeypatch.setattr(V2StudyController, "_worktree",
+                        lambda self: {"path": str(ROOT), "branch": "test", "head": "0" * 40, "dirty_paths": [], "unsafe_dirty_paths": []})
+    ctl = lambda: V2StudyController(study, options=opts, repo_root=ROOT)
+
+    ctl().run(through="tests")
+    ingest_audit_report(study, "causal", _write_audit(study, "causal"))
+    ingest_audit_report(study, "contract", _write_audit(study, "contract"))
+    card = ctl().run(through="close")
+    assert card["STATUS"] != "BLOCKED" and card["state"] == "STUDY_CLOSED", card
+
+    freeze = json.loads((study / "artifacts" / "train_experiment_freeze.json").read_text(encoding="utf-8"))
+    assert freeze["model_canonical_sha256"]["primary"]
+
+    summary = json.loads((study / "artifacts" / "experiment_analysis_v2.json").read_text(encoding="utf-8"))
+    lineage = summary["declared_analysis"]
+    assert lineage["source"] == "oos" and lineage["years"] == [2031]
+    assert lineage["train_frame"]["years"] == [2029, 2030] and lineage["train_frame"]["rows"] > 0
+    scores = lineage["model_scores"]
+    assert set(scores) == {"frame", "train_frame"}
+    for name in ("frame", "train_frame"):
+        (rec,) = scores[name]
+        assert rec["column"] == "score__primary" and rec["rows_scored"] > 0 and rec["score_digest"]
+        # bound to the bytes the TRAIN freeze committed to, not merely to the model id
+        assert rec["model_authentication"]["canonical_sha256"] == freeze["model_canonical_sha256"]["primary"]
+    assert scores["frame"][0]["score_digest"] != scores["train_frame"][0]["score_digest"]   # different rows, different scores
+    assert scores["frame"][0]["rows_scored"] == lineage["rows"]                              # every OOS row carries a score
+
+    tail = json.loads((study / "artifacts" / "probe_tail_lift.json").read_text(encoding="utf-8"))
+    assert tail["score"] == "score__primary" and tail["quantiles"] == [0.5, 0.9]
+    assert tail["excluded"]["rows_null_score"] == 0 and tail["excluded"]["reference_null_score"] == 0
+    cells = pd.read_parquet(study / "artifacts" / "probe_tail_lift.parquet")
+    assert list(cells["quantile"]) == [0.5, 0.9]
+    assert (cells["n_reference"] == lineage["train_frame"]["rows"] - tail["excluded"]["reference_null_score"]).all()
+    assert (cells["n_rows"] > 0).all() and all(math.isfinite(t) for t in cells["threshold"])
+    assert (cells["n_tail"] <= cells["n_rows"]).all()
+    assert cells["n_tail"].iloc[0] >= cells["n_tail"].iloc[1]     # a higher frozen quantile admits no more rows
+
+    from research_workflow.policy import scan_study_python
+    assert scan_study_python(study) == []
