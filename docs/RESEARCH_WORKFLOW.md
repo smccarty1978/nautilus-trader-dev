@@ -1334,6 +1334,7 @@ frame. Six operations, all study-agnostic — the science lives in the declared 
 | `analysis.control.cell_matched` | at most one control row per (group × stratum cell), chosen without reading any outcome: the latest below-threshold eligible row, strictly before the anchor where one exists. Min-n reportability gate; no matching, no weighting, no pooling. |
 | `analysis.path.anchored_offsets` | the value path at declared offsets after an anchor, bounded by its terminal, with delta, maximum, time-to-level, collapse and recross. A missing *required* offset censors that path and is never imputed. |
 | `analysis.classify.precedence` | ordered, first-match-wins labelling; declaration order **is** the precedence, so a dominating category is expressed by declaring it first. |
+| `analysis.metric.tail_lift` | label-rate lift inside the score tail at P90/P95/P97.5 thresholds **frozen on a declared reference frame** and applied to the evaluation rows; a tail evaluated at its own quantile is a description, not a test. Censored rows are excluded and counted. |
 
 The compiler proves before execution that every op is registered, that the pipeline is a DAG in
 declaration order (a step may read only the study frame or an earlier step), and that every
@@ -1341,6 +1342,22 @@ declared artifact names a declared step — so a study cannot reach execution wi
 fails half-way and leaves a partial artifact set behind. An analysis that declares no artifact is
 refused: it could not be audited. `analysis.source` decides whether the protected-OOS gate
 applies (`oos` calls `assert_oos_open` and needs `chronology.dev` years; `train` never opens one).
+
+**The study's own fitted model in its declared analysis.** `analysis.model_scores: true` makes the
+`analyze` stage score the study's own fitted record(s) into every analysis frame as
+`score__<record>` columns (`score__primary` for a single fit, `score__<arm>:<cell>` otherwise — the
+same keys the TRAIN freeze uses). Each record is authenticated against the canonical bytes its
+TRAIN freeze committed to before scoring (the same WARN-1 binding the OOS metrics use), every row of
+the record's subset is scored (censored rows included — a score does not depend on the label; the op
+excludes and counts non-binary rows itself), and the lineage records rows scored, a score digest and
+the authentication per frame. Under `source: oos` the TRAIN partition is also exposed as the built-in
+frame `train_frame`, so `tail_lift` declares `inputs: {reference: train_frame}` and evaluates
+`rows: frame` — thresholds frozen on TRAIN scores, applied to OOS rows. `train_frame` under
+`source: train` is refused, not aliased. A study that fits no model (`model: none` or
+`mode: score`) cannot declare `model_scores`: a frozen external model's scores are a derived
+input, never the study's own. This closes the `ANALYSIS_HARNESS_GAP` that
+`es_180s_model_c_portability` named (2026-09-06): the op existed at `2c2f4ddd`, but the frame never
+carried the study's own scores.
 
 A study with no dev years has no protected period: `freeze` records `NO_PROTECTED_OOS` rather
 than writing a gate that vouches for nothing, and `oos` writes a receipt saying nothing was

@@ -1236,6 +1236,22 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
                 "source: oos needs chronology.dev years; a study with no dev years analyses source: train")
     if not spec.steps:
         ctx.gap(GapKind.INVALID_PARAMETERIZATION, "analysis.steps", "declare at least one analysis step")
+    # Built-in frames a step may read. `train_frame` exists only under source: oos -- it is the
+    # TRAIN partition next to the OOS frame, so a threshold can be frozen on TRAIN and applied
+    # to OOS. Under source: train it would be the same rows as `frame`, and a tail evaluated at
+    # its own quantile is a description, not a test; naming it there is refused, not aliased.
+    builtin = {"frame"} | ({"train_frame"} if spec.source == "oos" else set())
+    model = getattr(ctx.spec, "model", "none")
+    if spec.model_scores and (model == "none" or getattr(model, "mode", "train") != "train"):
+        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "analysis.model_scores",
+                "model_scores joins the scores of THIS study's own fitted model; the study fits none "
+                "(model: none, or mode: score -- a frozen external model's scores are a derived input, not model_scores)")
+
+    def _unbound(ref: str) -> str:
+        if ref == "train_frame":
+            return "'train_frame' exists only under analysis.source: oos; under source: train it is the same rows as 'frame'"
+        return f"{ref!r} is neither {' / '.join(repr(b) for b in sorted(builtin))} nor an earlier step"
+
     steps: List[Dict[str, Any]] = []
     seen: List[str] = []
     for i, step in enumerate(spec.steps):
@@ -1247,17 +1263,16 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
                     closest=_closest(step.op, sorted(registered)))
             seen.append(step.id)
             continue
-        if step.rows != "frame" and step.rows not in seen:
+        if step.rows not in builtin and step.rows not in seen:
             ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.rows",
-                    f"{step.rows!r} is neither 'frame' nor an earlier step; an analysis pipeline runs in declaration order")
+                    _unbound(step.rows) + "; an analysis pipeline runs in declaration order")
         required = set(op_inputs(step.op))
         for name, ref in (step.inputs or {}).items():
             if name not in required:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs.{name}",
                         f"{step.op} takes no input {name!r}; it takes {sorted(required)}")
-            if ref != "frame" and ref not in seen:
-                ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.inputs.{name}",
-                        f"{ref!r} is neither 'frame' nor an earlier step")
+            if ref not in builtin and ref not in seen:
+                ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.inputs.{name}", _unbound(ref))
         for name in sorted(required - set((step.inputs or {}))):
             ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs", f"{step.op} needs input {name!r}")
         seen.append(step.id)
@@ -1285,8 +1300,13 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
     for rel in ("research/analysis/ops.py",) + implementation_files(s["op"] for s in steps):
         ctx.closure_files.add(rel)
         ctx.replay_excluded.add(rel)   # analysis stage: never executes during replay
-    return {"source": spec.source, "steps": steps, "artifacts": artifacts,
-            "ops": sorted({s["op"] for s in steps})}
+    out = {"source": spec.source, "steps": steps, "artifacts": artifacts,
+           "ops": sorted({s["op"] for s in steps})}
+    if spec.model_scores:
+        # Only present when declared: a plan that never asked for its own scores keeps the
+        # identical compiled shape (and plan_sha256) it had before this key existed.
+        out["model_scores"] = True
+    return out
 
 
 # --------------------------------------------------------------------------- #

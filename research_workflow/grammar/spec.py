@@ -361,8 +361,8 @@ class AnalysisStepSpec(_Strict):
     """One registered analysis operation over the study's own collected frame."""
     id: str
     op: str                                                # registered analysis_ops capability id
-    rows: str = "frame"                                    # 'frame' (the collected study frame) or a prior step id
-    inputs: Dict[str, str] = Field(default_factory=dict)   # extra frame inputs -> prior step id
+    rows: str = "frame"                                    # 'frame' (the collected study frame), 'train_frame' (source: oos only) or a prior step id
+    inputs: Dict[str, str] = Field(default_factory=dict)   # extra frame inputs -> 'frame' / 'train_frame' / prior step id
     params: Dict[str, Any] = Field(default_factory=dict)
 
 
@@ -375,6 +375,13 @@ class AnalysisArtifactSpec(_Strict):
 class AnalysisSpec(_Strict):
     """Declarative post-collection analysis: composed registered operations, zero study Python."""
     source: Literal["train", "oos"] = "train"              # which collected partition set the frame comes from
+    # Join the scores of THIS study's own fitted model(s) into every analysis frame as
+    # `score__<record>` columns (`score__primary` for a single fit; `score__<arm>:<cell>` otherwise),
+    # each record authenticated against the canonical bytes its TRAIN freeze committed to. Under
+    # `source: oos` the TRAIN partition is also exposed as the built-in frame `train_frame`, so a
+    # threshold can be frozen on TRAIN scores and applied to OOS rows (analysis.metric.tail_lift).
+    # A frozen EXTERNAL model's scores are a derived input, never model_scores.
+    model_scores: bool = False
     steps: List[AnalysisStepSpec] = Field(default_factory=list)
     artifacts: List[AnalysisArtifactSpec] = Field(default_factory=list)
 
