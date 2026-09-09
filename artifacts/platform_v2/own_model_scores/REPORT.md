@@ -104,3 +104,29 @@ no watcher loop (packet constraint).
 Next session: read the card, classify anything NEW with `results-triager` against the committed
 baseline (expect only the entries already known), merge `chore/analysis-own-model-scores` into
 `main`, then start **S2 — the rehearsal** in a fresh session per the packet.
+
+## S1 (2026-09-09) — broad gate classified, merge
+
+Card: `evidence/broad_gate.stdout.json` at HEAD `2dd06b8a`, baseline `ee16002e`.
+
+| ran | passed | failed | NEW | KNOWN | wall |
+|---|---|---|---|---|---|
+| 2440 | 2369 | 64 | 4 | 60 | 5281 s (88 m) |
+
+All four `NEW_FAILURE` entries are node ids already present in `config/test_failure_baseline.json`;
+they surface as NEW because their recorded signature no longer matches. They are the same four
+that were NEW on the registration-boundaries card (`eb831c9f`, merged to main at `2194055d`),
+and the branch does not touch any file they exercise:
+
+| node | evidence it is the known failure, not a new one |
+|---|---|
+| `test_redteam_pass1_acceptance.py::test_acc12_canaries_green` | same five inner failures as the baseline entry (ordered-barrier `CENSORED` vs `LABELED_NEGATIVE`); only the sub-run timing in the captured stdout differs |
+| `test_generic_contract_audit.py::test_no_hardcoded_feature_count_in_generic_workflow` | identical offender list to the prior card; `compiler.py:874` predates the branch (branch edits start at line 1236) |
+| `test_rt_final_blockers.py::test_rt2b2_...[scripts/check_feature_promotion.py]` | same assertion; the composite hash in the message moves with every platform commit |
+| `test_rt_final_blockers.py::test_rt2b2_...[scripts/select_required_tests.py]` | same |
+
+The fifth NEW on the prior card (`test_feature_system_v2.py::test_explicit_instances_...`) was
+refreshed in the baseline by `4797384e` (class path rename only) and now classifies KNOWN.
+
+No genuine new failure. Merge proceeds. The signatures were not baselined away: refreshing them
+needs the full re-record (F2), which stays deferred.
