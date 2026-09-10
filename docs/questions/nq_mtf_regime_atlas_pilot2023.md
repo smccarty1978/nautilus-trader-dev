@@ -399,3 +399,64 @@ A5. PLATFORM FREEZE. The platform is under a declared freeze after
     authorizes capability workers under `platform_merge:
     approval_required`, so the freeze does not block it — but every
     capability merge here is an owner-approved exception, not routine.
+
+============================================================
+OWNER AMENDMENT 01 — 2026-09-10, after the phase-A design pass
+============================================================
+Two owner decisions, taken after the design worker's compile probe
+returned a 106-gap inventory (recorded in the study's
+`research_decision.yaml` under `gap_inventory`). These amend the body
+above and take precedence over it.
+
+A1. POPULATION IS SINGLE-ANCHOR: 1m FLIPS ONLY.
+    §4 as written needs nine simultaneous candidate streams in one
+    collection. The v2 grammar's `population:` is single-anchored -- one
+    direction, one anchor identity, one cadence -- and no registered
+    tracker or trigger fans out (gap G0). That is a grammar change, and
+    it is NOT taken for this study.
+
+    Instead: the population is 1m regime flips. The other eight
+    timeframes -- 5s, 30s, 3m, 5m, 15m, 30m, 1h, 4h -- are recorded as
+    ALIGNMENT CONTEXT at T exactly as §7's ALIGNMENT block specifies
+    (direction, age, agrees/disagrees), not as populations of their own.
+
+    Consequences, stated once:
+      - Q1-Q5 are answered FOR 1m. Q5 is already a 1m question; Q1-Q4
+        narrow from "by timeframe" to "for 1m flips, by alignment,
+        session and volatility context".
+      - T1, T2, T3, T4, T5, T7, T8 keep their shape with the
+        "by timeframe" split replaced by "1m only".
+      - T6 LOSES ITS CROSS-TIMEFRAME CENSUS. It becomes the 1m census:
+        flips per year, censored counts, ETH vs RTH. The row counts §16
+        wanted from this pilot are 1m row counts.
+      - The nine-timeframe atlas of §0 is NOT delivered by this study.
+        G0 is reassessed with a completed study behind it.
+
+A2. CENSORING IS AT THE GLOBEX TRADING-DAY CLOSE.
+    This REPLACES the `session_end: ignore` answer given earlier the
+    same day; that answer was taken on an incomplete set of options and
+    is void.
+
+    `population.session` stays ALL: the census spans ETH and RTH,
+    distinguished by `feature.session_membership`, per §0. Censoring is
+    at the close of the Globex trading day the flip belongs to --  the
+    boundary `NQ_1S_V2_GLOBEX` already defines in its committed
+    `sessions` reference table (1636 session rows), and the same
+    session-day unit §9 clusters on.
+
+    The grammar today admits only `RTH | ETH | ALL` as a censoring
+    session and refuses `session_end: censor` when the session is ALL
+    (`research_workflow/sessions.py`: `AllSessionTable.session_close`
+    returns None). Closing that -- letting a calendar dataset's
+    trading-day close serve as the censoring session -- is a capability,
+    routed under §13, not a change to this contract.
+
+    §6's censoring rule therefore stands as written: session end, data
+    gap, and chronology boundary all censor and flag. Nothing is
+    imputed; censored rows are never counted as resolved; T6 reports the
+    censored count.
+
+A3. UNCHANGED. Everything else in §0-§16 stands, including §9's
+    mandatory session-day-clustered uncertainty, §11's prohibition on
+    models and economics, and §10's 2023-only pilot chronology with 2026
+    prohibited.
