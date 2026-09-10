@@ -69,6 +69,18 @@ which asserts an active-universe size of 129 and already fails on clean main `8b
 this branch). Three scopes, so not comparable with the two-scope 74m41s or five-scope 83m14s figures above.
 Re-run the command above to re-derive; the card is in the merge-session scratchpad evidence (`broad_gate.json`).
 
+## Broad merge gate for chore/cleanup_and_closure (2026-09-10)
+
+Same command and three scopes as the entry above, on commit `1b990d36` (six commits on main `9be6eba2`),
+Python 3.13.7, Windows, alone on the host: **81m59s** (4,918.8 s `wall_seconds`), **2,310 tests ran**,
+**2,242 passed / 61 failed** (56 known-baseline, 5 `NEW_FAILURE`, 0 outside scope, 0 now-fixed). The five
+NEW are the same five recorded for chore/feature_promotion (all pre-existing). Two earlier attempts the same
+day were not usable: the first was killed by the OS for low memory after ~40 min (no card); the second
+completed in 88m02s (5,281.8 s) with a sixth NEW that traced to a sandboxed `pytest` subprocess killed under
+the same pressure (`PLATFORM_TESTS_FAILED: {'passed': 0, 'failed': 0}`, empty captured output), which passes
+alone and did not recur. Evidence: `artifacts/platform_v2/cleanup_and_closure/evidence/broad_gate*.json`,
+`broad_gate_start.txt`. The gate is memory-bound on this host: run it with nothing else heavy open.
+
 ---
 
 ## Feature authority bundle
@@ -80,8 +92,11 @@ Re-run the command above to re-derive; the card is in the merge-session scratchp
 | Legacy aliases mapped | 693 | `python -c "import json;print(len(json.load(open('features/authority/candidate/legacy_alias_mapping.json'))['aliases']))"` |
 | Bundle composite | `133250b8…` | `cat features/authority/candidate/manifest.json` |
 
-`scripts/activate_feature_pipeline_v2.py` asserts these counts before flipping the pointer,
-so a mismatch here means the bundle changed and this table was not updated.
+These are the bundle's counts as of 2026-08-25; the bundle has since grown (143 definitions on
+2026-09-09) and evidence-promoted catalogue definitions are added on top of it, so the active
+verified universe is larger than the bundle. The activation script that once asserted these counts
+(`scripts/activate_feature_pipeline_v2.py`) was removed on 2026-09-10 with the rest of the cutover
+ceremony; nothing re-points the bundle any more.
 
 ---
 

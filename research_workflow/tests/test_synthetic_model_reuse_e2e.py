@@ -58,12 +58,23 @@ def test_synthetic_closed_model_reuse_without_runtime_code_change(tmp_path):
         {k: v for k, v in decision_body.items() if k != "decision_identity_sha256"})
     decision_p.write_text(json.dumps(decision_body))
     dec_sha = hashlib.sha256(decision_p.read_bytes()).hexdigest()
+    # The source study's CLOSURE is the reuse authority (2026-09-10): it names the model, carries
+    # the assessment + reuse policy and the CLEAR audits; the registry column stays UNASSESSED.
+    for name in ("causal.md", "contract.md"):
+        source.joinpath("artifacts", name).write_text(name, encoding="utf-8")
     closure_body = {
         "schema_version": 1, "study_id": "source", "status": "CLOSED",
         "outcome": "DIAGNOSTIC_POSITIVE", "terminal_decision": "ship_it",
         "model_ids": [rec["model_id"]],
+        "models": {"A": {"model_id": rec["model_id"], "artifact_sha256": rec["artifact_sha256"]}},
+        "model_scientific_assessment": {
+            "assessment": "VALID_DIAGNOSTIC",
+            "reuse_policy": {"allows_governed_diagnostic_derived_input": True},
+        },
         "bound_evidence": {
             "train_freeze_sha256": freeze_sha,
+            "causal_audit": {"verdict": "CLEAR", "report": "artifacts/causal.md"},
+            "contract_audit": {"verdict": "CLEAR", "report": "artifacts/contract.md"},
             "stage17_research_decision": {
                 "path": "artifacts/research_decision_stage17.json",
                 "sha256": dec_sha,
@@ -73,16 +84,15 @@ def test_synthetic_closed_model_reuse_without_runtime_code_change(tmp_path):
     closure_body["closure_identity_sha256"] = canonical_sha256(closure_body)
     closure_p = source.joinpath("artifacts/study_closure.json")
     closure_p.write_text(json.dumps(closure_body))
-    from research_workflow.model_artifacts import assign_scientific_status
-    assign_scientific_status(
-        model_id=rec["model_id"],
-        registry_root=root / "model_registry",
-        scientific_status="VALID_PRIMARY",
-        closure_evidence_path=closure_p,
-        decision_evidence_path=decision_p,
-    )
     assert WorkflowEngine(source).advance()["terminal_state"] == "STUDY_CLOSED"
-    child.joinpath("study.yaml").write_text("study:\n  id: child\nfeatures:\n  derived_inputs:\n    - name: parent_score\n      kind: frozen_external_model_score\n      model_id: %s\n" % rec["model_id"])
+    policy = {"kind": "diagnostic_derived_causal_input", "model_id": rec["model_id"], "parent_study_id": "source",
+              "parent_closure_path": "artifacts/study_closure.json",
+              "parent_closure_sha256": hashlib.sha256(closure_p.read_bytes()).hexdigest(),
+              "parent_closure_identity_sha256": closure_body["closure_identity_sha256"],
+              "expected_assessment": "VALID_DIAGNOSTIC", "artifact_sha256": rec["artifact_sha256"]}
+    child.joinpath("study.yaml").write_text(yaml.safe_dump({"study": {"id": "child"}, "features": {"derived_inputs": [
+        {"name": "parent_score", "kind": "frozen_external_model_score", "model_id": rec["model_id"],
+         "diagnostic_reuse_policy": policy}]}}))
     declaration=yaml.safe_load(child.joinpath("study.yaml").read_text())["features"]["derived_inputs"][0]
     parsed=DerivedCausalInputSpec.model_validate(declaration)
     scorer=FrozenExternalModelScorer.bind(parsed, parent_dir=source)

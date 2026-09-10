@@ -64,16 +64,8 @@ CODEX_META: dict[str, dict[str, str]] = {
         "name": "implementer",
         "approval_policy": "on-request",
     },
-    "research-executor": {
-        "name": "research_executor",
-        "approval_policy": "on-request",
-    },
     "analysis-decider": {
         "name": "analysis_decider",
-        "approval_policy": "never",
-    },
-    "capability-router": {
-        "name": "capability_router",
         "approval_policy": "never",
     },
     "results-triager": {

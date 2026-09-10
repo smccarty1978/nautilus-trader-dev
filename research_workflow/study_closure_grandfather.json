@@ -1,0 +1,56 @@
+{
+  "closures": {
+    "es_180s_model_c_portability": {
+      "closed_at_utc": "2026-09-07T02:50:47.288866+00:00",
+      "closure_artifact_sha256": "2c1a7ed0e4d3bbdae996fa938b3cb971d4754ed0c314ecb41e61106c8efad2db",
+      "closure_commit": "1864553927999a54a32c86add7ac467e90ef27c7",
+      "final_evidence": {
+        "artifacts/analysis_decision.json": "cda1bb054c994c688a1b9301f8d904bbb95bea654c4d1eb45b67087930c4e27c",
+        "artifacts/experiment_analysis_v2.json": "14533aad17c3e03bec60b16ecae09b280bb6dac16005d0d56ebdff83ed3368f6"
+      },
+      "plan_sha256": "e1f5dfb86789741516379416b7d646fc6e2cc6688464f0f457dd02dfdd9d22e5"
+    },
+    "first_p90_warning_horizon_march2024": {
+      "closed_at_utc": "2026-09-04T18:31:43.260162+00:00",
+      "closure_artifact_sha256": "f14f27f4fde4bad121374c61a2b0bb992ade8125d99a68ed379c9f6dbd51e101",
+      "closure_commit": "2a819b22f84e207ef774638889b29da82020b919",
+      "final_evidence": {
+        "artifacts/experiment_analysis_v2.json": "6a0c3bdc7817a485e452b0c7cbf990fa1cf1cdc60d202d4a1c7e406eb92df843"
+      },
+      "plan_sha256": "e4c2b81bbf9eda0c193c3ed0e75829d3370e6188e9b13751ebeb9b2b1e8a473e"
+    },
+    "v2_shape_a_flip_180s": {
+      "closed_at_utc": "2026-09-02T20:43:52.164062+00:00",
+      "closure_artifact_sha256": "fd2e9418b6ef234e361cddf7cc1feb8ce58261e9b511dc48413ed6becd9e7c02",
+      "closure_commit": "b72a9ae8c132befae35203a6dbbcb50e9d9d3086",
+      "final_evidence": {
+        "artifacts/experiment_analysis_v2.json": "60a4a2a7d105be5bea3adc02f7f4a7ad9a8bb97e52f0c5419dcebdb9dea4dab5"
+      },
+      "plan_sha256": "c291d96614549145e3295d3bb99c43b2275ffc34d75279cda52cc1154033093a"
+    },
+    "v2_shape_b_deep_pullback_5s": {
+      "closed_at_utc": "2026-09-02T20:14:46.102490+00:00",
+      "closure_artifact_sha256": "eaa5f6ab5bf5f547e9c83beafa1ec71be438c19dbcf333a399ec936a17d82d50",
+      "closure_commit": "17d9e386f5c2facd13a0dde24f697b6bf9ab409f",
+      "final_evidence": {
+        "artifacts/experiment_analysis_v2.json": "cd5dd9496b4dc1768120182b066c5c5006d4c2255a6ed8b37c2886cc51def481"
+      },
+      "plan_sha256": "e4d66bedf80ebc239e377dd41994e7ab83c4d8bfd670d7056c3e3ae34595300d"
+    },
+    "v2_shape_c_barrier_race_fade": {
+      "closed_at_utc": "2026-09-03T00:06:06.537359+00:00",
+      "closure_artifact_sha256": "905959c941accdbaa3348c17c76c5827302b1e565602b415f890c20e2d1dc613",
+      "closure_commit": "78e1a9782a4dbbca80043f4c311ab6262b566955",
+      "final_evidence": {
+        "artifacts/experiment_analysis_v2.json": "3bf55aab2b2edcedd41b47606247592d6889555a94b28cc778742323ce55229e"
+      },
+      "plan_sha256": "b252d6c0fc405a24d2c79546efef5fe3f5d62bf6e33a26df1dd7370c46ce58bb"
+    }
+  },
+  "hash_algorithm": "sha256 over CRLF-normalized bytes (scripts.resolve_execution_manifest.canonical_file_sha256)",
+  "note": "Closures written before rule_commit bind only the pre-execution seal and the TRAIN freeze; the corrected validator requires the V2 final evidence (experiment_analysis_v2.json, analysis_decision.json) to be closure-bound. These five closures are terminal records that predate the rule and are NOT re-closed. They validate under the prior rule ONLY while: the study_id is listed here, the closure's closed_at_utc equals the recorded value and precedes rule_commit_utc, the closure file hashes to closure_artifact_sha256, and every V2 final-evidence file present on disk hashes to the value recorded in final_evidence. The final evidence is git-preserved but not closure-bound; the hashes below give it the authentication the closure missed, recorded here on 2026-09-10 from the committed files. The validator refuses any entry whose closed_at_utc is not strictly before rule_commit_utc, so this record cannot exempt a later closure.",
+  "rule": "STUDY_CLOSURE_V2_FINAL_EVIDENCE_BINDING",
+  "rule_commit": "5d3aad6a7c529677f8066e34d63be64ac4d0b730",
+  "rule_commit_utc": "2026-09-07T12:45:25+00:00",
+  "schema_version": 1
+}

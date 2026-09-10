@@ -11,7 +11,9 @@ mechanism exists.
 """
 from __future__ import annotations
 
+import hashlib
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -21,6 +23,10 @@ V2_FINAL_EVIDENCE = {
     "v2_analysis": "artifacts/experiment_analysis_v2.json",
     "v2_decision": "artifacts/analysis_decision.json",
 }
+V2_PLAN_RELPATH = "compiled_plan.json"
+# Closures written before commit 5d3aad6a (the V2 final-evidence binding rule) that validate
+# under the prior rule. Date-bounded and hash-pinned; see the record's ``note``.
+GRANDFATHER_PATH = Path(__file__).resolve().parent / "study_closure_grandfather.json"
 _REQUIRED_FIELDS = ("schema_version", "study_id", "status", "outcome", "terminal_decision")
 
 
@@ -70,6 +76,153 @@ def _validate_terminal_decision(study_dir: Path, terminal_decision: str) -> None
         )
 
 
+def _utc(value: Any) -> datetime:
+    if not isinstance(value, str) or not value.strip():
+        raise StudyClosureInvalid("STUDY_CLOSURE_MALFORMED: closed_at_utc must be an ISO-8601 timestamp")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise StudyClosureInvalid(f"STUDY_CLOSURE_MALFORMED: unparseable timestamp {value!r}") from exc
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
+def _read_json(path: Path, label: str) -> Dict[str, Any]:
+    try:
+        body = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_CORRUPT: {label} unreadable: {exc}") from exc
+    if not isinstance(body, dict):
+        raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_CORRUPT: {label} is not a JSON object")
+    return body
+
+
+def load_grandfather_record(path: Path = GRANDFATHER_PATH) -> Dict[str, Any]:
+    """The recorded pre-``5d3aad6a`` closure exemptions. Every entry must predate the rule commit;
+    an entry that does not is refused here, so the record can never exempt a later closure."""
+    if not path.is_file():
+        return {"closures": {}, "rule_commit_utc": None}
+    record = _read_json(path, path.name)
+    cutoff = _utc(record.get("rule_commit_utc"))
+    for study_id, entry in (record.get("closures") or {}).items():
+        if not isinstance(entry, dict) or _utc(entry.get("closed_at_utc")) >= cutoff:
+            raise StudyClosureInvalid(
+                f"STUDY_CLOSURE_GRANDFATHER_OUT_OF_BOUNDS: {study_id} in {path.name} is not strictly before "
+                f"the rule commit ({record.get('rule_commit_utc')}); the exemption is date-bounded")
+    return record
+
+
+def _grandfathered_v2_evidence(study_dir: Path, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Return the exemption entry when this closure is one of the recorded pre-rule closures.
+
+    ``None`` means no exemption applies (the caller raises the ordinary
+    ``STUDY_CLOSURE_EVIDENCE_MISSING``). An entry that exists but whose closure or final evidence
+    does not authenticate against the recorded hashes raises: the exemption relaxes only the
+    *binding*, never the authentication -- the grandfathered evidence is pinned here instead.
+    """
+    record = load_grandfather_record()
+    entry = (record.get("closures") or {}).get(study_dir.name)
+    if not isinstance(entry, dict):
+        return None
+    cutoff = _utc(record.get("rule_commit_utc"))
+    closed = data.get("closed_at_utc")
+    if closed != entry.get("closed_at_utc") or _utc(closed) >= cutoff:
+        raise StudyClosureInvalid(
+            f"STUDY_CLOSURE_GRANDFATHER_OUT_OF_BOUNDS: {study_dir.name} closed_at_utc={closed!r} is not the "
+            f"recorded pre-rule closure ({entry.get('closed_at_utc')!r}, rule {record.get('rule_commit_utc')})")
+    from scripts.resolve_execution_manifest import canonical_file_sha256
+
+    if canonical_file_sha256(study_dir / CLOSURE_RELPATH) != entry.get("closure_artifact_sha256"):
+        raise StudyClosureInvalid(
+            f"STUDY_CLOSURE_GRANDFATHER_MISMATCH: {study_dir.name} closure bytes differ from the recorded pre-rule closure")
+    recorded = entry.get("final_evidence") or {}
+    for rel in V2_FINAL_EVIDENCE.values():
+        path = study_dir / rel
+        if path.is_file():
+            if not recorded.get(rel) or canonical_file_sha256(path) != recorded[rel]:
+                raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISMATCH: {rel} (grandfathered final evidence)")
+        elif recorded.get(rel):
+            raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISSING: {rel} (grandfathered final evidence)")
+    return entry
+
+
+def _cited_evidence(decision: Dict[str, Any]) -> Dict[str, Optional[str]]:
+    """``{relpath: sha256-or-None}`` for every artifact an analysis decision cites."""
+    cited: Dict[str, Optional[str]] = {}
+    for item in decision.get("evidence") or []:
+        if isinstance(item, str) and item.strip():
+            cited[item.strip().replace("\\", "/")] = None
+        elif isinstance(item, dict) and item.get("path"):
+            sha = item.get("sha256") or item.get("artifact_file_sha256")
+            cited[str(item["path"]).replace("\\", "/")] = sha if isinstance(sha, str) else None
+    return cited
+
+
+def _assert_v2_final_evidence_fresh(study_dir: Path, data: Dict[str, Any], bound: Dict[str, Any]) -> None:
+    """Fresh means *produced from this plan and this TRAIN freeze*, not merely unchanged since closure.
+
+    Byte authentication (done by the caller) cannot tell a stale-but-unmodified artifact from a
+    current one. So: ``experiment_analysis_v2.json`` must record the ``plan_sha256`` the closure and
+    the study's compiled plan carry, the bound TRAIN freeze must be of that same plan, and every
+    model the analysis scored must be a model that freeze binds. ``analysis_decision.json`` must
+    cite the analysis, and every cited artifact it hashed must still hash the same.
+    """
+    if "v2_analysis" not in bound and "v2_decision" not in bound:
+        return
+    plan_path = study_dir / V2_PLAN_RELPATH
+    current_plan = _read_json(plan_path, V2_PLAN_RELPATH).get("plan_sha256") if plan_path.is_file() else None
+    closure_plan = data.get("plan_sha256")
+
+    if "v2_analysis" in bound:
+        analysis_rel = V2_FINAL_EVIDENCE["v2_analysis"]
+        analysis = _read_json(study_dir / analysis_rel, analysis_rel)
+        produced = analysis.get("plan_sha256")
+        binding = bound["v2_analysis"] if isinstance(bound["v2_analysis"], dict) else {}
+        expected = {v for v in (closure_plan, current_plan, binding.get("plan_sha256")) if isinstance(v, str) and v}
+        if expected and (len(expected) != 1 or produced not in expected):
+            raise StudyClosureInvalid(
+                f"STUDY_CLOSURE_EVIDENCE_STALE: {analysis_rel} was produced from plan {str(produced)[:12]!r} but the "
+                f"closure/compiled plan is {[e[:12] for e in sorted(expected)]}; final evidence must come from this plan")
+        freeze_path = study_dir / "artifacts" / "train_experiment_freeze.json"
+        if "train_freeze_sha256" in bound and freeze_path.is_file():
+            binding_freeze = binding.get("train_freeze_sha256")
+            if binding_freeze and binding_freeze != bound["train_freeze_sha256"]:
+                raise StudyClosureInvalid(
+                    f"STUDY_CLOSURE_EVIDENCE_STALE: {analysis_rel} is bound to a different TRAIN freeze than the closure")
+            freeze = _read_json(freeze_path, "train_experiment_freeze.json")
+            if freeze.get("plan_sha256") and produced and freeze["plan_sha256"] != produced:
+                raise StudyClosureInvalid(
+                    f"STUDY_CLOSURE_EVIDENCE_STALE: the bound TRAIN freeze is of plan {str(freeze['plan_sha256'])[:12]!r}, "
+                    f"{analysis_rel} of plan {str(produced)[:12]!r}")
+            frozen_ids = ({str(v) for v in (freeze.get("model_hashes") or {}).values()}
+                          | {str(v) for v in (freeze.get("model_canonical_sha256") or {}).values()})
+            scored = {str(m.get("id") or m.get("model_id")) for key in ("frozen_models_oos", "train_metrics")
+                      for m in (analysis.get(key) or []) if isinstance(m, dict) and (m.get("id") or m.get("model_id"))}
+            if scored and not scored <= frozen_ids:
+                raise StudyClosureInvalid(
+                    f"STUDY_CLOSURE_EVIDENCE_STALE: {analysis_rel} scores model(s) {sorted(x[:12] for x in scored - frozen_ids)} "
+                    f"that the bound TRAIN freeze does not bind; final evidence must come from this freeze")
+
+    if "v2_decision" in bound:
+        decision_rel = V2_FINAL_EVIDENCE["v2_decision"]
+        decision = _read_json(study_dir / decision_rel, decision_rel)
+        if decision.get("study_id") not in (None, study_dir.name):
+            raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MALFORMED: {decision_rel} names study {decision.get('study_id')!r}")
+        cited = _cited_evidence(decision)
+        analysis_rel = V2_FINAL_EVIDENCE["v2_analysis"]
+        if (study_dir / analysis_rel).is_file() and analysis_rel not in cited:
+            raise StudyClosureInvalid(
+                f"STUDY_CLOSURE_EVIDENCE_STALE: {decision_rel} does not cite {analysis_rel}; a decision must be about this study's final analysis")
+        for rel, sha in cited.items():
+            if sha is None:
+                continue
+            path = study_dir / rel
+            if not path.is_file():
+                raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISSING: {decision_rel} cites {rel}, which is absent")
+            if hashlib.sha256(path.read_bytes()).hexdigest() != sha:
+                raise StudyClosureInvalid(
+                    f"STUDY_CLOSURE_EVIDENCE_STALE: {decision_rel} was decided on a different {rel} than the one on disk")
+
+
 def _require_mandatory_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> None:
     """A closure may be terminal only if ``bound_evidence`` binds the evidence that is
     mandatory for the lifecycle stage the study *actually reached* (proven by the stage's
@@ -84,9 +237,11 @@ def _require_mandatory_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> 
     """
     bound = data.get("bound_evidence")
     bound = bound if isinstance(bound, dict) else {}
-    for key, rel in V2_FINAL_EVIDENCE.items():
-        if (study_dir / rel).is_file() and key not in bound:
-            raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISSING: closure omits {rel}")
+    unbound = [rel for key, rel in V2_FINAL_EVIDENCE.items() if (study_dir / rel).is_file() and key not in bound]
+    # A closure recorded in study_closure_grandfather.json (written before the binding rule,
+    # date-bounded) validates under the prior rule; its final evidence is authenticated there.
+    if unbound and _grandfathered_v2_evidence(study_dir, data) is None:
+        raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISSING: closure omits {unbound[0]}")
     art = study_dir / "artifacts"
     reached_train = (art / "train_experiment_freeze.json").is_file()
     reached_s16 = (art / "experiment_analysis.json").is_file()
@@ -129,8 +284,6 @@ def _authenticate_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> None:
     if not isinstance(bound, dict) or not bound:
         return
 
-    import hashlib
-
     # V2 terminal evidence: exact paths and mandatory raw-byte hashes. A missing,
     # malformed or redirected binding must never authenticate an unrelated file.
     for key, rel in V2_FINAL_EVIDENCE.items():
@@ -147,6 +300,7 @@ def _authenticate_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> None:
             raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISSING: {rel}")
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
             raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_MISMATCH: {rel}")
+    _assert_v2_final_evidence_fresh(study_dir, data, bound)
 
     # 1. Preexec audit seal
     if "preexec_seal_artifact_sha256" in bound:
@@ -199,7 +353,7 @@ def _authenticate_bound_evidence(study_dir: Path, data: Dict[str, Any]) -> None:
                     raise StudyClosureInvalid("STUDY_CLOSURE_EVIDENCE_MISMATCH: stage17 decision artifact file sha mismatch")
             from research_workflow.oos_analysis_lineage import classify_stage17_decision
             verdict = classify_stage17_decision(study_dir)
-            if verdict is not None and verdict.get("state") != "FRESH":
+            if verdict is None or verdict.get("state") != "FRESH":
                 raise StudyClosureInvalid(f"STUDY_CLOSURE_EVIDENCE_STALE: stage17 decision is not FRESH: {verdict}")
 
     # 5. OOS reconciliation and reconciled authority
@@ -325,6 +479,8 @@ def closure_summary(study_dir: str | Path, closure: Dict[str, Any]) -> Dict[str,
 
 __all__ = [
     "CLOSURE_RELPATH",
+    "GRANDFATHER_PATH",
+    "load_grandfather_record",
     "StudyClosureInvalid",
     "load_study_closure",
     "closure_summary",

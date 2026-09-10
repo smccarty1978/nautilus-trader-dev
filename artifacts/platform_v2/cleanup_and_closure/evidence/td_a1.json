@@ -1,0 +1,1434 @@
+{
+  "STATUS": "NEW_FAILURES",
+  "baseline": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\config\\test_failure_baseline.json",
+  "baseline_commit": "ee16002ea0879989fa385a97e4e1c9d1924ab656",
+  "head": "9be6eba2",
+  "baseline_issues": [],
+  "pytest_exit_code": 1,
+  "wall_seconds": 114.97949890000746,
+  "per_test_timings": {
+    "features/tests/test_candidate_authority.py::test_candidate_is_explicit_and_normal_active_cannot_fallback": {
+      "seconds": 0.013104600133374333,
+      "phases": {
+        "setup": 0.00764080008957535,
+        "call": 0.005062100011855364,
+        "teardown": 0.00040170003194361925
+      }
+    },
+    "features/tests/test_candidate_authority.py::test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it": {
+      "seconds": 0.01227199996355921,
+      "phases": {
+        "setup": 0.001782099949195981,
+        "call": 0.01029120001476258,
+        "teardown": 0.00019869999960064888
+      }
+    },
+    "features/tests/test_feature_ctl_request_resolution.py::test_new_timeframe_alias_resolves_to_existing_regime_building_block": {
+      "seconds": 0.6212946000741795,
+      "phases": {
+        "setup": 0.0010631000623106956,
+        "call": 0.6200479000108317,
+        "teardown": 0.00018360000103712082
+      }
+    },
+    "features/tests/test_feature_ctl_request_resolution.py::test_legacy_alias_and_genuinely_missing_request_are_distinguished": {
+      "seconds": 1.1733883999986574,
+      "phases": {
+        "setup": 0.0012596000451594591,
+        "call": 1.1719332999782637,
+        "teardown": 0.0001954999752342701
+      }
+    },
+    "features/tests/test_feature_ctl_request_resolution.py::test_any_registered_physical_alias_is_normalized_before_a_new_definition_is_suggested": {
+      "seconds": 0.5913245999254286,
+      "phases": {
+        "setup": 0.0011659999145194888,
+        "call": 0.5899925000267103,
+        "teardown": 0.00016609998419880867
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_golden_resolution": {
+      "seconds": 9.258450800087303,
+      "phases": {
+        "setup": 0.0010660000843927264,
+        "call": 9.257215999998152,
+        "teardown": 0.00016880000475794077
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_resolver_does_not_statically_import_any_definition_module": {
+      "seconds": 0.12481890001799911,
+      "phases": {
+        "setup": 0.0011411999585106969,
+        "call": 0.12351760000456125,
+        "teardown": 0.00016010005492717028
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/provider_host.py]": {
+      "seconds": 0.0766721999971196,
+      "phases": {
+        "setup": 0.0010997999925166368,
+        "call": 0.07541689998470247,
+        "teardown": 0.00015550001990050077
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/forward_outcomes/guard.py]": {
+      "seconds": 0.10906269995030016,
+      "phases": {
+        "setup": 0.0010513999732211232,
+        "call": 0.10785620007663965,
+        "teardown": 0.0001550999004393816
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/output_manager.py]": {
+      "seconds": 0.08463450009003282,
+      "phases": {
+        "setup": 0.0010189999593421817,
+        "call": 0.08345760009251535,
+        "teardown": 0.00015790003817528486
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[backtests/nt_runtime/modes/collect.py]": {
+      "seconds": 0.23628979991190135,
+      "phases": {
+        "setup": 0.0010618999367579818,
+        "call": 0.2350716000655666,
+        "teardown": 0.00015629990957677364
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/generic_collector.py]": {
+      "seconds": 0.2513005000073463,
+      "phases": {
+        "setup": 0.001332300016656518,
+        "call": 0.24981449998449534,
+        "teardown": 0.0001537000061944127
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/grammar/compiler.py]": {
+      "seconds": 0.3589587998576462,
+      "phases": {
+        "setup": 0.0010300999274477363,
+        "call": 0.35775540000759065,
+        "teardown": 0.0001732999226078391
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/phase0.py]": {
+      "seconds": 0.22592310002073646,
+      "phases": {
+        "setup": 0.0010550000006332994,
+        "call": 0.22471099998801947,
+        "teardown": 0.00015710003208369017
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_definition_modules_are_reachable_only_through_the_index": {
+      "seconds": 4.049406799953431,
+      "phases": {
+        "setup": 0.0010348999639973044,
+        "call": 4.04822029999923,
+        "teardown": 0.00015159999020397663
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_declared_modules_match_the_definition_files": {
+      "seconds": 0.015805699862539768,
+      "phases": {
+        "setup": 0.0013185999123379588,
+        "call": 0.014358100015670061,
+        "teardown": 0.0001289999345317483
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_generated_registry_carries_the_definition_modules": {
+      "seconds": 0.009903400088660419,
+      "phases": {
+        "setup": 0.0008560999995097518,
+        "call": 0.008922200067900121,
+        "teardown": 0.00012510002125054598
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_compiler_closure_still_covers_every_definition_module": {
+      "seconds": 0.12987540010362864,
+      "phases": {
+        "setup": 0.000862700049765408,
+        "call": 0.12886779999826103,
+        "teardown": 0.00014490005560219288
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_an_empty_or_unreadable_index_fails_closed": {
+      "seconds": 0.016280799987725914,
+      "phases": {
+        "setup": 0.0016547000268474221,
+        "call": 0.014394599944353104,
+        "teardown": 0.00023150001652538776
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_definition_catalogues_are_still_reachable_by_their_historical_names": {
+      "seconds": 0.006088600144721568,
+      "phases": {
+        "setup": 0.0011414000764489174,
+        "call": 0.0048180000158026814,
+        "teardown": 0.0001292000524699688
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_a_definition_module_declaring_nothing_is_refused": {
+      "seconds": 0.003987699979916215,
+      "phases": {
+        "setup": 0.0018698000349104404,
+        "call": 0.001959199900738895,
+        "teardown": 0.00015870004426687956
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_an_unimportable_definition_module_is_refused": {
+      "seconds": 0.0037261999677866697,
+      "phases": {
+        "setup": 0.0018493999959900975,
+        "call": 0.0017377999611198902,
+        "teardown": 0.000139000010676682
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_the_rehearsal_feature_verifies_against_hand_derived_values": {
+      "seconds": 0.01294919999781996,
+      "phases": {
+        "setup": 0.001129999989643693,
+        "call": 0.011676099966280162,
+        "teardown": 0.0001431000418961048
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_the_rehearsal_feature_resolves_verified_and_compiles": {
+      "seconds": 2.0341860000044107,
+      "phases": {
+        "setup": 0.0010238999966531992,
+        "call": 2.032997400034219,
+        "teardown": 0.00016469997353851795
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_no_golden_values_is_refused": {
+      "seconds": 0.027285699965432286,
+      "phases": {
+        "setup": 0.006297199986875057,
+        "call": 0.020723000052385032,
+        "teardown": 0.00026549992617219687
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_wrong_golden_values_are_refused": {
+      "seconds": 0.09151139995083213,
+      "phases": {
+        "setup": 0.006785499979741871,
+        "call": 0.08445660001598299,
+        "teardown": 0.00026929995510727167
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_a_forged_record_is_refused_at_compile": {
+      "seconds": 0.18465509999077767,
+      "phases": {
+        "setup": 0.006375600001774728,
+        "call": 0.17811159999109805,
+        "teardown": 0.00016789999790489674
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_fixture_without_a_post_snapshot_event_is_refused": {
+      "seconds": 0.06896549998782575,
+      "phases": {
+        "setup": 0.004751599975861609,
+        "call": 0.06379349995404482,
+        "teardown": 0.00042040005791932344
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_fixture_without_a_derivation_is_refused": {
+      "seconds": 0.058454099926166236,
+      "phases": {
+        "setup": 0.00986300001386553,
+        "call": 0.04822589992545545,
+        "teardown": 0.0003651999868452549
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_provider_drift_after_promotion_demotes_the_definition": {
+      "seconds": 0.06074170011561364,
+      "phases": {
+        "setup": 0.00637990003451705,
+        "call": 0.05417330004274845,
+        "teardown": 0.00018850003834813833
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_a_bundle_identity_cannot_be_shadowed": {
+      "seconds": 0.046582299983128905,
+      "phases": {
+        "setup": 0.0047101000091061,
+        "call": 0.04167780000716448,
+        "teardown": 0.0001943999668583274
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_alias_collisions_are_refused": {
+      "seconds": 0.007968699908815324,
+      "phases": {
+        "setup": 0.0013689000625163317,
+        "call": 0.006461599958129227,
+        "teardown": 0.00013819988816976547
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_promotion_does_not_reach_candidate_or_legacy_authorities": {
+      "seconds": 0.005497300066053867,
+      "phases": {
+        "setup": 0.0011033000191673636,
+        "call": 0.004265900002792478,
+        "teardown": 0.0001281000440940261
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_catalogue_records_are_one_file_per_definition": {
+      "seconds": 0.005122100119479001,
+      "phases": {
+        "setup": 0.000980100012384355,
+        "call": 0.003981300047598779,
+        "teardown": 0.0001607000594958663
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_a_misnamed_record_fails_the_catalogue_closed": {
+      "seconds": 0.004290199954994023,
+      "phases": {
+        "setup": 0.001753999968059361,
+        "call": 0.00240470003336668,
+        "teardown": 0.00013149995356798172
+      }
+    },
+    "features/tests/test_feature_promotion_path.py::test_every_promotion_record_replays": {
+      "seconds": 0.08388010005000979,
+      "phases": {
+        "setup": 0.004462299984879792,
+        "call": 0.0792418000055477,
+        "teardown": 0.00017600005958229303
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_completed_calendar_instance_defaults_to_completed_semantics": {
+      "seconds": 0.0013706000754609704,
+      "phases": {
+        "setup": 0.0011237000580877066,
+        "call": 0.00013099994976073503,
+        "teardown": 0.0001159000676125288
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_event_anchored_timeframe_feature_without_bar_state_schema_is_idempotent": {
+      "seconds": 0.0012106001377105713,
+      "phases": {
+        "setup": 0.0009685000404715538,
+        "call": 0.00012600002810359,
+        "teardown": 0.00011610006913542747
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_instances_require_declared_legacy_compatible_parameter_combinations_before_cutover": {
+      "seconds": 0.0020671000238507986,
+      "phases": {
+        "setup": 0.0016393999103456736,
+        "call": 0.0003081000177189708,
+        "teardown": 0.00011960009578615427
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_live_legacy_provider_does_not_advertise_generic_timeframes_before_cutover": {
+      "seconds": 0.0013780000153928995,
+      "phases": {
+        "setup": 0.0010716000106185675,
+        "call": 0.0001841000048443675,
+        "teardown": 0.00012229999992996454
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_ambiguous_high_frequency_calendar_request_fails_closed": {
+      "seconds": 0.0013080999488011003,
+      "phases": {
+        "setup": 0.0010170999448746443,
+        "call": 0.0001732999226078391,
+        "teardown": 0.00011770008131861687
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_regime_geometry_does_not_advertise_unimplemented_forming_support": {
+      "seconds": 0.0012865000171586871,
+      "phases": {
+        "setup": 0.0009938000002875924,
+        "call": 0.0001666999887675047,
+        "teardown": 0.00012600002810359
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_forming_calendar_snapshot_excludes_future_completed_second": {
+      "seconds": 0.0013694000663235784,
+      "phases": {
+        "setup": 0.0011399000650271773,
+        "call": 0.00011869997251778841,
+        "teardown": 0.00011080002877861261
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_rolling_window_is_not_a_forming_calendar_bar": {
+      "seconds": 0.0012373999925330281,
+      "phases": {
+        "setup": 0.0010047000832855701,
+        "call": 0.00012009998317807913,
+        "teardown": 0.00011259992606937885
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_cross_timeframe_instances_validate_each_bar_state_and_derive_both_completed_streams": {
+      "seconds": 0.0012454999377951026,
+      "phases": {
+        "setup": 0.0009632000001147389,
+        "call": 0.000166199984960258,
+        "teardown": 0.00011609995272010565
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_rolling_instance_rejects_unsupported_update_cadence": {
+      "seconds": 0.001323099946603179,
+      "phases": {
+        "setup": 0.0010392999975010753,
+        "call": 0.00017129990737885237,
+        "teardown": 0.00011250004172325134
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_legacy_aliases_and_new_window_alias_are_deterministic": {
+      "seconds": 0.0012390000047162175,
+      "phases": {
+        "setup": 0.0010022999485954642,
+        "call": 0.00012310000602155924,
+        "teardown": 0.00011360005009919405
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_canonical_temporal_name_is_rejected_without_exception": {
+      "seconds": 0.0013307000044733286,
+      "phases": {
+        "setup": 0.0010405000066384673,
+        "call": 0.000174800050444901,
+        "teardown": 0.00011539994738996029
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_canonical_period_name_is_rejected_without_exception": {
+      "seconds": 0.0013016999000683427,
+      "phases": {
+        "setup": 0.0010532999876886606,
+        "call": 0.00012260000221431255,
+        "teardown": 0.0001257999101653695
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_explicit_instances_and_collection_universe_share_canonical_status": {
+      "seconds": 0.008030899916775525,
+      "phases": {
+        "setup": 0.0012146999360993505,
+        "call": 0.006620400003157556,
+        "teardown": 0.0001957999775186181
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_collection_resolver_is_deterministic_and_not_cache_backed": {
+      "seconds": 0.005669899983331561,
+      "phases": {
+        "setup": 0.0011024000123143196,
+        "call": 0.004447299987077713,
+        "teardown": 0.00012019998393952847
+      }
+    },
+    "features/tests/test_generic_episode_geometry.py::test_deep_pullback_surface_names_are_registered_and_parameterized": {
+      "seconds": 0.0013351000379770994,
+      "phases": {
+        "setup": 0.0010715000098571181,
+        "call": 0.00015239999629557133,
+        "teardown": 0.00011120003182440996
+      }
+    },
+    "features/tests/test_generic_episode_geometry.py::test_pullback_max_depth_uses_completed_1s_wick_and_keeps_arm_atr_separate_from_candidate_atr": {
+      "seconds": 0.0014152000658214092,
+      "phases": {
+        "setup": 0.0010449999244883657,
+        "call": 0.0002527000615373254,
+        "teardown": 0.00011750007979571819
+      }
+    },
+    "features/tests/test_generic_episode_geometry.py::test_pullback_direction_normalization_is_symmetric[1-100.0-100.0-94.0-98.0-1.0]": {
+      "seconds": 0.001571000088006258,
+      "phases": {
+        "setup": 0.00131870002951473,
+        "call": 0.0001221999991685152,
+        "teardown": 0.00013010005932301283
+      }
+    },
+    "features/tests/test_generic_episode_geometry.py::test_pullback_direction_normalization_is_symmetric[-1-100.0-106.0-100.0-102.0-1.0]": {
+      "seconds": 0.0015774000203236938,
+      "phases": {
+        "setup": 0.00130540004465729,
+        "call": 0.00013830000534653664,
+        "teardown": 0.00013369997031986713
+      }
+    },
+    "features/tests/test_generic_episode_geometry.py::test_pullback_provider_rejects_forming_or_reordered_completed_observations": {
+      "seconds": 0.001401799963787198,
+      "phases": {
+        "setup": 0.0010874000145122409,
+        "call": 0.0002012000186368823,
+        "teardown": 0.00011319993063807487
+      }
+    },
+    "features/tests/test_generic_episode_geometry.py::test_prior_5s_geometry_freezes_counter_regime_and_exposes_candidate_recovery_only_after_flip": {
+      "seconds": 0.001375499996356666,
+      "phases": {
+        "setup": 0.0011209000367671251,
+        "call": 0.00014140002895146608,
+        "teardown": 0.00011319993063807487
+      }
+    },
+    "features/tests/test_generic_episode_geometry.py::test_trend_normalized_delta_ratios_use_completed_windows_and_null_zero_scale": {
+      "seconds": 0.0033319999929517508,
+      "phases": {
+        "setup": 0.0011940000113099813,
+        "call": 0.002017499995417893,
+        "teardown": 0.00012049998622387648
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_ohlcv_delta_default_windows_are_legacy_identical_and_45s_is_generic": {
+      "seconds": 0.0019499000627547503,
+      "phases": {
+        "setup": 0.001194800017401576,
+        "call": 0.0006331000477075577,
+        "teardown": 0.00012199999764561653
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_ohlcv_delta_requires_completed_bar_close_timestamp_not_raw_open_timestamp": {
+      "seconds": 0.0016684000147506595,
+      "phases": {
+        "setup": 0.0013692000648006797,
+        "call": 0.0001841000048443675,
+        "teardown": 0.00011509994510561228
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_ohlcv_delta_rejects_out_of_order_completed_availability": {
+      "seconds": 0.0016982998931780457,
+      "phases": {
+        "setup": 0.0013707999605685472,
+        "call": 0.0002082999562844634,
+        "teardown": 0.0001191999763250351
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_price_level_default_window_is_legacy_identical_and_7m_is_generic": {
+      "seconds": 0.002292799879796803,
+      "phases": {
+        "setup": 0.0012710000155493617,
+        "call": 0.0008890999015420675,
+        "teardown": 0.00013269996270537376
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_price_level_provider_rejects_a_snapshot_before_its_latest_completed_bar": {
+      "seconds": 0.001523100072517991,
+      "phases": {
+        "setup": 0.0011690000537782907,
+        "call": 0.0002359000500291586,
+        "teardown": 0.00011819996871054173
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_arrival_velocity_and_volume_accept_nonlegacy_windows": {
+      "seconds": 0.0016868000384420156,
+      "phases": {
+        "setup": 0.00118090002797544,
+        "call": 0.0003855000250041485,
+        "teardown": 0.00012039998546242714
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_generic_pullback_reproduces_legacy_30s_trailing_values_and_event_scope": {
+      "seconds": 0.0018570000538602471,
+      "phases": {
+        "setup": 0.0011953000212088227,
+        "call": 0.0005330999847501516,
+        "teardown": 0.00012860004790127277
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_generic_median_context_and_bar_geometry_parameterize_legacy_singletons": {
+      "seconds": 0.001539899967610836,
+      "phases": {
+        "setup": 0.0011905999854207039,
+        "call": 0.00022679998073726892,
+        "teardown": 0.00012250000145286322
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_generic_observation_lookbacks_fail_closed_outside_retained_history": {
+      "seconds": 0.0015431999927386642,
+      "phases": {
+        "setup": 0.001206299988552928,
+        "call": 0.00021139997988939285,
+        "teardown": 0.00012550002429634333
+      }
+    },
+    "features/tests/test_generic_provider_parameterization.py::test_generic_warmup_is_null_and_volume_zero_is_not_coerced_to_neutral": {
+      "seconds": 0.001604099990800023,
+      "phases": {
+        "setup": 0.0012302999384701252,
+        "call": 0.0002528000622987747,
+        "teardown": 0.00012099999003112316
+      }
+    },
+    "features/tests/test_regime_dual_ema_parity.py::test_exact_parity_with_legacy_generic_collector_engine": {
+      "seconds": 0.01642939995508641,
+      "phases": {
+        "setup": 0.0013926000101491809,
+        "call": 0.014910000027157366,
+        "teardown": 0.00012679991777986288
+      }
+    },
+    "features/tests/test_regime_dual_ema_parity.py::test_exact_parity_with_collector_v2_regime_state_engine": {
+      "seconds": 0.032781500020064414,
+      "phases": {
+        "setup": 0.0012546000070869923,
+        "call": 0.03137930005323142,
+        "teardown": 0.00014759995974600315
+      }
+    },
+    "features/tests/test_regime_dual_ema_parity.py::test_identity_and_parameters_are_explicit": {
+      "seconds": 0.0015289998846128583,
+      "phases": {
+        "setup": 0.0013039999175816774,
+        "call": 0.00011120003182440996,
+        "teardown": 0.0001137999352067709
+      }
+    },
+    "features/tests/test_regime_dual_ema_parity.py::test_real_data_parity_with_frozen_regime_store_2021_01": {
+      "seconds": 0.1383121000835672,
+      "phases": {
+        "setup": 0.0012449000496417284,
+        "call": 0.1368899999652058,
+        "teardown": 0.00017720006871968508
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_candidate_authority_is_a_reader_only": {
+      "seconds": 0.0019258999964222312,
+      "phases": {
+        "setup": 0.0016952999867498875,
+        "call": 0.00011360005009919405,
+        "teardown": 0.00011699995957314968
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_removed_ceremony_entry_points_are_gone[scripts/materialize_feature_candidate.py]": {
+      "seconds": 0.0018218000186607242,
+      "phases": {
+        "setup": 0.0015269999857991934,
+        "call": 0.00016759999562054873,
+        "teardown": 0.00012720003724098206
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_removed_ceremony_entry_points_are_gone[scripts/prepare_feature_candidate.py]": {
+      "seconds": 0.0016789998626336455,
+      "phases": {
+        "setup": 0.0013977999333292246,
+        "call": 0.00015440001152455807,
+        "teardown": 0.00012679991777986288
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_removed_ceremony_entry_points_are_gone[scripts/activate_feature_pipeline_v2.py]": {
+      "seconds": 0.0016480999765917659,
+      "phases": {
+        "setup": 0.0013787000207230449,
+        "call": 0.0001498999772593379,
+        "teardown": 0.0001194999786093831
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_removed_ceremony_entry_points_are_gone[scripts/authorize_feature_candidate_activation.py]": {
+      "seconds": 0.0016342999879270792,
+      "phases": {
+        "setup": 0.0013453999999910593,
+        "call": 0.00016980001237243414,
+        "teardown": 0.00011909997556358576
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_removed_ceremony_entry_points_are_gone[scripts/materialize_scoped_promotions.py]": {
+      "seconds": 0.0017930999165400863,
+      "phases": {
+        "setup": 0.001501200022175908,
+        "call": 0.00016099994536489248,
+        "teardown": 0.0001308999489992857
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_removed_ceremony_entry_points_are_gone[scripts/_legacy_reconcile_study_capabilities.py]": {
+      "seconds": 0.001741299987770617,
+      "phases": {
+        "setup": 0.001444400055333972,
+        "call": 0.0001732999226078391,
+        "teardown": 0.00012360000982880592
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_no_module_but_promotion_writes_verified_or_repoints_active_authority": {
+      "seconds": 0.3688030999619514,
+      "phases": {
+        "setup": 0.0013416999718174338,
+        "call": 0.36730629997327924,
+        "teardown": 0.00015510001685470343
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_promotion_module_is_the_only_writer_of_promotion_records": {
+      "seconds": 0.1045246000867337,
+      "phases": {
+        "setup": 0.0015740999951958656,
+        "call": 0.10279120004270226,
+        "teardown": 0.00015930004883557558
+      }
+    },
+    "features/tests/test_verified_single_writer.py::test_workflow_engine_capability_leaf_is_a_typed_refusal": {
+      "seconds": 1.13114690000657,
+      "phases": {
+        "setup": 0.002812699996866286,
+        "call": 1.1281685000285506,
+        "teardown": 0.00016569998115301132
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_new_feature_cannot_self_grant_verified_without_evidence": {
+      "seconds": 0.007379400078207254,
+      "phases": {
+        "setup": 0.005475900019519031,
+        "call": 0.001069099991582334,
+        "teardown": 0.0008344000671058893
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_new_feature_with_no_tests_at_all_is_refused": {
+      "seconds": 0.005290199886076152,
+      "phases": {
+        "setup": 0.004338399972766638,
+        "call": 0.0002074999501928687,
+        "teardown": 0.0007442999631166458
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_bound_tests_alone_do_not_promote": {
+      "seconds": 0.0061209999257698655,
+      "phases": {
+        "setup": 0.004115500021725893,
+        "call": 0.0012157999444752932,
+        "teardown": 0.0007896999595686793
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_unresolvable_implementation_is_refused": {
+      "seconds": 0.006646499969065189,
+      "phases": {
+        "setup": 0.004160700016655028,
+        "call": 0.0017207999480888247,
+        "teardown": 0.0007650000043213367
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_provisional_feature_needs_no_promotion_evidence": {
+      "seconds": 0.005090900114737451,
+      "phases": {
+        "setup": 0.004208700032904744,
+        "call": 0.0001444000517949462,
+        "teardown": 0.0007378000300377607
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_unknown_status_is_refused": {
+      "seconds": 0.005688799894414842,
+      "phases": {
+        "setup": 0.004760099924169481,
+        "call": 0.0001490999711677432,
+        "teardown": 0.0007795999990776181
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_grandfathered_feature_is_not_re_evidenced": {
+      "seconds": 0.0073413001373410225,
+      "phases": {
+        "setup": 0.0064440000569447875,
+        "call": 0.00014320004265755415,
+        "teardown": 0.0007541000377386808
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_baseline_may_not_be_extended_with_a_name_the_registry_lacks": {
+      "seconds": 0.003352800034917891,
+      "phases": {
+        "setup": 0.0020692000398412347,
+        "call": 0.0005230000242590904,
+        "teardown": 0.0007605999708175659
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_missing_baseline_fails_closed": {
+      "seconds": 0.004484999924898148,
+      "phases": {
+        "setup": 0.0034097000025212765,
+        "call": 0.00022819999139755964,
+        "teardown": 0.0008470999309793115
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_malformed_baseline_fails_closed": {
+      "seconds": 0.005598700023256242,
+      "phases": {
+        "setup": 0.003463599947281182,
+        "call": 0.0013550000730901957,
+        "teardown": 0.0007801000028848648
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_real_registry_passes_the_promotion_gate": {
+      "seconds": 0.021323999972082675,
+      "phases": {
+        "setup": 0.002290799980983138,
+        "call": 0.018210000009275973,
+        "teardown": 0.0008231999818235636
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_wick_feature_is_not_verified_without_evidence": {
+      "seconds": 0.0031240000389516354,
+      "phases": {
+        "setup": 0.0022389000514522195,
+        "call": 0.00010689999908208847,
+        "teardown": 0.0007781999884173274
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_wick_feature_is_absent_from_the_grandfather_baseline": {
+      "seconds": 0.0034749001497402787,
+      "phases": {
+        "setup": 0.0022202000254765153,
+        "call": 0.0004988000728189945,
+        "teardown": 0.0007559000514447689
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_promoting_wick_to_verified_now_requires_auditor_clearance": {
+      "seconds": 0.00411440001334995,
+      "phases": {
+        "setup": 0.002200299990363419,
+        "call": 0.001114899991080165,
+        "teardown": 0.0007992000319063663
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_complete_promotion_record_admits_a_new_feature": {
+      "seconds": 0.008047800045460463,
+      "phases": {
+        "setup": 0.00485240004491061,
+        "call": 0.0023710000095888972,
+        "teardown": 0.0008243999909609556
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_promotion_does_not_survive_a_changed_implementation": {
+      "seconds": 0.008548000012524426,
+      "phases": {
+        "setup": 0.004807200049981475,
+        "call": 0.0029211000073701143,
+        "teardown": 0.0008196999551728368
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_promotion_without_implementation_binding_is_refused": {
+      "seconds": 0.007318000076338649,
+      "phases": {
+        "setup": 0.0046687000431120396,
+        "call": 0.0017943000420928001,
+        "teardown": 0.0008549999911338091
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_incomplete_promotion_record_is_refused": {
+      "seconds": 0.0070871999487280846,
+      "phases": {
+        "setup": 0.004757899907417595,
+        "call": 0.0015287999995052814,
+        "teardown": 0.0008005000418052077
+      }
+    },
+    "scripts/tests/test_feature_promotion.py::test_promotion_record_naming_a_nonexistent_audit_is_refused": {
+      "seconds": 0.007467999937944114,
+      "phases": {
+        "setup": 0.004832100006751716,
+        "call": 0.001828799955546856,
+        "teardown": 0.0008070999756455421
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_package_init_execution_is_included": {
+      "seconds": 0.011480800108984113,
+      "phases": {
+        "setup": 0.005472599994391203,
+        "call": 0.005188200040720403,
+        "teardown": 0.0008200000738725066
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_imports_triggered_from_init_are_included": {
+      "seconds": 0.011567599955014884,
+      "phases": {
+        "setup": 0.00563589995726943,
+        "call": 0.0050984000554308295,
+        "teardown": 0.0008332999423146248
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_namespace_package_without_init_contributes_nothing": {
+      "seconds": 0.010069299954921007,
+      "phases": {
+        "setup": 0.006272600032389164,
+        "call": 0.002983700018376112,
+        "teardown": 0.0008129999041557312
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_ancestor_inits_ignores_paths_outside_repo": {
+      "seconds": 0.005389599944464862,
+      "phases": {
+        "setup": 0.003962300019338727,
+        "call": 0.0006491999374702573,
+        "teardown": 0.0007780999876558781
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_seed_inside_a_package_pulls_its_own_init": {
+      "seconds": 0.011366000049747527,
+      "phases": {
+        "setup": 0.006349500035867095,
+        "call": 0.004096299991942942,
+        "teardown": 0.0009202000219374895
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_closure_does_not_over_broaden": {
+      "seconds": 0.01289869996253401,
+      "phases": {
+        "setup": 0.006091700051911175,
+        "call": 0.005857099895365536,
+        "teardown": 0.000949900015257299
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_unresolved_repo_local_import_is_reported": {
+      "seconds": 0.007091299979947507,
+      "phases": {
+        "setup": 0.004297700012102723,
+        "call": 0.001908999984152615,
+        "teardown": 0.0008845999836921692
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_features_engine_and_package_init_are_in_the_real_closure": {
+      "seconds": 2.5754457998555154,
+      "phases": {
+        "setup": 0.002545099938288331,
+        "call": 2.5718983999686316,
+        "teardown": 0.0010022999485954642
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_changing_an_execution_affecting_file_changes_the_composite": {
+      "seconds": 7.833831299911253,
+      "phases": {
+        "setup": 0.0043249999871477485,
+        "call": 7.828399099991657,
+        "teardown": 0.001107199932448566
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_documentation_only_edit_does_not_move_a_v2_composite_but_moves_v1": {
+      "seconds": 8.451912200078368,
+      "phases": {
+        "setup": 0.0044281999580562115,
+        "call": 8.446466600056738,
+        "teardown": 0.0010174000635743141
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_causal_lint_consumes_the_expanded_closure": {
+      "seconds": 6.766870299936272,
+      "phases": {
+        "setup": 0.0026621000142768025,
+        "call": 6.762714099953882,
+        "teardown": 0.0014940999681130052
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_coverage_cannot_report_100_when_a_dependency_is_unresolved": {
+      "seconds": 4.232296699890867,
+      "phases": {
+        "setup": 0.0044846999226138,
+        "call": 4.226695799967274,
+        "teardown": 0.0011162000009790063
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_declared_dataset_id_with_no_authority_yaml_raises": {
+      "seconds": 0.012705700006335974,
+      "phases": {
+        "setup": 0.004749500076286495,
+        "call": 0.007064800010994077,
+        "teardown": 0.0008913999190554023
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_declared_dataset_id_with_authority_yaml_is_included": {
+      "seconds": 0.01989370014052838,
+      "phases": {
+        "setup": 0.004582500085234642,
+        "call": 0.01442210003733635,
+        "teardown": 0.0008891000179573894
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_no_declared_dataset_id_adds_nothing": {
+      "seconds": 0.01019940001424402,
+      "phases": {
+        "setup": 0.004427499952726066,
+        "call": 0.00485959998331964,
+        "teardown": 0.0009123000781983137
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_unrelated_dataset_spec_does_not_change_declaring_study_closure": {
+      "seconds": 0.012426599976606667,
+      "phases": {
+        "setup": 0.004585199989378452,
+        "call": 0.006908099981956184,
+        "teardown": 0.0009333000052720308
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_declared_dataset_id_resolves_for_clean_flip_study": {
+      "seconds": 0.00763940007891506,
+      "phases": {
+        "setup": 0.0027854000218212605,
+        "call": 0.004026800044812262,
+        "teardown": 0.0008272000122815371
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_referenced_dataset_spec_is_in_the_real_closure": {
+      "seconds": 1.6598891000030562,
+      "phases": {
+        "setup": 0.0026799000333994627,
+        "call": 1.6562265999382362,
+        "teardown": 0.0009826000314205885
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_post_freeze_edit_to_referenced_dataset_spec_moves_the_composite": {
+      "seconds": 5.003385500051081,
+      "phases": {
+        "setup": 0.002819000044837594,
+        "call": 4.99960340000689,
+        "teardown": 0.0009630999993532896
+      }
+    },
+    "scripts/tests/test_execution_closure.py::test_unrelated_study_without_dataset_id_is_unaffected_by_nq_dataset_spec": {
+      "seconds": 5.06957210006658,
+      "phases": {
+        "setup": 0.005419600056484342,
+        "call": 5.0631242999807,
+        "teardown": 0.0010282000293955207
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_complete_request_materializes_and_reaches_authorization_gate": {
+      "seconds": 1.7233035998651758,
+      "phases": {
+        "setup": 0.00424919999204576,
+        "call": 1.7188628999283537,
+        "teardown": 0.00019149994477629662
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_default_actions_construct_without_name_error": {
+      "seconds": 0.011096999980509281,
+      "phases": {
+        "setup": 0.0022182000102475286,
+        "call": 0.008720399928279221,
+        "teardown": 0.00015840004198253155
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_failed_readiness_fails_closed": {
+      "seconds": 1.966538800043054,
+      "phases": {
+        "setup": 0.00417059997562319,
+        "call": 1.9621946000261232,
+        "teardown": 0.00017360004130750895
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_semantic_gap_is_not_construction_blocker": {
+      "seconds": 0.02241949993185699,
+      "phases": {
+        "setup": 0.004920499981380999,
+        "call": 0.017303299973718822,
+        "teardown": 0.00019569997675716877
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_authority_conflict_is_explicit_terminal": {
+      "seconds": 0.022327100159600377,
+      "phases": {
+        "setup": 0.002333100070245564,
+        "call": 0.01982980000320822,
+        "teardown": 0.0001642000861465931
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_compiler_exposes_exact_resolution_enum": {
+      "seconds": 2.0397300000768155,
+      "phases": {
+        "setup": 0.0024210000410676003,
+        "call": 2.0360972000053152,
+        "teardown": 0.0012118000304326415
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_rerun_is_idempotent_at_terminal_gate": {
+      "seconds": 2.2258861999725923,
+      "phases": {
+        "setup": 0.003082399955019355,
+        "call": 2.2224743999540806,
+        "teardown": 0.00032940006349235773
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_missing_implementation_writes_machine_handoff": {
+      "seconds": 0.021836400032043457,
+      "phases": {
+        "setup": 0.0022170000011101365,
+        "call": 0.019444100093096495,
+        "teardown": 0.00017529993783682585
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_train_and_oos_boundaries_are_not_crossed": {
+      "seconds": 2.1777890999801457,
+      "phases": {
+        "setup": 0.002316200057975948,
+        "call": 2.1750345999607816,
+        "teardown": 0.0004382999613881111
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_intake_with_concepts_but_no_authored_surface_is_semantic_decision": {
+      "seconds": 0.05946689995471388,
+      "phases": {
+        "setup": 0.0026091999607160687,
+        "call": 0.056675100000575185,
+        "teardown": 0.00018259999342262745
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_deep_pullback_materializes_from_its_authored_feature_surface": {
+      "seconds": 2.2952245998894796,
+      "phases": {
+        "setup": 0.002545399940572679,
+        "call": 2.2919137999415398,
+        "teardown": 0.0007654000073671341
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_ordered_barrier_atr_provenance_rejects_non_decision_freeze": {
+      "seconds": 0.005048499908298254,
+      "phases": {
+        "setup": 0.0032041999511420727,
+        "call": 0.0013515999307855964,
+        "teardown": 0.000492700026370585
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_verified_capability_does_not_call_reconciliation": {
+      "seconds": 2.2709905999945477,
+      "phases": {
+        "setup": 0.0056597000220790505,
+        "call": 2.264953100006096,
+        "teardown": 0.00037779996637254953
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_novel_reusable_capability_reconciles_then_continues": {
+      "seconds": 2.0134099998977035,
+      "phases": {
+        "setup": 0.0022025000071153045,
+        "call": 2.0110440999269485,
+        "teardown": 0.00016339996363967657
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_implementation_handoff_has_full_contract_shape": {
+      "seconds": 0.021331900148652494,
+      "phases": {
+        "setup": 0.0022851000539958477,
+        "call": 0.018893000087700784,
+        "teardown": 0.00015380000695586205
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_authority_change_restarts_from_prepare": {
+      "seconds": 2.421682200045325,
+      "phases": {
+        "setup": 0.002166000078432262,
+        "call": 2.4193250000244007,
+        "teardown": 0.0001911999424919486
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_study_spec_change_restarts_downstream_closure": {
+      "seconds": 2.2526661000447348,
+      "phases": {
+        "setup": 0.0024128000950440764,
+        "call": 2.2498406999511644,
+        "teardown": 0.00041259999852627516
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_completed_rerun_calls_no_leaf": {
+      "seconds": 2.398223999887705,
+      "phases": {
+        "setup": 0.0025644999695941806,
+        "call": 2.395480899955146,
+        "teardown": 0.00017859996296465397
+      }
+    },
+    "research_workflow/tests/test_workflow_engine.py::test_existing_compiled_study_is_compatible": {
+      "seconds": 2.061130400048569,
+      "phases": {
+        "setup": 0.0024757999926805496,
+        "call": 2.058484800043516,
+        "teardown": 0.00016980001237243414
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_stage_order_covers_the_whole_lifecycle": {
+      "seconds": 0.0015957001596689224,
+      "phases": {
+        "setup": 0.0013537000631913543,
+        "call": 0.00011530006304383278,
+        "teardown": 0.00012670003343373537
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_all_late_stages_run_in_order_with_receipts_and_resume": {
+      "seconds": 0.16851169988512993,
+      "phases": {
+        "setup": 0.002171899890527129,
+        "call": 0.1661850999807939,
+        "teardown": 0.00015470001380890608
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_stage_by_stage_states": {
+      "seconds": 0.44926509994547814,
+      "phases": {
+        "setup": 0.002280800021253526,
+        "call": 0.44682209996972233,
+        "teardown": 0.00016219995450228453
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_close_is_terminal_and_never_rerun": {
+      "seconds": 0.24065729998983443,
+      "phases": {
+        "setup": 0.0022841000463813543,
+        "call": 0.23815019999165088,
+        "teardown": 0.00022299995180219412
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_corrupt_receipt_reruns_only_that_stage": {
+      "seconds": 0.18190189998131245,
+      "phases": {
+        "setup": 0.0046033000107854605,
+        "call": 0.17703099991194904,
+        "teardown": 0.00026760005857795477
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_missing_leaf_is_a_capability_blocker": {
+      "seconds": 0.06845540006179363,
+      "phases": {
+        "setup": 0.003294600057415664,
+        "call": 0.06499470002017915,
+        "teardown": 0.00016609998419880867
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_duplicate_orchestrators_are_deprecated_shims[run_research_workflow.py]": {
+      "seconds": 0.6624102999921888,
+      "phases": {
+        "setup": 0.0013519000494852662,
+        "call": 0.6608406999148428,
+        "teardown": 0.00021770002786070108
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_duplicate_orchestrators_are_deprecated_shims[run_partitioned_train_collection.py]": {
+      "seconds": 0.5796479999553412,
+      "phases": {
+        "setup": 0.0019366999622434378,
+        "call": 0.5775313000194728,
+        "teardown": 0.0001799999736249447
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_duplicate_orchestrators_are_deprecated_shims[reconcile_study_capabilities.py]": {
+      "seconds": 0.5958111000945792,
+      "phases": {
+        "setup": 0.0016678000101819634,
+        "call": 0.5939648000057787,
+        "teardown": 0.00017850007861852646
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_production_close_requires_operator_decision": {
+      "seconds": 0.004240300040692091,
+      "phases": {
+        "setup": 0.002500200062058866,
+        "call": 0.0015960999298840761,
+        "teardown": 0.00014400004874914885
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_label_column_is_declared_or_explicit_never_guessed": {
+      "seconds": 0.0069682999746873975,
+      "phases": {
+        "setup": 0.002144899917766452,
+        "call": 0.004684800049290061,
+        "teardown": 0.00013860000763088465
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_train_matrix_uses_declared_features_and_train_rows_only": {
+      "seconds": 0.0654863998061046,
+      "phases": {
+        "setup": 0.0022996999323368073,
+        "call": 0.06299649993889034,
+        "teardown": 0.00019019993487745523
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_manuals_exist_and_point_to_workflow_first": {
+      "seconds": 0.0033673999132588506,
+      "phases": {
+        "setup": 0.0014839000068604946,
+        "call": 0.001747499918565154,
+        "teardown": 0.00013599998783320189
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_documented_research_cli_examples_parse": {
+      "seconds": 0.0329628000035882,
+      "phases": {
+        "setup": 0.0013164000120013952,
+        "call": 0.031493799993768334,
+        "teardown": 0.00015259999781847
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_documented_run_governed_study_flags_exist": {
+      "seconds": 0.0031693000346422195,
+      "phases": {
+        "setup": 0.0015239999629557133,
+        "call": 0.0015173000283539295,
+        "teardown": 0.00012800004333257675
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_examples_compile_and_registry_blind_draft_returns_typed_gaps": {
+      "seconds": 7.40503210015595,
+      "phases": {
+        "setup": 0.0013254000805318356,
+        "call": 7.403549600043334,
+        "teardown": 0.00015710003208369017
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_example_capability_ids_are_registered": {
+      "seconds": 0.025182600016705692,
+      "phases": {
+        "setup": 0.0014191999798640609,
+        "call": 0.023597100051119924,
+        "teardown": 0.00016629998572170734
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_repository_map_paths_exist": {
+      "seconds": 0.004457599949091673,
+      "phases": {
+        "setup": 0.001807499909773469,
+        "call": 0.0025134000461548567,
+        "teardown": 0.00013669999316334724
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_generated_reference_and_registry_are_current": {
+      "seconds": 9.109625699929893,
+      "phases": {
+        "setup": 0.0012205999810248613,
+        "call": 9.108220399939455,
+        "teardown": 0.00018470000941306353
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_manuals_never_route_new_research_to_the_legacy_runtime": {
+      "seconds": 0.003810899914242327,
+      "phases": {
+        "setup": 0.002113599912263453,
+        "call": 0.0015685000689700246,
+        "teardown": 0.00012879993300884962
+      }
+    },
+    "research_workflow/tests/test_docs_v2.py::test_copy_paste_prompt_is_present_and_matches_the_template": {
+      "seconds": 0.001837400021031499,
+      "phases": {
+        "setup": 0.0013129999861121178,
+        "call": 0.0003992000129073858,
+        "teardown": 0.00012520002201199532
+      }
+    },
+    "research_workflow/tests/test_concurrent_research_docs.py::test_workflow_has_the_canonical_concurrent_procedure": {
+      "seconds": 0.002440700074657798,
+      "phases": {
+        "setup": 0.0012154000578448176,
+        "call": 0.0010968000860884786,
+        "teardown": 0.0001284999307245016
+      }
+    },
+    "research_workflow/tests/test_concurrent_research_docs.py::test_lease_states_documented_match_the_implementation": {
+      "seconds": 0.002068599918857217,
+      "phases": {
+        "setup": 0.0011686000507324934,
+        "call": 0.0007559999357908964,
+        "teardown": 0.00014399993233382702
+      }
+    },
+    "research_workflow/tests/test_concurrent_research_docs.py::test_entrypoints_and_quickstart_point_to_the_procedure": {
+      "seconds": 0.00492490001488477,
+      "phases": {
+        "setup": 0.0013307000044733286,
+        "call": 0.003462799941189587,
+        "teardown": 0.0001314000692218542
+      }
+    },
+    "research_workflow/tests/test_concurrent_research_docs.py::test_agent_role_files_carry_worktree_rules": {
+      "seconds": 0.0024660000344738364,
+      "phases": {
+        "setup": 0.0011752999853342772,
+        "call": 0.001158699975349009,
+        "teardown": 0.00013200007379055023
+      }
+    },
+    "research_workflow/tests/test_concurrent_research_docs.py::test_agent_sync_roster_includes_every_active_role_and_is_current": {
+      "seconds": 0.6757612001383677,
+      "phases": {
+        "setup": 0.0011568000772967935,
+        "call": 0.674394000088796,
+        "teardown": 0.00021039997227489948
+      }
+    },
+    "research_workflow/tests/test_concurrent_research_docs.py::test_no_document_prefers_manual_study_branches_or_work_on_main": {
+      "seconds": 0.004489899962209165,
+      "phases": {
+        "setup": 0.0018697999184951186,
+        "call": 0.0024787000147625804,
+        "teardown": 0.00014140002895146608
+      }
+    },
+    "research_workflow/tests/test_concurrent_research_docs.py::test_mechanism_tests_exist": {
+      "seconds": 0.001981699955649674,
+      "phases": {
+        "setup": 0.0014610999496653676,
+        "call": 0.0003945000935345888,
+        "teardown": 0.00012609991244971752
+      }
+    },
+    "research_workflow/tests/test_concurrent_research_docs.py::test_supervised_research_is_documented_and_wired": {
+      "seconds": 0.0042931000934913754,
+      "phases": {
+        "setup": 0.0013758999994024634,
+        "call": 0.0027834000065922737,
+        "teardown": 0.0001338000874966383
+      }
+    },
+    "research_workflow/tests/test_capability_modularity.py::test_seeded_binding_resolves_from_the_index_without_editing_the_registration_module": {
+      "seconds": 0.010527099831961095,
+      "phases": {
+        "setup": 0.0022858999436721206,
+        "call": 0.008093499927781522,
+        "teardown": 0.0001476999605074525
+      }
+    },
+    "research_workflow/tests/test_capability_modularity.py::test_unresolvable_or_foreign_seed_entries_are_skipped": {
+      "seconds": 0.004774600034579635,
+      "phases": {
+        "setup": 0.00227450008969754,
+        "call": 0.0023662999738007784,
+        "teardown": 0.00013379997108131647
+      }
+    },
+    "research_workflow/tests/test_capability_modularity.py::test_importing_a_binding_module_before_the_registration_module_is_not_a_cycle": {
+      "seconds": 1.2517424001125619,
+      "phases": {
+        "setup": 0.0022193000186234713,
+        "call": 1.2493166000349447,
+        "teardown": 0.00020650005899369717
+      }
+    },
+    "research_workflow/tests/test_capability_modularity.py::test_scaffold_template_imports_the_base_module_and_yields_a_binding": {
+      "seconds": 0.0034347999608144164,
+      "phases": {
+        "setup": 0.001667700009420514,
+        "call": 0.0016280999407172203,
+        "teardown": 0.000139000010676682
+      }
+    },
+    "research_workflow/tests/test_capability_modularity.py::test_compiler_refuses_a_candidate_seeded_tracker_status": {
+      "seconds": 0.0016411000397056341,
+      "phases": {
+        "setup": 0.001394100021570921,
+        "call": 0.00012360000982880592,
+        "teardown": 0.00012340000830590725
+      }
+    },
+    "research_workflow/tests/test_capability_modularity.py::test_features_package_does_not_import_the_registry": {
+      "seconds": 1.3516719999024644,
+      "phases": {
+        "setup": 0.0013521999353542924,
+        "call": 1.3490519999759272,
+        "teardown": 0.001267799991182983
+      }
+    }
+  },
+  "ran": 175,
+  "passed": 173,
+  "failed": 2,
+  "counts": {
+    "NEW_FAILURE": 1,
+    "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+    "KNOWN_BASELINE_FAILURE": 1,
+    "BASELINE_FAILURE_NOW_FIXED": 0,
+    "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+  },
+  "NEW_FAILURE": [
+    {
+      "node_id": "features/tests/test_candidate_authority.py::test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it",
+      "message": "call: def test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it():\n        candidate = resolve_source_universe(\"verified_registry_numeric_universe\", authority=\"candidate\", legacy_mode=True)\n        active = resolve_source_universe(\"canonical_verified_definition_universe\")\n        assert len(candidate) == 693\n>       assert len(active) == 129\nE       AssertionError: assert 145 == 129\nE        +  where 145 = len(['abs_delta_cum', 'abs_delta_per_atr_moved', 'abs_delta_per_point_moved', 'accel', 'activity_duration_median', 'activity_flip_count', ...])\n\nfeatures\\tests\\test_candidate_authority.py:36: AssertionError",
+      "reason": "FAILURE_SIGNATURE_CHANGED_OR_MISSING"
+    }
+  ],
+  "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": [],
+  "BASELINE_FAILURE_NOW_FIXED": [],
+  "ENVIRONMENTAL_MISSING_ARTIFACT": [],
+  "KNOWN_BASELINE_FAILURE": [
+    "features/tests/test_feature_system_v2.py::test_explicit_instances_and_collection_universe_share_canonical_status"
+  ]
+}

@@ -17,6 +17,9 @@ from research.analysis.modeling import FittedModel, FitProvenance
 from research_workflow.generic_collector import GenericStudyCollector
 from research_workflow.model_artifacts import persist_models
 from research_workflow.runtime_bindings import verify_runtime_contract
+from research_workflow.tests.closure_reuse_support import reuse_policy_for, write_reuse_closure
+
+POLICIES: dict = {}
 
 
 # --------------------------------------------------------------------------- #
@@ -84,10 +87,9 @@ def _register(root, name_seed):
         study, {"A": FittedModel(est, prov)},
         {"arms": {"A": {**prov.to_dict(), "fit_identity_sha256": prov.fit_identity_sha256}}},
     )["records"][0]
-    reg = root / "studies" / "model_registry" / f"{rec['model_id']}.json"
-    body = json.loads(reg.read_text())
-    body["scientific_status"] = "VALID_PRIMARY"
-    reg.write_text(json.dumps(body))
+    # the parent CLOSURE authorizes reuse; the registry column stays UNASSESSED
+    write_reuse_closure(study, rec)
+    POLICIES[rec["model_id"]] = reuse_policy_for(study, rec)
     return rec["model_id"]
 
 
@@ -110,8 +112,11 @@ def _compiled_study(root, derived):
 
 
 def _di(name, model_id):
-    return {"name": name, "kind": "frozen_external_model_score", "model_id": model_id,
-            "retrain_prohibited": True}
+    di = {"name": name, "kind": "frozen_external_model_score", "model_id": model_id,
+          "retrain_prohibited": True}
+    if model_id in POLICIES:
+        di["diagnostic_reuse_policy"] = POLICIES[model_id]
+    return di
 
 
 def test_two_external_models_both_bind(tmp_path):

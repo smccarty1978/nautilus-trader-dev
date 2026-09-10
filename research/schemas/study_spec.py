@@ -455,11 +455,12 @@ class FeatureSelectionSpec(BaseModel):
 
 
 class DiagnosticModelReusePolicySpec(BaseModel):
-    """Closed, evidence-bound authorization for diagnostic derived-model reuse.
+    """Closed, evidence-bound authorization for frozen-model reuse as a derived causal input.
 
-    A registry ``UNASSESSED`` record is not approved merely because its source closure
-    assessed it.  Its child declaration must pin that closure's byte and canonical
-    identities, the exact assessed model byte, and the expected diagnostic assessment.
+    The parent study's closure is the positive authority (2026-09-10): a registry record --
+    whatever its informational ``scientific_status`` -- is reusable as a derived causal input
+    only when the child declaration pins that closure's byte and canonical identities, the
+    exact assessed model byte, and the expected diagnostic assessment.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -564,7 +565,7 @@ class DerivedCausalInputSpec(BaseModel):
     )
     diagnostic_reuse_policy: Optional[DiagnosticModelReusePolicySpec] = Field(
         None, exclude_if=lambda value: value is None,
-        description="Closed explicit authorization required only for VALID_DIAGNOSTIC model reuse",
+        description="Closed explicit authorization, pinned to the parent study's closure, required for any frozen-model reuse as a derived causal input",
     )
 
     @field_validator("retrain_prohibited")
