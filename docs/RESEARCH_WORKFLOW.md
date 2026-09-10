@@ -694,10 +694,17 @@ a study is sealed and in flight.
 |---|---|---|
 | `feature_ctl.py` | V2 canonical feature governance CLI: check and promote | yes (check) |
 | `generate_canonical_feature_reference.py` | regenerate `CANONICAL_FEATURE_REFERENCE.yaml` | yes |
-| `prepare_feature_candidate.py` | prepare + freeze an inactive candidate authority | yes |
-| `materialize_feature_candidate.py` | materialize the final candidate bundle | yes |
-| `authorize_feature_candidate_activation.py` | bind review evidence to candidate bytes | yes |
-| `activate_feature_pipeline_v2.py` | verify parity, then atomically flip the active pointer | **no** |
+| `check_candidate_promotion.py` | candidate-mode promotion checker; reachable only from a candidate-authority preflight | yes |
+
+The V1->V2 cutover ceremony -- `materialize_feature_candidate.py`, `prepare_feature_candidate.py`,
+`authorize_feature_candidate_activation.py`, `activate_feature_pipeline_v2.py`,
+`materialize_scoped_promotions.py`, `_legacy_reconcile_study_capabilities.py` and the
+`freeze_candidate` / `activate_*` writers in `features/candidate_authority.py` -- was removed on
+2026-09-10 (history: commit `9be6eba2` and earlier). It was the only path other than
+`features/promotion.py` that could mark a definition `verified`, and it required a sealed authorizing
+study that a new definition can never have. `features/authority/candidate/` is frozen data read by
+`load_authority()`; a new definition is verified by its own golden evidence
+(`research feature verify|promote`). `features/tests/test_verified_single_writer.py` keeps this so.
 
 ### Authoritative — data and catalog
 

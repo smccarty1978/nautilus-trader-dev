@@ -114,7 +114,7 @@ directly by a study's analysis step.
 | Path | Purpose |
 |---|---|
 | `features/registry.py` | `FeatureInstance`, `validate_feature_instance()` (:888–1005) — see §7 for full error-code table |
-| `features/candidate_authority.py` | `load_authority()`, `freeze_candidate()`, `activate_frozen_candidate()`, `activate_pipeline_candidate()` |
+| `features/candidate_authority.py` | `load_authority()` -- reader of the frozen migration bundle only (the freeze/activate writers were removed 2026-09-10; `verified` is granted only by `features/promotion.py`) |
 | `features/authority/active.json` | atomic pointer — `{"activation_kind", "bundle", "bundle_composite_sha256", "schema_version"}` |
 | `features/trackers/generic_*.py` | 10 parameterized providers: arrival, bar_geometry, context, median_center, ohlcv_delta, price_levels, pullback, regime_geometry, rolling_productivity, structural_geometry |
 | `features/FEATURE_REGISTRY_CONTRACT.md` | DESIGN CONTRACT — promotion lifecycle (§7) |
@@ -488,7 +488,7 @@ Required path, each stage catches silent inline features:
    test names the feature or carries `@covers_feature`, (c) an explicit promotion record with
    `causal_audit_artifact`, `audited_execution_composite_sha256`, `promoted_by`,
    `reviewed_implementation_sha256` matching current.
-6. `features/authority/active.json` atomically re-pointed via `activate_frozen_candidate()`.
+6. ~~`features/authority/active.json` atomically re-pointed via `activate_frozen_candidate()`~~ -- removed 2026-09-10; the bundle is never re-pointed. A **new** definition is verified by its own golden evidence: `research feature verify <name>` then `research feature promote <name>` (`features/promotion.py`), see `WORKFLOW.md`.
 
 **It cannot silently become an inline feature** — `check_feature_promotion.py` is one of
 PREFLIGHT's six required checks (§1.3, §4.1); an unresolved or unpromoted feature fails preflight

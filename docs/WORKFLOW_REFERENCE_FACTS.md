@@ -80,8 +80,11 @@ Re-run the command above to re-derive; the card is in the merge-session scratchp
 | Legacy aliases mapped | 693 | `python -c "import json;print(len(json.load(open('features/authority/candidate/legacy_alias_mapping.json'))['aliases']))"` |
 | Bundle composite | `133250b8…` | `cat features/authority/candidate/manifest.json` |
 
-`scripts/activate_feature_pipeline_v2.py` asserts these counts before flipping the pointer,
-so a mismatch here means the bundle changed and this table was not updated.
+These are the bundle's counts as of 2026-08-25; the bundle has since grown (143 definitions on
+2026-09-09) and evidence-promoted catalogue definitions are added on top of it, so the active
+verified universe is larger than the bundle. The activation script that once asserted these counts
+(`scripts/activate_feature_pipeline_v2.py`) was removed on 2026-09-10 with the rest of the cutover
+ceremony; nothing re-points the bundle any more.
 
 ---
 
