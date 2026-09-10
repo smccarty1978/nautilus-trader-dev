@@ -1,0 +1,511 @@
+{
+ "derivation": "Bars: open 100, high 101, low 99, volume 10; close 101 gives est_delta = 10*(202-200)/2 = +10, close 99 gives 10*(198-200)/2 = -10. Bars closing at 1..20 s are bearish (-10), bars closing at 21..40 s are bullish (+10). short_window 5s -> D(5) = sum of the last 5 bars, D(10) = sum of the last 10 bars; acceleration = dir * (2*D(5) - D(10)). Physical alias of the 5s instance is trend_normalized_est_delta_acceleration_5s. T=8s (8 bars): the 10s window needs 10 bars (oldest bar ts 1s > cutoff+1s = -1s) -> unavailable -> null. T=23s, dir=-1: D(5) = bars 19..23 = -10-10+10+10+10 = +10; D(10) = bars 14..23 = 7*(-10)+3*(+10) = -40; 2*10-(-40) = 60; times -1 = -60.0. T=25s, dir=+1: D(5) = bars 21..25 = +50; D(10) = bars 16..25 = -50+50 = 0; 2*50-0 = 100.0. T=26s, no prevailing direction in episode_state -> the adapter emits null. T=30s, dir=+1: D(5) = +50, D(10) = +100; 2*50-100 = 0.0. Bars continue to 40 s so the availability guard is exercised after the last snapshot.",
+ "feature": "trend_normalized_est_delta_acceleration",
+ "instances": [
+  {
+   "parameters": {
+    "direction_reference": "prevailing_1m",
+    "short_window": "5s",
+    "update_every": "1s"
+   }
+  }
+ ],
+ "schema_version": 1,
+ "snapshots": [
+  {
+   "atr": 10.0,
+   "decision_ts": 8000000000,
+   "episode_state": {
+    "prevailing_direction": 1
+   },
+   "expected": {
+    "trend_normalized_est_delta_acceleration_5s": null
+   },
+   "price": 100.0
+  },
+  {
+   "atr": 10.0,
+   "decision_ts": 23000000000,
+   "episode_state": {
+    "prevailing_direction": -1
+   },
+   "expected": {
+    "trend_normalized_est_delta_acceleration_5s": -60.0
+   },
+   "price": 100.0
+  },
+  {
+   "atr": 10.0,
+   "decision_ts": 25000000000,
+   "episode_state": {
+    "prevailing_direction": 1
+   },
+   "expected": {
+    "trend_normalized_est_delta_acceleration_5s": 100.0
+   },
+   "price": 100.0
+  },
+  {
+   "atr": 10.0,
+   "decision_ts": 26000000000,
+   "episode_state": {},
+   "expected": {
+    "trend_normalized_est_delta_acceleration_5s": null
+   },
+   "price": 100.0
+  },
+  {
+   "atr": 10.0,
+   "decision_ts": 30000000000,
+   "episode_state": {
+    "prevailing_direction": 1
+   },
+   "expected": {
+    "trend_normalized_est_delta_acceleration_5s": 0.0
+   },
+   "price": 100.0
+  }
+ ],
+ "tape": [
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 1000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 2000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 3000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 4000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 5000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 6000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 7000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 8000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 9000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 10000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 11000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 12000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 13000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 14000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 15000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 16000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 17000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 18000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 19000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 99.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 20000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 21000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 22000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 23000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 24000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 25000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 26000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 27000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 28000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 29000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 30000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 31000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 32000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 33000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 34000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 35000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 36000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 37000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 38000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 39000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  },
+  {
+   "event": {
+    "close": 101.0,
+    "high": 101.0,
+    "low": 99.0,
+    "open": 100.0,
+    "ts_init": 40000000000,
+    "volume": 10.0
+   },
+   "type": "completed_1s"
+  }
+ ]
+}

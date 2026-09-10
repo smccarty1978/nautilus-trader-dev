@@ -9,7 +9,7 @@ from features.feature_types import FeatureDefinition
 # prevailing regime building or fading versus the immediately preceding equal-length window? Distinct
 # from est_delta_sum_minus_scaled (D(a) - D(b) for a fixed unequal (a, b)). `short_window` implies
 # 2*short_window, which the adapter adds to the provider's window set.
-# NOT in the authority bundle: declared but never promoted -- promote it with golden evidence before use.
+# Not in the authority bundle: verified by its own golden evidence (features/definitions/golden/, promotions/).
 DEFINITION = FeatureDefinition(
     name='trend_normalized_est_delta_acceleration',
     status='provisional',
