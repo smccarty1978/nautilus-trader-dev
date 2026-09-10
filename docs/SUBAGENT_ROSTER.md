@@ -12,7 +12,7 @@ each harness; `Explore` remains a Claude-only built-in model pin.
 
 ---
 
-## Five roles, portable capability tiers
+## Six roles, portable capability tiers
 
 | Agent | Column it owns |
 |---|---|
@@ -21,6 +21,7 @@ each harness; `Explore` remains a Claude-only built-in model pin.
 | `contract-checker` | *Does this match what was declared, and is the lifecycle state legitimate?* |
 | `implementer` | *Make it correct.* |
 | `analysis-decider` | *What does this mean, and what do we do next?* |
+| `results-triager` | *Is this failure new, or already classified?* (read-only, Haiku) |
 | `Explore` | not a role — a model pin (below) |
 
 Ownership is exclusive. An agent that finds work in another column refers it in one line and
@@ -93,7 +94,7 @@ the role to add; it is not a lifecycle-execution role (that is the governed cont
 | `research-executor` | **added, then removed 2026-09-10** | Added when lifecycle execution had no owner; the v2 governed controller (`scripts/run_governed_study.py`) took that job, so the role drove only the v1 lifecycle by hand |
 | `capability-router` | **removed 2026-09-10** | Pre-study capability routing; superseded by `research cap search/describe` and the compiler's typed gaps |
 | `analysis-decider` | **added** | Result interpretation had no owner |
-| `results-triager` | **removed** | Its whole job — run targeted tests, reduce output — is `implementer`'s. Two agents owning test execution violates exclusive ownership. For a one-off test run the orchestrator uses Bash directly rather than paying for an agent |
+| `results-triager` | **removed, then re-added 2026-09-05 as read-only** | The 2026-08 version *ran* tests, which is `implementer`'s job. The current one reads compact artifacts (pytest logs, parity reports, controller cards) and classifies failures against `config/test_failure_baseline.json`; it never runs or fixes anything, so ownership stays exclusive |
 | `implementation-worker` | **retired** | Superseded by `implementer`, which is generated for all three harnesses instead of existing only under Codex |
 
 `validate-results-triager-command.py` (both harnesses) was deleted with the agent it guarded —

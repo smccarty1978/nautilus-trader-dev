@@ -113,7 +113,7 @@ stage bodies are:
 | `fit` | train mode: governed fit → model store (registry tier); score mode: frozen models scored per declared subset, nothing trained | `artifacts/experiment_models.json` |
 | `freeze` | TRAIN freeze binding model hashes and the merge identity | `artifacts/train_experiment_freeze.json` |
 | `oos` / `analyze` | dev-year partitions after `assert_oos_open`; metrics per model | `_work/controller/partitions/oos/`, `artifacts/experiment_analysis_v2.json` |
-| `close` | operator decision → `study_closure.json` validated by `load_study_closure` | `artifacts/study_closure.json` |
+| `close` | operator decision → `study_closure.json` validated by `load_study_closure` before it persists; binds seal, TRAIN freeze and the V2 final evidence (`experiment_analysis_v2.json`, `analysis_decision.json`) by bytes **and** by the plan/freeze they were produced from | `artifacts/study_closure.json` |
 
 A V2 study owns its own directory (the scaffold is untracked until the researcher commits it);
 every other dirty path is still contamination. Options: `--smoke-date`, `--years`,

@@ -163,6 +163,12 @@ python scripts/run_governed_study.py --study studies/my_flip_study --through clo
   --closure-outcome "..." --closure-decision "..."
 ```
 
+`close` validates the closure before it persists: it binds the seal, the TRAIN freeze and the V2
+final evidence (`artifacts/experiment_analysis_v2.json`, `artifacts/analysis_decision.json`) by bytes
+and by the `plan_sha256` / freeze they were produced from; an analysis from an earlier plan or freeze,
+or a decision that does not cite the analysis, is `STUDY_CLOSURE_EVIDENCE_STALE` and the closure is
+not written (`research_workflow/study_closure.py`; `docs/RESEARCH_WORKFLOW.md` §"Terminal closure").
+
 `research study run ...` forwards to `scripts/run_governed_study.py` (same flags). Useful flags:
 `--smoke-date`, `--years 2021`, `--studies-root <dir>` (frozen external scores), `--max-runtime`,
 `--stale-progress-timeout`, `--inspect`, `--json`.
