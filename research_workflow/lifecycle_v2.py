@@ -1656,7 +1656,14 @@ class V2Lifecycle:
         for key, rel in V2_FINAL_EVIDENCE.items():
             evidence = self.study / rel
             if evidence.is_file():
-                bound[key] = {"path": rel, "artifact_file_sha256": _sha(evidence)}
+                binding: Dict[str, Any] = {"path": rel, "artifact_file_sha256": _sha(evidence)}
+                if key == "v2_analysis":
+                    # Fresh means produced from THIS plan and THIS TRAIN freeze (study_closure
+                    # verifies it against the artifact's own plan_sha256 and the freeze's models).
+                    binding["plan_sha256"] = (_read(evidence) or {}).get("plan_sha256")
+                    if "train_freeze_sha256" in bound:
+                        binding["train_freeze_sha256"] = bound["train_freeze_sha256"]
+                bound[key] = binding
         body = {"schema_version": 1, "study_id": self.study.name, "status": "CLOSED", "outcome": str(closure["outcome"]), "terminal_decision": str(closure["terminal_decision"]),
                 "platform": "v2", "plan_sha256": load_plan(self.study).get("plan_sha256"), "closed_at_utc": _now(), "bound_evidence": bound}
         # DEV-08: validate BEFORE the closure persists, and never leave a rejected closure on disk -- a rejected
