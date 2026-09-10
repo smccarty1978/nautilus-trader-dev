@@ -73,6 +73,16 @@ def definition_files(index_path: Optional[Path] = None) -> Tuple[str, ...]:
             if p.is_file():
                 out.append(p.resolve().relative_to(repo_root.resolve()).as_posix())
                 break
+        if (candidate / "__init__.py").is_file():
+            # A catalogue package holds one record module per definition; each record is
+            # data the package loads by filename, invisible to the import walk.
+            out.extend(p.resolve().relative_to(repo_root.resolve()).as_posix()
+                       for p in sorted(candidate.glob("*.py")) if p.name != "__init__.py")
+    # Promotion evidence decides which catalogue definitions resolve as verified, so it is
+    # part of what a study binds: the golden fixtures and the promotion records are seeded
+    # alongside the definitions they vouch for (features/promotion.py).
+    from features.promotion import evidence_files
+    out.extend(evidence_files())
     return tuple(sorted(set(out)))
 
 
@@ -416,12 +426,12 @@ def resolve_feature_instances(source: Optional[str], instances: Optional[Tuple[F
         return []
     if source == "canonical_verified_definition_universe":
         bundle = _canonical_bundle("active")
-        definitions = (bundle or {}).get("registry", {}).get("definitions", [])
+        definitions = _active_definition_records(bundle)
         if instances is not None:
             resolved = []
             for instance in instances:
                 params = validate_feature_instance(instance)
-                definition = _canonical_definition_by_name(bundle, instance.canonical_name) if bundle else None
+                definition = _canonical_definition_by_name(bundle, instance.canonical_name)
                 if definition is None or definition.get("status") != "verified":
                     raise FeatureInstanceError(f"UNVERIFIED_CANONICAL_FEATURE: {instance.canonical_name}")
                 resolved.append({"canonical_name": instance.canonical_name, "parameters": params,
@@ -517,7 +527,7 @@ def resolve_source_universe(source: Optional[str], *, authority: str = "active",
         bundle = _canonical_bundle(authority)
         if bundle is None:
             return sorted(_canonical_definitions())
-        return sorted(item["canonical_name"] for item in bundle["registry"].get("definitions", [])
+        return sorted(item["canonical_name"] for item in _active_definition_records(bundle)
                       if item.get("status") == "verified")
     if source != "verified_registry_numeric_universe":
         raise FeatureInstanceError(f"UNKNOWN_FEATURE_SOURCE: {source!r}")
@@ -570,11 +580,71 @@ def _canonical_bundle(authority: str) -> Optional[Dict[str, Any]]:
     return load_authority("active") if ACTIVE_POINTER.is_file() else None
 
 
-def _canonical_definition_by_name(bundle: Mapping[str, Any], name: str) -> Optional[Mapping[str, Any]]:
-    for definition in bundle["registry"].get("definitions", []):
+_PROMOTED_CACHE: Optional[Dict[str, Dict[str, Any]]] = None
+
+
+def invalidate_promotion_cache() -> None:
+    global _PROMOTED_CACHE
+    _PROMOTED_CACHE = None
+
+
+def _promoted_records() -> Dict[str, Dict[str, Any]]:
+    """Catalogue definitions verified by their own evidence, in the bundle's record shape.
+
+    A record is included only while its promotion record (``features/definitions/promotions/``)
+    exists and still hashes to the definition module, the golden fixture and the provider
+    module it was written against -- drift in any of the three demotes the definition to
+    provisional and active resolution refuses it (UNVERIFIED_CANONICAL_FEATURE).  Names that
+    exist in the authority bundle are never shadowed: the bundle record wins and
+    ``features.promotion`` refuses to promote them.
+    """
+    global _PROMOTED_CACHE
+    if _PROMOTED_CACHE is None:
+        from features.promotion import content_sha256, promoted_names, read_record, record_binding_errors
+        repo_root = Path(__file__).resolve().parents[1]
+        out: Dict[str, Dict[str, Any]] = {}
+        definitions = _canonical_definitions()
+        for name in promoted_names():
+            definition = definitions.get(name)
+            record = read_record(name)
+            if definition is None or record is None or record_binding_errors(name, record):
+                continue
+            provider_module = repo_root / str(record.get("provider_module") or "")
+            out[name] = {
+                "canonical_name": name, "family": [definition.family], "dtype": definition.dtype,
+                "provider": definition.implementation,
+                "provider_sha256": content_sha256(provider_module) if provider_module.is_file() else "",
+                "parameter_schema": list(definition.parameter_schema),
+                "input_availability_contracts": [t for t in str(definition.source_timeframe).split("+") if t],
+                "reset_policies": [definition.reset_policy], "null_policies": [definition.null_policy],
+                "legacy_alias_count": 0, "status": "verified",
+                "verification": {"kind": "golden_evidence", "record": f"features/definitions/promotions/{name}.json",
+                                 "observed_sha256": record.get("observed_sha256")},
+            }
+        _PROMOTED_CACHE = out
+    return _PROMOTED_CACHE
+
+
+def _promotions_apply(bundle: Optional[Mapping[str, Any]]) -> bool:
+    """Evidence promotions extend the ACTIVE authority only: an explicit candidate bundle under
+    review, and the legacy (no-bundle) path, keep exactly the membership they had."""
+    return bundle is not None and bundle.get("authority") == "active"
+
+
+def _active_definition_records(bundle: Optional[Mapping[str, Any]]) -> List[Mapping[str, Any]]:
+    """Bundle definitions plus evidence-promoted catalogue definitions (bundle names win)."""
+    records = list((bundle or {}).get("registry", {}).get("definitions", []))
+    if _promotions_apply(bundle):
+        present = {r.get("canonical_name") for r in records}
+        records.extend(rec for name, rec in sorted(_promoted_records().items()) if name not in present)
+    return records
+
+
+def _canonical_definition_by_name(bundle: Optional[Mapping[str, Any]], name: str) -> Optional[Mapping[str, Any]]:
+    for definition in (bundle or {}).get("registry", {}).get("definitions", []):
         if definition.get("canonical_name") == name:
             return definition
-    return None
+    return _promoted_records().get(name) if _promotions_apply(bundle) else None
 
 
 def resolve_feature_request(
@@ -721,7 +791,7 @@ def resolve_runtime_family_aliases(families: Set[str], *, authority: str = "acti
     bundle = _canonical_bundle(authority)
     if bundle is None:
         return sorted(name for name, definition in _feature_registry().items() if definition.family in families)
-    definitions = {item["canonical_name"]: item for item in bundle["registry"].get("definitions", [])}
+    definitions = {item["canonical_name"]: item for item in _active_definition_records(bundle)}
     return sorted(name for name, definition in definitions.items()
                   if set(definition.get("family", [])) & set(families)
                   and definition.get("status") == "verified")
@@ -738,7 +808,7 @@ def resolve_feature_engine_output_aliases(*, authority: str = "active") -> List[
     """
     bundle = _canonical_bundle(authority)
     if bundle is not None:
-        implemented = {item["canonical_name"] for item in bundle["registry"].get("definitions", [])
+        implemented = {item["canonical_name"] for item in _active_definition_records(bundle)
                        if item.get("status") == "verified"}
     else:
         implemented = {name for name, definition in _feature_registry().items()

@@ -1,0 +1,51 @@
+{
+  "adapter_module": "research_workflow/provider_host.py",
+  "adapter_sha256_informational": "ccb8dfce0405bb26f2307346143f9a34bbf6c85ac32ea87e7e8e85cbb124dd34",
+  "causal_guard": "SNAPSHOT_BEFORE_LATEST_RUNTIME_EVENT",
+  "consumed_streams": [
+    "completed_1m",
+    "completed_1s",
+    "completed_5m"
+  ],
+  "declared_input_contracts": [
+    "completed_1m",
+    "completed_1s",
+    "completed_5m"
+  ],
+  "definition_record": "features/definitions/canonical/structural_max_expansion_checkpoint_atr.py",
+  "definition_sha256": "c20e0436b55c23b09ddc668a1fc9bd80b7638f168e4b95f9fdc46b7d524d801a",
+  "determinism": {
+    "identical": true,
+    "runs": 2
+  },
+  "feature": "structural_max_expansion_checkpoint_atr",
+  "golden_fixture": "features/definitions/golden/structural_max_expansion_checkpoint_atr.json",
+  "golden_sha256": "a4e7da4b18ce2104b3eb662e1c03d2f0b24e1bc2df26caf974f9dd06e58d4072",
+  "instances": [
+    {
+      "context": "current"
+    }
+  ],
+  "observed_sha256": "94701f9610eba778c16d78a3af9ed54bd4a8c012f57ae309b273b5dbd2807857",
+  "physical_aliases": [
+    "structural_max_expansion_checkpoint_atr"
+  ],
+  "post_snapshot_event": {
+    "avail_ts": 721000000000,
+    "type": "completed_1s"
+  },
+  "promoted_at_utc": "2026-09-10T03:57:47.874511+00:00",
+  "promoted_by": "research feature promote",
+  "provider": "features.trackers.generic_structural_geometry.GenericStructuralGeometryProvider",
+  "provider_module": "features/trackers/generic_structural_geometry.py",
+  "provider_sha256": "dcd9c7fb8f5e286deefb1662e091d9aa3e6a38de22f574c71212de60dddee7f0",
+  "runtime_adapters": [
+    "StructuralGeometryAdapter"
+  ],
+  "schema_version": 1,
+  "snapshots": 3,
+  "substitution_guard": {
+    "aliases_checked": 728,
+    "bundle_definitions": 143
+  }
+}

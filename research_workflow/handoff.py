@@ -50,7 +50,9 @@ PROHIBITED_FOR_STUDY_OWNER = [
 # where-prefix -> the platform modules a capability session most likely touches (a hint, not a rule)
 _SUGGESTED_FILES = [
     ("context.", ["features/trackers/host_bindings.py", "features/trackers/", "research_workflow/capabilities_index.yaml", "research_workflow/grammar/compiler.py"]),
-    ("features.", ["features/library.py", "features/library_mtf.py", "features/registry.py", "features/trackers/host_bindings.py", "research_workflow/provider_host.py"]),
+    ("features.", ["features/definitions/canonical/<name>.py", "features/definitions/golden/<name>.json",
+                   "features/definitions/promotions/<name>.json (written by `research feature promote`)",
+                   "features/trackers/", "research_workflow/provider_host.py"]),
     ("outcome", ["research_workflow/host/outcomes.py", "research_workflow/target_replay_oracle.py", "research_workflow/grammar/spec.py"]),
     ("triggers", ["research_workflow/host/triggers.py", "research_workflow/grammar/spec.py"]),
     ("population", ["research_workflow/grammar/compiler.py", "research_workflow/grammar/predicates.py", "research_workflow/host/predicate_eval.py"]),

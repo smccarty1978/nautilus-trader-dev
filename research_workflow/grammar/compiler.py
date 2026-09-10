@@ -497,15 +497,31 @@ def _resolve_features(ctx: _Ctx) -> None:
         try:
             params = validate_feature_instance(inst)
             alias = generate_physical_alias(inst)
-            definition = _canonical_definition_by_name(bundle, inst.canonical_name) if bundle else None
+            definition = _canonical_definition_by_name(bundle, inst.canonical_name)
             if definition is None:
                 raise KeyError(inst.canonical_name)
+            if (definition.get("verification") or {}).get("kind") == "golden_evidence":
+                # A catalogue definition verified by its own evidence (features/promotion.py):
+                # re-execute that evidence here, at the compile boundary, so a study never
+                # binds a definition whose golden values, availability contract or
+                # determinism no longer hold. Bundle definitions carry migration parity
+                # evidence and are not re-executed.
+                from features.promotion import FeaturePromotionRefused, check_record
+                try:
+                    report = check_record(inst.canonical_name, execute=True)
+                except FeaturePromotionRefused as exc:
+                    report = {"passed": False, "execution_error": str(exc)}
+                if not report.get("passed"):
+                    raise FeatureInstanceError(
+                        "FEATURE_PROMOTION_EVIDENCE_INVALID: " + str(report.get("execution_error")
+                                                                       or report.get("binding_errors")))
             reqs = derive_resolved_input_requirements(inst.canonical_name, params, definition)
             res = resolve_feature_instances("canonical_verified_definition_universe", (inst,))[0]
         except FeatureInstanceError as exc:
             msg = str(exc)
             code = msg.split(":")[0]
-            kind = (GapKind.MISSING_CAPABILITY if code == "UNKNOWN_CANONICAL_FEATURE"
+            kind = (GapKind.MISSING_CAPABILITY if code in ("UNKNOWN_CANONICAL_FEATURE", "UNVERIFIED_CANONICAL_FEATURE",
+                                                             "FEATURE_PROMOTION_EVIDENCE_INVALID")
                     else GapKind.AMBIGUOUS_TEMPORAL_SEMANTICS if code.startswith("AMBIGUOUS_TEMPORAL")
                     else GapKind.INVALID_PARAMETERIZATION)
             ctx.gap(kind, where, msg, feature=it["feature"], parameters=it.get("parameters"))

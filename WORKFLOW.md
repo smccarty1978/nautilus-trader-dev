@@ -194,7 +194,42 @@ tracker field exposed through `features.metadata`. If yes, use YAML composition 
 If no: `python scripts/research.py cap search <words>` and `cap list features`. The registry has 143
 canonical feature identities; check aliases and parameter schemas before proposing anything.
 
-If truly absent, the capability flow (anti-bloat gates included):
+If truly absent, decide which of two things is missing:
+
+* **A new feature DEFINITION on an existing provider** (the provider already computes the
+  quantity, or it is a new formula the provider family can emit): the feature-definition path
+  below. No proposal, no scaffold, no sealed study, no bundle.
+* **A new tracker / provider / adapter**: the capability flow after it.
+
+**Feature-definition path** (`features/promotion.py`; a definition is verified by evidence about
+*itself*, never by having been used in a study):
+
+```bash
+# 1. one record per definition: features/definitions/canonical/<name>.py declaring DEFINITION = FeatureDefinition(...)
+#    (status stays 'provisional' in the record; nothing self-grants 'verified')
+# 2. golden values: features/definitions/golden/<name>.json -- an event tape, snapshots with EXPECTED values you
+#    derived by hand (the `derivation` text is mandatory), and at least one event after the last snapshot
+# 3. verify: replays the fixture through ProviderHost (the study runtime path), twice; checks the declared
+#    input contract covers every stream the adapter consumes; exercises SNAPSHOT_BEFORE_LATEST_RUNTIME_EVENT;
+#    refuses bundle shadowing and alias collisions
+python scripts/research.py feature verify <name>
+# 4. promote: writes features/definitions/promotions/<name>.json (hash-bound to the record, the fixture and the
+#    provider module) and regenerates features/tests/golden/feature_resolution.json (generated output)
+python scripts/research.py feature promote <name>
+# 5. prove additivity and regenerate the capability registry, then consume it from study.yaml
+python -m features.tests.golden_feature_resolution --additive-against main
+python scripts/research.py cap generate --check
+```
+
+What holds afterwards: the compiler re-executes the golden evidence for every promoted definition a
+study binds (`FEATURE_PROMOTION_EVIDENCE_INVALID` is a typed gap), preflight re-executes every
+record (`FEATURE_PROMOTION` gate), and any drift in the record, the fixture or the provider module
+demotes the definition to provisional (`UNVERIFIED_CANONICAL_FEATURE`). The record, the fixture and
+the promotion record are in the execution closure, so a sealed study binds exactly the evidence it
+compiled against. The 143 migrated identities in `features/authority/` are untouched by this path
+and cannot be shadowed by it.
+
+**Tracker / provider capability flow** (anti-bloat gates included):
 
 ```bash
 # 1. proposal (kind.name, semantics, availability_rule, parameters, serves_studies, closest_existing, composition_attempted,

@@ -344,10 +344,13 @@ class StructuralGeometryAdapter(_BaseAdapter):
         self._five_close_ts: Optional[int] = None
 
     def required_streams(self) -> frozenset[str]:
-        streams = {STREAM_COMPLETED_1S, STREAM_COMPLETED_1M}
-        if any("5m" in (i.parameters.get("timeframe") or "") for i in self.instances):
-            streams.add(STREAM_COMPLETED_5M)
-        return frozenset(streams)
+        # Every structural output is unavailable until the tracker holds a COMPLETED PRIOR 5m
+        # regime (StructuralRegimeGeometryTracker.snapshot returns NO_COMPLETED_PRIOR_5M_REGIME
+        # for all keys otherwise), so completed_5m is a requirement of the family, not of a
+        # `timeframe: 5m` parameter. Keying it on the parameter left a study that bound only
+        # `{context: current}` structural instances with silent nulls -- found by the first
+        # golden-evidence replay of structural_max_expansion_checkpoint_atr in isolation.
+        return frozenset({STREAM_COMPLETED_1S, STREAM_COMPLETED_1M, STREAM_COMPLETED_5M})
 
     def on_event(self, event_type: str, event: Mapping[str, Any]) -> None:
         if event_type == STREAM_COMPLETED_1S:
@@ -917,6 +920,17 @@ class ProviderHost:
         cls, compiled_study: Mapping[str, Any], *, feature_authority: str = "active",
     ) -> "ProviderHost":
         specs = cls._resolve_instance_specs(compiled_study, feature_authority=feature_authority)
+        return cls.from_instance_specs(tuple(specs))
+
+    @classmethod
+    def from_instance_specs(cls, specs: Sequence[InstanceSpec]) -> "ProviderHost":
+        """Instantiate adapters for already-resolved instance specs (no registry lookup).
+
+        Used by the compiler's binding proof (through ``from_feature_contract``) and by
+        ``features.promotion`` to replay a definition's golden fixture through the same
+        adapters a study would use -- before the definition is verified, which is the point.
+        """
+        specs = list(specs)
         aliases = [s.physical_alias for s in specs]
         if len(aliases) != len(set(aliases)):
             dupes = sorted({a for a in aliases if aliases.count(a) > 1})

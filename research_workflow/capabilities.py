@@ -98,12 +98,13 @@ def _verify_implementation(dotted: str) -> tuple[bool, str]:
 
 def _features(repo_root: Path) -> List[Dict[str, Any]]:
     from features.candidate_authority import load_authority
+    from features.registry import _active_definition_records
     selected = load_authority("active")
     bundle_version = str((selected.get("manifest") or {}).get("bundle_composite_sha256") or "")[:12]
     test_roots = [repo_root / "features" / "tests", repo_root / "research_workflow" / "tests", repo_root / "scripts" / "tests"]
     test_cache: Dict[str, List[str]] = {}
     out = []
-    for d in selected["registry"]["definitions"]:
+    for d in _active_definition_records(selected):
         name = d["canonical_name"]
         cadence = _cadence_for_feature(d)
         provider = str(d.get("provider") or "")
@@ -120,6 +121,7 @@ def _features(repo_root: Path) -> List[Dict[str, Any]]:
             "implementation_exists": (repo_root / provider_path).is_file(),
             "null_policies": d.get("null_policies"), "reset_policies": d.get("reset_policies"), "dtype": d.get("dtype"),
             "required_tests": test_cache[name], "legacy_alias_count": d.get("legacy_alias_count"),
+            "verification": (d.get("verification") or {}).get("kind", "migration_parity"),
         })
     return out
 
@@ -267,7 +269,7 @@ def build_registry(repo_root: Path = REPO_ROOT) -> Dict[str, Any]:
 
 
 _INPUT_GLOBS = ("research_workflow/capabilities_index.yaml", "research_workflow/capabilities_index.d/*.yaml",
-                "features/authority/**/*.json", "research/datasets/*.yaml",
+                "features/authority/**/*.json", "features/definitions/promotions/*.json", "research/datasets/*.yaml",
                 "features/trackers/*.py", "research_workflow/host/*.py", "research_workflow/entry_references.py",
                 "research_workflow/capabilities.py")
 
