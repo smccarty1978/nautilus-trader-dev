@@ -41,7 +41,7 @@ If another document contradicts this one, this one wins. Classification of every
 features/                 CANONICAL FEATURE IDENTITY
   authority/                active.json pointer + candidate/ bundle (registry, aliases, promotion facts)
   registry.py               FeatureInstance, validate_feature_instance, resolvers
-  candidate_authority.py    bundle load / freeze / atomic activation
+  candidate_authority.py    bundle reader (load_authority; the freeze/activate writers are gone)
   trackers/generic_*.py     parameterized providers
   CANONICAL_FEATURE_REFERENCE.yaml   generated canonical vocabulary
   archive/                  Feature System V1. Non-runtime, rollback only.
@@ -270,8 +270,16 @@ The TRAIN freeze binds `COLLECTION_PRODUCER_CLOSURE`, `TARGET_RUNTIME_CLOSURE`, 
 `MODELING_EXECUTION_CLOSURE`. Modeling-only changes stale fit/freeze without invalidating
 valid collection partitions. Every governed fit persists an immutable, hash-verified model
 record and golden-score fixture. Scientific validity and artifact availability are separate:
-closed studies retain loadable artifacts. A permitted child derived input resolves by immutable
-`model_id`, validates artifact/golden parity, and never reopens its source study.
+closed studies retain loadable artifacts. A child derived input resolves by immutable `model_id`,
+validates artifact/golden parity, and never reopens its source study. Since 2026-09-10 the
+**parent study's closure is the reuse authority**: the child declares a `diagnostic_reuse_policy`
+pinning the parent's canonical `artifacts/study_closure.json` (byte and identity hashes, the exact
+model bytes), and that closure's `model_scientific_assessment` + `reuse_policy` must name and
+authorize the model, with CLEAR causal/contract audits and a bound TRAIN freeze
+(`model_artifacts.resolve_model(..., reuse_intent="derived_causal_input")`). The registry column
+`scientific_status` is informational -- no value of it grants reuse; `reuse_status: PROHIBITED` is the
+hard block and is checked first. There is no assignment route (`assign_scientific_status` was
+retired). Worked example: `studies/first_p90_warning_horizon_2024/study.yaml`.
 
 ### Terminal closure — `STUDY_CLOSED`
 
@@ -289,11 +297,25 @@ as a key, a value, or the `KEY_VALUE` concatenation).
 
 V2 close binds present `artifacts/experiment_analysis_v2.json` and
 `artifacts/analysis_decision.json` under `bound_evidence.v2_analysis` / `v2_decision`, with
-exact relative paths and raw-file SHA-256 hashes. Validation rejects an omitted, malformed,
-redirected, deleted, or changed binding. A closure made before these stages has no evidence
-from them to bind. Pre-fix closures with these files but no binding fail current validation;
-the change never rewrites historical closures, invents a fresh attestation, or reopens a study.
-Historical validation remains at the study's sealed platform commit.
+exact relative paths and raw-file SHA-256 hashes; the `v2_analysis` binding also records the
+`plan_sha256` and `train_freeze_sha256` the analysis was produced from. Validation rejects an
+omitted, malformed, redirected, deleted, or changed binding, **and a stale one**: fresh means
+*produced from this plan and this TRAIN freeze*, not merely unchanged since closure. The analysis
+must carry the `plan_sha256` that the closure and `compiled_plan.json` carry, the bound freeze must
+be of that plan, every model the analysis scores must be one the freeze binds, and the decision
+must cite the analysis (`evidence: [path | {path, sha256}]`) with every cited hash still matching
+(`STUDY_CLOSURE_EVIDENCE_STALE` otherwise). A closure made before these stages has no evidence from
+them to bind.
+
+Five closures written before the binding rule (commit `5d3aad6a`, 2026-09-07T12:45:25Z) bind only
+seal and freeze: `v2_shape_a_flip_180s`, `v2_shape_b_deep_pullback_5s`, `v2_shape_c_barrier_race_fade`,
+`first_p90_warning_horizon_march2024`, `es_180s_model_c_portability`. They are **grandfathered, not
+re-closed**: `research_workflow/study_closure_grandfather.json` records each closure's canonical hash
+and the canonical hashes of its final evidence; the validator honours an entry only when the
+closure and every final-evidence file on disk still hash to the record, and the loader refuses any
+entry at or after the rule commit, so the record cannot exempt a later closure. Nothing rewrites
+historical closures, invents a fresh attestation, or reopens a study. Historical validation remains
+at the study's sealed platform commit.
 
 
 `WorkflowEngine.advance()` recognizes it **first**, before any deterministic leaf and before
@@ -692,7 +714,7 @@ a study is sealed and in flight.
 
 | Script | Purpose | Sealed-safe |
 |---|---|---|
-| `feature_ctl.py` | V2 canonical feature governance CLI: check and promote | yes (check) |
+| `feature_ctl.py` | V2 canonical feature governance CLI: `check` (and `promote`, which only re-runs `check`; it never promotes -- a definition is promoted by `research feature promote`) | yes |
 | `generate_canonical_feature_reference.py` | regenerate `CANONICAL_FEATURE_REFERENCE.yaml` | yes |
 | `check_candidate_promotion.py` | candidate-mode promotion checker; reachable only from a candidate-authority preflight | yes |
 

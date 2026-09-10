@@ -186,15 +186,18 @@ Feature System V2 is active and the runtime is canonical-only
 (`docs/RESEARCH_WORKFLOW.md` §2).
 
 Before implementing a new feature:
-* Resolve the request first — `python scripts/feature_ctl.py`. Check
-  `features/CANONICAL_FEATURE_REFERENCE.yaml`.
+* Resolve the request first — `python scripts/research.py cap search <words>` /
+  `cap describe <id>`, then `python scripts/feature_ctl.py check --request NAME`. Check
+  `features/CANONICAL_FEATURE_REFERENCE.yaml` (bundle definitions) and `research cap list features`
+  (which also lists evidence-promoted definitions).
 * Declare a canonical `FeatureInstance` (`feature:` + `parameters:`), **not** a physical
   name. Timeframe, window, lookback and period are parameters, never identities.
 * Reuse a verified provider. Do not add one to support another timeframe or window.
 * Bind the feature to an explicit study-specific update and snapshot anchor. The central
   implementation defines *how* it is calculated; the study contract defines *when*.
 * Never declare a legacy alias in a new study.
-* Do not promote provisional features without tests that name the feature and an explicit
-  promotion record.
+* A new canonical definition becomes `verified` only by its own golden evidence:
+  `python scripts/research.py feature verify <name>` then `feature promote <name>`
+  (`features/promotion.py`). No study-side step and no bundle edit can do it.
 
 ```

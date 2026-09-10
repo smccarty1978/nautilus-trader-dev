@@ -118,7 +118,7 @@ directly by a study's analysis step.
 | `features/authority/active.json` | atomic pointer — `{"activation_kind", "bundle", "bundle_composite_sha256", "schema_version"}` |
 | `features/trackers/generic_*.py` | 10 parameterized providers: arrival, bar_geometry, context, median_center, ohlcv_delta, price_levels, pullback, regime_geometry, rolling_productivity, structural_geometry |
 | `features/FEATURE_REGISTRY_CONTRACT.md` | DESIGN CONTRACT — promotion lifecycle (§7) |
-| `scripts/feature_ctl.py` | `check` / `promote` CLI |
+| `scripts/feature_ctl.py` | `check` CLI (`promote` is an alias of `check`; real promotion is `research feature verify\|promote`, `features/promotion.py`) |
 
 ### 1.7 `backtests/nt_runtime/`
 
@@ -290,7 +290,8 @@ studies built against it before the freeze mechanism existed.
 | `python scripts/find_first_parity_divergence.py` | **mandatory first step** for any parity failure | yes (diagnostic, never a gate) |
 | `python scripts/safe_cleanup.py --target PATH --disposable-root PATH` | fail-closed recursive-deletion guard | — |
 | `python scripts/sync_agents.py [--check]` | regenerate Codex/Antigravity agent defs from `.claude/agents/*.md` | yes |
-| `python scripts/feature_ctl.py check\|promote [--feature] [--family] [--request NAME] [--legacy-study]` | V2 feature governance CLI | yes (check) |
+| `python scripts/feature_ctl.py check [--feature] [--family] [--request NAME] [--legacy-study]` | V2 feature governance check (`promote` is the same check) | yes |
+| `python scripts/research.py feature verify\|promote\|check <name>` | verify a canonical definition by its own golden evidence, then promote it (`features/promotion.py`) | yes |
 
 ---
 
@@ -482,16 +483,23 @@ Required path, each stage catches silent inline features:
    `supported_timeframes`).
 3. Implementation: a new/extended provider in `features/trackers/generic_*.py` only if the
    formula or state-transition semantics genuinely differ — never "to support a timeframe."
-4. Test added under `features/tests/` that **names the feature**.
-5. Promotion: `scripts/check_feature_promotion.py` requires (a) implementation resolves, (b) a
-   test names the feature or carries `@covers_feature`, (c) an explicit promotion record with
-   `causal_audit_artifact`, `audited_execution_composite_sha256`, `promoted_by`,
-   `reviewed_implementation_sha256` matching current.
-6. ~~`features/authority/active.json` atomically re-pointed via `activate_frozen_candidate()`~~ -- removed 2026-09-10; the bundle is never re-pointed. A **new** definition is verified by its own golden evidence: `research feature verify <name>` then `research feature promote <name>` (`features/promotion.py`), see `WORKFLOW.md`.
+4. Golden evidence about the definition itself (`features/definitions/golden/<name>.json`): an
+   event tape and snapshots whose expected values are derived independently (`derivation` text
+   mandatory), replayed through the same `ProviderHost` adapters a study binds.
+5. `python scripts/research.py feature verify <name>` -- golden values reproduce, causal availability
+   holds (declared input contract covers every consumed stream; an event after the last snapshot
+   exercises the host's causal guard), two fresh replays are byte-identical.
+6. `python scripts/research.py feature promote <name>` writes `features/definitions/promotions/<name>.json`
+   binding the record, the fixture and the observed values by hash; the compiler re-executes that
+   evidence on every compile and demotes the definition on any drift. The authority bundle
+   (`features/authority/candidate/`) is frozen migration data and is never re-pointed; nothing but
+   `features/promotion.py` can mark a definition `verified` (`features/tests/test_verified_single_writer.py`).
+   A test under `features/tests/` that names the feature is still expected.
 
-**It cannot silently become an inline feature** — `check_feature_promotion.py` is one of
-PREFLIGHT's six required checks (§1.3, §4.1); an unresolved or unpromoted feature fails preflight
-before any collection runs. **Level 3.**
+**It cannot silently become an inline feature** — an unpromoted canonical definition resolves
+`UNVERIFIED_CANONICAL_FEATURE` and the compile fails with a typed gap, and `check_feature_promotion.py`
+(one of PREFLIGHT's six required checks, §1.3, §4.1) still guards the bundle and the physical
+lifecycle baseline before any collection runs. **Level 3.**
 
 ### C. Different timeframe
 

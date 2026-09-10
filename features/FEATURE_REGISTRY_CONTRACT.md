@@ -60,11 +60,15 @@ canonical definition, never on the alias.
 
 ### Authority
 
-The active canonical bundle is selected by an atomic pointer, `features/authority/active.json`
-(currently `activation_kind: feature_pipeline_v2` — 129 canonical definitions, 693 legacy
-aliases with deterministic parity evidence). `features/candidate_authority.load_authority()` is
-the only loader; a candidate is never selected by environment variable, ambient state, or
-fallback.
+The canonical bundle `features/authority/candidate/` (143 migrated definitions, 693 legacy
+aliases with deterministic parity evidence) is selected by the pointer `features/authority/active.json`
+(`activation_kind: feature_pipeline_v2`). It is **frozen migration data**: the materializer and the
+freeze/authorize/activate ceremony were removed on 2026-09-10, nothing regenerates or re-points it,
+and every sealed study hashes it. `features/candidate_authority.load_authority()` is the only
+loader; a candidate is never selected by environment variable, ambient state, or fallback. New
+canonical definitions live in the catalogue (`features/definitions/canonical/<name>.py`) and become
+`verified` only through their own golden evidence (`features/promotion.py`, below); the active
+verified universe is the bundle plus the evidence-promoted definitions (145 on 2026-09-10).
 
 `features/CANONICAL_FEATURE_REFERENCE.yaml` is the generated, shareable vocabulary. Check it
 before proposing a new feature.
@@ -128,9 +132,24 @@ A feature must move through four explicit statuses:
 
 ### Promotion is enforced, not advisory
 
+**A new canonical definition (2026-09-09 onward) is verified by evidence about itself**, executed
+by `features/promotion.py` (`python scripts/research.py feature verify|promote|check <name>`):
+(1) golden values -- `features/definitions/golden/<name>.json`, an event tape and snapshots whose
+expected values were derived independently (`derivation` text mandatory), replayed through the
+same `ProviderHost` adapters a study binds; (2) causal availability -- the declared input contract
+covers every stream the adapter consumes and each value uses only events at or before its epoch;
+(3) determinism -- two fresh replays byte-identical. `promote` writes
+`features/definitions/promotions/<name>.json` binding record, fixture and observed values by hash;
+the compiler re-executes the evidence on every compile and demotes the definition on drift
+(`UNVERIFIED_CANONICAL_FEATURE`). This is the **only** writer of `verified`
+(`features/tests/test_verified_single_writer.py`); the bundle is never edited and there is no
+study-side ceremony. `research_workflow/study_closure` and `WORKFLOW.md` §"Feature-definition path"
+carry the operator view.
+
+The older lifecycle gate below still governs the migrated bundle and the V1 physical universe.
 This list was prose only until `latest_1m_wick_imbalance` was registered as `verified` in
 the same change that implemented it — the registry entry asserted the outcome of reviews
-that had not run. `scripts/check_feature_promotion.py` now enforces the lifecycle:
+that had not run. `scripts/check_feature_promotion.py` enforces that lifecycle:
 
 ```
 NEW FEATURE -> provisional -> deterministic evidence -> explicit promotion -> verified
@@ -160,7 +179,8 @@ The gate runs in `research_workflow/preflight.py` (as the `FEATURE_PROMOTION` re
 and again in `research_workflow/phase0.py`, which is where `verified` becomes an eligible
 candidate universe. `scripts/research_preflight.py` and `scripts/build_phase0_manifest.py`
 are compatibility shims for those modules. Regression coverage:
-`scripts/tests/test_feature_promotion.py`. Governance CLI: `python scripts/feature_ctl.py`.
+`scripts/tests/test_feature_promotion.py`. Check CLI: `python scripts/feature_ctl.py check` (its `promote`
+subcommand only re-runs `check`); promotion itself is `python scripts/research.py feature promote <name>`.
 
 ---
 

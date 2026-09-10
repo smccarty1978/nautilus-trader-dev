@@ -85,18 +85,19 @@ alone and did not recur. Evidence: `artifacts/platform_v2/cleanup_and_closure/ev
 
 ## Feature authority bundle
 
-| Fact | Value as of 2026-08-25 | Re-derive with |
+| Fact | Value as of 2026-09-10 | Re-derive with |
 |---|---|---|
-| Active bundle | `candidate`, `activation_kind: feature_pipeline_v2` | `cat features/authority/active.json` |
-| Canonical definitions | 129 | `python -c "import json;print(len(json.load(open('features/authority/candidate/canonical_registry.json'))['definitions']))"` |
+| Active bundle | `candidate`, `activation_kind: feature_pipeline_v2`, schema 2 | `cat features/authority/active.json` |
+| Bundle definitions (all `verified`) | 143 | `python -c "import json;print(len(json.load(open('features/authority/candidate/canonical_registry.json'))['definitions']))"` |
 | Legacy aliases mapped | 693 | `python -c "import json;print(len(json.load(open('features/authority/candidate/legacy_alias_mapping.json'))['aliases']))"` |
-| Bundle composite | `133250b8…` | `cat features/authority/candidate/manifest.json` |
+| Bundle composite | `e8a7004e…` | `python -c "import json;print(json.load(open('features/authority/active.json'))['bundle_composite_sha256'])"` |
+| Evidence-promoted catalogue definitions | 2 (`structural_max_expansion_checkpoint_atr`, `trend_normalized_est_delta_acceleration`) | `python -c "from features.promotion import promoted_names;print(promoted_names())"` |
+| Active verified universe (`canonical_verified_definition_universe`) | 145 = 143 + 2 | `python -c "from features.registry import resolve_source_universe as r;print(len(r('canonical_verified_definition_universe')))"` |
 
-These are the bundle's counts as of 2026-08-25; the bundle has since grown (143 definitions on
-2026-09-09) and evidence-promoted catalogue definitions are added on top of it, so the active
-verified universe is larger than the bundle. The activation script that once asserted these counts
-(`scripts/activate_feature_pipeline_v2.py`) was removed on 2026-09-10 with the rest of the cutover
-ceremony; nothing re-points the bundle any more.
+The bundle is frozen migration data (never regenerated or re-pointed since the cutover ceremony was
+removed on 2026-09-10); the active universe grows only by evidence-promoted definitions
+(`research feature verify|promote`). `features/tests/test_candidate_authority.py` still pins the
+universe at 129 and fails on `main` for that reason (recorded in the gate entries above).
 
 ---
 

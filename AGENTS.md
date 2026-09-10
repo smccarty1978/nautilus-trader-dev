@@ -224,7 +224,7 @@ Do not hand-edit the generated files. The harnesses previously drifted far enoug
 Codex auditor was silently missing 14 checklist rules including C4 and D4 — the #2 and #4
 most frequent finding categories in this repository.
 
-### Roster — six roles
+### Roster — six roles (five columns plus a read-only triager)
 
 | Agent | Codex `agent_type` | Owns | Tier | Cap |
 |---|---|---|---|---|
@@ -233,6 +233,7 @@ most frequent finding categories in this repository.
 | `contract-checker` | `contract_checker` | Governance: TRAIN/OOS separation, authorization, freeze/seal freshness, provenance, deliverables, model-integrity declarations. Checklist **C4, D, E** | Sonnet / medium | 1,000w compliance table |
 | `implementer` | `implementer` | Deterministic fixes, wiring, targeted tests, bounded fixtures, integration, first-broken-stage tracing | Sonnet / medium | — |
 | `analysis-decider` | `analysis_decider` | Reading generated artifacts, model comparison, forward-outcome interpretation, the research conclusion | Sonnet / high | — |
+| `results-triager` | `results_triager` | Read-only triage of compact artifacts (pytest logs, parity reports, controller cards): separates genuinely new regressions from the classified baseline; never fixes, never re-runs | Haiku / low | short card |
 
 `Explore` (`.claude/agents/Explore.md`, Claude-only) is **a model pin, not a role** — it stops
 the built-in fan-out search agent inheriting the orchestrator's model. Prefer `repo-scout`.
