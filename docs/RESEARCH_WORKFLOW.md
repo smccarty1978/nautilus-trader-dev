@@ -749,12 +749,14 @@ study that a new definition can never have. `features/authority/candidate/` is f
 | Script | Status |
 |---|---|
 | `generate_oos_unlock.py` | superseded by `experiment.assert_oos_open` + the TRAIN freeze; kept for studies built against it |
-| `archive_legacy_feature_registry.py` | V1 archive creation — done |
-| `restore_legacy_feature_file.py` | V1 rollback operator tool |
-| `migrate_cleanflip_feature_instances.py` | one-off V1→V2 study migration |
-| `audit_full_feature_system_v2_inventory.py` | V1→V2 normalization — done |
-| `build_canonical_promotion_inventory.py` | V2 promotion evidence build — done |
-| `run_full_legacy_feature_parity.py` | legacy→canonical parity matrix — evidence produced |
+
+The one-time V1→V2 migration tools (`archive_legacy_feature_registry.py`, `restore_legacy_feature_file.py`,
+`migrate_cleanflip_feature_instances.py`, `audit_full_feature_system_v2_inventory.py`,
+`build_canonical_promotion_inventory.py`, `run_full_legacy_feature_parity.py`) were removed on 2026-09-10;
+their outputs live on as the bundle's `promotion_facts.json` and the frozen archive
+`features/archive/legacy_registry_2026_08_22/` (kept, with its own README). History: commit `9be6eba2`
+and earlier. Parity tooling that still earns its place (`scripts/parity/*`,
+`find_first_parity_divergence.py`, `verify_collector_parity.py`) is untouched.
 
 ---
 
