@@ -256,12 +256,13 @@ def test_rt2_13_unassessed_model_cannot_be_derived_causal_input():
         assert_scientific_status_reusable(rec)
 
 
-# 14. VALID_DIAGNOSTIC requires explicit reuse policy
-def test_rt2_14_valid_diagnostic_requires_explicit_reuse_policy():
+# 14. a registry status value never authorizes reuse; only the parent's pinned closure does
+def test_rt2_14_registry_status_never_authorizes_without_the_closure():
     rec = {"model_id": "m2", "scientific_status": "VALID_DIAGNOSTIC", "reuse_status": "PERMITTED"}
-    with pytest.raises(ModelArtifactError, match="REQUIRES_POLICY"):
+    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
         assert_scientific_status_reusable(rec)
-    assert_scientific_status_reusable(rec, {"kind": "diagnostic_derived_causal_input", "model_id": "m2"})
+    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
+        assert_scientific_status_reusable(rec, {"kind": "diagnostic_derived_causal_input", "model_id": "m2"})
 
 
 # 15. native-booster recovery works through the real resolve/bind path
@@ -287,7 +288,7 @@ def test_rt2_15_native_booster_recovery_real_bind_path(tmp_path):
     golden_path.write_text(json.dumps(golden_data), encoding="utf-8")
     reg_record = {
         "model_id": mid, "model_role": "A", "study_id": "study",
-        "scientific_status": "VALID_PRIMARY", "reuse_status": "PERMITTED",
+        "scientific_status": "UNASSESSED", "reuse_status": "PERMITTED",
         "artifact_path": str(art_path.relative_to(tmp_path)),
         "artifact_sha256": _sha(art_path.read_bytes()),
         "native_booster_path": str(booster_path.relative_to(tmp_path)),
@@ -297,7 +298,10 @@ def test_rt2_15_native_booster_recovery_real_bind_path(tmp_path):
         "ordered_model_inputs": ["f1", "f2"],
     }
     (reg / f"{mid}.json").write_text(json.dumps(reg_record), encoding="utf-8")
-    spec = DerivedCausalInputSpec.model_validate({"name": "score_derived", "model_id": mid})
+    from research_workflow.tests.closure_reuse_support import reuse_policy_for, write_reuse_closure
+    write_reuse_closure(study, reg_record)   # the parent closure is the reuse authority
+    spec = DerivedCausalInputSpec.model_validate({"name": "score_derived", "model_id": mid,
+                                                  "diagnostic_reuse_policy": reuse_policy_for(study, reg_record)})
     scorer = FrozenExternalModelScorer.bind(spec, parent_dir=study)
     obs = scorer.score({"f1": 0.0, "f2": 1.0}, checkpoint_ts=100, direction="LONG", availability_ts={"f1": 100, "f2": 100})
     assert abs(obs.score - golden_data["expected_scores"][0]) < 1e-6

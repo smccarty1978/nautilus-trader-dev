@@ -84,7 +84,7 @@ def _verify_model_id(di: DerivedCausalInputSpec, repo_root: Path) -> Dict[str, A
 
     # resolve_model already proved: registry record exists, artifact present +
     # hash-valid, reuse_status == PERMITTED, preprocessing contract available, golden
-    # prediction reproduces, scientific_status compatible. Additionally require the
+    # prediction reproduces, parent closure authorizes the reuse. Additionally require the
     # ordered model inputs so a child study can bind its causal snapshot to them.
     if not rec.get("ordered_model_inputs"):
         raise DerivedInputBindingError(

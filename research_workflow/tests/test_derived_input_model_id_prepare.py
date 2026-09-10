@@ -19,9 +19,12 @@ from research_workflow.derived_inputs import (
     verify_derived_causal_inputs,
 )
 from research_workflow.model_artifacts import persist_models
+from research_workflow.tests.closure_reuse_support import reuse_policy_for, write_reuse_closure
 
 
-def _register_model(repo_root, *, scientific_status="VALID_PRIMARY", reuse_status="PERMITTED"):
+def _register_model(repo_root, *, scientific_status="UNASSESSED", reuse_status="PERMITTED"):
+    """Persist a parent model and close the parent study so its CLOSURE authorizes reuse
+    (the registry scientific_status column is informational and never grants reuse)."""
     study = repo_root / "studies" / "parent"
     study.mkdir(parents=True)
     est = LogisticRegression().fit([[0, 0], [1, 1]], [0, 1])
@@ -35,10 +38,20 @@ def _register_model(repo_root, *, scientific_status="VALID_PRIMARY", reuse_statu
     body["scientific_status"] = scientific_status
     body["reuse_status"] = reuse_status
     reg.write_text(json.dumps(body))
+    write_reuse_closure(study, rec)
     return rec["model_id"]
 
 
-def _spec_with_model_id(model_id: str) -> StudySpec:
+def _policy_for(repo_root, model_id: str) -> dict:
+    reg = json.loads((repo_root / "studies" / "model_registry" / f"{model_id}.json").read_text())
+    return reuse_policy_for(repo_root / "studies" / "parent", reg)
+
+
+def _spec_with_model_id(model_id: str, policy: dict | None = None) -> StudySpec:
+    derived = {"name": "parent_score", "kind": "frozen_external_model_score",
+               "model_id": model_id, "retrain_prohibited": True}
+    if policy is not None:
+        derived["diagnostic_reuse_policy"] = policy
     return StudySpec.model_validate({
         "study": {"id": "child", "type": "flip_prediction", "description": "d"},
         "instrument": {"symbol": "NQ", "venue": "XCME"},
@@ -46,10 +59,7 @@ def _spec_with_model_id(model_id: str) -> StudySpec:
         "target": {"type": "flip", "horizon_seconds": 300},
         "features": {
             "source": "canonical_verified_definition_universe",
-            "derived_inputs": [{
-                "name": "parent_score", "kind": "frozen_external_model_score",
-                "model_id": model_id, "retrain_prohibited": True,
-            }],
+            "derived_inputs": [derived],
         },
         "chronology": {"train": [2021], "dev": [2022], "prohibited": [2025, 2026]},
         "execution": {"runtime": "nautilustrader"},
@@ -58,7 +68,7 @@ def _spec_with_model_id(model_id: str) -> StudySpec:
 
 def test_model_id_derived_input_verifies_at_prepare(tmp_path):
     model_id = _register_model(tmp_path)
-    spec = _spec_with_model_id(model_id)
+    spec = _spec_with_model_id(model_id, _policy_for(tmp_path, model_id))
     records = verify_derived_causal_inputs(spec, repo_root=tmp_path)
     assert len(records) == 1
     assert records[0]["binding"] == "model_id"
@@ -76,45 +86,36 @@ def test_missing_model_id_fails_closed(tmp_path):
 
 def test_tampered_artifact_fails_closed(tmp_path):
     model_id = _register_model(tmp_path)
+    policy = _policy_for(tmp_path, model_id)
     reg = json.loads((tmp_path / "studies" / "model_registry" / f"{model_id}.json").read_text())
     artifact = tmp_path / "studies" / reg["artifact_path"]
     artifact.write_bytes(artifact.read_bytes() + b"tamper")
-    spec = _spec_with_model_id(model_id)
+    spec = _spec_with_model_id(model_id, policy)
     with pytest.raises(DerivedInputBindingError, match="MODEL_ID_UNRESOLVED"):
         verify_derived_causal_inputs(spec, repo_root=tmp_path)
 
 
 def test_reuse_prohibited_fails_closed(tmp_path):
     model_id = _register_model(tmp_path, reuse_status="PROHIBITED")
-    spec = _spec_with_model_id(model_id)
+    spec = _spec_with_model_id(model_id, _policy_for(tmp_path, model_id))   # closure evidence cannot lift the block
     with pytest.raises(DerivedInputBindingError, match="REUSE_PROHIBITED"):
         verify_derived_causal_inputs(spec, repo_root=tmp_path)
 
 
 def test_invalid_target_scientific_status_fails_closed(tmp_path):
     model_id = _register_model(tmp_path, scientific_status="INVALID_TARGET")
-    spec = _spec_with_model_id(model_id)
+    spec = _spec_with_model_id(model_id, _policy_for(tmp_path, model_id))
     with pytest.raises(DerivedInputBindingError, match="SCIENTIFICALLY_INVALID"):
         verify_derived_causal_inputs(spec, repo_root=tmp_path)
 
 
-def test_unassessed_scientific_status_is_rejected_even_when_reuse_permitted(tmp_path):
-    model_id = _register_model(tmp_path, scientific_status="UNASSESSED")
+@pytest.mark.parametrize("status", ["UNASSESSED", "VALID_PRIMARY", "VALID_DIAGNOSTIC"])
+def test_registry_status_alone_never_authorizes_reuse(tmp_path, status):
+    """Without the child pinning the parent's closure, no registry column value passes."""
+    model_id = _register_model(tmp_path, scientific_status=status)
     spec = _spec_with_model_id(model_id)
     with pytest.raises(DerivedInputBindingError, match="SCIENTIFICALLY_INVALID"):
         verify_derived_causal_inputs(spec, repo_root=tmp_path)
-
-
-def test_valid_diagnostic_requires_explicit_policy(tmp_path):
-    from research_workflow.model_artifacts import (
-        ModelArtifactError,
-        assert_scientific_status_reusable,
-    )
-
-    rec = {"model_id": "m", "scientific_status": "VALID_DIAGNOSTIC"}
-    with pytest.raises(ModelArtifactError, match="REQUIRES_POLICY"):
-        assert_scientific_status_reusable(rec)
-    assert_scientific_status_reusable(rec, {"kind": "diagnostic_derived_causal_input", "model_id": "m"})
 
 
 def test_legacy_parent_study_binding_still_works(tmp_path):

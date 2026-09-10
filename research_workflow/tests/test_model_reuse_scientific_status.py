@@ -1,5 +1,7 @@
-"""RT-09 -- model reuse enforces scientific_status + recorded runtime identity, and can
-recover a LightGBM model natively when joblib cannot load it.
+"""RT-09 -- model reuse as a derived causal input is authorized by the parent study's CLOSURE
+(generalised 2026-09-10: the registry ``scientific_status`` never grants reuse; the hard block is
+``reuse_status: PROHIBITED``), enforces the recorded runtime identity, and can recover a LightGBM
+model natively when joblib cannot load it.
 """
 from __future__ import annotations
 
@@ -16,11 +18,16 @@ from research_workflow.model_artifacts import (
     assert_scientific_status_reusable,
     load_model_bundle,
     persist_models,
+    register_historical_model,
     resolve_model,
-    assign_scientific_status,
 )
 from research.schemas.study_spec import DerivedCausalInputSpec
 from research_workflow.external_model_scoring import FrozenExternalModelScorer
+from research_workflow.tests.closure_reuse_support import (
+    refresh_closure_identity as _refresh_closure_identity,
+    reuse_policy_for as _diagnostic_reuse_policy,
+    write_reuse_closure as _write_diagnostic_reuse_closure,
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -32,83 +39,21 @@ def test_explicitly_invalid_status_is_never_reusable(status):
         assert_scientific_status_reusable({"model_id": "m", "scientific_status": status})
 
 
-def test_valid_diagnostic_needs_explicit_policy():
-    rec = {"model_id": "m", "scientific_status": "VALID_DIAGNOSTIC"}
-    with pytest.raises(ModelArtifactError, match="REQUIRES_POLICY"):
+def test_reuse_prohibited_is_the_hard_block_and_is_checked_first():
+    with pytest.raises(ModelArtifactError, match="REUSE_PROHIBITED"):
+        assert_scientific_status_reusable({"model_id": "m", "reuse_status": "PROHIBITED", "scientific_status": "UNASSESSED"})
+
+
+@pytest.mark.parametrize("status", ["VALID_PRIMARY", "VALID_DIAGNOSTIC", "UNASSESSED", None])
+def test_no_registry_status_value_grants_reuse_without_the_closure(status):
+    rec = {"model_id": "m", "reuse_status": "PERMITTED"}
+    if status:
+        rec["scientific_status"] = status
+    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
         assert_scientific_status_reusable(rec)
-    assert_scientific_status_reusable(rec, {"kind": "diagnostic_derived_causal_input", "model_id": "m"})
-
-
-def test_valid_primary_passes_but_unassessed_is_not_scientific_approval():
-    assert_scientific_status_reusable({"model_id": "m", "scientific_status": "VALID_PRIMARY"})
+    # a bare policy that pins no closure is not authorization either
     with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
-        assert_scientific_status_reusable({"model_id": "m", "scientific_status": "UNASSESSED"})
-    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
-        assert_scientific_status_reusable({"model_id": "m"})
-
-
-def _write_canonical_closure(study, rec, *, extra_bound=None):
-    """Write the source study's own artifacts/study_closure.json + Stage 17 decision."""
-    import hashlib
-    arts = study / "artifacts"; arts.mkdir(parents=True, exist_ok=True)
-    decision = arts / "research_decision_stage17.json"
-    decision_body = {"schema_version": 1, "artifact_kind": "research_decision_stage17", "stage": 17,
-                     "study_id": study.name, "terminal_decision": "valid",
-                     "bound_lineage": {
-                         "train_freeze_sha256": "synthetic-train-freeze",
-                         "model_ids": [rec["model_id"]],
-                         "modeling_execution_closure_sha256": "synthetic-modeling-closure",
-                         "authorization_sha256": "synthetic-auth"}}
-    decision_body["decision_identity_sha256"] = canonical_sha256(
-        {k: v for k, v in decision_body.items() if k != "decision_identity_sha256"})
-    decision.write_text(json.dumps(decision_body))
-    bound = {"stage17_research_decision": {
-        "path": "artifacts/research_decision_stage17.json",
-        "sha256": hashlib.sha256(decision.read_bytes()).hexdigest()}}
-    bound.update(extra_bound or {})
-    closure = arts / "study_closure.json"
-    closure_body = {"schema_version": 1, "study_id": study.name, "status": "CLOSED",
-                    "outcome": "DIAGNOSTIC_POSITIVE", "terminal_decision": "valid",
-                    "model_ids": [rec["model_id"]], "bound_evidence": bound}
-    closure_body["closure_identity_sha256"] = canonical_sha256(closure_body)
-    closure.write_text(json.dumps(closure_body))
-    return closure, decision
-
-
-def test_status_assignment_preserves_model_identity_and_binds_evidence(tmp_path):
-    study, rec = _persist_lgbm(tmp_path)
-    closure, decision = _write_canonical_closure(study, rec)
-    updated = assign_scientific_status(model_id=rec["model_id"], registry_root=study.parent / "model_registry",
-                                       scientific_status="VALID_PRIMARY", closure_evidence_path=closure,
-                                       decision_evidence_path=decision)
-    assert updated["model_id"] == rec["model_id"]
-    assert updated["artifact_sha256"] == rec["artifact_sha256"]
-    assert updated["scientific_status_audit_history"][-1]["closure_evidence_sha256"]
-
-
-def test_status_assignment_rejects_noncanonical_closure_copy(tmp_path):
-    """Fix 2: a self-consistent closure file placed anywhere but the study's own
-    artifacts/study_closure.json cannot authorize promotion."""
-    study, rec = _persist_lgbm(tmp_path)
-    canonical_closure, decision = _write_canonical_closure(study, rec)
-    copy = tmp_path / "elsewhere_study_closure.json"
-    copy.write_text(canonical_closure.read_text())
-    with pytest.raises(ModelArtifactError, match="CLOSURE_NOT_CANONICAL"):
-        assign_scientific_status(model_id=rec["model_id"], registry_root=study.parent / "model_registry",
-                                 scientific_status="VALID_PRIMARY", closure_evidence_path=copy,
-                                 decision_evidence_path=decision)
-
-
-def test_status_assignment_rejects_model_id_not_in_closure_evidence(tmp_path):
-    study, rec = _persist_lgbm(tmp_path)
-    closure, decision = _write_canonical_closure(study, rec)
-    body = json.loads(closure.read_text()); body["model_ids"] = ["some_other_model"]
-    body["closure_identity_sha256"] = canonical_sha256({k: v for k, v in body.items() if k != "closure_identity_sha256"})
-    closure.write_text(json.dumps(body))
-    with pytest.raises(ModelArtifactError, match="CLOSURE_MODEL_UNBOUND"):
-        assign_scientific_status(model_id=rec["model_id"], registry_root=study.parent / "model_registry",
-                                 scientific_status="VALID_PRIMARY", closure_evidence_path=closure,
-                                 decision_evidence_path=decision)
+        assert_scientific_status_reusable(rec, {"kind": "diagnostic_derived_causal_input", "model_id": "m"})
 
 
 def test_loadable_joblib_golden_mismatch_never_uses_native_fallback(tmp_path):
@@ -150,54 +95,7 @@ def _promote(study, model_id, **fields):
     reg.write_text(json.dumps(body))
 
 
-def _diagnostic_reuse_policy(study, rec):
-    closure = study / "artifacts" / "study_closure.json"
-    body = json.loads(closure.read_text())
-    return {
-        "kind": "diagnostic_derived_causal_input", "model_id": rec["model_id"],
-        "parent_study_id": study.name, "parent_closure_path": "artifacts/study_closure.json",
-        "parent_closure_sha256": hashlib.sha256(closure.read_bytes()).hexdigest(),
-        "parent_closure_identity_sha256": body["closure_identity_sha256"],
-        "expected_assessment": "VALID_DIAGNOSTIC", "artifact_sha256": rec["artifact_sha256"],
-    }
-
-
-def _write_diagnostic_reuse_closure(study, rec):
-    arts = study / "artifacts"; arts.mkdir(exist_ok=True)
-    for name in ("causal.md", "contract.md"):
-        (arts / name).write_text(name)
-    freeze = arts / "train_experiment_freeze.json"
-    freeze.write_text(json.dumps({"freeze_sha256": "synthetic-freeze"}))
-    closure = {
-        "schema_version": 1, "study_id": study.name, "status": "CLOSED",
-        "closed_at_utc": "2026-01-01T00:00:00+00:00",
-        "outcome": "DIAGNOSTIC", "terminal_decision": "diagnostic",
-        "models": {"A": {"model_id": rec["model_id"], "artifact_sha256": rec["artifact_sha256"]}},
-        "model_scientific_assessment": {
-            "assessment": "VALID_DIAGNOSTIC",
-            "reuse_policy": "Discoverable for future GOVERNED derived-input use if a child study's reuse policy explicitly permits diagnostic-derived input.",
-        },
-        "bound_evidence": {
-            "train_freeze_sha256": hashlib.sha256(freeze.read_bytes()).hexdigest(),
-            "causal_audit": {"verdict": "CLEAR", "report": "artifacts/causal.md"},
-            "contract_audit": {"verdict": "CLEAR", "report": "artifacts/contract.md"},
-        },
-    }
-    closure["closure_identity_sha256"] = canonical_sha256(
-        {k: v for k, v in closure.items() if k != "closed_at_utc"})
-    (arts / "study_closure.json").write_text(json.dumps(closure))
-
-
-def _refresh_closure_identity(study):
-    path = study / "artifacts" / "study_closure.json"
-    body = json.loads(path.read_text())
-    body["closure_identity_sha256"] = canonical_sha256(
-        {k: v for k, v in body.items()
-         if k not in {"closed_at_utc", "closure_identity_sha256"}})
-    path.write_text(json.dumps(body))
-
-
-def test_unassessed_model_can_bind_only_to_authenticated_diagnostic_closure(tmp_path):
+def test_model_binds_only_to_its_authenticated_parent_closure(tmp_path):
     study, rec = _persist_lgbm(tmp_path)
     _write_diagnostic_reuse_closure(study, rec)
     policy = _diagnostic_reuse_policy(study, rec)
@@ -218,7 +116,7 @@ def test_unassessed_model_can_bind_only_to_authenticated_diagnostic_closure(tmp_
     ("model", "CLOSURE_INVALID"), ("artifact", "MODEL_BINDING_MISMATCH"),
     ("audit", "AUDIT_EVIDENCE_MISSING"), ("authorization", "NOT_AUTHORIZED"),
 ])
-def test_unassessed_reuse_evidence_mismatches_fail_closed(tmp_path, mutation, error):
+def test_closure_reuse_evidence_mismatches_fail_closed(tmp_path, mutation, error):
     study, rec = _persist_lgbm(tmp_path)
     _write_diagnostic_reuse_closure(study, rec)
     policy = _diagnostic_reuse_policy(study, rec)
@@ -250,7 +148,45 @@ def test_invalid_registry_status_never_yields_to_closure_evidence(tmp_path):
                       reuse_intent="derived_causal_input", reuse_policy=policy)
 
 
-def test_unassessed_runtime_drift_requires_hash_bound_parent_evidence(tmp_path):
+def test_prohibited_record_hard_blocks_even_with_authenticated_closure_evidence(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    _write_diagnostic_reuse_closure(study, rec); policy = _diagnostic_reuse_policy(study, rec)
+    _promote(study, rec["model_id"], reuse_status="PROHIBITED")
+    with pytest.raises(ModelArtifactError, match="REUSE_PROHIBITED"):
+        resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
+                      reuse_intent="derived_causal_input", reuse_policy=policy)
+    # the block does not depend on the caller's intent
+    with pytest.raises(ModelArtifactError, match="REUSE_PROHIBITED"):
+        resolve_model(rec["model_id"], registry_root=study.parent / "model_registry")
+
+
+def test_historical_invalid_target_registration_hard_blocks_with_closure_evidence(tmp_path):
+    """C2: the historical writer records the block in reuse_status (the field resolve_model reads
+    first) with the informational reason beside it; closure evidence cannot lift it."""
+    study, rec = _persist_lgbm(tmp_path)
+    import os
+    hist = register_historical_model(study_dir=study, artifact_relpath=os.path.relpath(
+        study.parent / rec["artifact_path"], study))
+    assert hist["reuse_status"] == "PROHIBITED" and hist["scientific_status"] == "INVALID_TARGET"
+    assert "INVALID_TARGET" in hist["reuse_prohibited_reason"]
+    _write_diagnostic_reuse_closure(study, hist); policy = _diagnostic_reuse_policy(study, hist)
+    with pytest.raises(ModelArtifactError, match="REUSE_PROHIBITED"):
+        resolve_model(hist["model_id"], registry_root=study.parent / "model_registry",
+                      reuse_intent="derived_causal_input", reuse_policy=policy)
+
+
+def test_valid_primary_in_the_registry_does_not_bypass_the_closure(tmp_path):
+    study, rec = _persist_lgbm(tmp_path)
+    _promote(study, rec["model_id"], scientific_status="VALID_PRIMARY")
+    with pytest.raises(ModelArtifactError, match="SCIENTIFICALLY_INVALID"):
+        resolve_model(rec["model_id"], registry_root=study.parent / "model_registry", reuse_intent="derived_causal_input")
+    # with the parent closure pinned it resolves, whatever the informational column says
+    _write_diagnostic_reuse_closure(study, rec)
+    resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
+                  reuse_intent="derived_causal_input", reuse_policy=_diagnostic_reuse_policy(study, rec))
+
+
+def test_closure_runtime_drift_requires_hash_bound_parent_evidence(tmp_path):
     study, rec = _persist_lgbm(tmp_path)
     _write_diagnostic_reuse_closure(study, rec); policy = _diagnostic_reuse_policy(study, rec)
     _promote(study, rec["model_id"], runtime_identity_sha256="deadbeef" * 8)
@@ -276,25 +212,27 @@ def test_resolve_records_runtime_identity(tmp_path):
 
 def test_runtime_identity_drift_is_refused_for_derived_input(tmp_path):
     study, rec = _persist_lgbm(tmp_path)
-    _promote(study, rec["model_id"], scientific_status="VALID_PRIMARY",
-             runtime_identity_sha256="deadbeef" * 8)
+    _write_diagnostic_reuse_closure(study, rec); policy = _diagnostic_reuse_policy(study, rec)
+    _promote(study, rec["model_id"], runtime_identity_sha256="deadbeef" * 8)
     root = study.parent / "model_registry"
     with pytest.raises(ModelArtifactError, match="RUNTIME_IDENTITY_DRIFT"):
-        resolve_model(rec["model_id"], registry_root=root, reuse_intent="derived_causal_input")
-    # allowed with an explicit override, and never checked for a non-derived load
-    resolve_model(rec["model_id"], registry_root=root, reuse_intent="derived_causal_input",
-                  reuse_policy={"allow_runtime_drift": True})
+        resolve_model(rec["model_id"], registry_root=root, reuse_intent="derived_causal_input", reuse_policy=policy)
+    # a bare override is not an override: the drift evidence must be hash-bound to the parent
+    with pytest.raises(ModelArtifactError, match="RUNTIME_DRIFT_EVIDENCE_REQUIRED"):
+        resolve_model(rec["model_id"], registry_root=root, reuse_intent="derived_causal_input",
+                      reuse_policy={**policy, "allow_runtime_drift": True})
+    # never checked for a non-derived load
     resolve_model(rec["model_id"], registry_root=root)
 
 
 def test_missing_runtime_identity_is_unverifiable_not_blocked(tmp_path):
     study, rec = _persist_lgbm(tmp_path)
-    _promote(study, rec["model_id"], scientific_status="VALID_PRIMARY")
+    _write_diagnostic_reuse_closure(study, rec); policy = _diagnostic_reuse_policy(study, rec)
     body = json.loads((study.parent / "model_registry" / f"{rec['model_id']}.json").read_text())
     body.pop("runtime_identity_sha256", None)
     (study.parent / "model_registry" / f"{rec['model_id']}.json").write_text(json.dumps(body))
     resolve_model(rec["model_id"], registry_root=study.parent / "model_registry",
-                  reuse_intent="derived_causal_input")  # no raise
+                  reuse_intent="derived_causal_input", reuse_policy=policy)  # no raise
 
 
 # --------------------------------------------------------------------------- #
@@ -319,12 +257,13 @@ def test_native_recovery_is_reachable_through_real_scorer_bind(tmp_path):
     study, rec = _persist_lgbm(tmp_path)
     reg = study.parent / "model_registry" / f"{rec['model_id']}.json"
     body = json.loads(reg.read_text())
-    body["scientific_status"] = "VALID_PRIMARY"
     artifact = study.parent / body["artifact_path"]
     artifact.write_bytes(b"unloadable-but-authoritatively-registered")
     body["artifact_sha256"] = __import__("hashlib").sha256(artifact.read_bytes()).hexdigest()
     reg.write_text(json.dumps(body))
-    spec = DerivedCausalInputSpec.model_validate({"name": "upstream", "model_id": rec["model_id"]})
+    _write_diagnostic_reuse_closure(study, body)   # the closure binds the registered (unloadable) bytes
+    spec = DerivedCausalInputSpec.model_validate({"name": "upstream", "model_id": rec["model_id"],
+                                                  "diagnostic_reuse_policy": _diagnostic_reuse_policy(study, body)})
     scorer = FrozenExternalModelScorer.bind(spec, parent_dir=study)
     got = scorer.score({"x": 0.0, "y": 1.0}, checkpoint_ts=1, direction="LONG",
                        availability_ts={"x": 1, "y": 1})
@@ -334,14 +273,16 @@ def test_native_recovery_is_reachable_through_real_scorer_bind(tmp_path):
 def test_native_recovery_scorer_bind_rejects_golden_mismatch(tmp_path):
     study, rec = _persist_lgbm(tmp_path)
     reg = study.parent / "model_registry" / f"{rec['model_id']}.json"
-    body = json.loads(reg.read_text()); body["scientific_status"] = "VALID_PRIMARY"
+    body = json.loads(reg.read_text())
     artifact = study.parent / body["artifact_path"]; artifact.write_bytes(b"unloadable")
     body["artifact_sha256"] = __import__("hashlib").sha256(artifact.read_bytes()).hexdigest()
     golden = study.parent / body["golden_fixture_path"]
     fixture = json.loads(golden.read_text()); fixture["expected_scores"] = [0.0, 0.0]
     golden.write_text(json.dumps(fixture)); body["golden_fixture_sha256"] = __import__("hashlib").sha256(golden.read_bytes()).hexdigest()
     reg.write_text(json.dumps(body))
-    spec = DerivedCausalInputSpec.model_validate({"name": "upstream", "model_id": rec["model_id"]})
+    _write_diagnostic_reuse_closure(study, body)
+    spec = DerivedCausalInputSpec.model_validate({"name": "upstream", "model_id": rec["model_id"],
+                                                  "diagnostic_reuse_policy": _diagnostic_reuse_policy(study, body)})
     with pytest.raises(ModelArtifactError, match="NATIVE_RECOVERY_GOLDEN_MISMATCH"):
         FrozenExternalModelScorer.bind(spec, parent_dir=study)
 
