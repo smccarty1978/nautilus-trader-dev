@@ -1,0 +1,247 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
+# NQ MULTI-TIMEFRAME REGIME PATH ATLAS -- ONE-YEAR PILOT (2023). Phase A, platform commit 4f37a507.
+# The verbatim research contract is docs/questions/nq_mtf_regime_atlas_pilot2023.md.
+study_id: nq_mtf_regime_atlas_pilot2023
+research_question: "# NQ MULTI-TIMEFRAME REGIME PATH ATLAS — ONE-YEAR PILOT (2023)\n## SUPERVISED PLATFORM V2 RESEARCH CONTRACT — DESCRIPTIVE STUDY\n\nThis is the DISPOSABLE PILOT called for in the full contract's §16. It is the\nsame contract with one narrowing: the chronology is 2023 only (§10 below).\nIts purpose is to see the row counts and prove the composition compiles,\nseals and analyses end to end. It is not the deliverable; the six-year study\n`nq_mtf_regime_atlas` is. Close it and delete it.\n\n============================================================\n0. WHAT THIS STUDY IS\n============================================================\nDESCRIPTIVE ORIENTATION. Not falsification.\n\nThere is no hypothesis, no prediction direction, and no kill criteria.\nThe deliverable is a map of how NQ regimes move, at nine timeframes,\nwith their MFE/MAE paths, normalized to ATR.\n\nNothing found here is a finding. Anything that looks like edge becomes\na hypothesis for a separate study with\
+  \ a clean test on prohibited data.\nState this in the closure.\n\n    Instrument:   NQ only (assumption — say so if ES was intended)\n    Sessions:     ETH and RTH, both, distinguished not merged\n\n============================================================\n1. RESEARCH QUESTIONS\n============================================================\nAll descriptive. Each must resolve to a declared output in §8.\n\nQ1  For flips that end positive, what is mean MFE in ATR versus mean\n    realized outcome in ATR? Same for flips that end negative.\n    (The gap between the two is giveback.)\n\nQ2  How fast do losers resolve, relative to winners?\n    Distribution of time-to-resolution by outcome.\n\nQ3  Is the early path different between eventual winners and eventual\n    losers? Compare MFE/MAE at fixed early offsets.\n\nQ4  Is the early path different when the flip is AGAINST the prevailing\n    higher-timeframe regime versus WITH it?\n\nQ5  Does a 1m flip behave differently when aligned with\
+  \ 5m / 15m / 1h\n    than when not? Broken out by which higher timeframes agree.\n\n============================================================\n2. AUTHORITIES TO RESOLVE\n============================================================\nResolve from governed repository authority; do not infer from this\ndocument if registered artifacts specify more precisely:\n\n    regime tracker identity and parameters (the accepted EMA band\n        agreement definition, sticky until opposite conditions met)\n    ATR identity (Wilder 14 unless authority says otherwise)\n    session/calendar authority (Globex, RTH boundaries)\n    completed-bar and ts_init semantics\n    Databento close-time alignment shifts\n\nDataset: NQ 1s Globex V2. Verify through DatasetSpec/registry.\nDo not substitute V0 or legacy catalogs.\n\n============================================================\n3. TIMEFRAMES\n============================================================\n    5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h\n\nNine\
+  \ timeframes, the SAME regime definition on each. Do not vary the\ntracker per timeframe.\n\n5s is included deliberately. Recorded fact, not an objection: 5s EMA\nregime flips are a closed line for entries. Here 5s serves as a context\nand volume-of-observation timeframe, not as a candidate entry.\n\nHost-derive completed higher-timeframe bars. Only completed bars are\nvisible at any decision epoch.\n\n============================================================\n4. POPULATION\n============================================================\nOne row per regime flip, per timeframe, ETH and RTH.\n\n    decision epoch T = the close of the bar on which the flip is\n                       confirmed for that timeframe\n    direction        = the new regime's direction\n    identity         = timeframe + regime start\n\nNo filtering. No minimum age, no MFE floor, no retention gate. This is\na census, not a qualified population. Every flip is a row.\n\n============================================================\n\
+  5. NORMALIZATION — TWO DENOMINATORS\n============================================================\nPRIMARY: the flip's OWN timeframe ATR at T.\nEvery distance, MFE, MAE and outcome for a 5m flip is expressed in 5m\nATR.\n\nSECONDARY: the same quantities in 1h ATR at T.\n\nBoth are required. \"This 1m regime ran 3x its own ATR\" and \"it ran 0.2x\nthe 1h ATR\" are different facts, and the second is closer to what\nalignment is about.\n\nAlso record raw ATR values so the denominators are auditable.\n\n============================================================\n6. OUTCOME AND PATH\n============================================================\nOUTCOME\n    Realized return from the flip bar CLOSE to the next flip bar CLOSE\n    on that same timeframe, signed by direction, in own-timeframe ATR.\n\n    Bar close, not threshold level. This is a standing standard.\n\n    Sign determines winner/loser for Q1.\n\nPATH — fixed offsets, in bars OF THAT TIMEFRAME\n    Record MFE and MAE in ATR at offsets:\
+  \ 1, 2, 3, 5, 10, 20, and\n    terminal (next flip).\n\n    Fixed offsets are what make Q3 and Q4 answerable. Terminal MFE/MAE\n    alone cannot distinguish early path shape.\n\nORDERING — required, not optional\n    time to MFE\n    time to MAE\n    which occurred FIRST\n    MFE retained at regime end (giveback ratio)\n    MAE-before-MFE flag\n\n    The program's most complete prior falsification was correct\n    geometry with a large dollar loss from giveback. Path ordering is\n    the first-class question, not a diagnostic.\n\nCENSORING\n    Regimes still open at session end, at a data gap, or at the\n    chronology boundary are CENSORED and flagged, never treated as\n    resolved. Declare the rule explicitly.\n\n============================================================\n7. FEATURES AT T\n============================================================\nAll available at the decision epoch. No reconstruction after the fact.\n\nALIGNMENT — this is the study, record it, do not derive it\
+  \ later\n    For each of the other eight timeframes, at T:\n        current regime direction\n        current regime age\n        agrees / disagrees with the flipping timeframe\n    Age matters as much as direction. A 1h regime four minutes old is\n    not the same as one six hours old.\n\nVOLATILITY CONTEXT\n    ATR at T, per timeframe\n    ATR percentile vs trailing 20-day, per timeframe\n\nSESSION AND TIME\n    session bucket (Asia / London / NY pre / open / lunch / PM / close)\n    minutes from RTH open, minutes to RTH close\n    day of week\n    ETH / RTH flag\n\nVOLUME\n    relative volume vs same-time-of-day trailing 20-day baseline\n    flip-bar volume vs prior N bars\n    Raw volume is not comparable across 2020-2025. Do not use it alone.\n\nVWAP\n    distance from session VWAP in ATR\n    side of VWAP\n    VWAP slope\n\nPRIOR STATE\n    prior regime on the same timeframe: outcome, efficiency, MFE, duration\n    flip count so far in session on that timeframe\n    overnight gap\
+  \ in ATR\n    distance to prior session high / low in ATR\n\n============================================================\n8. REQUIRED OUTPUTS\n============================================================\nDeclare EVERY table here. The deliverable-producer gate fails at compile\nif any has no producer — which is the point. Discover a missing\nanalysis op in seconds, not after a multi-hour collection.\n\n    T1  Q1: mean/median MFE in ATR vs mean/median realized outcome in\n        ATR, split by outcome sign, by timeframe.\n    T2  Q2: time-to-resolution distribution by outcome sign, by\n        timeframe.\n    T3  Q3: MFE/MAE at offsets 1,2,3,5,10,20 by eventual outcome sign,\n        by timeframe.\n    T4  Q4: T3 broken out by with / against the prevailing higher\n        timeframe.\n    T5  Q5: 1m flip outcome and path by alignment state across\n        5m/15m/1h — each combination reported separately.\n    T6  Population census: flips per timeframe per year, censored\n        counts,\
+  \ ETH vs RTH.\n    T7  Giveback: MFE-retained distribution by timeframe and outcome.\n    T8  Session-bucket breakdown of T1 and T2.\n\nIf a required statistic has no registered producer, route the typed\nanalysis capability gap. Do not create study-local analysis Python.\n\n============================================================\n9. STATISTICAL REQUIREMENT — NOT OPTIONAL\n============================================================\nOverlapping regimes across nine timeframes are NOT independent\nobservations. The same price move appears in every timeframe's rows.\n\nEvery mean or difference reported must carry an uncertainty estimate\nCLUSTERED BY SESSION DAY. Report the cluster count alongside the row\ncount.\n\nThis program has already corrected a t of ~14 down to ~1.39 from\nexactly this error. Naive per-observation statistics on this dataset\nwill be wrong by a large factor.\n\n============================================================\n10. CHRONOLOGY\n============================================================\n\
+  \    EXPLORE:     2023 only\n    NOT OPENED BY THIS PILOT: 2020, 2021, 2022, 2024, 2025\n    PROHIBITED:  2026\n\nThis is the pilot narrowing of the full contract's chronology. 2026 must\nremain untouched -- not collected, not read, not summarized. The other\nEXPLORE years of the full contract are simply not run here; the pilot does\nnot change their authority, and the six-year study opens them.\n\n============================================================\n11. NO ECONOMICS, NO MODELS\n============================================================\nDo NOT:\n    fit any model\n    simulate entries or exits\n    optimize brackets, stops or targets\n    model fills, slippage or costs\n    derive thresholds\n    declare edge\n\nThis study ends at description.\n\n============================================================\n12. INTEGRITY\n============================================================\n    causal availability of every feature at T\n    completed-bar semantics on every derived\
+  \ timeframe\n    Databento close-time shifts applied and evidenced\n    no all-null feature columns\n    feature variance checks\n    censoring flags present and correct\n    unique regime counts distinct from row counts\n    2026 unopened, provable\n\nIf a timeframe legitimately cannot supply a feature, report it and fail\nper canonical null semantics. Do not impute.\n\n============================================================\n13. AUTONOMY\n============================================================\non_capability_gap:\n    MISSING_CAPABILITY / UNSUPPORTED_COMPOSITION\n        -> supervisor launches a fresh capability worker\n        -> generic chore branch, targeted tests, governed promotion\n        -> recompile, reseal, resume\n    A new feature definition follows the promotion path: golden values,\n    causal availability, determinism. It does NOT need a sealed study.\n    INVALID_PARAMETERIZATION\n        -> fresh study-design worker repairs the declarative spec\n    semantics\
+  \ already resolved by this contract\n        -> use this contract, do not ask again\ndeterministic_defect:      auto-repair, bounded\naudit_fixable_defect:      auto-repair, regenerate packet, bounded re-audit\nplatform_merge:            approval_required\nprotected_data:            never broaden chronology authority\nlong_jobs:                 detached, no AI worker waiting\n\nNote for the supervisor: a blocked contract audit currently has no\nre-audit route and will loop to escalation. The manual path is an\nindependent pass, ingest, re-run through seal, resume.\n\n============================================================\n14. ASK THE OWNER ONLY FOR\n============================================================\n    SCIENTIFIC_SEMANTIC_DECISION_REQUIRED not resolved above\n    PROTECTED_DATA_AUTHORIZATION beyond this contract\n    CAUSAL_DEFINITION_AMBIGUOUS\n    RESEARCH_CONTRACT_CONFLICT\n    a required output in §8 with no producer and no reasonable\n        capability route\n \
+  \   repeated escalation after bounded repairs\n\nDo NOT ask about: implementation defects, capability details, test\nfailures, stale seals, audit regeneration, merge mechanics, long-job\ncompletion, or semantics this contract already fixed.\n\n============================================================\n15. CLOSURE\n============================================================\nNQ_MTF_REGIME_ATLAS_PILOT_CARD\n\n    dataset / digest:\n    regime tracker identity:\n    timeframes collected:\n    rows per timeframe:\n    unique regimes per timeframe:\n    cluster (session-day) count:\n    censored fraction per timeframe:\n    ETH / RTH split:\n    T1-T8 produced:            yes / no per table\n    years accessed:            2023 ONLY\n    2026 accessed:             NO\n    models fitted:             NONE\n    economics simulated:       NONE\n\nTERMINAL DECISION\n    DESCRIPTIVE_ATLAS_COMPLETE  (pilot scope: 2023)\n\n    Followed by: nothing in this atlas is a finding. Candidate\n    hypotheses,\
+  \ if any, are listed for separate falsification studies\n    against 2026.\n\n============================================================\n16. OPERATOR SEQUENCE\n============================================================\nThis IS the pilot. When it reaches STUDY_CLOSED, read the T6 census\nfirst: rows and unique regimes per timeframe for one year, censored\nfraction, ETH vs RTH. Nine timeframes with seven path offsets across ETH\nmay be unwieldy; that is what this run is for. Report the counts, then\nstart the six-year study `nq_mtf_regime_atlas` from\n`docs/questions/nq_mtf_regime_atlas.md`.\n\nAny capability added to make this pilot compile and seal is added to the\nplatform once and is already present for the full study.\n\n============================================================\nAPPENDIX A — RECONNAISSANCE (added by the operator, non-authoritative)\n============================================================\nFacts established against `main` at 14e30315 before the study was\n\
+  started. They are evidence, not authority: verify each at compile.\nWhere this appendix and §0-§16 disagree, §0-§16 wins.\n\nA1. TIMEFRAMES ARE EXPRESSIBLE. `research_workflow/grammar/compiler.py`\n    derives any timeframe that is an integer multiple of a declared\n    external stream (`aggregation: complete_bucket`). `NQ_1S_V2_GLOBEX`\n    declares external 1s and 1m, so 5s and 30s derive from 1s and\n    3m/15m/30m/1h/4h derive from 1m. `duration_seconds` accepts the\n    `s|m|h` units, so `1h` and `4h` parse. The seed capability index\n    listing only `.1s/.1m/.5m` streams is a seed list, not a limit.\n    Each non-1m/5m timeframe still needs a regime-bar source in context\n    (a `tracker.regime.dual_ema` on that timeframe, or a\n    `tracker.regime_bar.calendar_bucket`) or the compiler raises the\n    \"feature surface needs a <tf> regime-bar source\" gap.\n\nA2. REGISTERED AND USABLE for §7: `feature.regime_direction`,\n    `feature.regime_age`, `feature.regime_alignment`,\n  \
+  \  `feature.regime_efficiency`, `feature.regime_mfe_atr`,\n    `feature.relative_volume`, `feature.session_membership`,\n    `feature.session_elapsed`,\n    `feature.distance_to_completed_range_high_atr` /\n    `..._low_atr`, `feature.range_atr`, `feature.price_change_atr`.\n    145 feature ids are registered; `research cap search` is the\n    authority, not this list.\n\nA3. NOT REGISTERED anywhere in `features/` (grep returned nothing):\n      - VWAP, in any form. §7's three VWAP features have no provider.\n      - ATR percentile vs a trailing 20-day window. No percentile\n        feature exists.\n    Both are MISSING_CAPABILITY on the feature-definition path\n    (`features/definitions/canonical/<name>.py` + golden evidence +\n    `research feature verify|promote`, per `WORKFLOW.md` §E). This is\n    the governed route and it does NOT need a sealed study.\n\nA4. THE ANALYSIS SURFACE IS THE REAL GAP. Nine analysis ops are\n    registered: `analysis.path.anchored_offsets`,\n    `analysis.incidence.cumulative`,\
+  \ `analysis.decomposition.buckets`,\n    `analysis.anchor.first_threshold_crossing`,\n    `analysis.control.cell_matched`, `analysis.classify.precedence`,\n    `analysis.metric.tail_lift`, `analysis.gate.population_parity`,\n    `analysis.gate.arm_delta_integrity`.\n      - T3 / T4 map onto `analysis.path.anchored_offsets`.\n      - T2 maps partly onto `analysis.incidence.cumulative`.\n      - T1, T6, T7, T8 have NO generic grouped-summary producer\n        (mean / median / quantiles by group).\n      - §9 has NO producer at all: `grep -rn cluster research/analysis/`\n        returns nothing. There is no cluster-robust standard error\n        anywhere in the analysis harness, and §9 makes one mandatory on\n        every reported mean and difference.\n    Expect the compile-time deliverable-producer gate to fail on T1,\n    T6, T7, T8 and on §9, and expect the capability flow to add one\n    grouped-descriptive op and one session-day-clustered uncertainty op\n    before this study can seal.\
+  \ §13 authorizes exactly that; §8 says\n    route it as a typed analysis capability gap rather than writing\n    study-local Python.\n\nA5. PLATFORM FREEZE. The platform is under a declared freeze after\n    `f136a469` (2026-09-10): no platform work until three real studies\n    have run. This study is one of those real studies and §13\n    authorizes capability workers under `platform_merge:\n    approval_required`, so the freeze does not block it — but every\n    capability merge here is an owner-approved exception, not routine."
+
+status: DESIGN_BLOCKED_CAPABILITY_GAP
+dataset_id: NQ_1S_V2_GLOBEX
+platform_commit: 4f37a50796a69ae7f54bf59a8d45185601838341
+phase: A
+
+# ---------------------------------------------------------------------------------------------
+# AUTHORITIES RESOLVED (contract section 2). Verified against the registry at the commit above.
+# ---------------------------------------------------------------------------------------------
+resolved_authorities:
+  dataset: >
+    NQ_1S_V2_GLOBEX (dataset.NQ_1S_V2_GLOBEX, verified). PLATFORM_STATE.json datasets.current.NQ.
+    logical_digest 9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64;
+    reference_digest e577a36165abd690f70221041c4e2b6c7302b876b81d63e7a1f4076b46514514;
+    1636 sessions, 58 early closes. The SUPERSEDED id NQ_1S_V2 and the legacy NQ_v0_2020_2026
+    catalog are NOT bound (PLATFORM_STATE known_warnings W-1-superseded-dataset-id).
+  regime_tracker_identity: >
+    tracker.regime.dual_ema (verified) -- canonical dual-EMA(3/9 high-low) regime state with
+    Wilder ATR(14), parity-tested against the accepted collector_v2 engine
+    (features/tests/test_regime_dual_ema_parity.py). Contract section 3 requires the SAME
+    definition on every timeframe, so only `timeframe` varies; short_period / long_period /
+    atr_period are left at the registered defaults on all nine instances.
+  atr_identity: Wilder ATR(14), carried by tracker.regime.dual_ema (contract section 2 default confirmed).
+  calendar_authority: >
+    CME Globex equity-index product trading/holiday schedule (PLATFORM_STATE calendar_authority).
+    The CME trading-floor close calendar is explicitly NOT authoritative for Globex futures.
+  completed_bar_semantics: >
+    Only completed bars are visible at a decision epoch. 1s and 1m are external streams of the
+    DatasetSpec; 5s / 30s / 3m / 15m / 30m / 1h / 4h are host-derived complete calendar buckets
+    (aggregation: complete_bucket) and compiled cleanly at all nine timeframes.
+  streams_verified: >
+    streams[] resolved with no gap for [1s, 5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h] on
+    NQ_1S_V2_GLOBEX, and all nine tracker.regime.dual_ema + nine tracker.regime.excursion
+    instances bound. Contract Appendix A1 is CONFIRMED for streams and trackers -- and REFUTED
+    for the feature surface (gap_inventory.G3).
+
+# ---------------------------------------------------------------------------------------------
+# TERMINAL DECISIONS -- the science this contract fixes (research_decision.yaml is the authority).
+# ---------------------------------------------------------------------------------------------
+terminal_decisions:
+  study_class: >
+    DESCRIPTIVE ORIENTATION, not falsification (contract section 0). No hypothesis, no prediction
+    direction, no kill criteria. Nothing found here is a finding; any apparent edge becomes a
+    hypothesis for a separate falsification study on prohibited data. model: none, and no
+    economics are simulated (contract section 11).
+  instrument: NQ only (contract section 0, stated assumption; ES is not collected).
+  sessions: >
+    ETH and RTH both, distinguished not merged. population.session: ALL; the ETH/RTH flag is
+    feature.session_membership(session=RTH), never a filter.
+  population: >
+    Census, not a qualified population (contract section 4). NO population.qualify: no minimum
+    age, no MFE floor, no retention gate. One row per regime flip, per timeframe; identity is
+    (timeframe, regime start); direction is the NEW regime's direction; the decision epoch T is
+    the close of the bar on which that timeframe's flip is confirmed.
+  normalization: >
+    PRIMARY denominator is the flip's OWN timeframe ATR at T; SECONDARY is the 1h ATR at T
+    (contract section 5). Both are required. The raw ATR of all nine timeframes is recorded as
+    metadata (atr_5s .. atr_4h) so both denominators are auditable.
+  outcome: >
+    Realized return from the flip bar CLOSE to the NEXT flip bar CLOSE on the same timeframe,
+    signed by direction, in own-timeframe ATR. Bar close, not a threshold level. Encoded as
+    outcome.kind: label with event: <flipping tracker>.flipped and entry_reference: decision_close.
+  censoring_rule: >
+    A regime still open at the session end, at a data gap, or at the chronology boundary is
+    CENSORED and flagged, never treated as resolved (contract section 6). Encoded as
+    session_end: censor plus max_gap: 300s. outcome.horizon: 24h is an OBSERVATION BOUND ONLY --
+    it is longer than any Globex trading day, and SESSION_END precedes HORIZON_EXPIRY in the
+    compiled resolution_precedence, so the session close is what censors. The horizon is NOT a
+    scientific truncation of the terminal. This encoding is currently REFUSED by the compiler
+    (gap_inventory.G2) and has NOT been silently traded for session_end: ignore.
+  path_ordering: >
+    time-to-MFE, time-to-MAE, which occurred FIRST, MFE retained at regime end (giveback ratio)
+    and the MAE-before-MFE flag are FIRST-CLASS, not diagnostics (contract section 6). They are
+    read off the per-bar checkpoint sequence of the running excursion columns
+    (mfe_atr_<tf> / mae_atr_<tf> / pnl_atr_<tf> / retained_<tf>), which is causal at every
+    checkpoint; they are NOT reconstructed from a terminal-only summary.
+  path_offsets: >
+    MFE and MAE in ATR at offsets 1, 2, 3, 5, 10, 20 bars OF THE FLIPPING TIMEFRAME plus terminal
+    (next flip), via analysis.path.anchored_offsets over the per-bar checkpoint rows. The
+    per-timeframe checkpoint cadence is part of gap_inventory.G1; population.cadence:
+    completed_1s in study.yaml is a compile placeholder, NOT the declared science, and must not
+    survive into a sealed study.
+  chronology: >
+    EXPLORE 2023 only. 2026 PROHIBITED -- not collected, not read, not summarized.
+    2020 / 2021 / 2022 / 2024 / 2025 are NOT declared prohibited: they are simply not partitions
+    of this pilot. Declaring 2022 prohibited would conflict with
+    chronology.warmup.days_before_partition (5 calendar days of lead-in immediately before
+    2023-01-01 fall in 2022), and the pilot does not change those years' authority for the
+    six-year study nq_mtf_regime_atlas.
+  statistics: >
+    Overlapping regimes across nine timeframes are NOT independent observations (contract
+    section 9). Every mean or difference reported must carry an uncertainty estimate CLUSTERED BY
+    SESSION DAY, with the cluster count reported alongside the row count. This is mandatory, not
+    optional, and no registered analysis op provides it (gap_inventory.G5).
+  terminal_label: DESCRIPTIVE_ATLAS_COMPLETE (pilot scope 2023).
+
+# ---------------------------------------------------------------------------------------------
+# Predeclared fork policy (WORKFLOW.md N.4). Agents follow these instead of asking again; a
+# genuine semantic choice with no policy here is still a SEMANTIC_DECISION_REQUIRED question.
+# ---------------------------------------------------------------------------------------------
+autonomy_decisions:
+  on_capability_gap: stop_and_handoff                # write CAPABILITY_GAP_HANDOFF, end the session; never build it here
+  platform_change_required: chore_branch_and_fresh_session
+  deterministic_defect: auto_fix                     # fix, add a targeted test, re-run the bounded check
+  calendar_reference_parity: common_interval_exact   # exact on the common calendar interval; Globex-only rows enumerated, descriptive
+  frozen_parent_model: rescore_if_authenticated      # never retrain a frozen parent
+  protected_period: never_expand_authority
+  platform_merge: approval_required                  # contract section 13; the platform freeze after f136a469 makes every merge here an owner-approved exception
+
+# ---------------------------------------------------------------------------------------------
+# CAPABILITY GAP INVENTORY (contract section 13 -> capability worker). Swept as ONE category set,
+# not one gap per freeze cycle. Evidence:
+#   CAPABILITY_GAP_HANDOFF.inventory.json      -- 100 gaps, compiler blocks 1-2
+#   CAPABILITY_GAP_HANDOFF.analysis_probe.json --   6 gaps, compiler block 3 (analysis / deliverables)
+#   CAPABILITY_GAP_HANDOFF.md OWNER ADDENDUM   -- how both were reproduced
+# The compiler short-circuits between blocks, so no single compile can report all of them; both
+# probes were run at platform commit 4f37a507 and are committed alongside this file.
+# ---------------------------------------------------------------------------------------------
+gap_inventory:
+  G0_multi_timeframe_population_fanout:
+    kind: MISSING_CAPABILITY / UNSUPPORTED_COMPOSITION
+    where: [context.flip_population, population.direction, population.anchor_identity, outcome.direction, outcome.atr, outcome.event, features.metadata.flip_timeframe]
+    requirement: >
+      Contract section 4 needs nine simultaneous candidate streams in ONE collection -- one row
+      per (timeframe, regime start), each carrying that timeframe's own direction, own frozen ATR,
+      own bar cadence and own terminal (its next flip). `population:` is single-anchored: one
+      direction, one anchor_identity, one cadence. No registered tracker or trigger primitive fans
+      out: tracker.episode.population_engine, trigger.population.established_filter,
+      trigger.host.completed_bar_cadence and trigger.host.grid_cadence are all single-anchor.
+    why_not_worked_around: >
+      A nine-way OR in population.qualify collapses to ONE row per epoch with ONE direction, which
+      loses the (timeframe, flip) identity the whole atlas is indexed by, and silently drops a
+      second timeframe that flips in the same epoch. Nine separate studies cannot produce T6
+      (cross-timeframe census) or T4/T5 (cross-timeframe alignment) as one deliverable.
+    blocks: [Q1, Q2, Q3, Q4, Q5, T1, T2, T3, T4, T5, T6, T7, T8]
+  G1_unknown_cadence_name_crashes_the_compiler:
+    kind: PLATFORM_DEFECT (deterministic)
+    where: research_workflow/grammar/compiler.py:746 (_resolve_population)
+    evidence: >
+      population.cadence: completed_flipping_timeframe raises
+      ValueError("duration: 'flipping_timeframe' is not a duration like '600s' or '5m'") out of
+      _tf_ns, AFTER the UNAVAILABLE_STREAM gap has already been recorded and `key` reassigned to
+      the finest stream. An unrecognised completed_<name> cadence must return the typed
+      UNAVAILABLE_STREAM gap, not crash the compile (and, when it crashes, no
+      CAPABILITY_GAP_HANDOFF is written at all).
+    repro: python scripts/research.py study compile --study <study with cadence completed_flipping_timeframe> --dry-run
+    workaround_in_study_yaml: population.cadence completed_1s, annotated in place; NOT the declared science.
+  G2_session_end_censoring_on_an_eth_plus_rth_census:
+    kind: AMBIGUOUS_TEMPORAL_SEMANTICS (compiler classification) -- read as a capability gap here
+    where: outcome.session (raised inside _resolve_streams, which short-circuits the whole compile)
+    message: "session-end censoring needs a session with a close; declare outcome.session (e.g. RTH) or session_end: ignore"
+    requirement: >
+      Contract section 0 collects ETH and RTH both, distinguished not merged, so the censoring
+      session is the GLOBEX TRADING DAY -- which NQ_1S_V2_GLOBEX does define (1636 sessions in the
+      committed sessions reference table, calendar authority in PLATFORM_STATE). The grammar
+      admits only RTH / ETH / ALL and refuses session_end in (censor, truncate) whenever the
+      censoring session is ALL, even for a calendar dataset that has a close for it.
+    why_not_worked_around: >
+      outcome.session RTH would censor an 03:00 CT ETH flip at that day's 15:00 CT RTH close, and
+      session_end ignore would drop contract section 6's censoring rule entirely. Both change the
+      science, so neither was taken. This gap is what the committed study.yaml compiles to, and it
+      is the reason CAPABILITY_GAP_HANDOFF.json lists ONE gap while the real inventory is 106.
+  G3_canonical_feature_timeframe_domain_is_5s_1m_5m_only:
+    kind: MISSING_CAPABILITY (feature-definition path, WORKFLOW.md E)
+    where: features.instances (64 UNSUPPORTED_TIMEFRAME_PARAMETER + 10 UNSUPPORTED_FEATURE_PARAMETER_COMBINATION)
+    finding: >
+      Contract Appendix A1 is correct that any integer-multiple timeframe is an expressible STREAM
+      and TRACKER -- and it is WRONG about the feature surface. The registered canonical feature
+      definitions accept only a fixed timeframe domain:
+        feature.regime_direction                  -> ['5m']            (5s, 30s, 1m, 3m, 15m, 30m, 1h, 4h all refused)
+        feature.regime_alignment                  -> ['1m', '5m']      (reference_timeframe 15m and 1h refused)
+        feature.regime_age_min                    -> ['1m', '5m', '5s']
+        feature.regime_efficiency                 -> ['1m', '5m', '5s']
+        feature.regime_mfe_atr                    -> ['1m', '5m', '5s']
+        feature.regime_duration_min               -> ['1m', '5m', '5s']
+        feature.regime_net_directional_move_atr   -> ['1m', '5m', '5s']
+        feature.regime_range_atr                  -> ['1m', '5m', '5s']
+        feature.distance_to_completed_range_high_atr / _low_atr -> ['1m', '5m', '5s']
+      Additionally, context: current with bar_state: completed is an UNSUPPORTED_FEATURE_PARAMETER_
+      COMBINATION for regime_mfe_atr / regime_net_directional_move_atr / regime_efficiency /
+      regime_range_atr at 5s and 1m, while the same combination IS supported at 5m.
+    requirement: widen the declared timeframe domain (and that parameter combination) to 30s, 3m, 15m, 30m, 1h, 4h across the regime feature family, on the golden-evidence promotion path.
+    blocks: "[Q4, Q5, T3, T4, T5] and the section 7 ALIGNMENT block at 7 of 9 timeframes"
+  G4_unregistered_features:
+    kind: MISSING_CAPABILITY (feature-definition path, WORKFLOW.md E)
+    where: features.instances (18 UNKNOWN_CANONICAL_FEATURE)
+    confirms: contract Appendix A3
+    missing:
+      - session VWAP distance in own-timeframe ATR at T
+      - side of session VWAP at T
+      - session VWAP slope at T
+      - ATR percentile versus a trailing 20-day window, per timeframe (9 instances)
+      - session bucket label (Asia / London / NY pre / open / lunch / PM / close)
+      - day of week of the trading session
+      - minutes remaining to the RTH close
+      - overnight gap in ATR
+      - distance to the PRIOR SESSION high in ATR
+      - distance to the PRIOR SESSION low in ATR
+    blocks: "[T8] and the section 7 VOLATILITY CONTEXT / SESSION AND TIME / VWAP / PRIOR STATE blocks"
+  G5_analysis_surface:
+    kind: MISSING_CAPABILITY (analysis op; contract section 8 routes it as a typed analysis capability gap)
+    where: analysis.steps[3..8].op
+    evidence: CAPABILITY_GAP_HANDOFF.analysis_probe.json (6 gaps)
+    confirms: contract Appendix A4
+    missing:
+      - >
+        ONE grouped descriptive summary op: n, mean, median and declared quantiles of declared
+        value columns by declared group keys, censoring-aware. Produces T1, T5, T6, T7, T8.
+      - >
+        ONE cluster-robust uncertainty op: standard error and confidence interval for every
+        reported mean and every reported difference of means, CLUSTERED BY SESSION DAY, reporting
+        the cluster count alongside the row count. Contract section 9 makes this mandatory on
+        every reported number, so without it NOTHING in T1-T8 is reportable.
+    already_registered_and_compiling:
+      - analysis.path.anchored_offsets  -> T3 and T4 (compiled cleanly with the declared params)
+      - analysis.incidence.cumulative   -> T2 (compiled cleanly with the declared params)
+    blocks: "[T1, T5, T6, T7, T8] and the section 9 uncertainty on every table"
+
+# ---------------------------------------------------------------------------------------------
+# Not asked of the owner (contract section 14 forbids it): capability details, implementation
+# defects, merge mechanics. Every item above is a capability route, not a scientific question.
+# No SCIENTIFIC_SEMANTIC_DECISION_REQUIRED was reached: every semantic choice this design needed
+# was already fixed by the contract and is recorded in terminal_decisions above.
+# ---------------------------------------------------------------------------------------------
+open_questions_for_the_owner: []
