@@ -1,0 +1,45 @@
+{
+  "artifacts": [
+    "studies/rehearsal_checkpoint_norm/CAPABILITY_GAP_HANDOFF.json",
+    "studies/rehearsal_checkpoint_norm/CAPABILITY_GAP_HANDOFF.md"
+  ],
+  "blocker_code": "CAPABILITY_GAP",
+  "branch": "study/rehearsal_checkpoint_norm",
+  "changed_files": [
+    "studies/rehearsal_checkpoint_norm/study.yaml",
+    "studies/rehearsal_checkpoint_norm/research_decision.yaml",
+    "studies/rehearsal_checkpoint_norm/SPEC.md"
+  ],
+  "commits": [
+    "458d26bdad6f13b41a0a7ed1eb9f483f18ef4d8a"
+  ],
+  "compiled_plan_sha256": null,
+  "expected_branch": "study/rehearsal_checkpoint_norm",
+  "expected_worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm",
+  "extra": {},
+  "head_commit": "458d26bdad6f13b41a0a7ed1eb9f483f18ef4d8a",
+  "next_exact_action": "Fresh capability session implements structural_max_expansion_checkpoint_atr as a feature DEFINITION under features/definitions on a chore branch, then a fresh study session merges main and recompiles",
+  "next_state": "CAPABILITY_IMPLEMENTATION",
+  "notes": "Compile BLOCKED. Gap 1 MISSING_CAPABILITY feature structural_max_expansion_checkpoint_atr, genuine. Gap 2 UNSUPPORTED_COMPOSITION population.qualify is DOWNSTREAM of gap 1 (compiler skips the features host when a feature fails), the same predicate compiles in es_180s_model_c_portability. Do not edit qualify.",
+  "packet_sha256": "6547b42d65569924b3b8df8204f418ab12b9b5ff0fd1dc5adffff6110584ebaf",
+  "platform_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "protected_data_accessed": false,
+  "provider": "claude",
+  "report": null,
+  "schema_version": 1,
+  "scientific_decisions_changed": [],
+  "session_id": "766fd46d-4731-40cf-a62a-e1421d5bdede",
+  "session_type": "STUDY_DESIGN_COMPILE",
+  "source_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "status": "BLOCKED",
+  "study_contract_sha256": "633f807aa88729f26d61114ad199180c14c4339e99d2ec962c17f7606da0b5f0",
+  "study_id": "rehearsal_checkpoint_norm",
+  "task_id": "001_study_design_compile_a6c435cc",
+  "tests": {
+    "command": null,
+    "fixed": null,
+    "known": null,
+    "new_failures": null
+  },
+  "worker_role": "primary-owner"
+}

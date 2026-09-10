@@ -1,0 +1,32 @@
+{
+  "execution_composite_sha256": "73db2ed0f21316e4c0a5b04790a37910824f37dc67d964a30d020c39dc6b75f7",
+  "log": {
+    "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\logs\\collection.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "outputs": [
+    {
+      "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\partitions\\train\\2023\\candidates.parquet",
+      "sha256": "b7e1f9ecb6e13599a6817a224bcb17e4e9659de9ec68d859f499b72463f9effe"
+    },
+    {
+      "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\partitions\\train\\2023\\observations.parquet",
+      "sha256": "20c70adee79a69632fa71a247f13eb3c6a10bfa0d77c8e5a81dff8265ffad3e1"
+    }
+  ],
+  "partitions": [
+    {
+      "id": "train-2023",
+      "manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\partitions\\train\\2023\\manifest.json",
+      "rows": {
+        "candidates": 877040,
+        "observations": 877040
+      },
+      "status": "PASS",
+      "year": 2023
+    }
+  ],
+  "schema_version": 1,
+  "stage": "collection",
+  "status": "PASS"
+}

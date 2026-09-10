@@ -1,0 +1,46 @@
+{
+  "artifacts": [],
+  "blocker_code": null,
+  "branch": "chore/rehearsal_checkpoint_norm-missing_capability",
+  "changed_files": [
+    "features/definitions/canonical.py",
+    "features/registry.py",
+    "features/tests/test_structural_expansion_normalizer_parameter.py",
+    "features/tests/golden/feature_resolution.json"
+  ],
+  "commits": [
+    "037e0645"
+  ],
+  "compiled_plan_sha256": null,
+  "expected_branch": "chore/rehearsal_checkpoint_norm-missing_capability",
+  "expected_worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm-missing_capability",
+  "extra": {},
+  "head_commit": "037e0645234d6b3e5649f3972b31f8c01af6d6ec",
+  "next_exact_action": "Merge the chore branch, then the design worker re-declares study.yaml instance[4] as feature structural_max_expansion_atr with context current and normalizer checkpoint_atr",
+  "next_state": "CAPABILITY_COMPLETE",
+  "notes": "The checkpoint reading is a normalizer PARAMETER of structural_max_expansion_atr, already verified in the active bundle, so no feature-authority change was needed. c94bfb3c reverted. Compile probe on the study spec gives COMPILED with 5 features. Study must re-declare instance[4].",
+  "packet_sha256": "605b9c3ba1c6ad7546d10b40535adce0e17889c137d81ae902d52f6b19a6e2bd",
+  "platform_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "protected_data_accessed": false,
+  "provider": "claude",
+  "report": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\003_capability_implementation_d912acc2.report.md",
+  "schema_version": 1,
+  "scientific_decisions_changed": [],
+  "session_id": "943437be-8a65-49a7-bd48-085e8a439ffb",
+  "session_type": "CAPABILITY_IMPLEMENTATION",
+  "source_commit": "c94bfb3c4051a4ff659585d799849b84d11889b5",
+  "status": "DONE",
+  "study_contract_sha256": "133d2d6dfe27ef3f68eaee8ff9c2e15eed106e2fcb7d20b9d686e85e16070be2",
+  "study_id": "rehearsal_checkpoint_norm",
+  "task_id": "003_capability_implementation_d912acc2",
+  "tests": {
+    "command": "python scripts/test_delta.py features/tests",
+    "fixed": 0,
+    "known": 0,
+    "new_failures": 2,
+    "note": "both BASELINE_COMMIT_MISMATCH and both reproduce on clean 8bf26857",
+    "passed": 75,
+    "ran": 77
+  },
+  "worker_role": "implementer"
+}

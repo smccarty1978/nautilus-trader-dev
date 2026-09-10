@@ -1,0 +1,48 @@
+{
+  "partition": "train",
+  "platform": "v2",
+  "plan_sha256": "9eb2ff0d6e63a72a48a48342d6b7d72cadb371e7528626ead3261eb0944570e6",
+  "execution_composite_sha256": "73db2ed0f21316e4c0a5b04790a37910824f37dc67d964a30d020c39dc6b75f7",
+  "feature_sets": {
+    "primary": [
+      "prior_1m_regime_efficiency",
+      "prior_5m_regime_efficiency",
+      "rolling_300s_giveback_atr",
+      "structural_max_expansion_atr"
+    ]
+  },
+  "preprocessing_hash": "identity",
+  "model_hashes": {
+    "primary": "d3cfd7621897d1e18d0c6827c98ca79785f77b6828fee1aab72ca00cca17452d"
+  },
+  "model_canonical_sha256": {
+    "primary": "27bc73fb54a9b4d4cd814c30304004cacda66cee3db6e5bc93b064fdcb5f3d02"
+  },
+  "thresholds": {},
+  "deciles": {},
+  "new_models_trained": true,
+  "merge_identity": {
+    "authority": "plan.chronology.train",
+    "candidates_identity": "719625bb72d94d48b653caa0ef503d0e82604bd89dc748a507236c4347a1a01e",
+    "candidates_sha256": "b7e1f9ecb6e13599a6817a224bcb17e4e9659de9ec68d859f499b72463f9effe",
+    "generated_at_utc": "2026-09-09T14:19:24.136224+00:00",
+    "observations_identity": "5019ead21f9064ae151644225feb00a7dcdf87682f475ccce400e13c8e085671",
+    "observations_sha256": "20c70adee79a69632fa71a247f13eb3c6a10bfa0d77c8e5a81dff8265ffad3e1",
+    "plan_sha256": "9eb2ff0d6e63a72a48a48342d6b7d72cadb371e7528626ead3261eb0944570e6",
+    "rows": 877040,
+    "years": [
+      2023
+    ]
+  },
+  "metrics": {
+    "final_validation": null,
+    "folds": [],
+    "tuning": null
+  },
+  "label_column": "target_flip_within_horizon",
+  "schema_version": 1,
+  "study_id": "rehearsal_checkpoint_norm",
+  "authorization_sha256": "82c2fbbfc46442acc847520fffbb2bd4a8027a46d92fe015632156b822d8fced",
+  "generated_at_utc": "2026-09-09T14:19:30.557753+00:00",
+  "freeze_sha256": "01edf9f0d31660dbe333d36219f91c7d0a59955c6c8a21430b38d8c66fab48da"
+}

@@ -1,0 +1,32 @@
+{
+  "execution_composite_sha256": "73db2ed0f21316e4c0a5b04790a37910824f37dc67d964a30d020c39dc6b75f7",
+  "log": {
+    "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\logs\\oos.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "outputs": [
+    {
+      "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\partitions\\oos\\2024\\candidates.parquet",
+      "sha256": "7fc5004497dbb86375b5b54d945526f4b3b4e6808667fbcb5da8934a36a1c15e"
+    },
+    {
+      "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\partitions\\oos\\2024\\observations.parquet",
+      "sha256": "7ae91eb4f1fc310b0f5c7d7e648996c8f0b4a5fe5b391a2f4f204859f9d13cc2"
+    }
+  ],
+  "partitions": [
+    {
+      "id": "oos-2024",
+      "manifest": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\partitions\\oos\\2024\\manifest.json",
+      "rows": {
+        "candidates": 867422,
+        "observations": 867422
+      },
+      "status": "PASS",
+      "year": 2024
+    }
+  ],
+  "schema_version": 1,
+  "stage": "oos",
+  "status": "PASS"
+}

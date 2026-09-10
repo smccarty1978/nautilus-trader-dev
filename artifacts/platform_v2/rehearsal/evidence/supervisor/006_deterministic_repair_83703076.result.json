@@ -1,0 +1,43 @@
+{
+  "artifacts": [],
+  "blocker_code": "PLATFORM_DEFECT",
+  "branch": "study/rehearsal_checkpoint_norm",
+  "changed_files": [
+    "studies/rehearsal_checkpoint_norm/research_decision.yaml",
+    "studies/rehearsal_checkpoint_norm/SPEC.md",
+    "studies/rehearsal_checkpoint_norm/study.yaml",
+    "studies/rehearsal_checkpoint_norm/compiled_plan.json"
+  ],
+  "commits": [
+    "3b63ccd250c370a654dd54f3336d130e34f2d297"
+  ],
+  "compiled_plan_sha256": "fb6167eb0185ccb3f5247b5879565dd2b95ba56743b2db77b5e416a7529302d1",
+  "expected_branch": "study/rehearsal_checkpoint_norm",
+  "expected_worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm",
+  "extra": {},
+  "head_commit": "3b63ccd250c370a654dd54f3336d130e34f2d297",
+  "next_exact_action": "launch CONTRACT_AUDIT pass 02 against composite 73db2ed0f213 and spec a20e2be9efe2 with an identity distinct from contract-checker:005_contract_audit_f4bffac6",
+  "next_state": "NEEDS_CONTRACT_AUDIT",
+  "notes": "Study-side defect FIXED and committed 3b63ccd2 (CRITICAL-1 plus WARNING-2, WARNING-3, NOTE-1 swept together, recompiled 9eb2ff0d6e63). Controller still CONTRACT_BLOCKER because audit currency keys on the execution composite alone, so a repair can never clear an audit verdict. PLATFORM DEFECT: supervisor core routes AUDIT_BLOCKER only to launch_repair, with no re-audit route, so it loops repair workers to MAX_ATTEMPTS. See report.",
+  "packet_sha256": "1bb3654d4c936ec7c76bf63a3c925bd25440f335aff9ad156b9101a2d92eb16f",
+  "platform_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "protected_data_accessed": false,
+  "provider": "claude",
+  "report": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\006_deterministic_repair_83703076.report.md",
+  "schema_version": 1,
+  "scientific_decisions_changed": [],
+  "session_id": "fc21c7d4-5d6d-4251-9b53-684b74c637c9",
+  "session_type": "DETERMINISTIC_REPAIR",
+  "source_commit": "5ae67a7d7a7fc3d3365091b59ae00330348f136b",
+  "status": "BLOCKED",
+  "study_contract_sha256": "4a7165ac899da5685cdc05a380cfe0b86da016785d9333a0a2d46753211b9670",
+  "study_id": "rehearsal_checkpoint_norm",
+  "task_id": "006_deterministic_repair_83703076",
+  "tests": {
+    "command": "python scripts/run_governed_study.py --study studies/rehearsal_checkpoint_norm --through seal",
+    "fixed": 0,
+    "known": 0,
+    "new_failures": 0
+  },
+  "worker_role": "implementer"
+}

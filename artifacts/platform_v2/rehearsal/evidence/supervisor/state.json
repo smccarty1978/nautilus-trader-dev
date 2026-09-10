@@ -1,0 +1,446 @@
+{
+  "active_capability": {
+    "attempt_key": "CAPABILITY:281b545aea887c91a4a2000b20f8a0dd8a9f7017daaeccf0d08d66f26bf7a894",
+    "base_commit": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+    "chore_branch": "chore/rehearsal_checkpoint_norm-missing_capability",
+    "chore_worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm-missing_capability",
+    "handoff_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\CAPABILITY_GAP_HANDOFF.json",
+    "handoff_sha256": "281b545aea887c91a4a2000b20f8a0dd8a9f7017daaeccf0d08d66f26bf7a894",
+    "merge_gate": {
+      "checks": {
+        "cap_generate_check": {
+          "rc": 0,
+          "tail": "ken\": 0, \"count\": 143}, \"model_drivers\": {\"broken\": 0, \"count\": 4}, \"outcomes\": {\"broken\": 0, \"count\": 8}, \"streams\": {\"broken\": 0, \"count\": 21}, \"total\": 224, \"trackers\": {\"broken\": 0, \"count\": 7}, \"trigger_primitives\": {\"broken\": 0, \"count\": 6}, \"validation_protocols\": {\"broken\": 0, \"count\": 8}}}\n"
+        },
+        "card_head": "037e0645234d6b3e5649f3972b31f8c01af6d6ec",
+        "chore_head": "037e0645234d6b3e5649f3972b31f8c01af6d6ec",
+        "diff_files": [
+          "features/definitions/canonical.py",
+          "features/registry.py",
+          "features/tests/golden/feature_resolution.json",
+          "features/tests/test_structural_expansion_normalizer_parameter.py"
+        ],
+        "outside_write_surface": [
+          "features/definitions/canonical.py",
+          "features/tests/golden/feature_resolution.json",
+          "features/tests/test_structural_expansion_normalizer_parameter.py"
+        ],
+        "result_status": "DONE",
+        "test_delta_new_failures": 2
+      },
+      "green": false,
+      "policy": "approval_required",
+      "reasons": [
+        "diff outside the claimed write surface: ['features/definitions/canonical.py', 'features/tests/golden/feature_resolution.json', 'features/tests/test_structural_expansion_normalizer_parameter.py']",
+        "test_delta new_failures=2 (must be 0)"
+      ]
+    },
+    "result_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\003_capability_implementation_d912acc2.result.json",
+    "started_at_utc": "2026-09-09T12:23:58.528562+00:00",
+    "status": "implementing",
+    "task_id": "003_capability_implementation_d912acc2",
+    "topic": "rehearsal_checkpoint_norm-missing_capability",
+    "write_paths": [
+      "features/library.py",
+      "features/library_mtf.py",
+      "features/registry.py",
+      "features/trackers/host_bindings.py",
+      "research_workflow/grammar/compiler.py",
+      "research_workflow/grammar/predicates.py",
+      "research_workflow/host/predicate_eval.py",
+      "research_workflow/provider_host.py"
+    ]
+  },
+  "active_job": null,
+  "active_worker": null,
+  "attempts": {
+    "ANALYSIS_DECISION:default": 1,
+    "JOB:analyze": 0,
+    "JOB:close": 0
+  },
+  "blocker_streak": 0,
+  "consumed_handoffs": [],
+  "consumed_results": [
+    "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\001_study_design_compile_a6c435cc.result.json",
+    "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\002_capability_implementation_84a59b58.result.json",
+    "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\003_capability_implementation_d912acc2.result.json",
+    "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\004_causal_audit_300a825d.result.json",
+    "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\005_contract_audit_f4bffac6.result.json",
+    "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\006_deterministic_repair_83703076.result.json",
+    "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\007_analysis_decision_a1f72277.result.json"
+  ],
+  "controller_command": null,
+  "counters": {
+    "jobs_launched": 4,
+    "max_packet_bytes": 8243,
+    "ticks": 133,
+    "user_interventions": 2,
+    "worker_cost_usd": 27.331601,
+    "worker_permission_denials": 1,
+    "worker_turns": 301,
+    "workers_launched": 7
+  },
+  "created_at_utc": "2026-09-09T12:16:31.485086+00:00",
+  "current_phase": "D",
+  "derived_from": {
+    "studies/rehearsal_checkpoint_norm/artifacts/study_closure.json": "9f4b82f294addd01681156f4131bbef1eb679d595e95397c358e884070b870e0"
+  },
+  "derived_state": "STUDY_CLOSED",
+  "execute_authorized": true,
+  "last_blocker_code": null,
+  "last_completed_deterministic_artifact": {
+    "STATUS": "OK",
+    "blocker_code": null,
+    "fresh": true,
+    "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm\\studies\\rehearsal_checkpoint_norm\\_work\\controller\\status.json",
+    "sha256": "b944f14c483187c912bd3ffbd8ab359f7fcd15c8ebef246aa355d05ab96b5fa1",
+    "state": "STUDY_CLOSED",
+    "through": "close"
+  },
+  "next_action": "git switch main && git merge --no-ff study/rehearsal_checkpoint_norm  (WORKFLOW.md section M.6)",
+  "options": {},
+  "platform_commit_at_start": "8bf26857f95b88846ce9c2dc142cb55112101dca",
+  "provider": "claude",
+  "providers": {
+    "claude": {
+      "ATTENDED_SUPPORTED": true,
+      "AVAILABLE": true,
+      "CLI_VERSION": "2.1.265 (Claude Code)",
+      "HEADLESS_SUPPORTED": true,
+      "READ_ONLY_SUPPORTED": true,
+      "SESSION_IDENTITY_SOURCE": "NT_RESEARCH_AGENT_SESSION (launcher env) + --session-id when supported",
+      "WRITE_SUPPORTED": true,
+      "binary": "C:\\Users\\Scott McCarty\\.local\\bin\\claude.EXE",
+      "flags": {
+        "--add-dir": true,
+        "--allowedTools": true,
+        "--bare": true,
+        "--dangerously-skip-permissions": true,
+        "--disallowedTools": true,
+        "--max-budget-usd": true,
+        "--max-turns": false,
+        "--no-session-persistence": true,
+        "--output-format": true,
+        "--permission-mode": true,
+        "--print": true,
+        "--session-id": true,
+        "--tools": true,
+        "-p": true
+      },
+      "probe_output_sha256": "5a92a73fedbc1df913ef670e1aae9bcbef80df9a78ab03c4abccd00c97ff4e46",
+      "probed_at_utc": "2026-09-09T12:16:31.485098+00:00",
+      "provider": "claude"
+    }
+  },
+  "question_path": "C:\\Users\\Scott McCarty\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\20f45ea6-fe49-46f2-96a9-072adb25bb4d\\scratchpad\\question_rehearsal.md",
+  "question_sha256": "8d15be4e7126f943956bf23a6d515144e2443e01ff9ad8e82340a375eae4739b",
+  "repo_root": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader",
+  "schema_version": 1,
+  "stopped": false,
+  "study_branch": "study/rehearsal_checkpoint_norm",
+  "study_id": "rehearsal_checkpoint_norm",
+  "study_worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-rehearsal_checkpoint_norm",
+  "supervisor_session_id": "6de0be62-f84b-4b6c-87e9-7d2d80496514",
+  "terminal": true,
+  "updated_at_utc": "2026-09-09T14:37:28.166251+00:00",
+  "user_decision": {
+    "answer": {
+      "retry": true
+    },
+    "answered": true,
+    "answered_at_utc": "2026-09-09T14:10:35.867862+00:00",
+    "card_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\USER_DECISION_02.json",
+    "code": "SUPERVISOR_ESCALATION_REQUIRED",
+    "question": "worker 006_deterministic_repair_83703076 reports a platform defect: Study-side defect FIXED and committed 3b63ccd2 (CRITICAL-1 plus WARNING-2, WARNING-3, NOTE-1 swept together, recompiled 9eb2ff0d6e63). Controller still CONTRACT_BLOCKER because audit currency keys on the execution composite alone, so a repair can never clear an audit verdict. PLATFORM DEFECT: supervisor core routes AUDIT_BLOCKER only to launch_repair, with no re-audit route, so it loops repair workers to MAX_ATTEMPTS. See report. -- answer {\"retry\": true} to reset the attempt counters, anything else to stop",
+    "raised_at_utc": "2026-09-09T13:56:44.997582+00:00"
+  },
+  "user_intervention_required": false,
+  "worker_history": [
+    {
+      "audit_packet_bytes": null,
+      "brief_bytes": null,
+      "changed_files": [
+        "studies/rehearsal_checkpoint_norm/study.yaml",
+        "studies/rehearsal_checkpoint_norm/research_decision.yaml",
+        "studies/rehearsal_checkpoint_norm/SPEC.md"
+      ],
+      "commits": [
+        "458d26bdad6f13b41a0a7ed1eb9f483f18ef4d8a"
+      ],
+      "field": null,
+      "finished_at_utc": "2026-09-09T12:23:47.324007+00:00",
+      "metrics": {
+        "cache_creation_input_tokens": 71932,
+        "cache_read_input_tokens": 2049510,
+        "denied_commands": [],
+        "duration_api_ms": 204318,
+        "duration_ms": 371040,
+        "input_tokens": 64,
+        "is_error": false,
+        "models": [
+          "claude-haiku-4-5-20251001",
+          "claude-opus-5"
+        ],
+        "num_turns": 32,
+        "output_tokens": 14642,
+        "permission_denials": 0,
+        "stop_reason": "end_turn",
+        "subtype": "success",
+        "total_cost_usd": 2.1114999999999995
+      },
+      "packet_bytes": 7230,
+      "reason": "CAPABILITY_GAP",
+      "result_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\001_study_design_compile_a6c435cc.result.json",
+      "session_id": "766fd46d-4731-40cf-a62a-e1421d5bdede",
+      "session_type": "STUDY_DESIGN_COMPILE",
+      "started_at_utc": "2026-09-09T12:16:41.837535+00:00",
+      "status": "BLOCKED",
+      "task_id": "001_study_design_compile_a6c435cc",
+      "wall_s": 425.486472
+    },
+    {
+      "audit_packet_bytes": null,
+      "brief_bytes": null,
+      "changed_files": [
+        "features/definitions/canonical.py",
+        "features/tests/test_structural_max_expansion_checkpoint_atr.py",
+        "features/tests/golden/feature_resolution.json",
+        "features/tests/test_feature_definition_boundary.py"
+      ],
+      "commits": [
+        "c94bfb3c"
+      ],
+      "field": null,
+      "finished_at_utc": "2026-09-09T12:40:22.948783+00:00",
+      "metrics": {
+        "cache_creation_input_tokens": 188198,
+        "cache_read_input_tokens": 10256017,
+        "denied_commands": [],
+        "duration_api_ms": 653640,
+        "duration_ms": 910465,
+        "input_tokens": 162,
+        "is_error": false,
+        "models": [
+          "claude-haiku-4-5-20251001",
+          "claude-opus-5"
+        ],
+        "num_turns": 88,
+        "output_tokens": 46134,
+        "permission_denials": 0,
+        "stop_reason": "end_turn",
+        "subtype": "success",
+        "total_cost_usd": 8.165186499999999
+      },
+      "packet_bytes": 8111,
+      "reason": "FEATURE_AUTHORITY_PROMOTION_PATH_ABSENT",
+      "result_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\002_capability_implementation_84a59b58.result.json",
+      "session_id": "aaa79c62-2993-4684-8760-f78820a678e4",
+      "session_type": "CAPABILITY_IMPLEMENTATION",
+      "started_at_utc": "2026-09-09T12:24:17.301528+00:00",
+      "status": "BLOCKED",
+      "task_id": "002_capability_implementation_84a59b58",
+      "wall_s": 965.647255
+    },
+    {
+      "audit_packet_bytes": null,
+      "brief_bytes": null,
+      "changed_files": [
+        "features/definitions/canonical.py",
+        "features/registry.py",
+        "features/tests/test_structural_expansion_normalizer_parameter.py",
+        "features/tests/golden/feature_resolution.json"
+      ],
+      "commits": [
+        "037e0645"
+      ],
+      "field": null,
+      "finished_at_utc": "2026-09-09T12:54:44.136894+00:00",
+      "metrics": {
+        "cache_creation_input_tokens": 169267,
+        "cache_read_input_tokens": 7617944,
+        "denied_commands": [],
+        "duration_api_ms": 723956,
+        "duration_ms": 840250,
+        "input_tokens": 134,
+        "is_error": false,
+        "models": [
+          "claude-haiku-4-5-20251001",
+          "claude-opus-5"
+        ],
+        "num_turns": 67,
+        "output_tokens": 55386,
+        "permission_denials": 0,
+        "stop_reason": "end_turn",
+        "subtype": "success",
+        "total_cost_usd": 6.888034000000001
+      },
+      "packet_bytes": 8121,
+      "reason": null,
+      "result_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\003_capability_implementation_d912acc2.result.json",
+      "session_id": "943437be-8a65-49a7-bd48-085e8a439ffb",
+      "session_type": "CAPABILITY_IMPLEMENTATION",
+      "started_at_utc": "2026-09-09T12:40:38.593352+00:00",
+      "status": "DONE",
+      "task_id": "003_capability_implementation_d912acc2",
+      "wall_s": 845.543542
+    },
+    {
+      "audit_packet_bytes": 18978,
+      "brief_bytes": 10831,
+      "changed_files": [],
+      "commits": [],
+      "field": null,
+      "finished_at_utc": "2026-09-09T13:40:52.543669+00:00",
+      "metrics": {
+        "cache_creation_input_tokens": 88883,
+        "cache_read_input_tokens": 723563,
+        "denied_commands": [],
+        "duration_api_ms": 294046,
+        "duration_ms": 295278,
+        "input_tokens": 24,
+        "is_error": false,
+        "models": [
+          "claude-haiku-4-5-20251001",
+          "claude-opus-5"
+        ],
+        "num_turns": 15,
+        "output_tokens": 21289,
+        "permission_denials": 0,
+        "stop_reason": "end_turn",
+        "subtype": "success",
+        "total_cost_usd": 1.7840285000000002
+      },
+      "packet_bytes": 8193,
+      "reason": null,
+      "result_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\004_causal_audit_300a825d.result.json",
+      "session_id": "86dd53cf-566d-44a8-9f0c-a8864b37204e",
+      "session_type": "CAUSAL_AUDIT",
+      "started_at_utc": "2026-09-09T13:35:43.861394+00:00",
+      "status": "DONE",
+      "task_id": "004_causal_audit_300a825d",
+      "wall_s": 308.682275
+    },
+    {
+      "audit_packet_bytes": 17705,
+      "brief_bytes": 10479,
+      "changed_files": [],
+      "commits": [],
+      "field": null,
+      "finished_at_utc": "2026-09-09T13:47:28.424725+00:00",
+      "metrics": {
+        "cache_creation_input_tokens": 66293,
+        "cache_read_input_tokens": 779682,
+        "denied_commands": [
+          "git -C \"C:/Users/Scott McCarty/Projects/Nautilus Trader-rehearsal_checkpoint_norm\" show --stat 5ae67a7d"
+        ],
+        "duration_api_ms": 252313,
+        "duration_ms": 253396,
+        "input_tokens": 26,
+        "is_error": false,
+        "models": [
+          "claude-haiku-4-5-20251001",
+          "claude-opus-5"
+        ],
+        "num_turns": 15,
+        "output_tokens": 18508,
+        "permission_denials": 1,
+        "stop_reason": "end_turn",
+        "subtype": "success",
+        "total_cost_usd": 1.5166540000000004
+      },
+      "packet_bytes": 8243,
+      "reason": null,
+      "result_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\005_contract_audit_f4bffac6.result.json",
+      "session_id": "81df46dd-0ffc-4772-80d7-3f539758524e",
+      "session_type": "CONTRACT_AUDIT",
+      "started_at_utc": "2026-09-09T13:42:19.753970+00:00",
+      "status": "DONE",
+      "task_id": "005_contract_audit_f4bffac6",
+      "wall_s": 308.670755
+    },
+    {
+      "audit_packet_bytes": null,
+      "brief_bytes": null,
+      "changed_files": [
+        "studies/rehearsal_checkpoint_norm/research_decision.yaml",
+        "studies/rehearsal_checkpoint_norm/SPEC.md",
+        "studies/rehearsal_checkpoint_norm/study.yaml",
+        "studies/rehearsal_checkpoint_norm/compiled_plan.json"
+      ],
+      "commits": [
+        "3b63ccd250c370a654dd54f3336d130e34f2d297"
+      ],
+      "field": null,
+      "finished_at_utc": "2026-09-09T13:56:44.997020+00:00",
+      "metrics": {
+        "cache_creation_input_tokens": 114237,
+        "cache_read_input_tokens": 4104000,
+        "denied_commands": [],
+        "duration_api_ms": 484581,
+        "duration_ms": 499893,
+        "input_tokens": 96,
+        "is_error": false,
+        "models": [
+          "claude-haiku-4-5-20251001",
+          "claude-opus-5"
+        ],
+        "num_turns": 48,
+        "output_tokens": 37159,
+        "permission_denials": 0,
+        "stop_reason": "end_turn",
+        "subtype": "success",
+        "total_cost_usd": 4.1248569999999996
+      },
+      "packet_bytes": 7208,
+      "reason": "PLATFORM_DEFECT",
+      "result_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\006_deterministic_repair_83703076.result.json",
+      "session_id": "fc21c7d4-5d6d-4251-9b53-684b74c637c9",
+      "session_type": "DETERMINISTIC_REPAIR",
+      "started_at_utc": "2026-09-09T13:47:39.412113+00:00",
+      "status": "BLOCKED",
+      "task_id": "006_deterministic_repair_83703076",
+      "wall_s": 545.584907
+    },
+    {
+      "audit_packet_bytes": null,
+      "brief_bytes": null,
+      "changed_files": [
+        "studies/rehearsal_checkpoint_norm/artifacts/analysis_decision.json",
+        "studies/rehearsal_checkpoint_norm/artifacts/analysis_decision.md"
+      ],
+      "commits": [
+        "d1ac6777"
+      ],
+      "field": null,
+      "finished_at_utc": "2026-09-09T14:34:58.544347+00:00",
+      "metrics": {
+        "cache_creation_input_tokens": 90089,
+        "cache_read_input_tokens": 2065085,
+        "denied_commands": [],
+        "duration_api_ms": 401515,
+        "duration_ms": 413932,
+        "input_tokens": 56,
+        "is_error": false,
+        "models": [
+          "claude-haiku-4-5-20251001",
+          "claude-opus-5"
+        ],
+        "num_turns": 36,
+        "output_tokens": 32262,
+        "permission_denials": 0,
+        "stop_reason": "end_turn",
+        "subtype": "success",
+        "total_cost_usd": 2.7413404999999997
+      },
+      "packet_bytes": 7113,
+      "reason": null,
+      "result_path": "C:\\Users\\Scott McCarty\\.nt_research\\supervisor\\rehearsal_checkpoint_norm\\results\\007_analysis_decision_a1f72277.result.json",
+      "session_id": "7a062aee-5f16-4899-92a9-842e6c0bace4",
+      "session_type": "ANALYSIS_DECISION",
+      "started_at_utc": "2026-09-09T14:27:52.983731+00:00",
+      "status": "DONE",
+      "task_id": "007_analysis_decision_a1f72277",
+      "wall_s": 425.560616
+    }
+  ]
+}

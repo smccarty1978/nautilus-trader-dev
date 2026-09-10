@@ -1,0 +1,79 @@
+{
+  "family": "lightgbm",
+  "features": [
+    "prior_1m_regime_efficiency",
+    "prior_5m_regime_efficiency",
+    "rolling_300s_giveback_atr",
+    "structural_max_expansion_atr"
+  ],
+  "final_train_validation_years": [],
+  "fold_protocol": "expanding_years",
+  "generated_at_utc": "2026-09-09T14:19:28.898419+00:00",
+  "hyperparameters": {
+    "deterministic": true,
+    "learning_rate": 0.05,
+    "max_depth": 3,
+    "min_data_in_leaf": 50,
+    "n_estimators": 100,
+    "n_jobs": 1,
+    "num_leaves": 7,
+    "verbosity": -1
+  },
+  "label_column": "target_flip_within_horizon",
+  "metrics": {
+    "final_validation": null,
+    "folds": [],
+    "tuning": null
+  },
+  "model_id": "d3cfd7621897d1e18d0c6827c98ca79785f77b6828fee1aab72ca00cca17452d",
+  "model_store_tier": "registry",
+  "models": [
+    {
+      "arm": "primary",
+      "baseline_arm": true,
+      "cell": "all",
+      "direction": "both",
+      "features": [
+        "prior_1m_regime_efficiency",
+        "prior_5m_regime_efficiency",
+        "rolling_300s_giveback_atr",
+        "structural_max_expansion_atr"
+      ],
+      "final_fit_rows": 869286,
+      "final_fit_unique_regimes": 6919,
+      "hyperparameters": {
+        "deterministic": true,
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "min_data_in_leaf": 50,
+        "n_estimators": 100,
+        "n_jobs": 1,
+        "num_leaves": 7,
+        "verbosity": -1
+      },
+      "metrics": {
+        "final_validation": null,
+        "folds": [],
+        "tuning": null
+      },
+      "model_id": "d3cfd7621897d1e18d0c6827c98ca79785f77b6828fee1aab72ca00cca17452d",
+      "model_store_tier": "registry",
+      "n_features": 4,
+      "subset": {}
+    }
+  ],
+  "month_folds": [],
+  "new_models_trained": true,
+  "paired_deltas_vs_baseline_arm": {},
+  "plan_sha256": "9eb2ff0d6e63a72a48a48342d6b7d72cadb371e7528626ead3261eb0944570e6",
+  "reference_models": [],
+  "rows": {
+    "binary": 869286,
+    "total": 877040
+  },
+  "schema_version": 3,
+  "training_population_identity": "719625bb72d94d48b653caa0ef503d0e82604bd89dc748a507236c4347a1a01e",
+  "tuning_years": [
+    2023
+  ]
+}

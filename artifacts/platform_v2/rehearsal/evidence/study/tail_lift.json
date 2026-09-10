@@ -1,0 +1,54 @@
+{
+  "cells": [
+    {
+      "base_rate": 0.3271128658108626,
+      "group": null,
+      "lift": 1.5311526215321984,
+      "n_reference": 877040,
+      "n_rows": 859153,
+      "n_tail": 83748,
+      "quantile": 0.9,
+      "tail_rate": 0.5008597220232125,
+      "tail_share": 0.09747739925251964,
+      "threshold": 0.4314232551273489
+    },
+    {
+      "base_rate": 0.3271128658108626,
+      "group": null,
+      "lift": 1.7009420830188215,
+      "n_reference": 877040,
+      "n_rows": 859153,
+      "n_tail": 40656,
+      "quantile": 0.95,
+      "tail_rate": 0.5564000393545848,
+      "tail_share": 0.04732102431115296,
+      "threshold": 0.4953571013558051
+    },
+    {
+      "base_rate": 0.3271128658108626,
+      "group": null,
+      "lift": 1.9765751758362355,
+      "n_reference": 877040,
+      "n_rows": 859153,
+      "n_tail": 19582,
+      "quantile": 0.975,
+      "tail_rate": 0.6465631702584006,
+      "tail_share": 0.022792215123499538,
+      "threshold": 0.5729407596993319
+    }
+  ],
+  "excluded": {
+    "reference_null_score": 0,
+    "rows_non_binary_label": 8269,
+    "rows_null_score": 0
+  },
+  "group_by": null,
+  "interpolation": "higher",
+  "label": "target_flip_within_horizon",
+  "quantiles": [
+    0.9,
+    0.95,
+    0.975
+  ],
+  "score": "score__primary"
+}
