@@ -12,7 +12,7 @@ each harness; `Explore` remains a Claude-only built-in model pin.
 
 ---
 
-## Six roles, portable capability tiers
+## Five roles, portable capability tiers
 
 | Agent | Column it owns |
 |---|---|
@@ -20,7 +20,6 @@ each harness; `Explore` remains a Claude-only built-in model pin.
 | `lookahead-auditor` | *Could this be known at T?* |
 | `contract-checker` | *Does this match what was declared, and is the lifecycle state legitimate?* |
 | `implementer` | *Make it correct.* |
-| `research-executor` | *Run the lifecycle and produce the artifacts.* |
 | `analysis-decider` | *What does this mean, and what do we do next?* |
 | `Explore` | not a role — a model pin (below) |
 
@@ -79,7 +78,7 @@ instrumentation cost must be separated from replay cost — is a **rule**
 numbers, adding a second, weaker source of truth for a figure that is already reproducible.
 
 If a profiling campaign ever needs sustained judgement rather than script invocation, this is
-the role to add, and `research-executor` is the wrong home for it.
+the role to add; it is not a lifecycle-execution role (that is the governed controller's, not an agent's).
 
 ---
 
@@ -91,7 +90,8 @@ the role to add, and `research-executor` is the wrong home for it.
 | `lookahead-auditor` | kept, trimmed | Shared audit protocol moved to `AGENTS.md`; card fell 199 → 115 lines |
 | `contract-checker` | kept, trimmed | Same; card fell 208 → 126 lines. Governance ownership (TRAIN/OOS, authorization, freeze/seal, provenance) made explicit |
 | `implementer` | **added** | Was Codex-only `implementation-worker`; now a first-class role on every harness |
-| `research-executor` | **added** | Lifecycle execution had no owner; the orchestrator was doing it inline |
+| `research-executor` | **added, then removed 2026-09-10** | Added when lifecycle execution had no owner; the v2 governed controller (`scripts/run_governed_study.py`) took that job, so the role drove only the v1 lifecycle by hand |
+| `capability-router` | **removed 2026-09-10** | Pre-study capability routing; superseded by `research cap search/describe` and the compiler's typed gaps |
 | `analysis-decider` | **added** | Result interpretation had no owner |
 | `results-triager` | **removed** | Its whole job — run targeted tests, reduce output — is `implementer`'s. Two agents owning test execution violates exclusive ownership. For a one-off test run the orchestrator uses Bash directly rather than paying for an agent |
 | `implementation-worker` | **retired** | Superseded by `implementer`, which is generated for all three harnesses instead of existing only under Codex |

@@ -169,7 +169,7 @@ If a test failed, say so and include the failing output. If you skipped a step, 
 ## 9. Agent roster
 
 Codex agent identifiers use underscores: `repo_scout`, `lookahead_auditor`,
-`contract_checker`, `implementer`, `research_executor`, `analysis_decider`. Roster, models and
+`contract_checker`, `implementer`, `analysis_decider`. Roster, models and
 caps are in `AGENTS.md` §11; rationale is in `docs/SUBAGENT_ROSTER.md`.
 
 `implementer` is the agent this file's §3–§8 describe most directly. It requires a frozen task

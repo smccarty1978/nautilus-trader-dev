@@ -28,7 +28,6 @@ hyphenated for easy cross-harness comparison.
 | `lookahead-auditor` | `lookahead_auditor` | `gpt-5.6-sol` | high | read-only + own audit artifacts |
 | `contract-checker` | `contract_checker` | `gpt-5.6-sol` | medium | read-only + own audit artifacts |
 | `implementer` | `implementer` | `gpt-5.6-terra` | medium | workspace-write |
-| `research-executor` | `research_executor` | `gpt-5.6-terra` | medium | workspace-write |
 | `analysis-decider` | `analysis_decider` | `gpt-5.6-sol` | high | workspace-write (reports only) |
 
 Model ids are resolved from portable capability tiers in

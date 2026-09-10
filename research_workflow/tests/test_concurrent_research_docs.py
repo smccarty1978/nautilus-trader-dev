@@ -17,8 +17,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-WRITE_CAPABLE = ("implementer", "research-executor", "analysis-decider")
-READ_ONLY = ("repo-scout", "Explore", "results-triager", "capability-router", "lookahead-auditor", "contract-checker")
+WRITE_CAPABLE = ("implementer", "analysis-decider")
+READ_ONLY = ("repo-scout", "Explore", "results-triager", "lookahead-auditor", "contract-checker")
 ENTRYPOINTS = ("CLAUDE.md", "CODEX.md", "AGENTS.md", "GEMINI.md")
 
 

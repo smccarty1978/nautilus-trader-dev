@@ -64,7 +64,7 @@ Codex, Gemini, Antigravity) can act as a worker by following the same packet and
 8. Never share that worktree with another writing agent.
 9. Execute the study through the controller (`python scripts/run_governed_study.py --study studies/<id> --through <stage> --execute-authorized`), never by hand. The controller re-checks the writer lease (who may edit) and then its own run lock (is a run already live); both must pass.
 10. Platform modifications belong on a separate `chore/*` worktree, never in the study branch.
-11. **Read-only roles** (repo-scout, lookahead-auditor, contract-checker, results-triager, capability-router, Explore) skip steps 2-8: they need no writer claim, may inspect source, artifacts, audit packets and results in any worktree, and mutate nothing but their own audit report.
+11. **Read-only roles** (repo-scout, lookahead-auditor, contract-checker, results-triager, Explore) skip steps 2-8: they need no writer claim, may inspect source, artifacts, audit packets and results in any worktree, and mutate nothing but their own audit report.
 12. **STOP-AT-CAPABILITY-GAP** (`WORKFLOW.md` §N.1): when compile returns a gap that needs shared platform work, the CLI has already written `studies/<id>/CAPABILITY_GAP_HANDOFF.json`. Commit `study.yaml`, `research_decision.yaml` and the handoff, then END THE SESSION. Do not touch `research_workflow/`, the grammar/compiler or `features/`; do not build the capability; do not keep working. A fresh capability session (`ws chore claim` -> `chore/<topic>` -> implement -> merge -> `CAPABILITY_COMPLETE`) and a fresh study session (merge `main`, `ws claim`, recompile) follow.
 13. **One lifecycle phase per session** (`WORKFLOW.md` §N.2: A design/compile, B prepare/seal, C execution, D analysis/closure). End every session with `python scripts/research.py study handoff --study studies/<id> --phase <A|B|C|D>`; start every session by reading `_work/handoff/SESSION_HANDOFF.md` and `research study status`, never by re-discovering the repository.
 14. **Tests**: `python scripts/test_delta.py <scope>` (§N.3). Act only on `NEW_FAILURE`; never re-run branch-vs-main suites to classify pre-existing failures. Commit gate for chores: targeted tests per commit, ONE broad relevant `test_delta` run before merge only.
@@ -116,8 +116,8 @@ and the expected branch naming (`study/<id>`).
 | `results-triager.md` | classifies failures against the baseline from logs and cards | active (new) |
 | `analysis-decider.md` | interprets generated artifacts, decides the research conclusion | active (post-analysis only) |
 | `Explore.md` | built-in search agent model pin | active (not a role) |
-| `capability-router.md` | pre-study capability routing | **LEGACY** — superseded by `research cap search/describe` and the compiler's typed gaps |
-| `research-executor.md` | drives the v1 lifecycle by hand | **LEGACY (v1 only)** — the v2 controller owns the lifecycle; use `scripts/run_governed_study.py` |
+
+`capability-router.md` (pre-study capability routing) and `research-executor.md` (the v1 lifecycle driven by hand) were **removed on 2026-09-10**: `research cap search/describe` and the compiler's typed gaps replaced the first; the v2 controller (`scripts/run_governed_study.py`) owns the lifecycle the second used to drive.
 
 Recommended use: the primary Claude session owns implementation and runs the controller; spawn
 `repo-scout` for discovery, one `lookahead-auditor` and one `contract-checker` per study (continue the

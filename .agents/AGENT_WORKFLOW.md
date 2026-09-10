@@ -26,7 +26,6 @@ all harness mappings are defined in `config/agent_model_profiles.json`.
 | `lookahead-auditor` | high assurance / high | Gemini Pro | `pro` |
 | `contract-checker` | governance review / medium | Gemini Pro / 3.6 Flash | `pro` / `flash` |
 | `implementer` | balanced coding / medium | Gemini Pro | `pro` |
-| `research-executor` | balanced coding / medium | Gemini Pro | `pro` |
 | `analysis-decider` | high assurance / high | Gemini Pro | `pro` |
 
 Tiering rule: the cheapest model that can be trusted with the decision. **Never put a

@@ -228,7 +228,6 @@ stages:
 | `lookahead-auditor` | Stage 4 (CAUSAL REVIEW) | Checklist A, B, C1–C3, F, G, H — "could this be known at T?" | Its own `audit/pass_NN.md` | Governance/completeness (C4, D, E) | Finds a completeness gap — refers to `contract-checker` in one line |
 | `contract-checker` | Stage 5 (CONTRACT REVIEW) | Checklist C4, D, E — TRAIN/OOS separation, authorization, freeze/seal freshness, provenance, deliverables, model-integrity declarations | Its own `audit/contract_pass_NN.md` | Causality/look-ahead | Finds a causal issue — refers to `lookahead-auditor` |
 | `implementer` | Any deterministic-defect repair, STEP 4–6 of §6 | Wiring, fixes, targeted tests, bounded fixtures, first-broken-stage tracing | Code, tests, config | Research semantics (target/population/chronology meaning) | Genuine semantic ambiguity |
-| `research-executor` | Stage 7–15 (collection through OOS scoring) | Driving a sealed study through the lifecycle in order, producing declared artifacts | Run directories, artifacts | Whether a result is good — that's `analysis-decider`'s job | Authorization mismatch, stale freeze, prohibited year |
 | `analysis-decider` | Stage 16–17 (ANALYSIS/DECISION) | Reading generated artifacts, model comparison, direction/maturity slicing, forward-outcome interpretation, the conclusion | Its own analysis write-ups | Fitting, tuning, re-running anything | Missing or inconsistent artifacts |
 | `Explore` | Ad hoc, Claude-only | Not a role — a **model pin** to Haiku for the built-in fan-out search agent, so a routine "where is X" sweep doesn't run at orchestrator cost | — | — | — (use `repo-scout` for anything that feeds a plan or audit) |
 
@@ -419,7 +418,7 @@ layer up.
 | **4 — Study contract** | — | `study_factory` scaffold → `compiler.py` compile; if a schema gap exists (§5.1), stop here and report it rather than working around it | `SPEC.md`, `study.yaml`, `compiled_study.json`, `config/*.json` | schema validation | schema cannot represent the design (§5.3 pattern) |
 | **5 — Readiness / pre-freeze validation** | — | `prepare` → `readiness` → `preflight` → `causal_audit` → `contract_audit`, autonomously fixing deterministic defects | `audit/*` | R1–R10, 6 preflight checks, both CLEAR | genuine semantic ambiguity found mid-audit |
 | **6 — Seal** | — | `seal.generate_preexec_audit_seal` | `artifacts/preexec_audit_seal.json` | `PREEXEC_AUDIT_STALE` | — |
-| **7 — TRAIN collection** | authorizes the run (nothing executes before the seal) | `research-executor`: smoke → reconcile → authorize → partitioned collect → merge | run dirs, `artifacts/train_collection_manifest.json` | authorization/prohibited-year check | prohibited year (⛔) |
+| **7 — TRAIN collection** | authorizes the run (nothing executes before the seal) | the governed controller: smoke → reconcile → authorize → partitioned collect → merge | run dirs, `artifacts/train_collection_manifest.json` | authorization/prohibited-year check | prohibited year (⛔) |
 | **8 — TRAIN model development** | model family / hyperparameter choices (per study type constraints) | `fit_models`, iterate on TRAIN only | `artifacts/experiment_models.json` | `PartitionMixing`/`SchemaSurplus` guards | outcome leak (never loosen the guard) |
 | **9 — TRAIN freeze** | confirms readiness to lock | `freeze_train_artifacts` | `artifacts/train_experiment_freeze.json` | `assert_causal_feature_surface` | — |
 | **10 — OOS** | explicit go-ahead to open OOS | `assert_oos_open` → `collect_period(..., "oos")` | run dirs | freeze must exist and bind | — |
@@ -816,7 +815,7 @@ Proven from current implementation only.
   in `studies/clean_maturity_flip_model_rolling_productivity/`; the single-file design-checkpoint
   state in `studies/clean_tradable_reversal/`.
 - Agent roster (`repo-scout`, `lookahead-auditor`, `contract-checker`, `implementer`,
-  `research-executor`, `analysis-decider`, `Explore`) cross-checked against `.claude/agents/*.md`
+  `analysis-decider`, `Explore`; `research-executor` removed 2026-09-10) cross-checked against `.claude/agents/*.md`
   on disk and matches `AGENTS.md` §11 exactly.
 - `data/catalog/NQ_v0_2020_2026/` and `data/catalog/ES_v0_2020_2026/` both confirmed present on
   disk (not just referenced by builder scripts).
