@@ -21,7 +21,7 @@ research_question: "# NQ MULTI-TIMEFRAME REGIME PATH ATLAS — ONE-YEAR PILOT (2
   \ `analysis.decomposition.buckets`,\n    `analysis.anchor.first_threshold_crossing`,\n    `analysis.control.cell_matched`, `analysis.classify.precedence`,\n    `analysis.metric.tail_lift`, `analysis.gate.population_parity`,\n    `analysis.gate.arm_delta_integrity`.\n      - T3 / T4 map onto `analysis.path.anchored_offsets`.\n      - T2 maps partly onto `analysis.incidence.cumulative`.\n      - T1, T6, T7, T8 have NO generic grouped-summary producer\n        (mean / median / quantiles by group).\n      - §9 has NO producer at all: `grep -rn cluster research/analysis/`\n        returns nothing. There is no cluster-robust standard error\n        anywhere in the analysis harness, and §9 makes one mandatory on\n        every reported mean and difference.\n    Expect the compile-time deliverable-producer gate to fail on T1,\n    T6, T7, T8 and on §9, and expect the capability flow to add one\n    grouped-descriptive op and one session-day-clustered uncertainty op\n    before this study can seal.\
   \ §13 authorizes exactly that; §8 says\n    route it as a typed analysis capability gap rather than writing\n    study-local Python.\n\nA5. PLATFORM FREEZE. The platform is under a declared freeze after\n    `f136a469` (2026-09-10): no platform work until three real studies\n    have run. This study is one of those real studies and §13\n    authorizes capability workers under `platform_merge:\n    approval_required`, so the freeze does not block it — but every\n    capability merge here is an owner-approved exception, not routine."
 
-status: DESIGN_BLOCKED_CAPABILITY_GAP
+status: DESIGN_BLOCKED_CAPABILITY_GAP  # re-scoped by OWNER AMENDMENT 01; G0 and G1 no longer block this study
 dataset_id: NQ_1S_V2_GLOBEX
 platform_commit: 4f37a50796a69ae7f54bf59a8d45185601838341
 phase: A
@@ -114,6 +114,35 @@ terminal_decisions:
     section 9). Every mean or difference reported must carry an uncertainty estimate CLUSTERED BY
     SESSION DAY, with the cluster count reported alongside the row count. This is mandatory, not
     optional, and no registered analysis op provides it (gap_inventory.G5).
+  # ---------------------------------------------------------------------------------------
+  # OWNER AMENDMENT 01 -- 2026-09-10, after the phase-A design pass. These two decisions amend
+  # the contract and take precedence over the research_question text above. Authority:
+  # docs/questions/nq_mtf_regime_atlas_pilot2023.md, section "OWNER AMENDMENT 01".
+  # ---------------------------------------------------------------------------------------
+  population_anchor: >
+    SINGLE ANCHOR: 1m REGIME FLIPS ONLY. The nine-way population fan-out of contract section 4
+    (gap G0) is a grammar change and is NOT taken for this study. The other eight timeframes --
+    5s, 30s, 3m, 5m, 15m, 30m, 1h, 4h -- are recorded as ALIGNMENT CONTEXT at T per contract
+    section 7's ALIGNMENT block (direction, age, agrees/disagrees), not as populations of their
+    own. Q1-Q5 are answered FOR 1m. T1/T2/T3/T4/T5/T7/T8 keep their shape with "by timeframe"
+    replaced by "1m only". T6 LOSES ITS CROSS-TIMEFRAME CENSUS and becomes the 1m census: flips
+    per year, censored counts, ETH vs RTH. The nine-timeframe atlas is not delivered here; G0 is
+    reassessed with this completed study behind it.
+  session: >
+    CENSORING IS AT THE GLOBEX TRADING-DAY CLOSE. This decision resolves the
+    AMBIGUOUS_TEMPORAL_SEMANTICS gap at outcome.session (gap G2) and VOIDS the earlier
+    "session_end: ignore" answer of the same day, which was taken on an incomplete set of
+    options. population.session stays ALL -- the census spans ETH and RTH, distinguished by
+    feature.session_membership per contract section 0 -- and the censoring instant is the close
+    of the Globex trading day the flip belongs to, the boundary NQ_1S_V2_GLOBEX already defines
+    in its committed sessions reference table (1636 rows) and the same session-day unit contract
+    section 9 clusters on. Contract section 6's censoring rule therefore stands as written:
+    session end, data gap and chronology boundary all censor and flag; nothing is imputed; a
+    censored row is never counted as resolved; T6 reports the censored count.
+    NOT AUTHORIZED: narrowing population.session to RTH or ETH; session_end: ignore; dropping the
+    censoring flag. The grammar admits only RTH/ETH/ALL and AllSessionTable.session_close returns
+    None, so this needs the G2 capability before it compiles -- that is a capability route under
+    contract section 13, not a further question for the owner.
   terminal_label: DESCRIPTIVE_ATLAS_COMPLETE (pilot scope 2023).
 
 # ---------------------------------------------------------------------------------------------
