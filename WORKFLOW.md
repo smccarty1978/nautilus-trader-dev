@@ -333,7 +333,7 @@ golden validation frame (`research model validate <id>`), optional exports with 
 
 Three separate states: **training succeeded** (bytes in the fit ledger) → **model selected**
 (`selection_status: selected`, tier `registry`, hash bound into `train_experiment_freeze.json`) →
-**scientifically validated** (`scientific_status`, decided at closure / OOS analysis, never by the fit).
+**scientifically validated** -- carried by the parent study's **closure** (`model_scientific_assessment` + `reuse_policy` in `artifacts/study_closure.json`), never by the fit. The registry's `scientific_status` column is informational only: nothing branches on its positive values, and a child study reuses a frozen model as a derived causal input only through a `diagnostic_reuse_policy` that pins that closure (`model_artifacts.resolve_model`, `reuse_intent="derived_causal_input"`). The hard block is `reuse_status: PROHIBITED`, checked first.
 OOS is gated by `experiment.assert_oos_open` after the freeze.
 
 ## H. Hyperparameter tuning (governed, TRAIN-only)
