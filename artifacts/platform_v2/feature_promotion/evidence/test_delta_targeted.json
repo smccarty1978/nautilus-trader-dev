@@ -1,0 +1,32 @@
+{
+ "STATUS": "NEW_FAILURES",
+ "baseline": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\config\\test_failure_baseline.json",
+ "baseline_commit": "ee16002ea0879989fa385a97e4e1c9d1924ab656",
+ "head": "3e90a73e",
+ "baseline_issues": [],
+ "pytest_exit_code": 1,
+ "wall_seconds": 40.290656200028025,
+ "ran": 128,
+ "passed": 126,
+ "failed": 2,
+ "counts": {
+  "NEW_FAILURE": 1,
+  "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+  "KNOWN_BASELINE_FAILURE": 1,
+  "BASELINE_FAILURE_NOW_FIXED": 0,
+  "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+ },
+ "NEW_FAILURE": [
+  {
+   "node_id": "features/tests/test_candidate_authority.py::test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it",
+   "message": "call: def test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it():\n        candidate = resolve_source_universe(\"verified_registry_numeric_universe\", authority=\"candidate\", legacy_mode=True)\n        active = resolve_source_universe(\"canonical_verified_definition_universe\")\n        assert len(candidate) == 693\n>       assert len(active) == 129\nE       AssertionError: assert 144 == 129\nE        +  where 144 = len(['abs_delta_cum', 'abs_delta_per_atr_moved', 'abs_delta_per_point_moved', 'accel', 'activity_duration_median', 'activity_flip_count', ...])\n\nfeatures\\tests\\test_candidate_authority.py:94: AssertionError",
+   "reason": "FAILURE_SIGNATURE_CHANGED_OR_MISSING"
+  }
+ ],
+ "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": [],
+ "BASELINE_FAILURE_NOW_FIXED": [],
+ "ENVIRONMENTAL_MISSING_ARTIFACT": [],
+ "KNOWN_BASELINE_FAILURE": [
+  "features/tests/test_feature_system_v2.py::test_explicit_instances_and_collection_universe_share_canonical_status"
+ ]
+}

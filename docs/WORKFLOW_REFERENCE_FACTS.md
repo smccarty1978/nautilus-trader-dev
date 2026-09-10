@@ -53,6 +53,22 @@ made `scripts/research.py` shadow the `research` package in every script-spawnin
 `test_delta --check-baseline <scope>` re-derives compatibility; re-run the command above to re-derive the
 duration.
 
+## Broad merge gate for chore/feature_promotion (2026-09-10)
+
+`python scripts/test_delta.py research_workflow/tests scripts/tests features/tests --baseline-reference ee16002e --json`
+on commit `a9762d7e` (chore/feature_promotion, three commits on main `8bf26857`), Python 3.13.7, Windows,
+detached and alone on the host: **97m53s** (5,872.9 s `wall_seconds` from the card), **2,279 tests ran**,
+**2,211 passed / 61 failed** (56 known-baseline, 5 `NEW_FAILURE`, 0 outside baseline scope, 0 now-fixed,
+0 environmental). All five NEW entries were pre-existing before this branch: the four already recorded on
+2026-09-09 at commit `2dd06b8a` (`test_redteam_pass1_acceptance.py::test_acc12_canaries_green`,
+`test_generic_contract_audit.py::test_no_hardcoded_feature_count_in_generic_workflow`, and the two
+`test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite` cases for
+`scripts/check_feature_promotion.py` and `scripts/select_required_tests.py`), plus
+`features/tests/test_candidate_authority.py::test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it`,
+which asserts an active-universe size of 129 and already fails on clean main `8bf26857` (143 there; 145 on
+this branch). Three scopes, so not comparable with the two-scope 74m41s or five-scope 83m14s figures above.
+Re-run the command above to re-derive; the card is in the merge-session scratchpad evidence (`broad_gate.json`).
+
 ---
 
 ## Feature authority bundle

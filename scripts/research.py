@@ -7,6 +7,7 @@ Every command prints one compact JSON card on stdout; verbose output goes to dis
     research data roots                                      show the machine-local root configuration
     research cap list [kind] | describe <id> | search <text>  generated capability registry (zero tokens)
     research cap propose <yaml> | scaffold <id> | promote <id> --parity <json>   capability addition flow
+    research feature verify <name> | promote <name> | check [--all] [--no-execute]  feature-definition promotion (golden evidence)
     research study new <id> [--from-question <file>]         branch + sibling worktree + lease + v2 skeleton
     research study compile --study <dir>                     static compile -> compiled_plan.json | typed CapabilityGap
     research study status --study <dir>                      non-mutating controller state card
@@ -83,6 +84,35 @@ def cmd_data_verify(ns: argparse.Namespace) -> int:
         payload.update({"recomputed_digest": actual, "bytes_match_manifest": actual == r.logical_digest})
         return _card(payload, ok=actual == r.logical_digest)
     return _card(payload)
+
+
+# ---------------------------------------------------------------------------
+# feature definitions: promotion by evidence about the definition itself
+# ---------------------------------------------------------------------------
+
+def cmd_feature(ns: argparse.Namespace) -> int:
+    from features.promotion import FeaturePromotionRefused, check_all, check_record, promote, verify
+    try:
+        if ns.cmd == "verify":
+            out = verify(ns.name)
+            return _card({"flow": "VERIFIED", **{k: v for k, v in out.items() if k != "adapter_sha256_informational"}})
+        if ns.cmd == "promote":
+            out = promote(ns.name)
+            from features.tests.golden_feature_resolution import write_golden
+            golden = write_golden()
+            return _card({"flow": "PROMOTED", "record": f"features/definitions/promotions/{ns.name}.json",
+                          "golden_resolution_fixture": golden,
+                          "physical_aliases": out["physical_aliases"], "observed_sha256": out["observed_sha256"],
+                          "next": "commit the definition record, the golden fixture, the promotion record and the "
+                                  "regenerated features/tests/golden/feature_resolution.json together; "
+                                  "then `research cap generate --check`"})
+        if ns.cmd == "check":
+            out = check_all(execute=not ns.no_execute) if ns.all or not ns.name else check_record(ns.name, execute=not ns.no_execute)
+            return _card({"flow": "CHECKED", **out}, ok=bool(out.get("passed")))
+    except FeaturePromotionRefused as exc:
+        code = str(exc).split(":")[0]
+        return _card({"flow": "REFUSED", "code": code, "error": str(exc)}, ok=False)
+    return _card({"error": f"unknown feature command {ns.cmd}"}, ok=False)
 
 
 # ---------------------------------------------------------------------------
@@ -293,6 +323,12 @@ def build_parser() -> argparse.ArgumentParser:
     c = cap.add_parser("propose"); c.add_argument("proposal"); c.set_defaults(fn=cmd_cap)
     c = cap.add_parser("scaffold"); c.add_argument("capability_id"); c.set_defaults(fn=cmd_cap)
     c = cap.add_parser("promote"); c.add_argument("capability_id"); c.add_argument("--parity"); c.add_argument("--no-tests", action="store_true"); c.set_defaults(fn=cmd_cap)
+
+    feat = sub.add_parser("feature").add_subparsers(dest="cmd", required=True)
+    f = feat.add_parser("verify"); f.add_argument("name"); f.set_defaults(fn=cmd_feature)
+    f = feat.add_parser("promote"); f.add_argument("name"); f.set_defaults(fn=cmd_feature)
+    f = feat.add_parser("check"); f.add_argument("name", nargs="?"); f.add_argument("--all", action="store_true")
+    f.add_argument("--no-execute", action="store_true", help="hash binding only; skip the golden replay"); f.set_defaults(fn=cmd_feature)
 
     study = sub.add_parser("study").add_subparsers(dest="cmd", required=True)
     n = study.add_parser("new"); n.add_argument("study_id"); n.add_argument("--from-question"); n.add_argument("--dataset", default="NQ_1S_V2_GLOBEX")

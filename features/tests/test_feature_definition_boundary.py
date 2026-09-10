@@ -30,8 +30,12 @@ from features.tests.golden_feature_resolution import GOLDEN_PATH, build, manifes
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BOUNDARY = "features/registry.py"
-DEFINITION_MODULES = {"features/definitions/physical_catalogue.py", "features/definitions/canonical.py",
-                      "features/definitions/legacy_instances.py"}
+# The canonical catalogue is a package of one record module per definition (feature promotion,
+# 2026-09): every record is a definition module for the reachability conditions below.
+DEFINITION_MODULES = {"features/definitions/physical_catalogue.py", "features/definitions/canonical/__init__.py",
+                      "features/definitions/legacy_instances.py"} | {
+    p.relative_to(REPO_ROOT).as_posix() for p in (REPO_ROOT / "features" / "definitions" / "canonical").glob("*.py")
+    if p.name != "__init__.py"}
 # The consumers whose reachability is the whole point (modularity report, B2 escalation table).
 CONSUMERS = ("research_workflow/provider_host.py", "research_workflow/forward_outcomes/guard.py",
              "research_workflow/output_manager.py", "backtests/nt_runtime/modes/collect.py",
@@ -115,7 +119,13 @@ def test_declared_modules_match_the_definition_files():
     declared = R.declared_definition_modules()
     assert declared == ("features.definitions.physical_catalogue", "features.definitions.canonical",
                         "features.definitions.legacy_instances")
-    assert set(R.definition_files()) == DEFINITION_MODULES
+    files = set(R.definition_files())
+    # every definition module, plus the promotion evidence that decides which records resolve
+    # as verified (golden fixtures + promotion records): both are part of what a study binds
+    assert DEFINITION_MODULES <= files
+    from features.promotion import evidence_files
+    assert set(evidence_files()) <= files
+    assert files - DEFINITION_MODULES - set(evidence_files()) == set()
 
 
 def test_generated_registry_carries_the_definition_modules():
@@ -148,8 +158,10 @@ def test_an_empty_or_unreadable_index_fails_closed(tmp_path):
 
 def test_definition_catalogues_are_still_reachable_by_their_historical_names():
     """Consumers and historical tests read these off the module; module ``__getattr__`` serves them."""
+    from features.definitions import canonical as CAT
     assert len(R.FEATURE_REGISTRY) == 693
-    assert len(R.CANONICAL_FEATURE_DEFINITIONS) == 41
+    # one record file per canonical definition (41 migrated + every evidence-promoted addition)
+    assert len(R.CANONICAL_FEATURE_DEFINITIONS) == len(CAT.record_files()) >= 41
     assert len(R.LEGACY_FEATURE_INSTANCE_OVERRIDES) == 36
     assert R.FEATURE_REGISTRY is R.FEATURE_REGISTRY          # one merged catalogue, not a rebuild per access
     with pytest.raises(AttributeError):

@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Materialize the final inactive Feature System V2 candidate bundle."""
+"""Materialize the final inactive Feature System V2 candidate bundle.
+
+HISTORICAL (V1 -> V2 migration, Aug 2026).  This script produced the bundle under
+``features/authority/candidate/`` from the legacy-alias parity inventories in ``scratch/``; the
+bundle is hashed into every sealed study's frozen manifest and is not regenerated.  It is NOT the
+path by which a new feature definition becomes verified: a new definition is promoted by its own
+golden evidence through ``research feature promote <name>`` (``features/promotion.py``), which
+never touches the bundle.  Re-running this script is not idempotent against the committed bundle
+(provider_sha256 drift) and would stale every sealed manifest -- do not run it.
+"""
 from __future__ import annotations
 
 import hashlib

@@ -1,0 +1,489 @@
+[
+ {
+  "label": "whole chore branch (platform work)",
+  "class": "CORE_SURFACE",
+  "files": 61,
+  "by_class": {
+   "INERT": [
+    "WORKFLOW.md",
+    "docs/RESEARCH_WORKFLOW.md"
+   ],
+   "CORE_SURFACE": [
+    "features/definitions/canonical.py",
+    "features/definitions/canonical/__init__.py",
+    "features/promotion.py",
+    "features/registry.py",
+    "research_workflow/capabilities.py",
+    "research_workflow/grammar/compiler.py",
+    "research_workflow/handoff.py",
+    "research_workflow/provider_host.py",
+    "scripts/check_feature_promotion.py",
+    "scripts/materialize_feature_candidate.py",
+    "scripts/research.py"
+   ],
+   "ADDITIVE_CAPABILITY": [
+    "features/definitions/canonical/distance_to_completed_range_high_atr.py",
+    "features/definitions/canonical/distance_to_completed_range_low_atr.py",
+    "features/definitions/canonical/fraction_of_counter_regime_move_recovered.py",
+    "features/definitions/canonical/move_outside_completed_range.py",
+    "features/definitions/canonical/prior_deep_pullback_count.py",
+    "features/definitions/canonical/pullback_current_depth_atr.py",
+    "features/definitions/canonical/pullback_elapsed_seconds.py",
+    "features/definitions/canonical/pullback_fraction_of_structural_move.py",
+    "features/definitions/canonical/pullback_max_depth_atr.py",
+    "features/definitions/canonical/pullback_post_arm_seconds.py",
+    "features/definitions/canonical/pullback_recovery_from_extreme_atr.py",
+    "features/definitions/canonical/recovery_from_counter_regime_extreme_atr.py",
+    "features/definitions/canonical/regime_age_min.py",
+    "features/definitions/canonical/regime_alignment.py",
+    "features/definitions/canonical/regime_direction.py",
+    "features/definitions/canonical/regime_directional_displacement_atr.py",
+    "features/definitions/canonical/regime_duration_min.py",
+    "features/definitions/canonical/regime_efficiency.py",
+    "features/definitions/canonical/regime_expansion_atr_per_min.py",
+    "features/definitions/canonical/regime_mfe_atr.py",
+    "features/definitions/canonical/regime_net_directional_move_atr.py",
+    "features/definitions/canonical/regime_net_move_atr_per_min.py",
+    "features/definitions/canonical/regime_range_atr.py",
+    "features/definitions/canonical/regime_range_atr_per_min.py",
+    "features/definitions/canonical/rolling_current_progress_atr.py",
+    "features/definitions/canonical/rolling_current_speed_atr_per_min.py",
+    "features/definitions/canonical/rolling_current_speed_vs_lifetime.py",
+    "features/definitions/canonical/rolling_giveback_atr.py",
+    "features/definitions/canonical/rolling_max_progress_atr.py",
+    "features/definitions/canonical/rolling_max_speed_atr_per_min.py",
+    "features/definitions/canonical/rolling_max_speed_vs_lifetime.py",
+    "features/definitions/canonical/rolling_retention_ratio.py",
+    "features/definitions/canonical/seconds_since_prevailing_directional_extreme.py",
+    "features/definitions/canonical/structural_current_expansion_atr.py",
+    "features/definitions/canonical/structural_expansion_atr_per_min.py",
+    "features/definitions/canonical/structural_giveback_atr.py",
+    "features/definitions/canonical/structural_max_expansion_atr.py",
+    "features/definitions/canonical/structural_max_expansion_checkpoint_atr.py",
+    "features/definitions/canonical/structural_retention_ratio.py",
+    "features/definitions/canonical/trend_normalized_est_delta_acceleration.py",
+    "features/definitions/canonical/trend_normalized_est_delta_sum.py",
+    "features/definitions/canonical/trend_normalized_est_delta_sum_ratio.py",
+    "features/definitions/golden/structural_max_expansion_checkpoint_atr.json",
+    "features/definitions/promotions/structural_max_expansion_checkpoint_atr.json"
+   ],
+   "GENERATED": [
+    "features/tests/golden/feature_resolution.json"
+   ],
+   "TESTS": [
+    "features/tests/golden_feature_resolution.py",
+    "features/tests/test_feature_definition_boundary.py",
+    "features/tests/test_feature_promotion_path.py"
+   ]
+  },
+  "rows": [
+   {
+    "status": "M",
+    "path": "WORKFLOW.md",
+    "class": "INERT",
+    "reason": "docs/artifacts/proposal"
+   },
+   {
+    "status": "M",
+    "path": "docs/RESEARCH_WORKFLOW.md",
+    "class": "INERT",
+    "reason": "docs/artifacts/proposal"
+   },
+   {
+    "status": "D",
+    "path": "features/definitions/canonical.py",
+    "class": "CORE_SURFACE",
+    "reason": "deletion"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/__init__.py",
+    "class": "CORE_SURFACE",
+    "reason": "not on any allowlist"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/distance_to_completed_range_high_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/distance_to_completed_range_low_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/fraction_of_counter_regime_move_recovered.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/move_outside_completed_range.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/prior_deep_pullback_count.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/pullback_current_depth_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/pullback_elapsed_seconds.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/pullback_fraction_of_structural_move.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/pullback_max_depth_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/pullback_post_arm_seconds.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/pullback_recovery_from_extreme_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/recovery_from_counter_regime_extreme_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_age_min.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_alignment.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_direction.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_directional_displacement_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_duration_min.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_efficiency.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_expansion_atr_per_min.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_mfe_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_net_directional_move_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_net_move_atr_per_min.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_range_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/regime_range_atr_per_min.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/rolling_current_progress_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/rolling_current_speed_atr_per_min.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/rolling_current_speed_vs_lifetime.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/rolling_giveback_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/rolling_max_progress_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/rolling_max_speed_atr_per_min.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/rolling_max_speed_vs_lifetime.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/rolling_retention_ratio.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/seconds_since_prevailing_directional_extreme.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/structural_current_expansion_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/structural_expansion_atr_per_min.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/structural_giveback_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/structural_max_expansion_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/structural_max_expansion_checkpoint_atr.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/structural_retention_ratio.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/trend_normalized_est_delta_acceleration.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/trend_normalized_est_delta_sum.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/trend_normalized_est_delta_sum_ratio.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/golden/structural_max_expansion_checkpoint_atr.json",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/promotions/structural_max_expansion_checkpoint_atr.json",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/promotion.py",
+    "class": "CORE_SURFACE",
+    "reason": "not on any allowlist"
+   },
+   {
+    "status": "M",
+    "path": "features/registry.py",
+    "class": "CORE_SURFACE",
+    "reason": "registration file: existing statements changed/removed: [('DEF', 'definition_files'), ('DEF', 'resolve_feature_instances'), ('DEF', 'resolve_source_universe')]"
+   },
+   {
+    "status": "M",
+    "path": "features/tests/golden/feature_resolution.json",
+    "class": "GENERATED",
+    "reason": "regenerated by the gate (cap generate --check / gen_yaml_reference)"
+   },
+   {
+    "status": "M",
+    "path": "features/tests/golden_feature_resolution.py",
+    "class": "TESTS",
+    "reason": "test file"
+   },
+   {
+    "status": "M",
+    "path": "features/tests/test_feature_definition_boundary.py",
+    "class": "TESTS",
+    "reason": "test file"
+   },
+   {
+    "status": "A",
+    "path": "features/tests/test_feature_promotion_path.py",
+    "class": "TESTS",
+    "reason": "test file"
+   },
+   {
+    "status": "M",
+    "path": "research_workflow/capabilities.py",
+    "class": "CORE_SURFACE",
+    "reason": "not on any allowlist"
+   },
+   {
+    "status": "M",
+    "path": "research_workflow/grammar/compiler.py",
+    "class": "CORE_SURFACE",
+    "reason": "not on any allowlist"
+   },
+   {
+    "status": "M",
+    "path": "research_workflow/handoff.py",
+    "class": "CORE_SURFACE",
+    "reason": "not on any allowlist"
+   },
+   {
+    "status": "M",
+    "path": "research_workflow/provider_host.py",
+    "class": "CORE_SURFACE",
+    "reason": "registration file: existing statements changed/removed: [('DEF', 'StructuralGeometryAdapter'), ('DEF', 'ProviderHost')]"
+   },
+   {
+    "status": "M",
+    "path": "scripts/check_feature_promotion.py",
+    "class": "CORE_SURFACE",
+    "reason": "not on any allowlist"
+   },
+   {
+    "status": "M",
+    "path": "scripts/materialize_feature_candidate.py",
+    "class": "CORE_SURFACE",
+    "reason": "not on any allowlist"
+   },
+   {
+    "status": "M",
+    "path": "scripts/research.py",
+    "class": "CORE_SURFACE",
+    "reason": "not on any allowlist"
+   }
+  ]
+ },
+ {
+  "label": "synthetic next addition: record + fixture + promotion record + regenerated golden",
+  "class": "ADDITIVE_CAPABILITY",
+  "files": 4,
+  "by_class": {
+   "ADDITIVE_CAPABILITY": [
+    "features/definitions/canonical/zz_synthetic_definition.py",
+    "features/definitions/golden/zz_synthetic_definition.json",
+    "features/definitions/promotions/zz_synthetic_definition.json"
+   ],
+   "GENERATED": [
+    "features/tests/golden/feature_resolution.json"
+   ]
+  },
+  "rows": [
+   {
+    "status": "A",
+    "path": "features/definitions/canonical/zz_synthetic_definition.py",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/golden/zz_synthetic_definition.json",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "A",
+    "path": "features/definitions/promotions/zz_synthetic_definition.json",
+    "class": "ADDITIVE_CAPABILITY",
+    "reason": "new capability module"
+   },
+   {
+    "status": "M",
+    "path": "features/tests/golden/feature_resolution.json",
+    "class": "GENERATED",
+    "reason": "regenerated by the gate (cap generate --check / gen_yaml_reference)"
+   }
+  ]
+ }
+]

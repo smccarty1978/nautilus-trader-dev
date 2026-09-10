@@ -1,0 +1,49 @@
+{
+  "adapter_module": "research_workflow/provider_host.py",
+  "adapter_sha256_informational": "ccb8dfce0405bb26f2307346143f9a34bbf6c85ac32ea87e7e8e85cbb124dd34",
+  "causal_guard": "SNAPSHOT_BEFORE_LATEST_RUNTIME_EVENT",
+  "consumed_streams": [
+    "completed_1s"
+  ],
+  "declared_input_contracts": [
+    "completed_1s"
+  ],
+  "definition_record": "features/definitions/canonical/trend_normalized_est_delta_acceleration.py",
+  "definition_sha256": "7f827d327d4be8baf97ad4a4e0381e1e6f6b996d7382f8b50308237a1d39a9e9",
+  "determinism": {
+    "identical": true,
+    "runs": 2
+  },
+  "feature": "trend_normalized_est_delta_acceleration",
+  "golden_fixture": "features/definitions/golden/trend_normalized_est_delta_acceleration.json",
+  "golden_sha256": "36d76ae0e1ac26c85e9b1dde3f86a52fbaa9009c2ca2fb775f3561b34bfe6b34",
+  "instances": [
+    {
+      "direction_reference": "prevailing_1m",
+      "short_window": "5s",
+      "update_every": "1s"
+    }
+  ],
+  "observed_sha256": "2b24173a49c7985de7059074da1308a95ab01f38355b982cbd465a9d9ef83ac7",
+  "physical_aliases": [
+    "trend_normalized_est_delta_acceleration_5s"
+  ],
+  "post_snapshot_event": {
+    "avail_ts": 31000000000,
+    "type": "completed_1s"
+  },
+  "promoted_at_utc": "2026-09-10T04:15:36.637339+00:00",
+  "promoted_by": "research feature promote",
+  "provider": "features.trackers.generic_ohlcv_delta.GenericOHLCVDeltaProvider",
+  "provider_module": "features/trackers/generic_ohlcv_delta.py",
+  "provider_sha256": "2627a56143ba1b638fa1a507c0fddb36b9e8b81f1a735cb1655e385e54bf432f",
+  "runtime_adapters": [
+    "OHLCVDeltaAdapter"
+  ],
+  "schema_version": 1,
+  "snapshots": 5,
+  "substitution_guard": {
+    "aliases_checked": 728,
+    "bundle_definitions": 143
+  }
+}

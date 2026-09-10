@@ -1533,7 +1533,7 @@ is attributable to that catalogue and to the governance floor, not to the bounda
 | Boundary | Catalogue side | Index | Golden fixture |
 |---|---|---|---|
 | `features/trackers/host_bindings.py` (trackers, feature hosts, derived inputs) | `features/trackers/*.py` | `research_workflow/capabilities_index.yaml` | `research_workflow/tests/test_capability_modularity.py` |
-| `features/registry.py` (feature definitions) | `features/definitions/*.py` | `research_workflow/capabilities_index.d/feature_definitions.yaml` | `features/tests/test_feature_definition_boundary.py` |
+| `features/registry.py` (feature definitions) | `features/definitions/canonical/<name>.py` (one record per definition), `features/definitions/{physical_catalogue,legacy_instances}.py` | `research_workflow/capabilities_index.d/feature_definitions.yaml` | `features/tests/test_feature_definition_boundary.py` |
 | `research/analysis/ops.py` (analysis operations) | `research/analysis/diagnostic_ops.py` | `research_workflow/capabilities_index.d/analysis_ops.yaml` | `research/analysis/tests/test_analysis_op_boundary.py` |
 
 A new capability kind follows the pattern rather than rediscovering it: resolution API in its own
@@ -1581,3 +1581,50 @@ already-merged tracker boundary. Shrinking that tier further is a question about
 derivation treats a compiler edit, not about the architecture — and it is not answered by
 excluding those proofs by name, which is the hand-maintained coupling this whole design exists to
 remove.
+### 21.15 Feature definition promotion (evidence about the definition itself)
+
+A canonical feature definition is **verified by evidence about itself**, never by having been
+used. The migration-era gate asked for the wrong evidence: `verified` could only be written into
+the authority bundle (`features/authority/`) from a legacy-alias parity inventory or from a
+scoped promotion record issued by a sealed authorizing study -- and a genuinely new definition
+has neither, because it cannot compile until it is verified. That loop cost the rehearsal two
+failed capability workers (`artifacts/platform_v2/rehearsal/REPORT.md`, X2).
+
+The bundle stays exactly as it is: it is the historical record of the 143 migrated identities
+and their 693 aliases, hashed into every sealed manifest. New definitions never touch it.
+
+**Three requirements**, executed by `features/promotion.py` (`research feature verify|promote|check`):
+
+1. *Golden values* -- `features/definitions/golden/<name>.json`: an event tape, snapshots with
+   expected values derived independently (the `derivation` text is mandatory), replayed through
+   `ProviderHost.from_instance_specs` -- the same adapters a study binds, never the provider class.
+2. *Causal availability* -- reuses the existing machinery: the definition's declared input
+   contract (`source_timeframe`) must cover every stream the adapter consumes; each value is
+   produced with only events available at or before its epoch dispatched; and the fixture must
+   carry an event after its last snapshot so the host's `SNAPSHOT_BEFORE_LATEST_RUNTIME_EVENT`
+   guard is exercised (`GOLDEN_FIXTURE_NO_POST_SNAPSHOT_EVENT` otherwise).
+3. *Determinism* -- two replays on fresh hosts, byte-identical rows.
+
+`promote` writes `features/definitions/promotions/<name>.json`, hash-bound to the definition
+record, the fixture and the provider module, and regenerates the golden resolution fixture.
+`features.registry` admits a catalogue definition to the ACTIVE authority only while that record
+exists and its hashes hold; the compiler re-executes the evidence for every promoted definition a
+study binds (`FEATURE_PROMOTION_EVIDENCE_INVALID`, a `MISSING_CAPABILITY` gap); preflight
+re-executes every record inside the `FEATURE_PROMOTION` gate. Candidate and legacy authorities
+never see promotions.
+
+**Substitution guard.** Promotion refuses a name that exists in the bundle
+(`FEATURE_ALREADY_IN_AUTHORITY_BUNDLE`), a name that is already an alias of another identity
+(`FEATURE_NAME_COLLIDES_WITH_ALIAS`) and an instance whose generated physical alias is owned by a
+different canonical name (`PHYSICAL_ALIAS_COLLISION`). A promoted feature is bound by
+`plan_sha256`, the frozen manifest and the replay closure exactly as a bundle feature: its record,
+fixture and promotion record are seeded into the closure by `features.registry.definition_files`.
+
+**Catalogue as data.** `features/definitions/canonical/` holds one record module per definition
+(`DEFINITION = FeatureDefinition(...)`, file stem = canonical name, filename-order discovery, a
+misnamed or duplicated record fails the whole catalogue closed). An addition is a new file, never
+an edit to a shared statement. The golden resolution fixture is keyed per resolvable name so an
+addition appears as new keys only; `python -m features.tests.golden_feature_resolution
+--additive-against <ref>` is the mechanical statement of that rule (`--allow <name>` for the
+promotion of an already-declared record).
+

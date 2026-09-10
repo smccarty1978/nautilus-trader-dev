@@ -544,8 +544,21 @@ def assert_feature_promotions(**kwargs) -> Dict[str, Any]:
                     raise FeaturePromotionError(
                         f"CANONICAL_PROMOTION_FACTS_INCOMPLETE: missing={missing}, unverified={unverified}"
                     )
+                # Catalogue definitions promoted by their own evidence (features/promotion.py):
+                # every promotion record must still bind its definition, fixture and provider
+                # by hash AND replay to the recorded observed values. A stale or forged record
+                # fails the gate here exactly as it fails the compiler.
+                from features.promotion import check_all
+                evidence = check_all(execute=True)
+                if not evidence["passed"]:
+                    failed = [r for r in evidence["records"] if not r["passed"]]
+                    raise FeaturePromotionError(
+                        "FEATURE_PROMOTION_EVIDENCE_INVALID: " + "; ".join(
+                            f"{r['feature']}: {r.get('execution_error') or r.get('binding_errors')}" for r in failed))
                 return {"passed": True, "authority": "canonical_active",
-                        "canonical_definition_count": len(definitions), "violations": []}
+                        "canonical_definition_count": len(definitions),
+                        "evidence_promoted_definitions": [r["feature"] for r in evidence["records"]],
+                        "violations": []}
         except ImportError:
             pass
     report = check_feature_promotions(**kwargs)
