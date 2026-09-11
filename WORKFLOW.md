@@ -903,3 +903,47 @@ binary prints are ever used, and a worker whose required capability is absent fa
 for the result card. A human-attended session of any provider can act as a worker by following the same packet.
 The `scripted` provider exists for tests only (`research_workflow/tests/supervisor_support.py`;
 `scripts/tests/test_supervisor_blackbox.py` is the black-box proof).
+
+## P. THE FOUR STAGES: COLLECT (frames)
+
+Collection makes no claim; it produces rows. A `stage: collect` study (`docs/RESEARCH_WORKFLOW.md`
+§21.16) runs the controller through `merge` under a **frame seal** (closure composite + causal
+audit; no contract audit, no deliverable gate, no fit/freeze/oos/close) and is then registered as
+an immutable, content-hashed **frame** that outlives the study:
+
+```bash
+python scripts/research.py study new my_frame --from-question question.md      # then: stage: collect, model: none, dev: []
+python scripts/run_governed_study.py --study studies/my_frame --through seal --execute-authorized   # NEEDS_CAUSAL_AUDIT only
+python scripts/research.py audit ingest --study studies/my_frame --type causal --report studies/my_frame/audit/pass_01.md
+python scripts/run_governed_study.py --study studies/my_frame --through merge --execute-authorized  # -> READY_TO_REGISTER_FRAME
+python scripts/research.py frame register --study studies/my_frame                                  # -> frame_id
+python scripts/research.py frame list | verify <frame_id>
+```
+
+Rules: an `every_candidate` collect study is **permissive** (no `population.qualify`; carry the
+fields a later selection reads as `features.metadata` columns, so selection is a filter, not a
+re-collection); a trigger-graph study keeps its `qualify` because it shapes the trigger state.
+`frame_id` is independent of the study id (two identical replays register one frame) and includes
+the chronology authority (train, prohibited, windows). The frame root is machine-local
+(`~/.nt_research/frames/` or the sibling `frames/` of the model root). The supervisor drives a
+collect study end to end: design -> causal audit -> frame seal -> smoke..merge -> a `register` job
+-> `FRAME_REGISTERED` (terminal; the receipt is `artifacts/frame_registration.json`). No contract
+audit, no analysis worker, no closure.
+
+**EXPLORE (step 4)** reads a registered frame by id and produces tables from the same registered
+`analysis_ops` a study's `analysis:` composes -- no study, no seal, no audit, no closure, no
+deliverable gate, freely re-runnable, frame verified byte-identical before and after:
+
+```bash
+python scripts/research.py explore compile --spec explore.yaml                       # prove it (registered ops, DAG, artifacts)
+python scripts/research.py explore run --frame <frame_id> --spec explore.yaml [--out DIR]   # tables in seconds, not the hour of replay
+```
+
+`explore.yaml` is the `analysis:` block detached from a study (`explore: {id, question}`,
+optional `frame: <id>`, `analysis: {steps, artifacts}`); the only built-in frame is `frame`
+(`source`, `train_frame`, `model_scores` and context-reading ops belong to a research study).
+Outputs go to `<frame root sibling>/explore/<frame_id>/<spec sha12>/` with `explore.json`.
+A census that spans ETH and RTH censors at the calendar dataset's own trading-day close with
+`outcome: {session: TRADING_DAY, session_end: censor}` (`population.session: ALL`). BIND and
+SELECTION follow as separate steps.
+

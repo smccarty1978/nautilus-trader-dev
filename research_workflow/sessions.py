@@ -12,6 +12,18 @@ from __future__ import annotations
 from bisect import bisect_right
 from typing import Any, Dict, Mapping, Optional, Sequence, Tuple
 
+# Session vocabulary. RTH / ETH / ALL gate a population and censor an outcome on every dataset.
+# TRADING_DAY is the calendar dataset's own session row -- the (open_ns, close_ns] tape of one
+# trading day as the dataset's `sessions` reference table defines it (NQ_1S_V2_GLOBEX: the Globex
+# trading day, holidays and early closes included). It is admitted as an outcome CENSORING session
+# only, and only on a calendar dataset: a legacy weekday-rule dataset has no trading-day table, so
+# it has no trading-day close to censor at (SessionCloseUndefinedError, and the compiler refuses it
+# before the runtime is reached). Censoring at the trading-day close and clustering on the
+# session day then agree on what a day is.
+TRADING_DAY = "TRADING_DAY"
+SESSION_NAMES = ("RTH", "ETH", "ALL")
+CENSOR_SESSION_NAMES = SESSION_NAMES + (TRADING_DAY,)
+
 
 class SessionRowInvalidError(ValueError):
     """Raised when a sessions reference-table row is internally inconsistent (e.g.
@@ -47,7 +59,11 @@ class LegacySessionTable:
     def __init__(self, session: str = "RTH") -> None:
         from utils.session_boundaries import is_in_session, session_close_ns, resolve_session_window
         key = (session or "").strip().upper()
-        if key not in {"RTH", "ETH", "ALL"}:
+        if key == TRADING_DAY:
+            raise SessionCloseUndefinedError(
+                "SESSION_CLOSE_UNDEFINED_FOR_LEGACY_TRADING_DAY: TRADING_DAY is a calendar dataset's own session row; "
+                "the legacy weekday-rule session table has no trading-day close.")
+        if key not in SESSION_NAMES:
             resolve_session_window(key)  # raises UnknownSessionError
         self.name = key
         self._in = is_in_session
@@ -155,16 +171,18 @@ def session_windows(sessions_df: Any, session: str, *, holidays_df: Any = None) 
     RTH on a session day is ``(08:30:00 CT, min(15:15:00 CT, close_ns)]`` -- an early close
     tightens the window, it never widens it. ETH is the contiguous complement within that
     session's tape: the pre-open segment ``(open_ns, 08:30:00 CT]`` and the post-close segment
-    ``(15:15:00 CT [or the pre-2021-06-28 halt end, 15:30 CT], close_ns]``. A day the sessions
-    table has no row for (holiday / non-session day) contributes no window. All wall-clock
+    ``(15:15:00 CT [or the pre-2021-06-28 halt end, 15:30 CT], close_ns]``. TRADING_DAY is the
+    row itself, ``(open_ns, close_ns]`` -- the trading day the dataset defines, used as an outcome
+    censoring session. A day the sessions table has no row for (holiday / non-session day)
+    contributes no window. All wall-clock
     conversions are DST-safe (``zoneinfo``).
     """
     import pandas as pd
     from zoneinfo import ZoneInfo
 
     key = str(session).upper()
-    if key not in {"RTH", "ETH"}:
-        raise ValueError(f"UNSUPPORTED_CALENDAR_SESSION: {session!r} (only RTH/ETH derive explicit windows)")
+    if key not in {"RTH", "ETH", TRADING_DAY}:
+        raise ValueError(f"UNSUPPORTED_CALENDAR_SESSION: {session!r} (only RTH/ETH/TRADING_DAY derive explicit windows)")
     tz = ZoneInfo(_CT)
     out: list = []
     prev_close_ns: Optional[int] = None
@@ -198,6 +216,10 @@ def session_windows(sessions_df: Any, session: str, *, holidays_df: Any = None) 
                 raise SessionHaltInvalidError(
                     f"SESSION_HALT_INVALID: session_date={day} halt_end_ns={int(halt_end)} < rth_close={rth_close} "
                     "(halt cannot end before the RTH close it interrupts)")
+        if key == TRADING_DAY:
+            # the trading day IS the row: its whole (open_ns, close_ns] tape, halts included
+            out.append((open_ns, close_ns))
+            continue
         if key == "RTH":
             if rth_open < rth_close:
                 out.append((rth_open, rth_close))
@@ -232,7 +254,7 @@ def resolve_calendar_session_spec(session_spec: Mapping[str, Any], repo_root: An
     needed = {str(spec.get("session", "RTH")).upper(), str(spec.get("censor_session") or spec.get("session", "RTH")).upper()}
     rows_by_session: Dict[str, list] = {}
     for name in sorted(needed):
-        if name in ("RTH", "ETH"):
+        if name in ("RTH", "ETH", TRADING_DAY):
             rows_by_session[name] = session_windows(sessions_df, name, holidays_df=tables.get("holidays"))
     spec["rows_by_session"] = rows_by_session
     spec["rows"] = rows_by_session.get(str(spec.get("session", "RTH")).upper(), [])
@@ -242,4 +264,5 @@ def resolve_calendar_session_spec(session_spec: Mapping[str, Any], repo_root: An
 
 __all__ = ["AllSessionTable", "LegacySessionTable", "CalendarSessionTable", "SplitSessionTable", "build_session_table",
            "session_windows", "resolve_calendar_session_spec", "SessionCloseUndefinedError",
+           "TRADING_DAY", "SESSION_NAMES", "CENSOR_SESSION_NAMES",
            "SessionRowInvalidError", "SessionHaltInvalidError"]
