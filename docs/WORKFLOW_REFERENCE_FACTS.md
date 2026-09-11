@@ -69,6 +69,63 @@ which asserts an active-universe size of 129 and already fails on clean main `8b
 this branch). Three scopes, so not comparable with the two-scope 74m41s or five-scope 83m14s figures above.
 Re-run the command above to re-derive; the card is in the merge-session scratchpad evidence (`broad_gate.json`).
 
+
+## Broad merge gate for chore/four_stages_collect (2026-09-11)
+
+`python scripts/test_delta.py research_workflow/tests scripts/tests` on commit `9f4e3b8b`, alone on the host:
+**99m02s** (5,941.4 s `wall_seconds`), **2,245 ran / 2,157 passed / 61 failed**. The card reported all 61
+as `NEW_FAILURE` for one reason, `BASELINE_COMMIT_MISMATCH`: the default reference is `git merge-base HEAD main`
+(`9907dee8`) while the baseline was recorded at `ee16002e`. Re-classified offline with the classifier's own
+function (`test_delta.classify(results, baseline, scope, reference_commit=baseline["platform_commit"])`):
+**53 known / 8 NEW** -- the four movers already recorded on 2026-09-09, plus four that need git-ignored artifacts
+absent from a fresh worktree (three pass on the canonical checkout and on the branch once the joblib is copied;
+the fourth authenticates closure evidence against ignored model files and matches the baseline on the canonical
+checkout). Zero regressions; merged `c480d8af`. Two scopes; comparable with the 74m41s figure only.
+
+## Baseline re-record on clean main c480d8af (2026-09-11)
+
+`python scripts/test_delta.py research_workflow/tests scripts/tests features/tests tests research/analysis/tests --update-baseline --reason "..." --json`
+on clean `main` `c480d8af0068c69d19669497c53747efa187b5dd`, alone on the host, Python 3.13.7, Windows.
+**Scopes covered by the baseline: `features/tests`, `research/analysis/tests`, `research_workflow/tests`,
+`scripts/tests`, `tests`** (recorded in the file's `scopes`; a failure outside them is
+`NEW_FAILURE_OUTSIDE_BASELINE_SCOPE`). **2,502 tests ran, 65 expected failures** (all `pre_existing`), schema 2.
+`--check-baseline` over the five scopes: OK, reference `c480d8af`.
+
+**Wall time: 200m09s** (05:43:17 to 09:03:26 local, start/end markers around the process), against 74m41s,
+81m59s, 83m14s, 88m02s, 97m53s and 99m02s. It is the longest run recorded and roughly 2.4x the previous
+five-scope figure (83m14s at `ee16002e`); no other test process ran on the host and the machine was idle
+(overnight, unattended), so the excess is unexplained -- do not treat it as the cost of the scope. Re-run the
+command above to re-derive.
+
+Membership against the 64-entry record at `ee16002e`: **one added, zero removed, 31 signatures moved**.
+- Added: `scripts/tests/test_multi_agent_ownership.py::test_10_simultaneous_claims_have_exactly_one_winner`
+  (the loser of a 10-way claim race observed `STUDY_CLAIM_IN_PROGRESS` instead of
+  `STUDY_WORKTREE_OWNED_BY_ANOTHER_AGENT`). It passes alone (twice, 0.4 s): a timing-sensitive test that failed
+  under the load of the broad run. It is recorded because it failed in the run; it is not on the expected list.
+- Moved, real content (2): `features/tests/test_candidate_authority.py::test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it`
+  (asserts an active-universe size of 129; 143 at `ee16002e`, **145** now) and
+  `scripts/tests/test_analysis_loader.py::test_real_fixture_b_is_the_stale_compiled_study_case` (a truncated
+  hash token in the detail).
+- Moved, traceback path only, same last error line (9): the two `test_rt2b2_editing_a_governance_authority_moves_the_composite`
+  cases (`scripts/check_feature_promotion.py`, `scripts/select_required_tests.py`; they move with every platform
+  commit), `test_rt1b1_real_code_edit_makes_existing_evidence_stale`, `test_wb_timeout_still_blocks`,
+  `test_test_delta_classifies_against_committed_baseline`, `test_aggregate_freeze_opens_the_real_oos_gate`
+  (closure-evidence authentication path since `f136a469`), and the three `test_diagnostic_followup_collector.py` cases.
+- Moved, line numbers / hashes only (2): `test_acc12_canaries_green`, `test_no_hardcoded_feature_count_in_generic_workflow`.
+- Moved, stored representation only (18): the recorded signature now carries the `<ROOT>` placeholder where the
+  `ee16002e` record stored the literal repo path (`test_stage3_integration.py` x8, `test_nt_runner_backtest.py` x6,
+  `test_guardrail_mutations.py` x2, `test_stage4_parity.py`, `test_spec_fidelity_and_oos_lock.py`). The classifier
+  normalises both sides at run time, so these matched as known before and match now.
+
+Not entries, by design of the canonical checkout: `test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row`,
+`test_episode_study_is_provider_host_mode_and_all_features_bind` and `test_stage3_model_c_long_short_routing`
+pass here because the git-ignored `train_fitted_models.joblib` under
+`studies/clean_maturity_flip_model_rolling_productivity` exists on this machine; in any worktree without it they
+are `NEW_FAILURE`. **Fragile entries (noted, not fixed):** those three, plus
+`test_aggregate_freeze_opens_the_real_oos_gate` (its message depends on ignored model files under
+`studies/clean_maturity_flip_model_180s_horizon/artifacts/models/`), pass or fail according to what happens to
+be on the machine, and the added claim-race entry is timing-sensitive; all of them will drift again.
+
 ## Broad merge gate for chore/cleanup_and_closure (2026-09-10)
 
 Same command and three scopes as the entry above, on commit `1b990d36` (six commits on main `9be6eba2`),
