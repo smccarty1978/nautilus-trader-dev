@@ -21,10 +21,10 @@ research_question: "# NQ MULTI-TIMEFRAME REGIME PATH ATLAS — ONE-YEAR PILOT (2
   \ `analysis.decomposition.buckets`,\n    `analysis.anchor.first_threshold_crossing`,\n    `analysis.control.cell_matched`, `analysis.classify.precedence`,\n    `analysis.metric.tail_lift`, `analysis.gate.population_parity`,\n    `analysis.gate.arm_delta_integrity`.\n      - T3 / T4 map onto `analysis.path.anchored_offsets`.\n      - T2 maps partly onto `analysis.incidence.cumulative`.\n      - T1, T6, T7, T8 have NO generic grouped-summary producer\n        (mean / median / quantiles by group).\n      - §9 has NO producer at all: `grep -rn cluster research/analysis/`\n        returns nothing. There is no cluster-robust standard error\n        anywhere in the analysis harness, and §9 makes one mandatory on\n        every reported mean and difference.\n    Expect the compile-time deliverable-producer gate to fail on T1,\n    T6, T7, T8 and on §9, and expect the capability flow to add one\n    grouped-descriptive op and one session-day-clustered uncertainty op\n    before this study can seal.\
   \ §13 authorizes exactly that; §8 says\n    route it as a typed analysis capability gap rather than writing\n    study-local Python.\n\nA5. PLATFORM FREEZE. The platform is under a declared freeze after\n    `f136a469` (2026-09-10): no platform work until three real studies\n    have run. This study is one of those real studies and §13\n    authorizes capability workers under `platform_merge:\n    approval_required`, so the freeze does not block it — but every\n    capability merge here is an owner-approved exception, not routine."
 
-status: DESIGN_BLOCKED_CAPABILITY_GAP  # re-scoped by OWNER AMENDMENT 01; G0 and G1 no longer block this study
+status: COMPILED_COLLECT_STAGE  # session one (2026-09-11): stage: collect, single 1m anchor, TRADING_DAY censoring; compiled at plan_sha256 67c7b47d
 dataset_id: NQ_1S_V2_GLOBEX
-platform_commit: 4f37a50796a69ae7f54bf59a8d45185601838341
-phase: A
+platform_commit: 451836f81518936d8cf5c95489d3b3c40e43c96d  # main merged into the study worktree 2026-09-11 (THE FOUR STAGES step 1 + 4, TRADING_DAY censoring)
+phase: B  # phase A closed by compile 2026-09-11; B (readiness..frame seal) continues in session one
 
 # ---------------------------------------------------------------------------------------------
 # AUTHORITIES RESOLVED (contract section 2). Verified against the registry at the commit above.
@@ -143,6 +143,55 @@ terminal_decisions:
     censoring flag. The grammar admits only RTH/ETH/ALL and AllSessionTable.session_close returns
     None, so this needs the G2 capability before it compiles -- that is a capability route under
     contract section 13, not a further question for the owner.
+  # ---------------------------------------------------------------------------------------
+  # SESSION ONE (2026-09-11) -- the acceptance test of THE FOUR STAGES. Composition decisions
+  # taken to make the pilot COLLECT, on platform main 451836f8. They implement OWNER AMENDMENT 01
+  # and do not amend the contract; where the registered surface cannot supply a section 7 block
+  # the fact is recorded (gap_inventory.G6), never imputed or patched around.
+  # ---------------------------------------------------------------------------------------
+  four_stages_collect: >
+    The pilot is a `stage: collect` study (WORKFLOW.md P; docs/RESEARCH_WORKFLOW.md 21.16). It
+    runs the controller through merge under a FRAME SEAL (closure composite + causal audit; the
+    contract audit is NOT_REQUIRED because a frame makes no claim), fits no model, declares no
+    analysis and no deliverables, and is registered as an immutable frame. T1-T8 are produced by
+    EXPLORE (step 4) over the registered frame from REGISTERED analysis_ops only; a table with no
+    registered producer is reported as an unsatisfied requirement, never computed in study-local
+    Python. The study is never closed (no STUDY_CLOSED for a collect study); the contract's
+    section 15 card is filled from the frame record and the EXPLORE tables.
+  population_cadence: >
+    population.cadence: completed_1m -- one candidate per completed 1m bar of every 1m dual-EMA
+    regime, ETH and RTH (session: ALL), no qualify. identity = (regime_1m.start_ns,
+    checkpoint_index); the flip row is the first checkpoint of a regime (bars_1m == 1,
+    flipped_1m == true). This REPLACES the phase-A placeholder completed_1s and IS the declared
+    science of OWNER AMENDMENT 01 A1: path offsets 1,2,3,5,10,20 are 1m bars of the flipping
+    timeframe, read off the per-checkpoint metadata sequence mfe_atr_1m / mae_atr_1m /
+    pnl_atr_1m / retained_1m.
+  alignment_context_as_metadata: >
+    The other eight timeframes (5s, 30s, 3m, 5m, 15m, 30m, 1h, 4h) are recorded at T as RAW
+    TRACKER STATE metadata columns (dir_<tf>, age_s_<tf>, bars_<tf>, start_ns_<tf>, atr_<tf>) from
+    nine regime.dual_ema trackers with identical parameters. agrees/disagrees is the sign
+    comparison dir_<tf> == dir_1m, applied at EXPLORE as a filter (a permissive frame carries the
+    fields a later selection reads; WORKFLOW.md P). The registered regime feature family covers
+    only 1m/5m/5s (G3) and its runtime adapters render only prior_1m/prior_5m/current_5m aliases;
+    the registered feature.regime_alignment (1m vs 5m) and feature.regime_direction (5m) are
+    composed where they exist.
+  censoring_encoding: >
+    outcome.session: TRADING_DAY with session_end: censor (OWNER AMENDMENT 01 A2). The compiled
+    plan carries session {kind: calendar, session: ALL, censor_session: TRADING_DAY, dataset
+    NQ_1S_V2_GLOBEX, reference_digest e577a361...}; resolution_precedence is [SESSION_END, GAP,
+    BARRIER_TOUCH, HORIZON_EXPIRY] with max_gap 300s and horizon 24h as the observation bound.
+  volume_block: >
+    feature.relative_volume (registered) has no RuntimeProviderAdapter (G6). The OHLCV/delta
+    provider is bindable, so the VOLUME block is: bar_volume (the flip bar's own volume),
+    vol_sum_60s_vs_1200s_ratio (last 1m of volume vs the trailing 20m: "flip-bar volume vs prior
+    N bars"), est_delta_ratio_60s. Volume and delta are ESTIMATED from bar geometry. Raw volume
+    is never compared across years (single-year pilot).
+  eth_rth_flag: >
+    feature.session_membership / feature.session_elapsed are registered but their provider
+    (GenericContextProvider) renders only ema_slope at runtime (G6). The ETH/RTH distinction of
+    contract section 0 is therefore derived downstream from triggering_1s_ts_init against the
+    dataset's committed sessions reference table -- a filter over the frame, never a population
+    gate -- and T6's ETH vs RTH split is reported as unsatisfied by a registered analysis op.
   terminal_label: DESCRIPTIVE_ATLAS_COMPLETE (pilot scope 2023).
 
 # ---------------------------------------------------------------------------------------------
@@ -273,4 +322,24 @@ gap_inventory:
 # No SCIENTIFIC_SEMANTIC_DECISION_REQUIRED was reached: every semantic choice this design needed
 # was already fixed by the contract and is recorded in terminal_decisions above.
 # ---------------------------------------------------------------------------------------------
+  G6_registered_features_without_runtime_adapters:
+    kind: MISSING_CAPABILITY (runtime binding; research_workflow/provider_host.py ADAPTER_REGISTRY)
+    where: features.instances
+    found: session one, 2026-09-11, platform main 451836f8
+    finding: >
+      The compiler's binding proof (ProviderHost.verify_bindings) refuses REGISTERED, VERIFIED
+      features whose canonical provider has no RuntimeProviderAdapter or whose adapter does not
+      render the requested alias:
+        feature.session_membership, feature.session_elapsed  -> GenericContextProvider adapter renders ema_slope only
+        feature.relative_volume, feature.activity_flip_count -> GenericArrivalVolumeProvider / GenericMedianCenterCompatibilityProvider have no adapter
+        feature.regime_age_min at 1m current              -> StructuralGeometryAdapter renders current_5m_regime_age_min only
+        feature.regime_net_directional_move_atr at 5m current -> not a snapshot key of the structural adapter
+        feature.distance_to_completed_range_*_atr at 1m   -> reference_timeframe domain is 5m only
+      `research cap describe` reports all of them status: verified. The registry and the runtime
+      adapter surface disagree; the compiler is the authority and the study composes only what binds.
+    consequence: >
+      ETH/RTH flag not carried as a feature column (derived downstream from triggering_1s_ts_init);
+      relative volume vs a trailing baseline and the session flip count are not carried.
+    blocks: "[T6 ETH vs RTH split] and the section 7 SESSION AND TIME / VOLUME(relative) blocks"
+
 open_questions_for_the_owner: []

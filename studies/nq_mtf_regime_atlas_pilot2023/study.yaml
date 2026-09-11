@@ -1,20 +1,26 @@
 # NQ MULTI-TIMEFRAME REGIME PATH ATLAS -- ONE-YEAR PILOT (2023)
-# Composition of REGISTERED Platform V2 primitives. The full research contract is
-# docs/questions/nq_mtf_regime_atlas_pilot2023.md; the authoritative decision contract is
-# studies/nq_mtf_regime_atlas_pilot2023/research_decision.yaml (which wins over this file).
+# THE FOUR STAGES, step 1: a `stage: collect` study. It produces an immutable FRAME (one row per
+# completed 1m bar of every 1m dual-EMA regime in 2023, ETH and RTH), makes no claim, fits no
+# model, declares no analysis. The tables (T1-T8, contract section 8) are produced by EXPLORE
+# (step 4) over the registered frame, from registered analysis_ops only.
 #
-# DESCRIPTIVE STUDY. No model, no economics (contract section 11).
+# The full research contract is docs/questions/nq_mtf_regime_atlas_pilot2023.md; the authoritative
+# decision contract is studies/nq_mtf_regime_atlas_pilot2023/research_decision.yaml (which wins over
+# this file). OWNER AMENDMENT 01 applies: single 1m anchor (A1), Globex trading-day censoring (A2).
 #
-# Where the composition needs a primitive that nobody has registered, this file writes
-# "unresolved: <semantic requirement>" instead of inventing an id
-# (docs/examples/registry_blind_draft.yaml). "research study compile" classifies each one as a
-# typed gap; contract section 13 routes them to a capability worker. Every id NOT prefixed
-# "unresolved:" was verified against "research cap list" at platform commit 4f37a507.
+# Every feature id here is REGISTERED (research cap describe) at the timeframes it declares. The
+# contract's section 7 blocks that no registered feature provides (VWAP, ATR percentile, session
+# bucket, day of week, minutes-to-RTH-close, overnight gap, prior-session high/low; gap_inventory G4)
+# and the regime feature family at 30s/3m/15m/30m/1h/4h (G3) are NOT composed here: the raw tracker
+# state of every timeframe at T (direction, age, bars, start, ATR) is carried as metadata columns
+# instead, so a later selection or EXPLORE reads alignment as a filter, never a re-collection.
+stage: collect
+
 study:
   id: nq_mtf_regime_atlas_pilot2023
   tier: 2
-  question: "Descriptively, how does an NQ dual-EMA regime move after it flips -- MFE/MAE path at fixed bar offsets, path ordering, giveback and realized outcome in ATR -- at each of nine timeframes, and how does that differ by higher-timeframe alignment, session and volatility context (2023 pilot)?"
-  description: "Descriptive orientation, not falsification. Census of every regime flip on 5s/30s/1m/3m/5m/15m/30m/1h/4h across ETH and RTH for 2023 only. Nothing found here is a finding."
+  question: "Descriptively, how does an NQ 1m dual-EMA regime move after it flips -- MFE/MAE path at fixed 1m bar offsets, path ordering, giveback and realized outcome in ATR -- and how does that differ by higher-timeframe alignment (5s/30s/3m/5m/15m/30m/1h/4h context at T), session and volatility context (2023 pilot)?"
+  description: "Descriptive orientation, not falsification. Census of every 1m regime flip across ETH and RTH for 2023 only, with one checkpoint per completed 1m bar until the next 1m flip. Nothing found here is a finding."
 
 streams:
   # 1s is the execution stream (epochs). 1s and 1m are external in the DatasetSpec; every other
@@ -33,301 +39,169 @@ context:
   regime_30m: {tracker: regime.dual_ema, timeframe: 30m}
   regime_1h:  {tracker: regime.dual_ema, timeframe: 1h}
   regime_4h:  {tracker: regime.dual_ema, timeframe: 4h}
-
-  # contract sections 5 and 6: running MFE/MAE/realized progress since the regime start, in that
-  # regime's own frozen ATR, measured on that timeframe's OWN bars (path offsets are "bars OF THAT
-  # TIMEFRAME").
-  excursion_5s:  {tracker: regime.excursion, bars: 5s,  regime: regime_5s}
-  excursion_30s: {tracker: regime.excursion, bars: 30s, regime: regime_30s}
-  excursion_1m:  {tracker: regime.excursion, bars: 1m,  regime: regime_1m}
-  excursion_3m:  {tracker: regime.excursion, bars: 3m,  regime: regime_3m}
-  excursion_5m:  {tracker: regime.excursion, bars: 5m,  regime: regime_5m}
-  excursion_15m: {tracker: regime.excursion, bars: 15m, regime: regime_15m}
-  excursion_30m: {tracker: regime.excursion, bars: 30m, regime: regime_30m}
-  excursion_1h:  {tracker: regime.excursion, bars: 1h,  regime: regime_1h}
-  excursion_4h:  {tracker: regime.excursion, bars: 4h,  regime: regime_4h}
-
-  # -------------------------------------------------------------------------------------------
-  # UNRESOLVED (contract section 4). The population of this study is "one row per regime flip,
-  # PER TIMEFRAME" -- nine simultaneous candidate streams in one collection, each carrying its own
-  # direction, its own frozen ATR, its own bar cadence and its own terminal (its next flip).
-  # "population:" in the v2 grammar is single-anchored: one direction, one anchor_identity, one
-  # cadence. Every part exists (the nine dual_ema trackers above); they cannot be composed into
-  # nine populations in one study, and no registered tracker or trigger primitive fans out
-  # (tracker.episode.population_engine, trigger.population.established_filter and
-  # trigger.host.completed_bar_cadence are all single-anchor). Declared here so the compiler types
-  # it, rather than the study silently narrowing to one timeframe.
-  flip_population:
-    tracker: "unresolved: per-timeframe regime-flip population fan-out -- one candidate stream per declared timeframe, emitting one anchor row per (timeframe, regime start) plus one checkpoint per completed bar of that timeframe until that timeframe's next flip, exposing per row: timeframe, dir, start_ns, atr, frozen_atr and the bar offset since the flip"
-    timeframes: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]
-    regimes: [regime_5s, regime_30s, regime_1m, regime_3m, regime_5m, regime_15m, regime_30m, regime_1h, regime_4h]
-    excursions: [excursion_5s, excursion_30s, excursion_1m, excursion_3m, excursion_5m, excursion_15m, excursion_30m, excursion_1h, excursion_4h]
+  # contract sections 5 and 6: running MFE / MAE / realized progress of the CURRENT 1m regime since
+  # its start, in the 1m regime's own frozen ATR, measured on 1m bars (path offsets are "bars OF
+  # THAT TIMEFRAME" -- 1m for the 1m anchor).
+  excursion_1m: {tracker: regime.excursion, bars: 1m, regime: regime_1m}
 
 population:
-  # contract section 0: ETH and RTH both, distinguished (by feature.session_membership) not merged.
+  # OWNER AMENDMENT 01 A1: SINGLE ANCHOR, 1m regime flips only. One candidate per completed 1m bar
+  # of every 1m regime; identity is the regime start; the flip row is checkpoint 0 (bars_1m == 1).
+  # contract section 0 / A2: ETH and RTH both, distinguished by feature.session_membership, never
+  # merged and never filtered.
   session: ALL
-  # contract section 6: path offsets are in bars OF THE FLIPPING TIMEFRAME, so the real checkpoint
-  # cadence is PER ROW and cannot be a single declared stream. That per-timeframe cadence is part of
-  # the context.flip_population fan-out gap ("one checkpoint per completed bar of that timeframe").
-  # `completed_1s` here is the finest declared epoch, NOT the science: it exists so the compiler can
-  # reach and report the rest of the surface. An unknown `completed_<name>` cadence currently raises
-  # ValueError out of research_workflow/grammar/compiler.py:746 instead of returning a typed gap
-  # (platform defect, recorded in research_decision.yaml gap_inventory.G1).
-  cadence: completed_1s
-  # contract section 4: NO qualify. Census, not a qualified population -- every flip is a row.
-  direction: flip_population.dir
-  anchor_identity: flip_population.start_ns
+  cadence: completed_1m
+  # contract section 4 / COLLECT rule: NO qualify. Census, not a qualified population.
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
 
 triggers: every_candidate
 
 features:
+  # Only instances a registered RuntimeProviderAdapter can render at collection time are composed
+  # (research_workflow/provider_host.py ADAPTER_REGISTRY). Registered features whose provider has
+  # no adapter (session_membership, session_elapsed, relative_volume, activity_flip_count, the
+  # regime family at 5s/30s/3m/15m/30m/1h/4h) are recorded in research_decision.yaml G6, not
+  # composed. The ETH/RTH flag therefore comes from triggering_1s_ts_init against the dataset's
+  # committed sessions table downstream, never from a filter here.
   instances:
-    # --- contract section 7 ALIGNMENT: current direction and age of every timeframe at T --------
-    - {feature: regime_direction, over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: current, bar_state: completed}
-    - {feature: regime_age_min,   over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: current, bar_state: completed}
-    # Q5: a 1m flip broken out by whether 5m / 15m / 1h agree (recorded, not derived later).
-    - {feature: regime_alignment, source_timeframe: 1m, over: {reference_timeframe: [5m, 15m, 1h]}, context: current, bar_state: completed}
+    # --- contract section 7 ALIGNMENT (registered + bindable): 1m vs 5m agreement, 5m direction/age
+    - {feature: regime_alignment, source_timeframe: 1m, reference_timeframe: 5m, context: current, bar_state: completed}
+    - {feature: regime_direction, timeframe: 5m, context: current, bar_state: completed}
+    - {feature: regime_age_min,   timeframe: 5m, context: current, bar_state: completed}
 
-    # --- contract section 7 PRIOR STATE: the prior regime on the same timeframe -----------------
-    - {feature: regime_efficiency,               over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: prior, bar_state: completed}
-    - {feature: regime_mfe_atr,                  over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: prior, bar_state: completed}
-    - {feature: regime_duration_min,             over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: prior, bar_state: completed}
-    - {feature: regime_net_directional_move_atr, over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: prior, bar_state: completed}
-    - {feature: activity_flip_count,             over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}}
+    # --- contract section 7 PRIOR STATE: the prior regime on 1m (same timeframe) and on 5m
+    - {feature: regime_efficiency,               over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
+    - {feature: regime_mfe_atr,                  over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
+    - {feature: regime_duration_min,             over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
+    - {feature: regime_net_directional_move_atr, over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
+    - {feature: regime_range_atr,                over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
 
-    # --- contract section 6 PATH: running geometry of the CURRENT regime at each checkpoint -----
-    - {feature: regime_mfe_atr,                  over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: current, bar_state: completed}
-    - {feature: regime_net_directional_move_atr, over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: current, bar_state: completed}
-    - {feature: regime_efficiency,               over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: current, bar_state: completed}
-    - {feature: regime_range_atr,                over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}, context: current, bar_state: completed}
+    # --- contract section 6 PATH on the 5m context regime (current + completed is supported at 5m)
+    - {feature: regime_mfe_atr,    timeframe: 5m, context: current, bar_state: completed}
+    - {feature: regime_efficiency, timeframe: 5m, context: current, bar_state: completed}
+    - {feature: regime_range_atr,  timeframe: 5m, context: current, bar_state: completed}
 
-    # --- contract section 7 SESSION AND TIME ---------------------------------------------------
-    - {feature: session_membership, session: RTH}
-    - {feature: session_elapsed, session: RTH, unit: minutes}
+    # --- contract section 7 PRIOR STATE: distance to the completed 5m range extremes in ATR
+    - {feature: distance_to_completed_range_high_atr, reference_timeframe: 5m, bar_state: completed}
+    - {feature: distance_to_completed_range_low_atr,  reference_timeframe: 5m, bar_state: completed}
 
-    # --- contract section 7 VOLUME -------------------------------------------------------------
-    # relative volume vs a trailing baseline; raw volume is never used alone (contract section 7).
-    - {feature: relative_volume, input_timeframe: 1m, bar_state: completed, aggregation_lookback: 1, baseline_lookback: 20}
-
-    # --- contract section 7 PRIOR STATE: distance to prior completed extremes in ATR ------------
-    - {feature: "unresolved: distance to the PRIOR SESSION high in own-timeframe ATR at T", alias: distance_to_prior_session_high_atr}
-    - {feature: "unresolved: distance to the PRIOR SESSION low in own-timeframe ATR at T", alias: distance_to_prior_session_low_atr}
-
-    # --- UNRESOLVED features (contract section 7; Appendix A3 -- nothing in features/ has these) -
-    - {feature: "unresolved: distance from the session VWAP in own-timeframe ATR at T", alias: vwap_distance_atr}
-    - {feature: "unresolved: side of the session VWAP at T (above/below, signed)", alias: vwap_side}
-    - {feature: "unresolved: session VWAP slope at T", alias: vwap_slope}
-    - {feature: "unresolved: percentile of the current ATR versus a trailing 20-day window of the same timeframe", over: {timeframe: [5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}}
-    - {feature: "unresolved: session bucket label at T (Asia / London / NY pre / open / lunch / PM / close)", alias: session_bucket}
-    - {feature: "unresolved: day of week of the trading session at T", alias: day_of_week}
-    - {feature: "unresolved: minutes remaining to the RTH close at T", alias: minutes_to_rth_close}
-    - {feature: "unresolved: overnight gap in ATR (this session's open versus the prior session's close)", alias: overnight_gap_atr}
+    # --- contract section 7 VOLUME (OHLCV/delta provider, bindable): the flip bar's own volume,
+    #     the last 1m of volume vs the trailing 20m (flip-bar volume vs prior N bars), and the
+    #     estimated delta ratio over the last 1m. Volume/delta are ESTIMATED from bar geometry.
+    #     Single-year pilot: raw volume is never compared across years (contract section 7).
+    - {feature: bar_volume, context: bar}
+    - {feature: vol_sum_vs_ratio, context: rolling, timeframe: 60s, timeframe_2: 1200s}
+    - {feature: est_delta_ratio,  context: rolling, timeframe: 60s}
 
   metadata:
-    # identity of the row (contract section 4: identity = timeframe + regime start)
-    flip_timeframe: flip_population.timeframe
     triggering_1s_ts_init: epoch.T
-    # contract section 5: record the RAW ATR denominators so both normalizations are auditable.
+    # --- the 1m anchor: regime state at T
+    dir_1m:        regime_1m.dir
+    prev_dir_1m:   regime_1m.prev_dir
+    flipped_1m:    regime_1m.flipped
+    bars_1m:       regime_1m.bars_in_regime
+    age_s_1m:      regime_1m.age_s
+    start_ns_1m:   regime_1m.start_ns
+    start_price_1m: regime_1m.start_price
+    atr_1m:        regime_1m.atr
+    frozen_atr_1m: regime_1m.frozen_atr
+    # --- contract section 6 PATH of the 1m regime at every 1m checkpoint, in the 1m frozen ATR.
+    #     time-to-MFE, time-to-MAE, which came FIRST, MFE retained (giveback) and the MAE-before-MFE
+    #     flag are read off this per-bar sequence at EXPLORE; never reconstructed from a terminal.
+    mfe_atr_1m:          excursion_1m.mfe_atr
+    mae_atr_1m:          excursion_1m.mae_atr
+    pnl_atr_1m:          excursion_1m.pnl_atr
+    retained_1m:         excursion_1m.retained_ratio
+    progress_windows_1m: excursion_1m.progress_windows
+    highest_high_1m:     excursion_1m.highest_high
+    lowest_low_1m:       excursion_1m.lowest_low
+    last_close_1m:       excursion_1m.last_close
+    # --- contract section 7 ALIGNMENT at the other eight timeframes: direction, age, bars, start
+    #     and ATR of each context regime at T (raw tracker state; agrees/disagrees is a sign
+    #     comparison against dir_1m at EXPLORE, a filter not a re-collection).
+    dir_5s:  regime_5s.dir
+    dir_30s: regime_30s.dir
+    dir_3m:  regime_3m.dir
+    dir_5m:  regime_5m.dir
+    dir_15m: regime_15m.dir
+    dir_30m: regime_30m.dir
+    dir_1h:  regime_1h.dir
+    dir_4h:  regime_4h.dir
+    age_s_5s:  regime_5s.age_s
+    age_s_30s: regime_30s.age_s
+    age_s_3m:  regime_3m.age_s
+    age_s_5m:  regime_5m.age_s
+    age_s_15m: regime_15m.age_s
+    age_s_30m: regime_30m.age_s
+    age_s_1h:  regime_1h.age_s
+    age_s_4h:  regime_4h.age_s
+    bars_5s:  regime_5s.bars_in_regime
+    bars_30s: regime_30s.bars_in_regime
+    bars_3m:  regime_3m.bars_in_regime
+    bars_5m:  regime_5m.bars_in_regime
+    bars_15m: regime_15m.bars_in_regime
+    bars_30m: regime_30m.bars_in_regime
+    bars_1h:  regime_1h.bars_in_regime
+    bars_4h:  regime_4h.bars_in_regime
+    start_ns_5s:  regime_5s.start_ns
+    start_ns_30s: regime_30s.start_ns
+    start_ns_3m:  regime_3m.start_ns
+    start_ns_5m:  regime_5m.start_ns
+    start_ns_15m: regime_15m.start_ns
+    start_ns_30m: regime_30m.start_ns
+    start_ns_1h:  regime_1h.start_ns
+    start_ns_4h:  regime_4h.start_ns
+    # contract section 5: RAW ATR denominators of all nine timeframes so both normalizations (own
+    # 1m ATR primary, 1h ATR secondary) are auditable.
     atr_5s:  regime_5s.atr
     atr_30s: regime_30s.atr
-    atr_1m:  regime_1m.atr
     atr_3m:  regime_3m.atr
     atr_5m:  regime_5m.atr
     atr_15m: regime_15m.atr
     atr_30m: regime_30m.atr
     atr_1h:  regime_1h.atr
     atr_4h:  regime_4h.atr
-    # contract section 6: running MFE / MAE / realized progress / retention, per timeframe, in that
-    # timeframe's own frozen ATR. The per-bar checkpoint sequence of these IS the path; time-to-MFE,
-    # time-to-MAE, which-came-first and the MAE-before-MFE flag are read off it at analysis.
-    mfe_atr_5s:   excursion_5s.mfe_atr
-    mae_atr_5s:   excursion_5s.mae_atr
-    pnl_atr_5s:   excursion_5s.pnl_atr
-    retained_5s:  excursion_5s.retained_ratio
-    mfe_atr_30s:  excursion_30s.mfe_atr
-    mae_atr_30s:  excursion_30s.mae_atr
-    pnl_atr_30s:  excursion_30s.pnl_atr
-    retained_30s: excursion_30s.retained_ratio
-    mfe_atr_1m:   excursion_1m.mfe_atr
-    mae_atr_1m:   excursion_1m.mae_atr
-    pnl_atr_1m:   excursion_1m.pnl_atr
-    retained_1m:  excursion_1m.retained_ratio
-    mfe_atr_3m:   excursion_3m.mfe_atr
-    mae_atr_3m:   excursion_3m.mae_atr
-    pnl_atr_3m:   excursion_3m.pnl_atr
-    retained_3m:  excursion_3m.retained_ratio
-    mfe_atr_5m:   excursion_5m.mfe_atr
-    mae_atr_5m:   excursion_5m.mae_atr
-    pnl_atr_5m:   excursion_5m.pnl_atr
-    retained_5m:  excursion_5m.retained_ratio
-    mfe_atr_15m:  excursion_15m.mfe_atr
-    mae_atr_15m:  excursion_15m.mae_atr
-    pnl_atr_15m:  excursion_15m.pnl_atr
-    retained_15m: excursion_15m.retained_ratio
-    mfe_atr_30m:  excursion_30m.mfe_atr
-    mae_atr_30m:  excursion_30m.mae_atr
-    pnl_atr_30m:  excursion_30m.pnl_atr
-    retained_30m: excursion_30m.retained_ratio
-    mfe_atr_1h:   excursion_1h.mfe_atr
-    mae_atr_1h:   excursion_1h.mae_atr
-    pnl_atr_1h:   excursion_1h.pnl_atr
-    retained_1h:  excursion_1h.retained_ratio
-    mfe_atr_4h:   excursion_4h.mfe_atr
-    mae_atr_4h:   excursion_4h.mae_atr
-    pnl_atr_4h:   excursion_4h.pnl_atr
-    retained_4h:  excursion_4h.retained_ratio
 
   bindings:
-    completed_1m:  {stream: 1m, regime: regime_1m}
-    completed_5s:  {tracker: regime_5s,  ready_gate: true}
-    completed_30s: {tracker: regime_30s, ready_gate: true}
-    completed_3m:  {tracker: regime_3m,  ready_gate: true}
-    completed_5m:  {tracker: regime_5m,  ready_gate: true}
-    completed_15m: {tracker: regime_15m, ready_gate: true}
-    completed_30m: {tracker: regime_30m, ready_gate: true}
-    completed_1h:  {tracker: regime_1h,  ready_gate: true}
-    completed_4h:  {tracker: regime_4h,  ready_gate: true}
+    completed_1m: {stream: 1m, regime: regime_1m}
+    completed_5s: {tracker: regime_5s, ready_gate: true}
+    completed_5m: {tracker: regime_5m, ready_gate: true}
     regime_transition_1m: {tracker: regime_1m, requires_atr: true}
     snapshot:
-      atr: flip_population.atr
-      family_a_atr: flip_population.frozen_atr
+      atr: regime_1m.atr
+      family_a_atr: excursion_1m.frozen_atr
       episode_state:
-        prevailing_direction: flip_population.dir
+        prevailing_direction: regime_1m.dir
 
 outcome:
-  # contract section 6 OUTCOME: realized return from the flip bar CLOSE to the NEXT flip bar CLOSE
-  # on the SAME timeframe, signed by direction, in own-timeframe ATR. The terminal is the next flip
-  # -- not a clock horizon. "horizon" below is the observation bound only: it is longer than any
-  # Globex trading day, so SESSION_END (which precedes HORIZON_EXPIRY in resolution_precedence) is
-  # what actually censors, which is exactly contract section 6's censoring rule. See
-  # research_decision.yaml terminal_decisions.censoring_rule.
+  # contract section 6 OUTCOME: realized return from the flip bar CLOSE to the NEXT 1m flip bar CLOSE,
+  # signed by direction, in own-timeframe ATR. The terminal is the next flip -- not a clock horizon.
+  # "horizon" is the observation bound only: longer than any Globex trading day, so the trading-day
+  # close (session: TRADING_DAY, OWNER AMENDMENT 01 A2) is what censors. A regime still open at the
+  # trading-day close, at a data gap (max_gap) or at the chronology boundary is CENSORED and flagged.
   kind: label
-  event: flip_population.flipped
-  direction: flip_population.dir
-  atr: flip_population.atr
+  event: regime_1m.flipped
+  direction: regime_1m.dir
+  atr: regime_1m.atr
   atr_availability: through_decision_ts
   entry_reference: decision_close
   horizon: 24h
   horizon_end_rule: strict
   max_gap: 300s
+  session: TRADING_DAY
   session_end: censor
-  label_column: target_next_flip_same_timeframe
+  label_column: target_next_flip_1m
 
 chronology:
   # contract section 10. EXPLORE: 2023 only. 2026 PROHIBITED. 2020/2021/2022/2024/2025 are simply
-  # not partitions of this pilot -- they are NOT declared prohibited, because warmup reads calendar
-  # days immediately before the 2023 partition and the pilot does not change their authority for
-  # the six-year study.
+  # not partitions of this pilot (warmup reads calendar days immediately before the 2023 partition).
   train: [2023]
   dev: []
   prohibited: [2026]
   warmup: {days_before_partition: 5, candidate_emission: false, target_generation: false}
   authorized_dates: ['2023-10-02']
 
-# contract section 11: NO models, no economics.
+# contract section 11: NO models, no economics. A collect study declares no analysis and no
+# deliverables; EXPLORE (step 4) produces the tables over the registered frame.
 model: none
-
-analysis:
-  source: train
-  steps:
-    # T3 / T4 -- MFE and MAE at fixed bar offsets by eventual outcome sign, and the same broken out
-    # by with / against the prevailing higher timeframe.
-    - id: t3_path_offsets
-      op: analysis.path.anchored_offsets
-      rows: frame
-      inputs: {anchors: frame}
-      params:
-        by: [flip_timeframe, regime_start_ns]
-        group_by: [flip_timeframe, outcome_sign]
-        order_by: [checkpoint_index]
-        offsets: [1, 2, 3, 5, 10, 20]
-        terminal_column: resolved_at_ts
-        time_unit: bars
-    - id: t4_path_offsets_by_alignment
-      op: analysis.path.anchored_offsets
-      rows: frame
-      inputs: {anchors: frame}
-      params:
-        by: [flip_timeframe, regime_start_ns]
-        group_by: [flip_timeframe, outcome_sign, higher_timeframe_agreement]
-        order_by: [checkpoint_index]
-        offsets: [1, 2, 3, 5, 10, 20]
-        terminal_column: resolved_at_ts
-        time_unit: bars
-    # T2 -- time-to-resolution distribution by outcome sign, censoring-aware.
-    - id: t2_time_to_resolution
-      op: analysis.incidence.cumulative
-      rows: frame
-      params:
-        horizons: [60, 180, 300, 600, 1800, 3600, 14400, 86400]
-        resolved_column: target_next_flip_same_timeframe
-        duration_column: time_to_flip_seconds
-        observed_seconds_column: time_to_flip_seconds
-        strata: [flip_timeframe, outcome_sign]
-        duration_unit: seconds
-        observed_unit: seconds
-    # -----------------------------------------------------------------------------------------
-    # UNRESOLVED analysis operations (contract sections 8 and 9; Appendix A4). No registered
-    # analysis_ops capability produces a grouped descriptive summary, and none produces a
-    # session-day-clustered uncertainty estimate. Contract section 9 makes the second mandatory on
-    # EVERY reported mean and difference, so T1/T5/T6/T7/T8 and the uncertainty on T1-T8 have no
-    # producer today.
-    - id: t1_mfe_vs_realized
-      op: "unresolved: grouped descriptive summary -- n, mean, median and declared quantiles of declared value columns by declared group keys, censoring-aware"
-      rows: frame
-      params:
-        values: [mfe_atr_own, realized_outcome_atr_own, mfe_atr_1h_denominator, realized_outcome_atr_1h_denominator]
-        group_by: [flip_timeframe, outcome_sign]
-    - id: t5_1m_by_alignment
-      op: "unresolved: grouped descriptive summary -- n, mean, median and declared quantiles of declared value columns by declared group keys, censoring-aware"
-      rows: frame
-      params:
-        values: [realized_outcome_atr_own, mfe_atr_own, mae_atr_own, time_to_flip_seconds]
-        group_by: [regime_alignment_1m_5m, regime_alignment_1m_15m, regime_alignment_1m_1h]
-    - id: t6_population_census
-      op: "unresolved: grouped descriptive summary -- n, mean, median and declared quantiles of declared value columns by declared group keys, censoring-aware"
-      rows: frame
-      params:
-        values: [regime_start_ns, censored]
-        group_by: [flip_timeframe, session_membership_rth, censored]
-    - id: t7_giveback
-      op: "unresolved: grouped descriptive summary -- n, mean, median and declared quantiles of declared value columns by declared group keys, censoring-aware"
-      rows: frame
-      params:
-        values: [retained_ratio_own]
-        group_by: [flip_timeframe, outcome_sign]
-    - id: t8_session_buckets
-      op: "unresolved: grouped descriptive summary -- n, mean, median and declared quantiles of declared value columns by declared group keys, censoring-aware"
-      rows: frame
-      params:
-        values: [mfe_atr_own, realized_outcome_atr_own, time_to_flip_seconds]
-        group_by: [flip_timeframe, session_bucket, outcome_sign]
-    - id: clustered_uncertainty
-      op: "unresolved: cluster-robust uncertainty -- standard error and confidence interval for every reported mean and every reported difference of means, CLUSTERED BY SESSION DAY, reporting the cluster count alongside the row count"
-      rows: frame
-      params:
-        cluster_column: session_day
-        estimates_from: [t1_mfe_vs_realized, t3_path_offsets, t4_path_offsets_by_alignment, t5_1m_by_alignment, t7_giveback, t8_session_buckets]
-  artifacts:
-    - {name: t1_mfe_vs_realized.json,    source: t1_mfe_vs_realized}
-    - {name: t2_time_to_resolution.json, source: t2_time_to_resolution}
-    - {name: t3_path_offsets.json,       source: t3_path_offsets}
-    - {name: t4_path_by_alignment.json,  source: t4_path_offsets_by_alignment}
-    - {name: t5_1m_by_alignment.json,    source: t5_1m_by_alignment}
-    - {name: t6_population_census.json,  source: t6_population_census}
-    - {name: t7_giveback.json,           source: t7_giveback}
-    - {name: t8_session_buckets.json,    source: t8_session_buckets}
-    - {name: clustered_uncertainty.json, source: clustered_uncertainty}
-
-deliverables:
-  # contract section 8: EVERY required table is declared, so the deliverable-producer gate fails at
-  # compile if any has no producer -- which is the point.
-  - {artifact: artifacts/t1_mfe_vs_realized.json,    producer: 'analysis:t1_mfe_vs_realized'}
-  - {artifact: artifacts/t2_time_to_resolution.json, producer: 'analysis:t2_time_to_resolution'}
-  - {artifact: artifacts/t3_path_offsets.json,       producer: 'analysis:t3_path_offsets'}
-  - {artifact: artifacts/t4_path_by_alignment.json,  producer: 'analysis:t4_path_offsets_by_alignment'}
-  - {artifact: artifacts/t5_1m_by_alignment.json,    producer: 'analysis:t5_1m_by_alignment'}
-  - {artifact: artifacts/t6_population_census.json,  producer: 'analysis:t6_population_census'}
-  - {artifact: artifacts/t7_giveback.json,           producer: 'analysis:t7_giveback'}
-  - {artifact: artifacts/t8_session_buckets.json,    producer: 'analysis:t8_session_buckets'}
-  - {artifact: artifacts/clustered_uncertainty.json, producer: 'analysis:clustered_uncertainty'}
