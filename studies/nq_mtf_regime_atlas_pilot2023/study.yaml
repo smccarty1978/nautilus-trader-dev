@@ -23,15 +23,13 @@ study:
   description: "Descriptive orientation, not falsification. Census of every 1m regime flip across ETH and RTH for 2023 only, with one checkpoint per completed 1m bar until the next 1m flip. Nothing found here is a finding."
 
 streams:
-  # 1s is the execution stream (epochs). 1s and 1m are external in the DatasetSpec; every other
-  # timeframe is a host-derived completed calendar bucket of them (contract Appendix A1).
-  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h]}
+  # 1m is the execution stream (epochs at its close). 1s is deliberately NOT declared (G7). Every
+  # other timeframe is a host-derived complete bucket of external 1m bars (contract Appendix A1).
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1m, 3m, 5m, 15m, 30m, 1h, 4h]}
 
 context:
   # contract section 3: the SAME regime definition on every timeframe -- one tracker capability,
   # accepted default dual-EMA band parameters and Wilder ATR(14), varying only "timeframe".
-  regime_5s:  {tracker: regime.dual_ema, timeframe: 5s}
-  regime_30s: {tracker: regime.dual_ema, timeframe: 30s}
   regime_1m:  {tracker: regime.dual_ema, timeframe: 1m}
   regime_3m:  {tracker: regime.dual_ema, timeframe: 3m}
   regime_5m:  {tracker: regime.dual_ema, timeframe: 5m}
@@ -58,44 +56,20 @@ population:
 triggers: every_candidate
 
 features:
-  # Only instances a registered RuntimeProviderAdapter can render at collection time are composed
-  # (research_workflow/provider_host.py ADAPTER_REGISTRY). Registered features whose provider has
-  # no adapter (session_membership, session_elapsed, relative_volume, activity_flip_count, the
-  # regime family at 5s/30s/3m/15m/30m/1h/4h) are recorded in research_decision.yaml G6, not
-  # composed. The ETH/RTH flag therefore comes from triggering_1s_ts_init against the dataset's
+  # SESSION ONE, smoke finding (research_decision.yaml G7): a `completed_1m` cadence raises its
+  # epochs on the 1m bar, and with a 1s stream declared the compiler makes the external 1m bar a
+  # CONTEXT stream (only the finest external timeframe carries epochs), so the host multiplexer
+  # refuses the epoch at the 1m bar's own ts_init (CONTEXT_STREAM_VISIBLE_AT_EPOCH). The faithful
+  # study-side composition is to declare NO 1s stream: 1m is then the finest external stream, the
+  # execution stream, and the decision epoch is the close of the completed 1m bar (contract
+  # section 4). The price of that: the feature host needs a 1s stream, so NO feature instances
+  # bind (the 21 adapter-rendered features of plan 67c7b47d are dropped; G6/G7), and 5s/30s
+  # context cannot be derived. Everything the pilot census needs is carried as tracker-state
+  # metadata below. The ETH/RTH flag comes from triggering_1s_ts_init against the dataset's
   # committed sessions table downstream, never from a filter here.
-  instances:
-    # --- contract section 7 ALIGNMENT (registered + bindable): 1m vs 5m agreement, 5m direction/age
-    - {feature: regime_alignment, source_timeframe: 1m, reference_timeframe: 5m, context: current, bar_state: completed}
-    - {feature: regime_direction, timeframe: 5m, context: current, bar_state: completed}
-    - {feature: regime_age_min,   timeframe: 5m, context: current, bar_state: completed}
-
-    # --- contract section 7 PRIOR STATE: the prior regime on 1m (same timeframe) and on 5m
-    - {feature: regime_efficiency,               over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
-    - {feature: regime_mfe_atr,                  over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
-    - {feature: regime_duration_min,             over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
-    - {feature: regime_net_directional_move_atr, over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
-    - {feature: regime_range_atr,                over: {timeframe: [1m, 5m]}, context: prior, bar_state: completed}
-
-    # --- contract section 6 PATH on the 5m context regime (current + completed is supported at 5m)
-    - {feature: regime_mfe_atr,    timeframe: 5m, context: current, bar_state: completed}
-    - {feature: regime_efficiency, timeframe: 5m, context: current, bar_state: completed}
-    - {feature: regime_range_atr,  timeframe: 5m, context: current, bar_state: completed}
-
-    # --- contract section 7 PRIOR STATE: distance to the completed 5m range extremes in ATR
-    - {feature: distance_to_completed_range_high_atr, reference_timeframe: 5m, bar_state: completed}
-    - {feature: distance_to_completed_range_low_atr,  reference_timeframe: 5m, bar_state: completed}
-
-    # --- contract section 7 VOLUME (OHLCV/delta provider, bindable): the flip bar's own volume,
-    #     the last 1m of volume vs the trailing 20m (flip-bar volume vs prior N bars), and the
-    #     estimated delta ratio over the last 1m. Volume/delta are ESTIMATED from bar geometry.
-    #     Single-year pilot: raw volume is never compared across years (contract section 7).
-    - {feature: bar_volume, context: bar}
-    - {feature: vol_sum_vs_ratio, context: rolling, timeframe: 60s, timeframe_2: 1200s}
-    - {feature: est_delta_ratio,  context: rolling, timeframe: 60s}
-
+  instances: []
   metadata:
-    triggering_1s_ts_init: epoch.T
+    triggering_1s_ts_init: epoch.T   # the epoch T = the completed 1m bar's ts_init (its close)
     # --- the 1m anchor: regime state at T
     dir_1m:        regime_1m.dir
     prev_dir_1m:   regime_1m.prev_dir
@@ -120,32 +94,24 @@ features:
     # --- contract section 7 ALIGNMENT at the other eight timeframes: direction, age, bars, start
     #     and ATR of each context regime at T (raw tracker state; agrees/disagrees is a sign
     #     comparison against dir_1m at EXPLORE, a filter not a re-collection).
-    dir_5s:  regime_5s.dir
-    dir_30s: regime_30s.dir
     dir_3m:  regime_3m.dir
     dir_5m:  regime_5m.dir
     dir_15m: regime_15m.dir
     dir_30m: regime_30m.dir
     dir_1h:  regime_1h.dir
     dir_4h:  regime_4h.dir
-    age_s_5s:  regime_5s.age_s
-    age_s_30s: regime_30s.age_s
     age_s_3m:  regime_3m.age_s
     age_s_5m:  regime_5m.age_s
     age_s_15m: regime_15m.age_s
     age_s_30m: regime_30m.age_s
     age_s_1h:  regime_1h.age_s
     age_s_4h:  regime_4h.age_s
-    bars_5s:  regime_5s.bars_in_regime
-    bars_30s: regime_30s.bars_in_regime
     bars_3m:  regime_3m.bars_in_regime
     bars_5m:  regime_5m.bars_in_regime
     bars_15m: regime_15m.bars_in_regime
     bars_30m: regime_30m.bars_in_regime
     bars_1h:  regime_1h.bars_in_regime
     bars_4h:  regime_4h.bars_in_regime
-    start_ns_5s:  regime_5s.start_ns
-    start_ns_30s: regime_30s.start_ns
     start_ns_3m:  regime_3m.start_ns
     start_ns_5m:  regime_5m.start_ns
     start_ns_15m: regime_15m.start_ns
@@ -154,8 +120,6 @@ features:
     start_ns_4h:  regime_4h.start_ns
     # contract section 5: RAW ATR denominators of all nine timeframes so both normalizations (own
     # 1m ATR primary, 1h ATR secondary) are auditable.
-    atr_5s:  regime_5s.atr
-    atr_30s: regime_30s.atr
     atr_3m:  regime_3m.atr
     atr_5m:  regime_5m.atr
     atr_15m: regime_15m.atr
@@ -164,10 +128,6 @@ features:
     atr_4h:  regime_4h.atr
 
   bindings:
-    completed_1m: {stream: 1m, regime: regime_1m}
-    completed_5s: {tracker: regime_5s, ready_gate: true}
-    completed_5m: {tracker: regime_5m, ready_gate: true}
-    regime_transition_1m: {tracker: regime_1m, requires_atr: true}
     snapshot:
       atr: regime_1m.atr
       family_a_atr: excursion_1m.frozen_atr

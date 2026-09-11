@@ -21,7 +21,7 @@ research_question: "# NQ MULTI-TIMEFRAME REGIME PATH ATLAS — ONE-YEAR PILOT (2
   \ `analysis.decomposition.buckets`,\n    `analysis.anchor.first_threshold_crossing`,\n    `analysis.control.cell_matched`, `analysis.classify.precedence`,\n    `analysis.metric.tail_lift`, `analysis.gate.population_parity`,\n    `analysis.gate.arm_delta_integrity`.\n      - T3 / T4 map onto `analysis.path.anchored_offsets`.\n      - T2 maps partly onto `analysis.incidence.cumulative`.\n      - T1, T6, T7, T8 have NO generic grouped-summary producer\n        (mean / median / quantiles by group).\n      - §9 has NO producer at all: `grep -rn cluster research/analysis/`\n        returns nothing. There is no cluster-robust standard error\n        anywhere in the analysis harness, and §9 makes one mandatory on\n        every reported mean and difference.\n    Expect the compile-time deliverable-producer gate to fail on T1,\n    T6, T7, T8 and on §9, and expect the capability flow to add one\n    grouped-descriptive op and one session-day-clustered uncertainty op\n    before this study can seal.\
   \ §13 authorizes exactly that; §8 says\n    route it as a typed analysis capability gap rather than writing\n    study-local Python.\n\nA5. PLATFORM FREEZE. The platform is under a declared freeze after\n    `f136a469` (2026-09-10): no platform work until three real studies\n    have run. This study is one of those real studies and §13\n    authorizes capability workers under `platform_merge:\n    approval_required`, so the freeze does not block it — but every\n    capability merge here is an owner-approved exception, not routine."
 
-status: COMPILED_COLLECT_STAGE  # session one (2026-09-11): stage: collect, single 1m anchor, TRADING_DAY censoring; compiled at plan_sha256 67c7b47d
+status: COLLECT_STAGE_1M_EPOCHS  # session one (2026-09-11): stage: collect, 1m epochs (no 1s stream, G7), TRADING_DAY censoring; plan 67c7b47d sealed then superseded at smoke by the features-free 1m-execution plan
 dataset_id: NQ_1S_V2_GLOBEX
 platform_commit: 451836f81518936d8cf5c95489d3b3c40e43c96d  # main merged into the study worktree 2026-09-11 (THE FOUR STAGES step 1 + 4, TRADING_DAY censoring)
 phase: B  # phase A closed by compile 2026-09-11; B (readiness..frame seal) continues in session one
@@ -341,5 +341,35 @@ gap_inventory:
       ETH/RTH flag not carried as a feature column (derived downstream from triggering_1s_ts_init);
       relative volume vs a trailing baseline and the session flip count are not carried.
     blocks: "[T6 ETH vs RTH split] and the section 7 SESSION AND TIME / VOLUME(relative) blocks"
+
+  G7_completed_bar_cadence_on_a_coarser_external_stream:
+    kind: MISSING_CAPABILITY (runtime; research_workflow/host/mux.py assert_epoch_visibility + grammar/compiler.py stream roles)
+    where: population.cadence
+    found: session one smoke 2023-10-02 (2026-09-11), plan 67c7b47d, RUNTIME_FAILURE
+    finding: >
+      population.cadence: completed_1m compiles (RESEARCH_YAML_REFERENCE lists it) but on a
+      DatasetSpec with external 1s AND 1m the compiler makes every coarser external timeframe a
+      CONTEXT stream ("only the finest external timeframe carries epochs"), and the host raises the
+      cadence epoch on the 1m bar itself, so mux.assert_epoch_visibility refuses it:
+      CONTEXT_STREAM_VISIBLE_AT_EPOCH nq_1m visible_through T >= T. The 1s execution bar with the
+      same ts_init is already visible at T, so an epoch at the completed 1m bar's own close is
+      causally sound; the assertion is generic, not semantic. The compiler does not refuse the
+      combination either, so the defect surfaces only at smoke.
+    requirement: >
+      EITHER let a completed-bar cadence stream carry its own epoch (exempt the cadence stream from
+      the strictly-before rule at its own ts_init, with a targeted mux test), OR refuse
+      completed_<coarser external tf> at compile with a typed gap. The scientifically required one
+      is the first; the second is the minimum.
+    study_side_route_taken: >
+      Declare no 1s stream: 1m becomes the finest external stream (execution), epochs are the
+      completed 1m bar close, 3m..4h derive as complete buckets of external 1m bars (fewer
+      discarded buckets than from 1s, where any second without a trade voids the bucket). Cost:
+      the feature host needs a 1s stream, so ZERO feature instances bind -- the 21 adapter-rendered
+      features of plan 67c7b47d (prior-regime geometry, 1m/5m alignment, 5m current geometry,
+      OHLCV volume/delta) are dropped, and 5s/30s alignment context is not derivable. Plan
+      3ff96583 (session one). The frame carries tracker-state metadata for 1m and 3m..4h and the
+      1m excursion path; regime_alignment 1m vs 5m is the sign comparison dir_5m == dir_1m at
+      EXPLORE.
+    blocks: "[section 7 features entirely for this pilot; 5s and 30s alignment context]"
 
 open_questions_for_the_owner: []
