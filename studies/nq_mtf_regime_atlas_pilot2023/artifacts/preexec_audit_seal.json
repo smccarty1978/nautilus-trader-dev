@@ -1,0 +1,22 @@
+{
+  "audits": {
+    "causal": {
+      "auditor": "claude-lookahead-auditor-pass01",
+      "report_sha256": "f6ba1100ecb35a1be3133ddac659ebf6133db924d6e6e5b5e1eaed5e2424d6ed",
+      "status_sha256": "d93cf57414ccd865ba49c28aa8e8bfedc07dd506951e00264dbc4eb0bf2814bc"
+    },
+    "contract": {
+      "reason": "stage: collect produces a frame and makes no claim; the contract audit belongs to the research study that binds it",
+      "status": "NOT_REQUIRED"
+    }
+  },
+  "composite_seal_hash": "82b687662b824898c1c27f5c3e11cce23b7a693a877ce047eb58f2cd422367df",
+  "execution_manifest_composite_sha256": "eceb0985fafc002b67d141fa9fdb728e8a6efe7403dd50a9c686c295d8d50768",
+  "plan_sha256": "67c7b47dca46582ce930a802a18f284a23e297e888ccfb2db7143543a3bc3efc",
+  "platform": "v2",
+  "registry_sha256": "8cd68dde521ea23338c19ca50386583f2271296b90ff9e78b9c7bdf47d0c3719",
+  "schema_version": 2,
+  "seal_kind": "frame",
+  "sealed_at_utc": "2026-09-11T16:03:36.906278+00:00",
+  "study_id": "nq_mtf_regime_atlas_pilot2023"
+}
