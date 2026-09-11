@@ -1525,37 +1525,19 @@ class V2Lifecycle:
             own_scores = {}
             for name in list(frames):
                 frames[name], own_scores[name] = self._join_own_model_scores(frames[name], bound)
-        extras: Dict[str, Any] = {}
-        payloads: Dict[str, Any] = {}
-        steps: List[Dict[str, Any]] = []
-        for step in spec["steps"]:
-            rows = frames[step["rows"]]
-            inputs = {name: frames[ref] for name, ref in (step.get("inputs") or {}).items()}
-            # Machine-local resolution only -- never part of the plan identity: where an operator
-            # keeps their files is not a scientific fact. `study_dir`/`model_root` let a gate read
-            # THIS study's own execution artifacts (e.g. the fitted arms of `fit`, which precedes
-            # `analyze`) without the study having to declare a path to itself.
-            result = run_op(step["op"], rows, inputs=inputs, params=step.get("params") or {},
-                            context={"studies_root": str(self.opts.studies_root or (self.repo_root / "studies")),
-                                     "study_dir": str(self.study), "artifacts_dir": str(self.artifacts),
-                                     "model_root": (str(self.opts.model_root) if self.opts.model_root else None)})
-            frames[step["id"]] = result["frame"]
-            payloads[step["id"]] = result.get("payload") or {}
-            if result.get("observations") is not None:
-                extras[step["id"]] = result["observations"]
-            steps.append({"id": step["id"], "op": step["op"], "rows_in": int(len(rows)), "rows_out": int(len(result["frame"]))})
-        written = []
-        for art in spec["artifacts"]:
-            path = self.artifacts / art["name"]
-            if art["kind"] == "json":
-                _write(path, payloads.get(art["source"]) or {})
-            elif art["kind"] == "frame":
-                frames[art["source"]].to_parquet(path, index=False)
-            else:
-                if art["source"] not in extras:
-                    raise LifecycleV2Error(f"ANALYSIS_ARTIFACT_UNAVAILABLE: step {art['source']!r} produced no observations frame")
-                extras[art["source"]].to_parquet(path, index=False)
-            written.append({"name": art["name"], "kind": art["kind"], "source": art["source"], "sha256": _sha(path)})
+        # Machine-local resolution only -- never part of the plan identity: where an operator
+        # keeps their files is not a scientific fact. `study_dir`/`model_root` let a gate read
+        # THIS study's own execution artifacts (e.g. the fitted arms of `fit`, which precedes
+        # `analyze`) without the study having to declare a path to itself.
+        from research_workflow.analysis_pipeline import AnalysisPipelineError, run_pipeline
+        context = {"studies_root": str(self.opts.studies_root or (self.repo_root / "studies")),
+                   "study_dir": str(self.study), "artifacts_dir": str(self.artifacts),
+                   "model_root": (str(self.opts.model_root) if self.opts.model_root else None)}
+        try:
+            ran = run_pipeline(spec["steps"], spec["artifacts"], frames, out_dir=self.artifacts, context=context)
+        except AnalysisPipelineError as exc:
+            raise LifecycleV2Error(str(exc)) from exc
+        steps, written, payloads = ran["steps"], ran["artifacts"], ran["payloads"]
         lineage = {"source": spec["source"], "years": years, "rows": int(len(frame)),
                    "partition_windows": windows_identity((plan.get("chronology") or {}).get("windows") or []),
                    "plan_sha256": plan["plan_sha256"],

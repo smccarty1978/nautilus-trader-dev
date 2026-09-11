@@ -11,6 +11,8 @@
 * :func:`make_repo` -- a throwaway canonical repo + machine-local config for one test.
 
 Scenario knobs come from ``NT_SUP_TEST_PLAN`` (JSON): ``gap_first`` (first design run emits a MISSING_CAPABILITY handoff),
+``study_side_gap_first`` (every design run before the capability lands declares a session name the grammar does not admit --
+an INVALID_PARAMETERIZATION handoff the design worker cannot fix), ``collect`` (the design worker writes a `stage: collect` spec),
 ``semantic_first`` (first design run stops with SCIENTIFIC_SEMANTIC_DECISION_REQUIRED until a USER_DECISION answer exists),
 ``auto_merge`` (declare autonomy_decisions.platform_merge: auto_if_green), ``worker_sleep_s`` (delay before acting),
 ``declare_vocab`` (the design worker declares ``terminal_decisions: {PLATFORM_V2_FLOW_PROVEN: ...}`` so the closure vocabulary is
@@ -31,6 +33,13 @@ ROOT = Path(__file__).resolve().parents[2]
 GOLDEN = ROOT / "fixtures" / "golden"
 NS = 1_000_000_000
 CAPABILITY_MARKER = "research_workflow/host/triggers.py"
+SESSION_CAPABILITY_MARKER = "research_workflow/grammar/compiler.py"   # inside the write surface claimed for a population.session gap
+
+
+def capability_marker(plan: Dict[str, Any]) -> str:
+    """The file the scripted capability worker writes: it must fall inside the chore's claimed write surface (the
+    handoff's suggested files for the gap's `where`), or the merge gate is red -- correctly."""
+    return SESSION_CAPABILITY_MARKER if plan.get("study_side_gap_first") else CAPABILITY_MARKER
 
 
 def _git(args: List[str], cwd: Path) -> str:
@@ -53,6 +62,18 @@ def compiling_spec(study_id: str) -> str:
                                                                           "chronology: {train: [2029, 2030], dev: [2031], prohibited: [], authorized_dates: ['2030-01-01']}")
     return spec.replace("model: none", "model:\n  family: lightgbm\n  params: {n_estimators: 20, max_depth: 2, num_leaves: 4, learning_rate: 0.1, verbosity: -1}\n"
                                        "  validation: {protocol: model_selection.random, tuning_years: [2029, 2030], final_train_validation_years: []}")
+
+
+def collect_spec(study_id: str) -> str:
+    """A `stage: collect` golden study: permissive (the golden qualify becomes a downstream selection; the fields it
+    reads are carried as metadata columns), two TRAIN years, no dev years, no model, no analysis."""
+    spec = (GOLDEN / "study_barrier.yaml").read_text(encoding="utf-8")
+    spec = spec.replace("id: golden_barrier", f"id: {study_id}")
+    spec = spec.replace("chronology: {train: [2030], dev: [], prohibited: []}",
+                        "chronology: {train: [2029, 2030], dev: [], prohibited: [2031], authorized_dates: ['2030-01-01']}")
+    spec = spec.replace('  qualify: "regime.age_s >= 10s and regime.frozen_atr > 0"\n', "")
+    spec = spec.replace("features:\n  host: synthetic\n", "features:\n  host: synthetic\n  metadata: {m_age_s: regime.age_s, m_frozen_atr: regime.frozen_atr}\n")
+    return "stage: collect\n" + spec
 
 
 def gap_spec(study_id: str) -> str:
@@ -105,9 +126,12 @@ def cmd_worker(ns: argparse.Namespace) -> int:
             if "terminal_decisions: {}" in text:
                 dec.write_text(text.replace("terminal_decisions: {}", "terminal_decisions:\n  PLATFORM_V2_FLOW_PROVEN: the synthetic flow completed end to end\n"
                                             "  PLATFORM_V2_FLOW_BROKEN: a synthetic stage failed"), encoding="utf-8")
-        capability_present = (wt / CAPABILITY_MARKER).is_file()
-        if plan.get("gap_first") and not capability_present:
-            (study_dir / "study.yaml").write_text(gap_spec(sid), encoding="utf-8")
+        capability_present = (wt / capability_marker(plan)).is_file()
+        if (plan.get("gap_first") or plan.get("study_side_gap_first")) and not capability_present:
+            # study_side_gap_first: the grammar refuses the declared session name -> INVALID_PARAMETERIZATION, a
+            # "study-side" kind the design worker is asked to fix and cannot (the vocabulary is the platform's)
+            spec = compiling_spec(sid).replace("session: RTH", "session: GLOBEX_DAY") if plan.get("study_side_gap_first") else gap_spec(sid)
+            (study_dir / "study.yaml").write_text(spec, encoding="utf-8")
             out = _compile(study_dir)
             assert not out.ok, "gap spec unexpectedly compiled"
             from research_workflow.handoff import write_capability_gap_handoff
@@ -116,7 +140,7 @@ def cmd_worker(ns: argparse.Namespace) -> int:
             _result(packet_path, wt, "--status", "BLOCKED", "--blocker-code", "CAPABILITY_GAP", "--commit", head,
                     "--artifact", str(study_dir / "CAPABILITY_GAP_HANDOFF.json"), "--next-state", "CAPABILITY_GAP")
             return 0
-        (study_dir / "study.yaml").write_text(compiling_spec(sid), encoding="utf-8")
+        (study_dir / "study.yaml").write_text(collect_spec(sid) if plan.get("collect") else compiling_spec(sid), encoding="utf-8")
         out = _compile(study_dir)
         assert out.ok, f"compile failed: {out.gaps.to_dict() if not out.ok else ''}"
         out.plan.write(study_dir / "compiled_plan.json")
@@ -124,11 +148,12 @@ def cmd_worker(ns: argparse.Namespace) -> int:
         _result(packet_path, wt, "--status", "DONE", "--commit", head, "--artifact", str(study_dir / "compiled_plan.json"), "--next-state", "COMPILED")
         return 0
     if stype == "CAPABILITY_IMPLEMENTATION":
-        marker = wt / CAPABILITY_MARKER
+        rel = capability_marker(plan)
+        marker = wt / rel
         marker.parent.mkdir(parents=True, exist_ok=True)
-        marker.write_text("# synthetic capability: triggers.add (scripted worker)\n", encoding="utf-8")
-        head = _commit_all(wt, "feat(triggers): synthetic add trigger (scripted capability worker)")
-        _result(packet_path, wt, "--status", "DONE", "--commit", head, "--changed-file", CAPABILITY_MARKER,
+        marker.write_text("# synthetic capability (scripted worker)\n", encoding="utf-8")
+        head = _commit_all(wt, "feat: synthetic capability (scripted capability worker)")
+        _result(packet_path, wt, "--status", "DONE", "--commit", head, "--changed-file", rel,
                 "--tests-json", json.dumps({"command": "scripted", "new_failures": 0, "known": 0, "fixed": 0}), "--extra-json", json.dumps({"cap_generate_check": "clean"}))
         return 0
     if stype in ("CAUSAL_AUDIT", "CONTRACT_AUDIT"):
@@ -151,6 +176,39 @@ def cmd_worker(ns: argparse.Namespace) -> int:
         _result(packet_path, wt, "--status", "DONE", "--commit", head, "--artifact", str(art / "analysis_decision.json"))
         return 0
     _result(packet_path, wt, "--status", "DONE", "--notes", f"scripted no-op for {stype}")
+    return 0
+
+
+def _synthetic_options(ns: argparse.Namespace):
+    from research_workflow.host.interfaces import BarView
+    from research_workflow.lifecycle_v2 import V2Options
+    from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
+    if not (GOLDEN / "bars.json").is_file():
+        subprocess.run([sys.executable, str(GOLDEN / "build_golden_fixture.py")], check=True, cwd=str(ROOT), capture_output=True)
+    bars = [BarView(**b) for b in json.loads((GOLDEN / "bars.json").read_text(encoding="utf-8"))]
+    expected = json.loads((GOLDEN / "expected.json").read_text(encoding="utf-8"))
+    session = {"kind": "calendar", "session": "RTH", "rows": [[a * NS, b * NS] for a, b in expected["sessions"]]}
+    model_root = os.environ.get("NT_RESEARCH_TEST_MODEL_ROOT")
+    assert model_root, "NT_RESEARCH_TEST_MODEL_ROOT must isolate the model store"
+    closure = {"outcome": ns.closure_outcome, "terminal_decision": ns.closure_decision} if getattr(ns, "closure_outcome", None) else None
+    return V2Options(execute=bool(getattr(ns, "execute_authorized", True)), smoke_date="2030-01-01", datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS,
+                     bar_source=lambda s, e: bars, session_table_spec=session, in_process_partitions=True, closure=closure, model_root=Path(model_root))
+
+
+def _patch_worktree(study: Path) -> None:
+    from research_workflow.governed_controller_v2 import V2StudyController
+    wt = Path(os.environ.get("NT_SUP_TEST_WORKTREE") or _git(["rev-parse", "--show-toplevel"], study))
+    info = {"path": str(wt), "branch": _git(["rev-parse", "--abbrev-ref", "HEAD"], wt), "head": _git(["rev-parse", "HEAD"], wt), "dirty_paths": [], "unsafe_dirty_paths": []}
+    V2StudyController._worktree = lambda self: dict(info)   # synthetic study lives in a throwaway repo, not this one
+
+
+def cmd_register(ns: argparse.Namespace) -> int:
+    """The register job of a supervised collect study: `research frame register` with the synthetic bindings."""
+    from research_workflow.frame_store import register_frame
+    study = Path(ns.study).resolve()
+    _patch_worktree(study)
+    card = register_frame(study, frame_root=os.environ.get("NT_RESEARCH_FRAME_ROOT"), repo_root=ROOT, options=_synthetic_options(ns))
+    print(json.dumps(card, default=str))
     return 0
 
 
@@ -213,13 +271,19 @@ def make_repo(tmp_path: Path) -> Dict[str, Any]:
     cfg = home / "config.yaml"
     cfg.write_text(f"catalog_roots: []\nmodel_root: {(tmp_path / 'model_store').as_posix()}\nleases_dir: {(home / 'leases').as_posix()}\n"
                    f"worktree_root: {(tmp_path / 'worktrees').as_posix()}\n", encoding="utf-8")
+    (tmp_path / "frames").mkdir()
     env = {"NT_RESEARCH_CONFIG": str(cfg), "NT_RESEARCH_SUPERVISOR_HOME": str(home), "NT_RESEARCH_SUPERVISOR_NO_TOAST": "1",
-           "NT_RESEARCH_TEST_MODEL_ROOT": str(tmp_path / "model_store"), "NT_RESEARCH_MODEL_ROOT": str(tmp_path / "model_store")}
+           "NT_RESEARCH_TEST_MODEL_ROOT": str(tmp_path / "model_store"), "NT_RESEARCH_MODEL_ROOT": str(tmp_path / "model_store"),
+           "NT_RESEARCH_FRAME_ROOT": str(tmp_path / "frames")}
     return {"repo": repo, "home": home, "env": env}
 
 
 def controller_command() -> List[str]:
     return [sys.executable, str(Path(__file__).resolve()), "controller", "--study", "{study}", "--through", "{through}"]
+
+
+def register_command() -> List[str]:
+    return [sys.executable, str(Path(__file__).resolve()), "register", "--study", "{study}"]
 
 
 def scripted_worker_command() -> List[str]:
@@ -235,6 +299,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     c = sub.add_parser("controller"); c.add_argument("--study", required=True); c.add_argument("--through", default="seal"); c.add_argument("--json", action="store_true")
     c.add_argument("--max-runtime", type=float, default=600); c.add_argument("--execute-authorized", action="store_true")
     c.add_argument("--closure-outcome"); c.add_argument("--closure-decision"); c.set_defaults(fn=cmd_controller)
+    r = sub.add_parser("register"); r.add_argument("--study", required=True); r.set_defaults(fn=cmd_register)
     m = sub.add_parser("merge_under_lock"); m.add_argument("--repo", required=True); m.add_argument("--branch", required=True); m.add_argument("--hold-s", type=float, default=0.5)
     m.set_defaults(fn=cmd_merge_under_lock)
     ns = ap.parse_args(argv)

@@ -40,7 +40,8 @@ def sandbox(tmp_path, monkeypatch):
 
 
 def _options(**over):
-    base = {"scripted_worker": SUP.scripted_worker_command(), "controller_command": SUP.controller_command(), "merge_gate_cap_check": None,
+    base = {"scripted_worker": SUP.scripted_worker_command(), "controller_command": SUP.controller_command(), "register_command": SUP.register_command(),
+            "merge_gate_cap_check": None,
             "max_workers": 2, "max_heavy_jobs": 2, "worker_timeout_s": 300, "job_timeout_s": 900}
     base.update(over)
     return base
@@ -139,6 +140,58 @@ def test_one_prompt_to_study_closed(sandbox):
     from research_workflow.supervisor.core import Supervisor
     assert Supervisor(sid).status()["derived_state"] == "STUDY_CLOSED"
     assert Supervisor(sid).tick()["action"] == "TERMINAL"
+
+
+def test_collect_study_runs_to_frame_register_with_no_owner_intervention(sandbox):
+    """THE FOUR STAGES (WORKFLOW.md section P): question -> design (stage: collect) -> controller to NEEDS_CAUSAL_AUDIT -> causal
+    worker -> seal (frame seal: contract audit NOT_REQUIRED, no contract worker) -> detached smoke..merge -> register job ->
+    FRAME_REGISTERED. No analysis worker, no closure, no user decision."""
+    sup = _start(sandbox, plan={"collect": True}, study_id="sup_collect")
+    sid = sup.study_id
+    sup, stats = drive(sid)
+    st = sup.state
+    assert st.get("terminal") and st["derived_state"] == "FRAME_REGISTERED", (st.get("derived_state"), st.get("user_decision"), stats["actions"])
+    assert st["counters"]["user_interventions"] == 0 and st.get("user_decision") is None and stats["ai_alive_during_job"] == 0
+    types = [h["session_type"] for h in st["worker_history"]]
+    assert types == ["STUDY_DESIGN_COMPILE", "CAUSAL_AUDIT"], types
+    throughs = [e["through"] for e in _events(sid) if e["kind"] == "JOB_LAUNCHED"]
+    assert throughs == ["seal", "seal", "merge", "register"], throughs
+    study = Path(st["study_worktree"]) / "studies" / sid
+    receipt = json.loads((study / "artifacts" / "frame_registration.json").read_text())
+    assert receipt["state"] == "FRAME_REGISTERED" and receipt["frame_id"] == st["frame_id"] and receipt["rows"] > 0
+    assert not (study / "artifacts" / "study_closure.json").exists() and not (study / "audit" / "contract_status.json").exists()
+    seal = json.loads((study / "artifacts" / "preexec_audit_seal.json").read_text())
+    assert seal["seal_kind"] == "frame" and seal["audits"]["contract"]["status"] == "NOT_REQUIRED"
+    # the frame is in the store and readable by id, without the supervisor
+    from research_workflow.frame_store import list_frames, verify_frame
+    root = Path(os.environ["NT_RESEARCH_FRAME_ROOT"])
+    assert [f["frame_id"] for f in list_frames(root)] == [receipt["frame_id"]]
+    assert verify_frame(receipt["frame_id"], root)["verified"]
+    assert [e for e in _events(sid) if e["kind"] == "FRAME_REGISTERED"]
+    from research_workflow.supervisor.core import Supervisor
+    assert Supervisor(sid).status()["derived_state"] == "FRAME_REGISTERED"
+    assert Supervisor(sid).tick()["action"] == "TERMINAL"
+
+
+def test_study_side_gap_the_design_worker_cannot_fix_reaches_the_capability_flow(sandbox):
+    """The routing defect behind the atlas's ~$8-per-cycle loop: an unknown session name compiles to INVALID_PARAMETERIZATION,
+    which is routed to a DESIGN worker; the vocabulary is the platform's, so design cannot fix it and re-emits the same handoff
+    forever. Now: the second identical study-side gap set goes to the capability flow (chore claim + implementer), and design
+    runs again only once the capability has landed."""
+    sup = _start(sandbox, plan={"study_side_gap_first": True, "auto_merge": True}, study_id="sup_routing")
+    sid = sup.study_id
+    sup, stats = drive(sid, stop_when=lambda s: len(s.state.get("worker_history") or []) >= 4)
+    st = sup.state
+    hist = st["worker_history"]
+    types = [(h["session_type"], h["status"]) for h in hist]
+    assert types[:4] == [("STUDY_DESIGN_COMPILE", "BLOCKED"), ("STUDY_DESIGN_COMPILE", "BLOCKED"), ("CAPABILITY_IMPLEMENTATION", "DONE"),
+                         ("STUDY_DESIGN_COMPILE", "DONE")], types
+    assert st["counters"]["user_interventions"] == 0 and not st.get("user_intervention_required")
+    events = [e for e in _events(sid) if e["kind"] == "STUDY_SIDE_GAP_UNRESOLVED_BY_DESIGN"]
+    assert len(events) == 1 and events[0]["gap_kinds"] == ["INVALID_PARAMETERIZATION"], events
+    assert (sandbox["repo"] / SUP.SESSION_CAPABILITY_MARKER).is_file()      # landed on main inside the claimed surface
+    study = Path(st["study_worktree"]) / "studies" / sid
+    assert (study / "compiled_plan.json").is_file()
 
 
 def test_semantic_decision_not_covered_stops_then_decide_resumes(sandbox):

@@ -925,7 +925,25 @@ fields a later selection reads as `features.metadata` columns, so selection is a
 re-collection); a trigger-graph study keeps its `qualify` because it shapes the trigger state.
 `frame_id` is independent of the study id (two identical replays register one frame) and includes
 the chronology authority (train, prohibited, windows). The frame root is machine-local
-(`~/.nt_research/frames/` or the sibling `frames/` of the model root). EXPLORE, BIND and SELECTION
-follow as separate steps; until EXPLORE lands, collect studies are driven by hand, not by the
-supervisor.
+(`~/.nt_research/frames/` or the sibling `frames/` of the model root). The supervisor drives a
+collect study end to end: design -> causal audit -> frame seal -> smoke..merge -> a `register` job
+-> `FRAME_REGISTERED` (terminal; the receipt is `artifacts/frame_registration.json`). No contract
+audit, no analysis worker, no closure.
+
+**EXPLORE (step 4)** reads a registered frame by id and produces tables from the same registered
+`analysis_ops` a study's `analysis:` composes -- no study, no seal, no audit, no closure, no
+deliverable gate, freely re-runnable, frame verified byte-identical before and after:
+
+```bash
+python scripts/research.py explore compile --spec explore.yaml                       # prove it (registered ops, DAG, artifacts)
+python scripts/research.py explore run --frame <frame_id> --spec explore.yaml [--out DIR]   # tables in seconds, not the hour of replay
+```
+
+`explore.yaml` is the `analysis:` block detached from a study (`explore: {id, question}`,
+optional `frame: <id>`, `analysis: {steps, artifacts}`); the only built-in frame is `frame`
+(`source`, `train_frame`, `model_scores` and context-reading ops belong to a research study).
+Outputs go to `<frame root sibling>/explore/<frame_id>/<spec sha12>/` with `explore.json`.
+A census that spans ETH and RTH censors at the calendar dataset's own trading-day close with
+`outcome: {session: TRADING_DAY, session_end: censor}` (`population.session: ALL`). BIND and
+SELECTION follow as separate steps.
 

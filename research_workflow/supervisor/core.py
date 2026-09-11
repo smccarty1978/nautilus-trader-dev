@@ -8,6 +8,7 @@ here runs a lifecycle stage itself -- the governed controller does, in its own d
 from __future__ import annotations
 
 import getpass
+import hashlib
 import json
 import os
 import shutil
@@ -295,7 +296,11 @@ class Supervisor:
             return self._user_decision(bc if bc in D.USER_INTERVENTION_CODES else "SCIENTIFIC_SEMANTIC_DECISION_REQUIRED",
                                        f"the controller reported {bc} at stage {d['evidence'].get('stage')}; answer with the scientific decision", d)
         if code == "READY_TO_EXECUTE":
-            return self._launch_job("analyze", heavy=True)
+            return self._launch_job(d.get("through") or "analyze", heavy=True)
+        if code == "READY_TO_REGISTER_FRAME":
+            return self._launch_job("register", heavy=False)
+        if code == "FRAME_REGISTERED":
+            return self._frame_registered(d)
         if code == "EXECUTION_NOT_AUTHORIZED":
             return self._user_decision("AUTHORIZATION_AMBIGUITY", "the study is sealed (READY_TO_SMOKE) but the supervisor was started without --execute-authorized; "
                                        "answer {\"execute_authorized\": true} to run smoke..analyze, false to stop here", d)
@@ -348,7 +353,16 @@ class Supervisor:
         cap = self.state.get("active_capability")
         if cap or (kinds & set(D.PLATFORM_GAP_KINDS)):
             return self._capability_step(d)
-        key = f"STUDY_DESIGN_COMPILE:{d.get('handoff_sha256') or 'card'}"
+        # Keyed by the gap CONTENT, not the handoff file's hash: a re-written handoff for the same unresolved
+        # gap set must count as the same attempt, or a study-side gap the design worker cannot fix loops.
+        gap_sig = hashlib.sha256(json.dumps([(g.get("kind"), g.get("where"), g.get("message")) for g in (d.get("gaps") or [])], sort_keys=True).encode()).hexdigest()[:16]
+        key = f"STUDY_DESIGN_COMPILE:{gap_sig if d.get('gaps') else (d.get('handoff_sha256') or 'card')}"
+        if kinds and not (kinds & set(D.SEMANTIC_GAP_KINDS)) and self._attempts(key) >= 1:
+            # The design worker already tried this exact study-side gap set and compile returned it unchanged:
+            # the grammar does not admit what the study declares (e.g. a session vocabulary the compiler lacks),
+            # which is platform work -- route it to the capability flow instead of a second design attempt.
+            S.append_event(self.study_id, "STUDY_SIDE_GAP_UNRESOLVED_BY_DESIGN", gap_kinds=sorted(kinds), gap_signature=gap_sig)
+            return self._capability_step(d)
         if kinds & set(D.SEMANTIC_GAP_KINDS):
             decision = _yaml(self.study_dir / "research_decision.yaml")
             semantic = [g for g in d.get("gaps") or [] if g.get("kind") in D.SEMANTIC_GAP_KINDS]
@@ -717,6 +731,31 @@ class Supervisor:
         return self._card("WORKER_LAUNCHED", "wait for the result card", task_id=task_id, session_type=session_type, attended=handle.attended)
 
     # ------------------------------------------------------------------ jobs
+    def _register_command(self) -> List[str]:
+        """`research frame register --study <dir>` from the STUDY worktree's platform (DEV-05), or the
+        `register_command` template ({study}) a test injects beside `controller_command`."""
+        tmpl = self.state.get("register_command") or self.options.get("register_command")
+        if tmpl:
+            return [str(t).replace("{study}", str(self.study_dir)) for t in tmpl]
+        return [sys.executable, str(self.worktree / "scripts" / "research.py"), "frame", "register", "--study", str(self.study_dir)]
+
+    def _frame_registered(self, d: Dict[str, Any]) -> Dict[str, Any]:
+        """Terminal for a collect study: the frame is registered (the receipt is the authority). No analysis
+        worker, no closure -- tables come from `research explore` over the frame, claims from a study that binds it."""
+        st = self.state
+        ev = d.get("evidence") or {}
+        if not st.get("terminal"):
+            try:
+                from research_workflow.handoff import write_session_handoff
+                write_session_handoff(self.study_dir, "C", repo_root=self.repo_root, note=f"SUPERVISOR_FRAME_REGISTERED:{ev.get('frame_id')}")
+            except Exception as exc:
+                S.append_event(self.study_id, "HANDOFF_WRITE_FAILED", error=str(exc)[:200])
+            st["terminal"] = True; st["current_phase"] = "C"; st["frame_id"] = ev.get("frame_id")
+            S.append_event(self.study_id, "FRAME_REGISTERED", frame_id=ev.get("frame_id"), rows=ev.get("rows"), frame_dir=ev.get("frame_dir"))
+            self._notify("Research supervisor", f"{self.study_id}: FRAME_REGISTERED {ev.get('frame_id')}")
+        return self._card("FRAME_REGISTERED", f"python scripts/research.py explore run --frame {ev.get('frame_id')} --spec <explore.yaml>",
+                          terminal=True, frame_id=ev.get("frame_id"), rows=ev.get("rows"), frame_dir=ev.get("frame_dir"))
+
     def _controller_command(self, through: str, closure: Optional[Dict[str, Any]]) -> List[str]:
         tmpl = self.state.get("controller_command") or self.options.get("controller_command")
         if tmpl:
@@ -745,10 +784,15 @@ class Supervisor:
             if slot is None:
                 S.append_event(self.study_id, "WAIT_RESOURCE", resource="heavy", through=through)
                 return self._card("WAIT_RESOURCE", "wait for a heavy-job slot", kind="heavy")
-        cmd = self._controller_command(through, closure)
+        if through == "register":
+            from research_workflow.frame_store import FRAME_RECEIPT
+            cmd = self._register_command()
+            status_path = self.study_dir / FRAME_RECEIPT
+        else:
+            cmd = self._controller_command(through, closure)
+            status_path = self.study_dir / "_work" / "controller" / "status.json"
         n = int(st["counters"].get("jobs_launched") or 0) + 1
         log = self.dir / "logs" / f"job_{n:03d}_{through}.log"
-        status_path = self.study_dir / "_work" / "controller" / "status.json"
         pid = spawn_detached(cmd, cwd=self.worktree, log_path=log, env={"NT_RESEARCH_AGENT": str(st["provider"]), "NT_RESEARCH_AGENT_SESSION": str(st["supervisor_session_id"])})
         self._attempts(key, bump=True)
         st["active_job"] = {"kind": "controller", "through": through, "pid": pid, "started_at_utc": S.now_utc(), "started_epoch": time.time(),

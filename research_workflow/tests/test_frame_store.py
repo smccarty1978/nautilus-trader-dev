@@ -28,15 +28,12 @@ def synthetic_bars():
 
 
 def _collect_spec(study_id: str, *, keep_qualify: bool = False) -> str:
-    spec = (GOLDEN / "study_barrier.yaml").read_text(encoding="utf-8")
-    spec = spec.replace("id: golden_barrier", f"id: {study_id}")
-    spec = spec.replace("chronology: {train: [2030], dev: [], prohibited: []}",
-                        "chronology: {train: [2029, 2030], dev: [], prohibited: [2031], authorized_dates: ['2030-01-01']}")
-    if not keep_qualify:
-        # permissive: the golden qualify becomes a downstream selection; the fields it reads are carried as metadata columns
-        spec = spec.replace('  qualify: "regime.age_s >= 10s and regime.frozen_atr > 0"\n', "")
-        spec = spec.replace("features:\n  host: synthetic\n", "features:\n  host: synthetic\n  metadata: {m_age_s: regime.age_s, m_frozen_atr: regime.frozen_atr}\n")
-    return "stage: collect\n" + spec
+    """The supervisor's scripted design worker writes the same collect spec (supervisor_support.collect_spec)."""
+    from research_workflow.tests.supervisor_support import collect_spec
+    spec = collect_spec(study_id)
+    if keep_qualify:
+        spec = spec.replace("  direction: regime.dir\n", '  qualify: "regime.age_s >= 10s and regime.frozen_atr > 0"\n  direction: regime.dir\n', 1)
+    return spec
 
 
 def _study(tmp_path: Path, study_id: str, spec: str) -> Path:

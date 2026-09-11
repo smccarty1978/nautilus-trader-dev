@@ -264,7 +264,9 @@ def register_frame(study: str | Path, *, frame_root: str | Path | None = None, r
         if not any(s.get("study_id") == source["study_id"] and s.get("plan_sha256") == source["plan_sha256"] for s in sources):
             sources.append(source)
             _write(target / FRAME_SOURCES, {"frame_id": fid, "sources": sources})
-        return {"STATUS": "OK", "frame_id": fid, "result": "already_registered", "frame_dir": str(target), "rows": record["rows"], "years": record["years"]}
+        receipt = _write_receipt(study_dir, record, source, target, "already_registered")
+        return {"STATUS": "OK", "frame_id": fid, "result": "already_registered", "frame_dir": str(target), "rows": record["rows"], "years": record["years"],
+                "receipt": str(receipt)}
     staging = root / f".{fid}.staging"
     if staging.exists():
         shutil.rmtree(staging)
@@ -299,7 +301,26 @@ def register_frame(study: str | Path, *, frame_root: str | Path | None = None, r
         shutil.rmtree(staging, ignore_errors=True)
         raise
     verify_frame(fid, frame_root=root)
-    return {"STATUS": "OK", "frame_id": fid, "result": "registered", "frame_dir": str(target), "rows": record["rows"], "years": record["years"]}
+    receipt = _write_receipt(study_dir, record, source, target, "registered")
+    return {"STATUS": "OK", "frame_id": fid, "result": "registered", "frame_dir": str(target), "rows": record["rows"], "years": record["years"],
+            "receipt": str(receipt)}
+
+
+FRAME_RECEIPT = "artifacts/frame_registration.json"
+
+
+def _write_receipt(study_dir: Path, record: Mapping[str, Any], source: Mapping[str, Any], target: Path, result: str) -> Path:
+    """The study-side receipt of a registration: `artifacts/frame_registration.json`. It is what a
+    later reader (the research supervisor, a session handoff) derives FRAME_REGISTERED from, so it
+    is shaped like a controller card (STATUS / state) and bound to the plan it registered."""
+    return _write(study_dir / FRAME_RECEIPT, {
+        "schema_version": 1, "kind": "frame_registration", "STATUS": "OK", "state": "FRAME_REGISTERED", "result": result,
+        "frame_id": record["frame_id"], "frame_dir": str(target), "frame_root": str(target.parent),
+        "rows": record["rows"], "years": record["years"], "dataset": (record.get("dataset") or {}).get("dataset_id"),
+        "study_id": source["study_id"], "plan_sha256": source["plan_sha256"], "execution_composite_sha256": source["execution_composite_sha256"],
+        "registered_at_utc": record["registered_at_utc"],
+        "next": {"explore": f"python scripts/research.py explore run --frame {record['frame_id']} --spec <explore.yaml>",
+                 "verify": f"python scripts/research.py frame verify {record['frame_id']}"}})
 
 
 # -- reading ----------------------------------------------------------------------------------------
@@ -357,4 +378,4 @@ def load_frame(frame_id: str, frame_root: str | Path | None = None, *, verify: b
 
 
 __all__ = ["FrameStoreError", "resolve_frame_root", "frame_dir", "frame_identity_components", "frame_id_of", "register_frame",
-           "load_frame_record", "verify_frame", "list_frames", "load_frame", "FRAME_SCHEMA_VERSION"]
+           "load_frame_record", "verify_frame", "list_frames", "load_frame", "FRAME_SCHEMA_VERSION", "FRAME_RECEIPT"]
