@@ -271,6 +271,33 @@ def cmd_ws_whoami(ns: argparse.Namespace) -> int:
 # model store
 # ---------------------------------------------------------------------------
 
+def cmd_explore(ns: argparse.Namespace) -> int:
+    from research_workflow.explore import ExploreError, compile_explore, load_explore_spec, run_explore
+    try:
+        if ns.cmd == "compile":
+            compiled, gaps = compile_explore(load_explore_spec(Path(ns.spec)))
+            if compiled is None:
+                return _card({"spec": str(ns.spec), **gaps.to_dict()}, ok=False)
+            return _card({"spec": str(ns.spec), **compiled})
+        card = run_explore(ns.frame, Path(ns.spec), out_dir=ns.out, frame_root=ns.frame_root)
+        return _card(card, ok=card.get("STATUS") == "OK")
+    except ExploreError as exc:
+        return _card({"error": str(exc), "blocker_code": str(exc).split(":", 1)[0].split(" ")[0]}, ok=False)
+
+
+def cmd_frame(ns: argparse.Namespace) -> int:
+    from research_workflow.frame_store import FrameStoreError, list_frames, register_frame, resolve_frame_root, verify_frame
+    try:
+        if ns.cmd == "register":
+            return _card(register_frame(ns.study, frame_root=ns.frame_root, repo_root=ROOT))
+        if ns.cmd == "verify":
+            return _card(verify_frame(ns.frame_id, frame_root=ns.frame_root))
+        rows = list_frames(ns.frame_root)
+        return _card({"frame_root": str(resolve_frame_root(ns.frame_root)), "count": len(rows), "frames": rows})
+    except FrameStoreError as exc:
+        return _card({"error": str(exc)}, ok=False)
+
+
 def cmd_model_list(_: argparse.Namespace) -> int:
     from research_workflow.model_store import list_store
     rows = list_store()
@@ -350,6 +377,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     b = sub.add_parser("bench"); b.add_argument("--series", default="host_c,host_a,golden"); b.add_argument("--repeats", type=int, default=3); b.set_defaults(fn=cmd_bench)
 
+    frame = sub.add_parser("frame", help="immutable content-hashed collection frames (THE FOUR STAGES: COLLECT)").add_subparsers(dest="cmd", required=True)
+    fr = frame.add_parser("register", help="register the merged frame of a `stage: collect` study that ran through merge under a frame seal")
+    fr.add_argument("--study", required=True); fr.add_argument("--frame-root"); fr.set_defaults(fn=cmd_frame)
+    fl = frame.add_parser("list"); fl.add_argument("--frame-root"); fl.set_defaults(fn=cmd_frame)
+    fv = frame.add_parser("verify"); fv.add_argument("frame_id"); fv.add_argument("--frame-root"); fv.set_defaults(fn=cmd_frame)
+
+    explore = sub.add_parser("explore", help="EXPLORE (THE FOUR STAGES, step 4): declared analysis ops over a REGISTERED frame by id -- tables, "
+                                            "no seal, no audit, no claim; freely re-runnable").add_subparsers(dest="cmd", required=True)
+    er = explore.add_parser("run", help="run an explore.yaml over a registered frame and write its declared artifacts")
+    er.add_argument("--frame", required=True, help="frame id (research frame list)"); er.add_argument("--spec", required=True, help="explore.yaml")
+    er.add_argument("--out", help="output directory (default: <frame root sibling>/explore/<frame_id>/<spec sha12>)"); er.add_argument("--frame-root")
+    er.set_defaults(fn=cmd_explore)
+    ec = explore.add_parser("compile", help="prove an explore.yaml without running it"); ec.add_argument("--spec", required=True); ec.set_defaults(fn=cmd_explore)
     model = sub.add_parser("model").add_subparsers(dest="cmd", required=True)
     model.add_parser("list").set_defaults(fn=cmd_model_list)
     mv = model.add_parser("validate"); mv.add_argument("model_id"); mv.set_defaults(fn=cmd_model_validate)

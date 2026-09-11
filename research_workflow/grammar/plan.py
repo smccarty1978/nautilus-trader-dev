@@ -43,9 +43,16 @@ class CompiledPlan:
     analysis: Optional[Dict[str, Any]] = None
     deliverables: List[Dict[str, str]] = field(default_factory=list)
     notes: List[str] = field(default_factory=list)
+    # "collect" for a frame-producing study; None for a research study. Omitted from the serialised
+    # plan when None so every research plan (and its plan_sha256) is byte-identical to before the
+    # field existed.
+    stage: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        if d.get("stage") is None:
+            d.pop("stage", None)
+        return d
 
     def identity_payload(self) -> Dict[str, Any]:
         d = self.to_dict()

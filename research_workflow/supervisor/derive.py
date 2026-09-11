@@ -29,7 +29,10 @@ USER_INTERVENTION_CODES = ("SCIENTIFIC_SEMANTIC_DECISION_REQUIRED", "AUTHORIZATI
                            "SUPERVISOR_ESCALATION_REQUIRED")
 PHASE_OF = {"CLOSURE_INVALID": "D", "NO_SPEC": "A", "CAPABILITY_GAP": "A", "COMPILED": "B", "CONTROLLER_STEP": "B", "NEEDS_CAUSAL_AUDIT": "B", "NEEDS_CONTRACT_AUDIT": "B",
             "DETERMINISTIC_BLOCKER": "B", "AUDIT_BLOCKER": "B", "SEMANTIC_BLOCKER": "A", "READY_TO_EXECUTE": "C", "EXECUTION_NOT_AUTHORIZED": "C",
-            "EXECUTION_BLOCKER": "C", "RUNNING": "C", "READY_FOR_ANALYSIS": "D", "ANALYSIS_DECIDED": "D", "STUDY_CLOSED": "D"}
+            "EXECUTION_BLOCKER": "C", "RUNNING": "C", "READY_FOR_ANALYSIS": "D", "ANALYSIS_DECIDED": "D", "STUDY_CLOSED": "D",
+            # THE FOUR STAGES: a `stage: collect` study ends at merge and is REGISTERED as a frame, never closed (WORKFLOW.md section P)
+            "READY_TO_REGISTER_FRAME": "C", "FRAME_REGISTERED": "C"}
+COLLECT_LAST_CONTROLLER_STATE = "READY_TO_FIT"      # the controller's card after `merge`; for a collect study the next step is registration
 
 
 def study_dir_of(state: Dict[str, Any]) -> Path:
@@ -158,6 +161,17 @@ def derive(state: Dict[str, Any], *, supervisor_identity: Dict[str, Any]) -> Dic
             return done("CAPABILITY_GAP", handoff=str(handoff), topic=doc.get("proposed_chore_topic"), suggested_files=doc.get("suggested_platform_files") or [])
     if not p_sha:
         return done("NO_SPEC")
+    plan_doc = read_json(plan)
+    is_collect = str(plan_doc.get("stage") or "") == "collect"
+    if is_collect:
+        # A registered frame is the terminal authority of a collect study (frame_store writes the receipt
+        # bound to the plan it registered); a receipt for another plan is stale and ignored.
+        from research_workflow.frame_store import FRAME_RECEIPT
+        receipt = study / FRAME_RECEIPT
+        if note(receipt):
+            rc = read_json(receipt)
+            if rc.get("frame_id") and rc.get("plan_sha256") == plan_doc.get("plan_sha256"):
+                return done("FRAME_REGISTERED", frame_id=rc.get("frame_id"), frame_dir=rc.get("frame_dir"), rows=rc.get("rows"), receipt=str(receipt))
     work = study / "_work" / "controller"
     lock = work / "run.lock"
     lk = read_json(lock) if lock.is_file() else {}
@@ -225,8 +239,12 @@ def derive(state: Dict[str, Any], *, supervisor_identity: Dict[str, Any]) -> Dic
     if cstate in PRE_SEAL_STATES:
         out["through"] = "seal"
         return done("CONTROLLER_STEP")
+    if is_collect and (cstate == COLLECT_LAST_CONTROLLER_STATE or card.get("next_state") == "READY_TO_REGISTER_FRAME"):
+        # merge is the last controller stage of a collect study; what follows is registration, not fit
+        out["through"] = "register"
+        return done("READY_TO_REGISTER_FRAME", controller_state=cstate)
     if cstate in EXEC_STATES:
-        out["through"] = "analyze"
+        out["through"] = "merge" if is_collect else "analyze"
         return done("READY_TO_EXECUTE" if state.get("execute_authorized") else "EXECUTION_NOT_AUTHORIZED", controller_state=cstate)
     if cstate in ("READY_TO_CLOSE", "COMPLETE"):
         dec = study / "artifacts" / "analysis_decision.json"
@@ -241,4 +259,4 @@ def derive(state: Dict[str, Any], *, supervisor_identity: Dict[str, Any]) -> Dic
 
 
 __all__ = ["derive", "decision_resolves", "study_dir_of", "closure_validity", "terminal_decision_declared", "PLATFORM_GAP_KINDS", "STUDY_SIDE_GAP_KINDS", "SEMANTIC_GAP_KINDS", "USER_INTERVENTION_CODES",
-           "PRE_SEAL_STATES", "EXEC_STATES", "STAGE_ORDER", "PHASE_OF"]
+           "PRE_SEAL_STATES", "EXEC_STATES", "STAGE_ORDER", "PHASE_OF", "COLLECT_LAST_CONTROLLER_STATE"]

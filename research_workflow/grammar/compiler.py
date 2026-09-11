@@ -273,12 +273,24 @@ def _resolve_streams(ctx: _Ctx) -> None:
         ctx.session = {"kind": "calendar" if has_calendar else "legacy", "session": ctx.spec.population.session,
                        "censor_session": censor, "dataset": inst["dataset_id"],
                        "reference_tables": list(reference_tables), "reference_digest": reference_digest}
-        for where, name in (("population.session", ctx.spec.population.session), ("outcome.session", censor)):
-            if str(name).upper() not in {"RTH", "ETH", "ALL"}:
-                ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"unknown session {name!r}", closest="RTH")
+        from research_workflow.sessions import CENSOR_SESSION_NAMES, SESSION_NAMES, TRADING_DAY
+        # RTH / ETH / ALL gate a population and censor an outcome. TRADING_DAY -- the calendar
+        # dataset's own session row, the trading day it defines -- is a CENSORING session only
+        # (outcome.session), so a census that spans ETH and RTH (population.session: ALL) can
+        # still censor a regime open at the trading-day close instead of resolving it.
+        for where, name, admitted in (("population.session", ctx.spec.population.session, SESSION_NAMES),
+                                      ("outcome.session", censor, CENSOR_SESSION_NAMES)):
+            if str(name).upper() not in admitted:
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"unknown session {name!r}; admitted: {', '.join(admitted)}", closest="RTH")
+        if str(censor).upper() == TRADING_DAY and not has_calendar:
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.session",
+                    f"TRADING_DAY is the calendar dataset's own session row (its trading day); dataset {inst['dataset_id']} declares no "
+                    "'sessions' reference table, so it has no trading-day close to censor at -- declare RTH, or collect on a calendar dataset",
+                    dataset=inst["dataset_id"], reference_tables=list(reference_tables))
         if ctx.spec.outcome.session_end in ("censor", "truncate") and str(censor).upper() == "ALL":
             ctx.gap(GapKind.AMBIGUOUS_TEMPORAL_SEMANTICS, "outcome.session",
-                    "session-end censoring needs a session with a close; declare outcome.session (e.g. RTH) or session_end: ignore")
+                    "session-end censoring needs a session with a close; declare outcome.session (RTH, ETH, or TRADING_DAY on a "
+                    "calendar dataset) or session_end: ignore")
         if reference_tables and not has_calendar and ctx.spec.outcome.session_end in ("censor", "truncate"):
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.session",
                     "dataset declares reference_tables without a 'sessions' table but the outcome censors on a "
@@ -743,7 +755,14 @@ def _resolve_population(ctx: _Ctx) -> Dict[str, Any]:
         if key is None:
             ctx.gap(GapKind.UNAVAILABLE_STREAM, "population.cadence", f"cadence stream {tf!r} is not declared on {sym}")
             key = finest["key"] if finest else None
-        cadence = {"kind": "completed_bar", "stream": key, "every_ns": _tf_ns(tf) if key else None}
+        # A cadence name that is not a duration (`completed_bogus`) used to fall through to _tf_ns and
+        # raise a raw ValueError out of compile -- no typed gap, no handoff. It is a typed gap.
+        try:
+            every_ns = _tf_ns(tf) if key else None
+        except ValueError as exc:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "population.cadence", f"cadence {pop.cadence!r} is not completed_<duration>: {exc}")
+            every_ns = None
+        cadence = {"kind": "completed_bar", "stream": key, "every_ns": every_ns}
     else:
         g = pop.cadence
         try:
@@ -1233,6 +1252,62 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
 _SAFE_ARTIFACT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.(json|parquet|md)$")
 
 
+def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec: Sequence[Any], *, registered: Set[str],
+                             builtin: Set[str], unbound: Any) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Prove a declared analysis pipeline at COMPILE time and return its compiled steps and artifacts.
+
+    Shared by ``_resolve_analysis`` (a study's own ``analysis:``) and ``research_workflow.explore``
+    (EXPLORE over a registered frame): every op is a registered ``analysis_ops`` capability, ``rows``
+    and every extra input resolve to a built-in frame or an EARLIER step (a DAG in declaration
+    order), and every artifact names a declared step. ``gap(kind, where, message, **detail)`` is the
+    caller's gap sink; ``unbound(ref)`` renders the message for a reference that binds to nothing.
+    """
+    from research.analysis.ops import op_inputs
+    steps: List[Dict[str, Any]] = []
+    seen: List[str] = []
+    for i, step in enumerate(steps_spec):
+        where = f"analysis.steps[{i}]"
+        if step.id in seen:
+            gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.id", f"duplicate step id {step.id!r}")
+        if step.op not in registered:
+            gap(GapKind.MISSING_CAPABILITY, f"{where}.op", f"{step.op!r} is not a registered analysis operation",
+                closest=_closest(step.op, sorted(registered)))
+            seen.append(step.id)
+            continue
+        if step.rows not in builtin and step.rows not in seen:
+            gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.rows",
+                unbound(step.rows) + "; an analysis pipeline runs in declaration order")
+        required = set(op_inputs(step.op))
+        for name, ref in (step.inputs or {}).items():
+            if name not in required:
+                gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs.{name}",
+                    f"{step.op} takes no input {name!r}; it takes {sorted(required)}")
+            if ref not in builtin and ref not in seen:
+                gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.inputs.{name}", unbound(ref))
+        for name in sorted(required - set((step.inputs or {}))):
+            gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs", f"{step.op} needs input {name!r}")
+        seen.append(step.id)
+        steps.append({"id": step.id, "op": step.op, "rows": step.rows, "inputs": dict(step.inputs or {}),
+                      "params": dict(step.params or {})})
+    artifacts: List[Dict[str, Any]] = []
+    names: Set[str] = set()
+    for i, art in enumerate(artifacts_spec):
+        where = f"analysis.artifacts[{i}]"
+        if not _SAFE_ARTIFACT_NAME.match(art.name):
+            gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.name",
+                f"{art.name!r} must be a plain .json/.parquet/.md file name")
+        if art.name in names:
+            gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.name", f"duplicate artifact name {art.name!r}")
+        names.add(art.name)
+        if art.source not in seen:
+            gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.source", f"{art.source!r} is not a declared step")
+        artifacts.append({"name": art.name, "source": art.source, "kind": art.kind})
+    if not artifacts:
+        gap(GapKind.INVALID_PARAMETERIZATION, "analysis.artifacts",
+            "declare the artifacts this analysis produces; an analysis that writes nothing cannot be audited")
+    return steps, artifacts
+
+
 def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
     """Compile the declarative ``analysis:`` pipeline: registered ops, bound inputs, named artifacts.
 
@@ -1245,7 +1320,7 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
     spec = getattr(ctx.spec, "analysis", None)
     if spec is None:
         return None
-    from research.analysis.ops import implementation_files, op_inputs
+    from research.analysis.ops import implementation_files
     registered = {e["id"] for e in ctx.registry.get("kinds", {}).get("analysis_ops", [])}
     if spec.source == "oos" and not (chronology.get("dev") or []):
         ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "analysis.source",
@@ -1268,48 +1343,7 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
             return "'train_frame' exists only under analysis.source: oos; under source: train it is the same rows as 'frame'"
         return f"{ref!r} is neither {' / '.join(repr(b) for b in sorted(builtin))} nor an earlier step"
 
-    steps: List[Dict[str, Any]] = []
-    seen: List[str] = []
-    for i, step in enumerate(spec.steps):
-        where = f"analysis.steps[{i}]"
-        if step.id in seen:
-            ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.id", f"duplicate step id {step.id!r}")
-        if step.op not in registered:
-            ctx.gap(GapKind.MISSING_CAPABILITY, f"{where}.op", f"{step.op!r} is not a registered analysis operation",
-                    closest=_closest(step.op, sorted(registered)))
-            seen.append(step.id)
-            continue
-        if step.rows not in builtin and step.rows not in seen:
-            ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.rows",
-                    _unbound(step.rows) + "; an analysis pipeline runs in declaration order")
-        required = set(op_inputs(step.op))
-        for name, ref in (step.inputs or {}).items():
-            if name not in required:
-                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs.{name}",
-                        f"{step.op} takes no input {name!r}; it takes {sorted(required)}")
-            if ref not in builtin and ref not in seen:
-                ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.inputs.{name}", _unbound(ref))
-        for name in sorted(required - set((step.inputs or {}))):
-            ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs", f"{step.op} needs input {name!r}")
-        seen.append(step.id)
-        steps.append({"id": step.id, "op": step.op, "rows": step.rows, "inputs": dict(step.inputs or {}),
-                      "params": dict(step.params or {})})
-    artifacts: List[Dict[str, Any]] = []
-    names: Set[str] = set()
-    for i, art in enumerate(spec.artifacts):
-        where = f"analysis.artifacts[{i}]"
-        if not _SAFE_ARTIFACT_NAME.match(art.name):
-            ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.name",
-                    f"{art.name!r} must be a plain .json/.parquet/.md file name")
-        if art.name in names:
-            ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.name", f"duplicate artifact name {art.name!r}")
-        names.add(art.name)
-        if art.source not in seen:
-            ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.source", f"{art.source!r} is not a declared step")
-        artifacts.append({"name": art.name, "source": art.source, "kind": art.kind})
-    if not artifacts:
-        ctx.gap(GapKind.INVALID_PARAMETERIZATION, "analysis.artifacts",
-                "declare the artifacts this analysis produces; an analysis that writes nothing cannot be audited")
+    steps, artifacts = _check_analysis_pipeline(ctx.gap, spec.steps, spec.artifacts, registered=registered, builtin=builtin, unbound=_unbound)
     # The analysis ops are resolved from the capability index, so the closure's import walk cannot
     # see them: seed the modules that actually implement the declared steps, plus the boundary that
     # binds an id to one of them. Editing either stales the freeze, exactly as before.
@@ -1502,6 +1536,38 @@ def _resolve_warmup_and_availability(ctx: _Ctx) -> Tuple[Dict[str, Any], Dict[st
 # --------------------------------------------------------------------------- #
 # entry point
 # --------------------------------------------------------------------------- #
+# Stages a `stage: collect` study never runs: they protect a claim, and a frame makes none.
+COLLECT_STAGES_NOT_RUN = ("contract_audit", "fit", "freeze", "oos", "analyze", "close")
+# What `research frame register` writes for a collect study (relative to the frame directory).
+FRAME_DELIVERABLES = ("frame.json", "candidates.parquet", "observations.parquet")
+
+
+def _resolve_collect_stage(ctx: _Ctx, population: Mapping[str, Any], triggers: Mapping[str, Any],
+                           chronology: Mapping[str, Any], model: Optional[Dict[str, Any]],
+                           analysis: Optional[Dict[str, Any]]) -> None:
+    """A collect study produces a frame and makes no claim. It fits no model, opens no OOS,
+    declares no analysis (EXPLORE reads the frame), and -- for an `every_candidate` population --
+    is PERMISSIVE: `population.qualify` gates emission only there, so a superset frame is
+    equivalent to any gated run and a later selection is a filter, never a re-collection.
+    Under a trigger graph `qualify` runs before the trigger engine and shapes its state
+    (host/strategy.py), so there it is structural and stays allowed."""
+    if ctx.spec.stage != "collect":
+        return
+    if model is not None:
+        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "model", "stage: collect produces a frame and fits no model; declare model: none "
+                "(a research study binds the frame and fits)")
+    if chronology.get("dev"):
+        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "chronology.dev", "stage: collect has no protected OOS: a frame covers the years it "
+                "collects and nothing else; declare dev: [] (a research study that binds the frame declares its own dev years, disjoint from the frame)")
+    if analysis is not None:
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "analysis", "stage: collect declares no analysis; tables come from `research explore` over "
+                "the registered frame, and claims from a research study that binds it")
+    if population.get("qualify") and triggers.get("kind") != "graph":
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "population.qualify", "COLLECT_MUST_BE_PERMISSIVE: an every_candidate collect study emits "
+                "the superset; a qualify predicate is a selection and belongs to the study that reads the frame "
+                f"(carry the fields it reads as features.metadata columns instead): {population['qualify'].get('text')!r}")
+
+
 def _resolve_deliverables(ctx: _Ctx, model: Optional[Dict[str, Any]],
                           analysis: Optional[Dict[str, Any]]) -> List[Dict[str, str]]:
     """Bind every obligation to an active producer; unknown prose never becomes proof.
@@ -1512,8 +1578,13 @@ def _resolve_deliverables(ctx: _Ctx, model: Optional[Dict[str, Any]],
     """
     from research_workflow.grammar.deliverables import DELIVERABLES, FIT_TUNING_DELIVERABLES
     producers = {}
+    collect = ctx.spec.stage == "collect"
     for stage, paths in DELIVERABLES.items():
         # Exclude inactive paths: static stage membership alone is not production.
+        # A collect study ends at merge and is registered as a frame: the claim stages
+        # (contract audit, fit, freeze, oos, analyze, close) never run and never produce.
+        if collect and stage in COLLECT_STAGES_NOT_RUN:
+            continue
         if stage == "oos" and not ctx.spec.chronology.dev:
             continue
         if stage == "fit" and not model:
@@ -1531,8 +1602,11 @@ def _resolve_deliverables(ctx: _Ctx, model: Optional[Dict[str, Any]],
                 concrete = [item.replace("<year>", str(year)) for item in concrete for year in years]
             for item in concrete:
                 producers[item] = f"stage:{stage}"
-    if not model:
+    if not model and not collect:
         producers["artifacts/fit_summary.json"] = "stage:fit"
+    if collect:
+        for path in FRAME_DELIVERABLES:
+            producers[path] = "stage:frame_register"
     if model and model.get("search_space"):
         for path in FIT_TUNING_DELIVERABLES:
             producers[path] = "stage:fit"
@@ -1595,6 +1669,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
         return CompileOutcome(None, ctx.gaps)
     warmup, availability = _resolve_warmup_and_availability(ctx)
     analysis = _resolve_analysis(ctx, chronology)
+    _resolve_collect_stage(ctx, population, triggers, chronology, model, analysis)
     deliverables = _resolve_deliverables(ctx, model, analysis)
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
@@ -1607,6 +1682,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
         binding_proof=ctx.binding_proof, warmup=warmup, availability=availability, features=ctx.features,
         spec_sha256=spec_sha, registry_sha256=str(registry.get("content_sha256", "")), notes=list(ctx.notes),
         analysis=analysis, deliverables=deliverables,
+        stage=("collect" if spec.stage == "collect" else None),
     ).seal()
     return CompileOutcome(plan, None)
 

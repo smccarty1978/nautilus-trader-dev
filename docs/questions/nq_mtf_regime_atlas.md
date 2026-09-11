@@ -398,3 +398,30 @@ A5. PLATFORM FREEZE. The platform is under a declared freeze after
     authorizes capability workers under `platform_merge:
     approval_required`, so the freeze does not block it — but every
     capability merge here is an owner-approved exception, not routine.
+
+============================================================
+OWNER AMENDMENT 01 — 2026-09-10 (carried from the 2023 pilot)
+============================================================
+Recorded here because it was taken against the pilot and carries
+forward to this six-year study on the same terms.
+
+CENSORING IS AT THE GLOBEX TRADING-DAY CLOSE. `population.session`
+stays ALL -- the census spans ETH and RTH, distinguished by
+`feature.session_membership` per §0 -- and censoring is at the close of
+the Globex trading day the flip belongs to: the boundary
+`NQ_1S_V2_GLOBEX` already defines in its committed `sessions` reference
+table (1636 session rows), and the same session-day unit §9 clusters
+on. §6's censoring rule stands as written.
+
+The grammar today admits only `RTH | ETH | ALL` as a censoring session
+and refuses `session_end: censor` when the session is ALL
+(`research_workflow/sessions.py`: `AllSessionTable.session_close`
+returns None). Closing that is a capability under §13, not a change to
+this contract.
+
+STILL OPEN FOR THIS STUDY: the nine-timeframe population of §3 and §4
+needs a nine-way population fan-out the v2 grammar does not have (gap
+G0 -- `population:` is single-anchored). The pilot was descoped to a
+single 1m anchor with the other eight timeframes as alignment context;
+this study's §3/§4 are NOT amended, and G0 is reassessed with the
+completed pilot behind it.

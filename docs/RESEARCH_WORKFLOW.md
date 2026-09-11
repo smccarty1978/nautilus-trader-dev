@@ -1659,3 +1659,138 @@ addition appears as new keys only; `python -m features.tests.golden_feature_reso
 --additive-against <ref>` is the mechanical statement of that rule (`--allow <name>` for the
 promotion of an already-declared record).
 
+### 21.16 COLLECT: `stage: collect` and the frame store (THE FOUR STAGES, step 1)
+
+Every mechanism of the lifecycle binds to one `study.yaml`, so collecting rows inherited the
+machinery that exists to protect a claim (declared deliverables, two audits, closure vocabulary,
+the freeze) and a descriptive census returned a 106-gap inventory and no rows. The four stages
+separate them: **COLLECT** produces a frame, **EXPLORE** reads a frame and produces tables,
+**RESEARCH** is the existing lifecycle unchanged, **PROMOTE** is unchanged. Step 1 is COLLECT.
+
+`stage: collect` (top-level in `study.yaml`, default `research`) declares a frame-producing study.
+The compiler (`grammar/compiler.py: _resolve_collect_stage`) refuses a model, dev years or an
+`analysis:` block, and -- for an `every_candidate` population -- a `population.qualify`
+(`COLLECT_MUST_BE_PERMISSIVE`): a permissive frame emits the superset with the tracker state a
+later selection reads carried as `features.metadata` columns, so a selection is a filter, never a
+re-collection. Under a trigger graph `qualify` runs before the trigger engine and shapes its state
+(`host/strategy.py`), so there it is structural and stays. The compiled plan carries
+`stage: collect`; a research plan carries no `stage` key, so every existing plan and
+`plan_sha256` is byte-identical.
+
+The controller runs a collect study through `merge` and refuses `fit`..`close`
+(`COLLECT_STAGE_NOT_APPLICABLE`). Its **frame seal** (`lifecycle_v2.seal`, `seal_kind: frame`)
+binds the frozen closure composite and the causal audit; the contract audit is recorded
+`NOT_REQUIRED` -- there are no deliverables, no TRAIN/OOS separation and no terminal label for it
+to vouch for. The ten structural stages (compile, prepare, readiness, preflight, tests, causal
+audit, seal, smoke with its replay trace, collection with reconcile, merge) are unchanged.
+After `merge` the card reports `READY_TO_REGISTER_FRAME` and:
+
+```bash
+python scripts/research.py frame register --study studies/<id>     # -> frame_id
+python scripts/research.py frame list
+python scripts/research.py frame verify <frame_id>
+```
+
+`research_workflow/frame_store.py` registers the merged TRAIN frame under a machine-local root
+(`~/.nt_research/frames/<frame_id>/`, or the sibling `frames/` of the configured model root;
+`NT_RESEARCH_FRAME_ROOT` overrides) holding `frame.json`, `candidates.parquet`,
+`observations.parquet`, `identity.json`, `compiled_plan.json`, `provenance/` (frozen manifest,
+frame seal, causal audit, replay trace, reconcile, partition manifests) and `sources.json`.
+**Frame identity is derived from what was collected, never from who collected it:**
+
+```
+frame_id = H( replay-closure composite + replay plan subset sha256 + replay data files
+            + dataset {id, logical_digest} + chronology {train, prohibited, windows}
+            + per-partition interval and parquet byte hashes + merged content identities )
+```
+
+Every component but the chronology content and the content identities is a component of the
+partition reuse key; the one reuse-key component deliberately absent is `authorization_sha256`,
+which hashes the study id and path. The reuse key itself is untouched -- the frame id is a second,
+wider identity derived beside it -- and two studies with different ids that replay the same plan
+over the same years register the **same** frame (`test_frame_store.py`, packet gate 2). A frame is
+never overwritten: an identical re-registration is idempotent and appends the study to
+`sources.json` (provenance, outside the identity); a different record under the same id is
+`FRAME_ID_COLLISION`. `verify` re-hashes the bytes and re-derives the id from the recorded
+components. A registered frame is readable after its study and worktree are deleted.
+
+What a frame carries as identity that a model does not: its chronology authority (`years`,
+`prohibited`, `windows`). Prohibited years never enter a frame; later steps (BIND, SELECTION)
+refuse a frame against a study's prohibited or dev years by that record.
+
+Registration writes a study-side receipt, `artifacts/frame_registration.json` (`STATUS`, `state:
+FRAME_REGISTERED`, `frame_id`, `frame_dir`, bound to the `plan_sha256` it registered). The research
+supervisor (`supervisor/derive.py`) reads `stage: collect` off the compiled plan and drives the
+study end to end: `READY_TO_SMOKE` executes `--through merge` (never `analyze`); the controller's
+post-merge card (`next_state: READY_TO_REGISTER_FRAME`) derives `READY_TO_REGISTER_FRAME`, which
+launches a `register` job (`research frame register --study <dir>` from the study worktree's
+platform, or the `register_command` template a test injects); a receipt bound to the current plan
+derives `FRAME_REGISTERED`, terminal (session handoff phase C, no analysis worker, no closure).
+`scripts/tests/test_supervisor_blackbox.py::test_collect_study_runs_to_frame_register_with_no_owner_intervention`
+proves it: workers `STUDY_DESIGN_COMPILE`, `CAUSAL_AUDIT`; jobs `seal, seal, merge, register`; zero
+user interventions.
+
+### 21.17 EXPLORE: declared analysis over a registered frame (THE FOUR STAGES, step 4)
+
+```bash
+python scripts/research.py explore compile --spec explore.yaml
+python scripts/research.py explore run --frame <frame_id> --spec explore.yaml [--out DIR] [--frame-root ROOT]
+```
+
+`research_workflow/explore.py` reads a registered frame by id and runs an `explore.yaml` over it:
+
+```yaml
+explore: {id: t6_census, question: "1m flips per session-day, censored counts"}
+frame: <frame_id>                      # optional; must match --frame when both are given
+analysis:
+  steps:
+    - {id: census, op: analysis.classify.precedence, rows: frame, params: {...}}
+  artifacts:
+    - {name: census.json, source: census, kind: json}
+```
+
+It is a study's `analysis:` block detached from the study. The compile proof is the compiler's own
+(`grammar/compiler.py: _check_analysis_pipeline`, shared with `_resolve_analysis`): every op is a
+registered `analysis_ops` capability, `rows` and every input bind to `frame` or an earlier step,
+every artifact names a step. The only built-in frame is `frame` (candidates joined with every
+observation column); `source`, `train_frame`, `model_scores` do not exist here, and an op that reads
+a study's execution artifacts (`needs_context`) is refused -- there is no study. The runner is the
+lifecycle's own (`research_workflow/analysis_pipeline.py: run_pipeline`, shared with the `analyze`
+stage), so a table computed here is the table the study stage would compute.
+
+What EXPLORE deliberately lacks: a seal, a contract audit, a closure vocabulary, a deliverable gate
+-- it makes no claim, so there is nothing to audit against intent -- and a replay: a changed filter
+or a new table costs the pipeline (fractions of a second on the golden frame; `explore.json`
+records `elapsed` per run), not the hour of replay plus two agent audits it costs inside a study.
+The frame is verified before and after every run (bytes hash to its record; `frame_unmodified`)
+and the outputs -- the declared artifacts plus `explore.json` (frame record summary, spec sha,
+steps, artifacts, `governance: {claim: null, seal: null, contract_audit: null, closure: null}`) --
+go to `--out` or `<frame root sibling>/explore/<frame_id>/<spec sha12>/`. Re-running the same spec
+over the same frame writes the same tables. Claims come from a research study that BINDS the
+frame (step 2), never from here. `research_workflow/tests/test_explore.py` proves packet gates 1
+(a frame registered by one study resolves in another, by id, with row parity) and 6.
+
+### 21.18 `outcome.session: TRADING_DAY` -- the calendar dataset's trading day as a censoring session
+
+The session vocabulary is `RTH | ETH | ALL` for a population gate and for outcome censoring.
+`ALL` has no close, so a census spanning ETH and RTH (`population.session: ALL`) could not censor
+at all and fell back to `session_end: ignore`, which reports a flip from the next trading day as a
+resolution. `outcome.session: TRADING_DAY` admits the calendar dataset's own `sessions` reference
+row -- `(open_ns, close_ns]` of the trading day the dataset defines (`NQ_1S_V2_GLOBEX`: the Globex
+trading day, 1636 committed rows, holidays and early closes included) -- as the censoring session
+(`research_workflow/sessions.py: TRADING_DAY`, `session_windows(..., "TRADING_DAY")`). Censoring at
+the trading-day close and clustering on the session day then agree on what a day is. It is a
+censoring session only (`population.session: TRADING_DAY` is refused), and only on a calendar
+dataset: on a legacy dataset the compiler returns `SEMANTIC_DECISION_REQUIRED` at `outcome.session`
+and the legacy table raises `SESSION_CLOSE_UNDEFINED_FOR_LEGACY_TRADING_DAY`. A regime still open at
+the trading-day close is `CENSORED SESSION_END` stamped at that close, under both `censor` and
+`truncate` (`research_workflow/tests/test_trading_day_censoring.py`).
+
+The routing defect that turned this gap into a loop is also closed: an `INVALID_PARAMETERIZATION`
+gap is study-side by kind and went to a design worker, which cannot add vocabulary to the grammar
+and re-emitted the same handoff each cycle. `supervisor/core.py: _route_gap` now keys design
+attempts by the gap CONTENT (kind, where, message) and, when the design worker has already tried
+that exact non-semantic gap set once, routes it to the capability flow
+(`STUDY_SIDE_GAP_UNRESOLVED_BY_DESIGN` event; black-box
+`test_study_side_gap_the_design_worker_cannot_fix_reaches_the_capability_flow`).
+

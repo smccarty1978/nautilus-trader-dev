@@ -71,6 +71,16 @@ class V2StudyController(GovernedStudyController):
     def _fingerprints(self) -> dict[str, str | None]:
         return self.lifecycle.fingerprints()
 
+    def _is_collect(self) -> bool:
+        """`stage: collect` (research_workflow.grammar.spec.StudySpecV2.stage): a frame-producing study.
+        Read from the spec so the answer exists before the first compile."""
+        try:
+            import yaml
+            data = yaml.safe_load((self.study / "study.yaml").read_text(encoding="utf-8")) or {}
+            return isinstance(data, dict) and data.get("stage") == "collect"
+        except Exception:
+            return False
+
     def _current_study_spec_sha256(self) -> str | None:
         from research_workflow.lifecycle_v2 import spec_sha256
         return spec_sha256(self.study)
@@ -109,11 +119,17 @@ class V2StudyController(GovernedStudyController):
         if stage == "causal_audit":
             return self._audit_current(self.study / "audit/status.json", fp)
         if stage == "contract_audit":
-            return self._audit_current(self.study / "audit/contract_status.json", fp)
+            # A collect study is never contract-audited (it makes no claim); the stage is fresh by
+            # construction and the frame seal records it as NOT_REQUIRED (lifecycle_v2.seal).
+            return True if self._is_collect() else self._audit_current(self.study / "audit/contract_status.json", fp)
         if stage == "seal":
             s = _read(self.study / "artifacts/preexec_audit_seal.json")
+            if self._is_collect():
+                contract_ok = s.get("seal_kind") == "frame" and ((s.get("audits") or {}).get("contract") or {}).get("status") == "NOT_REQUIRED"
+            else:
+                contract_ok = self._audit_current(self.study / "audit/contract_status.json", fp)
             return bool(s.get("composite_seal_hash") and s.get("execution_manifest_composite_sha256") == fp.get("execution_composite")
-                        and self._audit_current(self.study / "audit/status.json", fp) and self._audit_current(self.study / "audit/contract_status.json", fp))
+                        and self._audit_current(self.study / "audit/status.json", fp) and contract_ok)
         if stage == "close":
             try:
                 from research_workflow.study_closure import load_study_closure
@@ -207,10 +223,21 @@ class V2StudyController(GovernedStudyController):
         lock = self.work / "run.lock"
         release(lock, owns=lambda existing: bool(existing) and int(existing.get("pid") or 0) == os.getpid())
 
+    COLLECT_LAST_STAGE = "merge"
+
     def run(self, *, through: str = "seal", inspect: bool = False, dry_run: bool = False) -> dict[str, Any]:
         if through not in STAGE_ORDER:
             raise ValueError(f"unknown --through {through}")
         self._through = through
+        # A `stage: collect` study ends at merge; the claim stages do not apply to a frame. The
+        # frame is then registered with `research frame register --study <id>`, never closed.
+        if self._is_collect() and STAGE_ORDER.index(through) > STAGE_ORDER.index(self.COLLECT_LAST_STAGE):
+            card = self._card(ControllerState.NEEDS_COMPILE, through, blocker=BlockerType.RUNTIME_FAILURE,
+                              reason=f"COLLECT_STAGE_NOT_APPLICABLE: stage: collect ends at {self.COLLECT_LAST_STAGE}; "
+                                     f"--through {through} is a claim stage. Register the frame with `research frame register --study {self.study.name}`",
+                              last=None, dry_run=bool(inspect or dry_run))
+            card["blocker_code"] = "COLLECT_STAGE_NOT_APPLICABLE"
+            return card
         # --execute-authorized is the real execution gate: every stage after "seal" (smoke..close)
         # is refused before the lock is even acquired unless options.execute is True. --inspect and
         # --dry-run are read-only and are never gated.
@@ -261,7 +288,14 @@ class V2StudyController(GovernedStudyController):
                 card["capability_gaps"] = exc.report.get("gaps")
                 _json(self.work / "status.json", card)
                 return card
-        return super().run(through=through, inspect=inspect, dry_run=dry_run)
+        card = super().run(through=through, inspect=inspect, dry_run=dry_run)
+        if self._is_collect() and card.get("STATUS") == "OK" and through == self.COLLECT_LAST_STAGE and card.get("state") == ControllerState.READY_TO_FIT.value:
+            # merge is the last controller stage of a collect study; what follows is registration, not fit.
+            card["next_state"] = "READY_TO_REGISTER_FRAME"
+            card["frame"] = {"next": f"python scripts/research.py frame register --study studies/{self.study.name}"}
+            if not (inspect or dry_run):
+                _json(self.work / "status.json", card)
+        return card
 
 
 def controller_for(study: str | Path, **kwargs: Any):

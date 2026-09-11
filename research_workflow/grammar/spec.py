@@ -394,6 +394,10 @@ class DeliverableSpec(_Strict):
 
 class StudySpecV2(_Strict):
     study: StudySection
+    # Which lifecycle stage this spec is for. `research` (default) is the full claim lifecycle.
+    # `collect` produces an immutable frame: it runs through merge under a causal-only frame seal,
+    # fits no model, declares no OOS and no analysis, and is registered with `research frame register`.
+    stage: Literal["research", "collect"] = "research"
     streams: List[StreamSpec] = Field(..., min_length=1)
     population: PopulationSpec
     context: Dict[str, ContextTrackerSpec] = Field(default_factory=dict)

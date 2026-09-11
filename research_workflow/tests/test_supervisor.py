@@ -99,6 +99,38 @@ def test_decision_resolves_semantic_gaps():
     assert D.decision_resolves({"autonomy_decisions": {"fold_policy": "x"}}, [{"kind": "SEMANTIC_DECISION_REQUIRED", "where": "model", "detail": {"decision_key": "fold_policy"}}])
 
 
+def test_derive_routes_a_collect_study_to_register_and_reads_the_receipt(tmp_path, monkeypatch):
+    monkeypatch.setenv("NT_RESEARCH_SUPERVISOR_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("NT_RESEARCH_CONFIG", str(tmp_path / "cfg.yaml"))
+    (tmp_path / "cfg.yaml").write_text(f"catalog_roots: []\nleases_dir: {(tmp_path / 'leases').as_posix()}\n", encoding="utf-8")
+    repo = _repo(tmp_path)
+    study = repo / "studies" / "s1"
+    ident = {"user": "u", "host": "h", "owner": "u@h", "agent": "scripted", "session_id": "sup"}
+    st = {"study_id": "s1", "study_worktree": str(repo), "execute_authorized": True, "consumed_handoffs": [], "user_decision": None}
+    (study / "compiled_plan.json").write_text(json.dumps({"stage": "collect", "plan_sha256": "p1"}), encoding="utf-8")
+    work = study / "_work" / "controller"; work.mkdir(parents=True)
+    from research_workflow.lifecycle_v2 import spec_sha256
+    fp = {"study_spec": spec_sha256(study), "compiled_plan": P.sha256_file(study / "compiled_plan.json")}
+    (work / "status.json").write_text(json.dumps({"STATUS": "OK", "state": "READY_TO_SMOKE", "stage": "seal", "fingerprints": fp}), encoding="utf-8")
+    d = D.derive(st, supervisor_identity=ident)
+    assert d["code"] == "READY_TO_EXECUTE" and d["through"] == "merge"          # a collect study executes through merge, never analyze
+    (work / "status.json").write_text(json.dumps({"STATUS": "OK", "state": "READY_TO_FIT", "stage": "merge", "next_state": "READY_TO_REGISTER_FRAME", "fingerprints": fp}), encoding="utf-8")
+    d = D.derive(st, supervisor_identity=ident)
+    assert d["code"] == "READY_TO_REGISTER_FRAME" and d["through"] == "register" and d["phase"] == "C"
+    (study / "artifacts").mkdir()
+    (study / "artifacts" / "frame_registration.json").write_text(json.dumps({"frame_id": "f" * 64, "plan_sha256": "OTHER", "rows": 3}), encoding="utf-8")
+    assert D.derive(st, supervisor_identity=ident)["code"] == "READY_TO_REGISTER_FRAME"   # a receipt for another plan is stale
+    (study / "artifacts" / "frame_registration.json").write_text(json.dumps({"frame_id": "f" * 64, "plan_sha256": "p1", "rows": 3, "frame_dir": "x"}), encoding="utf-8")
+    d = D.derive(st, supervisor_identity=ident)
+    assert d["code"] == "FRAME_REGISTERED" and d["evidence"]["frame_id"] == "f" * 64 and d["phase"] == "C"
+    # a research plan (no stage key) with the same card is READY_TO_EXECUTE through analyze, unchanged
+    (study / "compiled_plan.json").write_text(json.dumps({"plan_sha256": "p1"}), encoding="utf-8")
+    fp["compiled_plan"] = P.sha256_file(study / "compiled_plan.json")
+    (work / "status.json").write_text(json.dumps({"STATUS": "OK", "state": "READY_TO_FIT", "stage": "merge", "fingerprints": fp}), encoding="utf-8")
+    d = D.derive(st, supervisor_identity=ident)
+    assert d["code"] == "READY_TO_EXECUTE" and d["through"] == "analyze"
+
+
 def test_derive_walks_the_artifact_precedence(tmp_path, monkeypatch):
     monkeypatch.setenv("NT_RESEARCH_SUPERVISOR_HOME", str(tmp_path / "home"))
     monkeypatch.setenv("NT_RESEARCH_CONFIG", str(tmp_path / "cfg.yaml"))
