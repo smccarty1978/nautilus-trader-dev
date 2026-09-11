@@ -1659,3 +1659,64 @@ addition appears as new keys only; `python -m features.tests.golden_feature_reso
 --additive-against <ref>` is the mechanical statement of that rule (`--allow <name>` for the
 promotion of an already-declared record).
 
+### 21.16 COLLECT: `stage: collect` and the frame store (THE FOUR STAGES, step 1)
+
+Every mechanism of the lifecycle binds to one `study.yaml`, so collecting rows inherited the
+machinery that exists to protect a claim (declared deliverables, two audits, closure vocabulary,
+the freeze) and a descriptive census returned a 106-gap inventory and no rows. The four stages
+separate them: **COLLECT** produces a frame, **EXPLORE** reads a frame and produces tables,
+**RESEARCH** is the existing lifecycle unchanged, **PROMOTE** is unchanged. Step 1 is COLLECT.
+
+`stage: collect` (top-level in `study.yaml`, default `research`) declares a frame-producing study.
+The compiler (`grammar/compiler.py: _resolve_collect_stage`) refuses a model, dev years or an
+`analysis:` block, and -- for an `every_candidate` population -- a `population.qualify`
+(`COLLECT_MUST_BE_PERMISSIVE`): a permissive frame emits the superset with the tracker state a
+later selection reads carried as `features.metadata` columns, so a selection is a filter, never a
+re-collection. Under a trigger graph `qualify` runs before the trigger engine and shapes its state
+(`host/strategy.py`), so there it is structural and stays. The compiled plan carries
+`stage: collect`; a research plan carries no `stage` key, so every existing plan and
+`plan_sha256` is byte-identical.
+
+The controller runs a collect study through `merge` and refuses `fit`..`close`
+(`COLLECT_STAGE_NOT_APPLICABLE`). Its **frame seal** (`lifecycle_v2.seal`, `seal_kind: frame`)
+binds the frozen closure composite and the causal audit; the contract audit is recorded
+`NOT_REQUIRED` -- there are no deliverables, no TRAIN/OOS separation and no terminal label for it
+to vouch for. The ten structural stages (compile, prepare, readiness, preflight, tests, causal
+audit, seal, smoke with its replay trace, collection with reconcile, merge) are unchanged.
+After `merge` the card reports `READY_TO_REGISTER_FRAME` and:
+
+```bash
+python scripts/research.py frame register --study studies/<id>     # -> frame_id
+python scripts/research.py frame list
+python scripts/research.py frame verify <frame_id>
+```
+
+`research_workflow/frame_store.py` registers the merged TRAIN frame under a machine-local root
+(`~/.nt_research/frames/<frame_id>/`, or the sibling `frames/` of the configured model root;
+`NT_RESEARCH_FRAME_ROOT` overrides) holding `frame.json`, `candidates.parquet`,
+`observations.parquet`, `identity.json`, `compiled_plan.json`, `provenance/` (frozen manifest,
+frame seal, causal audit, replay trace, reconcile, partition manifests) and `sources.json`.
+**Frame identity is derived from what was collected, never from who collected it:**
+
+```
+frame_id = H( replay-closure composite + replay plan subset sha256 + replay data files
+            + dataset {id, logical_digest} + chronology {train, prohibited, windows}
+            + per-partition interval and parquet byte hashes + merged content identities )
+```
+
+Every component but the chronology content and the content identities is a component of the
+partition reuse key; the one reuse-key component deliberately absent is `authorization_sha256`,
+which hashes the study id and path. The reuse key itself is untouched -- the frame id is a second,
+wider identity derived beside it -- and two studies with different ids that replay the same plan
+over the same years register the **same** frame (`test_frame_store.py`, packet gate 2). A frame is
+never overwritten: an identical re-registration is idempotent and appends the study to
+`sources.json` (provenance, outside the identity); a different record under the same id is
+`FRAME_ID_COLLISION`. `verify` re-hashes the bytes and re-derives the id from the recorded
+components. A registered frame is readable after its study and worktree are deleted.
+
+What a frame carries as identity that a model does not: its chronology authority (`years`,
+`prohibited`, `windows`). Prohibited years never enter a frame; later steps (BIND, SELECTION,
+EXPLORE) refuse a frame against a study's prohibited or dev years by that record. The research
+supervisor does not yet drive a collect study past `merge` (it would route `READY_TO_FIT` to
+`--through analyze`); collect studies are run by hand until EXPLORE lands.
+

@@ -903,3 +903,29 @@ binary prints are ever used, and a worker whose required capability is absent fa
 for the result card. A human-attended session of any provider can act as a worker by following the same packet.
 The `scripted` provider exists for tests only (`research_workflow/tests/supervisor_support.py`;
 `scripts/tests/test_supervisor_blackbox.py` is the black-box proof).
+
+## P. THE FOUR STAGES: COLLECT (frames)
+
+Collection makes no claim; it produces rows. A `stage: collect` study (`docs/RESEARCH_WORKFLOW.md`
+§21.16) runs the controller through `merge` under a **frame seal** (closure composite + causal
+audit; no contract audit, no deliverable gate, no fit/freeze/oos/close) and is then registered as
+an immutable, content-hashed **frame** that outlives the study:
+
+```bash
+python scripts/research.py study new my_frame --from-question question.md      # then: stage: collect, model: none, dev: []
+python scripts/run_governed_study.py --study studies/my_frame --through seal --execute-authorized   # NEEDS_CAUSAL_AUDIT only
+python scripts/research.py audit ingest --study studies/my_frame --type causal --report studies/my_frame/audit/pass_01.md
+python scripts/run_governed_study.py --study studies/my_frame --through merge --execute-authorized  # -> READY_TO_REGISTER_FRAME
+python scripts/research.py frame register --study studies/my_frame                                  # -> frame_id
+python scripts/research.py frame list | verify <frame_id>
+```
+
+Rules: an `every_candidate` collect study is **permissive** (no `population.qualify`; carry the
+fields a later selection reads as `features.metadata` columns, so selection is a filter, not a
+re-collection); a trigger-graph study keeps its `qualify` because it shapes the trigger state.
+`frame_id` is independent of the study id (two identical replays register one frame) and includes
+the chronology authority (train, prohibited, windows). The frame root is machine-local
+(`~/.nt_research/frames/` or the sibling `frames/` of the model root). EXPLORE, BIND and SELECTION
+follow as separate steps; until EXPLORE lands, collect studies are driven by hand, not by the
+supervisor.
+

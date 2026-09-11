@@ -516,13 +516,22 @@ class V2Lifecycle:
         plan = load_plan(self.study)
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
         audits = {}
+        collect = plan.get("stage") == "collect"
         for kind, name in (("causal", "status.json"), ("contract", "contract_status.json")):
+            if collect and kind == "contract":
+                # A frame makes no claim: there are no deliverables, no TRAIN/OOS separation and no
+                # terminal label for a contract audit to vouch for. The FRAME SEAL binds the closure
+                # composite and the causal audit only, and says so rather than leaving the slot empty.
+                audits[kind] = {"status": "NOT_REQUIRED", "reason": "stage: collect produces a frame and makes no claim; the contract audit belongs to the research study that binds it"}
+                continue
             st = _read(self.audit / name)
             if st.get("verdict") != "CLEAR" or st.get("audited_execution_composite_sha256") != frozen:
                 raise LifecycleV2Error(f"AUDIT_NOT_CLEAR_OR_STALE: {kind}")
             audits[kind] = {"auditor": st.get("auditor"), "report_sha256": st.get("audit_report_sha256"), "status_sha256": _sha(self.audit / name)}
         body = {"schema_version": 2, "platform": "v2", "study_id": plan["study"]["id"], "plan_sha256": plan["plan_sha256"],
                 "execution_manifest_composite_sha256": frozen, "audits": audits, "registry_sha256": plan.get("registry_sha256"), "sealed_at_utc": _now()}
+        if collect:
+            body["seal_kind"] = "frame"
         body["composite_seal_hash"] = hashlib.sha256(json.dumps({k: v for k, v in body.items() if k != "sealed_at_utc"}, sort_keys=True).encode()).hexdigest()
         path = _write(self.artifacts / "preexec_audit_seal.json", body)
         return {"status": "PASS", "outputs": [str(path)]}

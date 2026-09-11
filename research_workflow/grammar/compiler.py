@@ -743,7 +743,14 @@ def _resolve_population(ctx: _Ctx) -> Dict[str, Any]:
         if key is None:
             ctx.gap(GapKind.UNAVAILABLE_STREAM, "population.cadence", f"cadence stream {tf!r} is not declared on {sym}")
             key = finest["key"] if finest else None
-        cadence = {"kind": "completed_bar", "stream": key, "every_ns": _tf_ns(tf) if key else None}
+        # A cadence name that is not a duration (`completed_bogus`) used to fall through to _tf_ns and
+        # raise a raw ValueError out of compile -- no typed gap, no handoff. It is a typed gap.
+        try:
+            every_ns = _tf_ns(tf) if key else None
+        except ValueError as exc:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "population.cadence", f"cadence {pop.cadence!r} is not completed_<duration>: {exc}")
+            every_ns = None
+        cadence = {"kind": "completed_bar", "stream": key, "every_ns": every_ns}
     else:
         g = pop.cadence
         try:
@@ -1502,6 +1509,38 @@ def _resolve_warmup_and_availability(ctx: _Ctx) -> Tuple[Dict[str, Any], Dict[st
 # --------------------------------------------------------------------------- #
 # entry point
 # --------------------------------------------------------------------------- #
+# Stages a `stage: collect` study never runs: they protect a claim, and a frame makes none.
+COLLECT_STAGES_NOT_RUN = ("contract_audit", "fit", "freeze", "oos", "analyze", "close")
+# What `research frame register` writes for a collect study (relative to the frame directory).
+FRAME_DELIVERABLES = ("frame.json", "candidates.parquet", "observations.parquet")
+
+
+def _resolve_collect_stage(ctx: _Ctx, population: Mapping[str, Any], triggers: Mapping[str, Any],
+                           chronology: Mapping[str, Any], model: Optional[Dict[str, Any]],
+                           analysis: Optional[Dict[str, Any]]) -> None:
+    """A collect study produces a frame and makes no claim. It fits no model, opens no OOS,
+    declares no analysis (EXPLORE reads the frame), and -- for an `every_candidate` population --
+    is PERMISSIVE: `population.qualify` gates emission only there, so a superset frame is
+    equivalent to any gated run and a later selection is a filter, never a re-collection.
+    Under a trigger graph `qualify` runs before the trigger engine and shapes its state
+    (host/strategy.py), so there it is structural and stays allowed."""
+    if ctx.spec.stage != "collect":
+        return
+    if model is not None:
+        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "model", "stage: collect produces a frame and fits no model; declare model: none "
+                "(a research study binds the frame and fits)")
+    if chronology.get("dev"):
+        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "chronology.dev", "stage: collect has no protected OOS: a frame covers the years it "
+                "collects and nothing else; declare dev: [] (a research study that binds the frame declares its own dev years, disjoint from the frame)")
+    if analysis is not None:
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "analysis", "stage: collect declares no analysis; tables come from `research explore` over "
+                "the registered frame, and claims from a research study that binds it")
+    if population.get("qualify") and triggers.get("kind") != "graph":
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "population.qualify", "COLLECT_MUST_BE_PERMISSIVE: an every_candidate collect study emits "
+                "the superset; a qualify predicate is a selection and belongs to the study that reads the frame "
+                f"(carry the fields it reads as features.metadata columns instead): {population['qualify'].get('text')!r}")
+
+
 def _resolve_deliverables(ctx: _Ctx, model: Optional[Dict[str, Any]],
                           analysis: Optional[Dict[str, Any]]) -> List[Dict[str, str]]:
     """Bind every obligation to an active producer; unknown prose never becomes proof.
@@ -1512,8 +1551,13 @@ def _resolve_deliverables(ctx: _Ctx, model: Optional[Dict[str, Any]],
     """
     from research_workflow.grammar.deliverables import DELIVERABLES, FIT_TUNING_DELIVERABLES
     producers = {}
+    collect = ctx.spec.stage == "collect"
     for stage, paths in DELIVERABLES.items():
         # Exclude inactive paths: static stage membership alone is not production.
+        # A collect study ends at merge and is registered as a frame: the claim stages
+        # (contract audit, fit, freeze, oos, analyze, close) never run and never produce.
+        if collect and stage in COLLECT_STAGES_NOT_RUN:
+            continue
         if stage == "oos" and not ctx.spec.chronology.dev:
             continue
         if stage == "fit" and not model:
@@ -1531,8 +1575,11 @@ def _resolve_deliverables(ctx: _Ctx, model: Optional[Dict[str, Any]],
                 concrete = [item.replace("<year>", str(year)) for item in concrete for year in years]
             for item in concrete:
                 producers[item] = f"stage:{stage}"
-    if not model:
+    if not model and not collect:
         producers["artifacts/fit_summary.json"] = "stage:fit"
+    if collect:
+        for path in FRAME_DELIVERABLES:
+            producers[path] = "stage:frame_register"
     if model and model.get("search_space"):
         for path in FIT_TUNING_DELIVERABLES:
             producers[path] = "stage:fit"
@@ -1595,6 +1642,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
         return CompileOutcome(None, ctx.gaps)
     warmup, availability = _resolve_warmup_and_availability(ctx)
     analysis = _resolve_analysis(ctx, chronology)
+    _resolve_collect_stage(ctx, population, triggers, chronology, model, analysis)
     deliverables = _resolve_deliverables(ctx, model, analysis)
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
@@ -1607,6 +1655,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
         binding_proof=ctx.binding_proof, warmup=warmup, availability=availability, features=ctx.features,
         spec_sha256=spec_sha, registry_sha256=str(registry.get("content_sha256", "")), notes=list(ctx.notes),
         analysis=analysis, deliverables=deliverables,
+        stage=("collect" if spec.stage == "collect" else None),
     ).seal()
     return CompileOutcome(plan, None)
 

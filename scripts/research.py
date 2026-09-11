@@ -271,6 +271,19 @@ def cmd_ws_whoami(ns: argparse.Namespace) -> int:
 # model store
 # ---------------------------------------------------------------------------
 
+def cmd_frame(ns: argparse.Namespace) -> int:
+    from research_workflow.frame_store import FrameStoreError, list_frames, register_frame, resolve_frame_root, verify_frame
+    try:
+        if ns.cmd == "register":
+            return _card(register_frame(ns.study, frame_root=ns.frame_root, repo_root=ROOT))
+        if ns.cmd == "verify":
+            return _card(verify_frame(ns.frame_id, frame_root=ns.frame_root))
+        rows = list_frames(ns.frame_root)
+        return _card({"frame_root": str(resolve_frame_root(ns.frame_root)), "count": len(rows), "frames": rows})
+    except FrameStoreError as exc:
+        return _card({"error": str(exc)}, ok=False)
+
+
 def cmd_model_list(_: argparse.Namespace) -> int:
     from research_workflow.model_store import list_store
     rows = list_store()
@@ -349,6 +362,12 @@ def build_parser() -> argparse.ArgumentParser:
     ai.add_argument("--report", required=True); ai.add_argument("--author"); ai.set_defaults(fn=cmd_audit_ingest)
 
     b = sub.add_parser("bench"); b.add_argument("--series", default="host_c,host_a,golden"); b.add_argument("--repeats", type=int, default=3); b.set_defaults(fn=cmd_bench)
+
+    frame = sub.add_parser("frame", help="immutable content-hashed collection frames (THE FOUR STAGES: COLLECT)").add_subparsers(dest="cmd", required=True)
+    fr = frame.add_parser("register", help="register the merged frame of a `stage: collect` study that ran through merge under a frame seal")
+    fr.add_argument("--study", required=True); fr.add_argument("--frame-root"); fr.set_defaults(fn=cmd_frame)
+    fl = frame.add_parser("list"); fl.add_argument("--frame-root"); fl.set_defaults(fn=cmd_frame)
+    fv = frame.add_parser("verify"); fv.add_argument("frame_id"); fv.add_argument("--frame-root"); fv.set_defaults(fn=cmd_frame)
 
     model = sub.add_parser("model").add_subparsers(dest="cmd", required=True)
     model.add_parser("list").set_defaults(fn=cmd_model_list)
