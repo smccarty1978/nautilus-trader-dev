@@ -21,7 +21,7 @@ research_question: "# NQ MULTI-TIMEFRAME REGIME PATH ATLAS — ONE-YEAR PILOT (2
   \ `analysis.decomposition.buckets`,\n    `analysis.anchor.first_threshold_crossing`,\n    `analysis.control.cell_matched`, `analysis.classify.precedence`,\n    `analysis.metric.tail_lift`, `analysis.gate.population_parity`,\n    `analysis.gate.arm_delta_integrity`.\n      - T3 / T4 map onto `analysis.path.anchored_offsets`.\n      - T2 maps partly onto `analysis.incidence.cumulative`.\n      - T1, T6, T7, T8 have NO generic grouped-summary producer\n        (mean / median / quantiles by group).\n      - §9 has NO producer at all: `grep -rn cluster research/analysis/`\n        returns nothing. There is no cluster-robust standard error\n        anywhere in the analysis harness, and §9 makes one mandatory on\n        every reported mean and difference.\n    Expect the compile-time deliverable-producer gate to fail on T1,\n    T6, T7, T8 and on §9, and expect the capability flow to add one\n    grouped-descriptive op and one session-day-clustered uncertainty op\n    before this study can seal.\
   \ §13 authorizes exactly that; §8 says\n    route it as a typed analysis capability gap rather than writing\n    study-local Python.\n\nA5. PLATFORM FREEZE. The platform is under a declared freeze after\n    `f136a469` (2026-09-10): no platform work until three real studies\n    have run. This study is one of those real studies and §13\n    authorizes capability workers under `platform_merge:\n    approval_required`, so the freeze does not block it — but every\n    capability merge here is an owner-approved exception, not routine."
 
-status: COLLECT_STAGE_1M_EPOCHS  # session one (2026-09-11): stage: collect, 1m epochs (no 1s stream, G7), TRADING_DAY censoring; plan 67c7b47d sealed then superseded at smoke by the features-free 1m-execution plan
+status: BLOCKED_CAPABILITY_GAP_G7  # session one (2026-09-11): plan 67c7b47d compiles, seals (causal pass_01 CLEAR) and fails at smoke -- completed_1m cadence cannot epoch on the external 1m context stream; platform work required
 dataset_id: NQ_1S_V2_GLOBEX
 platform_commit: 451836f81518936d8cf5c95489d3b3c40e43c96d  # main merged into the study worktree 2026-09-11 (THE FOUR STAGES step 1 + 4, TRADING_DAY censoring)
 phase: B  # phase A closed by compile 2026-09-11; B (readiness..frame seal) continues in session one
@@ -360,16 +360,19 @@ gap_inventory:
       the strictly-before rule at its own ts_init, with a targeted mux test), OR refuse
       completed_<coarser external tf> at compile with a typed gap. The scientifically required one
       is the first; the second is the minimum.
-    study_side_route_taken: >
-      Declare no 1s stream: 1m becomes the finest external stream (execution), epochs are the
-      completed 1m bar close, 3m..4h derive as complete buckets of external 1m bars (fewer
-      discarded buckets than from 1s, where any second without a trade voids the bucket). Cost:
-      the feature host needs a 1s stream, so ZERO feature instances bind -- the 21 adapter-rendered
-      features of plan 67c7b47d (prior-regime geometry, 1m/5m alignment, 5m current geometry,
-      OHLCV volume/delta) are dropped, and 5s/30s alignment context is not derivable. Plan
-      3ff96583 (session one). The frame carries tracker-state metadata for 1m and 3m..4h and the
-      1m excursion path; regime_alignment 1m vs 5m is the sign comparison dir_5m == dir_1m at
-      EXPLORE.
-    blocks: "[section 7 features entirely for this pilot; 5s and 30s alignment context]"
+    study_side_route_attempted_and_invalid: >
+      Declaring no 1s stream (plan 3ff96583, features-free) compiled and passed readiness and
+      preflight, but causal pass_02 (BLOCKED, 1 critical) showed it cannot run: the compiler takes
+      `finest` / `externals` from the DATASET's declared external streams (NQ_1S_V2_GLOBEX always
+      declares 1s and 1m), not from the study's requested timeframes, so nq_1m stays a CONTEXT
+      stream and nq_3m..nq_4h are compiled with derived_from: nq_1s -- a key absent from the
+      plan's own streams -- which raises KeyError('nq_1s') in StreamMux.__init__ before the first
+      bar. Neither preflight nor readiness catches it (R8 is a static lint). The sealed
+      composition is restored to plan 67c7b47d (21 features, 1s + 1m external, completed_1m
+      cadence), which is what the G7 fix makes runnable. NO further study-side route exists: a
+      1s grid cadence (every: 60s, anchor: regime_1m.start_ns) would put every 1m tracker field
+      one bar behind the 1s price at the epoch and move the entry reference one bar after the
+      flip bar close -- a semantic substitution the contract forbids (section 6, bar close).
+    blocks: "[the whole pilot: no row can be collected until the completed_1m cadence can epoch on the external 1m bar]"
 
 open_questions_for_the_owner: []
