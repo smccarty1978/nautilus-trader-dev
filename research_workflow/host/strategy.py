@@ -13,7 +13,7 @@ import time
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
 from research_workflow.host.interfaces import NS, BarView, EmittedEvent, EpochView
-from research_workflow.host.mux import StreamMux
+from research_workflow.host.mux import CausalOrderViolation, StreamMux
 from research_workflow.host.outcomes import LabelOutcomeKernel, compile_outcome_contract, LabelOutcomeContract
 from research_workflow.host.predicate_eval import compile_predicate
 from research_workflow.host.sink import CollectionSink
@@ -85,6 +85,14 @@ class HostCore:
         pop = self.plan["population"]
         self.cadence = dict(pop["cadence"])
         self.epoch_stream = self.cadence["stream"]
+        # The stream that raises the epoch must be one the plan declares visible AT the epoch.
+        # The compiler guarantees this (it sets ``visibility: at_epoch`` on a completed-bar cadence
+        # stream and gaps the compositions it cannot support); refusing here at CONSTRUCTION keeps a
+        # plan that slipped through from failing mid-run, after a seal.
+        if self.epoch_stream not in self.mux.at_epoch_streams:
+            raise CausalOrderViolation(
+                f"EPOCH_STREAM_NOT_VISIBLE_AT_EPOCH: cadence stream {self.epoch_stream!r} is declared "
+                f"strictly_before; it cannot raise an epoch at its own bar close")
         self.qualify = compile_predicate(pop["qualify"]["ast"], epoch_fields=self.epoch_fields, allow_events=False) if pop.get("qualify") else None
         self.direction_ref = pop.get("direction")
         self.anchor_identity_ref = pop.get("anchor_identity")
@@ -269,7 +277,7 @@ class HostCore:
 
     def _epoch(self, bar: BarView, T: int, grid_index: Optional[int]) -> None:
         self.epochs_evaluated += 1
-        self.mux.assert_epoch_visibility(T, self.execution_streams)
+        self.mux.assert_epoch_visibility(T)
         epoch = EpochView(T=T, price=bar.close, bar=bar, trackers=self.trackers, grid_index=grid_index)
         if not self.session_table.in_session(T):
             return

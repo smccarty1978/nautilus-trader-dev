@@ -230,9 +230,21 @@ def _resolve_streams(ctx: _Ctx) -> None:
                                    "reference_tables": list(ds.get("reference_tables") or []),
                                    "reference_digest": ds.get("reference_digest"), "same_ts": s.same_ts}
         declared = ds.get("streams") or {}
-        externals = {tf: st for tf, st in declared.items() if (st or {}).get("source") == "external"}
-        if not externals:
+        dataset_externals = {tf: st for tf, st in declared.items() if (st or {}).get("source") == "external"}
+        if not dataset_externals:
             ctx.gap(GapKind.UNAVAILABLE_STREAM, where, f"dataset {s.dataset!r} declares no external streams", dataset=s.dataset)
+            continue
+        # Roles and derived sources are resolved over the external streams THIS STUDY REQUESTS, not over
+        # everything the dataset happens to declare. Scoping them to the dataset made `finest` name a stream
+        # that was never added to the plan, which (a) forced every coarser requested external to `context`
+        # even when the study carried no finer stream at all, and (b) wrote `derived_from: <absent key>` into
+        # the plan -- a compile that succeeds and a StreamMux that cannot be constructed.
+        externals = {tf: st for tf, st in dataset_externals.items() if tf in set(s.timeframes)}
+        if not externals:
+            ctx.gap(GapKind.UNAVAILABLE_STREAM, f"{where}.timeframes",
+                    f"none of {sorted(set(s.timeframes))} is an external stream of {s.dataset!r} "
+                    f"(external: {sorted(dataset_externals)}); a plan must carry the stream its derived timeframes are built from",
+                    dataset=s.dataset)
             continue
         finest = min(externals, key=_tf_ns)
         for tf in s.timeframes:
@@ -744,6 +756,81 @@ def _compile_predicate(ctx: _Ctx, text: Optional[str], where: str, *, allow_even
 # --------------------------------------------------------------------------- #
 # stage 4: population, triggers
 # --------------------------------------------------------------------------- #
+def _mark_epoch_bearing_stream(ctx: _Ctx, key: Optional[str], sym: str) -> None:
+    """A completed-bar cadence raises its epoch at its own bar's ``ts_init``.
+
+    That stream is therefore visible AT the epoch by construction: the epoch IS its close, the
+    finer execution bar closing at the same instant has already been applied, and no stream is
+    ahead of ``T``.  The mux enforces visibility from this plan field, so declaring it here is
+    what makes the composition legal -- there is no exception carved into the assertion.
+
+    The one composition this cannot cover: a context cadence stream with no execution stream to
+    release it.  The mux only drains the context queue just before an execution bar (and at
+    ``flush``), so every epoch would fire at the end of the run.  That is refused at compile.
+    """
+    if not key:
+        return
+    entry = next((st for st in ctx.streams if st["key"] == key), None)
+    if entry is None or entry.get("visibility") == "at_epoch":
+        return
+    if not any(st["role"] == "execution" for st in ctx.streams if st["instrument"] == sym):
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "population.cadence",
+                f"cadence stream {key!r} is a context stream and {sym} declares no execution stream; "
+                f"queued context bars are released only ahead of an execution bar, so no epoch could be raised in order",
+                stream=key)
+        return
+    entry["visibility"] = "at_epoch"
+    entry["epoch_bearing"] = True
+    ctx.notes.append(f"{key} is the completed-bar cadence stream: role context (queued, released strictly "
+                     f"before the next execution bar) with visibility at_epoch, because the epoch is that bar's close")
+
+
+def _validate_runtime_composition(ctx: _Ctx, population: Mapping[str, Any]) -> None:
+    """Prove the compiled stream graph can actually be built and stepped.
+
+    A typed gap at compile is the contract; a runtime assertion after a frame seal is not an
+    acceptable outcome for a composition the compiler accepted.  The structural checks below give
+    the precise message, and the dry construction of the real ``StreamMux`` closes the class:
+    whatever the host refuses to build, the compiler refuses to emit.
+    """
+    by_key = {st["key"]: st for st in ctx.streams}
+    for st in ctx.streams:
+        if st.get("source") != "derived":
+            continue
+        src_key = st.get("derived_from")
+        src = by_key.get(src_key)
+        if src is None:
+            ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "streams",
+                    f"{st['key']} is derived from {src_key!r}, which is not one of this plan's streams "
+                    f"({sorted(by_key)}); the host cannot construct the aggregator",
+                    stream=st["key"], derived_from=src_key)
+            continue
+        if int(src["duration_ns"]) >= int(st["duration_ns"]) or int(st["duration_ns"]) % int(src["duration_ns"]):
+            ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "streams",
+                    f"{st['key']} ({st['timeframe']}) is not a whole number of {src['timeframe']} buckets",
+                    stream=st["key"], derived_from=src_key)
+    cadence = population.get("cadence") or {}
+    epoch_stream = cadence.get("stream")
+    if epoch_stream and epoch_stream not in by_key:
+        ctx.gap(GapKind.UNAVAILABLE_STREAM, "population.cadence",
+                f"cadence stream {epoch_stream!r} is not one of this plan's streams ({sorted(by_key)})",
+                stream=epoch_stream)
+        return
+    if not ctx.gaps.ok:
+        return
+    from research_workflow.host.mux import StreamMux
+    try:
+        mux = StreamMux(ctx.streams, lambda bar: None)
+    except Exception as exc:                                    # the host is the authority on what it can build
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "streams",
+                f"the compiled stream graph cannot be constructed by the host multiplexer: {exc}")
+        return
+    if epoch_stream and epoch_stream not in mux.at_epoch_streams:
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "population.cadence",
+                f"cadence stream {epoch_stream!r} is declared strictly_before, so it cannot raise an epoch at its own bar close",
+                stream=epoch_stream)
+
+
 def _resolve_population(ctx: _Ctx) -> Dict[str, Any]:
     pop = ctx.spec.population
     sym = ctx.execution_symbol
@@ -763,6 +850,7 @@ def _resolve_population(ctx: _Ctx) -> Dict[str, Any]:
             ctx.gap(GapKind.INVALID_PARAMETERIZATION, "population.cadence", f"cadence {pop.cadence!r} is not completed_<duration>: {exc}")
             every_ns = None
         cadence = {"kind": "completed_bar", "stream": key, "every_ns": every_ns}
+        _mark_epoch_bearing_stream(ctx, key, sym)
     else:
         g = pop.cadence
         try:
@@ -1661,6 +1749,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
     _resolve_trackers(ctx)
     _resolve_features(ctx)
     population = _resolve_population(ctx)
+    _validate_runtime_composition(ctx, population)
     triggers = _resolve_triggers(ctx)
     outcome = _resolve_outcome(ctx, population)
     columns = _resolve_columns(ctx, population, outcome)
