@@ -62,7 +62,7 @@ features:
   # (research_workflow/provider_host.py ADAPTER_REGISTRY). Registered features whose provider has
   # no adapter (session_membership, session_elapsed, relative_volume, activity_flip_count, the
   # regime family at 5s/30s/3m/15m/30m/1h/4h) are recorded in research_decision.yaml G6, not
-  # composed. The ETH/RTH flag therefore comes from triggering_1s_ts_init against the dataset's
+  # composed. The ETH/RTH flag therefore comes from decision_epoch_ts_ns against the dataset's
   # committed sessions table downstream, never from a filter here.
   instances:
     # --- contract section 7 ALIGNMENT (registered + bindable): 1m vs 5m agreement, 5m direction/age
@@ -90,12 +90,24 @@ features:
     #     the last 1m of volume vs the trailing 20m (flip-bar volume vs prior N bars), and the
     #     estimated delta ratio over the last 1m. Volume/delta are ESTIMATED from bar geometry.
     #     Single-year pilot: raw volume is never compared across years (contract section 7).
+    #
+    #     bar_volume IS NOT THE FLIP BAR'S VOLUME under this cadence (causal audit pass_03 B9).
+    #     feature.bar_volume takes only `context` and is hard-wired to stream.completed_1s, so it
+    #     reports the LAST COMPLETED 1s BAR OF THE EPOCH MINUTE -- roughly 1/60 scale, the tail
+    #     second, not the minute. It was the epoch bar only while the cadence was completed_1s.
+    #     Pointing it at 1m needs a feature-definition change (capability work), not taken here.
+    #     Contract section 7's "flip-bar volume vs prior N bars" is carried by
+    #     vol_sum_60s_vs_1200s_ratio, which is unaffected (a time window, not a per-bar read).
+    #     Do not group or threshold on bar_volume as if it were the minute's volume.
     - {feature: bar_volume, context: bar}
     - {feature: vol_sum_vs_ratio, context: rolling, timeframe: 60s, timeframe_2: 1200s}
     - {feature: est_delta_ratio,  context: rolling, timeframe: 60s}
 
   metadata:
-    triggering_1s_ts_init: epoch.T
+    # The decision epoch T. Under population.cadence: completed_1m the epoch bar IS the 1m bar,
+    # so this is that bar's close (ts_init), not a 1s timestamp -- it was named
+    # triggering_1s_ts_init while the cadence was completed_1s (platform G7, main e66c981a).
+    decision_epoch_ts_ns: epoch.T
     # --- the 1m anchor: regime state at T
     dir_1m:        regime_1m.dir
     prev_dir_1m:   regime_1m.prev_dir

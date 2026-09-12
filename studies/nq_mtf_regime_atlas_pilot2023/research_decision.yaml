@@ -189,7 +189,7 @@ terminal_decisions:
   eth_rth_flag: >
     feature.session_membership / feature.session_elapsed are registered but their provider
     (GenericContextProvider) renders only ema_slope at runtime (G6). The ETH/RTH distinction of
-    contract section 0 is therefore derived downstream from triggering_1s_ts_init against the
+    contract section 0 is therefore derived downstream from decision_epoch_ts_ns against the
     dataset's committed sessions reference table -- a filter over the frame, never a population
     gate -- and T6's ETH vs RTH split is reported as unsatisfied by a registered analysis op.
   terminal_label: DESCRIPTIVE_ATLAS_COMPLETE (pilot scope 2023).
@@ -338,7 +338,7 @@ gap_inventory:
       `research cap describe` reports all of them status: verified. The registry and the runtime
       adapter surface disagree; the compiler is the authority and the study composes only what binds.
     consequence: >
-      ETH/RTH flag not carried as a feature column (derived downstream from triggering_1s_ts_init);
+      ETH/RTH flag not carried as a feature column (derived downstream from decision_epoch_ts_ns);
       relative volume vs a trailing baseline and the session flip count are not carried.
     blocks: "[T6 ETH vs RTH split] and the section 7 SESSION AND TIME / VOLUME(relative) blocks"
 

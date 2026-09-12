@@ -24,7 +24,7 @@
         "id": "regime_1m",
         "kind": "tracker",
         "stream": "nq_1m",
-        "visibility": "strictly_before"
+        "visibility": "at_epoch"
       },
       {
         "availability": "completed_bar_ts_init",
@@ -80,7 +80,7 @@
         "id": "excursion_1m",
         "kind": "tracker",
         "stream": "nq_1m",
-        "visibility": "strictly_before"
+        "visibility": "at_epoch"
       },
       {
         "availability": "completed_bar_ts_init",
@@ -568,7 +568,7 @@
     "windows": []
   },
   "closure": {
-    "composite_sha256": "eceb0985fafc002b67d141fa9fdb728e8a6efe7403dd50a9c686c295d8d50768",
+    "composite_sha256": "041379f7e433a637beba1e687fd70124f7d0c79a34e010c6b6de5cc53d13da7c",
     "file_count": 159,
     "files": {
       "backtests/nt_runtime/__init__.py": "8a091704d4e8c5dfeeb2fc16e97035e3b7e1986440e5050d9d530d1f4691614f",
@@ -685,7 +685,7 @@
       "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
       "research_workflow/governed_controller_v2.py": "a6301e7c2441cdf49c76cbf853d2f73171fcc2bb8c25e13aeb6bb13088a7291c",
       "research_workflow/grammar/__init__.py": "8346e9b1ae1cf1c7950e06d278e21d162678d0345ad5b8b2a6aa2a7eeaba5eba",
-      "research_workflow/grammar/compiler.py": "c3a5b36ff2a9a7c22c2c75a4f2359a085062c33c7d1a89f74fe94205022ff671",
+      "research_workflow/grammar/compiler.py": "aa68a535774a2b1b656f51ed5355dcdcb1a0bd81f34c256c5edc5632dbb462da",
       "research_workflow/grammar/deliverables.py": "f147d4f7f6fc8cf239a49440765d2410c3c6650f3f0f868b9c902e2ca9e87909",
       "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
       "research_workflow/grammar/gaps.py": "9e3341d65135484e56e868bbe9fbb2f13637d133156ce17bdffee988c0d46b48",
@@ -694,11 +694,11 @@
       "research_workflow/grammar/spec.py": "1d16c746dcf0938684f4e544a460a02f715d7e94d41bc9cfd6a2eff324170edd",
       "research_workflow/host/__init__.py": "eeb674dcd8d9ce76b484669752dc2e9cb6b15934cab13257a7b010750ea1f79c",
       "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
-      "research_workflow/host/mux.py": "63f4b606895181ead566de12b10f783d380ed9c0bf0bd650ac43b76588e1708d",
+      "research_workflow/host/mux.py": "72aacac84ac70d47cb3553df4ed353ba492d67fe69075673bd143c504a6bff22",
       "research_workflow/host/outcomes.py": "eddca7812228324d239a58657f6f734da41a7da651ccb2c2895901ff9c0ce18a",
       "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
       "research_workflow/host/sink.py": "c0e353d2cd2f23f4c4142927b9e06a90b52ff70ff365a8dd188fb43ec0e0959f",
-      "research_workflow/host/strategy.py": "59f4cca85697b4d82296d7a5e440d72353c8af15d3770a68c51c78c99b5eb66e",
+      "research_workflow/host/strategy.py": "3792e4ea966d76381cf3b3fee50fd0a7c99a521948e83862bc9dec7e96b402e6",
       "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
       "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
       "research_workflow/lifecycle_v2.py": "9050add5399e12885289d498cf7a6b0063d8d59174a2dff89a9b2c5c973a73df",
@@ -740,7 +740,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "69d7bbc032b59aefdd731a9adf34fdbf3f6e369e36c72e6a85c28521b7362040",
+        "composite_sha256": "8b30bb8b07e826da410abbaee69e113f4346d1385987260aaa3b9fb24e82740c",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -928,7 +928,7 @@
         ]
       },
       "replay": {
-        "composite_sha256": "0cee6aaca723c27e12732123f40a0cfaae7541fbe26732e368c5cc03314c25fa",
+        "composite_sha256": "e2c9a995a90c25f54f46d0336605d5538ea59271720f30c5ea0fe678a868e3d9",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -1105,7 +1105,7 @@
     ],
     "metadata": [
       {
-        "column": "triggering_1s_ts_init",
+        "column": "decision_epoch_ts_ns",
         "ref": "epoch.T"
       },
       {
@@ -1873,7 +1873,9 @@
     }
   },
   "model": null,
-  "notes": [],
+  "notes": [
+    "nq_1m is the completed-bar cadence stream: role context (queued, released strictly before the next execution bar) with visibility at_epoch, because the epoch is that bar's close"
+  ],
   "outcome": {
     "arms": [],
     "atr": "regime_1m.atr",
@@ -1923,7 +1925,7 @@
     "stream": "nq_1m",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "67c7b47dca46582ce930a802a18f284a23e297e888ccfb2db7143543a3bc3efc",
+  "plan_sha256": "bed51b460286e18dcc28139bfd91ede9e354d54647a5b82e658a9db39311ac67",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1952,7 +1954,7 @@
     ],
     "session": "ALL"
   },
-  "spec_sha256": "13edf777e1fca79f81ff95c541245542e38189b988c4cbf80fc10e7d3f47f9f5",
+  "spec_sha256": "40200fe12e09e50bf7751a2daa661ab0276ccd800455b3ce6eb39459fea15ebf",
   "stage": "collect",
   "streams": [
     {
@@ -1994,6 +1996,7 @@
     {
       "bar_type": "NQ.XCME-1-MINUTE-LAST-EXTERNAL",
       "duration_ns": 60000000000,
+      "epoch_bearing": true,
       "instrument": "NQ",
       "key": "nq_1m",
       "role": "context",
@@ -2001,7 +2004,7 @@
       "source": "external",
       "timeframe": "1m",
       "ts_init_delta_ns": 60000000000,
-      "visibility": "strictly_before"
+      "visibility": "at_epoch"
     },
     {
       "aggregation": "complete_bucket",

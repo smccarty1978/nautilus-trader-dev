@@ -1,0 +1,64 @@
+{
+  "candidates_count_total": 1380,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true,
+    "replay_imports_within_collection_closure": true
+  },
+  "date": "2023-10-02",
+  "execution_manifest_composite_sha256": "041379f7e433a637beba1e687fd70124f7d0c79a34e010c6b6de5cc53d13da7c",
+  "generated_at_utc": "2026-09-12T13:50:06.606299+00:00",
+  "manifest": {
+    "candidates_sha256": "b15a38b67bf8d2498a292b2e140f48aa0e1c244cc8c12905ea4a3f31ed1c4c3e",
+    "composite_seal_hash": "388d5dc03e5af6d0a4065643a7374cc1575df628c144e632150f3b286ede76d6",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2_GLOBEX",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2023-10-02",
+    "elapsed_s": 38.821411400000216,
+    "execution_manifest_sha256": "041379f7e433a637beba1e687fd70124f7d0c79a34e010c6b6de5cc53d13da7c",
+    "kind": "smoke",
+    "observations_sha256": "34d53d33a84bbddabfbb27d3643ce6aa464d11b8cbedc2e1d86c7169f4dd09e5",
+    "plan_sha256": "bed51b460286e18dcc28139bfd91ede9e354d54647a5b82e658a9db39311ac67",
+    "rows": {
+      "candidates": 1380,
+      "observations": 1380
+    },
+    "stats": {
+      "bars": 213431,
+      "bars_by_stream": {
+        "nq_15m": 18,
+        "nq_1h": 0,
+        "nq_1m": 5520,
+        "nq_1s": 207911,
+        "nq_30m": 5,
+        "nq_30s": 2737,
+        "nq_3m": 262,
+        "nq_4h": 0,
+        "nq_5m": 122,
+        "nq_5s": 23522
+      },
+      "candidates": 1380,
+      "dropped_outside_primary": {
+        "candidates": 4140,
+        "observations": 4140
+      },
+      "epochs": 5520,
+      "observations": 1380,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-12T13:50:06.593055+00:00"
+  },
+  "observations_count_total": 1380,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_atlas_pilot2023\\studies\\nq_mtf_regime_atlas_pilot2023\\runs\\20260912_134921_nq_mtf_regime_atlas_pilot2023_smoke",
+  "sealed_composite_sha256": "388d5dc03e5af6d0a4065643a7374cc1575df628c144e632150f3b286ede76d6",
+  "status": "ACCEPTED",
+  "study_name": "nq_mtf_regime_atlas_pilot2023",
+  "validator": "research_workflow.lifecycle_v2"
+}
