@@ -6,7 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from research_workflow.grammar.compiler import compile_study, load_spec
+from research_workflow.grammar.compiler import (_mark_epoch_bearing_stream, _validate_runtime_composition,
+                                                 compile_study, load_spec)
+from research_workflow.grammar.gaps import CapabilityGapReport
 from research_workflow.grammar.expansion import expand_instances
 from research_workflow.grammar.gaps import GapKind
 from research_workflow.grammar.predicates import PredicateSyntaxError, parse_predicate, referenced_roots, render
@@ -157,6 +159,110 @@ def test_coarser_external_timeframes_are_context_streams():
     assert roles["nq_1s"] == ("execution", "at_epoch", "external")
     assert roles["nq_1m"] == ("context", "strictly_before", "external")
     assert roles["nq_5s"][0] == "execution" and roles["nq_5s"][2] == "derived"
+
+
+def test_completed_bar_cadence_stream_is_visible_at_its_own_epoch():
+    """G7a.  ``cadence: completed_1m`` on a dataset that also declares external 1s leaves nq_1m a
+    queued CONTEXT stream (released strictly before the next execution bar) but marks it visible AT
+    the epoch: the epoch it raises is that bar's own close, and the 1s bar closing at the same
+    instant is already applied, so nothing is ahead of T."""
+    spec = load_spec(ROOT / "fixtures" / "parity" / "shape_b" / "study.yaml")
+    spec["population"]["cadence"] = "completed_1m"
+    out = compile_study(spec, repo_root=ROOT)
+    assert out.ok, out.card()
+    nq_1m = next(s for s in out.plan.streams if s["key"] == "nq_1m")
+    assert (nq_1m["role"], nq_1m["visibility"], nq_1m["epoch_bearing"]) == ("context", "at_epoch", True)
+    assert out.plan.population["cadence"] == {"kind": "completed_bar", "stream": "nq_1m", "every_ns": 60 * 1_000_000_000}
+    assert any("completed-bar cadence stream" in n for n in out.plan.notes)
+    # the availability table is what an auditor reads: it must carry the same fact
+    rows = {r["id"]: r for r in out.plan.availability["rows"] if r.get("stream") == "nq_1m"}
+    assert rows and all(r["visibility"] == "at_epoch" for r in rows.values())
+
+
+def test_stream_roles_are_resolved_over_the_timeframes_the_study_requests():
+    """The dataset declares external 1s AND 1m; a study that requests neither of them cannot derive
+    anything.  Resolving ``finest`` over the DATASET's externals wrote ``derived_from: nq_1s`` into a
+    plan that carried no nq_1s -- a compile that succeeds and a host that cannot be constructed."""
+    spec = load_spec(ROOT / "fixtures" / "parity" / "shape_b" / "study.yaml")
+    spec["streams"][0]["timeframes"] = ["5s", "5m"]
+    out = compile_study(spec, repo_root=ROOT)
+    assert not out.ok
+    assert (GapKind.UNAVAILABLE_STREAM, "streams[0].timeframes") in {(g.kind, g.where) for g in out.gaps.gaps}
+
+
+@pytest.mark.parametrize("shape,cadence", [("shape_a", None), ("shape_b", None), ("shape_c", None), ("shape_b", "completed_1m")])
+def test_every_compiled_plan_is_constructible_by_the_host(shape, cadence):
+    """G7b as a property: whatever the host multiplexer refuses to build, the compiler must refuse to
+    emit.  A runtime assertion after a frame seal is not an acceptable outcome for a composition the
+    compiler accepted."""
+    from research_workflow.host.mux import StreamMux
+    spec = load_spec(ROOT / "fixtures" / "parity" / shape / "study.yaml")
+    if cadence:
+        spec["population"]["cadence"] = cadence
+    out = compile_study(spec, repo_root=ROOT)
+    assert out.ok, out.card()
+    mux = StreamMux(out.plan.streams, lambda bar: None)
+    epoch_stream = out.plan.population["cadence"]["stream"]
+    assert epoch_stream in mux.at_epoch_streams
+
+
+class _StubCtx:
+    """Only what the two composition checks touch: streams, notes and the gap report."""
+
+    def __init__(self, streams):
+        self.streams = [dict(s) for s in streams]
+        self.notes = []
+        self.gaps = CapabilityGapReport("stub")
+
+    def gap(self, kind, where, message, **detail):
+        self.gaps.add(kind, where, message, **detail)
+
+
+def _stub_streams():
+    ns = 1_000_000_000
+    return [{"key": "nq_1s", "instrument": "NQ", "timeframe": "1s", "duration_ns": ns, "role": "execution",
+             "source": "external", "visibility": "at_epoch"},
+            {"key": "nq_5s", "instrument": "NQ", "timeframe": "5s", "duration_ns": 5 * ns, "role": "execution",
+             "source": "derived", "derived_from": "nq_1s", "aggregation": "complete_bucket", "visibility": "at_epoch"},
+            {"key": "nq_1m", "instrument": "NQ", "timeframe": "1m", "duration_ns": 60 * ns, "role": "context",
+             "source": "external", "visibility": "strictly_before"}]
+
+
+def test_non_constructible_stream_graph_is_a_typed_gap_not_a_runtime_error():
+    """Adversarial: a derived stream whose source is not in the plan.  The dry construction of the
+    real StreamMux is what closes the class -- the message names the host, not a stack trace."""
+    streams = [s for s in _stub_streams() if s["key"] != "nq_1s"]
+    ctx = _StubCtx(streams)
+    _validate_runtime_composition(ctx, {"cadence": {"kind": "completed_bar", "stream": "nq_1m"}})
+    assert (GapKind.UNSUPPORTED_COMPOSITION, "streams") in {(g.kind, g.where) for g in ctx.gaps.gaps}
+
+
+def test_cadence_stream_declared_strictly_before_is_a_typed_gap():
+    """Adversarial: the exact runtime failure G7 hit, now refused at compile.  If anything ever
+    leaves a cadence stream strictly_before, the compile returns a gap instead of sealing a plan
+    that raises CONTEXT_STREAM_VISIBLE_AT_EPOCH on its first epoch."""
+    ctx = _StubCtx(_stub_streams())
+    _validate_runtime_composition(ctx, {"cadence": {"kind": "completed_bar", "stream": "nq_1m"}})
+    assert (GapKind.UNSUPPORTED_COMPOSITION, "population.cadence") in {(g.kind, g.where) for g in ctx.gaps.gaps}
+
+
+def test_context_cadence_with_no_execution_stream_is_refused():
+    """The one composition G7a cannot cover: the mux drains the context queue only ahead of an
+    execution bar, so with no execution stream every epoch would fire at flush, at the end of the run."""
+    streams = [dict(s, role="context", visibility="strictly_before") for s in _stub_streams()]
+    ctx = _StubCtx(streams)
+    _mark_epoch_bearing_stream(ctx, "nq_1m", "NQ")
+    assert (GapKind.UNSUPPORTED_COMPOSITION, "population.cadence") in {(g.kind, g.where) for g in ctx.gaps.gaps}
+    assert all(s["visibility"] == "strictly_before" for s in ctx.streams)
+
+
+def test_cadence_stream_on_the_execution_stream_is_untouched():
+    """Control: the overwhelmingly common composition must not change at all -- gate 4 (existing
+    sealed studies reproduce bit-identically) rests on this."""
+    ctx = _StubCtx(_stub_streams())
+    _mark_epoch_bearing_stream(ctx, "nq_1s", "NQ")
+    assert ctx.gaps.ok and ctx.notes == []
+    assert ctx.streams == _stub_streams()
 
 
 def test_search_space_requires_walk_forward_protocol_and_two_tuning_years():

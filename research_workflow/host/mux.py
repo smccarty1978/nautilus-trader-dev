@@ -2,12 +2,19 @@
 generic completed-bucket aggregation for derived timeframes.
 
 Causal rule.  A decision epoch belongs to the execution instrument.  At epoch ``T``
-(the ``ts_init`` of an execution-stream bar) execution streams may expose their bar at
-``T``; a context stream exposes only bars with ``ts_init < T``.  Context bars are
-queued on arrival and released just before the first execution bar with a strictly
-later ``ts_init`` -- one integer per stream and one assertion at the epoch, nothing
-more.  There is no proven same-timestamp policy yet, so ``same_ts: available`` is
-refused at compile time.
+(the ``ts_init`` of the bar that raises the epoch) a stream whose declared
+``visibility`` is ``at_epoch`` may expose its bar at ``T``; a ``strictly_before``
+stream exposes only bars with ``ts_init < T``.  Context bars are queued on arrival and
+released just before the first execution bar with a strictly later ``ts_init`` -- one
+integer per stream and one assertion at the epoch, nothing more.  There is no proven
+same-timestamp policy yet, so ``same_ts: available`` is refused at compile time.
+
+``visibility`` is a per-stream plan field, not a synonym for ``role``.  Every execution
+stream is ``at_epoch``.  A context stream is ``strictly_before`` EXCEPT when it is the
+population's completed-bar cadence stream: that stream's own bar close *is* the epoch,
+the finer execution bar closing at the same instant is already visible, and nothing on
+any stream is ahead of ``T``, so the epoch is causally sound.  The compiler sets that
+field (``_resolve_population``); the mux only enforces what the plan declares.
 
 Derived timeframes.  A bucket of ``bucket_ns`` is keyed by ``ts_event // bucket_ns``;
 it publishes when every expected member (``bucket_ns / source_duration``) is present and
@@ -36,6 +43,7 @@ class StreamInfo:
     duration_ns: int
     role: str
     source: str
+    visibility: str = "at_epoch"
     derived_from: Optional[str] = None
     aggregation: Optional[str] = None
     bar_type: Optional[str] = None
@@ -122,14 +130,21 @@ class StreamMux:
         for s in streams:
             self.streams[s["key"]] = StreamInfo(
                 key=s["key"], instrument=s["instrument"], timeframe=s["timeframe"], duration_ns=int(s["duration_ns"]),
-                role=s["role"], source=s["source"], derived_from=s.get("derived_from"), aggregation=s.get("aggregation"),
+                role=s["role"], source=s["source"],
+                visibility=str(s.get("visibility") or ("at_epoch" if s["role"] == "execution" else "strictly_before")),
+                derived_from=s.get("derived_from"), aggregation=s.get("aggregation"),
                 bar_type=s.get("bar_type"))
         self._deliver = deliver
         self.visible_through: Dict[str, int] = {k: -1 for k in self.streams}
         self.by_bar_type: Dict[str, str] = {s.bar_type: s.key for s in self.streams.values() if s.bar_type}
         self._aggregators: Dict[str, List[BucketAggregator]] = {}
+        self.at_epoch_streams = {k for k, s in self.streams.items() if s.visibility == "at_epoch"}
         for s in self.streams.values():
             if s.source == "derived" and s.aggregation == "complete_bucket":
+                if s.derived_from not in self.streams:
+                    raise CausalOrderViolation(
+                        f"DERIVED_SOURCE_STREAM_ABSENT: {s.key} is derived from {s.derived_from!r}, "
+                        f"which is not one of the plan's streams {sorted(self.streams)}")
                 src = self.streams[s.derived_from]
                 self._aggregators.setdefault(src.key, []).append(BucketAggregator(s.key, s.duration_ns, src.duration_ns))
         for aggs in self._aggregators.values():
@@ -183,9 +198,13 @@ class StreamMux:
         self._deliver(bar)
 
     # -- the assertion ------------------------------------------------------------
-    def assert_epoch_visibility(self, T: int, execution_streams: Sequence[str]) -> None:
+    def assert_epoch_visibility(self, T: int) -> None:
+        """Nothing on any stream may be ahead of ``T``; a ``strictly_before`` stream may not
+        even reach it.  The allowed-at-``T`` set is the plan's ``visibility`` field, so a
+        cadence stream that raises its epoch at its own bar close is admitted by the plan
+        rather than by an exception carved into this assertion."""
         for key, ts in self.visible_through.items():
-            if key in execution_streams:
+            if key in self.at_epoch_streams:
                 if ts > T:
                     raise CausalOrderViolation(f"EXECUTION_STREAM_AHEAD_OF_EPOCH: {key} visible_through {ts} > T {T}")
             elif ts >= T:

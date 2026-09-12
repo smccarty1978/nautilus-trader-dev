@@ -39,11 +39,65 @@ def test_mux_context_stream_visible_strictly_before_epoch():
     mux.ingest(BarView("b_1m", 0, 60 * NS, 1, 1, 1, 1, 1))           # context bar closing at T=60
     mux.ingest(BarView("a_1s", 59 * NS, 60 * NS, 1, 1, 1, 1, 1))     # execution bar at T=60: context must NOT be visible
     assert [b.stream for b in delivered] == ["a_1s"]
-    mux.assert_epoch_visibility(60 * NS, ["a_1s", "a_5s"])
+    mux.assert_epoch_visibility(60 * NS)
     mux.ingest(BarView("a_1s", 60 * NS, 61 * NS, 1, 1, 1, 1, 1))     # first execution bar strictly later releases it
     assert [b.stream for b in delivered] == ["a_1s", "b_1m", "a_1s"]
     with pytest.raises(CausalOrderViolation):
         mux.ingest(BarView("a_1s", 60 * NS, 61 * NS, 1, 1, 1, 1, 1))
+
+
+def _cadence_streams(visibility: str):
+    """The G7 composition: 1s execution, and the coarser EXTERNAL 1m stream that supplies the
+    population cadence.  ``visibility`` is the plan field under test."""
+    return [{"key": "a_1s", "instrument": "A", "timeframe": "1s", "duration_ns": NS, "role": "execution", "source": "external"},
+            {"key": "a_5s", "instrument": "A", "timeframe": "5s", "duration_ns": 5 * NS, "role": "execution", "source": "derived",
+             "derived_from": "a_1s", "aggregation": "complete_bucket"},
+            {"key": "a_1m", "instrument": "A", "timeframe": "1m", "duration_ns": 60 * NS, "role": "context", "source": "external",
+             "visibility": visibility}]
+
+
+def _run_cadence_tape(visibility: str):
+    """Feed 1s bars across a minute boundary with the 1m bar queued, and raise the epoch the way
+    ``HostStrategy._deliver`` does -- inside the delivery of the cadence bar, before the execution
+    bar that released it is applied."""
+    delivered, epochs = [], []
+    mux = None
+
+    def deliver(bar):
+        delivered.append(bar)
+        if bar.stream == "a_1m":
+            mux.assert_epoch_visibility(bar.ts_init)
+            epochs.append(bar.ts_init)
+
+    mux = StreamMux(_cadence_streams(visibility), deliver)
+    mux.ingest(BarView("a_1m", 0, 60 * NS, 1, 1, 1, 1, 1))              # queued: released only ahead of a later execution bar
+    for s in (59, 60):
+        mux.ingest(BarView("a_1s", s * NS, (s + 1) * NS, 1, 1, 1, 1, 1))
+    return delivered, epochs
+
+
+def test_cadence_context_stream_raises_its_epoch_at_its_own_bar_close():
+    """G7a.  A completed-bar cadence stream declared ``at_epoch`` epochs at its own ts_init: the 1s
+    bar closing at the same instant is already visible, and nothing is ahead of T."""
+    delivered, epochs = _run_cadence_tape("at_epoch")
+    assert epochs == [60 * NS]
+    # ordering: the 1m bar is delivered after the 1s bar that closes at T and before the next 1s bar
+    assert [b.stream for b in delivered] == ["a_1s", "a_1m", "a_1s"]
+    assert [b.ts_init for b in delivered] == [60 * NS, 60 * NS, 61 * NS]
+
+
+def test_strictly_before_stream_still_cannot_be_visible_at_the_epoch():
+    """The relaxation is the plan's ``visibility`` field, not a hole in the assertion."""
+    with pytest.raises(CausalOrderViolation, match="CONTEXT_STREAM_VISIBLE_AT_EPOCH"):
+        _run_cadence_tape("strictly_before")
+
+
+def test_mux_refuses_a_derived_stream_whose_source_is_absent():
+    """G7b backstop: a plan that names a source stream it does not carry cannot be constructed.
+    The compiler dry-constructs the mux, so this is what turns that class into a typed gap."""
+    streams = [s for s in _cadence_streams("at_epoch") if s["key"] != "a_1s"]
+    with pytest.raises(CausalOrderViolation, match="DERIVED_SOURCE_STREAM_ABSENT"):
+        StreamMux(streams, lambda bar: None)
 
 
 def test_mux_derived_bucket_delivered_before_source_bar():
