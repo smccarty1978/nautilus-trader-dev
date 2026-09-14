@@ -133,7 +133,48 @@ observation window passes the close (`outcomes.py:277`) — pilot smoke 1380/138
 - B3: `lifecycle_v2.py:318` `compile_outcome`; `research_workflow/grammar/compiler.py:1722` `compile_study`.
 - B4: `scripts/research.py:159` and `research_workflow/policy.py:321` emit `OLD_RUNTIME_LEGACY_ONLY`.
 
+## Implementation session 1 (067506d2, 2026-09-14) -- HANDOFF
+
+Ended past context budget, per the packet ("hand off with what is committed").
+
+**Committed on `chore/bucketing_and_gate`:**
+- `4ffe1189` **A1** -- `closed_window` + D1 repoint + D3a/D3b in-session zero-volume fill. Plan fields per derived
+  stream: `aggregation: closed_window`, `empty_window: zero_volume_in_trading_day | none` (`none` only on a dataset
+  with no `sessions` table, with a compile note). Runtime calendar: `resolve_calendar_session_spec` always
+  materializes `TRADING_DAY` rows; `build_session_table` attaches them as `table.trading_day`; `HostCore` passes it
+  to `StreamMux(trading_days=...)`; the mux refuses a fill plan without one (`TRADING_DAY_CALENDAR_ABSENT`), the
+  compiler's dry construction passes `require_calendar=False`. Gates run: `test_host_core`, `test_grammar_v2`,
+  `test_redteam_v2_sessions`, `test_trading_day_censoring`, `test_golden_fixture` (92 passed) + new D1 compile
+  test (7 passed); `lint_host` CLEAR; shape_b sealed plan replay 2021-01-05 identical before/after (candidates
+  `6d49d2a8`, observations `b5c075da`, 103305 bars). NOT run: broad `test_delta`, `cap generate --check`, a real
+  GLOBEX run of a fill plan (that is S2's acceptance).
+- `d9c1587f` **A7** -- WORKFLOW.md census wording: `session_end: truncate`.
+
+**Not started: A2, A3, A4, A5, A6, B1-B4.** Anchors verified this session (do not re-derive):
+
+- **A3.** `lifecycle_v2.fingerprints()` (`:330-343`) already returns `plan_sha256`. Artifacts already carrying
+  `plan_sha256`: frozen manifest (`:405`), readiness (`:453`), preflight (`:494`), smoke manifest (`:589/596`);
+  check the seal body (`:531`). `_fresh_stage` (`governed_controller_v2.py:110-132`) compares only the composite.
+  Receipts: `governed_controller.py:302 _receipt_current` / `:324 _write_receipt` write and compare only
+  `execution_composite_sha256` -- `plan_sha256` must be added to the receipt body AND compared; that is the one
+  place the field does not exist yet.
+- **A5.** `LEGACY_OBSERVATION_COLUMNS` (`host/outcomes.py:46-50`) is shared by the kernel (`:229`) and the compiler
+  (`compiler.py:1091-1096`). Appending `observed_seconds` there changes the observation schema of every sealed
+  plan's replay (shape_b's observations hash would change). Gate it on a contract field new compiles emit
+  (e.g. `contract.observed_seconds: true`), appended by both compiler and kernel. Definition: `(resolved_at_ts - T)/1e9`,
+  which matches the analysis harness's own anchor op (`research/analysis/diagnostic_ops.py:171`, terminal_ts minus
+  anchor). The barrier arms' `<prefix>_resolution_seconds` (`outcomes.py:539-549`) is a DIFFERENT quantity
+  (measured from `entry_ts`, horizon substituted at early DATA_END) -- do not reuse it.
+- **A1 → live NT.** The zero-volume fill is in-session only; a live NT host with default
+  `build_with_no_updates=True` would also emit bars through closures. A live deployment must suppress those (or
+  use NT's `False` and synthesize in-session bars) to match offline. Not built; recorded.
+
 ## S2 carry-overs (study/nq_mtf_regime_atlas_pilot2023, report `reports/s2_resume_and_collect.md`)
+
+**Added by implementation session 1:** the pilot's committed plan names `complete_bucket`; recompile it (compile
+now emits `closed_window` / `zero_volume_in_trading_day` on `NQ_1S_V2_GLOBEX`, 3m..4h from `nq_1m` under the 1m
+cadence). Report `empty_windows_published` beside regime counts per timeframe once exposed -- today it is a mux
+attribute only (`ClosedWindowAggregator.empty_windows_published`), not in run stats.
 
 Fix in the study at recompile: `research_decision.yaml` flip anchor (`bars_1m == 0` with `flipped_1m`), identity
 claim (`checkpoint_index` null on 100% of rows; `(regime_start_ns, observation_ts)` unique). After A3 merges the
