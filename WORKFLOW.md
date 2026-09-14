@@ -943,7 +943,11 @@ python scripts/research.py explore run --frame <frame_id> --spec explore.yaml [-
 optional `frame: <id>`, `analysis: {steps, artifacts}`); the only built-in frame is `frame`
 (`source`, `train_frame`, `model_scores` and context-reading ops belong to a research study).
 Outputs go to `<frame root sibling>/explore/<frame_id>/<spec sha12>/` with `explore.json`.
-A census that spans ETH and RTH censors at the calendar dataset's own trading-day close with
-`outcome: {session: TRADING_DAY, session_end: censor}` (`population.session: ALL`). BIND and
+A next-event census that spans ETH and RTH ends at the calendar dataset's own trading-day close with
+`outcome: {session: TRADING_DAY, session_end: truncate}` (`population.session: ALL`). Not `censor`:
+`censor` censors every row whose observation window merely *passes* the close
+(`research_workflow/host/outcomes.py`), so a horizon longer than the time left in the day censors the
+whole census (pilot smoke: 1380/1380); `truncate` ends the window at the close and still resolves an
+event that happens before it. BIND and
 SELECTION follow as separate steps.
 
