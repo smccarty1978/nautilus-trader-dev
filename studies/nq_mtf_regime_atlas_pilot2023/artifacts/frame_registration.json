@@ -1,0 +1,23 @@
+{
+  "STATUS": "OK",
+  "dataset": "NQ_1S_V2_GLOBEX",
+  "execution_composite_sha256": "041379f7e433a637beba1e687fd70124f7d0c79a34e010c6b6de5cc53d13da7c",
+  "frame_dir": "C:\\Users\\Scott McCarty\\.nt_research\\frames\\80e644d1ac611a8911b570c3d6354b7558344f0fb5e8461595c426670b59bc0f",
+  "frame_id": "80e644d1ac611a8911b570c3d6354b7558344f0fb5e8461595c426670b59bc0f",
+  "frame_root": "C:\\Users\\Scott McCarty\\.nt_research\\frames",
+  "kind": "frame_registration",
+  "next": {
+    "explore": "python scripts/research.py explore run --frame 80e644d1ac611a8911b570c3d6354b7558344f0fb5e8461595c426670b59bc0f --spec <explore.yaml>",
+    "verify": "python scripts/research.py frame verify 80e644d1ac611a8911b570c3d6354b7558344f0fb5e8461595c426670b59bc0f"
+  },
+  "plan_sha256": "ed2b9dfa279902944a1c02fc588bf68b45bd72cdd554bb37df792574f75c421c",
+  "registered_at_utc": "2026-09-14T15:16:27.353082+00:00",
+  "result": "registered",
+  "rows": 353358,
+  "schema_version": 1,
+  "state": "FRAME_REGISTERED",
+  "study_id": "nq_mtf_regime_atlas_pilot2023",
+  "years": [
+    2023
+  ]
+}
