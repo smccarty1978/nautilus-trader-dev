@@ -4,11 +4,17 @@
 # uncertainty, contract section 9) are NOT computed here -- they are reported as unsatisfied in
 # the session report (gap_inventory.G5).
 #
-# Frame rows are 1m checkpoints; the flip (anchor) row of each regime is bars_1m == 1. Every op
-# below is declared so that the anchor rows are separable by a leading precedence rule.
+# REPAIRED 2026-09-14 against frame 80e644d1 (declarative only):
+#   - rule ops use the op's vocabulary (eq/gt/...), not symbols; `explore compile` did not check them.
+#   - the flip (anchor) row is flipped_1m == true, which is bars_1m == 0 (28,029 rows), NOT
+#     bars_1m == 1 (27,480 rows: the NEXT checkpoint; 550 one-bar regimes have none).
+#   - T2 (analysis.incidence.cumulative) is NOT run: it requires observed_seconds_column and the
+#     flip kernel's frame carries no observed-seconds column (observations: flip_ts,
+#     time_to_flip_seconds, horizon_end_ts, session_close_ts, resolved_at_ts). No registered op
+#     derives one. T2 is an unsatisfied requirement, not substituted with time_to_flip_seconds.
 explore:
   id: nq_mtf_regime_atlas_pilot2023_census
-  question: "T6 (1m census: flips, censored counts by reason, by direction) and T2 (time to the next 1m flip, censoring-aware) over the 2023 pilot frame"
+  question: "T6 (1m census: flips, censored counts by reason, by direction) over the 2023 pilot frame"
 
 analysis:
   steps:
@@ -22,27 +28,12 @@ analysis:
         output_column: t6_class
         strata: [regime_direction]
         rules:
-          - {label: checkpoint_not_anchor, when: [[bars_1m, ">", 1]]}
-          - {label: flip_censored_session_end, when: [[censored, "==", true], [censor_reason, "==", SESSION_END]]}
-          - {label: flip_censored_gap,         when: [[censored, "==", true], [censor_reason, "==", GAP]]}
-          - {label: flip_censored_other,       when: [[censored, "==", true]]}
-          - {label: flip_resolved_next_flip,   when: [[target_flip_within_horizon, "==", true]]}
+          - {label: checkpoint_not_anchor, when: [[flipped_1m, eq, false]]}
+          - {label: flip_censored_session_end, when: [[censored, eq, 1], [censor_reason, eq, SESSION_END]]}
+          - {label: flip_censored_gap,         when: [[censored, eq, 1], [censor_reason, eq, GAP]]}
+          - {label: flip_censored_other,       when: [[censored, eq, 1]]}
+          - {label: flip_resolved_next_flip,   when: [[target_flip_within_horizon, eq, 1]]}
           - {label: flip_unresolved_horizon,   when: []}
-
-    # T2 -- time to resolution (next 1m flip) of every checkpoint, censoring-aware, pooled and by
-    # direction. Horizons in seconds: 1, 2, 3, 5, 10, 20 bars of 1m, then 1h, 4h, 24h.
-    - id: t2_time_to_resolution
-      op: analysis.incidence.cumulative
-      rows: t6_census
-      params:
-        horizons: [60, 120, 180, 300, 600, 1200, 3600, 14400, 86400]
-        resolved_column: target_flip_within_horizon
-        duration_column: time_to_flip_seconds
-        observed_seconds_column: observed_seconds
-        strata: [regime_direction, t6_class]
-        duration_unit: seconds
-        observed_unit: seconds
 
   artifacts:
     - {name: t6_census.json, source: t6_census, kind: json}
-    - {name: t2_time_to_resolution.json, source: t2_time_to_resolution, kind: json}
