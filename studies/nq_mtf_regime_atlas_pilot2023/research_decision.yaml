@@ -85,11 +85,10 @@ terminal_decisions:
   censoring_rule: >
     A regime still open at the session end, at a data gap, or at the chronology boundary is
     CENSORED and flagged, never treated as resolved (contract section 6). Encoded as
-    session_end: censor plus max_gap: 300s. outcome.horizon: 24h is an OBSERVATION BOUND ONLY --
-    it is longer than any Globex trading day, and SESSION_END precedes HORIZON_EXPIRY in the
-    compiled resolution_precedence, so the session close is what censors. The horizon is NOT a
-    scientific truncation of the terminal. This encoding is currently REFUSED by the compiler
-    (gap_inventory.G2) and has NOT been silently traded for session_end: ignore.
+    session_end: truncate plus max_gap: 300s (OWNER AMENDMENT 02; see censoring_encoding).
+    outcome.horizon: 24h is an OBSERVATION BOUND ONLY -- it is longer than any Globex trading day,
+    so the trading-day close is what ends the window. The horizon is NOT a scientific truncation
+    of the terminal. Never traded for session_end: ignore.
   path_ordering: >
     time-to-MFE, time-to-MAE, which occurred FIRST, MFE retained at regime end (giveback ratio)
     and the MAE-before-MFE flag are FIRST-CLASS, not diagnostics (contract section 6). They are
@@ -176,7 +175,11 @@ terminal_decisions:
     the registered feature.regime_alignment (1m vs 5m) and feature.regime_direction (5m) are
     composed where they exist.
   censoring_encoding: >
-    outcome.session: TRADING_DAY with session_end: censor (OWNER AMENDMENT 01 A2). The compiled
+    outcome.session: TRADING_DAY (OWNER AMENDMENT 01 A2) with session_end: truncate (OWNER
+    AMENDMENT 02, 2026-09-14, docs/questions/nq_mtf_regime_atlas_pilot2023.md). `censor` censored
+    1380/1380 smoke rows at plan bed51b46: it censors whenever the 24h window passes the close
+    (outcomes.py:277), which is every row; `truncate` censors only a regime still open at the
+    close (outcomes.py:267-272), which is A2 as written. The compiled
     plan carries session {kind: calendar, session: ALL, censor_session: TRADING_DAY, dataset
     NQ_1S_V2_GLOBEX, reference_digest e577a361...}; resolution_precedence is [SESSION_END, GAP,
     BARRIER_TOUCH, HORIZON_EXPIRY] with max_gap 300s and horizon 24h as the observation bound.

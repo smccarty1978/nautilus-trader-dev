@@ -419,6 +419,14 @@ and refuses `session_end: censor` when the session is ALL
 returns None). Closing that is a capability under §13, not a change to
 this contract.
 
+OWNER AMENDMENT 02 — 2026-09-14 (carried from the 2023 pilot): the
+encoding is `outcome: {session: TRADING_DAY, session_end: truncate}`,
+NOT `session_end: censor`. With a next-flip label and an observation
+horizon longer than a trading day, `censor` censors every row (pilot
+smoke: 1380/1380); `truncate` ends the window at the close and censors
+only a regime still open there. Authority:
+`docs/questions/nq_mtf_regime_atlas_pilot2023.md`, OWNER AMENDMENT 02.
+
 STILL OPEN FOR THIS STUDY: the nine-timeframe population of §3 and §4
 needs a nine-way population fan-out the v2 grammar does not have (gap
 G0 -- `population:` is single-anchored). The pilot was descoped to a

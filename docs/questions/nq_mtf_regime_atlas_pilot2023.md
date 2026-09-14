@@ -460,3 +460,25 @@ A3. UNCHANGED. Everything else in §0-§16 stands, including §9's
     mandatory session-day-clustered uncertainty, §11's prohibition on
     models and economics, and §10's 2023-only pilot chronology with 2026
     prohibited.
+
+============================================================
+OWNER AMENDMENT 02 — 2026-09-14, after the post-G7 smoke
+============================================================
+A2's ENCODING is `session_end: truncate`, not `session_end: censor`.
+The meaning of A2 is unchanged; only the grammar word was wrong.
+
+    Evidence: the sealed smoke on 2023-10-02 (plan bed51b46) finished
+    1380 / 1380 rows CENSORED SESSION_END. Under `censor` the kernel
+    censors whenever the observation window (horizon 24h) reaches past
+    the session close (`research_workflow/host/outcomes.py:277`), and a
+    24h window always outlasts a ~23h Globex trading day -- so no outcome
+    is ever observed, even when the next flip lands minutes later.
+
+    `truncate` (`outcomes.py:267-272`) is A2 as written: the trading-day
+    close ends the window; a next flip at or before the close resolves
+    the row; a regime still open at the close is CENSORED SESSION_END and
+    flagged. Data gap (max_gap) and chronology boundary still censor.
+    horizon: 24h stays an observation bound only.
+
+    NOT AUTHORIZED, unchanged: session_end: ignore; narrowing
+    population.session; dropping the censoring flag.

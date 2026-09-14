@@ -1921,11 +1921,11 @@
     ],
     "same_bar_rule": "ambiguous_censor",
     "session_end_censoring": true,
-    "session_end_rule": "censor",
+    "session_end_rule": "truncate",
     "stream": "nq_1m",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "bed51b460286e18dcc28139bfd91ede9e354d54647a5b82e658a9db39311ac67",
+  "plan_sha256": "ed2b9dfa279902944a1c02fc588bf68b45bd72cdd554bb37df792574f75c421c",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1954,7 +1954,7 @@
     ],
     "session": "ALL"
   },
-  "spec_sha256": "40200fe12e09e50bf7751a2daa661ab0276ccd800455b3ce6eb39459fea15ebf",
+  "spec_sha256": "dae5e73e7b08ac4cacf55bf4c1b09a6d2fcc26378c508954f9f6ddb06ce83f57",
   "stage": "collect",
   "streams": [
     {

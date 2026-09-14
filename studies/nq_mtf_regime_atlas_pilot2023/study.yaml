@@ -192,6 +192,8 @@ outcome:
   # "horizon" is the observation bound only: longer than any Globex trading day, so the trading-day
   # close (session: TRADING_DAY, OWNER AMENDMENT 01 A2) is what censors. A regime still open at the
   # trading-day close, at a data gap (max_gap) or at the chronology boundary is CENSORED and flagged.
+  # session_end: truncate (OWNER AMENDMENT 02, 2026-09-14): the close ENDS the window; `censor` censored
+  # every row because a 24h window always reaches past a ~23h trading-day close (smoke 1380/1380).
   kind: label
   event: regime_1m.flipped
   direction: regime_1m.dir
@@ -202,7 +204,7 @@ outcome:
   horizon_end_rule: strict
   max_gap: 300s
   session: TRADING_DAY
-  session_end: censor
+  session_end: truncate
   label_column: target_next_flip_1m
 
 chronology:
