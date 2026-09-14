@@ -267,13 +267,23 @@ def _resolve_streams(ctx: _Ctx) -> None:
                     if _tf_ns(tf) % _tf_ns(cand) == 0 and _tf_ns(cand) < _tf_ns(tf):
                         src = cand
                         break
-                # accepted derived semantics: complete buckets from the finest external stream
+                # D1: derive from the coarsest external stream that divides the timeframe AND is visible at the
+                # epoch. Here only the finest (execution) stream is known to be at_epoch; a completed-bar cadence
+                # stream that becomes at_epoch later re-points its multiples (_mark_epoch_bearing_stream).
                 src = finest if (finest in externals and _tf_ns(tf) % _tf_ns(finest) == 0) else src
                 if src is None:
                     ctx.gap(GapKind.UNAVAILABLE_STREAM, f"{where}.timeframes", f"{tf} cannot be derived from {sorted(externals)}",
                             timeframe=tf, dataset=s.dataset)
                     continue
-                entry.update({"source": "derived", "derived_from": f"{symbol.lower()}_{src}", "aggregation": "complete_bucket"})
+                # closed_window: any member publishes. complete_bucket stays dispatchable for sealed plans only.
+                # Empty windows: a zero-volume bar inside a trading day of the dataset calendar (owner D3a/D3b);
+                # a dataset with no `sessions` table has no trading-day authority, so it emits nothing and says so.
+                has_trading_days = "sessions" in (ds.get("reference_tables") or [])
+                entry.update({"source": "derived", "derived_from": f"{symbol.lower()}_{src}", "aggregation": "closed_window",
+                              "empty_window": "zero_volume_in_trading_day" if has_trading_days else "none"})
+                if not has_trading_days:
+                    ctx.notes.append(f"{key}: dataset {s.dataset!r} declares no 'sessions' reference table, so empty "
+                                     f"{tf} windows emit no bar (empty_window: none) instead of a zero-volume bar")
             ctx.streams.append(entry)
             ctx.stream_by[(symbol, tf)] = key
     if ctx.execution_symbol:
@@ -783,6 +793,19 @@ def _mark_epoch_bearing_stream(ctx: _Ctx, key: Optional[str], sym: str) -> None:
     entry["epoch_bearing"] = True
     ctx.notes.append(f"{key} is the completed-bar cadence stream: role context (queued, released strictly "
                      f"before the next execution bar) with visibility at_epoch, because the epoch is that bar's close")
+    # D1: an external stream now visible at the epoch is the coarsest source for the derived timeframes it divides.
+    if entry.get("source") != "external":
+        return
+    by_key = {st["key"]: st for st in ctx.streams}
+    dur = int(entry["duration_ns"])
+    for st in ctx.streams:
+        if st.get("source") != "derived" or st["instrument"] != sym or int(st["duration_ns"]) <= dur or int(st["duration_ns"]) % dur:
+            continue
+        current = by_key.get(st.get("derived_from"))
+        if current is not None and int(current["duration_ns"]) < dur:
+            st["derived_from"] = key
+            ctx.notes.append(f"{st['key']} is derived from {key} (the coarsest external stream visible at the epoch "
+                             f"that divides {st['timeframe']}), not from {current['key']}")
 
 
 def _validate_runtime_composition(ctx: _Ctx, population: Mapping[str, Any]) -> None:
@@ -820,7 +843,7 @@ def _validate_runtime_composition(ctx: _Ctx, population: Mapping[str, Any]) -> N
         return
     from research_workflow.host.mux import StreamMux
     try:
-        mux = StreamMux(ctx.streams, lambda bar: None)
+        mux = StreamMux(ctx.streams, lambda bar: None, require_calendar=False)
     except Exception as exc:                                    # the host is the authority on what it can build
         ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "streams",
                 f"the compiled stream graph cannot be constructed by the host multiplexer: {exc}")

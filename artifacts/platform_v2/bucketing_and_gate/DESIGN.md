@@ -13,7 +13,9 @@ Branch base: main `78dc5879`.
 |---|---|
 | D1 | A1 derived-stream source = the **coarsest external stream that divides the timeframe AND is visible at the epoch**. Pilot (1m cadence): 3m..4h from `nq_1m`, 5s/30s from `nq_1s`. A 1s-cadence study keeps deriving from `nq_1s` (no one-bar lag). OHLCV is identical either way because 1m is itself built from 1s with the same any-member rule (below). |
 | D2 | A2: `seconds_since_update` beyond **8 calendar days** is a **hard runtime failure** `TRACKER_STALENESS_IMPOSSIBLE` (tracker id + age). Same bound for every timeframe. Below it: data, never null. |
-| D3 | A1 zero-trade window emits **nothing** (packet). Do not synthesize zero-volume bars. |
+| D3 | ~~A1 zero-trade window emits nothing.~~ **SUPERSEDED 2026-09-14 by the owner in the implementation session (see D3a/D3b).** It was decided on the wrong claim that NT emits nothing for an empty window. |
+| D3a | A1 zero-trade window emits a **zero-volume bar** (O=H=L=C = previous close, volume 0): NT 1.230's `TimeBarAggregator` default (`build_with_no_updates=True`). No bar before the first member (NT `_build_bar` returns while the builder is uninitialized). |
+| D3b | Fill scope **in-session only**: an empty window is emitted iff `[open_ts, close_ts)` overlaps a `TRADING_DAY` row `(open_ns, close_ns]` of the dataset's `sessions` calendar (holidays, early closes, the daily break and weekends excluded). **Known divergence from NT**: NT's timer also fires through closures. A dataset with no `sessions` table has no trading-day authority: the compiler records `empty_window: none` on its derived streams and says so in a compile note. The external `nq_1s`/`nq_1m` streams stay as the dataset built them (empty seconds/minutes absent) -- only derived timeframes are filled. |
 
 ## A1 — evidence gathered
 
@@ -66,6 +68,12 @@ Branch base: main `78dc5879`.
 4. `collectors/collector_v2/aggregator.py` is historical — do not edit.
 5. Close-time evidence: derived `ts_init = close_ts` unchanged; add a test that a 4h bar from 1m has
    `ts_event = open`, `ts_init = close`, and that the 1m source carries `ts_init_delta_ns = 60e9`.
+
+**Correction (implementation session).** Step 1's strict `>` sweep is not enough for "published set equals NT's
+timer-close set": a 30s window from `nq_1s` whose last second is empty closes at `T`, and under a 1m cadence the
+epoch at `T` is the 1m bar -- strict `>` would publish the window one epoch late. As built, a sweep is inclusive
+(`close_ts == t`) when the applied bar's stream is always applied after the source at the same instant (execution
+before context; finer context before coarser), strict otherwise. Tested in `test_host_core.py`.
 
 Gates: 1h for 2023 → thousands of regimes; 4h → bars (acceptance in S2); shape_b sealed replay bit-identical;
 `test_host_core` / `test_grammar_v2` / `test_completed_regime_state` updated — the synthetic "incomplete rejected"

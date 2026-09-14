@@ -47,7 +47,7 @@ class HostCore:
         # streams / mux
         self.streams = list(self.plan["streams"])
         self.execution_streams = [s["key"] for s in self.streams if s["role"] == "execution"]
-        self.mux = StreamMux(self.streams, self._deliver)
+        self.mux = StreamMux(self.streams, self._deliver, trading_days=getattr(session_table, "trading_day", None))
         self.stream_duration = {s["key"]: int(s["duration_ns"]) for s in self.streams}
 
         # trackers (in plan order)

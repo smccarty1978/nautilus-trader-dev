@@ -33,6 +33,102 @@ def test_bucket_aggregator_publishes_complete_buckets_only():
     assert agg.incomplete_close_ts == [10 * NS]
 
 
+def _cw(key, tf_s, src, *, role="execution", empty="none", visibility=None):
+    s = {"key": key, "instrument": "A", "timeframe": f"{tf_s}s", "duration_ns": tf_s * NS, "role": role, "source": "derived",
+         "derived_from": src, "aggregation": "closed_window", "empty_window": empty}
+    if visibility:
+        s["visibility"] = visibility
+    return s
+
+
+_A_1S = {"key": "a_1s", "instrument": "A", "timeframe": "1s", "duration_ns": NS, "role": "execution", "source": "external"}
+
+
+def test_closed_window_publishes_the_bucket_complete_bucket_rejects():
+    """Mirror of the complete-bucket test: the same tape with second 7 missing publishes [5,10)."""
+    delivered = []
+    mux = StreamMux([_A_1S, _cw("a_5s", 5, "a_1s")], delivered.append)
+    for s in [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14]:
+        mux.ingest(BarView("a_1s", s * NS, (s + 1) * NS, 1, 2, 0, 1, 1))
+    assert [b.ts_init // NS for b in delivered if b.stream == "a_5s"] == [5, 10, 15]
+    assert [b.volume for b in delivered if b.stream == "a_5s"] == [5, 4, 5]
+
+
+def test_empty_window_is_a_zero_volume_bar_inside_a_trading_day_and_nothing_across_a_closure():
+    """D3a/D3b: trading days (0,30] and (60,120].  No bar before the first member; empty windows
+    inside a day carry O=H=L=C = previous close and zero volume; the closure (30,60] emits nothing."""
+    from research_workflow.sessions import CalendarSessionTable
+    days = CalendarSessionTable([(0, 30 * NS), (60 * NS, 120 * NS)], name="TRADING_DAY")
+    delivered = []
+    mux = StreamMux([_A_1S, _cw("a_5s", 5, "a_1s", empty="zero_volume_in_trading_day")], delivered.append, trading_days=days)
+    mux.ingest(BarView("a_1s", 2 * NS, 3 * NS, 10, 12, 9, 11, 3))
+    mux.ingest(BarView("a_1s", 17 * NS, 18 * NS, 11, 13, 10, 12, 2))
+    mux.ingest(BarView("a_1s", 70 * NS, 71 * NS, 12, 12, 12, 12, 1))
+    five = [b for b in delivered if b.stream == "a_5s"]
+    assert [b.ts_init // NS for b in five] == [5, 10, 15, 20, 25, 30, 65, 70]
+    assert [b.volume for b in five] == [3, 0.0, 0.0, 2, 0.0, 0.0, 0.0, 0.0]
+    assert all((b.open, b.high, b.low, b.close) == (11, 11, 11, 11) for b in five[1:3])
+    assert all((b.open, b.high, b.low, b.close) == (12, 12, 12, 12) for b in five[4:])
+    assert [b.ts_event // NS for b in five] == [0, 5, 10, 15, 20, 25, 60, 65]
+
+
+def test_zero_volume_fill_without_a_calendar_is_refused_and_unknown_aggregation_raises():
+    with pytest.raises(CausalOrderViolation, match="TRADING_DAY_CALENDAR_ABSENT"):
+        StreamMux([_A_1S, _cw("a_5s", 5, "a_1s", empty="zero_volume_in_trading_day")], lambda b: None)
+    StreamMux([_A_1S, _cw("a_5s", 5, "a_1s", empty="zero_volume_in_trading_day")], lambda b: None, require_calendar=False)
+    with pytest.raises(CausalOrderViolation, match="EMPTY_WINDOW_RULE_UNDECLARED"):
+        StreamMux([_A_1S, dict(_cw("a_5s", 5, "a_1s"), empty_window=None)], lambda b: None)
+    with pytest.raises(CausalOrderViolation, match="UNKNOWN_AGGREGATION"):
+        StreamMux([_A_1S, dict(_cw("a_5s", 5, "a_1s"), aggregation="bogus")], lambda b: None)
+
+
+def test_window_whose_last_second_is_empty_is_visible_at_the_cadence_epoch_closing_it():
+    """A 30s window from 1s with no bar in its last second closes at T=60.  The 1m cadence bar at T
+    is applied after every 1s bar at T, so the window is published ahead of that epoch -- the set NT's
+    timer would have closed at T -- not one epoch later."""
+    streams = [_A_1S, _cw("a_30s", 30, "a_1s"),
+               {"key": "a_1m", "instrument": "A", "timeframe": "1m", "duration_ns": 60 * NS, "role": "context",
+                "source": "external", "visibility": "at_epoch"}]
+    delivered, mux = [], None
+
+    def deliver(bar):
+        delivered.append(bar)
+        if bar.stream == "a_1m":
+            mux.assert_epoch_visibility(bar.ts_init)
+
+    mux = StreamMux(streams, deliver)
+    for s in range(30, 59):
+        mux.ingest(BarView("a_1s", s * NS, (s + 1) * NS, 1, 1, 1, 1, 1))
+    mux.ingest(BarView("a_1m", 0, 60 * NS, 1, 1, 1, 1, 29))
+    mux.ingest(BarView("a_1s", 61 * NS, 62 * NS, 1, 1, 1, 1, 1))
+    tail = [(b.stream, b.ts_init // NS) for b in delivered[-3:]]
+    assert tail == [("a_30s", 60), ("a_1m", 60), ("a_1s", 62)]
+
+
+def test_window_from_a_context_source_closes_when_any_later_bar_arrives():
+    """3m from 1m with the last minute empty: nothing on the 1m stream closes it, the next 1s bar does."""
+    streams = [_A_1S, {"key": "a_1m", "instrument": "A", "timeframe": "1m", "duration_ns": 60 * NS, "role": "context",
+                       "source": "external"}, _cw("a_3m", 180, "a_1m")]
+    delivered = []
+    mux = StreamMux(streams, delivered.append)
+    mux.ingest(BarView("a_1m", 0, 60 * NS, 1, 3, 1, 2, 1))
+    mux.ingest(BarView("a_1m", 60 * NS, 120 * NS, 2, 4, 0, 3, 1))
+    mux.ingest(BarView("a_1s", 185 * NS, 186 * NS, 1, 1, 1, 1, 1))
+    assert [(b.stream, b.ts_init // NS) for b in delivered] == [("a_1m", 60), ("a_1m", 120), ("a_3m", 180), ("a_1s", 186)]
+    three = delivered[2]
+    assert (three.ts_event, three.open, three.high, three.low, three.close, three.volume) == (0, 1, 4, 0, 3, 2)
+
+
+def test_four_hour_bar_from_one_minute_is_stamped_open_and_close():
+    delivered = []
+    a_1m = {"key": "a_1m", "instrument": "A", "timeframe": "1m", "duration_ns": 60 * NS, "role": "execution", "source": "external"}
+    mux = StreamMux([a_1m, _cw("a_4h", 4 * 3600, "a_1m")], delivered.append)
+    mux.ingest(BarView("a_1m", 0, 60 * NS, 1, 1, 1, 1, 1))
+    mux.ingest(BarView("a_1m", (4 * 3600 - 60) * NS, 4 * 3600 * NS, 1, 1, 1, 1, 1))
+    four = [b for b in delivered if b.stream == "a_4h"]
+    assert [(b.ts_event, b.ts_init) for b in four] == [(0, 4 * 3600 * NS)]
+
+
 def test_mux_context_stream_visible_strictly_before_epoch():
     delivered = []
     mux = StreamMux(_streams(), delivered.append)
