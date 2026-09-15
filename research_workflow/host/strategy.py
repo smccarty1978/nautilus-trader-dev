@@ -368,6 +368,9 @@ class HostCore:
         out = {"bars": self._bars_processed, "bars_by_stream": dict(self.mux.bars_seen), "candidates": self.candidates_emitted,
                "observations": len(self.sink.observations), "epochs": self.epochs_evaluated, "pending_at_end": len(self.kernel.pending),
                "dropped_outside_primary": {"candidates": self.sink.dropped_candidates, "observations": self.sink.dropped_observations}}
+        empty = self.mux.empty_windows_published()
+        if empty:                                    # closed-window plans only: a sealed complete_bucket plan's stats are unchanged
+            out["empty_windows_published"] = empty
         if self._profile_enabled:
             total = sum(self._profile.values()) or 1.0
             digits = 4  # host-constant: profile rounding

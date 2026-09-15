@@ -323,6 +323,10 @@ class StreamMux:
                 keep.append(b)
         self._context_queue = keep
 
+    def empty_windows_published(self) -> Dict[str, int]:
+        """Zero-volume bars published per closed-window derived stream (the calendar-aware fill, D3a/D3b)."""
+        return {agg.key: agg.empty_windows_published for agg, _src, _rank in self._sweepers}
+
     def _recompute_sweep_due(self) -> None:
         due = float("inf")
         for agg, _src, _rank in self._sweepers:

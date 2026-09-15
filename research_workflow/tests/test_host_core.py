@@ -70,6 +70,7 @@ def test_empty_window_is_a_zero_volume_bar_inside_a_trading_day_and_nothing_acro
     assert all((b.open, b.high, b.low, b.close) == (11, 11, 11, 11) for b in five[1:3])
     assert all((b.open, b.high, b.low, b.close) == (12, 12, 12, 12) for b in five[4:])
     assert [b.ts_event // NS for b in five] == [0, 5, 10, 15, 20, 25, 60, 65]
+    assert mux.empty_windows_published() == {"a_5s": 6}          # the run statistic session 2 reads
 
 
 def test_zero_volume_fill_without_a_calendar_is_refused_and_unknown_aggregation_raises():
