@@ -33,6 +33,7 @@ outcome columns (that is their job) and must never be used to build a feature.
 """
 from __future__ import annotations
 
+import math
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
@@ -987,6 +988,204 @@ def tail_lift(rows: pd.DataFrame, *, reference: pd.DataFrame, score: str, label:
                                          "base_rate", "tail_rate", "lift"])
     payload = {"score": score, "label": label, "group_by": group_by, "quantiles": qs, "interpolation": interpolation,
                "excluded": excluded, "cells": cells}
+    return {"frame": frame, "payload": payload}
+
+
+# --------------------------------------------------------------------------- #
+# A6 -- grouped descriptive summary and session-day-clustered uncertainty
+# --------------------------------------------------------------------------- #
+def globex_trading_day(ts_ns: pd.Series) -> pd.Series:
+    """CME Globex trading day of UTC-nanosecond timestamps: the session that opens at 17:00 America/Chicago
+    belongs to the NEXT calendar date (ISO ``YYYY-MM-DD``). Weekday arithmetic only -- no holiday table; a
+    frame that carries its calendar session date should declare ``cluster_column`` instead."""
+    t = pd.to_datetime(pd.to_numeric(ts_ns, errors="coerce"), utc=True).dt.tz_convert("America/Chicago") + pd.Timedelta(hours=7)
+    return t.dt.strftime("%Y-%m-%d").where(t.notna(), None)
+
+
+def _cluster_keys(frame: pd.DataFrame, cluster_column: Optional[str], cluster_ts_column: Optional[str], where: str) -> pd.Series:
+    if (cluster_column is None) == (cluster_ts_column is None):
+        raise AnalysisOpError(
+            f"ANALYSIS_CLUSTER_UNDECLARED: {where} needs exactly one of cluster_column / cluster_ts_column (the session "
+            "day); rows from one session are not independent, and a count without its cluster count is not reportable")
+    if cluster_column is not None:
+        _require(frame, [cluster_column], where)
+        return frame[cluster_column]
+    _require(frame, [cluster_ts_column], where)
+    return globex_trading_day(frame[cluster_ts_column])
+
+
+def _scalar(v: Any) -> Any:
+    if isinstance(v, np.generic):
+        v = v.item()
+    if isinstance(v, float) and math.isnan(v):
+        return None
+    return v
+
+
+def _grouped(frame: pd.DataFrame, group_by: Sequence[str], where: str) -> List[tuple]:
+    keys = list(group_by or [])
+    if not keys:
+        return [({}, frame)]
+    _require(frame, keys, where)
+    out = []
+    for vals, sub in frame.groupby(keys, dropna=False, sort=True):
+        vals = vals if isinstance(vals, tuple) else (vals,)
+        out.append(({k: _scalar(v) for k, v in zip(keys, vals)}, sub))
+    return out
+
+
+def _censored_mask(frame: pd.DataFrame, censored_column: Optional[str], where: str) -> pd.Series:
+    if censored_column is None:
+        return pd.Series(False, index=frame.index)
+    _require(frame, [censored_column], where)
+    return frame[censored_column].fillna(False).astype(bool)
+
+
+def grouped_summary(rows: pd.DataFrame, *, value_columns: Sequence[str], group_by: Sequence[str] = (),
+                    quantiles: Sequence[float] = (0.25, 0.5, 0.75), censored_column: Optional[str] = None,
+                    cluster_column: Optional[str] = None, cluster_ts_column: Optional[str] = None) -> Dict[str, Any]:
+    """Grouped descriptive summary: per declared group and value column, ``n_rows`` and ``n_clusters`` (session
+    days) of the group, ``n_censored`` (excluded, counted), ``n_null``, and over the remaining ``n`` values
+    ``n_clusters_observed``, mean, median, std, min, max and every declared quantile (``q<q>``).
+
+    The cluster is REQUIRED: every count this op reports carries its session-day count beside it."""
+    where = "describe.grouped"
+    cols = list(value_columns or [])
+    if not cols:
+        raise AnalysisOpError(f"ANALYSIS_SUMMARY_COLUMNS_MISSING: {where} declares no value_columns")
+    _require(rows, cols, where)
+    qs = sorted({float(q) for q in quantiles})
+    if any(not (0.0 < q < 1.0) for q in qs):
+        raise AnalysisOpError(f"ANALYSIS_SUMMARY_QUANTILES_INVALID: {list(quantiles)!r} (each must satisfy 0 < q < 1)")
+    work = rows.assign(__cluster__=_cluster_keys(rows, cluster_column, cluster_ts_column, where))
+    work = work.assign(__censored__=_censored_mask(work, censored_column, where))
+    cells: List[Dict[str, Any]] = []
+    for keys, sub in _grouped(work, group_by, where):
+        for col in cols:
+            kept = sub[~sub["__censored__"]]
+            vals = pd.to_numeric(kept[col], errors="coerce")
+            observed = kept[vals.notna()]
+            v = vals.dropna().astype(float)
+            n = int(len(v))
+            cell: Dict[str, Any] = {**keys, "column": col, "n_rows": int(len(sub)),
+                                    "n_clusters": int(sub["__cluster__"].nunique(dropna=True)),
+                                    "n_censored": int(sub["__censored__"].sum()), "n_null": int(vals.isna().sum()), "n": n,
+                                    "n_clusters_observed": int(observed["__cluster__"].nunique(dropna=True)),
+                                    "mean": float(v.mean()) if n else None, "median": float(v.median()) if n else None,
+                                    "std": float(v.std(ddof=1)) if n > 1 else None,
+                                    "min": float(v.min()) if n else None, "max": float(v.max()) if n else None}
+            for q in qs:
+                cell[f"q{q:g}"] = float(v.quantile(q)) if n else None
+            cells.append(cell)
+    frame = pd.DataFrame(cells)
+    payload = {"value_columns": cols, "group_by": list(group_by or []), "quantiles": qs, "censored_column": censored_column,
+               "cluster": {"column": cluster_column, "ts_column": cluster_ts_column,
+                           "rule": "column" if cluster_column else "globex_trading_day_17:00_America/Chicago"},
+               "cells": cells}
+    return {"frame": frame, "payload": payload}
+
+
+def _cr1(psi: pd.Series, clusters: pd.Series, confidence: float) -> Dict[str, Any]:
+    """Cluster-robust (CR1) variance of an estimator from its per-row influence ``psi``:
+    ``G/(G-1) * sum_g (sum_{i in g} psi_i)^2``; t interval with ``G-1`` degrees of freedom."""
+    sums = psi.groupby(clusters.values).sum()
+    g = int(len(sums))
+    if g < 2:
+        return {"n_clusters": g, "se": None, "df": None, "t": None}
+    from scipy import stats
+    se = math.sqrt((g / (g - 1)) * float((sums ** 2).sum()))
+    return {"n_clusters": g, "se": se, "df": g - 1, "t": float(stats.t.ppf((1.0 + confidence) / 2.0, g - 1))}
+
+
+def clustered_uncertainty(rows: pd.DataFrame, *, value_columns: Sequence[str], group_by: Sequence[str] = (),
+                          cluster_column: Optional[str] = None, cluster_ts_column: Optional[str] = None,
+                          censored_column: Optional[str] = None, confidence: float = 0.95,
+                          differences: Optional[Sequence[Mapping[str, Any]]] = None) -> Dict[str, Any]:
+    """Session-day-clustered standard errors and confidence intervals for means and differences of means.
+
+    Rows from one session day are not independent; a row-level SE of their mean is wrong by the square
+    root of the within-day design effect (this program once reported t=14 for what was t=1.39). Every cell
+    carries ``n_rows`` AND ``n_clusters`` -- both required. With fewer than two clusters ``se``/``ci`` are
+    null and the counts still report. Censored rows (``censored_column``) and null values are excluded and
+    counted. ``differences``: ``[{name, a: {col: value, ...}, b: {...}, column?}]`` -- mean(a) - mean(b)
+    with the cluster-robust SE of the difference (rows of both sides share session days, so the sides are
+    not independent either)."""
+    where = "uncertainty.clustered_mean"
+    cols = list(value_columns or [])
+    if not cols:
+        raise AnalysisOpError(f"ANALYSIS_UNCERTAINTY_COLUMNS_MISSING: {where} declares no value_columns")
+    _require(rows, cols, where)
+    if not (0.0 < float(confidence) < 1.0):
+        raise AnalysisOpError(f"ANALYSIS_UNCERTAINTY_CONFIDENCE_INVALID: {confidence!r}")
+    work = rows.assign(__cluster__=_cluster_keys(rows, cluster_column, cluster_ts_column, where))
+    censored = _censored_mask(work, censored_column, where)
+
+    def usable(frame: pd.DataFrame, col: str) -> pd.DataFrame:
+        kept = frame[~censored.loc[frame.index]]
+        vals = pd.to_numeric(kept[col], errors="coerce")
+        kept = kept.assign(__y__=vals)
+        return kept[kept["__y__"].notna() & kept["__cluster__"].notna()]
+
+    def interval(est: float, r: Mapping[str, Any]) -> Dict[str, Any]:
+        if r["se"] is None:
+            return {"ci_low": None, "ci_high": None}
+        return {"ci_low": est - r["t"] * r["se"], "ci_high": est + r["t"] * r["se"]}
+
+    cells: List[Dict[str, Any]] = []
+    for keys, sub in _grouped(work, group_by, where):
+        for col in cols:
+            u = usable(sub, col)
+            n = int(len(u))
+            n_cens = int(censored.loc[sub.index].sum())
+            cell: Dict[str, Any] = {**keys, "column": col, "n_rows": n, "n_censored": n_cens, "n_null": int(len(sub) - n_cens - n)}
+            if n == 0:
+                cell.update({"n_clusters": 0, "mean": None, "se": None, "df": None, "ci_low": None, "ci_high": None})
+            else:
+                y = u["__y__"].astype(float)
+                mean = float(y.mean())
+                r = _cr1((y - mean) / n, u["__cluster__"], float(confidence))
+                cell.update({"n_clusters": r["n_clusters"], "mean": mean, "se": r["se"], "df": r["df"], **interval(mean, r)})
+            cells.append(cell)
+
+    diffs: List[Dict[str, Any]] = []
+    for i, d in enumerate(differences or []):
+        name = str(d.get("name") or f"difference_{i}")
+        a_sel, b_sel = dict(d.get("a") or {}), dict(d.get("b") or {})
+        if not a_sel or not b_sel:
+            raise AnalysisOpError(f"ANALYSIS_DIFFERENCE_INVALID: differences[{i}] needs non-empty selectors a and b")
+        _require(work, sorted(set(a_sel) | set(b_sel)), f"{where}.differences[{i}]")
+        for col in ([d["column"]] if d.get("column") else cols):
+            _require(work, [col], f"{where}.differences[{i}]")
+            u = usable(work, col)
+            ma = pd.Series(True, index=u.index)
+            mb = pd.Series(True, index=u.index)
+            for k, v in a_sel.items():
+                ma &= u[k].eq(v)
+            for k, v in b_sel.items():
+                mb &= u[k].eq(v)
+            if (ma & mb).any():
+                raise AnalysisOpError(f"ANALYSIS_DIFFERENCE_OVERLAP: differences[{i}] selectors a and b share rows")
+            ua, ub = u[ma], u[mb]
+            na, nb = int(len(ua)), int(len(ub))
+            row: Dict[str, Any] = {"name": name, "column": col, "a": a_sel, "b": b_sel, "n_rows": na + nb,
+                                   "n_rows_a": na, "n_rows_b": nb}
+            if na == 0 or nb == 0:
+                row.update({"n_clusters": int(pd.concat([ua["__cluster__"], ub["__cluster__"]]).nunique()), "estimate": None,
+                            "se": None, "df": None, "ci_low": None, "ci_high": None})
+            else:
+                ya, yb = ua["__y__"].astype(float), ub["__y__"].astype(float)
+                est = float(ya.mean() - yb.mean())
+                psi = pd.concat([(ya - ya.mean()) / na, -(yb - yb.mean()) / nb])
+                r = _cr1(psi, pd.concat([ua["__cluster__"], ub["__cluster__"]]), float(confidence))
+                row.update({"n_clusters": r["n_clusters"], "estimate": est, "se": r["se"], "df": r["df"], **interval(est, r)})
+            diffs.append(row)
+    frame = pd.DataFrame(cells)
+    payload = {"value_columns": cols, "group_by": list(group_by or []), "confidence": float(confidence),
+               "censored_column": censored_column,
+               "cluster": {"column": cluster_column, "ts_column": cluster_ts_column,
+                           "rule": "column" if cluster_column else "globex_trading_day_17:00_America/Chicago"},
+               "method": "CR1 cluster-robust SE from per-row influence (G/(G-1) small-sample factor); t interval, G-1 df",
+               "cells": cells, "differences": diffs}
     return {"frame": frame, "payload": payload}
 
 
