@@ -1366,6 +1366,8 @@ frame. Six operations, all study-agnostic — the science lives in the declared 
 | `analysis.path.anchored_offsets` | the value path at declared offsets after an anchor, bounded by its terminal, with delta, maximum, time-to-level, collapse and recross. A missing *required* offset censors that path and is never imputed. |
 | `analysis.classify.precedence` | ordered, first-match-wins labelling; declaration order **is** the precedence, so a dominating category is expressed by declaring it first. |
 | `analysis.metric.tail_lift` | label-rate lift inside the score tail at P90/P95/P97.5 thresholds **frozen on a declared reference frame** and applied to the evaluation rows; a tail evaluated at its own quantile is a description, not a test. Censored rows are excluded and counted. |
+| `analysis.describe.grouped` | grouped descriptive summary: n, mean, median, std, min, max and declared quantiles per value column and declared group; censored rows excluded and counted. **A cluster (`cluster_column`, or `cluster_ts_column` → Globex trading day) is required**, and every cell carries `n_rows` and `n_clusters`. |
+| `analysis.uncertainty.clustered_mean` | session-day-clustered (CR1) SE and t confidence interval for every mean and every declared difference of means (`differences: [{name, a: {...}, b: {...}}]`). `n_rows` **and** `n_clusters` are required output fields; with fewer than two clusters the SE is null and the counts still report. A row-level SE of a session-clustered mean is not reportable. |
 
 The compiler proves before execution that every op is registered, that the pipeline is a DAG in
 declaration order (a step may read only the study frame or an earlier step), and that every

@@ -95,3 +95,21 @@ analysis_ops:
     parameters: [score, label, quantiles, group_by, interpolation]
     update_cadence: offline_only
     required_tests: [research/analysis/tests/test_diagnostic_ops.py]
+  - id: analysis.describe.grouped
+    version: 1
+    description: Grouped descriptive summary -- n, mean, median, std, min, max and declared quantiles per value column and declared group; censored rows excluded and counted; every cell carries its row count AND its session-day cluster count (a cluster declaration is required).
+    implementation: research.analysis.diagnostic_ops.grouped_summary
+    inputs: []
+    needs_context: false
+    parameters: [value_columns, group_by, quantiles, censored_column, cluster_column, cluster_ts_column]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_summary_ops.py]
+  - id: analysis.uncertainty.clustered_mean
+    version: 1
+    description: Session-day-clustered (CR1) standard errors and t confidence intervals for every mean and declared difference of means, per value column and declared group; n_rows AND n_clusters are required output fields; fewer than two clusters reports counts with a null SE.
+    implementation: research.analysis.diagnostic_ops.clustered_uncertainty
+    inputs: []
+    needs_context: false
+    parameters: [value_columns, group_by, cluster_column, cluster_ts_column, censored_column, confidence, differences]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_summary_ops.py]

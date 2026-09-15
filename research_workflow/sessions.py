@@ -117,6 +117,16 @@ class CalendarSessionTable:
         j = (i + 1) if i is not None else 0
         return self._closes[j] if j < len(self._closes) else None
 
+    def overlaps(self, open_ts: int, close_ts: int) -> bool:
+        """True iff the bar window whose members close in ``(open_ts, close_ts]`` shares time with a row."""
+        i = bisect_right(self._closes, int(open_ts))
+        return i < len(self._opens) and self._opens[i] < int(close_ts)
+
+    def next_row_after(self, ts_ns: int) -> Optional[Tuple[int, int]]:
+        """The first row whose close is after ``ts_ns`` (the row a window starting at ``ts_ns`` runs into)."""
+        i = bisect_right(self._closes, int(ts_ns))
+        return (self._opens[i], self._closes[i]) if i < len(self._opens) else None
+
 
 class SplitSessionTable:
     """Population gating from one session, outcome censoring from another (legacy episode
@@ -134,6 +144,17 @@ class SplitSessionTable:
 
 
 def build_session_table(spec: dict) -> object:
+    """The population gate / outcome censor table.  A materialized calendar spec also carries the
+    dataset's TRADING_DAY rows; they are attached as ``table.trading_day`` (the fill scope of
+    closed-window derived streams, ``research_workflow.host.mux``) and never gate or censor."""
+    table = _build_gate_table(spec)
+    rows = (spec.get("rows_by_session") or {}).get(TRADING_DAY)
+    if rows is not None:
+        table.trading_day = CalendarSessionTable([(r[0], r[1]) for r in rows], name=TRADING_DAY)
+    return table
+
+
+def _build_gate_table(spec: dict) -> object:
     censor_name = spec.get("censor_session")
     if censor_name and str(censor_name).upper() != str(spec.get("session", "RTH")).upper():
         base = {k: v for k, v in spec.items() if k not in ("censor_session", "rows", "rows_by_session")}
@@ -251,7 +272,8 @@ def resolve_calendar_session_spec(session_spec: Mapping[str, Any], repo_root: An
     declared = list(spec.get("reference_tables") or [])
     tables = dataset_v2.load_reference_tables(resolved.catalog_path, declared, spec.get("reference_digest"))
     sessions_df = tables["sessions"]
-    needed = {str(spec.get("session", "RTH")).upper(), str(spec.get("censor_session") or spec.get("session", "RTH")).upper()}
+    # TRADING_DAY is always materialized: it is the empty-window fill scope of closed-window derived streams.
+    needed = {str(spec.get("session", "RTH")).upper(), str(spec.get("censor_session") or spec.get("session", "RTH")).upper(), TRADING_DAY}
     rows_by_session: Dict[str, list] = {}
     for name in sorted(needed):
         if name in ("RTH", "ETH", TRADING_DAY):
