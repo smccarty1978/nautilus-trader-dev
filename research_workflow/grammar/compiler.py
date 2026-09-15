@@ -1093,6 +1093,10 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
     if len(arms) > 1 or (len(arms) == 1 and primary is None and arms[0]["prefix"] != arms[0]["id"]):
         for a in arms:
             obs += [f"{a['prefix']}_label", f"{a['prefix']}_disposition", f"{a['prefix']}_censor_reason", f"{a['prefix']}_resolution_seconds"]
+    # A5: every new compile carries observed_seconds = (resolved_at_ts - T)/1e9 (the analysis harness's own
+    # terminal-minus-anchor definition). A contract field, not a legacy column: sealed plans replay unchanged.
+    contract["observed_seconds"] = True
+    obs.append("observed_seconds")
     contract["observation_columns"] = obs
     return contract
 

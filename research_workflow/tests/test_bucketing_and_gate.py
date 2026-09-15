@@ -63,6 +63,30 @@ def test_a3_plan_only_change_stales_every_plan_bound_gate_and_nothing_closure_bo
                      "contract_audit": True, "seal": False, "smoke": False}
 
 
+def test_a5_new_compiles_carry_observed_seconds_for_every_disposition(tmp_path):
+    from research_workflow.tests.test_session_end_truncate import _run, golden  # noqa: F401  (fixture re-export)
+    import subprocess, sys
+    from research_workflow.host.interfaces import BarView
+    gold = ROOT / "fixtures" / "golden"
+    subprocess.run([sys.executable, str(gold / "build_golden_fixture.py")], check=True, cwd=str(ROOT), capture_output=True)
+    bars = [BarView(**b) for b in json.loads((gold / "bars.json").read_text(encoding="utf-8"))]
+    expected = json.loads((gold / "expected.json").read_text(encoding="utf-8"))
+    session_spec = {"kind": "calendar", "session": "RTH", "rows": [[a * 10**9, b * 10**9] for a, b in expected["sessions"]]}
+    plan, obs = _run(tmp_path, bars, session_spec, session_end="truncate", horizon="86400s")
+    assert plan["outcome"]["observed_seconds"] is True and plan["outcome"]["observation_columns"][-1] == "observed_seconds"
+    assert len(obs) > 0 and obs["resolved_at_ts"].notna().all()
+    assert set(obs["disposition"]) >= {"CENSORED", "LABELED_POSITIVE"}
+    assert (obs["observed_seconds"] == (obs["resolved_at_ts"] - obs["observation_ts"]) / 1e9).all()
+
+
+def test_a5_a_sealed_plan_contract_emits_no_new_column():
+    from research_workflow.host.outcomes import LabelOutcomeContract, LabelOutcomeKernel
+    sealed = json.loads((ROOT / "studies/v2_shape_b_deep_pullback_5s/compiled_plan.json").read_text(encoding="utf-8"))
+    kernel = LabelOutcomeKernel(LabelOutcomeContract.from_plan(sealed["outcome"]), None)
+    assert "observed_seconds" not in kernel.observation_columns
+    assert kernel.observation_columns == list(sealed["outcome"]["observation_columns"])
+
+
 def test_a3_receipt_without_a_plan_hash_is_not_current(tmp_path):
     c = _controller(tmp_path)
     out = _write(c.study / "artifacts/x.json", {})
