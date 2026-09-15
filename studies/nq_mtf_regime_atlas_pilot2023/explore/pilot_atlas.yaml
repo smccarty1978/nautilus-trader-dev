@@ -1,0 +1,144 @@
+# EXPLORE (THE FOUR STAGES, step 4) over the re-collected pilot frame (plan 10209696, closed_window bars).
+# Registered analysis_ops ONLY. Every mean carries a session-day-clustered SE (analysis.uncertainty.clustered_mean,
+# cluster = session_close_ts: one Globex trading day per value) and every count carries n_clusters beside n_rows.
+#
+# What the frame cannot express (reported, not substituted):
+#   - realized outcome sign (flip close -> next flip close, in ATR): no column carries it. pnl_atr_1m is the running
+#     P&L to each checkpoint, and no registered op selects a regime's LAST checkpoint -> T1's winner/loser split,
+#     T3's "by eventual outcome sign" and T4's outcome-sign cut are not produced.
+#   - session bucket / ETH-RTH flag: no column (feature.session_membership has no runtime adapter, G6) -> T8 and
+#     T6's ETH/RTH split are not produced.
+#   - a row filter: ops read every row; flip rows are selected by GROUPING on flipped_1m (true = the flip anchor,
+#     bars_1m == 0), and offsets by grouping on bars_1m (a checkpoint exists at bars_1m = k only while the regime
+#     survives k bars -- a survivorship-conditioned path, stated at every cell by its own n_rows).
+explore:
+  id: nq_mtf_regime_atlas_pilot2023_atlas
+  question: "T2/T3/T5/T6/T7 with session-day-clustered uncertainty over the 2023 pilot frame (1m anchor)"
+
+analysis:
+  steps:
+    # --- T6: census of 1m flips by resolution class and direction (counts); then the same classes with
+    #     row AND cluster counts.
+    - id: t6_census
+      op: analysis.classify.precedence
+      rows: frame
+      params:
+        output_column: t6_class
+        strata: [regime_direction]
+        rules:
+          - {label: checkpoint_not_anchor, when: [[flipped_1m, eq, false]]}
+          - {label: flip_censored_session_end, when: [[censored, eq, 1], [censor_reason, eq, SESSION_END]]}
+          - {label: flip_censored_gap,         when: [[censored, eq, 1], [censor_reason, eq, GAP]]}
+          - {label: flip_censored_other,       when: [[censored, eq, 1]]}
+          - {label: flip_resolved_next_flip,   when: [[target_flip_within_horizon, eq, 1]]}
+          - {label: flip_unresolved_horizon,   when: []}
+    - id: t6_clusters
+      op: analysis.describe.grouped
+      rows: t6_census
+      params:
+        value_columns: [observed_seconds]
+        group_by: [t6_class, regime_direction]
+        quantiles: [0.5]
+        cluster_column: session_close_ts
+
+    # --- T2: time to the next 1m flip (resolution), censoring-aware incidence and distribution; flips only
+    #     (stratum flipped_1m = true).
+    - id: t2_incidence
+      op: analysis.incidence.cumulative
+      rows: frame
+      params:
+        horizons: [60, 120, 180, 300, 600, 900, 1200, 1800, 3600, 7200]
+        resolved_column: target_flip_within_horizon
+        duration_column: time_to_flip_seconds
+        observed_seconds_column: observed_seconds
+        strata: [flipped_1m, regime_direction]
+    - id: t2_distribution
+      op: analysis.describe.grouped
+      rows: frame
+      params:
+        value_columns: [time_to_flip_seconds]
+        group_by: [flipped_1m, regime_direction]
+        quantiles: [0.1, 0.25, 0.5, 0.75, 0.9, 0.99]
+        censored_column: censored
+        cluster_column: session_close_ts
+    - id: t2_uncertainty
+      op: analysis.uncertainty.clustered_mean
+      rows: frame
+      params:
+        value_columns: [time_to_flip_seconds]
+        group_by: [flipped_1m, regime_direction]
+        censored_column: censored
+        cluster_column: session_close_ts
+        differences:
+          - {name: flip_long_minus_short, a: {flipped_1m: true, regime_direction: 1}, b: {flipped_1m: true, regime_direction: -1}}
+
+    # --- T3 (without the outcome-sign cut): running MFE / MAE / P&L / retained at 1m checkpoint offsets
+    #     0 (flip), 1, 2, 3, 5, 10, 20 bars, by direction. Cells for every bars_1m value are produced; the report
+    #     reads the declared offsets.
+    - id: t3_path
+      op: analysis.describe.grouped
+      rows: frame
+      params:
+        value_columns: [mfe_atr_1m, mae_atr_1m, pnl_atr_1m, retained_1m]
+        group_by: [bars_1m, regime_direction]
+        quantiles: [0.1, 0.5, 0.9]
+        cluster_column: session_close_ts
+    - id: t3_uncertainty
+      op: analysis.uncertainty.clustered_mean
+      rows: frame
+      params:
+        value_columns: [mfe_atr_1m, mae_atr_1m, pnl_atr_1m]
+        group_by: [bars_1m]
+        cluster_column: session_close_ts
+
+    # --- T5: 1m flip time-to-next-flip and the flip row by alignment state across 5m / 15m / 1h (every
+    #     direction combination separately), and path at offsets by 5m alignment (T4's alignment cut).
+    - id: t5_alignment
+      op: analysis.uncertainty.clustered_mean
+      rows: frame
+      params:
+        value_columns: [time_to_flip_seconds]
+        group_by: [flipped_1m, dir_1m, dir_5m, dir_15m, dir_1h]
+        censored_column: censored
+        cluster_column: session_close_ts
+    - id: t4_path_by_5m
+      op: analysis.uncertainty.clustered_mean
+      rows: frame
+      params:
+        value_columns: [mfe_atr_1m, mae_atr_1m, pnl_atr_1m]
+        group_by: [bars_1m, dir_1m, dir_5m]
+        cluster_column: session_close_ts
+
+    # --- T7: giveback (MFE retained) distribution at checkpoints, by direction.
+    - id: t7_giveback
+      op: analysis.describe.grouped
+      rows: frame
+      params:
+        value_columns: [retained_1m]
+        group_by: [bars_1m, regime_direction]
+        quantiles: [0.1, 0.25, 0.5, 0.75, 0.9]
+        cluster_column: session_close_ts
+
+    # --- A2 payoff: tracker staleness at every checkpoint, per timeframe.
+    - id: staleness
+      op: analysis.describe.grouped
+      rows: frame
+      params:
+        value_columns: [regime_5s_seconds_since_update, regime_30s_seconds_since_update, regime_1m_seconds_since_update,
+                        regime_3m_seconds_since_update, regime_5m_seconds_since_update, regime_15m_seconds_since_update,
+                        regime_30m_seconds_since_update, regime_1h_seconds_since_update, regime_4h_seconds_since_update]
+        quantiles: [0.5, 0.9, 0.99]
+        cluster_column: session_close_ts
+
+  artifacts:
+    - {name: t6_census.json, source: t6_census, kind: json}
+    - {name: t6_clusters.json, source: t6_clusters, kind: json}
+    - {name: t2_incidence.json, source: t2_incidence, kind: json}
+    - {name: t2_distribution.json, source: t2_distribution, kind: json}
+    - {name: t2_uncertainty.json, source: t2_uncertainty, kind: json}
+    - {name: t3_path.parquet, source: t3_path, kind: frame}
+    - {name: t3_uncertainty.parquet, source: t3_uncertainty, kind: frame}
+    - {name: t5_alignment.json, source: t5_alignment, kind: json}
+    - {name: t4_path_by_5m.parquet, source: t4_path_by_5m, kind: frame}
+    - {name: t7_giveback.parquet, source: t7_giveback, kind: frame}
+    - {name: staleness.json, source: staleness, kind: json}
