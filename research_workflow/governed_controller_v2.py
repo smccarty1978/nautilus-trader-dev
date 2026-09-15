@@ -93,26 +93,44 @@ class V2StudyController(GovernedStudyController):
         st = _read(path)
         return bool(frozen and st.get("verdict") == "CLEAR" and st.get("audited_execution_composite_sha256") == frozen and fp.get("current_execution_composite") == frozen)
 
+    def _receipt_current(self, stage: str, fp: dict[str, str | None], *, require_partitions: bool = False) -> bool:
+        """A stage receipt is current only for the plan it ran against (a receipt with no plan_sha256 is not)."""
+        receipt = _read(self.work / "receipts" / f"{stage}.json")
+        return bool(fp.get("plan_sha256") and receipt.get("plan_sha256") == fp.get("plan_sha256")
+                    and super()._receipt_current(stage, fp, require_partitions=require_partitions))
+
+    def _write_receipt(self, stage: str, result: Any, fp: dict[str, str | None]) -> None:
+        super()._write_receipt(stage, result, fp)
+        path = self.work / "receipts" / f"{stage}.json"
+        receipt = _read(path)
+        receipt["plan_sha256"] = fp.get("plan_sha256")
+        _json(path, receipt)
+
     def _fresh_stage(self, stage: str, fp: dict[str, str | None]) -> bool:
         # a compiled plan is current only if the spec is unchanged AND the closure it was compiled against
         # (host modules, compiler, bound providers) still hashes to the same composite
         plan_ok = bool(fp.get("compiled_plan") and fp.get("plan_spec_sha256") == fp.get("study_spec")
                        and fp.get("plan_closure_composite") and fp.get("plan_closure_composite") == fp.get("current_execution_composite"))
         closure_ok = bool(fp.get("execution_composite") and fp.get("execution_composite") == fp.get("current_execution_composite"))
+        # A plan-only change (e.g. outcome.session_end) keeps the closure composite but changes what the gates
+        # vouched for. Every artifact that ran against the plan is bound to its plan_sha256 as well; tests and the
+        # causal audit stay composite-keyed because they inspect the closure, not a particular plan.
+        plan_bound = lambda doc: bool(fp.get("plan_sha256")) and doc.get("plan_sha256") == fp.get("plan_sha256")  # noqa: E731
         if stage == "compile":
             return plan_ok
         if not plan_ok:
             return False
         if stage == "prepare":
-            return closure_ok and (self.study / "artifacts/experiment_authorization.json").is_file()
+            return (closure_ok and (self.study / "artifacts/experiment_authorization.json").is_file()
+                    and plan_bound(_read(self.study / "audit/frozen_execution_manifest.json")))
         if not closure_ok:
             return False
         if stage == "readiness":
             r = _read(self.study / "audit/readiness.json")
-            return r.get("overall_status") == "PASS" and r.get("execution_composite_sha256") == fp.get("execution_composite")
+            return r.get("overall_status") == "PASS" and r.get("execution_composite_sha256") == fp.get("execution_composite") and plan_bound(r)
         if stage == "preflight":
             p = _read(self.study / "audit/preflight.json")
-            return p.get("status") == "CLEAR" and p.get("execution_composite_sha256") == fp.get("execution_composite")
+            return p.get("status") == "CLEAR" and p.get("execution_composite_sha256") == fp.get("execution_composite") and plan_bound(p)
         if stage == "tests":
             t = _read(self.work / "test_summary.json")
             return t.get("status") == "PASS" and t.get("execution_composite_sha256") == fp.get("execution_composite")
@@ -129,7 +147,7 @@ class V2StudyController(GovernedStudyController):
             else:
                 contract_ok = self._audit_current(self.study / "audit/contract_status.json", fp)
             return bool(s.get("composite_seal_hash") and s.get("execution_manifest_composite_sha256") == fp.get("execution_composite")
-                        and self._audit_current(self.study / "audit/status.json", fp) and contract_ok)
+                        and plan_bound(s) and self._audit_current(self.study / "audit/status.json", fp) and contract_ok)
         if stage == "close":
             try:
                 from research_workflow.study_closure import load_study_closure
