@@ -1,22 +1,22 @@
 {
   "audits": {
     "causal": {
-      "auditor": "claude-lookahead-auditor-pass04",
-      "report_sha256": "f2d08026eb59bc1ea8ca1af98075e581b6478abe0c6c8f5e1ed611508e83ba8d",
-      "status_sha256": "23942306c57d30568315b61cc7c5102e6b0a81143695ada1815ddca11b7d4305"
+      "auditor": "claude-delta-pass05-inline",
+      "report_sha256": "ce73f03bfb6769b22a448dc3d34fe0520e67322c62a082df856c787cb0b11a3a",
+      "status_sha256": "4b98fc0fbc4071dfe72c232f194f6b7a66a38ff97644a8b0e222a41975232952"
     },
     "contract": {
       "reason": "stage: collect produces a frame and makes no claim; the contract audit belongs to the research study that binds it",
       "status": "NOT_REQUIRED"
     }
   },
-  "composite_seal_hash": "1d135a78c0c24a1555cde744c6abcfe5320307e1606f5924046ed0c3ed406620",
-  "execution_manifest_composite_sha256": "041379f7e433a637beba1e687fd70124f7d0c79a34e010c6b6de5cc53d13da7c",
-  "plan_sha256": "ed2b9dfa279902944a1c02fc588bf68b45bd72cdd554bb37df792574f75c421c",
+  "composite_seal_hash": "b1a9298b7a3c0fc9810ce04a2c857df7f37217d6adc12ec6be3b559e2aba8225",
+  "execution_manifest_composite_sha256": "4e28ee0a8adf712acc52373811af61c4fd6bc2806c97b2b4894c7e458f84ac03",
+  "plan_sha256": "10209696eb4e898fe25d47eb1467bece1ddde7cae653edf466b70fab81a6f08a",
   "platform": "v2",
-  "registry_sha256": "8cd68dde521ea23338c19ca50386583f2271296b90ff9e78b9c7bdf47d0c3719",
+  "registry_sha256": "888bda0992e9461f6e183d24f6c2f2e303b848e1033effe4a56aa9a82a01cc6f",
   "schema_version": 2,
   "seal_kind": "frame",
-  "sealed_at_utc": "2026-09-14T13:29:03.981058+00:00",
+  "sealed_at_utc": "2026-09-15T14:37:29.840059+00:00",
   "study_id": "nq_mtf_regime_atlas_pilot2023"
 }

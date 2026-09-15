@@ -568,7 +568,7 @@
     "windows": []
   },
   "closure": {
-    "composite_sha256": "041379f7e433a637beba1e687fd70124f7d0c79a34e010c6b6de5cc53d13da7c",
+    "composite_sha256": "4e28ee0a8adf712acc52373811af61c4fd6bc2806c97b2b4894c7e458f84ac03",
     "file_count": 159,
     "files": {
       "backtests/nt_runtime/__init__.py": "8a091704d4e8c5dfeeb2fc16e97035e3b7e1986440e5050d9d530d1f4691614f",
@@ -643,7 +643,7 @@
       "features/trackers/generic_regime_geometry.py": "6cabe36025b7e4c721ccde2bdc3a5b5164208db453d0348f07300e9e9e529a89",
       "features/trackers/generic_rolling_productivity.py": "d0dcaa18e56debf27178e1e4c071f173f41988e5df57be8ee215303673f8e4a4",
       "features/trackers/generic_structural_geometry.py": "8368b1a01273001d674c78e86ae8590d1872bea2ad2478dffc290959ac71999d",
-      "features/trackers/host_bindings.py": "7d133c7b69ad7f98dac0c5c0503af066bdeba198089139a0bbc5467e234788f1",
+      "features/trackers/host_bindings.py": "19934b638f38fe008e91141a2f212e65b52943ce45b55985ffba029ecd2b170b",
       "features/trackers/ohlcv_delta.py": "4db29ec9f6337729cf140840c7eaa80201550a4874643ea64fe2c4e334532423",
       "features/trackers/regime_dual_ema.py": "79d9777db4279914b6f138ce9541c151ba7120b03c82300d6f8e0a31ca2d7081",
       "features/trackers/rolling_5m_productivity.py": "666be87d2234a3e8896bb08c6901e3303bf799273de37c0abc69f33af7e94077",
@@ -654,7 +654,7 @@
       "research/analysis/identity.py": "a5cf93fd6539093e974862d2fe4e839e7897fde2d760fcd4afc99ec3f42be5ae",
       "research/analysis/loader.py": "1e0b1f3767d17446502ef3182e5506000584b600ba9e46130d014fcd1b457a8c",
       "research/analysis/modeling.py": "cbd8bdee4d2c87efd7ac53f377e138c8103202bf0f6547c38517d4eb92567725",
-      "research/analysis/ops.py": "34db92708d1fbb0e6877253628ebf752ea01d85f86a3f4c79bdfcf232267eb1e",
+      "research/analysis/ops.py": "bbb9d5bd576c0a1f2f5f96ace899ac0ca850b32a6e72fe921b2f7648e1de06a9",
       "research/analysis/spec.py": "f5ca0167a9945ecb4b8a75f9525e1f09acbdb32e12d731b26e309460641383c3",
       "research/schemas/__init__.py": "e5ba7db1fb32f1a71efe547886d391218fbdaad329386dc666036b780523990a",
       "research/schemas/dataset_spec.py": "e2fff83322597874b035cb573ece383b4b6b1dfe83ab6d76b053ab7f648c3a7c",
@@ -683,9 +683,9 @@
       "research_workflow/forward_outcomes/tracker.py": "e79176468e68b220b430d8057c28945d4e4322f7f3c5954a14b279ef52fab71c",
       "research_workflow/gates.py": "465127281aa5cf66d3264aba9e1a1e6cd36930f6210cc9d0adf248d22fa32ac8",
       "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
-      "research_workflow/governed_controller_v2.py": "a6301e7c2441cdf49c76cbf853d2f73171fcc2bb8c25e13aeb6bb13088a7291c",
+      "research_workflow/governed_controller_v2.py": "e878042b11555a7fe5a5f6b75d6c369e8d331bd839c4a5d1f325781eeeda9714",
       "research_workflow/grammar/__init__.py": "8346e9b1ae1cf1c7950e06d278e21d162678d0345ad5b8b2a6aa2a7eeaba5eba",
-      "research_workflow/grammar/compiler.py": "aa68a535774a2b1b656f51ed5355dcdcb1a0bd81f34c256c5edc5632dbb462da",
+      "research_workflow/grammar/compiler.py": "88e38842ccd365d7dfd3701dfe5df8a6e9276bc84a5511cc5d5fae5996831508",
       "research_workflow/grammar/deliverables.py": "f147d4f7f6fc8cf239a49440765d2410c3c6650f3f0f868b9c902e2ca9e87909",
       "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
       "research_workflow/grammar/gaps.py": "9e3341d65135484e56e868bbe9fbb2f13637d133156ce17bdffee988c0d46b48",
@@ -694,11 +694,11 @@
       "research_workflow/grammar/spec.py": "1d16c746dcf0938684f4e544a460a02f715d7e94d41bc9cfd6a2eff324170edd",
       "research_workflow/host/__init__.py": "eeb674dcd8d9ce76b484669752dc2e9cb6b15934cab13257a7b010750ea1f79c",
       "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
-      "research_workflow/host/mux.py": "72aacac84ac70d47cb3553df4ed353ba492d67fe69075673bd143c504a6bff22",
-      "research_workflow/host/outcomes.py": "eddca7812228324d239a58657f6f734da41a7da651ccb2c2895901ff9c0ce18a",
+      "research_workflow/host/mux.py": "44c7322624469f7293f09496fdb8cf640addefd639e0027f2cdc9757589c7419",
+      "research_workflow/host/outcomes.py": "67317daa2fb73ce124803b79c98642e555d1feb3dcc76645251af2dd307f4fac",
       "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
       "research_workflow/host/sink.py": "c0e353d2cd2f23f4c4142927b9e06a90b52ff70ff365a8dd188fb43ec0e0959f",
-      "research_workflow/host/strategy.py": "3792e4ea966d76381cf3b3fee50fd0a7c99a521948e83862bc9dec7e96b402e6",
+      "research_workflow/host/strategy.py": "5e0148f1ca55a0fb823f1f6e96c6ccc4c72c32c1f2bd41dec2147d6ce8fab7c5",
       "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
       "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
       "research_workflow/lifecycle_v2.py": "9050add5399e12885289d498cf7a6b0063d8d59174a2dff89a9b2c5c973a73df",
@@ -717,7 +717,7 @@
       "research_workflow/roots.py": "157bd2694acf85ab46cd993de1fbc10af09967575f2d1c3911a057186ae4e695",
       "research_workflow/runtime_bindings.py": "7e8a028532ad02e15a48a8463250b1afd73e5691897bdd86c8b8b2eff51dd0bd",
       "research_workflow/seal.py": "95cdb55586214e62766f92544cd4d03dc47e7aae57b3a90388e12edf5b92597b",
-      "research_workflow/sessions.py": "914daebfbd790dfa8ee9bb55363d7fd93e21dc1a66c5aacbb76cf6ea1555f93d",
+      "research_workflow/sessions.py": "95c1861a3c38db7ed9ac639bf163c5ba706ed66d2e0fa6a87edc59317f5cfbad",
       "research_workflow/study_closure.py": "aab002720ac1f3a39e5b0e406fd5a818eeb42fb688cff4cc06b8b78d89239928",
       "research_workflow/study_kind.py": "ce5fe11e8c1dbe930e284b7a04dc205430261ed214dc81a88149c2138c837909",
       "research_workflow/target_expression.py": "cb2980ed3b1563ce2eee981896ab04ef101179a569dffdc975bbfb5bddd40045",
@@ -740,7 +740,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "8b30bb8b07e826da410abbaee69e113f4346d1385987260aaa3b9fb24e82740c",
+        "composite_sha256": "917421c02ad597fab34fd3a6781c36a7f8a276e298d64c60b7e0638f21530dcc",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -891,7 +891,7 @@
         ]
       },
       "lifecycle": {
-        "composite_sha256": "c40439ed73c0f0afa15546bf26ed6b57a8be47e0d7e9fe19a279859a2fd441ca",
+        "composite_sha256": "0d1e965b11bd993b3653a8135e57a75fde2ce0b45769ea0a371aac8f2535ad68",
         "files": [
           "research_workflow/closure_hash.py",
           "research_workflow/controller_contracts.py",
@@ -928,7 +928,7 @@
         ]
       },
       "replay": {
-        "composite_sha256": "e2c9a995a90c25f54f46d0336605d5538ea59271720f30c5ea0fe678a868e3d9",
+        "composite_sha256": "fc4a523dac800a0ea1dc0632f60c42629a110abb58af666ddc6886aa1b7d98f1",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -1335,6 +1335,42 @@
       {
         "column": "atr_4h",
         "ref": "regime_4h.atr"
+      },
+      {
+        "column": "regime_1m_seconds_since_update",
+        "ref": "regime_1m.seconds_since_update"
+      },
+      {
+        "column": "regime_5s_seconds_since_update",
+        "ref": "regime_5s.seconds_since_update"
+      },
+      {
+        "column": "regime_30s_seconds_since_update",
+        "ref": "regime_30s.seconds_since_update"
+      },
+      {
+        "column": "regime_3m_seconds_since_update",
+        "ref": "regime_3m.seconds_since_update"
+      },
+      {
+        "column": "regime_5m_seconds_since_update",
+        "ref": "regime_5m.seconds_since_update"
+      },
+      {
+        "column": "regime_15m_seconds_since_update",
+        "ref": "regime_15m.seconds_since_update"
+      },
+      {
+        "column": "regime_30m_seconds_since_update",
+        "ref": "regime_30m.seconds_since_update"
+      },
+      {
+        "column": "regime_1h_seconds_since_update",
+        "ref": "regime_1h.seconds_since_update"
+      },
+      {
+        "column": "regime_4h_seconds_since_update",
+        "ref": "regime_4h.seconds_since_update"
       }
     ],
     "observation": [
@@ -1350,7 +1386,8 @@
       "censor_reason",
       "horizon_end_ts",
       "session_close_ts",
-      "resolved_at_ts"
+      "resolved_at_ts",
+      "observed_seconds"
     ]
   },
   "deliverables": [],
@@ -1874,7 +1911,13 @@
   },
   "model": null,
   "notes": [
-    "nq_1m is the completed-bar cadence stream: role context (queued, released strictly before the next execution bar) with visibility at_epoch, because the epoch is that bar's close"
+    "nq_1m is the completed-bar cadence stream: role context (queued, released strictly before the next execution bar) with visibility at_epoch, because the epoch is that bar's close",
+    "nq_3m is derived from nq_1m (the coarsest external stream visible at the epoch that divides 3m), not from nq_1s",
+    "nq_5m is derived from nq_1m (the coarsest external stream visible at the epoch that divides 5m), not from nq_1s",
+    "nq_15m is derived from nq_1m (the coarsest external stream visible at the epoch that divides 15m), not from nq_1s",
+    "nq_30m is derived from nq_1m (the coarsest external stream visible at the epoch that divides 30m), not from nq_1s",
+    "nq_1h is derived from nq_1m (the coarsest external stream visible at the epoch that divides 1h), not from nq_1s",
+    "nq_4h is derived from nq_1m (the coarsest external stream visible at the epoch that divides 4h), not from nq_1s"
   ],
   "outcome": {
     "arms": [],
@@ -1909,8 +1952,10 @@
       "censor_reason",
       "horizon_end_ts",
       "session_close_ts",
-      "resolved_at_ts"
+      "resolved_at_ts",
+      "observed_seconds"
     ],
+    "observed_seconds": true,
     "primary_arm": null,
     "relation": "continuation",
     "resolution_precedence": [
@@ -1925,7 +1970,7 @@
     "stream": "nq_1m",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "ed2b9dfa279902944a1c02fc588bf68b45bd72cdd554bb37df792574f75c421c",
+  "plan_sha256": "10209696eb4e898fe25d47eb1467bece1ddde7cae653edf466b70fab81a6f08a",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -1938,7 +1983,7 @@
     "qualify": null,
     "session": "ALL"
   },
-  "registry_sha256": "8cd68dde521ea23338c19ca50386583f2271296b90ff9e78b9c7bdf47d0c3719",
+  "registry_sha256": "888bda0992e9461f6e183d24f6c2f2e303b848e1033effe4a56aa9a82a01cc6f",
   "session": {
     "censor_session": "TRADING_DAY",
     "dataset": "NQ_1S_V2_GLOBEX",
@@ -1970,9 +2015,10 @@
       "visibility": "at_epoch"
     },
     {
-      "aggregation": "complete_bucket",
+      "aggregation": "closed_window",
       "derived_from": "nq_1s",
       "duration_ns": 5000000000,
+      "empty_window": "zero_volume_in_trading_day",
       "instrument": "NQ",
       "key": "nq_5s",
       "role": "execution",
@@ -1982,9 +2028,10 @@
       "visibility": "at_epoch"
     },
     {
-      "aggregation": "complete_bucket",
+      "aggregation": "closed_window",
       "derived_from": "nq_1s",
       "duration_ns": 30000000000,
+      "empty_window": "zero_volume_in_trading_day",
       "instrument": "NQ",
       "key": "nq_30s",
       "role": "execution",
@@ -2007,9 +2054,10 @@
       "visibility": "at_epoch"
     },
     {
-      "aggregation": "complete_bucket",
-      "derived_from": "nq_1s",
+      "aggregation": "closed_window",
+      "derived_from": "nq_1m",
       "duration_ns": 180000000000,
+      "empty_window": "zero_volume_in_trading_day",
       "instrument": "NQ",
       "key": "nq_3m",
       "role": "execution",
@@ -2019,9 +2067,10 @@
       "visibility": "at_epoch"
     },
     {
-      "aggregation": "complete_bucket",
-      "derived_from": "nq_1s",
+      "aggregation": "closed_window",
+      "derived_from": "nq_1m",
       "duration_ns": 300000000000,
+      "empty_window": "zero_volume_in_trading_day",
       "instrument": "NQ",
       "key": "nq_5m",
       "role": "execution",
@@ -2031,9 +2080,10 @@
       "visibility": "at_epoch"
     },
     {
-      "aggregation": "complete_bucket",
-      "derived_from": "nq_1s",
+      "aggregation": "closed_window",
+      "derived_from": "nq_1m",
       "duration_ns": 900000000000,
+      "empty_window": "zero_volume_in_trading_day",
       "instrument": "NQ",
       "key": "nq_15m",
       "role": "execution",
@@ -2043,9 +2093,10 @@
       "visibility": "at_epoch"
     },
     {
-      "aggregation": "complete_bucket",
-      "derived_from": "nq_1s",
+      "aggregation": "closed_window",
+      "derived_from": "nq_1m",
       "duration_ns": 1800000000000,
+      "empty_window": "zero_volume_in_trading_day",
       "instrument": "NQ",
       "key": "nq_30m",
       "role": "execution",
@@ -2055,9 +2106,10 @@
       "visibility": "at_epoch"
     },
     {
-      "aggregation": "complete_bucket",
-      "derived_from": "nq_1s",
+      "aggregation": "closed_window",
+      "derived_from": "nq_1m",
       "duration_ns": 3600000000000,
+      "empty_window": "zero_volume_in_trading_day",
       "instrument": "NQ",
       "key": "nq_1h",
       "role": "execution",
@@ -2067,9 +2119,10 @@
       "visibility": "at_epoch"
     },
     {
-      "aggregation": "complete_bucket",
-      "derived_from": "nq_1s",
+      "aggregation": "closed_window",
+      "derived_from": "nq_1m",
       "duration_ns": 14400000000000,
+      "empty_window": "zero_volume_in_trading_day",
       "instrument": "NQ",
       "key": "nq_4h",
       "role": "execution",
@@ -2090,7 +2143,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",
@@ -2140,7 +2194,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",
@@ -2190,7 +2245,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",
@@ -2240,7 +2296,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",
@@ -2290,7 +2347,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",
@@ -2340,7 +2398,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",
@@ -2390,7 +2449,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",
@@ -2440,7 +2500,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",
@@ -2490,7 +2551,8 @@
       "cadence": "per_source_bar",
       "capability": "tracker.regime.dual_ema",
       "epoch_fields": [
-        "age_s"
+        "age_s",
+        "seconds_since_update"
       ],
       "events": [
         "regime_bar",

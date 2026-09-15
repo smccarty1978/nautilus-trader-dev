@@ -48,8 +48,13 @@ resolved_authorities:
     The CME trading-floor close calendar is explicitly NOT authoritative for Globex futures.
   completed_bar_semantics: >
     Only completed bars are visible at a decision epoch. 1s and 1m are external streams of the
-    DatasetSpec; 5s / 30s / 3m / 15m / 30m / 1h / 4h are host-derived complete calendar buckets
-    (aggregation: complete_bucket) and compiled cleanly at all nine timeframes.
+    DatasetSpec; 5s / 30s / 3m / 15m / 30m / 1h / 4h are host-derived calendar windows.
+    RECOMPILED 2026-09-15 on main d83be2fd (chore/bucketing_and_gate A1, plan 10209696): aggregation
+    closed_window (any member publishes a window) with empty_window zero_volume_in_trading_day (an
+    empty window inside a TRADING_DAY row is a zero-volume bar at the previous close; nothing across
+    closures, nothing before the first trade). 5s / 30s derive from nq_1s; 3m / 5m / 15m / 30m / 1h / 4h
+    derive from nq_1m, the at_epoch cadence stream. The earlier aggregation complete_bucket (frame
+    80e644d1) discarded any window missing one 1s member and left 1h with 3 regimes and 4h with no bars.
   streams_verified: >
     streams[] resolved with no gap for [1s, 5s, 30s, 1m, 3m, 5m, 15m, 30m, 1h, 4h] on
     NQ_1S_V2_GLOBEX, and all nine tracker.regime.dual_ema + nine tracker.regime.excursion
@@ -159,9 +164,13 @@ terminal_decisions:
     section 15 card is filled from the frame record and the EXPLORE tables.
   population_cadence: >
     population.cadence: completed_1m -- one candidate per completed 1m bar of every 1m dual-EMA
-    regime, ETH and RTH (session: ALL), no qualify. identity = (regime_1m.start_ns,
-    checkpoint_index); the flip row is the first checkpoint of a regime (bars_1m == 1,
-    flipped_1m == true). This REPLACES the phase-A placeholder completed_1s and IS the declared
+    regime, ETH and RTH (session: ALL), no qualify. identity = (regime_start_ns, observation_ts)
+    -- CORRECTED 2026-09-15 at the re-collect recompile: the earlier declaration named
+    checkpoint_index, which is null on 100% of rows of frame 80e644d1; (regime_start_ns,
+    observation_ts) is unique (0 duplicates). The flip row is the regime's first checkpoint:
+    bars_1m == 0 with flipped_1m == true -- CORRECTED from "bars_1m == 1", which is the NEXT
+    checkpoint (a one-bar regime has none; frame 80e644d1: 28,029 flip rows vs 27,480 rows at
+    bars_1m == 1). This REPLACES the phase-A placeholder completed_1s and IS the declared
     science of OWNER AMENDMENT 01 A1: path offsets 1,2,3,5,10,20 are 1m bars of the flipping
     timeframe, read off the per-checkpoint metadata sequence mfe_atr_1m / mae_atr_1m /
     pnl_atr_1m / retained_1m.

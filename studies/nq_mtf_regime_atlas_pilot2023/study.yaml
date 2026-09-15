@@ -46,7 +46,8 @@ context:
 
 population:
   # OWNER AMENDMENT 01 A1: SINGLE ANCHOR, 1m regime flips only. One candidate per completed 1m bar
-  # of every 1m regime; identity is the regime start; the flip row is checkpoint 0 (bars_1m == 1).
+  # of every 1m regime; identity is the regime start; the flip row is checkpoint 0 (bars_1m == 0,
+  # flipped_1m == true -- corrected 2026-09-15; bars_1m == 1 is the next checkpoint).
   # contract section 0 / A2: ETH and RTH both, distinguished by feature.session_membership, never
   # merged and never filtered.
   session: ALL
