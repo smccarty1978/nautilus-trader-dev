@@ -9,22 +9,22 @@
     "replay_imports_within_collection_closure": true
   },
   "date": "2023-10-02",
-  "execution_manifest_composite_sha256": "041379f7e433a637beba1e687fd70124f7d0c79a34e010c6b6de5cc53d13da7c",
-  "generated_at_utc": "2026-09-14T13:33:29.206689+00:00",
+  "execution_manifest_composite_sha256": "4e28ee0a8adf712acc52373811af61c4fd6bc2806c97b2b4894c7e458f84ac03",
+  "generated_at_utc": "2026-09-15T14:39:57.536632+00:00",
   "manifest": {
-    "candidates_sha256": "b15a38b67bf8d2498a292b2e140f48aa0e1c244cc8c12905ea4a3f31ed1c4c3e",
-    "composite_seal_hash": "1d135a78c0c24a1555cde744c6abcfe5320307e1606f5924046ed0c3ed406620",
+    "candidates_sha256": "4fff67daafb17f8fcc7d2afd49c31a0f9f777c07c905857a277003e00ba14848",
+    "composite_seal_hash": "b1a9298b7a3c0fc9810ce04a2c857df7f37217d6adc12ec6be3b559e2aba8225",
     "dataset": {
       "bytes_verification": "VERIFIED",
       "dataset_id": "NQ_1S_V2_GLOBEX",
       "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
     },
     "date": "2023-10-02",
-    "elapsed_s": 45.23566220002249,
-    "execution_manifest_sha256": "041379f7e433a637beba1e687fd70124f7d0c79a34e010c6b6de5cc53d13da7c",
+    "elapsed_s": 38.88485089997994,
+    "execution_manifest_sha256": "4e28ee0a8adf712acc52373811af61c4fd6bc2806c97b2b4894c7e458f84ac03",
     "kind": "smoke",
-    "observations_sha256": "0c53961cd218fc03476098e98333ab989527ba685c26ea67f86a990cd24f29eb",
-    "plan_sha256": "ed2b9dfa279902944a1c02fc588bf68b45bd72cdd554bb37df792574f75c421c",
+    "observations_sha256": "02b7fa4156dd041cfaac011319caf2f274be96fced916635fa85f851bf5cdfe1",
+    "plan_sha256": "10209696eb4e898fe25d47eb1467bece1ddde7cae653edf466b70fab81a6f08a",
     "rows": {
       "candidates": 1380,
       "observations": 1380
@@ -32,32 +32,42 @@
     "stats": {
       "bars": 213431,
       "bars_by_stream": {
-        "nq_15m": 18,
-        "nq_1h": 0,
+        "nq_15m": 368,
+        "nq_1h": 92,
         "nq_1m": 5520,
         "nq_1s": 207911,
-        "nq_30m": 5,
-        "nq_30s": 2737,
-        "nq_3m": 262,
-        "nq_4h": 0,
-        "nq_5m": 122,
-        "nq_5s": 23522
+        "nq_30m": 184,
+        "nq_30s": 11040,
+        "nq_3m": 1840,
+        "nq_4h": 25,
+        "nq_5m": 1104,
+        "nq_5s": 66240
       },
       "candidates": 1380,
       "dropped_outside_primary": {
         "candidates": 4140,
         "observations": 4140
       },
+      "empty_windows_published": {
+        "nq_15m": 0,
+        "nq_1h": 0,
+        "nq_30m": 0,
+        "nq_30s": 10,
+        "nq_3m": 0,
+        "nq_4h": 0,
+        "nq_5m": 0,
+        "nq_5s": 5289
+      },
       "epochs": 5520,
       "observations": 1380,
       "pending_at_end": 0
     },
     "status": "PASS",
-    "written_at_utc": "2026-09-14T13:33:29.193981+00:00"
+    "written_at_utc": "2026-09-15T14:39:57.527916+00:00"
   },
   "observations_count_total": 1380,
-  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_atlas_pilot2023\\studies\\nq_mtf_regime_atlas_pilot2023\\runs\\20260914_133234_nq_mtf_regime_atlas_pilot2023_smoke",
-  "sealed_composite_sha256": "1d135a78c0c24a1555cde744c6abcfe5320307e1606f5924046ed0c3ed406620",
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_atlas_pilot2023\\studies\\nq_mtf_regime_atlas_pilot2023\\runs\\20260915_143911_nq_mtf_regime_atlas_pilot2023_smoke",
+  "sealed_composite_sha256": "b1a9298b7a3c0fc9810ce04a2c857df7f37217d6adc12ec6be3b559e2aba8225",
   "status": "ACCEPTED",
   "study_name": "nq_mtf_regime_atlas_pilot2023",
   "validator": "research_workflow.lifecycle_v2"
