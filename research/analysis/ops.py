@@ -34,6 +34,12 @@ class AnalysisOpError(RuntimeError):
     pass
 
 
+# The `[column, op, value]` condition vocabulary of the analysis runtime. Declared at the boundary so the
+# compiler can refuse an unknown comparison without importing an implementation; the implementation
+# (research.analysis.diagnostic_ops) refuses to import if its own table drifts from it.
+COMPARISON_OPS: Tuple[str, ...] = ("eq", "gt", "gte", "is_null", "lt", "lte", "ne")
+
+
 _SEED_CACHE: Dict[Any, Dict[str, Dict[str, Any]]] = {}
 
 
@@ -153,5 +159,5 @@ def run_op(op: str, rows: Any, *, inputs: Mapping[str, Any] | None = None,
     return op_implementation(op)(rows, **kwargs)
 
 
-__all__ = ["AnalysisOpError", "known_ops", "op_inputs", "context_ops", "op_implementation",
+__all__ = ["AnalysisOpError", "COMPARISON_OPS", "known_ops", "op_inputs", "context_ops", "op_implementation",
            "implementation_files", "run_op"]

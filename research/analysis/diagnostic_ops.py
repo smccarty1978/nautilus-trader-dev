@@ -62,6 +62,11 @@ _COMPARISONS = {
     "lte": lambda s, v: s.le(v), "gt": lambda s, v: s.gt(v), "gte": lambda s, v: s.ge(v),
     "is_null": lambda s, v: s.isna() if v else s.notna(),
 }
+# The boundary declares this vocabulary (research.analysis.ops.COMPARISON_OPS) and the compiler checks
+# conditions against it; this table must implement exactly that set.
+from research.analysis.ops import COMPARISON_OPS  # noqa: E402
+if tuple(sorted(_COMPARISONS)) != tuple(sorted(COMPARISON_OPS)):
+    raise AnalysisOpError(f"ANALYSIS_COMPARISON_VOCABULARY_DRIFT: implemented {sorted(_COMPARISONS)} != declared {sorted(COMPARISON_OPS)}")
 
 
 def _require(frame: pd.DataFrame, columns: Sequence[str], where: str) -> None:

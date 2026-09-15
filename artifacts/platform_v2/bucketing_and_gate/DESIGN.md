@@ -169,6 +169,33 @@ Ended past context budget, per the packet ("hand off with what is committed").
   `build_with_no_updates=True` would also emit bars through closures. A live deployment must suppress those (or
   use NT's `False` and synthesize in-session bars) to match offline. Not built; recorded.
 
+## A4 -- the pattern, named (implementation session 2; not built)
+
+**Compile accepts what runtime refuses** -- three instances, each fixed as a point fix:
+
+| # | compile accepted | runtime refused | fix |
+|---|---|---|---|
+| G7 | a cadence stream declared `strictly_before` | `CONTEXT_STREAM_VISIBLE_AT_EPOCH` on the first epoch | compiler dry-constructs the real `StreamMux` |
+| stream roles | `derived_from: <a key not in the plan>` | mux cannot build the aggregator | same dry construction |
+| A4 | `>` / `==` in `classify.precedence` conditions | `ANALYSIS_RULE_INVALID` at run | vocabulary declared at the boundary (`research.analysis.ops.COMPARISON_OPS`), compiler checks against it, implementation refuses to import on drift |
+
+The shared cause: the compiler carries its **own model** of what a runtime component accepts. Whenever the
+compiler validates by re-stating a rule rather than asking the component, the two drift.
+
+**Is a general check possible?** Partly, and the shape is known:
+- *Streams*: already general -- dry construction of the real host object is the component answering.
+- *Analysis pipelines*: a zero-row dry run of the compiled pipeline over the frame's column schema is NOT
+  sufficient. Ops legitimately refuse empty populations (`ANALYSIS_TAIL_LIFT_ROWS_EMPTY`, `..._REFERENCE_EMPTY`),
+  so a dry run would refuse valid specs, and ops that run no validation on empty input would pass invalid
+  ones. It needs a per-op side-effect-free `validate(params, schema)` contract that the op's own run path
+  also calls first -- one definition of "valid", used by both.
+- *Trackers / predicates / outcome kernels*: same contract shape (`validate(declaration)` on the binding or
+  kernel), called by the compiler instead of compiler-side re-statements.
+
+Recommendation: scope "runtime-authoritative compile" as one capability -- every runtime component exposes
+`validate`, the compiler's point checks are replaced by calls to it, and a registration-boundary test proves
+no compiler-side re-statement of a runtime rule remains. Not a fourth point fix.
+
 ## S2 carry-overs (study/nq_mtf_regime_atlas_pilot2023, report `reports/s2_resume_and_collect.md`)
 
 **Added by implementation session 1:** the pilot's committed plan names `complete_bucket`; recompile it (compile

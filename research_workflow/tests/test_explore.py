@@ -40,6 +40,19 @@ def _explore_yaml(path: Path, *, frame_id: str | None = None, steps=None, artifa
     return path
 
 
+@pytest.mark.parametrize("op", [">", "=="])
+def test_a4_compile_refuses_a_comparison_the_analysis_runtime_refuses(tmp_path, op):
+    """`explore compile` accepted `>` and `==`; classify.precedence refuses them at run. Compile refuses them now."""
+    from research_workflow.explore import compile_explore
+    steps = [{"id": "wins", "op": "analysis.classify.precedence", "rows": "frame",
+              "params": {"output_column": "kind", "rules": [{"label": "win", "when": [["arm_a_label", op, 1]]}, {"label": "other", "when": []}]}}]
+    compiled, gaps = compile_explore(yaml.safe_load(_explore_yaml(tmp_path / "bad.yaml", steps=steps).read_text()))
+    assert compiled is None
+    assert "analysis.steps[0].params.rules[0].when[0]" in {g.where for g in gaps.gaps}
+    compiled, gaps = compile_explore(yaml.safe_load(_explore_yaml(tmp_path / "ok.yaml").read_text()))
+    assert compiled is not None, gaps.gaps
+
+
 @pytest.fixture(scope="module")
 def registered(tmp_path_factory, synthetic_bars):
     """One collect study run through merge and registered; its merged bytes captured; the study then DELETED."""

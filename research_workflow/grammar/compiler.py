@@ -1363,6 +1363,33 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
 _SAFE_ARTIFACT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.(json|parquet|md)$")
 
 
+def _check_condition_ops(gap: Any, where: str, params: Any) -> None:
+    """Every ``[column, op, value]`` condition in an analysis step's params (``rules[].when``, ``*_when``,
+    ``conditions``) uses the comparison vocabulary the analysis runtime accepts. A comparison the runtime
+    refuses (``>``, ``==``) is refused here, at compile, not after a frame has been read."""
+    from research.analysis.ops import COMPARISON_OPS
+
+    def walk(node: Any, path: str) -> None:
+        if isinstance(node, Mapping):
+            for key, value in node.items():
+                sub = f"{path}.{key}"
+                if (key in ("when", "conditions") or str(key).endswith("_when")) and isinstance(value, (list, tuple)):
+                    for j, cond in enumerate(value):
+                        if not isinstance(cond, (list, tuple)) or len(cond) != 3:
+                            gap(GapKind.INVALID_PARAMETERIZATION, f"{sub}[{j}]", f"a condition is [column, op, value], got {cond!r}")
+                        elif cond[1] not in COMPARISON_OPS:
+                            gap(GapKind.INVALID_PARAMETERIZATION, f"{sub}[{j}]",
+                                f"comparison {cond[1]!r} is refused by the analysis runtime; it accepts {list(COMPARISON_OPS)}",
+                                closest=_closest(str(cond[1]), list(COMPARISON_OPS)))
+                else:
+                    walk(value, sub)
+        elif isinstance(node, (list, tuple)):
+            for j, item in enumerate(node):
+                walk(item, f"{path}[{j}]")
+
+    walk(params, where)
+
+
 def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec: Sequence[Any], *, registered: Set[str],
                              builtin: Set[str], unbound: Any) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Prove a declared analysis pipeline at COMPILE time and return its compiled steps and artifacts.
@@ -1397,6 +1424,7 @@ def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec
                 gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.inputs.{name}", unbound(ref))
         for name in sorted(required - set((step.inputs or {}))):
             gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs", f"{step.op} needs input {name!r}")
+        _check_condition_ops(gap, f"{where}.params", step.params or {})
         seen.append(step.id)
         steps.append({"id": step.id, "op": step.op, "rows": step.rows, "inputs": dict(step.inputs or {}),
                       "params": dict(step.params or {})})
