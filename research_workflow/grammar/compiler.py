@@ -1389,12 +1389,15 @@ def _check_condition_ops(gap: Any, where: str, params: Any) -> None:
                 sub = f"{path}.{key}"
                 if (key in ("when", "conditions") or str(key).endswith("_when")) and isinstance(value, (list, tuple)):
                     for j, cond in enumerate(value):
-                        if not isinstance(cond, (list, tuple)) or len(cond) != 3:
+                        try:
+                            _column, op, _value = cond if isinstance(cond, (list, tuple)) else ()
+                        except ValueError:
                             gap(GapKind.INVALID_PARAMETERIZATION, f"{sub}[{j}]", f"a condition is [column, op, value], got {cond!r}")
-                        elif cond[1] not in COMPARISON_OPS:
+                            continue
+                        if op not in COMPARISON_OPS:
                             gap(GapKind.INVALID_PARAMETERIZATION, f"{sub}[{j}]",
-                                f"comparison {cond[1]!r} is refused by the analysis runtime; it accepts {list(COMPARISON_OPS)}",
-                                closest=_closest(str(cond[1]), list(COMPARISON_OPS)))
+                                f"comparison {op!r} is refused by the analysis runtime; it accepts {list(COMPARISON_OPS)}",
+                                closest=_closest(str(op), list(COMPARISON_OPS)))
                 else:
                     walk(value, sub)
         elif isinstance(node, (list, tuple)):
