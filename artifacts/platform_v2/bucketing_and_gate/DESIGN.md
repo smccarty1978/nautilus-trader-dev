@@ -169,6 +169,38 @@ Ended past context budget, per the packet ("hand off with what is committed").
   `build_with_no_updates=True` would also emit bars through closures. A live deployment must suppress those (or
   use NT's `False` and synthesize in-session bars) to match offline. Not built; recorded.
 
+## Implementation session 2 (2026-09-15) -- COMPLETE: A2-A6 + empty_windows_published, gated
+
+Commits: `09ed261a` A3 · `2e80ed1d` A4 · `743f92fa` A6 · `5e50caf9` A5 · `b2abd8bf` A1 run stat · `15511dc6` A2 ·
+plus the A4 audit-offender fix below. Part B not started (dropped per packet). shape_b sealed replay on
+2021-01-05 checked after EVERY item (a3, a4, a5, a2, final): candidates `6d49d2a8`, observations `b5c075da`,
+103305 bars, identical each time.
+
+**Broad gate** (`test_delta` five scopes, run alone, head `15511dc6`): 2538 ran, 2442 passed, 69 failed;
+KNOWN_BASELINE_FAILURE 60, BASELINE_FAILURE_NOW_FIXED 1 (`test_multi_agent_ownership::test_10_...`),
+NEW_FAILURE 9. Wall **271m06s** -- slower than every prior run (74m41s, 81m59s, 83m14s, 88m02s, 97m53s,
+99m02s, 211m29s; the 211m29s run was two scopes / 2258 tests). Not like-for-like with the one-/two-scope
+runs; no B2 in either.
+
+Baseline: `--check-baseline` returned `BASELINE_COMMIT_MISMATCH` (recorded on `c480d8af`, merge-base
+`78dc5879` -- stale on arrival, as recorded). The run used `--baseline-reference c480d8af` (an ancestor;
+`--check-baseline` then `OK`). Conservative: anything the five later commits broke is still NEW.
+
+The 9 NEW, each resolved:
+
+| node | verdict | evidence |
+|---|---|---|
+| `test_generic_contract_audit::test_no_hardcoded_feature_count_in_generic_workflow` | **one offender was mine** (`compiler.py` A4 `len(cond) != 3`) -- fixed by unpacking; the test also fails on main | worktree offenders after fix == main's five (`compiler.py:1020` here is main's `:997`, same statement, shifted) |
+| `test_redteam_pass1_acceptance::test_acc12_canaries_green` | pre-existing | fails identically on main `78dc5879` (same 5 ordered-barrier subtests, CENSORED vs LABELED_NEGATIVE) |
+| `test_direction_qualified_freeze_binding::test_aggregate_freeze_opens_the_real_oos_gate` | pre-existing / artifact | fails on main: closure evidence `bound model artifact corrupt/missing` |
+| `test_external_model_scoring::..._repaired_model_c_...` | joblib (by design) | `train_fitted_models.joblib` absent in a fresh worktree; passes on main |
+| `test_stage3_integration::test_stage3_model_c_long_short_routing` | joblib (by design) | same missing joblib; passes on main |
+| `test_runtime_bindings::test_episode_study_...` | joblib (by design) | worktree `missing` = the unbound scorer for that joblib; main `missing` = [] |
+| `test_catalog_materializer::test_materialization_required_when_catalog_absent` | environment | `RAW_DATA_MISSING` for YM raw parquet in the worktree; passes on main |
+| `test_pre_flip_reliability_contracts::test_long_/short_candidates_...` (2) | environment | untracked `studies/*/_work/prepared_*.parquet`; pass on main |
+
+Not verified on real data: the zero-volume fill on a GLOBEX run and the 8-day bound on a six-year run (S2).
+
 ## A4 -- the pattern, named (implementation session 2; not built)
 
 **Compile accepts what runtime refuses** -- three instances, each fixed as a point fix:
