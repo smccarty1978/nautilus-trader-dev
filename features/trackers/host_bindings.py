@@ -23,6 +23,7 @@ from typing import Any, Dict, List, Mapping, Optional
 from research_workflow.host.interfaces import REQUIRED, BarView, EmittedEvent, EpochView
 
 NS = 1_000_000_000
+TRACKER_STALENESS_BOUND_S = 8 * 86400     # A2/D2: the one hard staleness bound, identical for every timeframe
 _INDEX_PATH = Path(__file__).resolve().parents[2] / "research_workflow" / "capabilities_index.yaml"
 
 
@@ -57,7 +58,7 @@ class DualEmaRegimeBinding(BaseBinding):
     FIELDS = ("dir", "prev_dir", "dir_pre_bar_or_current", "atr", "start_ns", "start_price", "frozen_atr",
               "changed", "flipped", "changed_seq", "flipped_seq", "bars_in_regime", "last_bar_close_ts",
               "last_bar_close", "last_reference_close", "prev_bar_close_ts")
-    EPOCH_FIELDS = ("age_s",)
+    EPOCH_FIELDS = ("age_s", "seconds_since_update")
     EVENTS = ("regime_bar", "changed", "flipped")
     SUBSCRIBES = ()
     WARMUP_BARS = 14
@@ -131,6 +132,19 @@ class DualEmaRegimeBinding(BaseBinding):
     def epoch_value(self, name: str, epoch: EpochView) -> Any:
         if name == "age_s":
             return None if self.start_ns is None else (epoch.T - self.start_ns) / NS
+        if name == "seconds_since_update":
+            # Staleness is data, never a null: a quiet sub-minute window in ETH leaves the last state genuinely
+            # current. One hard bound only -- no completed bar for 8 calendar days cannot happen on a live
+            # market and means the stream feeding this tracker is broken.
+            if self.last_bar_close_ts is None:
+                return None
+            age = (epoch.T - self.last_bar_close_ts) / NS
+            if age > TRACKER_STALENESS_BOUND_S:
+                raise RuntimeError(
+                    f"TRACKER_STALENESS_IMPOSSIBLE: tracker {getattr(self, 'tracker_id', None) or self.CAPABILITY} "
+                    f"(timeframe {self.params['timeframe']}) last completed a bar {age:.0f}s before the epoch at {epoch.T}; "
+                    f"the bound is {TRACKER_STALENESS_BOUND_S}s (8 calendar days) for every timeframe")
+            return age
         raise KeyError(name)
 
 

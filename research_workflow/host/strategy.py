@@ -71,6 +71,7 @@ class HostCore:
             if getattr(cls, "NEEDS_STUDIES_ROOT", False):
                 params.setdefault("studies_root", self.studies_root)
             obj = cls(params, inputs_resolved)
+            obj.tracker_id = t["id"]                 # a binding's runtime errors name the plan's tracker
             self.trackers[t["id"]] = obj
             self._tracker_ids.append(t["id"])
             self.epoch_fields[t["id"]] = set(getattr(cls, "EPOCH_FIELDS", ()) or ())

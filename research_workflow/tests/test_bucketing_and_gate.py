@@ -87,6 +87,36 @@ def test_a5_a_sealed_plan_contract_emits_no_new_column():
     assert kernel.observation_columns == list(sealed["outcome"]["observation_columns"])
 
 
+def test_a2_seconds_since_update_is_data_below_eight_days_and_a_hard_failure_past_it():
+    import pytest
+    from features.trackers.host_bindings import TRACKER_STALENESS_BOUND_S, DualEmaRegimeBinding
+    from research_workflow.host.interfaces import BarView, EpochView
+    ns = 10**9
+    b = DualEmaRegimeBinding({"timeframe": "1h"}, {})
+    b.tracker_id = "regime_1h"
+    epoch = lambda T: EpochView(T=T, price=1.0, bar=None, trackers={})  # noqa: E731
+    assert b.epoch_value("seconds_since_update", epoch(10 * ns)) is None          # before the first bar: no state, no age
+    b.on_bar("bars", BarView("nq_1h", 0, 3600 * ns, 1.0, 2.0, 0.5, 1.5, 10.0))
+    assert b.epoch_value("seconds_since_update", epoch(3600 * ns)) == 0.0
+    quiet = 3600 * ns + 3 * 86400 * ns                                              # a long holiday weekend: data, not null
+    assert b.epoch_value("seconds_since_update", epoch(quiet)) == 3 * 86400.0
+    assert b.epoch_value("seconds_since_update", epoch(3600 * ns + TRACKER_STALENESS_BOUND_S * ns)) == float(TRACKER_STALENESS_BOUND_S)
+    with pytest.raises(RuntimeError, match="TRACKER_STALENESS_IMPOSSIBLE: tracker regime_1h"):
+        b.epoch_value("seconds_since_update", epoch(3600 * ns + (TRACKER_STALENESS_BOUND_S + 1) * ns))
+
+
+def test_a2_compile_adds_staleness_beside_every_tracker_a_metadata_column_reads():
+    spec = load_spec(ROOT / "fixtures" / "parity" / "shape_b" / "study.yaml")
+    out = compile_study(spec, repo_root=ROOT)
+    assert out.ok, out.card()
+    meta = {m["column"]: m["ref"] for m in out.plan.columns["metadata"]}
+    readers = {ref.partition(".")[0] for col, ref in meta.items() if not col.endswith("_seconds_since_update")}
+    stale = {t["id"] for t in out.plan.trackers if "seconds_since_update" in (t.get("epoch_fields") or [])}
+    assert readers & stale, "fixture reads no staleness-bearing tracker; the test would be vacuous"
+    for root in readers & stale:
+        assert meta[f"{root}_seconds_since_update"] == f"{root}.seconds_since_update"
+
+
 def test_a3_receipt_without_a_plan_hash_is_not_current(tmp_path):
     c = _controller(tmp_path)
     out = _write(c.study / "artifacts/x.json", {})

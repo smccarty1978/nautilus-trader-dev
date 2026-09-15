@@ -1119,6 +1119,16 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
     for col, ref in (ctx.spec.features.metadata or {}).items():
         if _validate_ref(ctx, ref, f"features.metadata.{col}"):
             metadata.append({"column": col, "ref": ref})
+    # A2: beside every tracker whose state a metadata column reads, that tracker's staleness -- seconds since its
+    # last completed bar. A value served from a stale tracker must be visible in the census, not inferred later.
+    declared = {m["column"] for m in metadata}
+    for m in list(metadata):
+        root = str(m["ref"]).partition(".")[0]
+        cls = ctx.tracker_meta.get(root)
+        column = f"{root}_seconds_since_update"
+        if cls is not None and "seconds_since_update" in (getattr(cls, "EPOCH_FIELDS", ()) or ()) and column not in declared:
+            metadata.append({"column": column, "ref": f"{root}.seconds_since_update"})
+            declared.add(column)
     derived = []
     for d in ctx.spec.features.derived_inputs:
         body = d.model_dump() | dict(d.model_extra or {})
