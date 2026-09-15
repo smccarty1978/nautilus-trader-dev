@@ -102,6 +102,9 @@ class LabelOutcomeContract:
     direction_sign: int = 1
     contract: str = "label"
     resolution: str = "mark_touch"
+    # `observed_seconds = (resolved_at_ts - T) / 1e9` on every row, whatever the disposition. Emitted only when the
+    # compiled contract asks for it (every new compile does); a sealed plan compiled before it replays unchanged.
+    observed_seconds: bool = False
 
     @classmethod
     def from_plan(cls, spec: Mapping[str, Any]) -> "LabelOutcomeContract":
@@ -121,6 +124,7 @@ class LabelOutcomeContract:
                                   bool(flip.get("inclusive_start", True)), int(flip.get("target_direction", 0) or 0)) if flip else None),
                    primary_arm=spec.get("primary_arm"), composition=spec.get("composition"),
                    direction_sign=int(spec.get("direction_sign", 1)),
+                   observed_seconds=bool(spec.get("observed_seconds", False)),
                    data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None))
 
 
@@ -227,10 +231,13 @@ class LabelOutcomeKernel:
         if contract.entry_reference != "next_bar_open" and self.arms:
             raise OutcomeContractError(f"ENTRY_REFERENCE_UNSUPPORTED: {contract.entry_reference!r}")
         self.observation_columns: List[str] = list(LEGACY_OBSERVATION_COLUMNS)
-        if self.n_arms > 1 or (self.n_arms == 1 and contract.primary_arm is None and self.arms[0].prefix != self.arms[0].id):
+        self._arm_columns = self.n_arms > 1 or (self.n_arms == 1 and contract.primary_arm is None and self.arms[0].prefix != self.arms[0].id)
+        if self._arm_columns:
             for arm in self.arms:
                 self.observation_columns += [f"{arm.prefix}_label", f"{arm.prefix}_disposition",
                                              f"{arm.prefix}_censor_reason", f"{arm.prefix}_resolution_seconds"]
+        if contract.observed_seconds:
+            self.observation_columns.append("observed_seconds")
         self._primary_index = 0
         if contract.primary_arm is not None:
             ids = [a.id for a in self.arms]
@@ -533,7 +540,9 @@ class LabelOutcomeKernel:
             "session_close_ts": p.session_close,
             "resolved_at_ts": at,
         })
-        if len(self.observation_columns) > len(LEGACY_OBSERVATION_COLUMNS):
+        if c.observed_seconds:
+            row["observed_seconds"] = ((at - p.T) / NS) if at is not None else None
+        if self._arm_columns:
             for i, arm in enumerate(self.arms):
                 st, rat, rr = p.arm_state[i], p.arm_at[i], p.arm_reason[i]
                 if p.entry_resolved:

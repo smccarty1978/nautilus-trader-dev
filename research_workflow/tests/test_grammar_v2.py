@@ -179,6 +179,26 @@ def test_completed_bar_cadence_stream_is_visible_at_its_own_epoch():
     assert rows and all(r["visibility"] == "at_epoch" for r in rows.values())
 
 
+@pytest.mark.parametrize("dataset,empty", [(None, "none"), ("NQ_1S_V2_GLOBEX", "zero_volume_in_trading_day")])
+def test_derived_streams_are_closed_window_from_the_coarsest_epoch_visible_source(dataset, empty):
+    """A1/D1: under a 1m cadence, 3m/5m/1h derive from nq_1m (visible at the epoch) and 5s from nq_1s;
+    every derived stream is closed_window; empty windows are zero-volume bars only on a dataset whose
+    `sessions` calendar can say what a trading day is."""
+    spec = load_spec(ROOT / "fixtures" / "parity" / "shape_b" / "study.yaml")
+    spec["streams"][0]["timeframes"] = list(spec["streams"][0]["timeframes"]) + ["3m", "1h"]
+    if dataset:
+        spec["streams"][0]["dataset"] = dataset
+    spec["population"]["cadence"] = "completed_1m"
+    out = compile_study(spec, repo_root=ROOT)
+    assert out.ok, out.card()
+    by = {s["key"]: s for s in out.plan.streams}
+    assert {k: by[k]["derived_from"] for k in ("nq_5s", "nq_3m", "nq_5m", "nq_1h")} == {
+        "nq_5s": "nq_1s", "nq_3m": "nq_1m", "nq_5m": "nq_1m", "nq_1h": "nq_1m"}
+    derived = [s for s in out.plan.streams if s["source"] == "derived"]
+    assert {(s["aggregation"], s["empty_window"]) for s in derived} == {("closed_window", empty)}
+    assert by["nq_1m"]["ts_init_delta_ns"] == 60 * 1_000_000_000
+
+
 def test_stream_roles_are_resolved_over_the_timeframes_the_study_requests():
     """The dataset declares external 1s AND 1m; a study that requests neither of them cannot derive
     anything.  Resolving ``finest`` over the DATASET's externals wrote ``derived_from: nq_1s`` into a

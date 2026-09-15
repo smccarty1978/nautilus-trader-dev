@@ -4,11 +4,13 @@
   "analysis.classify.precedence",
   "analysis.control.cell_matched",
   "analysis.decomposition.buckets",
+  "analysis.describe.grouped",
   "analysis.gate.arm_delta_integrity",
   "analysis.gate.population_parity",
   "analysis.incidence.cumulative",
   "analysis.metric.tail_lift",
-  "analysis.path.anchored_offsets"
+  "analysis.path.anchored_offsets",
+  "analysis.uncertainty.clustered_mean"
  ],
  "ops": {
   "analysis.anchor.first_threshold_crossing": {
@@ -30,6 +32,11 @@
   },
   "analysis.decomposition.buckets": {
    "implementation": "research.analysis.diagnostic_ops.bucket_decomposition",
+   "inputs": [],
+   "needs_context": false
+  },
+  "analysis.describe.grouped": {
+   "implementation": "research.analysis.diagnostic_ops.grouped_summary",
    "inputs": [],
    "needs_context": false
   },
@@ -61,8 +68,13 @@
     "anchors"
    ],
    "needs_context": false
+  },
+  "analysis.uncertainty.clustered_mean": {
+   "implementation": "research.analysis.diagnostic_ops.clustered_uncertainty",
+   "inputs": [],
+   "needs_context": false
   }
  },
  "schema_version": 1,
- "unknown_op_error": "AnalysisOpError: ANALYSIS_OP_UNKNOWN: 'analysis.not.an.op'; known=['analysis.anchor.first_threshold_crossing', 'analysis.classify.precedence', 'analysis.control.cell_matched', 'analysis.decomposition.buckets', 'analysis.gate.arm_delta_integrity', 'analysis.gate.population_parity', 'analysis.incidence.cumulative', 'analysis.metric.tail_lift', 'analysis.path.anchored_offsets']"
+ "unknown_op_error": "AnalysisOpError: ANALYSIS_OP_UNKNOWN: 'analysis.not.an.op'; known=['analysis.anchor.first_threshold_crossing', 'analysis.classify.precedence', 'analysis.control.cell_matched', 'analysis.decomposition.buckets', 'analysis.describe.grouped', 'analysis.gate.arm_delta_integrity', 'analysis.gate.population_parity', 'analysis.incidence.cumulative', 'analysis.metric.tail_lift', 'analysis.path.anchored_offsets', 'analysis.uncertainty.clustered_mean']"
 }

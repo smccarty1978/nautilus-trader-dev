@@ -267,13 +267,23 @@ def _resolve_streams(ctx: _Ctx) -> None:
                     if _tf_ns(tf) % _tf_ns(cand) == 0 and _tf_ns(cand) < _tf_ns(tf):
                         src = cand
                         break
-                # accepted derived semantics: complete buckets from the finest external stream
+                # D1: derive from the coarsest external stream that divides the timeframe AND is visible at the
+                # epoch. Here only the finest (execution) stream is known to be at_epoch; a completed-bar cadence
+                # stream that becomes at_epoch later re-points its multiples (_mark_epoch_bearing_stream).
                 src = finest if (finest in externals and _tf_ns(tf) % _tf_ns(finest) == 0) else src
                 if src is None:
                     ctx.gap(GapKind.UNAVAILABLE_STREAM, f"{where}.timeframes", f"{tf} cannot be derived from {sorted(externals)}",
                             timeframe=tf, dataset=s.dataset)
                     continue
-                entry.update({"source": "derived", "derived_from": f"{symbol.lower()}_{src}", "aggregation": "complete_bucket"})
+                # closed_window: any member publishes. complete_bucket stays dispatchable for sealed plans only.
+                # Empty windows: a zero-volume bar inside a trading day of the dataset calendar (owner D3a/D3b);
+                # a dataset with no `sessions` table has no trading-day authority, so it emits nothing and says so.
+                has_trading_days = "sessions" in (ds.get("reference_tables") or [])
+                entry.update({"source": "derived", "derived_from": f"{symbol.lower()}_{src}", "aggregation": "closed_window",
+                              "empty_window": "zero_volume_in_trading_day" if has_trading_days else "none"})
+                if not has_trading_days:
+                    ctx.notes.append(f"{key}: dataset {s.dataset!r} declares no 'sessions' reference table, so empty "
+                                     f"{tf} windows emit no bar (empty_window: none) instead of a zero-volume bar")
             ctx.streams.append(entry)
             ctx.stream_by[(symbol, tf)] = key
     if ctx.execution_symbol:
@@ -783,6 +793,19 @@ def _mark_epoch_bearing_stream(ctx: _Ctx, key: Optional[str], sym: str) -> None:
     entry["epoch_bearing"] = True
     ctx.notes.append(f"{key} is the completed-bar cadence stream: role context (queued, released strictly "
                      f"before the next execution bar) with visibility at_epoch, because the epoch is that bar's close")
+    # D1: an external stream now visible at the epoch is the coarsest source for the derived timeframes it divides.
+    if entry.get("source") != "external":
+        return
+    by_key = {st["key"]: st for st in ctx.streams}
+    dur = int(entry["duration_ns"])
+    for st in ctx.streams:
+        if st.get("source") != "derived" or st["instrument"] != sym or int(st["duration_ns"]) <= dur or int(st["duration_ns"]) % dur:
+            continue
+        current = by_key.get(st.get("derived_from"))
+        if current is not None and int(current["duration_ns"]) < dur:
+            st["derived_from"] = key
+            ctx.notes.append(f"{st['key']} is derived from {key} (the coarsest external stream visible at the epoch "
+                             f"that divides {st['timeframe']}), not from {current['key']}")
 
 
 def _validate_runtime_composition(ctx: _Ctx, population: Mapping[str, Any]) -> None:
@@ -820,7 +843,7 @@ def _validate_runtime_composition(ctx: _Ctx, population: Mapping[str, Any]) -> N
         return
     from research_workflow.host.mux import StreamMux
     try:
-        mux = StreamMux(ctx.streams, lambda bar: None)
+        mux = StreamMux(ctx.streams, lambda bar: None, require_calendar=False)
     except Exception as exc:                                    # the host is the authority on what it can build
         ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "streams",
                 f"the compiled stream graph cannot be constructed by the host multiplexer: {exc}")
@@ -1070,6 +1093,10 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
     if len(arms) > 1 or (len(arms) == 1 and primary is None and arms[0]["prefix"] != arms[0]["id"]):
         for a in arms:
             obs += [f"{a['prefix']}_label", f"{a['prefix']}_disposition", f"{a['prefix']}_censor_reason", f"{a['prefix']}_resolution_seconds"]
+    # A5: every new compile carries observed_seconds = (resolved_at_ts - T)/1e9 (the analysis harness's own
+    # terminal-minus-anchor definition). A contract field, not a legacy column: sealed plans replay unchanged.
+    contract["observed_seconds"] = True
+    obs.append("observed_seconds")
     contract["observation_columns"] = obs
     return contract
 
@@ -1092,6 +1119,16 @@ def _resolve_columns(ctx: _Ctx, population: Mapping[str, Any], outcome: Mapping[
     for col, ref in (ctx.spec.features.metadata or {}).items():
         if _validate_ref(ctx, ref, f"features.metadata.{col}"):
             metadata.append({"column": col, "ref": ref})
+    # A2: beside every tracker whose state a metadata column reads, that tracker's staleness -- seconds since its
+    # last completed bar. A value served from a stale tracker must be visible in the census, not inferred later.
+    declared = {m["column"] for m in metadata}
+    for m in list(metadata):
+        root = str(m["ref"]).partition(".")[0]
+        cls = ctx.tracker_meta.get(root)
+        column = f"{root}_seconds_since_update"
+        if cls is not None and "seconds_since_update" in (getattr(cls, "EPOCH_FIELDS", ()) or ()) and column not in declared:
+            metadata.append({"column": column, "ref": f"{root}.seconds_since_update"})
+            declared.add(column)
     derived = []
     for d in ctx.spec.features.derived_inputs:
         body = d.model_dump() | dict(d.model_extra or {})
@@ -1340,6 +1377,36 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
 _SAFE_ARTIFACT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.(json|parquet|md)$")
 
 
+def _check_condition_ops(gap: Any, where: str, params: Any) -> None:
+    """Every ``[column, op, value]`` condition in an analysis step's params (``rules[].when``, ``*_when``,
+    ``conditions``) uses the comparison vocabulary the analysis runtime accepts. A comparison the runtime
+    refuses (``>``, ``==``) is refused here, at compile, not after a frame has been read."""
+    from research.analysis.ops import COMPARISON_OPS
+
+    def walk(node: Any, path: str) -> None:
+        if isinstance(node, Mapping):
+            for key, value in node.items():
+                sub = f"{path}.{key}"
+                if (key in ("when", "conditions") or str(key).endswith("_when")) and isinstance(value, (list, tuple)):
+                    for j, cond in enumerate(value):
+                        try:
+                            _column, op, _value = cond if isinstance(cond, (list, tuple)) else ()
+                        except ValueError:
+                            gap(GapKind.INVALID_PARAMETERIZATION, f"{sub}[{j}]", f"a condition is [column, op, value], got {cond!r}")
+                            continue
+                        if op not in COMPARISON_OPS:
+                            gap(GapKind.INVALID_PARAMETERIZATION, f"{sub}[{j}]",
+                                f"comparison {op!r} is refused by the analysis runtime; it accepts {list(COMPARISON_OPS)}",
+                                closest=_closest(str(op), list(COMPARISON_OPS)))
+                else:
+                    walk(value, sub)
+        elif isinstance(node, (list, tuple)):
+            for j, item in enumerate(node):
+                walk(item, f"{path}[{j}]")
+
+    walk(params, where)
+
+
 def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec: Sequence[Any], *, registered: Set[str],
                              builtin: Set[str], unbound: Any) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Prove a declared analysis pipeline at COMPILE time and return its compiled steps and artifacts.
@@ -1374,6 +1441,7 @@ def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec
                 gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.inputs.{name}", unbound(ref))
         for name in sorted(required - set((step.inputs or {}))):
             gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs", f"{step.op} needs input {name!r}")
+        _check_condition_ops(gap, f"{where}.params", step.params or {})
         seen.append(step.id)
         steps.append({"id": step.id, "op": step.op, "rows": step.rows, "inputs": dict(step.inputs or {}),
                       "params": dict(step.params or {})})

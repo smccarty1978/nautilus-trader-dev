@@ -47,7 +47,7 @@ class HostCore:
         # streams / mux
         self.streams = list(self.plan["streams"])
         self.execution_streams = [s["key"] for s in self.streams if s["role"] == "execution"]
-        self.mux = StreamMux(self.streams, self._deliver)
+        self.mux = StreamMux(self.streams, self._deliver, trading_days=getattr(session_table, "trading_day", None))
         self.stream_duration = {s["key"]: int(s["duration_ns"]) for s in self.streams}
 
         # trackers (in plan order)
@@ -71,6 +71,7 @@ class HostCore:
             if getattr(cls, "NEEDS_STUDIES_ROOT", False):
                 params.setdefault("studies_root", self.studies_root)
             obj = cls(params, inputs_resolved)
+            obj.tracker_id = t["id"]                 # a binding's runtime errors name the plan's tracker
             self.trackers[t["id"]] = obj
             self._tracker_ids.append(t["id"])
             self.epoch_fields[t["id"]] = set(getattr(cls, "EPOCH_FIELDS", ()) or ())
@@ -368,6 +369,9 @@ class HostCore:
         out = {"bars": self._bars_processed, "bars_by_stream": dict(self.mux.bars_seen), "candidates": self.candidates_emitted,
                "observations": len(self.sink.observations), "epochs": self.epochs_evaluated, "pending_at_end": len(self.kernel.pending),
                "dropped_outside_primary": {"candidates": self.sink.dropped_candidates, "observations": self.sink.dropped_observations}}
+        empty = self.mux.empty_windows_published()
+        if empty:                                    # closed-window plans only: a sealed complete_bucket plan's stats are unchanged
+            out["empty_windows_published"] = empty
         if self._profile_enabled:
             total = sum(self._profile.values()) or 1.0
             digits = 4  # host-constant: profile rounding
