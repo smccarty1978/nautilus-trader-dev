@@ -1,0 +1,50 @@
+{
+  "gate_0_verdict": "PASS_ZERO_DIVERGENCE",
+  "total_census_regimes": 5610,
+  "authoritative_regime_source": "studies/nq_persistent_q4_to_q4_regime_capture/results/c0_control_ledger.parquet",
+  "market_data_source": "data/catalog/NQ_v0_2020_2026/.../NQ.XCME-1-SECOND-LAST-EXTERNAL",
+  "dataset_hashes": {
+    "c0_control_ledger_sha256": "a42deb5076f04baf1580be1ba437ea28fdfac776d3ec7ee05f6af9234ea05ebf",
+    "catalog_1s_file": "c:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026\\data\\bar\\NQ.XCME-1-SECOND-LAST-EXTERNAL\\2020-01-01T23-00-01-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+    "catalog_1s_sha256": "55c36ad6bc5c6045d71405aa919769f6b503f501ea0375827cb947469ce16057"
+  },
+  "reconciled_definitions": {
+    "va_regime": "Volume Absorption confirmed regime census (N=5,610)",
+    "va_flip": "Confirmed bar close event ending previous regime and starting new regime",
+    "direction": "+1 for Long (Bear->Bull), -1 for Short (Bull->Bear)",
+    "running_max_mfe": "Causal running extreme from regime start T0 up to observation bar",
+    "frozen_atr": "start_atr frozen at regime start T0 (14-period daily/1m equivalent)",
+    "canonical_pullback_model": "nq_p90_pullback_survival_atlas causal state machine: counter-direction retrace from running peak extreme",
+    "eligibility_boundary_contract": "t_checkpoint < t_va_flip (strictly less than, positive forward horizon)"
+  },
+  "authoritative_historical_giveback_distribution": {
+    "giveback_atr": {
+      "n": 5610,
+      "mean": 2.1484986411068454,
+      "median": 1.971584165873763,
+      "p10": 1.2579478021891568,
+      "p25": 1.5718306258299986,
+      "p50": 1.971584165873763,
+      "p75": 2.498332278466339,
+      "p90": 3.1556471848290895,
+      "p95": 3.652691370445831,
+      "p99": 5.704830272909541,
+      "max": 14.487193747639614
+    },
+    "giveback_points": {
+      "n": 5610,
+      "mean": 22.72687165775401,
+      "median": 19.25,
+      "p10": 10.25,
+      "p25": 13.75,
+      "p50": 19.25,
+      "p75": 27.5,
+      "p90": 39.27500000000009,
+      "p95": 49.0,
+      "p99": 74.0,
+      "max": 253.75
+    },
+    "dollar_giveback_median": 385.0,
+    "dollar_giveback_mean": 454.5374331550802
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "head_1_structural_failure": {
+    "M0_depth": {
+      "overall_oof": {
+        "roc_auc": 0.6873,
+        "pr_auc": 0.381,
+        "brier_score": 0.1556,
+        "log_loss": 0.4832,
+        "base_rate": 0.2161,
+        "sample_size": 128572
+      },
+      "folds": [
+        {
+          "roc_auc": 0.681,
+          "pr_auc": 0.3665,
+          "brier_score": 0.1525,
+          "log_loss": 0.4765,
+          "base_rate": 0.2082,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.6916,
+          "pr_auc": 0.3987,
+          "brier_score": 0.1561,
+          "log_loss": 0.4846,
+          "base_rate": 0.2194,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.6921,
+          "pr_auc": 0.39,
+          "brier_score": 0.1577,
+          "log_loss": 0.4877,
+          "base_rate": 0.2213,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7023,
+          "pr_auc": 0.4058,
+          "brier_score": 0.1546,
+          "log_loss": 0.48,
+          "base_rate": 0.2189,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.6718,
+          "pr_auc": 0.349,
+          "brier_score": 0.1571,
+          "log_loss": 0.4872,
+          "base_rate": 0.2126,
+          "sample_size": 25714
+        }
+      ]
+    },
+    "M1_path_state": {
+      "overall_oof": {
+        "roc_auc": 0.7592,
+        "pr_auc": 0.5261,
+        "brier_score": 0.1385,
+        "log_loss": 0.4379,
+        "base_rate": 0.2161,
+        "sample_size": 128572
+      },
+      "folds": [
+        {
+          "roc_auc": 0.7607,
+          "pr_auc": 0.5279,
+          "brier_score": 0.1339,
+          "log_loss": 0.4273,
+          "base_rate": 0.2082,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.7622,
+          "pr_auc": 0.5278,
+          "brier_score": 0.14,
+          "log_loss": 0.441,
+          "base_rate": 0.2194,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.7554,
+          "pr_auc": 0.5293,
+          "brier_score": 0.1414,
+          "log_loss": 0.4455,
+          "base_rate": 0.2213,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7644,
+          "pr_auc": 0.5295,
+          "brier_score": 0.1393,
+          "log_loss": 0.4393,
+          "base_rate": 0.2189,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7542,
+          "pr_auc": 0.5173,
+          "brier_score": 0.138,
+          "log_loss": 0.4363,
+          "base_rate": 0.2126,
+          "sample_size": 25714
+        }
+      ]
+    },
+    "M2_full_dynamic": {
+      "overall_oof": {
+        "roc_auc": 0.7683,
+        "pr_auc": 0.5379,
+        "brier_score": 0.1367,
+        "log_loss": 0.4326,
+        "base_rate": 0.2161,
+        "sample_size": 128572
+      },
+      "folds": [
+        {
+          "roc_auc": 0.7695,
+          "pr_auc": 0.5382,
+          "brier_score": 0.1323,
+          "log_loss": 0.4226,
+          "base_rate": 0.2082,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.7711,
+          "pr_auc": 0.5411,
+          "brier_score": 0.138,
+          "log_loss": 0.4355,
+          "base_rate": 0.2194,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.7638,
+          "pr_auc": 0.5391,
+          "brier_score": 0.1398,
+          "log_loss": 0.4406,
+          "base_rate": 0.2213,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7723,
+          "pr_auc": 0.5412,
+          "brier_score": 0.1376,
+          "log_loss": 0.4343,
+          "base_rate": 0.2189,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7655,
+          "pr_auc": 0.5318,
+          "brier_score": 0.1358,
+          "log_loss": 0.43,
+          "base_rate": 0.2126,
+          "sample_size": 25714
+        }
+      ]
+    }
+  },
+  "head_2_imminent_failure": {
+    "M0_depth": {
+      "overall_oof": {
+        "roc_auc": 0.6848,
+        "pr_auc": 0.2228,
+        "brier_score": 0.0988,
+        "log_loss": 0.3396,
+        "base_rate": 0.1178,
+        "sample_size": 128572
+      },
+      "folds": [
+        {
+          "roc_auc": 0.688,
+          "pr_auc": 0.2131,
+          "brier_score": 0.0954,
+          "log_loss": 0.3301,
+          "base_rate": 0.1129,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.6806,
+          "pr_auc": 0.2263,
+          "brier_score": 0.1011,
+          "log_loss": 0.3463,
+          "base_rate": 0.1208,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.697,
+          "pr_auc": 0.2272,
+          "brier_score": 0.096,
+          "log_loss": 0.3308,
+          "base_rate": 0.1147,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.6854,
+          "pr_auc": 0.2326,
+          "brier_score": 0.1019,
+          "log_loss": 0.3478,
+          "base_rate": 0.1224,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.6766,
+          "pr_auc": 0.2142,
+          "brier_score": 0.0999,
+          "log_loss": 0.343,
+          "base_rate": 0.1184,
+          "sample_size": 25714
+        }
+      ]
+    },
+    "M1_path_state": {
+      "overall_oof": {
+        "roc_auc": 0.762,
+        "pr_auc": 0.324,
+        "brier_score": 0.0921,
+        "log_loss": 0.3133,
+        "base_rate": 0.1178,
+        "sample_size": 128572
+      },
+      "folds": [
+        {
+          "roc_auc": 0.7704,
+          "pr_auc": 0.3268,
+          "brier_score": 0.0884,
+          "log_loss": 0.3024,
+          "base_rate": 0.1129,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.7621,
+          "pr_auc": 0.3299,
+          "brier_score": 0.0939,
+          "log_loss": 0.3185,
+          "base_rate": 0.1208,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.7662,
+          "pr_auc": 0.3056,
+          "brier_score": 0.0908,
+          "log_loss": 0.3084,
+          "base_rate": 0.1147,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7516,
+          "pr_auc": 0.3302,
+          "brier_score": 0.0954,
+          "log_loss": 0.324,
+          "base_rate": 0.1224,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7619,
+          "pr_auc": 0.3379,
+          "brier_score": 0.092,
+          "log_loss": 0.3133,
+          "base_rate": 0.1184,
+          "sample_size": 25714
+        }
+      ]
+    },
+    "M2_full_dynamic": {
+      "overall_oof": {
+        "roc_auc": 0.7654,
+        "pr_auc": 0.33,
+        "brier_score": 0.0917,
+        "log_loss": 0.3119,
+        "base_rate": 0.1178,
+        "sample_size": 128572
+      },
+      "folds": [
+        {
+          "roc_auc": 0.7715,
+          "pr_auc": 0.3293,
+          "brier_score": 0.0882,
+          "log_loss": 0.3018,
+          "base_rate": 0.1129,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.7663,
+          "pr_auc": 0.3365,
+          "brier_score": 0.0935,
+          "log_loss": 0.3167,
+          "base_rate": 0.1208,
+          "sample_size": 25715
+        },
+        {
+          "roc_auc": 0.7701,
+          "pr_auc": 0.3132,
+          "brier_score": 0.0902,
+          "log_loss": 0.3066,
+          "base_rate": 0.1147,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7545,
+          "pr_auc": 0.3361,
+          "brier_score": 0.095,
+          "log_loss": 0.3228,
+          "base_rate": 0.1224,
+          "sample_size": 25714
+        },
+        {
+          "roc_auc": 0.7662,
+          "pr_auc": 0.345,
+          "brier_score": 0.0916,
+          "log_loss": 0.3116,
+          "base_rate": 0.1184,
+          "sample_size": 25714
+        }
+      ]
+    }
+  }
+}

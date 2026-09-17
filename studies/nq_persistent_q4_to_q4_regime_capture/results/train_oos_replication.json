@@ -1,0 +1,96 @@
+{
+  "TRAIN": {
+    "n": 5038,
+    "q4q4": {
+      "gross_ev_dollars": -1.3408098451766575,
+      "gross_ev_points": -0.06704049225883288,
+      "net_ev_dollars": -16.340809845176658,
+      "net_ev_points": -0.8170404922588329,
+      "total_gross_dollars": -6755.0,
+      "total_net_dollars": -82325.0,
+      "win_rate": 0.370583564906709,
+      "profit_factor": 0.9920624662170102,
+      "mean_holding_time_seconds": 1134.2407701468837,
+      "mean_mae_atr": 1.5381994528836807,
+      "p50_mae_atr": 1.0730726272259905,
+      "p75_mae_atr": 1.7442455495860734,
+      "p90_mae_atr": 3.238678585584422,
+      "mean_giveback_atr": 2.2364595268890795,
+      "mean_capture_ratio": -4.105034965330532
+    },
+    "c0": {
+      "gross_ev_dollars": 4.944422389837237,
+      "gross_ev_points": 0.24722111949186182,
+      "net_ev_dollars": -10.055577610162763,
+      "net_ev_points": -0.5027788805081381,
+      "total_gross_dollars": 24910.0,
+      "total_net_dollars": -50660.0,
+      "win_rate": 0.32731242556570067,
+      "profit_factor": 1.0310049538224093,
+      "mean_holding_time_seconds": 936.9144501786424,
+      "mean_mae_atr": 1.1902323776078585,
+      "p50_mae_atr": 1.1014786135853243,
+      "p75_mae_atr": 1.6408923833096305,
+      "p90_mae_atr": 2.148771338400074,
+      "mean_giveback_atr": 2.148591139133856,
+      "mean_capture_ratio": -3.72966880661508
+    },
+    "delta_q4_minus_c0": {
+      "gross_ev_dollars": -6.285232235013894,
+      "gross_ev_points": -0.3142616117506947,
+      "net_ev_dollars": -6.285232235013895,
+      "total_gross_dollars": -31665.0,
+      "total_net_dollars": -31665.0,
+      "profit_factor_delta": -0.03894248760539909,
+      "mean_mae_atr_delta": 0.34796707527582216,
+      "mean_capture_ratio_delta": -0.375366158715452
+    }
+  },
+  "OOS": {
+    "n": 572,
+    "q4q4": {
+      "gross_ev_dollars": 15.183566433566433,
+      "gross_ev_points": 0.7591783216783217,
+      "net_ev_dollars": 0.18356643356643357,
+      "net_ev_points": 0.009178321678321678,
+      "total_gross_dollars": 8685.0,
+      "total_net_dollars": 105.0,
+      "win_rate": 0.3986013986013986,
+      "profit_factor": 1.0579908523353254,
+      "mean_holding_time_seconds": 1135.3758741258741,
+      "mean_mae_atr": 1.509573485607576,
+      "p50_mae_atr": 1.0009722239687764,
+      "p75_mae_atr": 1.787933248932101,
+      "p90_mae_atr": 3.6844614166219216,
+      "mean_giveback_atr": 2.2558205456092146,
+      "mean_capture_ratio": -4.227194140293123
+    },
+    "c0": {
+      "gross_ev_dollars": -24.195804195804197,
+      "gross_ev_points": -1.2097902097902098,
+      "net_ev_dollars": -39.19580419580419,
+      "net_ev_points": -1.9597902097902096,
+      "total_gross_dollars": -13840.0,
+      "total_net_dollars": -22420.0,
+      "win_rate": 0.32867132867132864,
+      "profit_factor": 0.9064864864864864,
+      "mean_holding_time_seconds": 872.2814685314685,
+      "mean_mae_atr": 1.195827445362807,
+      "p50_mae_atr": 1.056687902201666,
+      "p75_mae_atr": 1.6608865906285988,
+      "p90_mae_atr": 2.2102322965858257,
+      "mean_giveback_atr": 2.1476839469458704,
+      "mean_capture_ratio": -3.814822804209543
+    },
+    "delta_q4_minus_c0": {
+      "gross_ev_dollars": 39.37937062937063,
+      "gross_ev_points": 1.9689685314685312,
+      "net_ev_dollars": 39.37937062937063,
+      "total_gross_dollars": 22525.0,
+      "total_net_dollars": 22525.0,
+      "profit_factor_delta": 0.15150436584883897,
+      "mean_mae_atr_delta": 0.31374604024476893,
+      "mean_capture_ratio_delta": -0.4123713360835799
+    }
+  }
+}

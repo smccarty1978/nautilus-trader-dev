@@ -1,0 +1,30 @@
+{
+  "study_id": "nq_persistent_q4_confirmation_opportunity_capture",
+  "instrument": "NQ",
+  "total_matched_population": 5610,
+  "train_period": "2023-2024",
+  "oos_period": "2025 Q1",
+  "conditions": {
+    "A1": "+0.25 ATR counter-direction displacement from persistent Q4",
+    "A2": "+0.50 ATR counter-direction displacement from persistent Q4"
+  },
+  "competing_event_classes": [
+    "CONFIRM_BEFORE_VA",
+    "VA_BEFORE_CONFIRM",
+    "TIE",
+    "NO_VALID_RESOLUTION"
+  ],
+  "outcome_classes": [
+    "Q4_BETTER",
+    "FLAT",
+    "Q4_WORSE"
+  ],
+  "severity_ladder_points": [
+    -5.0,
+    -10.0,
+    -20.0,
+    -40.0,
+    -60.0
+  ],
+  "execution_mode": "Pure Observational Opportunity Capture & Selection Decomposition (Zero Strategy Backtesting, Zero Optimization)"
+}

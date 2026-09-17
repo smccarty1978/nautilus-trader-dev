@@ -1,0 +1,86 @@
+{
+  "A1": {
+    "total_regimes": 5610,
+    "exact_matches": 5392,
+    "exact_match_pct": 96.11,
+    "mismatch_breakdown": {
+      "MATCH": 5392,
+      "MISSING_LIVE": 0,
+      "EXTRA_LIVE": 0,
+      "EARLY_LIVE": 0,
+      "LATE_LIVE": 0,
+      "DUPLICATE_LIVE": 0,
+      "PRICE_MISMATCH": 0,
+      "ATR_REFERENCE_MISMATCH": 0,
+      "REGIME_STATE_MISMATCH": 0,
+      "OTHER": 218
+    },
+    "timestamp_delta_ns_quantiles": {
+      "n": 3065,
+      "mean": 0.0,
+      "median": 0.0,
+      "p10": 0.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+    },
+    "price_delta_pts_quantiles": {
+      "n": 3065,
+      "mean": 0.0,
+      "median": 0.0,
+      "p10": 0.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+    },
+    "verdict": "PASS_LIVE_PARITY"
+  },
+  "A2": {
+    "total_regimes": 5610,
+    "exact_matches": 5445,
+    "exact_match_pct": 97.06,
+    "mismatch_breakdown": {
+      "MATCH": 5445,
+      "MISSING_LIVE": 0,
+      "EXTRA_LIVE": 0,
+      "EARLY_LIVE": 0,
+      "LATE_LIVE": 0,
+      "DUPLICATE_LIVE": 0,
+      "PRICE_MISMATCH": 0,
+      "ATR_REFERENCE_MISMATCH": 0,
+      "REGIME_STATE_MISMATCH": 0,
+      "OTHER": 165
+    },
+    "timestamp_delta_ns_quantiles": {
+      "n": 1938,
+      "mean": 0.0,
+      "median": 0.0,
+      "p10": 0.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+    },
+    "price_delta_pts_quantiles": {
+      "n": 1938,
+      "mean": 0.0,
+      "median": 0.0,
+      "p10": 0.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+    },
+    "verdict": "PASS_LIVE_PARITY"
+  }
+}

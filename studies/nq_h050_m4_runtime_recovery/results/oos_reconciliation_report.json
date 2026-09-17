@@ -1,0 +1,32 @@
+{
+  "verdict_score_parity": "M4_SCORE_PARITY_PASS",
+  "verdict_signal_parity": "H050_SIGNAL_PARITY_PASS",
+  "verdict_regime_parity": "VA_REGIME_PARITY_PASS",
+  "oos_summary": {
+    "period": "2025 Q1 untouched OOS",
+    "census_regimes_evaluated": 572,
+    "h050_0_population_expected": 2422,
+    "h050_0_population_discovered": 2422,
+    "h050_0_population_matched": 2422,
+    "missing_signals": 0,
+    "extra_signals": 0,
+    "retimed_signals": 0
+  },
+  "score_parity_metrics": {
+    "n": 2422,
+    "exact_matches_1e9": 2422,
+    "max_abs_diff": 0.0,
+    "mean_abs_diff": 0.0,
+    "median_abs_diff": 0.0,
+    "top10_threshold": 0.003001,
+    "top10_classification_agreements": 2422,
+    "top10_agreement_pct": 1.0
+  },
+  "lifecycle_exit_parity": {
+    "total_lifecycles": 2422,
+    "exact_lifecycle_matches": 2422,
+    "lifecycle_match_pct": 1.0,
+    "h050_1_active_count_expected": 845,
+    "h050_1_active_count_live": 845
+  }
+}

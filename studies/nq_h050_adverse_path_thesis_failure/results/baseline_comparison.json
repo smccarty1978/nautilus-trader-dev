@@ -1,0 +1,155 @@
+{
+  "primary_target": "recovered_be (trade recovers to entry fill after landmark)",
+  "all_cohort": {
+    "n": 7845,
+    "baseline_1_distance_only": {
+      "roc_auc": 0.6207941685254237,
+      "pr_auc": 0.8259412699341251,
+      "brier": 0.4063705891130677
+    },
+    "baseline_2_time_only": {
+      "roc_auc": 0.5744968968515587,
+      "pr_auc": 0.8183654776334482,
+      "brier": 0.7660986944732983
+    },
+    "baseline_3_original_m4_only": {
+      "roc_auc": 0.4807101583378327,
+      "pr_auc": 0.7667114720638641,
+      "brier": 0.27575341562289135
+    },
+    "baseline_4_combined": {
+      "roc_auc": 0.5777776472742983,
+      "pr_auc": 0.8149210308870196,
+      "brier": 0.2890406742996495
+    },
+    "causal_state_augmented": {
+      "roc_auc": 0.5554484305508809,
+      "pr_auc": 0.8076941466747447,
+      "brier": 0.33620813215541745
+    }
+  },
+  "top10_cohort": {
+    "n": 1219,
+    "baseline_1_distance_only": {
+      "roc_auc": 0.6152358042567767,
+      "pr_auc": 0.8286804200092441,
+      "brier": 0.40714049090119536
+    },
+    "baseline_2_time_only": {
+      "roc_auc": 0.6102748843944136,
+      "pr_auc": 0.8388276267864299,
+      "brier": 0.7776660655493963
+    },
+    "baseline_3_original_m4_only": {
+      "roc_auc": 0.5188472137885936,
+      "pr_auc": 0.7896967988777392,
+      "brier": 0.23896281711560374
+    },
+    "baseline_4_combined": {
+      "roc_auc": 0.5946642377816183,
+      "pr_auc": 0.8249035122537517,
+      "brier": 0.28340111066341217
+    },
+    "causal_state_augmented": {
+      "roc_auc": 0.5268150466314789,
+      "pr_auc": 0.8047551413632368,
+      "brier": 0.36237938465939723
+    }
+  },
+  "fixed_landmark_comparisons": {
+    "-1.00A": {
+      "n": 240,
+      "recovery_rate": 0.7708333333333334,
+      "baseline_1_distance_auc": 0.5,
+      "baseline_2_time_auc": 0.5492383292383293,
+      "baseline_3_original_m4_auc": 0.4955282555282555,
+      "baseline_4_combined_auc": 0.5043734643734644,
+      "causal_state_augmented_auc": 0.41493857493857494
+    },
+    "-1.50A": {
+      "n": 175,
+      "recovery_rate": 0.6457142857142857,
+      "baseline_1_distance_auc": 0.5,
+      "baseline_2_time_auc": 0.5284755923494148,
+      "baseline_3_original_m4_auc": 0.5228375677990293,
+      "baseline_4_combined_auc": 0.5124179274907223,
+      "causal_state_augmented_auc": 0.48315729374821587
+    }
+  },
+  "quintile_economic_rankings": {
+    "-1.00A": {
+      "quintile_1": {
+        "n": 48,
+        "recovery_be_rate": 0.8541666666666666,
+        "mean_final_pnl_atr": -0.6543753471788314,
+        "mean_subsequent_mfe_atr": 2.1807704662328664,
+        "mean_further_mae_atr": 2.2147877809106733
+      },
+      "quintile_2": {
+        "n": 48,
+        "recovery_be_rate": 0.8333333333333334,
+        "mean_final_pnl_atr": -0.4638322048881782,
+        "mean_subsequent_mfe_atr": 1.79129222598659,
+        "mean_further_mae_atr": 1.802755386414117
+      },
+      "quintile_3": {
+        "n": 48,
+        "recovery_be_rate": 0.6875,
+        "mean_final_pnl_atr": -0.08338498701857873,
+        "mean_subsequent_mfe_atr": 1.5212877568432657,
+        "mean_further_mae_atr": 1.9215562965219062
+      },
+      "quintile_4": {
+        "n": 48,
+        "recovery_be_rate": 0.7291666666666666,
+        "mean_final_pnl_atr": -0.6821373557168345,
+        "mean_subsequent_mfe_atr": 0.9652427354433639,
+        "mean_further_mae_atr": 1.568747709271636
+      },
+      "quintile_5": {
+        "n": 48,
+        "recovery_be_rate": 0.75,
+        "mean_final_pnl_atr": 0.6175188350424062,
+        "mean_subsequent_mfe_atr": 4.0794078143686034,
+        "mean_further_mae_atr": 3.225415807506387
+      }
+    },
+    "-1.50A": {
+      "quintile_1": {
+        "n": 35,
+        "recovery_be_rate": 0.6571428571428571,
+        "mean_final_pnl_atr": -1.2087379743027828,
+        "mean_subsequent_mfe_atr": 2.1690634384286063,
+        "mean_further_mae_atr": 2.625566834087735
+      },
+      "quintile_2": {
+        "n": 35,
+        "recovery_be_rate": 0.5428571428571428,
+        "mean_final_pnl_atr": -1.626112092759725,
+        "mean_subsequent_mfe_atr": 0.644487918669895,
+        "mean_further_mae_atr": 2.711484932299451
+      },
+      "quintile_3": {
+        "n": 35,
+        "recovery_be_rate": 0.7428571428571429,
+        "mean_final_pnl_atr": -1.0279002554735017,
+        "mean_subsequent_mfe_atr": 0.8368647355362369,
+        "mean_further_mae_atr": 2.0007512588538834
+      },
+      "quintile_4": {
+        "n": 35,
+        "recovery_be_rate": 0.6857142857142857,
+        "mean_final_pnl_atr": -1.0122758598510353,
+        "mean_subsequent_mfe_atr": 0.9628850035247644,
+        "mean_further_mae_atr": 1.9255265840750666
+      },
+      "quintile_5": {
+        "n": 35,
+        "recovery_be_rate": 0.6,
+        "mean_final_pnl_atr": 0.22593091419481132,
+        "mean_subsequent_mfe_atr": 3.5185137710552365,
+        "mean_further_mae_atr": 2.485245214082001
+      }
+    }
+  }
+}

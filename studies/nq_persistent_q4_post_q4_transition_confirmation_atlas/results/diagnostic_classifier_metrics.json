@@ -1,0 +1,29 @@
+{
+  "checkpoint": "T+30s",
+  "target": "residual_old_regime_mfe_after_checkpoint_atr > 1.0",
+  "train_n": 3490,
+  "oos_n": 431,
+  "train_roc_auc": 0.7068168573278653,
+  "oos_roc_auc": 0.6611862396204033,
+  "train_brier_score": 0.20362878283531297,
+  "oos_brier_score": 0.210875790147864,
+  "feature_importances": {
+    "current_pullback_atr": 141.0,
+    "old_dir_max_excursion_since_q4_atr": 86.0,
+    "old_dir_displacement_from_q4_atr": 63.0,
+    "seconds_since_peak_mfe": 50.0,
+    "eff_30s_counter": 48.0,
+    "distance_from_post_q4_old_regime_extreme_atr": 38.0,
+    "counter_dir_displacement_from_q4_atr": 35.0,
+    "eff_30s_old": 34.0,
+    "post_q4_retracement_fraction": 31.0,
+    "delta_h2_since_q4": 24.0,
+    "consecutive_5s_bars_counter_dir": 21.0,
+    "delta_h1_since_q4": 13.0,
+    "seconds_since_last_old_regime_extreme": 12.0,
+    "new_old_regime_extreme_since_q4": 0.0,
+    "structure_both_30s": 0.0,
+    "h1_slope_post_q4": 0.0,
+    "h2_slope_post_q4": 0.0
+  }
+}

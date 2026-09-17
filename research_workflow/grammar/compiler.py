@@ -185,6 +185,7 @@ class _Ctx:
         self.tracker_meta: Dict[str, Any] = {}               # id -> binding class
         self.tracker_stream: Dict[str, Optional[str]] = {}   # id -> primary bars stream key
         self.notes: List[str] = []
+        self.outage_rule_checked: Set[str] = set()           # datasets already checked for rules.outage_gap_seconds
         self.session: Dict[str, Any] = {}
         self.features: Optional[Dict[str, Any]] = None
         self.feature_aliases: List[str] = []
@@ -201,6 +202,31 @@ class _Ctx:
 # --------------------------------------------------------------------------- #
 # stage 1: datasets, instruments, streams
 # --------------------------------------------------------------------------- #
+def _require_outage_rule(ctx: _Ctx, where: str, dataset_id: str, ds: Dict[str, Any]) -> None:
+    """A dataset whose calendar turns zero-volume fill ON must also declare what a data outage is.
+
+    Every empty window is inside some run of the ``gaps`` table by construction (the tape carries
+    native rows only), so "is this window a quiet market or a data hole?" has no answer the runtime
+    can derive -- it is a property of the tape, declared once per dataset as
+    ``rules.outage_gap_seconds``.  Without it the host would fill a multi-hour outage with flat bars
+    and make it indistinguishable from a calm session."""
+    if dataset_id in ctx.outage_rule_checked:          # one gap per dataset, not one per derived timeframe
+        return
+    ctx.outage_rule_checked.add(dataset_id)
+    rules = ds.get("rules") or {}
+    if rules.get("outage_gap_seconds") is None:
+        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, where,
+                f"dataset {dataset_id!r} carries a 'sessions' calendar, so empty windows are filled with zero-volume "
+                f"bars, but declares no rules.outage_gap_seconds -- the run cannot tell a quiet market from a data "
+                f"hole and would fill the hole; declare the outage threshold on the dataset",
+                dataset=dataset_id)
+        return
+    if "gaps" not in (ds.get("reference_tables") or []):
+        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, where,
+                f"dataset {dataset_id!r} declares rules.outage_gap_seconds but no 'gaps' reference table, so no "
+                f"outage can be identified", dataset=dataset_id)
+
+
 def _resolve_streams(ctx: _Ctx) -> None:
     spec = ctx.spec
     for i, s in enumerate(spec.streams):
@@ -228,7 +254,8 @@ def _resolve_streams(ctx: _Ctx) -> None:
         ctx.instruments[symbol] = {**facts, "symbol": symbol, "dataset_id": s.dataset,
                                    "dataset_digest": ds.get("logical_digest"), "role": s.role,
                                    "reference_tables": list(ds.get("reference_tables") or []),
-                                   "reference_digest": ds.get("reference_digest"), "same_ts": s.same_ts}
+                                   "reference_digest": ds.get("reference_digest"), "same_ts": s.same_ts,
+                                   "outage_gap_seconds": (ds.get("rules") or {}).get("outage_gap_seconds")}
         declared = ds.get("streams") or {}
         dataset_externals = {tf: st for tf, st in declared.items() if (st or {}).get("source") == "external"}
         if not dataset_externals:
@@ -279,6 +306,8 @@ def _resolve_streams(ctx: _Ctx) -> None:
                 # Empty windows: a zero-volume bar inside a trading day of the dataset calendar (owner D3a/D3b);
                 # a dataset with no `sessions` table has no trading-day authority, so it emits nothing and says so.
                 has_trading_days = "sessions" in (ds.get("reference_tables") or [])
+                if has_trading_days:
+                    _require_outage_rule(ctx, where, s.dataset, ds)
                 entry.update({"source": "derived", "derived_from": f"{symbol.lower()}_{src}", "aggregation": "closed_window",
                               "empty_window": "zero_volume_in_trading_day" if has_trading_days else "none"})
                 if not has_trading_days:
@@ -295,6 +324,10 @@ def _resolve_streams(ctx: _Ctx) -> None:
         ctx.session = {"kind": "calendar" if has_calendar else "legacy", "session": ctx.spec.population.session,
                        "censor_session": censor, "dataset": inst["dataset_id"],
                        "reference_tables": list(reference_tables), "reference_digest": reference_digest}
+        if has_calendar:
+            # The fill scope's outage rule travels in the plan, so a run cannot silently adopt a
+            # different one than the compile was audited under.
+            ctx.session["outage_gap_seconds"] = inst.get("outage_gap_seconds")
         from research_workflow.sessions import CENSOR_SESSION_NAMES, SESSION_NAMES, TRADING_DAY
         # RTH / ETH / ALL gate a population and censor an outcome. TRADING_DAY -- the calendar
         # dataset's own session row, the trading day it defines -- is a CENSORING session only

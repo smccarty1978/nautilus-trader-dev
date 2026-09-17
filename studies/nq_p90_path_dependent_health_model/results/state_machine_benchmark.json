@@ -1,0 +1,78 @@
+{
+  "head_1_structural_failure": {
+    "cell_empirical_rates_train": {
+      "0.50\u2013<1.00 ATR__FRESH": 0.128,
+      "0.50\u2013<1.00 ATR__ROLLOVER_25\u2013<50%": 0.1139,
+      "0.50\u2013<1.00 ATR__ROLLOVER_50\u2013<75%": 0.1379,
+      "0.50\u2013<1.00 ATR__ROLLOVER_<25%": 0.1188,
+      "0.50\u2013<1.00 ATR__ROLLOVER_>=75%": 0.1373,
+      "1.00\u2013<1.50 ATR__FRESH": 0.2204,
+      "1.00\u2013<1.50 ATR__ROLLOVER_25\u2013<50%": 0.2668,
+      "1.00\u2013<1.50 ATR__ROLLOVER_50\u2013<75%": 0.3981,
+      "1.00\u2013<1.50 ATR__ROLLOVER_<25%": 0.264,
+      "1.00\u2013<1.50 ATR__ROLLOVER_>=75%": 1.0,
+      "1.50\u2013<2.00 ATR__FRESH": 0.3067,
+      "1.50\u2013<2.00 ATR__ROLLOVER_25\u2013<50%": 0.3942,
+      "1.50\u2013<2.00 ATR__ROLLOVER_50\u2013<75%": 0.3721,
+      "1.50\u2013<2.00 ATR__ROLLOVER_<25%": 0.4394,
+      ">=2.00 ATR__FRESH": 0.405,
+      ">=2.00 ATR__ROLLOVER_25\u2013<50%": 0.5541,
+      ">=2.00 ATR__ROLLOVER_<25%": 0.6378
+    },
+    "cv_metrics": {
+      "roc_auc": 0.6734,
+      "pr_auc": 0.3713,
+      "brier_score": 0.1562,
+      "log_loss": 0.4857,
+      "base_rate": 0.2161,
+      "sample_size": 128572
+    },
+    "oos_metrics": {
+      "roc_auc": 0.7051,
+      "pr_auc": 0.4132,
+      "brier_score": 0.1535,
+      "log_loss": 0.4782,
+      "base_rate": 0.2215,
+      "sample_size": 15602
+    },
+    "auc_signal_fraction_of_m2_train": -0.1716
+  },
+  "head_2_imminent_failure": {
+    "cell_empirical_rates_train": {
+      "0.50\u2013<1.00 ATR__FRESH": 0.0749,
+      "0.50\u2013<1.00 ATR__ROLLOVER_25\u2013<50%": 0.0537,
+      "0.50\u2013<1.00 ATR__ROLLOVER_50\u2013<75%": 0.0504,
+      "0.50\u2013<1.00 ATR__ROLLOVER_<25%": 0.0639,
+      "0.50\u2013<1.00 ATR__ROLLOVER_>=75%": 0.041,
+      "1.00\u2013<1.50 ATR__FRESH": 0.1378,
+      "1.00\u2013<1.50 ATR__ROLLOVER_25\u2013<50%": 0.1067,
+      "1.00\u2013<1.50 ATR__ROLLOVER_50\u2013<75%": 0.1056,
+      "1.00\u2013<1.50 ATR__ROLLOVER_<25%": 0.1433,
+      "1.00\u2013<1.50 ATR__ROLLOVER_>=75%": 1.0,
+      "1.50\u2013<2.00 ATR__FRESH": 0.1893,
+      "1.50\u2013<2.00 ATR__ROLLOVER_25\u2013<50%": 0.1597,
+      "1.50\u2013<2.00 ATR__ROLLOVER_50\u2013<75%": 0.2093,
+      "1.50\u2013<2.00 ATR__ROLLOVER_<25%": 0.2259,
+      ">=2.00 ATR__FRESH": 0.256,
+      ">=2.00 ATR__ROLLOVER_25\u2013<50%": 0.1911,
+      ">=2.00 ATR__ROLLOVER_<25%": 0.3405
+    },
+    "cv_metrics": {
+      "roc_auc": 0.6713,
+      "pr_auc": 0.2094,
+      "brier_score": 0.0994,
+      "log_loss": 0.3423,
+      "base_rate": 0.1178,
+      "sample_size": 128572
+    },
+    "oos_metrics": {
+      "roc_auc": 0.7013,
+      "pr_auc": 0.2427,
+      "brier_score": 0.1007,
+      "log_loss": 0.3492,
+      "base_rate": 0.1224,
+      "sample_size": 15602
+    },
+    "auc_signal_fraction_of_m2_train": -0.1675
+  }
+}

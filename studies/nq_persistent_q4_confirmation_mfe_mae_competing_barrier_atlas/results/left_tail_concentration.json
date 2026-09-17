@@ -1,0 +1,202 @@
+{
+  "D1": {
+    "total_trades": 3065,
+    "total_gross_losses": 600200.0,
+    "loss_tail_contributions": {
+      "worst_1.0pct": {
+        "trade_count": 31,
+        "loss_sum_dollars": 72590.0,
+        "contribution_pct_of_total_losses": 12.094301899366878
+      },
+      "worst_2.5pct": {
+        "trade_count": 77,
+        "loss_sum_dollars": 128565.0,
+        "contribution_pct_of_total_losses": 21.42035988003999
+      },
+      "worst_5.0pct": {
+        "trade_count": 154,
+        "loss_sum_dollars": 192420.0,
+        "contribution_pct_of_total_losses": 32.05931356214595
+      },
+      "worst_10.0pct": {
+        "trade_count": 307,
+        "loss_sum_dollars": 282530.0,
+        "contribution_pct_of_total_losses": 47.07264245251583
+      },
+      "worst_20.0pct": {
+        "trade_count": 613,
+        "loss_sum_dollars": 402335.0,
+        "contribution_pct_of_total_losses": 67.0334888370543
+      }
+    },
+    "winsorized_diagnostics": {
+      "winsorized_1.0pct": {
+        "cutoff_pnl_gross": -1490.0,
+        "raw_mean_pnl_gross": -2.270799347471452,
+        "winsorized_mean_pnl_gross": 6.34257748776509,
+        "improvement_gross": 8.613376835236542,
+        "cutoff_pnl_net": -1505.0,
+        "raw_mean_pnl_net": -17.270799347471453,
+        "winsorized_mean_pnl_net": -8.65742251223491,
+        "improvement_net": 8.613376835236542
+      },
+      "winsorized_2.5pct": {
+        "cutoff_pnl_gross": -995.0,
+        "raw_mean_pnl_gross": -2.270799347471452,
+        "winsorized_mean_pnl_gross": 14.67862969004894,
+        "improvement_gross": 16.949429037520392,
+        "cutoff_pnl_net": -1010.0,
+        "raw_mean_pnl_net": -17.270799347471453,
+        "winsorized_mean_pnl_net": -0.32137030995106036,
+        "improvement_net": 16.949429037520392
+      },
+      "winsorized_5.0pct": {
+        "cutoff_pnl_gross": -725.0,
+        "raw_mean_pnl_gross": -2.270799347471452,
+        "winsorized_mean_pnl_gross": 24.081566068515496,
+        "improvement_gross": 26.35236541598695,
+        "cutoff_pnl_net": -740.0,
+        "raw_mean_pnl_net": -17.270799347471453,
+        "winsorized_mean_pnl_net": 9.081566068515498,
+        "improvement_net": 26.352365415986952
+      },
+      "winsorized_10.0pct": {
+        "cutoff_pnl_gross": -485.0,
+        "raw_mean_pnl_gross": -2.270799347471452,
+        "winsorized_mean_pnl_gross": 41.32952691680261,
+        "improvement_gross": 43.60032626427406,
+        "cutoff_pnl_net": -500.0,
+        "raw_mean_pnl_net": -17.270799347471453,
+        "winsorized_mean_pnl_net": 26.32952691680261,
+        "improvement_net": 43.60032626427406
+      }
+    },
+    "loss_tail_quantiles": {
+      "p01": {
+        "gross_dollars": -1486.8,
+        "points": -74.34,
+        "atr": -6.371399880044122
+      },
+      "p025": {
+        "gross_dollars": -995.0,
+        "points": -49.75,
+        "atr": -4.382611292229933
+      },
+      "p05": {
+        "gross_dollars": -723.9999999999999,
+        "points": -36.199999999999996,
+        "atr": -3.1460423257787604
+      },
+      "p10": {
+        "gross_dollars": -485.0,
+        "points": -24.25,
+        "atr": -2.197101468214917
+      },
+      "p20": {
+        "gross_dollars": -320.0,
+        "points": -16.0,
+        "atr": -1.577074145483495
+      }
+    }
+  },
+  "D2": {
+    "total_trades": 1938,
+    "total_gross_losses": 387510.0,
+    "loss_tail_contributions": {
+      "worst_1.0pct": {
+        "trade_count": 20,
+        "loss_sum_dollars": 43360.0,
+        "contribution_pct_of_total_losses": 11.189388660937782
+      },
+      "worst_2.5pct": {
+        "trade_count": 49,
+        "loss_sum_dollars": 76835.0,
+        "contribution_pct_of_total_losses": 19.82787540966685
+      },
+      "worst_5.0pct": {
+        "trade_count": 97,
+        "loss_sum_dollars": 115490.0,
+        "contribution_pct_of_total_losses": 29.803101855435987
+      },
+      "worst_10.0pct": {
+        "trade_count": 194,
+        "loss_sum_dollars": 173040.0,
+        "contribution_pct_of_total_losses": 44.65433150112255
+      },
+      "worst_20.0pct": {
+        "trade_count": 388,
+        "loss_sum_dollars": 251550.0,
+        "contribution_pct_of_total_losses": 64.91445382054657
+      }
+    },
+    "winsorized_diagnostics": {
+      "winsorized_1.0pct": {
+        "cutoff_pnl_gross": -1455.0,
+        "raw_mean_pnl_gross": -3.7951496388028896,
+        "winsorized_mean_pnl_gross": 3.562951496388029,
+        "improvement_gross": 7.3581011351909185,
+        "cutoff_pnl_net": -1470.0,
+        "raw_mean_pnl_net": -18.79514963880289,
+        "winsorized_mean_pnl_net": -11.43704850361197,
+        "improvement_net": 7.358101135190919
+      },
+      "winsorized_2.5pct": {
+        "cutoff_pnl_gross": -955.0,
+        "raw_mean_pnl_gross": -3.7951496388028896,
+        "winsorized_mean_pnl_gross": 11.705366357069144,
+        "improvement_gross": 15.500515995872034,
+        "cutoff_pnl_net": -970.0,
+        "raw_mean_pnl_net": -18.79514963880289,
+        "winsorized_mean_pnl_net": -3.2946336429308567,
+        "improvement_net": 15.500515995872034
+      },
+      "winsorized_5.0pct": {
+        "cutoff_pnl_gross": -715.0,
+        "raw_mean_pnl_gross": -3.7951496388028896,
+        "winsorized_mean_pnl_gross": 20.01031991744066,
+        "improvement_gross": 23.80546955624355,
+        "cutoff_pnl_net": -730.0,
+        "raw_mean_pnl_net": -18.79514963880289,
+        "winsorized_mean_pnl_net": 5.01031991744066,
+        "improvement_net": 23.80546955624355
+      },
+      "winsorized_10.0pct": {
+        "cutoff_pnl_gross": -510.0,
+        "raw_mean_pnl_gross": -3.7951496388028896,
+        "winsorized_mean_pnl_gross": 34.44014447884417,
+        "improvement_gross": 38.23529411764706,
+        "cutoff_pnl_net": -525.0,
+        "raw_mean_pnl_net": -18.79514963880289,
+        "winsorized_mean_pnl_net": 19.440144478844168,
+        "improvement_net": 38.23529411764706
+      }
+    },
+    "loss_tail_quantiles": {
+      "p01": {
+        "gross_dollars": -1449.45,
+        "points": -72.4725,
+        "atr": -5.925325740649059
+      },
+      "p025": {
+        "gross_dollars": -955.0,
+        "points": -47.75,
+        "atr": -4.188641270221492
+      },
+      "p05": {
+        "gross_dollars": -710.75,
+        "points": -35.537499999999994,
+        "atr": -3.0607631579430246
+      },
+      "p10": {
+        "gross_dollars": -506.4999999999999,
+        "points": -25.324999999999996,
+        "atr": -2.1840375350944217
+      },
+      "p20": {
+        "gross_dollars": -325.0,
+        "points": -16.25,
+        "atr": -1.604860395933876
+      }
+    }
+  }
+}

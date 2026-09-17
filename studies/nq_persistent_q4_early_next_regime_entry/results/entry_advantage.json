@@ -1,0 +1,56 @@
+{
+  "ALL": {
+    "mean_points": -0.05115864527629233,
+    "median_points": 1.75,
+    "mean_dollars": -1.0231729055258467,
+    "median_dollars": 35.0,
+    "mean_atr": 0.0035714434294376258,
+    "median_atr": 0.1900109326457743,
+    "percentiles_dollars": {
+      "p10": -180.0,
+      "p25": -10.0,
+      "p50": 35.0,
+      "p75": 115.0,
+      "p90": 220.0
+    },
+    "pct_q4_entry_better": 0.6529411764705882,
+    "pct_flip_entry_better": 0.27736185383244205,
+    "pct_within_025_atr": 0.3869875222816399
+  },
+  "TRAIN": {
+    "mean_points": -0.18295950774116712,
+    "median_points": 1.75,
+    "mean_dollars": -3.6591901548233428,
+    "median_dollars": 35.0,
+    "mean_atr": -0.0025720363118569636,
+    "median_atr": 0.18334776832148905,
+    "percentiles_dollars": {
+      "p10": -165.0,
+      "p25": -10.0,
+      "p50": 35.0,
+      "p75": 110.0,
+      "p90": 200.0
+    },
+    "pct_q4_entry_better": 0.6508535132989282,
+    "pct_flip_entry_better": 0.27649861055974595,
+    "pct_within_025_atr": 0.3924176260420802
+  },
+  "OOS": {
+    "mean_points": 1.1097027972027973,
+    "median_points": 3.25,
+    "mean_dollars": 22.194055944055943,
+    "median_dollars": 65.0,
+    "mean_atr": 0.05768132268930145,
+    "median_atr": 0.25470727831900175,
+    "percentiles_dollars": {
+      "p10": -334.0,
+      "p25": -10.0,
+      "p50": 65.0,
+      "p75": 205.0,
+      "p90": 390.0
+    },
+    "pct_q4_entry_better": 0.6713286713286714,
+    "pct_flip_entry_better": 0.28496503496503495,
+    "pct_within_025_atr": 0.33916083916083917
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "0.50_ATR_target": {
+    "depth_range_atr": [
+      0.5,
+      0.65
+    ],
+    "total_observations_in_band": 57377,
+    "groups": {
+      "Group_A_monotonic_deteriorating": {
+        "description": "Monotonic deterioration with zero prior material recovery (<25%)",
+        "N_observations": 14991,
+        "N_unique_episodes": 11478,
+        "flip_before_new_max_pct": 10.532986458541792,
+        "flip_le_180s_pct": 5.7567874057768
+      },
+      "Group_B_prior_25_to_50_rec_now_deteriorating": {
+        "description": "Prior 25-50% recovery rollover, now deteriorating",
+        "N_observations": 4570,
+        "N_unique_episodes": 3283,
+        "flip_before_new_max_pct": 7.308533916849015,
+        "flip_le_180s_pct": 4.048140043763676
+      },
+      "Group_C_prior_ge_50_rec_now_deteriorating": {
+        "description": "Prior >=50% recovery rollover, now deteriorating",
+        "N_observations": 9170,
+        "N_unique_episodes": 4912,
+        "flip_before_new_max_pct": 13.533260632497274,
+        "flip_le_180s_pct": 5.616139585605234
+      },
+      "Group_D_currently_recovering_ge_50": {
+        "description": "Actively recovering (current recovery >=50%)",
+        "N_observations": 7114,
+        "N_unique_episodes": 3461,
+        "flip_before_new_max_pct": 15.12510542592072,
+        "flip_le_180s_pct": 5.257239246556086
+      }
+    },
+    "deltas_vs_group_a": {
+      "Group_B_prior_25_to_50_rec_now_deteriorating_vs_Group_A": {
+        "flip_before_new_max_delta": -3.224452541692777,
+        "flip_le_180s_delta": -1.7086473620131235
+      },
+      "Group_C_prior_ge_50_rec_now_deteriorating_vs_Group_A": {
+        "flip_before_new_max_delta": 3.000274173955482,
+        "flip_le_180s_delta": -0.14064782017156574
+      },
+      "Group_D_currently_recovering_ge_50_vs_Group_A": {
+        "flip_before_new_max_delta": 4.592118967378928,
+        "flip_le_180s_delta": -0.4995481592207138
+      }
+    }
+  },
+  "1.00_ATR_target": {
+    "depth_range_atr": [
+      0.95,
+      1.15
+    ],
+    "total_observations_in_band": 59594,
+    "groups": {
+      "Group_A_monotonic_deteriorating": {
+        "description": "Monotonic deterioration with zero prior material recovery (<25%)",
+        "N_observations": 15168,
+        "N_unique_episodes": 9254,
+        "flip_before_new_max_pct": 19.73233122362869,
+        "flip_le_180s_pct": 12.315400843881855
+      },
+      "Group_B_prior_25_to_50_rec_now_deteriorating": {
+        "description": "Prior 25-50% recovery rollover, now deteriorating",
+        "N_observations": 8299,
+        "N_unique_episodes": 4643,
+        "flip_before_new_max_pct": 16.761055548861307,
+        "flip_le_180s_pct": 8.892637667188819
+      },
+      "Group_C_prior_ge_50_rec_now_deteriorating": {
+        "description": "Prior >=50% recovery rollover, now deteriorating",
+        "N_observations": 8340,
+        "N_unique_episodes": 2979,
+        "flip_before_new_max_pct": 27.74580335731415,
+        "flip_le_180s_pct": 11.858513189448441
+      },
+      "Group_D_currently_recovering_ge_50": {
+        "description": "Actively recovering (current recovery >=50%)",
+        "N_observations": 1406,
+        "N_unique_episodes": 485,
+        "flip_before_new_max_pct": 34.35277382645804,
+        "flip_le_180s_pct": 10.099573257467995
+      }
+    },
+    "deltas_vs_group_a": {
+      "Group_B_prior_25_to_50_rec_now_deteriorating_vs_Group_A": {
+        "flip_before_new_max_delta": -2.9712756747673836,
+        "flip_le_180s_delta": -3.422763176693037
+      },
+      "Group_C_prior_ge_50_rec_now_deteriorating_vs_Group_A": {
+        "flip_before_new_max_delta": 8.013472133685458,
+        "flip_le_180s_delta": -0.45688765443341417
+      },
+      "Group_D_currently_recovering_ge_50_vs_Group_A": {
+        "flip_before_new_max_delta": 14.62044260282935,
+        "flip_le_180s_delta": -2.2158275864138606
+      }
+    }
+  },
+  "1.50_ATR_target": {
+    "depth_range_atr": [
+      1.45,
+      1.65
+    ],
+    "total_observations_in_band": 33624,
+    "groups": {
+      "Group_A_monotonic_deteriorating": {
+        "description": "Monotonic deterioration with zero prior material recovery (<25%)",
+        "N_observations": 10416,
+        "N_unique_episodes": 5758,
+        "flip_before_new_max_pct": 28.465821812596005,
+        "flip_le_180s_pct": 17.62672811059908
+      },
+      "Group_B_prior_25_to_50_rec_now_deteriorating": {
+        "description": "Prior 25-50% recovery rollover, now deteriorating",
+        "N_observations": 4784,
+        "N_unique_episodes": 2243,
+        "flip_before_new_max_pct": 34.09280936454849,
+        "flip_le_180s_pct": 18.331939799331103
+      },
+      "Group_C_prior_ge_50_rec_now_deteriorating": {
+        "description": "Prior >=50% recovery rollover, now deteriorating",
+        "N_observations": 3781,
+        "N_unique_episodes": 1258,
+        "flip_before_new_max_pct": 47.183284845279026,
+        "flip_le_180s_pct": 20.629463104998678
+      },
+      "Group_D_currently_recovering_ge_50": {
+        "description": "Actively recovering (current recovery >=50%)",
+        "N_observations": 77,
+        "N_unique_episodes": 23,
+        "flip_before_new_max_pct": 58.44155844155844,
+        "flip_le_180s_pct": 15.584415584415584
+      }
+    },
+    "deltas_vs_group_a": {
+      "Group_B_prior_25_to_50_rec_now_deteriorating_vs_Group_A": {
+        "flip_before_new_max_delta": 5.626987551952489,
+        "flip_le_180s_delta": 0.7052116887320246
+      },
+      "Group_C_prior_ge_50_rec_now_deteriorating_vs_Group_A": {
+        "flip_before_new_max_delta": 18.71746303268302,
+        "flip_le_180s_delta": 3.0027349943995993
+      },
+      "Group_D_currently_recovering_ge_50_vs_Group_A": {
+        "flip_before_new_max_delta": 29.975736628962437,
+        "flip_le_180s_delta": -2.042312526183494
+      }
+    }
+  },
+  "2.00_ATR_target": {
+    "depth_range_atr": [
+      1.95,
+      2.15
+    ],
+    "total_observations_in_band": 13383,
+    "groups": {
+      "Group_A_monotonic_deteriorating": {
+        "description": "Monotonic deterioration with zero prior material recovery (<25%)",
+        "N_observations": 4899,
+        "N_unique_episodes": 2592,
+        "flip_before_new_max_pct": 38.27311696264544,
+        "flip_le_180s_pct": 23.96407430087773
+      },
+      "Group_B_prior_25_to_50_rec_now_deteriorating": {
+        "description": "Prior 25-50% recovery rollover, now deteriorating",
+        "N_observations": 1875,
+        "N_unique_episodes": 792,
+        "flip_before_new_max_pct": 51.04,
+        "flip_le_180s_pct": 28.586666666666666
+      },
+      "Group_C_prior_ge_50_rec_now_deteriorating": {
+        "description": "Prior >=50% recovery rollover, now deteriorating",
+        "N_observations": 1365,
+        "N_unique_episodes": 466,
+        "flip_before_new_max_pct": 62.56410256410256,
+        "flip_le_180s_pct": 29.37728937728938
+      },
+      "Group_D_currently_recovering_ge_50": {
+        "description": "Actively recovering (current recovery >=50%)",
+        "N_observations": 6,
+        "N_unique_episodes": 3,
+        "flip_before_new_max_pct": 16.666666666666664,
+        "flip_le_180s_pct": 16.666666666666664
+      }
+    },
+    "deltas_vs_group_a": {
+      "Group_B_prior_25_to_50_rec_now_deteriorating_vs_Group_A": {
+        "flip_before_new_max_delta": 12.76688303735456,
+        "flip_le_180s_delta": 4.622592365788936
+      },
+      "Group_C_prior_ge_50_rec_now_deteriorating_vs_Group_A": {
+        "flip_before_new_max_delta": 24.290985601457123,
+        "flip_le_180s_delta": 5.41321507641165
+      },
+      "Group_D_currently_recovering_ge_50_vs_Group_A": {
+        "flip_before_new_max_delta": -21.606450295978775,
+        "flip_le_180s_delta": -7.297407634211066
+      }
+    }
+  }
+}

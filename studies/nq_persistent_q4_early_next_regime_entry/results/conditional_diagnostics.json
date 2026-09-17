@@ -1,0 +1,242 @@
+{
+  "ALL": {
+    "H1_STRATIFICATION": {
+      "Q1_LOW": {
+        "n": 1403,
+        "mean_delta_dollars": 5.983606557377049,
+        "q4_better_pct": 0.7184604419101924
+      },
+      "Q2": {
+        "n": 1402,
+        "mean_delta_dollars": -2.2967189728958632,
+        "q4_better_pct": 0.6875891583452212
+      },
+      "Q3": {
+        "n": 1402,
+        "mean_delta_dollars": -10.51355206847361,
+        "q4_better_pct": 0.6298145506419401
+      },
+      "Q4_HIGH": {
+        "n": 1403,
+        "mean_delta_dollars": 2.7263007840342124,
+        "q4_better_pct": 0.5759087669280114
+      }
+    },
+    "H2_STRATIFICATION": {
+      "Q1_LOW": {
+        "n": 1403,
+        "mean_delta_dollars": 11.304347826086957,
+        "q4_better_pct": 0.7198859586600143
+      },
+      "Q2": {
+        "n": 1402,
+        "mean_delta_dollars": -19.151212553495007,
+        "q4_better_pct": 0.6847360912981455
+      },
+      "Q3": {
+        "n": 1402,
+        "mean_delta_dollars": 0.6062767475035663,
+        "q4_better_pct": 0.6440798858773181
+      },
+      "Q4_HIGH": {
+        "n": 1403,
+        "mean_delta_dollars": 3.136136849607983,
+        "q4_better_pct": 0.5630791161796151
+      }
+    },
+    "TRAJECTORY_SHAPE": {
+      "BOTH_FLAT_ELEVATED": {
+        "n": 576,
+        "mean_delta_dollars": 23.723958333333332,
+        "q4_better_pct": 0.7100694444444444
+      },
+      "H1_FLAT_H2_RISING": {
+        "n": 18,
+        "mean_delta_dollars": 117.77777777777777,
+        "q4_better_pct": 0.8333333333333334
+      },
+      "H1_RISING_H2_FLAT": {
+        "n": 171,
+        "mean_delta_dollars": 37.36842105263158,
+        "q4_better_pct": 0.7368421052631579
+      },
+      "H1_RISING_H2_RISING": {
+        "n": 4845,
+        "mean_delta_dollars": -5.761609907120743,
+        "q4_better_pct": 0.6425180598555211
+      }
+    },
+    "DIRECTION": {
+      "-1": {
+        "n": 2791,
+        "mean_delta_dollars": -4.423145825868864,
+        "q4_better_pct": 0.649587961304192
+      },
+      "1": {
+        "n": 2819,
+        "mean_delta_dollars": 2.343029443064917,
+        "q4_better_pct": 0.656261085491309
+      }
+    }
+  },
+  "TRAIN": {
+    "H1_STRATIFICATION": {
+      "Q1_LOW": {
+        "n": 1260,
+        "mean_delta_dollars": -0.0873015873015873,
+        "q4_better_pct": 0.7214285714285714
+      },
+      "Q2": {
+        "n": 1259,
+        "mean_delta_dollars": -3.2247815726767275,
+        "q4_better_pct": 0.6822875297855441
+      },
+      "Q3": {
+        "n": 1260,
+        "mean_delta_dollars": -9.932539682539682,
+        "q4_better_pct": 0.6277777777777778
+      },
+      "Q4_HIGH": {
+        "n": 1259,
+        "mean_delta_dollars": -1.3899920571882447,
+        "q4_better_pct": 0.5718824463860207
+      }
+    },
+    "H2_STRATIFICATION": {
+      "Q1_LOW": {
+        "n": 1260,
+        "mean_delta_dollars": 4.757936507936508,
+        "q4_better_pct": 0.7198412698412698
+      },
+      "Q2": {
+        "n": 1259,
+        "mean_delta_dollars": -15.472597299444002,
+        "q4_better_pct": 0.6862589356632248
+      },
+      "Q3": {
+        "n": 1259,
+        "mean_delta_dollars": -7.494042891183479,
+        "q4_better_pct": 0.6354249404289118
+      },
+      "Q4_HIGH": {
+        "n": 1260,
+        "mean_delta_dollars": 3.5595238095238093,
+        "q4_better_pct": 0.5619047619047619
+      }
+    },
+    "TRAJECTORY_SHAPE": {
+      "BOTH_FLAT_ELEVATED": {
+        "n": 504,
+        "mean_delta_dollars": 13.432539682539682,
+        "q4_better_pct": 0.7083333333333334
+      },
+      "H1_FLAT_H2_RISING": {
+        "n": 17,
+        "mean_delta_dollars": 80.29411764705883,
+        "q4_better_pct": 0.8235294117647058
+      },
+      "H1_RISING_H2_FLAT": {
+        "n": 144,
+        "mean_delta_dollars": 33.854166666666664,
+        "q4_better_pct": 0.7430555555555556
+      },
+      "H1_RISING_H2_RISING": {
+        "n": 4373,
+        "mean_delta_dollars": -7.190715755774068,
+        "q4_better_pct": 0.6405213812028355
+      }
+    },
+    "DIRECTION": {
+      "-1": {
+        "n": 2506,
+        "mean_delta_dollars": -5.273343974461293,
+        "q4_better_pct": 0.650438946528332
+      },
+      "1": {
+        "n": 2532,
+        "mean_delta_dollars": -2.061611374407583,
+        "q4_better_pct": 0.6512638230647709
+      }
+    }
+  },
+  "OOS": {
+    "H1_STRATIFICATION": {
+      "Q1_LOW": {
+        "n": 143,
+        "mean_delta_dollars": 75.8041958041958,
+        "q4_better_pct": 0.7202797202797203
+      },
+      "Q2": {
+        "n": 143,
+        "mean_delta_dollars": -10.734265734265735,
+        "q4_better_pct": 0.6923076923076923
+      },
+      "Q3": {
+        "n": 143,
+        "mean_delta_dollars": -15.13986013986014,
+        "q4_better_pct": 0.6503496503496503
+      },
+      "Q4_HIGH": {
+        "n": 143,
+        "mean_delta_dollars": 38.84615384615385,
+        "q4_better_pct": 0.6223776223776224
+      }
+    },
+    "H2_STRATIFICATION": {
+      "Q1_LOW": {
+        "n": 143,
+        "mean_delta_dollars": 90.31468531468532,
+        "q4_better_pct": 0.7272727272727273
+      },
+      "Q2": {
+        "n": 143,
+        "mean_delta_dollars": -75.9090909090909,
+        "q4_better_pct": 0.6433566433566433
+      },
+      "Q3": {
+        "n": 143,
+        "mean_delta_dollars": 69.8951048951049,
+        "q4_better_pct": 0.7132867132867133
+      },
+      "Q4_HIGH": {
+        "n": 143,
+        "mean_delta_dollars": 4.475524475524476,
+        "q4_better_pct": 0.6013986013986014
+      }
+    },
+    "TRAJECTORY_SHAPE": {
+      "BOTH_FLAT_ELEVATED": {
+        "n": 72,
+        "mean_delta_dollars": 95.76388888888889,
+        "q4_better_pct": 0.7222222222222222
+      },
+      "H1_FLAT_H2_RISING": {
+        "n": 1,
+        "mean_delta_dollars": 755.0,
+        "q4_better_pct": 1.0
+      },
+      "H1_RISING_H2_FLAT": {
+        "n": 27,
+        "mean_delta_dollars": 56.111111111111114,
+        "q4_better_pct": 0.7037037037037037
+      },
+      "H1_RISING_H2_RISING": {
+        "n": 472,
+        "mean_delta_dollars": 7.478813559322034,
+        "q4_better_pct": 0.6610169491525424
+      }
+    },
+    "DIRECTION": {
+      "-1": {
+        "n": 285,
+        "mean_delta_dollars": 3.0526315789473686,
+        "q4_better_pct": 0.6421052631578947
+      },
+      "1": {
+        "n": 287,
+        "mean_delta_dollars": 41.20209059233449,
+        "q4_better_pct": 0.7003484320557491
+      }
+    }
+  }
+}

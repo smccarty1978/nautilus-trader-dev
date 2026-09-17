@@ -1,0 +1,43 @@
+{
+  "transition_probabilities": {
+    "pb05_to_pb10_pct": 58.619194867497036,
+    "pb10_to_pb15_pct": 50.147899822520216,
+    "pb15_to_pb20_pct": 39.76602438065277,
+    "counts": {
+      "reaching_pb05": 34603,
+      "reaching_pb10": 20284,
+      "reaching_pb15": 10172,
+      "reaching_pb20": 4045
+    }
+  },
+  "conditional_on_deepest_stage_reached": {
+    "0.50_to_1.00": {
+      "deepest_stage_range_atr": "0.50 - 1.0",
+      "episodes_count_N": 14319,
+      "reversal_pct": 4.721000069837279,
+      "reextension_pct": 93.92415671485439,
+      "censored_pct": 1.3548432153083316
+    },
+    "1.00_to_1.50": {
+      "deepest_stage_range_atr": "1.00 - 1.5",
+      "episodes_count_N": 10112,
+      "reversal_pct": 13.39003164556962,
+      "reextension_pct": 84.92879746835443,
+      "censored_pct": 1.6811708860759493
+    },
+    "1.50_to_2.00": {
+      "deepest_stage_range_atr": "1.50 - 2.0",
+      "episodes_count_N": 6127,
+      "reversal_pct": 26.277133997062187,
+      "reextension_pct": 70.71976497470214,
+      "censored_pct": 3.0031010282356783
+    },
+    "ge_2.00": {
+      "deepest_stage_range_atr": "2.00 - +",
+      "episodes_count_N": 4045,
+      "reversal_pct": 47.39184177997528,
+      "reextension_pct": 47.14462299134734,
+      "censored_pct": 5.4635352286773795
+    }
+  }
+}

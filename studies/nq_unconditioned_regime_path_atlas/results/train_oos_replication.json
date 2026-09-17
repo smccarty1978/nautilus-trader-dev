@@ -1,0 +1,130 @@
+{
+  "PB0.50": {
+    "TRAIN": {
+      "fresh": {
+        "N": 42883,
+        "flip_pct": 33.68,
+        "flip_180s_pct": 14.28
+      },
+      "rollover_ge50": {
+        "N": 40141,
+        "flip_pct": 25.5,
+        "flip_180s_pct": 10.65
+      },
+      "penalty_flip_pct": -8.18,
+      "penalty_flip_180s_pct": -3.63
+    },
+    "OOS_2025_Q1": {
+      "fresh": {
+        "N": 5121,
+        "flip_pct": 32.79,
+        "flip_180s_pct": 14.53
+      },
+      "rollover_ge50": {
+        "N": 4609,
+        "flip_pct": 23.13,
+        "flip_180s_pct": 9.46
+      },
+      "penalty_flip_pct": -9.66,
+      "penalty_flip_180s_pct": -5.07
+    },
+    "preservation_ratio_flip": 118.1,
+    "preservation_ratio_180s": 139.7
+  },
+  "PB1.00": {
+    "TRAIN": {
+      "fresh": {
+        "N": 13473,
+        "flip_pct": 52.24,
+        "flip_180s_pct": 27.55
+      },
+      "rollover_ge50": {
+        "N": 8821,
+        "flip_pct": 56.94,
+        "flip_180s_pct": 34.0
+      },
+      "penalty_flip_pct": 4.7,
+      "penalty_flip_180s_pct": 6.45
+    },
+    "OOS_2025_Q1": {
+      "fresh": {
+        "N": 1787,
+        "flip_pct": 51.32,
+        "flip_180s_pct": 28.09
+      },
+      "rollover_ge50": {
+        "N": 987,
+        "flip_pct": 54.41,
+        "flip_180s_pct": 31.61
+      },
+      "penalty_flip_pct": 3.09,
+      "penalty_flip_180s_pct": 3.52
+    },
+    "preservation_ratio_flip": 65.7,
+    "preservation_ratio_180s": 54.6
+  },
+  "PB1.50": {
+    "TRAIN": {
+      "fresh": {
+        "N": 5086,
+        "flip_pct": 68.19,
+        "flip_180s_pct": 43.59
+      },
+      "rollover_ge50": {
+        "N": 7330,
+        "flip_pct": 75.81,
+        "flip_180s_pct": 57.27
+      },
+      "penalty_flip_pct": 7.62,
+      "penalty_flip_180s_pct": 13.68
+    },
+    "OOS_2025_Q1": {
+      "fresh": {
+        "N": 719,
+        "flip_pct": 67.32,
+        "flip_180s_pct": 42.84
+      },
+      "rollover_ge50": {
+        "N": 809,
+        "flip_pct": 71.57,
+        "flip_180s_pct": 54.14
+      },
+      "penalty_flip_pct": 4.25,
+      "penalty_flip_180s_pct": 11.3
+    },
+    "preservation_ratio_flip": 55.8,
+    "preservation_ratio_180s": 82.6
+  },
+  "PB2.00+": {
+    "TRAIN": {
+      "fresh": {
+        "N": 2312,
+        "flip_pct": 76.38,
+        "flip_180s_pct": 53.72
+      },
+      "rollover_ge50": {
+        "N": 4771,
+        "flip_pct": 82.79,
+        "flip_180s_pct": 67.18
+      },
+      "penalty_flip_pct": 6.41,
+      "penalty_flip_180s_pct": 13.46
+    },
+    "OOS_2025_Q1": {
+      "fresh": {
+        "N": 352,
+        "flip_pct": 77.84,
+        "flip_180s_pct": 55.11
+      },
+      "rollover_ge50": {
+        "N": 521,
+        "flip_pct": 79.08,
+        "flip_180s_pct": 63.92
+      },
+      "penalty_flip_pct": 1.24,
+      "penalty_flip_180s_pct": 8.81
+    },
+    "preservation_ratio_flip": 19.3,
+    "preservation_ratio_180s": 65.5
+  }
+}

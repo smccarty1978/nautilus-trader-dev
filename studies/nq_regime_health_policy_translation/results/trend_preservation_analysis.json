@@ -1,0 +1,116 @@
+{
+  "ALL": {
+    "P1": {
+      "total_health_exits": 16252,
+      "pct_health_exits": 0.9728241350413025,
+      "abandoned_extensions_ge_1atr": 6887,
+      "abandoned_extensions_ge_2atr": 4148,
+      "abandoned_extensions_ge_3atr": 2637,
+      "pct_health_exits_abandoning_ge_1atr": 0.4237632291410288,
+      "pct_health_exits_abandoning_ge_2atr": 0.25523012552301255,
+      "total_mfe_points_forfeited": 271529.25
+    },
+    "P2": {
+      "total_health_exits": 5733,
+      "pct_health_exits": 0.3431701185202921,
+      "abandoned_extensions_ge_1atr": 1695,
+      "abandoned_extensions_ge_2atr": 992,
+      "abandoned_extensions_ge_3atr": 620,
+      "pct_health_exits_abandoning_ge_1atr": 0.2956567242281528,
+      "pct_health_exits_abandoning_ge_2atr": 0.17303331589045876,
+      "total_mfe_points_forfeited": 67888.75
+    },
+    "P3": {
+      "total_health_exits": 5603,
+      "pct_health_exits": 0.33538848317969594,
+      "abandoned_extensions_ge_1atr": 1660,
+      "abandoned_extensions_ge_2atr": 973,
+      "abandoned_extensions_ge_3atr": 614,
+      "pct_health_exits_abandoning_ge_1atr": 0.2962698554345886,
+      "pct_health_exits_abandoning_ge_2atr": 0.1736569694806354,
+      "total_mfe_points_forfeited": 66778.25
+    },
+    "P3_RECOVERY_EFFECT": {
+      "recovered_trades_avoiding_invalidation": 461,
+      "recovered_trades_reaching_ge_1atr_pnl": 59,
+      "recovered_trades_reaching_ge_2atr_pnl": 40,
+      "recovered_total_pnl_preserved": -58810.0
+    }
+  },
+  "TRAIN": {
+    "P1": {
+      "total_health_exits": 14544,
+      "pct_health_exits": 0.9731682837069254,
+      "abandoned_extensions_ge_1atr": 6165,
+      "abandoned_extensions_ge_2atr": 3700,
+      "abandoned_extensions_ge_3atr": 2350,
+      "pct_health_exits_abandoning_ge_1atr": 0.4238861386138614,
+      "pct_health_exits_abandoning_ge_2atr": 0.2544004400440044,
+      "total_mfe_points_forfeited": 228195.25
+    },
+    "P2": {
+      "total_health_exits": 5144,
+      "pct_health_exits": 0.3441953830712613,
+      "abandoned_extensions_ge_1atr": 1516,
+      "abandoned_extensions_ge_2atr": 887,
+      "abandoned_extensions_ge_3atr": 555,
+      "pct_health_exits_abandoning_ge_1atr": 0.29471228615863143,
+      "pct_health_exits_abandoning_ge_2atr": 0.1724339035769829,
+      "total_mfe_points_forfeited": 57566.0
+    },
+    "P3": {
+      "total_health_exits": 5027,
+      "pct_health_exits": 0.33636667781866847,
+      "abandoned_extensions_ge_1atr": 1483,
+      "abandoned_extensions_ge_2atr": 868,
+      "abandoned_extensions_ge_3atr": 549,
+      "pct_health_exits_abandoning_ge_1atr": 0.29500696240302365,
+      "pct_health_exits_abandoning_ge_2atr": 0.17266759498706982,
+      "total_mfe_points_forfeited": 56552.0
+    },
+    "P3_RECOVERY_EFFECT": {
+      "recovered_trades_avoiding_invalidation": 407,
+      "recovered_trades_reaching_ge_1atr_pnl": 51,
+      "recovered_trades_reaching_ge_2atr_pnl": 36,
+      "recovered_total_pnl_preserved": -47570.0
+    }
+  },
+  "OOS": {
+    "P1": {
+      "total_health_exits": 1708,
+      "pct_health_exits": 0.9699034639409426,
+      "abandoned_extensions_ge_1atr": 722,
+      "abandoned_extensions_ge_2atr": 448,
+      "abandoned_extensions_ge_3atr": 287,
+      "pct_health_exits_abandoning_ge_1atr": 0.42271662763466045,
+      "pct_health_exits_abandoning_ge_2atr": 0.26229508196721313,
+      "total_mfe_points_forfeited": 43334.0
+    },
+    "P2": {
+      "total_health_exits": 589,
+      "pct_health_exits": 0.33446905167518454,
+      "abandoned_extensions_ge_1atr": 179,
+      "abandoned_extensions_ge_2atr": 105,
+      "abandoned_extensions_ge_3atr": 65,
+      "pct_health_exits_abandoning_ge_1atr": 0.30390492359932086,
+      "pct_health_exits_abandoning_ge_2atr": 0.17826825127334464,
+      "total_mfe_points_forfeited": 10322.75
+    },
+    "P3": {
+      "total_health_exits": 576,
+      "pct_health_exits": 0.3270868824531516,
+      "abandoned_extensions_ge_1atr": 177,
+      "abandoned_extensions_ge_2atr": 105,
+      "abandoned_extensions_ge_3atr": 65,
+      "pct_health_exits_abandoning_ge_1atr": 0.3072916666666667,
+      "pct_health_exits_abandoning_ge_2atr": 0.18229166666666666,
+      "total_mfe_points_forfeited": 10226.25
+    },
+    "P3_RECOVERY_EFFECT": {
+      "recovered_trades_avoiding_invalidation": 54,
+      "recovered_trades_reaching_ge_1atr_pnl": 8,
+      "recovered_trades_reaching_ge_2atr_pnl": 4,
+      "recovered_total_pnl_preserved": -11240.0
+    }
+  }
+}

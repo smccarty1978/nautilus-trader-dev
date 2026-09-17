@@ -1,0 +1,221 @@
+{
+  "ALL": {
+    "P0_NATURAL": {
+      "trade_count": 16706,
+      "win_rate": 0.3280857177062133,
+      "gross_pnl": 33410.0,
+      "gross_ev_per_trade": 1.9998802825332216,
+      "net_pnl": -217180.0,
+      "ev_per_trade": -13.000119717466779,
+      "median_trade": -140.0,
+      "profit_factor": 0.931109845823467,
+      "max_drawdown": 234700.0,
+      "mean_mfe_atr": 2.194357999547069,
+      "mean_mae_atr": 1.1674797091055256,
+      "mean_holding_seconds": 924.4741410271758,
+      "exit_reasons": {
+        "NATURAL_FLIP": 16706
+      }
+    },
+    "P1_IMMEDIATE_Q4": {
+      "trade_count": 16706,
+      "win_rate": 0.306297138752544,
+      "gross_pnl": 9485.0,
+      "gross_ev_per_trade": 0.567760086196576,
+      "net_pnl": -241105.0,
+      "ev_per_trade": -14.432239913803423,
+      "median_trade": -90.0,
+      "profit_factor": 0.8778624600756315,
+      "max_drawdown": 245125.0,
+      "mean_mfe_atr": 1.3879376018716838,
+      "mean_mae_atr": 0.6682834917465211,
+      "mean_holding_seconds": 348.536753262301,
+      "exit_reasons": {
+        "IMMEDIATE_Q4": 16252,
+        "NATURAL_FLIP": 454
+      }
+    },
+    "P2_PERSISTENCE_60S": {
+      "trade_count": 16706,
+      "win_rate": 0.32138153956662274,
+      "gross_pnl": 205.0,
+      "gross_ev_per_trade": 0.012271040344786304,
+      "net_pnl": -250385.0,
+      "ev_per_trade": -14.987728959655215,
+      "median_trade": -130.0,
+      "profit_factor": 0.9146054271774959,
+      "max_drawdown": 273755.0,
+      "mean_mfe_atr": 2.0327564572489356,
+      "mean_mae_atr": 1.0765018893816618,
+      "mean_holding_seconds": 800.0416018197055,
+      "exit_reasons": {
+        "NATURAL_FLIP": 10973,
+        "PERSISTENT_Q4_60S": 5733
+      }
+    },
+    "P3_PERSISTENCE_RECOVERY": {
+      "trade_count": 16706,
+      "win_rate": 0.32150125703340116,
+      "gross_pnl": -3380.0,
+      "gross_ev_per_trade": -0.202322518855501,
+      "net_pnl": -253970.0,
+      "ev_per_trade": -15.202322518855501,
+      "median_trade": -130.0,
+      "profit_factor": 0.9135906639674736,
+      "max_drawdown": 276295.0,
+      "mean_mfe_atr": 2.034881034645453,
+      "mean_mae_atr": 1.0791743517687395,
+      "mean_holding_seconds": 802.1872381180415,
+      "exit_reasons": {
+        "NATURAL_FLIP": 11103,
+        "PERSISTENT_Q4_60S": 5603
+      }
+    }
+  },
+  "TRAIN": {
+    "P0_NATURAL": {
+      "trade_count": 14945,
+      "win_rate": 0.3257276681164269,
+      "gross_pnl": 14735.0,
+      "gross_ev_per_trade": 0.9859484777517564,
+      "net_pnl": -209440.0,
+      "ev_per_trade": -14.014051522248243,
+      "median_trade": -135.0,
+      "profit_factor": 0.9215018983617494,
+      "max_drawdown": 217780.0,
+      "mean_mfe_atr": 2.1865367739268144,
+      "mean_mae_atr": 1.1680010687820728,
+      "mean_holding_seconds": 919.3037805286049,
+      "exit_reasons": {
+        "NATURAL_FLIP": 14945
+      }
+    },
+    "P1_IMMEDIATE_Q4": {
+      "trade_count": 14945,
+      "win_rate": 0.30525259284041484,
+      "gross_pnl": -6765.0,
+      "gross_ev_per_trade": -0.4526597524255604,
+      "net_pnl": -230940.0,
+      "ev_per_trade": -15.45265975242556,
+      "median_trade": -90.0,
+      "profit_factor": 0.8618002944238986,
+      "max_drawdown": 236480.0,
+      "mean_mfe_atr": 1.3801007021592648,
+      "mean_mae_atr": 0.6684227176489682,
+      "mean_holding_seconds": 348.01773168283705,
+      "exit_reasons": {
+        "IMMEDIATE_Q4": 14544,
+        "NATURAL_FLIP": 401
+      }
+    },
+    "P2_PERSISTENCE_60S": {
+      "trade_count": 14945,
+      "win_rate": 0.3189026430244229,
+      "gross_pnl": -27860.0,
+      "gross_ev_per_trade": -1.864168618266979,
+      "net_pnl": -252035.0,
+      "ev_per_trade": -16.86416861826698,
+      "median_trade": -130.0,
+      "profit_factor": 0.8984681699616287,
+      "max_drawdown": 258235.0,
+      "mean_mfe_atr": 2.025057027363017,
+      "mean_mae_atr": 1.0770311571811635,
+      "mean_holding_seconds": 794.8554700568752,
+      "exit_reasons": {
+        "NATURAL_FLIP": 9801,
+        "PERSISTENT_Q4_60S": 5144
+      }
+    },
+    "P3_PERSISTENCE_RECOVERY": {
+      "trade_count": 14945,
+      "win_rate": 0.3190364670458347,
+      "gross_pnl": -29580.0,
+      "gross_ev_per_trade": -1.9792572766811642,
+      "net_pnl": -253755.0,
+      "ev_per_trade": -16.979257276681164,
+      "median_trade": -130.0,
+      "profit_factor": 0.8979908103088556,
+      "max_drawdown": 259695.0,
+      "mean_mfe_atr": 2.027374339501174,
+      "mean_mae_atr": 1.0796500837943608,
+      "mean_holding_seconds": 797.0639009702242,
+      "exit_reasons": {
+        "NATURAL_FLIP": 9918,
+        "PERSISTENT_Q4_60S": 5027
+      }
+    }
+  },
+  "OOS": {
+    "P0_NATURAL": {
+      "trade_count": 1761,
+      "win_rate": 0.3480976717773992,
+      "gross_pnl": 18675.0,
+      "gross_ev_per_trade": 10.604770017035776,
+      "net_pnl": -7740.0,
+      "ev_per_trade": -4.395229982964225,
+      "median_trade": -190.0,
+      "profit_factor": 0.9840236136769426,
+      "max_drawdown": 31135.0,
+      "mean_mfe_atr": 2.26073404548387,
+      "mean_mae_atr": 1.1630551092384072,
+      "mean_holding_seconds": 968.3532084043158,
+      "exit_reasons": {
+        "NATURAL_FLIP": 1761
+      }
+    },
+    "P1_IMMEDIATE_Q4": {
+      "trade_count": 1761,
+      "win_rate": 0.3151618398637138,
+      "gross_pnl": 16250.0,
+      "gross_ev_per_trade": 9.22771152754117,
+      "net_pnl": -10165.0,
+      "ev_per_trade": -5.77228847245883,
+      "median_trade": -115.0,
+      "profit_factor": 0.96645048434741,
+      "max_drawdown": 28895.0,
+      "mean_mfe_atr": 1.4544466684259747,
+      "mean_mae_atr": 0.6671019295022997,
+      "mean_holding_seconds": 352.94151050539466,
+      "exit_reasons": {
+        "IMMEDIATE_Q4": 1708,
+        "NATURAL_FLIP": 53
+      }
+    },
+    "P2_PERSISTENCE_60S": {
+      "trade_count": 1761,
+      "win_rate": 0.3424190800681431,
+      "gross_pnl": 28065.0,
+      "gross_ev_per_trade": 15.936967632027256,
+      "net_pnl": 1650.0,
+      "ev_per_trade": 0.9369676320272572,
+      "median_trade": -170.0,
+      "profit_factor": 1.0036685416990907,
+      "max_drawdown": 30350.0,
+      "mean_mfe_atr": 2.0980988647702614,
+      "mean_mae_atr": 1.0720101760008833,
+      "mean_holding_seconds": 844.0545144804089,
+      "exit_reasons": {
+        "NATURAL_FLIP": 1172,
+        "PERSISTENT_Q4_60S": 589
+      }
+    },
+    "P3_PERSISTENCE_RECOVERY": {
+      "trade_count": 1761,
+      "win_rate": 0.3424190800681431,
+      "gross_pnl": 26200.0,
+      "gross_ev_per_trade": 14.877910278250994,
+      "net_pnl": -215.0,
+      "ev_per_trade": -0.12208972174900624,
+      "median_trade": -170.0,
+      "profit_factor": 0.9995238938836972,
+      "max_drawdown": 31135.0,
+      "mean_mfe_atr": 2.098587768848323,
+      "mean_mae_atr": 1.0751369780476068,
+      "mean_holding_seconds": 845.6672345258376,
+      "exit_reasons": {
+        "NATURAL_FLIP": 1185,
+        "PERSISTENT_Q4_60S": 576
+      }
+    }
+  }
+}

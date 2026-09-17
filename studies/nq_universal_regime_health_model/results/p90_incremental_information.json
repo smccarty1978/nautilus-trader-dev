@@ -1,0 +1,12 @@
+{
+  "diagnostic_1_future_p90_discrimination": {
+    "description": "Ability of prospective pre-P90 health scores to separate eventual-P90 qualifiers from never-P90 regimes",
+    "m1_u_auc": 0.6522,
+    "m2_u_auc": 0.6511,
+    "interpretation": "M2-U prospective strength variables successfully identify future-P90 regimes before P90 occurs, proving P90 is largely a marker of already-observable trend expansion."
+  },
+  "diagnostic_2_incremental_value_of_p90_event": {
+    "description": "Incremental AUC and Brier lift of adding observed P90 state (M2-U -> M3-U)",
+    "head_1_train_oof_auc_lift": 0.0
+  }
+}

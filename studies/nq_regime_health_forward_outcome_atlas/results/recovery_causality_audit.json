@@ -1,0 +1,37 @@
+{
+  "gate_0b_verdict": "RECOVERY_EFFECT_PARTIALLY_RETROSPECTIVE_REQUIRES_REESTIMATION",
+  "prior_implementation_audit": {
+    "file": "studies/nq_universal_regime_health_trajectory/results/hazard_recovery_analysis.json",
+    "h1_stress_criterion": "running_max_h1 >= 0.60",
+    "h2_stress_criterion": "running_max_h2 >= 0.35",
+    "prior_still_elevated_definition": "h1_drawdown_from_peak < 0.05 / h2_drawdown_from_peak < 0.05",
+    "prior_recovered_definition": "h1_drawdown_from_peak >= 0.15 / h2_drawdown_from_peak >= 0.15",
+    "prior_reported_numbers": {
+      "h1_still_elevated_failure_rate_train": 0.7624,
+      "h1_recovered_failure_rate_train": 0.3302,
+      "h2_still_elevated_failure_rate_train": 0.5921,
+      "h2_recovered_failure_rate_train": 0.1451
+    }
+  },
+  "biases_detected": {
+    "immortal_time_bias": {
+      "present": true,
+      "severity": "MODERATE_TO_HIGH",
+      "mechanism": "A regime cannot reach an observation where drawdown_from_peak >= 0.15 without first surviving the non-zero time interval from T_PEAK to T_RECOVERY_CONFIRM. Any regime that suffered an immediate terminal flip directly from peak hazard contributes rows only to the still-elevated pool and zero rows to the recovered pool."
+    },
+    "retrospective_conditioning": {
+      "present": true,
+      "severity": "MODERATE",
+      "mechanism": "In the parent study, observations with drawdown >= 0.15 were evaluated against the overall regime outcome (OPPOSITE_FLIP_BEFORE_NEW_MAX) rather than evaluating forward price opportunity exclusively from the confirmation timestamp forward."
+    },
+    "observation_level_overweighting": {
+      "present": true,
+      "severity": "MODERATE",
+      "mechanism": "Long, lingering regimes generated dozens of repeated observations with drawdown >= 0.15, whereas quickly resolving regimes generated fewer rows, overweighting persistent survivor trajectories."
+    }
+  },
+  "corrective_action": {
+    "action": "Re-estimate recovery outcomes using strictly causal prospective recovery-confirmation event timestamps (T_RECOVERY_CONFIRM).",
+    "prospective_event_definition": "For each regime, identify T_PEAK (first timestamp reaching acute stress threshold) and T_RECOVERY_CONFIRM (first subsequent timestamp where running_peak - current_hazard >= 0.15). Only outcomes occurring after T_RECOVERY_CONFIRM are evaluated."
+  }
+}

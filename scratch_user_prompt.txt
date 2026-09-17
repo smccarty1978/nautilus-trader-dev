@@ -1,0 +1,1012 @@
+<USER_REQUEST>
+You are continuing the NQ UNIVERSAL REGIME HEALTH research program.
+
+This is a FORWARD-OUTCOME / STATE-TRANSITION study.
+
+This is NOT:
+- a new predictive-model study
+- permission to retrain M1-U
+- a strategy backtest
+- an exit-policy optimization
+- an entry-policy optimization
+- a threshold search
+- a fill/slippage study
+- a PnL study
+
+The objective is to bridge the gap between:
+
+PREDICTIVE REGIME HEALTH
+
+and
+
+ECONOMICALLY RELEVANT FORWARD PRICE BEHAVIOR
+
+without designing a trading policy.
+
+The central question is:
+
+Given the complete causal H1/H2 state observable at timestamp t,
+what remaining favorable and adverse price opportunity exists from
+that timestamp forward, and how does it differ depending on whether
+hazard is deteriorating, persistent, or causally recovering?
+
+============================================================
+AUTHORITATIVE FROZEN CONTEXT
+============================================================
+
+Use as frozen parents:
+
+1. nq_unconditioned_regime_path_atlas
+2. nq_universal_regime_health_model
+3. nq_universal_regime_health_trajectory
+
+The authoritative population remains:
+
+Population-U
+= unconditioned natural V_A regimes
+
+TRAIN:
+2023–2024
+
+Untouched replication:
+2025 Q1
+
+Do not use 2026.
+
+Frozen model:
+
+M1-U
+
+HEAD 1:
+H1(t) =
+P(OPPOSITE_REGIME_FLIP before NEW_MAX | F_t)
+
+HEAD 2:
+H2(t) =
+P(OPPOSITE_REGIME_FLIP <= 180s | F_t)
+
+Do not retrain either model.
+
+Use the frozen model hashes, feature contract, calibration mappings,
+Population-U ledger, and trajectory ledger from the parent studies.
+
+Verify hashes before analysis.
+
+============================================================
+AUTHORITATIVE PRIOR FINDINGS
+============================================================
+
+The prior trajectory study found:
+
+1. Streaming feature/score parity was exact on the matched January
+2023 validation population.
+
+2. H1 and H2 exhibit distinct phase structure.
+
+3. Descriptive TRAIN-frozen quadrant boundaries were:
+
+Q1:
+H1 < 0.45 AND H2 < 0.20
+
+Q2:
+H1 >= 0.45 AND H2 < 0.20
+
+Q3:
+H1 < 0.45 AND H2 >= 0.20
+
+Q4:
+H1 >= 0.45 AND H2 >= 0.20
+
+These are DESCRIPTIVE STATE BOUNDARIES.
+
+They are NOT trading thresholds.
+
+Do not optimize or modify them based on forward economic outcomes.
+
+4. Hazard velocity appeared to add modest incremental information
+conditional on hazard level and pullback depth.
+
+5. Hazard persistence appeared important.
+
+6. Large apparent recovery effects were observed after elevated H1/H2.
+
+However, the recovery analysis requires a prospective timing audit
+before it may be interpreted for decision-making.
+
+============================================================
+GATE 0A — CLOSE THE 7-EXTRA PARITY ISSUE
+============================================================
+
+Before new research, resolve the prior Gate 1 population discrepancy:
+
+Expected transitions: 6,641
+Runtime transitions: 6,648
+Matched: 6,641
+Extra: 7
+
+The prior report described these as "boundary extras."
+
+Do not simply inherit that explanation.
+
+Determine exactly:
+
+- which 7 observations were extra
+- their timestamps
+- regime IDs
+- event types
+- why runtime emitted them
+- why the frozen ledger did not
+- whether they were outside the intended comparison interval
+- whether the difference can occur during ordinary full-period runtime
+- whether it represents a true population-semantic mismatch
+
+Return:
+
+BOUNDARY_EXTRAS_BENIGN
+
+or
+
+RUNTIME_POPULATION_SEMANTICS_MISMATCH
+
+If it is a real runtime population mismatch, STOP and repair/revalidate
+before continuing.
+
+Do not call population parity "exact" until this is resolved.
+
+============================================================
+GATE 0B — RECOVERY CAUSALITY / IMMORTAL-TIME AUDIT
+============================================================
+
+This gate is mandatory.
+
+The prior study reported approximately:
+
+H1 acute stress:
+76.2% failure without recovery
+vs
+33.0% after >=0.15 hazard recovery
+
+H2 acute stress:
+59.2% imminent flip
+vs
+14.5% after >=0.15 hazard recovery
+
+These effects MUST NOT automatically be interpreted prospectively.
+
+Audit exactly how "recovery" was defined.
+
+There are two fundamentally different timestamps:
+
+T_PEAK
+= timestamp at which elevated hazard is observed
+
+T_RECOVERY_CONFIRM
+= first later timestamp at which the required hazard decline has
+actually occurred and is causally observable
+
+A regime cannot be labeled RECOVERED at T_PEAK using knowledge that
+only becomes available at T_RECOVERY_CONFIRM.
+
+Explicitly test for:
+
+- future conditioning
+- immortal-time bias
+- survivorship conditioning
+- retrospective labeling
+- outcome-dependent window construction
+
+============================================================
+PROSPECTIVE RECOVERY DEFINITION
+============================================================
+
+Construct a causal recovery event.
+
+Example:
+
+H1 recovery confirmation occurs at the FIRST timestamp t where:
+
+running prior peak H1 - current H1 >= 0.15
+
+provided the prior peak satisfied the frozen stress condition.
+
+Analogously for H2.
+
+The exact implementation must use only information available at t.
+
+At T_RECOVERY_CONFIRM:
+
+the recovery state becomes observable.
+
+Only from that timestamp forward may the observation be classified
+as RECOVERED.
+
+Do NOT back-propagate the recovered label to the prior peak.
+
+Produce:
+
+recovery_causality_audit.json
+prospective_recovery_event_contract.json
+
+============================================================
+GATE 0B VERDICT
+============================================================
+
+Return:
+
+RECOVERY_ANALYSIS_CAUSAL
+
+RECOVERY_EFFECT_PARTIALLY_RETROSPECTIVE_REQUIRES_REESTIMATION
+
+or
+
+RECOVERY_ANALYSIS_INVALID
+
+If retrospective conditioning existed, that does NOT invalidate the
+parent M1-U model or trajectory atlas.
+
+It means only that the recovery effect must be re-estimated using
+prospective recovery-confirmation timestamps.
+
+Proceed using the corrected prospective definition.
+
+============================================================
+PHASE 1 — FORWARD OUTCOME LEDGER
+============================================================
+
+Construct a causal forward-outcome ledger.
+
+Observation timestamp t must contain only information known at t.
+
+Future outcomes may then be attached as LABELS for descriptive
+analysis.
+
+For every eligible state observation retain:
+
+regime_id
+timestamp
+direction
+regime_age
+current MFE
+prior_peak_MFE
+current_pullback_ATR
+path_state
+
+H1
+H2
+
+H1/H2 quadrant
+
+hazard velocity:
+5s
+15s
+30s
+60s
+120s
+
+hazard acceleration
+
+hazard persistence
+
+running peak H1/H2
+
+drawdown from peak H1/H2
+
+prospective recovery-confirmed state
+
+time since recovery confirmation
+
+All trajectory calculations at t must remain causal.
+
+============================================================
+PHASE 2 — FORWARD ECONOMIC OUTCOMES
+============================================================
+
+This is NOT PnL.
+
+Measure PRICE PATH OUTCOMES from observation timestamp t.
+
+Normalize primarily in ATR terms.
+
+For every observation calculate:
+
+1. Remaining MFE before opposite regime flip.
+
+2. Remaining MAE before opposite regime flip.
+
+3. MFE before NEW_MAX or FLIP, whichever occurs first.
+
+4. MAE before NEW_MAX or FLIP, whichever occurs first.
+
+5. Probability NEW_MAX occurs before FLIP.
+
+6. Probability FLIP occurs before NEW_MAX.
+
+7. Time to NEW_MAX if NEW_MAX occurs first.
+
+8. Time to FLIP if FLIP occurs first.
+
+9. Time to either terminal competing event.
+
+10. Maximum favorable excursion over:
+30s
+60s
+120s
+180s
+300s
+
+11. Maximum adverse excursion over:
+30s
+60s
+120s
+180s
+300s
+
+12. Net directional price change over the same horizons.
+
+13. Maximum additional trend extension beyond the current prior
+peak MFE before regime termination.
+
+14. Giveback from the maximum subsequently achieved price to the
+opposite regime flip.
+
+15. Whether the current regime ultimately produces another
+meaningful extension before death.
+
+Do NOT convert these into strategy PnL.
+
+No commissions.
+No slippage.
+No hypothetical orders.
+
+============================================================
+CRITICAL QUESTION — WHAT HAPPENS AFTER Q4?
+============================================================
+
+The prior study showed Q4 has high structural and imminent hazard.
+
+That does NOT establish that Q4 should trigger an exit.
+
+Directly measure what happens prospectively after FIRST ENTRY into Q4.
+
+For every regime's first Q4 entry report:
+
+remaining MFE
+remaining MAE
+P(NEW_MAX before FLIP)
+P(FLIP before NEW_MAX)
+time to FLIP
+time to NEW_MAX
+remaining regime duration
+maximum subsequent trend extension
+maximum giveback
+
+Then distinguish prospectively observable subsequent paths:
+
+Q4 → remains Q4
+Q4 → Q2
+Q4 → Q3
+Q4 → Q1
+Q4 → FLIP
+Q4 → NEW_MAX
+
+Do not use the eventual path to make a decision at Q4 entry.
+
+This is descriptive trajectory anatomy.
+
+============================================================
+PHASE 3 — STATE-TRANSITION MATRIX
+============================================================
+
+Build a complete H1/H2 state-transition atlas.
+
+At minimum analyze:
+
+Q1 → Q1
+Q1 → Q2
+Q1 → Q3
+Q1 → Q4
+
+Q2 → Q1
+Q2 → Q2
+Q2 → Q4
+
+Q3 → Q1
+Q3 → Q3
+Q3 → Q4
+
+Q4 → Q1
+Q4 → Q2
+Q4 → Q3
+Q4 → Q4
+Q4 → FLIP
+Q4 → NEW_MAX
+
+Include other empirically valid transitions if present.
+
+For every transition report:
+
+transition count
+unique regimes
+probability of next state
+median time to next transition
+P(FLIP before NEW_MAX)
+P(NEW_MAX before FLIP)
+remaining MFE
+remaining MAE
+time to terminal event
+
+The key question is:
+
+IS ENTERING A HIGH-HAZARD STATE DANGEROUS,
+
+or
+
+IS FAILING TO ESCAPE THAT STATE DANGEROUS?
+
+============================================================
+PHASE 4 — PERSISTENCE CONDITIONED OUTCOMES
+============================================================
+
+Using TRAIN-frozen persistence definitions from the parent trajectory
+study, compare forward outcomes after:
+
+brief high hazard
+persistent high hazard
+
+For H1 and H2 separately.
+
+At minimum preserve the descriptive persistence windows already used:
+
+<30s
+30–60s
+>60s
+
+Do not search for better cutoffs.
+
+Within comparable:
+
+current H1/H2 band
+pullback-depth band
+path state where sample size permits
+
+measure:
+
+remaining MFE
+remaining MAE
+NEW_MAX probability
+FLIP probability
+time to terminal event
+
+We want to know whether persistence changes remaining opportunity
+conditional on current hazard level.
+
+============================================================
+PHASE 5 — VELOCITY CONDITIONED OUTCOMES
+============================================================
+
+The prior atlas found modest incremental predictive separation from
+hazard velocity.
+
+Now ask whether velocity changes FORWARD PRICE OPPORTUNITY.
+
+Within matched/conditioned cells of:
+
+current H1/H2
+current PB depth
+
+compare:
+
+rapid deterioration
+flat hazard
+falling hazard
+
+using the already frozen TRAIN definitions.
+
+Do not optimize velocity thresholds.
+
+Measure:
+
+remaining MFE
+remaining MAE
+NEW_MAX probability
+FLIP probability
+time to event
+300s favorable/adverse excursion
+
+Do this for H1 and H2 separately.
+
+============================================================
+PHASE 6 — PROSPECTIVE RECOVERY OUTCOMES
+============================================================
+
+This is one of the most important sections.
+
+Starting ONLY at T_RECOVERY_CONFIRM:
+
+measure what happens after causal recovery becomes observable.
+
+For H1 recovery and H2 recovery separately report:
+
+P(NEW_MAX before FLIP)
+P(FLIP before NEW_MAX)
+remaining MFE
+remaining MAE
+time to NEW_MAX
+time to FLIP
+probability of re-entering elevated hazard
+probability of returning to Q4
+maximum subsequent trend extension
+
+Compare recovered states against appropriate controls matched on
+PRE-RECOVERY severity where possible:
+
+prior peak hazard
+pullback depth
+regime age
+path state
+direction
+
+Do NOT compare recovered observations against observations at the
+original peak timestamp without accounting for the survival interval
+required to reach recovery confirmation.
+
+============================================================
+PHASE 7 — FIRST-ENTRY EVENT ANALYSIS
+============================================================
+
+Repeated rows from a persistent state can overweight long episodes.
+
+Therefore construct event-level analyses for FIRST ENTRY into:
+
+Q2
+Q3
+Q4
+
+and FIRST causal:
+
+H1 stress event
+H2 stress event
+H1 recovery confirmation
+H2 recovery confirmation
+
+Each regime/event should contribute once to the relevant first-entry
+analysis.
+
+Compare these results with the full observation-level atlas.
+
+This is important for separating:
+
+state prevalence
+
+from
+
+event prognosis.
+
+============================================================
+PHASE 8 — SEQUENCE ANALYSIS
+============================================================
+
+Study common causal state sequences.
+
+Examples:
+
+Q1 → Q2 → Q4 → FLIP
+
+Q1 → Q3 → Q4 → FLIP
+
+Q1 → Q2 → Q1 → NEW_MAX
+
+Q1 → Q3 → Q1 → NEW_MAX
+
+Q4 → Q2 → Q1 → NEW_MAX
+
+Q4 → Q4 → FLIP
+
+But discover common sequences empirically.
+
+Do NOT select sequences because they have attractive outcomes.
+
+On TRAIN:
+
+rank sequences by frequency, not profitability or success.
+
+Freeze the most common sequence definitions.
+
+Then evaluate those sequences once in 2025 Q1.
+
+For each sequence report:
+
+frequency
+unique regimes
+median duration
+terminal outcome distribution
+remaining MFE from first state
+remaining MAE from first state
+
+============================================================
+PHASE 9 — MATCHED Q4 ANALYSIS
+============================================================
+
+Q4 is especially important.
+
+Construct a matched analysis at FIRST Q4 ENTRY.
+
+Match/condition observations using causal information available at
+Q4 entry:
+
+direction
+regime age
+current pullback depth
+H1
+H2
+prior peak MFE
+path state
+
+Then compare eventual Q4 trajectories:
+
+persistent deterioration
+causal recovery
+escape to Q2
+escape to Q3
+escape to Q1
+
+The purpose is NOT to claim those future trajectories were knowable
+at Q4 entry.
+
+The purpose is to understand the heterogeneity hidden inside the
+single Q4 state and determine what additional causal observation
+would need to occur before their paths become distinguishable.
+
+============================================================
+TRAIN / OOS GOVERNANCE
+============================================================
+
+2023–2024:
+
+discovery
+descriptive state anatomy
+transition definitions
+sequence definitions
+matching design
+
+2025 Q1:
+
+untouched replication only
+
+Do NOT:
+
+change state boundaries after OOS
+change velocity thresholds after OOS
+change recovery definition after OOS
+select sequences based on OOS
+optimize any parameter on OOS
+
+For important effects report:
+
+TRAIN estimate
+OOS estimate
+absolute difference
+relative preservation where meaningful
+sign preservation
+sample count
+unique regime count
+regime-clustered confidence interval
+
+============================================================
+STATISTICAL REQUIREMENTS
+============================================================
+
+Repeated observations within a regime are dependent.
+
+Use regime-clustered bootstrap or equivalent grouped inference.
+
+Also report EVENT-LEVEL results for first state entry so that row
+multiplicity cannot create misleading confidence.
+
+Be particularly careful about:
+
+immortal-time bias
+survivorship conditioning
+future-defined recovery categories
+repeated-state overweighting
+competing-risk censoring
+terminal-event alignment
+
+============================================================
+NO CAUSAL OVERCLAIMS
+============================================================
+
+Do not say:
+
+"recovery causes survival"
+
+unless a design actually supports causal identification.
+
+Preferred language:
+
+"Once recovery becomes causally observable, subsequent failure risk
+is X."
+
+Likewise:
+
+"persistent Q4 is associated with..."
+
+not:
+
+"Q4 causes regime death."
+
+============================================================
+PERFORMANCE / WORKFLOW
+============================================================
+
+Use the fastest validated immutable artifacts.
+
+Do NOT replay the full raw market stream unless necessary.
+
+Gate 0A may require bounded streaming/runtime reconciliation.
+
+After that:
+
+use the frozen trajectory ledger and deterministic derived ledgers.
+
+Observation research belongs in the Fast Causal Observation Engine.
+
+Do not invoke a trading BacktestEngine.
+
+Cache deterministic transformations.
+
+Hash all derived datasets.
+
+Use scripts for:
+
+lag calculations
+forward excursions
+state transitions
+sequence extraction
+matching
+bootstrap
+tables
+hashing
+
+Use LLM reasoning only for:
+
+audit interpretation
+research synthesis
+failure diagnosis
+
+============================================================
+REQUIRED ARTIFACTS
+============================================================
+
+Create a NEW study.
+
+Suggested:
+
+studies/nq_regime_health_forward_outcome_atlas/
+
+Persist at minimum:
+
+study_manifest.json
+parent_artifact_hashes.json
+
+boundary_extra_reconciliation.json
+
+recovery_causality_audit.json
+prospective_recovery_event_contract.json
+
+forward_outcome_ledger.parquet
+forward_outcome_contract.json
+
+first_state_entry_ledger.parquet
+state_transition_ledger.parquet
+recovery_event_ledger.parquet
+
+quadrant_forward_outcomes.json
+q4_forward_outcomes.json
+state_transition_matrix.json
+persistence_forward_outcomes.json
+velocity_forward_outcomes.json
+prospective_recovery_outcomes.json
+first_entry_event_analysis.json
+sequence_analysis.json
+matched_q4_analysis.json
+
+train_oos_replication.json
+dataset_composite_hashes.json
+
+Final human-readable report:
+
+REGIME_HEALTH_FORWARD_OUTCOME_ATLAS.md
+
+============================================================
+MANDATORY RESEARCH QUESTIONS
+============================================================
+
+Answer at minimum:
+
+1. Were the 7 prior runtime extras genuinely benign boundary
+observations?
+
+2. Was the previously reported recovery effect fully prospective, or
+did it contain retrospective/immortal-time conditioning?
+
+3. Once recovery is actually observable at T_RECOVERY_CONFIRM, how
+much subsequent survival/re-extension information remains?
+
+4. At first Q4 entry, how much favorable excursion typically remains?
+
+5. At first Q4 entry, how much adverse excursion typically remains?
+
+6. What fraction of first Q4 entries subsequently NEW_MAX before
+FLIP?
+
+7. What fraction escape Q4 before terminal failure?
+
+8. Among Q4 observations, is persistence more informative than
+simple Q4 entry?
+
+9. Among matched hazard/depth states, does rising hazard materially
+reduce remaining MFE or increase remaining MAE?
+
+10. Are Q2 and Q3 economically different, not merely statistically
+different?
+
+11. Which state transitions are most commonly associated with
+subsequent NEW_MAX?
+
+12. Which state transitions are most commonly associated with
+subsequent FLIP?
+
+13. Does Q4 → recovery retain meaningful trend opportunity?
+
+14. Does Q4 → persistent Q4 have little remaining favorable
+opportunity?
+
+15. How much of each relationship replicates in untouched 2025 Q1?
+
+16. Is the economically relevant object primarily:
+    hazard LEVEL,
+    hazard VELOCITY,
+    hazard PERSISTENCE,
+    hazard RECOVERY,
+    H1/H2 STATE,
+    or STATE TRANSITION?
+
+17. Does the evidence now justify a narrowly specified event-driven
+trading-policy experiment?
+
+============================================================
+DECISION GATE
+============================================================
+
+Classify the evidence into ONE primary outcome:
+
+OUTCOME_A_LEVEL_SUFFICIENT
+
+Current H1/H2 level largely determines remaining opportunity.
+Trajectory/state-transition information adds little.
+
+OUTCOME_B_PERSISTENCE_DOMINATES
+
+Remaining opportunity changes primarily according to how long high
+hazard persists.
+
+OUTCOME_C_RECOVERY_DOMINATES
+
+Once causally confirmed, hazard recovery identifies a materially
+different subsequent opportunity set.
+
+OUTCOME_D_STATE_TRANSITIONS_DOMINATE
+
+The economically relevant information is primarily movement between
+H1/H2 states rather than static levels.
+
+OUTCOME_E_TRAJECTORY_ADDS_LITTLE_ECONOMIC_INFORMATION
+
+Trajectory improves prediction statistics but does not materially
+separate remaining favorable/adverse excursion.
+
+OUTCOME_F_UNSTABLE_OOS
+
+Important TRAIN relationships do not survive untouched 2025 Q1.
+
+OUTCOME_G_CAUSALITY_OR_RUNTIME_GATE_FAILURE
+
+The recovery or runtime audit exposes a blocking methodological
+problem.
+
+Do not force these to be mutually exclusive descriptively.
+
+Select the PRIMARY outcome based on the evidence and report important
+secondary findings separately.
+
+============================================================
+CRITICAL FINAL DECISION
+============================================================
+
+Do NOT design a strategy.
+
+Instead answer:
+
+Does the evidence justify proceeding to ONE narrowly specified
+event-driven policy experiment?
+
+If YES:
+
+state the empirical phenomenon that deserves testing.
+
+For example:
+
+"persistent jointly elevated H1/H2 after failed recovery"
+
+rather than inventing an optimized threshold rule.
+
+Specify what information would be causally available to such a
+future policy, but DO NOT select or optimize the policy here.
+
+If NO:
+
+state exactly what research uncertainty remains.
+
+============================================================
+MANDATORY STOP
+============================================================
+
+STOP after:
+
+Gate 0 audits
+forward-outcome atlas
+state-transition analysis
+prospective recovery analysis
+2025 Q1 replication
+decision classification
+final report
+
+DO NOT:
+
+run a strategy backtest
+simulate orders
+simulate fills
+calculate PnL
+optimize exits
+optimize entries
+optimize stops
+optimize hazard thresholds
+retrain M1-U
+add new predictive features
+use 2026
+
+============================================================
+FINAL RESPONSE FORMAT
+============================================================
+
+Give me:
+
+1. Executive summary.
+2. Gate 0A runtime-extra verdict.
+3. Gate 0B recovery-causality verdict.
+4. Exact population.
+5. First-entry Q1/Q2/Q3/Q4 forward outcomes.
+6. Detailed first-Q4-entry anatomy.
+7. State-transition matrix findings.
+8. Persistence findings.
+9. Velocity findings.
+10. Prospectively confirmed recovery findings.
+11. Remaining MFE/MAE findings.
+12. Common sequence findings.
+13. TRAIN → untouched 2025 Q1 replication.
+14. What the evidence DOES establish.
+15. What it DOES NOT establish.
+16. Primary Decision-Gate outcome.
+17. Whether one narrowly specified policy experiment is now
+empirically justified.
+18. If justified, the exact empirical phenomenon to test — NOT an
+optimized rule.
+19. Exact artifacts and SHA256 hashes produced.
+20. Single most important remaining uncertainty.
+
+Then STOP.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-15T23:28:49-05:00.
+</ADDITIONAL_METADATA>

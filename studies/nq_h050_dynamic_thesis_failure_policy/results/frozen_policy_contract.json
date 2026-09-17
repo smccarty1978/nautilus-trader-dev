@@ -1,0 +1,28 @@
+{
+  "contract_id": "H050_DYNAMIC_THESIS_FAILURE_POLICY_V1",
+  "status": "FROZEN_AND_SEALED",
+  "creation_epoch": "PRE_OOS_SEAL",
+  "training_scope": "2023-2024 TRAIN (21,493 total trades, 2,150 Top 10% trades)",
+  "training_sample_size": 3066,
+  "policy_type": "Bounded Diagnostic Risk Classifier",
+  "evaluation_rule": "At each 1s bar, if running adverse excursion from entry >= 1.00 ATR, compute 9-feature causal state, scale, and infer P(THESIS_FAILURE). If P >= 0.65, execute prospective market exit.",
+  "threshold": 0.65,
+  "feature_count": 9,
+  "ordered_features": [
+    "landmark_level_atr",
+    "counter_direction",
+    "is_pre_r1",
+    "seconds_since_h050",
+    "rebound_from_adverse_extreme_atr",
+    "trailing_15s_return_atr",
+    "trailing_30s_return_atr",
+    "trailing_15s_range_atr",
+    "trailing_30s_range_atr"
+  ],
+  "hashes": {
+    "dynamic_risk_logreg_model.joblib": "46f500bf3840b027da1ea3a9e793bff70d35c60081d92e2c447d7c68c7ffdc19",
+    "dynamic_risk_scaler.joblib": "7fb7429919cea78922a697a1debfd4b443b40fc8d87204015e7f98373544845c",
+    "model_weights_and_parameters.json": "445767bef76ff2cd24248f9e47b196e0ae5eb5794a71e7728b8d7f5140eec447",
+    "golden_prediction_fixture.json": "3c0f486023385d4adcab50a976af0caea3fae07812530295a1c9b4d4e4106465"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "study_id": "nq_persistent_q4_first_hit_transition_confirmation",
+  "instrument": "NQ",
+  "total_matched_population": 5610,
+  "train_period": "2023-2024",
+  "oos_period": "2025 Q1",
+  "condition_families": {
+    "A1": "+0.25 ATR counter-direction displacement",
+    "A2": "+0.50 ATR counter-direction displacement",
+    "B1": "15 seconds elapsed without new old-regime extreme",
+    "B2": "30 seconds elapsed without new old-regime extreme",
+    "B3": "60 seconds elapsed without new old-regime extreme",
+    "C": "Completed 30s HH/LL structure in prospective trade direction"
+  },
+  "competing_event_rule": "Confirmed V_A flip terminates prospective confirmation; first-hit strictly < flip_ts for FIRST_HIT_BEFORE_FLIP",
+  "execution_mode": "Pure Observational First-Hit Event-Time Atlas (Zero Optimization, Zero Strategy Backtesting)"
+}

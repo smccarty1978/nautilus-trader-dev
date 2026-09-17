@@ -1,0 +1,84 @@
+{
+  "under_25pct": {
+    "recovery_fraction_range": "0% - 25%",
+    "sample_size_N": 3473,
+    "reversal_count": 3081,
+    "reversal_pct": 88.71292830405989,
+    "reextension_count": 0,
+    "reextension_pct": 0.0,
+    "censored_count": 392,
+    "censored_pct": 11.28707169594011,
+    "time_to_terminal_median_s": 91.0,
+    "time_to_terminal_p25_s": 55.0,
+    "time_to_terminal_p75_s": 168.0
+  },
+  "25_to_50pct": {
+    "recovery_fraction_range": "25% - 50%",
+    "sample_size_N": 1444,
+    "reversal_count": 1274,
+    "reversal_pct": 88.22714681440443,
+    "reextension_count": 0,
+    "reextension_pct": 0.0,
+    "censored_count": 170,
+    "censored_pct": 11.772853185595569,
+    "time_to_terminal_median_s": 156.5,
+    "time_to_terminal_p25_s": 91.0,
+    "time_to_terminal_p75_s": 262.0
+  },
+  "50_to_75pct": {
+    "recovery_fraction_range": "50% - 75%",
+    "sample_size_N": 849,
+    "reversal_count": 719,
+    "reversal_pct": 84.68786808009423,
+    "reextension_count": 0,
+    "reextension_pct": 0.0,
+    "censored_count": 130,
+    "censored_pct": 15.312131919905772,
+    "time_to_terminal_median_s": 220.0,
+    "time_to_terminal_p25_s": 124.0,
+    "time_to_terminal_p75_s": 354.0
+  },
+  "75_to_100pct": {
+    "recovery_fraction_range": "75% - 100%",
+    "sample_size_N": 560,
+    "reversal_count": 483,
+    "reversal_pct": 86.25,
+    "reextension_count": 0,
+    "reextension_pct": 0.0,
+    "censored_count": 77,
+    "censored_pct": 13.750000000000002,
+    "time_to_terminal_median_s": 319.5,
+    "time_to_terminal_p25_s": 191.75,
+    "time_to_terminal_p75_s": 516.5
+  },
+  "new_max_mfe_reextension": {
+    "recovery_fraction_range": "100%+ (New Max MFE Established)",
+    "sample_size_N": 28277,
+    "reversal_count": 0,
+    "reversal_pct": 0.0,
+    "reextension_count": 28277,
+    "reextension_pct": 100.0,
+    "censored_count": 0,
+    "censored_pct": 0.0,
+    "time_to_terminal_median_s": 60.0,
+    "time_to_terminal_p25_s": 40.0,
+    "time_to_terminal_p75_s": 70.0
+  },
+  "in_progress_bounce_progression": {
+    "reaching_ge_25pct_bounce": {
+      "total_episodes": 31130,
+      "proceeds_to_new_max_pct": 90.83520719563123,
+      "fails_and_reverses_pct": 7.953742370703501
+    },
+    "reaching_ge_50pct_bounce": {
+      "total_episodes": 29686,
+      "proceeds_to_new_max_pct": 95.25365492151182,
+      "fails_and_reverses_pct": 4.049046688674796
+    },
+    "reaching_ge_75pct_bounce": {
+      "total_episodes": 28837,
+      "proceeds_to_new_max_pct": 98.0580504213337,
+      "fails_and_reverses_pct": 1.674931511599681
+    }
+  }
+}

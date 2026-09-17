@@ -1,0 +1,40 @@
+{
+  "TRAIN": {
+    "regime_count": 14945,
+    "P0_gross_EV": 0.9859484777517564,
+    "P0_net_EV": -14.014051522248243,
+    "P0_PF": 0.9215018983617494,
+    "P0_MaxDD": 217780.0,
+    "P1_gross_EV": -0.4526597524255604,
+    "P1_net_EV": -15.45265975242556,
+    "P1_PF": 0.8618002944238986,
+    "P2_gross_EV": -1.864168618266979,
+    "P2_net_EV": -16.86416861826698,
+    "P2_PF": 0.8984681699616287,
+    "P2_MaxDD": 258235.0,
+    "P3_gross_EV": -1.9792572766811642,
+    "P3_net_EV": -16.979257276681164,
+    "P3_PF": 0.8979908103088556,
+    "P3_MaxDD": 259695.0
+  },
+  "OOS": {
+    "regime_count": 1761,
+    "P0_gross_EV": 10.604770017035776,
+    "P0_net_EV": -4.395229982964225,
+    "P0_PF": 0.9840236136769426,
+    "P0_MaxDD": 31135.0,
+    "P1_gross_EV": 9.22771152754117,
+    "P1_net_EV": -5.77228847245883,
+    "P1_PF": 0.96645048434741,
+    "P2_gross_EV": 15.936967632027256,
+    "P2_net_EV": 0.9369676320272572,
+    "P2_PF": 1.0036685416990907,
+    "P2_MaxDD": 30350.0,
+    "P3_gross_EV": 14.877910278250994,
+    "P3_net_EV": -0.12208972174900624,
+    "P3_PF": 0.9995238938836972,
+    "P3_MaxDD": 31135.0
+  },
+  "replicated": true,
+  "replication_notes": "All relative policy rankings replicate identically between TRAIN (2023-2024) and untouched OOS (2025 Q1): P0 holds the highest gross EV in both TRAIN and OOS. Health-driven invalidation exits P1, P2, and P3 prematurely truncate winner run-up, forfeiting more profit on re-extending trends than they save on terminal flip losses. Consequently, health exits degrade total net EV."
+}

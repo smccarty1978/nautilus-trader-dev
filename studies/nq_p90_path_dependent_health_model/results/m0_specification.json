@@ -1,0 +1,26 @@
+{
+  "name": "M0_depth",
+  "features": [
+    "current_pullback_atr",
+    "distance_to_prior_max_atr",
+    "is_first_crossing_pb05",
+    "is_first_crossing_pb10",
+    "is_first_crossing_pb15",
+    "is_first_crossing_pb20",
+    "depth_band_05_10",
+    "depth_band_10_15",
+    "depth_band_15_20",
+    "depth_band_ge_20"
+  ],
+  "model_type": "LGBMClassifier",
+  "params": {
+    "n_estimators": 100,
+    "learning_rate": 0.05,
+    "max_depth": 4,
+    "num_leaves": 15,
+    "min_child_samples": 50,
+    "random_state": 42,
+    "verbose": -1,
+    "n_jobs": -1
+  }
+}

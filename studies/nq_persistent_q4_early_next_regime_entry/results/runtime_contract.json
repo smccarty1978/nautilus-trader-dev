@@ -1,0 +1,14 @@
+{
+  "study": "nq_persistent_q4_early_next_regime_entry",
+  "instrument": "NQ",
+  "point_value": 20.0,
+  "commission_round_trip": 5.0,
+  "slippage_round_trip_pts": 0.5,
+  "total_friction_per_trade": 15.0,
+  "trade_execution": {
+    "Q4_EARLY": "Enter opposite active regime at next completed 5s bar after persistent Q4 confirmation; hold through R0->R1 flip; exit at R1->R2 flip",
+    "CONTROL_C0": "Enter at next completed 5s bar after R0->R1 flip; exit at identical R1->R2 flip",
+    "identical_exits": true,
+    "identical_frictions": true
+  }
+}

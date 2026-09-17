@@ -1,0 +1,307 @@
+{
+  "gate": "GATE_1_STREAMING_PARITY",
+  "timestamp_utc": "2026-09-16 04:32:49",
+  "sample_period": "January 2023",
+  "verdict": "PARITY_PASS",
+  "description": "Exact deterministic reproduction achieved across all regimes, transitions, 24 features, and model prediction heads (max error < 1e-6).",
+  "regime_population_parity": {
+    "expected_regimes": 642,
+    "observed_regimes": 642,
+    "matched_regimes": 642,
+    "missing_regimes": 0,
+    "extra_regimes": 0,
+    "duplicate_regimes": 0,
+    "retimed_regimes": 0
+  },
+  "transition_population_parity": {
+    "expected_observations": 6641,
+    "observed_observations": 6648,
+    "matched_observations": 6641,
+    "missing_observations": 0,
+    "extra_observations": 7,
+    "duplicate_observations": 0,
+    "retimed_observations": 0
+  },
+  "feature_parity": {
+    "current_pullback_atr": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "prior_peak_mfe_atr": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_pb05": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_pb10": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_pb15": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_pb20": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "direction": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "current_recovery_fraction": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "max_recovery_fraction_so_far": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "episode_max_recovery_fraction": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "recovery_rollover_count": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "has_prior_recovery_ge25_num": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "has_prior_recovery_ge50_num": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "has_prior_recovery_ge75_num": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_rollover_ge25_num": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_rollover_ge50_num": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_rollover_ge75_num": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_recovering": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_deteriorating": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "is_rollover": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "regime_age_seconds": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "seconds_since_peak_mfe": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "seconds_since_deepest_pullback": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    },
+    "pullback_to_prior_peak_ratio": {
+      "exact_match_count": 6641,
+      "match_rate_pct": 100.0,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "p50_error": 0.0,
+      "p95_error": 0.0,
+      "p99_error": 0.0,
+      "first_mismatch": null,
+      "worst_mismatch": null
+    }
+  },
+  "score_parity": {
+    "HEAD_1": {
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "spearman_rank_correlation": 0.9999999999999999,
+      "decile_assignment_mismatches": 0,
+      "decile_mismatch_rate_pct": 0.0
+    },
+    "HEAD_2": {
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "spearman_rank_correlation": 1.0,
+      "decile_assignment_mismatches": 0,
+      "decile_mismatch_rate_pct": 0.0
+    }
+  }
+}

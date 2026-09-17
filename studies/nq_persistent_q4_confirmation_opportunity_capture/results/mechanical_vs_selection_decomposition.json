@@ -1,0 +1,47 @@
+{
+  "framework": {
+    "component_A_mechanical_cost": "Favorable price displacement required (+0.25 ATR for A1, +0.50 ATR for A2) directly reduces entry advantage relative to Q4",
+    "component_B_selection_effect": "Filtering out regimes that never achieve displacement before V_A flip eliminates premature entries",
+    "component_C_post_confirmation_information": "Residual old-regime excursion occurring strictly after the confirmation event"
+  },
+  "A1": {
+    "mechanical_cost": {
+      "median_points_spent": 3.0,
+      "median_atr_spent": 0.33077731846033487,
+      "median_original_q4_advantage_pts": 4.5,
+      "median_remaining_advantage_pts": 1.5,
+      "share_of_q4_advantage_spent_pct": 66.66666666666666
+    },
+    "selection_effect": {
+      "q4_worse_avoided_pct": 66.3567693201627,
+      "severe_loss_lt_20pts_avoided_pct": 59.45945945945946,
+      "selectivity_ratio": 2.088413267537506
+    },
+    "post_confirmation_information": {
+      "matched_t0_mfe_atr": 0.37829935786383734,
+      "future_post_confirmation_mfe_atr": 0.27178004667259503,
+      "absolute_mfe_reduction_atr": 0.1065193111912423,
+      "relative_mfe_reduction_pct": 28.157412635519773
+    }
+  },
+  "A2": {
+    "mechanical_cost": {
+      "median_points_spent": 5.75,
+      "median_atr_spent": 0.5877065013623991,
+      "median_original_q4_advantage_pts": 6.75,
+      "median_remaining_advantage_pts": 1.0,
+      "share_of_q4_advantage_spent_pct": 85.18518518518519
+    },
+    "selection_effect": {
+      "q4_worse_avoided_pct": 86.57757117954678,
+      "severe_loss_lt_20pts_avoided_pct": 80.78078078078079,
+      "selectivity_ratio": 3.6300309001771573
+    },
+    "post_confirmation_information": {
+      "matched_t0_mfe_atr": 0.40475901464449127,
+      "future_post_confirmation_mfe_atr": 0.2723828299695913,
+      "absolute_mfe_reduction_atr": 0.13237618467489998,
+      "relative_mfe_reduction_pct": 32.70493797183712
+    }
+  }
+}

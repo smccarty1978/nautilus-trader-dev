@@ -1,0 +1,9 @@
+{
+  "train_period": "2023-2024",
+  "train_rows": 159855,
+  "train_regimes": 14945,
+  "validation_strategy": "5-Fold GroupKFold grouped by regime_id (zero regime leakage)",
+  "oos_period": "2025 Q1 (Untouched)",
+  "oos_rows": 19119,
+  "oos_regimes": 1761
+}

@@ -1,0 +1,10 @@
+{
+  "verdict": "PASS_ZERO_LOOKAHEAD",
+  "timestamp_semantics": {
+    "bar_stream": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+    "delivery_timestamp": "bar.ts_init (bar completed close time)",
+    "causal_invariant": "checkpoint_ts == bar.ts_init; bar.ts_event < bar.ts_init",
+    "no_future_bars": true,
+    "no_forward_regime_knowledge": true
+  }
+}

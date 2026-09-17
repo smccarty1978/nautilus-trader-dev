@@ -1,0 +1,13 @@
+{
+  "study_name": "nq_persistent_q4_confirmation_mfe_mae_competing_barrier_atlas",
+  "engine": "causal_1s_observation_engine",
+  "market_data_granularity": "1-second completed bars (NQ.XCME-1-SECOND-LAST-EXTERNAL)",
+  "timestamp_semantics": "ts_init (bar close / completion time)",
+  "entry_semantic": "actual causal fill_ts and fill_price from parent D1/D2 live event policy",
+  "observation_window": "strictly after entry (ts_init > fill_ts) to natural opposite V_A exit (ts_init <= exit_fill_ts)",
+  "tick_size": 0.25,
+  "multiplier": 20.0,
+  "round_turn_friction": 15.0,
+  "frozen_atr_semantic": "start_atr at Q4 armed time (no future leakage)",
+  "same_bar_ambiguity_rule": "marked SAME_BAR_AMBIGUOUS if favorable and adverse barriers breached in identical 1s bar"
+}

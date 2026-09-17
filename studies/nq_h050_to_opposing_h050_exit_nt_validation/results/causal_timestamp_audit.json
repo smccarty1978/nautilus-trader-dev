@@ -1,0 +1,9 @@
+{
+  "status": "PASS_CAUSAL_ORDERING",
+  "checkpoint_precedes_r1": true,
+  "r1_precedes_r2": true,
+  "h0501_strictly_between_r1_and_r2": true,
+  "submission_equals_decision_ts": true,
+  "fill_strictly_after_submission": true,
+  "zero_future_leakage_detected": true
+}

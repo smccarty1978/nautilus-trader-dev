@@ -1,0 +1,14 @@
+{
+  "execution_platform": "Causal event-driven forward excursion engine",
+  "underlying_market_data": "NQ 5-second regularized completed bar grid from XCME",
+  "temporal_guarantees": [
+    "EVENT_A identified strictly on causal completed 5s bar after 60 continuous seconds in Q4",
+    "EVENT_B identified strictly at first causal completed bar where running_max - current_hazard >= 0.15",
+    "Forward price paths measured prospectively from observation timestamp forward",
+    "Zero lookahead into regime termination, future milestones, or labels"
+  ],
+  "frozen_definitions": {
+    "EVENT_A": "H1 >= 0.50 and H2 >= 0.25 continuously for >= 60 seconds",
+    "EVENT_B": "severe stress followed by running_max_hazard - current_hazard >= 0.15"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "study_name": "nq_h050_counter_regime_lifecycle_economics",
+  "study_type": "BOUNDED_FOLLOW_ON_OBSERVATIONAL_POLICY_DIAGNOSTIC",
+  "entry_point": "H050 checkpoint (0.50 ATR giveback from running maxMFE)",
+  "confirmation_point": "Anticipated opposite V_A flip (R1 start)",
+  "exit_point": "Next opposite confirmed V_A flip (R2 start / R1 exit)",
+  "policies_compared": [
+    "EARLY_ENTRY_UNBOUNDED",
+    "CONFIRMED_ENTRY_CONTROL",
+    "EARLY_ENTRY_150_ATR_HARD_STOP"
+  ],
+  "hard_stop_distance_atr": 1.5,
+  "stop_rule": "Frozen H050 actual entry price +/- 1.50 ATR, active across entire trade",
+  "models_evaluated": [
+    "M0_Binary_Control",
+    "M1_Cost_Sensitive",
+    "M4_Composite_Risk"
+  ],
+  "confidence_tiers": [
+    "Top 5%",
+    "Top 10%",
+    "Top 20%",
+    "Unconditional Base"
+  ],
+  "train_split": "2023, 2024 (N=21,493)",
+  "oos_split": "2025 Q1 untouched (N=2,422)"
+}

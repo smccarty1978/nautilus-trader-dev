@@ -1,0 +1,32 @@
+{
+  "terminal_verdict": "3F_MATCHED_EVENT_ONLY_NOT_LIVE_TRIGGER",
+  "verdict_reason": "The Project 3F edge exists strictly as a retrospective matched-event discriminator (50% synthetic prevalence) between known T0 reversal starts and known continuation pauses. When scanned continuously across all eligible P90 seconds in the natural population, the frozen rules repeatedly fire during trending regimes, incurring severe false positive decay and negative/untradeable economics.",
+  "metrics_summary": {
+    "THRUST_EXHAUSTION_REJECTION": {
+      "3F_reported_expectancy_atr": 0.5333,
+      "3F_reported_win_rate": 0.7333,
+      "natural_all_triggers_pooled_expectancy_atr": 0.0007801664355063243,
+      "natural_all_triggers_pooled_win_rate": 0.42901723796314645,
+      "natural_first_trigger_pooled_expectancy_atr": -0.005190311418685034,
+      "natural_first_trigger_pooled_win_rate": 0.42560553633217996,
+      "natural_first_trigger_2025_q1_expectancy_atr": 0.023255813953488413,
+      "natural_all_triggers_2025_q1_expectancy_atr": 0.020410885805763113,
+      "triggers_per_regime_mean": 5.82051282051282,
+      "triggers_per_regime_max": 79
+    },
+    "VOLUME_ABSORPTION": {
+      "3F_reported_expectancy_atr": 0.4717,
+      "3F_reported_win_rate": 0.6981,
+      "natural_all_triggers_pooled_expectancy_atr": 0.01646557747084426,
+      "natural_first_trigger_pooled_expectancy_atr": 0.00616315553563429,
+      "natural_first_trigger_2025_q1_expectancy_atr": 0.03298969072164948
+    },
+    "EXTREME_SPIKE_REVERSAL": {
+      "3F_reported_expectancy_atr": 0.3752,
+      "3F_reported_win_rate": 0.643,
+      "natural_all_triggers_pooled_expectancy_atr": 0.027020159241063935,
+      "natural_first_trigger_pooled_expectancy_atr": 0.03433355810294447,
+      "natural_first_trigger_2025_q1_expectancy_atr": 0.0529835390946502
+    }
+  }
+}

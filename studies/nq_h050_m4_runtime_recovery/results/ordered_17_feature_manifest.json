@@ -1,0 +1,172 @@
+[
+  {
+    "order": 1,
+    "feature_name": "pullback_depth_atr",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 2,
+    "feature_name": "pullback_duration_sec",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 3,
+    "feature_name": "pullback_efficiency",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 4,
+    "feature_name": "pullback_velocity_atr_sec",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 5,
+    "feature_name": "pre_pullback_max_mfe_atr",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 6,
+    "feature_name": "pullback_ordinal",
+    "dtype": "int64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 7,
+    "feature_name": "regime_age_sec",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 8,
+    "feature_name": "previous_pullbacks_count",
+    "dtype": "int64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 9,
+    "feature_name": "previous_pullbacks_max_depth_atr",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 10,
+    "feature_name": "previous_pullbacks_avg_duration_sec",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 11,
+    "feature_name": "pullback_depth_vs_max_mfe_ratio",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 12,
+    "feature_name": "pullback_duration_vs_regime_age_ratio",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 13,
+    "feature_name": "incumbent_expansion_rate_atr_min",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 14,
+    "feature_name": "has_previous_pullbacks",
+    "dtype": "int64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 15,
+    "feature_name": "previous_max_depth_ratio",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 16,
+    "feature_name": "frozen_atr",
+    "dtype": "float64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  },
+  {
+    "order": 17,
+    "feature_name": "direction_is_long",
+    "dtype": "int64",
+    "timeframe": "1s bar stream / completed bar close",
+    "cadence": "on bar close (ts_init)",
+    "availability": "strictly causal at checkpoint_ts",
+    "reset_event": "resets on new running maxMFE or opposite V_A flip",
+    "null_policy": "zero nulls allowed"
+  }
+]

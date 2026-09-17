@@ -1,0 +1,108 @@
+{
+  "incumbent_LONG_counter_SHORT": {
+    "total_N": 12126,
+    "oos_N": 1175,
+    "unconditional_oos": {
+      "terminal_win_rate": 64.25531914893618,
+      "median_terminal_pnl_atr": 0.5663963089320128,
+      "mean_terminal_pnl_atr": 0.19682147106173734,
+      "median_counter_mfe": 1.0370786777635919,
+      "p90_counter_mfe": 2.322648685568899,
+      "median_counter_mae": 1.3905744607720922,
+      "p90_counter_mae": 4.378061518492333,
+      "prob_mae_ge_1p00": 59.829787234042556,
+      "prob_mae_ge_2p00": 36.340425531914896
+    },
+    "models_top10": {
+      "M0_Binary_Control": {
+        "N": 118,
+        "terminal_win_rate": 68.64406779661016,
+        "median_terminal_pnl_atr": 0.42528269318959105,
+        "median_counter_mfe": 0.752198680697644,
+        "median_counter_mae": 1.1223700150241864,
+        "p90_counter_mae": 3.6417836498935054,
+        "prob_mae_ge_1p00": 50.847457627118644,
+        "prob_mae_ge_2p00": 27.11864406779661,
+        "barrier_F050_A050_fav_first_pct": 46.61016949152542,
+        "barrier_F050_A050_adv_first_pct": 50.847457627118644
+      },
+      "M1_Cost_Sensitive": {
+        "N": 118,
+        "terminal_win_rate": 67.79661016949152,
+        "median_terminal_pnl_atr": 0.3889312002158957,
+        "median_counter_mfe": 0.752198680697644,
+        "median_counter_mae": 0.9403387571157149,
+        "p90_counter_mae": 3.486507080610576,
+        "prob_mae_ge_1p00": 49.152542372881356,
+        "prob_mae_ge_2p00": 26.27118644067797,
+        "barrier_F050_A050_fav_first_pct": 45.76271186440678,
+        "barrier_F050_A050_adv_first_pct": 51.69491525423729
+      },
+      "M4_Composite_Risk": {
+        "N": 118,
+        "terminal_win_rate": 68.64406779661016,
+        "median_terminal_pnl_atr": 0.45714937699655067,
+        "median_counter_mfe": 0.8059469245816177,
+        "median_counter_mae": 0.9634580823826295,
+        "p90_counter_mae": 3.5399962451342435,
+        "prob_mae_ge_1p00": 49.152542372881356,
+        "prob_mae_ge_2p00": 26.27118644067797,
+        "barrier_F050_A050_fav_first_pct": 47.45762711864407,
+        "barrier_F050_A050_adv_first_pct": 50.0
+      }
+    }
+  },
+  "incumbent_SHORT_counter_LONG": {
+    "total_N": 11789,
+    "oos_N": 1247,
+    "unconditional_oos": {
+      "terminal_win_rate": 63.11146752205292,
+      "median_terminal_pnl_atr": 0.6228486800315302,
+      "mean_terminal_pnl_atr": -0.4423353934189531,
+      "median_counter_mfe": 1.1470570457329308,
+      "p90_counter_mfe": 2.557685945950159,
+      "median_counter_mae": 1.5599061363427913,
+      "p90_counter_mae": 8.519038624342116,
+      "prob_mae_ge_1p00": 61.02646351242983,
+      "prob_mae_ge_2p00": 42.1812349639134
+    },
+    "models_top10": {
+      "M0_Binary_Control": {
+        "N": 125,
+        "terminal_win_rate": 78.4,
+        "median_terminal_pnl_atr": 0.603932395348115,
+        "median_counter_mfe": 0.9381898250593911,
+        "median_counter_mae": 0.8923095974616642,
+        "p90_counter_mae": 3.654251227141508,
+        "prob_mae_ge_1p00": 46.400000000000006,
+        "prob_mae_ge_2p00": 23.200000000000003,
+        "barrier_F050_A050_fav_first_pct": 53.6,
+        "barrier_F050_A050_adv_first_pct": 43.2
+      },
+      "M1_Cost_Sensitive": {
+        "N": 125,
+        "terminal_win_rate": 75.2,
+        "median_terminal_pnl_atr": 0.6080932411700837,
+        "median_counter_mfe": 0.9380690639981597,
+        "median_counter_mae": 0.915205217911543,
+        "p90_counter_mae": 3.3958228621903195,
+        "prob_mae_ge_1p00": 47.199999999999996,
+        "prob_mae_ge_2p00": 24.0,
+        "barrier_F050_A050_fav_first_pct": 49.6,
+        "barrier_F050_A050_adv_first_pct": 47.199999999999996
+      },
+      "M4_Composite_Risk": {
+        "N": 125,
+        "terminal_win_rate": 77.60000000000001,
+        "median_terminal_pnl_atr": 0.603932395348115,
+        "median_counter_mfe": 0.8923095974616642,
+        "median_counter_mae": 0.9315870533058739,
+        "p90_counter_mae": 3.1589369805653673,
+        "prob_mae_ge_1p00": 48.0,
+        "prob_mae_ge_2p00": 21.6,
+        "barrier_F050_A050_fav_first_pct": 45.6,
+        "barrier_F050_A050_adv_first_pct": 51.2
+      }
+    }
+  }
+}

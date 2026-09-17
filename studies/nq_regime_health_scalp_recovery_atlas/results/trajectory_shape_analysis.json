@@ -1,0 +1,116 @@
+{
+  "ALL": {
+    "BOTH_FLAT_ELEVATED": {
+      "count": 620,
+      "pct_of_events": 0.10814582243153671,
+      "mean_counter_mfe_to_flip_atr": 0.8966756501892831,
+      "mean_counter_mae_to_flip_atr": 1.7806196168414956,
+      "mean_time_to_flip_sec": 647.733870967742,
+      "prob_mfe_050_before_mae_025": 0.3387096774193548,
+      "prob_flip_le_180s": 0.317741935483871
+    },
+    "H1_FLAT_H2_RISING": {
+      "count": 20,
+      "pct_of_events": 0.0034885749171463458,
+      "mean_counter_mfe_to_flip_atr": 0.8714277580264793,
+      "mean_counter_mae_to_flip_atr": 1.0238174539287337,
+      "mean_time_to_flip_sec": 352.75,
+      "prob_mfe_050_before_mae_025": 0.4,
+      "prob_flip_le_180s": 0.5
+    },
+    "H1_RISING_H2_FLAT": {
+      "count": 182,
+      "pct_of_events": 0.031746031746031744,
+      "mean_counter_mfe_to_flip_atr": 0.795040968374883,
+      "mean_counter_mae_to_flip_atr": 1.586098492309657,
+      "mean_time_to_flip_sec": 655.2197802197802,
+      "prob_mfe_050_before_mae_025": 0.31868131868131866,
+      "prob_flip_le_180s": 0.3626373626373626
+    },
+    "H1_RISING_H2_RISING": {
+      "count": 4911,
+      "pct_of_events": 0.8566195709052852,
+      "mean_counter_mfe_to_flip_atr": 0.4691304066639639,
+      "mean_counter_mae_to_flip_atr": 1.0022960669516852,
+      "mean_time_to_flip_sec": 315.4143758908573,
+      "prob_mfe_050_before_mae_025": 0.19792302993280392,
+      "prob_flip_le_180s": 0.6727754021584199
+    }
+  },
+  "TRAIN": {
+    "BOTH_FLAT_ELEVATED": {
+      "count": 542,
+      "pct_of_events": 0.10536547433903577,
+      "mean_counter_mfe_to_flip_atr": 0.9072048186182036,
+      "mean_counter_mae_to_flip_atr": 1.831045715954614,
+      "mean_time_to_flip_sec": 657.1125461254612,
+      "prob_mfe_050_before_mae_025": 0.35239852398523985,
+      "prob_flip_le_180s": 0.3210332103321033
+    },
+    "H1_FLAT_H2_RISING": {
+      "count": 19,
+      "pct_of_events": 0.0036936236391912907,
+      "mean_counter_mfe_to_flip_atr": 0.7754212860139864,
+      "mean_counter_mae_to_flip_atr": 1.0013795278755404,
+      "mean_time_to_flip_sec": 353.1578947368421,
+      "prob_mfe_050_before_mae_025": 0.42105263157894735,
+      "prob_flip_le_180s": 0.5263157894736842
+    },
+    "H1_RISING_H2_FLAT": {
+      "count": 154,
+      "pct_of_events": 0.029937791601866253,
+      "mean_counter_mfe_to_flip_atr": 0.7875036005114011,
+      "mean_counter_mae_to_flip_atr": 1.5465440872970093,
+      "mean_time_to_flip_sec": 692.7272727272727,
+      "prob_mfe_050_before_mae_025": 0.3181818181818182,
+      "prob_flip_le_180s": 0.35064935064935066
+    },
+    "H1_RISING_H2_RISING": {
+      "count": 4429,
+      "pct_of_events": 0.8610031104199067,
+      "mean_counter_mfe_to_flip_atr": 0.46156390520791346,
+      "mean_counter_mae_to_flip_atr": 0.9978299532763341,
+      "mean_time_to_flip_sec": 313.527884398284,
+      "prob_mfe_050_before_mae_025": 0.19552946489049447,
+      "prob_flip_le_180s": 0.6757733122601038
+    }
+  },
+  "OOS": {
+    "BOTH_FLAT_ELEVATED": {
+      "count": 78,
+      "pct_of_events": 0.13242784380305603,
+      "mean_counter_mfe_to_flip_atr": 0.8235114285421691,
+      "mean_counter_mae_to_flip_atr": 1.4302228768503393,
+      "mean_time_to_flip_sec": 582.5641025641025,
+      "prob_mfe_050_before_mae_025": 0.24358974358974358,
+      "prob_flip_le_180s": 0.2948717948717949
+    },
+    "H1_FLAT_H2_RISING": {
+      "count": 1,
+      "pct_of_events": 0.001697792869269949,
+      "mean_counter_mfe_to_flip_atr": 2.6955507262638436,
+      "mean_counter_mae_to_flip_atr": 1.4501380489394096,
+      "mean_time_to_flip_sec": 345.0,
+      "prob_mfe_050_before_mae_025": 0.0,
+      "prob_flip_le_180s": 0.0
+    },
+    "H1_RISING_H2_FLAT": {
+      "count": 28,
+      "pct_of_events": 0.04753820033955857,
+      "mean_counter_mfe_to_flip_atr": 0.8364964916240337,
+      "mean_counter_mae_to_flip_atr": 1.8036477198792205,
+      "mean_time_to_flip_sec": 448.92857142857144,
+      "prob_mfe_050_before_mae_025": 0.32142857142857145,
+      "prob_flip_le_180s": 0.42857142857142855
+    },
+    "H1_RISING_H2_RISING": {
+      "count": 482,
+      "pct_of_events": 0.8183361629881154,
+      "mean_counter_mfe_to_flip_atr": 0.5386574501263023,
+      "mean_counter_mae_to_flip_atr": 1.0433342774664771,
+      "mean_time_to_flip_sec": 332.74896265560164,
+      "prob_mfe_050_before_mae_025": 0.21991701244813278,
+      "prob_flip_le_180s": 0.6452282157676349
+    }
+  }
+}

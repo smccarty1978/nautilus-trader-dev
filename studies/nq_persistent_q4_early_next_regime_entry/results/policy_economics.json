@@ -1,0 +1,142 @@
+{
+  "ALL": {
+    "Q4_EARLY_ALL_TRADES": {
+      "trade_count": 5733,
+      "gross_pnl": -23160.0,
+      "gross_ev_per_trade": -4.0397697540554685,
+      "net_pnl": -109155.0,
+      "net_ev_per_trade": -19.039769754055467,
+      "median_pnl": -90.0,
+      "win_rate": 0.3706610849467992,
+      "profit_factor": 0.9058257662360072,
+      "max_drawdown": 129685.0,
+      "worst_1pct_mean_loss": -2499.035087719298,
+      "worst_5pct_mean_loss": -1386.958041958042,
+      "mean_holding_time_sec": 1244.7409733124018,
+      "median_holding_time_sec": 910.0,
+      "mean_mfe_atr": 2.3425508392559014,
+      "mean_mae_atr": 1.5776977884160421
+    },
+    "Q4_EARLY_MATCHED": {
+      "trade_count": 5610,
+      "gross_pnl": 4305.0,
+      "gross_ev_per_trade": 0.767379679144385,
+      "net_pnl": -79845.0,
+      "net_ev_per_trade": -14.232620320855615,
+      "median_pnl": -90.0,
+      "win_rate": 0.37040998217468807,
+      "profit_factor": 0.9291107885309433,
+      "max_drawdown": 106245.0,
+      "worst_1pct_mean_loss": -2477.3214285714284,
+      "worst_5pct_mean_loss": -1368.0714285714287,
+      "mean_holding_time_sec": 1234.9322638146168,
+      "median_holding_time_sec": 910.0,
+      "mean_mfe_atr": 2.384333784253059,
+      "mean_mae_atr": 1.5618583481460289
+    },
+    "CONTROL_C0_MATCHED": {
+      "trade_count": 5610,
+      "gross_pnl": 10045.0,
+      "gross_ev_per_trade": 1.7905525846702317,
+      "net_pnl": -74105.0,
+      "net_ev_per_trade": -13.209447415329768,
+      "median_pnl": -135.0,
+      "win_rate": 0.3303030303030303,
+      "profit_factor": 0.926903368037917,
+      "max_drawdown": 92065.0,
+      "worst_1pct_mean_loss": -1201.607142857143,
+      "worst_5pct_mean_loss": -800.3392857142857,
+      "mean_holding_time_sec": 901.8181818181819,
+      "median_holding_time_sec": 600.0,
+      "mean_mfe_atr": 2.146300796269155,
+      "mean_mae_atr": 1.1358141735363234
+    },
+    "DELTA_Q4_MINUS_C0": {
+      "mean_delta_gross_dollars": -1.0231729055258467,
+      "mean_delta_net_dollars": -1.0231729055258467,
+      "total_delta_dollars": -5740.0
+    }
+  },
+  "TRAIN": {
+    "Q4_EARLY_MATCHED": {
+      "trade_count": 5038,
+      "gross_pnl": -2465.0,
+      "gross_ev_per_trade": -0.48928146089718144,
+      "net_pnl": -78035.0,
+      "net_ev_per_trade": -15.489281460897182,
+      "median_pnl": -90.0,
+      "win_rate": 0.3666137356093688,
+      "profit_factor": 0.9189764462187797,
+      "max_drawdown": 106245.0,
+      "worst_1pct_mean_loss": -2344.1,
+      "worst_5pct_mean_loss": -1282.9083665338646,
+      "mean_holding_time_sec": 1232.3332671695116,
+      "median_holding_time_sec": 900.0,
+      "mean_mfe_atr": 2.378931536026778,
+      "mean_mae_atr": 1.5659128940480345
+    },
+    "CONTROL_C0_MATCHED": {
+      "trade_count": 5038,
+      "gross_pnl": 15970.0,
+      "gross_ev_per_trade": 3.1699086939261614,
+      "net_pnl": -59600.0,
+      "net_ev_per_trade": -11.83009130607384,
+      "median_pnl": -130.0,
+      "win_rate": 0.3300913060738388,
+      "profit_factor": 0.9308969483350339,
+      "max_drawdown": 83640.0,
+      "worst_1pct_mean_loss": -1110.6,
+      "worst_5pct_mean_loss": -725.6772908366534,
+      "mean_holding_time_sec": 901.6554188169908,
+      "median_holding_time_sec": 600.0,
+      "mean_mfe_atr": 2.1495850434835235,
+      "mean_mae_atr": 1.1358675999705539
+    },
+    "DELTA_Q4_MINUS_C0": {
+      "mean_delta_gross_dollars": -3.6591901548233428,
+      "mean_delta_net_dollars": -3.6591901548233428,
+      "total_delta_dollars": -18435.0
+    }
+  },
+  "OOS": {
+    "Q4_EARLY_MATCHED": {
+      "trade_count": 572,
+      "gross_pnl": 6770.0,
+      "gross_ev_per_trade": 11.835664335664335,
+      "net_pnl": -1810.0,
+      "net_ev_per_trade": -3.164335664335664,
+      "median_pnl": -102.5,
+      "win_rate": 0.40384615384615385,
+      "profit_factor": 0.9889106727116775,
+      "max_drawdown": 18395.0,
+      "worst_1pct_mean_loss": -3135.0,
+      "worst_5pct_mean_loss": -1921.7857142857142,
+      "mean_holding_time_sec": 1257.8234265734266,
+      "median_holding_time_sec": 972.5,
+      "mean_mfe_atr": 2.431915124399921,
+      "mean_mae_atr": 1.526147155393747
+    },
+    "CONTROL_C0_MATCHED": {
+      "trade_count": 572,
+      "gross_pnl": -5925.0,
+      "gross_ev_per_trade": -10.358391608391608,
+      "net_pnl": -14505.0,
+      "net_ev_per_trade": -25.35839160839161,
+      "median_pnl": -180.0,
+      "win_rate": 0.3321678321678322,
+      "profit_factor": 0.9041403694280145,
+      "max_drawdown": 23295.0,
+      "worst_1pct_mean_loss": -1658.0,
+      "worst_5pct_mean_loss": -1131.25,
+      "mean_holding_time_sec": 903.2517482517483,
+      "median_holding_time_sec": 600.0,
+      "mean_mfe_atr": 2.1173741573426033,
+      "mean_mae_atr": 1.1353436099425245
+    },
+    "DELTA_Q4_MINUS_C0": {
+      "mean_delta_gross_dollars": 22.194055944055943,
+      "mean_delta_net_dollars": 22.194055944055943,
+      "total_delta_dollars": 12695.0
+    }
+  }
+}

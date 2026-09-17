@@ -1,0 +1,34 @@
+{
+  "gate_0_verdict": "PASS_ZERO_DIVERGENCE",
+  "parent_artifact_sha256": "2783fd0e8df4b69759d049c64263cbdb0dd20fc14a87c64c4b682fc288e5e3f2",
+  "total_parent_regimes": 5610,
+  "expected_census_regimes": 5610,
+  "total_checkpoints": 95546,
+  "expected_total_checkpoints": 95546,
+  "checkpoint_counts_reconciliation": {
+    "depth_0.25_ATR": {
+      "expected": 43130,
+      "actual": 43130,
+      "divergence": 0,
+      "match": true
+    },
+    "depth_0.50_ATR": {
+      "expected": 23915,
+      "actual": 23915,
+      "divergence": 0,
+      "match": true
+    },
+    "depth_0.75_ATR": {
+      "expected": 16250,
+      "actual": 16250,
+      "divergence": 0,
+      "match": true
+    },
+    "depth_1.00_ATR": {
+      "expected": 12251,
+      "actual": 12251,
+      "divergence": 0,
+      "match": true
+    }
+  }
+}

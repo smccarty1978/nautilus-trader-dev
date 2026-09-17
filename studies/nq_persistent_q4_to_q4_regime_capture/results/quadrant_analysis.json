@@ -1,0 +1,65 @@
+{
+  "EDGE_CASE_FLAT": {
+    "count": 3860,
+    "percentage": 0.6880570409982175,
+    "q4q4_gross_ev": 2.838082901554404,
+    "c0_gross_ev": 3.02720207253886,
+    "delta_gross_ev": -0.18911917098445596,
+    "mean_entry_advantage": 0.47020725388601037,
+    "mean_exit_advantage": -0.6593264248704663,
+    "win_rate_q4q4": 0.372279792746114,
+    "win_rate_c0": 0.32590673575129536
+  },
+  "Q1_ENTRY_BETTER_EXIT_BETTER": {
+    "count": 791,
+    "percentage": 0.1409982174688057,
+    "q4q4_gross_ev": 134.72187104930467,
+    "c0_gross_ev": -126.24525916561315,
+    "delta_gross_ev": 260.9671302149178,
+    "mean_entry_advantage": 133.12262958280658,
+    "mean_exit_advantage": 127.84450063211125,
+    "win_rate_q4q4": 0.4525916561314791,
+    "win_rate_c0": 0.21618204804045513
+  },
+  "Q2_ENTRY_BETTER_EXIT_WORSE": {
+    "count": 404,
+    "percentage": 0.07201426024955437,
+    "q4q4_gross_ev": 97.35148514851485,
+    "c0_gross_ev": 223.60148514851485,
+    "delta_gross_ev": -126.25,
+    "mean_entry_advantage": 126.8069306930693,
+    "mean_exit_advantage": -253.05693069306932,
+    "win_rate_q4q4": 0.4381188118811881,
+    "win_rate_c0": 0.5544554455445545
+  },
+  "Q3_ENTRY_WORSE_EXIT_BETTER": {
+    "count": 361,
+    "percentage": 0.064349376114082,
+    "q4q4_gross_ev": -281.8421052631579,
+    "c0_gross_ev": -129.15512465373962,
+    "delta_gross_ev": -152.68698060941827,
+    "mean_entry_advantage": -283.5318559556787,
+    "mean_exit_advantage": 130.84487534626038,
+    "win_rate_q4q4": 0.21606648199445982,
+    "win_rate_c0": 0.1994459833795014
+  },
+  "Q4_ENTRY_WORSE_EXIT_WORSE": {
+    "count": 194,
+    "percentage": 0.034581105169340466,
+    "q4q4_gross_ev": -274.0979381443299,
+    "c0_gross_ev": 286.2628865979381,
+    "delta_gross_ev": -560.360824742268,
+    "mean_entry_advantage": -273.840206185567,
+    "mean_exit_advantage": -286.52061855670104,
+    "win_rate_q4q4": 0.23195876288659795,
+    "win_rate_c0": 0.5773195876288659
+  },
+  "rescue_analysis": {
+    "rescued_count": 361,
+    "rescued_fraction": 0.064349376114082,
+    "rescued_mean_entry_loss": -283.5318559556787,
+    "rescued_mean_exit_gain": 130.84487534626038,
+    "rescued_net_delta_ev": -152.68698060941827,
+    "pct_turned_net_positive": 0.5041551246537396
+  }
+}

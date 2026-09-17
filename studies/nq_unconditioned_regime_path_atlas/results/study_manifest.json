@@ -1,0 +1,33 @@
+{
+  "study_id": "nq_unconditioned_regime_path_atlas",
+  "timestamp_utc": "2026-09-16 03:29:51",
+  "model_decision_gate": {
+    "verdict": "OUTCOME_B_P90_MODIFIED_PATH_EFFECT",
+    "description": "Depth-conditioned failed-recovery penalties are universal (surviving across NEVER_P90 and ALL_NATURAL cohorts), but baseline survival and penalty magnitudes are quantitatively modified by P90 status. An explicit structural path x P90 interaction model is required.",
+    "key_empirical_penalties": {
+      "all_natural_PB10_penalty": 4.7,
+      "all_natural_PB15_penalty": 7.62,
+      "never_p90_PB10_penalty": 7.1,
+      "never_p90_PB15_penalty": 5.4,
+      "post_p90_PB10_penalty": 5.72,
+      "post_p90_PB15_penalty": 7.01,
+      "pre_p90_PB10_penalty": 0.71
+    }
+  },
+  "artifacts": {
+    "natural_regime_ledger": {
+      "file": "natural_regime_ledger.parquet",
+      "sha256": "9b4da98f88fcfe3e0b5ebbc6cb9ad696b755f68986bb073e21444e6b4c13d877"
+    },
+    "universal_path_state_ledger": {
+      "file": "universal_path_state_ledger.parquet",
+      "sha256": "7ca87160ca48b8098b5767f277e0b347ef0ffa7c51792a1a20875a94f27f1551"
+    }
+  },
+  "population_counts": {
+    "train_natural_regimes": 14952,
+    "oos_natural_regimes": 1761,
+    "train_pop_u_observations": 159855,
+    "oos_pop_u_observations": 19119
+  }
+}

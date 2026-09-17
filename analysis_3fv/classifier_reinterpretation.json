@@ -1,0 +1,18 @@
+{
+  "status": "CLASSIFIER_NOT_LIVE_CAUSAL",
+  "rationale": "The Project 3F diagnostic classifier (HistGradientBoosting / LogisticRegression) was trained and evaluated strictly on a balanced retrospective matched-pair dataset (10,618 TRUE reversal starts vs 10,618 matched FALSE pauses). In that synthetic 50% prevalence population, OOS ROC-AUC reached 0.7655 and PR-AUC reached 0.7651. However, in the live natural P90 streaming population, TRUE reversal starts occur at a prevalence of only ~0.46% of 1s bars (or 1.81% of 5s checkpoints). Furthermore, the FALSE continuation pause candidates were retrospectively selected using future regime extension (rem_max_mfe >= 0.50 ATR), a label that does not exist in real-time streaming. Consequently, the classifier acts as a diagnostic matched-event discriminator, but cannot function as a standalone live causal trigger.",
+  "synthetic_matched_event_metrics": {
+    "population": "10,618 TRUE vs 10,618 matched FALSE pauses (21,236 total)",
+    "prevalence": 0.5,
+    "oos_roc_auc": 0.7655,
+    "oos_pr_auc": 0.7651,
+    "top_decile_win_rate": 0.87,
+    "top_decile_expectancy_atr": 0.7724
+  },
+  "natural_population_context": {
+    "total_p90_regimes": 6559,
+    "total_natural_1s_bars": 3703806,
+    "natural_true_event_prevalence": 0.002866780819513765,
+    "implied_false_positive_multiplier": 174.41165944622338
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "parent_artifacts": {
+    "checkpoint_target_ledger": {
+      "path": "studies\\nq_h050_asymmetric_regime_exhaustion\\results\\checkpoint_target_ledger.parquet",
+      "sha256": "553cab47b8c063ecb822d53ae4ac18e50b9606693302647ff36ced0ad678f2d9",
+      "bytes": 5771666
+    },
+    "c0_control_ledger": {
+      "path": "studies\\nq_persistent_q4_to_q4_regime_capture\\results\\c0_control_ledger.parquet",
+      "sha256": "a42deb5076f04baf1580be1ba437ea28fdfac776d3ec7ee05f6af9234ea05ebf",
+      "bytes": 762307
+    },
+    "counter_h0501_exit_ledger": {
+      "path": "studies\\nq_h050_to_opposing_h050_exit_lifecycle\\results\\counter_h0501_exit_ledger.parquet",
+      "sha256": "dcca83c9687446aacfee476037838ca8b9755f2bd66d7bb3ec187bb6fcff2f0e",
+      "bytes": 12618582
+    }
+  },
+  "study_artifacts": {
+    "bounded_feature_parity_report.json": {
+      "sha256": "34b8e1d485e6d95c58e52adfc99a918581d2bd16f72aa13cc24e2847d40c8d59",
+      "bytes": 10731
+    },
+    "capability_gap_inventory.json": {
+      "sha256": "c1deffb321534be169f8d5b10f60e35ef4b1375b03e3d5fddf4fcaff0a868fbb",
+      "bytes": 732
+    },
+    "causal_timestamp_audit.json": {
+      "sha256": "9838c1cf5b3d941157f2d693a73595b16168693db7429e001793a68b05cd68af",
+      "bytes": 351
+    },
+    "full_score_parity_ledger.parquet": {
+      "sha256": "54182eadff51b435ac185f76d21cd0f4615d003b7638073aaaa00201b8f1a65b",
+      "bytes": 122757
+    },
+    "golden_score_fixture.json": {
+      "sha256": "e17c0841667a1634c1ca9c0218dbed719fb051b0160179bbc5d82eab42fa3d32",
+      "bytes": 10943
+    },
+    "h050_signal_parity_ledger.parquet": {
+      "sha256": "d120a212f16a9c18ee7735bc1975c44ceaed7b71748f0850eba1dcff4765eace",
+      "bytes": 49127
+    },
+    "historical_score_oracle.parquet": {
+      "sha256": "aa85e92ba901c6571cfc2edeebae2994f1f2cf79f57ebde240c5e724b08321be",
+      "bytes": 1327079
+    },
+    "m4_head0_model.txt": {
+      "sha256": "99c09266531ff97b8dec2ecaf7dca91c1954cdf29c2b78ba815ca36e307d8266",
+      "bytes": 174276
+    },
+    "m4_head0_recovered.joblib": {
+      "sha256": "02c9e37f806c82c22772b659297bd5e11944981365acafbcbb523fe4ecc93c55",
+      "bytes": 176260
+    },
+    "m4_head1_model.txt": {
+      "sha256": "701f2fb60ab64ec5fcfaf5fb6f193f487896739f8d641aa68bcdc904ef5c47c9",
+      "bytes": 173234
+    },
+    "m4_head1_recovered.joblib": {
+      "sha256": "346b7d584029222184a0da11c836962a2fc55844611a40b2087647f424a9b279",
+      "bytes": 175220
+    },
+    "m4_head2_model.txt": {
+      "sha256": "7c1b676afda50002a06289fa07b8af412d492f8a65e71e49f7d3aa0b8f98d282",
+      "bytes": 171324
+    },
+    "m4_head2_recovered.joblib": {
+      "sha256": "cbc7d45df84ca8482e228cc17876e53ee0449c9b17d7d9456482ed96f80e70a2",
+      "bytes": 173300
+    },
+    "model_hashes.json": {
+      "sha256": "87ddfd76fb8a0d9aad2e9b741f388e5f71b7a8f5889c977103cdaa6c384129e7",
+      "bytes": 582
+    },
+    "oos_reconciliation_report.json": {
+      "sha256": "18a1811b370b36bbfbdf0bedbabe662c92805f6a317eb98685e8baa1774efa7d",
+      "bytes": 962
+    },
+    "ordered_17_feature_manifest.json": {
+      "sha256": "23053d316e47f276ad6c6bc295be060b71d048bfe1e2ea6b6eb19c8cca9235a3",
+      "bytes": 6320
+    },
+    "reconstruction_contract.json": {
+      "sha256": "d4ff8fc8a69d17c5e1cdbfa600afe89bf9e087f60fc9629e627d24d9aed3f861",
+      "bytes": 3358
+    },
+    "va_regime_parity_ledger.parquet": {
+      "sha256": "710e7568f89a0c092fb4d3091c383086cfba767f6f6cad0b17871c6444a80d91",
+      "bytes": 21431
+    },
+    "M4_RUNTIME_RECOVERY_REPORT.md": {
+      "sha256": "041c3390c0926a5bfccd7800342afa7e32690e93b94a757424fefb8da34e716f",
+      "bytes": 23307
+    },
+    "c0_streaming_nt_engine_oos_trades.parquet": {
+      "sha256": "9941b57acc6433ce15bef7f17d12127c01843491cb1eb08c92e1796f4e91b6ff",
+      "bytes": 90315
+    },
+    "c1_streaming_nt_engine_oos_trades.parquet": {
+      "sha256": "77acd5702b7d561ac93acaf2a1cfccbd1d35c4a7030c883dad36c2023ec4811f",
+      "bytes": 92489
+    },
+    "streaming_nt_reconciliation_report.json": {
+      "sha256": "62ca45740a21d8b30a19e0037f92e533fde12ff366b8089cfea68d0baa41b6f4",
+      "bytes": 866
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "study_id": "nq_persistent_q4_confirmation_nt_policy_comparison",
+  "instrument": "NQ",
+  "multiplier": 20.0,
+  "commission_round_trip_dollars": 5.0,
+  "slippage_tick_size_pts": 0.25,
+  "slippage_per_fill_ticks": 1,
+  "slippage_round_trip_dollars": 10.0,
+  "total_friction_round_trip_dollars": 15.0,
+  "order_handling": "simulated_orders",
+  "fill_model": "Next-bar open/close execution (signal on completed bar t, fill on bar t+5s at close + 1 tick adverse slippage)",
+  "policies_evaluated": {
+    "C0": "Confirmed V_A flip-to-flip baseline (Control)",
+    "P1": "A1-First (+0.25 ATR displacement) / V_A Fallback",
+    "P2": "A2-First (+0.50 ATR displacement) / V_A Fallback",
+    "D1": "A1-Only Diagnostic (No trade on V_A fallback)",
+    "D2": "A2-Only Diagnostic (No trade on V_A fallback)"
+  },
+  "exit_contract": "Identical natural opposite V_A regime flip across all policies (c0_exit_fill_ts, c0_exit_price)"
+}

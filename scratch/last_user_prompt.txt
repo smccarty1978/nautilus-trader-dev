@@ -1,0 +1,129 @@
+<USER_REQUEST>
+You are running a bounded end-to-end H050 runtime parity validation on the already-tested 2025 Q1 OOS quarter.
+
+Do not begin stop-loss research, threshold tuning, or additional strategy optimization.
+
+The purpose is to answer one unresolved question from the previous NautilusTrader BacktestEngine validation:
+
+Did the NT strategy genuinely regenerate H050_0 and H050_1 from causal streaming feature state and frozen model scoring, or did it merely consume precomputed/frozen H050 timestamps from the observational ledger as an execution schedule?
+
+If the previous run used frozen timestamps, then the execution-engine test is valid as an execution validation, but the live signal-generation layer remains unproven.
+
+This study must close that gap.
+
+⸻
+
+1. First: audit the previous BacktestEngine implementation
+
+Inspect:
+
+* scratch/run_nt_event_driven_oos_validation.py
+* any strategy class it used
+* any loaded ledgers / schedules / checkpoint tables
+* any model-loading code
+* any feature runtime code
+* any H050 scoring code
+* any R1/R2 regime generation code
+
+Answer explicitly:
+
+A. H050_0 generation
+
+Was H050_0:
+
+1. generated live from streamed causal features + frozen model score/threshold, or
+2. loaded from an existing frozen timestamp/identity ledger?
+
+B. H050_1 generation
+
+Was H050_1:
+
+1. generated live from streamed causal features + frozen model score/threshold after R1 confirmation, or
+2. loaded from an existing frozen timestamp/identity ledger?
+
+C. R1/R2 generation
+
+Were R1 and R2:
+
+1. produced live from the regime engine during replay, or
+2. looked up from the observational ledger?
+
+D. Population
+
+Was the 2,422-trade OOS population:
+
+1. discovered by runtime logic, or
+2. injected as a frozen trade schedule?
+
+Produce an explicit verdict:
+
+* FULL_END_TO_END_RUNTIME_ALREADY_PROVEN
+* EXECUTION_ENGINE_ONLY_FROZEN_SIGNAL_SCHEDULE
+* MIXED_RUNTIME_AND_FROZEN_SCHEDULE
+
+Do not infer. Inspect the actual code path.
+
+⸻
+
+2. If frozen timestamps drove any H050 event, run the missing full parity test
+
+Use the sa
+<truncated 9308 bytes>
+s/manifest
+
+Also add a note to the prior validation artifact clarifying whether it was:
+
+* frozen-signal NT execution validation, or
+* full end-to-end runtime validation
+
+Do not erase the historical result.
+
+⸻
+
+20. Explicit questions to answer
+
+1. Did the prior BacktestEngine strategy use frozen signal timestamps?
+2. Did it generate H050_0 live?
+3. Did it generate H050_1 live?
+4. Did it generate R1 and R2 live?
+5. Can the frozen H050 model be loaded with exact artifact/hash/feature-order parity?
+6. Can the full causal feature vector be recreated live?
+7. Do runtime H050_0 scores match frozen scores?
+8. Do runtime H050_1 scores match frozen scores?
+9. Does runtime generate exactly the expected 2,422 OOS entries?
+10. Are there any extra runtime signals?
+11. Are any signals retimed?
+12. Does R1 match?
+13. Does R2 match?
+14. Does first-opposing H050_1 selection match?
+15. Does the genuine NT execution result remain similar once signals are generated live?
+16. Does C1 still improve median/win rate/drawdown?
+17. Does C1 still improve Counter-LONG mean expectancy?
+18. Does Counter-SHORT still show the mean-vs-distribution tradeoff?
+19. Why does ATR mean improve while total dollars may decline?
+20. Is the full pipeline now validated from historical bars all the way through signal generation and NT fills?
+
+⸻
+
+21. Mandatory stop
+
+When feature parity, score parity, signal parity, regime parity, and NT execution reconciliation are complete:
+
+STOP.
+
+Do not begin:
+
+* stop-loss research
+* 600-second filters
+* directional optimization
+* new model training
+* threshold modification
+* additional OOS periods
+
+The sole purpose of this study is to close the final question:
+
+Can 2025 Q1 historical NQ bars, replayed causally through the actual runtime, independently regenerate the frozen H050_0 -> R1 -> H050_1/R2 lifecycle and execute it through NautilusTrader without using the observational ledger as a signal schedule?
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-16T18:07:27-05:00.
+</ADDITIONAL_METADATA>

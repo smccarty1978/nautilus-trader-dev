@@ -47,7 +47,9 @@ class HostCore:
         # streams / mux
         self.streams = list(self.plan["streams"])
         self.execution_streams = [s["key"] for s in self.streams if s["role"] == "execution"]
-        self.mux = StreamMux(self.streams, self._deliver, trading_days=getattr(session_table, "trading_day", None))
+        # The fill scope, not the trading-day rows: a trading day includes its maintenance halt (that
+        # is what censoring means), the fill scope does not, and it also drops declared data outages.
+        self.mux = StreamMux(self.streams, self._deliver, trading_days=getattr(session_table, "fill_scope", None))
         self.stream_duration = {s["key"]: int(s["duration_ns"]) for s in self.streams}
 
         # trackers (in plan order)
@@ -372,6 +374,9 @@ class HostCore:
         empty = self.mux.empty_windows_published()
         if empty:                                    # closed-window plans only: a sealed complete_bucket plan's stats are unchanged
             out["empty_windows_published"] = empty
+        suppressed = self.mux.windows_suppressed()
+        if suppressed:                               # empty windows a declared halt or data outage excluded from the fill scope
+            out["windows_suppressed"] = suppressed
         if self._profile_enabled:
             total = sum(self._profile.values()) or 1.0
             digits = 4  # host-constant: profile rounding

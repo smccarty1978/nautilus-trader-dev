@@ -1,0 +1,316 @@
+{
+  "audit_version": "1.0.0",
+  "study_id": "nq_universal_regime_health_trajectory",
+  "parent_model_study": "nq_universal_regime_health_model",
+  "status": "CAUSAL_STREAMING_AUDIT_PASSED",
+  "feature_count": 24,
+  "ordered_features": [
+    "current_pullback_atr",
+    "prior_peak_mfe_atr",
+    "is_pb05",
+    "is_pb10",
+    "is_pb15",
+    "is_pb20",
+    "direction",
+    "current_recovery_fraction",
+    "max_recovery_fraction_so_far",
+    "episode_max_recovery_fraction",
+    "recovery_rollover_count",
+    "has_prior_recovery_ge25_num",
+    "has_prior_recovery_ge50_num",
+    "has_prior_recovery_ge75_num",
+    "is_rollover_ge25_num",
+    "is_rollover_ge50_num",
+    "is_rollover_ge75_num",
+    "is_recovering",
+    "is_deteriorating",
+    "is_rollover",
+    "regime_age_seconds",
+    "seconds_since_peak_mfe",
+    "seconds_since_deepest_pullback",
+    "pullback_to_prior_peak_ratio"
+  ],
+  "execution_closure_compliance": {
+    "zero_lookahead_verified": true,
+    "completed_bar_semantics": "1m DualEma completed bars for regime direction; 5s completed bars for evaluation grid",
+    "atr_initialization": "Regime start ATR initialized from completed 1m ATR at regime_start_ts",
+    "session_boundaries": "RTH session classification (09:30-16:00 ET)",
+    "tie_breaking_rules": "Timestamp tie-breaking preserves chronological event order (NEW_MAX -> PULLBACK -> RECOVERY -> ROLLOVER -> FLIP)"
+  },
+  "features": {
+    "current_pullback_atr": {
+      "source_tracker": "Pullback Episode Tracker",
+      "source_timeframe": "1s catalog bars downsampled to 5s grid",
+      "update_event": "5s bar close during active pullback (giveback >= 0.50 ATR)",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets to 0 on NEW_MAX_MFE or regime flip",
+      "required_historical_state": [
+        "running_max_mfe_atr",
+        "start_price",
+        "direction",
+        "start_atr"
+      ],
+      "causal_availability": "Contemporaneous (t <= obs_ts), strictly zero lookahead"
+    },
+    "prior_peak_mfe_atr": {
+      "source_tracker": "Running Regime MFE Tracker",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Emitted when price reaches new peak MFE (cur_mfe > running_max_mfe)",
+      "timestamp_semantics": "Timestamp of most recent peak MFE prior to or at current bar",
+      "reset_semantics": "Resets to 0 on regime creation (t=0)",
+      "required_historical_state": [
+        "running_max_mfe_atr"
+      ],
+      "causal_availability": "Contemporaneous, backward-looking"
+    },
+    "is_pb05": {
+      "source_tracker": "Pullback Milestone Tracker",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Binary indicator whether current giveback >= 0.50 ATR",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets on new max MFE or regime flip",
+      "required_historical_state": [
+        "current_pullback_atr"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_pb10": {
+      "source_tracker": "Pullback Milestone Tracker",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Binary indicator whether current giveback >= 1.00 ATR",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets on new max MFE or regime flip",
+      "required_historical_state": [
+        "current_pullback_atr"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_pb15": {
+      "source_tracker": "Pullback Milestone Tracker",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Binary indicator whether current giveback >= 1.50 ATR",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets on new max MFE or regime flip",
+      "required_historical_state": [
+        "current_pullback_atr"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_pb20": {
+      "source_tracker": "Pullback Milestone Tracker",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Binary indicator whether current giveback >= 2.00 ATR",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets on new max MFE or regime flip",
+      "required_historical_state": [
+        "current_pullback_atr"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "direction": {
+      "source_tracker": "DualEmaRegimeTracker (Canonical V_A Regime Detector)",
+      "source_timeframe": "1m completed bars",
+      "update_event": "Dual EMA crossover on completed 1m bar",
+      "timestamp_semantics": "ts_init of completed 1m bar",
+      "reset_semantics": "Latches until opposite crossover occurs",
+      "required_historical_state": [
+        "fast_ema_1m",
+        "slow_ema_1m"
+      ],
+      "causal_availability": "Contemporaneous completed bar, zero lookahead"
+    },
+    "current_recovery_fraction": {
+      "source_tracker": "Pullback Recovery Tracker",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "When price rebounds from deepest pullback in episode",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets to 0.0 when new deepest pullback is made in episode",
+      "required_historical_state": [
+        "deepest_pb_atr",
+        "current_pullback_atr"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "max_recovery_fraction_so_far": {
+      "source_tracker": "Pullback Recovery Tracker",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Highest recovery fraction achieved within the current bounce leg",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets to 0.0 on rollover to new deepest pullback",
+      "required_historical_state": [
+        "historical bounce recovery values"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "episode_max_recovery_fraction": {
+      "source_tracker": "Pullback Episode Tracker",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Highest recovery fraction achieved across all bounces in episode",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets to 0.0 on new max MFE / episode start",
+      "required_historical_state": [
+        "all bounce recovery values in episode"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "recovery_rollover_count": {
+      "source_tracker": "Recovery Rollover Detector",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Increments when a recovery leg (>= 25%) fails and makes a new low",
+      "timestamp_semantics": "ts_init of completed 5s bar breaking deepest pullback",
+      "reset_semantics": "Resets to 0 on new max MFE / episode start",
+      "required_historical_state": [
+        "cumulative rollover count in episode"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "has_prior_recovery_ge25_num": {
+      "source_tracker": "Recovery Rollover Detector",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Latches True (1.0) when any recovery in episode reaches >= 25%",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets on episode start",
+      "required_historical_state": [
+        "episode bounce history"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "has_prior_recovery_ge50_num": {
+      "source_tracker": "Recovery Rollover Detector",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Latches True (1.0) when any recovery in episode reaches >= 50%",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets on episode start",
+      "required_historical_state": [
+        "episode bounce history"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "has_prior_recovery_ge75_num": {
+      "source_tracker": "Recovery Rollover Detector",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Latches True (1.0) when any recovery in episode reaches >= 75%",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Resets on episode start",
+      "required_historical_state": [
+        "episode bounce history"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_rollover_ge25_num": {
+      "source_tracker": "Recovery Rollover Detector",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "True (1.0) at the observation where a >= 25% recovery fails into new low",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Set on rollover transition event",
+      "required_historical_state": [
+        "immediate prior recovery leg amplitude"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_rollover_ge50_num": {
+      "source_tracker": "Recovery Rollover Detector",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "True (1.0) at the observation where a >= 50% recovery fails into new low",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Set on rollover transition event",
+      "required_historical_state": [
+        "immediate prior recovery leg amplitude"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_rollover_ge75_num": {
+      "source_tracker": "Recovery Rollover Detector",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "True (1.0) at the observation where a >= 75% recovery fails into new low",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Set on rollover transition event",
+      "required_historical_state": [
+        "immediate prior recovery leg amplitude"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_recovering": {
+      "source_tracker": "Path State Classifier",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "True (1.0) when current giveback < deepest_pb_atr - 1e-4",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Updated tick-by-tick upon price direction changes",
+      "required_historical_state": [
+        "deepest_pb_atr",
+        "current_pullback_atr"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_deteriorating": {
+      "source_tracker": "Path State Classifier",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "True (1.0) when price is at new deepest pullback without active recovery",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Updated tick-by-tick upon price direction changes",
+      "required_historical_state": [
+        "deepest_pb_atr",
+        "current_pullback_atr"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "is_rollover": {
+      "source_tracker": "Path State Classifier",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "True (1.0) at the exact transition where price breaks below prior deepest pullback",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Emitted on rollover transition event",
+      "required_historical_state": [
+        "deepest_pb_atr",
+        "current_pullback_atr",
+        "was_recovering"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "regime_age_seconds": {
+      "source_tracker": "Regime Clocks",
+      "source_timeframe": "Continuous timestamp difference",
+      "update_event": "Evaluated at each transition observation: (t - regime_start_ts) / 1e9",
+      "timestamp_semantics": "ts_init of completed 5s bar vs regime start timestamp",
+      "reset_semantics": "Resets to 0 on regime inception (t=0)",
+      "required_historical_state": [
+        "regime_start_ts"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "seconds_since_peak_mfe": {
+      "source_tracker": "Regime Clocks",
+      "source_timeframe": "Continuous timestamp difference",
+      "update_event": "Evaluated at each transition observation: (t - running_max_mfe_ts) / 1e9",
+      "timestamp_semantics": "ts_init of completed 5s bar vs running peak MFE timestamp",
+      "reset_semantics": "Resets to 0 whenever new peak MFE is established",
+      "required_historical_state": [
+        "running_max_mfe_ts"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "seconds_since_deepest_pullback": {
+      "source_tracker": "Episode Clocks",
+      "source_timeframe": "Continuous timestamp difference",
+      "update_event": "Evaluated at each transition observation: (t - deepest_pb_ts) / 1e9",
+      "timestamp_semantics": "ts_init of completed 5s bar vs deepest pullback timestamp",
+      "reset_semantics": "Resets to 0 whenever a new deepest pullback is set",
+      "required_historical_state": [
+        "deepest_pb_ts"
+      ],
+      "causal_availability": "Contemporaneous"
+    },
+    "pullback_to_prior_peak_ratio": {
+      "source_tracker": "Regime Position Ratios",
+      "source_timeframe": "5s grid evaluation",
+      "update_event": "Evaluated at each observation: current_pullback_atr / prior_peak_mfe_atr",
+      "timestamp_semantics": "ts_init of completed 5s bar",
+      "reset_semantics": "Recomputed at each observation; resets on episode end",
+      "required_historical_state": [
+        "current_pullback_atr",
+        "prior_peak_mfe_atr"
+      ],
+      "causal_availability": "Contemporaneous"
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "year_oos_stability": {
+    "PB0.50": {
+      "2023": {
+        "N": 15375,
+        "reversal_pct": 16.422764227642276,
+        "reextension_pct": 81.37235772357724
+      },
+      "2024": {
+        "N": 15403,
+        "reversal_pct": 15.83457767967279,
+        "reextension_pct": 81.97104460170097
+      },
+      "2025_Q1": {
+        "N": 3825,
+        "reversal_pct": 15.503267973856207,
+        "reextension_pct": 82.09150326797385
+      }
+    },
+    "PB1.00": {
+      "2023": {
+        "N": 8971,
+        "reversal_pct": 24.74640508304537,
+        "reextension_pct": 72.54486679299966
+      },
+      "2024": {
+        "N": 9117,
+        "reversal_pct": 23.45069650104201,
+        "reextension_pct": 73.68651968849403
+      },
+      "2025_Q1": {
+        "N": 2196,
+        "reversal_pct": 23.816029143897996,
+        "reextension_pct": 72.95081967213115
+      }
+    },
+    "PB1.50": {
+      "2023": {
+        "N": 4562,
+        "reversal_pct": 35.29153879877247,
+        "reextension_pct": 60.96010521701009
+      },
+      "2024": {
+        "N": 4551,
+        "reversal_pct": 33.92660953636563,
+        "reextension_pct": 62.052296198637656
+      },
+      "2025_Q1": {
+        "N": 1059,
+        "reversal_pct": 35.2219074598678,
+        "reextension_pct": 59.962228517469306
+      }
+    },
+    "PB2.00": {
+      "2023": {
+        "N": 1816,
+        "reversal_pct": 48.348017621145374,
+        "reextension_pct": 46.86123348017621
+      },
+      "2024": {
+        "N": 1849,
+        "reversal_pct": 45.32179556517036,
+        "reextension_pct": 48.99945916711736
+      },
+      "2025_Q1": {
+        "N": 380,
+        "reversal_pct": 52.89473684210526,
+        "reextension_pct": 39.473684210526315
+      }
+    }
+  },
+  "direction_stability": {
+    "PB0.50": {
+      "BULLISH_REGIME_FADE_BEAR": {
+        "N": 19301,
+        "reversal_pct": 15.02512823169784,
+        "reextension_pct": 82.85062950106212
+      },
+      "BEARISH_REGIME_FADE_BULL": {
+        "N": 15302,
+        "reversal_pct": 17.36374330152921,
+        "reextension_pct": 80.29015814926154
+      }
+    },
+    "PB1.00": {
+      "BULLISH_REGIME_FADE_BEAR": {
+        "N": 10746,
+        "reversal_pct": 23.283082077051926,
+        "reextension_pct": 74.01823934487251
+      },
+      "BEARISH_REGIME_FADE_BULL": {
+        "N": 9538,
+        "reversal_pct": 24.942335919479973,
+        "reextension_pct": 72.0696162717551
+      }
+    },
+    "PB1.50": {
+      "BULLISH_REGIME_FADE_BEAR": {
+        "N": 5040,
+        "reversal_pct": 35.05952380952381,
+        "reextension_pct": 60.952380952380956
+      },
+      "BEARISH_REGIME_FADE_BULL": {
+        "N": 5132,
+        "reversal_pct": 34.294621979735,
+        "reextension_pct": 61.730319563523
+      }
+    },
+    "PB2.00": {
+      "BULLISH_REGIME_FADE_BEAR": {
+        "N": 1856,
+        "reversal_pct": 48.76077586206897,
+        "reextension_pct": 45.366379310344826
+      },
+      "BEARISH_REGIME_FADE_BULL": {
+        "N": 2189,
+        "reversal_pct": 46.231155778894475,
+        "reextension_pct": 48.652352672453176
+      }
+    }
+  },
+  "peak_mfe_context": {
+    "Q1_low_excursion": {
+      "peak_mfe_range": "< 3.00 ATR",
+      "sample_size_N": 8651,
+      "reversal_pct": 15.616691711940817,
+      "reextension_pct": 83.43544098948098,
+      "mean_pullback_to_peak_ratio": 0.22995687878128254
+    },
+    "Q2_mid_low_excursion": {
+      "peak_mfe_range": "3.00 - 4.18 ATR",
+      "sample_size_N": 8650,
+      "reversal_pct": 14.369942196531793,
+      "reextension_pct": 83.97687861271676,
+      "mean_pullback_to_peak_ratio": 0.14005274942305232
+    },
+    "Q3_mid_high_excursion": {
+      "peak_mfe_range": "4.18 - 5.63 ATR",
+      "sample_size_N": 8651,
+      "reversal_pct": 15.223673563749857,
+      "reextension_pct": 82.51069240550225,
+      "mean_pullback_to_peak_ratio": 0.10365614009910615
+    },
+    "Q4_high_excursion": {
+      "peak_mfe_range": ">= 5.63 ATR",
+      "sample_size_N": 8651,
+      "reversal_pct": 19.026702115362387,
+      "reextension_pct": 76.95064154433014,
+      "mean_pullback_to_peak_ratio": 0.07276885213720655
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "study_id": "nq_regime_health_policy_translation",
+  "status": "COMPLETE",
+  "parent_studies": [
+    "studies/nq_unconditioned_regime_path_atlas",
+    "studies/nq_universal_regime_health_model",
+    "studies/nq_universal_regime_health_trajectory",
+    "studies/nq_regime_health_forward_outcome_atlas"
+  ],
+  "model_hashes": {
+    "HEAD_1_M1_U": "a6047c14815ced1786b8a00f1d18d3495a8e285bb91e3de0f3f9bf98600390c2",
+    "HEAD_2_M1_U": "693ab868289d30b7eacbc4bad144a97755596850b133a40b098c96516cf626ff"
+  },
+  "decision_classification": "OUTCOME_C_INFORMATION_VALID_POLICY_NOT_USEFUL",
+  "decision_rationale": "M1-U accurately predicts regime deterioration and hazard transitions (AUC ~0.78), but applying frozen health states as early position-exit rules degrades realized trading economics across all variants (P1, P2, P3) compared to the natural V_A regime-flip baseline (P0) due to severe truncation of re-extending trend winners.",
+  "reversal_diagnostic": "PROMISING",
+  "reversal_rationale": "Persistent Q4 invalidation leads natural regime flip by an average of 178.4 seconds with 0.81 ATR prospective adverse price excursion, indicating strong information for prospective opposite-direction entry rather than position exit.",
+  "artifacts_generated": 13,
+  "timestamp": "2026-09-16T11:45:41Z"
+}

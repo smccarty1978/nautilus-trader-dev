@@ -1,0 +1,83 @@
+{
+  "gate_0_verdict": "PASS_ZERO_DIVERGENCE",
+  "authoritative_q4_arming_timestamp_definition": "ts_init of the 5s bar where persistent Q4 is reached (H1 >= 0.50 and H2 >= 0.25 continuously for >= 60s); matches t_event_a in timing_observation_ledger.parquet and q4_ts in first_hit and competing event ledgers.",
+  "authoritative_a1_first_hit_timestamp_definition": "ts_init of first completed 5s bar after q4_ts where counter-direction displacement d_trade * (close - q4_price) / atr_reference >= +0.25 ATR.",
+  "authoritative_a2_first_hit_timestamp_definition": "ts_init of first completed 5s bar after q4_ts where counter-direction displacement d_trade * (close - q4_price) / atr_reference >= +0.50 ATR.",
+  "authoritative_va_timestamp_definition": "natural_flip_ts in timing_observation_ledger.parquet, representing the authoritative volume-absorption regime flip milestone.",
+  "exact_timing_anchor": "q4_ts (decision moment of persistent Q4 regime entry)",
+  "eligible_event_stream_granularity": "5-second completed grid bars (ts_init % 5000000000 == 0)",
+  "underlying_data_divergence": {
+    "regimes_compared": 5610,
+    "A1_timestamp_divergences": 0,
+    "A2_timestamp_divergences": 0,
+    "A1_elapsed_seconds_divergences": 0,
+    "A2_elapsed_seconds_divergences": 0,
+    "A1_competing_status_divergences": 0,
+    "A2_competing_status_divergences": 0
+  },
+  "discrepancy_explanation": "The underlying parquet ledgers (first_hit_event_ledger.parquet and competing_event_ledger.parquet) are 100% BIT-FOR-BIT IDENTICAL across all 5,610 regimes. In BOTH ledgers, the true median elapsed confirmation time from Q4 T0 is exactly 25.0 seconds for A1 (mean 78.7s) and 60.0 seconds for A2 (mean 119.3s). The figures '8.0s' (A1) and '16.0s' (A2) quoted in the prompt arose from an unverified text template inserted into the primary comparison table of the previous report draft (CONFIRMATION_OPPORTUNITY_CAPTURE_REPORT.md), which did not reflect the underlying parquet data. The true underlying authoritative data has zero divergences.",
+  "recomputed_medians_under_same_population": {
+    "A1_confirmed_before_va_median_sec": 25.0,
+    "A1_confirmed_before_va_mean_sec": 78.73046875,
+    "A2_confirmed_before_va_median_sec": 60.0,
+    "A2_confirmed_before_va_mean_sec": 119.32321152856407
+  },
+  "condition_details": {
+    "A1": {
+      "total_regimes": 5610,
+      "regime_id_mismatches": 0,
+      "direction_mismatches": 0,
+      "q4_ts_mismatches": 0,
+      "first_hit_ts_mismatches": 0,
+      "flip_ts_mismatches": 0,
+      "seconds_q4_to_first_hit_mismatches": 0,
+      "status_flag_mismatches": 0,
+      "tie_flag_mismatches": 0,
+      "confirmed_before_va_count": 3072,
+      "tie_count": 211,
+      "va_before_confirm_count": 2327,
+      "timing_confirmed_subset": {
+        "n": 3072,
+        "median_seconds": 25.0,
+        "mean_seconds": 78.73046875,
+        "p25_seconds": 10.0,
+        "p75_seconds": 80.0
+      },
+      "timing_all_first_hits": {
+        "n": 3283,
+        "median_seconds": 30.0,
+        "mean_seconds": 79.22631739262869,
+        "p25_seconds": 10.0,
+        "p75_seconds": 80.0
+      }
+    },
+    "A2": {
+      "total_regimes": 5610,
+      "regime_id_mismatches": 0,
+      "direction_mismatches": 0,
+      "q4_ts_mismatches": 0,
+      "first_hit_ts_mismatches": 0,
+      "flip_ts_mismatches": 0,
+      "seconds_q4_to_first_hit_mismatches": 0,
+      "status_flag_mismatches": 0,
+      "tie_flag_mismatches": 0,
+      "confirmed_before_va_count": 1943,
+      "tie_count": 160,
+      "va_before_confirm_count": 3507,
+      "timing_confirmed_subset": {
+        "n": 1943,
+        "median_seconds": 60.0,
+        "mean_seconds": 119.32321152856407,
+        "p25_seconds": 25.0,
+        "p75_seconds": 160.0
+      },
+      "timing_all_first_hits": {
+        "n": 2103,
+        "median_seconds": 55.0,
+        "mean_seconds": 121.23870660960533,
+        "p25_seconds": 25.0,
+        "p75_seconds": 160.0
+      }
+    }
+  }
+}

@@ -1,0 +1,806 @@
+{
+  "A1": {
+    "ALL": {
+      "total_q4_worse_n": 1721,
+      "q4_worse_first_hit_n": 579,
+      "q4_worse_flip_first_n": 1116,
+      "q4_worse_same_ts_n": 26,
+      "pct_worse_not_exposed": 66.3567693201627,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 725,
+          "first_hit_before_flip_n": 273,
+          "flip_before_first_hit_n": 450,
+          "same_timestamp_n": 2,
+          "pct_not_exposed_before_confirmation": 62.3448275862069
+        },
+        "lt_10pts": {
+          "original_n": 510,
+          "first_hit_before_flip_n": 199,
+          "flip_before_first_hit_n": 311,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 60.98039215686275
+        },
+        "lt_20pts": {
+          "original_n": 333,
+          "first_hit_before_flip_n": 135,
+          "flip_before_first_hit_n": 198,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 59.45945945945946
+        },
+        "lt_40pts": {
+          "original_n": 174,
+          "first_hit_before_flip_n": 69,
+          "flip_before_first_hit_n": 105,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 60.3448275862069
+        },
+        "lt_60pts": {
+          "original_n": 86,
+          "first_hit_before_flip_n": 31,
+          "flip_before_first_hit_n": 55,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 63.95348837209303
+        }
+      }
+    },
+    "TRAIN": {
+      "total_q4_worse_n": 1546,
+      "q4_worse_first_hit_n": 511,
+      "q4_worse_flip_first_n": 1010,
+      "q4_worse_same_ts_n": 25,
+      "pct_worse_not_exposed": 66.94695989650712,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 630,
+          "first_hit_before_flip_n": 236,
+          "flip_before_first_hit_n": 392,
+          "same_timestamp_n": 2,
+          "pct_not_exposed_before_confirmation": 62.53968253968254
+        },
+        "lt_10pts": {
+          "original_n": 441,
+          "first_hit_before_flip_n": 171,
+          "flip_before_first_hit_n": 270,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 61.224489795918366
+        },
+        "lt_20pts": {
+          "original_n": 281,
+          "first_hit_before_flip_n": 114,
+          "flip_before_first_hit_n": 167,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 59.430604982206404
+        },
+        "lt_40pts": {
+          "original_n": 147,
+          "first_hit_before_flip_n": 59,
+          "flip_before_first_hit_n": 88,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 59.863945578231295
+        },
+        "lt_60pts": {
+          "original_n": 72,
+          "first_hit_before_flip_n": 24,
+          "flip_before_first_hit_n": 48,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 66.66666666666666
+        }
+      }
+    },
+    "OOS": {
+      "total_q4_worse_n": 175,
+      "q4_worse_first_hit_n": 68,
+      "q4_worse_flip_first_n": 106,
+      "q4_worse_same_ts_n": 1,
+      "pct_worse_not_exposed": 61.142857142857146,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 95,
+          "first_hit_before_flip_n": 37,
+          "flip_before_first_hit_n": 58,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 61.05263157894737
+        },
+        "lt_10pts": {
+          "original_n": 69,
+          "first_hit_before_flip_n": 28,
+          "flip_before_first_hit_n": 41,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 59.42028985507246
+        },
+        "lt_20pts": {
+          "original_n": 52,
+          "first_hit_before_flip_n": 21,
+          "flip_before_first_hit_n": 31,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 59.61538461538461
+        },
+        "lt_40pts": {
+          "original_n": 27,
+          "first_hit_before_flip_n": 10,
+          "flip_before_first_hit_n": 17,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 62.96296296296296
+        },
+        "lt_60pts": {
+          "original_n": 14,
+          "first_hit_before_flip_n": 7,
+          "flip_before_first_hit_n": 7,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 50.0
+        }
+      }
+    }
+  },
+  "A2": {
+    "ALL": {
+      "total_q4_worse_n": 1721,
+      "q4_worse_first_hit_n": 231,
+      "q4_worse_flip_first_n": 1486,
+      "q4_worse_same_ts_n": 4,
+      "pct_worse_not_exposed": 86.57757117954678,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 725,
+          "first_hit_before_flip_n": 126,
+          "flip_before_first_hit_n": 599,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 82.62068965517241
+        },
+        "lt_10pts": {
+          "original_n": 510,
+          "first_hit_before_flip_n": 91,
+          "flip_before_first_hit_n": 419,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 82.15686274509804
+        },
+        "lt_20pts": {
+          "original_n": 333,
+          "first_hit_before_flip_n": 64,
+          "flip_before_first_hit_n": 269,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 80.78078078078079
+        },
+        "lt_40pts": {
+          "original_n": 174,
+          "first_hit_before_flip_n": 33,
+          "flip_before_first_hit_n": 141,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 81.03448275862068
+        },
+        "lt_60pts": {
+          "original_n": 86,
+          "first_hit_before_flip_n": 12,
+          "flip_before_first_hit_n": 74,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 86.04651162790698
+        }
+      }
+    },
+    "TRAIN": {
+      "total_q4_worse_n": 1546,
+      "q4_worse_first_hit_n": 202,
+      "q4_worse_flip_first_n": 1340,
+      "q4_worse_same_ts_n": 4,
+      "pct_worse_not_exposed": 86.9340232858991,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 630,
+          "first_hit_before_flip_n": 110,
+          "flip_before_first_hit_n": 520,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 82.53968253968253
+        },
+        "lt_10pts": {
+          "original_n": 441,
+          "first_hit_before_flip_n": 78,
+          "flip_before_first_hit_n": 363,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 82.31292517006803
+        },
+        "lt_20pts": {
+          "original_n": 281,
+          "first_hit_before_flip_n": 53,
+          "flip_before_first_hit_n": 228,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 81.13879003558719
+        },
+        "lt_40pts": {
+          "original_n": 147,
+          "first_hit_before_flip_n": 26,
+          "flip_before_first_hit_n": 121,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 82.31292517006803
+        },
+        "lt_60pts": {
+          "original_n": 72,
+          "first_hit_before_flip_n": 8,
+          "flip_before_first_hit_n": 64,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 88.88888888888889
+        }
+      }
+    },
+    "OOS": {
+      "total_q4_worse_n": 175,
+      "q4_worse_first_hit_n": 29,
+      "q4_worse_flip_first_n": 146,
+      "q4_worse_same_ts_n": 0,
+      "pct_worse_not_exposed": 83.42857142857143,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 95,
+          "first_hit_before_flip_n": 16,
+          "flip_before_first_hit_n": 79,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 83.15789473684211
+        },
+        "lt_10pts": {
+          "original_n": 69,
+          "first_hit_before_flip_n": 13,
+          "flip_before_first_hit_n": 56,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 81.15942028985508
+        },
+        "lt_20pts": {
+          "original_n": 52,
+          "first_hit_before_flip_n": 11,
+          "flip_before_first_hit_n": 41,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 78.84615384615384
+        },
+        "lt_40pts": {
+          "original_n": 27,
+          "first_hit_before_flip_n": 7,
+          "flip_before_first_hit_n": 20,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 74.07407407407408
+        },
+        "lt_60pts": {
+          "original_n": 14,
+          "first_hit_before_flip_n": 4,
+          "flip_before_first_hit_n": 10,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 71.42857142857143
+        }
+      }
+    }
+  },
+  "B1": {
+    "ALL": {
+      "total_q4_worse_n": 1721,
+      "q4_worse_first_hit_n": 1306,
+      "q4_worse_flip_first_n": 350,
+      "q4_worse_same_ts_n": 65,
+      "pct_worse_not_exposed": 24.11388727484021,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 725,
+          "first_hit_before_flip_n": 697,
+          "flip_before_first_hit_n": 24,
+          "same_timestamp_n": 4,
+          "pct_not_exposed_before_confirmation": 3.8620689655172415
+        },
+        "lt_10pts": {
+          "original_n": 510,
+          "first_hit_before_flip_n": 509,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.19607843137254902
+        },
+        "lt_20pts": {
+          "original_n": 333,
+          "first_hit_before_flip_n": 332,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.3003003003003003
+        },
+        "lt_40pts": {
+          "original_n": 174,
+          "first_hit_before_flip_n": 174,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 86,
+          "first_hit_before_flip_n": 86,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    },
+    "TRAIN": {
+      "total_q4_worse_n": 1546,
+      "q4_worse_first_hit_n": 1165,
+      "q4_worse_flip_first_n": 324,
+      "q4_worse_same_ts_n": 57,
+      "pct_worse_not_exposed": 24.64424320827943,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 630,
+          "first_hit_before_flip_n": 606,
+          "flip_before_first_hit_n": 21,
+          "same_timestamp_n": 3,
+          "pct_not_exposed_before_confirmation": 3.8095238095238098
+        },
+        "lt_10pts": {
+          "original_n": 441,
+          "first_hit_before_flip_n": 440,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.22675736961451248
+        },
+        "lt_20pts": {
+          "original_n": 281,
+          "first_hit_before_flip_n": 280,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.3558718861209964
+        },
+        "lt_40pts": {
+          "original_n": 147,
+          "first_hit_before_flip_n": 147,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 72,
+          "first_hit_before_flip_n": 72,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    },
+    "OOS": {
+      "total_q4_worse_n": 175,
+      "q4_worse_first_hit_n": 141,
+      "q4_worse_flip_first_n": 26,
+      "q4_worse_same_ts_n": 8,
+      "pct_worse_not_exposed": 19.428571428571427,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 95,
+          "first_hit_before_flip_n": 91,
+          "flip_before_first_hit_n": 3,
+          "same_timestamp_n": 1,
+          "pct_not_exposed_before_confirmation": 4.2105263157894735
+        },
+        "lt_10pts": {
+          "original_n": 69,
+          "first_hit_before_flip_n": 69,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_20pts": {
+          "original_n": 52,
+          "first_hit_before_flip_n": 52,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_40pts": {
+          "original_n": 27,
+          "first_hit_before_flip_n": 27,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 14,
+          "first_hit_before_flip_n": 14,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    }
+  },
+  "B2": {
+    "ALL": {
+      "total_q4_worse_n": 1721,
+      "q4_worse_first_hit_n": 1118,
+      "q4_worse_flip_first_n": 561,
+      "q4_worse_same_ts_n": 42,
+      "pct_worse_not_exposed": 35.037768739105175,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 725,
+          "first_hit_before_flip_n": 687,
+          "flip_before_first_hit_n": 33,
+          "same_timestamp_n": 5,
+          "pct_not_exposed_before_confirmation": 5.241379310344827
+        },
+        "lt_10pts": {
+          "original_n": 510,
+          "first_hit_before_flip_n": 509,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.19607843137254902
+        },
+        "lt_20pts": {
+          "original_n": 333,
+          "first_hit_before_flip_n": 332,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.3003003003003003
+        },
+        "lt_40pts": {
+          "original_n": 174,
+          "first_hit_before_flip_n": 174,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 86,
+          "first_hit_before_flip_n": 86,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    },
+    "TRAIN": {
+      "total_q4_worse_n": 1546,
+      "q4_worse_first_hit_n": 993,
+      "q4_worse_flip_first_n": 516,
+      "q4_worse_same_ts_n": 37,
+      "pct_worse_not_exposed": 35.769728331177234,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 630,
+          "first_hit_before_flip_n": 599,
+          "flip_before_first_hit_n": 27,
+          "same_timestamp_n": 4,
+          "pct_not_exposed_before_confirmation": 4.920634920634921
+        },
+        "lt_10pts": {
+          "original_n": 441,
+          "first_hit_before_flip_n": 440,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.22675736961451248
+        },
+        "lt_20pts": {
+          "original_n": 281,
+          "first_hit_before_flip_n": 280,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.3558718861209964
+        },
+        "lt_40pts": {
+          "original_n": 147,
+          "first_hit_before_flip_n": 147,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 72,
+          "first_hit_before_flip_n": 72,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    },
+    "OOS": {
+      "total_q4_worse_n": 175,
+      "q4_worse_first_hit_n": 125,
+      "q4_worse_flip_first_n": 45,
+      "q4_worse_same_ts_n": 5,
+      "pct_worse_not_exposed": 28.57142857142857,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 95,
+          "first_hit_before_flip_n": 88,
+          "flip_before_first_hit_n": 6,
+          "same_timestamp_n": 1,
+          "pct_not_exposed_before_confirmation": 7.368421052631578
+        },
+        "lt_10pts": {
+          "original_n": 69,
+          "first_hit_before_flip_n": 69,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_20pts": {
+          "original_n": 52,
+          "first_hit_before_flip_n": 52,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_40pts": {
+          "original_n": 27,
+          "first_hit_before_flip_n": 27,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 14,
+          "first_hit_before_flip_n": 14,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    }
+  },
+  "B3": {
+    "ALL": {
+      "total_q4_worse_n": 1721,
+      "q4_worse_first_hit_n": 997,
+      "q4_worse_flip_first_n": 720,
+      "q4_worse_same_ts_n": 4,
+      "pct_worse_not_exposed": 42.068564787914006,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 725,
+          "first_hit_before_flip_n": 674,
+          "flip_before_first_hit_n": 51,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 7.03448275862069
+        },
+        "lt_10pts": {
+          "original_n": 510,
+          "first_hit_before_flip_n": 508,
+          "flip_before_first_hit_n": 2,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.39215686274509803
+        },
+        "lt_20pts": {
+          "original_n": 333,
+          "first_hit_before_flip_n": 332,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.3003003003003003
+        },
+        "lt_40pts": {
+          "original_n": 174,
+          "first_hit_before_flip_n": 174,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 86,
+          "first_hit_before_flip_n": 86,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    },
+    "TRAIN": {
+      "total_q4_worse_n": 1546,
+      "q4_worse_first_hit_n": 882,
+      "q4_worse_flip_first_n": 660,
+      "q4_worse_same_ts_n": 4,
+      "pct_worse_not_exposed": 42.94954721862872,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 630,
+          "first_hit_before_flip_n": 589,
+          "flip_before_first_hit_n": 41,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 6.507936507936509
+        },
+        "lt_10pts": {
+          "original_n": 441,
+          "first_hit_before_flip_n": 439,
+          "flip_before_first_hit_n": 2,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.45351473922902497
+        },
+        "lt_20pts": {
+          "original_n": 281,
+          "first_hit_before_flip_n": 280,
+          "flip_before_first_hit_n": 1,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.3558718861209964
+        },
+        "lt_40pts": {
+          "original_n": 147,
+          "first_hit_before_flip_n": 147,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 72,
+          "first_hit_before_flip_n": 72,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    },
+    "OOS": {
+      "total_q4_worse_n": 175,
+      "q4_worse_first_hit_n": 115,
+      "q4_worse_flip_first_n": 60,
+      "q4_worse_same_ts_n": 0,
+      "pct_worse_not_exposed": 34.285714285714285,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 95,
+          "first_hit_before_flip_n": 85,
+          "flip_before_first_hit_n": 10,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 10.526315789473683
+        },
+        "lt_10pts": {
+          "original_n": 69,
+          "first_hit_before_flip_n": 69,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_20pts": {
+          "original_n": 52,
+          "first_hit_before_flip_n": 52,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_40pts": {
+          "original_n": 27,
+          "first_hit_before_flip_n": 27,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 14,
+          "first_hit_before_flip_n": 14,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    }
+  },
+  "C": {
+    "ALL": {
+      "total_q4_worse_n": 1721,
+      "q4_worse_first_hit_n": 1567,
+      "q4_worse_flip_first_n": 31,
+      "q4_worse_same_ts_n": 123,
+      "pct_worse_not_exposed": 8.94828588030215,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 725,
+          "first_hit_before_flip_n": 716,
+          "flip_before_first_hit_n": 6,
+          "same_timestamp_n": 3,
+          "pct_not_exposed_before_confirmation": 1.2413793103448276
+        },
+        "lt_10pts": {
+          "original_n": 510,
+          "first_hit_before_flip_n": 510,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_20pts": {
+          "original_n": 333,
+          "first_hit_before_flip_n": 333,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_40pts": {
+          "original_n": 174,
+          "first_hit_before_flip_n": 174,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 86,
+          "first_hit_before_flip_n": 86,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    },
+    "TRAIN": {
+      "total_q4_worse_n": 1546,
+      "q4_worse_first_hit_n": 1399,
+      "q4_worse_flip_first_n": 30,
+      "q4_worse_same_ts_n": 117,
+      "pct_worse_not_exposed": 9.508408796895214,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 630,
+          "first_hit_before_flip_n": 621,
+          "flip_before_first_hit_n": 6,
+          "same_timestamp_n": 3,
+          "pct_not_exposed_before_confirmation": 1.4285714285714286
+        },
+        "lt_10pts": {
+          "original_n": 441,
+          "first_hit_before_flip_n": 441,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_20pts": {
+          "original_n": 281,
+          "first_hit_before_flip_n": 281,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_40pts": {
+          "original_n": 147,
+          "first_hit_before_flip_n": 147,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 72,
+          "first_hit_before_flip_n": 72,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    },
+    "OOS": {
+      "total_q4_worse_n": 175,
+      "q4_worse_first_hit_n": 168,
+      "q4_worse_flip_first_n": 1,
+      "q4_worse_same_ts_n": 6,
+      "pct_worse_not_exposed": 4.0,
+      "severity_ladder": {
+        "lt_5pts": {
+          "original_n": 95,
+          "first_hit_before_flip_n": 95,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_10pts": {
+          "original_n": 69,
+          "first_hit_before_flip_n": 69,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_20pts": {
+          "original_n": 52,
+          "first_hit_before_flip_n": 52,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_40pts": {
+          "original_n": 27,
+          "first_hit_before_flip_n": 27,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        },
+        "lt_60pts": {
+          "original_n": 14,
+          "first_hit_before_flip_n": 14,
+          "flip_before_first_hit_n": 0,
+          "same_timestamp_n": 0,
+          "pct_not_exposed_before_confirmation": 0.0
+        }
+      }
+    }
+  }
+}

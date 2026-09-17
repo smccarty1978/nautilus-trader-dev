@@ -1,0 +1,103 @@
+{
+  "M0_Binary_Control": {
+    "family": "LightGBM Binary Classifier",
+    "target": "P(additional_mfe_beyond_max_atr >= 0.50)",
+    "sample_weight": "uniform (1.0)",
+    "params": {
+      "n_estimators": 100,
+      "learning_rate": 0.03,
+      "max_depth": 4,
+      "num_leaves": 15,
+      "min_child_samples": 50,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "random_state": 42
+    },
+    "exhaustion_score_formula": "1.0 - P(continuation >= 0.50) = P(additional_mfe < 0.50)"
+  },
+  "M1_Cost_Sensitive": {
+    "family": "LightGBM Cost-Sensitive Binary Classifier",
+    "target": "P(additional_mfe_beyond_max_atr >= 0.50)",
+    "sample_weight": "MFE < 0.5: 1.0 | 0.5-1.0: 1.5 | 1.0-2.0: 3.0 | >=2.0: 5.0",
+    "params": {
+      "n_estimators": 100,
+      "learning_rate": 0.03,
+      "max_depth": 4,
+      "num_leaves": 15,
+      "min_child_samples": 50,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "random_state": 42
+    },
+    "exhaustion_score_formula": "1.0 - P(continuation >= 0.50)"
+  },
+  "M2_Ordinal_ExpSeverity": {
+    "family": "LightGBM 4-Class Ordinal Multiclass Classifier",
+    "target": "Severity State S in {0: <0.5A, 1: 0.5-<1A, 2: 1-<2A, 3: >=2A}",
+    "sample_weight": "uniform (1.0)",
+    "params": {
+      "objective": "multiclass",
+      "num_class": 4,
+      "n_estimators": 100,
+      "learning_rate": 0.03,
+      "max_depth": 4,
+      "num_leaves": 15,
+      "min_child_samples": 50,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "random_state": 42
+    },
+    "exhaustion_score_formula": "-E[Severity] = -(0*P(S0) + 1*P(S1) + 2*P(S2) + 3*P(S3))"
+  },
+  "M2_Ordinal_TailPenalized": {
+    "family": "LightGBM 4-Class Ordinal Multiclass Classifier",
+    "target": "Severity State S in {0: <0.5A, 1: 0.5-<1A, 2: 1-<2A, 3: >=2A}",
+    "sample_weight": "uniform (1.0)",
+    "params": {
+      "objective": "multiclass",
+      "num_class": 4,
+      "n_estimators": 100,
+      "learning_rate": 0.03,
+      "max_depth": 4,
+      "num_leaves": 15,
+      "min_child_samples": 50,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "random_state": 42
+    },
+    "exhaustion_score_formula": "P(S0) - 1.5*P(S2) - 3.0*P(S3)"
+  },
+  "M3_Continuous_Log1p": {
+    "family": "LightGBM Continuous Regressor",
+    "target": "log1p(additional_mfe_beyond_max_atr)",
+    "sample_weight": "uniform (1.0)",
+    "params": {
+      "objective": "regression",
+      "n_estimators": 100,
+      "learning_rate": 0.03,
+      "max_depth": 4,
+      "num_leaves": 15,
+      "min_child_samples": 50,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "random_state": 42
+    },
+    "exhaustion_score_formula": "-predicted_log1p_mfe"
+  },
+  "M4_Composite_Risk": {
+    "family": "Multi-Head LightGBM Ensembles",
+    "target": "Head 0: P(<0.5A), Head 1: P(>=1A), Head 2: P(>=2A)",
+    "sample_weight": "uniform (1.0)",
+    "params": {
+      "n_estimators": 100,
+      "learning_rate": 0.03,
+      "max_depth": 4,
+      "num_leaves": 15,
+      "min_child_samples": 50,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "random_state": 42
+    },
+    "exhaustion_score_formula": "P(<0.5A) - 0.5*P(>=1A) - 1.0*P(>=2A)"
+  }
+}

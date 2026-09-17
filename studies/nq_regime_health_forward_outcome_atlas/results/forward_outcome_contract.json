@@ -1,0 +1,42 @@
+{
+  "contract_name": "FORWARD_ECONOMIC_OUTCOME_SPECIFICATION_V1",
+  "description": "Causal forward price excursion and terminal event definitions for unconditioned regime health observations",
+  "units": {
+    "mfe_mae_excursions": "ATR (normalized by regime starting ATR)",
+    "time_horizons": "seconds",
+    "probabilities": "binary indicator {0, 1} at row level, empirical mean in grouped analysis"
+  },
+  "fields": {
+    "remaining_mfe_to_flip_atr": "Maximum favorable excursion (in ATR) achieved from timestamp t forward until regime terminates in opposite flip",
+    "remaining_mae_to_flip_atr": "Maximum adverse excursion (in ATR) suffered from timestamp t forward until regime terminates in opposite flip",
+    "mfe_to_terminal_atr": "Maximum favorable excursion (in ATR) from timestamp t until either NEW_MAX or FLIP occurs (competing horizon)",
+    "mae_to_terminal_atr": "Maximum adverse excursion (in ATR) from timestamp t until either NEW_MAX or FLIP occurs (competing horizon)",
+    "p_new_max_before_flip": "1.0 if the active pullback episode terminates by re-extending to a new maximum MFE, 0.0 otherwise",
+    "p_flip_before_new_max": "1.0 if the active pullback episode terminates by flipping to opposite regime, 0.0 otherwise",
+    "time_to_new_max_seconds": "Duration in seconds from timestamp t until NEW_MAX_MFE is established (NaN if FLIP occurred first)",
+    "time_to_flip_seconds": "Duration in seconds from timestamp t until regime flip occurs (NaN if NEW_MAX occurred first)",
+    "time_to_terminal_competing_seconds": "Duration in seconds until either competing terminal event resolves the episode",
+    "mfe_30s_atr": "Maximum favorable excursion within next 30s (or until regime flip)",
+    "mae_30s_atr": "Maximum adverse excursion within next 30s (or until regime flip)",
+    "net_change_30s_atr": "Directional return in ATR terms from price at t to price at t+30s",
+    "mfe_60s_atr": "Maximum favorable excursion within next 60s",
+    "mae_60s_atr": "Maximum adverse excursion within next 60s",
+    "net_change_60s_atr": "Directional return within next 60s",
+    "mfe_120s_atr": "Maximum favorable excursion within next 120s",
+    "mae_120s_atr": "Maximum adverse excursion within next 120s",
+    "net_change_120s_atr": "Directional return within next 120s",
+    "mfe_180s_atr": "Maximum favorable excursion within next 180s",
+    "mae_180s_atr": "Maximum adverse excursion within next 180s",
+    "net_change_180s_atr": "Directional return within next 180s",
+    "mfe_300s_atr": "Maximum favorable excursion within next 300s",
+    "mae_300s_atr": "Maximum adverse excursion within next 300s",
+    "net_change_300s_atr": "Directional return within next 300s",
+    "additional_extension_atr": "Max future MFE from regime start minus prior peak MFE (measures further trend expansion)",
+    "giveback_from_subsequent_peak_atr": "Drawdown in ATR from maximum achieved price after t to the terminal regime flip",
+    "has_meaningful_extension": "True if additional_extension_atr >= 0.50 ATR or episode establishes a new max MFE",
+    "h1_recovery_confirmed": "True if by timestamp t, H1 has declined >= 0.15 from its acute running peak (>= 0.60)",
+    "h2_recovery_confirmed": "True if by timestamp t, H2 has declined >= 0.15 from its acute running peak (>= 0.35)",
+    "seconds_since_h1_recovery_confirm": "Elapsed seconds since H1 recovery confirmation timestamp",
+    "seconds_since_h2_recovery_confirm": "Elapsed seconds since H2 recovery confirmation timestamp"
+  }
+}

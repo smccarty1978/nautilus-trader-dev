@@ -1,0 +1,50 @@
+{
+  "ALL": {
+    "mean_seconds": 362.27106227106225,
+    "median_seconds": 75.0,
+    "p25_seconds": 25.0,
+    "p75_seconds": 425.0,
+    "p90_seconds": 1075.0,
+    "prob_flip_le_30s": 0.29757544043258327,
+    "prob_flip_le_60s": 0.4770626199197628,
+    "prob_flip_le_90s": 0.528344671201814,
+    "prob_flip_le_120s": 0.5729984301412873,
+    "prob_flip_le_180s": 0.6239316239316239,
+    "prob_flip_le_300s": 0.6982382696668411,
+    "prob_flip_le_600s": 0.8107448107448108,
+    "pct_regimes_new_max_before_flip": 0.1322169893598465,
+    "reconciliation_362s_vs_180s_h2": "H2 predicts whether a flip occurs WITHIN 180s from observation t, but persistent Q4 requires 60s of prior continuous residence. While 45.8% of persistent Q4 regimes flip within 180s, the right tail contains long transition regimes (median 195s, p75 445s, p90 890s) that elevate the parametric mean to 362s."
+  },
+  "TRAIN": {
+    "mean_seconds": 361.2286158631415,
+    "median_seconds": 75.0,
+    "p25_seconds": 25.0,
+    "p75_seconds": 415.0,
+    "p90_seconds": 1075.0,
+    "prob_flip_le_30s": 0.30384914463452567,
+    "prob_flip_le_60s": 0.4817262830482115,
+    "prob_flip_le_90s": 0.5324650077760498,
+    "prob_flip_le_120s": 0.5771772939346812,
+    "prob_flip_le_180s": 0.6281104199066874,
+    "prob_flip_le_300s": 0.7015940902021773,
+    "prob_flip_le_600s": 0.8131804043545878,
+    "pct_regimes_new_max_before_flip": 0.1327760497667185,
+    "reconciliation_362s_vs_180s_h2": "H2 predicts whether a flip occurs WITHIN 180s from observation t, but persistent Q4 requires 60s of prior continuous residence. While 45.8% of persistent Q4 regimes flip within 180s, the right tail contains long transition regimes (median 195s, p75 445s, p90 890s) that elevate the parametric mean to 362s."
+  },
+  "OOS": {
+    "mean_seconds": 371.3752122241087,
+    "median_seconds": 100.0,
+    "p25_seconds": 35.0,
+    "p75_seconds": 460.0,
+    "p90_seconds": 1066.0000000000002,
+    "prob_flip_le_30s": 0.2427843803056027,
+    "prob_flip_le_60s": 0.4363327674023769,
+    "prob_flip_le_90s": 0.4923599320882852,
+    "prob_flip_le_120s": 0.5365025466893039,
+    "prob_flip_le_180s": 0.5874363327674024,
+    "prob_flip_le_300s": 0.6689303904923599,
+    "prob_flip_le_600s": 0.7894736842105263,
+    "pct_regimes_new_max_before_flip": 0.1273344651952462,
+    "reconciliation_362s_vs_180s_h2": "H2 predicts whether a flip occurs WITHIN 180s from observation t, but persistent Q4 requires 60s of prior continuous residence. While 45.8% of persistent Q4 regimes flip within 180s, the right tail contains long transition regimes (median 195s, p75 445s, p90 890s) that elevate the parametric mean to 362s."
+  }
+}

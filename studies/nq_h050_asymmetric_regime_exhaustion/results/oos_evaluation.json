@@ -1,0 +1,73 @@
+{
+  "evaluation_period": "2025 Q1 (2025-01-02 to 2025-03-31)",
+  "oos_n": 2422,
+  "unconditional_base_rates": {
+    "P_lt_0p50_success": 0.3959537572254335,
+    "P_ge_0p50_continuation": 0.6040462427745664,
+    "P_ge_1p00_dangerous": 0.4847233691164327,
+    "P_ge_2p00_severe": 0.3236994219653179,
+    "median_additional_mfe": 0.9243064207875649
+  },
+  "model_comparison_top10pct_oos_exact_rank": {
+    "M0_Binary_Control": {
+      "N": 243,
+      "precision_P_lt_0p50": 0.5185185185185185,
+      "dangerous_P_ge_1p00": 0.3497942386831276,
+      "severe_P_ge_2p00": 0.1934156378600823,
+      "median_add_mfe": 0.4335104002518077,
+      "mean_add_mfe": 1.0521109125537111,
+      "p90_add_mfe": 3.186105860995954,
+      "median_remaining_giveback_atr": 0.4706695216615847
+    },
+    "M1_Cost_Sensitive": {
+      "N": 243,
+      "precision_P_lt_0p50": 0.49794238683127573,
+      "dangerous_P_ge_1p00": 0.37037037037037035,
+      "severe_P_ge_2p00": 0.1934156378600823,
+      "median_add_mfe": 0.5444314320592745,
+      "mean_add_mfe": 1.0500869338889531,
+      "p90_add_mfe": 2.9969418891753716,
+      "median_remaining_giveback_atr": 0.4629481035524821
+    },
+    "M2_Ordinal_ExpSeverity": {
+      "N": 243,
+      "precision_P_lt_0p50": 0.51440329218107,
+      "dangerous_P_ge_1p00": 0.3662551440329218,
+      "severe_P_ge_2p00": 0.18930041152263374,
+      "median_add_mfe": 0.4202472939389738,
+      "mean_add_mfe": 1.0237161646275548,
+      "p90_add_mfe": 2.95778997891556,
+      "median_remaining_giveback_atr": 0.5950880158021192
+    },
+    "M2_Ordinal_TailPenalized": {
+      "N": 243,
+      "precision_P_lt_0p50": 0.51440329218107,
+      "dangerous_P_ge_1p00": 0.36213991769547327,
+      "severe_P_ge_2p00": 0.18518518518518517,
+      "median_add_mfe": 0.4202472939389738,
+      "mean_add_mfe": 1.0228454668131197,
+      "p90_add_mfe": 2.95778997891556,
+      "median_remaining_giveback_atr": 0.5950880158021192
+    },
+    "M3_Continuous_Log1p": {
+      "N": 243,
+      "precision_P_lt_0p50": 0.4732510288065844,
+      "dangerous_P_ge_1p00": 0.3950617283950617,
+      "severe_P_ge_2p00": 0.205761316872428,
+      "median_add_mfe": 0.6232806302041571,
+      "mean_add_mfe": 1.1141720630322252,
+      "p90_add_mfe": 3.0362841330307284,
+      "median_remaining_giveback_atr": 0.4513506504406193
+    },
+    "M4_Composite_Risk": {
+      "N": 243,
+      "precision_P_lt_0p50": 0.5102880658436214,
+      "dangerous_P_ge_1p00": 0.35390946502057613,
+      "severe_P_ge_2p00": 0.17695473251028807,
+      "median_add_mfe": 0.4347149320967082,
+      "mean_add_mfe": 0.9946703957780801,
+      "p90_add_mfe": 2.860013421963152,
+      "median_remaining_giveback_atr": 0.5739396082295178
+    }
+  }
+}

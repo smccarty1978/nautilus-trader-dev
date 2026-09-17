@@ -1,0 +1,102 @@
+{
+  "HEAD_1": [
+    {
+      "model": "M0-U",
+      "features": 7,
+      "train_oof_auc": 0.7199,
+      "train_oof_pr_auc": 0.6764,
+      "train_oof_brier": 0.2079,
+      "oos_auc": 0.7231,
+      "oos_pr_auc": 0.6695,
+      "oos_brier": 0.2063,
+      "oos_decile_spread": 0.6631,
+      "oos_delta": 0.0031
+    },
+    {
+      "model": "M1-U",
+      "features": 24,
+      "train_oof_auc": 0.7293,
+      "train_oof_pr_auc": 0.6907,
+      "train_oof_brier": 0.2045,
+      "oos_auc": 0.7377,
+      "oos_pr_auc": 0.6887,
+      "oos_brier": 0.2015,
+      "oos_decile_spread": 0.6893,
+      "oos_delta": 0.0084
+    },
+    {
+      "model": "M2-U",
+      "features": 31,
+      "train_oof_auc": 0.7299,
+      "train_oof_pr_auc": 0.6918,
+      "train_oof_brier": 0.2042,
+      "oos_auc": 0.7376,
+      "oos_pr_auc": 0.69,
+      "oos_brier": 0.2013,
+      "oos_decile_spread": 0.693,
+      "oos_delta": 0.0077
+    },
+    {
+      "model": "M3-U",
+      "features": 37,
+      "train_oof_auc": 0.7298,
+      "train_oof_pr_auc": 0.6916,
+      "train_oof_brier": 0.2043,
+      "oos_auc": 0.7375,
+      "oos_pr_auc": 0.6899,
+      "oos_brier": 0.2013,
+      "oos_decile_spread": 0.6946,
+      "oos_delta": 0.0077
+    }
+  ],
+  "HEAD_2": [
+    {
+      "model": "M0-U",
+      "features": 7,
+      "train_oof_auc": 0.7718,
+      "train_oof_pr_auc": 0.5521,
+      "train_oof_brier": 0.1453,
+      "oos_auc": 0.7689,
+      "oos_pr_auc": 0.5455,
+      "oos_brier": 0.1462,
+      "oos_decile_spread": 0.6151,
+      "oos_delta": -0.0028
+    },
+    {
+      "model": "M1-U",
+      "features": 24,
+      "train_oof_auc": 0.7957,
+      "train_oof_pr_auc": 0.5846,
+      "train_oof_brier": 0.1389,
+      "oos_auc": 0.795,
+      "oos_pr_auc": 0.5799,
+      "oos_brier": 0.1393,
+      "oos_decile_spread": 0.6893,
+      "oos_delta": -0.0006
+    },
+    {
+      "model": "M2-U",
+      "features": 31,
+      "train_oof_auc": 0.797,
+      "train_oof_pr_auc": 0.5866,
+      "train_oof_brier": 0.1385,
+      "oos_auc": 0.7949,
+      "oos_pr_auc": 0.5819,
+      "oos_brier": 0.139,
+      "oos_decile_spread": 0.6904,
+      "oos_delta": -0.0021
+    },
+    {
+      "model": "M3-U",
+      "features": 37,
+      "train_oof_auc": 0.7969,
+      "train_oof_pr_auc": 0.5866,
+      "train_oof_brier": 0.1386,
+      "oos_auc": 0.7955,
+      "oos_pr_auc": 0.5827,
+      "oos_brier": 0.1389,
+      "oos_decile_spread": 0.6935,
+      "oos_delta": -0.0014
+    }
+  ]
+}

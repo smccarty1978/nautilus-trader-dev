@@ -1,0 +1,56 @@
+{
+  "description": "Preservation of key forward-outcome relationships from TRAIN (2023-2024) to untouched 2025 Q1 OOS",
+  "metrics": {
+    "Q1_remaining_mfe_atr": {
+      "train": 2.3257,
+      "oos": 2.3333,
+      "train_ci": [
+        2.2263,
+        2.4269
+      ],
+      "oos_ci": [
+        2.1479,
+        2.5127
+      ],
+      "sign_preserved": true
+    },
+    "Q4_remaining_mfe_atr": {
+      "train": 1.4628,
+      "oos": 1.485,
+      "train_ci": [
+        1.4185,
+        1.5132
+      ],
+      "oos_ci": [
+        1.3755,
+        1.6117
+      ],
+      "sign_preserved": true
+    },
+    "Q1_survival_rate_p_new_max": {
+      "train": 0.7148,
+      "oos": 0.7205,
+      "sign_preserved": true
+    },
+    "Q4_survival_rate_p_new_max": {
+      "train": 0.3179,
+      "oos": 0.3269,
+      "sign_preserved": true
+    },
+    "FIRST_Q4_survival_rate": {
+      "train": 0.4009,
+      "oos": 0.3949,
+      "sign_preserved": true
+    },
+    "H1_recovery_survival_rate": {
+      "train": 0.6302,
+      "oos": 0.6332,
+      "sign_preserved": true
+    },
+    "H1_non_recovery_survival_rate": {
+      "train": 0.0006,
+      "oos": 0.0021,
+      "sign_preserved": true
+    }
+  }
+}

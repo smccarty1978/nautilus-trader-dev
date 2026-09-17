@@ -1,0 +1,28 @@
+{
+  "study": "nq_persistent_q4_first_hit_transition_confirmation",
+  "timestamp": "2026-09-16T15:52:38Z",
+  "execution_time_seconds": 156.77,
+  "total_matched_population": 5610,
+  "train_regimes": 5038,
+  "oos_regimes": 572,
+  "total_ledger_rows": 33660,
+  "decision_gate": "OUTCOME_A_EARLY_FIRST_HIT_EXISTS",
+  "artifacts": [
+    "first_hit_event_ledger.parquet",
+    "first_hit_summary.json",
+    "event_timing_distribution.json",
+    "entry_advantage_at_first_hit.json",
+    "residual_mfe_after_first_hit.json",
+    "tail_capture_analysis.json",
+    "time_from_first_hit_to_flip.json",
+    "train_oos_replication.json",
+    "event_overlap_redundancy.json",
+    "early_confirmation_analysis.json",
+    "checkpoint_reconciliation.json",
+    "population_reconciliation.json",
+    "runtime_contract.json",
+    "parent_artifact_hashes.json",
+    "dataset_composite_hashes.json",
+    "study_manifest.json"
+  ]
+}

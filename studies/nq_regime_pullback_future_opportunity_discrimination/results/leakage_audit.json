@@ -1,0 +1,18 @@
+{
+  "status": "PASS_ZERO_LEAKAGE",
+  "audit_timestamp_utc": "2026-09-16T20:31:11Z",
+  "prohibited_fields_inspected": [
+    "additional_mfe_beyond_max_atr",
+    "additional_mfe_beyond_max_points",
+    "outcome",
+    "time_to_max_mfe_recovery_sec",
+    "time_to_va_sec",
+    "giveback_remaining_atr",
+    "giveback_remaining_points",
+    "final_regime_max_mfe_atr",
+    "final_regime_giveback_atr",
+    "final_regime_giveback_points",
+    "is_final_pullback"
+  ],
+  "audit_result": "All prohibited retrospective fields are strictly sequestered into the TARGET and OUTCOME data structures. Zero target or outcome fields enter the feature matrix X for any model or descriptive analysis. All feature predictors evaluate strictly on completed bars prior to checkpoint_ts."
+}

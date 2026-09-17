@@ -1,0 +1,22 @@
+{
+  "status": "INCONCLUSIVE",
+  "sample_size": 100,
+  "sample_composition": "50 TRUE reversal starts + 50 matched FALSE pauses from 2025 Q1",
+  "validation_protocol": "Shuffled 5-fold Stratified Cross-Validation (NO chronological out-of-sample split)",
+  "reported_metrics": {
+    "mean_roc_auc_price_volume": 0.654,
+    "mean_roc_auc_price_volume_plus_mbp1": 0.67,
+    "delta_roc_auc": 0.016,
+    "mean_pr_auc_price_volume": 0.6902,
+    "mean_pr_auc_price_volume_plus_mbp1": 0.6092,
+    "delta_pr_auc": -0.0809
+  },
+  "deficiencies": [
+    "Sample size of N=100 is statistically underpowered to detect a stable microstructure signal.",
+    "Cross-validation used random shuffling across events rather than a strict chronological forward test.",
+    "PR-AUC actually deteriorated by -0.0809 (-11.7%) when adding MBP-1 features, directly contradicting the claim of uniform information gain.",
+    "Top-of-book depth imbalance was found to be ephemeral and non-causal.",
+    "Aggressive seller absorption was inferred from an unverified 5-second delta proxy rather than executable queue dynamics."
+  ],
+  "verdict": "MBP-1 incremental information remains strictly INCONCLUSIVE. No production deployment or strategy rescue may rely on this pilot."
+}

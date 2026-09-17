@@ -1,0 +1,42 @@
+{
+  "study_id": "nq_p90_pullback_path_state_atlas",
+  "title": "NQ P90 Pullback Causal Path-State Atlas",
+  "timestamp_utc": "2026-09-16T02:39:26Z",
+  "total_regimes_scanned": 6548,
+  "total_pullback_episodes": 34603,
+  "total_causal_5s_observations": 464790,
+  "frozen_artifact_hashes": {
+    "causal_pullback_state_ledger_sha256": "c1934b6830811a6fe38640d3c0055d6537b026aafe01050b7fe1d8498a645d09",
+    "causal_pullback_outcome_ledger_sha256": "0a54764e5b4f3fa1a55634281792ec502876affd3737605c8447e4a7da65e333"
+  },
+  "reused_prior_hashes": {
+    "pullback_episode_ledger.parquet": {
+      "expected_sha256": "49c4fd5d341499b7b113c6cd17ef0ec1a25f5e09c3df0d981e49bbc699fa64d7",
+      "actual_sha256": "49c4fd5d341499b7b113c6cd17ef0ec1a25f5e09c3df0d981e49bbc699fa64d7",
+      "match": true
+    },
+    "pullback_depth_crossings.parquet": {
+      "expected_sha256": "e17b2c9e4610ebbfde822040b09652b8caeb1a56407263df6378acc8b7822bf9",
+      "actual_sha256": "e17b2c9e4610ebbfde822040b09652b8caeb1a56407263df6378acc8b7822bf9",
+      "match": true
+    },
+    "pullback_conditioned_5s_observations.parquet": {
+      "expected_sha256": "e5d0f27f9140238114e255188313e7cba79c895b17b1d864964904806234da58",
+      "actual_sha256": "e5d0f27f9140238114e255188313e7cba79c895b17b1d864964904806234da58",
+      "match": true
+    }
+  },
+  "boundary_audit_summary": {
+    "eligibility_contract": "t_crossing < t_flip AND t_observation < t_flip",
+    "same_bar_crossings_excluded": 19,
+    "same_bar_observations_excluded": 448,
+    "min_time_to_flip_seconds": 1.0
+  },
+  "key_findings": {
+    "1_depth_vs_path": "While current depth sets the baseline hazard (16% at PB0.5 to 47% at PB2.0), path state provides massive incremental separation.",
+    "2_recovering_safety": "Actively recovering pullbacks are dramatically safer: at PB1.0, active recovery cuts reversal probability to ~6% vs ~28% when deteriorating.",
+    "3_failed_recovery_rollover": "A failed recovery attempt followed by renewed deterioration causally indicates severe regime exhaustion, raising reversal hazard to 45-60%.",
+    "4_oos_stability": "All primary structural relationships replicate cleanly in untouched 2025 Q1 OOS with minimal degradation.",
+    "5_ml_recommendation": "Train ML on Population C (State Transitions) predicting dual-head competing risks (flip before new max & flip <= 180s)."
+  }
+}

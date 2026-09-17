@@ -1,0 +1,51 @@
+{
+  "study_name": "nq_h050_to_opposing_h050_exit_nt_validation",
+  "parent_study": "nq_h050_to_opposing_h050_exit_lifecycle",
+  "description": "NautilusTrader event-driven streaming validation of H050 opposing exit lifecycle under realistic execution fills and transaction costs",
+  "acceptance_criteria": {
+    "research_runtime_parity": "PARITY_PASS",
+    "execution_scope_audit": "EXECUTION_ENGINE_ONLY_FROZEN_SIGNAL_SCHEDULE",
+    "execution_economics": "C1_IMPROVES_NET_LIFECYCLE_ECONOMICS_AND_PRESERVES_DISTRIBUTIONAL_EXPANSION"
+  },
+  "population_counts": {
+    "total_trades": 23915,
+    "train_trades": 21493,
+    "oos_trades": 2422,
+    "oos_m4_top10_trades": 411
+  },
+  "key_metrics_oos_m4_top10_net": {
+    "c0_net_win_rate": 0.5012165450121655,
+    "c1_net_win_rate": 0.5474452554744526,
+    "c0_net_median_atr": 0.016182751683771784,
+    "c1_net_median_atr": 0.2439296891110328,
+    "c0_net_mean_atr": 0.5376121338512441,
+    "c1_net_mean_atr": 0.5784113220821886,
+    "paired_net_mean_delta_atr": 0.04079918823094461,
+    "pct_improved": 0.25790754257907544,
+    "pct_worsened": 0.11678832116788321,
+    "c0_max_drawdown_dollars": 37995.0,
+    "c1_max_drawdown_dollars": 32400.0
+  },
+  "file_inventory": {
+    "c0_nt_engine_oos_trades.parquet": 75392,
+    "c0_nt_trades_ledger.parquet": 1561365,
+    "c1_nt_engine_oos_trades.parquet": 75641,
+    "c1_nt_trades_ledger.parquet": 1623037,
+    "causal_timestamp_audit.json": 273,
+    "directional_replication.json": 53262,
+    "execution_assumptions_manifest.json": 1005,
+    "gross_execution_reconciliation.json": 2304,
+    "gross_vs_net_economics.json": 56318,
+    "h0501_active_subset_nt_report.json": 4220,
+    "live_event_parity.json": 753,
+    "nt_engine_oos_validation_report.json": 5570,
+    "NT_OPPOSING_H050_EXIT_VALIDATION_REPORT.md": 26662,
+    "nt_reconciliation_mismatch_ledger.parquet": 1391816,
+    "parent_artifact_hashes.json": 315,
+    "population_reconciliation.json": 615,
+    "primary_oos_m4_top10_table.json": 1935,
+    "tail_and_drawdown_comparison.json": 830,
+    "transaction_cost_reconciliation.json": 663,
+    "yearly_oos_replication.json": 39977
+  }
+}

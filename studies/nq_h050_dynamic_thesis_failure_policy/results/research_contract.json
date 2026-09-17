@@ -1,0 +1,45 @@
+{
+  "study_id": "nq_h050_dynamic_thesis_failure_policy",
+  "title": "NQ H050 Executable Dynamic Thesis-Failure Risk Policy Study",
+  "status": "ACTIVE_EXECUTION",
+  "frozen_upstream_authority": {
+    "runtime": "studies/nq_h050_m4_runtime_recovery",
+    "observational_atlas": "studies/nq_h050_adverse_path_thesis_failure",
+    "historical_parent": "studies/nq_h050_to_opposing_h050_exit_lifecycle"
+  },
+  "chronology_contract": {
+    "train_period": "2023-2024 (pre-2025)",
+    "train_total_trades": 21493,
+    "train_top10_trades": 2150,
+    "historical_reference_period": "2025 Q1 (observational discovery reference only, not for rule selection)",
+    "final_unopened_oos_period": "2025 Q2-Q4 / 2026"
+  },
+  "frozen_baseline_strategy": {
+    "entry": "H050_0 live causal entry",
+    "model": "Recovered M4 3-head LightGBM (frozen hashes & features)",
+    "exit_lifecycle": "C1 (First opposing H050_1 after R1 confirmation -> R2 fallback)",
+    "stop_loss": "None (B0 control)"
+  },
+  "baseline_controls": {
+    "B0": "No-stop C1 control",
+    "B1": "Fixed 0.50 ATR stop",
+    "B2": "Fixed 0.75 ATR stop",
+    "B3": "Fixed 1.00 ATR stop",
+    "B4": "Fixed 1.25 ATR stop",
+    "B5": "Fixed 1.50 ATR stop"
+  },
+  "transaction_costs": {
+    "entry_slippage_ticks": 1,
+    "exit_slippage_ticks": 1,
+    "tick_size": 0.25,
+    "point_value": 20.0,
+    "commission_round_trip_dollars": 5.0,
+    "total_friction_round_trip_dollars": 15.0,
+    "total_friction_points": 0.75
+  },
+  "policy_candidate_families": {
+    "Family_A": "Deterministic state-machine rule (2-4 causal conditions)",
+    "Family_B": "Bounded diagnostic classifier (Logistic Regression on causal state)"
+  },
+  "primary_train_target": "THESIS_FAILURE = (recovered_be == False) & (final_c1_pnl_atr <= -1.00)"
+}

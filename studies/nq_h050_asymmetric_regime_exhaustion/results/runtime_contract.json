@@ -1,0 +1,42 @@
+{
+  "study_name": "nq_h050_asymmetric_regime_exhaustion",
+  "parent_study": "nq_regime_pullback_future_opportunity_discrimination",
+  "horizon": "H050 (0.50 ATR giveback from running maxMFE)",
+  "target_definition": "additional_mfe_beyond_max_atr = max MFE beyond pre-pullback maxMFE before opposite V_A flip",
+  "target_classes": {
+    "SUCCESS": "<0.50 ATR",
+    "MATERIAL_MISS": ">=0.50 ATR",
+    "DANGEROUS": ">=1.00 ATR",
+    "SEVERE": ">=2.00 ATR"
+  },
+  "train_split": "2023, 2024 (N=21,493)",
+  "oos_split": "2025 Q1 untouched (N=2,422)",
+  "feature_set": [
+    "pullback_depth_atr",
+    "pullback_duration_sec",
+    "pullback_efficiency",
+    "pullback_velocity_atr_sec",
+    "pre_pullback_max_mfe_atr",
+    "pullback_ordinal",
+    "regime_age_sec",
+    "previous_pullbacks_count",
+    "previous_pullbacks_max_depth_atr",
+    "previous_pullbacks_avg_duration_sec",
+    "pullback_depth_vs_max_mfe_ratio",
+    "pullback_duration_vs_regime_age_ratio",
+    "incumbent_expansion_rate_atr_min",
+    "has_previous_pullbacks",
+    "previous_max_depth_ratio",
+    "frozen_atr",
+    "direction_is_long"
+  ],
+  "models_evaluated": [
+    "M0_Binary_Control",
+    "M1_Cost_Sensitive",
+    "M2_Ordinal_ExpSeverity",
+    "M2_Ordinal_TailPenalized",
+    "M3_Continuous_Log1p",
+    "M4_Composite_Risk"
+  ],
+  "decision_gate_verdict": "OUTCOME_B_ASYMMETRIC_TARGET_IMPROVES_RANKING_BUT_TAIL_REMAINS_MATERIAL"
+}

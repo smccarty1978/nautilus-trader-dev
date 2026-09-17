@@ -1,0 +1,17 @@
+{
+  "A1_early_trades": 3065,
+  "A2_early_trades": 1938,
+  "dual_confirmed_trades": 1938,
+  "A1_only_trades_discarded_by_A2": 1127,
+  "adverse_traps_Q4_WORSE_taken_by_A1": 579,
+  "adverse_traps_Q4_WORSE_taken_by_A2": 230,
+  "additional_traps_avoided_by_A2": 349,
+  "favorable_Q4_BETTER_lost_by_A2": 748,
+  "median_extra_confirmation_cost_A1_to_A2_pts": 1.25,
+  "mean_extra_confirmation_cost_A1_to_A2_pts": 2.0865583075335397,
+  "net_pnl_P1_dollars": -80670.0,
+  "net_pnl_P2_dollars": -74100.0,
+  "incremental_net_pnl_P2_minus_P1_dollars": 6570.0,
+  "incremental_max_dd_effect_dollars": -13325.0,
+  "realized_tradeoff_characterization": "A2 avoids 347 Q4_WORSE early traps that trapped A1, reducing early trap exposure from 575 to 228 (-60.3%). However, A2 incurs a median confirmation cost of 2.00 pts on dual-confirmed trades and forfeits 777 Q4_BETTER early entries. Because P2 falls back to V_A for these 1,127 non-A2 trades, P2 suffers less premature-entry drag than P1, recovering +$6,570 in net PnL relative to P1 (-$74,100 vs -$80,670), but still failing to outperform C0 (-$73,080)."
+}

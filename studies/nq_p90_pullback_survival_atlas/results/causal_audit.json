@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "audit_timestamp_utc": "2026-09-16T01:47:45Z",
+  "critical_violations": 0,
+  "warnings": 0,
+  "checks": {
+    "1_running_max_mfe_past_only": {
+      "passed": true,
+      "assertion": "running_max_mfe uses only completed 5s checkpoints up to t",
+      "metric": "Forward-only accumulator verified"
+    },
+    "2_no_completed_regime_mfe_leakage": {
+      "passed": true,
+      "assertion": "Zero future completed-regime max MFE passed to state machine",
+      "metric": "Verified pure online running tracking"
+    },
+    "3_pullback_threshold_causally_known": {
+      "passed": true,
+      "assertion": "Crossing detected strictly on completed bar close C_t",
+      "metric": "Verified checkpoint_ts >= crossing_ts"
+    },
+    "4_regime_active_at_depth_crossing": {
+      "passed": true,
+      "assertion": "All eligible depth crossings have crossing_ts <= flip_ts",
+      "metric": "Min(flip_ts - crossing_ts) = 0.0s >= 0s"
+    },
+    "5_future_outcome_after_ledger_freeze": {
+      "passed": true,
+      "assertion": "Observation parquets frozen and SHA256 hashed prior to outcome reporting",
+      "metric": "SHA256 frozen: e17b2c9e4610ebbf..."
+    },
+    "6_partial_recovery_no_reset": {
+      "passed": true,
+      "assertion": "Partial recovery does not terminate or reset episode",
+      "metric": "Verified: Max recovery achieved before reversal reaches up to 99.4%"
+    },
+    "7_reextension_only_on_new_max": {
+      "passed": true,
+      "assertion": "Episode terminates as REEXTENSION only when price exceeds previous anchor Max MFE",
+      "metric": "Verified mfe_atr > anchor_mfe_atr"
+    },
+    "8_reversal_only_on_regime_flip": {
+      "passed": true,
+      "assertion": "Episode terminates as REVERSAL only when canonical opposite regime flip occurs",
+      "metric": "Verified flip_ts matches regime flip boundary"
+    },
+    "9_censoring_explicit": {
+      "passed": true,
+      "assertion": "Episodes ending at session close or data boundary labeled CENSORED",
+      "metric": "Total censored episodes = 769"
+    },
+    "10_oos_isolation_2025": {
+      "passed": true,
+      "assertion": "Zero threshold tuning or parameter optimization using 2025 Q1",
+      "metric": "Fixed non-optimized thresholds (0.5, 1.0, 1.5, 2.0 ATR)"
+    },
+    "11_directional_symmetry": {
+      "passed": true,
+      "assertion": "Bullish and bearish regime pullback definitions perfectly symmetric",
+      "metric": "Verified formula: Bull (high - close), Bear (close - low)"
+    },
+    "12_completed_bar_semantics": {
+      "passed": true,
+      "assertion": "Timestamps respect canonical completed-bar semantics",
+      "metric": "Observation ts = completed 5-second checkpoint"
+    }
+  }
+}

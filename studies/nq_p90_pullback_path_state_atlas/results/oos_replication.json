@@ -1,0 +1,282 @@
+{
+  "unconditional_crossings": {
+    "PB0.50": {
+      "TRAIN": {
+        "N": 30056,
+        "flip_before_new_max_pct": 16.509182858663827,
+        "flip_le_180s_pct": 9.908171413361725
+      },
+      "OOS_2025_Q1": {
+        "N": 3717,
+        "flip_before_new_max_pct": 15.953726123217649,
+        "flip_le_180s_pct": 9.819747107882701
+      },
+      "absolute_degradation_flip_pct": -0.5554567354461781,
+      "absolute_degradation_180s_pct": -0.08842430547902325
+    },
+    "PB1.00": {
+      "TRAIN": {
+        "N": 17737,
+        "flip_before_new_max_pct": 24.508090432429384,
+        "flip_le_180s_pct": 14.731916333089023
+      },
+      "OOS_2025_Q1": {
+        "N": 2148,
+        "flip_before_new_max_pct": 24.30167597765363,
+        "flip_le_180s_pct": 14.804469273743019
+      },
+      "absolute_degradation_flip_pct": -0.2064144547757536,
+      "absolute_degradation_180s_pct": 0.07255294065399553
+    },
+    "PB1.50": {
+      "TRAIN": {
+        "N": 8916,
+        "flip_before_new_max_pct": 35.02691790040377,
+        "flip_le_180s_pct": 21.231493943472408
+      },
+      "OOS_2025_Q1": {
+        "N": 1032,
+        "flip_before_new_max_pct": 35.65891472868217,
+        "flip_le_180s_pct": 21.705426356589147
+      },
+      "absolute_degradation_flip_pct": 0.6319968282784032,
+      "absolute_degradation_180s_pct": 0.4739324131167386
+    },
+    "PB2.00": {
+      "TRAIN": {
+        "N": 3546,
+        "flip_before_new_max_pct": 47.03891708967851,
+        "flip_le_180s_pct": 28.990411731528482
+      },
+      "OOS_2025_Q1": {
+        "N": 368,
+        "flip_before_new_max_pct": 53.2608695652174,
+        "flip_le_180s_pct": 32.880434782608695
+      },
+      "absolute_degradation_flip_pct": 6.221952475538885,
+      "absolute_degradation_180s_pct": 3.890023051080213
+    }
+  },
+  "depth_path_states": {
+    "0.50\u2013<1.00 ATR": {
+      "DETERIORATING": {
+        "TRAIN": {
+          "N": 39971,
+          "flip_before_new_max_pct": 13.607365339871407,
+          "flip_le_180s_pct": 7.91323709689525
+        },
+        "OOS_2025_Q1": {
+          "N": 5252,
+          "flip_before_new_max_pct": 11.862147753236862,
+          "flip_le_180s_pct": 7.044935262757044
+        },
+        "absolute_degradation_flip_pct": -1.7452175866345456,
+        "absolute_degradation_180s_pct": -0.8683018341382054
+      },
+      "RECOVERING": {
+        "TRAIN": {
+          "N": 112161,
+          "flip_before_new_max_pct": 11.005608009914319,
+          "flip_le_180s_pct": 5.034726865844634
+        },
+        "OOS_2025_Q1": {
+          "N": 13409,
+          "flip_before_new_max_pct": 10.306510552613917,
+          "flip_le_180s_pct": 4.400029830710716
+        },
+        "absolute_degradation_flip_pct": -0.6990974573004021,
+        "absolute_degradation_180s_pct": -0.6346970351339181
+      },
+      "RECOVERY_ROLLOVER": {
+        "TRAIN": {
+          "N": 58086,
+          "flip_before_new_max_pct": 13.294081189959714,
+          "flip_le_180s_pct": 5.894707846985504
+        },
+        "OOS_2025_Q1": {
+          "N": 6869,
+          "flip_before_new_max_pct": 12.432668510700246,
+          "flip_le_180s_pct": 5.226379385645654
+        },
+        "absolute_degradation_flip_pct": -0.8614126792594679,
+        "absolute_degradation_180s_pct": -0.6683284613398506
+      }
+    },
+    "1.00\u2013<1.50 ATR": {
+      "DETERIORATING": {
+        "TRAIN": {
+          "N": 29745,
+          "flip_before_new_max_pct": 23.156833081190115,
+          "flip_le_180s_pct": 14.432677760968229
+        },
+        "OOS_2025_Q1": {
+          "N": 3933,
+          "flip_before_new_max_pct": 22.95957284515637,
+          "flip_le_180s_pct": 15.306381896770912
+        },
+        "absolute_degradation_flip_pct": -0.19726023603374543,
+        "absolute_degradation_180s_pct": 0.8737041358026829
+      },
+      "RECOVERING": {
+        "TRAIN": {
+          "N": 42697,
+          "flip_before_new_max_pct": 23.523900976649415,
+          "flip_le_180s_pct": 11.64718832704874
+        },
+        "OOS_2025_Q1": {
+          "N": 5235,
+          "flip_before_new_max_pct": 25.214899713467048,
+          "flip_le_180s_pct": 13.065902578796562
+        },
+        "absolute_degradation_flip_pct": 1.6909987368176331,
+        "absolute_degradation_180s_pct": 1.4187142517478222
+      },
+      "RECOVERY_ROLLOVER": {
+        "TRAIN": {
+          "N": 30078,
+          "flip_before_new_max_pct": 28.050402287386127,
+          "flip_le_180s_pct": 13.780836491788017
+        },
+        "OOS_2025_Q1": {
+          "N": 3442,
+          "flip_before_new_max_pct": 30.12783265543289,
+          "flip_le_180s_pct": 13.335270191748982
+        },
+        "absolute_degradation_flip_pct": 2.0774303680467625,
+        "absolute_degradation_180s_pct": -0.44556630003903486
+      }
+    },
+    "1.50\u2013<2.00 ATR": {
+      "DETERIORATING": {
+        "TRAIN": {
+          "N": 18015,
+          "flip_before_new_max_pct": 32.02886483485984,
+          "flip_le_180s_pct": 19.789064668331946
+        },
+        "OOS_2025_Q1": {
+          "N": 2209,
+          "flip_before_new_max_pct": 34.54051607062019,
+          "flip_le_180s_pct": 22.272521502942507
+        },
+        "absolute_degradation_flip_pct": 2.511651235760354,
+        "absolute_degradation_180s_pct": 2.4834568346105605
+      },
+      "RECOVERING": {
+        "TRAIN": {
+          "N": 19926,
+          "flip_before_new_max_pct": 33.13760915386932,
+          "flip_le_180s_pct": 16.666666666666664
+        },
+        "OOS_2025_Q1": {
+          "N": 2386,
+          "flip_before_new_max_pct": 39.019279128248115,
+          "flip_le_180s_pct": 20.66219614417435
+        },
+        "absolute_degradation_flip_pct": 5.881669974378795,
+        "absolute_degradation_180s_pct": 3.9955294775076844
+      },
+      "RECOVERY_ROLLOVER": {
+        "TRAIN": {
+          "N": 14276,
+          "flip_before_new_max_pct": 44.543289436817034,
+          "flip_le_180s_pct": 22.33818996917904
+        },
+        "OOS_2025_Q1": {
+          "N": 1614,
+          "flip_before_new_max_pct": 51.98265179677819,
+          "flip_le_180s_pct": 26.827757125154893
+        },
+        "absolute_degradation_flip_pct": 7.439362359961159,
+        "absolute_degradation_180s_pct": 4.489567155975852
+      }
+    },
+    ">=2.00 ATR": {
+      "DETERIORATING": {
+        "TRAIN": {
+          "N": 9960,
+          "flip_before_new_max_pct": 43.15261044176707,
+          "flip_le_180s_pct": 27.299196787148595
+        },
+        "OOS_2025_Q1": {
+          "N": 999,
+          "flip_before_new_max_pct": 50.45045045045045,
+          "flip_le_180s_pct": 32.83283283283283
+        },
+        "absolute_degradation_flip_pct": 7.29784000868338,
+        "absolute_degradation_180s_pct": 5.533636045684233
+      },
+      "RECOVERING": {
+        "TRAIN": {
+          "N": 8212,
+          "flip_before_new_max_pct": 44.73940574768631,
+          "flip_le_180s_pct": 23.502191914271798
+        },
+        "OOS_2025_Q1": {
+          "N": 923,
+          "flip_before_new_max_pct": 54.062838569880824,
+          "flip_le_180s_pct": 30.444203683640303
+        },
+        "absolute_degradation_flip_pct": 9.323432822194512,
+        "absolute_degradation_180s_pct": 6.942011769368506
+      },
+      "RECOVERY_ROLLOVER": {
+        "TRAIN": {
+          "N": 5673,
+          "flip_before_new_max_pct": 64.23409130971267,
+          "flip_le_180s_pct": 34.16181914331042
+        },
+        "OOS_2025_Q1": {
+          "N": 727,
+          "flip_before_new_max_pct": 76.61623108665749,
+          "flip_le_180s_pct": 44.70426409903714
+        },
+        "absolute_degradation_flip_pct": 12.382139776944825,
+        "absolute_degradation_180s_pct": 10.542444955726722
+      }
+    }
+  },
+  "recovery_rollover_first_bars": {
+    "rollover_>=25%": {
+      "TRAIN": {
+        "N": 17240,
+        "flip_before_new_max_pct": 12.22737819025522,
+        "flip_le_180s_pct": 6.293503480278423
+      },
+      "OOS_2025_Q1": {
+        "N": 2096,
+        "flip_before_new_max_pct": 11.688931297709923,
+        "flip_le_180s_pct": 5.963740458015267
+      },
+      "absolute_degradation_flip_pct": -0.5384468925452968,
+      "absolute_degradation_180s_pct": -0.32976302226315557
+    },
+    "rollover_>=50%": {
+      "TRAIN": {
+        "N": 9194,
+        "flip_before_new_max_pct": 10.985425277354796,
+        "flip_le_180s_pct": 4.7966064824885795
+      },
+      "OOS_2025_Q1": {
+        "N": 1061,
+        "flip_before_new_max_pct": 10.461828463713479,
+        "flip_le_180s_pct": 3.7700282752120637
+      },
+      "absolute_degradation_flip_pct": -0.5235968136413174,
+      "absolute_degradation_180s_pct": -1.0265782072765157
+    },
+    "rollover_>=75%": {
+      "TRAIN": {
+        "N": 3703,
+        "flip_before_new_max_pct": 10.74804212800432,
+        "flip_le_180s_pct": 4.158790170132325
+      },
+      "OOS_2025_Q1": {
+        "N": 417,
+        "flip_before_new_max_pct": 11.031175059952037,
+        "flip_le_180s_pct": 4.316546762589928
+      },
+      "absolute_degradation_flip_pct": 0.2831329319477174,
+      "absolute_degradation_180s_pct": 0.15775659245760298
+    }
+  }
+}

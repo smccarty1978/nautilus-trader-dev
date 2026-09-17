@@ -1,0 +1,774 @@
+{
+  "A1": {
+    "ALL": {
+      "total_population": 5610,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 3487,
+          "CONFIRM_BEFORE_VA": {
+            "n": 2450,
+            "pct_of_row": 70.26096931459708,
+            "pct_of_total": 43.672014260249554
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 858,
+            "pct_of_row": 24.605678233438486,
+            "pct_of_total": 15.294117647058824
+          },
+          "TIE": {
+            "n": 179,
+            "pct_of_row": 5.13335245196444,
+            "pct_of_total": 3.190730837789661
+          }
+        },
+        "FLAT": {
+          "row_total_n": 402,
+          "CONFIRM_BEFORE_VA": {
+            "n": 43,
+            "pct_of_row": 10.696517412935323,
+            "pct_of_total": 0.7664884135472371
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 353,
+            "pct_of_row": 87.81094527363184,
+            "pct_of_total": 6.292335115864528
+          },
+          "TIE": {
+            "n": 6,
+            "pct_of_row": 1.4925373134328357,
+            "pct_of_total": 0.10695187165775401
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 1721,
+          "CONFIRM_BEFORE_VA": {
+            "n": 579,
+            "pct_of_row": 33.6432306798373,
+            "pct_of_total": 10.320855614973262
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 1116,
+            "pct_of_row": 64.84601975595584,
+            "pct_of_total": 19.893048128342247
+          },
+          "TIE": {
+            "n": 26,
+            "pct_of_row": 1.5107495642068565,
+            "pct_of_total": 0.4634581105169341
+          }
+        }
+      },
+      "better_retention_rate": 0.7026096931459708,
+      "worse_retention_rate": 0.336432306798373,
+      "better_discard_rate": 0.24605678233438485,
+      "worse_discard_rate": 0.6484601975595584,
+      "selectivity_ratio": 2.088413267537506
+    },
+    "TRAIN": {
+      "total_population": 5038,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 3117,
+          "CONFIRM_BEFORE_VA": {
+            "n": 2178,
+            "pct_of_row": 69.87487969201155,
+            "pct_of_total": 43.23144104803494
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 779,
+            "pct_of_row": 24.991979467436636,
+            "pct_of_total": 15.462485113140135
+          },
+          "TIE": {
+            "n": 160,
+            "pct_of_row": 5.133140840551813,
+            "pct_of_total": 3.1758634378721715
+          }
+        },
+        "FLAT": {
+          "row_total_n": 375,
+          "CONFIRM_BEFORE_VA": {
+            "n": 42,
+            "pct_of_row": 11.200000000000001,
+            "pct_of_total": 0.833664152441445
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 328,
+            "pct_of_row": 87.46666666666667,
+            "pct_of_total": 6.510520047637952
+          },
+          "TIE": {
+            "n": 5,
+            "pct_of_row": 1.3333333333333335,
+            "pct_of_total": 0.09924573243350536
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 1546,
+          "CONFIRM_BEFORE_VA": {
+            "n": 511,
+            "pct_of_row": 33.05304010349289,
+            "pct_of_total": 10.142913854704249
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 1010,
+            "pct_of_row": 65.32988357050453,
+            "pct_of_total": 20.04763795156808
+          },
+          "TIE": {
+            "n": 25,
+            "pct_of_row": 1.6170763260025873,
+            "pct_of_total": 0.4962286621675268
+          }
+        }
+      },
+      "better_retention_rate": 0.6987487969201155,
+      "worse_retention_rate": 0.3305304010349289,
+      "better_discard_rate": 0.24991979467436637,
+      "worse_discard_rate": 0.6532988357050453,
+      "selectivity_ratio": 2.11402277894031
+    },
+    "OOS": {
+      "total_population": 572,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 370,
+          "CONFIRM_BEFORE_VA": {
+            "n": 272,
+            "pct_of_row": 73.51351351351352,
+            "pct_of_total": 47.55244755244755
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 79,
+            "pct_of_row": 21.35135135135135,
+            "pct_of_total": 13.81118881118881
+          },
+          "TIE": {
+            "n": 19,
+            "pct_of_row": 5.135135135135135,
+            "pct_of_total": 3.3216783216783217
+          }
+        },
+        "FLAT": {
+          "row_total_n": 27,
+          "CONFIRM_BEFORE_VA": {
+            "n": 1,
+            "pct_of_row": 3.7037037037037033,
+            "pct_of_total": 0.17482517482517482
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 25,
+            "pct_of_row": 92.5925925925926,
+            "pct_of_total": 4.370629370629371
+          },
+          "TIE": {
+            "n": 1,
+            "pct_of_row": 3.7037037037037033,
+            "pct_of_total": 0.17482517482517482
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 175,
+          "CONFIRM_BEFORE_VA": {
+            "n": 68,
+            "pct_of_row": 38.857142857142854,
+            "pct_of_total": 11.888111888111888
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 106,
+            "pct_of_row": 60.57142857142858,
+            "pct_of_total": 18.53146853146853
+          },
+          "TIE": {
+            "n": 1,
+            "pct_of_row": 0.5714285714285714,
+            "pct_of_total": 0.17482517482517482
+          }
+        }
+      },
+      "better_retention_rate": 0.7351351351351352,
+      "worse_retention_rate": 0.38857142857142857,
+      "better_discard_rate": 0.2135135135135135,
+      "worse_discard_rate": 0.6057142857142858,
+      "selectivity_ratio": 1.891891891891892
+    },
+    "2023": {
+      "total_population": 2529,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 1569,
+          "CONFIRM_BEFORE_VA": {
+            "n": 1089,
+            "pct_of_row": 69.40726577437859,
+            "pct_of_total": 43.06049822064057
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 397,
+            "pct_of_row": 25.302740599107707,
+            "pct_of_total": 15.697904310003954
+          },
+          "TIE": {
+            "n": 83,
+            "pct_of_row": 5.289993626513703,
+            "pct_of_total": 3.28192961644919
+          }
+        },
+        "FLAT": {
+          "row_total_n": 194,
+          "CONFIRM_BEFORE_VA": {
+            "n": 21,
+            "pct_of_row": 10.824742268041238,
+            "pct_of_total": 0.8303677342823249
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 171,
+            "pct_of_row": 88.14432989690721,
+            "pct_of_total": 6.761565836298933
+          },
+          "TIE": {
+            "n": 2,
+            "pct_of_row": 1.0309278350515463,
+            "pct_of_total": 0.07908264136022143
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 766,
+          "CONFIRM_BEFORE_VA": {
+            "n": 246,
+            "pct_of_row": 32.114882506527415,
+            "pct_of_total": 9.727164887307236
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 509,
+            "pct_of_row": 66.4490861618799,
+            "pct_of_total": 20.126532226176355
+          },
+          "TIE": {
+            "n": 11,
+            "pct_of_row": 1.4360313315926894,
+            "pct_of_total": 0.4349545274812179
+          }
+        }
+      },
+      "better_retention_rate": 0.6940726577437859,
+      "worse_retention_rate": 0.32114882506527415,
+      "better_discard_rate": 0.2530274059910771,
+      "worse_discard_rate": 0.664490861618799,
+      "selectivity_ratio": 2.1612181131371546
+    },
+    "2024": {
+      "total_population": 2509,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 1548,
+          "CONFIRM_BEFORE_VA": {
+            "n": 1089,
+            "pct_of_row": 70.34883720930233,
+            "pct_of_total": 43.403746512554804
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 382,
+            "pct_of_row": 24.67700258397933,
+            "pct_of_total": 15.225189318453566
+          },
+          "TIE": {
+            "n": 77,
+            "pct_of_row": 4.974160206718346,
+            "pct_of_total": 3.068951773614986
+          }
+        },
+        "FLAT": {
+          "row_total_n": 181,
+          "CONFIRM_BEFORE_VA": {
+            "n": 21,
+            "pct_of_row": 11.602209944751381,
+            "pct_of_total": 0.8369868473495418
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 157,
+            "pct_of_row": 86.74033149171271,
+            "pct_of_total": 6.257473096851335
+          },
+          "TIE": {
+            "n": 3,
+            "pct_of_row": 1.6574585635359116,
+            "pct_of_total": 0.11956954962136308
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 780,
+          "CONFIRM_BEFORE_VA": {
+            "n": 265,
+            "pct_of_row": 33.97435897435898,
+            "pct_of_total": 10.561976883220407
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 501,
+            "pct_of_row": 64.23076923076924,
+            "pct_of_total": 19.96811478676764
+          },
+          "TIE": {
+            "n": 14,
+            "pct_of_row": 1.7948717948717947,
+            "pct_of_total": 0.5579912315663611
+          }
+        }
+      },
+      "better_retention_rate": 0.7034883720930233,
+      "worse_retention_rate": 0.33974358974358976,
+      "better_discard_rate": 0.2467700258397933,
+      "worse_discard_rate": 0.6423076923076924,
+      "selectivity_ratio": 2.0706450197455024
+    },
+    "2025_Q1": {
+      "total_population": 572,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 370,
+          "CONFIRM_BEFORE_VA": {
+            "n": 272,
+            "pct_of_row": 73.51351351351352,
+            "pct_of_total": 47.55244755244755
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 79,
+            "pct_of_row": 21.35135135135135,
+            "pct_of_total": 13.81118881118881
+          },
+          "TIE": {
+            "n": 19,
+            "pct_of_row": 5.135135135135135,
+            "pct_of_total": 3.3216783216783217
+          }
+        },
+        "FLAT": {
+          "row_total_n": 27,
+          "CONFIRM_BEFORE_VA": {
+            "n": 1,
+            "pct_of_row": 3.7037037037037033,
+            "pct_of_total": 0.17482517482517482
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 25,
+            "pct_of_row": 92.5925925925926,
+            "pct_of_total": 4.370629370629371
+          },
+          "TIE": {
+            "n": 1,
+            "pct_of_row": 3.7037037037037033,
+            "pct_of_total": 0.17482517482517482
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 175,
+          "CONFIRM_BEFORE_VA": {
+            "n": 68,
+            "pct_of_row": 38.857142857142854,
+            "pct_of_total": 11.888111888111888
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 106,
+            "pct_of_row": 60.57142857142858,
+            "pct_of_total": 18.53146853146853
+          },
+          "TIE": {
+            "n": 1,
+            "pct_of_row": 0.5714285714285714,
+            "pct_of_total": 0.17482517482517482
+          }
+        }
+      },
+      "better_retention_rate": 0.7351351351351352,
+      "worse_retention_rate": 0.38857142857142857,
+      "better_discard_rate": 0.2135135135135135,
+      "worse_discard_rate": 0.6057142857142858,
+      "selectivity_ratio": 1.891891891891892
+    }
+  },
+  "A2": {
+    "ALL": {
+      "total_population": 5610,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 3487,
+          "CONFIRM_BEFORE_VA": {
+            "n": 1699,
+            "pct_of_row": 48.72383137367364,
+            "pct_of_total": 30.285204991087344
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 1632,
+            "pct_of_row": 46.80240894751936,
+            "pct_of_total": 29.09090909090909
+          },
+          "TIE": {
+            "n": 156,
+            "pct_of_row": 4.4737596788069975,
+            "pct_of_total": 2.7807486631016043
+          }
+        },
+        "FLAT": {
+          "row_total_n": 402,
+          "CONFIRM_BEFORE_VA": {
+            "n": 13,
+            "pct_of_row": 3.233830845771144,
+            "pct_of_total": 0.23172905525846704
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 389,
+            "pct_of_row": 96.76616915422885,
+            "pct_of_total": 6.934046345811051
+          },
+          "TIE": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 1721,
+          "CONFIRM_BEFORE_VA": {
+            "n": 231,
+            "pct_of_row": 13.422428820453225,
+            "pct_of_total": 4.117647058823529
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 1486,
+            "pct_of_row": 86.34514816966879,
+            "pct_of_total": 26.488413547237077
+          },
+          "TIE": {
+            "n": 4,
+            "pct_of_row": 0.2324230098779779,
+            "pct_of_total": 0.07130124777183601
+          }
+        }
+      },
+      "better_retention_rate": 0.48723831373673643,
+      "worse_retention_rate": 0.13422428820453225,
+      "better_discard_rate": 0.4680240894751936,
+      "worse_discard_rate": 0.8634514816966878,
+      "selectivity_ratio": 3.6300309001771573
+    },
+    "TRAIN": {
+      "total_population": 5038,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 3117,
+          "CONFIRM_BEFORE_VA": {
+            "n": 1490,
+            "pct_of_row": 47.80237407763875,
+            "pct_of_total": 29.575228265184595
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 1485,
+            "pct_of_row": 47.64196342637151,
+            "pct_of_total": 29.475982532751093
+          },
+          "TIE": {
+            "n": 142,
+            "pct_of_row": 4.555662495989734,
+            "pct_of_total": 2.8185788011115522
+          }
+        },
+        "FLAT": {
+          "row_total_n": 375,
+          "CONFIRM_BEFORE_VA": {
+            "n": 13,
+            "pct_of_row": 3.4666666666666663,
+            "pct_of_total": 0.25803890432711396
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 362,
+            "pct_of_row": 96.53333333333333,
+            "pct_of_total": 7.185391028185788
+          },
+          "TIE": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 1546,
+          "CONFIRM_BEFORE_VA": {
+            "n": 202,
+            "pct_of_row": 13.065976714100906,
+            "pct_of_total": 4.009527590313616
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 1340,
+            "pct_of_row": 86.67529107373868,
+            "pct_of_total": 26.597856292179433
+          },
+          "TIE": {
+            "n": 4,
+            "pct_of_row": 0.258732212160414,
+            "pct_of_total": 0.07939658594680428
+          }
+        }
+      },
+      "better_retention_rate": 0.47802374077638754,
+      "worse_retention_rate": 0.13065976714100905,
+      "better_discard_rate": 0.4764196342637151,
+      "worse_discard_rate": 0.8667529107373868,
+      "selectivity_ratio": 3.6585381348529467
+    },
+    "OOS": {
+      "total_population": 572,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 370,
+          "CONFIRM_BEFORE_VA": {
+            "n": 209,
+            "pct_of_row": 56.486486486486484,
+            "pct_of_total": 36.53846153846153
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 147,
+            "pct_of_row": 39.729729729729726,
+            "pct_of_total": 25.699300699300696
+          },
+          "TIE": {
+            "n": 14,
+            "pct_of_row": 3.783783783783784,
+            "pct_of_total": 2.4475524475524475
+          }
+        },
+        "FLAT": {
+          "row_total_n": 27,
+          "CONFIRM_BEFORE_VA": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 27,
+            "pct_of_row": 100.0,
+            "pct_of_total": 4.72027972027972
+          },
+          "TIE": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 175,
+          "CONFIRM_BEFORE_VA": {
+            "n": 29,
+            "pct_of_row": 16.57142857142857,
+            "pct_of_total": 5.06993006993007
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 146,
+            "pct_of_row": 83.42857142857143,
+            "pct_of_total": 25.524475524475527
+          },
+          "TIE": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          }
+        }
+      },
+      "better_retention_rate": 0.5648648648648649,
+      "worse_retention_rate": 0.1657142857142857,
+      "better_discard_rate": 0.39729729729729724,
+      "worse_discard_rate": 0.8342857142857143,
+      "selectivity_ratio": 3.408667287977633
+    },
+    "2023": {
+      "total_population": 2529,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 1569,
+          "CONFIRM_BEFORE_VA": {
+            "n": 731,
+            "pct_of_row": 46.59018483110262,
+            "pct_of_total": 28.90470541716093
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 768,
+            "pct_of_row": 48.94837476099426,
+            "pct_of_total": 30.36773428232503
+          },
+          "TIE": {
+            "n": 70,
+            "pct_of_row": 4.461440407903123,
+            "pct_of_total": 2.76789244760775
+          }
+        },
+        "FLAT": {
+          "row_total_n": 194,
+          "CONFIRM_BEFORE_VA": {
+            "n": 5,
+            "pct_of_row": 2.5773195876288657,
+            "pct_of_total": 0.19770660340055357
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 189,
+            "pct_of_row": 97.42268041237114,
+            "pct_of_total": 7.473309608540925
+          },
+          "TIE": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 766,
+          "CONFIRM_BEFORE_VA": {
+            "n": 93,
+            "pct_of_row": 12.140992167101828,
+            "pct_of_total": 3.6773428232502967
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 671,
+            "pct_of_row": 87.59791122715404,
+            "pct_of_total": 26.53222617635429
+          },
+          "TIE": {
+            "n": 2,
+            "pct_of_row": 0.26109660574412535,
+            "pct_of_total": 0.07908264136022143
+          }
+        }
+      },
+      "better_retention_rate": 0.4659018483110262,
+      "worse_retention_rate": 0.12140992167101829,
+      "better_discard_rate": 0.4894837476099426,
+      "worse_discard_rate": 0.8759791122715405,
+      "selectivity_ratio": 3.837428126948882
+    },
+    "2024": {
+      "total_population": 2509,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 1548,
+          "CONFIRM_BEFORE_VA": {
+            "n": 759,
+            "pct_of_row": 49.031007751937985,
+            "pct_of_total": 30.25109605420486
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 717,
+            "pct_of_row": 46.31782945736434,
+            "pct_of_total": 28.57712235950578
+          },
+          "TIE": {
+            "n": 72,
+            "pct_of_row": 4.651162790697675,
+            "pct_of_total": 2.869669190912714
+          }
+        },
+        "FLAT": {
+          "row_total_n": 181,
+          "CONFIRM_BEFORE_VA": {
+            "n": 8,
+            "pct_of_row": 4.41988950276243,
+            "pct_of_total": 0.3188521323236349
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 173,
+            "pct_of_row": 95.58011049723757,
+            "pct_of_total": 6.895177361498606
+          },
+          "TIE": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 780,
+          "CONFIRM_BEFORE_VA": {
+            "n": 109,
+            "pct_of_row": 13.974358974358974,
+            "pct_of_total": 4.344360302909526
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 669,
+            "pct_of_row": 85.76923076923076,
+            "pct_of_total": 26.66400956556397
+          },
+          "TIE": {
+            "n": 2,
+            "pct_of_row": 0.2564102564102564,
+            "pct_of_total": 0.07971303308090873
+          }
+        }
+      },
+      "better_retention_rate": 0.4903100775193798,
+      "worse_retention_rate": 0.13974358974358975,
+      "better_discard_rate": 0.4631782945736434,
+      "worse_discard_rate": 0.8576923076923076,
+      "selectivity_ratio": 3.5086409216983143
+    },
+    "2025_Q1": {
+      "total_population": 572,
+      "matrix": {
+        "Q4_BETTER": {
+          "row_total_n": 370,
+          "CONFIRM_BEFORE_VA": {
+            "n": 209,
+            "pct_of_row": 56.486486486486484,
+            "pct_of_total": 36.53846153846153
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 147,
+            "pct_of_row": 39.729729729729726,
+            "pct_of_total": 25.699300699300696
+          },
+          "TIE": {
+            "n": 14,
+            "pct_of_row": 3.783783783783784,
+            "pct_of_total": 2.4475524475524475
+          }
+        },
+        "FLAT": {
+          "row_total_n": 27,
+          "CONFIRM_BEFORE_VA": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 27,
+            "pct_of_row": 100.0,
+            "pct_of_total": 4.72027972027972
+          },
+          "TIE": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          }
+        },
+        "Q4_WORSE": {
+          "row_total_n": 175,
+          "CONFIRM_BEFORE_VA": {
+            "n": 29,
+            "pct_of_row": 16.57142857142857,
+            "pct_of_total": 5.06993006993007
+          },
+          "VA_BEFORE_CONFIRM": {
+            "n": 146,
+            "pct_of_row": 83.42857142857143,
+            "pct_of_total": 25.524475524475527
+          },
+          "TIE": {
+            "n": 0,
+            "pct_of_row": 0.0,
+            "pct_of_total": 0.0
+          }
+        }
+      },
+      "better_retention_rate": 0.5648648648648649,
+      "worse_retention_rate": 0.1657142857142857,
+      "better_discard_rate": 0.39729729729729724,
+      "worse_discard_rate": 0.8342857142857143,
+      "selectivity_ratio": 3.408667287977633
+    }
+  }
+}

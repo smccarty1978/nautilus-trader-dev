@@ -1,0 +1,15 @@
+{
+  "execution_platform": "NautilusTrader causal event-driven streaming simulation",
+  "data_frequency": "5-second regularized completed bar grid from NQ.XCME-1-SECOND-LAST-EXTERNAL",
+  "causal_guarantees": [
+    "Features and M1-U scores derived on completed bar boundaries only",
+    "Order submission occurs at decision timestamp t; fill executes at t + delta with 1-tick adverse slippage",
+    "No future regime boundaries, labels, or terminal outcomes accessible to policy decisions",
+    "Persistence clock increments strictly by elapsed observation time",
+    "Recovery cancellation condition evaluated strictly on causally observed running peak"
+  ],
+  "tie_breaking_rules": {
+    "same_timestamp_recovery_and_persistence": "Persistence wins if streak >= 60s reached simultaneously",
+    "exit_priority": "Health invalidation exit preempts baseline natural flip if triggered at earlier timestamp"
+  }
+}

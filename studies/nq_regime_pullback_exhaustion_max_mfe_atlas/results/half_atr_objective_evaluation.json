@@ -1,0 +1,23 @@
+{
+  "objective": "Identify economic regime exhaustion after <= 0.50 ATR giveback from maxMFE",
+  "checkpoint_evaluated": "depth_0.50_ATR",
+  "n_total_observations": 23915,
+  "exhaust_rate_pct": 23.43299184612168,
+  "resume_rate_pct": 76.56700815387832,
+  "verdict_at_depth_alone": "UNFEASIBLE_WITHOUT_CONDITIONING",
+  "rationale": "At a 0.50 ATR pullback depth alone across all pullbacks, only 23.4% exhaust, while 76.6% resume to set a new maxMFE. Declaring exhaustion unconditionally at 0.50 ATR produces a massive false-exhaustion rate (76.6%), abandoning a median of 1.59 ATR in missed continuation.",
+  "giveback_economics_if_exhaustion_detected": {
+    "median_total_regime_giveback_atr": 1.9726773554746226,
+    "median_giveback_consumed_atr": 0.517652960569243,
+    "median_giveback_preserved_atr": 1.5220132088808254,
+    "median_giveback_preserved_points": 14.75,
+    "median_giveback_preserved_dollars": 295.0,
+    "pct_of_giveback_preserved": 77.15469560477779
+  },
+  "lead_time_advantage_over_va": {
+    "median_seconds_before_va": 236.0,
+    "mean_seconds_before_va": 311.89400428265526,
+    "p25_seconds_before_va": 149.0,
+    "p75_seconds_before_va": 389.0
+  }
+}

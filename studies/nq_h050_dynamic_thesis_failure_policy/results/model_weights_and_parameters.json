@@ -1,0 +1,52 @@
+{
+  "model_family": "LogisticRegression",
+  "penalty": "l2",
+  "C": 1.0,
+  "class_weight": "balanced",
+  "random_state": 42,
+  "feature_names": [
+    "landmark_level_atr",
+    "counter_direction",
+    "is_pre_r1",
+    "seconds_since_h050",
+    "rebound_from_adverse_extreme_atr",
+    "trailing_15s_return_atr",
+    "trailing_30s_return_atr",
+    "trailing_15s_range_atr",
+    "trailing_30s_range_atr"
+  ],
+  "scaler_mean": [
+    -1.2279843444227005,
+    -0.09067188519243313,
+    0.8829093281148076,
+    4427.729288975865,
+    0.07444950540371859,
+    -0.5400249667745417,
+    -0.6824114368567089,
+    0.7172100318519774,
+    0.8940768900220363
+  ],
+  "scaler_scale": [
+    0.2037354545398832,
+    0.9958808207991809,
+    0.3215282980433707,
+    24217.620461860803,
+    0.08543343201017398,
+    0.5516846366963313,
+    0.5905482652567257,
+    0.5744798743424773,
+    0.612372299955429
+  ],
+  "intercept": -0.0882157782889108,
+  "coefficients": {
+    "landmark_level_atr": -0.2812586558656266,
+    "counter_direction": -0.15149377465105604,
+    "is_pre_r1": -0.12869527998392125,
+    "seconds_since_h050": -0.709574109741207,
+    "rebound_from_adverse_extreme_atr": -0.12967733650581695,
+    "trailing_15s_return_atr": 0.3401060547439233,
+    "trailing_30s_return_atr": -0.12865531648470596,
+    "trailing_15s_range_atr": 0.12318086062216804,
+    "trailing_30s_range_atr": -0.05246380775013914
+  }
+}
