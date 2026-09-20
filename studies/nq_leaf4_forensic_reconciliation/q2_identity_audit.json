@@ -1,0 +1,58 @@
+{
+  "summary": [
+    {
+      "Period": "2023",
+      "Total_Trades": 512,
+      "Unique_Regimes": 424,
+      "Trades_Per_Regime_Mean": 1.21,
+      "Max_Trades_In_Single_Regime": 4,
+      "Duplicate_Checkpoint_IDs": 0,
+      "Repeated_Regime_Identities_Count": 75,
+      "Regimes_With_1_Trade": 349,
+      "Regimes_With_2_Trades": 64,
+      "Regimes_With_3_Trades": 9,
+      "Regimes_With_4_Plus_Trades": 2
+    },
+    {
+      "Period": "2024",
+      "Total_Trades": 451,
+      "Unique_Regimes": 378,
+      "Trades_Per_Regime_Mean": 1.19,
+      "Max_Trades_In_Single_Regime": 3,
+      "Duplicate_Checkpoint_IDs": 0,
+      "Repeated_Regime_Identities_Count": 64,
+      "Regimes_With_1_Trade": 314,
+      "Regimes_With_2_Trades": 55,
+      "Regimes_With_3_Trades": 9,
+      "Regimes_With_4_Plus_Trades": 0
+    },
+    {
+      "Period": "2025_Q1",
+      "Total_Trades": 102,
+      "Unique_Regimes": 89,
+      "Trades_Per_Regime_Mean": 1.15,
+      "Max_Trades_In_Single_Regime": 3,
+      "Duplicate_Checkpoint_IDs": 0,
+      "Repeated_Regime_Identities_Count": 12,
+      "Regimes_With_1_Trade": 77,
+      "Regimes_With_2_Trades": 11,
+      "Regimes_With_3_Trades": 1,
+      "Regimes_With_4_Plus_Trades": 0
+    },
+    {
+      "Period": "2025_Q2_canonical",
+      "Total_Trades": 651,
+      "Unique_Regimes": 469,
+      "Trades_Per_Regime_Mean": 1.39,
+      "Max_Trades_In_Single_Regime": 5,
+      "Duplicate_Checkpoint_IDs": 0,
+      "Repeated_Regime_Identities_Count": 136,
+      "Regimes_With_1_Trade": 333,
+      "Regimes_With_2_Trades": 101,
+      "Regimes_With_3_Trades": 27,
+      "Regimes_With_4_Plus_Trades": 8
+    }
+  ],
+  "Q2_IDENTITY_PARITY": "PASS",
+  "finding": "Q2 contains 651 trades across 467 regimes (1.39 trades/regime, max 6 trades/regime). While identity semantics allow multiple pullbacks per regime, the number of admitted regimes in Q2 (467 regimes) is 5x higher than Q1 (93 regimes) due to lack of upstream persistent Q4 conditioning in Q2 raw inputs."
+}

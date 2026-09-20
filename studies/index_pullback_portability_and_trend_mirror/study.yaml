@@ -1,0 +1,18 @@
+# Governed Study Specification: index_pullback_portability_and_trend_mirror
+study_id: index_pullback_portability_and_trend_mirror
+date: 2026-09-17
+lineage:
+  upstream: studies/nq_h050_economic_subpopulation_mining
+  branch_a: Leaf 4 cross-instrument portability (NQ -> ES, YM)
+  branch_b: H050 trend-following mirror (E0, E1 x R0, R1, R2)
+instruments:
+  - NQ
+  - ES
+  - YM
+temporal_coverage:
+  train: 2023-01-03 to 2024-12-31
+  oos_diagnostic: 2025-01-02 to 2025-03-31
+governance:
+  causal_feature_contracts: STRICT
+  no_in_sample_retuning: ENFORCED
+  terminal_state: COMPLETED

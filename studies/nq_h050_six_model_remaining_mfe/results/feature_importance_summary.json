@@ -1,0 +1,3422 @@
+{
+  "pooled__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3615781153408825,
+      "Family G: External Price-Level Context": 0.04617273182598678,
+      "Family C: Cross-Regime Displacement": 0.14629741145526373,
+      "Other": 0.02080552854352284,
+      "Family I: Session Context": 0.08795072656237096,
+      "Family F: MTF Structural Alignment": 0.020608667567856103,
+      "Family B: Prior Regime Geometry": 0.13242801057652095,
+      "Family E: Pullback Shape": 0.08843822115820789,
+      "Family A: Current Regime Geometry": 0.05145596146526248,
+      "Family D: Regime Persistence": 0.044264625504125736
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2316.172203183174,
+        "split": 71
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 2163.8440845012665,
+        "split": 45
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 2083.948476791382,
+        "split": 126
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 1909.0332627147436,
+        "split": 114
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1523.1157492771745,
+        "split": 61
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1108.5549159049988,
+        "split": 64
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 833.1715404987335,
+        "split": 57
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 808.5548442993313,
+        "split": 51
+      },
+      {
+        "feature": "atr_ratio_short_long",
+        "family": "Family H: Volatility Context",
+        "gain": 804.7266752328724,
+        "split": 71
+      },
+      {
+        "feature": "regime_distance_from_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 748.30313539505,
+        "split": 41
+      }
+    ]
+  },
+  "pooled__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3670757984491829,
+      "Family G: External Price-Level Context": 0.03657711338337558,
+      "Family C: Cross-Regime Displacement": 0.14849667974316552,
+      "Other": 0.022355885130082565,
+      "Family I: Session Context": 0.10362661385416924,
+      "Family F: MTF Structural Alignment": 0.01680041600249679,
+      "Family B: Prior Regime Geometry": 0.14624671005458875,
+      "Family E: Pullback Shape": 0.06793583226925326,
+      "Family A: Current Regime Geometry": 0.05335558748887736,
+      "Family D: Regime Persistence": 0.03752936362480799
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 2513.3179609775543,
+        "split": 129
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2498.021876335144,
+        "split": 66
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 2404.833007335663,
+        "split": 43
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2252.408594608307,
+        "split": 54
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 1277.0334196090698,
+        "split": 77
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 963.4316267967224,
+        "split": 66
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 915.5822601318359,
+        "split": 51
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 861.4614267349243,
+        "split": 69
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 781.4679222106934,
+        "split": 51
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 754.0966262817383,
+        "split": 40
+      }
+    ]
+  },
+  "pooled__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.33578944709207925,
+      "Family G: External Price-Level Context": 0.04380667822074106,
+      "Family C: Cross-Regime Displacement": 0.1737911966594248,
+      "Other": 0.01846812881461938,
+      "Family I: Session Context": 0.106011832764852,
+      "Family F: MTF Structural Alignment": 0.02130201510983905,
+      "Family B: Prior Regime Geometry": 0.1794940486309838,
+      "Family E: Pullback Shape": 0.0355902814172395,
+      "Family A: Current Regime Geometry": 0.04573917682384367,
+      "Family D: Regime Persistence": 0.0400071944663775
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 4548.262747764587,
+        "split": 57
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 2987.953287124634,
+        "split": 121
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 1817.2427043914795,
+        "split": 30
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1750.6434979438782,
+        "split": 47
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 1229.427191734314,
+        "split": 65
+      },
+      {
+        "feature": "current_price_from_prior_mae_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1162.0892052650452,
+        "split": 63
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1147.1604237556458,
+        "split": 64
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 991.454391002655,
+        "split": 71
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 980.0561852455139,
+        "split": 56
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 949.9540576934814,
+        "split": 41
+      }
+    ]
+  },
+  "pooled__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3163503800513229,
+      "Family G: External Price-Level Context": 0.03805070047793836,
+      "Family C: Cross-Regime Displacement": 0.15898741446796735,
+      "Other": 0.01376616433402001,
+      "Family I: Session Context": 0.11727357555955556,
+      "Family F: MTF Structural Alignment": 0.009699935265149878,
+      "Family B: Prior Regime Geometry": 0.2208277742492553,
+      "Family E: Pullback Shape": 0.025908348922803647,
+      "Family A: Current Regime Geometry": 0.0554074468341523,
+      "Family D: Regime Persistence": 0.0437282598378347
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 5618.121641635895,
+        "split": 49
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 3882.875029563904,
+        "split": 140
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 2046.0055170059204,
+        "split": 102
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2010.998412668705,
+        "split": 41
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 1735.6630382537842,
+        "split": 70
+      },
+      {
+        "feature": "session_new_low_count",
+        "family": "Family I: Session Context",
+        "gain": 1640.4861698150635,
+        "split": 78
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 1277.0822004973888,
+        "split": 34
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1251.3676946163177,
+        "split": 64
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1231.9035625457764,
+        "split": 56
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 1185.515632867813,
+        "split": 51
+      }
+    ]
+  },
+  "pooled__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3291765350073633,
+      "Family G: External Price-Level Context": 0.045531183080637146,
+      "Family C: Cross-Regime Displacement": 0.16237105189623033,
+      "Other": 0.020451835797034506,
+      "Family I: Session Context": 0.12911602314494908,
+      "Family F: MTF Structural Alignment": 0.028269647305014817,
+      "Family B: Prior Regime Geometry": 0.17114092540378917,
+      "Family E: Pullback Shape": 0.039900966124963445,
+      "Family A: Current Regime Geometry": 0.0467484398160834,
+      "Family D: Regime Persistence": 0.027293392423934783
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 5238.997925758362,
+        "split": 150
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 4164.95446062088,
+        "split": 62
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1948.4623050689697,
+        "split": 45
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 1827.5657711029053,
+        "split": 36
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 1541.3488273620605,
+        "split": 60
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1361.6683053970337,
+        "split": 86
+      },
+      {
+        "feature": "current_price_from_prior_mae_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1112.885353088379,
+        "split": 61
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 1074.705891609192,
+        "split": 35
+      },
+      {
+        "feature": "mtf_current_regime_mfe_mean_atr",
+        "family": "Family F: MTF Structural Alignment",
+        "gain": 1070.4496371746063,
+        "split": 56
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1005.612633228302,
+        "split": 42
+      }
+    ]
+  },
+  "long__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3546558094042816,
+      "Family G: External Price-Level Context": 0.022572511770141423,
+      "Family C: Cross-Regime Displacement": 0.1618978133366918,
+      "Other": 0.030231312152847068,
+      "Family I: Session Context": 0.05377991803107884,
+      "Family F: MTF Structural Alignment": 0.014857624306584232,
+      "Family B: Prior Regime Geometry": 0.1799302079225184,
+      "Family E: Pullback Shape": 0.07529559860057014,
+      "Family A: Current Regime Geometry": 0.0467300562957073,
+      "Family D: Regime Persistence": 0.060049148179579216
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2181.2612341539934,
+        "split": 68
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1006.1973099708557,
+        "split": 34
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 994.0995409488678,
+        "split": 78
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 977.2492175102234,
+        "split": 61
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 725.0383734703064,
+        "split": 59
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 716.0939493179321,
+        "split": 64
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 678.981632232666,
+        "split": 60
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 623.8384535312653,
+        "split": 59
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 601.4430420994759,
+        "split": 43
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 599.6511397687718,
+        "split": 27
+      }
+    ]
+  },
+  "long__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3453085208470442,
+      "Family G: External Price-Level Context": 0.02142596670316462,
+      "Family C: Cross-Regime Displacement": 0.17789659375139302,
+      "Other": 0.029477555236537577,
+      "Family I: Session Context": 0.06786156358695594,
+      "Family F: MTF Structural Alignment": 0.011752093901120364,
+      "Family B: Prior Regime Geometry": 0.18457684392446477,
+      "Family E: Pullback Shape": 0.05232793173021896,
+      "Family A: Current Regime Geometry": 0.05784963383062425,
+      "Family D: Regime Persistence": 0.051523296488476304
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1871.575771331787,
+        "split": 53
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1612.1955211162567,
+        "split": 102
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1323.5600912570953,
+        "split": 34
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1040.4796788692474,
+        "split": 59
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 774.2816395759583,
+        "split": 64
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 743.108115196228,
+        "split": 39
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 741.3279714584351,
+        "split": 61
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 723.1030492782593,
+        "split": 54
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 718.6617336273193,
+        "split": 26
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 712.1448106765747,
+        "split": 61
+      }
+    ]
+  },
+  "long__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3423488497539391,
+      "Family G: External Price-Level Context": 0.015823839212946694,
+      "Family C: Cross-Regime Displacement": 0.17707463786436708,
+      "Other": 0.019310426862880717,
+      "Family I: Session Context": 0.08495832569891709,
+      "Family F: MTF Structural Alignment": 0.009635025802732742,
+      "Family B: Prior Regime Geometry": 0.20275171154472132,
+      "Family E: Pullback Shape": 0.026319512186680178,
+      "Family A: Current Regime Geometry": 0.06177606848660017,
+      "Family D: Regime Persistence": 0.060001602586214925
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2395.2297213077545,
+        "split": 40
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 2282.0837111473083,
+        "split": 106
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2167.042092561722,
+        "split": 55
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1109.0819067955017,
+        "split": 77
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 1063.8024849891663,
+        "split": 55
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1018.216136932373,
+        "split": 72
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 931.9517650604248,
+        "split": 52
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 930.655800819397,
+        "split": 63
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 929.0667014122009,
+        "split": 50
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 895.1383481025696,
+        "split": 58
+      }
+    ]
+  },
+  "long__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.30025493223151634,
+      "Family G: External Price-Level Context": 0.02375589541776896,
+      "Family C: Cross-Regime Displacement": 0.18658459421511794,
+      "Other": 0.021968088443455665,
+      "Family I: Session Context": 0.08376973199242145,
+      "Family F: MTF Structural Alignment": 0.013040457293881995,
+      "Family B: Prior Regime Geometry": 0.22985527731359232,
+      "Family E: Pullback Shape": 0.015406383822420659,
+      "Family A: Current Regime Geometry": 0.07083469966887443,
+      "Family D: Regime Persistence": 0.05452993960095021
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 3876.080411836505,
+        "split": 56
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1742.2414635419846,
+        "split": 83
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1462.528794504702,
+        "split": 66
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1395.734637260437,
+        "split": 65
+      },
+      {
+        "feature": "regime_progress_efficiency__tf_1h",
+        "family": "Family A: Current Regime Geometry",
+        "gain": 1366.5405049324036,
+        "split": 65
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 1330.923397809267,
+        "split": 84
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1283.8972928524017,
+        "split": 72
+      },
+      {
+        "feature": "session_new_low_count",
+        "family": "Family I: Session Context",
+        "gain": 1279.6574029922485,
+        "split": 62
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1261.1756193637848,
+        "split": 64
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 1212.977050125599,
+        "split": 70
+      }
+    ]
+  },
+  "long__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.28853240162819327,
+      "Family G: External Price-Level Context": 0.01911996316027246,
+      "Family C: Cross-Regime Displacement": 0.20222704786973159,
+      "Other": 0.032704478019124676,
+      "Family I: Session Context": 0.0903626512546412,
+      "Family F: MTF Structural Alignment": 0.014562017882176764,
+      "Family B: Prior Regime Geometry": 0.19468697388452796,
+      "Family E: Pullback Shape": 0.027545904691149203,
+      "Family A: Current Regime Geometry": 0.0666900084246247,
+      "Family D: Regime Persistence": 0.0635685531855582
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 2717.6127920150757,
+        "split": 105
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2716.263024330139,
+        "split": 58
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 2459.9094247817993,
+        "split": 61
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1249.7469687461853,
+        "split": 70
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 1086.4320755004883,
+        "split": 52
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1080.6861643791199,
+        "split": 60
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1077.3673810958862,
+        "split": 47
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 1057.1486115455627,
+        "split": 45
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1036.1969890594482,
+        "split": 50
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1022.2802867889404,
+        "split": 52
+      }
+    ]
+  },
+  "short__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.33704442845902033,
+      "Family G: External Price-Level Context": 0.04386687794264651,
+      "Family C: Cross-Regime Displacement": 0.17392889089180488,
+      "Other": 0.01758537689948906,
+      "Family I: Session Context": 0.08996889363942133,
+      "Family F: MTF Structural Alignment": 0.012309926102410088,
+      "Family B: Prior Regime Geometry": 0.15710100004811395,
+      "Family E: Pullback Shape": 0.07376571992968144,
+      "Family A: Current Regime Geometry": 0.05373315264530609,
+      "Family D: Regime Persistence": 0.04069573344210633
+    },
+    "top_10_features": [
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 1352.6802821159363,
+        "split": 48
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1316.7193183898926,
+        "split": 77
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1179.032702922821,
+        "split": 104
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 1062.333720445633,
+        "split": 83
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 835.6722731590271,
+        "split": 58
+      },
+      {
+        "feature": "session_position_in_range",
+        "family": "Family I: Session Context",
+        "gain": 693.1251816749573,
+        "split": 53
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 664.4308819770813,
+        "split": 50
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 613.9138902425766,
+        "split": 59
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 612.543532371521,
+        "split": 56
+      },
+      {
+        "feature": "nearest_context_level_below_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 588.150869846344,
+        "split": 52
+      }
+    ]
+  },
+  "short__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.32736982044465085,
+      "Family G: External Price-Level Context": 0.03917510099927826,
+      "Family C: Cross-Regime Displacement": 0.18498549112248142,
+      "Other": 0.021998746832988667,
+      "Family I: Session Context": 0.09160902755679676,
+      "Family F: MTF Structural Alignment": 0.02744117731052001,
+      "Family B: Prior Regime Geometry": 0.1637647562190012,
+      "Family E: Pullback Shape": 0.04492693115065988,
+      "Family A: Current Regime Geometry": 0.05438347825964756,
+      "Family D: Regime Persistence": 0.044345470103975416
+    },
+    "top_10_features": [
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 1653.9280610084534,
+        "split": 39
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1238.5163440704346,
+        "split": 94
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 965.7983400821686,
+        "split": 64
+      },
+      {
+        "feature": "session_position_in_range",
+        "family": "Family I: Session Context",
+        "gain": 884.9142189025879,
+        "split": 62
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 836.2466793060303,
+        "split": 69
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 777.6336263418198,
+        "split": 51
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 743.9605169296265,
+        "split": 45
+      },
+      {
+        "feature": "regime_time_since_mae_sec__tf_1m",
+        "family": "Family D: Regime Persistence",
+        "gain": 718.3196620941162,
+        "split": 67
+      },
+      {
+        "feature": "mtf_current_regime_mfe_mean_atr",
+        "family": "Family F: MTF Structural Alignment",
+        "gain": 632.9120635986328,
+        "split": 43
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 628.5543570518494,
+        "split": 55
+      }
+    ]
+  },
+  "short__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.293274343731944,
+      "Family G: External Price-Level Context": 0.048162604438565154,
+      "Family C: Cross-Regime Displacement": 0.20138099267735446,
+      "Other": 0.029360469381180296,
+      "Family I: Session Context": 0.10730307897785372,
+      "Family F: MTF Structural Alignment": 0.015788742823665044,
+      "Family B: Prior Regime Geometry": 0.19238523764098356,
+      "Family E: Pullback Shape": 0.028280729819121057,
+      "Family A: Current Regime Geometry": 0.050797989501219123,
+      "Family D: Regime Persistence": 0.033265811008113606
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 2015.2767777442932,
+        "split": 128
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 1427.1360297203064,
+        "split": 34
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1309.366888999939,
+        "split": 39
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 1277.6681642532349,
+        "split": 84
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 1269.9786450862885,
+        "split": 81
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1018.7208485603333,
+        "split": 65
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 979.6330695152283,
+        "split": 77
+      },
+      {
+        "feature": "session_position_in_range",
+        "family": "Family I: Session Context",
+        "gain": 810.0231680870056,
+        "split": 65
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 783.9996609687805,
+        "split": 56
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 778.7203583717346,
+        "split": 58
+      }
+    ]
+  },
+  "short__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.27777401941850816,
+      "Family G: External Price-Level Context": 0.0323366698379543,
+      "Family C: Cross-Regime Displacement": 0.20539350550974259,
+      "Other": 0.019728623428863334,
+      "Family I: Session Context": 0.0994201019044032,
+      "Family F: MTF Structural Alignment": 0.009930773476411714,
+      "Family B: Prior Regime Geometry": 0.24795795194427372,
+      "Family E: Pullback Shape": 0.01807896094750022,
+      "Family A: Current Regime Geometry": 0.05676388994233206,
+      "Family D: Regime Persistence": 0.03261550359001068
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 2051.8969445228577,
+        "split": 112
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1985.224658921361,
+        "split": 37
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 1402.4087443351746,
+        "split": 72
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1303.9397731274366,
+        "split": 66
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1246.7026238441467,
+        "split": 69
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1185.3310914039612,
+        "split": 78
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1092.012677192688,
+        "split": 53
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 1071.6230969429016,
+        "split": 61
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1044.6121973320842,
+        "split": 59
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1003.5352711677551,
+        "split": 60
+      }
+    ]
+  },
+  "short__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.306847602116613,
+      "Family G: External Price-Level Context": 0.034803648315432645,
+      "Family C: Cross-Regime Displacement": 0.19871574487429033,
+      "Other": 0.031690042990043396,
+      "Family I: Session Context": 0.12277181181515048,
+      "Family F: MTF Structural Alignment": 0.02402211446674438,
+      "Family B: Prior Regime Geometry": 0.16779812091313318,
+      "Family E: Pullback Shape": 0.025638317442080744,
+      "Family A: Current Regime Geometry": 0.05896238658102035,
+      "Family D: Regime Persistence": 0.028750210485491496
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 2809.1989316940308,
+        "split": 147
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1472.8779592514038,
+        "split": 47
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 1435.1018748283386,
+        "split": 35
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 1200.6657228469849,
+        "split": 65
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 1118.2500457763672,
+        "split": 65
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 1066.1472034454346,
+        "split": 56
+      },
+      {
+        "feature": "session_new_high_count",
+        "family": "Family I: Session Context",
+        "gain": 1035.9052810668945,
+        "split": 68
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1016.4350800514221,
+        "split": 54
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 924.7636804580688,
+        "split": 56
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 898.3102169036865,
+        "split": 47
+      }
+    ]
+  },
+  "L1__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.34234537520636915,
+      "Family G: External Price-Level Context": 0.024333446687315453,
+      "Family C: Cross-Regime Displacement": 0.18253521210019663,
+      "Other": 0.021768056080300982,
+      "Family I: Session Context": 0.06133587334836824,
+      "Family F: MTF Structural Alignment": 0.014438881869065813,
+      "Family B: Prior Regime Geometry": 0.17213356764973006,
+      "Family E: Pullback Shape": 0.07123967672268869,
+      "Family A: Current Regime Geometry": 0.05427809831161066,
+      "Family D: Regime Persistence": 0.05559181202435429
+    },
+    "top_10_features": [
+      {
+        "feature": "regime_distance_from_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 837.6452116966248,
+        "split": 46
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 697.089072227478,
+        "split": 70
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 657.1785841733217,
+        "split": 64
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 627.7394261360168,
+        "split": 58
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 595.1995519399643,
+        "split": 55
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 587.994180560112,
+        "split": 67
+      },
+      {
+        "feature": "atr_percentile_20d",
+        "family": "Family H: Volatility Context",
+        "gain": 578.7405331861228,
+        "split": 69
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 517.9940108060837,
+        "split": 50
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 517.580030798912,
+        "split": 53
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 506.9938395023346,
+        "split": 49
+      }
+    ]
+  },
+  "L1__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3311410439619305,
+      "Family G: External Price-Level Context": 0.021466765202043842,
+      "Family C: Cross-Regime Displacement": 0.19538634014806996,
+      "Other": 0.02584975861441774,
+      "Family I: Session Context": 0.05902358044723166,
+      "Family F: MTF Structural Alignment": 0.016287651316747434,
+      "Family B: Prior Regime Geometry": 0.1864664009256429,
+      "Family E: Pullback Shape": 0.050700775018959504,
+      "Family A: Current Regime Geometry": 0.06526496012700368,
+      "Family D: Regime Persistence": 0.04841272423795278
+    },
+    "top_10_features": [
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 932.0623331069946,
+        "split": 73
+      },
+      {
+        "feature": "regime_distance_from_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 852.16623878479,
+        "split": 36
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 770.9185011386871,
+        "split": 64
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 758.4797170162201,
+        "split": 69
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 743.7801403999329,
+        "split": 77
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 592.6817018985748,
+        "split": 48
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 592.4316930770874,
+        "split": 60
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 583.7288808822632,
+        "split": 50
+      },
+      {
+        "feature": "atr_percentile_20d",
+        "family": "Family H: Volatility Context",
+        "gain": 494.31567645072937,
+        "split": 50
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 483.97524213790894,
+        "split": 44
+      }
+    ]
+  },
+  "L1__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.2934611236230817,
+      "Family G: External Price-Level Context": 0.027575964158125948,
+      "Family C: Cross-Regime Displacement": 0.19273065657479274,
+      "Other": 0.018887104109201195,
+      "Family I: Session Context": 0.06500055023921518,
+      "Family F: MTF Structural Alignment": 0.014890072507361187,
+      "Family B: Prior Regime Geometry": 0.21808947005976273,
+      "Family E: Pullback Shape": 0.03678086872217522,
+      "Family A: Current Regime Geometry": 0.06128970491592389,
+      "Family D: Regime Persistence": 0.0712944850903602
+    },
+    "top_10_features": [
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1095.1073870658875,
+        "split": 73
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1080.5928790569305,
+        "split": 100
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 837.0157096385956,
+        "split": 59
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 810.4080011844635,
+        "split": 70
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 766.2921723127365,
+        "split": 57
+      },
+      {
+        "feature": "regime_distance_from_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 693.2102823257446,
+        "split": 27
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 668.8771712779999,
+        "split": 55
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 658.212988615036,
+        "split": 54
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 637.642391294241,
+        "split": 51
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_5m",
+        "family": "Family D: Regime Persistence",
+        "gain": 627.6114995479584,
+        "split": 46
+      }
+    ]
+  },
+  "L1__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.28087017969191086,
+      "Family G: External Price-Level Context": 0.018473456961282237,
+      "Family C: Cross-Regime Displacement": 0.20886151846951048,
+      "Other": 0.016442526487834497,
+      "Family I: Session Context": 0.0750190168580438,
+      "Family F: MTF Structural Alignment": 0.013577668117961694,
+      "Family B: Prior Regime Geometry": 0.25154135223102253,
+      "Family E: Pullback Shape": 0.01865149431323284,
+      "Family A: Current Regime Geometry": 0.05214216137798574,
+      "Family D: Regime Persistence": 0.06442062549121533
+    },
+    "top_10_features": [
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1557.2631082832813,
+        "split": 102
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1061.0626283288002,
+        "split": 88
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 952.5988313704729,
+        "split": 80
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 928.2044906616211,
+        "split": 63
+      },
+      {
+        "feature": "regime_distance_from_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 812.1871314048767,
+        "split": 26
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 810.781508564949,
+        "split": 61
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_1m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 754.6872897148132,
+        "split": 48
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 754.0110669136047,
+        "split": 53
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 729.1171045303345,
+        "split": 29
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 728.7311279773712,
+        "split": 64
+      }
+    ]
+  },
+  "L1__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.29709218865404546,
+      "Family G: External Price-Level Context": 0.019449579492378175,
+      "Family C: Cross-Regime Displacement": 0.20280545520004625,
+      "Other": 0.02825255167503452,
+      "Family I: Session Context": 0.08075791045438221,
+      "Family F: MTF Structural Alignment": 0.007422426525794613,
+      "Family B: Prior Regime Geometry": 0.20550957970252812,
+      "Family E: Pullback Shape": 0.03590075938616361,
+      "Family A: Current Regime Geometry": 0.06169777447985157,
+      "Family D: Regime Persistence": 0.06111177442977544
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1448.7500128746033,
+        "split": 88
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1320.8269739151,
+        "split": 84
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1190.8978905677795,
+        "split": 86
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 1101.0401902198792,
+        "split": 66
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1025.102653503418,
+        "split": 75
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 925.2387609481812,
+        "split": 59
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 791.8516159057617,
+        "split": 49
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 758.1770191192627,
+        "split": 55
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 741.3294930458069,
+        "split": 41
+      },
+      {
+        "feature": "session_position_in_range",
+        "family": "Family I: Session Context",
+        "gain": 709.1179809570312,
+        "split": 45
+      }
+    ]
+  },
+  "L2__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.29374522360803534,
+      "Family G: External Price-Level Context": 0.04002485980440155,
+      "Family C: Cross-Regime Displacement": 0.1715454536455878,
+      "Other": 0.029077448453012064,
+      "Family I: Session Context": 0.06434752395516384,
+      "Family F: MTF Structural Alignment": 0.014812686372478843,
+      "Family B: Prior Regime Geometry": 0.17934754594281194,
+      "Family E: Pullback Shape": 0.060235129465363774,
+      "Family A: Current Regime Geometry": 0.09654485415602017,
+      "Family D: Regime Persistence": 0.050319274597124715
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 784.9369251728058,
+        "split": 47
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 477.0347912311554,
+        "split": 47
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 442.92395973205566,
+        "split": 47
+      },
+      {
+        "feature": "regime_recent_expansion_rate_60s_atr_min__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 417.79117798805237,
+        "split": 51
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 406.4641260243952,
+        "split": 59
+      },
+      {
+        "feature": "regime_age_sec__tf_1m",
+        "family": "Family A: Current Regime Geometry",
+        "gain": 403.6208803653717,
+        "split": 69
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 399.6142416000366,
+        "split": 43
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 396.8994014263153,
+        "split": 25
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 394.04757022857666,
+        "split": 40
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 344.7979384660721,
+        "split": 49
+      }
+    ]
+  },
+  "L2__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.30015954457809935,
+      "Family G: External Price-Level Context": 0.026978469063698083,
+      "Family C: Cross-Regime Displacement": 0.1947986476691938,
+      "Other": 0.023850916005290684,
+      "Family I: Session Context": 0.08891778843738703,
+      "Family F: MTF Structural Alignment": 0.01728373188868714,
+      "Family B: Prior Regime Geometry": 0.17344667996354576,
+      "Family E: Pullback Shape": 0.05019382337266984,
+      "Family A: Current Regime Geometry": 0.0686890302348515,
+      "Family D: Regime Persistence": 0.055681368786576806
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 732.8258056640625,
+        "split": 38
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 591.6807675361633,
+        "split": 69
+      },
+      {
+        "feature": "session_displacement_from_open_atr",
+        "family": "Family I: Session Context",
+        "gain": 552.3700127601624,
+        "split": 55
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 530.8078422546387,
+        "split": 54
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 498.75882935523987,
+        "split": 63
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 487.26761078834534,
+        "split": 48
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 469.1432843208313,
+        "split": 30
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 424.4639583826065,
+        "split": 45
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 418.4262184202671,
+        "split": 31
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 415.62460136413574,
+        "split": 39
+      }
+    ]
+  },
+  "L2__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.279341045828531,
+      "Family G: External Price-Level Context": 0.0250942444169849,
+      "Family C: Cross-Regime Displacement": 0.209741589573564,
+      "Other": 0.03848999234901581,
+      "Family I: Session Context": 0.06245909255074468,
+      "Family F: MTF Structural Alignment": 0.009266318418934,
+      "Family B: Prior Regime Geometry": 0.21069905762052302,
+      "Family E: Pullback Shape": 0.03727127820472784,
+      "Family A: Current Regime Geometry": 0.07634945147997846,
+      "Family D: Regime Persistence": 0.05128792955699633
+    },
+    "top_10_features": [
+      {
+        "feature": "previous_pullbacks_max_depth_atr",
+        "family": "Other",
+        "gain": 679.2983665466309,
+        "split": 57
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 668.0684885978699,
+        "split": 65
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 659.8653310537338,
+        "split": 29
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 622.5729303359985,
+        "split": 58
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 602.7701575756073,
+        "split": 52
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 585.1640703678131,
+        "split": 42
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 564.9526839256287,
+        "split": 56
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 563.8444435596466,
+        "split": 70
+      },
+      {
+        "feature": "prior_regime_range_reclaim_ratio__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 548.2244732379913,
+        "split": 59
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 544.4502966403961,
+        "split": 49
+      }
+    ]
+  },
+  "L2__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.2635478422566944,
+      "Family G: External Price-Level Context": 0.01964691439074816,
+      "Family C: Cross-Regime Displacement": 0.20588495892898842,
+      "Other": 0.051228727308027466,
+      "Family I: Session Context": 0.08048577999594307,
+      "Family F: MTF Structural Alignment": 0.010164403551967011,
+      "Family B: Prior Regime Geometry": 0.2309602509589703,
+      "Family E: Pullback Shape": 0.017709946111035435,
+      "Family A: Current Regime Geometry": 0.07607958863158772,
+      "Family D: Regime Persistence": 0.04429158786603803
+    },
+    "top_10_features": [
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1218.8269328773022,
+        "split": 103
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 769.3885643482208,
+        "split": 57
+      },
+      {
+        "feature": "session_new_high_count",
+        "family": "Family I: Session Context",
+        "gain": 764.4089095592499,
+        "split": 51
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 738.3495771884918,
+        "split": 61
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 738.0769085884094,
+        "split": 73
+      },
+      {
+        "feature": "previous_pullbacks_avg_duration_sec",
+        "family": "Other",
+        "gain": 679.71264731884,
+        "split": 23
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 624.4374992847443,
+        "split": 62
+      },
+      {
+        "feature": "prior_regime_range_reclaim_ratio__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 601.6619087457657,
+        "split": 52
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 584.2433675527573,
+        "split": 63
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 536.1802709102631,
+        "split": 53
+      }
+    ]
+  },
+  "L2__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.2939344151087746,
+      "Family G: External Price-Level Context": 0.023124439253692702,
+      "Family C: Cross-Regime Displacement": 0.22836504730268226,
+      "Other": 0.03688102042291926,
+      "Family I: Session Context": 0.05550583053985045,
+      "Family F: MTF Structural Alignment": 0.006075887602165939,
+      "Family B: Prior Regime Geometry": 0.2024539916509782,
+      "Family E: Pullback Shape": 0.03021742226551194,
+      "Family A: Current Regime Geometry": 0.08016711359853027,
+      "Family D: Regime Persistence": 0.04327483225489441
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1170.9548683166504,
+        "split": 41
+      },
+      {
+        "feature": "regime_age_sec__tf_1m",
+        "family": "Family A: Current Regime Geometry",
+        "gain": 1013.9242115020752,
+        "split": 92
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 933.9350824356079,
+        "split": 64
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 898.215320110321,
+        "split": 48
+      },
+      {
+        "feature": "current_max_mfe_from_prior_regime_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 859.2741413116455,
+        "split": 59
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 799.8681311607361,
+        "split": 52
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 797.8175182342529,
+        "split": 50
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 788.107825756073,
+        "split": 53
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 710.836049079895,
+        "split": 54
+      },
+      {
+        "feature": "atr_ratio_short_long",
+        "family": "Family H: Volatility Context",
+        "gain": 693.3838653564453,
+        "split": 46
+      }
+    ]
+  },
+  "L3__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3626330972264492,
+      "Family G: External Price-Level Context": 0.02872703064045712,
+      "Family C: Cross-Regime Displacement": 0.18143822722503414,
+      "Other": 0.04148131414071301,
+      "Family I: Session Context": 0.038128034203383954,
+      "Family F: MTF Structural Alignment": 0.01128406446344216,
+      "Family B: Prior Regime Geometry": 0.1446411382333175,
+      "Family E: Pullback Shape": 0.07536437785597938,
+      "Family A: Current Regime Geometry": 0.07496364142755371,
+      "Family D: Regime Persistence": 0.04133907458366982
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1099.9741951413453,
+        "split": 65
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 496.6712212562561,
+        "split": 68
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 420.3992456253618,
+        "split": 39
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 405.75160360336304,
+        "split": 34
+      },
+      {
+        "feature": "atr_ratio_short_long",
+        "family": "Family H: Volatility Context",
+        "gain": 393.2089014053345,
+        "split": 49
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 372.7647000551224,
+        "split": 60
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 353.04336845874786,
+        "split": 55
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 348.7720900774002,
+        "split": 49
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 326.85171246528625,
+        "split": 49
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 305.06495201587677,
+        "split": 38
+      }
+    ]
+  },
+  "L3__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3568558709840224,
+      "Family G: External Price-Level Context": 0.033739017142240715,
+      "Family C: Cross-Regime Displacement": 0.20256120054518598,
+      "Other": 0.04123226440647723,
+      "Family I: Session Context": 0.06460143352992417,
+      "Family F: MTF Structural Alignment": 0.016912445834384716,
+      "Family B: Prior Regime Geometry": 0.1384550648678393,
+      "Family E: Pullback Shape": 0.041404373641837286,
+      "Family A: Current Regime Geometry": 0.0690431845818079,
+      "Family D: Regime Persistence": 0.035195144466280325
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1539.2653766572475,
+        "split": 69
+      },
+      {
+        "feature": "atr_ratio_short_long",
+        "family": "Family H: Volatility Context",
+        "gain": 572.6902992725372,
+        "split": 63
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 481.23643159866333,
+        "split": 67
+      },
+      {
+        "feature": "session_new_low_count",
+        "family": "Family I: Session Context",
+        "gain": 475.2763890028,
+        "split": 57
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 475.15524727106094,
+        "split": 59
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 444.81172919273376,
+        "split": 57
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 444.7587540149689,
+        "split": 27
+      },
+      {
+        "feature": "prior_regime_total_range_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 386.370282292366,
+        "split": 38
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 383.81045055389404,
+        "split": 47
+      },
+      {
+        "feature": "nearest_context_level_above_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 361.33680963516235,
+        "split": 54
+      }
+    ]
+  },
+  "L3__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.33534958868121634,
+      "Family G: External Price-Level Context": 0.028814974322987415,
+      "Family C: Cross-Regime Displacement": 0.18007716258858666,
+      "Other": 0.02736885065193334,
+      "Family I: Session Context": 0.08903435889545598,
+      "Family F: MTF Structural Alignment": 0.01268350799461275,
+      "Family B: Prior Regime Geometry": 0.1768577790290796,
+      "Family E: Pullback Shape": 0.02908203256661419,
+      "Family A: Current Regime Geometry": 0.08050711617741271,
+      "Family D: Regime Persistence": 0.04022462909210104
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1476.8823564052582,
+        "split": 35
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 772.8822821974754,
+        "split": 68
+      },
+      {
+        "feature": "atr_percentile_20d",
+        "family": "Family H: Volatility Context",
+        "gain": 708.0426522493362,
+        "split": 66
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 703.2346912622452,
+        "split": 85
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 623.5600609779358,
+        "split": 73
+      },
+      {
+        "feature": "atr_ratio_short_long",
+        "family": "Family H: Volatility Context",
+        "gain": 572.769339799881,
+        "split": 45
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 466.8714574575424,
+        "split": 53
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 445.76266288757324,
+        "split": 47
+      },
+      {
+        "feature": "regime_age_sec__tf_1m",
+        "family": "Family A: Current Regime Geometry",
+        "gain": 444.49287939071655,
+        "split": 56
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 441.91315150260925,
+        "split": 53
+      }
+    ]
+  },
+  "L3__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3473981053833396,
+      "Family G: External Price-Level Context": 0.030951646661922308,
+      "Family C: Cross-Regime Displacement": 0.1979738459716069,
+      "Other": 0.02436771067439505,
+      "Family I: Session Context": 0.10648776901479554,
+      "Family F: MTF Structural Alignment": 0.009028025388234821,
+      "Family B: Prior Regime Geometry": 0.1362204717968385,
+      "Family E: Pullback Shape": 0.02187995609485592,
+      "Family A: Current Regime Geometry": 0.09461430726184514,
+      "Family D: Regime Persistence": 0.031078161752166263
+    },
+    "top_10_features": [
+      {
+        "feature": "atr_ratio_short_long",
+        "family": "Family H: Volatility Context",
+        "gain": 1521.4291907325387,
+        "split": 47
+      },
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1087.3868445698172,
+        "split": 47
+      },
+      {
+        "feature": "regime_progress_efficiency__tf_1h",
+        "family": "Family A: Current Regime Geometry",
+        "gain": 1073.911829739809,
+        "split": 83
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1065.593612371944,
+        "split": 91
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1011.5742902010679,
+        "split": 25
+      },
+      {
+        "feature": "session_new_low_count",
+        "family": "Family I: Session Context",
+        "gain": 1002.9900628328323,
+        "split": 75
+      },
+      {
+        "feature": "prior_regime_range_reclaim_ratio__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 792.599041223526,
+        "split": 82
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 770.1320614814758,
+        "split": 57
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 680.5894659142941,
+        "split": 70
+      },
+      {
+        "feature": "atr_percentile_20d",
+        "family": "Family H: Volatility Context",
+        "gain": 592.8703982830048,
+        "split": 45
+      }
+    ]
+  },
+  "L3__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.28973775959490555,
+      "Family G: External Price-Level Context": 0.026466959928069165,
+      "Family C: Cross-Regime Displacement": 0.1836522109301534,
+      "Other": 0.04002417574984902,
+      "Family I: Session Context": 0.08586786092653785,
+      "Family F: MTF Structural Alignment": 0.015462207870458902,
+      "Family B: Prior Regime Geometry": 0.18663176313308216,
+      "Family E: Pullback Shape": 0.02401033140199223,
+      "Family A: Current Regime Geometry": 0.08784086558070953,
+      "Family D: Regime Persistence": 0.06030586488424217
+    },
+    "top_10_features": [
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 1327.6125221252441,
+        "split": 98
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1146.3554010391235,
+        "split": 21
+      },
+      {
+        "feature": "regime_new_extreme_count__tf_1m",
+        "family": "Family A: Current Regime Geometry",
+        "gain": 1045.1798467636108,
+        "split": 70
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 1023.0257987976074,
+        "split": 64
+      },
+      {
+        "feature": "atr_percentile_20d",
+        "family": "Family H: Volatility Context",
+        "gain": 1016.8110653087497,
+        "split": 50
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 990.6828342676163,
+        "split": 67
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 969.0180506706238,
+        "split": 59
+      },
+      {
+        "feature": "session_new_low_count",
+        "family": "Family I: Session Context",
+        "gain": 938.4394407272339,
+        "split": 52
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 934.2391934394836,
+        "split": 57
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 925.8083992004395,
+        "split": 47
+      }
+    ]
+  },
+  "S1__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3096666071606073,
+      "Family G: External Price-Level Context": 0.04616198876101472,
+      "Family C: Cross-Regime Displacement": 0.18472962744040825,
+      "Other": 0.016707399854022465,
+      "Family I: Session Context": 0.06800841346865308,
+      "Family F: MTF Structural Alignment": 0.015320591790069402,
+      "Family B: Prior Regime Geometry": 0.17186642104374375,
+      "Family E: Pullback Shape": 0.07931252133699537,
+      "Family A: Current Regime Geometry": 0.07096898588965483,
+      "Family D: Regime Persistence": 0.037257443254830845
+    },
+    "top_10_features": [
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 765.5476204156876,
+        "split": 76
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 645.1845812797546,
+        "split": 60
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 632.6369576454163,
+        "split": 44
+      },
+      {
+        "feature": "pullback_depth_vs_max_mfe_ratio",
+        "family": "Family E: Pullback Shape",
+        "gain": 549.4961433410645,
+        "split": 37
+      },
+      {
+        "feature": "nearest_context_level_below_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 521.8390209674835,
+        "split": 68
+      },
+      {
+        "feature": "regime_distance_from_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 500.0454533100128,
+        "split": 23
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 490.6600637435913,
+        "split": 57
+      },
+      {
+        "feature": "session_position_in_range",
+        "family": "Family I: Session Context",
+        "gain": 426.1555116176605,
+        "split": 47
+      },
+      {
+        "feature": "prior_regime_range_reclaim_ratio__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 399.6556234359741,
+        "split": 37
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 387.7385804653168,
+        "split": 49
+      }
+    ]
+  },
+  "S1__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.2982351862152181,
+      "Family G: External Price-Level Context": 0.037014665149371496,
+      "Family C: Cross-Regime Displacement": 0.20179164090684912,
+      "Other": 0.018697462401842443,
+      "Family I: Session Context": 0.07609647441387243,
+      "Family F: MTF Structural Alignment": 0.019028496883484868,
+      "Family B: Prior Regime Geometry": 0.19723475018386252,
+      "Family E: Pullback Shape": 0.06581924674339769,
+      "Family A: Current Regime Geometry": 0.04378302267729622,
+      "Family D: Regime Persistence": 0.04229905442480512
+    },
+    "top_10_features": [
+      {
+        "feature": "pullback_depth_vs_max_mfe_ratio",
+        "family": "Family E: Pullback Shape",
+        "gain": 748.7524251937866,
+        "split": 46
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 724.1661648750305,
+        "split": 81
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 624.9662997722626,
+        "split": 66
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 545.4311003684998,
+        "split": 56
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 529.7243695259094,
+        "split": 58
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 523.2143521308899,
+        "split": 52
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 518.0946793556213,
+        "split": 61
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 507.90401911735535,
+        "split": 64
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 497.99540162086487,
+        "split": 47
+      },
+      {
+        "feature": "prior_regime_range_reclaim_ratio__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 485.6024296283722,
+        "split": 50
+      }
+    ]
+  },
+  "S1__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.30178449692033993,
+      "Family G: External Price-Level Context": 0.037856822811053806,
+      "Family C: Cross-Regime Displacement": 0.20463143032382086,
+      "Other": 0.012268879460855033,
+      "Family I: Session Context": 0.06705104894156479,
+      "Family F: MTF Structural Alignment": 0.024950480139596914,
+      "Family B: Prior Regime Geometry": 0.2143880018298346,
+      "Family E: Pullback Shape": 0.032238313489796395,
+      "Family A: Current Regime Geometry": 0.05975533603566446,
+      "Family D: Regime Persistence": 0.045075190047473165
+    },
+    "top_10_features": [
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 914.0264122486115,
+        "split": 87
+      },
+      {
+        "feature": "regime_distance_from_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 873.9735779762268,
+        "split": 39
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 694.82177901268,
+        "split": 59
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 659.5833177566528,
+        "split": 68
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 608.6798119544983,
+        "split": 47
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 601.7340769767761,
+        "split": 56
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 595.2327876091003,
+        "split": 52
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 569.999409198761,
+        "split": 47
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 539.337301492691,
+        "split": 54
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 509.47063732147217,
+        "split": 52
+      }
+    ]
+  },
+  "S1__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.28345073357988204,
+      "Family G: External Price-Level Context": 0.056812323542243755,
+      "Family C: Cross-Regime Displacement": 0.2164807410413593,
+      "Other": 0.00807054396300673,
+      "Family I: Session Context": 0.06250413642734819,
+      "Family F: MTF Structural Alignment": 0.014291122887352466,
+      "Family B: Prior Regime Geometry": 0.2261588679906388,
+      "Family E: Pullback Shape": 0.025770305531091883,
+      "Family A: Current Regime Geometry": 0.050207775182702856,
+      "Family D: Regime Persistence": 0.05625344985437398
+    },
+    "top_10_features": [
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 1104.9158668518066,
+        "split": 84
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 822.7388436794281,
+        "split": 80
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 754.2776780128479,
+        "split": 64
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 734.5826468467712,
+        "split": 65
+      },
+      {
+        "feature": "prior_regime_range_reclaim_ratio__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 678.5800018310547,
+        "split": 55
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 675.6610682010651,
+        "split": 59
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 670.2212076187134,
+        "split": 71
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 617.724002957344,
+        "split": 58
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 615.2884366512299,
+        "split": 60
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 552.1587862968445,
+        "split": 46
+      }
+    ]
+  },
+  "S1__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.2970360950056608,
+      "Family G: External Price-Level Context": 0.04145981639362235,
+      "Family C: Cross-Regime Displacement": 0.19547263178665597,
+      "Other": 0.017722139214431495,
+      "Family I: Session Context": 0.06773328762330272,
+      "Family F: MTF Structural Alignment": 0.017216514148019915,
+      "Family B: Prior Regime Geometry": 0.20661990041849634,
+      "Family E: Pullback Shape": 0.05226092416841951,
+      "Family A: Current Regime Geometry": 0.06619532302439951,
+      "Family D: Regime Persistence": 0.03828336821699141
+    },
+    "top_10_features": [
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 922.2122092247009,
+        "split": 64
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 876.4095735549927,
+        "split": 72
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 853.8312449455261,
+        "split": 65
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 836.2528948783875,
+        "split": 72
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 833.6550431251526,
+        "split": 64
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 819.0098528862,
+        "split": 70
+      },
+      {
+        "feature": "regime_distance_from_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 754.1382851600647,
+        "split": 31
+      },
+      {
+        "feature": "prior_regime_range_reclaim_ratio__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 693.9238018989563,
+        "split": 56
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 651.4538683891296,
+        "split": 42
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 637.3485503196716,
+        "split": 43
+      }
+    ]
+  },
+  "S2__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.295483750516471,
+      "Family G: External Price-Level Context": 0.03951936490485611,
+      "Family C: Cross-Regime Displacement": 0.16335507944030217,
+      "Other": 0.04653718058819998,
+      "Family I: Session Context": 0.05627547559977817,
+      "Family F: MTF Structural Alignment": 0.019134757796156244,
+      "Family B: Prior Regime Geometry": 0.16861400068568344,
+      "Family E: Pullback Shape": 0.07290016043591115,
+      "Family A: Current Regime Geometry": 0.07996223157551935,
+      "Family D: Regime Persistence": 0.058217998457122375
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 706.9506437778473,
+        "split": 93
+      },
+      {
+        "feature": "pullback_depth_vs_max_mfe_ratio",
+        "family": "Family E: Pullback Shape",
+        "gain": 515.6703821122646,
+        "split": 43
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 480.494019985199,
+        "split": 43
+      },
+      {
+        "feature": "pullback_depth_atr",
+        "family": "Family E: Pullback Shape",
+        "gain": 428.1521170139313,
+        "split": 53
+      },
+      {
+        "feature": "realized_range_1m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 422.96171832084656,
+        "split": 49
+      },
+      {
+        "feature": "previous_max_depth_ratio",
+        "family": "Other",
+        "gain": 418.3407790660858,
+        "split": 50
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 366.29116716515273,
+        "split": 39
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_5m",
+        "family": "Family H: Volatility Context",
+        "gain": 346.6899802684784,
+        "split": 51
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 334.3279299736023,
+        "split": 58
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 328.63436222076416,
+        "split": 40
+      }
+    ]
+  },
+  "S2__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.27349232949418745,
+      "Family G: External Price-Level Context": 0.041609723418666686,
+      "Family C: Cross-Regime Displacement": 0.16353332932921577,
+      "Other": 0.035069886756792124,
+      "Family I: Session Context": 0.06648370964925338,
+      "Family F: MTF Structural Alignment": 0.023711726322579292,
+      "Family B: Prior Regime Geometry": 0.21738549797726472,
+      "Family E: Pullback Shape": 0.06185061515098882,
+      "Family A: Current Regime Geometry": 0.06928123329066266,
+      "Family D: Regime Persistence": 0.04758194861038907
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 811.9380791187286,
+        "split": 85
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 661.6539974212646,
+        "split": 70
+      },
+      {
+        "feature": "pullback_depth_vs_max_mfe_ratio",
+        "family": "Family E: Pullback Shape",
+        "gain": 542.4262909889221,
+        "split": 29
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 515.7531012296677,
+        "split": 53
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 508.7584822177887,
+        "split": 47
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 455.82077980041504,
+        "split": 42
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 452.87317752838135,
+        "split": 42
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 449.50075793266296,
+        "split": 31
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 359.1127893924713,
+        "split": 46
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 357.26627945899963,
+        "split": 49
+      }
+    ]
+  },
+  "S2__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.2958868098098807,
+      "Family G: External Price-Level Context": 0.045986881515422164,
+      "Family C: Cross-Regime Displacement": 0.1640388080043858,
+      "Other": 0.030354846207856633,
+      "Family I: Session Context": 0.06413349030545112,
+      "Family F: MTF Structural Alignment": 0.02062544789428277,
+      "Family B: Prior Regime Geometry": 0.22026773608270878,
+      "Family E: Pullback Shape": 0.03845794081254348,
+      "Family A: Current Regime Geometry": 0.06964632758115244,
+      "Family D: Regime Persistence": 0.05060171178631611
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 901.0359854698181,
+        "split": 88
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 665.7181916236877,
+        "split": 85
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 654.1407599449158,
+        "split": 53
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 612.9123311042786,
+        "split": 24
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 563.8887004852295,
+        "split": 61
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 538.2452709674835,
+        "split": 62
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 529.0949366092682,
+        "split": 55
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 518.7981576919556,
+        "split": 51
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 512.4168102741241,
+        "split": 51
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 488.2285590171814,
+        "split": 41
+      }
+    ]
+  },
+  "S2__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.30593143668016853,
+      "Family G: External Price-Level Context": 0.02473547521099808,
+      "Family C: Cross-Regime Displacement": 0.1507492290818545,
+      "Other": 0.03705565661576808,
+      "Family I: Session Context": 0.0887688556190386,
+      "Family F: MTF Structural Alignment": 0.007152678823133712,
+      "Family B: Prior Regime Geometry": 0.26334293446180845,
+      "Family E: Pullback Shape": 0.027925646413444784,
+      "Family A: Current Regime Geometry": 0.0541988121329986,
+      "Family D: Regime Persistence": 0.040139274960786606
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 1129.8235492706299,
+        "split": 41
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1109.286551475525,
+        "split": 107
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 821.3786408901215,
+        "split": 89
+      },
+      {
+        "feature": "regime_expansion_rate_atr_min__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 753.5489102602005,
+        "split": 69
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 717.003894329071,
+        "split": 59
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 674.2303117513657,
+        "split": 64
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 662.5384016036987,
+        "split": 69
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 627.5031976699829,
+        "split": 41
+      },
+      {
+        "feature": "session_new_low_count",
+        "family": "Family I: Session Context",
+        "gain": 561.0333580970764,
+        "split": 50
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_5m",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 556.3579344749451,
+        "split": 35
+      }
+    ]
+  },
+  "S2__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.27290781939258046,
+      "Family G: External Price-Level Context": 0.039238428638807665,
+      "Family C: Cross-Regime Displacement": 0.16297153868867317,
+      "Other": 0.03889856741367504,
+      "Family I: Session Context": 0.08312826612319742,
+      "Family F: MTF Structural Alignment": 0.01408263771603503,
+      "Family B: Prior Regime Geometry": 0.2204495014953232,
+      "Family E: Pullback Shape": 0.033616477505089726,
+      "Family A: Current Regime Geometry": 0.08375459306631136,
+      "Family D: Regime Persistence": 0.05095216996030695
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1854.5341815948486,
+        "split": 130
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 943.3604626655579,
+        "split": 80
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 896.3689250946045,
+        "split": 68
+      },
+      {
+        "feature": "realized_range_15m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 844.1118264198303,
+        "split": 29
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 747.2102494239807,
+        "split": 53
+      },
+      {
+        "feature": "context_level_span_atr",
+        "family": "Family G: External Price-Level Context",
+        "gain": 722.2238507270813,
+        "split": 59
+      },
+      {
+        "feature": "previous_pullbacks_max_depth_atr",
+        "family": "Other",
+        "gain": 719.3183221817017,
+        "split": 50
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 711.7043018341064,
+        "split": 43
+      },
+      {
+        "feature": "prior_regime_duration_sec__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 630.9097895622253,
+        "split": 53
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 626.259397983551,
+        "split": 45
+      }
+    ]
+  },
+  "S3__terminal_mfe_within_0p25a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.3134295150027832,
+      "Family G: External Price-Level Context": 0.03388680677516031,
+      "Family C: Cross-Regime Displacement": 0.19403222052182734,
+      "Other": 0.029295016776970665,
+      "Family I: Session Context": 0.09040632858333494,
+      "Family F: MTF Structural Alignment": 0.015220556819980002,
+      "Family B: Prior Regime Geometry": 0.1533523982293671,
+      "Family E: Pullback Shape": 0.05063618800137893,
+      "Family A: Current Regime Geometry": 0.06011814319853546,
+      "Family D: Regime Persistence": 0.05962282609066207
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 723.8258518576622,
+        "split": 47
+      },
+      {
+        "feature": "session_position_in_range",
+        "family": "Family I: Session Context",
+        "gain": 567.0951322317123,
+        "split": 50
+      },
+      {
+        "feature": "regime_time_since_mae_sec__tf_1m",
+        "family": "Family D: Regime Persistence",
+        "gain": 556.1014115810394,
+        "split": 79
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 437.25889134407043,
+        "split": 36
+      },
+      {
+        "feature": "prior_regime_max_mfe_atr__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 393.52775835990906,
+        "split": 42
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 392.5207986831665,
+        "split": 36
+      },
+      {
+        "feature": "current_regime_start_from_prior_mfe_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 346.7655303478241,
+        "split": 56
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 344.3430926799774,
+        "split": 40
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 342.7373411655426,
+        "split": 52
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 327.2319984436035,
+        "split": 55
+      }
+    ]
+  },
+  "S3__remaining_mfe_gte_0p5a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.313740850663373,
+      "Family G: External Price-Level Context": 0.024352229298245646,
+      "Family C: Cross-Regime Displacement": 0.20032608470787996,
+      "Other": 0.04674953059075103,
+      "Family I: Session Context": 0.08857298329946933,
+      "Family F: MTF Structural Alignment": 0.013602423787067417,
+      "Family B: Prior Regime Geometry": 0.14845595973764578,
+      "Family E: Pullback Shape": 0.030695717336721037,
+      "Family A: Current Regime Geometry": 0.07503126457947921,
+      "Family D: Regime Persistence": 0.058472955999367596
+    },
+    "top_10_features": [
+      {
+        "feature": "realized_range_5m_atr",
+        "family": "Family H: Volatility Context",
+        "gain": 805.6352417469025,
+        "split": 53
+      },
+      {
+        "feature": "regime_time_since_mae_sec__tf_1m",
+        "family": "Family D: Regime Persistence",
+        "gain": 733.0893065929413,
+        "split": 89
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 607.3988556861877,
+        "split": 20
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 561.1117010116577,
+        "split": 52
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 529.06689620018,
+        "split": 44
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 518.6214101314545,
+        "split": 53
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 471.4490497112274,
+        "split": 40
+      },
+      {
+        "feature": "session_position_in_range",
+        "family": "Family I: Session Context",
+        "gain": 441.8738226890564,
+        "split": 48
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 432.5163390636444,
+        "split": 39
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 420.39527916908264,
+        "split": 44
+      }
+    ]
+  },
+  "S3__remaining_mfe_gte_1p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.285192614220394,
+      "Family G: External Price-Level Context": 0.0286519394664836,
+      "Family C: Cross-Regime Displacement": 0.20278771004070292,
+      "Other": 0.04276126233704447,
+      "Family I: Session Context": 0.088290788163915,
+      "Family F: MTF Structural Alignment": 0.009688912240846306,
+      "Family B: Prior Regime Geometry": 0.1885589248877012,
+      "Family E: Pullback Shape": 0.02834366535103219,
+      "Family A: Current Regime Geometry": 0.07340937961490362,
+      "Family D: Regime Persistence": 0.05231480367697664
+    },
+    "top_10_features": [
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 984.9638590812683,
+        "split": 26
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 706.1862306594849,
+        "split": 69
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 664.3167910575867,
+        "split": 62
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 639.1317505836487,
+        "split": 41
+      },
+      {
+        "feature": "previous_pullbacks_max_depth_atr",
+        "family": "Other",
+        "gain": 612.8114776611328,
+        "split": 63
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 599.9603300094604,
+        "split": 53
+      },
+      {
+        "feature": "regime_age_sec__tf_1m",
+        "family": "Family A: Current Regime Geometry",
+        "gain": 574.6614212989807,
+        "split": 77
+      },
+      {
+        "feature": "regime_time_since_mfe_sec__tf_1h",
+        "family": "Family D: Regime Persistence",
+        "gain": 481.8464797735214,
+        "split": 57
+      },
+      {
+        "feature": "regime_total_range_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 472.6380310058594,
+        "split": 46
+      },
+      {
+        "feature": "session_new_low_count",
+        "family": "Family I: Session Context",
+        "gain": 458.81968879699707,
+        "split": 39
+      }
+    ]
+  },
+  "S3__remaining_mfe_gte_2p0a": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.25352020599465075,
+      "Family G: External Price-Level Context": 0.021578366660003553,
+      "Family C: Cross-Regime Displacement": 0.22178418123715685,
+      "Other": 0.03610231811595481,
+      "Family I: Session Context": 0.10613579240391556,
+      "Family F: MTF Structural Alignment": 0.010084414052422459,
+      "Family B: Prior Regime Geometry": 0.21181959304839748,
+      "Family E: Pullback Shape": 0.027598969778369297,
+      "Family A: Current Regime Geometry": 0.07124712099171078,
+      "Family D: Regime Persistence": 0.04012903771741845
+    },
+    "top_10_features": [
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 1224.2316374778748,
+        "split": 79
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 1062.863563105464,
+        "split": 82
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 980.4492001533508,
+        "split": 52
+      },
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 871.9007025640458,
+        "split": 81
+      },
+      {
+        "feature": "session_new_high_count",
+        "family": "Family I: Session Context",
+        "gain": 776.0708315372467,
+        "split": 69
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 695.8203392028809,
+        "split": 52
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 653.8998110294342,
+        "split": 57
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_30s",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 634.0208126306534,
+        "split": 59
+      },
+      {
+        "feature": "prior_regime_duration_sec__tf_5m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 581.1817123889923,
+        "split": 54
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_1h",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 578.6429591178894,
+        "split": 44
+      }
+    ]
+  },
+  "S3__remaining_mfe_continuous": {
+    "family_shares": {
+      "Family H: Volatility Context": 0.2813945768751344,
+      "Family G: External Price-Level Context": 0.02616626893350585,
+      "Family C: Cross-Regime Displacement": 0.1964576330201662,
+      "Other": 0.03238144879866512,
+      "Family I: Session Context": 0.10085243337603868,
+      "Family F: MTF Structural Alignment": 0.008113403359184,
+      "Family B: Prior Regime Geometry": 0.18778689214488528,
+      "Family E: Pullback Shape": 0.029065758779134837,
+      "Family A: Current Regime Geometry": 0.08222874878946411,
+      "Family D: Regime Persistence": 0.05555283592382152
+    },
+    "top_10_features": [
+      {
+        "feature": "minutes_from_rth_open",
+        "family": "Family I: Session Context",
+        "gain": 1645.1704769134521,
+        "split": 113
+      },
+      {
+        "feature": "regime_time_since_mae_sec__tf_1m",
+        "family": "Family D: Regime Persistence",
+        "gain": 1298.5848035812378,
+        "split": 94
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_1h",
+        "family": "Family H: Volatility Context",
+        "gain": 1092.7470917701721,
+        "split": 74
+      },
+      {
+        "feature": "regime_distance_from_mfe_atr__tf_30s",
+        "family": "Family H: Volatility Context",
+        "gain": 1034.6616809368134,
+        "split": 27
+      },
+      {
+        "feature": "session_current_range_atr",
+        "family": "Family I: Session Context",
+        "gain": 1000.762601852417,
+        "split": 57
+      },
+      {
+        "feature": "atr_change_rate",
+        "family": "Family H: Volatility Context",
+        "gain": 959.444902420044,
+        "split": 51
+      },
+      {
+        "feature": "prior_regime_range_overlap_ratio__tf_1m",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 927.8524103164673,
+        "split": 57
+      },
+      {
+        "feature": "regime_max_mae_atr__tf_1m",
+        "family": "Family H: Volatility Context",
+        "gain": 922.6936206817627,
+        "split": 63
+      },
+      {
+        "feature": "current_regime_start_from_prior_mae_atr__tf_30s",
+        "family": "Family C: Cross-Regime Displacement",
+        "gain": 870.2853932380676,
+        "split": 52
+      },
+      {
+        "feature": "prior_regime_max_mae_atr__tf_1h",
+        "family": "Family B: Prior Regime Geometry",
+        "gain": 802.3348127603531,
+        "split": 47
+      }
+    ]
+  }
+}

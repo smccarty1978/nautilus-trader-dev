@@ -1,0 +1,57 @@
+study_id: nq_h050_depth_progression
+description: Bounded Causal Audit and Deeper-Pullback Progression Observational Study for NQ H050 Counter-Regime Lineage
+status: COMPLETED
+lineage:
+  parent_study: studies/nq_h050_delayed_entry_fast_failure
+  baseline_models:
+    m4_runtime_recovery: studies/nq_h050_m4_runtime_recovery
+  historical_ledgers:
+    delayed_entry_ledger: studies/nq_h050_delayed_entry_fast_failure/results/delayed_entry_observation_ledger.parquet
+    checkpoint_target_ledger: studies/nq_h050_asymmetric_regime_exhaustion/results/checkpoint_target_ledger.parquet
+depth_levels:
+  - H050
+  - H075
+  - H100
+  - H125
+elapsed_time_horizons:
+  - T0
+  - T30
+  - T60
+  - T120
+  - T180
+  - T300
+fast_failure_horizons:
+  - +15s
+  - +30s
+  - +60s
+population:
+  dataset: TRAIN 2023-2024
+  unconditional_count: 21493
+  chronological_protocol:
+    fit_year: "2023 (N=10,605)"
+    validation_year: "2024 (N=10,888)"
+audits:
+  delayed_entry_fill_audit:
+    status: PASS
+    verdict: DELAYED_ENTRY_EXECUTION_AUDIT_PASS
+    artifact: results/delayed_entry_fill_audit.json
+  opportunity_cost_metric_audit:
+    status: PASS
+    verdict: OPPORTUNITY_COST_METRIC_AUDIT_PASS
+    artifact: results/opportunity_cost_metric_audit.json
+artifacts:
+  depth_progression_population_census: results/depth_progression_population_census.json
+  depth_checkpoint_feature_contract: results/depth_checkpoint_feature_contract.json
+  depth_checkpoint_target_summary: results/depth_checkpoint_target_summary.json
+  depth_model_metrics: results/depth_model_metrics.json
+  depth_entry_economics: results/depth_entry_economics.json
+  depth_opportunity_cost: results/depth_opportunity_cost.json
+  depth_winner_retention: results/depth_winner_retention.json
+  time_vs_depth_comparison: results/time_vs_depth_comparison.json
+  time_depth_surface: results/time_depth_surface.json
+  matched_same_time_depth_analysis: results/matched_same_time_depth_analysis.json
+  matched_same_depth_speed_analysis: results/matched_same_depth_speed_analysis.json
+  fast_failure_by_entry_type: results/fast_failure_by_entry_type.json
+  depth_progression_observation_ledger: results/depth_progression_observation_ledger.parquet
+  study_manifest: results/study_manifest.json
+  report: H050_DEPTH_PROGRESSION_REPORT.md

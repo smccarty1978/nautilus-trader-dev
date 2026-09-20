@@ -1,0 +1,25 @@
+study_id: nq_h050_mtf_regime_context_features
+description: Causal Multi-Timeframe Regime Context Feature Collection and Observational Study
+status: COMPLETED
+lineage:
+  parent_study: nq_h050_fat_tail_regime_position
+timeframes:
+  - 30s
+  - 1m
+  - 5m
+  - 1h
+population:
+  dataset: TRAIN 2023-2024
+  unconditional_count: 21493
+feature_surface:
+  total_materialized_features: 183
+  unique_canonical_features: 78
+artifacts:
+  surface_parquet: results/feature_surface_train.parquet
+  feature_contract_audit: results/feature_contract_audit.json
+  feature_registry_snapshot: results/feature_registry_snapshot.json
+  feature_missingness: results/feature_missingness.json
+  feature_redundancy_report: results/feature_redundancy_report.json
+  age_direction_cell_summary: results/age_direction_cell_summary.json
+  remaining_incumbent_expansion_summary: results/remaining_incumbent_expansion_summary.json
+  fat_tail_feature_summary: results/fat_tail_feature_summary.json

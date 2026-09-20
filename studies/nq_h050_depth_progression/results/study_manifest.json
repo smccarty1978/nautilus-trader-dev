@@ -1,0 +1,105 @@
+{
+  "study_id": "nq_h050_depth_progression",
+  "generated_utc": "2026-09-20 15:30:09 UTC",
+  "manifest_note": "Regenerated after the independent Phase A re-audit. delayed_entry_fill_audit.json, opportunity_cost_metric_audit.json and H050_DEPTH_PROGRESSION_REPORT.md were REPLACED; the versions the 2026-09-17 manifest was sealed against are preserved as the _superseded_* entries and hash to their original values.",
+  "superseded": {
+    "results/_superseded_delayed_entry_fill_audit.json": {
+      "original_verdict": "DELAYED_ENTRY_EXECUTION_AUDIT_PASS",
+      "now": "FAIL"
+    },
+    "_superseded_H050_DEPTH_PROGRESSION_REPORT.md": {
+      "sha256_in_2026_09_17_manifest": "a335b835833cf8d6453468e7de87426e719eff7e6b7ce5ce1ffc7320732138bf",
+      "restored_byte_identical": true
+    }
+  },
+  "artifacts": {
+    "study.yaml": {
+      "sha256": "fbf1c0022ff47e9c78778916566e2fcd67eba8c776b5922f619be0005512c1b1",
+      "size_bytes": 2266
+    },
+    "H050_DEPTH_PROGRESSION_REPORT.md": {
+      "sha256": "3c7491072bff1741f4f31aa39abd7472f423821f9a6d0978317d00ceb25c7b5b",
+      "size_bytes": 25057
+    },
+    "_superseded_H050_DEPTH_PROGRESSION_REPORT.md": {
+      "sha256": "a335b835833cf8d6453468e7de87426e719eff7e6b7ce5ce1ffc7320732138bf",
+      "size_bytes": 27201
+    },
+    "results/_fill_recheck.parquet": {
+      "sha256": "4457bd07f01c6ccccbbaa4305d878e42cd1d14bf01b567c1bc38826c9a2441fe",
+      "size_bytes": 2027003
+    },
+    "results/_superseded_delayed_entry_fill_audit.json": {
+      "sha256": "2d4a863586ee576d40401f22831accd2d7f88b5fdfc774b26386db8e3ee8efc2",
+      "size_bytes": 4850
+    },
+    "results/delayed_entry_fill_audit.json": {
+      "sha256": "aa02db62381c231407a9abf22a2fceca32bbb2da7cf55df8c5a4d16b6b7a9f60",
+      "size_bytes": 2832
+    },
+    "results/depth_checkpoint_feature_contract.json": {
+      "sha256": "41c7040ecee8f54cd680f09f4059602021a54e8f7972514e6f425b88e574c6d4",
+      "size_bytes": 7113
+    },
+    "results/depth_checkpoint_target_summary.json": {
+      "sha256": "ab1f22aa8b82375784737c289546bcb6472398f83632f3bad25697617b0d84bb",
+      "size_bytes": 965
+    },
+    "results/depth_entry_economics.json": {
+      "sha256": "c5f08b9a3b02e725405338099e179816d85ea96a3b52f17e567f8da415c6da6e",
+      "size_bytes": 1825
+    },
+    "results/depth_model_metrics.json": {
+      "sha256": "f13a06a8232157f9695ea80cc6875790a4fee870f81cd94f1eb03602a325820c",
+      "size_bytes": 2915
+    },
+    "results/depth_opportunity_cost.json": {
+      "sha256": "42163d06d3a9a7b22aadefba24ffcc7da4825724b43604e08546ae5354fce42c",
+      "size_bytes": 813
+    },
+    "results/depth_progression_observation_ledger.parquet": {
+      "sha256": "b41e94bea62a89eaf6e602fb1fe0b58952bc39691b3cab81a3472e998adcf83d",
+      "size_bytes": 43442042
+    },
+    "results/depth_progression_population_census.json": {
+      "sha256": "561f758942383aa3f5553025bfde4e269d177cbbf22d722f4620f0e9bff050c8",
+      "size_bytes": 1497
+    },
+    "results/depth_winner_retention.json": {
+      "sha256": "b33e6e60becbb05872c1ccb0a56e7a8c522372d147f2e4618b041518634db15a",
+      "size_bytes": 2003
+    },
+    "results/fast_failure_by_entry_type.json": {
+      "sha256": "086cf5a8969a0088d8d6ab7cfe0d0a48ea2fcca27ba2ef9428fe778af81fcb87",
+      "size_bytes": 632
+    },
+    "results/matched_same_depth_speed_analysis.json": {
+      "sha256": "314f95cbca28a97a0d114416659bdec81c6c7d398a24342ed27fa52893ee0802",
+      "size_bytes": 1183
+    },
+    "results/matched_same_time_depth_analysis.json": {
+      "sha256": "40e001ed31897698eb6e0e0469e857da54d72cffa7d159f67ece53e8ef177c3f",
+      "size_bytes": 2808
+    },
+    "results/opportunity_cost_metric_audit.json": {
+      "sha256": "ae53c968a388e09fbf8d7bc3ef9042e0f0dfc6f53df7ad5ebc73bec3b46a12c2",
+      "size_bytes": 3250
+    },
+    "results/parent_study_model_surface_audit.json": {
+      "sha256": "f6d42ec06fc4cc0c9ccd8040c06aa1db2b4d31c0a93c2e117673300b5a0d8f41",
+      "size_bytes": 5802
+    },
+    "results/time_depth_surface.json": {
+      "sha256": "239191b83008e5ac73eafff845748f19f18877cddbf8341098b9ecec9ee4532a",
+      "size_bytes": 4169
+    },
+    "results/time_depth_surface_construction_audit.json": {
+      "sha256": "85ec05de04bdf479d8a5525b53e3fefd0d1defe33f5972896de9c75b9b9a5d1f",
+      "size_bytes": 3112
+    },
+    "results/time_vs_depth_comparison.json": {
+      "sha256": "4abf8bdbab5ee2b64b615da22c6e54a7b87e9c87c61710cd57ff0d9a23dc0848",
+      "size_bytes": 1570
+    }
+  }
+}

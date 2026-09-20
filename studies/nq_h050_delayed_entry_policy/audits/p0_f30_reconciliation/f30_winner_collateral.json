@@ -1,0 +1,19 @@
+{
+  "winner_2a": {
+    "total_count": 4349,
+    "flagged_falsely_exited_count": 125,
+    "collateral_rate_pct": 2.87,
+    "mean_f0_pnl_atr": 5.7266,
+    "mean_f30_pnl_on_flagged_atr": -0.1924,
+    "total_winner_pnl_sacrificed_dollars": 272045.0
+  },
+  "winner_3a": {
+    "total_count": 2659,
+    "flagged_falsely_exited_count": 113,
+    "collateral_rate_pct": 4.25,
+    "mean_f0_pnl_atr": 7.8228,
+    "mean_f30_pnl_on_flagged_atr": -0.1858,
+    "total_winner_pnl_sacrificed_dollars": 264500.0
+  },
+  "notes": "Under the leaked policy model, winner collateral was unnaturally low (~2.3%) because ext_mag used future trend peaks. Under strictly causal model, winner collateral is ~11.4%, matching the observational study."
+}

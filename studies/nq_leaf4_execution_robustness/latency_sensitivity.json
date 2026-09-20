@@ -1,0 +1,107 @@
+{
+  "grid": {
+    "L0_baseline": {
+      "mean_net_atr": 0.4806,
+      "net_dollars_per_trade": 54.11,
+      "profit_factor": 1.3201,
+      "win_rate": 0.4787,
+      "max_dd_atr": 68.91,
+      "top_1pct_pnl_retained_pct": 100.02,
+      "ex_top_1pct_ev_atr": 0.1675,
+      "entry_drag_atr": -0.0052,
+      "exit_drag_atr": -0.0026
+    },
+    "L1_entry_plus1s": {
+      "mean_net_atr": 0.4797,
+      "net_dollars_per_trade": 54.14,
+      "profit_factor": 1.3199,
+      "win_rate": 0.4829,
+      "max_dd_atr": 68.46,
+      "top_1pct_pnl_retained_pct": 99.95,
+      "ex_top_1pct_ev_atr": 0.1669,
+      "entry_drag_atr": -0.0043,
+      "exit_drag_atr": -0.0026
+    },
+    "L2_entry_plus2s": {
+      "mean_net_atr": 0.4844,
+      "net_dollars_per_trade": 54.95,
+      "profit_factor": 1.3252,
+      "win_rate": 0.4808,
+      "max_dd_atr": 69.12,
+      "top_1pct_pnl_retained_pct": 100.05,
+      "ex_top_1pct_ev_atr": 0.1711,
+      "entry_drag_atr": -0.009,
+      "exit_drag_atr": -0.0026
+    },
+    "L5_entry_plus5s": {
+      "mean_net_atr": 0.484,
+      "net_dollars_per_trade": 55.07,
+      "profit_factor": 1.3271,
+      "win_rate": 0.4891,
+      "max_dd_atr": 69.5,
+      "top_1pct_pnl_retained_pct": 99.98,
+      "ex_top_1pct_ev_atr": 0.1708,
+      "entry_drag_atr": -0.0086,
+      "exit_drag_atr": -0.0026
+    },
+    "L1_exit_plus1s": {
+      "mean_net_atr": 0.4863,
+      "net_dollars_per_trade": 54.98,
+      "profit_factor": 1.3234,
+      "win_rate": 0.486,
+      "max_dd_atr": 67.29,
+      "top_1pct_pnl_retained_pct": 100.51,
+      "ex_top_1pct_ev_atr": 0.1717,
+      "entry_drag_atr": -0.0052,
+      "exit_drag_atr": -0.0083
+    },
+    "L2_exit_plus2s": {
+      "mean_net_atr": 0.4935,
+      "net_dollars_per_trade": 56.28,
+      "profit_factor": 1.3318,
+      "win_rate": 0.486,
+      "max_dd_atr": 67.06,
+      "top_1pct_pnl_retained_pct": 100.89,
+      "ex_top_1pct_ev_atr": 0.178,
+      "entry_drag_atr": -0.0052,
+      "exit_drag_atr": -0.0155
+    },
+    "L5_exit_plus5s": {
+      "mean_net_atr": 0.5069,
+      "net_dollars_per_trade": 58.34,
+      "profit_factor": 1.3448,
+      "win_rate": 0.4933,
+      "max_dd_atr": 67.96,
+      "top_1pct_pnl_retained_pct": 101.17,
+      "ex_top_1pct_ev_atr": 0.1906,
+      "entry_drag_atr": -0.0052,
+      "exit_drag_atr": -0.0289
+    },
+    "Combined_plus1s": {
+      "mean_net_atr": 0.4854,
+      "net_dollars_per_trade": 55.01,
+      "profit_factor": 1.3231,
+      "win_rate": 0.4912,
+      "max_dd_atr": 66.85,
+      "top_1pct_pnl_retained_pct": 100.44,
+      "ex_top_1pct_ev_atr": 0.1711,
+      "entry_drag_atr": -0.0043,
+      "exit_drag_atr": -0.0083
+    },
+    "Combined_plus2s": {
+      "mean_net_atr": 0.4973,
+      "net_dollars_per_trade": 57.12,
+      "profit_factor": 1.337,
+      "win_rate": 0.4891,
+      "max_dd_atr": 67.27,
+      "top_1pct_pnl_retained_pct": 100.91,
+      "ex_top_1pct_ev_atr": 0.1817,
+      "entry_drag_atr": -0.009,
+      "exit_drag_atr": -0.0155
+    }
+  },
+  "entry_decay_atr_per_sec": -0.0007,
+  "exit_decay_atr_per_sec": -0.0053,
+  "entry_sensitivity_verdict": "LOW",
+  "exit_sensitivity_verdict": "LOW"
+}

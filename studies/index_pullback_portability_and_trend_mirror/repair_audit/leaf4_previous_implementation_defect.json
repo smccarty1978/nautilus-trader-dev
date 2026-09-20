@@ -1,0 +1,39 @@
+{
+  "defect_id": "LEAF4_ES_YM_C1_LOOP_TERMINATION_DEFECT",
+  "affected_artifacts": [
+    "branch_a_leaf4_portability/es_h050_observations.parquet",
+    "branch_a_leaf4_portability/ym_h050_observations.parquet",
+    "branch_a_leaf4_portability/leaf4_es_results.json",
+    "branch_a_leaf4_portability/leaf4_ym_results.json",
+    "branch_a_leaf4_portability/leaf4_portfolio_results.json",
+    "INDEX_PULLBACK_PORTABILITY_AND_TREND_MIRROR_REPORT.md (Branch A)"
+  ],
+  "revoked_verdicts": {
+    "LEAF4_ES_PORTABILITY": "REVOKED (was NOT_FOUND -> UNRESOLVED)",
+    "LEAF4_YM_PORTABILITY": "REVOKED (was NOT_FOUND -> UNRESOLVED)",
+    "LEAF4_CROSS_INSTRUMENT_STATE": "REVOKED (was NQ_SPECIFIC -> UNRESOLVED)",
+    "LEAF4_WORTH_EXECUTABLE_VALIDATION": "REVOKED (was NO -> UNRESOLVED)",
+    "LEAF4_CROSS_INSTRUMENT_PARITY": "FAIL_PENDING_REPAIR"
+  },
+  "critical_code_defect": {
+    "file": "scratch/run_cross_instrument_leaf4.py",
+    "lines": "273-281",
+    "snippet": "for next_ck in year_ck_list[idx_ck+1:]:\n    if next_ck['checkpoint_ts'] > reg_exit:\n        break\n    if next_ck['direction'] == -d:\n        opposing_ts = next_ck['checkpoint_ts']\n        break\nexit_target_ts = opposing_ts if opposing_ts is not None else reg_exit",
+    "semantic_explanation": "During the incumbent regime R0 (which terminates at reg_exit), all checkpoints possess the incumbent direction d. An opposing checkpoint H050_1 carries direction -d and occurs strictly during regime R1 (after reg_exit). The loop condition 'if next_ck['checkpoint_ts'] > reg_exit: break' terminated the search before R1 was ever reached. Consequently, opposing_ts was ALWAYS None (0/69,394 on ES; 0/73,200 on YM). The fallback 'exit_target_ts = reg_exit' therefore forced every trade to exit at the very first bar of R1 confirmation rather than participating in the canonical C1 lifecycle (which holds through R1 until the first opposing giveback or R2 flip)."
+  },
+  "secondary_defects": [
+    {
+      "defect": "realized_range_15m_atr denominator divergence",
+      "code": "realized_range_15m_atr = cur_1m_r15 / cur_1m_atr",
+      "canonical": "realized_range_15m_atr = cur_1m_r15 / frozen_atr (regime starting ATR)",
+      "impact": "Alters feature scaling against the frozen threshold 9.344128."
+    },
+    {
+      "defect": "Inline bespoke reconstruction rather than governed canonical provider resolution",
+      "code": "scratch/run_cross_instrument_leaf4.py",
+      "canonical": "Feature System V2 canonical resolution and governed lifecycle provider",
+      "impact": "Violates workflow rule A3 prohibiting bespoke script implementations of core primitives."
+    }
+  ],
+  "audit_verdict": "LEAF4_PREVIOUS_CROSS_INSTRUMENT_IMPLEMENTATION = INVALID"
+}

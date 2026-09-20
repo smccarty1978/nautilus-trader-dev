@@ -1,0 +1,17 @@
+{
+  "provider": "features/providers/causal_fast_failure.py::CausalFastFailureProvider",
+  "features": [
+    "post_entry_adverse_excursion_atr",
+    "post_entry_favorable_excursion_atr",
+    "post_entry_mfe_mae_ratio",
+    "has_new_incumbent_extreme_post_entry",
+    "magnitude_new_incumbent_extreme_post_entry",
+    "incumbent_bars_count_post_entry",
+    "counter_bars_count_post_entry"
+  ],
+  "observation_horizons_sec": [
+    30,
+    60
+  ],
+  "causality_guarantee": "Strict observation timestamp cutoff; zero post-observation bar queries; causal running peak."
+}

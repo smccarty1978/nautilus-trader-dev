@@ -1,0 +1,29 @@
+{
+  "study_id": "nq_h050_six_model_remaining_mfe",
+  "description": "Bounded Six-Model Remaining MFE & Terminal Exhaustion Training Study",
+  "parent_surface": "studies/nq_h050_mtf_regime_context_features/results/feature_surface_train.parquet",
+  "benchmarks_evaluated": [
+    "Benchmark_A_Pooled",
+    "Benchmark_B_Directional",
+    "Benchmark_C_Six_Cell"
+  ],
+  "cells": [
+    "L1",
+    "L2",
+    "L3",
+    "S1",
+    "S2",
+    "S3"
+  ],
+  "heads": [
+    "terminal_mfe_within_0p25a",
+    "remaining_mfe_gte_0p5a",
+    "remaining_mfe_gte_1p0a",
+    "remaining_mfe_gte_2p0a",
+    "remaining_mfe_continuous"
+  ],
+  "total_models_persisted": 45,
+  "total_features": 163,
+  "validation_protocol": "2023 Fit (N=10,605), 2024 Validation (N=10,888)",
+  "persistence_protocol": "Refit on full 2023-2024 TRAIN (N=21,493)"
+}

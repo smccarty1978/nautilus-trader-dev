@@ -1,0 +1,29 @@
+{
+  "contract_name": "NQ_LEAF4_EXECUTION_ROBUSTNESS_CONTRACT",
+  "strategy_rules": {
+    "condition_1": "minutes_from_rth_open <= 380.649994",
+    "condition_2": "realized_range_15m_atr <= 9.344128",
+    "condition_3": "current_price_from_prior_mfe_atr__tf_1m <= 1.738367"
+  },
+  "canonical_lifecycle": "C1 (counter-regime entry at H050_0 -> first opposing H050_1 in R1 -> R2 fallback)",
+  "position_size": "1 NQ contract",
+  "transaction_costs": {
+    "commission_per_side_dollars": 2.5,
+    "commission_round_trip_dollars": 5.0,
+    "slippage_per_side_ticks": 1.0,
+    "slippage_per_side_points": 0.25,
+    "slippage_per_side_dollars": 5.0,
+    "total_round_trip_slippage_points": 0.5,
+    "total_round_trip_slippage_dollars": 10.0,
+    "total_round_trip_friction_points": 0.75,
+    "total_round_trip_friction_dollars": 15.0,
+    "tick_size": 0.25,
+    "point_value": 20.0,
+    "rounding_decimals": 2
+  },
+  "data_catalogs": {
+    "1s_bars": "data/raw/NQ_v0_1s_{year}.parquet",
+    "mbp1_quotes": "data/raw/legacy_c0/NQ_mbp1_2025_Q1.parquet"
+  },
+  "verdict_execution_cost_contract": "PASS"
+}

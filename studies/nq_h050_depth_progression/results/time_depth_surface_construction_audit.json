@@ -1,0 +1,33 @@
+{
+  "audit_verdict": "TIME_DEPTH_SURFACE_CONSTRUCTION_FAIL",
+  "artifact_audited": "results/time_depth_surface.json",
+  "spec_clause": "§17: time buckets x CURRENT pullback depth buckets, 'At the same elapsed time, does deeper pullback evidence materially change the outcome distribution?'",
+
+  "defect_1_depth_axis_is_the_checkpoint_target_not_observed_depth": {
+    "code": "scripts/run_depth_progression_study.py:735 -- sub = df_depth[... & (df_depth['depth_target_atr'] >= d_min) & (df_depth['depth_target_atr'] < d_max)]",
+    "consequence": "depth_target_atr takes exactly four values (0.50, 0.75, 1.00, 1.25) because it is the checkpoint's THRESHOLD, not the pullback depth observed at that moment. The 'depth' axis is therefore checkpoint identity relabelled, and within any cell every row has identical depth by construction.",
+    "evidence": [
+      "the 0.625-0.75A column is empty in every time bucket (no checkpoint targets 0.625)",
+      "the 0.50-0.625A column contains exactly 21,493 rows, i.e. the entire H050 population, all in the 0-30s bucket because H050 is at t=0 by definition",
+      "the 0.75-1.00A column is exactly the H075 rows; the >1.00A column is H100 plus H125"
+    ]
+  },
+
+  "defect_2_double_counting": {
+    "consequence": "df_depth stacks all four checkpoints, so one H050 event contributes up to four rows and cells are not disjoint.",
+    "verified_example": "cell 0-30s x >1.00A reports N=9552; the ledger shows this is 6,412 H100 rows plus 3,140 H125 rows, and those 3,140 H125 rows are the SAME underlying events already counted at H100.",
+    "ledger_total_rows": 85390,
+    "unique_underlying_h050_events": 21493
+  },
+
+  "defect_3_the_question_is_unanswerable_as_built": {
+    "statement": "Because depth is pinned and checkpoint identity is confounded with it, the surface cannot separate 'deeper at the same elapsed time' from 'a different checkpoint'. Comparing the 30-60s H075 cell (n=3,234) with the 30-60s H100 cell (n=3,753) is not a matched comparison: those are largely different events, and an event that reached 1.00A in 30-60s travelled twice as fast as one that reached 0.75A in the same window, so depth and traversal speed are perfectly entangled."
+  },
+
+  "consequence_for_prior_conclusions": {
+    "superseded_claim": "The superseded report identified cell (120-180s x 0.75-1.00A) as a 'sweet spot' with mean C1 PnL +0.0748 ATR and used it to support HYBRID_RULE_POTENTIAL = RECOMMENDED.",
+    "why_it_does_not_hold": "That cell is simply 'H075 reached slowly', n=1,265 of 21,493 (5.9%), selected as the maximum of ten populated cells with no multiplicity control, on a mean whose sign is set by a small number of tail observations. It is a post-hoc maximum, not a finding."
+  },
+
+  "what_would_answer_the_question": "Sample the observed pullback depth at each FIXED time checkpoint (the delayed-entry ledger already carries current_pullback_depth_atr at T30/T60/T120/T180/T300) and bucket on that. This needs no new collection. It is NOT done here because it would cross into selecting an entry condition, which the mandatory stop (§30) forbids."
+}

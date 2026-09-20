@@ -1,0 +1,56 @@
+{
+  "lifecycle_name": "C1_OPPOSING_H050_WITH_R2_FALLBACK",
+  "description": "Counter-regime trade lifecycle entering at H050_0 giveback and exiting at the first opposing giveback in the favorable regime, or falling back to terminal regime transition.",
+  "phases": [
+    {
+      "phase": "ENTRY",
+      "trigger": "H050_0 checkpoint: First passage where giveback from running maxMFE in incumbent regime R0 reaches >= 0.50 ATR.",
+      "trade_direction": "Counter-direction C = -D0 (where D0 is R0 regime direction).",
+      "entry_execution": "Next 1s bar open price (ts_init + 1s)."
+    },
+    {
+      "phase": "CONFIRMATION",
+      "event": "R1 confirmation: Incumbent regime R0 terminates at r0_end_ts and transitions to regime R1 (direction D1 = C).",
+      "holding_policy": "Position held through confirmation into R1."
+    },
+    {
+      "phase": "ACTIVE_EXIT_CANDIDATE",
+      "candidate": "H050_1 opposing checkpoint: The first causal H050 checkpoint emitted during regime R1 (giveback >= 0.50 ATR from R1 running maxMFE).",
+      "temporal_scope": "Must occur between r1_start_ts and r1_end_ts with direction D1 = C.",
+      "exit_execution": "Next 1s bar open price following h050_1_ts. c1_exit_source = 'H050_1'."
+    },
+    {
+      "phase": "DETERMINISTIC_FALLBACK",
+      "condition": "If regime R1 terminates without emitting an H050 checkpoint (r1_end_ts reached without H050_1).",
+      "fallback_exit": "R2 confirmed flip: Exit at r1_end_ts / r2_start_ts upon confirmed opposite regime transition.",
+      "exit_execution": "Next 1s bar open price following r1_end_ts. c1_exit_source = 'R2_FALLBACK'."
+    }
+  ],
+  "exit_selection_order": "1. First causal H050_1 in R1 if present; 2. R2 flip exit at r1_end_ts if H050_1 absent.",
+  "execution_friction_model": {
+    "NQ": {
+      "tick_size": 0.25,
+      "point_value": 20.0,
+      "commission_rt": 5.0,
+      "slippage_ticks_rt": 2,
+      "total_friction_pts": 0.75,
+      "total_friction_dollars": 15.0
+    },
+    "ES": {
+      "tick_size": 0.25,
+      "point_value": 50.0,
+      "commission_rt": 5.0,
+      "slippage_ticks_rt": 2,
+      "total_friction_pts": 0.6,
+      "total_friction_dollars": 30.0
+    },
+    "YM": {
+      "tick_size": 1.0,
+      "point_value": 5.0,
+      "commission_rt": 5.0,
+      "slippage_ticks_rt": 2,
+      "total_friction_pts": 3.0,
+      "total_friction_dollars": 15.0
+    }
+  }
+}

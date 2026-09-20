@@ -1,0 +1,23 @@
+audit_id: p0_f30_reconciliation
+study_id: nq_h050_delayed_entry_policy
+timestamp: "2026-09-17 16:45:29 UTC"
+target_policy: P0_F30
+baseline_policy: P0_F0
+root_cause_verdict: F30_CAUSALITY_LEAKAGE
+promotion_status: BLOCKED_PENDING_FIX
+
+verdicts:
+  f30_threshold_provenance: F30_THRESHOLD_PROVENANCE_PASS
+  f30_expectancy_accounting: F30_EXPECTANCY_ACCOUNTING_PASS
+  f30_catastrophic_accounting: F30_CATASTROPHIC_ACCOUNTING_PASS
+  f30_execution_causality: F30_EXECUTION_CAUSALITY_PASS
+  f30_model_causality: F30_MODEL_CAUSALITY_FAIL
+  f30_population_reconciliation: F30_POPULATION_RECONCILIATION_PASS
+  f30_units_and_costs: F30_UNITS_AND_COSTS_PASS
+  f30_counterfactual_match: F30_COUNTERFACTUAL_MATCH_PASS
+
+primary_defect:
+  classification: LOOKAHEAD_FEATURE_LEAKAGE
+  location: "scripts/run_delayed_entry_policy_study.py:177-183, 367-375"
+  mechanism: "cur_peak iterated through idx_reg_end (terminal regime peak) and leaked into magnitude_new_incumbent_extreme_post_entry"
+  remedy_required: "Recalculate running peak strictly causally up to decision bar (idx_ff_dec) and retrain fast-failure model"

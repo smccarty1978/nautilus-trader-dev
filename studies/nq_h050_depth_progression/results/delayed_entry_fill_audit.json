@@ -1,0 +1,58 @@
+{
+ "audit_verdict": "DELAYED_ENTRY_EXECUTION_AUDIT_FAIL",
+ "auditor_note": "This artifact SUPERSEDES the earlier self-certified PASS (kept as _superseded_delayed_entry_fill_audit.json). The earlier audit measured the gap between the decision close and the next bar open but never checked which price the study's economics actually used.",
+ "empirical_verification": {
+  "ledger_entry_price_equals_checkpoint_bar_close_pct": 100.0,
+  "max_decision_to_fill_latency_sec": 33.0,
+  "method": "recomputed the first executable price (open of bar idx_ck+1) from data/raw/NQ_v0_1s_{2023,2024}.parquet for EVERY ledger row and compared with the stored entry_price",
+  "per_horizon_reported_vs_corrected_mean_c1_net_atr": {
+   "T0": [
+    -0.1683,
+    -0.1667
+   ],
+   "T120": [
+    -0.176,
+    -0.1763
+   ],
+   "T180": [
+    -0.1828,
+    -0.183
+   ],
+   "T30": [
+    -0.1638,
+    -0.1637
+   ],
+   "T300": [
+    -0.198,
+    -0.1981
+   ],
+   "T60": [
+    -0.1773,
+    -0.1777
+   ]
+  },
+  "rows_checked": 121086,
+  "signed_pnl_correction_if_filled_executably_atr": {
+   "mean": 0.00013,
+   "median": 0.0,
+   "p25": -0.02809,
+   "p75": 0.02813,
+   "share_worse_off": 0.364
+  }
+ },
+ "materiality": "The violation is unambiguous but its ECONOMIC bias is negligible: at 1s resolution the close-to-next-open step on NQ is symmetric (mean +0.00013 ATR, median exactly 0). It adds variance, not bias. The previously reported delayed-entry economics and AUCs are therefore NOT materially inflated by this defect, but they are not executable as stated and must be recomputed on the executable fill before any policy use.",
+ "phase_b_contrast": "scripts/run_depth_progression_study.py DOES implement the contract correctly: idx_fill = idx_d + 1; entry_fill_px = opens_1s[idx_fill]. The depth study's economics are executable.",
+ "secondary_finding": "the superseded artifact claims sampled_records_audited=200 but persists only 10 sample rows, so its headline statistics were not reproducible from the artifact itself",
+ "status": "FAIL",
+ "what_the_code_does": {
+  "consequence": "the entry fill IS the close of the decision bar, i.e. decision and fill occur at the same instant and the same price; opens_1s is loaded in the script but never used for the fill",
+  "file": "scripts/run_delayed_entry_fast_failure_study.py",
+  "lines": "ts_1s_arr = df_1s.index + 1e9 (close stamps); idx_ck = searchsorted(ts_1s_arr, ck_ts); ck_price = closes_1s[idx_ck]",
+  "pnl": "c1_pnl_pts = counter_direction * (c1_exit_px - ck_price) - 0.75"
+ },
+ "what_the_contract_requires": {
+  "decision_state": "frozen at the completed 1s bar whose close is at/after the checkpoint instant",
+  "explicit_prohibition": "the checkpoint close must NOT be treated as an executable fill",
+  "fill": "the FIRST causally executable price AFTER that decision instant (next bar open)"
+ }
+}

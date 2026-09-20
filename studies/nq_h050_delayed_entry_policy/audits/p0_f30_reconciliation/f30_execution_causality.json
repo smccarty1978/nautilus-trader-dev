@@ -1,0 +1,15 @@
+{
+  "verdict": "F30_EXECUTION_CAUSALITY_PASS",
+  "order_routing_delay_seconds": 1.0,
+  "observation_timestamp_formula": "fill_ts + 30s",
+  "decision_timestamp_formula": "fill_ts + 30s",
+  "fill_timestamp_formula": "fill_ts + 31s (next 1s bar open)",
+  "minimum_lag_seconds": 1.0,
+  "median_lag_seconds": 1.0,
+  "maximum_lag_seconds": 1.0,
+  "invalid_temporal_orderings_count": 0,
+  "price_source_mismatches_count": 0,
+  "same_bar_close_as_fill_count": 0,
+  "future_high_low_used_as_fill_count": 0,
+  "notes": "Execution simulation correctly used next 1-second bar open for both entry and fast-failure exit fills. No temporal execution lag defect found."
+}

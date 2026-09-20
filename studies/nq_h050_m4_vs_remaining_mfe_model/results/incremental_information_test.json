@@ -1,0 +1,194 @@
+{
+  "terminal_mfe_within_0p25a": {
+    "2024_validation": {
+      "model_X_m4_only": {
+        "roc_auc": 0.6234489415460376,
+        "pr_auc": 0.4172883109358386,
+        "brier_score": 0.20353215912658745,
+        "prevalence": 0.30547391623806025
+      },
+      "model_Y_new_model_only": {
+        "roc_auc": 0.5722152872791976,
+        "pr_auc": 0.3627280113685082,
+        "brier_score": 0.26419343964526465,
+        "prevalence": 0.30547391623806025
+      },
+      "model_Z_both": {
+        "roc_auc": 0.5374600237952748,
+        "pr_auc": 0.33750928505991035,
+        "brier_score": 0.2833261516981057,
+        "prevalence": 0.30547391623806025
+      },
+      "delta_auc_z_minus_x": -0.08598891775076278,
+      "delta_auc_z_minus_y": -0.03475526348392277,
+      "verdict": "MOSTLY_DUPLICATES_M4"
+    },
+    "2025_q1_forward": {
+      "model_X_m4_only": {
+        "roc_auc": 0.5958443240697127,
+        "pr_auc": 0.39092085545466304,
+        "brier_score": 0.21273207967666546,
+        "prevalence": 0.3187448389760528
+      },
+      "model_Y_new_model_only": {
+        "roc_auc": 0.5919751923378866,
+        "pr_auc": 0.40174122105556964,
+        "brier_score": 0.24840382090106108,
+        "prevalence": 0.3187448389760528
+      },
+      "model_Z_both": {
+        "roc_auc": 0.5705715182917256,
+        "pr_auc": 0.3891640487318644,
+        "brier_score": 0.2553996649676793,
+        "prevalence": 0.3187448389760528
+      },
+      "delta_auc_z_minus_x": -0.025272805777987073,
+      "delta_auc_z_minus_y": -0.02140367404616106,
+      "verdict": "MOSTLY_DUPLICATES_M4"
+    }
+  },
+  "remaining_mfe_gte_0p5a": {
+    "2024_validation": {
+      "model_X_m4_only": {
+        "roc_auc": 0.6317857581981162,
+        "pr_auc": 0.7269340140985867,
+        "brier_score": 0.22378553855095382,
+        "prevalence": 0.6180198383541513
+      },
+      "model_Y_new_model_only": {
+        "roc_auc": 0.5655803021741904,
+        "pr_auc": 0.673276507709947,
+        "brier_score": 0.29567996775100674,
+        "prevalence": 0.6180198383541513
+      },
+      "model_Z_both": {
+        "roc_auc": 0.5296730558458504,
+        "pr_auc": 0.6374838365509081,
+        "brier_score": 0.31999020018163676,
+        "prevalence": 0.6180198383541513
+      },
+      "delta_auc_z_minus_x": -0.10211270235226577,
+      "delta_auc_z_minus_y": -0.03590724632833997,
+      "verdict": "MOSTLY_DUPLICATES_M4"
+    },
+    "2025_q1_forward": {
+      "model_X_m4_only": {
+        "roc_auc": 0.6011463154045888,
+        "pr_auc": 0.6983246400867823,
+        "brier_score": 0.2323681744708,
+        "prevalence": 0.6040462427745664
+      },
+      "model_Y_new_model_only": {
+        "roc_auc": 0.5959279181934359,
+        "pr_auc": 0.6823844711530753,
+        "brier_score": 0.26818405232519227,
+        "prevalence": 0.6040462427745664
+      },
+      "model_Z_both": {
+        "roc_auc": 0.5738212723010484,
+        "pr_auc": 0.6574389856375059,
+        "brier_score": 0.2774767850906763,
+        "prevalence": 0.6040462427745664
+      },
+      "delta_auc_z_minus_x": -0.027325043103540447,
+      "delta_auc_z_minus_y": -0.022106645892387533,
+      "verdict": "MOSTLY_DUPLICATES_M4"
+    }
+  },
+  "remaining_mfe_gte_1p0a": {
+    "2024_validation": {
+      "model_X_m4_only": {
+        "roc_auc": 0.6346066562070083,
+        "pr_auc": 0.6298616396982526,
+        "brier_score": 0.2353269775537832,
+        "prevalence": 0.4966017634092579
+      },
+      "model_Y_new_model_only": {
+        "roc_auc": 0.5612403923947709,
+        "pr_auc": 0.5605925514452903,
+        "brier_score": 0.31104948899149126,
+        "prevalence": 0.4966017634092579
+      },
+      "model_Z_both": {
+        "roc_auc": 0.5282318152926496,
+        "pr_auc": 0.5252575708353322,
+        "brier_score": 0.3330055569855471,
+        "prevalence": 0.4966017634092579
+      },
+      "delta_auc_z_minus_x": -0.10637484091435867,
+      "delta_auc_z_minus_y": -0.03300857710212124,
+      "verdict": "MOSTLY_DUPLICATES_M4"
+    },
+    "2025_q1_forward": {
+      "model_X_m4_only": {
+        "roc_auc": 0.6077031598086752,
+        "pr_auc": 0.5996895344584019,
+        "brier_score": 0.2408842422159703,
+        "prevalence": 0.4847233691164327
+      },
+      "model_Y_new_model_only": {
+        "roc_auc": 0.6037462324728082,
+        "pr_auc": 0.5839150445611155,
+        "brier_score": 0.27755819552988764,
+        "prevalence": 0.4847233691164327
+      },
+      "model_Z_both": {
+        "roc_auc": 0.5842445015943738,
+        "pr_auc": 0.558295096552977,
+        "brier_score": 0.2861991246679495,
+        "prevalence": 0.4847233691164327
+      },
+      "delta_auc_z_minus_x": -0.023458658214301376,
+      "delta_auc_z_minus_y": -0.01950173087843443,
+      "verdict": "MOSTLY_DUPLICATES_M4"
+    }
+  },
+  "remaining_mfe_gte_2p0a": {
+    "2024_validation": {
+      "model_X_m4_only": {
+        "roc_auc": 0.6495672226072859,
+        "pr_auc": 0.48697302827792033,
+        "brier_score": 0.20649386072820822,
+        "prevalence": 0.3304555473916238
+      },
+      "model_Y_new_model_only": {
+        "roc_auc": 0.5436666727666872,
+        "pr_auc": 0.37531004171024507,
+        "brier_score": 0.28049750139671553,
+        "prevalence": 0.3304555473916238
+      },
+      "model_Z_both": {
+        "roc_auc": 0.4991980760535308,
+        "pr_auc": 0.3376409743791434,
+        "brier_score": 0.30099089084891156,
+        "prevalence": 0.3304555473916238
+      },
+      "delta_auc_z_minus_x": -0.15036914655375516,
+      "delta_auc_z_minus_y": -0.04446859671315645,
+      "verdict": "MOSTLY_DUPLICATES_M4"
+    },
+    "2025_q1_forward": {
+      "model_X_m4_only": {
+        "roc_auc": 0.6322598178465525,
+        "pr_auc": 0.46077561948626367,
+        "brier_score": 0.20837519158859988,
+        "prevalence": 0.3236994219653179
+      },
+      "model_Y_new_model_only": {
+        "roc_auc": 0.6338413570556428,
+        "pr_auc": 0.45333937525282164,
+        "brier_score": 0.23330203695679747,
+        "prevalence": 0.3236994219653179
+      },
+      "model_Z_both": {
+        "roc_auc": 0.6099882260596547,
+        "pr_auc": 0.4215032591802047,
+        "brier_score": 0.2426748665093772,
+        "prevalence": 0.3236994219653179
+      },
+      "delta_auc_z_minus_x": -0.02227159178689775,
+      "delta_auc_z_minus_y": -0.02385313099598807,
+      "verdict": "MOSTLY_DUPLICATES_M4"
+    }
+  }
+}

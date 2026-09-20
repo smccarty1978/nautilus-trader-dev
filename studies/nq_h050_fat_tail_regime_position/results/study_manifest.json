@@ -1,0 +1,51 @@
+{
+  "study_id": "nq_h050_fat_tail_regime_position",
+  "description": "Bounded observational entry-quality study analyzing fat-tail loss concentration across the incumbent regime lifecycle",
+  "datasets": {
+    "train": "TRAIN 2023-2024 (N=2,150 Top 10% / N=21,493 unconditional)",
+    "2025_q1": "2025 Q1 (N=411 Top 10% / N=2,422 unconditional)",
+    "2025_q2": "2025 Q2 (N=1,083 Top 10% / N=8,087 unconditional)"
+  },
+  "artifacts": {
+    "regime_position_trade_ledger.parquet": {
+      "sha256": "e36ee0591ebb57cc1e003c01e0b019d33f80978346356e30a7e5a637bace3215",
+      "size_bytes": 3252154
+    },
+    "outcome_bucket_summary.json": {
+      "sha256": "231426bbbafd7e95cc17d42e717b9a7cdce0e24716fe92550b52481de268f75b",
+      "size_bytes": 66845
+    },
+    "lifecycle_quantiles.json": {
+      "sha256": "bed998e78ded2697ddf4fed7513f5013095a140d0209b0ed82c21a2080606fe7",
+      "size_bytes": 137535
+    },
+    "pullback_ordinal_summary.json": {
+      "sha256": "4eaba2a7ab8c7b71b9192389abbb13925bc3d5768f715fb3850298c0016ea0df",
+      "size_bytes": 22275
+    },
+    "fat_tail_concentration.json": {
+      "sha256": "08ed5d75f13b8d597e7d83cee07523af65fb5143de3ddffefb4b65e6988e2861",
+      "size_bytes": 3730
+    },
+    "directional_summary.json": {
+      "sha256": "bfac5972dfcd2c770ad52842e15c289c287a02455a78f015565d1cef9be8be86",
+      "size_bytes": 3326
+    },
+    "m4_lifecycle_relationship.json": {
+      "sha256": "007714956bb0136c9bf2388db0f490eb5f4d02a5d95ad58ac49809a5ecdacb74",
+      "size_bytes": 28641
+    },
+    "candidate_entry_risk_regions.json": {
+      "sha256": "eda0e5877e89adbd299e3383e206ebee01baf90789ea4f2f3cdabec22e8eda09",
+      "size_bytes": 7995
+    },
+    "causal_audit.json": {
+      "sha256": "b58341762a46789d576b8c6ad091af3f9e133bbdb58cb9b126e5a892e0a0aebd",
+      "size_bytes": 1066
+    },
+    "H050_FAT_TAIL_REGIME_POSITION_REPORT.md": {
+      "sha256": "88fafcd3637e7729ae851aede68cf867ccc6f9d31c3ede6ead48754c93b5fb29",
+      "size_bytes": 24550
+    }
+  }
+}

@@ -1,0 +1,36 @@
+study_id: nq_h050_economic_subpopulation_mining
+description: Bounded Economic Subpopulation Mining Study on NQ H050 Causal Feature Surface
+status: COMPLETED
+lineage:
+  parent_study: nq_h050_mtf_regime_context_features
+  source_features:
+    train: studies/nq_h050_mtf_regime_context_features/results/feature_surface_train.parquet
+    2025_q1: studies/nq_h050_m4_vs_remaining_mfe_model/feature_surface_2025_q1.parquet
+  execution_contract: studies/nq_h050_to_opposing_h050_exit_nt_validation/results/c1_nt_trades_ledger.parquet
+temporal_split:
+  discovery_oof: 2023 (N=10,605)
+  untouched_validation: 2024 (N=10,888)
+  frozen_forward_diagnostic: 2025 Q1 (N=2,422)
+target_frequency: 5-10 trades/day (~12% to 24% coverage)
+target_expectancy: ">= +0.30 ATR/trade net of costs"
+artifacts:
+  candidate_subpopulation_matrix: results/candidate_subpopulation_matrix.json
+  population_frequency_summary: results/population_frequency_summary.json
+  economic_target_contract: results/economic_target_contract.json
+  feature_manifest: results/feature_manifest.json
+  oof_model_manifest: results/oof_model_manifest.json
+  ev_rank_metrics: results/ev_rank_metrics.json
+  left_tail_rank_metrics: results/left_tail_rank_metrics.json
+  right_tail_rank_metrics: results/right_tail_rank_metrics.json
+  coverage_band_results: results/coverage_band_results.json
+  direction_age_matrix: results/direction_age_matrix.json
+  interpretable_rule_tree: results/interpretable_rule_tree.json
+  interpretable_rule_validation: results/interpretable_rule_validation.json
+  drawdown_stress_tests: results/drawdown_stress_tests.json
+  tail_dependence_tests: results/tail_dependence_tests.json
+  monthly_stability: results/monthly_stability.json
+  baseline_comparisons: results/baseline_comparisons.json
+  2025_q1_frozen_diagnostic: results/2025_q1_frozen_diagnostic.json
+  h050_scored_observation_ledger: results/h050_scored_observation_ledger.parquet
+  study_manifest: results/study_manifest.json
+  report: H050_ECONOMIC_SUBPOPULATION_MINING_REPORT.md

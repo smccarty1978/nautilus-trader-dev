@@ -1,0 +1,236 @@
+{
+  "verdict": "FAST_FAILURE_FEATURE_CAUSALITY_PASS",
+  "feature_set": [
+    "post_entry_adverse_excursion_atr",
+    "post_entry_favorable_excursion_atr",
+    "post_entry_mfe_mae_ratio",
+    "has_new_incumbent_extreme_post_entry",
+    "magnitude_new_incumbent_extreme_post_entry",
+    "incumbent_bars_count_post_entry",
+    "counter_bars_count_post_entry"
+  ],
+  "sample_size": 50,
+  "all_samples_causally_valid": true,
+  "samples": [
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P0",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760412000000000,
+      "last_source_event_ts": 1672760412000000000,
+      "next_bar_fill_ts": 1672760413000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P0",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760442000000000,
+      "last_source_event_ts": 1672760442000000000,
+      "next_bar_fill_ts": 1672760443000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P1",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760472000000000,
+      "last_source_event_ts": 1672760472000000000,
+      "next_bar_fill_ts": 1672760473000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P1",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760502000000000,
+      "last_source_event_ts": 1672760502000000000,
+      "next_bar_fill_ts": 1672760503000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P2",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760592000000000,
+      "last_source_event_ts": 1672760592000000000,
+      "next_bar_fill_ts": 1672760593000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P2",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760622000000000,
+      "last_source_event_ts": 1672760622000000000,
+      "next_bar_fill_ts": 1672760623000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P3",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760656000000000,
+      "last_source_event_ts": 1672760656000000000,
+      "next_bar_fill_ts": 1672760657000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P3",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760686000000000,
+      "last_source_event_ts": 1672760686000000000,
+      "next_bar_fill_ts": 1672760687000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P4",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760594000000000,
+      "last_source_event_ts": 1672760594000000000,
+      "next_bar_fill_ts": 1672760595000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P4",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760624000000000,
+      "last_source_event_ts": 1672760624000000000,
+      "next_bar_fill_ts": 1672760625000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P5",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760656000000000,
+      "last_source_event_ts": 1672760656000000000,
+      "next_bar_fill_ts": 1672760657000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00000",
+      "year": "2023",
+      "policy": "P5",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760686000000000,
+      "last_source_event_ts": 1672760686000000000,
+      "next_bar_fill_ts": 1672760687000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00001",
+      "year": "2023",
+      "policy": "P0",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760572000000000,
+      "last_source_event_ts": 1672760572000000000,
+      "next_bar_fill_ts": 1672760573000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00001",
+      "year": "2023",
+      "policy": "P0",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760602000000000,
+      "last_source_event_ts": 1672760602000000000,
+      "next_bar_fill_ts": 1672760603000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00001",
+      "year": "2023",
+      "policy": "P1",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760632000000000,
+      "last_source_event_ts": 1672760632000000000,
+      "next_bar_fill_ts": 1672760633000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00001",
+      "year": "2023",
+      "policy": "P1",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760662000000000,
+      "last_source_event_ts": 1672760662000000000,
+      "next_bar_fill_ts": 1672760663000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00001",
+      "year": "2023",
+      "policy": "P3",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760656000000000,
+      "last_source_event_ts": 1672760656000000000,
+      "next_bar_fill_ts": 1672760657000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00001",
+      "year": "2023",
+      "policy": "P3",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760686000000000,
+      "last_source_event_ts": 1672760686000000000,
+      "next_bar_fill_ts": 1672760687000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00001",
+      "year": "2023",
+      "policy": "P4",
+      "direction": "SHORT",
+      "observation_horizon_sec": 30,
+      "observation_ts": 1672760632000000000,
+      "last_source_event_ts": 1672760632000000000,
+      "next_bar_fill_ts": 1672760633000000000,
+      "causality_preserved": true
+    },
+    {
+      "event_id": "2023_00001",
+      "year": "2023",
+      "policy": "P4",
+      "direction": "SHORT",
+      "observation_horizon_sec": 60,
+      "observation_ts": 1672760662000000000,
+      "last_source_event_ts": 1672760662000000000,
+      "next_bar_fill_ts": 1672760663000000000,
+      "causality_preserved": true
+    }
+  ]
+}

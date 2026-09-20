@@ -1,0 +1,16 @@
+{
+  "verdict": "F30_UNITS_AND_COSTS_PASS",
+  "nq_point_value": 20.0,
+  "tick_size": 0.25,
+  "tick_value": 5.0,
+  "round_turn_friction_points": 0.75,
+  "round_turn_friction_dollars": 15.0,
+  "consistency_checks": {
+    "dollar_vs_points_identity": "pnl_dollars == pnl_pts * 20.0",
+    "mismatched_rows_count": 0,
+    "double_friction_applied_count": 0,
+    "atr_normalization_consistency": "pnl_atr == pnl_pts / frozen_atr",
+    "atr_mismatched_rows_count": 0
+  },
+  "notes": "All trade ledger rows strictly adhere to 0.75 pts friction ($15.00/contract RT) and $20/pt multiplier. ATR normalizer was consistently frozen at H050 checkpoint."
+}

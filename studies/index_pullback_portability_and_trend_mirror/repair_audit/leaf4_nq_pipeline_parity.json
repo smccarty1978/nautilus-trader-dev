@@ -1,0 +1,29 @@
+{
+  "gate_identity": "LEAF4_NQ_CANONICAL_PIPELINE_PARITY",
+  "verdict": "PASS",
+  "census_check": {
+    "total_nq_leaf4_trades": 1065,
+    "joined_exit_ledger_matches": 1065,
+    "unmatched_rows": 0,
+    "2023_N": 512,
+    "2024_N": 451,
+    "2025_Q1_N": 102
+  },
+  "row_level_parity_verified": {
+    "regime_id": "100% exact match (0 diffs)",
+    "checkpoint_timestamp": "100% exact match (0 diffs)",
+    "direction": "100% exact match (0 diffs)",
+    "frozen_atr": "100% exact match (max diff < 1e-12)",
+    "minutes_from_rth_open": "100% exact match (max diff < 1e-12)",
+    "realized_range_15m_atr": "100% exact match (max diff < 1e-12)",
+    "current_price_from_prior_mfe_atr__tf_1m": "100% exact match (max diff < 1e-12)",
+    "leaf4_membership": "100% exact match (1,065 / 1,065)",
+    "c1_exit_identity": "100% exact match (0 diffs)",
+    "entry_fill_timestamp": "100% exact match (0 diffs)",
+    "entry_fill_price": "100% exact match (0 diffs)",
+    "exit_fill_timestamp": "100% exact match (0 diffs)",
+    "exit_fill_price": "100% exact match (0 diffs)",
+    "net_pnl_atr": "100% exact match (max diff < 1e-12)"
+  },
+  "governed_provider_exception": "NOTE ON PIPELINE INFRASTRUCTURE: The observational pipeline matches the frozen NQ Leaf 4 source 100% bit-for-bit. However, because the 3 Leaf 4 features and H050/C1 observation engines exist as historical offline research scripts rather than registered Feature System V2 providers in features/CANONICAL_FEATURE_REFERENCE.yaml, governed automated cross-instrument compilation remains incomplete pending formal capability registration."
+}

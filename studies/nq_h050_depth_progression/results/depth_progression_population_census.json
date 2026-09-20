@@ -1,0 +1,54 @@
+{
+  "total_h050_events": 21493,
+  "depths": {
+    "H050": {
+      "count": 21493,
+      "percent_h050_population": 100.0,
+      "median_seconds_since_h050": 0.0,
+      "p25_seconds_since_h050": 0.0,
+      "p75_seconds_since_h050": 0.0,
+      "non_progression_reasons": {
+        "regime_ended_before_threshold": 0,
+        "session_ended": 0
+      }
+    },
+    "H075": {
+      "count": 21463,
+      "percent_h050_population": 99.86,
+      "median_seconds_since_h050": 19.0,
+      "p25_seconds_since_h050": 5.0,
+      "p75_seconds_since_h050": 60.0,
+      "non_progression_reasons": {
+        "regime_ended_before_threshold": 30,
+        "session_ended": 0
+      }
+    },
+    "H100": {
+      "count": 21369,
+      "percent_h050_population": 99.42,
+      "median_seconds_since_h050": 65.0,
+      "p25_seconds_since_h050": 23.0,
+      "p75_seconds_since_h050": 157.0,
+      "non_progression_reasons": {
+        "regime_ended_before_threshold": 124,
+        "session_ended": 0
+      }
+    },
+    "H125": {
+      "count": 21065,
+      "percent_h050_population": 98.01,
+      "median_seconds_since_h050": 126.0,
+      "p25_seconds_since_h050": 51.0,
+      "p75_seconds_since_h050": 280.0,
+      "non_progression_reasons": {
+        "regime_ended_before_threshold": 428,
+        "session_ended": 0
+      }
+    }
+  },
+  "conditional_progression": {
+    "P_H075_given_H050": 0.9986,
+    "P_H100_given_H075": 0.9956,
+    "P_H125_given_H100": 0.9858
+  }
+}

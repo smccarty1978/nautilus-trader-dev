@@ -1,0 +1,10 @@
+﻿import pandas as pd
+es_canon = pd.read_parquet('data/canonical/ES_dense_1s_2016_2026.parquet', columns=['open', 'high', 'low', 'close', 'volume'])
+print("ES canonical shape:", es_canon.shape)
+print("ES index min/max:", es_canon.index.min(), es_canon.index.max())
+ym_canon = pd.read_parquet('data/canonical/YM_dense_1s_2016_2026.parquet', columns=['open', 'high', 'low', 'close', 'volume'])
+print("YM canonical shape:", ym_canon.shape)
+print("YM index min/max:", ym_canon.index.min(), ym_canon.index.max())
+nq_canon = pd.read_parquet('data/canonical/NQ_dense_1s_2016_2026.parquet', columns=['open', 'high', 'low', 'close', 'volume'])
+print("NQ canonical shape:", nq_canon.shape)
+print("NQ index min/max:", nq_canon.index.min(), nq_canon.index.max())

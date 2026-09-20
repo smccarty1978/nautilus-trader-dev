@@ -1,0 +1,95 @@
+{
+  "total_top10_train_entries": 2150,
+  "total_severe_losses": 304,
+  "total_catastrophic_losses": 185,
+  "conditions": [
+    {
+      "condition": "Youngest Regime Age (Q1, <= 69.0s)",
+      "n_entries": 435,
+      "pct_of_entries": 0.20232558139534884,
+      "severe_losses_in_cond": 62,
+      "pct_of_severe_losses": 0.20394736842105263,
+      "severe_concentration_ratio": 1.0080157289776164,
+      "catastrophic_losses_in_cond": 42,
+      "pct_of_catastrophic_losses": 0.22702702702702704,
+      "catastrophic_concentration_ratio": 1.1220876048462256
+    },
+    {
+      "condition": "Below Median Pre-Pullback MFE (<= 0.80A)",
+      "n_entries": 1075,
+      "pct_of_entries": 0.5,
+      "severe_losses_in_cond": 163,
+      "pct_of_severe_losses": 0.5361842105263158,
+      "severe_concentration_ratio": 1.0723684210526316,
+      "catastrophic_losses_in_cond": 114,
+      "pct_of_catastrophic_losses": 0.6162162162162163,
+      "catastrophic_concentration_ratio": 1.2324324324324325
+    },
+    {
+      "condition": "First Pullback (Ordinal == 1)",
+      "n_entries": 340,
+      "pct_of_entries": 0.15813953488372093,
+      "severe_losses_in_cond": 51,
+      "pct_of_severe_losses": 0.16776315789473684,
+      "severe_concentration_ratio": 1.0608552631578947,
+      "catastrophic_losses_in_cond": 36,
+      "pct_of_catastrophic_losses": 0.1945945945945946,
+      "catastrophic_concentration_ratio": 1.2305246422893483
+    },
+    {
+      "condition": "High Incumbent Expansion Rate (Q5, >= 0.51A/min)",
+      "n_entries": 430,
+      "pct_of_entries": 0.2,
+      "severe_losses_in_cond": 63,
+      "pct_of_severe_losses": 0.20723684210526316,
+      "severe_concentration_ratio": 1.0361842105263157,
+      "catastrophic_losses_in_cond": 43,
+      "pct_of_catastrophic_losses": 0.23243243243243245,
+      "catastrophic_concentration_ratio": 1.162162162162162
+    },
+    {
+      "condition": "High Pullback Depth / Prior MFE Ratio (Q5, >= 2.12)",
+      "n_entries": 431,
+      "pct_of_entries": 0.20046511627906977,
+      "severe_losses_in_cond": 60,
+      "pct_of_severe_losses": 0.19736842105263158,
+      "severe_concentration_ratio": 0.9845524484063989,
+      "catastrophic_losses_in_cond": 44,
+      "pct_of_catastrophic_losses": 0.23783783783783785,
+      "catastrophic_concentration_ratio": 1.1864300495390983
+    },
+    {
+      "condition": "Retrospective MFE Completed < 25%",
+      "n_entries": 442,
+      "pct_of_entries": 0.2055813953488372,
+      "severe_losses_in_cond": 172,
+      "pct_of_severe_losses": 0.5657894736842105,
+      "severe_concentration_ratio": 2.752143367468445,
+      "catastrophic_losses_in_cond": 124,
+      "pct_of_catastrophic_losses": 0.6702702702702703,
+      "catastrophic_concentration_ratio": 3.260364436835025
+    },
+    {
+      "condition": "Retrospective MFE Completed < 50%",
+      "n_entries": 725,
+      "pct_of_entries": 0.3372093023255814,
+      "severe_losses_in_cond": 229,
+      "pct_of_severe_losses": 0.7532894736842105,
+      "severe_concentration_ratio": 2.2338929219600727,
+      "catastrophic_losses_in_cond": 143,
+      "pct_of_catastrophic_losses": 0.772972972972973,
+      "catastrophic_concentration_ratio": 2.2922646784715752
+    },
+    {
+      "condition": "Retrospective MFE Completed < 75%",
+      "n_entries": 1023,
+      "pct_of_entries": 0.4758139534883721,
+      "severe_losses_in_cond": 264,
+      "pct_of_severe_losses": 0.868421052631579,
+      "severe_concentration_ratio": 1.8251273344651955,
+      "catastrophic_losses_in_cond": 153,
+      "pct_of_catastrophic_losses": 0.827027027027027,
+      "catastrophic_concentration_ratio": 1.7381310929698026
+    }
+  ]
+}

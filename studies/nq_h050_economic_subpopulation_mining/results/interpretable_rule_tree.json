@@ -1,0 +1,15 @@
+{
+  "tree_text": "|--- minutes_from_rth_open <= 387.91\n|   |--- minutes_from_rth_open <= 380.65\n|   |   |--- realized_range_15m_atr <= 9.34\n|   |   |   |--- current_price_from_prior_mfe_atr__tf_1m <= 1.74\n|   |   |   |   |--- value: [0.70]\n|   |   |   |--- current_price_from_prior_mfe_atr__tf_1m >  1.74\n|   |   |   |   |--- value: [-0.07]\n|   |   |--- realized_range_15m_atr >  9.34\n|   |   |   |--- value: [-1.55]\n|   |--- minutes_from_rth_open >  380.65\n|   |   |--- prior_regime_range_reclaim_ratio__tf_1m <= 1.23\n|   |   |   |--- value: [-4.49]\n|   |   |--- prior_regime_range_reclaim_ratio__tf_1m >  1.23\n|   |   |   |--- value: [0.39]\n|--- minutes_from_rth_open >  387.91\n|   |--- current_price_from_prior_mfe_atr__tf_1m <= 5.02\n|   |   |--- value: [0.19]\n|   |--- current_price_from_prior_mfe_atr__tf_1m >  5.02\n|   |   |--- value: [3.33]\n",
+  "features": [
+    "direction_is_long",
+    "regime_age_sec__tf_1m",
+    "pullback_depth_atr",
+    "pullback_velocity_atr_sec",
+    "pullback_efficiency",
+    "realized_range_15m_atr",
+    "atr_change_rate",
+    "prior_regime_range_reclaim_ratio__tf_1m",
+    "current_price_from_prior_mfe_atr__tf_1m",
+    "minutes_from_rth_open"
+  ]
+}

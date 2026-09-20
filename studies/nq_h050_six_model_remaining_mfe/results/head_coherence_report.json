@@ -1,0 +1,107 @@
+{
+  "Benchmark_A_Pooled": {
+    "pooled": {
+      "total_rows": 10888,
+      "viol_rate_p20_gt_p10": 0.014603232916972814,
+      "viol_rate_p10_gt_p05": 0.025900073475385747,
+      "any_hierarchy_violation_rate": 0.040044085231447465,
+      "mean_violation_magnitude": 0.029966926779643726,
+      "max_violation_magnitude": 0.17511795849953166,
+      "spearman_corr_term_vs_gte0p5": -0.804566888753116,
+      "spearman_corr_term_vs_gte1p0": -0.6658935151945929,
+      "spearman_corr_term_vs_gte2p0": -0.5182413982703439
+    }
+  },
+  "Benchmark_B_Directional": {
+    "long": {
+      "total_rows": 5405,
+      "viol_rate_p20_gt_p10": 0.03126734505087882,
+      "viol_rate_p10_gt_p05": 0.072895467160037,
+      "any_hierarchy_violation_rate": 0.10342275670675301,
+      "mean_violation_magnitude": 0.04736593558969506,
+      "max_violation_magnitude": 0.28485232827910323,
+      "spearman_corr_term_vs_gte0p5": -0.7990525643566383,
+      "spearman_corr_term_vs_gte1p0": -0.6629471840314127,
+      "spearman_corr_term_vs_gte2p0": -0.5371973245863312
+    },
+    "short": {
+      "total_rows": 5483,
+      "viol_rate_p20_gt_p10": 0.036293999635236183,
+      "viol_rate_p10_gt_p05": 0.06748130585445923,
+      "any_hierarchy_violation_rate": 0.10286339595112165,
+      "mean_violation_magnitude": 0.050196204041600474,
+      "max_violation_magnitude": 0.24928247570527723,
+      "spearman_corr_term_vs_gte0p5": -0.7286095050377406,
+      "spearman_corr_term_vs_gte1p0": -0.6397842825733482,
+      "spearman_corr_term_vs_gte2p0": -0.45057691339219186
+    }
+  },
+  "Benchmark_C_Six_Cell": {
+    "L1": {
+      "total_rows": 2845,
+      "viol_rate_p20_gt_p10": 0.10439367311072056,
+      "viol_rate_p10_gt_p05": 0.10896309314586995,
+      "any_hierarchy_violation_rate": 0.20492091388400702,
+      "mean_violation_magnitude": 0.06616201276961328,
+      "max_violation_magnitude": 0.40791941100844964,
+      "spearman_corr_term_vs_gte0p5": -0.7670922522202249,
+      "spearman_corr_term_vs_gte1p0": -0.6396512948518176,
+      "spearman_corr_term_vs_gte2p0": -0.48545332812284464
+    },
+    "L2": {
+      "total_rows": 1622,
+      "viol_rate_p20_gt_p10": 0.07953144266337854,
+      "viol_rate_p10_gt_p05": 0.1935881627620222,
+      "any_hierarchy_violation_rate": 0.2626387176325524,
+      "mean_violation_magnitude": 0.08512004319582778,
+      "max_violation_magnitude": 0.3976437950145169,
+      "spearman_corr_term_vs_gte0p5": -0.6505867760910548,
+      "spearman_corr_term_vs_gte1p0": -0.468430073438936,
+      "spearman_corr_term_vs_gte2p0": -0.3684300450590445
+    },
+    "L3": {
+      "total_rows": 938,
+      "viol_rate_p20_gt_p10": 0.0650319829424307,
+      "viol_rate_p10_gt_p05": 0.13326226012793177,
+      "any_hierarchy_violation_rate": 0.19616204690831557,
+      "mean_violation_magnitude": 0.07221815085824863,
+      "max_violation_magnitude": 0.37573655854875576,
+      "spearman_corr_term_vs_gte0p5": -0.8090197944236354,
+      "spearman_corr_term_vs_gte1p0": -0.6576017255957084,
+      "spearman_corr_term_vs_gte2p0": -0.5293581886354324
+    },
+    "S1": {
+      "total_rows": 2541,
+      "viol_rate_p20_gt_p10": 0.05194805194805195,
+      "viol_rate_p10_gt_p05": 0.09838646202282567,
+      "any_hierarchy_violation_rate": 0.1483667847304211,
+      "mean_violation_magnitude": 0.05611358133295892,
+      "max_violation_magnitude": 0.32793391336720507,
+      "spearman_corr_term_vs_gte0p5": -0.689558211764144,
+      "spearman_corr_term_vs_gte1p0": -0.4524523551485903,
+      "spearman_corr_term_vs_gte2p0": -0.27019265219925015
+    },
+    "S2": {
+      "total_rows": 1558,
+      "viol_rate_p20_gt_p10": 0.08729139922978177,
+      "viol_rate_p10_gt_p05": 0.14505776636713735,
+      "any_hierarchy_violation_rate": 0.22913992297817715,
+      "mean_violation_magnitude": 0.06525633155761033,
+      "max_violation_magnitude": 0.37766783093862477,
+      "spearman_corr_term_vs_gte0p5": -0.7312822870888359,
+      "spearman_corr_term_vs_gte1p0": -0.5264218353336173,
+      "spearman_corr_term_vs_gte2p0": -0.4193544023875536
+    },
+    "S3": {
+      "total_rows": 1384,
+      "viol_rate_p20_gt_p10": 0.08598265895953758,
+      "viol_rate_p10_gt_p05": 0.17413294797687862,
+      "any_hierarchy_violation_rate": 0.24927745664739884,
+      "mean_violation_magnitude": 0.08485030210528283,
+      "max_violation_magnitude": 0.3785777535880362,
+      "spearman_corr_term_vs_gte0p5": -0.7721933572794089,
+      "spearman_corr_term_vs_gte1p0": -0.6378341059404418,
+      "spearman_corr_term_vs_gte2p0": -0.4400582194637858
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "pooled_2023_2024": [
+    {
+      "test": "Full",
+      "drop_count": 0,
+      "reference_ev_atr": 0.4863,
+      "nt_native_ev_atr": 0.4728,
+      "difference_atr": -0.0135
+    },
+    {
+      "test": "Ex-largest",
+      "drop_count": 1,
+      "reference_ev_atr": 0.4091,
+      "nt_native_ev_atr": 0.3961,
+      "difference_atr": -0.0129
+    },
+    {
+      "test": "Ex-top 0.5%",
+      "drop_count": 5,
+      "reference_ev_atr": 0.1931,
+      "nt_native_ev_atr": 0.1809,
+      "difference_atr": -0.0122
+    },
+    {
+      "test": "Ex-top 1%",
+      "drop_count": 10,
+      "reference_ev_atr": 0.0371,
+      "nt_native_ev_atr": 0.0252,
+      "difference_atr": -0.012
+    },
+    {
+      "test": "Ex-top 2%",
+      "drop_count": 19,
+      "reference_ev_atr": -0.1102,
+      "nt_native_ev_atr": -0.1215,
+      "difference_atr": -0.0112
+    }
+  ],
+  "tail_survival_verdict": "STRONG"
+}

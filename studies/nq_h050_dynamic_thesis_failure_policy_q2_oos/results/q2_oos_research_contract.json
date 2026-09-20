@@ -1,0 +1,84 @@
+{
+  "study_id": "nq_h050_dynamic_thesis_failure_policy_q2_oos",
+  "lineage_authority": "studies/nq_h050_dynamic_thesis_failure_policy",
+  "provenance_status": "2025Q2_INDEPENDENT_OOS_PASS",
+  "validation_period": {
+    "name": "2025 Q2",
+    "start_date": "2025-04-01T00:00:00Z",
+    "end_date": "2025-06-30T23:59:59Z",
+    "total_cme_1s_bars": 3163350
+  },
+  "provenance_assertions": {
+    "raw_nq_1s_data_verified": true,
+    "q2_used_for_policy_selection": false,
+    "q2_used_for_feature_selection": false,
+    "q2_used_for_model_fitting": false,
+    "q2_used_for_probability_cutoff": false,
+    "q2_used_for_landmark_selection": false
+  },
+  "frozen_candidate_artifacts": {
+    "dynamic_risk_logreg_model": {
+      "path": "studies/nq_h050_dynamic_thesis_failure_policy/results/dynamic_risk_logreg_model.joblib",
+      "sha256": "46f500bf3840b027da1ea3a9e793bff70d35c60081d92e2c447d7c68c7ffdc19"
+    },
+    "dynamic_risk_scaler": {
+      "path": "studies/nq_h050_dynamic_thesis_failure_policy/results/dynamic_risk_scaler.joblib",
+      "sha256": "7fb7429919cea78922a697a1debfd4b443b40fc8d87204015e7f98373544845c"
+    },
+    "model_weights_and_parameters": {
+      "path": "studies/nq_h050_dynamic_thesis_failure_policy/results/model_weights_and_parameters.json",
+      "sha256": "445767bef76ff2cd24248f9e47b196e0ae5eb5794a71e7728b8d7f5140eec447"
+    },
+    "golden_prediction_fixture": {
+      "path": "studies/nq_h050_dynamic_thesis_failure_policy/results/golden_prediction_fixture.json",
+      "sha256": "3c0f486023385d4adcab50a976af0caea3fae07812530295a1c9b4d4e4106465"
+    },
+    "frozen_policy_contract": {
+      "path": "studies/nq_h050_dynamic_thesis_failure_policy/results/frozen_policy_contract.json",
+      "sha256": "fa257de1120c56663643bde3951acbf1850eae29d18e17de4eb6a784a791ff77"
+    }
+  },
+  "strategy_specifications": {
+    "instrument": "NQ.XCME",
+    "multiplier": 20.0,
+    "commission_round_trip": 5.0,
+    "slippage_per_fill_ticks": 1,
+    "slippage_tick_size": 0.25,
+    "total_friction_round_trip_pts": 0.75,
+    "total_friction_round_trip_dollars": 15.0,
+    "entry_signal": "H050_0 (0.50 ATR giveback from prevailing regime running maxMFE)",
+    "m4_scoring": "Recovered 3-head LightGBM Composite Risk",
+    "m4_top10_threshold": 0.003001,
+    "candidate_dynamic_stop": {
+      "trigger_probability_threshold": 0.65,
+      "evaluation_landmarks_atr": [
+        1.0,
+        1.25,
+        1.5
+      ],
+      "feature_count": 9,
+      "features": [
+        "landmark_level_atr",
+        "counter_direction",
+        "is_pre_r1",
+        "seconds_since_h050",
+        "rebound_from_adverse_extreme_atr",
+        "trailing_15s_return_atr",
+        "trailing_30s_return_atr",
+        "trailing_15s_range_atr",
+        "trailing_30s_range_atr"
+      ]
+    },
+    "baseline_c1_exit": "First opposing H050_1 after R0 flip, or R2 fallback at end of R1"
+  },
+  "formal_evaluation_criteria": {
+    "verdict_provenance": "2025Q2_INDEPENDENT_OOS_PASS",
+    "verdict_runtime_parity": "FROZEN_POLICY_RUNTIME_PARITY_PASS",
+    "verdict_runtime_integrity": "H050_RUNTIME_INTEGRITY_PASS",
+    "tail_risk_reduction": "Must reduce frequency of losses <= -2.00A / -3.00A and compress max drawdown",
+    "expectancy_preservation": "Mean net PnL (ATR and dollars) must be preserved or improved",
+    "right_tail_preservation": "Substantial retention of +1A, +2A, +3A runners",
+    "edge_ratio": "Net gain/loss edge ratio > 1.5x",
+    "directional_integrity": "Both Counter-LONG and Counter-SHORT must maintain integrity"
+  }
+}

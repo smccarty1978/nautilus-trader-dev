@@ -1,0 +1,27 @@
+{
+  "audit_name": "H050 Entry Lifecycle Causality Audit",
+  "verdict": "REGIME_POSITION_DIAGNOSTIC_CAUSALITY_PASS",
+  "causal_at_entry_features": [
+    "regime_age_sec",
+    "pre_pullback_max_mfe_atr",
+    "incumbent_expansion_rate_atr_min",
+    "pullback_ordinal",
+    "previous_pullbacks_count",
+    "pullback_depth_vs_max_mfe_ratio",
+    "pullback_duration_vs_regime_age_ratio",
+    "has_previous_pullbacks",
+    "pullback_depth_atr",
+    "pullback_duration_sec",
+    "pullback_efficiency",
+    "pullback_velocity_atr_sec",
+    "frozen_atr",
+    "direction_is_long"
+  ],
+  "strictly_retrospective_explanatory_diagnostics": [
+    "retrospective_final_regime_max_mfe_atr",
+    "retrospective_incumbent_additional_mfe_after_h050_atr",
+    "retrospective_fraction_of_eventual_mfe_completed",
+    "retrospective_time_to_reversal_sec"
+  ],
+  "confirmation": "No retrospective or forward-peeking variable was used in M4 scoring or proposed as an executable causal feature. All exploratory features were evaluated causally at trade inception."
+}

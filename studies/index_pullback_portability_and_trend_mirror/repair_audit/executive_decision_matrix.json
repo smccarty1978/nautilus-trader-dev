@@ -1,0 +1,40 @@
+{
+  "program_summary": {
+    "branch_a_leaf4_cross_instrument": {
+      "nq_performance": "Robust positive edge (+0.52 ATR mean net, > net profit, profitable all 3 years)",
+      "es_corrected_performance": "Strongly negative (-1.029 ATR mean net, - net loss, 21% win rate)",
+      "ym_corrected_performance": "Strongly negative (-0.844 ATR mean net, - net loss, 26% win rate)",
+      "portability_verdict": "NOT_FOUND (NQ_SPECIFIC)",
+      "portfolio_viable": "NO"
+    },
+    "branch_b_trend_mirror": {
+      "gross_expectancy": "Marginally positive (+0.010 to +0.016 ATR in pooled E0, +0.028 to +0.044 ATR in Longs)",
+      "net_expectancy": "Systematically negative (-0.070 to -0.076 ATR in pooled E0, net negative across all cells and years)",
+      "primary_drag": "Transaction friction (/trade = 0.0862 ATR) exceeds gross edge by 5x-8x",
+      "regime_termination_drag": "Minor contributor (-0.0066 ATR drag, only 1.4% of exits in E0_R0)",
+      "reacceleration_value": "Negative (-0.010 to -0.018 ATR penalty due to 0.18 ATR fill slippage)",
+      "economic_verdict": "Real gross continuation edge exists on Longs, but is far too thin to survive execution friction without structural expansion"
+    }
+  },
+  "comparative_scoring": {
+    "leaf4_nq": {
+      "gross_edge": "STRONG",
+      "net_edge": "STRONG",
+      "tradable_now": true,
+      "action": "Deploy/refine NQ-only"
+    },
+    "leaf4_es_ym": {
+      "gross_edge": "NEGATIVE",
+      "net_edge": "NEGATIVE",
+      "tradable_now": false,
+      "action": "Abandon portability"
+    },
+    "trend_mirror_nq": {
+      "gross_edge": "WEAK_POSITIVE",
+      "net_edge": "NEGATIVE",
+      "tradable_now": false,
+      "action": "Research friction reduction / higher timeframe targets or hold for lower fees"
+    }
+  },
+  "best_research_path": "LEAF4"
+}

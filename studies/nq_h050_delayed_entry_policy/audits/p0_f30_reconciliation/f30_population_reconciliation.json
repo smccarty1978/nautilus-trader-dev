@@ -1,0 +1,20 @@
+{
+  "verdict": "F30_POPULATION_RECONCILIATION_PASS",
+  "observational_study_rows": 121086,
+  "observational_horizons": [
+    "T0",
+    "T30",
+    "T60",
+    "T120",
+    "T180",
+    "T300"
+  ],
+  "policy_study_p0_rows": 23915,
+  "policy_horizons": [
+    "T0 only (H050 entry)"
+  ],
+  "population_divergence_analysis": {
+    "unmatched_rows_explanation": "The observational study evaluated fast failure across 6 delayed entry horizons pooled together. In delayed entries (T30-T300), entries occurred after waiting, which had already filtered some continuations and buffered entry prices. In contrast, P0 is strictly immediate H050 entry.",
+    "divergence_status": "EXPLAINED_DIVERGENCE"
+  }
+}

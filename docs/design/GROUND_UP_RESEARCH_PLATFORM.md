@@ -1,7 +1,107 @@
-# Ground-Up Research Platform — Architecture for Red-Team Review (revision 6)
+# Ground-Up Research Platform — Architecture for Red-Team Review (revision 8)
 
-**Status:** PROPOSAL, revision 6 after red-team reviews 1–5. **Phase 0 experimentation approved
-by reviews 4 and 5; the full platform contract is not yet approved.** Nothing is implemented.
+**Status:** PROPOSAL, revision 8 after red-team reviews 1–8. **Phase 0 complete; Phase 1 synthetic
+portion approved (review 8); the full platform contract is not yet approved.**
+
+**Revision 8 change log (review 8 → resolution → section):**
+
+| Item | Resolution | Section |
+|---|---|---|
+| 1 Dependency parameter change leaves the consumer's key unchanged | `gid` hashes the *resolved dependency gids* (transitive), not dependency code fingerprints; same for trigger dependencies in `spine_key` | §4.2, §4.5 |
+| 2 Whole-module fingerprints invalidate unrelated features | Symbol-level fingerprint over the plugin class and the symbols it transitively references; whole-module fallback only where static resolution fails, and recorded as `fp_scope: module` | §4.5 |
+| Phase 1: reader is not a manifest validator | Catalog manifest validation against the expected build plan (inventory, counts, safe relative paths, hashes); `read_group`'s role limited to group parts | §4.1 |
+**Phase 0 outcome (2026-09-16, revision 2 after review 7):** `../ntr` at 36 tests passing; report
+`../ntr/PHASE0_REPORT.md` with 21 demonstrated behaviours (D18 ancestor-junction refusal, D19
+delivery permutations + negative control, D20 interrupted recovery chain), 4 failed assumptions
+(F1–F4, absorbed in §3.4, §4.6, §6.7) and 9 unresolved cases (U8 registration-time I/O and U9
+fingerprint tests are Phase 2 obligations). Phase 0 authorises Phase 1 only.
+**Phase 1 outcome (2026-09-17):** synthetic portion complete (`../ntr/PHASE1_REPORT.md` rev 3), one
+real TRAIN month built, independently verified and coverage-declared (`../ntr/PILOT_202101_REPORT.md`
+rev 2, catalog `NQ_1S_P1_202101_r2`), memory task complete (`../ntr/MEMORY_TASK_REPORT.md`).
+**Phase 2 prerequisites closed (2026-09-17):** registration-time boundary (U8), symbol-level
+fingerprints (U9) and open-handle publication (U1) -- `../ntr/PHASE2_PREREQ_REPORT.md`.
+**Phase 2 record layer, first slice (2026-09-17):** all §11 row 2 acceptance cases pass; real January
+spine + two groups through the authorised ReadPlan path -- `../ntr/PHASE2_REPORT.md` (F22–F26), 131
+tests. **Remainder complete (2026-09-17, rev 2):** batch-streamed engine input (F24 closed: 556 MB vs
+1.47 GB on a day-streamed catalog), parallel shards via study modules, plan-authorised reference-input
+loading, feature checkpoints on sequential attach, study-source validation, the fresh-interpreter
+audit-armed 6.1 CLI, and layered receipts -- 139 tests.
+**Phase 2 red team (2026-09-17):** nine gate-layer defects found by ten probes (`../ntr/PHASE2_REDTEAM.md`),
+all remediated with negative controls (`../ntr/PHASE2_REDTEAM_RESPONSE.md`, 153 tests). Contract
+amendments below: 6.4 compares the deliverable itself (§6.0); warm-up is denominated per plugin
+timeframe and unbounded closures are refused in shards (§4.3); the study path validates plugin sources
+and executes under the armed audit (§3.4); checkpoints are bound to plan, mode and plugin set (§4.3);
+6.1/6.6 have no vacuous verdicts (§6.0).
+**Phase 3 (2026-09-17):** labels implemented (`../ntr/PHASE3_REPORT.md`, 164 tests). Three NT 1.230
+facts were probed and the 6.7 conventions bound to them (table below): a stop-market touched inside a
+bar fills at the STOP price, not the extreme; a limit fills at its LIMIT price even when the bar opens
+beyond it (a stop gapped through fills at the open); NT processes O, H, L, C for every bar, so a
+same-bar hit always fills the PT first; the bar at `ts_open + horizon` is processed BEFORE a clock
+alert at that time, so it is inside the window.
+**Phase 4 (2026-09-17):** `fit` implemented (`../ntr/PHASE4_REPORT.md`, 174 tests): typed estimand and
+selection, grouped chronological split (purge + embargo, `group` = `anchor_id` or `day`), receipts as
+fit prerequisites, C / E / E∩O populations with coverage, bundle with `contract.json` +
+`manifest.json` + card, 6.8 receipt at the fit layer, contract rebuild proven label-free and
+unselected-feature-free. Model families v1: LightGBM and logistic.
+**Phase 5 (2026-09-17):** backtest layer implemented (`../ntr/PHASE5_REPORT.md`, 182 tests):
+`ModelStrategy` with 6.5 at start (the contract now also binds the trigger gids -- the population the
+model was fitted on -- so a changed trigger is a stale contract, not a 6.9 surprise), `Policy` plugins
+with a policy gid, `Scenario`/`xid`, `bt_key` (a holdout retry binds its exposure seq), 6.9 against the
+recorded spine + selected-arm groups, `chronology.toml` with `chron_id` bound to the ledger lines, and
+the three-event ledger under the OS byte-range lock. Instrument mapping is `single_contract_v1` until
+multi-contract data arrives.
+**Phase 6 (2026-09-17):** operator layer implemented (`../ntr/PHASE6_REPORT.md`, 190 tests): the CLI
+verbs of §8, `status` with the §6.0 prerequisites table and one `next:` verb, semantic reviews bound
+to fingerprints (§7 decides who needs one: labels, unbounded features, input consumers) gating `fit`
+and `commit`, `report.md` with a preserved interpretation section, `commit` writing the COMMIT line
+only over PASS receipts (6.7 when trade-shaped), analysis helpers (`UNEQUAL_WINDOWS`,
+`SIGNAL_TOO_RARE`), `explore` over TRAIN/tune frames only, and the card audit (≤ 30 lines, one
+`next:` verb, no questions). Found by the real walk-through and fixed: plugin sources may import
+`__future__`; study modules may import `ntr.core.estimand`; the study loader binds `studies` to the
+study's own root. **6.7 amendment:** NT 1.230 delays a touched limit fill when another open bracket on
+the same instrument fills on the same tick (25 of 5,422 rows at a 60 s cadence, thin hours); a single
+bracket fills at the touch. 6.7 therefore checks rows as isolated trades (non-overlapping lanes, one
+engine per lane); overlapping-position matching is execution, reported by the backtest, never a label
+gate. Open decision: `ntr/checks` is inside `rfp`, so a check fix re-keys every spine; receipts already
+bind `checks_version`.
+**Phase 7 (2026-09-17):** live layer implemented without a venue (`../ntr/PHASE7_REPORT.md`, 195 tests):
+capture format of §3.6, one shared arrival-normalisation rule (a bar at or before the last delivered
+bar is dropped and counted; arrival order is preserved through NT's per-batch sort), explicit
+checkpoints carrying `last_ts_init`, restart = checkpoint + replay of every later bar verified against
+the source (unfillable gap → WARMING statuses → ineligible; `warmup_bars = None` → cold start refused),
+`live-equivalence` with the seven classes. Amendment found on real data: a restored session's capture
+must be replayed from the SAME checkpoint, never cold (2,676 spurious STATE_RESTORE otherwise); the
+capture header names the checkpoint. Execution residual unmeasured until a venue capture exists.
+**Completed-repo red team (2026-09-17):** ten findings (`../ntr/REDTEAM_COMPLETED_REPO.md`), all
+remediated (`../ntr/REDTEAM_COMPLETED_REPO_RESPONSE.md`). Contract amendments: §5.1 the split is
+**walk-forward** by default (block k trains only on blocks before it; block 0 is never a test fold);
+`purged_kfold` remains as a named option whose fit card says so, and `fit.py` asserts that no
+deployment-scored row is a training row. §6.8 a trade-shaped label's 6.7 receipt is read at fit and
+anything but PASS makes the verdict INCONCLUSIVE (the receipt state is in `eval_key`); a comparison
+population below `Selection.min_coverage` of the deployment population is INCONCLUSIVE; the censored
+fraction is reported by UTC hour; the selected arm's aggregate is disclosed as its selection statistic.
+§3.6 classes: `STATE_RESTORE` is `REPLAY_DIVERGENCE` (replay from the same state reproduces the live
+snapshots); `CATALOG_DIVERGENCE` compares the catalog leg; AGGREGATION is symmetric; a separate
+**checkpoint-fidelity** check compares a restored session with an uninterrupted run past warm-up;
+nothing compared is INCONCLUSIVE; a catalog-replay capture can only be `EQUIVALENT_REPLAY`; the
+checkpoint a capture names is resolved under the runs root and hash-bound. §4.5 `rfp` covers
+`ntr/{core,record,data}`; `ntr/checks` is bound through `checks_version` in receipts and `eval_key`.
+**Phase 8 (2026-09-17):** a Sonnet-class operator re-ran the closed January question end to end
+(`../ntr/PHASE8_REPORT.md`): 7 verbs, 12 tool calls, ~2 min wall, answer reproduced exactly, one
+guess (the plugin to review, read off the status card), no card contradicted. Every phase of §11 is
+now implemented and committed (195 tests). Open items: `ntr/checks` inside `rfp` (owner decision);
+venue adapter and execution residual; multi-contract mapping and latency; CME holiday calendar;
+censored outcomes (v1 by design).
+
+**Revision 7 change log:**
+
+| Item | Resolution | Section |
+|---|---|---|
+| Owner: iterate without running the full pipeline | Incremental research is the normal workflow; the verb sequence is one available path. Layered artifact keys with receipts bound to the narrowest layer they depend on; `ntr explore` is independent of fit/commit; evidence boundary stated | §8.1, §6.0 |
+| Review 7 item 1 (Phase 0) | Containment = lexical + resolved + ancestor-reparse inspection, in both deletion and lock recovery | §4.6 |
+| Phase 0 F4 | `os.replace` onto a file a reader has open fails on Windows; bounded retry on marker and info writes | §4.6 |
+| Phase 0 U8 | Registration validates plugin source statically before executing it; import and construction run under a registration-scoped audit; constructor-time leakage is a negative control | §3.4 |
+
 **Date:** 2026-09-16
 **Scope:** a new repository, starting from (a) the Databento-derived bar data and (b) NautilusTrader
 1.230. Nothing from the current `research_workflow/` platform is carried over as code.
@@ -216,9 +316,24 @@ to it by the actor, and (d) its params and declared `initial_state`.**
   (`numpy.loadtxt`, `pandas.read_*`) is caught because the plugin frame is on the stack. Engine
   catalog reads and sink writes originate in `ntr.*` frames. `compile` and `exec` events are
   treated differently: they fail only when the **innermost** frame is a plugin frame, so
-  `numba`'s own JIT machinery (which compiles from within a plugin call) is permitted while a
-  plugin-authored `exec` is not. `numba` is configured `cache=False, fastmath=False,
-  parallel=False` for plugin packages. Phase 0 proves both the rejection and the permission.
+  a plugin-authored `exec` is refused. `ctypes.*` events follow the same innermost-frame rule
+  (Phase 2 F20: numba/llvmlite resolve LLVM symbols through ctypes during compilation with the
+  plugin frame further up the stack; a plugin calling ctypes itself is still refused).
+  **Phase 0 finding F1 / Phase 2 F21:** numba's lazy JIT performed `open` events with the plugin
+  frame on the stack while numba was cold; `audit.install()` now pre-initialises entry points and
+  performs a dummy eager compile before arming, so the runtime hook no longer sees that I/O.
+  The pinned rule is therefore **static**: plugin jit functions must carry an explicit signature,
+  and registration refuses `NUMBA_LAZY_JIT` before any plugin code runs. The runtime hook is the
+  net, not the rule. `numba` is configured `cache=False, fastmath=False, parallel=False` for
+  plugin packages. Phase 0 proved the three rejections, the ordinary-plugin permission, the
+  eager-numba permission, and the lazy-numba refusal.
+* **Registration-time boundary (Phase 0 U8).** The runtime hook cannot see the period before it
+  is armed, and plugins are imported and constructed then. Registration therefore (1) runs the
+  static boundary check on the plugin module's source **before executing it**, (2) imports and
+  constructs the plugin under a *registration-scoped* audit that permits only the import
+  allowlist and no I/O, and (3) keeps import-time and constructor-time leakage as negative
+  controls in the suite. Eager numba compilation is the one sanctioned bootstrap activity and it
+  performs no I/O once entry points are pre-initialised.
 * **Semantic review.** Registering a new `ReferenceInput`, a new `subscribes` bar spec,
   `warmup_bars = None`, or a new `Label` marks the study `NEEDS_SEMANTIC_REVIEW`; the transition
   is in §8.
@@ -308,10 +423,30 @@ produce two spines rather than one ambiguous cache entry.
 
 ### 4.1 Ingest
 
-`ntr data build` writes an NT `ParquetDataCatalog` of 1s `EXTERNAL` bars partitioned by month,
-plus `manifest.json` (per-partition sha256, row counts, first/last `ts_init`, roll table,
-normalisation rule, source rules). Existing catalogs are adopted by re-partitioning into monthly
-files and writing their manifest.
+`ntr data build` writes 1s `EXTERNAL` bars as NT-native Parquet (NT `ArrowSerializer` schema and
+metadata) partitioned by month, plus `manifest.json` (per-partition sha256, row counts, first/last
+`ts_init`, roll table, normalisation rule, source rules, and the **build plan**: the expected
+partition inventory). Existing catalogs are adopted by re-partitioning into monthly files into a
+*separate* output catalog and writing their manifest; the originals are never modified.
+
+**Manifest validation (review 8).** A manifest is accepted only if: its partition inventory equals
+the expected build plan exactly (no missing, no extra months); every path is relative, contains no
+`..` or absolute component, and resolves under the catalog directory; every partition's row count,
+first/last `ts_init` and sha256 match the bytes; partitions are non-overlapping and ordered; the
+bar type metadata matches the manifest's declaration. An empty inventory is refused. The Phase 0
+`read_group` helper validates *group parts only* and is not the catalog validator.
+
+**Memory (Phase 1 memory task).** The builder buckets source rows by UTC day: one Arrow table and
+one Parquet row group per day, freed as written, verified by a rolling value digest re-read one row
+group at a time. At most two days of bars are resident. Measured on one real month of 1s NQ bars:
+builder peak 1,082 MB with a month bucket, 333 MB with day buckets, values identical
+(`../ntr/MEMORY_TASK_REPORT.md`). Whole-month `Bar` materialisation is not used anywhere in ingestion.
+
+**Build refusals.** Duplicate `ts_init` within an instrument (`DUPLICATE_TIMESTAMP`), a bar whose
+`ts_init` is not the declared close-time normalisation of its source stamp
+(`TIMESTAMP_NORMALISATION`), an out-of-order source, and a partition that cannot be verified after
+write all refuse the build and leave no manifest; a rebuild resumes by overwriting the unverified
+partition. Publication of each partition and of the manifest uses the §4.6 protocol.
 
 ### 4.2 Layout and addresses
 
@@ -323,10 +458,14 @@ runs/<study>/evals/<eval_key>/                 checks/  fit/  backtest/  report.
 runs/<study>/holdout/<eval_key>/               (§5.2; separate, refused by fit/analyze)
 ```
 
-* `gid = h(name, plugin fp, params, rfp)`; directory carries 12 hex characters, manifest the full
-  digest.
-* `spine_key = h(data manifest, trigger gids, origin, date range, role_boundary, timeframe +
-  aggregation config, calendar version, rfp)`.
+* `gid = h(name, plugin fp, params, sorted gids of every plugin in depends_on, rfp)`. Because a
+  dependency's gid already contains *its* params and *its* dependencies' gids, the identity is
+  transitive over configured instances: changing feature A's period from 20 to 60 changes A's gid
+  and therefore B's (which reads A), while an unrelated C keeps its gid and its receipts (review 8
+  item 1; Phase 2 acceptance case). Directory carries 12 hex characters, manifest the full digest.
+* `spine_key = h(data manifest, trigger gids (each including the gids of features the trigger
+  depends on), origin, effective date range, role_boundary, timeframe + aggregation config,
+  calendar version, rfp)`.
 * `eval_key = h(spine_key, sorted gids selected, label gid, comparison mask, split, model family
   + params, estimand, checks version, rfp)`.
 
@@ -337,7 +476,9 @@ runs/<study>/holdout/<eval_key>/               (§5.2; separate, refused by fit/
   and are excluded by both populations.
 * **Runtime checkpoints** (`ckpt_runtime/`): trigger state, aggregator state, coarse-bar buffer,
   engine clock, producing `ReadPlan` hash. Schema fingerprint `h(trigger gids, rfp)`. Written at
-  month boundaries of the sequential spine record.
+  month boundaries of the sequential spine record. A restore is **refused** unless the
+  checkpoint's ReadPlan hash, mode and plugin set (and gids when recorded) equal the restoring run's
+  (red-team F4): a checkpoint carries its provenance and the actor enforces it.
 * **Feature checkpoints** (`ckpt_feature/`, per group): `state()` at the same boundaries; schema
   fingerprint = gid. Only a sequentially recorded group has them.
 * **Spine record**: sequential over `[origin, end)`.
@@ -350,17 +491,42 @@ runs/<study>/holdout/<eval_key>/               (§5.2; separate, refused by fit/
   `initial_state`, writing its own feature checkpoints. A feature never claims history from
   another feature's or the spine's checkpoints.
 * **Attach never moves the spine.** Population prefix consistency is proven by 6.1.
+* **Engine input is batch-streamed (Phase 2 F24).** The authorised loader yields one Parquet row
+  group (one UTC day) at a time and the runner feeds NautilusTrader's batch streaming; plugin and
+  aggregator state persist inside the one engine, so memory is bounded by a day of bars plus the
+  run's own snapshots. Only day-streamed catalogs realise this (F27).
 
 ### 4.4 Shard consistency
 
 `ntr check shards` records one window sharded and sequentially and diffs every column including
 status columns.
 
+**Phase 2 amendments.** (red-team F2) Warm-up is denominated in each plugin's OWN timeframe: a
+fine-stream plugin contributes a bar count, a coarse-stream plugin a time span (NT emits an internal
+coarse bar per interval regardless of sparsity); a shard's prefix satisfies both and includes one bar
+before the span so the aggregator covers it; an unbounded closure is refused in shards mode
+(`UNBOUNDED_IN_SHARDS`) and its manifest records `warmup_ns: null`. A plugin whose state persists
+until an event (a regime's anchor and age) is unbounded and records sequentially.
+(F22) Warm-up is declared in bars and a shard's prefix is *counted* in bars,
+walking back month by month through authorised ReadPlans until the declared count precedes the shard
+start; the shard then receives exactly that many bars, never more, so an understated declaration is
+detectable. (F23) Bit-identity under re-warm is unattainable for floating-point IIR features (an EMA
+re-warmed from a finite prefix agrees to 1–2 ULP, not bit-for-bit); a plugin may declare
+`shard_tolerance()` (relative, default 0), which 6.4 applies to floating columns only and records in
+the receipt beside the observed maximum; status and integer columns stay exact. A finite-warm-up
+feature must not expose unbounded state (a bar counter) as a field.
+
 ### 4.5 Fingerprints
 
-* **Plugin fingerprint** `fp = h(normalised AST of the plugin module and every first-party module
-  reachable by static import walk within the plugin packages and `ntr.core`, `depends_on`
-  fingerprints, declared input partition hashes + schema)`.
+* **Plugin fingerprint (symbol-level)** `fp = h(normalised AST of the plugin *class* and of every
+  first-party symbol it references transitively -- functions, constants, base classes, helper
+  classes -- resolved statically across the plugin packages and `ntr.core`; declared input
+  partition hashes + schema)`. Adding an unrelated class to the same module leaves existing
+  fingerprints, gids and receipts unchanged (review 8 item 2; Phase 2 acceptance case). Where
+  static resolution fails (dynamic attribute access, `getattr` on modules, star imports) the
+  fingerprint falls back to the whole module and the manifest records `fp_scope: module` so the
+  conservative invalidation is visible rather than silent. Dependency *instances* are not part of
+  `fp`; they enter through `gid` (§4.2).
 * **Producer-runtime fingerprint** `rfp = h(normalised AST of every module reachable from the
   `ntr record` and `ntr fit` entrypoints within `ntr/`, excluding `ntr.analysis`, `ntr.cli`
   presentation and `ntr.backtest.execution`; pinned versions of Python, `nautilus_trader`,
@@ -422,9 +588,19 @@ status columns.
   marker is written to `_COMPLETE.json.tmp` and `os.replace`d into place so a reader never sees
   a partial marker; selecting the fallback is not evidence it is safe, so Phase 0 also injects a
   crash mid-marker-write and runs concurrent readers against a publisher under both protocols.
-* **Cleanup.** Only the lock holder (a successor that acquired the lock, or the process for its own temp dir). Before deleting, walk **every
-  descendant** and refuse the whole operation if any entry is a symlink, junction or reparse
-  point; never follow one. Nothing outside `runs/` is deleted by `ntr`.
+* **Cleanup.** Only the lock holder (a successor that acquired the lock, or the process for its
+  own temp dir). **Containment** of the deletion target is checked three ways before anything is
+  removed: lexical containment under `runs/`, containment of the *resolved* path (`realpath`,
+  junctions and symlinks followed) under the resolved root, and inspection of every ancestor
+  strictly between root and target for a reparse point (Phase 0 D18: a junction at
+  `runs/redirect` would otherwise redirect deletion outside `runs/`). Then walk **every
+  descendant** and refuse if any entry is a symlink, junction or reparse point; never follow one.
+  The same containment rule validates a recovered temp-dir path from lock metadata. Nothing
+  outside `runs/` is ever deleted by `ntr`.
+* **Replace with retry (Phase 0 F4).** On Windows, `os.replace` onto a file another process is
+  reading at that instant fails with `PermissionError`, because Python's `open()` grants no delete
+  sharing. Marker and lock-info writes use a bounded retry (100 × 20 ms); readers hold these files
+  for microseconds. Exhausting the retry re-raises and the publish fails loudly.
 * **Readers** require `_COMPLETE.json`, verify the manifest hash on open and part hashes before
   a fit or a check.
 * **Dispositions.** `<feature>__status ∈ {OK, WARMING, NOT_READY, INPUT_UNAVAILABLE}`; label
@@ -480,11 +656,26 @@ models/<study>/<model_id>/  model.txt|model.onnx  contract.json  manifest.json  
 
 ## 6. Checks (`ntr check`)
 
-### 6.0 Receipts and stage prerequisites
+### 6.0 Receipts, layered keys, and stage prerequisites
 
-A receipt `evals/<eval_key>/checks/<name>.json` records verdict, reason, check version, and the
-`_COMPLETE.json` content hash of every directory it read. Consumers recompute and refuse on any
-difference. "As applicable" is this table, computed by `ntr status`:
+Artifacts and receipts live in **layers**, and a receipt binds to the narrowest layer it actually
+depends on, so that an iteration invalidates only what it touched (§8.1):
+
+| Layer | Key | Receipts bound here |
+|---|---|---|
+| Population | `spine_key` | 6.6 chronology of the spine's ReadPlan; spine half of 6.1 |
+| Feature / label group | `gid` (with `spine_key`) | 6.2 static boundary (per plugin fp), 6.1 truncation for that group, 6.4 shards, 6.7 label fidelity (label gids, per `xid_ref`) |
+| Training frame | `frame_key = h(spine_key, selected gids, label gid, comparison mask)` | 6.3 provenance |
+| Fit | `fit_key = h(frame_key, split, model family + params, estimand)` | 6.8 selection verdict, coverage, metrics |
+| Backtest | `bt_key` (§4.5) | 6.5 contract fidelity, 6.9 production invariance |
+
+`eval_key` remains the name of the whole evaluated thing (it is `fit_key` plus checks version and
+`rfp`) and is where cards and reports live, but a change to model parameters re-runs only the fit
+layer: the spine, group and frame receipts stay valid because their keys did not change.
+
+A receipt records verdict, reason, check version, and the `_COMPLETE.json` content hash of every
+directory it read. Consumers recompute and refuse on any difference. "As applicable" is this
+table, computed by `ntr status`:
 
 | Verb | Required PASS receipts before it runs | Produced by it |
 |---|---|---|
@@ -498,12 +689,12 @@ difference. "As applicable" is this table, computed by `ntr status`:
 
 | # | Check | Computes |
 |---|---|---|
-| 6.1 | **Truncation** | Cutoffs `D1 < D2 < D3`, fresh interpreters, audit installed: run the full study (triggers and features) over `[A, Di]` and `[A, Di + k]` with the suffix perturbed. Compare the spine (`snapshot_id` set and trigger fields with `ts_init <= Di`) and every feature field with `ts_init <= Di`. Any difference or audit violation fails. |
+| 6.1 | **Truncation** | Cutoffs `D1 < D2 < D3`, fresh interpreters, audit installed: run the full study (triggers and features) over `[A, Di]` and `[A, Di + k]` with the suffix perturbed. Compare the spine (`snapshot_id` set and trigger fields with `ts_init <= Di`) and every feature field with `ts_init <= Di`. Any difference or audit violation fails. A cutoff with an empty prefix, an empty perturbed suffix, or zero rows compared is `INCONCLUSIVE`, never `PASS` (red-team F5). The study module and every plugin it imports are validated statically and executed under the armed audit before any bar is delivered (F3). |
 | 6.2 | **Static boundary** | §3.4 and §3.2 rules; params JSON-serialisable; trigger names unique; inputs year-partitioned. |
 | 6.3 | **Label isolation (provenance)** | `X` only from `f_*` gids of the arm, `y` only from the label gid; label-provenance columns refused. Negative controls: `numpy.loadtxt` of a registered path from a plugin (audit), target copied from future bars (6.1). Permutation test is a diagnostic. |
-| 6.4 | **Shard consistency** | §4.4. |
+| 6.4 | **Shard consistency** | §4.4. The check compares the **published group itself** against a fresh in-memory recompute in the other attach mode (a receipt must be about the bytes it binds; red-team F1); a deliverable recorded from a bar override is `INCONCLUSIVE`. |
 | 6.5 | **Contract fidelity** | `contract.json` equals the running actor's rebuilt contract. |
-| 6.6 | **Chronology** | Executed `ReadPlan` ⊆ authorised plan; holdout path untouched by fit/analyze; `EXPOSURE_START` present for any holdout partition; post-exposure class propagated. |
+| 6.6 | **Chronology** | Executed `ReadPlan` ⊆ authorised plan; holdout path untouched by fit/analyze; `EXPOSURE_START` present for any holdout partition; post-exposure class propagated. Permitted roles are enumerated per verb; an unknown verb is refused, never passed (F6). |
 | 6.7 | **Label fidelity** | Below. |
 | 6.8 | **Estimand execution** | Typed `Selection` over the comparison mask; per-arm row counts equal the mask; verdict on the card; equal elapsed windows and conditioning-signal rate enforced in analysis helpers. |
 | 6.9 | **Production invariance** | During any backtest, the actor's emitted snapshots (spine fields and selected-arm feature fields) are compared bit-identically to the recorded spine and groups over the same window. Proves that the execution scenario `xid` did not alter feature production; a difference is a defect in the delivery/execution separation, surfaced as `SCENARIO_ALTERED_PRODUCTION`. |
@@ -512,7 +703,9 @@ difference. "As applicable" is this table, computed by `ntr status`:
 `backtest/engine.pyx`: the loop is `exchange.process_bar(bar)` → `data_engine.process(bar)`
 (actors' `on_bar`, orders submitted) → `_process_and_settle_venues(bar.ts_init)`, so a market
 order submitted during `on_bar(T)` is filled at `T` against the L1 book after bar `T`'s ticks,
-i.e. at close(T) under `FillModel(prob_slippage=0)`. The label actor uses the same convention:
+i.e. at close(T) under `FillModel(prob_fill_on_limit=1.0, prob_slippage=0.0)` (Phase 0 D1 confirmed
+this empirically; F2: 1.230 has no stop-fill probability knob, so `xid_ref` is exactly those two
+parameters plus zero latency). The label actor uses the same convention:
 entry price close(T), entry time `T`, observation from `T + 1s`. At 1s resolution the
 difference from a next-open convention is one second and is measured, not assumed, by the
 Phase 0 fixture. A different execution timing (a limit at a price, a delayed market order) is a
@@ -520,12 +713,13 @@ different `Label`/`Policy` pair with its own fidelity evidence.
 
 | Class | Definition | Disposition |
 |---|---|---|
-| `DETERMINISTIC` | Entry at close(T); barrier order decided by bar sequence with no gap across a barrier | Must agree **exactly** with NT fills in an isolated engine |
-| `SAME_BAR` | Both barriers inside one bar | Declared resolution (`worst_case` default); NT's assumption documented beside it |
-| `GAP` | A bar opens beyond a barrier | Resolution known, fill price = open (worst case), gap size recorded |
+| `DETERMINISTIC` | Entry at close(T); barrier order decided by bar sequence with no gap across a barrier | Must agree **exactly** with NT fills in an isolated engine. SL convention `sl_fill="stop_price"` (NT: a stop touched inside a bar fills at the stop, not the bar extreme); the pessimistic `bar_extreme` convention is a label param that FAILS 6.7 by design |
+| `SAME_BAR` | Both barriers inside one bar | Declared resolution (`worst_case` default = SL at the stop price); NT itself processes O,H,L,C and fills the PT first -- reported by 6.7, never compared |
+| `GAP` | A bar opens beyond a barrier | Resolution known: a stop fills at the **open**, a limit at its **limit price** (NT 1.230 probe); compared exactly with NT fills like `DETERMINISTIC` |
+| `HORIZON` | No barrier by `ts_open + horizon` | Timed market exit at `ts_open + horizon` against the last observed close (the bar AT the horizon is inside the window; NT fires the clock alert after it); compared exactly with NT fills |
 | `DATA_GAP` | No bar for more than `max_gap` (default 60 s) in the window | Status `DATA_GAP`, excluded by default mask, counted |
 | `SESSION_BOUNDARY` | Window crosses a session close or halt | `truncate`/`censor` per label param |
-| `ROLE_BOUNDARY` | Window crosses a chronology role boundary (§4.0) | `TRUNCATED`, counted |
+| `ROLE_BOUNDARY` | Window crosses a chronology role boundary (§4.0) | `TRUNCATED`, counted. Produced by a `ReadPlan` whose declared label suffix is truncated (`role_boundary: truncate`); with `refuse` the label group is refused (6.6). A suffix that ends while rows are still pending (declared coverage shorter than the label needs) is `SUFFIX_INSUFFICIENT`, never silent censoring |
 | `ENTRY_UNFILLED` | No bar at `T` usable for entry (empty-window bar, halt) | Status `ENTRY_UNFILLED`, counted |
 
 Every fit/backtest card reports the share of rows and of PnL in each non-deterministic class and
@@ -557,6 +751,7 @@ ntr doctor                        environment, roles file sanity, NT version pin
 ntr status  --study X             state at the current eval_key; prerequisites table; next verb
 ntr record  --study X             ReadPlan → spine (once) + missing groups; detached; progress.json
 ntr check   --study X [--fidelity]   post-record receipts (6.1, 6.4, 6.6); --fidelity runs the bounded isolated engine for 6.7
+ntr explore --study X [script]    tables over the TRAIN/tune frame; no fit, no commit, no holdout (§8.1)
 ntr review  request --study X     writes reviews/<plugin>_<fp12>.request.json (plugin fp, input partition hashes, subscribes, warmup)
 ntr review  ingest  --study X --file <md> --reviewer <id>
                                   writes reviews/<plugin>_<fp12>.approval.json bound to those exact fingerprints;
@@ -566,6 +761,29 @@ ntr report  --study X             report.md from artifacts; operator edits only 
 ntr commit  --study X             COMMIT line
 ntr backtest --study X [--holdout --commitment <id>]     train/tune, or EXPOSURE_START … RESULT
 ```
+
+### 8.1 Incremental research is the normal workflow
+
+The verb sequence above is the *end-to-end path*. The normal interactive workflow is
+dependency-driven: a change re-runs only the work it invalidates, and the operator may stop at
+any layer and look. Nothing below requires a fit, a winner, a commitment or a backtest.
+
+| What you change or want | Work executed | Reused untouched |
+|---|---|---|
+| Look at recorded TRAIN/tune rows, distributions, outcome tables; test an interpretation | `ntr explore --study X [script]` over the frame; no replay, no fit | everything |
+| Add a feature | record its group (and any `depends_on` groups missing) against the existing spine; run the group-layer checks for it | spine, other groups, their receipts |
+| Change a feature's parameters | new `gid` → record that group only | as above |
+| Compare feature subsets or model settings | new `frame_key` / `fit_key`; fit and paired comparison on the same rows | spine, groups, group receipts |
+| Add a label or change its horizon | record the label group; reuse features | spine, feature groups |
+| Change the trigger or population logic | new `spine_key`: re-record the spine and dependent groups | nothing (correct: the population changed) |
+| Change a policy or threshold | new `bt_key`; rerun the backtest with the same model | model, frame, fit |
+
+`ntr explore` reads TRAIN and tune frames only and writes tables to `explore/<frame_key>/<spec
+hash>/`; it never opens a holdout path. Commitment and holdout evaluation belong at the point where
+a frozen candidate is to be tested, not at every iteration. **Evidence boundary:** iteration
+informed by TRAIN/tune results is free; iteration informed by a holdout result is
+`post_exposure` for that (instrument, year) by the ledger rule in §5.2 and cannot claim that
+holdout as untouched validation.
 
 Decisions the operator never makes: roles, holdout years, which checks apply, whether a review
 is needed, what to delete, whether a stale approval still counts. Decisions the operator makes:

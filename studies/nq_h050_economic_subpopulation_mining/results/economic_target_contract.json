@@ -1,0 +1,11 @@
+{
+  "target_frequency": "5-10 trades/day",
+  "target_net_expectancy": ">= +0.30 ATR/trade net of slippage/costs",
+  "cost_model": "audited C1 execution model",
+  "primary_split": {
+    "discovery_fit_oof": "2023 (N=10,605)",
+    "untouched_validation": "2024 (N=10,888)",
+    "frozen_forward_diagnostic": "2025 Q1 (N=2,422)"
+  },
+  "kill_condition": "If no candidate achieves >= +0.20 ATR/trade on untouched 2024 with ~5/day frequency and controlled DD, recommend STOP"
+}

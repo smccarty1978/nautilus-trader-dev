@@ -1,0 +1,205 @@
+{
+  "total_features_checked": 183,
+  "threshold": 0.98,
+  "high_correlation_pairs_count": 33,
+  "pairs": [
+    {
+      "feature_1": "regime_max_mfe_atr__tf_30s",
+      "feature_2": "regime_total_range_atr__tf_30s",
+      "correlation": 0.9932896601738058,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "regime_current_displacement_atr__tf_30s",
+      "feature_2": "regime_distance_from_mae_atr__tf_30s",
+      "correlation": 0.9918307016407801,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "regime_time_since_mfe_sec__tf_30s",
+      "feature_2": "regime_time_since_mfe_sec__tf_1m",
+      "correlation": 0.9927859408405404,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "prior_regime_total_range_atr__tf_30s",
+      "feature_2": "prior_regime_mfe_to_mae_range_atr__tf_30s",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "current_price_from_prior_mae_atr__tf_30s",
+      "feature_2": "current_max_mfe_from_prior_regime_mae_atr__tf_30s",
+      "correlation": 0.9812560430121345,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "regime_mfe_gain_30s_atr__tf_30s",
+      "feature_2": "regime_recent_expansion_rate_30s_atr_min__tf_30s",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_60s_atr__tf_30s",
+      "feature_2": "regime_recent_expansion_rate_60s_atr_min__tf_30s",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_180s_atr__tf_30s",
+      "feature_2": "regime_recent_expansion_rate_180s_atr_min__tf_30s",
+      "correlation": 0.9999999999999991,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_age_sec__tf_1m",
+      "feature_2": "regime_time_since_mae_sec__tf_1m",
+      "correlation": 0.9954614815523145,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "regime_max_mfe_atr__tf_1m",
+      "feature_2": "regime_total_range_atr__tf_1m",
+      "correlation": 0.9929216030175081,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "regime_current_displacement_atr__tf_1m",
+      "feature_2": "regime_distance_from_mae_atr__tf_1m",
+      "correlation": 0.9931483242543487,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "prior_regime_total_range_atr__tf_1m",
+      "feature_2": "prior_regime_mfe_to_mae_range_atr__tf_1m",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "current_price_from_prior_mae_atr__tf_1m",
+      "feature_2": "current_max_mfe_from_prior_regime_mae_atr__tf_1m",
+      "correlation": 0.9862044175505692,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "regime_mfe_gain_30s_atr__tf_1m",
+      "feature_2": "regime_recent_expansion_rate_30s_atr_min__tf_1m",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_60s_atr__tf_1m",
+      "feature_2": "regime_recent_expansion_rate_60s_atr_min__tf_1m",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_180s_atr__tf_1m",
+      "feature_2": "regime_recent_expansion_rate_180s_atr_min__tf_1m",
+      "correlation": 0.9999999999999986,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_max_mfe_atr__tf_5m",
+      "feature_2": "regime_total_range_atr__tf_5m",
+      "correlation": 0.9933233837335818,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "regime_current_displacement_atr__tf_5m",
+      "feature_2": "regime_distance_from_mae_atr__tf_5m",
+      "correlation": 0.9906521697077173,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "prior_regime_total_range_atr__tf_5m",
+      "feature_2": "prior_regime_mfe_to_mae_range_atr__tf_5m",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_30s_atr__tf_5m",
+      "feature_2": "regime_recent_expansion_rate_30s_atr_min__tf_5m",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_60s_atr__tf_5m",
+      "feature_2": "regime_recent_expansion_rate_60s_atr_min__tf_5m",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_180s_atr__tf_5m",
+      "feature_2": "regime_recent_expansion_rate_180s_atr_min__tf_5m",
+      "correlation": 0.9999999999999971,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_age_sec__tf_1h",
+      "feature_2": "regime_time_since_mae_sec__tf_1h",
+      "correlation": 0.983655997005138,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "regime_max_mfe_atr__tf_1h",
+      "feature_2": "regime_total_range_atr__tf_1h",
+      "correlation": 0.9842225307546988,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "prior_regime_total_range_atr__tf_1h",
+      "feature_2": "prior_regime_mfe_to_mae_range_atr__tf_1h",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_30s_atr__tf_1h",
+      "feature_2": "regime_recent_expansion_rate_30s_atr_min__tf_1h",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_60s_atr__tf_1h",
+      "feature_2": "regime_recent_expansion_rate_60s_atr_min__tf_1h",
+      "correlation": 1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "regime_mfe_gain_180s_atr__tf_1h",
+      "feature_2": "regime_recent_expansion_rate_180s_atr_min__tf_1h",
+      "correlation": 0.9999999999999873,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "mtf_regime_direction_agreement_count",
+      "feature_2": "mtf_regime_direction_signed_sum",
+      "correlation": 1.0000000000000002,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "pullback_efficiency",
+      "feature_2": "pullback_velocity_atr_sec",
+      "correlation": 0.9999999999999992,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "pullback_ordinal",
+      "feature_2": "previous_pullbacks_count",
+      "correlation": 1.0000000000000002,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    },
+    {
+      "feature_1": "context_levels_above_count",
+      "feature_2": "context_levels_below_count",
+      "correlation": -0.9836249806084754,
+      "redundancy_type": "HIGH_CORRELATION"
+    },
+    {
+      "feature_1": "minutes_from_rth_open",
+      "feature_2": "minutes_to_rth_close",
+      "correlation": -1.0,
+      "redundancy_type": "ALGEBRAIC_OR_HIGH_COLLINEARITY"
+    }
+  ]
+}

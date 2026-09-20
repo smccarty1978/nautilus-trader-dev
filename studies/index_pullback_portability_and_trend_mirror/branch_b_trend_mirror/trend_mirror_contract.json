@@ -1,0 +1,37 @@
+{
+  "study_id": "nq_h050_trend_following_mirror",
+  "hypothesis": "Trading in the direction of the incumbent regime (Bull pullback -> LONG, Bear rally -> SHORT) at the 0.50 ATR pullback checkpoint provides superior risk-adjusted economics and substantially lower drawdown than counter-regime reversal.",
+  "entry_architectures": {
+    "E0": "Immediate continuation: decision at H050 checkpoint, enter at next 1s bar open with 1 tick adverse slippage.",
+    "E1": "Re-acceleration: first completed 5s bar with close in direction of incumbent regime (Bull: close > open; Bear: close < open), enter at next 1s bar open with 1 tick adverse slippage. If regime terminates before re-acceleration, trade is skipped."
+  },
+  "bracket_policies": {
+    "R0": {
+      "stop_loss_atr": 0.75,
+      "take_profit_atr": 0.75,
+      "nominal_reward_risk": 1.0
+    },
+    "R1": {
+      "stop_loss_atr": 0.75,
+      "take_profit_atr": 1.0,
+      "nominal_reward_risk": 1.3333
+    },
+    "R2": {
+      "stop_loss_atr": 1.0,
+      "take_profit_atr": 1.25,
+      "nominal_reward_risk": 1.25
+    }
+  },
+  "execution_resolution": "1-second completed bars (CME NQ 1s catalog/raw bars)",
+  "tie_break_rule": "Conservative tie-break: if both SL and PT are touched in the same 1s bar, SL takes priority (SL wins)",
+  "exit_timeout_policy": "REGIME_TERMINATION_EXIT: if neither PT nor SL is touched before incumbent regime flip, exit at next 1s bar open upon confirmed transition with 1 tick adverse slippage",
+  "friction_model": {
+    "instrument": "CME NQ",
+    "point_value": 20.0,
+    "tick_size": 0.25,
+    "commission_round_trip_dollars": 5.0,
+    "slippage_round_trip_ticks": 2,
+    "total_round_trip_friction_points": 0.75,
+    "total_round_trip_friction_dollars": 15.0
+  }
+}

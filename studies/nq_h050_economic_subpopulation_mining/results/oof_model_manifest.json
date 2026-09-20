@@ -1,0 +1,99 @@
+{
+  "model_type": "LightGBM Regressor (EV) & Classifiers (Tail)",
+  "hyperparameters": {
+    "objective": "regression",
+    "metric": "rmse",
+    "max_depth": 4,
+    "num_leaves": 15,
+    "learning_rate": 0.03,
+    "min_child_samples": 50,
+    "colsample_bytree": 0.8,
+    "subsample": 0.8,
+    "n_estimators": 150,
+    "random_state": 42,
+    "verbosity": -1
+  },
+  "feature_count": 183,
+  "top_20_features_by_split_importance": [
+    [
+      "prior_regime_max_mae_atr__tf_1h",
+      58.0
+    ],
+    [
+      "minutes_to_rth_close",
+      52.0
+    ],
+    [
+      "prior_regime_max_mae_atr__tf_30s",
+      45.0
+    ],
+    [
+      "minutes_from_rth_open",
+      43.0
+    ],
+    [
+      "prior_regime_max_mae_atr__tf_1m",
+      38.0
+    ],
+    [
+      "prior_regime_max_mfe_atr__tf_1m",
+      32.0
+    ],
+    [
+      "previous_pullbacks_max_depth_atr",
+      32.0
+    ],
+    [
+      "atr_percentile_20d",
+      31.0
+    ],
+    [
+      "regime_max_mae_atr__tf_1h",
+      27.0
+    ],
+    [
+      "context_level_span_atr",
+      27.0
+    ],
+    [
+      "prior_regime_duration_sec__tf_5m",
+      26.0
+    ],
+    [
+      "current_regime_start_from_prior_mfe_atr__tf_30s",
+      24.0
+    ],
+    [
+      "session_current_range_atr",
+      24.0
+    ],
+    [
+      "regime_time_since_mfe_sec__tf_1h",
+      23.0
+    ],
+    [
+      "regime_max_mae_atr__tf_1m",
+      22.0
+    ],
+    [
+      "current_regime_start_from_prior_mfe_atr__tf_1h",
+      21.0
+    ],
+    [
+      "prior_regime_total_range_atr__tf_5m",
+      20.0
+    ],
+    [
+      "prior_regime_max_mfe_atr__tf_5m",
+      19.0
+    ],
+    [
+      "current_regime_start_from_prior_mae_atr__tf_1h",
+      19.0
+    ],
+    [
+      "session_new_high_count",
+      18.0
+    ]
+  ]
+}

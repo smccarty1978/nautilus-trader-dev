@@ -1,0 +1,82 @@
+{
+  "audit_verdict": "PARENT_MODEL_SURFACE_AUDIT_FAIL_CONTRACT_PASS_MATERIALITY",
+  "scope": "Extension of Phase A. The spec (§2-§4) bounded the audit to fills and opportunity-cost metrics; this block was added because the time-vs-depth comparison (§16, §22) is a MODEL comparison and is only valid if the two arms are fed comparable, causal feature surfaces.",
+
+  "finding_1_future_prices_in_the_feature_matrix": {
+    "status": "CONTRACT_VIOLATION",
+    "file": "scripts/run_delayed_entry_fast_failure_study.py",
+    "mechanism": "expanded_feature_cols = [c for c in df_obs.columns if c not in meta_cols]. meta_cols excludes 'c1_exit_ts' and 'r2_exit_ts' but NOT 'c1_exit_price' and 'r2_exit_price'.",
+    "consequence": "The C1 and R2 exit prices of the very trade whose forward outcome is the label were passed to LightGBM as features, alongside 'entry_price'. These are strictly-future prices relative to the checkpoint.",
+    "exploited": false,
+    "evidence": "Refitting the parent protocol with identical fixed hyperparameters, 2023 fit / 2024 validate, with the two columns removed, changes validation AUC by at most 0.0045 and in 4 of 6 cells the leak-free model scores HIGHER (seed noise).",
+    "why_not_exploited": "Raw absolute price levels are non-stationary between 2023 and 2024; a depth-4 tree splitting on an absolute NQ price learned in 2023 does not transfer, and trees cannot form the exit-minus-entry difference directly.",
+    "required_action": "Add c1_exit_price and r2_exit_price to meta_cols and re-run. The exposure must be closed even though it was not monetised by the model; it is a latent leak that a different model class or a same-year fit would exploit."
+  },
+
+  "finding_2_the_two_arms_did_not_share_a_feature_surface": {
+    "status": "SPEC_DEVIATION",
+    "spec_clause": "§9 'At H050/H075/H100 materialize the SAME causal feature state used in the delayed-entry study ... path evolution since H050 ... pullback evolution'",
+    "delayed_entry_features": 191,
+    "depth_progression_features": 161,
+    "present_in_delayed_absent_from_depth": 39,
+    "notable_omissions": [
+      "current_pullback_depth_atr",
+      "deepest_pullback_depth_since_h050_atr",
+      "pullback_rebound_from_deepest_atr",
+      "current_pullback_velocity_atr_sec",
+      "current_pullback_efficiency",
+      "current_pullback_duration_sec",
+      "pullback_depth_increasing",
+      "price_displacement_from_h050_atr",
+      "path_max_counter_mfe_atr",
+      "path_max_incumbent_mae_atr",
+      "path_efficiency_since_h050",
+      "path_realized_vol_since_h050",
+      "path_longest_counter_run_bars",
+      "path_longest_incumbent_run_bars",
+      "m4_score_at_h050",
+      "delta_m4_score_from_h050",
+      "atr_ratio_short_long",
+      "current_1m_atr"
+    ],
+    "materiality": "Small. Refitting T60/T180 restricted to the 152 features the depth study also has costs 0.007-0.021 AUC, far less than the 0.07-0.12 gap to the depth checkpoints."
+  },
+
+  "reproduction_and_decomposition": {
+    "protocol": "parent's own: LightGBM n_estimators=100, lr=0.03, max_depth=4, num_leaves=15, min_child_samples=50, subsample=0.8, colsample_bytree=0.8, random_state=42; fit 2023, validate 2024; no tuning",
+    "note": "as_published reproduces the parent's reported AUCs exactly, confirming the replication is faithful",
+    "T60": {
+      "terminal_mfe_within_0p25a_from_t": {"as_published": 0.7008, "leak_removed": 0.7015, "depth_matched_surface": 0.6909},
+      "remaining_mfe_gte_1p0a_from_t": {"as_published": 0.6691, "leak_removed": 0.6697, "depth_matched_surface": 0.6542},
+      "remaining_mfe_gte_2p0a_from_t": {"as_published": 0.6553, "leak_removed": 0.6508, "depth_matched_surface": 0.6337}
+    },
+    "T180": {
+      "terminal_mfe_within_0p25a_from_t": {"as_published": 0.7363, "leak_removed": 0.7363, "depth_matched_surface": 0.7290},
+      "remaining_mfe_gte_1p0a_from_t": {"as_published": 0.6936, "leak_removed": 0.6943, "depth_matched_surface": 0.6848},
+      "remaining_mfe_gte_2p0a_from_t": {"as_published": 0.6720, "leak_removed": 0.6763, "depth_matched_surface": 0.6666}
+    }
+  },
+
+  "finding_3_what_actually_explains_the_gap": {
+    "claim": "The time-vs-depth AUC gap is NOT a leak and NOT the feature surface. It is conditioning.",
+    "univariate_auc_2024_T60_terminal": {
+      "current_pullback_depth_atr": 0.6779,
+      "price_displacement_from_h050_atr": 0.6774,
+      "m4_score_current": 0.6425,
+      "pullback_rebound_from_deepest_atr": 0.6535,
+      "path_max_counter_mfe_atr": 0.6129,
+      "deepest_pullback_depth_since_h050_atr": 0.5586,
+      "current_pullback_velocity_atr_sec": 0.5292
+    },
+    "current_pullback_depth_atr_spread_at_T60": {"p10": 0.146, "p25": 0.321, "p50": 0.609, "p75": 0.977, "p90": 1.399, "sd": 0.625},
+    "univariate_auc_2024_H100_terminal": {"seconds_since_h050": 0.5479, "pullback_speed_atr_sec": 0.5479, "max_rebound_atr_before_depth": 0.5215, "rebound_attempts_count": 0.5269},
+    "univariate_auc_2024_catastrophic": {
+      "H100__seconds_since_h050": 0.5578,
+      "H100__pullback_speed_atr_sec": 0.5577,
+      "T60__current_pullback_depth_atr": 0.5210,
+      "T60__price_displacement_from_h050_atr": 0.5487
+    },
+    "interpretation": "At a fixed-TIME checkpoint, current pullback depth varies widely and is by far the strongest single predictor of terminal exhaustion: 0.6779 ALONE, which beats the entire 161-feature H100 model (0.6174). At a DEPTH checkpoint that same variable is pinned to the threshold by construction and its predictive content is destroyed. Depth is the information; a depth trigger is the one design that throws it away.",
+    "symmetric_result": "For catastrophic risk the ordering reverses: traversal speed measured at fixed depth (0.558) beats depth measured at fixed time (0.521)."
+  }
+}

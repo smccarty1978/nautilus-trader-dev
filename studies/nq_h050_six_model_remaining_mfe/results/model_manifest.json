@@ -1,0 +1,776 @@
+{
+  "pooled__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_A_Pooled",
+    "cell": "pooled",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/pooled/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "7a9e7bc2c90e8dcaac7d0ce4dbcb9134943b487062cc6f8e6e3ddf765e4c9623",
+    "num_features": 164,
+    "val_2024_metrics": {
+      "roc_auc": 0.5722152872791976,
+      "pr_auc": 0.3627280113685082,
+      "log_loss": 0.6153085082931388,
+      "brier_score": 0.21239982723861017,
+      "calibration_slope": 0.11409335155368877,
+      "calibration_intercept": 0.3876163595588892,
+      "target_prevalence": 0.30547391623806025
+    },
+    "full_train_rows": 21493
+  },
+  "pooled__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_A_Pooled",
+    "cell": "pooled",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/pooled/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "be3a66eee208d377d864bc38b5bdd51691dc2aed94f99f11f874fcc209ca4bf0",
+    "num_features": 164,
+    "val_2024_metrics": {
+      "roc_auc": 0.5655803021741904,
+      "pr_auc": 0.673276507709947,
+      "log_loss": 0.6657785304720846,
+      "brier_score": 0.23641266992524504,
+      "calibration_slope": 0.11972583661906011,
+      "calibration_intercept": 0.5736734420435873,
+      "target_prevalence": 0.6180198383541513
+    },
+    "full_train_rows": 21493
+  },
+  "pooled__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_A_Pooled",
+    "cell": "pooled",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/pooled/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "71eff6f65f93ce89f316dea49397a67b67ff58b7cb17095dd8fa0e9948be5393",
+    "num_features": 164,
+    "val_2024_metrics": {
+      "roc_auc": 0.5612403923947709,
+      "pr_auc": 0.5605925514452903,
+      "log_loss": 0.6963771197149028,
+      "brier_score": 0.25098586529862116,
+      "calibration_slope": 0.11936970931839049,
+      "calibration_intercept": 0.5180202631130442,
+      "target_prevalence": 0.4966017634092579
+    },
+    "full_train_rows": 21493
+  },
+  "pooled__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_A_Pooled",
+    "cell": "pooled",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/pooled/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "a5608c5606f4b60d35ad6a74ab0199ceed3ff0bcf7108cfd24bf094e4ab6d4f8",
+    "num_features": 164,
+    "val_2024_metrics": {
+      "roc_auc": 0.5436666727666872,
+      "pr_auc": 0.37531004171024507,
+      "log_loss": 0.6504280635252729,
+      "brier_score": 0.22591309075229699,
+      "calibration_slope": 0.06742568064752524,
+      "calibration_intercept": 0.395572576670185,
+      "target_prevalence": 0.3304555473916238
+    },
+    "full_train_rows": 21493
+  },
+  "pooled__remaining_mfe_continuous": {
+    "architecture": "Benchmark_A_Pooled",
+    "cell": "pooled",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/pooled/remaining_mfe_continuous/model.txt",
+    "model_sha256": "1627d0f97af4a7a0de5b6877b8178136199384394e451a67b0b781753e93f8e9",
+    "num_features": 164,
+    "val_2024_metrics": {
+      "mae": 1.8361708248058308,
+      "rmse": 3.719628380418502,
+      "spearman_corr": 0.1517934417528088
+    },
+    "full_train_rows": 21493
+  },
+  "long__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "long",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/long/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "79a00096a61ce3273c48448ba91f4d341e970f3117e3be240babd71af8ab7067",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5717321804253299,
+      "pr_auc": 0.36425533358931295,
+      "log_loss": 0.6223124046882819,
+      "brier_score": 0.21549520701138888,
+      "calibration_slope": 0.09375758384767888,
+      "calibration_intercept": 0.37135671996030295,
+      "target_prevalence": 0.30582793709528217
+    },
+    "full_train_rows": 10542
+  },
+  "long__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "long",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/long/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "a6e7aae85831ca8d807803fb0960c992e3b508eb4161eae5b775b9893dff6768",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5674866100353164,
+      "pr_auc": 0.6741229139939873,
+      "log_loss": 0.6726048941748897,
+      "brier_score": 0.239531635254412,
+      "calibration_slope": 0.10253126858342085,
+      "calibration_intercept": 0.583057815717725,
+      "target_prevalence": 0.6172062904717854
+    },
+    "full_train_rows": 10542
+  },
+  "long__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "long",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/long/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "c8ef74ef17f2aa71a68eb39ac48e3d888120808af1e4b2334283304cb76f31f1",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5608763556960874,
+      "pr_auc": 0.5532744130186953,
+      "log_loss": 0.7075584242993603,
+      "brier_score": 0.25545348232091564,
+      "calibration_slope": 0.09343039482350114,
+      "calibration_intercept": 0.5157052919800844,
+      "target_prevalence": 0.4923219241443108
+    },
+    "full_train_rows": 10542
+  },
+  "long__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "long",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/long/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "be00bcb2b7a17167bd6dbe25581568bd81bb3da229dbcd154abb3e6b28d04bd9",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5444237126789738,
+      "pr_auc": 0.38721454491922896,
+      "log_loss": 0.6750943924592276,
+      "brier_score": 0.23280899599131527,
+      "calibration_slope": 0.05395447569154962,
+      "calibration_intercept": 0.3938283344572653,
+      "target_prevalence": 0.33376503237742833
+    },
+    "full_train_rows": 10542
+  },
+  "long__remaining_mfe_continuous": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "long",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/long/remaining_mfe_continuous/model.txt",
+    "model_sha256": "ffa8a3f0f31292057254c9c3081f43988d5143df22695c13404fbc966081ca16",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "mae": 2.0010662800623407,
+      "rmse": 4.500258196415142,
+      "spearman_corr": 0.18820389932060155
+    },
+    "full_train_rows": 10542
+  },
+  "short__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "short",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/short/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "32e6fd51a98f8827c6824cb2987a026b3ac165319de1b805b6e54d81288fb326",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5333978127211086,
+      "pr_auc": 0.33236829768976184,
+      "log_loss": 0.6340215210869169,
+      "brier_score": 0.22069695496897612,
+      "calibration_slope": 0.05070854110845907,
+      "calibration_intercept": 0.3368942334611088,
+      "target_prevalence": 0.3051249316067846
+    },
+    "full_train_rows": 10951
+  },
+  "short__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "short",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/short/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "4f6558e67c3e8ee9277e1e6296d29e8aea6a0b82cf45a59533b25ed04c94f136",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5235050490948857,
+      "pr_auc": 0.6408872998483858,
+      "log_loss": 0.693556731062325,
+      "brier_score": 0.24912800882299413,
+      "calibration_slope": 0.033438207734925944,
+      "calibration_intercept": 0.6098006504039445,
+      "target_prevalence": 0.6188218128761627
+    },
+    "full_train_rows": 10951
+  },
+  "short__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "short",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/short/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "319a40a6cc7ee950c3cf86bca84befcc0610574e3c1d10a55211b8f315fea22a",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5125361870895481,
+      "pr_auc": 0.5143936095569158,
+      "log_loss": 0.7269474620422718,
+      "brier_score": 0.2647655646244113,
+      "calibration_slope": 0.02939221235712145,
+      "calibration_intercept": 0.5080357991381395,
+      "target_prevalence": 0.5008207185847164
+    },
+    "full_train_rows": 10951
+  },
+  "short__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "short",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/short/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "f4df7d1a69182b3167b20e5db361b638baac3207c1996b1bf7819d78a7cbf449",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5028904214614964,
+      "pr_auc": 0.33546275652648505,
+      "log_loss": 0.673474294356918,
+      "brier_score": 0.23417277824102384,
+      "calibration_slope": 0.01902013693641191,
+      "calibration_intercept": 0.34812672410595713,
+      "target_prevalence": 0.3271931424402699
+    },
+    "full_train_rows": 10951
+  },
+  "short__remaining_mfe_continuous": {
+    "architecture": "Benchmark_B_Directional",
+    "cell": "short",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/short/remaining_mfe_continuous/model.txt",
+    "model_sha256": "2728b25408fbf613f8eaa168bfa418bbc489419234298bdb257318ed52c88615",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "mae": 1.7030951109760613,
+      "rmse": 2.7237871319059623,
+      "spearman_corr": 0.03439617101608937
+    },
+    "full_train_rows": 10951
+  },
+  "L1__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L1",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L1/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "e5c7e5e22366b5f3136d2f2d9507d04764abd3fe4fb3a7c1cd02e88fafa1c5a1",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5643129076956364,
+      "pr_auc": 0.36648949955644294,
+      "log_loss": 0.6338887491668149,
+      "brier_score": 0.2206604067588905,
+      "calibration_slope": 0.0782955609052474,
+      "calibration_intercept": 0.36677156992609644,
+      "target_prevalence": 0.31212653778558874
+    },
+    "full_train_rows": 5512
+  },
+  "L1__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L1",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L1/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "75d18c0cf4c663600e2e15785d45cdc688c42fdd8e564972a33ed17f4dc2f243",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5477703229833047,
+      "pr_auc": 0.6509796348563716,
+      "log_loss": 0.6922666036463805,
+      "brier_score": 0.24805244281568387,
+      "calibration_slope": 0.06548587299503218,
+      "calibration_intercept": 0.5912746391232361,
+      "target_prevalence": 0.6115992970123023
+    },
+    "full_train_rows": 5512
+  },
+  "L1__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L1",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L1/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "daf64fa57df023373a81bc37eeaf26c093c717fb71f3ae31a045afdcfe154189",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5540753979799659,
+      "pr_auc": 0.5229767054494798,
+      "log_loss": 0.7135179185641046,
+      "brier_score": 0.2582302016193452,
+      "calibration_slope": 0.07710993510369776,
+      "calibration_intercept": 0.5009018353715289,
+      "target_prevalence": 0.4822495606326889
+    },
+    "full_train_rows": 5512
+  },
+  "L1__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L1",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L1/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "f3828198e9e1231a2012ed7c1e78613c437b5c9d8e26ec67e4d7e531bf3b523b",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5663242129998054,
+      "pr_auc": 0.36917721678672755,
+      "log_loss": 0.6495993640676542,
+      "brier_score": 0.22475255054294463,
+      "calibration_slope": 0.0655966521851783,
+      "calibration_intercept": 0.384718156567755,
+      "target_prevalence": 0.3184534270650264
+    },
+    "full_train_rows": 5512
+  },
+  "L1__remaining_mfe_continuous": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L1",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L1/remaining_mfe_continuous/model.txt",
+    "model_sha256": "9fda0d305751eb8ae071dc07c6572d8f01323bf87df3030beaa9a0b5b0adf966",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "mae": 1.708333782307794,
+      "rmse": 3.1359448416924303,
+      "spearman_corr": 0.18822205523853913
+    },
+    "full_train_rows": 5512
+  },
+  "L2__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L2",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L2/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "1cd3c07bf59b74e736da7dd570c405ea56a2c8402197d37e847f2118b5ce6e3e",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.516196570854956,
+      "pr_auc": 0.3260599841245503,
+      "log_loss": 0.6526082950054978,
+      "brier_score": 0.22612401380197017,
+      "calibration_slope": 0.02000855355832275,
+      "calibration_intercept": 0.32277441844713656,
+      "target_prevalence": 0.30517879161528977
+    },
+    "full_train_rows": 3163
+  },
+  "L2__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L2",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L2/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "80593ae1371729f711e673ad026d6a23f682b94316d035aa9fc27e92e1836c1c",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5046432152446504,
+      "pr_auc": 0.6125470018654631,
+      "log_loss": 0.7230324602230699,
+      "brier_score": 0.2601732559595639,
+      "calibration_slope": 0.00940601975669051,
+      "calibration_intercept": 0.6067382381354472,
+      "target_prevalence": 0.6109741060419236
+    },
+    "full_train_rows": 3163
+  },
+  "L2__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L2",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L2/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "f0b21f8463f6bfa7ad715a263909a07a79f9b87ad4c401fbabf3911e5699da84",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5239875190356006,
+      "pr_auc": 0.5036689865227532,
+      "log_loss": 0.7554844327171143,
+      "brier_score": 0.27478955110417236,
+      "calibration_slope": 0.021769638516810904,
+      "calibration_intercept": 0.49124115442303495,
+      "target_prevalence": 0.4876695437731196
+    },
+    "full_train_rows": 3163
+  },
+  "L2__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L2",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L2/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "b855a3c8331cfa2c5854cd9432218cb9612a37ee254a660ed29298e6ba7bd75d",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.47867228768793174,
+      "pr_auc": 0.32849126703739195,
+      "log_loss": 0.7538681994032529,
+      "brier_score": 0.26010938662980726,
+      "calibration_slope": -0.016508363694859113,
+      "calibration_intercept": 0.32155651031901145,
+      "target_prevalence": 0.3403205918618989
+    },
+    "full_train_rows": 3163
+  },
+  "L2__remaining_mfe_continuous": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L2",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L2/remaining_mfe_continuous/model.txt",
+    "model_sha256": "19832c05243ec1186753f5a39f045798f19682546004d70f86930237abcbe734",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "mae": 1.9286726879252174,
+      "rmse": 3.425089957260417,
+      "spearman_corr": 0.09936974309201375
+    },
+    "full_train_rows": 3163
+  },
+  "L3__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L3",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L3/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "e239a6f151551272f47642c737bdf11ca52a14df37d0a1d6534af226a760ccb0",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5504546462630295,
+      "pr_auc": 0.33785777291065244,
+      "log_loss": 0.669427040602225,
+      "brier_score": 0.22853175958573743,
+      "calibration_slope": 0.03166491245243972,
+      "calibration_intercept": 0.31572570494025354,
+      "target_prevalence": 0.2878464818763326
+    },
+    "full_train_rows": 1867
+  },
+  "L3__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L3",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L3/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "98475cfd5a2c908187fce7a7156ece6fde98a571764c6a9b91681c00d41f32fc",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5513910604819696,
+      "pr_auc": 0.6684115200608651,
+      "log_loss": 0.7379926986329828,
+      "brier_score": 0.2621139308984909,
+      "calibration_slope": 0.039537615791020435,
+      "calibration_intercept": 0.630068762860006,
+      "target_prevalence": 0.6449893390191898
+    },
+    "full_train_rows": 1867
+  },
+  "L3__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L3",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L3/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "0b41d196f15a8fd4eff07be0aac96268e75a89912097d387d86029e87f515d3c",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5363043081416575,
+      "pr_auc": 0.5513173288442778,
+      "log_loss": 0.8463610597329204,
+      "brier_score": 0.30280748555455994,
+      "calibration_slope": 0.03267310917569648,
+      "calibration_intercept": 0.5487634965929207,
+      "target_prevalence": 0.5309168443496801
+    },
+    "full_train_rows": 1867
+  },
+  "L3__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L3",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L3/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "65d7f4858c56fadd3fb57c425202a0f4d4672ba5b5ced5d27bc9a091c29ef858",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5023043274488361,
+      "pr_auc": 0.35676198911185764,
+      "log_loss": 0.9499169327681335,
+      "brier_score": 0.30738916445285536,
+      "calibration_slope": 0.001137077442113344,
+      "calibration_intercept": 0.37101797781156826,
+      "target_prevalence": 0.36886993603411516
+    },
+    "full_train_rows": 1867
+  },
+  "L3__remaining_mfe_continuous": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "L3",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/L3/remaining_mfe_continuous/model.txt",
+    "model_sha256": "0bd7ba4287a44332b684ea50d8d3ff20428ce52b6cc4b670c0fb22b257344822",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "mae": 3.5320952098674794,
+      "rmse": 8.487842324062994,
+      "spearman_corr": 0.0740395103117104
+    },
+    "full_train_rows": 1867
+  },
+  "S1__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S1",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S1/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "6ca58f21cb3b7036c914428457ea4a429c97b6a1ba6cbde954e84d2682de9a1d",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5282641486101944,
+      "pr_auc": 0.3372996340260359,
+      "log_loss": 0.6456545960101593,
+      "brier_score": 0.2246251906852049,
+      "calibration_slope": 0.0367674320882138,
+      "calibration_intercept": 0.34359923077984383,
+      "target_prevalence": 0.3140495867768595
+    },
+    "full_train_rows": 5200
+  },
+  "S1__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S1",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S1/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "c68e038b9eeb50b3c56db118c59b70ebb44b843004b95f45a72ce88b52a3642d",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5334814988107771,
+      "pr_auc": 0.6351609623347804,
+      "log_loss": 0.6869466546626412,
+      "brier_score": 0.24563305642707628,
+      "calibration_slope": 0.05587242353327171,
+      "calibration_intercept": 0.5831617574563983,
+      "target_prevalence": 0.6080283353010626
+    },
+    "full_train_rows": 5200
+  },
+  "S1__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S1",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S1/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "a583e02f7aeeda2d300d28e686d2e067c3f17e50267bd0b78306afaf0732dea8",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5024977878683479,
+      "pr_auc": 0.4946616540298016,
+      "log_loss": 0.7205769390904283,
+      "brier_score": 0.2626178851328129,
+      "calibration_slope": 0.016011504642802557,
+      "calibration_intercept": 0.49467573264075754,
+      "target_prevalence": 0.4927194018103109
+    },
+    "full_train_rows": 5200
+  },
+  "S1__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S1",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S1/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "504423f2e919864525cfef7a3e1a4838498b8235d0d2188dc5a5a27390b32141",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5082510051694429,
+      "pr_auc": 0.32561413932098043,
+      "log_loss": 0.6552092644709584,
+      "brier_score": 0.22697668596262022,
+      "calibration_slope": 0.01048965418975796,
+      "calibration_intercept": 0.3250499189809094,
+      "target_prevalence": 0.3148366784730421
+    },
+    "full_train_rows": 5200
+  },
+  "S1__remaining_mfe_continuous": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S1",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S1/remaining_mfe_continuous/model.txt",
+    "model_sha256": "16bd9a6b6bf24d92995eca54abc5de41059ea63773d95ca1542e715f0c474dec",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "mae": 1.6385582338611142,
+      "rmse": 2.648171666271711,
+      "spearman_corr": 0.03366736084470465
+    },
+    "full_train_rows": 5200
+  },
+  "S2__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S2",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S2/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "80a6b446e358f9f16c7c35ec7186a44aff21cfbb05d815d52872886339bf457e",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5314906709011512,
+      "pr_auc": 0.3182834199603714,
+      "log_loss": 0.6415890826396575,
+      "brier_score": 0.2226144694405826,
+      "calibration_slope": 0.028013250235065026,
+      "calibration_intercept": 0.3134628941395355,
+      "target_prevalence": 0.2939666238767651
+    },
+    "full_train_rows": 3174
+  },
+  "S2__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S2",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S2/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "de750c08869a9fe8f269c2392b3a3b6f35bd11e8269850187b9ec1eae98cf81f",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5238612526221157,
+      "pr_auc": 0.653688144326999,
+      "log_loss": 0.6957587676858742,
+      "brier_score": 0.2490900033045114,
+      "calibration_slope": 0.02663293520479635,
+      "calibration_intercept": 0.627623528356396,
+      "target_prevalence": 0.637997432605905
+    },
+    "full_train_rows": 3174
+  },
+  "S2__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S2",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S2/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "f897f180699388e50a2f2a53b59aea1eaf66939c36ea51cfbe80252d68216eef",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5045565882905989,
+      "pr_auc": 0.5131930790601766,
+      "log_loss": 0.7650871232922578,
+      "brier_score": 0.2796362095529003,
+      "calibration_slope": 0.005544267958440995,
+      "calibration_intercept": 0.5166638264525636,
+      "target_prevalence": 0.5154043645699615
+    },
+    "full_train_rows": 3174
+  },
+  "S2__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S2",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S2/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "d744c0c812064e2db15f3f2e912d5fec7c35174780a60bdd213430431b18a3e6",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.45425956915989246,
+      "pr_auc": 0.3304463023252418,
+      "log_loss": 0.7811991721509722,
+      "brier_score": 0.2680046280280765,
+      "calibration_slope": -0.04008539325239127,
+      "calibration_intercept": 0.3044992189917929,
+      "target_prevalence": 0.3523748395378691
+    },
+    "full_train_rows": 3174
+  },
+  "S2__remaining_mfe_continuous": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S2",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S2/remaining_mfe_continuous/model.txt",
+    "model_sha256": "454491cb0dad632ac7c1e93c7226f1bf2183e1e5d39825bbd601eb64948e5c83",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "mae": 1.8233560896378398,
+      "rmse": 2.9203115344693695,
+      "spearman_corr": 0.00682496955308058
+    },
+    "full_train_rows": 3174
+  },
+  "S3__terminal_mfe_within_0p25a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S3",
+    "head": "terminal_mfe_within_0p25a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S3/terminal_mfe_within_0p25a/model.txt",
+    "model_sha256": "94c65ce1515b391db58bec1e4894cb84b2a2da20042b86d479785eeeba65f038",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5550876775311913,
+      "pr_auc": 0.3499349112960654,
+      "log_loss": 0.6606688767356105,
+      "brier_score": 0.23115928786350085,
+      "calibration_slope": 0.0478377824519382,
+      "calibration_intercept": 0.33083834291963715,
+      "target_prevalence": 0.3013005780346821
+    },
+    "full_train_rows": 2577
+  },
+  "S3__remaining_mfe_gte_0p5a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S3",
+    "head": "remaining_mfe_gte_0p5a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S3/remaining_mfe_gte_0p5a/model.txt",
+    "model_sha256": "028ace91de7b3c494f2167c8251488f4c42e9736bd9cc3d173513a39f285a81c",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.533878308514869,
+      "pr_auc": 0.6586618174860717,
+      "log_loss": 0.7669421992048195,
+      "brier_score": 0.2781616943893567,
+      "calibration_slope": 0.02945225364431509,
+      "calibration_intercept": 0.6139578582529969,
+      "target_prevalence": 0.6170520231213873
+    },
+    "full_train_rows": 2577
+  },
+  "S3__remaining_mfe_gte_1p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S3",
+    "head": "remaining_mfe_gte_1p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S3/remaining_mfe_gte_1p0a/model.txt",
+    "model_sha256": "0c702973d0d0111277e2bf25e8d35854757191c62bde0b5f1dae7759f67dee68",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5637311715459328,
+      "pr_auc": 0.5473751263466766,
+      "log_loss": 0.7600737429257015,
+      "brier_score": 0.275294674377301,
+      "calibration_slope": 0.062137891594317714,
+      "calibration_intercept": 0.5293658938828215,
+      "target_prevalence": 0.49927745664739887
+    },
+    "full_train_rows": 2577
+  },
+  "S3__remaining_mfe_gte_2p0a": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S3",
+    "head": "remaining_mfe_gte_2p0a",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S3/remaining_mfe_gte_2p0a/model.txt",
+    "model_sha256": "669ced30e787927768277d5384c2c429bda1f3043249ab282f9b9b5e81ab392e",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "roc_auc": 0.5563149896495195,
+      "pr_auc": 0.3843606631220752,
+      "log_loss": 0.7185284854655531,
+      "brier_score": 0.2391319061166799,
+      "calibration_slope": 0.04700211888456795,
+      "calibration_intercept": 0.39423061212754407,
+      "target_prevalence": 0.32153179190751446
+    },
+    "full_train_rows": 2577
+  },
+  "S3__remaining_mfe_continuous": {
+    "architecture": "Benchmark_C_Six_Cell",
+    "cell": "S3",
+    "head": "remaining_mfe_continuous",
+    "model_path": "studies/nq_h050_six_model_remaining_mfe/models/S3/remaining_mfe_continuous/model.txt",
+    "model_sha256": "2a40bf67dd75a357444a53aba18b2e2d75dfe51bc695f068e26910be2a69bbf0",
+    "num_features": 163,
+    "val_2024_metrics": {
+      "mae": 1.7569048381180623,
+      "rmse": 2.5720134392391856,
+      "spearman_corr": 0.11467595329858447
+    },
+    "full_train_rows": 2577
+  }
+}

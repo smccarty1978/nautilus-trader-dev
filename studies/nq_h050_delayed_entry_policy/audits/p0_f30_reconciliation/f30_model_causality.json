@@ -1,0 +1,23 @@
+{
+  "verdict": "F30_MODEL_CAUSALITY_FAIL",
+  "severity": "CRITICAL_DEFECT",
+  "defect_type": "LOOKAHEAD_FEATURE_LEAKAGE",
+  "owning_script": "scripts/run_delayed_entry_policy_study.py",
+  "affected_features": [
+    "magnitude_new_incumbent_extreme_post_entry",
+    "has_new_incumbent_extreme_post_entry"
+  ],
+  "defect_mechanism": {
+    "step_1": "In run_delayed_entry_policy_study.py lines 177-183, a loop scanned bars from idx_t0 to idx_reg_end (the regime termination timestamp, hours or days ahead) to find pullback depth crossings.",
+    "step_2": "Inside that loop, cur_peak was continuously updated with highs_1s / lows_1s up to the end of the entire regime.",
+    "step_3": "In lines 367-375, fast-failure features at +30s were computed using cur_peak.",
+    "step_4": "For short counter-regime trades, ext_mag was calculated as max(0.0, cur_peak - min(ff_lows)) / frozen_atr, where cur_peak was the future highest high of the entire multi-hour trend!",
+    "step_5": "This directly leaked whether the incumbent regime would continue into a massive runaway adverse trend vs reverse quickly."
+  },
+  "impact_on_model": {
+    "feature_importance": "magnitude_new_incumbent_extreme_post_entry was the #1 feature with 486 splits in LightGBM (over 30% of all splits).",
+    "leaked_auc": 0.933,
+    "strictly_causal_auc": 0.5809,
+    "auc_inflation": "+0.3521 AUC points due purely to leakage."
+  }
+}

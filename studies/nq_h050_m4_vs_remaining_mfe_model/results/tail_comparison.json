@@ -1,0 +1,374 @@
+{
+  "2024_validation": {
+    "m4_composite_score": {
+      "best_10pct": {
+        "count": 1088,
+        "terminal_0p25_rate": 0.49172794117647056,
+        "mean_remaining_mfe": 0.8901066899288474,
+        "remaining_gte_1a_rate": 0.27389705882352944,
+        "remaining_gte_2a_rate": 0.140625,
+        "catastrophic_loss_rate": 0.0625,
+        "c1_mean_pnl_atr": 0.3766532005240157,
+        "winner_gte_2a_rate": 0.15992647058823528,
+        "winner_gte_3a_rate": 0.09466911764705882
+      },
+      "best_20pct": {
+        "count": 2177,
+        "terminal_0p25_rate": 0.4492420762517226,
+        "mean_remaining_mfe": 1.0965055200402973,
+        "remaining_gte_1a_rate": 0.32751492880110245,
+        "remaining_gte_2a_rate": 0.18373909049150206,
+        "catastrophic_loss_rate": 0.0799265043638034,
+        "c1_mean_pnl_atr": 0.2260776822181948,
+        "winner_gte_2a_rate": 0.15020670647680295,
+        "winner_gte_3a_rate": 0.08360128617363344
+      },
+      "worst_10pct": {
+        "count": 1089,
+        "terminal_0p25_rate": 0.14692378328741965,
+        "mean_remaining_mfe": 4.7494371371721105,
+        "remaining_gte_1a_rate": 0.7309458218549127,
+        "remaining_gte_2a_rate": 0.5803489439853077,
+        "catastrophic_loss_rate": 0.26538108356290174,
+        "c1_mean_pnl_atr": -1.367753062971965,
+        "winner_gte_2a_rate": 0.29201101928374656,
+        "winner_gte_3a_rate": 0.19834710743801653
+      },
+      "worst_20pct": {
+        "count": 2178,
+        "terminal_0p25_rate": 0.1827364554637282,
+        "mean_remaining_mfe": 3.737144640607477,
+        "remaining_gte_1a_rate": 0.6744719926538109,
+        "remaining_gte_2a_rate": 0.5188246097337006,
+        "catastrophic_loss_rate": 0.22497704315886133,
+        "c1_mean_pnl_atr": -0.9632674779283604,
+        "winner_gte_2a_rate": 0.27915518824609736,
+        "winner_gte_3a_rate": 0.18365472910927455
+      }
+    },
+    "new_p_terminal_0p25": {
+      "best_10pct": {
+        "count": 1088,
+        "terminal_0p25_rate": 0.39246323529411764,
+        "mean_remaining_mfe": 1.399844182107607,
+        "remaining_gte_1a_rate": 0.40441176470588236,
+        "remaining_gte_2a_rate": 0.2555147058823529,
+        "catastrophic_loss_rate": 0.109375,
+        "c1_mean_pnl_atr": 0.09242517821540858,
+        "winner_gte_2a_rate": 0.15900735294117646,
+        "winner_gte_3a_rate": 0.10110294117647059
+      },
+      "best_20pct": {
+        "count": 2177,
+        "terminal_0p25_rate": 0.377124483233808,
+        "mean_remaining_mfe": 1.4432109644872326,
+        "remaining_gte_1a_rate": 0.4157096922370234,
+        "remaining_gte_2a_rate": 0.2581534221405604,
+        "catastrophic_loss_rate": 0.10197519522278364,
+        "c1_mean_pnl_atr": 0.16291017063632238,
+        "winner_gte_2a_rate": 0.16123105190629305,
+        "winner_gte_3a_rate": 0.10059715204409739
+      },
+      "worst_10pct": {
+        "count": 1089,
+        "terminal_0p25_rate": 0.2194674012855831,
+        "mean_remaining_mfe": 3.9195567328543803,
+        "remaining_gte_1a_rate": 0.6115702479338843,
+        "remaining_gte_2a_rate": 0.4628099173553719,
+        "catastrophic_loss_rate": 0.18457300275482094,
+        "c1_mean_pnl_atr": -0.23315215263646366,
+        "winner_gte_2a_rate": 0.3085399449035813,
+        "winner_gte_3a_rate": 0.2056932966023875
+      },
+      "worst_20pct": {
+        "count": 2178,
+        "terminal_0p25_rate": 0.23737373737373738,
+        "mean_remaining_mfe": 3.2184826163598816,
+        "remaining_gte_1a_rate": 0.5964187327823691,
+        "remaining_gte_2a_rate": 0.43112947658402206,
+        "catastrophic_loss_rate": 0.17676767676767677,
+        "c1_mean_pnl_atr": -0.17673227549015855,
+        "winner_gte_2a_rate": 0.2681359044995409,
+        "winner_gte_3a_rate": 0.16942148760330578
+      }
+    },
+    "new_p_remaining_gte_1p0a_inverted": {
+      "best_10pct": {
+        "count": 1088,
+        "terminal_0p25_rate": 0.3897058823529412,
+        "mean_remaining_mfe": 1.4381196904427245,
+        "remaining_gte_1a_rate": 0.3915441176470588,
+        "remaining_gte_2a_rate": 0.2545955882352941,
+        "catastrophic_loss_rate": 0.13970588235294118,
+        "c1_mean_pnl_atr": -0.23037060253694452,
+        "winner_gte_2a_rate": 0.1636029411764706,
+        "winner_gte_3a_rate": 0.11213235294117647
+      },
+      "best_20pct": {
+        "count": 2177,
+        "terminal_0p25_rate": 0.3661001378043179,
+        "mean_remaining_mfe": 1.5883407524728925,
+        "remaining_gte_1a_rate": 0.4304088194763436,
+        "remaining_gte_2a_rate": 0.2806614607257694,
+        "catastrophic_loss_rate": 0.13918236104731282,
+        "c1_mean_pnl_atr": -0.13456531043191264,
+        "winner_gte_2a_rate": 0.16995865870463941,
+        "winner_gte_3a_rate": 0.11345888837850253
+      },
+      "worst_10pct": {
+        "count": 1089,
+        "terminal_0p25_rate": 0.24242424242424243,
+        "mean_remaining_mfe": 4.07942986884139,
+        "remaining_gte_1a_rate": 0.6088154269972452,
+        "remaining_gte_2a_rate": 0.4563820018365473,
+        "catastrophic_loss_rate": 0.19651056014692378,
+        "c1_mean_pnl_atr": -0.6416206922834609,
+        "winner_gte_2a_rate": 0.28558310376492196,
+        "winner_gte_3a_rate": 0.18824609733700642
+      },
+      "worst_20pct": {
+        "count": 2178,
+        "terminal_0p25_rate": 0.25068870523415976,
+        "mean_remaining_mfe": 3.163609808720529,
+        "remaining_gte_1a_rate": 0.5785123966942148,
+        "remaining_gte_2a_rate": 0.41414141414141414,
+        "catastrophic_loss_rate": 0.17033976124885217,
+        "c1_mean_pnl_atr": -0.31936921711036126,
+        "winner_gte_2a_rate": 0.24563820018365473,
+        "winner_gte_3a_rate": 0.15472910927456382
+      }
+    },
+    "new_p_remaining_gte_2p0a_inverted": {
+      "best_10pct": {
+        "count": 1088,
+        "terminal_0p25_rate": 0.35661764705882354,
+        "mean_remaining_mfe": 1.5492535237172735,
+        "remaining_gte_1a_rate": 0.4420955882352941,
+        "remaining_gte_2a_rate": 0.2803308823529412,
+        "catastrophic_loss_rate": 0.15073529411764705,
+        "c1_mean_pnl_atr": -0.6363351170109481,
+        "winner_gte_2a_rate": 0.18933823529411764,
+        "winner_gte_3a_rate": 0.12316176470588236
+      },
+      "best_20pct": {
+        "count": 2177,
+        "terminal_0p25_rate": 0.34680753330271014,
+        "mean_remaining_mfe": 1.6547666344682281,
+        "remaining_gte_1a_rate": 0.4533762057877814,
+        "remaining_gte_2a_rate": 0.29260450160771706,
+        "catastrophic_loss_rate": 0.13642627468994029,
+        "c1_mean_pnl_atr": -0.35075396338209547,
+        "winner_gte_2a_rate": 0.1864951768488746,
+        "winner_gte_3a_rate": 0.12310519062930639
+      },
+      "worst_10pct": {
+        "count": 1089,
+        "terminal_0p25_rate": 0.23783287419651056,
+        "mean_remaining_mfe": 3.7044830611350146,
+        "remaining_gte_1a_rate": 0.5876951331496786,
+        "remaining_gte_2a_rate": 0.43434343434343436,
+        "catastrophic_loss_rate": 0.1652892561983471,
+        "c1_mean_pnl_atr": -0.3144211920772111,
+        "winner_gte_2a_rate": 0.26538108356290174,
+        "winner_gte_3a_rate": 0.16804407713498623
+      },
+      "worst_20pct": {
+        "count": 2178,
+        "terminal_0p25_rate": 0.26170798898071623,
+        "mean_remaining_mfe": 2.965491531453582,
+        "remaining_gte_1a_rate": 0.5528007346189164,
+        "remaining_gte_2a_rate": 0.3888888888888889,
+        "catastrophic_loss_rate": 0.15289256198347106,
+        "c1_mean_pnl_atr": -0.04639188492957664,
+        "winner_gte_2a_rate": 0.2516069788797062,
+        "winner_gte_3a_rate": 0.15151515151515152
+      }
+    }
+  },
+  "2025_q1_forward": {
+    "m4_composite_score": {
+      "best_10pct": {
+        "count": 242,
+        "terminal_0p25_rate": 0.4256198347107438,
+        "mean_remaining_mfe": 0.9928793237480161,
+        "remaining_gte_1a_rate": 0.3512396694214876,
+        "remaining_gte_2a_rate": 0.17768595041322313,
+        "catastrophic_loss_rate": 0.0743801652892562,
+        "c1_mean_pnl_atr": 1.1161318190720588,
+        "winner_gte_2a_rate": 0.18181818181818182,
+        "winner_gte_3a_rate": 0.09917355371900827
+      },
+      "best_20pct": {
+        "count": 484,
+        "terminal_0p25_rate": 0.40289256198347106,
+        "mean_remaining_mfe": 1.0628651845759973,
+        "remaining_gte_1a_rate": 0.36983471074380164,
+        "remaining_gte_2a_rate": 0.1921487603305785,
+        "catastrophic_loss_rate": 0.06818181818181818,
+        "c1_mean_pnl_atr": 0.5151108564232608,
+        "winner_gte_2a_rate": 0.14669421487603307,
+        "winner_gte_3a_rate": 0.06818181818181818
+      },
+      "worst_10pct": {
+        "count": 243,
+        "terminal_0p25_rate": 0.18518518518518517,
+        "mean_remaining_mfe": 4.613003832323281,
+        "remaining_gte_1a_rate": 0.6995884773662552,
+        "remaining_gte_2a_rate": 0.5555555555555556,
+        "catastrophic_loss_rate": 0.25925925925925924,
+        "c1_mean_pnl_atr": 0.8384074212113406,
+        "winner_gte_2a_rate": 0.2962962962962963,
+        "winner_gte_3a_rate": 0.23045267489711935
+      },
+      "worst_20pct": {
+        "count": 485,
+        "terminal_0p25_rate": 0.2,
+        "mean_remaining_mfe": 3.749713760405883,
+        "remaining_gte_1a_rate": 0.643298969072165,
+        "remaining_gte_2a_rate": 0.4865979381443299,
+        "catastrophic_loss_rate": 0.22474226804123712,
+        "c1_mean_pnl_atr": 0.5141256399475993,
+        "winner_gte_2a_rate": 0.2556701030927835,
+        "winner_gte_3a_rate": 0.177319587628866
+      }
+    },
+    "new_p_terminal_0p25": {
+      "best_10pct": {
+        "count": 242,
+        "terminal_0p25_rate": 0.45454545454545453,
+        "mean_remaining_mfe": 0.9652240077641573,
+        "remaining_gte_1a_rate": 0.2892561983471074,
+        "remaining_gte_2a_rate": 0.15289256198347106,
+        "catastrophic_loss_rate": 0.16115702479338842,
+        "c1_mean_pnl_atr": -0.09237092442631739,
+        "winner_gte_2a_rate": 0.19834710743801653,
+        "winner_gte_3a_rate": 0.11983471074380166
+      },
+      "best_20pct": {
+        "count": 484,
+        "terminal_0p25_rate": 0.4152892561983471,
+        "mean_remaining_mfe": 1.1839984518462148,
+        "remaining_gte_1a_rate": 0.36363636363636365,
+        "remaining_gte_2a_rate": 0.20867768595041322,
+        "catastrophic_loss_rate": 0.1322314049586777,
+        "c1_mean_pnl_atr": -0.10878526875372864,
+        "winner_gte_2a_rate": 0.15702479338842976,
+        "winner_gte_3a_rate": 0.07851239669421488
+      },
+      "worst_10pct": {
+        "count": 243,
+        "terminal_0p25_rate": 0.1934156378600823,
+        "mean_remaining_mfe": 3.788557474709134,
+        "remaining_gte_1a_rate": 0.6666666666666666,
+        "remaining_gte_2a_rate": 0.51440329218107,
+        "catastrophic_loss_rate": 0.20164609053497942,
+        "c1_mean_pnl_atr": 0.26454567598255074,
+        "winner_gte_2a_rate": 0.26337448559670784,
+        "winner_gte_3a_rate": 0.16049382716049382
+      },
+      "worst_20pct": {
+        "count": 485,
+        "terminal_0p25_rate": 0.22061855670103092,
+        "mean_remaining_mfe": 3.598351566346126,
+        "remaining_gte_1a_rate": 0.6329896907216495,
+        "remaining_gte_2a_rate": 0.4865979381443299,
+        "catastrophic_loss_rate": 0.18969072164948453,
+        "c1_mean_pnl_atr": 0.4252910592536213,
+        "winner_gte_2a_rate": 0.2309278350515464,
+        "winner_gte_3a_rate": 0.14845360824742268
+      }
+    },
+    "new_p_remaining_gte_1p0a_inverted": {
+      "best_10pct": {
+        "count": 242,
+        "terminal_0p25_rate": 0.39669421487603307,
+        "mean_remaining_mfe": 1.1269141442228774,
+        "remaining_gte_1a_rate": 0.359504132231405,
+        "remaining_gte_2a_rate": 0.21074380165289255,
+        "catastrophic_loss_rate": 0.16942148760330578,
+        "c1_mean_pnl_atr": 0.6425227620893638,
+        "winner_gte_2a_rate": 0.21074380165289255,
+        "winner_gte_3a_rate": 0.128099173553719
+      },
+      "best_20pct": {
+        "count": 484,
+        "terminal_0p25_rate": 0.40289256198347106,
+        "mean_remaining_mfe": 1.2045908594262742,
+        "remaining_gte_1a_rate": 0.38016528925619836,
+        "remaining_gte_2a_rate": 0.2190082644628099,
+        "catastrophic_loss_rate": 0.11363636363636363,
+        "c1_mean_pnl_atr": 0.7000533545473224,
+        "winner_gte_2a_rate": 0.19421487603305784,
+        "winner_gte_3a_rate": 0.10950413223140495
+      },
+      "worst_10pct": {
+        "count": 243,
+        "terminal_0p25_rate": 0.21810699588477367,
+        "mean_remaining_mfe": 3.1570706171456817,
+        "remaining_gte_1a_rate": 0.6502057613168725,
+        "remaining_gte_2a_rate": 0.5020576131687243,
+        "catastrophic_loss_rate": 0.16872427983539096,
+        "c1_mean_pnl_atr": 0.1096826773771406,
+        "winner_gte_2a_rate": 0.20987654320987653,
+        "winner_gte_3a_rate": 0.14814814814814814
+      },
+      "worst_20pct": {
+        "count": 485,
+        "terminal_0p25_rate": 0.2329896907216495,
+        "mean_remaining_mfe": 3.202918684736267,
+        "remaining_gte_1a_rate": 0.6123711340206186,
+        "remaining_gte_2a_rate": 0.465979381443299,
+        "catastrophic_loss_rate": 0.18556701030927836,
+        "c1_mean_pnl_atr": -0.16205435220588787,
+        "winner_gte_2a_rate": 0.21649484536082475,
+        "winner_gte_3a_rate": 0.13814432989690723
+      }
+    },
+    "new_p_remaining_gte_2p0a_inverted": {
+      "best_10pct": {
+        "count": 242,
+        "terminal_0p25_rate": 0.4462809917355372,
+        "mean_remaining_mfe": 0.9947355284865125,
+        "remaining_gte_1a_rate": 0.3181818181818182,
+        "remaining_gte_2a_rate": 0.18181818181818182,
+        "catastrophic_loss_rate": 0.18181818181818182,
+        "c1_mean_pnl_atr": -0.05318504396894378,
+        "winner_gte_2a_rate": 0.2024793388429752,
+        "winner_gte_3a_rate": 0.11983471074380166
+      },
+      "best_20pct": {
+        "count": 484,
+        "terminal_0p25_rate": 0.4152892561983471,
+        "mean_remaining_mfe": 1.079264339890892,
+        "remaining_gte_1a_rate": 0.34710743801652894,
+        "remaining_gte_2a_rate": 0.2066115702479339,
+        "catastrophic_loss_rate": 0.12190082644628099,
+        "c1_mean_pnl_atr": 0.12204495336608429,
+        "winner_gte_2a_rate": 0.18388429752066116,
+        "winner_gte_3a_rate": 0.09504132231404959
+      },
+      "worst_10pct": {
+        "count": 243,
+        "terminal_0p25_rate": 0.18930041152263374,
+        "mean_remaining_mfe": 4.38511215885615,
+        "remaining_gte_1a_rate": 0.691358024691358,
+        "remaining_gte_2a_rate": 0.5637860082304527,
+        "catastrophic_loss_rate": 0.23045267489711935,
+        "c1_mean_pnl_atr": -0.34445835144829623,
+        "winner_gte_2a_rate": 0.2222222222222222,
+        "winner_gte_3a_rate": 0.16049382716049382
+      },
+      "worst_20pct": {
+        "count": 485,
+        "terminal_0p25_rate": 0.2020618556701031,
+        "mean_remaining_mfe": 3.9295199345641105,
+        "remaining_gte_1a_rate": 0.6577319587628866,
+        "remaining_gte_2a_rate": 0.511340206185567,
+        "catastrophic_loss_rate": 0.21237113402061855,
+        "c1_mean_pnl_atr": -0.21513083222087037,
+        "winner_gte_2a_rate": 0.21030927835051547,
+        "winner_gte_3a_rate": 0.1360824742268041
+      }
+    }
+  }
+}

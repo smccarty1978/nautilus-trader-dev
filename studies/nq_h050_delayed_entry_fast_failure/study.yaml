@@ -1,0 +1,45 @@
+study_id: nq_h050_delayed_entry_fast_failure
+description: Bounded Delayed-Entry and Fast-Failure Observational Study for NQ H050 Counter-Regime Lineage
+status: COMPLETED
+lineage:
+  parent_study: studies/nq_h050_mtf_regime_context_features
+  baseline_models:
+    m4_runtime_recovery: studies/nq_h050_m4_runtime_recovery
+  historical_ledgers:
+    checkpoint_target_ledger: studies/nq_h050_asymmetric_regime_exhaustion/results/checkpoint_target_ledger.parquet
+    counter_exit_ledger: studies/nq_h050_to_opposing_h050_exit_lifecycle/results/counter_h0501_exit_ledger.parquet
+    regime_position_ledger: studies/nq_h050_fat_tail_regime_position/results/regime_position_trade_ledger.parquet
+horizons:
+  - T0
+  - T30
+  - T60
+  - T120
+  - T180
+  - T300
+fast_failure_horizons:
+  - +15s
+  - +30s
+  - +60s
+population:
+  dataset: TRAIN 2023-2024
+  unconditional_count: 21493
+  chronological_protocol:
+    fit_year: "2023 (N=10,605)"
+    validation_year: "2024 (N=10,888)"
+artifacts:
+  checkpoint_population_census: results/checkpoint_population_census.json
+  checkpoint_feature_contract: results/checkpoint_feature_contract.json
+  checkpoint_target_summary: results/checkpoint_target_summary.json
+  m4_dynamic_rescore_summary: results/m4_dynamic_rescore_summary.json
+  horizon_model_metrics: results/horizon_model_metrics.json
+  survivor_adjusted_information: results/survivor_adjusted_information.json
+  delayed_entry_economics: results/delayed_entry_economics.json
+  opportunity_cost_of_waiting: results/opportunity_cost_of_waiting.json
+  winner_opportunity_retention: results/winner_opportunity_retention.json
+  fast_failure_15s: results/fast_failure_15s.json
+  fast_failure_30s: results/fast_failure_30s.json
+  fast_failure_60s: results/fast_failure_60s.json
+  fast_failure_economic_separation: results/fast_failure_economic_separation.json
+  delayed_entry_observation_ledger: results/delayed_entry_observation_ledger.parquet
+  study_manifest: results/study_manifest.json
+  report: H050_DELAYED_ENTRY_FAST_FAILURE_REPORT.md

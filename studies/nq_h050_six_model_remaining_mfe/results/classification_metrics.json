@@ -1,0 +1,395 @@
+{
+  "Benchmark_A_Pooled": {
+    "pooled": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.5722152872791976,
+        "pr_auc": 0.3627280113685082,
+        "log_loss": 0.6153085082931388,
+        "brier_score": 0.21239982723861017,
+        "calibration_slope": 0.11409335155368877,
+        "calibration_intercept": 0.3876163595588892,
+        "target_prevalence": 0.30547391623806025
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.5655803021741904,
+        "pr_auc": 0.673276507709947,
+        "log_loss": 0.6657785304720846,
+        "brier_score": 0.23641266992524504,
+        "calibration_slope": 0.11972583661906011,
+        "calibration_intercept": 0.5736734420435873,
+        "target_prevalence": 0.6180198383541513
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5612403923947709,
+        "pr_auc": 0.5605925514452903,
+        "log_loss": 0.6963771197149028,
+        "brier_score": 0.25098586529862116,
+        "calibration_slope": 0.11936970931839049,
+        "calibration_intercept": 0.5180202631130442,
+        "target_prevalence": 0.4966017634092579
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.5436666727666872,
+        "pr_auc": 0.37531004171024507,
+        "log_loss": 0.6504280635252729,
+        "brier_score": 0.22591309075229699,
+        "calibration_slope": 0.06742568064752524,
+        "calibration_intercept": 0.395572576670185,
+        "target_prevalence": 0.3304555473916238
+      },
+      "remaining_mfe_continuous": {
+        "mae": 1.8361708248058308,
+        "rmse": 3.719628380418502,
+        "spearman_corr": 0.1517934417528088
+      }
+    }
+  },
+  "Benchmark_B_Directional": {
+    "long": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.5717321804253299,
+        "pr_auc": 0.36425533358931295,
+        "log_loss": 0.6223124046882819,
+        "brier_score": 0.21549520701138888,
+        "calibration_slope": 0.09375758384767888,
+        "calibration_intercept": 0.37135671996030295,
+        "target_prevalence": 0.30582793709528217
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.5674866100353164,
+        "pr_auc": 0.6741229139939873,
+        "log_loss": 0.6726048941748897,
+        "brier_score": 0.239531635254412,
+        "calibration_slope": 0.10253126858342085,
+        "calibration_intercept": 0.583057815717725,
+        "target_prevalence": 0.6172062904717854
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5608763556960874,
+        "pr_auc": 0.5532744130186953,
+        "log_loss": 0.7075584242993603,
+        "brier_score": 0.25545348232091564,
+        "calibration_slope": 0.09343039482350114,
+        "calibration_intercept": 0.5157052919800844,
+        "target_prevalence": 0.4923219241443108
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.5444237126789738,
+        "pr_auc": 0.38721454491922896,
+        "log_loss": 0.6750943924592276,
+        "brier_score": 0.23280899599131527,
+        "calibration_slope": 0.05395447569154962,
+        "calibration_intercept": 0.3938283344572653,
+        "target_prevalence": 0.33376503237742833
+      },
+      "remaining_mfe_continuous": {
+        "mae": 2.0010662800623407,
+        "rmse": 4.500258196415142,
+        "spearman_corr": 0.18820389932060155
+      }
+    },
+    "short": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.5333978127211086,
+        "pr_auc": 0.33236829768976184,
+        "log_loss": 0.6340215210869169,
+        "brier_score": 0.22069695496897612,
+        "calibration_slope": 0.05070854110845907,
+        "calibration_intercept": 0.3368942334611088,
+        "target_prevalence": 0.3051249316067846
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.5235050490948857,
+        "pr_auc": 0.6408872998483858,
+        "log_loss": 0.693556731062325,
+        "brier_score": 0.24912800882299413,
+        "calibration_slope": 0.033438207734925944,
+        "calibration_intercept": 0.6098006504039445,
+        "target_prevalence": 0.6188218128761627
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5125361870895481,
+        "pr_auc": 0.5143936095569158,
+        "log_loss": 0.7269474620422718,
+        "brier_score": 0.2647655646244113,
+        "calibration_slope": 0.02939221235712145,
+        "calibration_intercept": 0.5080357991381395,
+        "target_prevalence": 0.5008207185847164
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.5028904214614964,
+        "pr_auc": 0.33546275652648505,
+        "log_loss": 0.673474294356918,
+        "brier_score": 0.23417277824102384,
+        "calibration_slope": 0.01902013693641191,
+        "calibration_intercept": 0.34812672410595713,
+        "target_prevalence": 0.3271931424402699
+      },
+      "remaining_mfe_continuous": {
+        "mae": 1.7030951109760613,
+        "rmse": 2.7237871319059623,
+        "spearman_corr": 0.03439617101608937
+      }
+    }
+  },
+  "Benchmark_C_Six_Cell": {
+    "L1": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.5643129076956364,
+        "pr_auc": 0.36648949955644294,
+        "log_loss": 0.6338887491668149,
+        "brier_score": 0.2206604067588905,
+        "calibration_slope": 0.0782955609052474,
+        "calibration_intercept": 0.36677156992609644,
+        "target_prevalence": 0.31212653778558874
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.5477703229833047,
+        "pr_auc": 0.6509796348563716,
+        "log_loss": 0.6922666036463805,
+        "brier_score": 0.24805244281568387,
+        "calibration_slope": 0.06548587299503218,
+        "calibration_intercept": 0.5912746391232361,
+        "target_prevalence": 0.6115992970123023
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5540753979799659,
+        "pr_auc": 0.5229767054494798,
+        "log_loss": 0.7135179185641046,
+        "brier_score": 0.2582302016193452,
+        "calibration_slope": 0.07710993510369776,
+        "calibration_intercept": 0.5009018353715289,
+        "target_prevalence": 0.4822495606326889
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.5663242129998054,
+        "pr_auc": 0.36917721678672755,
+        "log_loss": 0.6495993640676542,
+        "brier_score": 0.22475255054294463,
+        "calibration_slope": 0.0655966521851783,
+        "calibration_intercept": 0.384718156567755,
+        "target_prevalence": 0.3184534270650264
+      },
+      "remaining_mfe_continuous": {
+        "mae": 1.708333782307794,
+        "rmse": 3.1359448416924303,
+        "spearman_corr": 0.18822205523853913
+      }
+    },
+    "L2": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.516196570854956,
+        "pr_auc": 0.3260599841245503,
+        "log_loss": 0.6526082950054978,
+        "brier_score": 0.22612401380197017,
+        "calibration_slope": 0.02000855355832275,
+        "calibration_intercept": 0.32277441844713656,
+        "target_prevalence": 0.30517879161528977
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.5046432152446504,
+        "pr_auc": 0.6125470018654631,
+        "log_loss": 0.7230324602230699,
+        "brier_score": 0.2601732559595639,
+        "calibration_slope": 0.00940601975669051,
+        "calibration_intercept": 0.6067382381354472,
+        "target_prevalence": 0.6109741060419236
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5239875190356006,
+        "pr_auc": 0.5036689865227532,
+        "log_loss": 0.7554844327171143,
+        "brier_score": 0.27478955110417236,
+        "calibration_slope": 0.021769638516810904,
+        "calibration_intercept": 0.49124115442303495,
+        "target_prevalence": 0.4876695437731196
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.47867228768793174,
+        "pr_auc": 0.32849126703739195,
+        "log_loss": 0.7538681994032529,
+        "brier_score": 0.26010938662980726,
+        "calibration_slope": -0.016508363694859113,
+        "calibration_intercept": 0.32155651031901145,
+        "target_prevalence": 0.3403205918618989
+      },
+      "remaining_mfe_continuous": {
+        "mae": 1.9286726879252174,
+        "rmse": 3.425089957260417,
+        "spearman_corr": 0.09936974309201375
+      }
+    },
+    "L3": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.5504546462630295,
+        "pr_auc": 0.33785777291065244,
+        "log_loss": 0.669427040602225,
+        "brier_score": 0.22853175958573743,
+        "calibration_slope": 0.03166491245243972,
+        "calibration_intercept": 0.31572570494025354,
+        "target_prevalence": 0.2878464818763326
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.5513910604819696,
+        "pr_auc": 0.6684115200608651,
+        "log_loss": 0.7379926986329828,
+        "brier_score": 0.2621139308984909,
+        "calibration_slope": 0.039537615791020435,
+        "calibration_intercept": 0.630068762860006,
+        "target_prevalence": 0.6449893390191898
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5363043081416575,
+        "pr_auc": 0.5513173288442778,
+        "log_loss": 0.8463610597329204,
+        "brier_score": 0.30280748555455994,
+        "calibration_slope": 0.03267310917569648,
+        "calibration_intercept": 0.5487634965929207,
+        "target_prevalence": 0.5309168443496801
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.5023043274488361,
+        "pr_auc": 0.35676198911185764,
+        "log_loss": 0.9499169327681335,
+        "brier_score": 0.30738916445285536,
+        "calibration_slope": 0.001137077442113344,
+        "calibration_intercept": 0.37101797781156826,
+        "target_prevalence": 0.36886993603411516
+      },
+      "remaining_mfe_continuous": {
+        "mae": 3.5320952098674794,
+        "rmse": 8.487842324062994,
+        "spearman_corr": 0.0740395103117104
+      }
+    },
+    "S1": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.5282641486101944,
+        "pr_auc": 0.3372996340260359,
+        "log_loss": 0.6456545960101593,
+        "brier_score": 0.2246251906852049,
+        "calibration_slope": 0.0367674320882138,
+        "calibration_intercept": 0.34359923077984383,
+        "target_prevalence": 0.3140495867768595
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.5334814988107771,
+        "pr_auc": 0.6351609623347804,
+        "log_loss": 0.6869466546626412,
+        "brier_score": 0.24563305642707628,
+        "calibration_slope": 0.05587242353327171,
+        "calibration_intercept": 0.5831617574563983,
+        "target_prevalence": 0.6080283353010626
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5024977878683479,
+        "pr_auc": 0.4946616540298016,
+        "log_loss": 0.7205769390904283,
+        "brier_score": 0.2626178851328129,
+        "calibration_slope": 0.016011504642802557,
+        "calibration_intercept": 0.49467573264075754,
+        "target_prevalence": 0.4927194018103109
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.5082510051694429,
+        "pr_auc": 0.32561413932098043,
+        "log_loss": 0.6552092644709584,
+        "brier_score": 0.22697668596262022,
+        "calibration_slope": 0.01048965418975796,
+        "calibration_intercept": 0.3250499189809094,
+        "target_prevalence": 0.3148366784730421
+      },
+      "remaining_mfe_continuous": {
+        "mae": 1.6385582338611142,
+        "rmse": 2.648171666271711,
+        "spearman_corr": 0.03366736084470465
+      }
+    },
+    "S2": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.5314906709011512,
+        "pr_auc": 0.3182834199603714,
+        "log_loss": 0.6415890826396575,
+        "brier_score": 0.2226144694405826,
+        "calibration_slope": 0.028013250235065026,
+        "calibration_intercept": 0.3134628941395355,
+        "target_prevalence": 0.2939666238767651
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.5238612526221157,
+        "pr_auc": 0.653688144326999,
+        "log_loss": 0.6957587676858742,
+        "brier_score": 0.2490900033045114,
+        "calibration_slope": 0.02663293520479635,
+        "calibration_intercept": 0.627623528356396,
+        "target_prevalence": 0.637997432605905
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5045565882905989,
+        "pr_auc": 0.5131930790601766,
+        "log_loss": 0.7650871232922578,
+        "brier_score": 0.2796362095529003,
+        "calibration_slope": 0.005544267958440995,
+        "calibration_intercept": 0.5166638264525636,
+        "target_prevalence": 0.5154043645699615
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.45425956915989246,
+        "pr_auc": 0.3304463023252418,
+        "log_loss": 0.7811991721509722,
+        "brier_score": 0.2680046280280765,
+        "calibration_slope": -0.04008539325239127,
+        "calibration_intercept": 0.3044992189917929,
+        "target_prevalence": 0.3523748395378691
+      },
+      "remaining_mfe_continuous": {
+        "mae": 1.8233560896378398,
+        "rmse": 2.9203115344693695,
+        "spearman_corr": 0.00682496955308058
+      }
+    },
+    "S3": {
+      "terminal_mfe_within_0p25a": {
+        "roc_auc": 0.5550876775311913,
+        "pr_auc": 0.3499349112960654,
+        "log_loss": 0.6606688767356105,
+        "brier_score": 0.23115928786350085,
+        "calibration_slope": 0.0478377824519382,
+        "calibration_intercept": 0.33083834291963715,
+        "target_prevalence": 0.3013005780346821
+      },
+      "remaining_mfe_gte_0p5a": {
+        "roc_auc": 0.533878308514869,
+        "pr_auc": 0.6586618174860717,
+        "log_loss": 0.7669421992048195,
+        "brier_score": 0.2781616943893567,
+        "calibration_slope": 0.02945225364431509,
+        "calibration_intercept": 0.6139578582529969,
+        "target_prevalence": 0.6170520231213873
+      },
+      "remaining_mfe_gte_1p0a": {
+        "roc_auc": 0.5637311715459328,
+        "pr_auc": 0.5473751263466766,
+        "log_loss": 0.7600737429257015,
+        "brier_score": 0.275294674377301,
+        "calibration_slope": 0.062137891594317714,
+        "calibration_intercept": 0.5293658938828215,
+        "target_prevalence": 0.49927745664739887
+      },
+      "remaining_mfe_gte_2p0a": {
+        "roc_auc": 0.5563149896495195,
+        "pr_auc": 0.3843606631220752,
+        "log_loss": 0.7185284854655531,
+        "brier_score": 0.2391319061166799,
+        "calibration_slope": 0.04700211888456795,
+        "calibration_intercept": 0.39423061212754407,
+        "target_prevalence": 0.32153179190751446
+      },
+      "remaining_mfe_continuous": {
+        "mae": 1.7569048381180623,
+        "rmse": 2.5720134392391856,
+        "spearman_corr": 0.11467595329858447
+      }
+    }
+  }
+}

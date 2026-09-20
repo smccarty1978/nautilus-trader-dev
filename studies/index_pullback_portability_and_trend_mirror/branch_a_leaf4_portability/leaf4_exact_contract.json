@@ -1,0 +1,65 @@
+{
+  "leaf_name": "Interpretable_Leaf_4",
+  "source_study": "studies/nq_h050_economic_subpopulation_mining",
+  "tree_model": "DecisionTreeRegressor(max_depth=4, min_samples_leaf=150, random_state=42)",
+  "original_leaf_id": 4,
+  "split_path": [
+    {
+      "feature": "minutes_from_rth_open",
+      "operator": "<=",
+      "threshold": 387.90834045410156,
+      "subsumed_by": 380.6499938964844
+    },
+    {
+      "feature": "minutes_from_rth_open",
+      "operator": "<=",
+      "threshold": 380.6499938964844,
+      "effective": true
+    },
+    {
+      "feature": "realized_range_15m_atr",
+      "operator": "<=",
+      "threshold": 9.344127655029297,
+      "effective": true
+    },
+    {
+      "feature": "current_price_from_prior_mfe_atr__tf_1m",
+      "operator": "<=",
+      "threshold": 1.738366961479187,
+      "effective": true
+    }
+  ],
+  "effective_rules": [
+    {
+      "feature": "minutes_from_rth_open",
+      "operator": "<=",
+      "threshold": 380.649994,
+      "units": "minutes from RTH open (08:30 CT)"
+    },
+    {
+      "feature": "realized_range_15m_atr",
+      "operator": "<=",
+      "threshold": 9.344128,
+      "units": "15m rolling high-low range / completed-1m Wilder ATR(14)"
+    },
+    {
+      "feature": "current_price_from_prior_mfe_atr__tf_1m",
+      "operator": "<=",
+      "threshold": 1.738367,
+      "units": "signed distance from current price to prior completed 1m regime MFE / completed-1m Wilder ATR(14)"
+    }
+  ],
+  "session_condition": "RTH only (08:30 to 15:15 CT); minutes_from_rth_open <= 380.65 excludes last 14m 21s of session (after 14:50:39 CT)",
+  "direction_treatment": "Direction-neutral (applies to both Counter-LONG and Counter-SHORT)",
+  "missing_null_handling": "Prior regime MFE defaults to 0.0 if first regime of session; realized range uses min_periods=1 if < 15 completed bars",
+  "original_discovery_N_2023": 512,
+  "original_validation_N_2024": 451,
+  "original_frozen_diagnostic_N_2025_Q1": 102,
+  "original_frequency_trades_per_day": {
+    "2023": 1.98,
+    "2024": 1.75,
+    "2025_Q1": 1.65,
+    "pooled": 1.84
+  },
+  "contract_reconstruction_status": "PASS"
+}

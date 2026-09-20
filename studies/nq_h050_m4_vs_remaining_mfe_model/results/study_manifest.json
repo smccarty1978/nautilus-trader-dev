@@ -1,0 +1,31 @@
+{
+  "study_id": "nq_h050_m4_vs_remaining_mfe_model",
+  "description": "Bounded Comparison Study: Frozen M4 Model Stack vs New Pooled Remaining-MFE Stack (Strict Forward Metrics)",
+  "cohorts": {
+    "2024_validation": {
+      "rows": 10888,
+      "status": "SAME_POPULATION_DIAGNOSTIC_ONLY"
+    },
+    "2025_q1_forward": {
+      "rows": 2422,
+      "status": "COMMON_FORWARD_DIAGNOSTIC"
+    }
+  },
+  "models_evaluated": {
+    "m4": [
+      "m4_head0_model.txt",
+      "m4_head1_model.txt",
+      "m4_head2_model.txt"
+    ],
+    "new_pooled_2023_fit": "Used for 2024 validation diagnostic (legitimate out-of-sample)",
+    "new_pooled_refit": "Used for 2025 Q1 forward diagnostic"
+  },
+  "formal_verdicts": {
+    "COMMON_POPULATION_PARITY": "COMMON_POPULATION_PARITY_PASS",
+    "M4_PROVENANCE_COMPARISON": "DIAGNOSTIC_ONLY",
+    "NEW_MODEL_TERMINAL_MFE_RANKING": "SIMILAR",
+    "NEW_MODEL_REMAINING_MFE_RANKING": "SIMILAR",
+    "INCREMENTAL_INFORMATION": "NEW_MODEL_MOSTLY_DUPLICATES_M4",
+    "DELAYED_ENTRY_MODEL_INPUT_RECOMMENDATION": "M4_ONLY"
+  }
+}
