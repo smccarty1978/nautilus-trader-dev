@@ -105,6 +105,17 @@ class LabelOutcomeContract:
     # `observed_seconds = (resolved_at_ts - T) / 1e9` on every row, whatever the disposition. Emitted only when the
     # compiled contract asks for it (every new compile does); a sealed plan compiled before it replays unchanged.
     observed_seconds: bool = False
+    # C1. The CANONICAL TERMINAL of the lifecycle: the qualifying opposite flip, its executable
+    # exit fill and the realized gross economics between the executable entry and that exit.
+    # Emitted only when the compiled contract asks for it (every new compile does); a sealed plan
+    # compiled before C1 replays byte-identically. These columns are INDEPENDENT of the composite
+    # disposition by construction -- three clocks (fixed-time features, milestone arms, lifecycle
+    # terminal) are preserved separately and never collapsed into one aggregate status.
+    terminal_outcome: bool = False
+    # Per-side friction in POINTS. None means the research contract supplies no cost assumption,
+    # in which case gross economics are canonical and net economics are explicitly unavailable --
+    # never guessed.
+    cost_points_per_side: Optional[float] = None
 
     @classmethod
     def from_plan(cls, spec: Mapping[str, Any]) -> "LabelOutcomeContract":
@@ -125,6 +136,9 @@ class LabelOutcomeContract:
                    primary_arm=spec.get("primary_arm"), composition=spec.get("composition"),
                    direction_sign=int(spec.get("direction_sign", 1)),
                    observed_seconds=bool(spec.get("observed_seconds", False)),
+                   terminal_outcome=bool(spec.get("terminal_outcome", False)),
+                   cost_points_per_side=(float(spec["cost_points_per_side"])
+                                         if spec.get("cost_points_per_side") is not None else None),
                    data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None))
 
 
@@ -180,7 +194,8 @@ def compile_outcome_contract(spec: Mapping[str, Any]):
 class _Pending:
     __slots__ = ("identity", "T", "direction", "prevailing", "atr", "session_close", "entry_resolved", "entry_price", "entry_ts",
                  "prev_ts", "arm_end", "arm_state", "arm_at", "arm_reason", "arm_good", "arm_bad", "arm_open",
-                 "flip_end", "flip_state", "flip_at", "flip_reason", "flip_ts", "opened_at")
+                 "flip_end", "flip_state", "flip_at", "flip_reason", "flip_ts", "opened_at",
+                 "exit_ts", "exit_price", "exit_reason")
 
     def __init__(self, identity: Dict[str, Any], T: int, direction: int, atr: float, session_close: Optional[int],
                  n_arms: int, flip_end: Optional[int], prevailing: int) -> None:
@@ -207,6 +222,10 @@ class _Pending:
         self.flip_reason = None
         self.flip_ts = None
         self.opened_at = T
+        # C1: executable terminal exit (first bar OPEN strictly after the flip instant).
+        self.exit_ts: Optional[int] = None
+        self.exit_price: Optional[float] = None
+        self.exit_reason: Optional[str] = None
 
 
 # --------------------------------------------------------------------------- #
@@ -348,6 +367,15 @@ class LabelOutcomeKernel:
                         p.arm_bad[i] = ep - d * arm.adverse_atr * atr
                         if p.session_close is not None and p.arm_end[i] > p.session_close:
                             self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+            # C1: the canonical terminal exit is the OPEN of the first bar strictly after the
+            # qualifying flip -- the same next_bar_open convention the entry already uses. No new
+            # fill convention is invented here.
+            if (c1 := self.c).terminal_outcome and p.flip_ts is not None and p.exit_ts is None and ts > p.flip_ts:
+                if c1.max_gap_ns is not None and (ts - p.flip_ts) > c1.max_gap_ns:
+                    p.exit_reason = "GAP"
+                else:
+                    p.exit_price = op
+                    p.exit_ts = ts - (bar.ts_init - bar.ts_event)
             if p.arm_open:
                 gap = bool(max_gap is not None and ts - p.prev_ts > max_gap)
                 for i in range(self.n_arms):
@@ -455,6 +483,13 @@ class LabelOutcomeKernel:
                     p.flip_state, p.flip_at, p.flip_reason = CENSORED, now_ts, "DATA_END"
             else:
                 return False
+        # C1: if the flip has happened but its executable exit bar has not arrived yet, hold the
+        # row one more bar. Without this a candidate whose arms all resolved before the flip would
+        # emit with no terminal fill. On `final` there is no next bar, so record why.
+        if self.c.terminal_outcome and p.flip_ts is not None and p.exit_ts is None and p.exit_reason is None:
+            if not final:
+                return False
+            p.exit_reason = "DATA_END"
         return True
 
     def _sweep_flip(self, now_ts: int, *, final: bool) -> None:
@@ -542,6 +577,54 @@ class LabelOutcomeKernel:
         })
         if c.observed_seconds:
             row["observed_seconds"] = ((at - p.T) / NS) if at is not None else None
+
+        # ------------------------------------------------------------------ C1 terminal block --
+        # THE CANONICAL LIFECYCLE TERMINAL, independent of `disp`. The composite disposition
+        # summarises the barrier arms and is CENSORED whenever any arm never touched; deriving the
+        # terminal from it (the pre-C1 behaviour) discarded a flip the kernel had already recorded.
+        # These columns read p.flip_ts directly and are never conditioned on the aggregate.
+        if c.terminal_outcome:
+            has_flip = p.flip_ts is not None
+            if has_flip:
+                term_disp, term_reason = POSITIVE, None
+            elif p.flip_reason is not None:
+                term_disp, term_reason = CENSORED, p.flip_reason
+            elif p.flip_state is not None:
+                term_disp, term_reason = p.flip_state, None
+            else:
+                term_disp, term_reason = CENSORED, "UNRESOLVED"
+            row["terminal_flip_ts"] = p.flip_ts
+            row["terminal_flip_disposition"] = LEGACY[term_disp]
+            row["terminal_flip_censor_reason"] = term_reason
+            row["terminal_time_to_flip_seconds"] = ((p.flip_ts - p.T) / NS) if has_flip else None
+            row["terminal_exit_ts"] = p.exit_ts
+            row["terminal_exit_price"] = p.exit_price
+            row["terminal_exit_unavailable_reason"] = p.exit_reason
+            # Realized gross economics between the EXECUTABLE entry fill and the EXECUTABLE exit
+            # fill. Both are next_bar_open marks; neither is a decision-bar close.
+            if p.entry_resolved and p.exit_ts is not None and p.exit_price is not None:
+                gross_pts = p.direction * (p.exit_price - p.entry_price)
+                row["terminal_entry_ts"] = p.entry_ts
+                row["terminal_entry_price"] = p.entry_price
+                row["terminal_gross_pnl_points"] = gross_pts
+                row["terminal_gross_pnl_atr"] = (gross_pts / p.atr) if p.atr else None
+                row["terminal_duration_seconds"] = (p.exit_ts - p.entry_ts) / NS
+                if c.cost_points_per_side is not None:
+                    net_pts = gross_pts - 2.0 * c.cost_points_per_side
+                    row["terminal_cost_points"] = 2.0 * c.cost_points_per_side
+                    row["terminal_net_pnl_points"] = net_pts
+                    row["terminal_net_pnl_atr"] = (net_pts / p.atr) if p.atr else None
+                else:
+                    # The research contract supplies no cost assumption: gross is canonical and
+                    # net is EXPLICITLY unavailable rather than invented.
+                    row["terminal_cost_points"] = None
+                    row["terminal_net_pnl_points"] = None
+                    row["terminal_net_pnl_atr"] = None
+            else:
+                for k_ in ("terminal_entry_ts", "terminal_entry_price", "terminal_gross_pnl_points",
+                           "terminal_gross_pnl_atr", "terminal_duration_seconds", "terminal_cost_points",
+                           "terminal_net_pnl_points", "terminal_net_pnl_atr"):
+                    row[k_] = None
         if self._arm_columns:
             for i, arm in enumerate(self.arms):
                 st, rat, rr = p.arm_state[i], p.arm_at[i], p.arm_reason[i]

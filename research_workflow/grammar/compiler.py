@@ -1097,6 +1097,21 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
     # terminal-minus-anchor definition). A contract field, not a legacy column: sealed plans replay unchanged.
     contract["observed_seconds"] = True
     obs.append("observed_seconds")
+    # C1: every new compile that declares a flip item also carries the CANONICAL LIFECYCLE
+    # TERMINAL -- the qualifying opposite flip, its executable next_bar_open exit and the realized
+    # gross economics against the executable entry. A contract field, not a legacy column, so a
+    # sealed plan compiled before C1 replays unchanged. The terminal is emitted independently of
+    # the composite disposition: fixed-time features, milestone arms and the lifecycle terminal
+    # are three separate clocks and no aggregate status is allowed to stand for all three.
+    if flip:
+        contract["terminal_outcome"] = True
+        if o.cost_points_per_side is not None:
+            contract["cost_points_per_side"] = float(o.cost_points_per_side)
+        obs += ["terminal_flip_ts", "terminal_flip_disposition", "terminal_flip_censor_reason",
+                "terminal_time_to_flip_seconds", "terminal_exit_ts", "terminal_exit_price",
+                "terminal_exit_unavailable_reason", "terminal_entry_ts", "terminal_entry_price",
+                "terminal_gross_pnl_points", "terminal_gross_pnl_atr", "terminal_duration_seconds",
+                "terminal_cost_points", "terminal_net_pnl_points", "terminal_net_pnl_atr"]
     contract["observation_columns"] = obs
     return contract
 
