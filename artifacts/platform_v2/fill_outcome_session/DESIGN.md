@@ -164,3 +164,51 @@ change collection) and re-explores.
 **Chore claim** `fill_outcome_session` is live (paths: `research_workflow/host/mux.py`,
 `research_workflow/sessions.py`, `research_workflow/grammar/compiler.py`,
 `research_workflow/host/strategy.py`, `research/datasets/`). Release it at merge.
+
+---
+
+## C1 — realized outcome to the next flip (DONE 2026-09-20)
+
+Driven by `studies/nq_va_multitf_trade_state_geometry`, whose fixture found the defect.
+
+**The defect.** `LabelOutcomeKernel._emit` derived `flip_ts` from the COMPOSITE row disposition
+(`flip_ts = at if disp == POSITIVE else None`), discarding the `p.flip_ts` the kernel had already
+recorded. With one-sided milestone arms every untouched arm expires CENSORED and `_compose`
+censors the row, so `flip_ts` and `time_to_flip_seconds` were null on virtually every row:
+composing milestone arms COST the lifecycle terminal.
+
+**The fix — three independent clocks, never collapsed into one status.**
+Fixed-time feature checkpoints end at their own `max_age`; milestone arms own their own horizons
+and keep running after the flip; the canonical lifecycle terminal is the qualifying opposite flip.
+The terminal columns read `p.flip_ts` directly and are never conditioned on the aggregate
+disposition. The composite row's `disposition`/`censored` semantics are UNCHANGED, and the flip
+does not terminate barrier observation.
+
+**Emitted terminal schema** (only when `contract["terminal_outcome"]`, which every new compile that
+declares a flip item sets — a sealed pre-C1 plan replays byte-identically):
+
+| column | meaning |
+|---|---|
+| `terminal_flip_ts` | instant of the qualifying opposite flip |
+| `terminal_flip_disposition` / `terminal_flip_censor_reason` | canonical terminal status |
+| `terminal_time_to_flip_seconds` | flip instant minus the decision epoch T |
+| `terminal_exit_ts` / `terminal_exit_price` | executable exit: OPEN of the first bar strictly after the flip (the existing next_bar_open convention; no new fill convention) |
+| `terminal_exit_unavailable_reason` | `GAP` or `DATA_END` when no executable exit bar exists |
+| `terminal_entry_ts` / `terminal_entry_price` | the executable entry the economics are measured from |
+| `terminal_gross_pnl_points` / `terminal_gross_pnl_atr` | realized gross, ATR = the frozen contract ATR |
+| `terminal_duration_seconds` | executable entry to executable exit |
+| `terminal_cost_points` / `terminal_net_pnl_points` / `terminal_net_pnl_atr` | net, **null unless `outcome.cost_points_per_side` is declared** — gross stays canonical and net is explicitly unavailable rather than guessed |
+
+**Surface.** `research_workflow/host/outcomes.py` (contract flag, `_Pending` exit state, exit
+capture in `on_bar`, deferred completion until the exit bar, terminal emit block),
+`research_workflow/grammar/compiler.py` (column declaration), `research_workflow/grammar/spec.py`
+(`outcome.cost_points_per_side`).
+
+**Tests.** `research_workflow/tests/test_c1_terminal_outcome.py`, 12 cases on the production path
+(real contract, real kernel): the censored-arm regression, pre-C1 replay unchanged, exit is
+next-bar-open not the decision close, exact gross arithmetic long and short, net unavailable vs
+declared, flip far past the fixed observation window, no-flip, flip on the final bar, and arms
+still resolving after the flip. `test_ordered_barrier_entry_reference.py` has 3 failures that are
+identical on clean `main` (pre-existing, not caused here).
+
+**Still not started:** C2 terminal-checkpoint op, C3 session-bucket feature, C4 regimes-alive, B1-B4.
